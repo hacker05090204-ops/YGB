@@ -32,18 +32,27 @@
 ```
 ============================= test session starts ==============================
 platform linux -- Python 3.13.9, pytest-8.4.2
-collected 84 items
+collected 103 items
 
-test_constants.py (20 tests)     - constants + immutability + bypass tests
-test_errors.py (28 tests)        - error instantiation + immutability
-test_identities.py (15 tests)    - identity model tests
-test_invariants.py (13 tests)    - invariant enforcement
-test_no_forbidden_behavior.py (8 tests) - pattern scanning
+test_constants.py (20 tests)              - constants + immutability + bypass
+test_documentation_consistency.py (19 tests) - README/implementation match
+test_errors.py (28 tests)                 - error instantiation + immutability
+test_identities.py (15 tests)             - identity model tests
+test_invariants.py (13 tests)             - invariant enforcement
+test_no_forbidden_behavior.py (8 tests)   - pattern scanning
 
-============================== 84 passed ======================================
+============================== 103 passed ======================================
+
+Coverage Report:
+  constants.py      23 stmts   100%
+  errors.py         29 stmts   100%
+  identities.py     22 stmts   100%
+  invariants.py     20 stmts   100%
+  __init__.py        5 stmts   100%
+  TOTAL             99 stmts   100%
 ```
 
-**HARDENED — Tests Extended (No Logic Change)**
+**HARDENED — 100% test coverage achieved (No logic changes)**
 
 ---
 
@@ -79,8 +88,10 @@ Upon freeze:
 ### Test Files
 - `python/phase01_core/tests/__init__.py`
 - `python/phase01_core/tests/test_constants.py`
-- `python/phase01_core/tests/test_invariants.py`
+- `python/phase01_core/tests/test_documentation_consistency.py`
+- `python/phase01_core/tests/test_errors.py`
 - `python/phase01_core/tests/test_identities.py`
+- `python/phase01_core/tests/test_invariants.py`
 - `python/phase01_core/tests/test_no_forbidden_behavior.py`
 
 ---
