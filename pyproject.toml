@@ -1,14 +1,23 @@
 [tool.pytest.ini_options]
-testpaths = ["python/phase01_core/tests"]
+testpaths = [
+    "python/phase01_core/tests",
+    "python/phase02_actors/tests",
+    "python/phase03_trust/tests"
+]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 
 [tool.coverage.run]
-source = ["python/phase01_core"]
+source = [
+    "python/phase01_core",
+    "python/phase02_actors",
+    "python/phase03_trust"
+]
 omit = [
-    "python/phase01_core/tests/*",
+    "*/tests/*",
     "*/__pycache__/*",
+    "**/test_*.py",
 ]
 
 [tool.coverage.report]
