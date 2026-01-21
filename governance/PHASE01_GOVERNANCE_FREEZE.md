@@ -4,7 +4,8 @@
 **Phase:** 01 — Core Constants, Identities, and Invariants  
 **Date:** 2026-01-21  
 **Freeze Date:** 2026-01-21  
-**Zero-Risk Date:** 2026-01-21  
+**Seal Date:** 2026-01-21  
+**Audit Report:** [REPORT.md](/REPORT.md)  
 
 ---
 
@@ -15,6 +16,7 @@
 | **IMMUTABLE** | ✅ TRUE | Phase-01 cannot be modified |
 | **SAFE** | ✅ TRUE | Phase-01 contains no risk vectors |
 | **AUTHORIZED** | ✅ TRUE | Phase-02 may proceed |
+| **SEALED** | ✅ TRUE | Cryptographic hashes recorded |
 
 **[ ] PENDING** — Phase-01 is not yet frozen  
 **[x] FROZEN** — Phase-01 is immutable  
