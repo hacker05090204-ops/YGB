@@ -4,6 +4,7 @@
 **Phase:** 01 — Core Constants, Identities, and Invariants  
 **Date:** 2026-01-21  
 **Freeze Date:** 2026-01-21  
+**Hardened Date:** 2026-01-21
 
 ---
 
@@ -11,6 +12,7 @@
 
 **[ ] PENDING** — Phase-01 is not yet frozen  
 **[x] FROZEN** — Phase-01 is immutable  
+**[x] HARDENED** — Tests Extended (No Logic Change)  
 
 ---
 
@@ -30,15 +32,18 @@
 ```
 ============================= test session starts ==============================
 platform linux -- Python 3.13.9, pytest-8.4.2
-collected 53 items
+collected 84 items
 
-test_constants.py .......... [18%]
-test_identities.py ............... [47%]
-test_invariants.py ............. [71%]
-test_no_forbidden_behavior.py ............... [100%]
+test_constants.py (20 tests)     - constants + immutability + bypass tests
+test_errors.py (28 tests)        - error instantiation + immutability
+test_identities.py (15 tests)    - identity model tests
+test_invariants.py (13 tests)    - invariant enforcement
+test_no_forbidden_behavior.py (8 tests) - pattern scanning
 
-============================== 53 passed ======================================
+============================== 84 passed ======================================
 ```
+
+**HARDENED — Tests Extended (No Logic Change)**
 
 ---
 
