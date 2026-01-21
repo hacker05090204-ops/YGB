@@ -114,11 +114,24 @@ Any modification to Phase-01 **REQUIRES**:
 
 ---
 
+## Binding Invariant Declaration
+
+> **BINDING STATEMENT:** Phase-1 invariants are legally and technically
+> binding for ALL future phases. No future phase may weaken, override,
+> or circumvent Phase-1 rules.
+>
+> **RETROACTIVE PROHIBITION:** Retroactive changes to Phase-1 are
+> ABSOLUTELY FORBIDDEN. Any attempt to modify Phase-1 after this
+> declaration requires full governance reopening.
+
+---
+
 ## Document Control
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
 | 1.0 | 2026-01-21 | Human | Initial creation |
+| 1.1 | 2026-01-21 | Human | Added binding invariant declaration |
 
 ---
 

@@ -70,4 +70,11 @@ The following are FORBIDDEN in Phase-02:
 
 ---
 
+## Phase-1 Binding Constraint
+
+> **CRITICAL:** Phase-2 MAY NOT weaken, override, or circumvent
+> any Phase-1 constraints. Phase-1 invariants remain binding.
+
+---
+
 **END OF REQUIREMENTS**
