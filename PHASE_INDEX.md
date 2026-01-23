@@ -15,10 +15,14 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 
 ## Phase Registry
 
-| Phase | Name | Status | Immutable |
-|-------|------|--------|-----------|
-| **01** | Core Constants, Identities, and Invariants | **FROZEN** | ✅ YES |
-| **02** | Actor & Role Model | FROZEN | ✅ YES |
+| Phase | Name | Status | Immutable | Coverage |
+|-------|------|--------|-----------|----------|
+| **01** | Core Constants, Identities, and Invariants | 🔒 **FROZEN** | ✅ YES | 100% |
+| **02** | Actor & Role Model | 🔒 **FROZEN** | ✅ YES | 100% |
+| **03** | Trust Zones | 🔒 **FROZEN** | ✅ YES | 100% |
+| **04** | Action Validation | 🔒 **FROZEN** | ✅ YES | 100% |
+| **05** | Workflow State Model | 🔒 **FROZEN** | ✅ YES | 100% |
+| **06** | [TBD] | 📋 PLANNING | ❌ NO | N/A |
 
 ---
 
@@ -50,7 +54,10 @@ The canonical phase ordering is:
 
 1. **Phase-01** — Core Constants, Identities, and Invariants (FOUNDATION)
 2. **Phase-02** — Actor & Role Model (DEPENDS ON Phase-01)
-3. **Future phases** — Must depend on Phase-01 and Phase-02
+3. **Phase-03** — Trust Zones (DEPENDS ON Phase-01, Phase-02)
+4. **Phase-04** — Action Validation (DEPENDS ON Phase-01, Phase-02, Phase-03)
+5. **Phase-05** — Workflow State Model (DEPENDS ON Phase-01, Phase-02)
+6. **Phase-06** — [TBD] (PLANNING - DEPENDS ON Phase-01 through Phase-05)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
