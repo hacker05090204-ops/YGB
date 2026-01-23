@@ -22,7 +22,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **03** | Trust Zones | 🔒 **FROZEN** | ✅ YES | 100% |
 | **04** | Action Validation | 🔒 **FROZEN** | ✅ YES | 100% |
 | **05** | Workflow State Model | 🔒 **FROZEN** | ✅ YES | 100% |
-| **06** | [TBD] | 📋 PLANNING | ❌ NO | N/A |
+| **06** | Decision Aggregation & Authority Resolution | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -57,7 +57,7 @@ The canonical phase ordering is:
 3. **Phase-03** — Trust Zones (DEPENDS ON Phase-01, Phase-02)
 4. **Phase-04** — Action Validation (DEPENDS ON Phase-01, Phase-02, Phase-03)
 5. **Phase-05** — Workflow State Model (DEPENDS ON Phase-01, Phase-02)
-6. **Phase-06** — [TBD] (PLANNING - DEPENDS ON Phase-01 through Phase-05)
+6. **Phase-06** — Decision Aggregation & Authority Resolution (FROZEN - DEPENDS ON Phase-02 through Phase-05)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
