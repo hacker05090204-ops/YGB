@@ -25,6 +25,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **06** | Decision Aggregation & Authority Resolution | 🔒 **FROZEN** | ✅ YES | 100% |
 | **07** | Bug Intelligence & Knowledge Resolution | 🔒 **FROZEN** | ✅ YES | 100% |
 | **08** | Evidence & Explanation Orchestration | 🔒 **FROZEN** | ✅ YES | 100% |
+| **09** | Bug Bounty Policy, Scope & Eligibility | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -62,6 +63,7 @@ The canonical phase ordering is:
 6. **Phase-06** — Decision Aggregation & Authority Resolution (FROZEN - DEPENDS ON Phase-02 through Phase-05)
 7. **Phase-07** — Bug Intelligence & Knowledge Resolution (FROZEN - DEPENDS ON prior phases)
 8. **Phase-08** — Evidence & Explanation Orchestration (FROZEN - DEPENDS ON Phase-06, Phase-07)
+9. **Phase-09** — Bug Bounty Policy, Scope & Eligibility (FROZEN - DEPENDS ON Phase-01, Phase-02)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
