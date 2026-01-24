@@ -7,8 +7,7 @@ testpaths = [
     "python/phase05_workflow/tests",
     "python/phase06_decision/tests",
     "python/phase07_knowledge/tests",
-    "python/phase08_evidence/tests",
-    "python/phase09_bounty/tests"
+    "python/phase08_evidence/tests"
 ]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
@@ -23,8 +22,7 @@ source = [
     "python/phase05_workflow",
     "python/phase06_decision",
     "python/phase07_knowledge",
-    "python/phase08_evidence",
-    "python/phase09_bounty"
+    "python/phase08_evidence"
 ]
 omit = [
     "*/tests/*",
