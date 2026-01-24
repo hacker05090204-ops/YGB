@@ -199,7 +199,7 @@ class TestNoForbiddenImports:
             os.path.dirname(os.path.dirname(__file__)),
             'composer.py'
         )
-        with open(composer_path, 'r') as f:
+        with open(composer_path, 'r', encoding='utf-8') as f:
             content = f.read()
         assert 'import os' not in content
     
@@ -209,7 +209,7 @@ class TestNoForbiddenImports:
             os.path.dirname(os.path.dirname(__file__)),
             'composer.py'
         )
-        with open(composer_path, 'r') as f:
+        with open(composer_path, 'r', encoding='utf-8') as f:
             content = f.read()
         assert 'import subprocess' not in content
     
@@ -219,7 +219,7 @@ class TestNoForbiddenImports:
             os.path.dirname(os.path.dirname(__file__)),
             'composer.py'
         )
-        with open(composer_path, 'r') as f:
+        with open(composer_path, 'r', encoding='utf-8') as f:
             content = f.read()
         assert 'import asyncio' not in content
 
@@ -233,7 +233,7 @@ class TestNoFuturePhaseCoupling:
         for filename in os.listdir(phase08_dir):
             if filename.endswith('.py'):
                 filepath = os.path.join(phase08_dir, filename)
-                with open(filepath, 'r') as f:
+                with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read().lower()
                 assert 'phase09' not in content, f"Found phase09 in {filename}"
                 assert 'phase10' not in content, f"Found phase10 in {filename}"

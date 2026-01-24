@@ -155,7 +155,7 @@ class TestNoForbiddenImports:
             os.path.dirname(os.path.dirname(__file__)),
             'resolver.py'
         )
-        with open(resolver_path, 'r') as f:
+        with open(resolver_path, 'r', encoding='utf-8') as f:
             content = f.read()
         assert 'import os' not in content
     
@@ -165,7 +165,7 @@ class TestNoForbiddenImports:
             os.path.dirname(os.path.dirname(__file__)),
             'resolver.py'
         )
-        with open(resolver_path, 'r') as f:
+        with open(resolver_path, 'r', encoding='utf-8') as f:
             content = f.read()
         assert 'import subprocess' not in content
     
@@ -175,7 +175,7 @@ class TestNoForbiddenImports:
             os.path.dirname(os.path.dirname(__file__)),
             'resolver.py'
         )
-        with open(resolver_path, 'r') as f:
+        with open(resolver_path, 'r', encoding='utf-8') as f:
             content = f.read()
         assert 'import requests' not in content
     
@@ -185,7 +185,7 @@ class TestNoForbiddenImports:
             os.path.dirname(os.path.dirname(__file__)),
             'resolver.py'
         )
-        with open(resolver_path, 'r') as f:
+        with open(resolver_path, 'r', encoding='utf-8') as f:
             content = f.read()
         assert 'import selenium' not in content
 
@@ -199,7 +199,7 @@ class TestNoFuturePhaseCoupling:
         for filename in os.listdir(phase07_dir):
             if filename.endswith('.py'):
                 filepath = os.path.join(phase07_dir, filename)
-                with open(filepath, 'r') as f:
+                with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read().lower()
                 assert 'phase08' not in content, f"Found phase08 in {filename}"
                 assert 'phase09' not in content, f"Found phase09 in {filename}"
