@@ -3,7 +3,12 @@ testpaths = [
     "python/phase01_core/tests",
     "python/phase02_actors/tests",
     "python/phase03_trust/tests",
-    "python/phase04_validation/tests"
+    "python/phase04_validation/tests",
+    "python/phase05_workflow/tests",
+    "python/phase06_decision/tests",
+    "python/phase07_knowledge/tests",
+    "python/phase08_evidence/tests",
+    "python/phase09_bounty/tests"
 ]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
@@ -14,7 +19,12 @@ source = [
     "python/phase01_core",
     "python/phase02_actors",
     "python/phase03_trust",
-    "python/phase04_validation"
+    "python/phase04_validation",
+    "python/phase05_workflow",
+    "python/phase06_decision",
+    "python/phase07_knowledge",
+    "python/phase08_evidence",
+    "python/phase09_bounty"
 ]
 omit = [
     "*/tests/*",
