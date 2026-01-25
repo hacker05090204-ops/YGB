@@ -29,6 +29,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **10** | Target Coordination & De-Duplication | 🔒 **FROZEN** | ✅ YES | 100% |
 | **11** | Work Scheduling, Fair Distribution & Delegation | 🔒 **FROZEN** | ✅ YES | 100% |
 | **12** | Evidence Consistency, Replay & Confidence | 🔒 **FROZEN** | ✅ YES | 100% |
+| **13** | Human Readiness, Safety Gate & Browser Handoff | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -70,6 +71,7 @@ The canonical phase ordering is:
 10. **Phase-10** — Target Coordination & De-Duplication (FROZEN - DEPENDS ON Phase-01, Phase-02)
 11. **Phase-11** — Work Scheduling, Fair Distribution & Delegation (FROZEN - DEPENDS ON Phase-01, Phase-02)
 12. **Phase-12** — Evidence Consistency, Replay & Confidence (FROZEN - DEPENDS ON Phase-01)
+13. **Phase-13** — Human Readiness, Safety Gate & Browser Handoff (FROZEN - DEPENDS ON Phase-01, Phase-12)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
