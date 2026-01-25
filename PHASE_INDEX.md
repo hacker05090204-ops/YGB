@@ -32,6 +32,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **13** | Human Readiness, Safety Gate & Browser Handoff | 🔒 **FROZEN** | ✅ YES | 100% |
 | **14** | Backend Connector & Integration Verification | 🔒 **FROZEN** | ✅ YES | 100% |
 | **15** | Frontend ↔ Backend Contract Authority | 🔒 **FROZEN** | ✅ YES | 100% |
+| **16** | Execution Boundary & Browser Invocation | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -76,6 +77,7 @@ The canonical phase ordering is:
 13. **Phase-13** — Human Readiness, Safety Gate & Browser Handoff (FROZEN - DEPENDS ON Phase-01, Phase-12)
 14. **Phase-14** — Backend Connector & Integration Verification (FROZEN - DEPENDS ON Phase-12, Phase-13)
 15. **Phase-15** — Frontend ↔ Backend Contract Authority (FROZEN - DEPENDS ON Phase-01)
+16. **Phase-16** — Execution Boundary & Browser Invocation (FROZEN - DEPENDS ON Phase-13, Phase-15)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
