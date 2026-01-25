@@ -28,6 +28,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **09** | Bug Bounty Policy, Scope & Eligibility | 🔒 **FROZEN** | ✅ YES | 100% |
 | **10** | Target Coordination & De-Duplication | 🔒 **FROZEN** | ✅ YES | 100% |
 | **11** | Work Scheduling, Fair Distribution & Delegation | 🔒 **FROZEN** | ✅ YES | 100% |
+| **12** | Evidence Consistency, Replay & Confidence | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -68,6 +69,7 @@ The canonical phase ordering is:
 9. **Phase-09** — Bug Bounty Policy, Scope & Eligibility (FROZEN - DEPENDS ON Phase-01, Phase-02)
 10. **Phase-10** — Target Coordination & De-Duplication (FROZEN - DEPENDS ON Phase-01, Phase-02)
 11. **Phase-11** — Work Scheduling, Fair Distribution & Delegation (FROZEN - DEPENDS ON Phase-01, Phase-02)
+12. **Phase-12** — Evidence Consistency, Replay & Confidence (FROZEN - DEPENDS ON Phase-01)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
