@@ -39,6 +39,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **20** | HUMANOID HUNTER Executor Adapter | 🔒 **FROZEN** | ✅ YES | 100% |
 | **21** | HUMANOID HUNTER Sandbox & Fault Isolation | 🔒 **FROZEN** | ✅ YES | 100% |
 | **22** | Native Runtime Boundary & OS Isolation | 🔒 **FROZEN** | ✅ YES | 100% |
+| **23** | Native Evidence Integrity & Verification | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -90,6 +91,7 @@ The canonical phase ordering is:
 20. **Phase-20** — HUMANOID HUNTER Executor Adapter (FROZEN - DEPENDS ON Phase-19)
 21. **Phase-21** — HUMANOID HUNTER Sandbox & Fault Isolation (FROZEN - DEPENDS ON Phase-20)
 22. **Phase-22** — Native Runtime Boundary & OS Isolation (FROZEN - DEPENDS ON Phase-21)
+23. **Phase-23** — Native Evidence Integrity & Verification (FROZEN - DEPENDS ON Phase-22)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
