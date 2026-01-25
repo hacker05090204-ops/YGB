@@ -1,0 +1,149 @@
+"""
+Tests for Phase-24 No Browser Imports.
+
+Tests:
+- No playwright imports
+- No selenium imports
+- No subprocess imports
+- No os imports
+- No phase25+ imports
+"""
+import pytest
+
+
+class TestNoForbiddenImports:
+    """Test no forbidden imports."""
+
+    def test_no_playwright_import_in_types(self):
+        """No playwright import in planning_types."""
+        import HUMANOID_HUNTER.planning.planning_types as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'playwright' not in source
+
+    def test_no_playwright_import_in_context(self):
+        """No playwright import in planning_context."""
+        import HUMANOID_HUNTER.planning.planning_context as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'playwright' not in source
+
+    def test_no_playwright_import_in_engine(self):
+        """No playwright import in planning_engine."""
+        import HUMANOID_HUNTER.planning.planning_engine as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'playwright' not in source
+
+    def test_no_selenium_import_in_types(self):
+        """No selenium import in planning_types."""
+        import HUMANOID_HUNTER.planning.planning_types as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'selenium' not in source
+
+    def test_no_selenium_import_in_context(self):
+        """No selenium import in planning_context."""
+        import HUMANOID_HUNTER.planning.planning_context as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'selenium' not in source
+
+    def test_no_selenium_import_in_engine(self):
+        """No selenium import in planning_engine."""
+        import HUMANOID_HUNTER.planning.planning_engine as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'selenium' not in source
+
+    def test_no_subprocess_import_in_types(self):
+        """No subprocess import in planning_types."""
+        import HUMANOID_HUNTER.planning.planning_types as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'import subprocess' not in source
+
+    def test_no_subprocess_import_in_context(self):
+        """No subprocess import in planning_context."""
+        import HUMANOID_HUNTER.planning.planning_context as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'import subprocess' not in source
+
+    def test_no_subprocess_import_in_engine(self):
+        """No subprocess import in planning_engine."""
+        import HUMANOID_HUNTER.planning.planning_engine as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'import subprocess' not in source
+
+    def test_no_os_import_in_types(self):
+        """No os import in planning_types."""
+        import HUMANOID_HUNTER.planning.planning_types as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'import os' not in source
+
+    def test_no_os_import_in_context(self):
+        """No os import in planning_context."""
+        import HUMANOID_HUNTER.planning.planning_context as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'import os' not in source
+
+    def test_no_os_import_in_engine(self):
+        """No os import in planning_engine."""
+        import HUMANOID_HUNTER.planning.planning_engine as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'import os' not in source
+
+
+class TestNoForwardPhaseImports:
+    """Test no forward-phase imports."""
+
+    def test_no_phase25_import(self):
+        """No phase25+ imports."""
+        import os as os_module
+        import HUMANOID_HUNTER.planning
+        module_dir = os_module.path.dirname(HUMANOID_HUNTER.planning.__file__)
+        for filename in os_module.listdir(module_dir):
+            if filename.endswith('.py'):
+                filepath = os_module.path.join(module_dir, filename)
+                with open(filepath, 'r') as f:
+                    content = f.read()
+                    assert 'phase25' not in content.lower(), f"phase25 found in {filename}"
+                    assert 'phase26' not in content.lower(), f"phase26 found in {filename}"
+                    assert 'phase27' not in content.lower(), f"phase27 found in {filename}"
+
+
+class TestNoExecutionCode:
+    """Test no execution code in planning module."""
+
+    def test_no_exec_call_in_engine(self):
+        """No exec() call in planning_engine."""
+        import HUMANOID_HUNTER.planning.planning_engine as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'exec(' not in source
+
+    def test_no_eval_call_in_engine(self):
+        """No eval() call in planning_engine."""
+        import HUMANOID_HUNTER.planning.planning_engine as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'eval(' not in source
+
+    def test_no_exec_call_in_context(self):
+        """No exec() call in planning_context."""
+        import HUMANOID_HUNTER.planning.planning_context as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'exec(' not in source
+
+    def test_no_eval_call_in_context(self):
+        """No eval() call in planning_context."""
+        import HUMANOID_HUNTER.planning.planning_context as module
+        import inspect
+        source = inspect.getsource(module)
+        assert 'eval(' not in source
