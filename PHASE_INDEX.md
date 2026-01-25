@@ -34,6 +34,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **15** | Frontend ↔ Backend Contract Authority | 🔒 **FROZEN** | ✅ YES | 100% |
 | **16** | Execution Boundary & Browser Invocation | 🔒 **FROZEN** | ✅ YES | 100% |
 | **17** | Browser Execution Interface Contract | 🔒 **FROZEN** | ✅ YES | 100% |
+| **18** | Execution State & Provenance Ledger | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -80,6 +81,7 @@ The canonical phase ordering is:
 15. **Phase-15** — Frontend ↔ Backend Contract Authority (FROZEN - DEPENDS ON Phase-01)
 16. **Phase-16** — Execution Boundary & Browser Invocation (FROZEN - DEPENDS ON Phase-13, Phase-15)
 17. **Phase-17** — Browser Execution Interface Contract (FROZEN - DEPENDS ON Phase-16)
+18. **Phase-18** — Execution State & Provenance Ledger (FROZEN - DEPENDS ON Phase-17)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
