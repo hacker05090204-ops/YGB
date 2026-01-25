@@ -37,6 +37,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **18** | Execution State & Provenance Ledger | 🔒 **FROZEN** | ✅ YES | 100% |
 | **19** | Browser Capability Governance | 🔒 **FROZEN** | ✅ YES | 100% |
 | **20** | HUMANOID HUNTER Executor Adapter | 🔒 **FROZEN** | ✅ YES | 100% |
+| **21** | HUMANOID HUNTER Sandbox & Fault Isolation | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -86,6 +87,7 @@ The canonical phase ordering is:
 18. **Phase-18** — Execution State & Provenance Ledger (FROZEN - DEPENDS ON Phase-17)
 19. **Phase-19** — Browser Capability Governance (FROZEN - DEPENDS ON Phase-18)
 20. **Phase-20** — HUMANOID HUNTER Executor Adapter (FROZEN - DEPENDS ON Phase-19)
+21. **Phase-21** — HUMANOID HUNTER Sandbox & Fault Isolation (FROZEN - DEPENDS ON Phase-20)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
