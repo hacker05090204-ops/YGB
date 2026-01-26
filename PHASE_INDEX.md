@@ -50,6 +50,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **31** | Runtime Observation & Controlled Execution Evidence Capture | 🔒 **FROZEN** | ✅ YES | 100% |
 | **32** | Human-Mediated Execution Decision & Continuation Governance | 🔒 **FROZEN** | ✅ YES | 100% |
 | **33** | Human Decision → Execution Intent Binding | 🔒 **FROZEN** | ✅ YES | 100% |
+| **34** | Execution Authorization & Controlled Invocation Boundary | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -112,6 +113,7 @@ The canonical phase ordering is:
 31. **Phase-31** — Runtime Observation & Controlled Execution Evidence Capture (FROZEN - DEPENDS ON Phase-29, Phase-30)
 32. **Phase-32** — Human-Mediated Execution Decision & Continuation Governance (FROZEN - DEPENDS ON Phase-01, Phase-29, Phase-30, Phase-31)
 33. **Phase-33** — Human Decision → Execution Intent Binding (FROZEN - DEPENDS ON Phase-01, Phase-29, Phase-31, Phase-32)
+34. **Phase-34** — Execution Authorization & Controlled Invocation Boundary (FROZEN - DEPENDS ON Phase-01, Phase-29, Phase-31, Phase-32, Phase-33)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
