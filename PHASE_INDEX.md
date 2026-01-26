@@ -47,6 +47,7 @@ This document establishes the **canonical phase ordering** for the YGB repositor
 | **28** | Executor Handshake & Runtime Contract Validation | 🔒 **FROZEN** | ✅ YES | 100% |
 | **29** | Governed Execution Loop Definition (NO EXECUTION) | 🔒 **FROZEN** | ✅ YES | 100% |
 | **30** | Executor Response Governance & Result Normalization | 🔒 **FROZEN** | ✅ YES | 100% |
+| **31** | Runtime Observation & Controlled Execution Evidence Capture | 🔒 **FROZEN** | ✅ YES | 100% |
 
 ---
 
@@ -106,6 +107,7 @@ The canonical phase ordering is:
 28. **Phase-28** — Executor Handshake & Runtime Contract Validation (FROZEN - DEPENDS ON Phase-27)
 29. **Phase-29** — Governed Execution Loop Definition (NO EXECUTION) (FROZEN - DEPENDS ON Phase-27, Phase-28)
 30. **Phase-30** — Executor Response Governance & Result Normalization (FROZEN - DEPENDS ON Phase-29)
+31. **Phase-31** — Runtime Observation & Controlled Execution Evidence Capture (FROZEN - DEPENDS ON Phase-29, Phase-30)
 
 **No phase may be inserted before Phase-01.**
 **No phase may override Phase-01 invariants.**
