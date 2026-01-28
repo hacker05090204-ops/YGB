@@ -3,10 +3,12 @@
 CRITICAL: This is the FIRST phase with actual execution capabilities.
 All prior phases (01-48) are pure governance with no execution logic.
 
-This phase implements 11 governors that control:
+This phase implements 14 governors that control:
 - Execution kernel state machine
 - Browser launch (C++ native)
-- Voice output (TTS proxy)
+- Voice input/output (TTS proxy)
+- Dashboard approval flow
+- Target discovery (read-only)
 - CVE intelligence (read-only)
 - Device trust & licensing
 - Final execution seal
@@ -62,6 +64,25 @@ from .governors.g11_execution_seal import (
     ExecutionSealResult,
     seal_execution_intent,
 )
+from .governors.g12_voice_input import (
+    VoiceIntentType,
+    VoiceInputStatus,
+    VoiceIntent,
+    validate_voice_input,
+)
+from .governors.g13_dashboard_router import (
+    ApprovalStatus,
+    ApprovalRequest,
+    ApprovalDecision,
+    create_approval_request,
+    submit_decision,
+)
+from .governors.g14_target_discovery import (
+    DiscoverySource,
+    TargetCandidate,
+    DiscoveryResult,
+    discover_targets,
+)
 
 __all__ = [
     # G1
@@ -101,4 +122,21 @@ __all__ = [
     # G11
     "ExecutionSealResult",
     "seal_execution_intent",
+    # G12
+    "VoiceIntentType",
+    "VoiceInputStatus",
+    "VoiceIntent",
+    "validate_voice_input",
+    # G13
+    "ApprovalStatus",
+    "ApprovalRequest",
+    "ApprovalDecision",
+    "create_approval_request",
+    "submit_decision",
+    # G14
+    "DiscoverySource",
+    "TargetCandidate",
+    "DiscoveryResult",
+    "discover_targets",
 ]
+
