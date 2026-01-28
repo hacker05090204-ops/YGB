@@ -3,7 +3,7 @@
 CRITICAL: This is the FIRST phase with actual execution capabilities.
 All prior phases (01-48) are pure governance with no execution logic.
 
-This phase implements 23 governors that control:
+This phase implements 24 governors that control:
 - Execution kernel state machine
 - Browser launch (C++ native)
 - Voice input/output (TTS proxy)
@@ -179,6 +179,23 @@ from .governors.g23_reasoning_engine import (
     can_reasoning_decide,
     can_reasoning_modify_state,
 )
+from .governors.g24_system_evolution import (
+    PythonVersionStatus,
+    DependencyStatus,
+    UpdateDecision,
+    SystemMode,
+    HealthStatus,
+    RollbackDecision,
+    check_python_version_upgrade,
+    check_dependency_stability,
+    create_update_policy,
+    check_update_policy,
+    check_system_health,
+    check_rollback_availability,
+    can_evolution_governor_execute,
+    can_evolution_governor_modify,
+    can_evolution_governor_approve,
+)
 
 __all__ = [
     # G1
@@ -314,6 +331,22 @@ __all__ = [
     "can_reasoning_execute",
     "can_reasoning_decide",
     "can_reasoning_modify_state",
+    # G24
+    "PythonVersionStatus",
+    "DependencyStatus",
+    "UpdateDecision",
+    "SystemMode",
+    "HealthStatus",
+    "RollbackDecision",
+    "check_python_version_upgrade",
+    "check_dependency_stability",
+    "create_update_policy",
+    "check_update_policy",
+    "check_system_health",
+    "check_rollback_availability",
+    "can_evolution_governor_execute",
+    "can_evolution_governor_modify",
+    "can_evolution_governor_approve",
 ]
 
 
