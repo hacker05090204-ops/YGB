@@ -3,7 +3,7 @@
 CRITICAL: This is the FIRST phase with actual execution capabilities.
 All prior phases (01-48) are pure governance with no execution logic.
 
-This phase implements 22 governors that control:
+This phase implements 23 governors that control:
 - Execution kernel state machine
 - Browser launch (C++ native)
 - Voice input/output (TTS proxy)
@@ -165,6 +165,20 @@ from .governors.g22_user_database import (
     create_admin,
     can_database_delete_without_approval,
 )
+from .governors.g23_reasoning_engine import (
+    ReportSection,
+    EvidenceType,
+    ReasoningStatus,
+    EvidencePack,
+    StructuredReport,
+    VoiceScript,
+    ReasoningResult,
+    create_evidence_pack,
+    perform_reasoning,
+    can_reasoning_execute,
+    can_reasoning_decide,
+    can_reasoning_modify_state,
+)
 
 __all__ = [
     # G1
@@ -287,5 +301,19 @@ __all__ = [
     "create_session",
     "create_admin",
     "can_database_delete_without_approval",
+    # G23
+    "ReportSection",
+    "EvidenceType",
+    "ReasoningStatus",
+    "EvidencePack",
+    "StructuredReport",
+    "VoiceScript",
+    "ReasoningResult",
+    "create_evidence_pack",
+    "perform_reasoning",
+    "can_reasoning_execute",
+    "can_reasoning_decide",
+    "can_reasoning_modify_state",
 ]
+
 
