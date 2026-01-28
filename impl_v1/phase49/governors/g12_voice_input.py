@@ -25,12 +25,14 @@ import re
 
 
 class VoiceIntentType(Enum):
-    """CLOSED ENUM - 6 intent types"""
+    """CLOSED ENUM - 8 intent types"""
     SET_TARGET = "SET_TARGET"
     SET_SCOPE = "SET_SCOPE"
     QUERY_STATUS = "QUERY_STATUS"
     QUERY_PROGRESS = "QUERY_PROGRESS"
     FIND_TARGETS = "FIND_TARGETS"
+    SCREEN_TAKEOVER = "SCREEN_TAKEOVER"  # READ-ONLY inspection
+    REPORT_HELP = "REPORT_HELP"  # High impact tips
     UNKNOWN = "UNKNOWN"
 
 
@@ -62,7 +64,7 @@ FORBIDDEN_PATTERNS = [
     r'\b(submit|send|post)\b',
 ]
 
-# Intent patterns
+# Intent patterns (English)
 INTENT_PATTERNS = {
     VoiceIntentType.SET_TARGET: [
         r'(?:set\s+)?target\s+(?:is\s+|to\s+)?(.+)',
@@ -89,6 +91,56 @@ INTENT_PATTERNS = {
         r'(?:show\s+me|list)\s+(?:bug\s+)?bounty',
         r'(?:suggest|recommend)\s+targets?',
     ],
+    VoiceIntentType.SCREEN_TAKEOVER: [
+        r'takeover\s+(?:the\s+)?screen',
+        r'screen\s+takeover',
+        r'show\s+(?:me\s+)?(?:the\s+)?screen',
+        r'inspect\s+screen',
+    ],
+    VoiceIntentType.REPORT_HELP: [
+        r'(?:is\s+)?report\s+(?:me|mein)\s+(?:aur\s+)?kya\s+add',
+        r'high\s+impact\s+(?:tips?|suggestions?)',
+        r'(?:how\s+to\s+)?increase\s+payout',
+        r'improve\s+(?:the\s+)?report',
+    ],
+}
+
+# Hindi intent patterns (merged with English)
+HINDI_PATTERNS = {
+    VoiceIntentType.SET_TARGET: [
+        r'(?:ye\s+)?mera\s+target\s+(?:hai\s+)?(.+)',
+        r'target\s+set\s+karo\s+(.+)',
+        r'target\s+ye\s+hai\s+(.+)',
+    ],
+    VoiceIntentType.SET_SCOPE: [
+        r'scope\s+ye\s+hai\s+(.+)',
+        r'scope\s+set\s+karo\s+(.+)',
+        r'sirf\s+(.+)',
+    ],
+    VoiceIntentType.QUERY_STATUS: [
+        r'status\s+batao',
+        r'kya\s+(?:hal|haal)\s+hai',
+        r'kahan\s+tak\s+hua',
+    ],
+    VoiceIntentType.QUERY_PROGRESS: [
+        r'progress\s+kitna\s+hua',
+        r'kitna\s+complete\s+hua',
+        r'kab\s+tak\s+hoga',
+    ],
+    VoiceIntentType.FIND_TARGETS: [
+        r'program\s+start\s+karo\s+(?:aur\s+)?(?:accha\s+)?target\s+dhundo',
+        r'targets?\s+dhundo',
+        r'(?:accha|acha)\s+target\s+(?:batao|dhundo)',
+    ],
+    VoiceIntentType.SCREEN_TAKEOVER: [
+        r'screen\s+(?:dekho|dikhao)',
+        r'screen\s+takeover\s+karo',
+    ],
+    VoiceIntentType.REPORT_HELP: [
+        r'(?:is\s+)?report\s+(?:me|mein)\s+(?:aur\s+)?kya\s+add\s+(?:kar\s+)?sakte\s+(?:hain|hai)',
+        r'payout\s+(?:kaise\s+)?(?:badhao|increase\s+karo)',
+        r'high\s+impact\s+ke\s+liye',
+    ],
 }
 
 
@@ -104,7 +156,7 @@ def is_forbidden_command(text: str) -> tuple:
 
 
 def extract_intent(raw_text: str) -> VoiceIntent:
-    """Extract intent from voice command text."""
+    """Extract intent from voice command text (English and Hindi)."""
     text = raw_text.strip()
     
     # Check for forbidden commands
@@ -124,6 +176,7 @@ def extract_intent(raw_text: str) -> VoiceIntent:
     # Try to match intent patterns
     text_lower = text.lower()
     
+    # Check English patterns first
     for intent_type, patterns in INTENT_PATTERNS.items():
         for pattern in patterns:
             match = re.search(pattern, text_lower, re.IGNORECASE)
@@ -137,6 +190,24 @@ def extract_intent(raw_text: str) -> VoiceIntent:
                     raw_text=raw_text,
                     extracted_value=extracted,
                     confidence=0.8,
+                    status=VoiceInputStatus.PARSED,
+                    block_reason=None,
+                    timestamp=datetime.now(UTC).isoformat(),
+                )
+    
+    # Check Hindi patterns
+    for intent_type, patterns in HINDI_PATTERNS.items():
+        for pattern in patterns:
+            match = re.search(pattern, text_lower, re.IGNORECASE)
+            if match:
+                extracted = match.group(1) if match.lastindex else None
+                
+                return VoiceIntent(
+                    intent_id=f"VOC-{uuid.uuid4().hex[:16].upper()}",
+                    intent_type=intent_type,
+                    raw_text=raw_text,
+                    extracted_value=extracted,
+                    confidence=0.75,  # Slightly lower for Hindi parsing
                     status=VoiceInputStatus.PARSED,
                     block_reason=None,
                     timestamp=datetime.now(UTC).isoformat(),

@@ -3,15 +3,18 @@
 CRITICAL: This is the FIRST phase with actual execution capabilities.
 All prior phases (01-48) are pure governance with no execution logic.
 
-This phase implements 14 governors that control:
+This phase implements 18 governors that control:
 - Execution kernel state machine
 - Browser launch (C++ native)
 - Voice input/output (TTS proxy)
 - Dashboard approval flow
 - Target discovery (read-only)
-- CVE intelligence (read-only)
+- CVE intelligence (read-only, real API)
 - Device trust & licensing
 - Final execution seal
+- Gmail owner alerts
+- Voice reporting (bilingual)
+- Screen inspection (read-only)
 
 NO SILENT EXECUTION - Human approval mandatory for EXECUTING state.
 """
@@ -83,6 +86,37 @@ from .governors.g14_target_discovery import (
     DiscoveryResult,
     discover_targets,
 )
+from .governors.g15_cve_api import (
+    CVEAPIConfig,
+    CVEAPIResult,
+    APIStatus,
+    fetch_cves_passive,
+    can_cve_trigger_execution,
+)
+from .governors.g16_gmail_alerts import (
+    GmailAlertConfig,
+    AlertSendResult,
+    VerificationPassword,
+    generate_verification_password,
+    send_alert,
+    can_email_approve_execution,
+)
+from .governors.g17_voice_reporting import (
+    VoiceReportType,
+    VoiceReport,
+    ProgressNarration,
+    generate_high_impact_tips,
+    explain_report,
+    can_voice_execute,
+)
+from .governors.g18_screen_inspection import (
+    InspectionMode,
+    ScreenInspectionRequest,
+    InspectionResult,
+    create_inspection_request,
+    can_execute_inspection,
+    can_inspection_interact,
+)
 
 __all__ = [
     # G1
@@ -138,5 +172,31 @@ __all__ = [
     "TargetCandidate",
     "DiscoveryResult",
     "discover_targets",
+    # G15
+    "CVEAPIConfig",
+    "CVEAPIResult",
+    "APIStatus",
+    "fetch_cves_passive",
+    "can_cve_trigger_execution",
+    # G16
+    "GmailAlertConfig",
+    "AlertSendResult",
+    "VerificationPassword",
+    "generate_verification_password",
+    "send_alert",
+    "can_email_approve_execution",
+    # G17
+    "VoiceReportType",
+    "VoiceReport",
+    "ProgressNarration",
+    "generate_high_impact_tips",
+    "explain_report",
+    "can_voice_execute",
+    # G18
+    "InspectionMode",
+    "ScreenInspectionRequest",
+    "InspectionResult",
+    "create_inspection_request",
+    "can_execute_inspection",
+    "can_inspection_interact",
 ]
-
