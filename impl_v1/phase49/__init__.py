@@ -3,7 +3,7 @@
 CRITICAL: This is the FIRST phase with actual execution capabilities.
 All prior phases (01-48) are pure governance with no execution logic.
 
-This phase implements 18 governors that control:
+This phase implements 22 governors that control:
 - Execution kernel state machine
 - Browser launch (C++ native)
 - Voice input/output (TTS proxy)
@@ -15,6 +15,10 @@ This phase implements 18 governors that control:
 - Gmail owner alerts
 - Voice reporting (bilingual)
 - Screen inspection (read-only)
+- Interactive browser session (OBSERVE_ONLY)
+- Dashboard state & events
+- Auto-update governance
+- User/Admin database
 
 NO SILENT EXECUTION - Human approval mandatory for EXECUTING state.
 """
@@ -117,6 +121,50 @@ from .governors.g18_screen_inspection import (
     can_execute_inspection,
     can_inspection_interact,
 )
+from .governors.g19_interactive_browser import (
+    InteractiveMode,
+    SessionState,
+    Platform,
+    InteractiveSession,
+    ObservationResult,
+    create_interactive_session,
+    perform_observation,
+    detect_platform,
+    can_session_execute,
+    can_session_interact,
+)
+from .governors.g20_dashboard_state import (
+    DashboardPanel,
+    UserMode,
+    ActivityType,
+    DashboardState,
+    DashboardEvent,
+    create_dashboard_state,
+    update_activity_with_targets,
+    can_dashboard_approve_execution,
+)
+from .governors.g21_auto_update import (
+    UpdateStatus,
+    UpdateChannel,
+    UpdateInfo,
+    UpdateApproval,
+    check_for_updates,
+    request_update_approval,
+    install_update,
+    rollback,
+    can_auto_update_execute,
+)
+from .governors.g22_user_database import (
+    UserRole,
+    Permission,
+    User,
+    UserSession,
+    Admin,
+    create_user,
+    create_session,
+    create_admin,
+    can_database_delete_without_approval,
+)
 
 __all__ = [
     # G1
@@ -199,4 +247,45 @@ __all__ = [
     "create_inspection_request",
     "can_execute_inspection",
     "can_inspection_interact",
+    # G19
+    "InteractiveMode",
+    "SessionState",
+    "Platform",
+    "InteractiveSession",
+    "ObservationResult",
+    "create_interactive_session",
+    "perform_observation",
+    "detect_platform",
+    "can_session_execute",
+    "can_session_interact",
+    # G20
+    "DashboardPanel",
+    "UserMode",
+    "ActivityType",
+    "DashboardState",
+    "DashboardEvent",
+    "create_dashboard_state",
+    "update_activity_with_targets",
+    "can_dashboard_approve_execution",
+    # G21
+    "UpdateStatus",
+    "UpdateChannel",
+    "UpdateInfo",
+    "UpdateApproval",
+    "check_for_updates",
+    "request_update_approval",
+    "install_update",
+    "rollback",
+    "can_auto_update_execute",
+    # G22
+    "UserRole",
+    "Permission",
+    "User",
+    "UserSession",
+    "Admin",
+    "create_user",
+    "create_session",
+    "create_admin",
+    "can_database_delete_without_approval",
 ]
+
