@@ -429,3 +429,203 @@ class TestDataclasses:
         )
         with pytest.raises(Exception):
             bundle.is_complete = False
+
+
+# =============================================================================
+# PoC VIDEO EXTENSION TESTS
+# =============================================================================
+
+from impl_v1.phase49.governors.g26_forensic_evidence import (
+    PoCAnnotation,
+    PoCTimeline,
+    PoCVideoOutput,
+    create_poc_annotation,
+    build_poc_timeline,
+    generate_poc_video_output,
+    export_poc_video,
+    can_generate_poc_without_evidence,
+    can_modify_browser_state_for_poc,
+    can_execute_exploitation_for_poc,
+    can_capture_new_evidence_for_poc,
+)
+
+
+class TestPoCAnnotation:
+    """Tests for PoCAnnotation dataclass."""
+    
+    def test_create_poc_annotation(self):
+        """Create PoC annotation."""
+        annotation = create_poc_annotation(
+            step_number=1,
+            timestamp_ms=0,
+            description="Navigate to login page",
+            evidence_hash="abc123",
+        )
+        assert annotation.annotation_id.startswith("POC-ANN-")
+        assert annotation.step_number == 1
+        assert annotation.timestamp_ms == 0
+    
+    def test_annotation_with_overlay_text(self):
+        """Annotation with custom overlay."""
+        annotation = create_poc_annotation(
+            step_number=2,
+            timestamp_ms=3000,
+            description="Enter payload",
+            evidence_hash="def456",
+            overlay_text="Custom overlay text",
+        )
+        assert annotation.overlay_text == "Custom overlay text"
+    
+    def test_annotation_is_frozen(self):
+        """Annotation is immutable."""
+        annotation = create_poc_annotation(1, 0, "test", "hash")
+        with pytest.raises(AttributeError):
+            annotation.step_number = 2
+
+
+class TestPoCTimeline:
+    """Tests for PoCTimeline building."""
+    
+    def test_build_poc_timeline(self):
+        """Build timeline from evidence bundle."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            engine.capture_screenshot("https://example.com")
+            engine.capture_screenshot("https://example.com/login")
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(
+                bundle,
+                step_descriptions=("Navigate to target", "Enter credentials"),
+            )
+            
+            assert timeline.timeline_id.startswith("POC-TML-")
+            assert len(timeline.annotations) == 2
+            assert timeline.step_count == 2
+            assert timeline.total_duration_ms > 0
+    
+    def test_timeline_has_determinism_hash(self):
+        """Timeline has determinism hash."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            engine.capture_screenshot("https://example.com")
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(bundle, ("Step 1",))
+            assert len(timeline.determinism_hash) == 32
+    
+    def test_timeline_is_frozen(self):
+        """Timeline is immutable."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(bundle, tuple())
+            with pytest.raises(AttributeError):
+                timeline.step_count = 99
+
+
+class TestPoCVideoOutput:
+    """Tests for PoCVideoOutput generation."""
+    
+    def test_generate_poc_video_output(self):
+        """Generate video output structure."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            engine.capture_screenshot("https://example.com")
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(bundle, ("Navigate", "Execute"))
+            output = generate_poc_video_output(timeline, tmpdir)
+            
+            assert output.output_id.startswith("POC-VID-")
+            assert output.format == "WEBM"
+            assert output.is_rendered == False  # Mock
+    
+    def test_generate_poc_video_mp4(self):
+        """Generate MP4 video output."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(bundle, tuple())
+            output = generate_poc_video_output(timeline, tmpdir, format="MP4")
+            
+            assert output.format == "MP4"
+            assert output.video_path.endswith(".mp4")
+    
+    def test_video_output_has_integrity_hash(self):
+        """Video output has integrity hash."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(bundle, tuple())
+            output = generate_poc_video_output(timeline, tmpdir)
+            
+            assert len(output.integrity_hash) == 64
+
+
+class TestExportPoCVideo:
+    """Tests for export_poc_video function."""
+    
+    def test_export_returns_bytes(self):
+        """Export returns bytes."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(bundle, ("Step 1",))
+            output = generate_poc_video_output(timeline, tmpdir)
+            
+            exported = export_poc_video(output)
+            assert isinstance(exported, bytes)
+    
+    def test_export_creates_meta_file(self):
+        """Export creates metadata file."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            session_id, engine = create_evidence_session(tmpdir)
+            bundle = engine.finalize_bundle()
+            
+            timeline = build_poc_timeline(bundle, tuple())
+            output = generate_poc_video_output(timeline, tmpdir)
+            
+            export_poc_video(output)
+            assert Path(output.video_path + ".meta.json").exists()
+
+
+class TestPoCVideoGuards:
+    """Tests for PoC video guards."""
+    
+    def test_can_generate_poc_without_evidence_false(self):
+        """Guard: Cannot generate PoC without evidence."""
+        assert can_generate_poc_without_evidence() == False
+    
+    def test_can_modify_browser_state_for_poc_false(self):
+        """Guard: Cannot modify browser for PoC."""
+        assert can_modify_browser_state_for_poc() == False
+    
+    def test_can_execute_exploitation_for_poc_false(self):
+        """Guard: Cannot execute exploitation for PoC."""
+        assert can_execute_exploitation_for_poc() == False
+    
+    def test_can_capture_new_evidence_for_poc_false(self):
+        """Guard: Cannot capture new evidence for PoC."""
+        assert can_capture_new_evidence_for_poc() == False
+
+
+class TestAllPoCGuardsReturnFalse:
+    """Comprehensive test that ALL PoC guards return False."""
+    
+    def test_all_poc_guards_return_false(self):
+        guards = [
+            can_generate_poc_without_evidence,
+            can_modify_browser_state_for_poc,
+            can_execute_exploitation_for_poc,
+            can_capture_new_evidence_for_poc,
+        ]
+        
+        for guard in guards:
+            result = guard()
+            assert result == False, f"Guard {guard.__name__} returned True!"
+

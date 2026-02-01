@@ -858,3 +858,313 @@ def can_reasoning_execute_browser() -> Tuple[bool, str]:
     """
     return False, "Reasoning engine cannot execute browser - post-processing only"
 
+
+# ============================================================
+# PoC EXPLANATION EXTENSION
+# ============================================================
+
+@dataclass(frozen=True)
+class NarrationSegmentPoc:
+    """Single narration segment for PoC explanation."""
+    segment_id: str
+    step_order: int
+    spoken_text: str
+    sync_timestamp_ms: int
+    duration_ms: int
+    evidence_reference: str
+
+
+@dataclass(frozen=True)
+class NarrationScript:
+    """Complete narration script for PoC video."""
+    script_id: str
+    segments: Tuple[NarrationSegmentPoc, ...]
+    total_duration_ms: int
+    language: str  # "en" or "hi"
+    word_count: int
+    determinism_hash: str
+
+
+@dataclass(frozen=True)
+class PoCExplanation:
+    """Text explanation synced to PoC video."""
+    explanation_id: str
+    title: str
+    summary: str
+    step_explanations: Tuple[str, ...]
+    impact_statement: str
+    proof_summary: str
+    determinism_hash: str
+
+
+@dataclass(frozen=True)
+class PoCExplanationBundle:
+    """Complete bundle: video path + explanation + JSON."""
+    bundle_id: str
+    video_path: str
+    explanation_text_path: str
+    explanation_json_path: str
+    narration_script: NarrationScript
+    poc_explanation: PoCExplanation
+    integrity_hash: str
+
+
+def _generate_script_id(prefix: str) -> str:
+    """Generate script component ID."""
+    import uuid
+    return f"SCR-{prefix}-{uuid.uuid4().hex[:12].upper()}"
+
+
+def generate_narration_segment_poc(
+    step_order: int,
+    spoken_text: str,
+    sync_timestamp_ms: int,
+    evidence_reference: str,
+    duration_ms: int = 3000,
+) -> NarrationSegmentPoc:
+    """Create a single narration segment for PoC."""
+    return NarrationSegmentPoc(
+        segment_id=_generate_script_id("SEG"),
+        step_order=step_order,
+        spoken_text=spoken_text,
+        sync_timestamp_ms=sync_timestamp_ms,
+        duration_ms=duration_ms,
+        evidence_reference=evidence_reference,
+    )
+
+
+def generate_narration_script(
+    reasoning_explanation: ReasoningExplanation,
+    step_descriptions: Tuple[str, ...],
+    evidence_hashes: Tuple[str, ...],
+    language: str = "en",
+) -> NarrationScript:
+    """
+    Generate human-style narration script from reasoning.
+    
+    DETERMINISTIC: Same input produces same script.
+    """
+    if can_generate_poc_without_human_trigger()[0]:  # pragma: no cover
+        raise RuntimeError("SECURITY: PoC requires human initiation")
+    
+    segments = []
+    current_time = 0
+    word_count = 0
+    
+    # Intro segment
+    intro_text = f"This proof of concept demonstrates: {reasoning_explanation.why_this_matters[:80]}."
+    segments.append(generate_narration_segment_poc(
+        step_order=0,
+        spoken_text=intro_text,
+        sync_timestamp_ms=current_time,
+        evidence_reference=evidence_hashes[0] if evidence_hashes else "",
+        duration_ms=5000,
+    ))
+    word_count += len(intro_text.split())
+    current_time += 5000
+    
+    # Step segments
+    for i, description in enumerate(step_descriptions):
+        step_text = f"Step {i + 1}: {description}"
+        evidence_ref = evidence_hashes[i] if i < len(evidence_hashes) else ""
+        
+        segments.append(generate_narration_segment_poc(
+            step_order=i + 1,
+            spoken_text=step_text,
+            sync_timestamp_ms=current_time,
+            evidence_reference=evidence_ref,
+            duration_ms=3000,
+        ))
+        word_count += len(step_text.split())
+        current_time += 3000
+    
+    # Impact segment
+    impact_text = f"Impact: {reasoning_explanation.business_impact[:80]}."
+    segments.append(generate_narration_segment_poc(
+        step_order=len(step_descriptions) + 1,
+        spoken_text=impact_text,
+        sync_timestamp_ms=current_time,
+        evidence_reference=evidence_hashes[-1] if evidence_hashes else "",
+        duration_ms=4000,
+    ))
+    word_count += len(impact_text.split())
+    current_time += 4000
+    
+    # Determinism hash
+    hash_content = f"{reasoning_explanation.determinism_hash}|{len(segments)}|{current_time}"
+    det_hash = _hash_content(hash_content)
+    
+    return NarrationScript(
+        script_id=_generate_script_id("NAR"),
+        segments=tuple(segments),
+        total_duration_ms=current_time,
+        language=language,
+        word_count=word_count,
+        determinism_hash=det_hash,
+    )
+
+
+def generate_poc_explanation(
+    reasoning_explanation: ReasoningExplanation,
+    step_descriptions: Tuple[str, ...],
+    bug_type: str,
+    target: str,
+) -> PoCExplanation:
+    """
+    Generate text explanation synced to PoC video.
+    
+    DETERMINISTIC: Same input produces same explanation.
+    """
+    title = f"{bug_type} Vulnerability on {target}"
+    summary = reasoning_explanation.why_this_matters
+    impact_statement = reasoning_explanation.business_impact
+    proof_summary = f"Risk: {reasoning_explanation.risk_framing}"
+    
+    # Determinism hash
+    hash_content = f"{reasoning_explanation.determinism_hash}|{bug_type}|{target}"
+    det_hash = _hash_content(hash_content)
+    
+    return PoCExplanation(
+        explanation_id=_generate_script_id("EXP"),
+        title=title,
+        summary=summary,
+        step_explanations=step_descriptions,
+        impact_statement=impact_statement,
+        proof_summary=proof_summary,
+        determinism_hash=det_hash,
+    )
+
+
+def export_poc_explanation_json(explanation: PoCExplanation) -> bytes:
+    """Export PoC explanation as JSON bytes."""
+    import json
+    
+    export_data = {
+        "explanation_id": explanation.explanation_id,
+        "title": explanation.title,
+        "summary": explanation.summary,
+        "steps": list(explanation.step_explanations),
+        "impact": explanation.impact_statement,
+        "proof": explanation.proof_summary,
+        "determinism_hash": explanation.determinism_hash,
+    }
+    
+    return json.dumps(export_data, indent=2).encode("utf-8")
+
+
+def export_poc_explanation_text(explanation: PoCExplanation) -> str:
+    """Export PoC explanation as human-readable text."""
+    lines = [
+        f"# {explanation.title}",
+        "",
+        "## Summary",
+        explanation.summary,
+        "",
+        "## Steps",
+    ]
+    
+    for i, step in enumerate(explanation.step_explanations, 1):
+        lines.append(f"{i}. {step}")
+    
+    lines.extend([
+        "",
+        "## Impact",
+        explanation.impact_statement,
+        "",
+        "## Proof",
+        explanation.proof_summary,
+    ])
+    
+    return "\n".join(lines)
+
+
+def create_poc_explanation_bundle(
+    video_path: str,
+    output_dir: str,
+    narration_script: NarrationScript,
+    poc_explanation: PoCExplanation,
+) -> PoCExplanationBundle:
+    """
+    Create complete PoC explanation bundle.
+    
+    Outputs:
+    - poc_explanation.txt
+    - poc_explanation.json
+    """
+    import os
+    from pathlib import Path
+    
+    out_path = Path(output_dir)
+    out_path.mkdir(parents=True, exist_ok=True)
+    
+    bundle_id = _generate_script_id("BND")
+    
+    # Write text explanation
+    text_path = str(out_path / "poc_explanation.txt")
+    with open(text_path, "w", encoding="utf-8") as f:
+        f.write(export_poc_explanation_text(poc_explanation))
+    
+    # Write JSON explanation
+    json_path = str(out_path / "poc_explanation.json")
+    with open(json_path, "wb") as f:
+        f.write(export_poc_explanation_json(poc_explanation))
+    
+    # Compute integrity hash
+    integrity_content = f"{bundle_id}|{video_path}|{narration_script.script_id}|{poc_explanation.explanation_id}"
+    integrity_hash = _hash_content(integrity_content)
+    
+    return PoCExplanationBundle(
+        bundle_id=bundle_id,
+        video_path=video_path,
+        explanation_text_path=text_path,
+        explanation_json_path=json_path,
+        narration_script=narration_script,
+        poc_explanation=poc_explanation,
+        integrity_hash=integrity_hash,
+    )
+
+
+# ============================================================
+# PoC EXPLANATION GUARDS (ALL RETURN FALSE)
+# ============================================================
+
+def can_generate_poc_without_human_trigger() -> Tuple[bool, str]:
+    """
+    Check if PoC can be generated without human trigger.
+    
+    Returns (can_generate, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "PoC generation requires human initiation"
+
+
+def can_execute_payload_for_poc() -> Tuple[bool, str]:
+    """
+    Check if payloads can be executed for PoC.
+    
+    Returns (can_execute, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "PoC cannot execute payloads - uses existing evidence only"
+
+
+def can_poc_modify_evidence() -> Tuple[bool, str]:
+    """
+    Check if PoC generation can modify evidence.
+    
+    Returns (can_modify, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "PoC cannot modify evidence - read-only access"
+
+
+def can_poc_submit_report() -> Tuple[bool, str]:
+    """
+    Check if PoC can automatically submit report.
+    
+    Returns (can_submit, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "PoC cannot submit reports - human submission required"
+
+

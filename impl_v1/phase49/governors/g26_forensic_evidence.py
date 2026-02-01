@@ -504,3 +504,234 @@ def verify_evidence_integrity(bundle: EvidenceBundle) -> bool:
     
     computed_hash = compute_bundle_hash(all_hashes)
     return computed_hash == bundle.bundle_hash
+
+
+# =============================================================================
+# PoC VIDEO GENERATION EXTENSION
+# =============================================================================
+
+@dataclass(frozen=True)
+class PoCAnnotation:
+    """Single annotation for PoC video overlay."""
+    annotation_id: str
+    timestamp_ms: int
+    step_number: int
+    description: str
+    bounding_box: Optional[Tuple[int, int, int, int]]  # x, y, width, height
+    highlight_selector: Optional[str]
+    overlay_text: str
+    evidence_hash: str
+
+
+@dataclass(frozen=True)
+class PoCTimeline:
+    """Ordered timeline of annotations for PoC video."""
+    timeline_id: str
+    annotations: Tuple[PoCAnnotation, ...]
+    total_duration_ms: int
+    step_count: int
+    bundle_hash: str
+    determinism_hash: str
+
+
+@dataclass(frozen=True)
+class PoCVideoOutput:
+    """Complete PoC video output structure."""
+    output_id: str
+    video_path: str
+    timeline: PoCTimeline
+    format: str  # "WEBM" or "MP4"
+    width: int
+    height: int
+    integrity_hash: str
+    is_rendered: bool  # False = mock, True = real (C++)
+
+
+def _generate_poc_id(prefix: str) -> str:
+    """Generate unique PoC component ID."""
+    return f"POC-{prefix}-{uuid.uuid4().hex[:12].upper()}"
+
+
+def create_poc_annotation(
+    step_number: int,
+    timestamp_ms: int,
+    description: str,
+    evidence_hash: str,
+    overlay_text: str = "",
+    bounding_box: Optional[Tuple[int, int, int, int]] = None,
+    highlight_selector: Optional[str] = None,
+) -> PoCAnnotation:
+    """
+    Create a single PoC annotation.
+    
+    REQUIRES: Evidence must exist (hash provided).
+    """
+    return PoCAnnotation(
+        annotation_id=_generate_poc_id("ANN"),
+        timestamp_ms=timestamp_ms,
+        step_number=step_number,
+        description=description,
+        bounding_box=bounding_box,
+        highlight_selector=highlight_selector,
+        overlay_text=overlay_text or f"Step {step_number}: {description[:40]}",
+        evidence_hash=evidence_hash,
+    )
+
+
+def build_poc_timeline(
+    bundle: EvidenceBundle,
+    step_descriptions: Tuple[str, ...],
+) -> PoCTimeline:
+    """
+    Build PoC timeline from evidence bundle.
+    
+    RULES:
+    - Uses ONLY existing evidence (no new captures)
+    - NO browser actions
+    - NO payload execution
+    """
+    if can_generate_poc_without_evidence():  # pragma: no cover
+        raise RuntimeError("SECURITY: PoC requires evidence bundle")
+    
+    annotations = []
+    current_time = 0
+    step_interval = 3000  # 3 seconds per step
+    
+    # Build annotations from evidence
+    for i, description in enumerate(step_descriptions):
+        # Find matching evidence hash
+        evidence_hash = ""
+        if i < len(bundle.screenshots):
+            evidence_hash = bundle.screenshots[i].metadata.sha256_hash
+        elif bundle.videos:
+            evidence_hash = bundle.videos[0].metadata.sha256_hash
+        else:
+            evidence_hash = bundle.bundle_hash
+        
+        annotation = create_poc_annotation(
+            step_number=i + 1,
+            timestamp_ms=current_time,
+            description=description,
+            evidence_hash=evidence_hash,
+        )
+        annotations.append(annotation)
+        current_time += step_interval
+    
+    # Generate determinism hash
+    hash_content = f"{bundle.bundle_hash}|{len(annotations)}|{current_time}"
+    det_hash = compute_sha256(hash_content.encode())[:32]
+    
+    return PoCTimeline(
+        timeline_id=_generate_poc_id("TML"),
+        annotations=tuple(annotations),
+        total_duration_ms=current_time,
+        step_count=len(annotations),
+        bundle_hash=bundle.bundle_hash,
+        determinism_hash=det_hash,
+    )
+
+
+def generate_poc_video_output(
+    timeline: PoCTimeline,
+    output_dir: str,
+    format: str = "WEBM",
+    width: int = 1920,
+    height: int = 1080,
+) -> PoCVideoOutput:
+    """
+    Generate PoC video output structure.
+    
+    NOTE: This generates the OUTPUT STRUCTURE only.
+    Actual video rendering is deferred to C++ backend.
+    """
+    if can_modify_browser_state_for_poc():  # pragma: no cover
+        raise RuntimeError("SECURITY: PoC is POST-processing only")
+    
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    
+    output_id = _generate_poc_id("VID")
+    video_path = str(output_path / f"{output_id}.{format.lower()}")
+    
+    # Compute integrity hash
+    integrity_content = f"{timeline.timeline_id}|{timeline.bundle_hash}|{format}"
+    integrity_hash = compute_sha256(integrity_content.encode())
+    
+    return PoCVideoOutput(
+        output_id=output_id,
+        video_path=video_path,
+        timeline=timeline,
+        format=format,
+        width=width,
+        height=height,
+        integrity_hash=integrity_hash,
+        is_rendered=False,  # Mock - real rendering in C++
+    )
+
+
+def export_poc_video(output: PoCVideoOutput) -> bytes:
+    """
+    Export PoC video as bytes.
+    
+    MOCK IMPLEMENTATION: Real rendering deferred to C++.
+    Returns JSON metadata as bytes.
+    """
+    export_data = {
+        "output_id": output.output_id,
+        "video_path": output.video_path,
+        "format": output.format,
+        "width": output.width,
+        "height": output.height,
+        "duration_ms": output.timeline.total_duration_ms,
+        "step_count": output.timeline.step_count,
+        "integrity_hash": output.integrity_hash,
+        "is_rendered": output.is_rendered,
+        "status": "MOCK_VIDEO_NO_RENDER",
+    }
+    
+    # Write mock metadata file
+    with open(output.video_path + ".meta.json", "w") as f:
+        json.dump(export_data, f, indent=2)
+    
+    return json.dumps(export_data, indent=2).encode("utf-8")
+
+
+# =============================================================================
+# PoC VIDEO GUARDS (ALL RETURN FALSE)
+# =============================================================================
+
+def can_generate_poc_without_evidence() -> bool:
+    """
+    Guard: Can PoC be generated without evidence bundle?
+    
+    ANSWER: NEVER.
+    """
+    return False
+
+
+def can_modify_browser_state_for_poc() -> bool:
+    """
+    Guard: Can PoC generation modify browser state?
+    
+    ANSWER: NEVER. PoC is POST-processing only.
+    """
+    return False
+
+
+def can_execute_exploitation_for_poc() -> bool:
+    """
+    Guard: Can PoC generation execute exploitation?
+    
+    ANSWER: NEVER.
+    """
+    return False
+
+
+def can_capture_new_evidence_for_poc() -> bool:
+    """
+    Guard: Can PoC generation capture new evidence?
+    
+    ANSWER: NEVER. Uses only existing evidence.
+    """
+    return False
+

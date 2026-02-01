@@ -886,3 +886,228 @@ class TestAllVideoGuardsReturnFalse:
             assert result == False, f"Guard {guard.__name__} returned True!"
             assert len(reason) > 0, f"Guard {guard.__name__} has empty reason!"
 
+
+# ============================================================
+# PoC EXPLANATION EXTENSION TESTS
+# ============================================================
+
+class TestNarrationScript:
+    """Tests for NarrationScript generation."""
+    
+    def test_generate_narration_script(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_narration_script,
+            generate_reasoning_explanation,
+            TestCategory,
+        )
+        
+        explanation = generate_reasoning_explanation(
+            TestCategory.XSS, "HIGH", "example.com", "web app"
+        )
+        
+        script = generate_narration_script(
+            reasoning_explanation=explanation,
+            step_descriptions=("Navigate to target", "Enter payload"),
+            evidence_hashes=("hash1", "hash2"),
+        )
+        
+        assert script.script_id.startswith("SCR-NAR-")
+        assert len(script.segments) >= 3  # Intro + steps + impact
+        assert script.total_duration_ms > 0
+        assert script.word_count > 0
+    
+    def test_narration_script_is_frozen(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_narration_script,
+            generate_reasoning_explanation,
+            TestCategory,
+        )
+        
+        explanation = generate_reasoning_explanation(
+            TestCategory.SQLI, "CRITICAL", "example.com", "API"
+        )
+        script = generate_narration_script(explanation, tuple(), tuple())
+        
+        with pytest.raises(AttributeError):
+            script.word_count = 999
+
+
+class TestPoCExplanationG32:
+    """Tests for PoCExplanation generation."""
+    
+    def test_generate_poc_explanation(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_poc_explanation,
+            generate_reasoning_explanation,
+            TestCategory,
+        )
+        
+        reasoning = generate_reasoning_explanation(
+            TestCategory.IDOR, "HIGH", "api.example.com", "REST API"
+        )
+        
+        explanation = generate_poc_explanation(
+            reasoning_explanation=reasoning,
+            step_descriptions=("Navigate", "Access", "Exploit"),
+            bug_type="IDOR",
+            target="api.example.com",
+        )
+        
+        assert explanation.explanation_id.startswith("SCR-EXP-")
+        assert "IDOR" in explanation.title
+        assert len(explanation.step_explanations) == 3
+    
+    def test_poc_explanation_has_determinism_hash(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_poc_explanation,
+            generate_reasoning_explanation,
+            TestCategory,
+        )
+        
+        reasoning = generate_reasoning_explanation(
+            TestCategory.XSS, "MEDIUM", "example.com", "web"
+        )
+        explanation = generate_poc_explanation(reasoning, tuple(), "XSS", "example.com")
+        
+        assert len(explanation.determinism_hash) == 32
+
+
+class TestExportPoCExplanation:
+    """Tests for PoC explanation export functions."""
+    
+    def test_export_poc_explanation_json(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_poc_explanation,
+            generate_reasoning_explanation,
+            export_poc_explanation_json,
+            TestCategory,
+        )
+        import json
+        
+        reasoning = generate_reasoning_explanation(
+            TestCategory.RCE, "CRITICAL", "target.com", "server"
+        )
+        explanation = generate_poc_explanation(reasoning, ("Step 1",), "RCE", "target.com")
+        
+        exported = export_poc_explanation_json(explanation)
+        assert isinstance(exported, bytes)
+        
+        data = json.loads(exported.decode("utf-8"))
+        assert "explanation_id" in data
+        assert data["title"] == "RCE Vulnerability on target.com"
+    
+    def test_export_poc_explanation_text(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_poc_explanation,
+            generate_reasoning_explanation,
+            export_poc_explanation_text,
+            TestCategory,
+        )
+        
+        reasoning = generate_reasoning_explanation(
+            TestCategory.AUTH, "HIGH", "login.com", "auth"
+        )
+        explanation = generate_poc_explanation(
+            reasoning, ("Login", "Bypass"), "AUTH", "login.com"
+        )
+        
+        text = export_poc_explanation_text(explanation)
+        assert isinstance(text, str)
+        assert "# AUTH Vulnerability" in text
+        assert "## Summary" in text
+        assert "## Steps" in text
+
+
+class TestPoCExplanationBundle:
+    """Tests for PoCExplanationBundle creation."""
+    
+    def test_create_poc_explanation_bundle(self):
+        import tempfile
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_narration_script,
+            generate_poc_explanation,
+            generate_reasoning_explanation,
+            create_poc_explanation_bundle,
+            TestCategory,
+        )
+        
+        with tempfile.TemporaryDirectory() as tmpdir:
+            reasoning = generate_reasoning_explanation(
+                TestCategory.CSRF, "MEDIUM", "example.com", "web"
+            )
+            script = generate_narration_script(reasoning, ("Step 1",), ("hash1",))
+            explanation = generate_poc_explanation(reasoning, ("Step 1",), "CSRF", "example.com")
+            
+            bundle = create_poc_explanation_bundle(
+                video_path="/tmp/poc.webm",
+                output_dir=tmpdir,
+                narration_script=script,
+                poc_explanation=explanation,
+            )
+            
+            assert bundle.bundle_id.startswith("SCR-BND-")
+            assert bundle.explanation_text_path.endswith("poc_explanation.txt")
+            assert bundle.explanation_json_path.endswith("poc_explanation.json")
+            
+            # Files created
+            from pathlib import Path
+            assert Path(bundle.explanation_text_path).exists()
+            assert Path(bundle.explanation_json_path).exists()
+
+
+class TestPoCExplanationGuards:
+    """Tests for PoC explanation guards."""
+    
+    def test_can_generate_poc_without_human_trigger_returns_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import can_generate_poc_without_human_trigger
+        
+        can_generate, reason = can_generate_poc_without_human_trigger()
+        assert can_generate == False
+        assert "human" in reason.lower()
+    
+    def test_can_execute_payload_for_poc_returns_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import can_execute_payload_for_poc
+        
+        can_execute, reason = can_execute_payload_for_poc()
+        assert can_execute == False
+        assert "evidence" in reason.lower() or "payload" in reason.lower()
+    
+    def test_can_poc_modify_evidence_returns_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import can_poc_modify_evidence
+        
+        can_modify, reason = can_poc_modify_evidence()
+        assert can_modify == False
+        assert "read-only" in reason.lower()
+    
+    def test_can_poc_submit_report_returns_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import can_poc_submit_report
+        
+        can_submit, reason = can_poc_submit_report()
+        assert can_submit == False
+        assert "human" in reason.lower()
+
+
+class TestAllPoCExplanationGuardsReturnFalse:
+    """Comprehensive test that ALL PoC explanation guards return False."""
+    
+    def test_all_poc_explanation_guards_return_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            can_generate_poc_without_human_trigger,
+            can_execute_payload_for_poc,
+            can_poc_modify_evidence,
+            can_poc_submit_report,
+        )
+        
+        guards = [
+            can_generate_poc_without_human_trigger,
+            can_execute_payload_for_poc,
+            can_poc_modify_evidence,
+            can_poc_submit_report,
+        ]
+        
+        for guard in guards:
+            result, reason = guard()
+            assert result == False, f"Guard {guard.__name__} returned True!"
+            assert len(reason) > 0, f"Guard {guard.__name__} has empty reason!"
+
+
