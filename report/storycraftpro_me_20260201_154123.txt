@@ -1,0 +1,309 @@
+================================================================================
+YGB SECURITY REPORT
+================================================================================
+
+Target URL: https://storycraftpro.me
+Workflow ID: RPT-6751448B2D26
+Mode: REAL
+Generated: 2026-02-01T15:41:23.295162
+
+--------------------------------------------------------------------------------
+SUMMARY
+--------------------------------------------------------------------------------
+Total Findings: 31
+Pages Analyzed: 6
+Phases Executed: 50
+Technologies: None detected
+
+--------------------------------------------------------------------------------
+SEVERITY BREAKDOWN
+--------------------------------------------------------------------------------
+  CRITICAL: 2
+  MEDIUM: 18
+  LOW: 5
+  INFO: 6
+
+--------------------------------------------------------------------------------
+CATEGORY BREAKDOWN
+--------------------------------------------------------------------------------
+  2FA: 1
+  CLICKJACKING: 1
+  DNS: 1
+  HEADERS: 18
+  LFI_RFI: 1
+  RATE_LIMIT: 1
+  SESSION: 1
+  SQLI: 1
+  SSL: 1
+  SSTI: 1
+  SUMMARY: 1
+  XSS: 2
+  XXE: 1
+
+================================================================================
+DETAILED FINDINGS
+================================================================================
+
+--- CRITICAL (2) ---
+
+[FND-69d968d2] SQL error message exposed
+  Category: SQLI
+  Severity: CRITICAL
+  Description: Found 'ora-' indicating possible SQL injection vulnerability
+  URL: https://storycraftpro.me
+
+[FND-68dc3f45] Critical issues found: 1
+  Category: SUMMARY
+  Severity: CRITICAL
+  Description: Immediate attention required for critical vulnerabilities
+  URL: https://storycraftpro.me
+
+--- MEDIUM (18) ---
+
+[FND-332d70af] Missing X-Frame-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the X-Frame-Options header (Clickjacking protection)
+  URL: https://storycraftpro.me
+
+[FND-74470de0] Missing X-Content-Type-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the X-Content-Type-Options header (MIME type sniffing protection)
+  URL: https://storycraftpro.me
+
+[FND-fb24a5df] Missing Content-Security-Policy
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the Content-Security-Policy header (Content injection protection)
+  URL: https://storycraftpro.me
+
+[FND-d10fc18c] Missing Strict-Transport-Security
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the Strict-Transport-Security header (HTTPS enforcement)
+  URL: https://storycraftpro.me
+
+[FND-284186e7] Potential XSS: innerHTML assignment (1 occurrences)
+  Category: XSS
+  Severity: MEDIUM
+  Description: Found 1 instances of innerHTML which could lead to XSS
+  URL: https://storycraftpro.me
+
+[FND-49843053] DOM-based XSS source detected: location.href
+  Category: XSS
+  Severity: MEDIUM
+  Description: User-controllable data source found in JavaScript
+  URL: https://storycraftpro.me
+
+[FND-84a03610] Missing X-Frame-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/login vulnerable to clickjacking
+  URL: https://storycraftpro.me/login
+
+[FND-c1a4b407] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/login lacks Content-Security-Policy
+  URL: https://storycraftpro.me/login
+
+[FND-bdd542c0] Missing X-Frame-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/signin vulnerable to clickjacking
+  URL: https://storycraftpro.me/signin
+
+[FND-7813dfad] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/signin lacks Content-Security-Policy
+  URL: https://storycraftpro.me/signin
+
+[FND-7c5d4c6e] Missing X-Frame-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/sign-in vulnerable to clickjacking
+  URL: https://storycraftpro.me/sign-in
+
+[FND-3547f759] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/sign-in lacks Content-Security-Policy
+  URL: https://storycraftpro.me/sign-in
+
+[FND-38642d84] Missing X-Frame-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/auth/login vulnerable to clickjacking
+  URL: https://storycraftpro.me/auth/login
+
+[FND-c6b04151] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/auth/login lacks Content-Security-Policy
+  URL: https://storycraftpro.me/auth/login
+
+[FND-c423c544] Missing X-Frame-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/admin vulnerable to clickjacking
+  URL: https://storycraftpro.me/admin
+
+[FND-06c1c6a8] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page https://storycraftpro.me/admin lacks Content-Security-Policy
+  URL: https://storycraftpro.me/admin
+
+[FND-425f0eb3] HSTS not enabled
+  Category: SSL
+  Severity: MEDIUM
+  Description: HTTP Strict Transport Security header missing
+  URL: https://storycraftpro.me
+
+[FND-1776cf06] No clickjacking protection
+  Category: CLICKJACKING
+  Severity: MEDIUM
+  Description: Page can be embedded in iframes (clickjacking possible)
+  URL: https://storycraftpro.me
+
+--- LOW (5) ---
+
+[FND-4a1eed19] Missing X-XSS-Protection
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the X-XSS-Protection header (XSS filter)
+  URL: https://storycraftpro.me
+
+[FND-7073c651] Missing Permissions-Policy
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the Permissions-Policy header (Browser feature restrictions)
+  URL: https://storycraftpro.me
+
+[FND-21b8fa43] Missing Referrer-Policy
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the Referrer-Policy header (Referrer information control)
+  URL: https://storycraftpro.me
+
+[FND-35eb1194] Missing X-Permitted-Cross-Domain-Policies
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the X-Permitted-Cross-Domain-Policies header (Cross-domain policy)
+  URL: https://storycraftpro.me
+
+[FND-8f99a758] No rate limiting headers detected
+  Category: RATE_LIMIT
+  Severity: LOW
+  Description: Server may be vulnerable to brute force and DoS attacks
+  URL: https://storycraftpro.me
+
+--- INFO (6) ---
+
+[FND-d5187b17] Email security records not detected
+  Category: DNS
+  Severity: INFO
+  Description: Consider checking SPF, DKIM, and DMARC records
+  URL: https://storycraftpro.me
+
+[FND-7e403c7a] XML handling detected
+  Category: XXE
+  Severity: INFO
+  Description: Application processes XML - test for XXE vulnerabilities
+  URL: https://storycraftpro.me
+
+[FND-8e3ec3e9] PHP include patterns detected
+  Category: LFI_RFI
+  Severity: INFO
+  Description: Test for Local/Remote File Inclusion vulnerabilities
+  URL: https://storycraftpro.me
+
+[FND-01d02d5e] Template syntax detected
+  Category: SSTI
+  Severity: INFO
+  Description: Test for Server-Side Template Injection
+  URL: https://storycraftpro.me
+
+[FND-7a01228e] No 2FA/MFA detected
+  Category: 2FA
+  Severity: INFO
+  Description: Consider implementing two-factor authentication
+  URL: https://storycraftpro.me
+
+[FND-f1c9ae36] Manual session fixation test required
+  Category: SESSION
+  Severity: INFO
+  Description: Verify that session IDs are regenerated after login
+  URL: https://storycraftpro.me
+
+================================================================================
+PHASES EXECUTED
+================================================================================
+
+  [✓] Phase 0: Governance Initialization (60ms)
+  [✓] Phase 1: Browser Initialization (2246ms)
+  [✓] Phase 2: Navigating to https://storycraftpro.me... (2250ms)
+  [✓] Phase 3: Extracting Page Content (306ms)
+  [✓] Phase 4: Detecting Forms & Inputs (15ms)
+  [✓] Phase 5: Analyzing Security Headers (4ms)
+  [✓] Phase 6: Checking Cookie Security (5ms)
+  [✓] Phase 7: XSS Vulnerability Detection (3ms)
+  [✓] Phase 8: SQL Injection Detection (0ms)
+  [✓] Phase 9: CSRF Token Analysis (0ms)
+  [✓] Phase 10: IDOR Vulnerability Check (1ms)
+  [✓] Phase 11: Information Disclosure Scan (4ms)
+  [✓] Phase 12: Technology Fingerprinting (1ms)
+  [✓] Phase 13: Crawling Links (max 5) (2103ms)
+  [✓] Phase 14: JavaScript Security Analysis (3ms)
+  [✓] Phase 15: API Endpoint Discovery (1ms)
+  [✓] Phase 16: Authentication Analysis (0ms)
+  [✓] Phase 17: CORS Policy Check (0ms)
+  [✓] Phase 18: CSP Analysis (0ms)
+  [✓] Phase 19: Capturing Screenshot (84ms)
+  [✓] Phase 20: Subdomain Enumeration (0ms)
+  [✓] Phase 21: DNS Security Analysis (0ms)
+  [✓] Phase 22: SSL/TLS Certificate Check (0ms)
+  [✓] Phase 23: Open Redirect Detection (0ms)
+  [✓] Phase 24: SSRF Vulnerability Check (0ms)
+  [✓] Phase 25: XXE Vulnerability Check (0ms)
+  [✓] Phase 26: Command Injection Detection (0ms)
+  [✓] Phase 27: Path Traversal Detection (0ms)
+  [✓] Phase 28: File Inclusion Check (0ms)
+  [✓] Phase 29: Template Injection Detection (0ms)
+  [✓] Phase 30: Clickjacking Defense Check (0ms)
+  [✓] Phase 31: HTTP Method Testing (0ms)
+  [✓] Phase 32: Header Injection Detection (0ms)
+  [✓] Phase 33: WebSocket Security Check (0ms)
+  [✓] Phase 34: GraphQL Security Analysis (1ms)
+  [✓] Phase 35: JWT Token Analysis (0ms)
+  [✓] Phase 36: OAuth Implementation Check (0ms)
+  [✓] Phase 37: Rate Limiting Check (0ms)
+  [✓] Phase 38: CAPTCHA Implementation Check (0ms)
+  [✓] Phase 39: Payment Security Analysis (0ms)
+  [✓] Phase 40: Business Logic Flaws (0ms)
+  [✓] Phase 41: Race Condition Detection (0ms)
+  [✓] Phase 42: Password Policy Check (0ms)
+  [✓] Phase 43: 2FA Implementation Check (0ms)
+  [✓] Phase 44: Session Fixation Check (0ms)
+  [✓] Phase 45: Privilege Escalation Check (0ms)
+  [✓] Phase 46: Sensitive Data Exposure (2ms)
+  [✓] Phase 47: CVE Vulnerability Detection (15ms)
+  [✓] Phase 48: Dependency Security Scan (0ms)
+  [✓] Phase 49: Final Security Summary (0ms)
+
+================================================================================
+PAGES VISITED
+================================================================================
+
+  • https://www.storycraftpro.me/
+  • https://storycraftpro.me/login
+  • https://storycraftpro.me/signin
+  • https://storycraftpro.me/sign-in
+  • https://storycraftpro.me/auth/login
+  • https://storycraftpro.me/admin
+
+================================================================================
+END OF REPORT
+================================================================================
