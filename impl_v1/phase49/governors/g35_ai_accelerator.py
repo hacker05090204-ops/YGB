@@ -385,3 +385,217 @@ def can_ai_override_human() -> Tuple[bool, str]:
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot override human decisions - human authority is absolute"
+
+
+# =============================================================================
+# GPU TRAINING EXTENSION
+# =============================================================================
+
+class TrainingMode(Enum):
+    """CLOSED ENUM - When AI training is allowed."""
+    IDLE = "IDLE"        # System idle, no human interaction
+    AUTO = "AUTO"        # System in auto mode
+
+
+class TrainingDataSource(Enum):
+    """CLOSED ENUM - Sources of training data."""
+    G33_VERIFIED_REAL = "G33_VERIFIED_REAL"      # Human-verified real bugs
+    G33_REJECTED = "G33_REJECTED"                # Rejected findings
+    G36_AUTO_VERIFIED = "G36_AUTO_VERIFIED"      # Auto-verified results
+    G36_HUMAN_CORRECTED = "G36_HUMAN_CORRECTED"  # Auto results later corrected
+    ACCEPTED_BOUNTY = "ACCEPTED_BOUNTY"          # Accepted bounty reports
+    REJECTED_BOUNTY = "REJECTED_BOUNTY"          # Rejected/duplicate reports
+    POC_VIDEO = "POC_VIDEO"                      # PoC videos with explanations
+
+
+@dataclass(frozen=True)
+class GPUTrainingConfig:
+    """Configuration for GPU-accelerated training."""
+    config_id: str
+    model_name: str
+    batch_size: int
+    learning_rate: float
+    epochs: int
+    gpu_memory_limit_mb: int
+    internet_allowed: bool  # For fetching public reports/CVEs
+
+
+@dataclass(frozen=True)
+class TrainingDataItem:
+    """Single training data item."""
+    item_id: str
+    source: TrainingDataSource
+    content_hash: str
+    label: str  # "REAL", "NOT_REAL", "DUPLICATE"
+    confidence_target: int
+    metadata: Dict[str, str]
+
+
+@dataclass(frozen=True)
+class TrainingBatch:
+    """Batch of training data."""
+    batch_id: str
+    items: Tuple[TrainingDataItem, ...]
+    total_items: int
+    sources_used: Tuple[TrainingDataSource, ...]
+    batch_hash: str
+
+
+@dataclass(frozen=True)
+class TrainingResult:
+    """Result of a training run."""
+    result_id: str
+    mode: TrainingMode
+    epochs_completed: int
+    loss_final: float
+    accuracy_estimate: float
+    gpu_time_seconds: float
+    is_mock: bool  # True = mock, False = real C++ GPU
+
+
+def _create_training_config(
+    model_name: str = "ygb-bug-classifier-v1",
+    batch_size: int = 32,
+) -> GPUTrainingConfig:
+    """Create default training configuration."""
+    return GPUTrainingConfig(
+        config_id=_generate_id("CFG"),
+        model_name=model_name,
+        batch_size=batch_size,
+        learning_rate=0.001,
+        epochs=10,
+        gpu_memory_limit_mb=4096,
+        internet_allowed=True,  # For public reports/CVEs ONLY
+    )
+
+
+def can_train_now(current_mode: str) -> Tuple[bool, str]:
+    """
+    Check if training is allowed in current mode.
+    
+    Training ONLY allowed in IDLE or AUTO mode.
+    """
+    allowed_modes = {"IDLE", "AUTO"}
+    
+    if current_mode.upper() in allowed_modes:
+        return True, f"Training allowed in {current_mode} mode"
+    
+    return False, f"Training not allowed in {current_mode} mode - requires IDLE or AUTO"
+
+
+def prepare_training_batch(
+    verified_bugs: Tuple[Tuple[str, str, str], ...],  # (id, content_hash, label)
+    rejected_findings: Tuple[Tuple[str, str], ...],   # (id, content_hash)
+    max_items: int = 1000,
+) -> TrainingBatch:
+    """
+    Prepare a batch of training data.
+    
+    Uses G33 verified bugs and rejected findings.
+    """
+    items = []
+    sources_used = set()
+    
+    # Add verified bugs
+    for item_id, content_hash, label in verified_bugs[:max_items // 2]:
+        items.append(TrainingDataItem(
+            item_id=item_id,
+            source=TrainingDataSource.G33_VERIFIED_REAL,
+            content_hash=content_hash,
+            label=label,
+            confidence_target=95,
+            metadata={},
+        ))
+        sources_used.add(TrainingDataSource.G33_VERIFIED_REAL)
+    
+    # Add rejected findings
+    for item_id, content_hash in rejected_findings[:max_items // 2]:
+        items.append(TrainingDataItem(
+            item_id=item_id,
+            source=TrainingDataSource.G33_REJECTED,
+            content_hash=content_hash,
+            label="NOT_REAL",
+            confidence_target=90,
+            metadata={},
+        ))
+        sources_used.add(TrainingDataSource.G33_REJECTED)
+    
+    batch_hash = _hash_content(str([i.content_hash for i in items]))
+    
+    return TrainingBatch(
+        batch_id=_generate_id("TRB"),
+        items=tuple(items),
+        total_items=len(items),
+        sources_used=tuple(sources_used),
+        batch_hash=batch_hash,
+    )
+
+
+def simulate_gpu_training(
+    batch: TrainingBatch,
+    config: GPUTrainingConfig,
+    mode: TrainingMode,
+) -> TrainingResult:
+    """
+    Simulate GPU training (mock for Python, real in C++).
+    
+    Returns mock training result.
+    """
+    if can_ai_approve()[0]:  # pragma: no cover
+        raise RuntimeError("SECURITY: AI cannot approve - training aborted")
+    
+    # Mock results - real implementation in C++ GPU kernel
+    return TrainingResult(
+        result_id=_generate_id("TRR"),
+        mode=mode,
+        epochs_completed=config.epochs,
+        loss_final=0.05,  # Mock low loss
+        accuracy_estimate=0.97,  # Mock ~97% accuracy
+        gpu_time_seconds=batch.total_items * 0.01,  # Mock time
+        is_mock=True,  # Flag as mock
+    )
+
+
+# =============================================================================
+# ADDITIONAL TRAINING GUARDS (ALL RETURN FALSE)
+# =============================================================================
+
+def can_ai_approve_bug() -> Tuple[bool, str]:
+    """
+    Check if AI can approve bugs during training.
+    
+    Returns (can_approve, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "AI cannot approve bugs - human approval required"
+
+
+def can_ai_override_governance() -> Tuple[bool, str]:
+    """
+    Check if AI can override governance during training.
+    
+    Returns (can_override, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "AI cannot override governance - governance is absolute"
+
+
+def can_ai_submit() -> Tuple[bool, str]:
+    """
+    Check if AI can submit bugs.
+    
+    Returns (can_submit, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "AI cannot submit bugs - human submission required"
+
+
+def can_training_access_credentials() -> Tuple[bool, str]:
+    """
+    Check if training can access credentials.
+    
+    Returns (can_access, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "Training cannot access credentials - read-only data access"
+

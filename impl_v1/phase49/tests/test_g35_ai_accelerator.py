@@ -307,3 +307,180 @@ class TestAiCannotApproveOrVerify:
         
         # Binding decisions MUST be 0
         assert result.binding_decisions == 0
+
+
+# =============================================================================
+# GPU TRAINING EXTENSION TESTS
+# =============================================================================
+
+from impl_v1.phase49.governors.g35_ai_accelerator import (
+    TrainingMode,
+    TrainingDataSource,
+    GPUTrainingConfig,
+    TrainingDataItem,
+    TrainingBatch,
+    TrainingResult,
+    can_train_now,
+    prepare_training_batch,
+    simulate_gpu_training,
+    can_ai_approve_bug,
+    can_ai_override_governance,
+    can_ai_submit,
+    can_training_access_credentials,
+)
+
+
+class TestTrainingModeEnum:
+    """Tests for TrainingMode enum."""
+    
+    def test_has_idle(self):
+        assert TrainingMode.IDLE.value == "IDLE"
+    
+    def test_has_auto(self):
+        assert TrainingMode.AUTO.value == "AUTO"
+
+
+class TestTrainingDataSource:
+    """Tests for TrainingDataSource enum."""
+    
+    def test_has_g33_verified(self):
+        assert TrainingDataSource.G33_VERIFIED_REAL.value == "G33_VERIFIED_REAL"
+    
+    def test_has_g36_auto(self):
+        assert TrainingDataSource.G36_AUTO_VERIFIED.value == "G36_AUTO_VERIFIED"
+    
+    def test_has_accepted_bounty(self):
+        assert TrainingDataSource.ACCEPTED_BOUNTY.value == "ACCEPTED_BOUNTY"
+
+
+class TestCanTrainNow:
+    """Tests for can_train_now function."""
+    
+    def test_allowed_in_idle(self):
+        can_train, reason = can_train_now("IDLE")
+        assert can_train is True
+        assert "idle" in reason.lower()
+    
+    def test_allowed_in_auto(self):
+        can_train, reason = can_train_now("AUTO")
+        assert can_train is True
+        assert "auto" in reason.lower()
+    
+    def test_not_allowed_in_manual(self):
+        can_train, reason = can_train_now("MANUAL")
+        assert can_train is False
+        assert "not allowed" in reason.lower()
+    
+    def test_not_allowed_in_active(self):
+        can_train, reason = can_train_now("ACTIVE")
+        assert can_train is False
+
+
+class TestPrepareTrainingBatch:
+    """Tests for prepare_training_batch function."""
+    
+    def test_creates_batch_from_verified_bugs(self):
+        verified = (
+            ("bug1", "hash1", "REAL"),
+            ("bug2", "hash2", "REAL"),
+        )
+        rejected = (
+            ("noise1", "hash3"),
+        )
+        
+        batch = prepare_training_batch(verified, rejected)
+        
+        assert batch.batch_id.startswith("TRB-")
+        assert batch.total_items == 3
+        assert TrainingDataSource.G33_VERIFIED_REAL in batch.sources_used
+    
+    def test_has_batch_hash(self):
+        batch = prepare_training_batch(
+            (("b1", "h1", "REAL"),),
+            tuple(),
+        )
+        assert len(batch.batch_hash) == 32
+    
+    def test_empty_batch(self):
+        batch = prepare_training_batch(tuple(), tuple())
+        assert batch.total_items == 0
+
+
+class TestSimulateGpuTraining:
+    """Tests for simulate_gpu_training function."""
+    
+    def test_returns_training_result(self):
+        batch = prepare_training_batch(
+            (("b1", "h1", "REAL"),),
+            tuple(),
+        )
+        config = GPUTrainingConfig(
+            config_id="cfg1",
+            model_name="test-model",
+            batch_size=32,
+            learning_rate=0.001,
+            epochs=5,
+            gpu_memory_limit_mb=4096,
+            internet_allowed=True,
+        )
+        
+        result = simulate_gpu_training(batch, config, TrainingMode.IDLE)
+        
+        assert result.result_id.startswith("TRR-")
+        assert result.mode == TrainingMode.IDLE
+        assert result.epochs_completed == 5
+        assert result.is_mock is True  # Mock in Python
+    
+    def test_result_shows_mock_flag(self):
+        batch = prepare_training_batch(tuple(), tuple())
+        config = GPUTrainingConfig(
+            config_id="cfg1", model_name="test",
+            batch_size=32, learning_rate=0.001,
+            epochs=1, gpu_memory_limit_mb=4096,
+            internet_allowed=True,
+        )
+        
+        result = simulate_gpu_training(batch, config, TrainingMode.AUTO)
+        assert result.is_mock is True
+
+
+class TestTrainingGuards:
+    """Tests for training-related guards."""
+    
+    def test_can_ai_approve_bug_returns_false(self):
+        can_approve, reason = can_ai_approve_bug()
+        assert can_approve is False
+        assert "human" in reason.lower()
+    
+    def test_can_ai_override_governance_returns_false(self):
+        can_override, reason = can_ai_override_governance()
+        assert can_override is False
+        assert "governance" in reason.lower()
+    
+    def test_can_ai_submit_returns_false(self):
+        can_submit, reason = can_ai_submit()
+        assert can_submit is False
+        assert "human" in reason.lower()
+    
+    def test_can_training_access_credentials_returns_false(self):
+        can_access, reason = can_training_access_credentials()
+        assert can_access is False
+        assert "read-only" in reason.lower()
+
+
+class TestAllTrainingGuardsReturnFalse:
+    """Comprehensive training guards test."""
+    
+    def test_all_training_guards_return_false(self):
+        guards = [
+            can_ai_approve_bug,
+            can_ai_override_governance,
+            can_ai_submit,
+            can_training_access_credentials,
+        ]
+        
+        for guard in guards:
+            result, reason = guard()
+            assert result is False, f"Guard {guard.__name__} returned True!"
+            assert len(reason) > 0
+
