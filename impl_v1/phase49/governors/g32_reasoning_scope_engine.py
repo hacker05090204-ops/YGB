@@ -649,3 +649,212 @@ def can_reasoning_override_governance() -> Tuple[bool, str]:
     ALWAYS returns (False, ...).
     """
     return False, "Reasoning engine cannot override governance - immutable constraints"
+
+
+# ============================================================
+# VIDEO EXPLANATION PIPELINE (POST-PROCESSING ONLY)
+# ============================================================
+
+@dataclass(frozen=True)
+class VideoAnnotation:
+    """Single annotation for video overlay."""
+    annotation_id: str
+    timestamp_ms: int
+    bounding_boxes: Tuple[Tuple[int, int, int, int], ...]  # (x, y, width, height)
+    highlighted_elements: Tuple[str, ...]  # CSS selectors
+    text_overlays: Tuple[str, ...]  # Overlay text
+    step_number: int
+
+
+@dataclass(frozen=True)
+class NarrationSegment:
+    """Single narration segment for voice explanation."""
+    segment_id: str
+    step_order: int
+    spoken_text: str
+    evidence_hash: str
+    sync_timestamp_ms: int
+    duration_ms: int
+
+
+@dataclass(frozen=True)
+class VideoExplanationPlan:
+    """Complete video explanation plan."""
+    plan_id: str
+    annotations: Tuple[VideoAnnotation, ...]
+    narration_segments: Tuple[NarrationSegment, ...]
+    total_duration_ms: int
+    evidence_hashes: Tuple[str, ...]
+    determinism_hash: str
+
+
+def generate_video_annotation(
+    step_number: int,
+    timestamp_ms: int,
+    element_selectors: Tuple[str, ...],
+    overlay_text: str,
+    bounding_boxes: Tuple[Tuple[int, int, int, int], ...] = tuple(),
+) -> VideoAnnotation:
+    """
+    Generate a single video annotation.
+    
+    DETERMINISTIC: Same input always produces same annotation.
+    """
+    return VideoAnnotation(
+        annotation_id=_generate_id("ANN"),
+        timestamp_ms=timestamp_ms,
+        bounding_boxes=bounding_boxes,
+        highlighted_elements=element_selectors,
+        text_overlays=(overlay_text,) if overlay_text else tuple(),
+        step_number=step_number,
+    )
+
+
+def generate_narration_segment(
+    step_order: int,
+    spoken_text: str,
+    evidence_hash: str,
+    sync_timestamp_ms: int,
+    duration_ms: int = 3000,
+) -> NarrationSegment:
+    """
+    Generate a single narration segment.
+    
+    DETERMINISTIC: Same input always produces same segment.
+    """
+    return NarrationSegment(
+        segment_id=_generate_id("NAR"),
+        step_order=step_order,
+        spoken_text=spoken_text,
+        evidence_hash=evidence_hash,
+        sync_timestamp_ms=sync_timestamp_ms,
+        duration_ms=duration_ms,
+    )
+
+
+def generate_video_explanation_plan(
+    reasoning_explanation: ReasoningExplanation,
+    evidence_hashes: Tuple[str, ...],
+    step_descriptions: Tuple[str, ...],
+) -> VideoExplanationPlan:
+    """
+    Convert reasoning explanation to video explanation plan.
+    
+    DETERMINISTIC: Same input always produces same plan.
+    
+    NOTE: This generates the PLAN only. Actual rendering is
+    deferred to C++ for performance.
+    """
+    annotations = []
+    narration_segments = []
+    current_time = 0
+    
+    # Generate intro segment
+    intro_text = f"This explains why this finding matters: {reasoning_explanation.why_this_matters[:100]}"
+    narration_segments.append(generate_narration_segment(
+        step_order=0,
+        spoken_text=intro_text,
+        evidence_hash=evidence_hashes[0] if evidence_hashes else "",
+        sync_timestamp_ms=current_time,
+        duration_ms=5000,
+    ))
+    current_time += 5000
+    
+    # Generate step annotations
+    for i, description in enumerate(step_descriptions):
+        annotations.append(generate_video_annotation(
+            step_number=i + 1,
+            timestamp_ms=current_time,
+            element_selectors=tuple(),
+            overlay_text=f"Step {i + 1}: {description[:50]}",
+        ))
+        
+        narration_segments.append(generate_narration_segment(
+            step_order=i + 1,
+            spoken_text=description,
+            evidence_hash=evidence_hashes[i] if i < len(evidence_hashes) else "",
+            sync_timestamp_ms=current_time,
+            duration_ms=3000,
+        ))
+        current_time += 3000
+    
+    # Generate impact segment
+    impact_text = f"Business impact: {reasoning_explanation.business_impact[:100]}"
+    narration_segments.append(generate_narration_segment(
+        step_order=len(step_descriptions) + 1,
+        spoken_text=impact_text,
+        evidence_hash=evidence_hashes[-1] if evidence_hashes else "",
+        sync_timestamp_ms=current_time,
+        duration_ms=4000,
+    ))
+    current_time += 4000
+    
+    # Generate determinism hash
+    hash_content = f"{reasoning_explanation.determinism_hash}|{len(annotations)}|{current_time}"
+    det_hash = _hash_content(hash_content)
+    
+    return VideoExplanationPlan(
+        plan_id=_generate_id("VPL"),
+        annotations=tuple(annotations),
+        narration_segments=tuple(narration_segments),
+        total_duration_ms=current_time,
+        evidence_hashes=evidence_hashes,
+        determinism_hash=det_hash,
+    )
+
+
+def export_video_plan(plan: VideoExplanationPlan) -> bytes:
+    """
+    Export video plan as serialized bytes.
+    
+    MOCK IMPLEMENTATION: Real rendering deferred to C++.
+    Returns JSON representation as bytes.
+    """
+    import json
+    
+    export_data = {
+        "plan_id": plan.plan_id,
+        "total_duration_ms": plan.total_duration_ms,
+        "annotation_count": len(plan.annotations),
+        "narration_count": len(plan.narration_segments),
+        "evidence_hashes": list(plan.evidence_hashes),
+        "determinism_hash": plan.determinism_hash,
+        "status": "PLAN_ONLY_NO_RENDER",
+    }
+    
+    return json.dumps(export_data, indent=2).encode("utf-8")
+
+
+# ============================================================
+# VIDEO PIPELINE GUARDS (ALL RETURN FALSE)
+# ============================================================
+
+def can_reasoning_render_video() -> Tuple[bool, str]:
+    """
+    Check if reasoning engine can render video.
+    
+    Returns (can_render, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "Reasoning engine cannot render video - deferred to C++"
+
+
+def can_reasoning_modify_evidence() -> Tuple[bool, str]:
+    """
+    Check if reasoning engine can modify evidence.
+    
+    Returns (can_modify, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "Reasoning engine cannot modify evidence - read-only access"
+
+
+def can_reasoning_execute_browser() -> Tuple[bool, str]:
+    """
+    Check if reasoning engine can execute browser actions.
+    
+    Returns (can_execute, reason).
+    ALWAYS returns (False, ...).
+    """
+    return False, "Reasoning engine cannot execute browser - post-processing only"
+

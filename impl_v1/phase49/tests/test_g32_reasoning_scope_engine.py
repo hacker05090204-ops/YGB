@@ -693,3 +693,196 @@ class TestIntegrationScopeToTest:
         # Verify immutability throughout
         assert scope_result.determinism_hash is not None
         assert test_result.determinism_hash is not None
+
+
+# ============================================================
+# VIDEO EXPLANATION PIPELINE TESTS
+# ============================================================
+
+class TestVideoAnnotation:
+    """Tests for VideoAnnotation dataclass."""
+    
+    def test_generate_video_annotation(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import generate_video_annotation
+        
+        annotation = generate_video_annotation(
+            step_number=1,
+            timestamp_ms=5000,
+            element_selectors=("#login-form",),
+            overlay_text="Step 1: Enter credentials",
+        )
+        assert annotation.annotation_id.startswith("ANN-")
+        assert annotation.step_number == 1
+        assert annotation.timestamp_ms == 5000
+    
+    def test_is_frozen(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import generate_video_annotation
+        
+        annotation = generate_video_annotation(1, 0, tuple(), "test")
+        with pytest.raises(AttributeError):
+            annotation.step_number = 2
+
+
+class TestNarrationSegment:
+    """Tests for NarrationSegment dataclass."""
+    
+    def test_generate_narration_segment(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import generate_narration_segment
+        
+        segment = generate_narration_segment(
+            step_order=1,
+            spoken_text="This vulnerability allows...",
+            evidence_hash="abc123",
+            sync_timestamp_ms=0,
+            duration_ms=3000,
+        )
+        assert segment.segment_id.startswith("NAR-")
+        assert segment.step_order == 1
+        assert segment.duration_ms == 3000
+    
+    def test_is_frozen(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import generate_narration_segment
+        
+        segment = generate_narration_segment(1, "text", "hash", 0)
+        with pytest.raises(AttributeError):
+            segment.spoken_text = "changed"
+
+
+class TestVideoExplanationPlan:
+    """Tests for VideoExplanationPlan generation."""
+    
+    def test_generate_video_explanation_plan(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_video_explanation_plan,
+            generate_reasoning_explanation,
+            TestCategory,
+        )
+        
+        explanation = generate_reasoning_explanation(
+            TestCategory.XSS, "HIGH", "example.com", "web app"
+        )
+        
+        plan = generate_video_explanation_plan(
+            reasoning_explanation=explanation,
+            evidence_hashes=("hash1", "hash2"),
+            step_descriptions=("Navigate to login", "Enter payload"),
+        )
+        
+        assert plan.plan_id.startswith("VPL-")
+        assert len(plan.annotations) == 2  # One per step
+        assert len(plan.narration_segments) >= 3  # Intro + steps + impact
+        assert plan.total_duration_ms > 0
+    
+    def test_has_determinism_hash(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_video_explanation_plan,
+            generate_reasoning_explanation,
+            TestCategory,
+        )
+        
+        explanation = generate_reasoning_explanation(
+            TestCategory.SQLI, "CRITICAL", "example.com", "API"
+        )
+        plan = generate_video_explanation_plan(explanation, tuple(), tuple())
+        assert len(plan.determinism_hash) == 32
+    
+    def test_is_frozen(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_video_explanation_plan,
+            generate_reasoning_explanation,
+            TestCategory,
+        )
+        
+        explanation = generate_reasoning_explanation(
+            TestCategory.IDOR, "MEDIUM", "example.com", "API"
+        )
+        plan = generate_video_explanation_plan(explanation, tuple(), tuple())
+        with pytest.raises(AttributeError):
+            plan.total_duration_ms = 999
+
+
+class TestExportVideoPlan:
+    """Tests for export_video_plan function."""
+    
+    def test_export_returns_bytes(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_video_explanation_plan,
+            generate_reasoning_explanation,
+            export_video_plan,
+            TestCategory,
+        )
+        
+        explanation = generate_reasoning_explanation(
+            TestCategory.XSS, "HIGH", "example.com", "web"
+        )
+        plan = generate_video_explanation_plan(explanation, tuple(), tuple())
+        
+        exported = export_video_plan(plan)
+        assert isinstance(exported, bytes)
+    
+    def test_export_contains_plan_only_status(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            generate_video_explanation_plan,
+            generate_reasoning_explanation,
+            export_video_plan,
+            TestCategory,
+        )
+        import json
+        
+        explanation = generate_reasoning_explanation(
+            TestCategory.RCE, "CRITICAL", "example.com", "server"
+        )
+        plan = generate_video_explanation_plan(explanation, tuple(), tuple())
+        
+        exported = export_video_plan(plan)
+        data = json.loads(exported.decode("utf-8"))
+        
+        assert data["status"] == "PLAN_ONLY_NO_RENDER"
+
+
+class TestVideoGuards:
+    """Tests for video pipeline guards."""
+    
+    def test_can_reasoning_render_video_returns_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import can_reasoning_render_video
+        
+        can_render, reason = can_reasoning_render_video()
+        assert can_render == False
+        assert "c++" in reason.lower()
+    
+    def test_can_reasoning_modify_evidence_returns_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import can_reasoning_modify_evidence
+        
+        can_modify, reason = can_reasoning_modify_evidence()
+        assert can_modify == False
+        assert "read-only" in reason.lower()
+    
+    def test_can_reasoning_execute_browser_returns_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import can_reasoning_execute_browser
+        
+        can_execute, reason = can_reasoning_execute_browser()
+        assert can_execute == False
+        assert "post-processing" in reason.lower()
+
+
+class TestAllVideoGuardsReturnFalse:
+    """Comprehensive test that ALL video guards return False."""
+    
+    def test_all_video_guards_return_false(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
+            can_reasoning_render_video,
+            can_reasoning_modify_evidence,
+            can_reasoning_execute_browser,
+        )
+        
+        guards = [
+            can_reasoning_render_video,
+            can_reasoning_modify_evidence,
+            can_reasoning_execute_browser,
+        ]
+        
+        for guard in guards:
+            result, reason = guard()
+            assert result == False, f"Guard {guard.__name__} returned True!"
+            assert len(reason) > 0, f"Guard {guard.__name__} has empty reason!"
+

@@ -5,7 +5,11 @@ import pytest
 from pathlib import Path
 
 PHASE49_DIR = Path(__file__).parent.parent
-PYTHON_FILES = list(PHASE49_DIR.rglob("*.py"))
+# Exclude test files - they may contain forbidden strings in assertions
+PYTHON_FILES = [
+    f for f in PHASE49_DIR.rglob("*.py")
+    if "test_" not in f.name and f.parent.name != "tests"
+]
 
 FORBIDDEN = ["subprocess", "socket", "selenium", "playwright"]
 
