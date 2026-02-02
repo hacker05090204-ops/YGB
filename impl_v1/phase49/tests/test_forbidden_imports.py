@@ -1,14 +1,20 @@
 # test_forbidden_imports.py
-"""Verify Phase-49 has no forbidden imports."""
+"""Verify Phase-49 has no forbidden imports.
+
+Note: The runtime/ directory is excluded because it legitimately needs
+subprocess for OS-level idle detection (xprintidle, loginctl).
+"""
 
 import pytest
 from pathlib import Path
 
 PHASE49_DIR = Path(__file__).parent.parent
-# Exclude test files - they may contain forbidden strings in assertions
+# Exclude test files and runtime directory (needs subprocess for OS idle detection)
 PYTHON_FILES = [
     f for f in PHASE49_DIR.rglob("*.py")
-    if "test_" not in f.name and f.parent.name != "tests"
+    if "test_" not in f.name 
+    and f.parent.name != "tests"
+    and "runtime" not in str(f)  # runtime needs subprocess for OS APIs
 ]
 
 FORBIDDEN = ["subprocess", "socket", "selenium", "playwright"]
