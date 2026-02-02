@@ -698,6 +698,16 @@ def can_ai_hide_external_usage() -> Tuple[bool, str]:
     return False, "AI cannot hide external usage - all usage logged"
 
 
+def can_ai_learn_bug_labels_from_internet() -> Tuple[bool, str]:
+    """
+    Check if AI can learn bug labels from internet.
+    
+    ALWAYS returns (False, ...).
+    Core principle: AI may learn how systems look, NOT what is a bug.
+    """
+    return False, "AI cannot learn bug labels from internet - representation only"
+
+
 # =============================================================================
 # ALL GUARDS LIST
 # =============================================================================
@@ -713,6 +723,7 @@ ALL_GUARDS = (
     can_ai_leak_data,
     can_ai_enable_failover_without_error,
     can_ai_hide_external_usage,
+    can_ai_learn_bug_labels_from_internet,
 )
 
 
@@ -727,4 +738,4 @@ def verify_all_guards() -> Tuple[bool, str]:
         result, msg = guard()
         if result:
             return False, f"Guard {guard.__name__} returned True: {msg}"
-    return True, "All 10 guards verified - AI has ZERO authority"
+    return True, "All 11 guards verified - AI has ZERO authority"

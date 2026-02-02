@@ -58,6 +58,7 @@ from impl_v1.phase49.governors.g38_self_trained_model import (
     can_ai_leak_data,
     can_ai_enable_failover_without_error,
     can_ai_hide_external_usage,
+    can_ai_learn_bug_labels_from_internet,
     ALL_GUARDS,
     verify_all_guards,
 )
@@ -512,13 +513,18 @@ class TestGuardsReturnFalse:
         result, msg = can_ai_hide_external_usage()
         assert result is False
         assert isinstance(msg, str)
+    
+    def test_can_ai_learn_bug_labels_from_internet_returns_false(self):
+        result, msg = can_ai_learn_bug_labels_from_internet()
+        assert result is False
+        assert "representation only" in msg.lower()
 
 
 class TestAllGuardsCollection:
     """Tests for ALL_GUARDS collection."""
     
-    def test_all_guards_has_10_guards(self):
-        assert len(ALL_GUARDS) == 10
+    def test_all_guards_has_11_guards(self):
+        assert len(ALL_GUARDS) == 11
     
     def test_all_guards_are_callable(self):
         for guard in ALL_GUARDS:
