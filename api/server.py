@@ -40,6 +40,35 @@ from database import (
 from phase_runner import RealPhaseRunner, run_real_workflow
 
 # =============================================================================
+# G38 AUTO-TRAINING IMPORTS
+# =============================================================================
+
+try:
+    from impl_v1.phase49.runtime import (
+        get_auto_trainer,
+        start_auto_training,
+        stop_auto_training,
+        get_idle_seconds,
+        is_power_connected,
+        is_scan_active,
+        set_scan_active,
+        TrainingState,
+    )
+    from impl_v1.phase49.governors.g38_self_trained_model import (
+        verify_all_guards,
+        ALL_GUARDS,
+    )
+    from impl_v1.phase49.governors.g38_safe_pretraining import (
+        verify_pretraining_guards,
+        get_mode_a_status,
+        get_training_mode_summary,
+    )
+    G38_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  G38 modules not available: {e}")
+    G38_AVAILABLE = False
+
+# =============================================================================
 # APP CONFIGURATION
 # =============================================================================
 
@@ -689,6 +718,115 @@ async def create_autonomy_session(request: AutonomySessionRequest):
 
 
 # =============================================================================
+# G38 AUTO-TRAINING ENDPOINTS
+# =============================================================================
+
+@app.get("/api/g38/status")
+async def get_g38_status():
+    """Get G38 auto-training status."""
+    if not G38_AVAILABLE:
+        return {"available": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    status = trainer.get_status()
+    
+    # Add guard verification
+    guards_ok, guards_msg = verify_all_guards()
+    pretraining_ok, pretraining_msg = verify_pretraining_guards()
+    mode_a_status, mode_a_msg = get_mode_a_status()
+    
+    return {
+        "available": True,
+        "auto_training": {
+            "state": status["state"],
+            "is_training": status["is_training"],
+            "epoch": status["epoch"],
+            "idle_seconds": status["idle_seconds"],
+            "power_connected": status["power_connected"],
+            "scan_active": status["scan_active"],
+            "gpu_available": status["gpu_available"],
+            "events_count": status["events_count"],
+            "last_event": status["last_event"],
+        },
+        "guards": {
+            "main_guards": len(ALL_GUARDS),
+            "all_verified": guards_ok,
+            "message": guards_msg,
+        },
+        "pretraining": {
+            "verified": pretraining_ok,
+            "message": pretraining_msg,
+        },
+        "mode": {
+            "mode_a_status": mode_a_status.value,
+            "message": mode_a_msg,
+        },
+        "training_summary": get_training_mode_summary() if G38_AVAILABLE else None,
+    }
+
+
+@app.get("/api/g38/events")
+async def get_g38_events(limit: int = 50):
+    """Get recent G38 training events."""
+    if not G38_AVAILABLE:
+        return {"events": [], "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    events = trainer.events[-limit:] if trainer.events else []
+    
+    return {
+        "events": [
+            {
+                "event_id": e.event_id,
+                "event_type": e.event_type,
+                "timestamp": e.timestamp,
+                "details": e.details,
+                "idle_seconds": e.idle_seconds,
+                "gpu_used": e.gpu_used,
+                "epoch": e.epoch,
+            }
+            for e in events
+        ],
+        "total": len(trainer.events),
+    }
+
+
+@app.post("/api/g38/abort")
+async def abort_g38_training():
+    """Abort current G38 training."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    trainer.abort_training()
+    
+    return {
+        "success": True,
+        "state": trainer.state.value,
+        "message": "Training abort requested",
+    }
+
+
+@app.get("/api/g38/guards")
+async def get_g38_guards():
+    """Get all G38 guard statuses."""
+    if not G38_AVAILABLE:
+        return {"guards": [], "error": "G38 modules not loaded"}
+    
+    guards = []
+    for guard in ALL_GUARDS:
+        result, msg = guard()
+        guards.append({
+            "name": guard.__name__,
+            "returns_false": not result,
+            "message": msg,
+        })
+    
+    return {
+        "guards": guards,
+        "total": len(guards),
+        "all_passing": all(not g["returns_false"] is False for g in guards),
+    }
 # DATABASE API ENDPOINTS
 # =============================================================================
 
@@ -1062,10 +1200,22 @@ async def lifespan(app):
         print(f"⚠️  Database connection failed: {e}")
     
     print(f"✅ Server ready at http://localhost:8000")
+    
+    # Start G38 auto-training scheduler
+    if G38_AVAILABLE:
+        start_auto_training()
+        print("🧠 G38 auto-training started")
+    
     yield
     
     # Shutdown
     print("👋 YGB API Server shutting down...")
+    
+    # Stop G38 auto-training
+    if G38_AVAILABLE:
+        stop_auto_training()
+        print("🛑 G38 auto-training stopped")
+    
     await close_pool()
 
 # Apply lifespan to app

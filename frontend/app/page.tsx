@@ -21,7 +21,10 @@ import {
   AlertTriangle,
   Activity,
   Zap,
-  Clock
+  Clock,
+  Brain,
+  Cpu,
+  Power
 } from "lucide-react"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -59,6 +62,26 @@ interface WorkflowResult {
   phases?: any[]
 }
 
+interface G38Status {
+  available: boolean
+  auto_training?: {
+    state: string
+    is_training: boolean
+    epoch: number
+    idle_seconds: number
+    power_connected: boolean
+    scan_active: boolean
+    gpu_available: boolean
+    events_count: number
+    last_event: string | null
+  }
+  guards?: {
+    main_guards: number
+    all_verified: boolean
+    message: string
+  }
+}
+
 const API_BASE = "http://localhost:8000"
 
 export default function Home() {
@@ -78,6 +101,7 @@ export default function Home() {
   const [progress, setProgress] = useState(0)
   const [result, setResult] = useState<WorkflowResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [g38Status, setG38Status] = useState<G38Status | null>(null)
 
   const wsRef = useRef<WebSocket | null>(null)
 
@@ -96,6 +120,25 @@ export default function Home() {
       }
     }
     checkAPI()
+  }, [])
+
+  // Fetch G38 status periodically
+  useEffect(() => {
+    async function fetchG38Status() {
+      try {
+        const res = await fetch(`${API_BASE}/api/g38/status`)
+        if (res.ok) {
+          const data = await res.json()
+          setG38Status(data)
+        }
+      } catch {
+        // G38 not available
+      }
+    }
+
+    fetchG38Status()
+    const interval = setInterval(fetchG38Status, 5000) // Refresh every 5 seconds
+    return () => clearInterval(interval)
   }, [])
 
   // Auto-scroll logs
@@ -340,6 +383,79 @@ export default function Home() {
               </div>
             )}
           </div>
+
+          {/* G38 Auto-Training Status */}
+          {g38Status?.available && (
+            <div className="mt-8 bg-[#0A0A0A] border border-white/[0.06] rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">G38 Auto-Training</h3>
+                    <p className="text-xs text-[#525252]">
+                      {g38Status.auto_training?.is_training ? "Training in progress" : "Ready to train when idle"}
+                    </p>
+                  </div>
+                </div>
+                <div className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 ${g38Status.auto_training?.is_training
+                    ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                    : "bg-white/[0.03] text-[#737373] border border-white/[0.06]"
+                  }`}>
+                  <div className={`w-2 h-2 rounded-full ${g38Status.auto_training?.is_training
+                      ? "bg-purple-400 animate-pulse"
+                      : "bg-[#404040]"
+                    }`} />
+                  {g38Status.auto_training?.state || "IDLE"}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="p-3 rounded-xl bg-[#171717] border border-white/[0.04]">
+                  <div className="flex items-center gap-2 text-[#525252] text-xs mb-1">
+                    <Clock className="w-3 h-3" />
+                    Idle Time
+                  </div>
+                  <div className="text-lg font-bold text-[#FAFAFA]">{g38Status.auto_training?.idle_seconds || 0}s</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#171717] border border-white/[0.04]">
+                  <div className="flex items-center gap-2 text-[#525252] text-xs mb-1">
+                    <Zap className="w-3 h-3" />
+                    Epoch
+                  </div>
+                  <div className="text-lg font-bold text-[#FAFAFA]">{g38Status.auto_training?.epoch || 0}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#171717] border border-white/[0.04]">
+                  <div className="flex items-center gap-2 text-[#525252] text-xs mb-1">
+                    <Cpu className="w-3 h-3" />
+                    GPU
+                  </div>
+                  <div className={`text-lg font-bold ${g38Status.auto_training?.gpu_available ? "text-green-400" : "text-[#525252]"
+                    }`}>{g38Status.auto_training?.gpu_available ? "Available" : "CPU"}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-[#171717] border border-white/[0.04]">
+                  <div className="flex items-center gap-2 text-[#525252] text-xs mb-1">
+                    <Power className="w-3 h-3" />
+                    Power
+                  </div>
+                  <div className={`text-lg font-bold ${g38Status.auto_training?.power_connected ? "text-green-400" : "text-yellow-400"
+                    }`}>{g38Status.auto_training?.power_connected ? "Connected" : "Battery"}</div>
+                </div>
+              </div>
+
+              {g38Status.guards && (
+                <div className="mt-4 flex items-center justify-between p-3 rounded-xl bg-[#171717] border border-white/[0.04]">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-green-400" />
+                    <span className="text-sm text-[#A3A3A3]">{g38Status.guards.main_guards} Guards</span>
+                  </div>
+                  <span className={`text-xs ${g38Status.guards.all_verified ? "text-green-400" : "text-red-400"
+                    }`}>{g38Status.guards.all_verified ? "✓ All Verified" : "⚠ Guard Failure"}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
