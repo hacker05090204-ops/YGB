@@ -740,7 +740,10 @@ async def get_g38_status():
         "auto_training": {
             "state": status["state"],
             "is_training": status["is_training"],
-            "epoch": status["epoch"],
+            "epoch": status["epoch"],  # Current session epoch (real)
+            "total_epochs": status.get("total_epochs", 0),  # Target epochs for this session
+            "total_completed": status.get("total_completed", 0),  # Total ever completed
+            "progress": status.get("progress", 0),  # REAL progress from backend
             "idle_seconds": status["idle_seconds"],
             "power_connected": status["power_connected"],
             "scan_active": status["scan_active"],
@@ -748,6 +751,7 @@ async def get_g38_status():
             "events_count": status["events_count"],
             "last_event": status["last_event"],
         },
+
         "guards": {
             "main_guards": len(ALL_GUARDS),
             "all_verified": guards_ok,
@@ -804,6 +808,37 @@ async def abort_g38_training():
         "success": True,
         "state": trainer.state.value,
         "message": "Training abort requested",
+    }
+
+
+@app.post("/api/g38/start")
+async def start_g38_training(epochs: int = 10):
+    """Manually start G38 training for demo/testing."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    
+    # Check if already training
+    if trainer.is_training:
+        return {
+            "success": False,
+            "error": "Training already in progress",
+            "state": trainer.state.value,
+        }
+    
+    # Start training in background thread (async)
+    import threading
+    def run_training():
+        trainer.force_start_training(epochs=epochs)
+    
+    thread = threading.Thread(target=run_training, daemon=True)
+    thread.start()
+    
+    return {
+        "success": True,
+        "message": f"Training started for {epochs} epochs",
+        "state": "TRAINING",
     }
 
 

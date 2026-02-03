@@ -74,6 +74,8 @@ interface G38Status {
     gpu_available: boolean
     events_count: number
     last_event: string | null
+    progress?: number  // Training progress percentage (0-100)
+    total_epochs?: number  // Total epochs for training
   }
   guards?: {
     main_guards: number
@@ -389,27 +391,51 @@ export default function Home() {
             <div className="mt-8 bg-[#0A0A0A] border border-white/[0.06] rounded-2xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30 flex items-center justify-center">
-                    <Brain className="w-5 h-5 text-purple-400" />
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${g38Status.auto_training?.is_training
+                    ? "bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-purple-500/40"
+                    : "bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-purple-500/30"
+                    }`}>
+                    <Brain className={`w-5 h-5 ${g38Status.auto_training?.is_training ? "text-purple-300 animate-pulse" : "text-purple-400"
+                      }`} />
                   </div>
                   <div>
                     <h3 className="font-semibold">G38 Auto-Training</h3>
                     <p className="text-xs text-[#525252]">
-                      {g38Status.auto_training?.is_training ? "Training in progress" : "Ready to train when idle"}
+                      {g38Status.auto_training?.is_training
+                        ? `AI Training Started ${g38Status.auto_training?.progress || 0}% done`
+                        : "Device Idle - Ready to train when idle"}
                     </p>
                   </div>
                 </div>
                 <div className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 ${g38Status.auto_training?.is_training
-                    ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                    : "bg-white/[0.03] text-[#737373] border border-white/[0.06]"
+                  ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                  : "bg-white/[0.03] text-[#737373] border border-white/[0.06]"
                   }`}>
                   <div className={`w-2 h-2 rounded-full ${g38Status.auto_training?.is_training
-                      ? "bg-purple-400 animate-pulse"
-                      : "bg-[#404040]"
+                    ? "bg-purple-400 animate-pulse"
+                    : "bg-[#404040]"
                     }`} />
-                  {g38Status.auto_training?.state || "IDLE"}
+                  {g38Status.auto_training?.is_training
+                    ? `TRAINING ${g38Status.auto_training?.progress || 0}%`
+                    : g38Status.auto_training?.state || "IDLE"}
                 </div>
               </div>
+
+              {/* Training Progress Bar */}
+              {g38Status.auto_training?.is_training && (
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs text-[#525252] mb-2">
+                    <span>Epoch {g38Status.auto_training?.epoch || 0} / {g38Status.auto_training?.total_epochs || 0}</span>
+                    <span>{g38Status.auto_training?.progress || 0}%</span>
+                  </div>
+                  <div className="h-2 bg-[#171717] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-500"
+                      style={{ width: `${g38Status.auto_training?.progress || 0}%` }}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 rounded-xl bg-[#171717] border border-white/[0.04]">

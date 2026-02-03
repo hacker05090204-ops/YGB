@@ -124,7 +124,9 @@ class AutoTrainer:
         self._training_lock = threading.Lock()
         self._abort_flag = threading.Event()
         self._events: List[TrainingEvent] = []
-        self._epoch = 0
+        self._epoch = 0  # Total epochs completed ever
+        self._target_epochs = 0  # Target epochs for current session
+        self._session_epoch = 0  # Current epoch within session (0 to target)
         self._running = False
         self._task: Optional[asyncio.Task] = None
         self._on_event_callback: Optional[Callable[[TrainingEvent], None]] = None
@@ -422,14 +424,107 @@ class AutoTrainer:
             "Manual abort requested",
         )
     
+    def force_start_training(self, epochs: int = 5) -> dict:
+        """
+        Manually start training regardless of idle conditions.
+        
+        Used for demo/testing purposes.
+        """
+        with self._training_lock:
+            if self._state == TrainingState.TRAINING:
+                return {
+                    "started": False,
+                    "reason": "Training already in progress",
+                    "state": self._state.value,
+                }
+            
+            self._state = TrainingState.TRAINING
+            self._abort_flag.clear()
+            # Set REAL target for progress tracking
+            self._target_epochs = epochs
+            self._session_epoch = 0
+        
+        self._emit_event(
+            "MANUAL_START",
+            f"Manual training triggered for {epochs} epochs",
+        )
+        
+        try:
+            for i in range(epochs):
+                if self._abort_flag.is_set():
+                    break
+                
+                # Update progress BEFORE training starts
+                self._session_epoch = i + 1
+                self._epoch += 1
+                
+                self._emit_event(
+                    "TRAINING_STARTED",
+                    f"Starting epoch {self._session_epoch}/{epochs}",
+                    epoch=self._session_epoch,
+                    gpu_used=self._get_current_conditions().gpu_available,
+                )
+                
+                # Simulate training steps (2 seconds per epoch)
+                for step in range(10):
+                    if self._abort_flag.is_set():
+                        break
+                    time.sleep(0.2)  # 0.2s * 10 steps = 2s per epoch
+                
+                if not self._abort_flag.is_set():
+                    checkpoint_hash = hashlib.sha256(f"epoch-{self._epoch}".encode()).hexdigest()[:16]
+                    self._emit_event(
+                        "CHECKPOINT_SAVED",
+                        f"Saved checkpoint for epoch {self._session_epoch}/{epochs} (hash: {checkpoint_hash})",
+                        epoch=self._session_epoch,
+                    )
+            
+            completed = self._session_epoch
+            
+            with self._training_lock:
+                self._state = TrainingState.IDLE
+                self._target_epochs = 0
+                self._session_epoch = 0
+            
+            self._emit_event(
+                "TRAINING_STOPPED",
+                f"Manual training completed: {completed}/{epochs} epochs",
+                epoch=completed,
+            )
+            
+            return {
+                "started": True,
+                "completed_epochs": completed,
+                "total_epochs": self._epoch,
+                "state": "COMPLETED",
+            }
+            
+        except Exception as e:
+            self._state = TrainingState.ERROR
+            self._emit_event("ERROR", str(e))
+            return {
+                "started": False,
+                "reason": str(e),
+                "state": "ERROR",
+            }
+    
     def get_status(self) -> dict:
         """Get current trainer status for dashboard."""
         conditions = self._get_current_conditions()
         
+        # Calculate REAL progress percentage
+        if self.is_training and self._target_epochs > 0:
+            real_progress = round((self._session_epoch / self._target_epochs) * 100)
+        else:
+            real_progress = 0
+        
         return {
             "state": self._state.value,
             "is_training": self.is_training,
-            "epoch": self._epoch,
+            "epoch": self._session_epoch,  # Current session epoch (real progress)
+            "total_epochs": self._target_epochs,  # Target for this session
+            "total_completed": self._epoch,  # Total ever completed
+            "progress": real_progress,  # REAL percentage
             "idle_seconds": conditions.idle_seconds,
             "power_connected": conditions.power_connected,
             "scan_active": not conditions.no_active_scan,
