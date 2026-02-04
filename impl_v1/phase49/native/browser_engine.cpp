@@ -140,12 +140,56 @@ BrowserEngine::launch_chromium(const BrowserLaunchRequest &request) {
     return response;
   }
 
-  // MOCK: In real implementation, would fork/exec browser
-  // For governance testing, we just validate and return mock PID
+  // REAL: Fork and exec browser process
+#ifdef _WIN32
+  // Windows: CreateProcess
+  STARTUPINFO si = {sizeof(si)};
+  PROCESS_INFORMATION pi;
+  std::string cmdline = path + " --new-window";
+  if (request.mode == LaunchMode::HEADLESS) {
+    cmdline += " --headless";
+  }
+  cmdline += " " + request.target_url;
+
+  if (!CreateProcessA(NULL, const_cast<char *>(cmdline.c_str()), NULL, NULL,
+                      FALSE, 0, NULL, NULL, &si, &pi)) {
+    response.result = LaunchResult::FAILED_UNKNOWN;
+    response.error_message = "CreateProcess failed";
+    response.process_id = -1;
+    return response;
+  }
+  response.process_id = static_cast<int>(pi.dwProcessId);
+  CloseHandle(pi.hThread);
+  CloseHandle(pi.hProcess);
+#else
+  // Linux/macOS: fork + execv
+  pid_t pid = fork();
+  if (pid < 0) {
+    response.result = LaunchResult::FAILED_UNKNOWN;
+    response.error_message = "fork() failed";
+    response.process_id = -1;
+    return response;
+  } else if (pid == 0) {
+    // Child process
+    std::vector<const char *> args;
+    args.push_back(path.c_str());
+    args.push_back("--new-window");
+    if (request.mode == LaunchMode::HEADLESS) {
+      args.push_back("--headless");
+      args.push_back("--disable-gpu");
+    }
+    args.push_back(request.target_url.c_str());
+    args.push_back(nullptr);
+
+    execv(path.c_str(), const_cast<char *const *>(args.data()));
+    _exit(1); // execv failed
+  }
+  // Parent process
+  response.process_id = static_cast<int>(pid);
+#endif
+
   response.result = LaunchResult::SUCCESS;
   response.error_message = "";
-  response.process_id = 1000 + (rand() % 9000); // Mock PID
-
   running_processes_.push_back(response.process_id);
 
   return response;
@@ -165,11 +209,46 @@ BrowserEngine::launch_edge_headless(const BrowserLaunchRequest &request) {
     return response;
   }
 
-  // MOCK: Same as above
+  // REAL: Fork and exec Edge browser
+#ifdef _WIN32
+  STARTUPINFO si = {sizeof(si)};
+  PROCESS_INFORMATION pi;
+  std::string cmdline = path + " --headless";
+  cmdline += " " + request.target_url;
+
+  if (!CreateProcessA(NULL, const_cast<char *>(cmdline.c_str()), NULL, NULL,
+                      FALSE, 0, NULL, NULL, &si, &pi)) {
+    response.result = LaunchResult::FAILED_UNKNOWN;
+    response.error_message = "CreateProcess failed for Edge";
+    response.process_id = -1;
+    return response;
+  }
+  response.process_id = static_cast<int>(pi.dwProcessId);
+  CloseHandle(pi.hThread);
+  CloseHandle(pi.hProcess);
+#else
+  pid_t pid = fork();
+  if (pid < 0) {
+    response.result = LaunchResult::FAILED_UNKNOWN;
+    response.error_message = "fork() failed for Edge";
+    response.process_id = -1;
+    return response;
+  } else if (pid == 0) {
+    std::vector<const char *> args;
+    args.push_back(path.c_str());
+    args.push_back("--headless");
+    args.push_back("--disable-gpu");
+    args.push_back(request.target_url.c_str());
+    args.push_back(nullptr);
+
+    execv(path.c_str(), const_cast<char *const *>(args.data()));
+    _exit(1);
+  }
+  response.process_id = static_cast<int>(pid);
+#endif
+
   response.result = LaunchResult::SUCCESS;
   response.error_message = "";
-  response.process_id = 2000 + (rand() % 9000); // Mock PID
-
   running_processes_.push_back(response.process_id);
 
   return response;
@@ -182,7 +261,17 @@ bool BrowserEngine::stop(int process_id) {
     return false;
   }
 
-  // MOCK: In real implementation, would kill process
+  // REAL: Kill process with SIGTERM
+#ifdef _WIN32
+  HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, FALSE, process_id);
+  if (hProcess) {
+    TerminateProcess(hProcess, 0);
+    CloseHandle(hProcess);
+  }
+#else
+  kill(process_id, SIGTERM);
+  waitpid(process_id, nullptr, WNOHANG);
+#endif
   running_processes_.erase(it);
   return true;
 }
