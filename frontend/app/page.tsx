@@ -293,6 +293,10 @@ export default function Home() {
                 <div className={`w-2 h-2 rounded-full ${apiStatus === "online" ? "bg-[#FAFAFA] shadow-[0_0_8px_rgba(255,255,255,0.5)]" : "bg-[#404040]"}`} />
                 {apiStatus === "online" ? "Connected" : "Offline"}
               </div>
+              <Link href="/training" className="hidden md:flex items-center gap-2 text-sm text-[#525252] hover:text-[#FAFAFA] transition-colors group">
+                <Brain className="w-4 h-4" />
+                Training
+              </Link>
               <Link href="/dashboard" className="hidden md:flex items-center gap-2 text-sm text-[#525252] hover:text-[#FAFAFA] transition-colors group">
                 Dashboard
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
