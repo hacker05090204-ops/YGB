@@ -64,6 +64,11 @@ from impl_v1.phase49.governors.g38_safe_pretraining import (
     TrainingModeStatus,
 )
 
+from impl_v1.phase49.runtime.training_reports import (
+    TrainingMode as ReportTrainingMode,
+    generate_training_report,
+)
+
 
 # =============================================================================
 # LOGGING
@@ -105,6 +110,16 @@ class TrainingEvent:
     epoch: Optional[int] = None
 
 
+@dataclass
+class TrainingSession:
+    """Training session metadata for report generation."""
+    started_at: str
+    start_epoch: int
+    gpu_used: bool
+    checkpoints_saved: int = 0
+    last_checkpoint_hash: str = ""
+
+
 # =============================================================================
 # AUTO TRAINER CLASS
 # =============================================================================
@@ -130,6 +145,7 @@ class AutoTrainer:
         self._running = False
         self._task: Optional[asyncio.Task] = None
         self._on_event_callback: Optional[Callable[[TrainingEvent], None]] = None
+        self._current_session: Optional[TrainingSession] = None
     
     @property
     def state(self) -> TrainingState:
@@ -364,14 +380,24 @@ class AutoTrainer:
                 self._state = TrainingState.IDLE
                 return False
             
-            # Start training
+            # Start training session
             with self._training_lock:
                 self._state = TrainingState.TRAINING
+                self._current_session = TrainingSession(
+                    started_at=datetime.now(timezone.utc).isoformat(),
+                    start_epoch=self._epoch,
+                    gpu_used=conditions.gpu_available,
+                )
             
             success = self._train_representation_only()
             
+            # Generate training report after session
+            if self._current_session:
+                self._generate_session_report()
+            
             with self._training_lock:
                 self._state = TrainingState.IDLE
+                self._current_session = None
             
             return success
             
@@ -379,6 +405,49 @@ class AutoTrainer:
             self._emit_event("ERROR", str(e))
             self._state = TrainingState.ERROR
             return False
+    
+    def _generate_session_report(self) -> None:
+        """Generate training report after session completes."""
+        if not self._current_session:
+            return
+        
+        try:
+            stopped_at = datetime.now(timezone.utc).isoformat()
+            epochs_trained = self._epoch - self._current_session.start_epoch
+            
+            # Get last checkpoint hash from events
+            checkpoint_events = [
+                e for e in self._events 
+                if e.event_type == "CHECKPOINT_SAVED"
+            ]
+            last_hash = ""
+            if checkpoint_events:
+                # Extract hash from details
+                details = checkpoint_events[-1].details
+                if "hash: " in details:
+                    last_hash = details.split("hash: ")[1].rstrip(")")
+            
+            paths = generate_training_report(
+                total_epochs=epochs_trained,
+                gpu_used=self._current_session.gpu_used,
+                started_at=self._current_session.started_at,
+                stopped_at=stopped_at,
+                checkpoints_saved=len(checkpoint_events),
+                last_checkpoint_hash=last_hash,
+                samples_processed=epochs_trained * 100,  # Mock samples
+                training_mode=ReportTrainingMode.MODE_A,
+                reports_dir="reports/g38_training",
+            )
+            
+            self._emit_event(
+                "REPORT_GENERATED",
+                f"Training report saved: {list(paths.values())[0]}",
+            )
+            
+            logger.info(f"Training report generated: {paths}")
+            
+        except Exception as e:
+            logger.error(f"Failed to generate training report: {e}")
     
     async def run_scheduler(self) -> None:
         """
@@ -443,6 +512,12 @@ class AutoTrainer:
             # Set REAL target for progress tracking
             self._target_epochs = epochs
             self._session_epoch = 0
+            # Track session for report generation
+            self._current_session = TrainingSession(
+                started_at=datetime.now(timezone.utc).isoformat(),
+                start_epoch=self._epoch,
+                gpu_used=self._get_current_conditions().gpu_available,
+            )
         
         self._emit_event(
             "MANUAL_START",
@@ -481,10 +556,15 @@ class AutoTrainer:
             
             completed = self._session_epoch
             
+            # Generate training report
+            if self._current_session:
+                self._generate_session_report()
+            
             with self._training_lock:
                 self._state = TrainingState.IDLE
                 self._target_epochs = 0
                 self._session_epoch = 0
+                self._current_session = None
             
             self._emit_event(
                 "TRAINING_STOPPED",

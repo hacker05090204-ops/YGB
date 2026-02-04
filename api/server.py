@@ -862,6 +862,85 @@ async def get_g38_guards():
         "total": len(guards),
         "all_passing": all(not g["returns_false"] is False for g in guards),
     }
+
+
+@app.get("/api/g38/reports")
+async def get_g38_training_reports():
+    """Get G38 training reports."""
+    reports_dir = PROJECT_ROOT / "reports" / "g38_training"
+    
+    if not reports_dir.exists():
+        return {"reports": [], "count": 0}
+    
+    reports = []
+    
+    # Find all summary files
+    for summary_file in sorted(reports_dir.glob("training_summary_*.txt"), reverse=True):
+        session_id = summary_file.stem.replace("training_summary_", "")
+        
+        # Find corresponding learned and not_learned files
+        learned_file = reports_dir / f"learned_features_{session_id}.json"
+        not_learned_file = reports_dir / f"not_learned_yet_{session_id}.txt"
+        
+        report = {
+            "session_id": session_id,
+            "summary_file": summary_file.name,
+            "summary_content": summary_file.read_text()[:500] + "..." if summary_file.exists() else None,
+            "has_learned_features": learned_file.exists(),
+            "has_not_learned": not_learned_file.exists(),
+            "created_at": datetime.fromtimestamp(summary_file.stat().st_mtime).isoformat(),
+        }
+        
+        # Read learned features JSON if exists
+        if learned_file.exists():
+            import json
+            try:
+                report["learned_features"] = json.loads(learned_file.read_text())
+            except:
+                report["learned_features"] = None
+        
+        reports.append(report)
+    
+    return {
+        "reports": reports[:20],  # Last 20 reports
+        "count": len(reports),
+        "reports_dir": str(reports_dir),
+    }
+
+
+@app.get("/api/g38/reports/latest")
+async def get_g38_latest_report():
+    """Get the latest G38 training report."""
+    reports_dir = PROJECT_ROOT / "reports" / "g38_training"
+    
+    if not reports_dir.exists():
+        return {"available": False, "error": "No reports directory"}
+    
+    # Find latest summary
+    summaries = sorted(reports_dir.glob("training_summary_*.txt"), reverse=True)
+    
+    if not summaries:
+        return {"available": False, "error": "No reports found"}
+    
+    latest = summaries[0]
+    session_id = latest.stem.replace("training_summary_", "")
+    
+    # Read all files for this session
+    learned_file = reports_dir / f"learned_features_{session_id}.json"
+    not_learned_file = reports_dir / f"not_learned_yet_{session_id}.txt"
+    
+    import json
+    
+    return {
+        "available": True,
+        "session_id": session_id,
+        "summary": latest.read_text() if latest.exists() else None,
+        "learned_features": json.loads(learned_file.read_text()) if learned_file.exists() else None,
+        "not_learned": not_learned_file.read_text() if not_learned_file.exists() else None,
+        "created_at": datetime.fromtimestamp(latest.stat().st_mtime).isoformat(),
+    }
+
+
 # DATABASE API ENDPOINTS
 # =============================================================================
 
