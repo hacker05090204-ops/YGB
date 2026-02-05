@@ -1,0 +1,36 @@
+=== G38 GOVERNANCE-LOCKED ABILITIES ===
+Session ID: G38-20260205_155508
+Generated: 2026-02-05T15:55:08.407650+00:00
+
+The following abilities are PERMANENTLY LOCKED by governance:
+
+  - bug_decision
+  - severity_labeling
+  - exploit_logic
+  - submission_logic
+  - verification
+  - scope_expansion
+  - governance_override
+  - network_training
+  - active_training
+
+REASON:
+  Governance guards prevent learning these abilities
+
+ENFORCEMENT:
+  Governance Enforced: True
+  Guards Active: ALL
+  Override Possible: NO
+
+EXPLANATION:
+  G38 is designed as an ADVISORY system only.
+  It learns HOW systems LOOK (representation learning),
+  NOT what constitutes a bug or how to exploit.
+  
+  Bug decisions require:
+  - G33: Verified proof from human
+  - G36: Auto-verification from deterministic checks
+  
+  G38 can RECOMMEND, but NEVER DECIDE.
+
+================================
