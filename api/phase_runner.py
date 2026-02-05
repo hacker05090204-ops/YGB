@@ -39,7 +39,7 @@ try:
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
-    print("⚠️ httpx not installed. Run: pip install httpx")
+    print("[WARNING] httpx not installed. Run: pip install httpx")
 
 # ==============================================================================
 # SELENIUM (NATIVE BROWSER)
@@ -54,7 +54,7 @@ try:
     SELENIUM_AVAILABLE = True
 except ImportError:
     SELENIUM_AVAILABLE = False
-    print("ℹ️ Selenium not installed. Using HTTP-only mode.")
+    print("[INFO] Selenium not installed. Using HTTP-only mode.")
 
 # ==============================================================================
 # CVE SCANNER
@@ -64,7 +64,7 @@ try:
     CVE_SCANNER_AVAILABLE = True
 except ImportError:
     CVE_SCANNER_AVAILABLE = False
-    print("ℹ️ CVE scanner not available.")
+    print("[INFO] CVE scanner not available.")
 
 
 # ==============================================================================
@@ -554,7 +554,7 @@ class UnifiedPhaseRunner:
         except Exception as e:
             status = "FAILED"
             output = {"error": str(e)}
-            print(f"❌ Phase {phase_num} error: {e}")
+            print(f"[ERROR] Phase {phase_num} error: {e}")
         
         duration = int((datetime.now(UTC) - phase_start).total_seconds() * 1000)
         
@@ -611,7 +611,7 @@ class UnifiedPhaseRunner:
                 await self._emit_action("BROWSER_START", "edge", {"headless": True})
                 return {"browser": "Edge", "mode": "selenium"}
             except Exception as e:
-                print(f"⚠️ Edge failed: {e}, trying Chrome...")
+                print(f"[WARNING] Edge failed: {e}, trying Chrome...")
                 try:
                     options = ChromeOptions()
                     options.add_argument("--headless=new")
