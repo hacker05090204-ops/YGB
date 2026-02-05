@@ -22,6 +22,7 @@ LIB_DIR = lib
 
 # Source files
 SOURCES = browser_engine.cpp \
+          sandbox.cpp \
           screenshot_engine.cpp \
           video_recorder.cpp \
           dom_diff_engine.cpp \

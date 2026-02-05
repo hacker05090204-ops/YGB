@@ -8,6 +8,7 @@
 // - Human approval required before any launch
 
 #include "browser_engine.h"
+#include "sandbox.h"
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
@@ -170,7 +171,15 @@ BrowserEngine::launch_chromium(const BrowserLaunchRequest &request) {
     response.process_id = -1;
     return response;
   } else if (pid == 0) {
-    // Child process
+    // Child process - apply sandbox immediately
+    SandboxConfig sandbox_cfg = sandbox_get_default_config();
+    SandboxResult sandbox_res = sandbox_enter(&sandbox_cfg);
+    if (!sandbox_res.success) {
+      fprintf(stderr, "[SANDBOX] ERROR: %s\n", sandbox_res.error_message);
+      // Continue anyway - sandbox is best-effort
+    }
+
+    // Build arguments
     std::vector<const char *> args;
     args.push_back(path.c_str());
     args.push_back("--new-window");
