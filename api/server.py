@@ -1199,7 +1199,7 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
         mode = workflow.get("mode", "READ_ONLY")  # READ_ONLY or REAL
         
         # Debug logging
-        print(f"🌐 WEBSOCKET CONNECTED: {report_id}")
+        print(f"[WS] WEBSOCKET CONNECTED: {report_id}")
         print(f"   Target URL: {target_url}")
         print(f"   Mode: {mode}")
         
@@ -1277,9 +1277,9 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
             pass
         
     except WebSocketDisconnect:
-        print(f"📤 WebSocket disconnected: {report_id}")
+        print(f"[WS] WebSocket disconnected: {report_id}")
     except Exception as e:
-        print(f"❌ WebSocket error: {e}")
+        print(f"[ERROR] WebSocket error: {e}")
         try:
             await websocket.send_json({"type": "error", "message": str(e)})
         except:
@@ -1301,34 +1301,34 @@ async def lifespan(app):
     # Startup
     phases = discover_python_phases()
     hunter = discover_hunter_modules()
-    print(f"🚀 YGB API Server starting...")
-    print(f"📁 Project root: {PROJECT_ROOT}")
-    print(f"🔧 Python phases: {len(phases)}")
-    print(f"🎯 Hunter modules: {len(hunter)}")
+    print(f"[*] YGB API Server starting...")
+    print(f"[*] Project root: {PROJECT_ROOT}")
+    print(f"[*] Python phases: {len(phases)}")
+    print(f"[*] Hunter modules: {len(hunter)}")
     
     # Initialize database
     try:
         await init_database()
-        print(f"🗄️  Database connected")
+        print(f"[*] Database connected")
     except Exception as e:
-        print(f"⚠️  Database connection failed: {e}")
+        print(f"[WARN] Database connection failed: {e}")
     
-    print(f"✅ Server ready at http://localhost:8000")
+    print(f"[OK] Server ready at http://localhost:8000")
     
     # Start G38 auto-training scheduler
     if G38_AVAILABLE:
         start_auto_training()
-        print("🧠 G38 auto-training started")
+        print("[*] G38 auto-training started")
     
     yield
     
     # Shutdown
-    print("👋 YGB API Server shutting down...")
+    print("[*] YGB API Server shutting down...")
     
     # Stop G38 auto-training
     if G38_AVAILABLE:
         stop_auto_training()
-        print("🛑 G38 auto-training stopped")
+        print("[*] G38 auto-training stopped")
     
     await close_pool()
 
