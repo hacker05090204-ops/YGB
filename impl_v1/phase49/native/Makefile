@@ -2,8 +2,24 @@
 # Build C++ engines as shared libraries for Python ctypes
 
 CXX = g++
-CXXFLAGS = -std=c++17 -fPIC -Wall -Wextra -O2
-LDFLAGS = -shared
+
+# Security hardening flags (Phase-49 enforcement)
+CXXFLAGS = -std=c++17 -fPIC -O2 \
+    -Wall -Wextra -Werror -Wshadow \
+    -fstack-protector-strong \
+    -D_FORTIFY_SOURCE=2
+
+# Linker security flags
+LDFLAGS = -shared \
+    -Wl,-z,relro \
+    -Wl,-z,now \
+    -Wl,-z,noexecstack
+
+# Debug build with sanitizers (make DEBUG=1)
+ifdef DEBUG
+    CXXFLAGS += -g -fsanitize=address -fsanitize=undefined
+    LDFLAGS += -fsanitize=address -fsanitize=undefined
+endif
 
 # Detect OS
 UNAME_S := $(shell uname -s)
