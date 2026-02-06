@@ -1,0 +1,20 @@
+{
+    "models": {
+        "ygb_vuln_detector_v1": {
+            "model_id": "ygb_vuln_detector_v1",
+            "version": "1.0.0",
+            "model_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "dataset_hash": "a7ffc6f8bf1ed76651c14756a061d662f580ff4de43b49fa82d80a4b80f8434a",
+            "calibration_metrics": {
+                "accuracy": 0.97,
+                "ece": 0.018,
+                "brier": 0.025
+            },
+            "drift_history": [],
+            "deployment_date": "2026-02-07T00:00:00",
+            "rollback_reference": null,
+            "is_active": true
+        }
+    },
+    "last_updated": "2026-02-07T00:58:00"
+}
