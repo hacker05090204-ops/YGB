@@ -60,8 +60,25 @@ class TestDecisionTrace(unittest.TestCase):
     def test_hash_chain(self):
         """Verify hash chain."""
         engine = DecisionTraceEngine()
+        # Reset to ensure clean state for testing
+        engine.reset_chain()
+        # Create a fresh trace
+        engine.create_trace(
+            scan_id="TEST_CHAIN_001",
+            input_data="test",
+            feature_vector={"x": 1},
+            model_version="1.0",
+            checkpoint_hash="hash",
+            calibration={"ece": 0.01},
+            confidence=0.9,
+            boundary_distance=0.2,
+            entropy=0.1,
+            decision="CLEAN",
+        )
         valid, _ = engine.verify_chain()
         self.assertTrue(valid)
+        # Clean up
+        engine.reset_chain()
 
 
 class TestDecisionValidator(unittest.TestCase):

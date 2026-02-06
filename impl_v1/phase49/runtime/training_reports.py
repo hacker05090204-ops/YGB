@@ -394,7 +394,9 @@ EXPLANATION:
 # =============================================================================
 
 def update_latest_symlinks(reports_dir: str = "reports/g38_training") -> None:
-    """Update symlinks to latest reports."""
+    """Update symlinks to latest reports (with fallback to copy on Windows)."""
+    import shutil
+    
     reports_path = Path(reports_dir)
     
     # Find latest of each type
@@ -402,27 +404,25 @@ def update_latest_symlinks(reports_dir: str = "reports/g38_training") -> None:
     learned = sorted(reports_path.glob("learned_features_*.json"))
     not_learned = sorted(reports_path.glob("not_learned_yet_*.txt"))
     
-    # Create/update symlinks
+    def _link_or_copy(latest: Path, target: Path) -> None:
+        """Create symlink or fallback to copy on Windows."""
+        if target.is_symlink() or target.exists():
+            target.unlink()
+        try:
+            target.symlink_to(latest.name)
+        except OSError:
+            # Fallback: copy file on Windows without admin privileges
+            shutil.copy(latest, target)
+    
+    # Create/update links
     if summaries:
-        latest_summary = reports_path / "training_summary.txt"
-        if latest_summary.is_symlink():
-            latest_summary.unlink()
-        if not latest_summary.exists():
-            latest_summary.symlink_to(summaries[-1].name)
+        _link_or_copy(summaries[-1], reports_path / "training_summary.txt")
     
     if learned:
-        latest_learned = reports_path / "learned_features.json"
-        if latest_learned.is_symlink():
-            latest_learned.unlink()
-        if not latest_learned.exists():
-            latest_learned.symlink_to(learned[-1].name)
+        _link_or_copy(learned[-1], reports_path / "learned_features.json")
     
     if not_learned:
-        latest_not_learned = reports_path / "not_learned_yet.txt"
-        if latest_not_learned.is_symlink():
-            latest_not_learned.unlink()
-        if not latest_not_learned.exists():
-            latest_not_learned.symlink_to(not_learned[-1].name)
+        _link_or_copy(not_learned[-1], reports_path / "not_learned_yet.txt")
 
 
 # =============================================================================

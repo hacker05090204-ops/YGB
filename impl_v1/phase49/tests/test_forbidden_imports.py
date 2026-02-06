@@ -25,6 +25,7 @@ PYTHON_FILES = [
     if "test_" not in f.name 
     and f.parent.name != "tests"
     and "runtime" not in str(f)  # runtime needs subprocess for OS APIs
+    and f.parent.name != "ci"    # ci tools legitimately use subprocess
     and f.name not in APPROVED_FILES
 ]
 

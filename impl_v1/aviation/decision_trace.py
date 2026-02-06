@@ -217,3 +217,17 @@ class DecisionTraceEngine:
             data = json.load(f)
         
         return DecisionTrace(**data)
+    
+    def reset_chain(self) -> None:
+        """Reset chain state for testing. Clears all traces."""
+        import shutil
+        
+        # Remove all trace files
+        if self.TRACE_DIR.exists():
+            for trace_file in self.TRACE_DIR.glob("*.trace.json"):
+                trace_file.unlink()
+            if self.CHAIN_FILE.exists():
+                self.CHAIN_FILE.unlink()
+        
+        # Reset state
+        self.last_hash = "GENESIS"

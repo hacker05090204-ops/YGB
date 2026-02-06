@@ -160,15 +160,18 @@ class TestVersionCheck:
     
     def test_get_version_with_existing_file(self):
         """Get version from existing binary path."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
+        f = tempfile.NamedTemporaryFile(delete=False)
+        try:
             f.write(b"mock binary")
             f.flush()
+            f.close()  # Close before access on Windows
             
             result = _get_version(f.name)
             # Mock returns "125.0.0.0" for existing files
             assert result == "125.0.0.0"
-            
-            os.unlink(f.name)
+        finally:
+            if os.path.exists(f.name):
+                os.unlink(f.name)
     
     def test_get_version_with_nonexistent_file(self):
         """Get version from non-existent binary path."""
@@ -202,15 +205,18 @@ class TestChecksum:
     
     def test_compute_checksum_success(self):
         """Compute checksum of file."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
+        f = tempfile.NamedTemporaryFile(delete=False)
+        try:
             f.write(b"test data")
             f.flush()
+            f.close()  # Close before access on Windows
             
             result = _compute_checksum(f.name)
             assert result is not None
             assert len(result) == 64  # SHA-256 hex length
-            
-            os.unlink(f.name)
+        finally:
+            if os.path.exists(f.name):
+                os.unlink(f.name)
     
     def test_compute_checksum_not_exists(self):
         """Checksum of non-existent file."""
@@ -236,9 +242,11 @@ class TestDetection:
     
     def test_detect_found_and_verified(self):
         """Detect and verify installation with temp file."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
+        f = tempfile.NamedTemporaryFile(delete=False)
+        try:
             f.write(b"mock ungoogled chromium binary")
             f.flush()
+            f.close()  # Close before access on Windows
             
             with patch("shutil.which") as mock_which:
                 mock_which.return_value = f.name
@@ -250,8 +258,9 @@ class TestDetection:
                 assert result.can_launch is True
                 assert result.binary is not None
                 assert result.binary.verified is True
-            
-            os.unlink(f.name)
+        finally:
+            if os.path.exists(f.name):
+                os.unlink(f.name)
     
     def test_detect_version_not_available(self):
         """Detect with version detection returning None (non-existent path)."""
@@ -275,9 +284,11 @@ class TestVerifyAndAuthorize:
     
     def test_verify_success(self):
         """Verify and authorize successfully."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
+        f = tempfile.NamedTemporaryFile(delete=False)
+        try:
             f.write(b"mock binary")
             f.flush()
+            f.close()  # Close before access on Windows
             
             with patch("shutil.which") as mock_which:
                 mock_which.return_value = f.name
@@ -286,8 +297,9 @@ class TestVerifyAndAuthorize:
                 
                 assert can_launch is True
                 assert result.status == BrowserVerificationStatus.VERIFIED
-            
-            os.unlink(f.name)
+        finally:
+            if os.path.exists(f.name):
+                os.unlink(f.name)
     
     def test_verify_failure(self):
         """Verify fails when not found."""
@@ -348,9 +360,11 @@ class TestEnforcement:
     
     def test_enforce_success(self):
         """Enforcement passes when verified."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
+        f = tempfile.NamedTemporaryFile(delete=False)
+        try:
             f.write(b"mock binary")
             f.flush()
+            f.close()  # Close before access on Windows
             
             with patch("shutil.which") as mock_which:
                 mock_which.return_value = f.name
@@ -358,8 +372,9 @@ class TestEnforcement:
                 result = enforce_ungoogled_chromium()
                 
                 assert result.can_launch is True
-            
-            os.unlink(f.name)
+        finally:
+            if os.path.exists(f.name):
+                os.unlink(f.name)
     
     def test_enforce_failure_raises(self):
         """Enforcement raises on failure."""

@@ -371,15 +371,15 @@ class TestNoExternalAIInModule:
     
     def test_no_huggingface_import(self):
         import impl_v1.phase49.governors.g38_external_failover as module
-        source = open(module.__file__).read()
+        source = open(module.__file__, encoding='utf-8', errors='ignore').read()
         assert "hugging" not in source.lower()
     
     def test_no_openai_import(self):
         import impl_v1.phase49.governors.g38_external_failover as module
-        source = open(module.__file__).read()
+        source = open(module.__file__, encoding='utf-8', errors='ignore').read()
         assert "openai" not in source.lower()
     
     def test_no_anthropic_import(self):
         import impl_v1.phase49.governors.g38_external_failover as module
-        source = open(module.__file__).read()
+        source = open(module.__file__, encoding='utf-8', errors='ignore').read()
         assert "anthropic" not in source.lower()

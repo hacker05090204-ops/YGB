@@ -120,15 +120,18 @@ class TestHashUtilities:
     
     def test_compute_sha256_from_file(self):
         """Compute SHA-256 from file."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
+        f = tempfile.NamedTemporaryFile(delete=False)
+        try:
             f.write(b"test data")
             f.flush()
+            f.close()  # Close before access on Windows
             
             result = compute_sha256_from_file(f.name)
             assert result is not None
             assert len(result) == 64
-            
-            os.unlink(f.name)
+        finally:
+            if os.path.exists(f.name):
+                os.unlink(f.name)
     
     def test_compute_sha256_from_file_not_exists(self):
         """Hash of non-existent file."""

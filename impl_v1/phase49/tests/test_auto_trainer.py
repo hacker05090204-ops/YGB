@@ -440,17 +440,15 @@ class TestForceStartTraining:
 class TestSchedulerLoop:
     """Tests for the async scheduler loop."""
     
-    @pytest.mark.asyncio
-    async def test_run_scheduler_starts_and_stops(self):
+    def test_run_scheduler_starts_and_stops(self):
+        """Test that scheduler can start and stop."""
         trainer = AutoTrainer()
         
-        # Run scheduler for a very short time
-        async def run_briefly():
-            trainer._running = True
-            # Just one iteration
-            trainer._running = False
+        # Verify scheduler can be controlled
+        trainer._running = True
+        assert trainer._running is True
         
-        await run_briefly()
+        trainer._running = False
         assert trainer._running is False
     
     def test_start_creates_task(self):
