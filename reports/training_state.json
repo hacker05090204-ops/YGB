@@ -1,0 +1,9 @@
+{
+  "mode": "safe_idle",
+  "is_running": false,
+  "current_epoch": 0,
+  "last_checkpoint": null,
+  "started_at": "2026-02-07T01:20:39.579541",
+  "stopped_at": "2026-02-07T01:20:39.579541",
+  "updated": "2026-02-07T01:20:39.579541"
+}

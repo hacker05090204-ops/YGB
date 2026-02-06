@@ -1,0 +1,39 @@
+{
+  "seccomp": {
+    "enabled": true,
+    "blocked_syscalls": [
+      "socket",
+      "connect",
+      "bind",
+      "listen",
+      "accept",
+      "sendto",
+      "recvfrom",
+      "sendmsg",
+      "recvmsg",
+      "execve",
+      "fork",
+      "clone"
+    ]
+  },
+  "network": {
+    "enabled": false,
+    "blocked": true
+  },
+  "filesystem": {
+    "writable_paths": [
+      "/checkpoints",
+      "/tmp/training"
+    ],
+    "readonly_paths": [
+      "/models",
+      "/data"
+    ]
+  },
+  "rlimits": {
+    "RLIMIT_AS": 34359738368,
+    "RLIMIT_FSIZE": 10737418240,
+    "RLIMIT_NOFILE": 1024,
+    "RLIMIT_NPROC": 64
+  }
+}

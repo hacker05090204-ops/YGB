@@ -1,0 +1,14 @@
+{
+  "device_id": "device_0",
+  "history": [
+    {
+      "action": "merged",
+      "local_checkpoint": "ckpt1",
+      "remote_checkpoint": "ckpt2",
+      "model_version": "1.0.0",
+      "details": "weight=0.5",
+      "timestamp": "2026-02-07T01:20:39.589364"
+    }
+  ],
+  "updated": "2026-02-07T01:20:39.589364"
+}

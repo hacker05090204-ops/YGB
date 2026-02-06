@@ -1,0 +1,12 @@
+{
+  "auto_mode_safe": true,
+  "reason": "ALL GOVERNANCE CHECKS PASSED",
+  "checks": {
+    "registry_valid": true,
+    "model_not_expired": true,
+    "no_override_misuse": true,
+    "incident_automation": true,
+    "governance_active": true
+  },
+  "timestamp": "2026-02-07T01:20:39.594688"
+}
