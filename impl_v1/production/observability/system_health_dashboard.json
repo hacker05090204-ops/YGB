@@ -1,0 +1,124 @@
+{
+    "dashboard": {
+        "title": "YGB System Health",
+        "refresh": "5s",
+        "panels": [
+            {
+                "title": "Auto-Mode State",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "ygb_auto_mode_enabled"
+                    }
+                ],
+                "thresholds": {
+                    "0": "red",
+                    "1": "green"
+                }
+            },
+            {
+                "title": "Drift Events",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "rate(ygb_drift_events_total[5m])"
+                    }
+                ]
+            },
+            {
+                "title": "Scan Latency",
+                "type": "gauge",
+                "targets": [
+                    {
+                        "expr": "ygb_scan_latency_ms"
+                    }
+                ],
+                "thresholds": {
+                    "0": "green",
+                    "200": "yellow",
+                    "500": "red"
+                }
+            },
+            {
+                "title": "Memory Usage",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "ygb_memory_usage_mb"
+                    }
+                ]
+            },
+            {
+                "title": "CPU Usage",
+                "type": "gauge",
+                "targets": [
+                    {
+                        "expr": "ygb_cpu_percent"
+                    }
+                ],
+                "thresholds": {
+                    "0": "green",
+                    "60": "yellow",
+                    "80": "red"
+                }
+            },
+            {
+                "title": "Calibration ECE",
+                "type": "graph",
+                "targets": [
+                    {
+                        "expr": "ygb_calibration_ece"
+                    }
+                ],
+                "thresholds": {
+                    "0": "green",
+                    "0.02": "yellow",
+                    "0.03": "red"
+                }
+            },
+            {
+                "title": "Seccomp Violations",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "ygb_seccomp_violations_total"
+                    }
+                ],
+                "thresholds": {
+                    "0": "green",
+                    "1": "red"
+                }
+            },
+            {
+                "title": "Emergency Lock",
+                "type": "stat",
+                "targets": [
+                    {
+                        "expr": "ygb_emergency_lock_active"
+                    }
+                ],
+                "thresholds": {
+                    "0": "green",
+                    "1": "red"
+                }
+            }
+        ],
+        "alerts": [
+            {
+                "name": "Drift Alert",
+                "condition": "rate(ygb_drift_events_total[1h]) > 0",
+                "severity": "high"
+            },
+            {
+                "name": "Seccomp Violation",
+                "condition": "ygb_seccomp_violations_total > 0",
+                "severity": "critical"
+            },
+            {
+                "name": "High Latency",
+                "condition": "ygb_scan_latency_ms > 500",
+                "severity": "medium"
+            }
+        ]
+    }
+}
