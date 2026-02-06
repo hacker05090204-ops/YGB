@@ -10,3 +10,15 @@
 {"timestamp": "2026-02-07T01:38:34.431663", "action": "first_approval", "details": {"request_id": "OVERRIDE_20260207013834", "approver": "user2"}}
 {"timestamp": "2026-02-07T01:38:34.431663", "action": "override_approved", "details": {"request_id": "OVERRIDE_20260207013834", "first_approver": "user2", "second_approver": "user3", "gpg_verified": false}}
 {"timestamp": "2026-02-07T01:38:34.434286", "action": "request_created", "details": {"request_id": "OVERRIDE_20260207013834", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-02-07T01:42:44.837248", "action": "request_created", "details": {"request_id": "OVERRIDE_20260207014244", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-02-07T01:42:44.837248", "action": "first_approval", "details": {"request_id": "OVERRIDE_20260207014244", "approver": "user2"}}
+{"timestamp": "2026-02-07T01:42:44.838756", "action": "override_approved", "details": {"request_id": "OVERRIDE_20260207014244", "first_approver": "user2", "second_approver": "user3", "gpg_verified": false}}
+{"timestamp": "2026-02-07T01:42:44.839836", "action": "request_created", "details": {"request_id": "OVERRIDE_20260207014244", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-02-07T01:43:15.428458", "action": "request_created", "details": {"request_id": "OVERRIDE_20260207014315", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-02-07T01:43:15.429460", "action": "first_approval", "details": {"request_id": "OVERRIDE_20260207014315", "approver": "user2"}}
+{"timestamp": "2026-02-07T01:43:15.429460", "action": "override_approved", "details": {"request_id": "OVERRIDE_20260207014315", "first_approver": "user2", "second_approver": "user3", "gpg_verified": false}}
+{"timestamp": "2026-02-07T01:43:15.431534", "action": "request_created", "details": {"request_id": "OVERRIDE_20260207014315", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-02-07T01:49:38.321422", "action": "request_created", "details": {"request_id": "OVERRIDE_20260207014938", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-02-07T01:49:38.321422", "action": "first_approval", "details": {"request_id": "OVERRIDE_20260207014938", "approver": "user2"}}
+{"timestamp": "2026-02-07T01:49:38.322930", "action": "override_approved", "details": {"request_id": "OVERRIDE_20260207014938", "first_approver": "user2", "second_approver": "user3", "gpg_verified": false}}
+{"timestamp": "2026-02-07T01:49:38.324031", "action": "request_created", "details": {"request_id": "OVERRIDE_20260207014938", "reason": "Test", "requested_by": "user1"}}

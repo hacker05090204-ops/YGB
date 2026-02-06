@@ -24,7 +24,31 @@
       "model_version": "1.0.0",
       "details": "weight=0.5",
       "timestamp": "2026-02-07T01:38:34.415958"
+    },
+    {
+      "action": "merged",
+      "local_checkpoint": "ckpt1",
+      "remote_checkpoint": "ckpt2",
+      "model_version": "1.0.0",
+      "details": "weight=0.5",
+      "timestamp": "2026-02-07T01:42:44.821511"
+    },
+    {
+      "action": "merged",
+      "local_checkpoint": "ckpt1",
+      "remote_checkpoint": "ckpt2",
+      "model_version": "1.0.0",
+      "details": "weight=0.5",
+      "timestamp": "2026-02-07T01:43:15.414651"
+    },
+    {
+      "action": "merged",
+      "local_checkpoint": "ckpt1",
+      "remote_checkpoint": "ckpt2",
+      "model_version": "1.0.0",
+      "details": "weight=0.5",
+      "timestamp": "2026-02-07T01:49:38.307491"
     }
   ],
-  "updated": "2026-02-07T01:38:34.415958"
+  "updated": "2026-02-07T01:49:38.307491"
 }

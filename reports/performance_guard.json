@@ -1,3 +1,6 @@
 {"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:20:39.588819"}
 {"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:26:58.017916"}
 {"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:38:34.413263"}
+{"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:42:44.820507"}
+{"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:43:15.413143"}
+{"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:49:38.306132"}
