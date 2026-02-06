@@ -1,0 +1,121 @@
+{
+  "version": "1.0",
+  "generated": "2026-02-07T01:13:27.406676",
+  "failure_modes": [
+    {
+      "id": "FM-001",
+      "name": "Model Drift",
+      "trigger": "Data distribution shift or concept drift",
+      "detection_method": "Drift monitoring, ECE tracking, baseline comparison",
+      "mitigation": "Automatic auto-mode disable, incident report, retraining trigger",
+      "severity": 8,
+      "likelihood": 4,
+      "residual_risk": 2,
+      "risk_priority_number": 32
+    },
+    {
+      "id": "FM-002",
+      "name": "Calibration Failure",
+      "trigger": "Confidence scores misaligned with accuracy",
+      "detection_method": "ECE computation, Brier score, calibration histogram",
+      "mitigation": "Recalibration, temperature scaling, auto-mode lock",
+      "severity": 7,
+      "likelihood": 3,
+      "residual_risk": 2,
+      "risk_priority_number": 21
+    },
+    {
+      "id": "FM-003",
+      "name": "Adversarial Attack",
+      "trigger": "Malicious input designed to evade detection",
+      "detection_method": "Adversarial drift testing, entropy analysis",
+      "mitigation": "Robustness testing, input sanitization, consensus mode",
+      "severity": 9,
+      "likelihood": 3,
+      "residual_risk": 3,
+      "risk_priority_number": 27
+    },
+    {
+      "id": "FM-004",
+      "name": "Non-Determinism",
+      "trigger": "Hardware variance, floating-point errors",
+      "detection_method": "Cross-platform determinism tests, replay validation",
+      "mitigation": "Strict determinism flags, checkpoint verification",
+      "severity": 8,
+      "likelihood": 2,
+      "residual_risk": 1,
+      "risk_priority_number": 16
+    },
+    {
+      "id": "FM-005",
+      "name": "Rare Class Collapse",
+      "trigger": "Underrepresented vulnerability class degradation",
+      "detection_method": "Per-class recall monitoring, stability checks",
+      "mitigation": "Class-balanced training, weighted loss, auto-disable",
+      "severity": 8,
+      "likelihood": 4,
+      "residual_risk": 2,
+      "risk_priority_number": 32
+    },
+    {
+      "id": "FM-006",
+      "name": "Checkpoint Corruption",
+      "trigger": "Storage failure, incomplete write",
+      "detection_method": "SHA256 verification, atomic save, replay test",
+      "mitigation": "Atomic writes, backup checkpoints, integrity checks",
+      "severity": 7,
+      "likelihood": 2,
+      "residual_risk": 1,
+      "risk_priority_number": 14
+    },
+    {
+      "id": "FM-007",
+      "name": "GPU Thermal Throttle",
+      "trigger": "Excessive GPU temperature causing slowdown",
+      "detection_method": "Temperature monitoring, throttle count tracking",
+      "mitigation": "Automatic pause, cooldown period, batch reduction",
+      "severity": 5,
+      "likelihood": 4,
+      "residual_risk": 2,
+      "risk_priority_number": 20
+    },
+    {
+      "id": "FM-008",
+      "name": "Dependency Vulnerability",
+      "trigger": "Security flaw in third-party library",
+      "detection_method": "Hash monitoring, version tracking, CVE alerts",
+      "mitigation": "Pinned versions, security scanning, update policy",
+      "severity": 8,
+      "likelihood": 3,
+      "residual_risk": 2,
+      "risk_priority_number": 24
+    },
+    {
+      "id": "FM-009",
+      "name": "Operator Override Abuse",
+      "trigger": "Single-person unauthorized override",
+      "detection_method": "Dual-approval enforcement, audit logging",
+      "mitigation": "Two-person rule, GPG verification, abuse detection",
+      "severity": 9,
+      "likelihood": 2,
+      "residual_risk": 1,
+      "risk_priority_number": 18
+    },
+    {
+      "id": "FM-010",
+      "name": "Decision Hallucination",
+      "trigger": "High entropy, low confidence, model uncertainty",
+      "detection_method": "DecisionValidator rules, abstention tracking",
+      "mitigation": "Prefer abstention over error, human review required",
+      "severity": 9,
+      "likelihood": 3,
+      "residual_risk": 2,
+      "risk_priority_number": 27
+    }
+  ],
+  "summary": {
+    "total_modes": 10,
+    "high_severity_count": 7,
+    "max_residual_risk": 3
+  }
+}

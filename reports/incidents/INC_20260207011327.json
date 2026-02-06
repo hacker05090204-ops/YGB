@@ -1,0 +1,27 @@
+{
+  "incident_id": "INC_20260207011327",
+  "incident_type": "calibration_break",
+  "timestamp": "2026-02-07T01:13:27.413055",
+  "severity": "critical",
+  "summary": "No-silent-failure triggered: calibration_break",
+  "scan_metrics": {
+    "last_1000_scans": {
+      "total": 1000,
+      "true_positives": 950,
+      "false_positives": 20,
+      "false_negatives": 30,
+      "accuracy": 0.95
+    },
+    "avg_confidence": 0.85,
+    "avg_latency_ms": 150
+  },
+  "model_diff": {
+    "ece": 0.1,
+    "threshold": 0.02
+  },
+  "performance_diff": {},
+  "dependency_diff": {},
+  "recommended_actions": [
+    "Investigate and document findings"
+  ]
+}

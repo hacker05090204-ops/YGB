@@ -1,0 +1,2 @@
+{"failure_id": "FAIL_20260207011327", "failure_type": "drift", "timestamp": "2026-02-07T01:13:27.411041", "details": {"drift_type": "accuracy", "value": 0.1}, "auto_mode_disabled": true}
+{"failure_id": "FAIL_20260207011327", "failure_type": "calibration_break", "timestamp": "2026-02-07T01:13:27.413055", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}

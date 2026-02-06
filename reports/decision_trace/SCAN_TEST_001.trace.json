@@ -1,0 +1,17 @@
+{
+  "scan_id": "SCAN_TEST_001",
+  "timestamp": "2026-02-07T01:13:27.396181",
+  "input_hash": "9dfe6f15d1ab73af898739394fd22fd72a03db01834582f24bb2e1c66c7aaeae",
+  "feature_vector_hash": "8125dcaeaf10c91b78d0028e0b315be3424ebc44f5c8d4eccaf9de9934ab0654",
+  "model_version": "1.0.0",
+  "checkpoint_hash": "abc123",
+  "calibration_snapshot": {
+    "ece": 0.02
+  },
+  "confidence_score": 0.95,
+  "decision_boundary_distance": 0.3,
+  "entropy_score": 0.15,
+  "decision": "VULNERABLE",
+  "previous_hash": "GENESIS",
+  "trace_hash": "5cfbbd79fc1bba9b667e1506ce367cfca36e127936b1b84da60294e406bccc2a"
+}
