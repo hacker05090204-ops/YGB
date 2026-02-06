@@ -1,0 +1,6 @@
+{
+    "version": "1.0.0",
+    "description": "Key revocation list for Phase-49 signing keys",
+    "last_updated": "2026-02-06",
+    "revoked_keys": []
+}
