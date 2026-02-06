@@ -1,0 +1,34 @@
+{
+    "version": "1.0.0",
+    "created": "2026-02-06",
+    "description": "Performance baseline for Phase-49 scanning operations",
+    "scan_performance": {
+        "avg_scan_time_ms": 150,
+        "max_scan_time_ms": 500,
+        "min_scan_time_ms": 50,
+        "target_p99_ms": 300
+    },
+    "memory_usage": {
+        "baseline_mb": 256,
+        "max_per_scan_mb": 50,
+        "max_total_mb": 2048
+    },
+    "cpu_usage": {
+        "avg_percent": 25,
+        "max_percent": 80
+    },
+    "gpu_usage": {
+        "avg_percent": 60,
+        "max_percent": 95,
+        "memory_mb": 4096
+    },
+    "report_generation": {
+        "avg_time_ms": 100,
+        "max_time_ms": 500
+    },
+    "thresholds": {
+        "scan_time_alert_ms": 1000,
+        "memory_alert_mb": 1024,
+        "memory_growth_alert_mb_per_hour": 50
+    }
+}
