@@ -1,0 +1,14 @@
+{
+  "unlocked": true,
+  "reason": "ALL REQUIREMENTS MET - AUTO MODE SAFE = TRUE",
+  "unlock_time": "2026-02-07T00:36:34.967058",
+  "requirements_met": {
+    "accuracy_\u226597%": true,
+    "ece_\u22640.02": true,
+    "brier_\u22640.03": true,
+    "stable_epochs_\u226510": true,
+    "no_drift_events": true,
+    "checkpoints_\u226550": true,
+    "replay_verified": true
+  }
+}
