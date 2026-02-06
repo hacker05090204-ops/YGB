@@ -1,0 +1,111 @@
+{
+    "version": "1.0.0",
+    "phase": 49,
+    "created": "2026-02-06",
+    "description": "Phase-49 Security Baseline - Any modification requires signed approval",
+    "compile_flags": {
+        "gcc_clang": [
+            "-fstack-protector-strong",
+            "-D_FORTIFY_SOURCE=2",
+            "-fPIE",
+            "-pie",
+            "-Werror",
+            "-Wall",
+            "-Wextra",
+            "-Wshadow",
+            "-Wl,-z,relro",
+            "-Wl,-z,now",
+            "-Wl,-z,noexecstack"
+        ],
+        "msvc": [
+            "/GS",
+            "/DYNAMICBASE",
+            "/NXCOMPAT",
+            "/WX",
+            "/W4"
+        ],
+        "sanitizers_debug": [
+            "-fsanitize=address",
+            "-fsanitize=undefined"
+        ]
+    },
+    "seccomp_filter": {
+        "blocked_syscalls": [
+            "socket",
+            "execve",
+            "clone",
+            "ptrace",
+            "fork",
+            "mount",
+            "umount",
+            "chroot",
+            "pivot_root"
+        ],
+        "mode": "SECCOMP_MODE_FILTER",
+        "prctl_value": 2
+    },
+    "coverage_thresholds": {
+        "python_minimum": 95.0,
+        "cpp_minimum": 85.0,
+        "branch_coverage": true
+    },
+    "sanitizer_config": {
+        "asan": {
+            "detect_leaks": true,
+            "detect_stack_use_after_return": true,
+            "strict_string_checks": true
+        },
+        "ubsan": {
+            "print_stacktrace": true,
+            "halt_on_error": true
+        }
+    },
+    "deterministic_training": {
+        "torch_deterministic": true,
+        "cudnn_benchmark": false,
+        "cudnn_deterministic": true,
+        "seed_sync": [
+            "torch",
+            "numpy",
+            "random",
+            "cuda"
+        ],
+        "rng_checkpointing": true
+    },
+    "ci_scanners": [
+        "check_full_security.py",
+        "check_security.py",
+        "coverage_enforcement.py",
+        "static_analysis.py",
+        "fuzz_testing.py"
+    ],
+    "forbidden_patterns": {
+        "python": [
+            "eval(",
+            "exec(",
+            "import subprocess",
+            "import socket",
+            "import selenium",
+            "import playwright"
+        ],
+        "cpp": [
+            "strcpy",
+            "sprintf",
+            "gets",
+            "new ",
+            "delete "
+        ]
+    },
+    "protected_files": [
+        "CMakeLists.txt",
+        "Makefile",
+        "seccomp_filter.bpf",
+        "deterministic_training.py",
+        "SECURITY_BASELINE.json"
+    ],
+    "approval_requirements": {
+        "protected_file_change": "SIGNED_COMMIT_REQUIRED",
+        "security_baseline_change": "TWO_APPROVERS_REQUIRED",
+        "ci_bypass": "FORBIDDEN"
+    }
+}
