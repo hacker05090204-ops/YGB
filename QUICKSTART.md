@@ -43,7 +43,7 @@ C:\Users\jadav\OneDrive\Desktop\YGB\report\
 ## Requirements
 
 ```powershell
-pip install selenium httpx fastapi uvicorn pydantic
+pip install httpx fastapi uvicorn pydantic
 ```
 
 ---
@@ -55,5 +55,5 @@ pip install selenium httpx fastapi uvicorn pydantic
 - SQL Injection Testing
 - XSS, CSRF, IDOR Detection
 - Common Path Discovery (/login, /admin, /api)
-- Real Browser Automation (Edge/Chrome)
+- HTTP-Only Analysis Mode (governance enforced)
 - Auto TXT Reports

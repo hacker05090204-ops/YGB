@@ -42,19 +42,12 @@ except ImportError:
     print("[WARNING] httpx not installed. Run: pip install httpx")
 
 # ==============================================================================
-# SELENIUM (NATIVE BROWSER)
+# BROWSER EXECUTION - FORBIDDEN IN PYTHON
 # ==============================================================================
-try:
-    from selenium import webdriver
-    from selenium.webdriver.edge.options import Options as EdgeOptions
-    from selenium.webdriver.chrome.options import Options as ChromeOptions
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
-    SELENIUM_AVAILABLE = True
-except ImportError:
-    SELENIUM_AVAILABLE = False
-    print("[INFO] Selenium not installed. Using HTTP-only mode.")
+# ARCHITECTURE ENFORCEMENT: Browser automation MUST use C++ native engine.
+# Python is limited to: governance, AI advisory, intent parsing, report formatting.
+# All browser execution, screenshot, video, DOM diff, network capture -> C++ only.
+SELENIUM_AVAILABLE = False  # Browser execution disabled per governance
 
 # ==============================================================================
 # CVE SCANNER
@@ -595,42 +588,23 @@ class UnifiedPhaseRunner:
         return {"governance_phases": loaded}
     
     async def _phase_browser_init(self, context: WorkflowContext) -> Dict:
-        """Phase 1: Initialize browser or HTTP client."""
-        # Try Selenium first
-        if SELENIUM_AVAILABLE:
-            try:
-                options = EdgeOptions()
-                options.add_argument("--headless=new")
-                options.add_argument("--disable-gpu")
-                options.add_argument("--no-sandbox")
-                options.add_argument("--disable-dev-shm-usage")
-                options.add_argument("--window-size=1920,1080")
-                
-                self.driver = webdriver.Edge(options=options)
-                self.use_browser = True
-                await self._emit_action("BROWSER_START", "edge", {"headless": True})
-                return {"browser": "Edge", "mode": "selenium"}
-            except Exception as e:
-                print(f"[WARNING] Edge failed: {e}, trying Chrome...")
-                try:
-                    options = ChromeOptions()
-                    options.add_argument("--headless=new")
-                    options.add_argument("--disable-gpu")
-                    options.add_argument("--no-sandbox")
-                    
-                    self.driver = webdriver.Chrome(options=options)
-                    self.use_browser = True
-                    await self._emit_action("BROWSER_START", "chrome", {"headless": True})
-                    return {"browser": "Chrome", "mode": "selenium"}
-                except:
-                    pass
+        """Phase 1: Initialize HTTP client (HTTP-only mode).
         
-        # Fallback to HTTP
+        ARCHITECTURE ENFORCEMENT:
+        Browser execution is FORBIDDEN in Python.
+        All browser automation must use C++ native engine.
+        This phase now uses HTTP-only analysis.
+        """
+        # SELENIUM_AVAILABLE is always False per governance
+        # Python uses HTTP-only mode for security analysis
+        
         if HTTPX_AVAILABLE:
-            await self._emit_action("HTTP_INIT", "httpx", {"mode": "HTTP"})
-            return {"browser": "httpx", "mode": "http"}
+            self.use_browser = False
+            self.driver = None
+            await self._emit_action("HTTP_INIT", "httpx", {"mode": "HTTP-ONLY"})
+            return {"analyzer": "httpx", "mode": "http", "governance": "enforced"}
         
-        return {"error": "No analyzer available"}
+        return {"error": "No HTTP client available - install httpx"}
     
     async def _phase_navigate(self, context: WorkflowContext) -> Dict:
         """Phase 2: Navigate to target URL."""

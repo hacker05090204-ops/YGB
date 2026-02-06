@@ -1,0 +1,25 @@
+{
+  "session_id": "G38-20260205_121606",
+  "generated_at": "2026-02-05T12:16:06.660692+00:00",
+  "domains_learned": [
+    "code_patterns",
+    "ui_layouts",
+    "network_protocols",
+    "api_structures",
+    "file_formats",
+    "encoding_patterns",
+    "syntax_structure"
+  ],
+  "representation_only": true,
+  "confidence_calibration_trend": 0.85,
+  "duplicate_detection_accuracy": 0.78,
+  "noise_detection_accuracy": 0.82,
+  "proof_learning": false,
+  "total_samples_processed": 100,
+  "governance": {
+    "ai_has_authority": false,
+    "can_decide_bugs": false,
+    "can_verify": false,
+    "can_submit": false
+  }
+}
