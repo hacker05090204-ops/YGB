@@ -1,0 +1,12 @@
+{
+    "version": "1.0.0",
+    "created": "2026-02-06",
+    "description": "Environment baseline for Phase-50 dependency monitoring",
+    "kernel_version": "10.0.22631",
+    "cuda_version": null,
+    "compiler_version": "MSVC (detected)",
+    "openssl_version": "OpenSSL 3.0.13",
+    "glibc_version": null,
+    "python_version": "3.11.4",
+    "timestamp": "2026-02-06T23:58:00"
+}

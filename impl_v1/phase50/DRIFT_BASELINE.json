@@ -1,0 +1,14 @@
+{
+    "version": "1.0.0",
+    "created": "2026-02-06",
+    "description": "Model drift baseline for Phase-50 continuous monitoring",
+    "accuracy": 0.95,
+    "ece": 0.02,
+    "avg_confidence": 0.85,
+    "thresholds": {
+        "accuracy_drop": 0.03,
+        "ece_increase": 0.01,
+        "confidence_inflation": 0.05
+    },
+    "window_size": 1000
+}
