@@ -1,0 +1,11 @@
+{
+  "gates": {
+    "calibration": {
+      "passed": true,
+      "details": {
+        "accuracy": 0.98
+      }
+    }
+  },
+  "timestamp": "2026-02-07T00:48:51.192666"
+}
