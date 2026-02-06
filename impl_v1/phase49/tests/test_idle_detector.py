@@ -8,6 +8,8 @@ Mocks are allowed ONLY in tests, not in production.
 import pytest
 from unittest.mock import patch, MagicMock
 import subprocess
+import sys
+import os
 
 from impl_v1.phase49.runtime.idle_detector import (
     get_idle_seconds,
@@ -109,6 +111,45 @@ class TestLinuxIdleDetection:
         
         idle = get_linux_idle_seconds()
         assert idle == 0
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._get_linux_idle_xprintidle")
+    def test_linux_idle_xprintidle_first(self, mock_xprintidle):
+        mock_xprintidle.return_value = 45
+        
+        idle = get_linux_idle_seconds()
+        assert idle == 45
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._get_linux_idle_xprintidle")
+    @patch("impl_v1.phase49.runtime.idle_detector._get_linux_idle_loginctl")
+    def test_linux_idle_loginctl_fallback(self, mock_loginctl, mock_xprintidle):
+        mock_xprintidle.return_value = None
+        mock_loginctl.return_value = 60
+        
+        idle = get_linux_idle_seconds()
+        assert idle == 60
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._get_linux_idle_xprintidle")
+    @patch("impl_v1.phase49.runtime.idle_detector._get_linux_idle_loginctl")
+    @patch("impl_v1.phase49.runtime.idle_detector._get_linux_idle_proc")
+    def test_linux_idle_proc_fallback(self, mock_proc, mock_loginctl, mock_xprintidle):
+        mock_xprintidle.return_value = None
+        mock_loginctl.return_value = None
+        mock_proc.return_value = 120
+        
+        idle = get_linux_idle_seconds()
+        assert idle == 120
+    
+    @patch("impl_v1.phase49.runtime.idle_detector.subprocess.run")
+    def test_loginctl_not_installed(self, mock_run):
+        mock_run.side_effect = FileNotFoundError()
+        idle = _get_linux_idle_loginctl()
+        assert idle is None
+    
+    @patch("impl_v1.phase49.runtime.idle_detector.subprocess.run")
+    def test_loginctl_failure_returns_none(self, mock_run):
+        mock_run.return_value = MagicMock(returncode=1)
+        idle = _get_linux_idle_loginctl()
+        assert idle is None
 
 
 # =============================================================================
@@ -125,6 +166,15 @@ class TestWindowsIdleDetection:
         mock_linux.return_value = False
         idle = get_idle_seconds()
         assert idle == 0
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._is_windows")
+    def test_windows_idle_returns_int(self, mock_windows):
+        mock_windows.return_value = True
+        # On actual Windows, this should work
+        # On non-Windows, it returns 0
+        idle = get_windows_idle_seconds()
+        assert isinstance(idle, int)
+        assert idle >= 0
 
 
 # =============================================================================
@@ -163,6 +213,46 @@ class TestCrossplatformAPI:
         
         idle = get_idle_seconds()
         assert idle == 0
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._is_linux")
+    @patch("impl_v1.phase49.runtime.idle_detector._is_windows")
+    @patch("impl_v1.phase49.runtime.idle_detector.get_windows_idle_seconds")
+    def test_get_idle_seconds_calls_windows_on_windows(self, mock_windows_idle, mock_is_windows, mock_is_linux):
+        mock_is_linux.return_value = False
+        mock_is_windows.return_value = True
+        mock_windows_idle.return_value = 77
+        
+        idle = get_idle_seconds()
+        assert idle == 77
+        mock_windows_idle.assert_called_once()
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._is_linux")
+    @patch("impl_v1.phase49.runtime.idle_detector._is_windows")
+    def test_get_idle_info_linux(self, mock_windows, mock_linux):
+        mock_linux.return_value = True
+        mock_windows.return_value = False
+        
+        idle, method = get_idle_info()
+        assert method == "linux"
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._is_linux")
+    @patch("impl_v1.phase49.runtime.idle_detector._is_windows")
+    def test_get_idle_info_windows(self, mock_windows, mock_linux):
+        mock_linux.return_value = False
+        mock_windows.return_value = True
+        
+        idle, method = get_idle_info()
+        assert method == "windows"
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._is_linux")
+    @patch("impl_v1.phase49.runtime.idle_detector._is_windows")
+    def test_get_idle_info_unsupported(self, mock_windows, mock_linux):
+        mock_linux.return_value = False
+        mock_windows.return_value = False
+        
+        idle, method = get_idle_info()
+        assert method == "unsupported"
+        assert idle == 0
 
 
 # =============================================================================
@@ -177,11 +267,23 @@ class TestPowerStatus:
         assert isinstance(result, bool)
     
     @patch("impl_v1.phase49.runtime.idle_detector._is_linux")
-    def test_power_connected_on_unsupported_returns_true(self, mock_linux):
+    @patch("impl_v1.phase49.runtime.idle_detector._is_windows")
+    def test_power_connected_on_unsupported_returns_true(self, mock_windows, mock_linux):
         mock_linux.return_value = False
+        mock_windows.return_value = False
         result = is_power_connected()
         # Default to True for safety
         assert result is True
+    
+    @patch("impl_v1.phase49.runtime.idle_detector._is_linux")
+    @patch("impl_v1.phase49.runtime.idle_detector._is_windows")
+    def test_windows_power_detection(self, mock_windows, mock_linux):
+        mock_linux.return_value = False
+        mock_windows.return_value = True
+        
+        # On Windows, this calls the real ctypes function
+        result = is_power_connected()
+        assert isinstance(result, bool)
 
 
 # =============================================================================
@@ -204,6 +306,14 @@ class TestScanStatus:
         set_scan_active(True)
         set_scan_active(False)
         assert is_scan_active() is False
+    
+    def test_scan_status_toggle(self):
+        """Test toggling scan status multiple times."""
+        for _ in range(3):
+            set_scan_active(True)
+            assert is_scan_active() is True
+            set_scan_active(False)
+            assert is_scan_active() is False
 
 
 # =============================================================================
@@ -218,3 +328,40 @@ class TestZeroIdle:
         mock_idle.return_value = 0
         from impl_v1.phase49.runtime.idle_detector import get_idle_seconds
         assert get_idle_seconds() == 0
+
+
+# =============================================================================
+# EDGE CASE TESTS
+# =============================================================================
+
+class TestEdgeCases:
+    """Tests for edge cases and error handling."""
+    
+    @patch("impl_v1.phase49.runtime.idle_detector.subprocess.run")
+    def test_xprintidle_invalid_output(self, mock_run):
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout="invalid\n",
+        )
+        idle = _get_linux_idle_xprintidle()
+        # Should handle ValueError gracefully
+        assert idle is None
+    
+    @patch("impl_v1.phase49.runtime.idle_detector.subprocess.run")
+    def test_loginctl_empty_output(self, mock_run):
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout="",
+        )
+        idle = _get_linux_idle_loginctl()
+        assert idle is None
+    
+    @patch("impl_v1.phase49.runtime.idle_detector.subprocess.run")
+    def test_loginctl_no_idle_hint(self, mock_run):
+        mock_run.return_value = MagicMock(
+            returncode=0,
+            stdout="no\n",  # session not idle
+        )
+        idle = _get_linux_idle_loginctl()
+        assert idle is None or idle == 0
+

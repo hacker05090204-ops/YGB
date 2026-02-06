@@ -1279,7 +1279,7 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
     except WebSocketDisconnect:
         print(f"[WS] WebSocket disconnected: {report_id}")
     except Exception as e:
-        print(f"[ERROR] WebSocket error: {e}")
+        print(f"[!] WebSocket error: {e}")
         try:
             await websocket.send_json({"type": "error", "message": str(e)})
         except:
@@ -1309,11 +1309,11 @@ async def lifespan(app):
     # Initialize database
     try:
         await init_database()
-        print(f"[*] Database connected")
+        print(f"[+] Database connected")
     except Exception as e:
-        print(f"[WARN] Database connection failed: {e}")
+        print(f"[!] Database connection failed: {e}")
     
-    print(f"[OK] Server ready at http://localhost:8000")
+    print(f"[+] Server ready at http://localhost:8000")
     
     # Start G38 auto-training scheduler
     if G38_AVAILABLE:
