@@ -172,6 +172,9 @@ class AutoTrainer:
         # 24/7 CONTINUOUS MODE - training runs regardless of user activity
         self._continuous_mode = False
         self._continuous_target = 0  # Target epochs for continuous training (0 = infinite)
+        # Track last completed session for progress display
+        self._last_completed_epochs = 0
+        self._last_target_epochs = 0
         
         # === GPU RESOURCE CACHING (reduces CPU overhead) ===
         self._gpu_model = None  # Persistent model in GPU memory
@@ -845,6 +848,9 @@ class AutoTrainer:
                 self._generate_session_report()
             
             with self._training_lock:
+                # Save last session for progress display
+                self._last_completed_epochs = completed
+                self._last_target_epochs = epochs
                 self._state = TrainingState.IDLE
                 self._target_epochs = 0
                 self._session_epoch = 0
@@ -881,17 +887,28 @@ class AutoTrainer:
         
         # Calculate REAL progress percentage
         if self.is_training and self._target_epochs > 0:
+            # Active training - show live progress
             real_progress = round((self._session_epoch / self._target_epochs) * 100)
+            current_epoch = self._session_epoch
+            target = self._target_epochs
+        elif self._last_target_epochs > 0:
+            # Training completed - show last session at 100%
+            real_progress = 100
+            current_epoch = self._last_completed_epochs
+            target = self._last_target_epochs
         else:
+            # No training has happened yet
             real_progress = 0
+            current_epoch = 0
+            target = 0
         
         return {
             "state": self._state.value,
             "is_training": self.is_training,
-            "epoch": self._session_epoch,  # Current session epoch (real progress)
-            "total_epochs": self._target_epochs,  # Target for this session
+            "epoch": current_epoch,  # Current or last completed epoch
+            "total_epochs": target,  # Target for current/last session
             "total_completed": self._epoch,  # Total ever completed
-            "progress": real_progress,  # REAL percentage
+            "progress": real_progress,  # REAL percentage (100% when done)
             "idle_seconds": conditions.idle_seconds,
             "power_connected": conditions.power_connected,
             "scan_active": not conditions.no_active_scan,
