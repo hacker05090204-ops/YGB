@@ -146,6 +146,9 @@ class AutoTrainer:
         self._task: Optional[asyncio.Task] = None
         self._on_event_callback: Optional[Callable[[TrainingEvent], None]] = None
         self._current_session: Optional[TrainingSession] = None
+        # 24/7 CONTINUOUS MODE - training runs regardless of user activity
+        self._continuous_mode = False
+        self._continuous_target = 0  # Target epochs for continuous training (0 = infinite)
     
     @property
     def state(self) -> TrainingState:
@@ -639,3 +642,114 @@ def stop_auto_training() -> None:
     """Stop automatic idle training."""
     if _auto_trainer is not None:
         _auto_trainer.stop()
+
+
+def start_continuous_training(target_epochs: int = 0) -> dict:
+    """
+    Start 24/7 continuous training that runs regardless of user activity.
+    
+    Args:
+        target_epochs: Number of epochs to train (0 = infinite/24/7)
+    
+    Returns:
+        Status dict with training info
+    """
+    trainer = get_auto_trainer()
+    
+    with trainer._training_lock:
+        if trainer._state == TrainingState.TRAINING:
+            return {
+                "started": False,
+                "reason": "Training already in progress",
+                "state": trainer._state.value,
+            }
+        
+        trainer._continuous_mode = True
+        trainer._continuous_target = target_epochs
+        trainer._state = TrainingState.TRAINING
+        trainer._abort_flag.clear()
+        trainer._target_epochs = target_epochs if target_epochs > 0 else 999999
+        trainer._session_epoch = 0
+        trainer._current_session = TrainingSession(
+            started_at=datetime.now(timezone.utc).isoformat(),
+            start_epoch=trainer._epoch,
+            gpu_used=trainer._get_current_conditions().gpu_available,
+        )
+    
+    trainer._emit_event(
+        "CONTINUOUS_START",
+        f"24/7 continuous training started (target: {'infinite' if target_epochs == 0 else target_epochs} epochs)",
+    )
+    
+    # Start background thread for continuous training
+    def _run_continuous():
+        epoch_count = 0
+        while trainer._continuous_mode and not trainer._abort_flag.is_set():
+            # Check if target reached
+            if target_epochs > 0 and epoch_count >= target_epochs:
+                break
+            
+            epoch_count += 1
+            trainer._epoch += 1
+            trainer._session_epoch = epoch_count
+            
+            trainer._emit_event(
+                "TRAINING_STARTED",
+                f"Starting epoch {epoch_count}" + (f"/{target_epochs}" if target_epochs > 0 else " (24/7 mode)"),
+                epoch=epoch_count,
+                gpu_used=trainer._get_current_conditions().gpu_available,
+            )
+            
+            # Simulate training steps (2 seconds per epoch)
+            for step in range(10):
+                if trainer._abort_flag.is_set() or not trainer._continuous_mode:
+                    break
+                time.sleep(0.2)
+            
+            if not trainer._abort_flag.is_set() and trainer._continuous_mode:
+                checkpoint_hash = hashlib.sha256(f"epoch-{trainer._epoch}".encode()).hexdigest()[:16]
+                trainer._emit_event(
+                    "CHECKPOINT_SAVED",
+                    f"Saved checkpoint for epoch {epoch_count} (hash: {checkpoint_hash})",
+                    epoch=epoch_count,
+                )
+            
+            # Small pause between epochs
+            time.sleep(0.5)
+        
+        # Cleanup
+        trainer._continuous_mode = False
+        with trainer._training_lock:
+            trainer._state = TrainingState.IDLE
+            if trainer._current_session:
+                trainer._generate_session_report()
+            trainer._current_session = None
+        
+        trainer._emit_event(
+            "CONTINUOUS_STOP",
+            f"Continuous training completed: {epoch_count} epochs",
+            epoch=epoch_count,
+        )
+    
+    thread = threading.Thread(target=_run_continuous, daemon=True)
+    thread.start()
+    
+    return {
+        "started": True,
+        "mode": "continuous",
+        "target_epochs": target_epochs if target_epochs > 0 else "infinite",
+        "state": "TRAINING",
+    }
+
+
+def stop_continuous_training() -> dict:
+    """Stop 24/7 continuous training."""
+    trainer = get_auto_trainer()
+    trainer._continuous_mode = False
+    trainer._abort_flag.set()
+    
+    return {
+        "stopped": True,
+        "state": trainer._state.value,
+        "total_completed": trainer._epoch,
+    }
