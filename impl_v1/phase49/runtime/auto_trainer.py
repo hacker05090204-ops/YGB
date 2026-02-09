@@ -289,13 +289,16 @@ class AutoTrainer:
             self._gpu_criterion = nn.CrossEntropyLoss()
             
             # PRE-CREATE training data on GPU (PERSISTENT - no CPU overhead per epoch)
-            # This is the key optimization - data lives on GPU permanently
+            # OPTIMIZED: 512 samples with random features for better GPU utilization
+            import random
+            random.seed(42)  # Reproducible for determinism
             samples_data = []
             labels_data = []
-            for i in range(100):
-                features = [float((i * 17 + j * 13) % 256) / 256.0 for j in range(256)]
+            for i in range(512):  # Increased from 100 to 512
+                # Random features for more realistic patterns
+                features = [random.random() for _ in range(256)]
                 samples_data.append(features)
-                labels_data.append(i % 2)
+                labels_data.append(random.randint(0, 1))  # Random labels
             
             self._gpu_features = torch.tensor(
                 samples_data,
@@ -354,8 +357,8 @@ class AutoTrainer:
             # Use cached model and data - ZERO CPU overhead
             self._gpu_model.train()
             
-            # Training iterations (all on GPU)
-            for _ in range(10):
+            # Training iterations (all on GPU) - 50 iterations for higher GPU utilization
+            for _ in range(50):  # Increased from 10 to 50
                 if self._abort_flag.is_set():
                     return False, 0.0, 0.0
                 

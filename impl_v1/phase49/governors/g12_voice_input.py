@@ -25,11 +25,13 @@ import re
 
 
 class VoiceIntentType(Enum):
-    """CLOSED ENUM - 8 intent types"""
+    """CLOSED ENUM - 10 intent types (added GPU and training)"""
     SET_TARGET = "SET_TARGET"
     SET_SCOPE = "SET_SCOPE"
     QUERY_STATUS = "QUERY_STATUS"
     QUERY_PROGRESS = "QUERY_PROGRESS"
+    QUERY_GPU = "QUERY_GPU"  # NEW: GPU status
+    QUERY_TRAINING = "QUERY_TRAINING"  # NEW: Training metrics
     FIND_TARGETS = "FIND_TARGETS"
     SCREEN_TAKEOVER = "SCREEN_TAKEOVER"  # READ-ONLY inspection
     REPORT_HELP = "REPORT_HELP"  # High impact tips
@@ -102,6 +104,22 @@ INTENT_PATTERNS = {
         r'high\s+impact\s+(?:tips?|suggestions?)',
         r'(?:how\s+to\s+)?increase\s+payout',
         r'improve\s+(?:the\s+)?report',
+    ],
+    # NEW: GPU status queries
+    VoiceIntentType.QUERY_GPU: [
+        r'(?:show|check|what\s+is)\s+(?:the\s+)?gpu',
+        r'gpu\s+(?:status|usage|utilization)',
+        r'(?:is\s+)?gpu\s+(?:working|active)',
+        r'(?:how\s+is\s+)?(?:the\s+)?graphics\s+card',
+    ],
+    # NEW: Training metrics queries
+    VoiceIntentType.QUERY_TRAINING: [
+        r'(?:show|check)\s+(?:the\s+)?training',
+        r'training\s+(?:status|progress|metrics)',
+        r'(?:what\s+is\s+)?(?:the\s+)?(?:current\s+)?epoch',
+        r'(?:how\s+is\s+)?(?:the\s+)?model\s+(?:doing|training)',
+        r'(?:show\s+)?loss\s+(?:value|graph)?',
+        r'(?:what\s+is\s+)?(?:the\s+)?accuracy',
     ],
 }
 
