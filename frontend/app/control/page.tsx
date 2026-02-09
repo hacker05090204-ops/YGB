@@ -18,6 +18,7 @@ import { ApprovalPanel, type ApprovalRequest, type RiskLevelType } from "@/compo
 import { BrowserAssistant, type AssistantExplanation } from "@/components/browser-assistant"
 import { VoiceControls, type VoiceIntent } from "@/components/voice-controls"
 import { TargetDiscoveryPanel, type TargetCandidate } from "@/components/target-discovery-panel"
+import { TrainingProgress } from "@/components/training-progress"
 
 // API Base URL
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
@@ -435,13 +436,15 @@ export default function ControlPage() {
                                 </div>
                             </div>
 
-                            {/* Right Column: Browser Assistant */}
-                            <div className="col-span-12 lg:col-span-4">
+                            {/* Right Column: Training Progress & Browser Assistant */}
+                            <div className="col-span-12 lg:col-span-4 space-y-6">
+                                <TrainingProgress refreshInterval={3000} />
+
                                 <BrowserAssistant
                                     currentAction={currentAction}
                                     explanations={explanations}
                                     isActive={assistantActive}
-                                    className="h-[calc(100vh-280px)] min-h-[500px]"
+                                    className="h-[calc(100vh-580px)] min-h-[300px]"
                                 />
                             </div>
                         </div>
