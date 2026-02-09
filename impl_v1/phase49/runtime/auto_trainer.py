@@ -150,6 +150,9 @@ class AutoTrainer:
     
     Monitors system idle state and triggers MODE-A training
     when conditions are met.
+    
+    OPTIMIZATION: Pre-creates training data and keeps model in GPU memory
+    to reduce CPU overhead and increase GPU utilization.
     """
     
     CHECK_INTERVAL_SECONDS = 30
@@ -169,6 +172,15 @@ class AutoTrainer:
         # 24/7 CONTINUOUS MODE - training runs regardless of user activity
         self._continuous_mode = False
         self._continuous_target = 0  # Target epochs for continuous training (0 = infinite)
+        
+        # === GPU RESOURCE CACHING (reduces CPU overhead) ===
+        self._gpu_model = None  # Persistent model in GPU memory
+        self._gpu_optimizer = None
+        self._gpu_criterion = None
+        self._gpu_features = None  # Pre-created tensors on GPU
+        self._gpu_labels = None
+        self._gpu_device = None
+        self._gpu_initialized = False
     
     @property
     def state(self) -> TrainingState:
@@ -232,6 +244,78 @@ class AutoTrainer:
         
         return event
     
+    def _init_gpu_resources(self) -> bool:
+        """
+        Initialize GPU resources ONCE to reduce CPU overhead.
+        
+        Creates model, optimizer, criterion, and training tensors
+        on GPU and keeps them in memory for reuse across epochs.
+        """
+        if self._gpu_initialized:
+            return True
+        
+        if not TORCH_AVAILABLE or not PYTORCH_AVAILABLE:
+            return False
+        
+        device_info = detect_compute_device()
+        if device_info.device_type != DeviceType.CUDA:
+            return False
+        
+        try:
+            import torch.nn as nn
+            import torch.optim as optim
+            from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier
+            
+            self._gpu_device = get_torch_device()
+            
+            # Create model config
+            config = create_model_config(
+                input_dim=256,
+                output_dim=2,
+                hidden_dims=(512, 256, 128),
+                dropout=0.3,
+                learning_rate=0.001,
+                batch_size=32,
+                epochs=1,
+                seed=42,
+            )
+            
+            # Create model on GPU (PERSISTENT)
+            self._gpu_model = BugClassifier(config)
+            self._gpu_model = self._gpu_model.to(self._gpu_device)
+            
+            # Create optimizer and criterion (PERSISTENT)
+            self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate)
+            self._gpu_criterion = nn.CrossEntropyLoss()
+            
+            # PRE-CREATE training data on GPU (PERSISTENT - no CPU overhead per epoch)
+            # This is the key optimization - data lives on GPU permanently
+            samples_data = []
+            labels_data = []
+            for i in range(100):
+                features = [float((i * 17 + j * 13) % 256) / 256.0 for j in range(256)]
+                samples_data.append(features)
+                labels_data.append(i % 2)
+            
+            self._gpu_features = torch.tensor(
+                samples_data,
+                dtype=torch.float32,
+                device=self._gpu_device,
+            )
+            self._gpu_labels = torch.tensor(
+                labels_data,
+                dtype=torch.long,
+                device=self._gpu_device,
+            )
+            
+            self._gpu_initialized = True
+            logger.info(f"GPU resources initialized on {device_info.device_name}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize GPU resources: {e}")
+            return False
+    
     def _check_all_guards(self) -> Tuple[bool, str]:
         """
         Check ALL guards before training.
@@ -254,6 +338,45 @@ class AutoTrainer:
             return False, "MODE-A is not active"
         
         return True, "All guards passed"
+    
+    def _gpu_train_step(self) -> tuple:
+        """
+        Execute one training step using CACHED GPU resources.
+        
+        OPTIMIZED: No CPU overhead - model and data stay on GPU.
+        Returns (success: bool, accuracy: float, loss: float).
+        """
+        if not self._gpu_initialized:
+            if not self._init_gpu_resources():
+                return False, 0.0, 0.0
+        
+        try:
+            # Use cached model and data - ZERO CPU overhead
+            self._gpu_model.train()
+            
+            # Training iterations (all on GPU)
+            for _ in range(10):
+                if self._abort_flag.is_set():
+                    return False, 0.0, 0.0
+                
+                self._gpu_optimizer.zero_grad()
+                outputs = self._gpu_model(self._gpu_features)
+                loss = self._gpu_criterion(outputs, self._gpu_labels)
+                loss.backward()
+                self._gpu_optimizer.step()
+            
+            # Calculate accuracy (still on GPU)
+            self._gpu_model.eval()
+            with torch.no_grad():
+                outputs = self._gpu_model(self._gpu_features)
+                _, predicted = torch.max(outputs.data, 1)
+                accuracy = (predicted == self._gpu_labels).sum().item() / self._gpu_labels.size(0)
+            
+            return True, accuracy, loss.item()
+            
+        except Exception as e:
+            logger.error(f"GPU training step failed: {e}")
+            return False, 0.0, 0.0
     
     def _get_current_conditions(self) -> IdleConditions:
         """Get current idle conditions from real OS."""
@@ -676,10 +799,14 @@ class AutoTrainer:
         )
         
         try:
-            device = get_torch_device()
-            import torch.nn as nn
-            import torch.optim as optim
-            from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier
+            # Initialize GPU resources ONCE (data stays on GPU)
+            if not self._init_gpu_resources():
+                self._state = TrainingState.ERROR
+                return {
+                    "started": False,
+                    "reason": "Failed to initialize GPU resources",
+                    "state": "ERROR",
+                }
             
             for i in range(epochs):
                 if self._abort_flag.is_set():
@@ -691,80 +818,19 @@ class AutoTrainer:
                 
                 self._emit_event(
                     "TRAINING_STARTED",
-                    f"Starting GPU epoch {self._session_epoch}/{epochs}",
+                    f"Starting GPU epoch {self._session_epoch}/{epochs} (OPTIMIZED)",
                     epoch=self._session_epoch,
                     gpu_used=True,
                 )
                 
-                # Create model config for this epoch
-                config = create_model_config(
-                    input_dim=256,
-                    output_dim=2,
-                    hidden_dims=(512, 256, 128),
-                    dropout=0.3,
-                    learning_rate=0.001,
-                    batch_size=32,
-                    epochs=1,
-                    seed=42 + self._epoch,
-                )
+                # === USE OPTIMIZED GPU TRAINING (zero CPU overhead) ===
+                success, accuracy, loss = self._gpu_train_step()
                 
-                # Generate synthetic training samples
-                samples = tuple(
-                    TrainingSample(
-                        sample_id=f"SAMPLE-{j:04d}",
-                        features=tuple(float((j * 17 + k * 13) % 256) / 256.0 for k in range(256)),
-                        label=j % 2,
-                        source="synthetic_representation",
-                    )
-                    for j in range(100)
-                )
-                
-                # Create model on GPU
-                model = BugClassifier(config)
-                model = model.to(device)
-                
-                optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
-                criterion = nn.CrossEntropyLoss()
-                
-                # Convert samples to tensors on GPU
-                features = torch.tensor(
-                    [list(s.features) for s in samples],
-                    dtype=torch.float32,
-                    device=device,
-                )
-                labels = torch.tensor(
-                    [s.label for s in samples],
-                    dtype=torch.long,
-                    device=device,
-                )
-                
-                # === REAL GPU TRAINING LOOP ===
-                model.train()
-                for step in range(10):
-                    if self._abort_flag.is_set():
-                        break
-                    
-                    # Forward pass
-                    optimizer.zero_grad()
-                    outputs = model(features)
-                    loss = criterion(outputs, labels)
-                    
-                    # Backward pass (real gradient descent on GPU)
-                    loss.backward()
-                    optimizer.step()
-                
-                if not self._abort_flag.is_set():
-                    # Calculate accuracy
-                    model.eval()
-                    with torch.no_grad():
-                        outputs = model(features)
-                        _, predicted = torch.max(outputs.data, 1)
-                        accuracy = (predicted == labels).sum().item() / labels.size(0)
-                    
+                if not self._abort_flag.is_set() and success:
                     checkpoint_hash = hashlib.sha256(f"epoch-{self._epoch}-gpu".encode()).hexdigest()[:16]
                     self._emit_event(
                         "CHECKPOINT_SAVED",
-                        f"Saved GPU checkpoint {self._session_epoch}/{epochs} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%})",
+                        f"GPU checkpoint {self._session_epoch}/{epochs} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
                         epoch=self._session_epoch,
                         gpu_used=True,
                     )
