@@ -85,9 +85,23 @@ from impl_v1.phase49.governors.g37_pytorch_backend import (
 # Try importing torch for GPU enforcement
 try:
     import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    from torch.cuda.amp import autocast, GradScaler
     TORCH_AVAILABLE = True
+    AMP_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
+    AMP_AVAILABLE = False
+
+# Enforce deterministic mode for reproducibility
+if TORCH_AVAILABLE:
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+    try:
+        torch.use_deterministic_algorithms(True)
+    except Exception:
+        pass  # Not all operations support deterministic mode
 
 
 # =============================================================================
@@ -347,9 +361,9 @@ class AutoTrainer:
     
     def _gpu_train_step(self) -> tuple:
         """
-        Execute one training step using CACHED GPU resources.
+        Execute one training step using CACHED GPU resources with AMP.
         
-        OPTIMIZED: No CPU overhead - model and data stay on GPU.
+        OPTIMIZED: Uses mixed precision for RTX 2050 Tensor cores.
         Returns (success: bool, accuracy: float, loss: float).
         """
         if not self._gpu_initialized:
@@ -357,24 +371,45 @@ class AutoTrainer:
                 return False, 0.0, 0.0
         
         try:
+            # Initialize AMP scaler if not exists
+            if not hasattr(self, '_scaler') or self._scaler is None:
+                self._scaler = GradScaler() if AMP_AVAILABLE else None
+            
             # Use cached model and data - ZERO CPU overhead
             self._gpu_model.train()
             
-            # Training iterations (all on GPU) - 50 iterations for higher GPU utilization
-            for _ in range(50):  # Increased from 10 to 50
+            # Training iterations with AMP (50 iterations for GPU utilization)
+            for _ in range(50):
                 if self._abort_flag.is_set():
                     return False, 0.0, 0.0
                 
                 self._gpu_optimizer.zero_grad()
-                outputs = self._gpu_model(self._gpu_features)
-                loss = self._gpu_criterion(outputs, self._gpu_labels)
-                loss.backward()
-                self._gpu_optimizer.step()
+                
+                # AMP: Mixed precision forward pass
+                if AMP_AVAILABLE and self._scaler is not None:
+                    with autocast():
+                        outputs = self._gpu_model(self._gpu_features)
+                        loss = self._gpu_criterion(outputs, self._gpu_labels)
+                    
+                    # AMP: Scaled backward pass
+                    self._scaler.scale(loss).backward()
+                    self._scaler.step(self._gpu_optimizer)
+                    self._scaler.update()
+                else:
+                    # Fallback: Standard FP32 training
+                    outputs = self._gpu_model(self._gpu_features)
+                    loss = self._gpu_criterion(outputs, self._gpu_labels)
+                    loss.backward()
+                    self._gpu_optimizer.step()
             
             # Calculate accuracy (still on GPU)
             self._gpu_model.eval()
             with torch.no_grad():
-                outputs = self._gpu_model(self._gpu_features)
+                if AMP_AVAILABLE:
+                    with autocast():
+                        outputs = self._gpu_model(self._gpu_features)
+                else:
+                    outputs = self._gpu_model(self._gpu_features)
                 _, predicted = torch.max(outputs.data, 1)
                 accuracy = (predicted == self._gpu_labels).sum().item() / self._gpu_labels.size(0)
             
