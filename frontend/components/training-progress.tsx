@@ -254,10 +254,14 @@ export function TrainingProgress({
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-2 mb-6">
+            <div className="grid grid-cols-4 gap-2 mb-6">
+                <div className="text-center p-2 rounded-lg bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
+                    <p className="text-xl font-bold text-emerald-400">{Math.min(Math.round((status.auto_training.total_completed / 1000) * 100), 100)}%</p>
+                    <p className="text-xs text-muted-foreground">Model Progress</p>
+                </div>
                 <div className="text-center p-2 rounded-lg bg-muted/5">
                     <p className="text-lg font-bold text-foreground">{status.auto_training.total_completed}</p>
-                    <p className="text-xs text-muted-foreground">Total Done</p>
+                    <p className="text-xs text-muted-foreground">Epochs Done</p>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-muted/5">
                     <p className="text-lg font-bold text-foreground">{status.auto_training.idle_seconds}s</p>
