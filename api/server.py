@@ -802,12 +802,12 @@ async def abort_g38_training():
         return {"success": False, "error": "G38 modules not loaded"}
     
     trainer = get_auto_trainer()
-    trainer.abort_training()
+    result = trainer.abort_training()
     
     return {
-        "success": True,
+        "success": result.get("aborted", False),
         "state": trainer.state.value,
-        "message": "Training abort requested",
+        "message": "Training abort requested" if result.get("aborted") else result.get("reason", "No training in progress"),
     }
 
 
@@ -941,7 +941,135 @@ async def get_g38_latest_report():
     }
 
 
-# DATABASE API ENDPOINTS
+# =============================================================================
+# MANUAL TRAINING CONTROL ENDPOINTS
+# =============================================================================
+
+@app.post("/training/start")
+async def manual_start_training(epochs: int = 10):
+    """Manually start GPU training. No auto-trigger."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    
+    if trainer.is_training:
+        return {
+            "success": False,
+            "error": "Training already in progress",
+            "state": trainer.state.value,
+        }
+    
+    import threading
+    def run_training():
+        trainer.force_start_training(epochs=epochs)
+    
+    thread = threading.Thread(target=run_training, daemon=True)
+    thread.start()
+    
+    return {
+        "success": True,
+        "message": f"Training started for {epochs} epochs",
+        "state": "TRAINING",
+        "training_mode": "MANUAL",
+    }
+
+
+@app.post("/training/stop")
+async def manual_stop_training():
+    """Stop training immediately."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    result = trainer.abort_training()
+    
+    return {
+        "success": result.get("aborted", False),
+        "message": "Training stopped" if result.get("aborted") else "No training in progress",
+        "state": trainer.state.value,
+    }
+
+
+@app.get("/training/status")
+async def manual_training_status():
+    """Get current training status."""
+    if not G38_AVAILABLE:
+        return {"available": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    return trainer.get_status()
+
+
+@app.get("/training/progress")
+async def manual_training_progress():
+    """Get real-time training progress."""
+    if not G38_AVAILABLE:
+        return {"available": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    status = trainer.get_status()
+    
+    return {
+        "epoch": status["epoch"],
+        "total_epochs": status["total_epochs"],
+        "total_completed": status["total_completed"],
+        "progress": status["progress"],
+        "is_training": status["is_training"],
+        "last_loss": status.get("last_loss", 0.0),
+        "last_accuracy": status.get("last_accuracy", 0.0),
+        "samples_per_sec": status.get("samples_per_sec", 0.0),
+        "dataset_size": status.get("dataset_size", 0),
+        "training_mode": "MANUAL",
+    }
+
+
+@app.get("/gpu/status")
+async def gpu_status():
+    """Get GPU utilization and memory metrics."""
+    try:
+        import torch
+        if not torch.cuda.is_available():
+            return {"available": False, "error": "CUDA not available"}
+        
+        return {
+            "available": True,
+            "device_name": torch.cuda.get_device_name(0),
+            "memory_allocated_mb": round(torch.cuda.memory_allocated() / 1024 / 1024, 2),
+            "memory_reserved_mb": round(torch.cuda.memory_reserved() / 1024 / 1024, 2),
+            "memory_total_mb": round(torch.cuda.get_device_properties(0).total_mem / 1024 / 1024, 2),
+            "compute_capability": f"{torch.cuda.get_device_capability(0)[0]}.{torch.cuda.get_device_capability(0)[1]}",
+            "amp_available": True,
+            "cudnn_deterministic": torch.backends.cudnn.deterministic,
+        }
+    except Exception as e:
+        return {"available": False, "error": str(e)}
+
+
+@app.get("/dataset/stats")
+async def dataset_stats():
+    """Get training dataset statistics."""
+    if not G38_AVAILABLE:
+        return {"available": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    if trainer._gpu_dataset_stats:
+        return {
+            "available": True,
+            **trainer._gpu_dataset_stats,
+        }
+    
+    # Try to get stats from dataset loader directly
+    try:
+        from impl_v1.training.data.real_dataset_loader import validate_dataset_integrity
+        valid, msg = validate_dataset_integrity()
+        return {
+            "available": valid,
+            "message": msg,
+            "source": "real_dataset_loader",
+        }
+    except Exception as e:
+        return {"available": False, "error": str(e)}
 # =============================================================================
 
 @app.get("/api/db/users")

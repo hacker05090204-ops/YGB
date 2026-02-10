@@ -11,7 +11,10 @@ import {
     CheckCircle,
     AlertCircle,
     Loader2,
-    TrendingUp
+    TrendingUp,
+    Play,
+    Square,
+    BarChart3
 } from "lucide-react"
 
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
@@ -31,6 +34,13 @@ interface G38Status {
         gpu_available: boolean
         events_count: number
         last_event: string | null
+        gpu_mem_allocated_mb: number
+        gpu_mem_reserved_mb: number
+        last_loss: number
+        last_accuracy: number
+        samples_per_sec: number
+        dataset_size: number
+        training_mode: string
     }
     guards: {
         main_guards: number
@@ -70,6 +80,9 @@ export function TrainingProgress({
     const [events, setEvents] = useState<TrainingEvent[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [selectedEpochs, setSelectedEpochs] = useState(10)
+    const [isStarting, setIsStarting] = useState(false)
+    const [isStopping, setIsStopping] = useState(false)
 
     const fetchStatus = useCallback(async () => {
         try {
@@ -96,6 +109,38 @@ export function TrainingProgress({
             setIsLoading(false)
         }
     }, [])
+
+    const startTraining = useCallback(async () => {
+        setIsStarting(true)
+        try {
+            const res = await fetch(`${API_BASE}/training/start?epochs=${selectedEpochs}`, {
+                method: 'POST'
+            })
+            if (res.ok) {
+                fetchStatus()
+            }
+        } catch (e) {
+            console.error('Failed to start training', e)
+        } finally {
+            setIsStarting(false)
+        }
+    }, [selectedEpochs, fetchStatus])
+
+    const stopTraining = useCallback(async () => {
+        setIsStopping(true)
+        try {
+            const res = await fetch(`${API_BASE}/training/stop`, {
+                method: 'POST'
+            })
+            if (res.ok) {
+                fetchStatus()
+            }
+        } catch (e) {
+            console.error('Failed to stop training', e)
+        } finally {
+            setIsStopping(false)
+        }
+    }, [fetchStatus])
 
     useEffect(() => {
         fetchStatus()
@@ -163,8 +208,8 @@ export function TrainingProgress({
                         <TrendingUp className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                        <h3 className="font-semibold text-sm">Training Progress</h3>
-                        <p className="text-xs text-muted-foreground">G38 Auto-Training</p>
+                        <h3 className="font-semibold text-sm">Training Control</h3>
+                        <p className="text-xs text-muted-foreground">Manual Mode</p>
                     </div>
                 </div>
                 <div className={cn(
@@ -227,6 +272,42 @@ export function TrainingProgress({
                 </div>
             </div>
 
+            {/* Manual Training Controls */}
+            <div className="flex items-center justify-center gap-3 mb-6">
+                {!status.auto_training.is_training ? (
+                    <>
+                        <select
+                            value={selectedEpochs}
+                            onChange={(e) => setSelectedEpochs(Number(e.target.value))}
+                            className="bg-muted/20 border border-border/50 rounded-lg px-3 py-2 text-sm text-foreground"
+                        >
+                            <option value={5}>5 epochs</option>
+                            <option value={10}>10 epochs</option>
+                            <option value={20}>20 epochs</option>
+                            <option value={50}>50 epochs</option>
+                            <option value={100}>100 epochs</option>
+                        </select>
+                        <button
+                            onClick={startTraining}
+                            disabled={isStarting}
+                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                        >
+                            {isStarting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+                            Start Training
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        onClick={stopTraining}
+                        disabled={isStopping}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-rose-500 text-white text-sm font-medium hover:from-red-600 hover:to-rose-600 transition-all shadow-lg shadow-red-500/20 disabled:opacity-50"
+                    >
+                        {isStopping ? <Loader2 className="w-4 h-4 animate-spin" /> : <Square className="w-4 h-4" />}
+                        Stop Training
+                    </button>
+                )}
+            </div>
+
             {/* Status Indicators */}
             <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className={cn(
@@ -254,7 +335,7 @@ export function TrainingProgress({
             </div>
 
             {/* Stats Row */}
-            <div className="grid grid-cols-4 gap-2 mb-6">
+            <div className="grid grid-cols-4 gap-2 mb-4">
                 <div className="text-center p-2 rounded-lg bg-gradient-to-br from-emerald-500/10 to-teal-500/10 border border-emerald-500/20">
                     <p className="text-xl font-bold text-emerald-400">{Math.min(Math.round((status.auto_training.total_completed / 1000) * 100), 100)}%</p>
                     <p className="text-xs text-muted-foreground">Model Progress</p>
@@ -264,12 +345,28 @@ export function TrainingProgress({
                     <p className="text-xs text-muted-foreground">Epochs Done</p>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-muted/5">
-                    <p className="text-lg font-bold text-foreground">{status.auto_training.idle_seconds}s</p>
-                    <p className="text-xs text-muted-foreground">Idle</p>
+                    <p className="text-lg font-bold text-foreground">{status.auto_training.dataset_size || 0}</p>
+                    <p className="text-xs text-muted-foreground">Dataset</p>
                 </div>
                 <div className="text-center p-2 rounded-lg bg-muted/5">
                     <p className="text-lg font-bold text-foreground">{status.auto_training.events_count}</p>
                     <p className="text-xs text-muted-foreground">Events</p>
+                </div>
+            </div>
+
+            {/* GPU + Training Metrics */}
+            <div className="grid grid-cols-3 gap-2 mb-6">
+                <div className="text-center p-2 rounded-lg bg-purple-500/5 border border-purple-500/15">
+                    <p className="text-sm font-bold text-purple-400">{status.auto_training.gpu_mem_allocated_mb || 0} MB</p>
+                    <p className="text-xs text-muted-foreground">GPU Mem</p>
+                </div>
+                <div className="text-center p-2 rounded-lg bg-cyan-500/5 border border-cyan-500/15">
+                    <p className="text-sm font-bold text-cyan-400">{(status.auto_training.last_loss || 0).toFixed(4)}</p>
+                    <p className="text-xs text-muted-foreground">Loss</p>
+                </div>
+                <div className="text-center p-2 rounded-lg bg-amber-500/5 border border-amber-500/15">
+                    <p className="text-sm font-bold text-amber-400">{((status.auto_training.last_accuracy || 0) * 100).toFixed(1)}%</p>
+                    <p className="text-xs text-muted-foreground">Accuracy</p>
                 </div>
             </div>
 

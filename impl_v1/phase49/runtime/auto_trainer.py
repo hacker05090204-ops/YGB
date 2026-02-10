@@ -160,13 +160,13 @@ class TrainingSession:
 
 class AutoTrainer:
     """
-    Background auto-trainer for G38.
+    MANUAL-CONTROL trainer for G38.
     
-    Monitors system idle state and triggers MODE-A training
-    when conditions are met.
+    Training is triggered ONLY by explicit user action via API.
+    NO idle-based auto-trigger. NO automatic background training.
     
-    OPTIMIZATION: Pre-creates training data and keeps model in GPU memory
-    to reduce CPU overhead and increase GPU utilization.
+    OPTIMIZATION: Uses RealTrainingDataset with 18K+ structured samples,
+    PyTorch DataLoader with pin_memory, and AMP mixed precision.
     """
     
     CHECK_INTERVAL_SECONDS = 30
@@ -198,6 +198,11 @@ class AutoTrainer:
         self._gpu_labels = None
         self._gpu_device = None
         self._gpu_initialized = False
+        self._gpu_dataloader = None  # Real data DataLoader
+        self._gpu_dataset_stats = None  # Dataset statistics
+        self._last_loss = 0.0  # Last training loss
+        self._last_accuracy = 0.0  # Last training accuracy
+        self._samples_per_sec = 0.0  # Training throughput
     
     @property
     def state(self) -> TrainingState:
@@ -263,10 +268,10 @@ class AutoTrainer:
     
     def _init_gpu_resources(self) -> bool:
         """
-        Initialize GPU resources ONCE to reduce CPU overhead.
+        Initialize GPU resources ONCE with REAL structured data.
         
-        Creates model, optimizer, criterion, and training tensors
-        on GPU and keeps them in memory for reuse across epochs.
+        Uses RealTrainingDataset (18K+ samples) with PyTorch DataLoader.
+        NO synthetic data. NO random samples.
         """
         if self._gpu_initialized:
             return True
@@ -279,8 +284,6 @@ class AutoTrainer:
             return False
         
         try:
-            import torch.nn as nn
-            import torch.optim as optim
             from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier
             
             self._gpu_device = get_torch_device()
@@ -292,7 +295,7 @@ class AutoTrainer:
                 hidden_dims=(512, 256, 128),
                 dropout=0.3,
                 learning_rate=0.001,
-                batch_size=32,
+                batch_size=1024,
                 epochs=1,
                 seed=42,
             )
@@ -305,31 +308,41 @@ class AutoTrainer:
             self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate)
             self._gpu_criterion = nn.CrossEntropyLoss()
             
-            # PRE-CREATE training data on GPU (PERSISTENT - no CPU overhead per epoch)
-            # OPTIMIZED: 512 samples with random features for better GPU utilization
-            import random
-            random.seed(42)  # Reproducible for determinism
-            samples_data = []
-            labels_data = []
-            for i in range(512):  # Increased from 100 to 512
-                # Random features for more realistic patterns
-                features = [random.random() for _ in range(256)]
-                samples_data.append(features)
-                labels_data.append(random.randint(0, 1))  # Random labels
+            # === REAL DATA PIPELINE (NO SYNTHETIC DATA) ===
+            from impl_v1.training.data.real_dataset_loader import (
+                create_training_dataloader,
+                validate_dataset_integrity,
+            )
             
-            self._gpu_features = torch.tensor(
-                samples_data,
-                dtype=torch.float32,
-                device=self._gpu_device,
+            # Validate dataset before use
+            valid, msg = validate_dataset_integrity()
+            if not valid:
+                logger.error(f"Dataset validation failed: {msg}")
+                return False
+            logger.info(f"Dataset validated: {msg}")
+            
+            # Create optimized DataLoader (pin_memory, workers)
+            train_loader, holdout_loader, stats = create_training_dataloader(
+                batch_size=1024,
+                num_workers=4,
+                pin_memory=True,
+                prefetch_factor=2,
+                seed=42,
             )
-            self._gpu_labels = torch.tensor(
-                labels_data,
-                dtype=torch.long,
-                device=self._gpu_device,
-            )
+            
+            self._gpu_dataloader = train_loader
+            self._gpu_dataset_stats = stats
+            
+            # Pre-load first batch to GPU for fast access
+            first_batch = next(iter(train_loader))
+            self._gpu_features = first_batch[0].to(self._gpu_device)
+            self._gpu_labels = first_batch[1].to(self._gpu_device)
             
             self._gpu_initialized = True
-            logger.info(f"GPU resources initialized on {device_info.device_name}")
+            logger.info(
+                f"GPU resources initialized on {device_info.device_name} "
+                f"with {stats['train']['total']} real samples"
+            )
             return True
             
         except Exception as e:
@@ -748,22 +761,19 @@ class AutoTrainer:
     
     async def run_scheduler(self) -> None:
         """
-        Run the background scheduler loop.
+        Background loop - MANUAL MODE ONLY.
         
-        Checks idle conditions every 30 seconds.
+        Does NOT auto-trigger training. Only monitors system state
+        for dashboard display. Training starts ONLY via API.
         """
         self._running = True
-        logger.info(f"G38 Auto-Trainer started (check interval: {self.CHECK_INTERVAL_SECONDS}s)")
+        logger.info("G38 Trainer started in MANUAL MODE (no auto-trigger)")
         
         while self._running:
-            try:
-                self.check_and_train()
-            except Exception as e:
-                logger.error(f"Scheduler error: {e}")
-            
+            # NO auto-trigger - just keep alive for status polling
             await asyncio.sleep(self.CHECK_INTERVAL_SECONDS)
         
-        logger.info("G38 Auto-Trainer stopped")
+        logger.info("G38 Trainer stopped")
     
     def start(self) -> None:
         """Start the background scheduler."""
@@ -782,8 +792,31 @@ class AutoTrainer:
             self._task.cancel()
             self._task = None
     
-    def abort_training(self) -> None:
-        """Abort current training (if any)."""
+    def abort_training(self) -> dict:
+        """Abort training immediately. Returns status."""
+        if self._state != TrainingState.TRAINING:
+            return {
+                "aborted": False,
+                "reason": "No training in progress",
+                "state": self._state.value,
+            }
+        
+        self._abort_flag.set()
+        self._emit_event(
+            "MANUAL_STOP",
+            "Training aborted by user",
+            gpu_used=True,
+        )
+        
+        return {
+            "aborted": True,
+            "epoch_at_stop": self._session_epoch,
+            "total_completed": self._epoch,
+            "state": "ABORTING",
+        }
+    
+    def abort_training_legacy(self) -> None:
+        """Legacy abort - use abort_training() instead."""
         self._abort_flag.set()
         self._emit_event(
             "TRAINING_ABORTED",
@@ -937,19 +970,35 @@ class AutoTrainer:
             current_epoch = 0
             target = 0
         
+        # GPU metrics
+        gpu_mem_allocated = 0.0
+        gpu_mem_reserved = 0.0
+        gpu_utilization = 0.0
+        if TORCH_AVAILABLE and torch.cuda.is_available():
+            gpu_mem_allocated = torch.cuda.memory_allocated() / 1024 / 1024  # MB
+            gpu_mem_reserved = torch.cuda.memory_reserved() / 1024 / 1024  # MB
+        
         return {
             "state": self._state.value,
             "is_training": self.is_training,
-            "epoch": current_epoch,  # Current or last completed epoch
-            "total_epochs": target,  # Target for current/last session
-            "total_completed": self._epoch,  # Total ever completed
-            "progress": real_progress,  # REAL percentage (100% when done)
+            "epoch": current_epoch,
+            "total_epochs": target,
+            "total_completed": self._epoch,
+            "progress": real_progress,
             "idle_seconds": conditions.idle_seconds,
             "power_connected": conditions.power_connected,
             "scan_active": not conditions.no_active_scan,
             "gpu_available": conditions.gpu_available,
             "events_count": len(self._events),
             "last_event": self._events[-1].event_type if self._events else None,
+            # Real GPU metrics
+            "gpu_mem_allocated_mb": round(gpu_mem_allocated, 2),
+            "gpu_mem_reserved_mb": round(gpu_mem_reserved, 2),
+            "last_loss": round(self._last_loss, 6),
+            "last_accuracy": round(self._last_accuracy, 4),
+            "samples_per_sec": round(self._samples_per_sec, 1),
+            "dataset_size": self._gpu_dataset_stats["train"]["total"] if self._gpu_dataset_stats else 0,
+            "training_mode": "MANUAL",
         }
 
 
@@ -969,9 +1018,9 @@ def get_auto_trainer() -> AutoTrainer:
 
 
 def start_auto_training() -> None:
-    """Start automatic idle training."""
+    """Initialize trainer in MANUAL mode. No auto-trigger."""
     trainer = get_auto_trainer()
-    trainer.start()
+    trainer.start()  # Starts background loop for status polling only
 
 
 def stop_auto_training() -> None:
