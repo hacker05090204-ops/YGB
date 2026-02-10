@@ -113,7 +113,7 @@ export function TrainingProgress({
     const startTraining = useCallback(async () => {
         setIsStarting(true)
         try {
-            const res = await fetch(`${API_BASE}/training/start?epochs=${selectedEpochs}`, {
+            const res = await fetch(`${API_BASE}/api/g38/start?epochs=${selectedEpochs}`, {
                 method: 'POST'
             })
             if (res.ok) {
@@ -129,7 +129,7 @@ export function TrainingProgress({
     const stopTraining = useCallback(async () => {
         setIsStopping(true)
         try {
-            const res = await fetch(`${API_BASE}/training/stop`, {
+            const res = await fetch(`${API_BASE}/api/g38/abort`, {
                 method: 'POST'
             })
             if (res.ok) {

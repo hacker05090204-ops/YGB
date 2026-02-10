@@ -740,16 +740,24 @@ async def get_g38_status():
         "auto_training": {
             "state": status["state"],
             "is_training": status["is_training"],
-            "epoch": status["epoch"],  # Current session epoch (real)
-            "total_epochs": status.get("total_epochs", 0),  # Target epochs for this session
-            "total_completed": status.get("total_completed", 0),  # Total ever completed
-            "progress": status.get("progress", 0),  # REAL progress from backend
+            "epoch": status["epoch"],
+            "total_epochs": status.get("total_epochs", 0),
+            "total_completed": status.get("total_completed", 0),
+            "progress": status.get("progress", 0),
             "idle_seconds": status["idle_seconds"],
             "power_connected": status["power_connected"],
             "scan_active": status["scan_active"],
             "gpu_available": status["gpu_available"],
             "events_count": status["events_count"],
             "last_event": status["last_event"],
+            # Real GPU + training metrics
+            "gpu_mem_allocated_mb": status.get("gpu_mem_allocated_mb", 0),
+            "gpu_mem_reserved_mb": status.get("gpu_mem_reserved_mb", 0),
+            "last_loss": status.get("last_loss", 0),
+            "last_accuracy": status.get("last_accuracy", 0),
+            "samples_per_sec": status.get("samples_per_sec", 0),
+            "dataset_size": status.get("dataset_size", 0),
+            "training_mode": status.get("training_mode", "MANUAL"),
         },
 
         "guards": {
