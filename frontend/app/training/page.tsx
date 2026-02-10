@@ -44,6 +44,13 @@ interface G38Status {
         gpu_available: boolean
         events_count: number
         last_event: string | null
+        gpu_mem_allocated_mb: number
+        gpu_mem_reserved_mb: number
+        last_loss: number
+        last_accuracy: number
+        samples_per_sec: number
+        dataset_size: number
+        training_mode: string
     }
     guards?: {
         main_guards: number
@@ -236,6 +243,30 @@ export default function TrainingDashboard() {
                                             <span className={status?.auto_training?.gpu_available ? "text-green-400" : "text-[#525252]"}>
                                                 {status?.auto_training?.gpu_available ? "Available" : "CPU Only"}
                                             </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">GPU Memory</span>
+                                            <span>{status?.auto_training?.gpu_mem_allocated_mb || 0} MB / {status?.auto_training?.gpu_mem_reserved_mb || 0} MB</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Loss</span>
+                                            <span className="text-orange-400">{status?.auto_training?.last_loss?.toFixed(6) || "0.000000"}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Accuracy</span>
+                                            <span className="text-cyan-400">{((status?.auto_training?.last_accuracy || 0) * 100).toFixed(2)}%</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Samples/sec</span>
+                                            <span>{status?.auto_training?.samples_per_sec || 0}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Dataset Size</span>
+                                            <span className="text-purple-400">{(status?.auto_training?.dataset_size || 0).toLocaleString()}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Mode</span>
+                                            <span className="text-yellow-400 font-medium">{status?.auto_training?.training_mode || "MANUAL"}</span>
                                         </div>
                                     </div>
                                 </div>
