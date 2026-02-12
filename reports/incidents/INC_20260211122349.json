@@ -1,0 +1,27 @@
+{
+  "incident_id": "INC_20260211122349",
+  "incident_type": "drift",
+  "timestamp": "2026-02-11T12:23:49.158102",
+  "severity": "high",
+  "summary": "Test drift",
+  "scan_metrics": {
+    "last_1000_scans": {
+      "total": 1000,
+      "true_positives": 950,
+      "false_positives": 20,
+      "false_negatives": 30,
+      "accuracy": 0.95
+    },
+    "avg_confidence": 0.85,
+    "avg_latency_ms": 150
+  },
+  "model_diff": {},
+  "performance_diff": {},
+  "dependency_diff": {},
+  "recommended_actions": [
+    "Review last 100 predictions for pattern changes",
+    "Compare current model metrics to baseline",
+    "Consider rolling back to previous checkpoint",
+    "Schedule calibration rerun"
+  ]
+}

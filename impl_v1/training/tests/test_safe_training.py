@@ -87,8 +87,8 @@ class TestSafeAcceleration(unittest.TestCase):
 class TestGPUThermalMonitor(unittest.TestCase):
     """Test GPU thermal monitoring."""
     
-    def test_mock_status(self):
-        """Mock status returns valid data."""
+    def test_gpu_status(self):
+        """GPU status returns valid data (real or unavailable)."""
         monitor = GPUThermalMonitor()
         status = monitor.get_gpu_status()
         self.assertIsNotNone(status.temperature_c)

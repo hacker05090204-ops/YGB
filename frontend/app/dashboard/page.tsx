@@ -200,14 +200,30 @@ export default function Dashboard() {
     }
   }
 
+  // Aggregate real activity data by day-of-week from API
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const dayCounts: Record<string, number> = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 }
+  for (const act of activities) {
+    if (act.created_at) {
+      const day = dayNames[new Date(act.created_at).getDay()]
+      dayCounts[day] = (dayCounts[day] || 0) + 1
+    }
+  }
+  // Also count bounties submitted per day
+  for (const b of bounties) {
+    if (b.submitted_at) {
+      const day = dayNames[new Date(b.submitted_at).getDay()]
+      dayCounts[day] = (dayCounts[day] || 0) + 1
+    }
+  }
   const chartData = [
-    { name: 'Mon', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 2 },
-    { name: 'Tue', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 3 },
-    { name: 'Wed', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 4 },
-    { name: 'Thu', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 2 },
-    { name: 'Fri', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 5 },
-    { name: 'Sat', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 3 },
-    { name: 'Sun', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 4 },
+    { name: 'Mon', bounties: dayCounts['Mon'] },
+    { name: 'Tue', bounties: dayCounts['Tue'] },
+    { name: 'Wed', bounties: dayCounts['Wed'] },
+    { name: 'Thu', bounties: dayCounts['Thu'] },
+    { name: 'Fri', bounties: dayCounts['Fri'] },
+    { name: 'Sat', bounties: dayCounts['Sat'] },
+    { name: 'Sun', bounties: dayCounts['Sun'] },
   ]
 
   return (
@@ -238,10 +254,10 @@ export default function Dashboard() {
               <RefreshCw className={`w-4 h-4 text-[#737373] ${apiStatus === "loading" ? "animate-spin" : ""}`} />
             </button>
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${apiStatus === "online"
-                ? "bg-green-500/10 border-green-500/20 text-green-400"
-                : apiStatus === "loading"
-                  ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
-                  : "bg-red-500/10 border-red-500/20 text-red-400"
+              ? "bg-green-500/10 border-green-500/20 text-green-400"
+              : apiStatus === "loading"
+                ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                : "bg-red-500/10 border-red-500/20 text-red-400"
               }`}>
               <div className={`w-1.5 h-1.5 rounded-full ${apiStatus === "online" ? "bg-green-400" : apiStatus === "loading" ? "bg-yellow-400 animate-pulse" : "bg-red-400"
                 }`} />
@@ -257,8 +273,8 @@ export default function Dashboard() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === tab
-                  ? "bg-white/[0.1] text-[#FAFAFA]"
-                  : "text-[#737373] hover:text-[#FAFAFA] hover:bg-white/[0.05]"
+                ? "bg-white/[0.1] text-[#FAFAFA]"
+                : "text-[#737373] hover:text-[#FAFAFA] hover:bg-white/[0.05]"
                 }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -626,8 +642,8 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center gap-3 mt-4">
                         <span className={`px-2 py-1 text-xs rounded-full ${target.payout_tier === 'HIGH' ? 'bg-green-500/20 text-green-400' :
-                            target.payout_tier === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-gray-500/20 text-gray-400'
+                          target.payout_tier === 'MEDIUM' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-gray-500/20 text-gray-400'
                           }`}>
                           {target.payout_tier} Payout
                         </span>

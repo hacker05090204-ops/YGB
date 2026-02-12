@@ -66,16 +66,16 @@ class TestRareClassStability(unittest.TestCase):
 class TestRepresentationIntegrity(unittest.TestCase):
     """Test representation integrity monitoring."""
     
-    def test_mock_profile(self):
-        """Mock profile is valid."""
+    def test_unavailable_profile(self):
+        """Unavailable profile is valid."""
         monitor = RepresentationIntegrityMonitor()
-        profile = monitor._mock_profile("test_checkpoint")
+        profile = monitor._unavailable_profile("test_checkpoint")
         self.assertEqual(profile.checkpoint_id, "test_checkpoint")
     
     def test_check_integrity_no_baseline(self):
         """First check establishes baseline."""
         monitor = RepresentationIntegrityMonitor()
-        profile = monitor._mock_profile("ckpt_1")
+        profile = monitor._unavailable_profile("ckpt_1")
         is_valid, reason = monitor.check_integrity(profile)
         self.assertTrue(is_valid)
 

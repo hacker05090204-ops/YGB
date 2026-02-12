@@ -17,7 +17,7 @@ from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
@@ -26,14 +26,40 @@ from pydantic import BaseModel
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-# Import database module
-from database import (
-    init_database, close_pool,
+# Ensure HDD storage root points to the dedicated YGB_DATA partition (D:\)
+import platform as _plat
+if _plat.system() == "Windows":
+    os.environ["YGB_HDD_ROOT"] = "D:/ygb_hdd"
+
+# Import HDD storage bridge (replaces SQLite database module)
+from backend.storage.storage_bridge import (
+    init_storage, shutdown_storage,
     create_user, get_user, get_all_users, update_user_stats,
     create_target, get_all_targets, get_target,
     create_bounty, get_user_bounties, get_all_bounties, update_bounty_status,
     create_session, get_user_sessions, update_session_progress,
-    log_activity, get_recent_activity, get_admin_stats
+    log_activity, get_recent_activity, get_admin_stats,
+    get_storage_stats, get_lifecycle_status, get_disk_status,
+    get_delete_preview, store_video, get_video_stream_token,
+    stream_video, list_videos,
+)
+
+# Import training state manager
+from backend.training.state_manager import get_training_state_manager
+
+# Import auth and alerts
+from backend.auth.auth import (
+    hash_password, verify_password, generate_jwt, verify_jwt,
+    compute_device_hash, get_rate_limiter, generate_csrf_token
+)
+from backend.alerts.email_alerts import (
+    alert_new_login, alert_new_device, alert_multiple_devices,
+    alert_suspicious_activity, alert_rate_limit_exceeded
+)
+from backend.storage.storage_bridge import (
+    register_device, get_user_devices, get_all_active_devices,
+    get_active_device_count, get_active_sessions, end_session,
+    get_user_by_email, update_user_password
 )
 
 # Import REAL phase runner with actual browser automation
@@ -142,7 +168,7 @@ class VoiceParseRequest(BaseModel):
 
 
 class AutonomySessionRequest(BaseModel):
-    mode: str  # MOCK, READ_ONLY, AUTONOMOUS_FIND, REAL
+    mode: str  # READ_ONLY, AUTONOMOUS_FIND, REAL
     duration_hours: float = 0.0
 
 
@@ -185,7 +211,7 @@ class CreateSessionRequest(BaseModel):
 
 
 # =============================================================================
-# IN-MEMORY STATE (for demo purposes)
+# IN-MEMORY STATE (runtime state — persisted in-memory per server lifetime)
 # =============================================================================
 
 # Active WebSocket connections
@@ -454,12 +480,8 @@ async def get_dashboard_state(dashboard_id: str = None):
     if dashboard_id and dashboard_id in dashboard_states:
         return dashboard_states[dashboard_id]
     
-    # Return demo state if no specific ID
-    return {
-        "dashboard_id": "DASH-DEMO",
-        "state": "IDLE",
-        "panels": ["USER", "ACTIVITY", "REPORT"]
-    }
+    # No dashboard found — return error
+    return {"error": "No dashboard found", "dashboard_id": None, "state": "DISCONNECTED"}
 
 
 @app.get("/api/execution/state")
@@ -552,53 +574,161 @@ async def submit_approval_decision(request: ApprovalDecisionRequest):
 
 @app.post("/api/targets/discover")
 async def discover_targets(request: TargetDiscoveryRequest):
-    """Discover potential bug bounty targets."""
-    # Mock target data based on G14
-    mock_targets = [
-        {
-            "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
-            "program_name": "Example Corp",
-            "source": "HACKERONE_PUBLIC",
-            "scope_summary": "*.example.com",
-            "payout_tier": "HIGH",
-            "report_density": "LOW",
-            "is_public": True,
-            "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat()
-        },
-        {
-            "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
-            "program_name": "Test Inc",
-            "source": "BUGCROWD_PUBLIC",
-            "scope_summary": "api.test.io",
-            "payout_tier": "MEDIUM",
-            "report_density": "MEDIUM",
-            "is_public": True,
-            "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat()
-        },
-        {
-            "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
-            "program_name": "Secure Ltd",
-            "source": "SECURITY_TXT",
-            "scope_summary": "security.secure.io",
-            "payout_tier": "HIGH",
-            "report_density": "LOW",
-            "is_public": True,
-            "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat()
+    """Discover potential bug bounty targets from the database."""
+    try:
+        targets = await get_all_targets()
+        candidates = []
+        for t in targets:
+            candidate = {
+                "candidate_id": f"TGT-{t.get('id', uuid.uuid4().hex[:16].upper())}",
+                "program_name": t.get("program_name", "Unknown"),
+                "source": t.get("platform", "DATABASE"),
+                "scope_summary": t.get("scope", ""),
+                "payout_tier": t.get("payout_tier", "UNKNOWN"),
+                "report_density": "UNKNOWN",
+                "is_public": True,
+                "requires_invite": False,
+                "discovered_at": t.get("created_at", datetime.now(UTC).isoformat())
+            }
+            candidates.append(candidate)
+
+        # Filter based on request
+        filtered = [c for c in candidates if c["is_public"] or not request.public_only]
+
+        return {
+            "result_id": f"DIS-{uuid.uuid4().hex[:16].upper()}",
+            "candidates": filtered,
+            "total_found": len(candidates),
+            "filtered_count": len(candidates) - len(filtered),
+            "timestamp": datetime.now(UTC).isoformat()
         }
-    ]
-    
-    # Filter based on request
-    filtered = [t for t in mock_targets if t["is_public"] or not request.public_only]
-    
+    except Exception as e:
+        return {
+            "result_id": f"DIS-{uuid.uuid4().hex[:16].upper()}",
+            "candidates": [],
+            "total_found": 0,
+            "filtered_count": 0,
+            "error": str(e),
+            "timestamp": datetime.now(UTC).isoformat()
+        }
+
+
+# =============================================================================
+# SCOPE VALIDATION & TARGET SESSION MANAGEMENT
+# =============================================================================
+
+# In-memory target session state
+target_sessions: Dict[str, Dict[str, Any]] = {}
+scope_violations: List[Dict[str, Any]] = []
+
+
+@app.post("/scope/validate")
+async def validate_scope(request: Request):
+    """Validate a scope definition against security rules."""
+    data = await request.json()
+    target_url = data.get("target_url", "")
+    scope_definition = data.get("scope_definition", {})
+    now = datetime.now(UTC).isoformat()
+
+    violations = []
+
+    # Rule 1: Reject empty target
+    if not target_url.strip():
+        violations.append({"rule": "EMPTY_TARGET", "message": "Target URL cannot be empty"})
+
+    # Rule 2: Reject wildcards at TLD level (e.g. *.com, *.io)
+    import re
+    if re.match(r'^\*\.[a-z]{2,4}$', target_url):
+        violations.append({"rule": "WILDCARD_TLD", "message": f"Wildcard at TLD level not allowed: {target_url}"})
+
+    # Rule 3: Reject localhost/internal targets
+    forbidden_hosts = ["localhost", "127.0.0.1", "0.0.0.0", "10.", "192.168.", "172.16."]
+    for host in forbidden_hosts:
+        if host in target_url.lower():
+            violations.append({"rule": "INTERNAL_TARGET", "message": f"Internal/localhost targets are forbidden: {target_url}"})
+            break
+
+    # Rule 4: Reject if no valid domain pattern
+    if not re.search(r'[a-zA-Z0-9][a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', target_url):
+        violations.append({"rule": "INVALID_DOMAIN", "message": f"No valid domain found in: {target_url}"})
+
+    is_valid = len(violations) == 0
     return {
-        "result_id": f"DIS-{uuid.uuid4().hex[:16].upper()}",
-        "candidates": filtered,
-        "total_found": len(mock_targets),
-        "filtered_count": len(mock_targets) - len(filtered),
-        "timestamp": datetime.now(UTC).isoformat()
+        "valid": is_valid,
+        "target_url": target_url,
+        "violations": violations,
+        "validated_at": now
+    }
+
+
+@app.post("/target/start")
+async def start_target_session(request: Request):
+    """Start a target scanning session."""
+    data = await request.json()
+    target_url = data.get("target_url", "")
+    scope_definition = data.get("scope_definition", {})
+    mode = data.get("mode", "READ_ONLY")
+    now = datetime.now(UTC).isoformat()
+
+    if not target_url.strip():
+        return {"error": "target_url is required", "started": False}
+
+    session_id = f"TSESS-{uuid.uuid4().hex[:12].upper()}"
+    target_sessions[session_id] = {
+        "session_id": session_id,
+        "target_url": target_url,
+        "scope_definition": scope_definition,
+        "mode": mode,
+        "status": "ACTIVE",
+        "started_at": now,
+        "stopped_at": None,
+        "violations": [],
+        "findings_count": 0
+    }
+
+    return {
+        "started": True,
+        "session_id": session_id,
+        "target_url": target_url,
+        "mode": mode,
+        "started_at": now
+    }
+
+
+@app.post("/target/stop")
+async def stop_target_session(request: Request):
+    """Stop an active target scanning session."""
+    data = await request.json()
+    session_id = data.get("session_id", "")
+    now = datetime.now(UTC).isoformat()
+
+    if session_id not in target_sessions:
+        return {"error": f"Session {session_id} not found", "stopped": False}
+
+    session = target_sessions[session_id]
+    session["status"] = "STOPPED"
+    session["stopped_at"] = now
+
+    return {
+        "stopped": True,
+        "session_id": session_id,
+        "stopped_at": now,
+        "duration_seconds": 0  # Would compute real duration in production
+    }
+
+
+@app.get("/target/status")
+async def get_target_status():
+    """Get status of all target sessions."""
+    active = [s for s in target_sessions.values() if s["status"] == "ACTIVE"]
+    stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED"]
+
+    return {
+        "active_sessions": active,
+        "stopped_sessions": stopped[-10:],  # Last 10 stopped
+        "total_active": len(active),
+        "total_stopped": len(stopped),
+        "violations": scope_violations[-20:]  # Last 20 violations
     }
 
 
@@ -699,8 +829,11 @@ async def create_autonomy_session(request: AutonomySessionRequest):
     elif request.mode == "READ_ONLY":
         blocked = ["EXPLOIT", "SUBMISSION", "STATE_CHANGE", "BROWSER_ACTION"]
     elif request.mode == "MOCK":
-        blocked = ["TARGET_ANALYSIS", "CVE_CORRELATION", "PASSIVE_DISCOVERY", 
-                   "DRAFT_REPORT", "EXPLOIT", "SUBMISSION", "STATE_CHANGE", "BROWSER_ACTION"]
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=400,
+            content={"error": "MOCK mode is disabled. Use READ_ONLY, AUTONOMOUS_FIND, or REAL."}
+        )
     
     session = {
         "session_id": session_id,
@@ -1011,47 +1144,59 @@ async def manual_training_status():
 
 @app.get("/training/progress")
 async def manual_training_progress():
-    """Get real-time training progress."""
-    if not G38_AVAILABLE:
-        return {"available": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
-    status = trainer.get_status()
-    
-    return {
-        "epoch": status["epoch"],
-        "total_epochs": status["total_epochs"],
-        "total_completed": status["total_completed"],
-        "progress": status["progress"],
-        "is_training": status["is_training"],
-        "last_loss": status.get("last_loss", 0.0),
-        "last_accuracy": status.get("last_accuracy", 0.0),
-        "samples_per_sec": status.get("samples_per_sec", 0.0),
-        "dataset_size": status.get("dataset_size", 0),
-        "training_mode": "MANUAL",
-    }
+    """Get real-time training progress. Returns null if unavailable."""
+    mgr = get_training_state_manager()
+    metrics = mgr.get_training_progress()
+    return metrics.to_dict()
 
 
 @app.get("/gpu/status")
 async def gpu_status():
-    """Get GPU utilization and memory metrics."""
+    """Get GPU utilization and memory metrics. Real data only."""
+    result = {
+        "gpu_available": False,
+        "device_name": None,
+        "utilization_percent": None,
+        "memory_allocated_mb": None,
+        "memory_reserved_mb": None, 
+        "memory_total_mb": None,
+        "temperature": None,
+        "compute_capability": None,
+    }
+    
     try:
         import torch
         if not torch.cuda.is_available():
-            return {"available": False, "error": "CUDA not available"}
+            return result
         
-        return {
-            "available": True,
-            "device_name": torch.cuda.get_device_name(0),
-            "memory_allocated_mb": round(torch.cuda.memory_allocated() / 1024 / 1024, 2),
-            "memory_reserved_mb": round(torch.cuda.memory_reserved() / 1024 / 1024, 2),
-            "memory_total_mb": round(torch.cuda.get_device_properties(0).total_mem / 1024 / 1024, 2),
-            "compute_capability": f"{torch.cuda.get_device_capability(0)[0]}.{torch.cuda.get_device_capability(0)[1]}",
-            "amp_available": True,
-            "cudnn_deterministic": torch.backends.cudnn.deterministic,
-        }
-    except Exception as e:
-        return {"available": False, "error": str(e)}
+        result["gpu_available"] = True
+        result["device_name"] = torch.cuda.get_device_name(0)
+        result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
+        result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
+        props = torch.cuda.get_device_properties(0)
+        result["memory_total_mb"] = round(props.total_mem / 1024 / 1024, 2)
+        cap = torch.cuda.get_device_capability(0)
+        result["compute_capability"] = f"{cap[0]}.{cap[1]}"
+    except Exception:
+        pass
+    
+    # nvidia-smi for utilization and temperature
+    try:
+        import subprocess
+        smi_output = subprocess.check_output(
+            ["nvidia-smi",
+             "--query-gpu=utilization.gpu,temperature.gpu",
+             "--format=csv,noheader,nounits"],
+            timeout=5, text=True
+        ).strip()
+        parts = smi_output.split(",")
+        if len(parts) >= 2:
+            result["utilization_percent"] = float(parts[0].strip())
+            result["temperature"] = float(parts[1].strip())
+    except Exception:
+        pass
+    
+    return result
 
 
 @app.get("/dataset/stats")
@@ -1081,47 +1226,32 @@ async def dataset_stats():
 # =============================================================================
 
 @app.get("/api/db/users")
-async def list_users():
-    """Get all users from database."""
+def list_users():
+    """Get all users from HDD storage."""
     try:
-        users = await get_all_users()
-        # Convert UUID to string for JSON serialization
-        for user in users:
-            user['id'] = str(user['id'])
-            if user.get('created_at'):
-                user['created_at'] = user['created_at'].isoformat()
-            if user.get('last_active'):
-                user['last_active'] = user['last_active'].isoformat()
+        users = get_all_users()
         return {"users": users, "total": len(users)}
     except Exception as e:
         return {"users": [], "total": 0, "error": str(e)}
 
 
 @app.post("/api/db/users")
-async def add_user(request: CreateUserRequest):
+def add_user(request: CreateUserRequest):
     """Create a new user."""
     try:
-        user = await create_user(request.name, request.email, request.role)
-        user['id'] = str(user['id'])
-        if user.get('created_at'):
-            user['created_at'] = user['created_at'].isoformat()
-        await log_activity(str(user['id']), "USER_CREATED", f"User {request.name} created")
+        user = create_user(request.name, request.email, request.role)
+        log_activity(str(user['id']), "USER_CREATED", f"User {request.name} created")
         return {"success": True, "user": user}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/users/{user_id}")
-async def get_single_user(user_id: str):
+def get_single_user(user_id: str):
     """Get a specific user by ID."""
     try:
-        user = await get_user(user_id)
+        user = get_user(user_id)
         if user:
-            user['id'] = str(user['id'])
-            if user.get('created_at'):
-                user['created_at'] = user['created_at'].isoformat()
-            if user.get('last_active'):
-                user['last_active'] = user['last_active'].isoformat()
             return {"success": True, "user": user}
         return {"success": False, "error": "User not found"}
     except Exception as e:
@@ -1129,138 +1259,290 @@ async def get_single_user(user_id: str):
 
 
 @app.get("/api/db/users/{user_id}/bounties")
-async def get_user_bounties_endpoint(user_id: str):
+def get_user_bounties_endpoint(user_id: str):
     """Get all bounties for a specific user."""
     try:
-        bounties = await get_user_bounties(user_id)
-        for b in bounties:
-            b['id'] = str(b['id'])
-            if b.get('submitted_at'):
-                b['submitted_at'] = b['submitted_at'].isoformat()
+        bounties = get_user_bounties(user_id)
         return {"bounties": bounties, "total": len(bounties)}
     except Exception as e:
         return {"bounties": [], "total": 0, "error": str(e)}
 
 
 @app.get("/api/db/targets")
-async def list_targets():
-    """Get all targets from database."""
+def list_targets():
+    """Get all targets from HDD storage."""
     try:
-        targets = await get_all_targets()
-        for t in targets:
-            t['id'] = str(t['id'])
-            if t.get('created_at'):
-                t['created_at'] = t['created_at'].isoformat()
+        targets = get_all_targets()
         return {"targets": targets, "total": len(targets)}
     except Exception as e:
         return {"targets": [], "total": 0, "error": str(e)}
 
 
 @app.post("/api/db/targets")
-async def add_target(request: CreateTargetRequest):
+def add_target(request: CreateTargetRequest):
     """Create a new target."""
     try:
-        target = await create_target(
-            request.program_name, 
-            request.scope, 
-            request.link, 
-            request.platform, 
+        target = create_target(
+            request.program_name,
+            request.scope,
+            request.link,
+            request.platform,
             request.payout_tier
         )
-        target['id'] = str(target['id'])
-        if target.get('created_at'):
-            target['created_at'] = target['created_at'].isoformat()
-        await log_activity(None, "TARGET_CREATED", f"Target {request.program_name} created")
+        log_activity(None, "TARGET_CREATED", f"Target {request.program_name} created")
         return {"success": True, "target": target}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/bounties")
-async def list_bounties():
-    """Get all bounties with user and target info."""
+def list_bounties():
+    """Get all bounties."""
     try:
-        bounties = await get_all_bounties()
-        for b in bounties:
-            b['id'] = str(b['id'])
-            if b.get('submitted_at'):
-                b['submitted_at'] = b['submitted_at'].isoformat()
+        bounties = get_all_bounties()
         return {"bounties": bounties, "total": len(bounties)}
     except Exception as e:
         return {"bounties": [], "total": 0, "error": str(e)}
 
 
 @app.post("/api/db/bounties")
-async def add_bounty(request: CreateBountyRequest):
+def add_bounty(request: CreateBountyRequest):
     """Create a new bounty submission."""
     try:
-        bounty = await create_bounty(
+        bounty = create_bounty(
             request.user_id,
             request.target_id,
             request.title,
             request.description,
             request.severity
         )
-        bounty['id'] = str(bounty['id'])
-        bounty['user_id'] = str(bounty['user_id'])
-        if bounty.get('target_id'):
-            bounty['target_id'] = str(bounty['target_id'])
-        if bounty.get('submitted_at'):
-            bounty['submitted_at'] = bounty['submitted_at'].isoformat()
-        await log_activity(request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}")
+        log_activity(request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}")
         return {"success": True, "bounty": bounty}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.put("/api/db/bounties")
-async def update_bounty(request: UpdateBountyRequest):
+def update_bounty(request: UpdateBountyRequest):
     """Update bounty status and reward."""
     try:
-        await update_bounty_status(request.bounty_id, request.status, request.reward)
-        await log_activity(None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}")
+        update_bounty_status(request.bounty_id, request.status, request.reward)
+        log_activity(None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}")
         return {"success": True, "bounty_id": request.bounty_id, "status": request.status}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.post("/api/db/sessions")
-async def add_session(request: CreateSessionRequest):
+def add_session(request: CreateSessionRequest):
     """Create a new session."""
     try:
-        session = await create_session(request.user_id, request.mode, request.target_scope)
-        session['id'] = str(session['id'])
-        session['user_id'] = str(session['user_id'])
-        if session.get('started_at'):
-            session['started_at'] = session['started_at'].isoformat()
-        await log_activity(request.user_id, "SESSION_STARTED", f"Mode: {request.mode}")
+        session = create_session(request.user_id, request.mode, request.target_scope)
+        log_activity(request.user_id, "SESSION_STARTED", f"Mode: {request.mode}")
         return {"success": True, "session": session}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/activity")
-async def list_activity(limit: int = 50):
+def list_activity(limit: int = 50):
     """Get recent activity log."""
     try:
-        activities = await get_recent_activity(limit)
-        for a in activities:
-            a['id'] = str(a['id'])
-            if a.get('created_at'):
-                a['created_at'] = a['created_at'].isoformat()
+        activities = get_recent_activity(limit)
         return {"activities": activities, "total": len(activities)}
     except Exception as e:
         return {"activities": [], "total": 0, "error": str(e)}
 
 
 @app.get("/api/db/admin/stats")
-async def get_admin_statistics():
+def get_admin_statistics():
     """Get admin dashboard statistics."""
     try:
-        stats = await get_admin_stats()
+        stats = get_admin_stats()
         return {"success": True, "stats": stats}
     except Exception as e:
         return {"success": False, "stats": None, "error": str(e)}
+
+
+# =============================================================================
+# HDD STORAGE ENGINE ENDPOINTS (NEW)
+# =============================================================================
+
+@app.get("/api/storage/stats")
+def storage_stats_endpoint():
+    """Get HDD storage engine statistics."""
+    return get_storage_stats()
+
+
+@app.get("/api/storage/lifecycle")
+def lifecycle_status_endpoint():
+    """Get lifecycle status and deletion preview."""
+    return get_lifecycle_status()
+
+
+@app.get("/api/storage/disk")
+def disk_status_endpoint():
+    """Get HDD disk usage, alerts, and health."""
+    return get_disk_status()
+
+
+@app.get("/api/storage/delete-preview")
+def delete_preview_endpoint(entity_type: Optional[str] = None):
+    """Preview which entities would be auto-deleted."""
+    return get_delete_preview(entity_type)
+
+
+@app.get("/api/video/list")
+def video_list_endpoint(user_id: Optional[str] = None):
+    """List stored videos."""
+    return list_videos(user_id)
+
+
+@app.post("/api/video/token")
+async def video_token_endpoint(request: Request):
+    """Generate a signed video streaming token."""
+    body = await request.json()
+    return get_video_stream_token(
+        body.get("user_id", ""),
+        body.get("session_id", ""),
+        body.get("filename", "video.webm"),
+    )
+
+
+# =============================================================================
+# AUTH / LOGIN / DEVICE TRACKING ENDPOINTS
+# =============================================================================
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class RegisterRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    role: str = "hunter"
+
+
+@app.post("/auth/register")
+async def register_user(request: RegisterRequest, req: Request):
+    """Register a new user with hashed password."""
+    existing = get_user_by_email(request.email)
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    pw_hash = hash_password(request.password)
+    user = create_user(request.name, request.email, request.role)
+    update_user_password(user["id"], pw_hash)
+
+    ip = req.client.host if req.client else "unknown"
+    log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
+
+    token = generate_jwt(user["id"], request.email)
+    return {
+        "success": True,
+        "user": {"id": user["id"], "name": user["name"], "email": user["email"]},
+        "token": token
+    }
+
+
+@app.post("/auth/login")
+async def login(request: LoginRequest, req: Request):
+    """Login with email/password. Captures IP, UA, device hash. Sends alerts."""
+    ip = req.client.host if req.client else "unknown"
+    ua = req.headers.get("user-agent", "unknown")
+
+    # Rate limiting
+    limiter = get_rate_limiter()
+    if limiter.is_rate_limited(ip):
+        alert_rate_limit_exceeded(ip, limiter.max_attempts)
+        log_activity(None, "RATE_LIMIT_EXCEEDED", f"IP {ip} exceeded login rate limit", ip_address=ip)
+        raise HTTPException(status_code=429, detail="Too many login attempts. Try again later.")
+
+    limiter.record_attempt(ip)
+
+    # Find user
+    user = get_user_by_email(request.email)
+    if not user:
+        log_activity(None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip)
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Verify password
+    if not user.get("password_hash") or not verify_password(request.password, user["password_hash"]):
+        log_activity(user["id"], "LOGIN_FAILED", "Invalid password", ip_address=ip)
+        alert_suspicious_activity(
+            f"Failed login attempt for {user['name']}",
+            ip_address=ip, user_name=user["name"],
+            metadata={"email": request.email}
+        )
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Success — reset rate limiter
+    limiter.reset(ip)
+
+    # Compute device hash and register device
+    dh = compute_device_hash(ua, ip)
+    device = register_device(user["id"], dh, ip, ua)
+
+    # Create session on HDD
+    session = create_session(
+        user["id"], "AUTHENTICATED", None,
+        ip_address=ip, user_agent=ua, device_hash=dh
+    )
+
+    # Log activity
+    log_activity(user["id"], "LOGIN_SUCCESS", f"Login from {ip}", ip_address=ip)
+
+    # Send alerts
+    alert_new_login(user["name"], ip, ua)
+
+    if device.get("is_new"):
+        alert_new_device(user["name"], dh, ip, ua)
+
+    active_count = get_active_device_count(user["id"])
+    if active_count > 1:
+        devices = get_user_devices(user["id"])
+        alert_multiple_devices(user["name"], active_count, devices)
+
+    # Generate JWT
+    token = generate_jwt(user["id"], user.get("email"))
+
+    return {
+        "success": True,
+        "user": {"id": user["id"], "name": user["name"], "email": user.get("email")},
+        "token": token,
+        "session_id": session["id"],
+        "device": {"hash": dh, "is_new": device.get("is_new", False)}
+    }
+
+
+@app.post("/auth/logout")
+async def logout(req: Request):
+    """End current session."""
+    ip = req.client.host if req.client else "unknown"
+    log_activity(None, "LOGOUT", f"Logout from {ip}", ip_address=ip)
+    return {"success": True, "message": "Logged out"}
+
+
+@app.get("/admin/active-devices")
+def get_active_devices_endpoint():
+    """Get all active devices. HDD data only."""
+    try:
+        devices = get_all_active_devices()
+        return {"devices": devices, "total": len(devices)}
+    except Exception as e:
+        return {"devices": [], "total": 0, "error": str(e)}
+
+
+@app.get("/admin/active-sessions")
+def get_active_sessions_endpoint():
+    """Get all active sessions. HDD data only."""
+    try:
+        sessions = get_active_sessions()
+        return {"sessions": sessions, "total": len(sessions)}
+    except Exception as e:
+        return {"sessions": [], "total": 0, "error": str(e)}
 
 
 # =============================================================================
@@ -1442,12 +1724,13 @@ async def lifespan(app):
     print(f"[*] Python phases: {len(phases)}")
     print(f"[*] Hunter modules: {len(hunter)}")
     
-    # Initialize database
+    # Initialize HDD storage engine (replaces SQLite)
     try:
-        await init_database()
-        print(f"[+] Database connected")
+        result = init_storage()
+        print(f"[+] HDD Storage Engine initialized at: {result['hdd_root']}")
+        print(f"[+] Subsystems: {result['subsystems']}")
     except Exception as e:
-        print(f"[!] Database connection failed: {e}")
+        print(f"[!] HDD Storage Engine init failed: {e}")
     
     print(f"[+] Server ready at http://localhost:8000")
     
@@ -1466,7 +1749,9 @@ async def lifespan(app):
         stop_auto_training()
         print("[*] G38 auto-training stopped")
     
-    await close_pool()
+    # Shutdown HDD storage engine
+    shutdown_storage()
+    print("[*] HDD Storage Engine shutdown complete")
 
 # Apply lifespan to app
 app.router.lifespan_context = lifespan

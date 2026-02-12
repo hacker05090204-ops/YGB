@@ -1,9 +1,9 @@
 "use client"
 
-import { useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
-import { DollarSign, TrendingUp, CheckCircle, CreditCard, ArrowUpRight } from "lucide-react"
+import { DollarSign, TrendingUp, CheckCircle, CreditCard, ArrowUpRight, RefreshCw, AlertCircle } from "lucide-react"
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, CartesianGrid } from "recharts"
 
 import { AppSidebar } from "@/components/app-sidebar"
@@ -13,35 +13,57 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 
-const earningsByMonth = [
-    { name: 'Jan', total: 4000 },
-    { name: 'Feb', total: 3000 },
-    { name: 'Mar', total: 9800 },
-    { name: 'Apr', total: 3908 },
-    { name: 'May', total: 4800 },
-    { name: 'Jun', total: 3800 },
-    { name: 'Jul', total: 4300 },
-]
+const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
-const distributionData = [
-    { name: "Critical", value: 15000, color: "#a855f7" },
-    { name: "High", value: 8000, color: "#3b82f6" },
-    { name: "Medium", value: 3000, color: "#06b6d4" },
-    { name: "Low", value: 500, color: "#94a3b8" },
-]
+interface Bounty {
+    id: string
+    title: string
+    severity: string
+    reward: number
+    status: string
+    submitted_at: string
+    user_name: string
+}
 
-const payouts = [
-    { title: "Critical RCE in Payment Gateway", date: "Jan 12, 2024", amount: "$5,000", status: "Paid" },
-    { title: "Stored XSS in User Profile", date: "Jan 08, 2024", amount: "$1,500", status: "Paid" },
-    { title: "IDOR on Order History", date: "Dec 28, 2023", amount: "$2,000", status: "Paid" },
-    { title: "Information Disclosure via API", date: "Dec 15, 2023", amount: "$800", status: "Paid" },
-    { title: "Logic Flaw in Coupon System", date: "Nov 30, 2023", amount: "$3,500", status: "Paid" },
-]
+const SEVERITY_COLORS: Record<string, string> = {
+    Critical: "#a855f7",
+    CRITICAL: "#a855f7",
+    High: "#3b82f6",
+    HIGH: "#3b82f6",
+    Medium: "#06b6d4",
+    MEDIUM: "#06b6d4",
+    Low: "#94a3b8",
+    LOW: "#94a3b8",
+}
 
 export default function EarningsPage() {
     const containerRef = useRef(null)
+    const [bounties, setBounties] = useState<Bounty[]>([])
+    const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
+
+    const fetchData = async () => {
+        try {
+            setApiStatus("loading")
+            const res = await fetch(`${API_BASE}/api/db/bounties`)
+            if (res.ok) {
+                const data = await res.json()
+                setBounties(data.bounties || [])
+                setApiStatus("online")
+            } else {
+                setApiStatus("offline")
+            }
+        } catch (e) {
+            console.error("Failed to fetch earnings data:", e)
+            setApiStatus("offline")
+        }
+    }
+
+    useEffect(() => {
+        fetchData()
+        const interval = setInterval(fetchData, 30000)
+        return () => clearInterval(interval)
+    }, [])
 
     useGSAP(() => {
         gsap.from(".animate-item", {
@@ -52,7 +74,40 @@ export default function EarningsPage() {
             ease: "power2.out",
             delay: 0.2
         })
-    }, { scope: containerRef })
+    }, { scope: containerRef, dependencies: [bounties] })
+
+    // Compute stats from real bounty data
+    const paidBounties = bounties.filter(b => b.status === "PAID" || b.status === "Paid" || b.status === "Resolved")
+    const totalEarnings = paidBounties.reduce((sum, b) => sum + (b.reward || 0), 0)
+    const avgPerBug = paidBounties.length > 0 ? Math.round(totalEarnings / paidBounties.length) : 0
+
+    // Build monthly earnings from real data
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const monthCounts: Record<string, number> = {}
+    for (const b of paidBounties) {
+        if (b.submitted_at) {
+            const month = monthNames[new Date(b.submitted_at).getMonth()]
+            monthCounts[month] = (monthCounts[month] || 0) + (b.reward || 0)
+        }
+    }
+    const earningsByMonth = monthNames.map(m => ({ name: m, total: monthCounts[m] || 0 }))
+
+    // Build severity distribution from real data
+    const severityTotals: Record<string, number> = {}
+    for (const b of paidBounties) {
+        const sev = b.severity || "Unknown"
+        severityTotals[sev] = (severityTotals[sev] || 0) + (b.reward || 0)
+    }
+    const distributionData = Object.entries(severityTotals).map(([name, value]) => ({
+        name,
+        value,
+        color: SEVERITY_COLORS[name] || "#94a3b8"
+    }))
+
+    // Recent payouts from real data
+    const recentPayouts = paidBounties
+        .sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+        .slice(0, 5)
 
     return (
         <SidebarProvider
@@ -69,6 +124,19 @@ export default function EarningsPage() {
                     <div className="flex items-center gap-2 px-4">
                         <SidebarTrigger className="-ml-1" />
                     </div>
+                    <div className="flex items-center gap-3">
+                        <button onClick={fetchData} className="p-2 rounded-lg hover:bg-white/[0.05] transition-colors">
+                            <RefreshCw className={`w-4 h-4 text-muted-foreground ${apiStatus === "loading" ? "animate-spin" : ""}`} />
+                        </button>
+                        <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${apiStatus === "online" ? "bg-green-500/10 border-green-500/20 text-green-400"
+                                : apiStatus === "loading" ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                                    : "bg-red-500/10 border-red-500/20 text-red-400"
+                            }`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${apiStatus === "online" ? "bg-green-400" : apiStatus === "loading" ? "bg-yellow-400 animate-pulse" : "bg-red-400"
+                                }`} />
+                            {apiStatus === "online" ? "Live Data" : apiStatus === "loading" ? "Loading..." : "Backend Offline"}
+                        </div>
+                    </div>
                 </header>
 
                 <div className="flex flex-1 flex-col p-4 md:p-8 pt-6 gap-8 max-w-7xl mx-auto w-full" ref={containerRef}>
@@ -78,6 +146,13 @@ export default function EarningsPage() {
                         <p className="text-muted-foreground text-lg">Track your bug bounty rewards and payouts</p>
                     </div>
 
+                    {apiStatus === "offline" && (
+                        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3">
+                            <AlertCircle className="w-5 h-5 shrink-0" />
+                            <span>Backend offline — cannot load earnings data. Connect to the API server.</span>
+                        </div>
+                    )}
+
                     <div className="grid gap-4 md:grid-cols-4">
                         <Card className="animate-item bg-card/40 border-border/50">
                             <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -85,7 +160,7 @@ export default function EarningsPage() {
                                 <DollarSign className="size-4 text-emerald-500" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold text-emerald-400">$26,500</div>
+                                <div className="text-2xl font-bold text-emerald-400">${totalEarnings.toLocaleString()}</div>
                                 <p className="text-xs text-muted-foreground mt-1">Lifetime total</p>
                             </CardContent>
                         </Card>
@@ -95,8 +170,8 @@ export default function EarningsPage() {
                                 <TrendingUp className="size-4 text-primary" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">42</div>
-                                <p className="text-xs text-muted-foreground mt-1">This year</p>
+                                <div className="text-2xl font-bold">{bounties.length}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Total submissions</p>
                             </CardContent>
                         </Card>
                         <Card className="animate-item bg-card/40 border-border/50">
@@ -105,8 +180,10 @@ export default function EarningsPage() {
                                 <CheckCircle className="size-4 text-blue-500" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">38</div>
-                                <p className="text-xs text-muted-foreground mt-1">90% success</p>
+                                <div className="text-2xl font-bold">{paidBounties.length}</div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    {bounties.length > 0 ? `${Math.round(paidBounties.length / bounties.length * 100)}% success` : "No data yet"}
+                                </p>
                             </CardContent>
                         </Card>
                         <Card className="animate-item bg-card/40 border-border/50">
@@ -115,8 +192,8 @@ export default function EarningsPage() {
                                 <CreditCard className="size-4 text-orange-500" />
                             </CardHeader>
                             <CardContent>
-                                <div className="text-2xl font-bold">$630</div>
-                                <p className="text-xs text-muted-foreground mt-1">Estimated</p>
+                                <div className="text-2xl font-bold">${avgPerBug.toLocaleString()}</div>
+                                <p className="text-xs text-muted-foreground mt-1">Based on paid reports</p>
                             </CardContent>
                         </Card>
                     </div>
@@ -128,18 +205,24 @@ export default function EarningsPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={earningsByMonth}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                                            <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                                            <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                                            <Tooltip
-                                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                                contentStyle={{ backgroundColor: '#171717', border: '1px solid #333', borderRadius: '8px' }}
-                                            />
-                                            <Bar dataKey="total" fill="#a855f7" radius={[4, 4, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                    {earningsByMonth.some(m => m.total > 0) ? (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={earningsByMonth}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                                                <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
+                                                <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                                                <Tooltip
+                                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                                    contentStyle={{ backgroundColor: '#171717', border: '1px solid #333', borderRadius: '8px' }}
+                                                />
+                                                <Bar dataKey="total" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full text-muted-foreground">
+                                            <p>No earnings data yet</p>
+                                        </div>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -151,27 +234,33 @@ export default function EarningsPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={distributionData}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={70}
-                                                outerRadius={90}
-                                                paddingAngle={5}
-                                                dataKey="value"
-                                            >
-                                                {distributionData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(0,0,0,0)" />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip
-                                                contentStyle={{ backgroundColor: '#171717', border: '1px solid #333', borderRadius: '8px' }}
-                                                itemStyle={{ color: '#e5e5e5' }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
+                                    {distributionData.length > 0 ? (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={distributionData}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={70}
+                                                    outerRadius={90}
+                                                    paddingAngle={5}
+                                                    dataKey="value"
+                                                >
+                                                    {distributionData.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(0,0,0,0)" />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip
+                                                    contentStyle={{ backgroundColor: '#171717', border: '1px solid #333', borderRadius: '8px' }}
+                                                    itemStyle={{ color: '#e5e5e5' }}
+                                                />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    ) : (
+                                        <div className="flex items-center justify-center h-full text-muted-foreground">
+                                            <p>No severity distribution data</p>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex justify-center gap-4 text-xs text-muted-foreground">
                                     {distributionData.map(d => (
@@ -191,18 +280,24 @@ export default function EarningsPage() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {payouts.map((payout, i) => (
-                                    <div key={i} className="flex items-center justify-between border-b border-border/40 pb-4 last:border-0 last:pb-0">
+                                {recentPayouts.length > 0 ? recentPayouts.map((payout, i) => (
+                                    <div key={payout.id || i} className="flex items-center justify-between border-b border-border/40 pb-4 last:border-0 last:pb-0">
                                         <div>
                                             <div className="font-medium text-lg">{payout.title}</div>
-                                            <div className="text-sm text-muted-foreground">{payout.date}</div>
+                                            <div className="text-sm text-muted-foreground">
+                                                {payout.submitted_at ? new Date(payout.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Unknown date"}
+                                            </div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="font-bold text-green-500">{payout.amount}</div>
+                                            <div className="font-bold text-green-500">${(payout.reward || 0).toLocaleString()}</div>
                                             <div className="text-xs text-muted-foreground">{payout.status}</div>
                                         </div>
                                     </div>
-                                ))}
+                                )) : (
+                                    <div className="text-center py-8 text-muted-foreground">
+                                        <p>{apiStatus === "online" ? "No payouts yet" : "Waiting for backend connection..."}</p>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

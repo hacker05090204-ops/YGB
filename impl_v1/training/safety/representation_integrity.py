@@ -102,18 +102,17 @@ class RepresentationIntegrityMonitor:
             )
         
         except ImportError:
-            return self._mock_profile(checkpoint_id)
+            return self._unavailable_profile(checkpoint_id)
     
-    def _mock_profile(self, checkpoint_id: str) -> CheckpointProfile:
-        """Return mock profile for testing."""
+    def _unavailable_profile(self, checkpoint_id: str) -> CheckpointProfile:
+        """Return profile when PyTorch is unavailable. No fake layer data."""
         return CheckpointProfile(
             checkpoint_id=checkpoint_id,
             timestamp=datetime.now().isoformat(),
-            layer_profiles={
-                "layer1": LayerProfile("layer1", 0.0, 1.0, 0.5, 2.0),
-                "layer2": LayerProfile("layer2", 0.0, 1.0, 0.5, 2.0),
-            },
-            embedding_variance=1.0,
+            layer_profiles={},
+            embedding_variance=0.0,
+            is_suspicious=True,
+            suspicious_reason="pytorch_unavailable",
         )
     
     def set_baseline(self, profile: CheckpointProfile) -> None:

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { Clock, Shield, Eye, Zap } from "lucide-react"
 
 // Autonomy modes from G06
-export type AutonomyModeType = "MOCK" | "READ_ONLY" | "AUTONOMOUS_FIND" | "REAL"
+export type AutonomyModeType = "READ_ONLY" | "AUTONOMOUS_FIND" | "REAL"
 
 interface ModeSelectorProps {
     currentMode: AutonomyModeType
@@ -22,12 +22,6 @@ const MODE_CONFIG: Record<AutonomyModeType, {
     requiresHours?: boolean
     requiresHumanEnable?: boolean
 }> = {
-    MOCK: {
-        label: "Mock",
-        description: "No real actions - simulation only",
-        icon: <Shield className="w-4 h-4" />,
-        color: "bg-[#404040] border-[#525252]"
-    },
     READ_ONLY: {
         label: "Read Only",
         description: "Analysis and reconnaissance only",

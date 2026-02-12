@@ -1,0 +1,10 @@
+{
+  "id": "27660a49-57b4-4fff-9e11-f8161dd06e33",
+  "program_name": "HackerOne Example Corp",
+  "scope": "*.example.com",
+  "link": "https://hackerone.com/example",
+  "platform": "HACKERONE",
+  "payout_tier": "HIGH",
+  "status": "ACTIVE",
+  "created_at": "2026-02-11T15:08:50.295955+00:00"
+}

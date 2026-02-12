@@ -19,6 +19,12 @@ import { BrowserAssistant, type AssistantExplanation } from "@/components/browse
 import { VoiceControls, type VoiceIntent } from "@/components/voice-controls"
 import { TargetDiscoveryPanel, type TargetCandidate } from "@/components/target-discovery-panel"
 import { TrainingProgress } from "@/components/training-progress"
+import { ScopeTargetPanel } from "@/components/scope-target-panel"
+import { GpuMonitor } from "@/components/gpu-monitor"
+import { ActiveDevices } from "@/components/active-devices"
+import { SessionHistory } from "@/components/session-history"
+import { LoginAlerts } from "@/components/login-alerts"
+import { StorageMonitor } from "@/components/storage-monitor"
 
 // API Base URL
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
@@ -35,7 +41,7 @@ export default function ControlPage() {
     const [denyReason, setDenyReason] = useState<string | undefined>()
 
     // Autonomy Mode (from G06)
-    const [autonomyMode, setAutonomyMode] = useState<AutonomyModeType>("MOCK")
+    const [autonomyMode, setAutonomyMode] = useState<AutonomyModeType>("READ_ONLY")
 
     // Approval Requests (from G13)
     const [pendingRequest, setPendingRequest] = useState<ApprovalRequest | null>(null)
@@ -70,13 +76,14 @@ export default function ControlPage() {
                     setDashboardId(data.dashboard_id)
                     setIsConnected(true)
                 } else {
-                    setDashboardId("DASH-DEMO")
-                    setIsConnected(true)
+                    console.error("Dashboard init failed: non-OK response")
+                    setDashboardId(null)
+                    setIsConnected(false)
                 }
             } catch (error) {
                 console.error("Dashboard init failed:", error)
-                setDashboardId("DASH-DEMO")
-                setIsConnected(true)
+                setDashboardId(null)
+                setIsConnected(false)
             } finally {
                 setIsLoading(false)
             }
@@ -193,47 +200,12 @@ export default function ControlPage() {
                 const data = await response.json()
                 setTargets(data.candidates || [])
             } else {
-                // Demo data fallback
-                setTargets([
-                    {
-                        candidate_id: "TGT-001",
-                        program_name: "Example Corp",
-                        source: "HACKERONE_PUBLIC",
-                        scope_summary: "*.example.com",
-                        payout_tier: "HIGH",
-                        report_density: "LOW",
-                        is_public: true,
-                        requires_invite: false,
-                        discovered_at: new Date().toISOString()
-                    },
-                    {
-                        candidate_id: "TGT-002",
-                        program_name: "Test Inc",
-                        source: "BUGCROWD_PUBLIC",
-                        scope_summary: "api.test.io",
-                        payout_tier: "MEDIUM",
-                        report_density: "MEDIUM",
-                        is_public: true,
-                        requires_invite: false,
-                        discovered_at: new Date().toISOString()
-                    }
-                ])
+                console.error("Target discovery failed: non-OK response")
+                setTargets([])
             }
         } catch (error) {
             console.error("Discovery failed:", error)
-            setTargets([
-                {
-                    candidate_id: "TGT-001",
-                    program_name: "Example Corp",
-                    source: "HACKERONE_PUBLIC",
-                    scope_summary: "*.example.com",
-                    payout_tier: "HIGH",
-                    report_density: "LOW",
-                    is_public: true,
-                    requires_invite: false,
-                    discovered_at: new Date().toISOString()
-                }
-            ])
+            setTargets([])
         } finally {
             setIsDiscovering(false)
         }
@@ -395,6 +367,10 @@ export default function ControlPage() {
                                 />
 
                                 <div className="p-5 rounded-2xl bg-card/50 border border-border/50">
+                                    <ScopeTargetPanel />
+                                </div>
+
+                                <div className="p-5 rounded-2xl bg-card/50 border border-border/50">
                                     <ModeSelector
                                         currentMode={autonomyMode}
                                         onModeChange={handleModeChange}
@@ -436,9 +412,16 @@ export default function ControlPage() {
                                 </div>
                             </div>
 
-                            {/* Right Column: Training Progress & Browser Assistant */}
+                            {/* Right Column: Training Progress, GPU, Sessions & Browser Assistant */}
                             <div className="col-span-12 lg:col-span-4 space-y-6">
                                 <TrainingProgress refreshInterval={3000} />
+                                <GpuMonitor refreshInterval={5000} />
+                                <div className="p-5 rounded-2xl bg-card/50 border border-border/50">
+                                    <StorageMonitor />
+                                </div>
+                                <ActiveDevices refreshInterval={5000} />
+                                <SessionHistory refreshInterval={5000} />
+                                <LoginAlerts refreshInterval={5000} />
 
                                 <BrowserAssistant
                                     currentAction={currentAction}

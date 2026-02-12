@@ -28,6 +28,7 @@ RULES:
 """
 
 import asyncio
+import os
 import threading
 import time
 import logging
@@ -96,6 +97,8 @@ except ImportError:
 
 # Enforce deterministic mode for reproducibility
 if TORCH_AVAILABLE:
+    # Required for CUDA >= 10.2 deterministic CuBLAS
+    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     try:
@@ -374,9 +377,10 @@ class AutoTrainer:
     
     def _gpu_train_step(self) -> tuple:
         """
-        Execute one training step using CACHED GPU resources with AMP.
+        Execute one FULL EPOCH over the entire DataLoader with AMP.
         
-        OPTIMIZED: Uses mixed precision for RTX 2050 Tensor cores.
+        Iterates through ALL batches of the real 20K+ sample dataset.
+        Uses mixed precision for RTX 2050 Tensor cores.
         Returns (success: bool, accuracy: float, loss: float).
         """
         if not self._gpu_initialized:
@@ -388,21 +392,30 @@ class AutoTrainer:
             if not hasattr(self, '_scaler') or self._scaler is None:
                 self._scaler = GradScaler() if AMP_AVAILABLE else None
             
-            # Use cached model and data - ZERO CPU overhead
             self._gpu_model.train()
             
-            # Training iterations with AMP (50 iterations for GPU utilization)
-            for _ in range(50):
+            total_loss = 0.0
+            total_correct = 0
+            total_samples = 0
+            batch_count = 0
+            
+            # === ITERATE OVER FULL DATALOADER (all batches, all 20K+ samples) ===
+            for batch_features, batch_labels in self._gpu_dataloader:
                 if self._abort_flag.is_set():
                     return False, 0.0, 0.0
+                
+                # Move batch to GPU
+                batch_features = batch_features.to(self._gpu_device, non_blocking=True)
+                batch_labels = batch_labels.to(self._gpu_device, non_blocking=True)
+                batch_size = batch_labels.size(0)
                 
                 self._gpu_optimizer.zero_grad()
                 
                 # AMP: Mixed precision forward pass
                 if AMP_AVAILABLE and self._scaler is not None:
                     with autocast():
-                        outputs = self._gpu_model(self._gpu_features)
-                        loss = self._gpu_criterion(outputs, self._gpu_labels)
+                        outputs = self._gpu_model(batch_features)
+                        loss = self._gpu_criterion(outputs, batch_labels)
                     
                     # AMP: Scaled backward pass
                     self._scaler.scale(loss).backward()
@@ -410,23 +423,34 @@ class AutoTrainer:
                     self._scaler.update()
                 else:
                     # Fallback: Standard FP32 training
-                    outputs = self._gpu_model(self._gpu_features)
-                    loss = self._gpu_criterion(outputs, self._gpu_labels)
+                    outputs = self._gpu_model(batch_features)
+                    loss = self._gpu_criterion(outputs, batch_labels)
                     loss.backward()
                     self._gpu_optimizer.step()
-            
-            # Calculate accuracy (still on GPU)
-            self._gpu_model.eval()
-            with torch.no_grad():
-                if AMP_AVAILABLE:
-                    with autocast():
-                        outputs = self._gpu_model(self._gpu_features)
-                else:
-                    outputs = self._gpu_model(self._gpu_features)
+                
+                # Accumulate batch stats
+                total_loss += loss.item() * batch_size
                 _, predicted = torch.max(outputs.data, 1)
-                accuracy = (predicted == self._gpu_labels).sum().item() / self._gpu_labels.size(0)
+                total_correct += (predicted == batch_labels).sum().item()
+                total_samples += batch_size
+                batch_count += 1
             
-            return True, accuracy, loss.item()
+            # Also update the cached batch reference for status queries
+            if total_samples > 0:
+                self._gpu_features = batch_features
+                self._gpu_labels = batch_labels
+            
+            # Epoch-level metrics
+            avg_loss = total_loss / max(total_samples, 1)
+            accuracy = total_correct / max(total_samples, 1)
+            
+            logger.info(
+                f"Epoch complete: {batch_count} batches, "
+                f"{total_samples} samples, "
+                f"loss={avg_loss:.4f}, accuracy={accuracy:.2%}"
+            )
+            
+            return True, accuracy, avg_loss
             
         except Exception as e:
             logger.error(f"GPU training step failed: {e}")
@@ -464,6 +488,7 @@ class AutoTrainer:
         - Learning accepted/rejected outcomes
         
         ENFORCES GPU-ONLY MODE - will NOT fall back to CPU.
+        Uses the shared full-DataLoader training step (20K+ real samples).
         
         Returns True if training completed, False if aborted.
         """
@@ -486,7 +511,6 @@ class AutoTrainer:
             )
             return False
         
-        device = get_torch_device()
         self._epoch += 1
         
         self._emit_event(
@@ -497,30 +521,6 @@ class AutoTrainer:
         )
         
         try:
-            # Create model config for representation learning
-            config = create_model_config(
-                input_dim=256,
-                output_dim=2,
-                hidden_dims=(512, 256, 128),
-                dropout=0.3,
-                learning_rate=0.001,
-                batch_size=32,
-                epochs=1,
-                seed=42 + self._epoch,
-            )
-            
-            # Generate synthetic training samples for representation learning
-            # In production, these would come from real security data
-            samples = tuple(
-                TrainingSample(
-                    sample_id=f"SAMPLE-{i:04d}",
-                    features=tuple(float((i * 17 + j * 13) % 256) / 256.0 for j in range(256)),
-                    label=i % 2,
-                    source="synthetic_representation",
-                )
-                for i in range(100)
-            )
-            
             # Check for abort before training
             if self._abort_flag.is_set():
                 self._emit_event(
@@ -555,72 +555,39 @@ class AutoTrainer:
                 )
                 return False
             
-            # === REAL GPU TRAINING ===
-            # Import here to avoid circular deps
-            import torch.nn as nn
-            import torch.optim as optim
-            from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier
+            # === REAL GPU TRAINING using full DataLoader (20K+ samples) ===
+            import time as _time
+            _step_start = _time.perf_counter()
+            success, accuracy, loss = self._gpu_train_step()
+            _step_elapsed = _time.perf_counter() - _step_start
             
-            # Create model on GPU
-            model = BugClassifier(config)
-            model = model.to(device)
+            if not success:
+                self._emit_event(
+                    "ERROR",
+                    "GPU training step failed",
+                    epoch=self._epoch,
+                    gpu_used=True,
+                )
+                return False
             
-            optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
-            criterion = nn.CrossEntropyLoss()
-            
-            # Convert samples to tensors on GPU
-            features = torch.tensor(
-                [list(s.features) for s in samples],
-                dtype=torch.float32,
-                device=device,
-            )
-            labels = torch.tensor(
-                [s.label for s in samples],
-                dtype=torch.long,
-                device=device,
-            )
-            
-            # Training loop (real gradient descent on GPU)
-            model.train()
-            for step in range(10):
-                # Check for abort
-                if self._abort_flag.is_set():
-                    self._emit_event(
-                        "TRAINING_ABORTED",
-                        f"Aborted at GPU step {step}/10",
-                        epoch=self._epoch,
-                        gpu_used=True,
-                    )
-                    return False
-                
-                # Forward pass
-                optimizer.zero_grad()
-                outputs = model(features)
-                loss = criterion(outputs, labels)
-                
-                # Backward pass (real gradient descent on GPU)
-                loss.backward()
-                optimizer.step()
-            
-            # Calculate final accuracy
-            model.eval()
-            with torch.no_grad():
-                outputs = model(features)
-                _, predicted = torch.max(outputs.data, 1)
-                accuracy = (predicted == labels).sum().item() / labels.size(0)
+            # Update metrics
+            self._last_loss = loss
+            self._last_accuracy = accuracy
+            ds_total = self._gpu_dataset_stats.get('train', {}).get('total', 0) if self._gpu_dataset_stats else 0
+            self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
             
             # Save checkpoint
             checkpoint_hash = hashlib.sha256(f"epoch-{self._epoch}-gpu".encode()).hexdigest()[:16]
             self._emit_event(
                 "CHECKPOINT_SAVED",
-                f"Saved GPU checkpoint for epoch {self._epoch} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%})",
+                f"Saved GPU checkpoint for epoch {self._epoch} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
                 epoch=self._epoch,
                 gpu_used=True,
             )
             
             self._emit_event(
                 "TRAINING_STOPPED",
-                f"Completed GPU epoch {self._epoch} (accuracy: {accuracy:.2%})",
+                f"Completed GPU epoch {self._epoch} — {ds_total} samples, {_step_elapsed:.1f}s (accuracy: {accuracy:.2%}, loss: {loss:.4f})",
                 epoch=self._epoch,
                 gpu_used=True,
             )
@@ -761,16 +728,40 @@ class AutoTrainer:
     
     async def run_scheduler(self) -> None:
         """
-        Background loop - MANUAL MODE ONLY.
+        Background loop - IDLE AUTO-TRAINING MODE.
         
-        Does NOT auto-trigger training. Only monitors system state
-        for dashboard display. Training starts ONLY via API.
+        Every 30 seconds, checks if the system is idle (≥60s no input).
+        If idle + power connected + no scan active + guards pass:
+            → Automatically triggers one training epoch.
+        
+        Training aborts immediately if:
+            - User starts interacting (idle < 60s)
+            - A scan starts
+            - Any guard check fails
+        
+        Manual training via API always available regardless.
         """
         self._running = True
-        logger.info("G38 Trainer started in MANUAL MODE (no auto-trigger)")
+        self._training_mode_label = "AUTO"
+        logger.info("G38 Trainer started in IDLE AUTO-TRAINING MODE")
         
         while self._running:
-            # NO auto-trigger - just keep alive for status polling
+            try:
+                # Only auto-trigger if not already training
+                if self._state != TrainingState.TRAINING:
+                    conditions = self._get_current_conditions()
+                    if conditions.idle_seconds >= IDLE_THRESHOLD_SECONDS:
+                        logger.info(
+                            f"Idle detected ({conditions.idle_seconds}s) — "
+                            f"attempting auto-training"
+                        )
+                        # check_and_train has ALL safety guards built in
+                        await asyncio.get_event_loop().run_in_executor(
+                            None, self.check_and_train
+                        )
+            except Exception as e:
+                logger.error(f"Auto-training scheduler error: {e}")
+            
             await asyncio.sleep(self.CHECK_INTERVAL_SECONDS)
         
         logger.info("G38 Trainer stopped")
@@ -898,7 +889,18 @@ class AutoTrainer:
                 )
                 
                 # === USE OPTIMIZED GPU TRAINING (zero CPU overhead) ===
+                import time as _time
+                _step_start = _time.perf_counter()
                 success, accuracy, loss = self._gpu_train_step()
+                _step_elapsed = _time.perf_counter() - _step_start
+                
+                # Store metrics for dashboard display
+                if success:
+                    self._last_loss = loss
+                    self._last_accuracy = accuracy
+                    # Use real dataset size for throughput (full DataLoader iteration)
+                    ds_total = self._gpu_dataset_stats.get('train', {}).get('total', 0) if self._gpu_dataset_stats else 0
+                    self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
                 
                 if not self._abort_flag.is_set() and success:
                     checkpoint_hash = hashlib.sha256(f"epoch-{self._epoch}-gpu".encode()).hexdigest()[:16]
@@ -998,7 +1000,7 @@ class AutoTrainer:
             "last_accuracy": round(self._last_accuracy, 4),
             "samples_per_sec": round(self._samples_per_sec, 1),
             "dataset_size": self._gpu_dataset_stats["train"]["total"] if self._gpu_dataset_stats else 0,
-            "training_mode": "MANUAL",
+            "training_mode": getattr(self, '_training_mode_label', 'AUTO'),
         }
 
 
@@ -1018,9 +1020,13 @@ def get_auto_trainer() -> AutoTrainer:
 
 
 def start_auto_training() -> None:
-    """Initialize trainer in MANUAL mode. No auto-trigger."""
+    """Initialize trainer in IDLE AUTO-TRAINING mode.
+    
+    Starts background scheduler that auto-triggers training
+    when system is idle >= 60 seconds. All guards enforced.
+    """
     trainer = get_auto_trainer()
-    trainer.start()  # Starts background loop for status polling only
+    trainer.start()  # Starts background loop with idle auto-training
 
 
 def stop_auto_training() -> None:
@@ -1087,10 +1093,16 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
     
     # Start background thread for continuous GPU training
     def _run_continuous():
-        device = get_torch_device()
-        import torch.nn as nn
-        import torch.optim as optim
-        from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier
+        import time as _time
+        
+        # Initialize GPU resources ONCE (uses real 20K+ dataset)
+        if not trainer._gpu_initialized:
+            if not trainer._init_gpu_resources():
+                trainer._emit_event("ERROR", "Failed to initialize GPU resources", gpu_used=True)
+                trainer._continuous_mode = False
+                with trainer._training_lock:
+                    trainer._state = TrainingState.ERROR
+                return
         
         epoch_count = 0
         while trainer._continuous_mode and not trainer._abort_flag.is_set():
@@ -1110,75 +1122,22 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             )
             
             try:
-                # Create model config for this epoch
-                config = create_model_config(
-                    input_dim=256,
-                    output_dim=2,
-                    hidden_dims=(512, 256, 128),
-                    dropout=0.3,
-                    learning_rate=0.001,
-                    batch_size=32,
-                    epochs=1,
-                    seed=42 + trainer._epoch,
-                )
+                # Use the shared full-DataLoader training step
+                _step_start = _time.perf_counter()
+                success, accuracy, loss = trainer._gpu_train_step()
+                _step_elapsed = _time.perf_counter() - _step_start
                 
-                # Generate synthetic training samples
-                samples = tuple(
-                    TrainingSample(
-                        sample_id=f"SAMPLE-{j:04d}",
-                        features=tuple(float((j * 17 + k * 13) % 256) / 256.0 for k in range(256)),
-                        label=j % 2,
-                        source="synthetic_representation",
-                    )
-                    for j in range(100)
-                )
-                
-                # Create model on GPU
-                model = BugClassifier(config)
-                model = model.to(device)
-                
-                optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
-                criterion = nn.CrossEntropyLoss()
-                
-                # Convert samples to tensors on GPU
-                features = torch.tensor(
-                    [list(s.features) for s in samples],
-                    dtype=torch.float32,
-                    device=device,
-                )
-                labels = torch.tensor(
-                    [s.label for s in samples],
-                    dtype=torch.long,
-                    device=device,
-                )
-                
-                # === REAL GPU TRAINING LOOP ===
-                model.train()
-                for step in range(10):
-                    if trainer._abort_flag.is_set() or not trainer._continuous_mode:
-                        break
-                    
-                    # Forward pass
-                    optimizer.zero_grad()
-                    outputs = model(features)
-                    loss = criterion(outputs, labels)
-                    
-                    # Backward pass (real gradient descent on GPU)
-                    loss.backward()
-                    optimizer.step()
-                
-                if not trainer._abort_flag.is_set() and trainer._continuous_mode:
-                    # Calculate accuracy
-                    model.eval()
-                    with torch.no_grad():
-                        outputs = model(features)
-                        _, predicted = torch.max(outputs.data, 1)
-                        accuracy = (predicted == labels).sum().item() / labels.size(0)
+                if success and not trainer._abort_flag.is_set() and trainer._continuous_mode:
+                    # Update metrics
+                    trainer._last_loss = loss
+                    trainer._last_accuracy = accuracy
+                    ds_total = trainer._gpu_dataset_stats.get('train', {}).get('total', 0) if trainer._gpu_dataset_stats else 0
+                    trainer._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
                     
                     checkpoint_hash = hashlib.sha256(f"epoch-{trainer._epoch}-gpu".encode()).hexdigest()[:16]
                     trainer._emit_event(
                         "CHECKPOINT_SAVED",
-                        f"Saved GPU checkpoint epoch {epoch_count} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%})",
+                        f"Saved GPU checkpoint epoch {epoch_count} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
                         epoch=epoch_count,
                         gpu_used=True,
                     )

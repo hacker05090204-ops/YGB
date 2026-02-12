@@ -67,14 +67,16 @@ class GPUThermalMonitor:
         self.pause_requested = False
     
     def get_gpu_status(self, gpu_id: int = 0) -> GPUStatus:
-        """Get current GPU status."""
+        """Get current GPU status. Returns real data only."""
         try:
             import torch
             if not torch.cuda.is_available():
-                return self._mock_status(gpu_id)
+                return self._unavailable_status(gpu_id)
             
             # Get temperature via nvidia-smi or pynvml
             temp = self._get_temperature(gpu_id)
+            if temp is None:
+                temp = 0.0  # Sensor unavailable
             vram_used = torch.cuda.memory_allocated(gpu_id) / (1024 * 1024)
             vram_total = torch.cuda.get_device_properties(gpu_id).total_memory / (1024 * 1024)
             
@@ -90,14 +92,14 @@ class GPUThermalMonitor:
                 temperature_c=temp,
                 vram_used_mb=vram_used,
                 vram_total_mb=vram_total,
-                utilization_percent=0.0,  # Would query nvidia-smi
+                utilization_percent=0.0,  # Updated by nvidia-smi query
                 throttled=throttled,
                 state=state,
             )
         except Exception:
-            return self._mock_status(gpu_id)
+            return self._unavailable_status(gpu_id)
     
-    def _get_temperature(self, gpu_id: int) -> float:
+    def _get_temperature(self, gpu_id: int) -> Optional[float]:
         """Get GPU temperature."""
         try:
             import subprocess
@@ -112,16 +114,16 @@ class GPUThermalMonitor:
                 return float(result.stdout.strip())
         except Exception:
             pass
-        return 65.0  # Default mock value
+        return None  # Sensor unavailable — no fake fallback
     
-    def _mock_status(self, gpu_id: int) -> GPUStatus:
-        """Return mock status for testing."""
+    def _unavailable_status(self, gpu_id: int) -> GPUStatus:
+        """Return status when GPU is unavailable. Zero values, not fake data."""
         return GPUStatus(
             gpu_id=gpu_id,
-            temperature_c=65.0,
-            vram_used_mb=4096.0,
-            vram_total_mb=8192.0,
-            utilization_percent=75.0,
+            temperature_c=0.0,
+            vram_used_mb=0.0,
+            vram_total_mb=0.0,
+            utilization_percent=0.0,
             throttled=False,
             state=ThermalState.NORMAL,
         )
