@@ -16,6 +16,8 @@ from .auto_trainer import (
     get_auto_trainer,
     start_auto_training,
     stop_auto_training,
+    start_continuous_training,
+    stop_continuous_training,
 )
 
 __all__ = [
@@ -32,4 +34,6 @@ __all__ = [
     "get_auto_trainer",
     "start_auto_training",
     "stop_auto_training",
+    "start_continuous_training",
+    "stop_continuous_training",
 ]

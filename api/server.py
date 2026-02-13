@@ -74,6 +74,8 @@ try:
         get_auto_trainer,
         start_auto_training,
         stop_auto_training,
+        start_continuous_training,
+        stop_continuous_training,
         get_idle_seconds,
         is_power_connected,
         is_scan_active,
@@ -1114,6 +1116,26 @@ async def manual_start_training(epochs: int = 10):
         "state": "TRAINING",
         "training_mode": "MANUAL",
     }
+
+
+@app.post("/training/continuous")
+async def start_24_7_training(epochs: int = 0):
+    """Start 24/7 continuous GPU training. epochs=0 means infinite."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    result = start_continuous_training(target_epochs=epochs)
+    return {"success": result.get("started", False), **result}
+
+
+@app.post("/training/continuous/stop")
+async def stop_24_7_training():
+    """Stop 24/7 continuous training."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    result = stop_continuous_training()
+    return {"success": result.get("stopped", False), **result}
 
 
 @app.post("/training/stop")
