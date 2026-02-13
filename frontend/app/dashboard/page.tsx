@@ -296,8 +296,8 @@ export default function Dashboard() {
                       <div className="text-sm font-medium text-[#737373]">Total Users</div>
                       <Users className="h-4 w-4 text-purple-400" />
                     </div>
-                    <div className="text-3xl font-bold text-[#FAFAFA]">{adminStats?.users.total || users.length}</div>
-                    <p className="text-xs text-[#525252] mt-1">{adminStats?.users.active_last_7_days || 0} active this week</p>
+                    <div className="text-3xl font-bold text-[#FAFAFA]">{adminStats?.users?.total || users.length}</div>
+                    <p className="text-xs text-[#525252] mt-1">{adminStats?.users?.active_last_7_days || 0} active this week</p>
                   </div>
 
                   <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-[#0A0A0A] p-6 hover:border-blue-500/30 transition-colors group">
@@ -305,8 +305,8 @@ export default function Dashboard() {
                       <div className="text-sm font-medium text-[#737373]">Total Bounties</div>
                       <Trophy className="h-4 w-4 text-blue-400" />
                     </div>
-                    <div className="text-3xl font-bold text-[#FAFAFA]">{adminStats?.bounties.total || bounties.length}</div>
-                    <p className="text-xs text-[#525252] mt-1">{adminStats?.bounties.pending || 0} pending review</p>
+                    <div className="text-3xl font-bold text-[#FAFAFA]">{adminStats?.bounties?.total || bounties.length}</div>
+                    <p className="text-xs text-[#525252] mt-1">{adminStats?.bounties?.pending || 0} pending review</p>
                   </div>
 
                   <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-[#0A0A0A] p-6 hover:border-green-500/30 transition-colors group">
@@ -314,7 +314,7 @@ export default function Dashboard() {
                       <div className="text-sm font-medium text-[#737373]">Total Paid</div>
                       <DollarSign className="h-4 w-4 text-green-400" />
                     </div>
-                    <div className="text-3xl font-bold text-[#FAFAFA]">${adminStats?.bounties.total_paid?.toLocaleString() || "0"}</div>
+                    <div className="text-3xl font-bold text-[#FAFAFA]">${adminStats?.bounties?.total_paid?.toLocaleString() || "0"}</div>
                     <p className="text-xs text-[#525252] mt-1">Lifetime earnings</p>
                   </div>
 
@@ -323,8 +323,8 @@ export default function Dashboard() {
                       <div className="text-sm font-medium text-[#737373]">Active Targets</div>
                       <Target className="h-4 w-4 text-orange-400" />
                     </div>
-                    <div className="text-3xl font-bold text-[#FAFAFA]">{adminStats?.targets.active || targets.length}</div>
-                    <p className="text-xs text-[#525252] mt-1">{adminStats?.sessions.active || 0} active sessions</p>
+                    <div className="text-3xl font-bold text-[#FAFAFA]">{adminStats?.targets?.active || targets.length}</div>
+                    <p className="text-xs text-[#525252] mt-1">{adminStats?.sessions?.active || 0} active sessions</p>
                   </div>
                 </div>
 
