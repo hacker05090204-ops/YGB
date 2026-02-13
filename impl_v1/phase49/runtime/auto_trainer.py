@@ -1014,8 +1014,15 @@ class AutoTrainer:
         conditions = self._get_current_conditions()
         
         # Calculate REAL progress percentage
-        if self.is_training and self._target_epochs > 0:
-            # Active training - show live progress
+        is_continuous = getattr(self, '_continuous_mode', False)
+        
+        if self.is_training and is_continuous:
+            # 24/7 continuous mode: show accuracy as progress
+            real_progress = round(self._last_accuracy * 100)
+            current_epoch = self._session_epoch
+            target = 0  # 0 = infinite
+        elif self.is_training and self._target_epochs > 0:
+            # Fixed-epoch training: show live epoch progress
             real_progress = round((self._session_epoch / self._target_epochs) * 100)
             current_epoch = self._session_epoch
             target = self._target_epochs
@@ -1058,7 +1065,8 @@ class AutoTrainer:
             "last_accuracy": round(self._last_accuracy, 4),
             "samples_per_sec": round(self._samples_per_sec, 1),
             "dataset_size": self._gpu_dataset_stats["train"]["total"] if self._gpu_dataset_stats else 0,
-            "training_mode": getattr(self, '_training_mode_label', 'AUTO'),
+            "training_mode": "CONTINUOUS" if is_continuous else getattr(self, '_training_mode_label', 'AUTO'),
+            "continuous_mode": is_continuous,
         }
 
 

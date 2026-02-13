@@ -51,6 +51,7 @@ interface G38Status {
         samples_per_sec: number
         dataset_size: number
         training_mode: string
+        continuous_mode?: boolean
     }
     guards?: {
         main_guards: number
@@ -227,12 +228,12 @@ export default function TrainingDashboard() {
                                             </span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-[#525252]">Progress</span>
-                                            <span>{status?.auto_training?.progress || 0}%</span>
+                                            <span className="text-[#525252]">{status?.auto_training?.continuous_mode ? 'Accuracy' : 'Progress'}</span>
+                                            <span className={status?.auto_training?.continuous_mode ? 'text-cyan-400 font-bold' : ''}>{status?.auto_training?.continuous_mode ? ((status?.auto_training?.last_accuracy || 0) * 100).toFixed(2) + '%' : (status?.auto_training?.progress || 0) + '%'}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-[#525252]">Current Epoch</span>
-                                            <span>{status?.auto_training?.epoch || 0} / {status?.auto_training?.total_epochs || 0}</span>
+                                            <span>{status?.auto_training?.total_completed || status?.auto_training?.epoch || 0}{status?.auto_training?.continuous_mode ? ' (24/7)' : ` / ${status?.auto_training?.total_epochs || 0}`}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-[#525252]">Idle Time</span>
