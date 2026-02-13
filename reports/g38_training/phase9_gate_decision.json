@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-02-13T12:00:07.455243+00:00",
+  "all_passed": false,
+  "gates": {
+    "Data Audit": false,
+    "Cross Validation": true,
+    "Stress Test": false,
+    "Calibration": false,
+    "Rare Class": true,
+    "Drift Simulation": false,
+    "Shadow Mode": true,
+    "Governance Integrity": true
+  },
+  "decision": "LOCKED"
+}

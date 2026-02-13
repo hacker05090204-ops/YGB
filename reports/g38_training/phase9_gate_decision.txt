@@ -1,0 +1,26 @@
+======================================================================
+  G38 MODE-B GATE -- CONSOLIDATED DECISION REPORT
+======================================================================
+  Generated: 2026-02-13T12:00:07.448258+00:00
+
+  GATE STATUS TABLE:
+  Phase                       Result
+  -----------------------------------
+  Data Audit                    FAIL
+  Cross Validation              PASS
+  Stress Test                   FAIL
+  Calibration                   FAIL
+  Rare Class                    PASS
+  Drift Simulation              FAIL
+  Shadow Mode                   PASS
+  Governance Integrity          PASS
+  -----------------------------------
+  Total: 4/8 gates passed
+
+======================================================================
+  DECISION: MODE-B REMAINS LOCKED
+
+  REASON: One or more validation gates failed.
+  ACTION: Fix failures and re-run validation.
+
+======================================================================

@@ -1,0 +1,91 @@
+======================================================================
+  G38 MODE-B GATE — PHASE 1: DATA VALIDATION AUDIT
+======================================================================
+  Timestamp: 2026-02-13T11:59:21.083849+00:00
+  Verdict: ❌ FAIL
+
+----------------------------------------------------------------------
+  SECTION A — Dataset Composition
+----------------------------------------------------------------------
+  Total Samples:          16,200
+  Feature Dimensions:     256
+  Positive Samples:       8,090
+  Negative Samples:       8,110
+  Class Ratio (pos/neg):  0.9975
+  Edge Case Count:        1,621
+  Edge Case Ratio:        0.1001
+  Synthetic Ratio:        100.0%
+  Label Leakage:          ✅ NO
+  Max Feature Correlation: 0.9116 (dim 188)
+  Signal Gap:             0.5050
+  Overlap Risk:           LOW
+
+  Feature Group Correlations with Label:
+    signal_dims_0_63              : 0.9008
+    response_dims_64_127          : 0.8678
+    interaction_dims_128_191      : 0.9109
+    noise_dims_192_255            : 0.0061
+
+----------------------------------------------------------------------
+  SECTION B — Feature Stability
+----------------------------------------------------------------------
+  [SIGNAL]
+    Positive: mean=0.7521, std=0.1221
+    Negative: mean=0.2471, std=0.1214
+    Mean diff: 0.5050
+  [RESPONSE]
+    Positive: mean=0.7047, std=0.1211
+    Negative: mean=0.2920, std=0.1152
+    Mean diff: 0.4127
+  [INTERACTION]
+    Positive: mean=0.5795, std=0.1278
+    Negative: mean=0.1206, std=0.0728
+    Mean diff: 0.4589
+  [NOISE]
+    Positive: mean=0.5000, std=0.0501
+    Negative: mean=0.5001, std=0.0499
+    Mean diff: -0.0001
+
+  KL Divergence (Pos || Neg):
+    signal              : 2.8977
+    response            : 1.8633
+    interaction         : 1.9027
+    noise               : 0.0135
+  Noise Variance:         0.002499
+  Expected Noise Var:     0.002500
+  Noise Var Ratio:        0.9997x
+
+----------------------------------------------------------------------
+  SECTION C — Label Signal Integrity
+----------------------------------------------------------------------
+  Mutual Information by Group:
+    signal              : 0.9032 bits
+    response            : 0.8393 bits
+    interaction         : 0.9150 bits
+    noise               : 0.0010 bits
+
+  Top 10 Correlated Features:
+    # 1: dim=188 corr=+0.9116 (interaction)
+    # 2: dim=145 corr=+0.9116 (interaction)
+    # 3: dim=164 corr=+0.9115 (interaction)
+    # 4: dim=167 corr=+0.9115 (interaction)
+    # 5: dim=184 corr=+0.9114 (interaction)
+    # 6: dim=172 corr=+0.9113 (interaction)
+    # 7: dim=138 corr=+0.9113 (interaction)
+    # 8: dim=173 corr=+0.9113 (interaction)
+    # 9: dim=180 corr=+0.9113 (interaction)
+    #10: dim=174 corr=+0.9113 (interaction)
+
+  Single-Feature Dominance: ✅ NO
+  Dominance Gap:           0.0000
+  Shortcut Learning Risk:  ❌ YES
+  Groups in Top-10:        interaction
+
+----------------------------------------------------------------------
+  FAILURES
+----------------------------------------------------------------------
+  ❌ SHORTCUT RISK: All top-10 features from 'interaction' group
+
+======================================================================
+  PHASE 1 VERDICT: ❌ FAIL — MODE-B BLOCKED
+======================================================================

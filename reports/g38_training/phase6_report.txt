@@ -1,0 +1,17 @@
+======================================================================
+  G38 MODE-B GATE -- PHASE 6: DRIFT SIMULATION
+======================================================================
+  Verdict: FAIL
+
+  Test                             Base  Drift   Drop ConfInf ReprDev  Pass
+  distribution_shift_10pct       0.9790 0.9790 0.0000  0.0001  0.0991     Y
+  unseen_pattern_injection       0.9790 0.8849 0.0941  0.0934  0.0333     N
+  class_imbalance_70_30          0.9790 0.9790 0.0000 -0.0012  0.0000     Y
+  feature_missingness_15pct      0.9790 0.9778 0.0012 -0.0033  0.1494     Y
+
+  FAILURES:
+    novel_pattern: drop=0.0941 ci=0.0934
+
+======================================================================
+  PHASE 6 VERDICT: FAIL -- MODE-B BLOCKED
+======================================================================
