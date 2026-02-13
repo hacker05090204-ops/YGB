@@ -87,19 +87,47 @@ class ScaledDatasetGenerator:
         return train, holdout
     
     def _create_sample(self, idx: int, label: int, is_edge: bool) -> Sample:
-        """Create a sample."""
+        """Create a sample with LABEL-DEPENDENT features.
+        
+        Positive (label=1) and negative (label=0) samples get different
+        feature distributions so the model can learn the difference.
+        """
+        # Label-dependent signal — this is the CORE discriminative feature
+        if label == 1:
+            signal_strength = self.rng.uniform(0.6, 0.95)
+            pattern_type = "high_signal"
+            response_ratio = self.rng.uniform(0.55, 0.90)
+        else:
+            signal_strength = self.rng.uniform(0.05, 0.40)
+            pattern_type = "low_signal"
+            response_ratio = self.rng.uniform(0.10, 0.45)
+        
         if is_edge:
-            # Edge case: harder features
+            # Edge case: harder — signal closer to the boundary
+            if label == 1:
+                signal_strength = self.rng.uniform(0.45, 0.65)
+                response_ratio = self.rng.uniform(0.40, 0.60)
+            else:
+                signal_strength = self.rng.uniform(0.35, 0.55)
+                response_ratio = self.rng.uniform(0.35, 0.55)
             features = {
                 "type": "edge_case",
                 "difficulty": self.rng.uniform(0.8, 1.0),
                 "noise": self.rng.uniform(0.3, 0.5),
+                "signal_strength": signal_strength,
+                "response_ratio": response_ratio,
+                "pattern_type": pattern_type,
+                "label_signal": float(label),
             }
         else:
             features = {
                 "type": "standard",
                 "difficulty": self.rng.uniform(0.1, 0.7),
                 "noise": self.rng.uniform(0.0, 0.2),
+                "signal_strength": signal_strength,
+                "response_ratio": response_ratio,
+                "pattern_type": pattern_type,
+                "label_signal": float(label),
             }
         
         return Sample(

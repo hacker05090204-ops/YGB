@@ -107,29 +107,47 @@ class RealTrainingDataset(Dataset):
         self._labels_tensor = torch.tensor(self._labels, dtype=torch.long)
     
     def _encode_features(self, features: dict, is_edge: bool) -> List[float]:
-        """Encode feature dict to fixed-size vector."""
-        # Reset RNG for determinism
+        """Encode feature dict to fixed-size vector with label-correlated patterns.
+        
+        Feature layout:
+          [0-63]   Signal-strength features (high for positive, low for negative)
+          [64-127] Response-ratio features (label-correlated secondary signal)
+          [128-191] Interaction features (signal × response patterns)
+          [192-255] Controlled noise (small amplitude, not pure random)
+        """
         vec = []
         
-        # Base features from dict
+        # Extract label-correlated fields
+        signal = features.get("signal_strength", 0.5)
+        response = features.get("response_ratio", 0.5)
         difficulty = features.get("difficulty", 0.5)
-        noise = features.get("noise", 0.1)
+        noise_level = features.get("noise", 0.1)
         
-        # Create 256-dim feature vector with patterns
+        # Use a per-sample seed derived from signal+response for determinism
+        sample_seed = int((signal * 10000 + response * 1000 + difficulty * 100) * 100)
+        sample_rng = random.Random(sample_seed)
+        
         for i in range(self.feature_dim):
             if i < 64:
-                # Difficulty-based features
-                val = difficulty * (1 + 0.1 * self.rng.gauss(0, 1))
+                # Signal-strength features — PRIMARY label signal
+                base = signal
+                noise = noise_level * 0.15 * sample_rng.gauss(0, 1)
+                val = base + noise
             elif i < 128:
-                # Noise-based features
-                val = noise * (1 + 0.05 * self.rng.gauss(0, 1))
+                # Response-ratio features — SECONDARY label signal
+                base = response
+                noise = noise_level * 0.15 * sample_rng.gauss(0, 1)
+                val = base + noise
             elif i < 192:
-                # Edge case indicator features
-                val = 0.8 if is_edge else 0.2
-                val += 0.1 * self.rng.gauss(0, 1)
+                # Interaction features — signal × response cross-patterns
+                base = (signal * response) + (0.1 * difficulty)
+                noise = noise_level * 0.10 * sample_rng.gauss(0, 1)
+                val = base + noise
             else:
-                # Random supplementary features
-                val = self.rng.random()
+                # Controlled noise — small perturbation (NOT pure random)
+                base = 0.5
+                noise = 0.05 * sample_rng.gauss(0, 1)
+                val = base + noise
             
             # Clamp to [0, 1]
             vec.append(max(0.0, min(1.0, val)))

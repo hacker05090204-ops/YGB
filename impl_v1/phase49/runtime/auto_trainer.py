@@ -311,6 +311,12 @@ class AutoTrainer:
             self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate)
             self._gpu_criterion = nn.CrossEntropyLoss()
             
+            # LR scheduler — reduce LR when loss plateaus
+            self._gpu_scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+                self._gpu_optimizer, mode='min', factor=0.5, patience=10,
+                min_lr=1e-6, verbose=False,
+            )
+            
             # === REAL DATA PIPELINE (NO SYNTHETIC DATA) ===
             from impl_v1.training.data.real_dataset_loader import (
                 create_training_dataloader,
@@ -341,10 +347,38 @@ class AutoTrainer:
             self._gpu_features = first_batch[0].to(self._gpu_device)
             self._gpu_labels = first_batch[1].to(self._gpu_device)
             
+            # === TRY TO LOAD EXISTING CHECKPOINT ===
+            self._checkpoint_path = os.path.join(
+                os.environ.get('YGB_HDD_ROOT', 'D:/ygb_hdd'),
+                'training', 'g38_model_checkpoint.pt'
+            )
+            os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
+            
+            if os.path.exists(self._checkpoint_path):
+                try:
+                    ckpt = torch.load(self._checkpoint_path, map_location=self._gpu_device, weights_only=True)
+                    self._gpu_model.load_state_dict(ckpt['model_state'])
+                    self._gpu_optimizer.load_state_dict(ckpt['optimizer_state'])
+                    if 'scheduler_state' in ckpt:
+                        self._gpu_scheduler.load_state_dict(ckpt['scheduler_state'])
+                    self._epoch = ckpt.get('epoch', 0)
+                    self._last_accuracy = ckpt.get('accuracy', 0.0)
+                    self._last_loss = ckpt.get('loss', 0.0)
+                    logger.info(
+                        f"Loaded checkpoint: epoch={self._epoch}, "
+                        f"accuracy={self._last_accuracy:.2%}, loss={self._last_loss:.4f}"
+                    )
+                except Exception as e:
+                    logger.warning(f"Could not load checkpoint, starting fresh: {e}")
+            
             self._gpu_initialized = True
+            
+            # Verify model is on GPU (not CPU)
+            model_device = next(self._gpu_model.parameters()).device
             logger.info(
                 f"GPU resources initialized on {device_info.device_name} "
-                f"with {stats['train']['total']} real samples"
+                f"with {stats['train']['total']} real samples "
+                f"(model on {model_device}, NOT CPU)"
             )
             return True
             
@@ -444,10 +478,34 @@ class AutoTrainer:
             avg_loss = total_loss / max(total_samples, 1)
             accuracy = total_correct / max(total_samples, 1)
             
+            # Step LR scheduler based on loss
+            current_lr = self._gpu_optimizer.param_groups[0]['lr']
+            if hasattr(self, '_gpu_scheduler') and self._gpu_scheduler is not None:
+                self._gpu_scheduler.step(avg_loss)
+                current_lr = self._gpu_optimizer.param_groups[0]['lr']
+            
+            # Save checkpoint after every epoch
+            if hasattr(self, '_checkpoint_path') and self._checkpoint_path:
+                try:
+                    torch.save({
+                        'model_state': self._gpu_model.state_dict(),
+                        'optimizer_state': self._gpu_optimizer.state_dict(),
+                        'scheduler_state': self._gpu_scheduler.state_dict() if hasattr(self, '_gpu_scheduler') else None,
+                        'epoch': self._epoch,
+                        'accuracy': accuracy,
+                        'loss': avg_loss,
+                    }, self._checkpoint_path)
+                except Exception:
+                    pass  # Non-critical
+            
+            # Verify training is on GPU, not CPU
+            model_device = next(self._gpu_model.parameters()).device
+            
             logger.info(
                 f"Epoch complete: {batch_count} batches, "
                 f"{total_samples} samples, "
-                f"loss={avg_loss:.4f}, accuracy={accuracy:.2%}"
+                f"loss={avg_loss:.4f}, accuracy={accuracy:.2%}, "
+                f"lr={current_lr:.2e}, device={model_device}"
             )
             
             return True, accuracy, avg_loss
