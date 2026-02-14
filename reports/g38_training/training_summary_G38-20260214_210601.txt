@@ -1,0 +1,27 @@
+=== G38 TRAINING SUMMARY ===
+Session ID: G38-20260214_210601
+Generated: 2026-02-14T21:06:01.796016+00:00
+
+TRAINING STATISTICS:
+  Total Epochs: 1
+  Training Mode: REPRESENTATION_ONLY
+  Backend: GPU
+  Duration: 0 seconds
+
+LEARNING FOCUS:
+  Representation learning - patterns without bug labels
+
+CHECKPOINTS:
+  Saved: 213
+  Last Hash: c2e5a93eb2d25d43, accuracy: 98.87%, loss: 0.0226
+
+TIMESTAMPS:
+  Started: 2026-02-14T21:06:01.480017+00:00
+  Stopped: 2026-02-14T21:06:01.794100+00:00
+
+GOVERNANCE STATUS:
+  AI Authority: ZERO
+  All Guards: VERIFIED
+  Proof Required: YES
+
+================================
