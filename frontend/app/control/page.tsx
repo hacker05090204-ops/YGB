@@ -16,7 +16,7 @@ import { ExecutionState, type ExecutionStateType } from "@/components/execution-
 import { ModeSelector, type AutonomyModeType } from "@/components/mode-selector"
 import { ApprovalPanel, type ApprovalRequest, type RiskLevelType } from "@/components/approval-panel"
 import { BrowserAssistant, type AssistantExplanation } from "@/components/browser-assistant"
-import { VoiceControls, type VoiceIntent } from "@/components/voice-controls"
+import { VoiceControls, type VoiceIntent, type VoiceModeType } from "@/components/voice-controls"
 import { TargetDiscoveryPanel, type TargetCandidate } from "@/components/target-discovery-panel"
 import { TrainingProgress } from "@/components/training-progress"
 import { ScopeTargetPanel } from "@/components/scope-target-panel"
@@ -60,6 +60,7 @@ export default function ControlPage() {
     // Voice (from G12)
     const [lastIntent, setLastIntent] = useState<VoiceIntent | null>(null)
     const [voiceProcessing, setVoiceProcessing] = useState(false)
+    const [voiceMode, setVoiceMode] = useState<VoiceModeType>("SECURITY")
 
     // Initialize dashboard
     useEffect(() => {
@@ -247,7 +248,7 @@ export default function ControlPage() {
             const response = await fetch(`${API_BASE}/api/voice/parse`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text, mode: voiceMode })
             })
 
             if (response.ok) {
@@ -274,7 +275,7 @@ export default function ControlPage() {
         } finally {
             setVoiceProcessing(false)
         }
-    }, [handleDiscoverTargets])
+    }, [handleDiscoverTargets, voiceMode])
 
     // Loading State
     if (isLoading) {
@@ -350,6 +351,8 @@ export default function ControlPage() {
                                 onVoiceInput={handleVoiceInput}
                                 lastIntent={lastIntent}
                                 isProcessing={voiceProcessing}
+                                voiceMode={voiceMode}
+                                onModeChange={setVoiceMode}
                             />
                         </div>
 

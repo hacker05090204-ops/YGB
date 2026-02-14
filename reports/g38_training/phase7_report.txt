@@ -3,12 +3,12 @@
 ======================================================================
   Verdict: PASS
   Total Decisions:          1000
-  Agreement Rate:           0.9886  (>= 0.97)
-  Rare Class Agreement:     0.9875
-  Rare Class Delta:         0.0011  (< 0.05)
-  Abstention Rate:          0.0360
-  Abstentions Correct:      0.4722
-  Misclass w/ High Conf:    2
+  Agreement Rate:           0.9876  (>= 0.97)
+  Rare Class Agreement:     0.9833
+  Rare Class Delta:         0.0043  (< 0.05)
+  Abstention Rate:          0.0320
+  Abstentions Correct:      0.4375
+  Misclass w/ High Conf:    4
 
 ======================================================================
   PHASE 7 VERDICT: PASS

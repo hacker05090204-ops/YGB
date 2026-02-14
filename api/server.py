@@ -97,6 +97,31 @@ except ImportError as e:
     G38_AVAILABLE = False
 
 # =============================================================================
+# SYSTEM INTEGRITY SUPERVISOR
+# =============================================================================
+
+try:
+    from backend.integrity.integrity_bridge import get_integrity_supervisor
+    INTEGRITY_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  Integrity supervisor not available: {e}")
+    INTEGRITY_AVAILABLE = False
+
+# =============================================================================
+# RESEARCH ASSISTANT (DUAL-MODE VOICE)
+# =============================================================================
+
+try:
+    from backend.assistant.query_router import (
+        QueryRouter, ResearchSearchPipeline, VoiceMode, ResearchStatus,
+    )
+    from backend.assistant.isolation_guard import IsolationGuard
+    RESEARCH_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  Research assistant not available: {e}")
+    RESEARCH_AVAILABLE = False
+
+# =============================================================================
 # APP CONFIGURATION
 # =============================================================================
 
@@ -1777,6 +1802,171 @@ async def lifespan(app):
 
 # Apply lifespan to app
 app.router.lifespan_context = lifespan
+
+
+# =============================================================================
+# SYSTEM INTEGRITY ENDPOINT
+# =============================================================================
+
+@app.get("/system/integrity")
+async def system_integrity():
+    """Unified system integrity dashboard. Real data only — no mocks."""
+    if not INTEGRITY_AVAILABLE:
+        return {
+            "error": "Integrity supervisor not available",
+            "overall_integrity": {"score": 0, "status": "RED"},
+            "shadow_allowed": False,
+            "forced_mode": "MODE_A",
+        }
+
+    supervisor = get_integrity_supervisor()
+    return supervisor.probe_all()
+
+
+# =============================================================================
+# DUAL-MODE VOICE ENDPOINTS
+# =============================================================================
+
+# Active voice mode state
+_active_voice_mode = "SECURITY"
+
+
+class VoiceParseRequest(BaseModel):
+    text: str
+    mode: Optional[str] = None  # "SECURITY" or "RESEARCH", auto-detect if None
+
+
+@app.post("/api/voice/parse")
+async def voice_parse(request: VoiceParseRequest):
+    """
+    Dual-mode voice parser.
+    
+    - SECURITY mode: routes to g12_voice_input.extract_intent()
+    - RESEARCH mode: routes to isolated Edge search pipeline
+    - Auto-classifies if mode not specified
+    """
+    global _active_voice_mode
+    text = request.text.strip()
+    
+    if not text:
+        return {
+            "intent_id": f"VOC-EMPTY",
+            "intent_type": "UNKNOWN",
+            "raw_text": "",
+            "extracted_value": None,
+            "confidence": 0.0,
+            "status": "INVALID",
+            "block_reason": "Empty voice input",
+            "active_mode": _active_voice_mode,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+    
+    # Determine mode
+    mode = request.mode
+    route_decision = None
+    
+    if RESEARCH_AVAILABLE and mode is None:
+        # Auto-classify
+        router = QueryRouter()
+        route_decision = router.classify(text)
+        mode = route_decision.mode.value
+    elif mode is None:
+        mode = "SECURITY"
+    
+    _active_voice_mode = mode
+    
+    # ===== RESEARCH MODE =====
+    if mode == "RESEARCH" and RESEARCH_AVAILABLE:
+        # Run isolation pre-check
+        guard = IsolationGuard()
+        isolation_check = guard.pre_query_check(text)
+        
+        if not isolation_check.allowed:
+            return {
+                "intent_id": f"VOC-BLOCKED",
+                "intent_type": "RESEARCH_QUERY",
+                "raw_text": text,
+                "extracted_value": None,
+                "confidence": 0.0,
+                "status": "BLOCKED",
+                "block_reason": isolation_check.reason,
+                "active_mode": "RESEARCH",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        
+        # Execute research search
+        pipeline = ResearchSearchPipeline()
+        result = pipeline.search(text)
+        
+        # Audit log
+        guard.log_research_query(
+            query=text,
+            result_status=result.status.value,
+            checks_passed=5,
+            checks_failed=0,
+            violations=[],
+        )
+        
+        return {
+            "intent_id": f"VOC-RESEARCH",
+            "intent_type": "RESEARCH_QUERY",
+            "raw_text": text,
+            "extracted_value": result.summary,
+            "confidence": 0.9 if result.status == ResearchStatus.SUCCESS else 0.3,
+            "status": "PARSED" if result.status == ResearchStatus.SUCCESS else "INVALID",
+            "block_reason": None if result.status == ResearchStatus.SUCCESS else result.summary,
+            "active_mode": "RESEARCH",
+            "research_result": {
+                "title": result.title,
+                "summary": result.summary,
+                "source": result.source,
+                "key_terms": list(result.key_terms),
+                "word_count": result.word_count,
+                "elapsed_ms": result.elapsed_ms,
+            },
+            "route_decision": {
+                "confidence": route_decision.confidence if route_decision else 1.0,
+                "reason": route_decision.reason if route_decision else "Manual mode selection",
+            } if route_decision or mode == "RESEARCH" else None,
+            "timestamp": result.timestamp,
+        }
+    
+    # ===== SECURITY MODE (default) =====
+    try:
+        from impl_v1.phase49.governors.g12_voice_input import extract_intent
+        intent = extract_intent(text)
+        return {
+            "intent_id": intent.intent_id,
+            "intent_type": intent.intent_type.value,
+            "raw_text": intent.raw_text,
+            "extracted_value": intent.extracted_value,
+            "confidence": intent.confidence,
+            "status": intent.status.value,
+            "block_reason": intent.block_reason,
+            "active_mode": "SECURITY",
+            "timestamp": intent.timestamp,
+        }
+    except ImportError:
+        return {
+            "intent_id": "VOC-ERROR",
+            "intent_type": "UNKNOWN",
+            "raw_text": text,
+            "extracted_value": None,
+            "confidence": 0.0,
+            "status": "INVALID",
+            "block_reason": "Voice parser not available",
+            "active_mode": "SECURITY",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+
+
+@app.get("/api/voice/mode")
+async def voice_mode():
+    """Return current active voice mode."""
+    return {
+        "mode": _active_voice_mode,
+        "research_available": RESEARCH_AVAILABLE,
+    }
 
 
 # =============================================================================

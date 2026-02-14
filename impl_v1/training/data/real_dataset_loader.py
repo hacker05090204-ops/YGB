@@ -110,10 +110,15 @@ class RealTrainingDataset(Dataset):
         """Encode feature dict to fixed-size vector with label-correlated patterns.
         
         Feature layout:
-          [0-63]   Signal-strength features (high for positive, low for negative)
-          [64-127] Response-ratio features (label-correlated secondary signal)
-          [128-191] Interaction features (signal × response patterns)
-          [192-255] Controlled noise (small amplitude, not pure random)
+          [0-63]   Signal-strength features (primary label signal)
+          [64-127] Response-ratio features (secondary label signal)
+          [128-191] Diverse derived features (NOT simple signal×response)
+          [192-255] Controlled noise (small amplitude)
+        
+        DESIGN: Each feature group encodes INDEPENDENT aspects of the label
+        signal. No single group should be sufficient for >90% accuracy.
+        Interaction dims use diverse nonlinear combinations with higher
+        noise to prevent shortcut dominance.
         """
         vec = []
         
@@ -131,17 +136,46 @@ class RealTrainingDataset(Dataset):
             if i < 64:
                 # Signal-strength features — PRIMARY label signal
                 base = signal
-                noise = noise_level * 0.15 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 128:
                 # Response-ratio features — SECONDARY label signal
                 base = response
-                noise = noise_level * 0.15 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 192:
-                # Interaction features — signal × response cross-patterns
-                base = (signal * response) + (0.1 * difficulty)
-                noise = noise_level * 0.10 * sample_rng.gauss(0, 1)
+                # Diverse derived features — INDEPENDENT combinations
+                # Each sub-range uses a different non-redundant encoding
+                sub_idx = i - 128  # 0-63
+                
+                if sub_idx < 16:
+                    # Polynomial: signal^2 with independent noise
+                    base = signal * signal
+                    noise = 0.15 * sample_rng.gauss(0, 1)
+                elif sub_idx < 32:
+                    # Polynomial: response^2 with independent noise
+                    base = response * response
+                    noise = 0.15 * sample_rng.gauss(0, 1)
+                elif sub_idx < 40:
+                    # Trigonometric: sin(signal * pi)
+                    import math
+                    base = 0.5 + 0.5 * math.sin(signal * math.pi)
+                    noise = 0.12 * sample_rng.gauss(0, 1)
+                elif sub_idx < 48:
+                    # Trigonometric: cos(response * pi)
+                    import math
+                    base = 0.5 + 0.5 * math.cos(response * math.pi)
+                    noise = 0.12 * sample_rng.gauss(0, 1)
+                elif sub_idx < 56:
+                    # Threshold: binary indicator with noise
+                    threshold = 0.5 + 0.05 * sample_rng.gauss(0, 1)
+                    base = 0.8 if signal > threshold else 0.2
+                    noise = 0.10 * sample_rng.gauss(0, 1)
+                else:
+                    # Rank-based: difficulty-weighted signal magnitude
+                    base = signal * (1.0 - difficulty * 0.3)
+                    noise = 0.12 * sample_rng.gauss(0, 1)
+                
                 val = base + noise
             else:
                 # Controlled noise — small perturbation (NOT pure random)

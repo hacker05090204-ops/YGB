@@ -1,0 +1,27 @@
+======================================================================
+  G38 MODE-B GATE -- PHASE 4: CALIBRATION PROOF
+======================================================================
+  Verdict: FAIL
+  ECE: 0.0045
+  MCE (Max Cal Error): 0.1239
+  Confidence Inflation: 0.0035
+  Overconfidence Spikes: 2
+  Monotonic: NO
+  Temperature (optimal): 1.0050
+  ECE after temp scaling: 0.0041
+
+  Reliability Diagram:
+           Bin  Samples    Conf     Acc     Gap
+  [0.50-0.60]       55  0.5516  0.5818 -0.0302
+  [0.60-0.70]       42  0.6478  0.5238 +0.1239
+  [0.70-0.80]       42  0.7496  0.6429 +0.1067
+  [0.80-0.90]       22  0.8583  0.8182 +0.0401
+  [0.90-1.00]     2155  0.9983  0.9972 +0.0011
+
+  FAILURES:
+    Overconfidence spikes: 2 bins with gap > 0.1
+    Confidence not monotonic with correctness
+
+======================================================================
+  PHASE 4 VERDICT: FAIL -- MODE-B BLOCKED
+======================================================================

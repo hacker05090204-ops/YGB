@@ -25,7 +25,7 @@ import re
 
 
 class VoiceIntentType(Enum):
-    """CLOSED ENUM - 10 intent types (added GPU and training)"""
+    """CLOSED ENUM - 11 intent types (added GPU, training, and research)"""
     SET_TARGET = "SET_TARGET"
     SET_SCOPE = "SET_SCOPE"
     QUERY_STATUS = "QUERY_STATUS"
@@ -35,6 +35,7 @@ class VoiceIntentType(Enum):
     FIND_TARGETS = "FIND_TARGETS"
     SCREEN_TAKEOVER = "SCREEN_TAKEOVER"  # READ-ONLY inspection
     REPORT_HELP = "REPORT_HELP"  # High impact tips
+    RESEARCH_QUERY = "RESEARCH_QUERY"  # NEW: General knowledge queries
     UNKNOWN = "UNKNOWN"
 
 
@@ -120,6 +121,21 @@ INTENT_PATTERNS = {
         r'(?:how\s+is\s+)?(?:the\s+)?model\s+(?:doing|training)',
         r'(?:show\s+)?loss\s+(?:value|graph)?',
         r'(?:what\s+is\s+)?(?:the\s+)?accuracy',
+    ],
+    # NEW: Research / general knowledge queries
+    VoiceIntentType.RESEARCH_QUERY: [
+        r'^what\s+(?:is|are|was|were)\s+',
+        r'^(?:who|when|where|why)\s+(?:is|are|was|were|did|does|do)',
+        r'^(?:how\s+does|how\s+do|how\s+is|how\s+are)\s+',
+        r'^define\s+',
+        r'^explain\s+',
+        r'^tell\s+me\s+about\s+',
+        r'^describe\s+',
+        r'^meaning\s+of\s+',
+        r'^history\s+of\s+',
+        r'^difference\s+between\s+',
+        r'^translate\s+',
+        r'^calculate\s+',
     ],
 }
 

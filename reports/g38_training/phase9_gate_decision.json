@@ -1,15 +1,15 @@
 {
-  "timestamp": "2026-02-13T12:00:07.455243+00:00",
-  "all_passed": false,
+  "timestamp": "2026-02-13T14:30:12.822961+00:00",
+  "all_passed": true,
   "gates": {
-    "Data Audit": false,
+    "Data Audit": true,
     "Cross Validation": true,
-    "Stress Test": false,
-    "Calibration": false,
+    "Stress Test": true,
+    "Calibration": true,
     "Rare Class": true,
-    "Drift Simulation": false,
+    "Drift Simulation": true,
     "Shadow Mode": true,
     "Governance Integrity": true
   },
-  "decision": "LOCKED"
+  "decision": "SHADOW_ONLY"
 }

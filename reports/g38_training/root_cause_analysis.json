@@ -1,0 +1,8 @@
+{
+  "interaction_dominance_pct": 49.090909090908696,
+  "interaction_scramble_drop": 0.21512345679012346,
+  "calibration_spearman": 0.9999999999999999,
+  "calibration_monotonic": true,
+  "novel_pattern_drop": 0.09506172839506177,
+  "confidence_inflation": 0.0018032759795953979
+}

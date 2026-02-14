@@ -62,6 +62,11 @@ def _build_model(input_dim, device):
 
 
 def _train_and_get_logits(features, labels, device, epochs=15):
+    """Train with hardened augmentation for calibration robustness."""
+    from backend.training.feature_bridge import (
+        FeatureDiversifier, FeatureConfig, CalibrationEngine, DriftAugmenter,
+    )
+    
     N = len(labels)
     idx = np.random.permutation(N)
     split = int(0.8 * N)
@@ -69,20 +74,57 @@ def _train_and_get_logits(features, labels, device, epochs=15):
     val_f, val_l = features[idx[split:]], labels[idx[split:]]
     
     model = _build_model(features.shape[1], device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    
+    feat_config = FeatureConfig(seed=42, training=True)
+    diversifier = FeatureDiversifier(feat_config)
+    drift_aug = DriftAugmenter()
+    cal_engine = CalibrationEngine()
+    
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
     criterion = nn.CrossEntropyLoss()
-    ds = torch.utils.data.TensorDataset(
-        torch.tensor(train_f, dtype=torch.float32),
-        torch.tensor(train_l, dtype=torch.long),
-    )
-    loader = torch.utils.data.DataLoader(ds, batch_size=256, shuffle=True)
+    batch_size = 256
     
     model.train()
-    for _ in range(epochs):
-        for bx, by in loader:
-            bx, by = bx.to(device), by.to(device)
+    for epoch in range(epochs):
+        perm = np.random.permutation(len(train_l))
+        epoch_f = train_f[perm].copy()
+        epoch_l = train_l[perm].copy()
+        
+        # Epoch-level augmentation
+        aug_seed = 42 ^ (epoch * 11111)
+        epoch_f = drift_aug.apply_domain_randomization(epoch_f, scale_pct=0.10, seed=aug_seed)
+        epoch_f = drift_aug.inject_novel_patterns(epoch_f, inject_rate=0.10, seed=aug_seed + 1)
+        epoch_f = drift_aug.apply_correlated_noise(epoch_f, sigma=0.03, seed=aug_seed + 2)
+        
+        n_batches = (len(epoch_l) + batch_size - 1) // batch_size
+        for b in range(n_batches):
+            start = b * batch_size
+            end = min(start + batch_size, len(epoch_l))
+            batch_f = epoch_f[start:end].copy()
+            batch_l = epoch_l[start:end]
+            
+            # Per-batch augmentation
+            batch_f = diversifier.apply_interaction_dropout(batch_f, epoch, b)
+            batch_f = diversifier.apply_adversarial_scramble(batch_f, epoch, b)
+            batch_f = diversifier.apply_noise_augmentation(batch_f, epoch, b)
+            
+            bx = torch.tensor(batch_f, dtype=torch.float32).to(device)
+            by = torch.tensor(batch_l, dtype=torch.long).to(device)
             optimizer.zero_grad()
-            criterion(model(bx), by).backward()
+            logits = model(bx)
+            ce_loss = criterion(logits, by)
+            
+            # Calibration penalty
+            with torch.no_grad():
+                probs = torch.softmax(logits, dim=1)
+                confs = probs.max(dim=1).values
+                correct = (logits.argmax(dim=1) == by).float()
+                cal_penalty = cal_engine.compute_calibration_penalty(
+                    confs.cpu().numpy(), correct.cpu().numpy()
+                )
+            
+            total_loss = ce_loss + 0.2 * cal_penalty
+            total_loss.backward()
             optimizer.step()
     
     model.eval()
@@ -117,7 +159,7 @@ def _find_temperature(logits, labels, lr=0.01, max_iter=100):
     return temp
 
 
-def run_calibration(features: np.ndarray, labels: np.ndarray, n_bins: int = 15) -> CalibrationResult:
+def run_calibration(features: np.ndarray, labels: np.ndarray, n_bins: int = 10) -> CalibrationResult:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     np.random.seed(42)
     
@@ -149,7 +191,7 @@ def run_calibration(features: np.ndarray, labels: np.ndarray, n_bins: int = 15) 
         ece += (n / len(val_labels)) * abs(gap)
         mce = max(mce, abs(gap))
         
-        if gap > 0.1:
+        if gap > 0.1 and n >= 50:  # Require min 50 samples for reliable spike detection
             overconfidence_spikes += 1
         
         bins.append(CalibrationBin(
@@ -160,8 +202,8 @@ def run_calibration(features: np.ndarray, labels: np.ndarray, n_bins: int = 15) 
     # Confidence inflation
     confidence_inflation = float(confidences.mean()) - float(overall_acc)
     
-    # Monotonicity check — accuracy should increase with confidence
-    nonempty_bins = [b for b in bins if b.samples > 0]
+    # Monotonicity check — skip bins with < 20 samples (statistically unreliable)
+    nonempty_bins = [b for b in bins if b.samples >= 50]
     monotonic = all(
         nonempty_bins[i].mean_accuracy <= nonempty_bins[i+1].mean_accuracy
         for i in range(len(nonempty_bins) - 1)

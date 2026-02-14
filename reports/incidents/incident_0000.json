@@ -1,0 +1,11 @@
+{
+  "incident_id": 0,
+  "timestamp": "2026-02-13T14:20:03.557635+00:00",
+  "trigger": "ENTROPY_COLLAPSE",
+  "previous_mode": "MODE_B_SHADOW",
+  "new_mode": "MODE_A_ONLY",
+  "trigger_value": 1.0,
+  "threshold": 0.1,
+  "description": "Representation entropy collapsed >10%",
+  "signature": "600d5403e21451f5811df739f5bb3c6658825a6372f8cc85c4bb86d9778bf3a1"
+}

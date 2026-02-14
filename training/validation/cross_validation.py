@@ -102,7 +102,11 @@ def _compute_roc_auc(probs: np.ndarray, labels: np.ndarray) -> float:
 def train_fold(train_features: np.ndarray, train_labels: np.ndarray,
                val_features: np.ndarray, val_labels: np.ndarray,
                fold: int, epochs: int = 15, lr: float = 0.001) -> FoldResult:
-    """Train and evaluate one fold."""
+    """Train and evaluate one fold with hardened augmentation."""
+    from backend.training.feature_bridge import (
+        FeatureDiversifier, FeatureConfig, CalibrationEngine, DriftAugmenter,
+    )
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
     # Create model
@@ -120,30 +124,62 @@ def train_fold(train_features: np.ndarray, train_labels: np.ndarray,
         nn.Linear(128, 2),
     ).to(device)
     
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    feat_config = FeatureConfig(seed=42 + fold, training=True)
+    diversifier = FeatureDiversifier(feat_config)
+    drift_aug = DriftAugmenter()
+    cal_engine = CalibrationEngine()
+    
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3, factor=0.5)
     criterion = nn.CrossEntropyLoss()
+    batch_size = 256
     
-    # DataLoaders
-    train_ds = TensorDataset(
-        torch.tensor(train_features, dtype=torch.float32),
-        torch.tensor(train_labels, dtype=torch.long),
-    )
-    train_loader = DataLoader(train_ds, batch_size=256, shuffle=True)
-    
-    # Train
+    # Train with hardened augmentation
     model.train()
     for epoch in range(epochs):
+        perm = np.random.permutation(len(train_labels))
+        epoch_f = train_features[perm].copy()
+        epoch_l = train_labels[perm].copy()
+        
+        # Epoch-level augmentation
+        aug_seed = (42 + fold) ^ (epoch * 11111)
+        epoch_f = drift_aug.apply_domain_randomization(epoch_f, scale_pct=0.10, seed=aug_seed)
+        epoch_f = drift_aug.inject_novel_patterns(epoch_f, inject_rate=0.10, seed=aug_seed + 1)
+        epoch_f = drift_aug.apply_correlated_noise(epoch_f, sigma=0.03, seed=aug_seed + 2)
+        
         total_loss = 0
-        for batch_x, batch_y in train_loader:
-            batch_x, batch_y = batch_x.to(device), batch_y.to(device)
+        n_batches = (len(epoch_l) + batch_size - 1) // batch_size
+        for b in range(n_batches):
+            start = b * batch_size
+            end = min(start + batch_size, len(epoch_l))
+            batch_f = epoch_f[start:end].copy()
+            batch_l = epoch_l[start:end]
+            
+            # Per-batch augmentation
+            batch_f = diversifier.apply_interaction_dropout(batch_f, epoch, b)
+            batch_f = diversifier.apply_adversarial_scramble(batch_f, epoch, b)
+            batch_f = diversifier.apply_noise_augmentation(batch_f, epoch, b)
+            
+            batch_x = torch.tensor(batch_f, dtype=torch.float32).to(device)
+            batch_y = torch.tensor(batch_l, dtype=torch.long).to(device)
             optimizer.zero_grad()
             out = model(batch_x)
             loss = criterion(out, batch_y)
-            loss.backward()
+            
+            # Calibration penalty
+            with torch.no_grad():
+                probs = torch.softmax(out, dim=1)
+                confs = probs.max(dim=1).values
+                correct = (out.argmax(dim=1) == batch_y).float()
+                cal_penalty = cal_engine.compute_calibration_penalty(
+                    confs.cpu().numpy(), correct.cpu().numpy()
+                )
+            
+            total = loss + 0.2 * cal_penalty
+            total.backward()
             optimizer.step()
             total_loss += loss.item()
-        scheduler.step(total_loss / len(train_loader))
+        scheduler.step(total_loss / n_batches)
     
     # Evaluate
     model.eval()

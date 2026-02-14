@@ -1,0 +1,61 @@
+======================================================================
+  PHASE 1: ROOT CAUSE CONFIRMATION REPORT
+======================================================================
+  Baseline accuracy: 0.9799
+  Device: cuda
+
+----------------------------------------------------------------------
+  SECTION A -- Feature Attribution
+----------------------------------------------------------------------
+  signal (0-63)            : importance=+0.0065 (acc=0.9735)
+  response (64-127)        : importance=+0.0012 (acc=0.9787)
+  interaction (128-191)    : importance=+0.0083 (acc=0.9716)
+  noise (192-255)          : importance=+0.0009 (acc=0.9790)
+
+  Group Contribution %:
+    signal (0-63)            : 38.2%
+    response (64-127)        : 7.3%
+    interaction (128-191)    : 49.1%
+    noise (192-255)          : 5.5%
+
+  Interaction dominance: 49.1% (threshold: <50%)
+  SHORTCUT CONFIRMED: NO
+
+----------------------------------------------------------------------
+  SECTION B -- Shortcut Detection (Per-Group Accuracy)
+----------------------------------------------------------------------
+  signal (0-63)             only: accuracy=0.9744
+  response (64-127)         only: accuracy=0.9630
+  interaction (128-191)     only: accuracy=0.9799
+  noise (192-255)           only: accuracy=0.4985
+
+----------------------------------------------------------------------
+  SECTION C -- Calibration Curve + Monotonicity
+----------------------------------------------------------------------
+           Bin      N    Conf     Acc     Gap
+  [0.50-0.60]     46  0.5494  0.5217 +0.0276
+  [0.60-0.70]     45  0.6442  0.6000 +0.0442
+  [0.70-0.80]     41  0.7409  0.7073 +0.0336
+  [0.80-0.90]     50  0.8423  0.7600 +0.0823
+  [0.90-1.00]   1683  0.9977  0.9994 -0.0017
+
+  Spearman rho:        1.0000 (target >= 0.95)
+  Spearman p-value:    0.000000
+  Confidence inflation: 0.0018 (target <= 0.03)
+  Monotonic:           YES
+
+----------------------------------------------------------------------
+  SECTION D -- Drift Sensitivity
+----------------------------------------------------------------------
+  Novel patterns (20%): acc=0.8849 drop=0.0951 (target <0.05)
+  Interaction scramble: acc=0.7648 drop=0.2151 (target <0.05)
+  Feature scaling ±15%: acc=0.9790 drop=0.0009 (target <0.05)
+
+======================================================================
+  ROOT CAUSE SUMMARY
+======================================================================
+  1. Interaction dominance:    49.1% -- OK
+  2. Interaction scramble drop: 0.2151 -- FIX REQUIRED
+  3. Calibration monotonic:     YES (Spearman=1.0000) -- OK
+  4. Novel pattern drop:        0.0951 -- FIX REQUIRED
+======================================================================
