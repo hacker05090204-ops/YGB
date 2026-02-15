@@ -1,0 +1,493 @@
+{
+  "passed": true,
+  "n_cycles": 48,
+  "peak_memory_mb": 55.66,
+  "memory_growth_mb": 55.66,
+  "worst_accuracy": 0.9133,
+  "max_kl_spike": 0.472769,
+  "max_conf_inflation": 0.0597,
+  "cycles": [
+    {
+      "cycle": 1,
+      "memory_mb": 55.62,
+      "memory_growth_mb": 55.62,
+      "accuracy": 0.9208,
+      "accuracy_drop": 0,
+      "kl_divergence": 0.071443,
+      "confidence_inflation": 0.0108,
+      "passed": true
+    },
+    {
+      "cycle": 2,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9275,
+      "accuracy_drop": 0,
+      "kl_divergence": 0.045051,
+      "confidence_inflation": 0.0058,
+      "passed": true
+    },
+    {
+      "cycle": 3,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9142,
+      "accuracy_drop": 0.0133,
+      "kl_divergence": 0.043379,
+      "confidence_inflation": 0.0209,
+      "passed": true
+    },
+    {
+      "cycle": 4,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9225,
+      "accuracy_drop": 0.005,
+      "kl_divergence": 0.040289,
+      "confidence_inflation": 0.0074,
+      "passed": true
+    },
+    {
+      "cycle": 5,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9208,
+      "accuracy_drop": 0.0067,
+      "kl_divergence": 0.056323,
+      "confidence_inflation": 0.02,
+      "passed": true
+    },
+    {
+      "cycle": 6,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9233,
+      "accuracy_drop": 0.0042,
+      "kl_divergence": 0.051358,
+      "confidence_inflation": 0.0226,
+      "passed": true
+    },
+    {
+      "cycle": 7,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9283,
+      "accuracy_drop": 0,
+      "kl_divergence": 0.040352,
+      "confidence_inflation": 0.0151,
+      "passed": true
+    },
+    {
+      "cycle": 8,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.925,
+      "accuracy_drop": 0.0033,
+      "kl_divergence": 0.039902,
+      "confidence_inflation": 0.0182,
+      "passed": true
+    },
+    {
+      "cycle": 9,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9242,
+      "accuracy_drop": 0.0042,
+      "kl_divergence": 0.064785,
+      "confidence_inflation": 0.0263,
+      "passed": true
+    },
+    {
+      "cycle": 10,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9217,
+      "accuracy_drop": 0.0067,
+      "kl_divergence": 0.048564,
+      "confidence_inflation": 0.0242,
+      "passed": true
+    },
+    {
+      "cycle": 11,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9292,
+      "accuracy_drop": 0,
+      "kl_divergence": 0.037233,
+      "confidence_inflation": 0.0215,
+      "passed": true
+    },
+    {
+      "cycle": 12,
+      "memory_mb": 55.63,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9283,
+      "accuracy_drop": 0.0008,
+      "kl_divergence": 0.174948,
+      "confidence_inflation": 0.0242,
+      "passed": true
+    },
+    {
+      "cycle": 13,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.92,
+      "accuracy_drop": 0.0092,
+      "kl_divergence": 0.133379,
+      "confidence_inflation": 0.0374,
+      "passed": true
+    },
+    {
+      "cycle": 14,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.63,
+      "accuracy": 0.9192,
+      "accuracy_drop": 0.01,
+      "kl_divergence": 0.063454,
+      "confidence_inflation": 0.0376,
+      "passed": true
+    },
+    {
+      "cycle": 15,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9192,
+      "accuracy_drop": 0.01,
+      "kl_divergence": 0.229497,
+      "confidence_inflation": 0.04,
+      "passed": true
+    },
+    {
+      "cycle": 16,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9283,
+      "accuracy_drop": 0.0008,
+      "kl_divergence": 0.123804,
+      "confidence_inflation": 0.0313,
+      "passed": true
+    },
+    {
+      "cycle": 17,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9258,
+      "accuracy_drop": 0.0033,
+      "kl_divergence": 0.100582,
+      "confidence_inflation": 0.0332,
+      "passed": true
+    },
+    {
+      "cycle": 18,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9292,
+      "accuracy_drop": 0,
+      "kl_divergence": 0.041422,
+      "confidence_inflation": 0.034,
+      "passed": true
+    },
+    {
+      "cycle": 19,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9225,
+      "accuracy_drop": 0.0067,
+      "kl_divergence": 0.13,
+      "confidence_inflation": 0.0434,
+      "passed": true
+    },
+    {
+      "cycle": 20,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9183,
+      "accuracy_drop": 0.0108,
+      "kl_divergence": 0.046423,
+      "confidence_inflation": 0.0386,
+      "passed": true
+    },
+    {
+      "cycle": 21,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9242,
+      "accuracy_drop": 0.005,
+      "kl_divergence": 0.126124,
+      "confidence_inflation": 0.0258,
+      "passed": true
+    },
+    {
+      "cycle": 22,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9258,
+      "accuracy_drop": 0.0033,
+      "kl_divergence": 0.472769,
+      "confidence_inflation": 0.0381,
+      "passed": true
+    },
+    {
+      "cycle": 23,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9308,
+      "accuracy_drop": 0,
+      "kl_divergence": 0.07612,
+      "confidence_inflation": 0.0352,
+      "passed": true
+    },
+    {
+      "cycle": 24,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9325,
+      "accuracy_drop": 0,
+      "kl_divergence": 0.042053,
+      "confidence_inflation": 0.0251,
+      "passed": true
+    },
+    {
+      "cycle": 25,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9158,
+      "accuracy_drop": 0.0167,
+      "kl_divergence": 0.114205,
+      "confidence_inflation": 0.0468,
+      "passed": true
+    },
+    {
+      "cycle": 26,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9258,
+      "accuracy_drop": 0.0067,
+      "kl_divergence": 0.195373,
+      "confidence_inflation": 0.0415,
+      "passed": true
+    },
+    {
+      "cycle": 27,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.92,
+      "accuracy_drop": 0.0125,
+      "kl_divergence": 0.115071,
+      "confidence_inflation": 0.052,
+      "passed": true
+    },
+    {
+      "cycle": 28,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.92,
+      "accuracy_drop": 0.0125,
+      "kl_divergence": 0.089565,
+      "confidence_inflation": 0.0489,
+      "passed": true
+    },
+    {
+      "cycle": 29,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9225,
+      "accuracy_drop": 0.01,
+      "kl_divergence": 0.135172,
+      "confidence_inflation": 0.044,
+      "passed": true
+    },
+    {
+      "cycle": 30,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9267,
+      "accuracy_drop": 0.0058,
+      "kl_divergence": 0.189225,
+      "confidence_inflation": 0.0437,
+      "passed": true
+    },
+    {
+      "cycle": 31,
+      "memory_mb": 55.64,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9275,
+      "accuracy_drop": 0.005,
+      "kl_divergence": 0.452768,
+      "confidence_inflation": 0.046,
+      "passed": true
+    },
+    {
+      "cycle": 32,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.64,
+      "accuracy": 0.9267,
+      "accuracy_drop": 0.0058,
+      "kl_divergence": 0.371077,
+      "confidence_inflation": 0.0454,
+      "passed": true
+    },
+    {
+      "cycle": 33,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9217,
+      "accuracy_drop": 0.0108,
+      "kl_divergence": 0.266086,
+      "confidence_inflation": 0.047,
+      "passed": true
+    },
+    {
+      "cycle": 34,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9133,
+      "accuracy_drop": 0.0192,
+      "kl_divergence": 0.355685,
+      "confidence_inflation": 0.0597,
+      "passed": true
+    },
+    {
+      "cycle": 35,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9175,
+      "accuracy_drop": 0.015,
+      "kl_divergence": 0.158058,
+      "confidence_inflation": 0.0597,
+      "passed": true
+    },
+    {
+      "cycle": 36,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9225,
+      "accuracy_drop": 0.01,
+      "kl_divergence": 0.268851,
+      "confidence_inflation": 0.0516,
+      "passed": true
+    },
+    {
+      "cycle": 37,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9208,
+      "accuracy_drop": 0.0117,
+      "kl_divergence": 0.039552,
+      "confidence_inflation": 0.0506,
+      "passed": true
+    },
+    {
+      "cycle": 38,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9233,
+      "accuracy_drop": 0.0092,
+      "kl_divergence": 0.046112,
+      "confidence_inflation": 0.0492,
+      "passed": true
+    },
+    {
+      "cycle": 39,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9192,
+      "accuracy_drop": 0.0133,
+      "kl_divergence": 0.041774,
+      "confidence_inflation": 0.051,
+      "passed": true
+    },
+    {
+      "cycle": 40,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9242,
+      "accuracy_drop": 0.0083,
+      "kl_divergence": 0.316627,
+      "confidence_inflation": 0.0474,
+      "passed": true
+    },
+    {
+      "cycle": 41,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9283,
+      "accuracy_drop": 0.0042,
+      "kl_divergence": 0.202966,
+      "confidence_inflation": 0.044,
+      "passed": true
+    },
+    {
+      "cycle": 42,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9225,
+      "accuracy_drop": 0.01,
+      "kl_divergence": 0.427171,
+      "confidence_inflation": 0.053,
+      "passed": true
+    },
+    {
+      "cycle": 43,
+      "memory_mb": 55.65,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.9217,
+      "accuracy_drop": 0.0108,
+      "kl_divergence": 0.137416,
+      "confidence_inflation": 0.0476,
+      "passed": true
+    },
+    {
+      "cycle": 44,
+      "memory_mb": 55.66,
+      "memory_growth_mb": 55.65,
+      "accuracy": 0.92,
+      "accuracy_drop": 0.0125,
+      "kl_divergence": 0.116626,
+      "confidence_inflation": 0.0511,
+      "passed": true
+    },
+    {
+      "cycle": 45,
+      "memory_mb": 55.66,
+      "memory_growth_mb": 55.66,
+      "accuracy": 0.9142,
+      "accuracy_drop": 0.0183,
+      "kl_divergence": 0.086826,
+      "confidence_inflation": 0.0488,
+      "passed": true
+    },
+    {
+      "cycle": 46,
+      "memory_mb": 55.66,
+      "memory_growth_mb": 55.66,
+      "accuracy": 0.915,
+      "accuracy_drop": 0.0175,
+      "kl_divergence": 0.196234,
+      "confidence_inflation": 0.0497,
+      "passed": true
+    },
+    {
+      "cycle": 47,
+      "memory_mb": 55.66,
+      "memory_growth_mb": 55.66,
+      "accuracy": 0.9225,
+      "accuracy_drop": 0.01,
+      "kl_divergence": 0.169975,
+      "confidence_inflation": 0.0459,
+      "passed": true
+    },
+    {
+      "cycle": 48,
+      "memory_mb": 55.66,
+      "memory_growth_mb": 55.66,
+      "accuracy": 0.9233,
+      "accuracy_drop": 0.0092,
+      "kl_divergence": 0.145478,
+      "confidence_inflation": 0.0459,
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "timestamp": "2026-02-15T07:03:10.871933+00:00"
+}

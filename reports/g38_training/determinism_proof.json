@@ -1,0 +1,64 @@
+{
+  "passed": true,
+  "hashes_match": true,
+  "losses_match": true,
+  "accuracies_match": true,
+  "runs": [
+    {
+      "run_id": 1,
+      "weight_hash": "42b460dba5cf6a85f478f28ef154ca9ceb19ed17c8265a4ee90ca37669215a88",
+      "final_loss": 0.154168,
+      "final_accuracy": 0.928926,
+      "epoch_losses": [
+        0.263555,
+        0.169275,
+        0.156676,
+        0.141966,
+        0.133454,
+        0.133124,
+        0.138481,
+        0.128192,
+        0.123836,
+        0.121393
+      ]
+    },
+    {
+      "run_id": 2,
+      "weight_hash": "42b460dba5cf6a85f478f28ef154ca9ceb19ed17c8265a4ee90ca37669215a88",
+      "final_loss": 0.154168,
+      "final_accuracy": 0.928926,
+      "epoch_losses": [
+        0.263555,
+        0.169275,
+        0.156676,
+        0.141966,
+        0.133454,
+        0.133124,
+        0.138481,
+        0.128192,
+        0.123836,
+        0.121393
+      ]
+    },
+    {
+      "run_id": 3,
+      "weight_hash": "42b460dba5cf6a85f478f28ef154ca9ceb19ed17c8265a4ee90ca37669215a88",
+      "final_loss": 0.154168,
+      "final_accuracy": 0.928926,
+      "epoch_losses": [
+        0.263555,
+        0.169275,
+        0.156676,
+        0.141966,
+        0.133454,
+        0.133124,
+        0.138481,
+        0.128192,
+        0.123836,
+        0.121393
+      ]
+    }
+  ],
+  "failures": [],
+  "timestamp": "2026-02-15T06:52:01.037089+00:00"
+}
