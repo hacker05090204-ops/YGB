@@ -1,0 +1,5 @@
+2026-02-15 05:35:36,640 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-02-15 05:36:48,151 [REPR-GUARD] ALLOWED: input #1, stripped=1 fields
+2026-02-15 05:36:48,151 [REPR-GUARD] BLOCKED: Decision token 'is_bug' in input #2
+2026-02-15 05:36:48,151 [REPR-GUARD] BLOCKED: Exploit pattern in input #3
+2026-02-15 05:36:48,151 [REPR-GUARD] BLOCKED: MODE-B token in input #4

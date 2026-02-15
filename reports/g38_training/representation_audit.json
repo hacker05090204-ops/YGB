@@ -1,0 +1,99 @@
+{
+  "passed": false,
+  "saturation_risks": [
+    "LOW_KL_DIVERGENCE: noise_pos_vs_neg=0.000096 < 0.05",
+    "LOW_KL_DIVERGENCE: edge_vs_normal=0.000838 < 0.05"
+  ],
+  "feature_group_coverage": {
+    "signal": {
+      "variance_ratio": 0.3672,
+      "mean": 0.4998,
+      "std": 0.2817,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "response": {
+      "variance_ratio": 0.265,
+      "mean": 0.4988,
+      "std": 0.2393,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "interaction": {
+      "variance_ratio": 0.3562,
+      "mean": 0.447,
+      "std": 0.3182,
+      "min": 0.0,
+      "max": 1.0
+    },
+    "noise": {
+      "variance_ratio": 0.0116,
+      "mean": 0.5001,
+      "std": 0.05,
+      "min": 0.2606,
+      "max": 0.7514
+    }
+  },
+  "protocol_diversity": {
+    "mean_unique_values_per_dim": 7598.9375,
+    "mean_variance": 0.07937900722026825,
+    "min_variance": 0.07923160493373871,
+    "max_variance": 0.07960254698991776,
+    "mean_pairwise_distance": 1.8275335036665201,
+    "std_pairwise_distance": 1.2707882561998465,
+    "active_dims": 32,
+    "total_dims": 32
+  },
+  "dom_diversity": {
+    "mean_unique_values_per_dim": 7598.25,
+    "mean_variance": 0.07934217154979706,
+    "min_variance": 0.07906993478536606,
+    "max_variance": 0.07958334684371948,
+    "mean_pairwise_distance": 1.824852736055851,
+    "std_pairwise_distance": 1.2746211992762617,
+    "active_dims": 32,
+    "total_dims": 32
+  },
+  "api_diversity": {
+    "mean_unique_values_per_dim": 7260.25,
+    "mean_variance": 0.05727352201938629,
+    "min_variance": 0.05710674449801445,
+    "max_variance": 0.05747968703508377,
+    "mean_pairwise_distance": 1.5872395601570606,
+    "std_pairwise_distance": 1.0672688811433932,
+    "active_dims": 32,
+    "total_dims": 32
+  },
+  "auth_diversity": {
+    "mean_unique_values_per_dim": 7255.875,
+    "mean_variance": 0.057279594242572784,
+    "min_variance": 0.057089295238256454,
+    "max_variance": 0.057452231645584106,
+    "mean_pairwise_distance": 1.5894493193030357,
+    "std_pairwise_distance": 1.0621932963497271,
+    "active_dims": 32,
+    "total_dims": 32
+  },
+  "duplicate_rate": 0.0,
+  "shortcut_correlation": {
+    "signal": 0.9048,
+    "response": 0.8727,
+    "interaction": 0.9283,
+    "noise": -0.0034
+  },
+  "entropy_per_group": {
+    "signal": 5.4654,
+    "response": 5.3642,
+    "interaction": 5.4619,
+    "noise": 4.3983
+  },
+  "kl_divergence": {
+    "signal_pos_vs_neg": 12.080667,
+    "response_pos_vs_neg": 8.069059,
+    "interaction_pos_vs_neg": 0.607972,
+    "noise_pos_vs_neg": 9.6e-05,
+    "edge_vs_normal": 0.000838
+  },
+  "interaction_dominance": 0.3562,
+  "timestamp": "2026-02-14T23:57:46.595553+00:00"
+}

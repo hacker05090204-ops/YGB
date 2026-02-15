@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-02-15T00:06:41.157028+00:00",
+  "overall_pass": true,
+  "passed": 7,
+  "total": 7,
+  "tests": [
+    {
+      "name": "data_audit",
+      "passed": true,
+      "details": {
+        "duplicate_rate": 0.0,
+        "interaction_dominance": 0.319,
+        "saturation_risks": 2
+      },
+      "errors": []
+    },
+    {
+      "name": "shortcut_correlation",
+      "passed": true,
+      "details": {
+        "signal": 0.7627,
+        "response": 0.7286,
+        "interaction": 0.6544,
+        "noise": 0.0035
+      },
+      "errors": []
+    },
+    {
+      "name": "entropy_floor",
+      "passed": true,
+      "details": {
+        "signal": 5.5799,
+        "response": 5.5469,
+        "interaction": 5.3855,
+        "noise": 4.671
+      },
+      "errors": []
+    },
+    {
+      "name": "distribution_balance",
+      "passed": true,
+      "details": {
+        "interaction_ratio": 0.319,
+        "threshold": 0.4
+      },
+      "errors": []
+    },
+    {
+      "name": "kl_divergence",
+      "passed": true,
+      "details": {
+        "signal": 1.164332,
+        "response": 1.084142,
+        "interaction": 0.314418
+      },
+      "errors": []
+    },
+    {
+      "name": "governance_firewall",
+      "passed": true,
+      "details": {
+        "tested": 4,
+        "blocked": 4
+      },
+      "errors": []
+    },
+    {
+      "name": "data_robustness",
+      "passed": true,
+      "details": {
+        "signal_response_ratio_after_scramble": 0.5694,
+        "threshold": "> 0.40"
+      },
+      "errors": []
+    }
+  ]
+}
