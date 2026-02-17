@@ -651,7 +651,7 @@ if __name__ == '__main__':
     print("Shadow Monitor self-test...")
     monitor = ShadowMonitor(feature_dim=256, n_classes=2)
 
-    # Create fake baseline
+    # Create deterministic test baseline
     np.random.seed(42)
     features = np.random.randn(1000, 256).astype(np.float64)
     labels = np.random.randint(0, 2, 1000)

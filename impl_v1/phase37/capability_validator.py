@@ -177,10 +177,10 @@ def validate_intent_description(intent: str) -> bool:
 
 
 # =============================================================================
-# REPLAY DETECTION (SIMULATED)
+# REPLAY DETECTION (IN-MEMORY)
 # =============================================================================
 
-# In-memory set for replay detection (would be persistent in real system)
+# In-memory set for replay detection (would be persistent in production)
 _seen_request_ids: Set[str] = set()
 
 
@@ -202,7 +202,7 @@ def reset_replay_detection() -> None:
 
 
 # =============================================================================
-# RATE LIMITING (SIMULATED)
+# RATE LIMITING (IN-MEMORY)
 # =============================================================================
 
 # Simple rate limit tracking

@@ -2,14 +2,17 @@
     "configurations": [
         {
             "name": "Win32",
-            "intelliSenseMode": "windows-msvc-x64",
-            "compilerPath": "cl.exe",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${default}"
-            ]
+            "intelliSenseMode": "windows-gcc-x64"
         }
     ],
     "version": 4

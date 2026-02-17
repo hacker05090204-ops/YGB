@@ -73,36 +73,46 @@ class DiscoveryResult:
     timestamp: str
 
 
-# Mock public program data (for governance testing)
-_MOCK_PROGRAMS = [
-    {
-        "name": "Example Corp",
-        "source": DiscoverySource.HACKERONE_PUBLIC,
-        "scope": "*.example.com",
-        "payout": PayoutTier.HIGH,
-        "density": ReportDensity.LOW,
-        "public": True,
-        "invite": False,
-    },
-    {
-        "name": "Test Inc",
-        "source": DiscoverySource.BUGCROWD_PUBLIC,
-        "scope": "api.test.io",
-        "payout": PayoutTier.MEDIUM,
-        "density": ReportDensity.MEDIUM,
-        "public": True,
-        "invite": False,
-    },
-    {
-        "name": "Private Corp",
-        "source": DiscoverySource.HACKERONE_PUBLIC,
-        "scope": "*.private.com",
-        "payout": PayoutTier.HIGH,
-        "density": ReportDensity.LOW,
-        "public": False,
-        "invite": True,
-    },
-]
+# =============================================================================
+# PROGRAM REGISTRY — Loaded from data file, not hardcoded
+# =============================================================================
+
+import json
+from pathlib import Path
+
+_PROGRAMS_FILE = Path(__file__).parent.parent / "data" / "target_programs.json"
+
+
+def _load_programs() -> list:
+    """Load target programs from registry file.
+
+    Raises RuntimeError if no programs file exists — never uses mock data.
+    """
+    if not _PROGRAMS_FILE.exists():
+        raise RuntimeError(
+            f"Target programs file not found: {_PROGRAMS_FILE}\n"
+            "Create data/target_programs.json with real program data."
+        )
+    try:
+        data = json.loads(_PROGRAMS_FILE.read_text())
+        if not isinstance(data, list):
+            raise ValueError("Programs file must contain a JSON array")
+        return data
+    except (json.JSONDecodeError, ValueError) as e:
+        raise RuntimeError(f"Invalid programs file: {e}") from e
+
+
+def _parse_program(program: dict) -> dict:
+    """Parse a program dict, resolving enums."""
+    return {
+        "name": program["name"],
+        "source": DiscoverySource(program["source"]),
+        "scope": program["scope"],
+        "payout": PayoutTier(program["payout"]),
+        "density": ReportDensity(program["density"]),
+        "public": program.get("public", True),
+        "invite": program.get("invite", False),
+    }
 
 
 def discover_targets(
@@ -111,37 +121,39 @@ def discover_targets(
     public_only: bool = True,
 ) -> DiscoveryResult:
     """
-    Discover potential targets from public sources.
-    
-    NOTE: This is a mock implementation for governance testing.
-    Real implementation would query public APIs.
+    Discover potential targets from program registry.
+
+    Loads real program data from data/target_programs.json.
     """
+    programs = _load_programs()
     candidates = []
     filtered = 0
-    
-    for program in _MOCK_PROGRAMS:
+
+    for raw in programs:
+        program = _parse_program(raw)
+
         # Filter by public
         if public_only and not program["public"]:
             filtered += 1
             continue
-        
+
         # Filter by invite
         if program["invite"]:
             filtered += 1
             continue
-        
+
         # Filter by payout tier
         payout_order = [PayoutTier.LOW, PayoutTier.MEDIUM, PayoutTier.HIGH]
         if payout_order.index(program["payout"]) < payout_order.index(min_payout):
             filtered += 1
             continue
-        
+
         # Filter by density
         density_order = [ReportDensity.LOW, ReportDensity.MEDIUM, ReportDensity.HIGH]
         if density_order.index(program["density"]) > density_order.index(max_density):
             filtered += 1
             continue
-        
+
         candidate = TargetCandidate(
             candidate_id=f"TGT-{uuid.uuid4().hex[:16].upper()}",
             program_name=program["name"],
@@ -154,11 +166,11 @@ def discover_targets(
             discovered_at=datetime.now(UTC).isoformat(),
         )
         candidates.append(candidate)
-    
+
     return DiscoveryResult(
         result_id=f"DIS-{uuid.uuid4().hex[:16].upper()}",
         candidates=tuple(candidates),
-        total_found=len(_MOCK_PROGRAMS),
+        total_found=len(programs),
         filtered_count=filtered,
         timestamp=datetime.now(UTC).isoformat(),
     )

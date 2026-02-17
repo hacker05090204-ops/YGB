@@ -92,18 +92,17 @@ class IncidentReportGenerator:
         return report
     
     def _get_default_scan_metrics(self) -> dict:
-        """Get placeholder scan metrics."""
-        return {
-            "last_1000_scans": {
-                "total": 1000,
-                "true_positives": 950,
-                "false_positives": 20,
-                "false_negatives": 30,
-                "accuracy": 0.95,
-            },
-            "avg_confidence": 0.85,
-            "avg_latency_ms": 150,
-        }
+        """Load real scan metrics from latest metrics file.
+
+        Returns empty dict if no metrics file exists — never fabricates data.
+        """
+        metrics_file = Path("reports/last_1000_scan_metrics.json")
+        if metrics_file.exists():
+            try:
+                return json.loads(metrics_file.read_text())
+            except (json.JSONDecodeError, OSError):
+                pass
+        return {}
     
     def _generate_recommendations(self, incident_type: str) -> List[str]:
         """Generate recommended actions based on incident type."""

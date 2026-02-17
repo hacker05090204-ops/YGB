@@ -8,6 +8,8 @@ Continuous operation monitoring:
 - FD usage, thread leaks
 - GPU temp/throttling
 - Scan latency drift
+
+No mock data. No simulated values. Real OS metrics only.
 """
 
 from dataclasses import dataclass, field
@@ -90,52 +92,85 @@ class BurnTestThresholds:
 
 
 # =============================================================================
-# MOCK COLLECTORS
+# SYSTEM COLLECTORS — Real OS metrics, no mock data
 # =============================================================================
 
 def collect_memory_metrics() -> tuple:
-    """Collect memory metrics."""
+    """Collect REAL memory metrics from OS."""
     try:
         import psutil
         process = psutil.Process()
-        rss = process.memory_info().rss / (1024 * 1024)
-        # Fragmentation estimation (simplified)
-        frag = 0.1  # Would calculate from actual memory layout
-        return rss, frag
+        mem = process.memory_info()
+        rss = mem.rss / (1024 * 1024)
+        # Fragmentation: ratio of VMS to RSS (>1.0 = fragmented)
+        vms = mem.vms / (1024 * 1024)
+        frag = (vms / rss - 1.0) if rss > 0 else 0.0
+        return rss, round(frag, 4)
     except ImportError:
-        return 256.0, 0.1
+        return None, None
 
 
 def collect_fd_count() -> int:
-    """Collect file descriptor count."""
+    """Collect REAL file descriptor count from OS."""
     try:
         import psutil
         process = psutil.Process()
         if hasattr(process, 'num_fds'):
             return process.num_fds()
+        # Windows: use handle count
+        if hasattr(process, 'num_handles'):
+            return process.num_handles()
     except Exception:
         pass
-    return 50  # Mock value
+    # Fallback: try reading /proc on Linux
+    try:
+        import os
+        fd_dir = f'/proc/{os.getpid()}/fd'
+        if os.path.isdir(fd_dir):
+            return len(os.listdir(fd_dir))
+    except (OSError, PermissionError):
+        pass
+    return None
 
 
 def collect_thread_count() -> int:
-    """Collect thread count."""
+    """Collect REAL thread count."""
     try:
         import threading
         return threading.active_count()
     except Exception:
-        return 5
+        return None
 
 
 def collect_gpu_metrics() -> tuple:
-    """Collect GPU metrics."""
-    # Would use nvidia-smi or pynvml
-    return 65.0, False  # temp, throttled
+    """Collect REAL GPU metrics via nvidia-smi."""
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["nvidia-smi",
+             "--query-gpu=temperature.gpu,throttle.reason.sw_thermal_slowdown",
+             "--format=csv,noheader,nounits"],
+            capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            parts = result.stdout.strip().split(',')
+            temp = float(parts[0].strip())
+            throttled = parts[1].strip().lower() not in ('not active', '0')
+            return temp, throttled
+    except (FileNotFoundError, subprocess.SubprocessError,
+            ValueError, IndexError):
+        pass
+    return None, False
 
 
 def collect_scan_latency() -> float:
-    """Collect scan latency."""
-    return 150.0 + (time.time() % 50)  # Mock with slight variation
+    """Collect REAL latest scan latency from timing log."""
+    try:
+        latency_file = Path("reports/last_scan_latency_ms.txt")
+        if latency_file.exists():
+            return float(latency_file.read_text().strip())
+    except (ValueError, OSError):
+        pass
+    return None
 
 
 # =============================================================================

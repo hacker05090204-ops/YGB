@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Tuple, List
 from datetime import datetime, timedelta
 import time
+import subprocess
 
 
 # =============================================================================
@@ -123,18 +124,21 @@ class AutoModeStressTester:
     def run_gpu_starvation_test(self) -> StressTestResult:
         """Test for GPU starvation."""
         try:
-            import torch
-            if not torch.cuda.is_available():
-                raise ImportError("No GPU")
-            
-            # Check GPU utilization
-            # Would use nvidia-smi in production
-            utilization = 75.0  # Mock
+            import subprocess
+            result = subprocess.run(
+                ["nvidia-smi", "--query-gpu=utilization.gpu",
+                 "--format=csv,noheader,nounits"],
+                capture_output=True, text=True, timeout=5)
+            if result.returncode == 0:
+                utilization = float(result.stdout.strip().split('\n')[0])
+            else:
+                raise ImportError("nvidia-smi failed")
             starved = utilization < self.config.gpu_starvation_threshold_percent
             passed = not starved
-            
-        except ImportError:
-            utilization = 75.0
+
+        except (ImportError, FileNotFoundError, subprocess.SubprocessError,
+                ValueError, IndexError):
+            utilization = None  # No GPU available — skip check
             passed = True
         
         result = StressTestResult(

@@ -21,7 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from enum import Enum
 import json
-import random
+import time
 import math
 
 
@@ -105,37 +105,41 @@ def generate_large_scale_dataset() -> List[ValidationSample]:
 
 
 # =============================================================================
-# MOCK SCANNER (realistic behavior)
+# SCANNER INTERFACE — Real scanner required, no mock
 # =============================================================================
 
-def production_scan(sample: ValidationSample) -> PredictionResult:
-    """Production scanner with realistic accuracy profiles."""
-    # Different accuracy by sample type
-    if sample.sample_type == SampleType.CLEAN:
-        # 2% FPR
-        predicted = random.random() < 0.02
-        confidence = random.uniform(0.1, 0.4) if predicted else random.uniform(0.0, 0.15)
-    
-    elif sample.sample_type == SampleType.VULNERABLE:
-        # 96% TPR
-        predicted = random.random() < 0.96
-        confidence = random.uniform(0.75, 0.98) if predicted else random.uniform(0.3, 0.5)
-    
-    elif sample.sample_type == SampleType.OBFUSCATED:
-        # 88% TPR on obfuscated
-        predicted = random.random() < 0.88
-        confidence = random.uniform(0.6, 0.9) if predicted else random.uniform(0.4, 0.6)
-    
-    else:  # Malformed
-        # Best effort
-        predicted = random.random() < 0.5 if sample.ground_truth else random.random() < 0.1
-        confidence = random.uniform(0.3, 0.7)
-    
+class RequireScannerError(RuntimeError):
+    """Raised when no real scanner is provided for production validation."""
+    pass
+
+
+def production_scan(sample: ValidationSample, scan_func=None) -> PredictionResult:
+    """Production scanner — delegates to real scan function.
+
+    Args:
+        sample: The validation sample to scan.
+        scan_func: A real scanner function that takes a payload string
+                   and returns (predicted: bool, confidence: float).
+
+    Raises:
+        RequireScannerError: If no real scanner function is provided.
+    """
+    if scan_func is None:
+        raise RequireScannerError(
+            "No real scanner provided. "
+            "Pass a scan_func(payload) -> (bool, float) to production_scan. "
+            "Mock scanners are not allowed in production."
+        )
+
+    start = time.time()
+    predicted, confidence = scan_func(sample.payload)
+    latency_ms = (time.time() - start) * 1000
+
     return PredictionResult(
         sample_id=sample.id,
-        predicted=predicted,
-        confidence=confidence,
-        latency_ms=random.uniform(50, 200),
+        predicted=bool(predicted),
+        confidence=float(confidence),
+        latency_ms=round(latency_ms, 2),
     )
 
 
@@ -235,12 +239,25 @@ def calculate_production_metrics(
 # VALIDATION RUNNER
 # =============================================================================
 
-def run_production_validation() -> Tuple[ProductionMetrics, dict]:
-    """Run full production validation."""
+def run_production_validation(scan_func=None) -> Tuple[ProductionMetrics, dict]:
+    """Run full production validation.
+
+    Args:
+        scan_func: Real scanner function(payload) -> (bool, float).
+                   Required. No mock scanners allowed.
+
+    Raises:
+        RequireScannerError: If no real scanner is provided.
+    """
+    if scan_func is None:
+        raise RequireScannerError(
+            "No real scanner provided to run_production_validation. "
+            "Pass a scan_func(payload) -> (bool, float).")
+
     samples = generate_large_scale_dataset()
-    results = [production_scan(s) for s in samples]
+    results = [production_scan(s, scan_func) for s in samples]
     metrics = calculate_production_metrics(samples, results)
-    
+
     report = {
         "timestamp": datetime.now().isoformat(),
         "dataset": {
@@ -261,5 +278,5 @@ def run_production_validation() -> Tuple[ProductionMetrics, dict]:
         },
         "verdict": "PASS" if metrics.precision >= 0.95 else "REVIEW",
     }
-    
+
     return metrics, report

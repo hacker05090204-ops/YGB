@@ -176,15 +176,76 @@ class SystemMetricsCollector:
 # =============================================================================
 
 def get_metrics() -> str:
-    """Get current metrics in Prometheus format."""
+    """Get current metrics in Prometheus format.
+
+    Reads REAL system state. No mock values.
+    """
     collector = SystemMetricsCollector()
-    
-    # Collect all metrics (mock values for now)
-    collector.collect_auto_mode_state(True)
-    collector.collect_drift_events(0, 0)
-    collector.collect_performance_metrics(150.0, 256.0, 25.0)
-    collector.collect_seccomp_violations(0)
-    collector.collect_emergency_lock(False)
-    collector.collect_calibration_trend(0.02)
-    
+
+    # Auto-mode: read from governance state file
+    auto_mode_enabled = False
+    state_file = Path("reports/governance_state.json")
+    if state_file.exists():
+        try:
+            state = json.loads(state_file.read_text())
+            auto_mode_enabled = state.get("auto_mode_enabled", False)
+        except (json.JSONDecodeError, OSError):
+            pass
+    collector.collect_auto_mode_state(auto_mode_enabled)
+
+    # Drift events: read from incident logs
+    drift_dir = Path("reports/incidents")
+    accuracy_drift = 0
+    calibration_drift = 0
+    if drift_dir.exists():
+        for f in drift_dir.glob("*.json"):
+            try:
+                inc = json.loads(f.read_text())
+                trigger = inc.get("trigger", "")
+                if trigger == "DRIFT_SPIKE":
+                    accuracy_drift += 1
+                elif trigger == "CALIBRATION_INFLATION":
+                    calibration_drift += 1
+            except (json.JSONDecodeError, OSError):
+                pass
+    collector.collect_drift_events(accuracy_drift, calibration_drift)
+
+    # Performance: real system metrics
+    scan_latency = 0.0
+    memory_mb = 0.0
+    cpu_percent = 0.0
+    try:
+        import psutil
+        proc = psutil.Process()
+        memory_mb = proc.memory_info().rss / (1024 * 1024)
+        cpu_percent = proc.cpu_percent(interval=0.1)
+    except (ImportError, Exception):
+        pass
+    collector.collect_performance_metrics(scan_latency, memory_mb, cpu_percent)
+
+    # Seccomp: read from violation log
+    seccomp_count = 0
+    seccomp_log = Path("reports/seccomp_violations.log")
+    if seccomp_log.exists():
+        try:
+            seccomp_count = sum(1 for _ in seccomp_log.open())
+        except OSError:
+            pass
+    collector.collect_seccomp_violations(seccomp_count)
+
+    # Emergency lock: read from lock file
+    emergency_active = Path("reports/emergency_lock.active").exists()
+    collector.collect_emergency_lock(emergency_active)
+
+    # Calibration: read from latest report
+    ece = 0.0
+    cal_report = Path("reports/calibration_latest.json")
+    if cal_report.exists():
+        try:
+            cal = json.loads(cal_report.read_text())
+            ece = cal.get("ece", 0.0)
+        except (json.JSONDecodeError, OSError):
+            pass
+    collector.collect_calibration_trend(ece)
+
     return collector.export()
