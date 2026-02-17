@@ -123,10 +123,10 @@ class TestQueryRouter:
         assert result.mode == VoiceMode.SECURITY
         assert result.confidence == 1.0
 
-    def test_ambiguous_defaults_security(self):
-        """Queries with no clear intent → SECURITY."""
+    def test_ambiguous_defaults_clarification(self):
+        """Queries with no clear intent → CLARIFICATION."""
         result = self.router.classify("hello there")
-        assert result.mode == VoiceMode.SECURITY
+        assert result.mode == VoiceMode.CLARIFICATION
 
     def test_route_decision_has_timestamp(self):
         """All decisions have timestamp."""

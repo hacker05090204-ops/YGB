@@ -13,7 +13,6 @@
 #include <cstring>
 #include <vector>
 
-
 struct LatentSpaceStats {
   std::vector<double> mean;         // per-dimension mean
   std::vector<double> variance;     // per-dimension variance
@@ -43,7 +42,7 @@ private:
   double compute_kl_gaussian(const std::vector<double> &mu0,
                              const std::vector<double> &var0,
                              const std::vector<double> &mu1,
-                             const std::vector<double> &var1) {
+                             const std::vector<double> &var1) const {
     // KL(N(mu1, var1) || N(mu0, var0))
     // = 0.5 * sum_d [ log(var0/var1) + var1/var0 + (mu0-mu1)^2/var0 - 1 ]
     double kl = 0.0;

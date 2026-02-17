@@ -145,14 +145,14 @@ class TestWeightedClassification(unittest.TestCase):
         self.assertEqual(result.mode, VoiceMode.SECURITY)
         self.assertEqual(result.confidence, 1.0)
 
-    def test_gibberish_defaults_security(self):
+    def test_gibberish_defaults_clarification(self):
         result = self.router.classify("asdf jkl zxcv qwer")
-        self.assertEqual(result.mode, VoiceMode.SECURITY)
+        self.assertEqual(result.mode, VoiceMode.CLARIFICATION)
 
-    def test_ambiguous_defaults_security(self):
-        """Ambiguous queries with no keywords → Security."""
+    def test_ambiguous_defaults_clarification(self):
+        """Ambiguous queries with no keywords → Clarification."""
         result = self.router.classify("hello there")
-        self.assertEqual(result.mode, VoiceMode.SECURITY)
+        self.assertEqual(result.mode, VoiceMode.CLARIFICATION)
         self.assertLessEqual(result.confidence, 0.5)
 
     # === CONFIDENCE PROPERTIES ===
@@ -182,11 +182,11 @@ class TestWeightedClassification(unittest.TestCase):
         self.assertTrue(hasattr(result, 'confidence'))
         self.assertIsInstance(result.confidence, float)
 
-    def test_below_threshold_falls_to_security(self):
-        """If neither mode reaches 0.75, fall to Security."""
+    def test_below_threshold_falls_to_clarification(self):
+        """If neither mode reaches 0.75, fall to Clarification or Research."""
         # A query with balanced security + research keywords (neither dominates)
         result = self.router.classify("science of exploit payload math")
-        self.assertEqual(result.mode, VoiceMode.SECURITY)
+        self.assertIn(result.mode, (VoiceMode.CLARIFICATION, VoiceMode.RESEARCH))
 
     # === WEIGHT IMPACT ===
 

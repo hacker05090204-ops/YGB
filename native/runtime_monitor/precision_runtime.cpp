@@ -22,13 +22,19 @@
 #include <cstdio>
 #include <cstring>
 
-
 namespace runtime_monitor {
 
 static constexpr uint32_t ROLLING_WINDOW = 1000;
 static constexpr double PRECISION_FLOOR = 0.95;
 static constexpr double FP_RATE_CEILING = 0.03;
 static constexpr double DUPLICATE_ALERT = 0.20;
+
+enum class GpuStatus : uint8_t {
+  UNKNOWN = 0,
+  AVAILABLE = 1,
+  UNAVAILABLE = 2,
+  TIMEOUT = 3
+};
 
 enum class ContainmentAction : uint8_t {
   NONE = 0,
@@ -62,6 +68,10 @@ struct RuntimeMetrics {
   bool duplicate_spike;
   bool containment_active;
   char containment_reason[256];
+
+  // GPU status (never fabricated)
+  GpuStatus gpu_status;
+  char gpu_status_detail[128];
 };
 
 struct SampleOutcome {
@@ -78,6 +88,19 @@ public:
     std::memset(&metrics_, 0, sizeof(metrics_));
     std::memset(window_, 0, sizeof(window_));
     metrics_.action = ContainmentAction::NONE;
+    metrics_.gpu_status = GpuStatus::UNKNOWN;
+    metrics_.gpu_status_detail[0] = '\0';
+  }
+
+  // --- GPU status (set from subprocess result, never fabricated) ---
+  void set_gpu_status(GpuStatus status, const char *detail = nullptr) {
+    metrics_.gpu_status = status;
+    if (detail) {
+      std::snprintf(metrics_.gpu_status_detail,
+                    sizeof(metrics_.gpu_status_detail), "%s", detail);
+    } else {
+      metrics_.gpu_status_detail[0] = '\0';
+    }
   }
 
   // --- Record a sample outcome ---

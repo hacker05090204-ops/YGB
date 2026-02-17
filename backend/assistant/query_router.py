@@ -343,17 +343,32 @@ class ResearchSearchPipeline:
                     query=query,
                     status=ResearchStatus.NO_RESULTS,
                     title="",
-                    summary="No results found",
+                    summary="I couldn't find results for that query. Could you rephrase your question?",
                     source="bing.com",
                     key_terms=(),
                     word_count=0,
                     elapsed_ms=elapsed,
-                    mode=VoiceMode.RESEARCH,
+                    mode=VoiceMode.CLARIFICATION,
                     timestamp=timestamp,
                 )
 
             # Extract text from HTML (mirrors C++ content_extractor)
             text = self._extract_text(raw_html)
+
+            # Empty extraction fail-safe → route to CLARIFICATION
+            if not text or len(text.strip()) < 10:
+                return ResearchResult(
+                    query=query,
+                    status=ResearchStatus.NO_RESULTS,
+                    title="",
+                    summary="I found the page but couldn't extract useful content. Could you try a different question?",
+                    source="bing.com",
+                    key_terms=(),
+                    word_count=0,
+                    elapsed_ms=elapsed,
+                    mode=VoiceMode.CLARIFICATION,
+                    timestamp=timestamp,
+                )
 
             # Sanitize (mirrors C++ research_sanitizer)
             text = self._sanitize(text)
@@ -380,12 +395,12 @@ class ResearchSearchPipeline:
                 query=query,
                 status=ResearchStatus.TIMEOUT,
                 title="",
-                summary="Search timed out",
+                summary="The search took too long. Could you try a simpler question?",
                 source="",
                 key_terms=(),
                 word_count=0,
                 elapsed_ms=elapsed,
-                mode=VoiceMode.RESEARCH,
+                mode=VoiceMode.CLARIFICATION,
                 timestamp=timestamp,
             )
 
@@ -396,12 +411,12 @@ class ResearchSearchPipeline:
                 query=query,
                 status=ResearchStatus.ERROR,
                 title="",
-                summary=f"Search error: {str(e)[:100]}",
+                summary="I couldn't complete the search. Could you rephrase your question?",
                 source="",
                 key_terms=(),
                 word_count=0,
                 elapsed_ms=elapsed,
-                mode=VoiceMode.RESEARCH,
+                mode=VoiceMode.CLARIFICATION,
                 timestamp=timestamp,
             )
 
