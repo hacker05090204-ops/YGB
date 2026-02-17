@@ -1,0 +1,33 @@
+{
+  "date": "2026-02-17",
+  "total_fetched": 6,
+  "total_parsed": 5,
+  "total_dedup_skipped": 4,
+  "total_blocked": 0,
+  "total_expanded": 1,
+  "domains_visited": [
+    "owasp.org",
+    "www.cvedetails.com",
+    "cve.org",
+    "cwe.mitre.org",
+    "services.nvd.nist.gov",
+    "cheatsheetseries.owasp.org"
+  ],
+  "cves_processed": [
+    {
+      "cve_id": "CVE-2024-10000",
+      "title": "CVE-2024-10000: Test vulnerability in web component",
+      "summary": "A vulnerability in HTTP request handling allows unauthorized access via crafted headers. Affects web servers using default configuration.",
+      "affected_component": "web-server",
+      "cvss_vector": "",
+      "cvss_score": 7.5,
+      "cwe_id": "CWE-79",
+      "published_date": "",
+      "source_url": "https://nvd.nist.gov/vuln/detail/CVE-2024-10000",
+      "content_hash": "aca933e337fb4f7081b376164f99e84d"
+    }
+  ],
+  "representation_diversity_delta": 0.301,
+  "errors": [],
+  "timestamp": "2026-02-17T02:13:40.102651+00:00"
+}

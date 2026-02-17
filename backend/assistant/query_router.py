@@ -28,9 +28,10 @@ logger = logging.getLogger(__name__)
 # =========================================================================
 
 class VoiceMode(Enum):
-    """CLOSED ENUM - 2 modes only."""
+    """CLOSED ENUM - 3 modes only."""
     SECURITY = "SECURITY"
     RESEARCH = "RESEARCH"
+    CLARIFICATION = "CLARIFICATION"
 
 
 class ResearchStatus(Enum):
@@ -71,7 +72,8 @@ class ResearchResult:
 # KEYWORD WEIGHTS — used for weighted scoring classification
 # =========================================================================
 
-CONFIDENCE_THRESHOLD = 0.75  # Below this → SECURITY (safer fallback)
+CONFIDENCE_THRESHOLD = 0.75  # Above this → route to winning mode
+LOW_CONFIDENCE_THRESHOLD = 0.6  # Below this → RESEARCH or CLARIFICATION
 
 # Security keywords with per-keyword weights
 SECURITY_KEYWORD_WEIGHTS: Dict[str, float] = {
@@ -193,11 +195,11 @@ class QueryRouter:
         # Compute confidence for each mode
         total_score = security_score + research_score
         if total_score == 0:
-            # No keywords matched — ambiguous → Security
+            # No keywords matched — ask clarification instead of defaulting
             return RouteDecision(
-                mode=VoiceMode.SECURITY,
-                confidence=0.3,
-                reason="Ambiguous query, defaulting to Security",
+                mode=VoiceMode.CLARIFICATION,
+                confidence=0.0,
+                reason="No keywords matched. Please clarify your query.",
                 matched_keywords=(),
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
@@ -226,13 +228,22 @@ class QueryRouter:
                 matched_keywords=tuple(security_matches[:5]),
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
-        else:
-            # Below threshold for both → Security (safer fallback)
+        elif max(research_confidence, security_confidence) < LOW_CONFIDENCE_THRESHOLD:
+            # Both below 0.6 — route to RESEARCH for knowledge expansion
             return RouteDecision(
-                mode=VoiceMode.SECURITY,
-                confidence=round(max(security_confidence, 0.3), 4),
-                reason=f"Below threshold ({CONFIDENCE_THRESHOLD}), defaulting to Security",
-                matched_keywords=tuple(security_matches[:5]),
+                mode=VoiceMode.RESEARCH,
+                confidence=round(max(research_confidence, 0.3), 4),
+                reason=f"Low confidence ({max(research_confidence, security_confidence):.2f} < {LOW_CONFIDENCE_THRESHOLD}), routing to Research",
+                matched_keywords=tuple((research_matches + security_matches)[:5]),
+                timestamp=datetime.now(timezone.utc).isoformat(),
+            )
+        else:
+            # Ambiguous (0.6-0.75) — ask clarification
+            return RouteDecision(
+                mode=VoiceMode.CLARIFICATION,
+                confidence=round(max(security_confidence, research_confidence), 4),
+                reason=f"Ambiguous ({max(security_confidence, research_confidence):.2f}). Did you mean a security operation or a research question?",
+                matched_keywords=tuple((security_matches + research_matches)[:5]),
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
 

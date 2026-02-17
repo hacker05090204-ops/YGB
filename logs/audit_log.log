@@ -3,3 +3,4 @@
 2026-02-15 05:36:48,151 [REPR-GUARD] BLOCKED: Decision token 'is_bug' in input #2
 2026-02-15 05:36:48,151 [REPR-GUARD] BLOCKED: Exploit pattern in input #3
 2026-02-15 05:36:48,151 [REPR-GUARD] BLOCKED: MODE-B token in input #4
+2026-02-17 07:43:40,104 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
