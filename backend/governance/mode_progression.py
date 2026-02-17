@@ -51,6 +51,8 @@ class GateMetrics:
     long_run_stable: bool = False   # 24h stability passed
     calibration_passed: bool = False # Deep audit passed
     integrity_score: float = 0.0    # ≥ 95 for B, ≥ 98 for C
+    precision_above_threshold: float = 0.0  # ≥ 0.95 for B, ≥ 0.97 for C
+    scope_engine_accuracy: float = 0.0      # ≥ 0.95 for B, ≥ 0.98 for C
 
 
 # =========================================================================
@@ -67,6 +69,8 @@ GATE_A_TO_B = {
     "require_determinism": True,
     "require_long_run_stable": True,
     "require_calibration": True,
+    "min_precision": 0.95,
+    "min_scope_accuracy": 0.95,
 }
 
 # MODE-B → MODE-C: lab autonomy entry (stricter)
@@ -79,6 +83,8 @@ GATE_B_TO_C = {
     "require_determinism": True,
     "require_long_run_stable": True,
     "require_calibration": True,
+    "min_precision": 0.97,
+    "min_scope_accuracy": 0.98,
 }
 
 # =========================================================================
@@ -234,6 +240,18 @@ class ModeProgressionController:
         if thresholds["require_calibration"] and \
                 not metrics.calibration_passed:
             failures.append("Calibration audit not passed")
+
+        if metrics.precision_above_threshold < thresholds.get("min_precision", 0.0):
+            failures.append(
+                f"Precision {metrics.precision_above_threshold:.4f} < "
+                f"{thresholds['min_precision']}"
+            )
+
+        if metrics.scope_engine_accuracy < thresholds.get("min_scope_accuracy", 0.0):
+            failures.append(
+                f"Scope engine accuracy {metrics.scope_engine_accuracy:.4f} < "
+                f"{thresholds['min_scope_accuracy']}"
+            )
 
         if failures:
             decision.reasons = failures

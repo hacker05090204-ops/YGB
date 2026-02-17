@@ -14,3 +14,7 @@
 {"failure_id": "FAIL_20260211122333", "failure_type": "calibration_break", "timestamp": "2026-02-11T12:23:33.455718", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}
 {"failure_id": "FAIL_20260211122349", "failure_type": "drift", "timestamp": "2026-02-11T12:23:49.122902", "details": {"drift_type": "accuracy", "value": 0.1}, "auto_mode_disabled": true}
 {"failure_id": "FAIL_20260211122349", "failure_type": "calibration_break", "timestamp": "2026-02-11T12:23:49.126546", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}
+{"failure_id": "FAIL_20260217075806", "failure_type": "drift", "timestamp": "2026-02-17T07:58:06.156925", "details": {"drift_type": "accuracy", "value": 0.1}, "auto_mode_disabled": true}
+{"failure_id": "FAIL_20260217075806", "failure_type": "calibration_break", "timestamp": "2026-02-17T07:58:06.161995", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}
+{"failure_id": "FAIL_20260217080332", "failure_type": "drift", "timestamp": "2026-02-17T08:03:32.655287", "details": {"drift_type": "accuracy", "value": 0.1}, "auto_mode_disabled": true}
+{"failure_id": "FAIL_20260217080332", "failure_type": "calibration_break", "timestamp": "2026-02-17T08:03:32.660020", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}

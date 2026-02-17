@@ -64,7 +64,23 @@
       "model_version": "1.0.0",
       "details": "weight=0.5",
       "timestamp": "2026-02-11T12:23:49.145778"
+    },
+    {
+      "action": "merged",
+      "local_checkpoint": "ckpt1",
+      "remote_checkpoint": "ckpt2",
+      "model_version": "1.0.0",
+      "details": "weight=0.5",
+      "timestamp": "2026-02-17T07:58:06.192769"
+    },
+    {
+      "action": "merged",
+      "local_checkpoint": "ckpt1",
+      "remote_checkpoint": "ckpt2",
+      "model_version": "1.0.0",
+      "details": "weight=0.5",
+      "timestamp": "2026-02-17T08:03:32.688948"
     }
   ],
-  "updated": "2026-02-11T12:23:49.145778"
+  "updated": "2026-02-17T08:03:32.688948"
 }
