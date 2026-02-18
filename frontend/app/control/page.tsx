@@ -510,6 +510,53 @@ export default function ControlPage() {
                             </div>
                         </div>
 
+                        {/* Distributed Training Panel */}
+                        <div className="mb-6 p-5 rounded-2xl bg-card/50 border border-border/50">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">
+                                    <Target className="w-4 h-4 text-violet-400" />
+                                </div>
+                                <div>
+                                    <h2 className="text-sm font-bold">Distributed Training</h2>
+                                    <p className="text-xs text-muted-foreground">Single-Field Multi-GPU</p>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Active Field</p>
+                                    <p className="text-sm font-bold text-violet-400">Web/Client</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">RTX 3050</p>
+                                    <p className="text-lg font-bold text-emerald-400">—</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">RTX 2050 ×2</p>
+                                    <p className="text-lg font-bold text-emerald-400">—</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Mac M1</p>
+                                    <p className="text-lg font-bold text-emerald-400">—</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Merge Ready</p>
+                                    <p className="text-lg font-bold text-amber-400">—</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Node Contrib</p>
+                                    <p className="text-lg font-bold text-blue-400">—</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Stability</p>
+                                    <p className="text-lg font-bold text-cyan-400">—</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Mode</p>
+                                    <p className="text-sm font-bold text-zinc-400">A — Lab</p>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Voice Controls Row */}
                         <div className="mb-6 p-4 rounded-2xl bg-card/50 border border-border/50">
                             <VoiceControls
