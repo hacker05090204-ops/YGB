@@ -19,6 +19,13 @@ from typing import List, Dict, Optional
 
 logger = logging.getLogger("parallel_scheduler")
 
+# Lifecycle phase gate — prevents backward execution
+try:
+    from backend.mode.mode_orchestrator import ModeOrchestrator, LifecycleViolation
+    _HAS_LIFECYCLE = True
+except ImportError:
+    _HAS_LIFECYCLE = False
+
 
 @dataclass
 class TrainingSplit:
@@ -59,6 +66,14 @@ class ParallelScheduler:
 
     def create_splits(self, total_samples: int) -> List[TrainingSplit]:
         """Create deterministic data splits."""
+        # Lifecycle gate: block if frozen or backward phase
+        if _HAS_LIFECYCLE:
+            orch = ModeOrchestrator.get()
+            if not orch.is_training_allowed():
+                raise LifecycleViolation(
+                    "LIFECYCLE_VIOLATION: Training scheduler blocked — "
+                    f"system is {orch.current_name}"
+                )
         self.splits.clear()
         samples_per_split = total_samples // self.num_splits
         remainder = total_samples % self.num_splits
@@ -112,6 +127,14 @@ class ParallelScheduler:
 
     def merge_results(self) -> MergeResult:
         """Deterministic merge of split results."""
+        # Lifecycle gate: block merge if frozen
+        if _HAS_LIFECYCLE:
+            orch = ModeOrchestrator.get()
+            if not orch.is_training_allowed():
+                raise LifecycleViolation(
+                    "LIFECYCLE_VIOLATION: Merge blocked — "
+                    f"system is {orch.current_name}"
+                )
         completed = [s for s in self.splits if s.status == "completed"]
 
         if not completed:
