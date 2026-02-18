@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { cn } from "@/lib/utils"
-import { Activity, Shield, AlertTriangle } from "lucide-react"
+import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck } from "lucide-react"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -62,6 +62,16 @@ export default function ControlPage() {
     const [voiceProcessing, setVoiceProcessing] = useState(false)
     const [voiceMode, setVoiceMode] = useState<VoiceModeType>("SECURITY")
 
+    // Runtime Mode Control (Train/Hunt separation)
+    const [runtimeMode, setRuntimeMode] = useState<"IDLE" | "TRAIN" | "HUNT">("IDLE")
+    const [modeLoading, setModeLoading] = useState(false)
+    const [accuracySnapshot, setAccuracySnapshot] = useState<{
+        precision: number; recall: number; ece_score: number;
+        dup_suppression_rate: number; scope_compliance: number;
+    } | null>(null)
+    const [targetsActive, setTargetsActive] = useState(0)
+    const maxTargets = 5
+
     // Initialize dashboard
     useEffect(() => {
         const initDashboard = async () => {
@@ -91,6 +101,59 @@ export default function ControlPage() {
         }
 
         initDashboard()
+    }, [])
+
+    // Poll accuracy snapshot
+    useEffect(() => {
+        const fetchAccuracy = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/accuracy/snapshot`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setAccuracySnapshot(data)
+                }
+            } catch { /* offline fallback */ }
+        }
+        fetchAccuracy()
+        const interval = setInterval(fetchAccuracy, 10000)
+        return () => clearInterval(interval)
+    }, [])
+
+    // Mode transition handlers
+    const handleStartTraining = useCallback(async () => {
+        setModeLoading(true)
+        try {
+            const res = await fetch(`${API_BASE}/api/mode/train/start`, { method: "POST" })
+            if (res.ok) setRuntimeMode("TRAIN")
+        } catch (e) { console.error("Start training failed:", e) }
+        finally { setModeLoading(false) }
+    }, [])
+
+    const handleStopTraining = useCallback(async () => {
+        setModeLoading(true)
+        try {
+            const res = await fetch(`${API_BASE}/api/mode/train/stop`, { method: "POST" })
+            if (res.ok) setRuntimeMode("IDLE")
+        } catch (e) { console.error("Stop training failed:", e) }
+        finally { setModeLoading(false) }
+    }, [])
+
+    const handleStartHunting = useCallback(async () => {
+        setModeLoading(true)
+        try {
+            const res = await fetch(`${API_BASE}/api/mode/hunt/start`, { method: "POST" })
+            if (res.ok) setRuntimeMode("HUNT")
+        } catch (e) { console.error("Start hunting failed:", e) }
+        finally { setModeLoading(false) }
+    }, [])
+
+    const handleStopHunting = useCallback(async () => {
+        setModeLoading(true)
+        try {
+            const res = await fetch(`${API_BASE}/api/mode/hunt/stop`, { method: "POST" })
+            if (res.ok) setRuntimeMode("IDLE")
+        } catch (e) { console.error("Stop hunting failed:", e) }
+        finally { setModeLoading(false) }
     }, [])
 
     // Mode Change Handler
@@ -344,6 +407,108 @@ export default function ControlPage() {
                 {/* Main Content */}
                 <main className="flex-1 p-6">
                     <div className="max-w-[1600px] mx-auto">
+
+                        {/* Runtime Mode Control Panel */}
+                        <div className="mb-6 p-5 rounded-2xl bg-card/50 border border-border/50">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className={cn(
+                                        "w-8 h-8 rounded-lg flex items-center justify-center",
+                                        runtimeMode === "TRAIN" ? "bg-blue-500/20" :
+                                            runtimeMode === "HUNT" ? "bg-red-500/20" : "bg-zinc-500/20"
+                                    )}>
+                                        {runtimeMode === "TRAIN" ? <BookOpen className="w-4 h-4 text-blue-400" /> :
+                                            runtimeMode === "HUNT" ? <Crosshair className="w-4 h-4 text-red-400" /> :
+                                                <Gauge className="w-4 h-4 text-zinc-400" />}
+                                    </div>
+                                    <div>
+                                        <h2 className="text-sm font-bold">Runtime Mode</h2>
+                                        <p className={cn(
+                                            "text-xs font-medium",
+                                            runtimeMode === "TRAIN" ? "text-blue-400" :
+                                                runtimeMode === "HUNT" ? "text-red-400" : "text-zinc-400"
+                                        )}>
+                                            {runtimeMode === "TRAIN" ? "LAB TRAINING" :
+                                                runtimeMode === "HUNT" ? "HUNT EXECUTION" : "IDLE"}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    {runtimeMode === "IDLE" ? (
+                                        <>
+                                            <button
+                                                onClick={handleStartTraining}
+                                                disabled={modeLoading}
+                                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium transition-colors disabled:opacity-50"
+                                            >
+                                                <Play className="w-3 h-3" /> Start Training
+                                            </button>
+                                            <button
+                                                onClick={handleStartHunting}
+                                                disabled={modeLoading}
+                                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-medium transition-colors disabled:opacity-50"
+                                            >
+                                                <Crosshair className="w-3 h-3" /> Start Hunting
+                                            </button>
+                                        </>
+                                    ) : runtimeMode === "TRAIN" ? (
+                                        <button
+                                            onClick={handleStopTraining}
+                                            disabled={modeLoading}
+                                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-xs font-medium transition-colors disabled:opacity-50"
+                                        >
+                                            <Square className="w-3 h-3" /> Stop Training
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleStopHunting}
+                                            disabled={modeLoading}
+                                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-xs font-medium transition-colors disabled:opacity-50"
+                                        >
+                                            <Square className="w-3 h-3" /> Stop Hunting
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Metrics Strip */}
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Lab Accuracy</p>
+                                    <p className="text-lg font-bold text-emerald-400">
+                                        {accuracySnapshot ? `${(accuracySnapshot.precision * 100).toFixed(1)}%` : "—"}
+                                    </p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Precision</p>
+                                    <p className="text-lg font-bold text-blue-400">
+                                        {accuracySnapshot ? `${(accuracySnapshot.precision * 100).toFixed(1)}%` : "—"}
+                                    </p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dup Suppression</p>
+                                    <p className="text-lg font-bold text-purple-400">
+                                        {accuracySnapshot ? `${(accuracySnapshot.dup_suppression_rate * 100).toFixed(0)}%` : "—"}
+                                    </p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Scope Compliance</p>
+                                    <p className="text-lg font-bold text-cyan-400">
+                                        {accuracySnapshot ? `${(accuracySnapshot.scope_compliance * 100).toFixed(0)}%` : "—"}
+                                    </p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Targets Active</p>
+                                    <p className="text-lg font-bold">
+                                        <span className={runtimeMode === "HUNT" ? "text-red-400" : "text-zinc-400"}>
+                                            {targetsActive}
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">/{maxTargets}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
 
                         {/* Voice Controls Row */}
                         <div className="mb-6 p-4 rounded-2xl bg-card/50 border border-border/50">
