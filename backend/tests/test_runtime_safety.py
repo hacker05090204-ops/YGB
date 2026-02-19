@@ -78,7 +78,7 @@ class RuntimeSafetyTest:
         payload = {
             "schema_version": EXPECTED_SCHEMA_VERSION,
             "determinism_status": True,
-            "freeze_status": True,
+            "freeze_status": False,
             "precision": 0.96500000,
             "recall": 0.93000000,
             "kl_divergence": 0.01500000,
@@ -236,21 +236,36 @@ class RuntimeSafetyTest:
                   "Concurrent validation: at least one returns ok")
 
     def test_thermal_spike_simulation(self):
-        """Temperature thresholds in telemetry data are preserved."""
+        """Phase 9: GPU temperature > 88C triggers thermal halt."""
+        # Test 1: 90C should be REJECTED (thermal halt)
         self._remove_last_seen()
         payload = self._make_valid_payload()
         payload['gpu_temperature'] = 90.0
-        payload['monotonic_timestamp'] = 100000001  # Fresh timestamp
+        payload['monotonic_timestamp'] = 100000001
         payload['crc32'] = compute_payload_crc(payload)
         payload['hmac'] = compute_payload_hmac(payload)
-
         self._write_telemetry(payload)
 
         result = validate_telemetry()
-        self.test(result['status'] == 'ok',
-                  "Thermal spike: valid telemetry accepted")
-        self.test(result['data']['gpu_temperature'] == 90.0,
-                  "Thermal spike: temperature preserved at 90C")
+        self.test(result['status'] == 'corrupted',
+                  "Thermal spike: 90C rejected")
+        self.test(result.get('reason') == 'thermal_limit',
+                  "Thermal spike: reason=thermal_limit")
+
+        # Test 2: 85C should be ACCEPTED (under limit)
+        self._remove_last_seen()
+        payload2 = self._make_valid_payload()
+        payload2['gpu_temperature'] = 85.0
+        payload2['monotonic_timestamp'] = 100000002
+        payload2['crc32'] = compute_payload_crc(payload2)
+        payload2['hmac'] = compute_payload_hmac(payload2)
+        self._write_telemetry(payload2)
+
+        result2 = validate_telemetry()
+        self.test(result2['status'] == 'ok',
+                  "Thermal safe: 85C accepted")
+        self.test(result2['data']['gpu_temperature'] == 85.0,
+                  "Thermal safe: temperature preserved at 85C")
 
     def test_runtime_demotion_after_corruption(self):
         """Corrupted state returns error, never partial data."""
@@ -313,7 +328,7 @@ class RuntimeSafetyTest:
                   "Round-trip: schema_version preserved")
         self.test(data.get('determinism_status') is True,
                   "Round-trip: determinism_status preserved")
-        self.test(data.get('freeze_status') is True,
+        self.test(data.get('freeze_status') is False,
                   "Round-trip: freeze_status preserved")
         self.test(data.get('epoch') == 42,
                   "Round-trip: epoch preserved")

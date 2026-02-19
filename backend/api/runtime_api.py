@@ -289,6 +289,25 @@ def validate_telemetry() -> dict:
             "detail": "determinism_status is false"
         }
 
+    # Step 9: THERMAL HALT — reject if GPU temperature > 88°C
+    gpu_temp = data.get('gpu_temperature', 0.0)
+    if isinstance(gpu_temp, (int, float)) and gpu_temp > 88.0:
+        logger.error("THERMAL HALT: gpu_temperature=%.1f > 88.0°C", gpu_temp)
+        return {
+            "status": "corrupted",
+            "reason": "thermal_limit",
+            "detail": f"GPU temperature {gpu_temp:.1f}°C exceeds 88°C safety limit"
+        }
+
+    # Step 10: GOVERNANCE LOCK — reject if freeze_status is active
+    if data.get('freeze_status') is True:
+        logger.error("GOVERNANCE LOCK ACTIVE: freeze_status=true — training blocked")
+        return {
+            "status": "corrupted",
+            "reason": "governance_lock",
+            "detail": "Governance freeze is active — training halted"
+        }
+
     # All checks passed — update last_seen atomically
     if monotonic_ts > last_seen:
         save_last_seen_timestamp(monotonic_ts)
