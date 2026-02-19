@@ -91,12 +91,11 @@ def compute_payload_crc(payload: dict) -> int:
 
 def load_hmac_key() -> bytes:
     """Load HMAC secret key. Priority: env var > file.
-    
-    1. Check YGB_HMAC_SECRET environment variable
-    2. Fallback to config/hmac_secret.key file
-    3. If neither → return empty bytes (fail closed)
+
+    In CI (CI env var set): raises RuntimeError if no secret found.
+    Locally: returns empty bytes on failure (fail closed).
     """
-    # Priority 1: Environment variable
+    # Priority 1: Environment variable (works in CI and local)
     env_secret = os.environ.get('YGB_HMAC_SECRET', '').strip()
     if env_secret:
         try:
@@ -105,19 +104,22 @@ def load_hmac_key() -> bytes:
             # Treat as raw UTF-8 key if not valid hex
             return env_secret.encode('utf-8')
 
-    # Priority 2: Key file
+    # Priority 2: Key file (local development only)
     try:
         with open(HMAC_KEY_PATH, 'r') as f:
             hex_key = f.read().strip()
         if not hex_key:
-            logger.error("HMAC secret not configured: key file empty")
-            return b''
+            raise ValueError("key file empty")
         return bytes.fromhex(hex_key)
-    except FileNotFoundError:
-        logger.error("HMAC secret not configured: no env var YGB_HMAC_SECRET and no file %s", HMAC_KEY_PATH)
-        return b''
-    except ValueError as e:
-        logger.error("HMAC key hex decode failed: %s", e)
+    except (FileNotFoundError, ValueError) as e:
+        # In CI, this is fatal
+        if os.environ.get('CI'):
+            raise RuntimeError(
+                f"HMAC secret not configured: {e}. "
+                "Set YGB_HMAC_SECRET in GitHub Secrets."
+            )
+        # Locally, log and return empty (fail closed)
+        logger.error("HMAC secret not configured: %s", e)
         return b''
 
 
