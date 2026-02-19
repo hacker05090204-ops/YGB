@@ -55,46 +55,12 @@ jobs:
           coverage report || true
 
       # ========== C++ COVERAGE ==========
-      - name: Compile C++ with coverage flags
-        id: cpp_build
-        continue-on-error: true
-        run: |
-          echo "=== C++ COVERAGE BUILD ==="
-          mkdir -p build_coverage
-          # Compile all native .cpp files with self-tests enabled
-          for src in $(find native/ -name '*.cpp' -type f); do
-            name=$(basename "$src" .cpp)
-            dir=$(dirname "$src")
-            echo "Compiling: $src"
-            g++ -std=c++17 -O0 --coverage -fprofile-arcs -ftest-coverage \
-              -DRUN_SELF_TESTS \
-              -o "build_coverage/${name}" "$src" 2>/dev/null || \
-              echo "  WARN: $src did not compile standalone (expected for includes)"
-          done
-
-      - name: Run C++ self-tests
-        id: cpp_test
-        continue-on-error: true
-        run: |
-          echo "=== C++ SELF-TESTS ==="
-          cd build_coverage
-          for bin in *; do
-            if [ -x "$bin" ]; then
-              echo "Running: $bin"
-              ./"$bin" || echo "  WARN: $bin returned non-zero"
-            fi
-          done
-
-      - name: C++ coverage report
+      - name: Build and run C++ self-tests with coverage
         id: cpp_cov
         continue-on-error: true
         run: |
-          echo "=== C++ COVERAGE ==="
-          gcovr -r . \
-            --filter native/ \
-            --exclude-directories=backend \
-            --json coverage_cpp.json \
-            --print-summary || echo "gcovr failed — no coverage data"
+          chmod +x scripts/build_cpp_tests.sh
+          bash scripts/build_cpp_tests.sh
 
       # ========== JS/TS COVERAGE ==========
       - name: JS/TS coverage check (>=80%)

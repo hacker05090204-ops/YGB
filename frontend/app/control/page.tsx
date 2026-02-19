@@ -72,6 +72,22 @@ export default function ControlPage() {
     const [targetsActive, setTargetsActive] = useState(0)
     const maxTargets = 5
 
+    // Runtime telemetry — polled from /runtime/status (C++ authoritative source)
+    const [runtimeStatus, setRuntimeStatus] = useState<{
+        status: string;
+        runtime?: {
+            total_epochs: number; completed_epochs: number; current_loss: number;
+            precision: number; ece: number; drift_kl: number; duplicate_rate: number;
+            gpu_util: number; cpu_util: number; temperature: number;
+            determinism_status: boolean; freeze_status: boolean;
+            mode: string; progress_pct: number; loss_trend: number;
+        };
+        determinism_ok?: boolean;
+        stale?: boolean;
+        last_update_ms?: number;
+        signature?: string;
+    } | null>(null)
+
     // Initialize dashboard
     useEffect(() => {
         const initDashboard = async () => {
@@ -116,6 +132,22 @@ export default function ControlPage() {
         }
         fetchAccuracy()
         const interval = setInterval(fetchAccuracy, 10000)
+        return () => clearInterval(interval)
+    }, [])
+
+    // Poll runtime status from backend (every 30s)
+    useEffect(() => {
+        const fetchRuntimeStatus = async () => {
+            try {
+                const res = await fetch(`${API_BASE}/runtime/status`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setRuntimeStatus(data)
+                }
+            } catch { /* backend offline — keep last known state */ }
+        }
+        fetchRuntimeStatus()
+        const interval = setInterval(fetchRuntimeStatus, 30000)
         return () => clearInterval(interval)
     }, [])
 
@@ -498,7 +530,7 @@ export default function ControlPage() {
                                         {accuracySnapshot ? `${(accuracySnapshot.scope_compliance * 100).toFixed(0)}%` : "—"}
                                     </p>
                                 </div>
-                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                <div className="p-3 rounded-xl bg-background/50 border border-border/30" id="metric-targets">
                                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Targets Active</p>
                                     <p className="text-lg font-bold">
                                         <span className={runtimeMode === "HUNT" ? "text-red-400" : "text-zinc-400"}>
@@ -508,6 +540,118 @@ export default function ControlPage() {
                                     </p>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* ═══ Runtime Telemetry Panel ═══ */}
+                        <div className="mb-6 p-5 rounded-2xl bg-card/50 border border-border/50" id="runtime-telemetry">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                                        <Activity className="w-4 h-4 text-emerald-400" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-sm font-bold">Runtime Telemetry</h2>
+                                        <p className="text-xs text-muted-foreground">C++ Authoritative Source</p>
+                                    </div>
+                                </div>
+                                {runtimeStatus?.stale && (
+                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium animate-pulse">
+                                        <AlertTriangle className="w-3 h-3" />
+                                        STALE DATA
+                                    </div>
+                                )}
+                                {runtimeStatus?.status === "awaiting_data" && (
+                                    <div className="px-3 py-1 rounded-full bg-zinc-500/20 text-zinc-400 text-xs font-medium">
+                                        Awaiting Training Start
+                                    </div>
+                                )}
+                            </div>
+
+                            {runtimeStatus?.status === "active" && runtimeStatus.runtime ? (
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Epochs</p>
+                                        <p className="text-lg font-bold text-violet-400">
+                                            {runtimeStatus.runtime.completed_epochs}/{runtimeStatus.runtime.total_epochs}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Progress</p>
+                                        <p className="text-lg font-bold text-blue-400">
+                                            {runtimeStatus.runtime.progress_pct.toFixed(1)}%
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Loss</p>
+                                        <p className="text-lg font-bold text-amber-400">
+                                            {runtimeStatus.runtime.current_loss.toFixed(4)}
+                                            <span className={cn("text-xs ml-1", runtimeStatus.runtime.loss_trend < 0 ? "text-emerald-400" : "text-red-400")}>
+                                                {runtimeStatus.runtime.loss_trend < 0 ? "↓" : "↑"}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Precision</p>
+                                        <p className="text-lg font-bold text-emerald-400">
+                                            {(runtimeStatus.runtime.precision * 100).toFixed(1)}%
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">ECE</p>
+                                        <p className="text-lg font-bold text-cyan-400">
+                                            {runtimeStatus.runtime.ece.toFixed(4)}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Drift KL</p>
+                                        <p className="text-lg font-bold text-purple-400">
+                                            {runtimeStatus.runtime.drift_kl.toFixed(4)}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">GPU Util</p>
+                                        <p className="text-lg font-bold text-orange-400">
+                                            {runtimeStatus.runtime.gpu_util.toFixed(0)}%
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">CPU Util</p>
+                                        <p className="text-lg font-bold text-sky-400">
+                                            {runtimeStatus.runtime.cpu_util.toFixed(0)}%
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Temp</p>
+                                        <p className={cn("text-lg font-bold", runtimeStatus.runtime.temperature > 85 ? "text-red-400" : "text-emerald-400")}>
+                                            {runtimeStatus.runtime.temperature.toFixed(0)}°C
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dup Rate</p>
+                                        <p className="text-lg font-bold text-pink-400">
+                                            {(runtimeStatus.runtime.duplicate_rate * 100).toFixed(1)}%
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Determinism</p>
+                                        <p className={cn("text-lg font-bold", runtimeStatus.runtime.determinism_status ? "text-emerald-400" : "text-red-400")}>
+                                            {runtimeStatus.runtime.determinism_status ? "✓ OK" : "✗ FAIL"}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Freeze</p>
+                                        <p className={cn("text-lg font-bold", runtimeStatus.runtime.freeze_status ? "text-emerald-400" : "text-amber-400")}>
+                                            {runtimeStatus.runtime.freeze_status ? "✓ Valid" : "⚠ Invalid"}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center py-6 text-muted-foreground text-sm">
+                                    {runtimeStatus?.status === "error"
+                                        ? "⚠ Error reading runtime state"
+                                        : "Waiting for training telemetry..."}
+                                </div>
+                            )}
                         </div>
 
                         {/* Distributed Training Panel */}
