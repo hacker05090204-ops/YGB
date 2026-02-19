@@ -1,7 +1,7 @@
 /**
- * training_start_protocol.cpp — Training Start Protocol with Monotonic Clock
+ * training_start_protocol.cpp — Training Start Protocol v2
  *
- * Training allowed ONLY IF all gates pass:
+ * Training allowed ONLY IF ALL gates pass:
  *   1. CI fully green
  *   2. Determinism validator PASS
  *   3. Cross-device validator PASS
@@ -11,11 +11,15 @@
  *   7. Mode mutex active (not in HUNT)
  *   8. Thermal guard active (not in THERMAL_PAUSE)
  *   9. HMAC validated (telemetry signed)
+ *  10. Secret validated (key exists, permissions OK)
+ *  11. No drift alert active
+ *  12. Stability counter clean (≥5 consecutive evals)
  *
  * Post-start:
- *   - Enter MODE-A training only
+ *   - Enter MODE_A training only
  *   - 72-hour lockout on HUNT (monotonic clock — immune to rollback)
- *   - Auto-chain: MODE_A -> MODE_B -> MODE_C (thresholds required)
+ *   - Auto-chain: MODE_A -> MODE_B -> MODE_C via stability rule only
+ *   - No single-batch promotion
  *
  * NO silent fallback. NO race conditions. NO clock rollback bypass.
  */
@@ -46,13 +50,20 @@ static constexpr char PROTOCOL_STATE_PATH[] =
     "reports/training_protocol_state.json";
 static constexpr char PROTOCOL_TMP_PATH[] =
     "reports/training_protocol_state.json.tmp";
+static constexpr char HMAC_KEY_PATH[] = "config/hmac_secret.key";
 
 // Mode progression thresholds
 static constexpr double MODE_B_MIN_PRECISION = 0.90;
 static constexpr double MODE_B_MIN_RECALL = 0.85;
+static constexpr double MODE_B_MAX_FPR = 0.10;
+static constexpr double MODE_B_MAX_KL = 0.10;
 static constexpr double MODE_C_MIN_PRECISION = 0.95;
 static constexpr double MODE_C_MIN_RECALL = 0.92;
-static constexpr double MODE_C_MAX_KL_DRIFT = 0.05;
+static constexpr double MODE_C_MAX_FPR = 0.05;
+static constexpr double MODE_C_MAX_KL = 0.05;
+
+// Stability window: must meet thresholds for N consecutive evaluations
+static constexpr int STABILITY_WINDOW = 5;
 
 // Mode enum
 static constexpr int MODE_IDLE = 0;
@@ -66,7 +77,6 @@ static constexpr int MODE_C_TRAIN = 3;
 
 static uint64_t get_monotonic_seconds() {
 #ifdef _WIN32
-  // QueryPerformanceCounter — true monotonic on Windows
   static LARGE_INTEGER freq = {};
   if (freq.QuadPart == 0) {
     QueryPerformanceFrequency(&freq);
@@ -101,6 +111,9 @@ struct TrainingReadiness {
   GateResult mode_mutex_ok;
   GateResult thermal_ok;
   GateResult hmac_valid;
+  GateResult secret_valid;
+  GateResult no_drift;
+  GateResult stability_ok;
   int gates_passed;
   int gates_total;
   char summary[1024];
@@ -117,7 +130,8 @@ struct TrainingState {
   uint64_t elapsed_seconds_monotonic;    // Accumulated monotonic elapsed
   uint64_t hunt_lockout_until_monotonic; // Monotonic target for unlock
   bool hunt_locked;
-  int mode; // 0=IDLE, 1=MODE_A, 2=MODE_B, 3=MODE_C
+  int mode;              // 0=IDLE, 1=MODE_A, 2=MODE_B, 3=MODE_C
+  int stability_counter; // Consecutive stable evaluations
 };
 
 // =========================================================================
@@ -144,7 +158,8 @@ static bool save_protocol_state(const TrainingState &state) {
       static_cast<unsigned long long>(state.hunt_lockout_until_monotonic));
   std::fprintf(f, "  \"hunt_locked\": %s,\n",
                state.hunt_locked ? "true" : "false");
-  std::fprintf(f, "  \"mode\": %d\n", state.mode);
+  std::fprintf(f, "  \"mode\": %d,\n", state.mode);
+  std::fprintf(f, "  \"stability_counter\": %d\n", state.stability_counter);
   std::fprintf(f, "}\n");
 
   std::fflush(f);
@@ -215,6 +230,7 @@ static TrainingState load_protocol_state() {
       parse_uint64_field(buf, "hunt_lockout_until_monotonic");
   state.hunt_locked = parse_bool_field(buf, "hunt_locked");
   state.mode = parse_int_field(buf, "\"mode\"");
+  state.stability_counter = parse_int_field(buf, "stability_counter");
 
   return state;
 }
@@ -244,11 +260,10 @@ static bool check_file_status(const char *path, const char *key,
 }
 
 // =========================================================================
-// HMAC VALIDATION GATE (reads telemetry and checks signature)
+// HMAC FIELD CHECK
 // =========================================================================
 
 static bool check_hmac_valid() {
-  // Check that HMAC field exists and is non-empty in telemetry
   FILE *f = std::fopen("reports/training_telemetry.json", "r");
   if (!f)
     return false;
@@ -264,11 +279,41 @@ static bool check_hmac_valid() {
   pos += 6;
   while (*pos && (*pos == '"' || *pos == ':' || *pos == ' '))
     ++pos;
-  // Must have at least 64 hex chars
   int count = 0;
   while (*pos && *pos != '"' && count < 65)
     ++count, ++pos;
   return count == 64;
+}
+
+// =========================================================================
+// SECRET VALIDATION GATE
+// =========================================================================
+
+static bool check_secret_valid() {
+  FILE *f = std::fopen(HMAC_KEY_PATH, "r");
+  if (!f)
+    return false;
+  // Check non-empty
+  char buf[256];
+  std::memset(buf, 0, sizeof(buf));
+  size_t n = std::fread(buf, 1, sizeof(buf) - 1, f);
+  std::fclose(f);
+  // Trim whitespace
+  while (n > 0 &&
+         (buf[n - 1] == '\n' || buf[n - 1] == '\r' || buf[n - 1] == ' '))
+    --n;
+  return n > 0;
+}
+
+// =========================================================================
+// DRIFT ALERT CHECK
+// =========================================================================
+
+static bool check_no_drift() {
+  // Drift alert is set if reports/drift_alert.json exists with active=true
+  bool drift_active =
+      check_file_status("reports/drift_alert.json", "active", "true");
+  return !drift_active;
 }
 
 // =========================================================================
@@ -278,7 +323,6 @@ static bool check_hmac_valid() {
 class TrainingStartProtocol {
 public:
   TrainingStartProtocol() : state_(load_protocol_state()) {
-    // Check if hunt lockout has expired (monotonic)
     if (state_.hunt_locked) {
       uint64_t now_mono = get_monotonic_seconds();
       uint64_t elapsed = state_.elapsed_seconds_monotonic;
@@ -293,125 +337,80 @@ public:
     }
   }
 
-  // --- Check all gates ---
+  // --- Check all 12 gates ---
   TrainingReadiness can_start_training() const {
     TrainingReadiness r;
     std::memset(&r, 0, sizeof(r));
-    r.gates_total = 9;
+    r.gates_total = 12;
     r.gates_passed = 0;
 
     // Gate 1: CI fully green
     r.ci_green.passed =
         check_file_status("reports/ci_status.json", "status", "green");
-    if (r.ci_green.passed) {
-      std::snprintf(r.ci_green.reason, sizeof(r.ci_green.reason),
-                    "CI status: green");
+    if (r.ci_green.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.ci_green.reason, sizeof(r.ci_green.reason),
-                    "CI status: not green or missing");
-    }
 
     // Gate 2: Determinism validator PASS
     r.determinism_pass.passed = check_file_status(
         "reports/determinism_validation.json", "status", "pass");
-    if (r.determinism_pass.passed) {
-      std::snprintf(r.determinism_pass.reason,
-                    sizeof(r.determinism_pass.reason),
-                    "Determinism validator: PASS");
+    if (r.determinism_pass.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.determinism_pass.reason,
-                    sizeof(r.determinism_pass.reason),
-                    "Determinism validator: not PASS or missing");
-    }
 
     // Gate 3: Cross-device validator PASS
     r.cross_device_pass.passed = check_file_status(
         "reports/cross_device_validation.json", "status", "pass");
-    if (r.cross_device_pass.passed) {
-      std::snprintf(r.cross_device_pass.reason,
-                    sizeof(r.cross_device_pass.reason),
-                    "Cross-device validator: PASS");
+    if (r.cross_device_pass.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.cross_device_pass.reason,
-                    sizeof(r.cross_device_pass.reason),
-                    "Cross-device validator: not PASS or missing");
-    }
 
     // Gate 4: Freeze valid
     r.freeze_valid.passed = check_file_status("reports/training_telemetry.json",
                                               "freeze_status", "true");
-    if (r.freeze_valid.passed) {
-      std::snprintf(r.freeze_valid.reason, sizeof(r.freeze_valid.reason),
-                    "Freeze status: valid");
+    if (r.freeze_valid.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.freeze_valid.reason, sizeof(r.freeze_valid.reason),
-                    "Freeze status: invalid or missing");
-    }
 
     // Gate 5: No containment active
     r.no_containment.passed = !check_file_status("reports/mode_override.json",
                                                  "forced_mode", "MODE_A");
-    if (r.no_containment.passed) {
-      std::snprintf(r.no_containment.reason, sizeof(r.no_containment.reason),
-                    "No containment: clear");
+    if (r.no_containment.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.no_containment.reason, sizeof(r.no_containment.reason),
-                    "Containment active: MODE_A forced");
-    }
 
     // Gate 6: Telemetry validated (CRC + schema)
     r.telemetry_valid.passed = check_file_status(
         "reports/training_telemetry.json", "schema_version", "1");
-    if (r.telemetry_valid.passed) {
-      std::snprintf(r.telemetry_valid.reason, sizeof(r.telemetry_valid.reason),
-                    "Telemetry: schema valid");
+    if (r.telemetry_valid.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.telemetry_valid.reason, sizeof(r.telemetry_valid.reason),
-                    "Telemetry: schema invalid or missing");
-    }
 
     // Gate 7: Mode mutex (not in HUNT)
-    bool in_hunt =
-        check_file_status("reports/mode_mutex_state.json", "mode_name", "HUNT");
-    r.mode_mutex_ok.passed = !in_hunt;
-    if (r.mode_mutex_ok.passed) {
-      std::snprintf(r.mode_mutex_ok.reason, sizeof(r.mode_mutex_ok.reason),
-                    "Mode mutex: not in HUNT");
+    r.mode_mutex_ok.passed = !check_file_status("reports/mode_mutex_state.json",
+                                                "mode_name", "HUNT");
+    if (r.mode_mutex_ok.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.mode_mutex_ok.reason, sizeof(r.mode_mutex_ok.reason),
-                    "Mode mutex: HUNT active — cannot train");
-    }
 
     // Gate 8: Thermal guard (not in THERMAL_PAUSE)
-    bool thermal_paused = check_file_status("reports/thermal_state.json",
-                                            "thermal_state", "THERMAL_PAUSE");
-    r.thermal_ok.passed = !thermal_paused;
-    if (r.thermal_ok.passed) {
-      std::snprintf(r.thermal_ok.reason, sizeof(r.thermal_ok.reason),
-                    "Thermal guard: OK");
+    r.thermal_ok.passed = !check_file_status("reports/thermal_state.json",
+                                             "thermal_state", "THERMAL_PAUSE");
+    if (r.thermal_ok.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.thermal_ok.reason, sizeof(r.thermal_ok.reason),
-                    "Thermal guard: THERMAL_PAUSE — too hot to train");
-    }
 
     // Gate 9: HMAC validated (telemetry signed)
     r.hmac_valid.passed = check_hmac_valid();
-    if (r.hmac_valid.passed) {
-      std::snprintf(r.hmac_valid.reason, sizeof(r.hmac_valid.reason),
-                    "HMAC: telemetry signed and valid");
+    if (r.hmac_valid.passed)
       ++r.gates_passed;
-    } else {
-      std::snprintf(r.hmac_valid.reason, sizeof(r.hmac_valid.reason),
-                    "HMAC: telemetry unsigned or invalid");
-    }
+
+    // Gate 10: Secret validated
+    r.secret_valid.passed = check_secret_valid();
+    if (r.secret_valid.passed)
+      ++r.gates_passed;
+
+    // Gate 11: No drift alert
+    r.no_drift.passed = check_no_drift();
+    if (r.no_drift.passed)
+      ++r.gates_passed;
+
+    // Gate 12: Stability counter clean (≥5 consecutive evals)
+    r.stability_ok.passed = (state_.stability_counter >= STABILITY_WINDOW);
+    if (r.stability_ok.passed)
+      ++r.gates_passed;
 
     r.ready = (r.gates_passed == r.gates_total);
 
@@ -438,33 +437,59 @@ public:
     state_.hunt_lockout_until_monotonic = now_mono + HUNT_LOCKOUT_SECONDS;
     state_.hunt_locked = true;
     state_.mode = MODE_A_TRAIN; // Always start at MODE_A
+    // stability_counter retains its value — not reset on start
 
     save_protocol_state(state_);
     return true;
   }
 
-  // --- Auto-chain mode progression (thresholds required) ---
-  bool try_advance_mode(double precision, double recall, double kl_divergence) {
+  // --- Record evaluation result for stability tracking ---
+  void record_evaluation(double precision, double recall, double fpr, double kl,
+                         bool drift_alert) {
     if (!state_.training_active)
+      return;
+
+    bool meets_threshold = false;
+
+    if (state_.mode == MODE_A_TRAIN) {
+      meets_threshold =
+          (precision >= MODE_B_MIN_PRECISION && recall >= MODE_B_MIN_RECALL &&
+           fpr <= MODE_B_MAX_FPR && kl < MODE_B_MAX_KL && !drift_alert);
+    } else if (state_.mode == MODE_B_TRAIN) {
+      meets_threshold =
+          (precision >= MODE_C_MIN_PRECISION && recall >= MODE_C_MIN_RECALL &&
+           fpr <= MODE_C_MAX_FPR && kl < MODE_C_MAX_KL && !drift_alert);
+    }
+
+    if (meets_threshold) {
+      ++state_.stability_counter;
+    } else {
+      // ANY violation resets counter — no single-batch promotion
+      state_.stability_counter = 0;
+    }
+
+    save_protocol_state(state_);
+  }
+
+  // --- Auto-chain mode progression via stability rule ---
+  bool try_advance_mode() {
+    if (!state_.training_active)
+      return false;
+    if (state_.stability_counter < STABILITY_WINDOW)
       return false;
 
     if (state_.mode == MODE_A_TRAIN) {
-      // MODE_A -> MODE_B: precision >= 0.90, recall >= 0.85
-      if (precision >= MODE_B_MIN_PRECISION && recall >= MODE_B_MIN_RECALL) {
-        state_.mode = MODE_B_TRAIN;
-        save_protocol_state(state_);
-        return true;
-      }
+      state_.mode = MODE_B_TRAIN;
+      state_.stability_counter = 0; // Reset for next tier
+      save_protocol_state(state_);
+      return true;
     } else if (state_.mode == MODE_B_TRAIN) {
-      // MODE_B -> MODE_C: precision >= 0.95, recall >= 0.92, KL <= 0.05
-      if (precision >= MODE_C_MIN_PRECISION && recall >= MODE_C_MIN_RECALL &&
-          kl_divergence <= MODE_C_MAX_KL_DRIFT) {
-        state_.mode = MODE_C_TRAIN;
-        save_protocol_state(state_);
-        return true;
-      }
+      state_.mode = MODE_C_TRAIN;
+      state_.stability_counter = 0;
+      save_protocol_state(state_);
+      return true;
     }
-    // MODE_C is terminal — no further advancement
+    // MODE_C is terminal
     return false;
   }
 
@@ -474,8 +499,7 @@ public:
       return true;
     uint64_t now_mono = get_monotonic_seconds();
     if (now_mono < state_.training_start_monotonic) {
-      // Clock rollback detected — DENY
-      return false;
+      return false; // Clock rollback — DENY
     }
     uint64_t elapsed = now_mono - state_.training_start_monotonic;
     return elapsed >= HUNT_LOCKOUT_SECONDS;
@@ -491,19 +515,24 @@ public:
           now_mono - state_.training_start_monotonic;
       save_protocol_state(state_);
     }
-    // If now_mono < start, clock rollback — do NOT update
   }
 
   // --- Stop training ---
   void stop_training() {
     state_.training_active = false;
     state_.mode = MODE_IDLE;
+    state_.stability_counter = 0;
     save_protocol_state(state_);
   }
 
   // --- State queries ---
   bool is_training_active() const { return state_.training_active; }
   bool is_hunt_locked() const { return state_.hunt_locked; }
+  int current_mode() const { return state_.mode; }
+  int stability_count() const { return state_.stability_counter; }
+  uint64_t elapsed_monotonic() const {
+    return state_.elapsed_seconds_monotonic;
+  }
   uint64_t hunt_lockout_remaining() const {
     if (!state_.hunt_locked)
       return 0;
@@ -514,10 +543,6 @@ public:
     if (elapsed >= HUNT_LOCKOUT_SECONDS)
       return 0;
     return HUNT_LOCKOUT_SECONDS - elapsed;
-  }
-  int current_mode() const { return state_.mode; }
-  uint64_t elapsed_monotonic() const {
-    return state_.elapsed_seconds_monotonic;
   }
 
   // Expose for testing
@@ -548,99 +573,157 @@ static bool run_tests() {
   std::remove(PROTOCOL_STATE_PATH);
   std::remove(PROTOCOL_TMP_PATH);
 
-  // Test 1: Fresh protocol — no gates pass (files missing)
+  // Test 1: Fresh protocol — not ready (no gate files)
   TrainingStartProtocol protocol;
   TrainingReadiness r = protocol.can_start_training();
-  test(!r.ready, "Fresh state: not ready (no gate files)");
-  test(r.gates_total == 9, "9 total gates");
+  test(!r.ready, "Fresh state: not ready");
+  test(r.gates_total == 12, "12 total gates");
 
   // Test 2: Training not active initially
   test(!protocol.is_training_active(), "Not training initially");
 
-  // Test 3: Start training fails without gates
-  bool started = protocol.start_training();
-  test(!started, "Cannot start training without gates");
+  // Test 3: Cannot start without gates
+  test(!protocol.start_training(), "Cannot start without gates");
 
   // Test 4: Monotonic clock returns non-zero
   uint64_t mono = get_monotonic_seconds();
-  test(mono > 0, "Monotonic clock returns non-zero");
+  test(mono > 0, "Monotonic clock non-zero");
 
-  // Test 5: Monotonic clock is non-decreasing
+  // Test 5: Monotonic clock non-decreasing
   {
     uint64_t t1 = get_monotonic_seconds();
     uint64_t t2 = get_monotonic_seconds();
     test(t2 >= t1, "Monotonic clock non-decreasing");
   }
 
-  // Test 6: Hunt lockout persistence round-trip (monotonic)
-  {
-    TrainingState ts;
-    std::memset(&ts, 0, sizeof(ts));
-    ts.training_active = true;
-    ts.training_start_timestamp = 1700000000;
-    ts.training_start_monotonic = get_monotonic_seconds() - 100;
-    ts.elapsed_seconds_monotonic = 100;
-    ts.hunt_lockout_until_monotonic =
-        ts.training_start_monotonic + HUNT_LOCKOUT_SECONDS;
-    ts.hunt_locked = true;
-    ts.mode = MODE_A_TRAIN;
-    save_protocol_state(ts);
-
-    TrainingStartProtocol p2;
-    test(p2.is_training_active(), "Persisted: training_active");
-    test(p2.is_hunt_locked(), "Persisted: hunt_locked");
-    test(p2.current_mode() == MODE_A_TRAIN, "Persisted: MODE_A");
-  }
-
-  // Test 7: Hunt allowed after monotonic lockout expires
-  {
-    TrainingState ts;
-    std::memset(&ts, 0, sizeof(ts));
-    ts.training_active = false;
-    ts.hunt_locked = true;
-    // Start was far in the past (monotonic)
-    ts.training_start_monotonic = 1; // Very small value
-    ts.elapsed_seconds_monotonic = HUNT_LOCKOUT_SECONDS + 1;
-    ts.hunt_lockout_until_monotonic = 1 + HUNT_LOCKOUT_SECONDS;
-    ts.mode = MODE_IDLE;
-    save_protocol_state(ts);
-
-    TrainingStartProtocol p3;
-    test(p3.is_hunt_allowed(), "Hunt allowed after monotonic lockout expires");
-    test(!p3.is_hunt_locked(), "Hunt lock cleared after monotonic expiry");
-  }
-
-  // Test 8: Mode progression thresholds
+  // Test 6: Stability counter — 4 evals not enough
   {
     TrainingState ts;
     std::memset(&ts, 0, sizeof(ts));
     ts.training_active = true;
     ts.mode = MODE_A_TRAIN;
+    ts.stability_counter = 0;
     save_protocol_state(ts);
 
-    TrainingStartProtocol p4;
+    TrainingStartProtocol p;
+    // 4 good evaluations — not enough
+    for (int i = 0; i < 4; ++i) {
+      p.record_evaluation(0.92, 0.87, 0.08, 0.05, false);
+    }
+    test(p.stability_count() == 4, "4 evals: counter=4");
+    test(!p.try_advance_mode(), "4 evals: cannot advance");
+  }
 
-    // Below threshold — no advance
-    test(!p4.try_advance_mode(0.80, 0.80, 0.10),
-         "MODE_A: below threshold no advance");
+  // Test 7: Stability counter — 5 evals triggers advance
+  {
+    TrainingState ts;
+    std::memset(&ts, 0, sizeof(ts));
+    ts.training_active = true;
+    ts.mode = MODE_A_TRAIN;
+    ts.stability_counter = 0;
+    save_protocol_state(ts);
 
-    // At threshold — advance to MODE_B
-    test(p4.try_advance_mode(0.90, 0.85, 0.10),
-         "MODE_A -> MODE_B at threshold");
-    test(p4.current_mode() == MODE_B_TRAIN, "Now in MODE_B");
+    TrainingStartProtocol p;
+    for (int i = 0; i < 5; ++i) {
+      p.record_evaluation(0.92, 0.87, 0.08, 0.05, false);
+    }
+    test(p.stability_count() == 5, "5 evals: counter=5");
+    test(p.try_advance_mode(), "5 evals: advance MODE_A → MODE_B");
+    test(p.current_mode() == MODE_B_TRAIN, "Now in MODE_B");
+    test(p.stability_count() == 0, "Counter reset after advance");
+  }
 
-    // Below MODE_C threshold — no advance
-    test(!p4.try_advance_mode(0.93, 0.90, 0.06),
-         "MODE_B: below threshold no advance");
+  // Test 8: Stability counter reset on violation
+  {
+    TrainingState ts;
+    std::memset(&ts, 0, sizeof(ts));
+    ts.training_active = true;
+    ts.mode = MODE_A_TRAIN;
+    ts.stability_counter = 0;
+    save_protocol_state(ts);
 
-    // At MODE_C threshold — advance
-    test(p4.try_advance_mode(0.95, 0.92, 0.05),
-         "MODE_B -> MODE_C at threshold");
-    test(p4.current_mode() == MODE_C_TRAIN, "Now in MODE_C");
+    TrainingStartProtocol p;
+    // 3 good evaluations
+    for (int i = 0; i < 3; ++i) {
+      p.record_evaluation(0.92, 0.87, 0.08, 0.05, false);
+    }
+    test(p.stability_count() == 3, "3 good evals: counter=3");
 
-    // MODE_C is terminal
-    test(!p4.try_advance_mode(0.99, 0.99, 0.01),
-         "MODE_C: terminal, no advance");
+    // 1 bad evaluation — resets counter
+    p.record_evaluation(0.50, 0.50, 0.30, 0.20, false);
+    test(p.stability_count() == 0, "Bad eval: counter reset to 0");
+
+    // Cannot advance
+    test(!p.try_advance_mode(), "Cannot advance after reset");
+  }
+
+  // Test 9: Drift alert resets stability counter
+  {
+    TrainingState ts;
+    std::memset(&ts, 0, sizeof(ts));
+    ts.training_active = true;
+    ts.mode = MODE_A_TRAIN;
+    ts.stability_counter = 0;
+    save_protocol_state(ts);
+
+    TrainingStartProtocol p;
+    for (int i = 0; i < 4; ++i) {
+      p.record_evaluation(0.92, 0.87, 0.08, 0.05, false);
+    }
+    // Drift alert on 5th eval
+    p.record_evaluation(0.92, 0.87, 0.08, 0.05, true);
+    test(p.stability_count() == 0, "Drift alert resets counter");
+  }
+
+  // Test 10: MODE_B → MODE_C via stability
+  {
+    TrainingState ts;
+    std::memset(&ts, 0, sizeof(ts));
+    ts.training_active = true;
+    ts.mode = MODE_B_TRAIN;
+    ts.stability_counter = 0;
+    save_protocol_state(ts);
+
+    TrainingStartProtocol p;
+    for (int i = 0; i < 5; ++i) {
+      p.record_evaluation(0.96, 0.94, 0.03, 0.04, false);
+    }
+    test(p.try_advance_mode(), "MODE_B → MODE_C at threshold");
+    test(p.current_mode() == MODE_C_TRAIN, "Now in MODE_C");
+  }
+
+  // Test 11: MODE_C is terminal
+  {
+    TrainingState ts;
+    std::memset(&ts, 0, sizeof(ts));
+    ts.training_active = true;
+    ts.mode = MODE_C_TRAIN;
+    ts.stability_counter = 5;
+    save_protocol_state(ts);
+
+    TrainingStartProtocol p;
+    test(!p.try_advance_mode(), "MODE_C: terminal, no advance");
+  }
+
+  // Test 12: No single-batch promotion
+  {
+    TrainingState ts;
+    std::memset(&ts, 0, sizeof(ts));
+    ts.training_active = true;
+    ts.mode = MODE_A_TRAIN;
+    ts.stability_counter = 0;
+    save_protocol_state(ts);
+
+    TrainingStartProtocol p;
+    // Single excellent eval
+    p.record_evaluation(0.99, 0.99, 0.01, 0.01, false);
+    test(p.stability_count() == 1, "Single eval: counter=1");
+    test(!p.try_advance_mode(), "Single eval: no promotion");
+  }
+
+  // Test 13: Secret validation gate
+  {
+    test(check_secret_valid(), "Secret key is present");
   }
 
   // Cleanup

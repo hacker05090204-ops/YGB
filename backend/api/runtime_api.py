@@ -1,6 +1,6 @@
 """
-runtime_api.py — Backend Runtime Hard Validation API with HMAC
-=============================================================
+runtime_api.py — Backend Runtime Hard Validation API with HMAC + Replay Protection
+====================================================================================
 Endpoint:
   GET  /runtime/status  — Validated runtime state
 
@@ -8,12 +8,14 @@ Before returning runtime data:
   1. Load reports/training_telemetry.json
   2. Validate HMAC-SHA256
   3. Validate CRC32 (recompute and match)
-  4. Validate schema_version
-  5. Validate determinism_status == true
-  6. If ANY fail → return {"status": "corrupted", "reason": "..."}
+  4. Validate monotonic_timestamp > last_seen (replay protection)
+  5. Validate schema_version
+  6. Validate determinism_status == true
+  7. If ANY fail → return {"status": "corrupted", "reason": "..."}
 
 Never trust partial state.
 Never trust unsigned telemetry.
+Never expose replayed telemetry.
 NO silent fallback.
 """
 
@@ -31,6 +33,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(
 
 TELEMETRY_PATH = os.path.join(PROJECT_ROOT, 'reports', 'training_telemetry.json')
 HMAC_KEY_PATH = os.path.join(PROJECT_ROOT, 'config', 'hmac_secret.key')
+LAST_SEEN_PATH = os.path.join(PROJECT_ROOT, 'reports', 'last_seen_timestamp.json')
 EXPECTED_SCHEMA_VERSION = 1
 
 
@@ -77,6 +80,7 @@ def compute_payload_crc(payload: dict) -> int:
         f"|epoch:{payload.get('epoch', 0)}"
         f"|batch:{payload.get('batch_size', 0)}"
         f"|ts:{payload.get('timestamp', 0)}"
+        f"|mono:{payload.get('monotonic_timestamp', 0)}"
     )
     return compute_crc32(crc_string.encode('ascii'))
 
@@ -123,6 +127,36 @@ def validate_hmac(payload: dict) -> bool:
 
 
 # =========================================================================
+# MONOTONIC TIMESTAMP REPLAY PROTECTION
+# =========================================================================
+
+def load_last_seen_timestamp() -> int:
+    """Load last seen monotonic timestamp from persistence."""
+    try:
+        with open(LAST_SEEN_PATH, 'r') as f:
+            data = json.load(f)
+        return int(data.get('last_seen', 0))
+    except (FileNotFoundError, json.JSONDecodeError, ValueError):
+        return 0
+
+
+def save_last_seen_timestamp(ts: int) -> None:
+    """Persist last seen monotonic timestamp atomically."""
+    tmp_path = LAST_SEEN_PATH + '.tmp'
+    try:
+        with open(tmp_path, 'w') as f:
+            json.dump({"last_seen": ts}, f)
+            f.flush()
+            os.fsync(f.fileno())
+        # Atomic replace
+        if os.path.exists(LAST_SEEN_PATH):
+            os.remove(LAST_SEEN_PATH)
+        os.rename(tmp_path, LAST_SEEN_PATH)
+    except Exception as e:
+        logger.error("Failed to save last_seen_timestamp: %s", e)
+
+
+# =========================================================================
 # VALIDATION
 # =========================================================================
 
@@ -131,7 +165,7 @@ def validate_telemetry() -> dict:
     Load and validate runtime telemetry.
     Returns validated data or error response.
     Never returns partial state.
-    Never trusts unsigned telemetry.
+    Never trusts unsigned or replayed telemetry.
     """
     # Step 1: Load file
     if not os.path.exists(TELEMETRY_PATH):
@@ -166,7 +200,7 @@ def validate_telemetry() -> dict:
 
     # Step 3: Validate required fields
     required_fields = ['schema_version', 'determinism_status', 'freeze_status',
-                       'crc32', 'hmac']
+                       'crc32', 'hmac', 'monotonic_timestamp']
     for field in required_fields:
         if field not in data:
             logger.error("Telemetry missing field: %s", field)
@@ -199,7 +233,21 @@ def validate_telemetry() -> dict:
             "detail": f"CRC mismatch: stored={stored_crc} computed={computed_crc}"
         }
 
-    # Step 6: Validate schema version
+    # Step 6: Validate monotonic_timestamp > last_seen (replay protection)
+    monotonic_ts = data.get('monotonic_timestamp', 0)
+    last_seen = load_last_seen_timestamp()
+    if last_seen > 0 and monotonic_ts <= last_seen:
+        logger.error(
+            "REPLAY DETECTED: monotonic_timestamp=%d <= last_seen=%d",
+            monotonic_ts, last_seen
+        )
+        return {
+            "status": "corrupted",
+            "reason": "replay_detected",
+            "detail": f"Replay detected: monotonic_timestamp={monotonic_ts} <= last_seen={last_seen}"
+        }
+
+    # Step 7: Validate schema version
     if data['schema_version'] != EXPECTED_SCHEMA_VERSION:
         logger.error(
             "Schema version mismatch: got %s, expected %s",
@@ -211,7 +259,7 @@ def validate_telemetry() -> dict:
             "detail": f"Schema version mismatch: {data['schema_version']}"
         }
 
-    # Step 7: Validate determinism_status
+    # Step 8: Validate determinism_status
     if data['determinism_status'] is not True:
         logger.error("determinism_status is not true")
         return {
@@ -220,7 +268,10 @@ def validate_telemetry() -> dict:
             "detail": "determinism_status is false"
         }
 
-    # All checks passed
+    # All checks passed — update last_seen atomically
+    if monotonic_ts > last_seen:
+        save_last_seen_timestamp(monotonic_ts)
+
     return {
         "status": "ok",
         "data": data,

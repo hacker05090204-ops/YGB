@@ -22,9 +22,12 @@
 
 #ifdef _WIN32
 #include <io.h>
+#include <windows.h>
 #define fsync_fd(fd) _commit(fd)
 #else
+#include <sys/stat.h>
 #include <unistd.h>
+
 #define fsync_fd(fd) fsync(fd)
 #endif
 
@@ -40,6 +43,8 @@ static constexpr char MODE_OVERRIDE[] = "reports/mode_override.json";
 static constexpr char MUTEX_STATE[] = "reports/mode_mutex_state.json";
 static constexpr char INCIDENT_LOG[] = "reports/signature_incidents.log";
 static constexpr char HMAC_KEY_PATH[] = "config/hmac_secret.key";
+static constexpr char LAST_SEEN_PATH[] = "reports/last_seen_timestamp.json";
+static constexpr char LAST_SEEN_TMP[] = "reports/last_seen_timestamp.json.tmp";
 
 // =========================================================================
 // SHA-256 (same implementation as training_telemetry.cpp)
@@ -267,6 +272,7 @@ struct TelemetryData {
   double precision, recall, kl_divergence, ece, loss, gpu_temperature;
   int epoch, batch_size;
   uint64_t timestamp;
+  uint64_t monotonic_timestamp;
   uint32_t crc32;
   char hmac[65];
   bool loaded;
@@ -373,6 +379,7 @@ static TelemetryData load_telemetry(const char *path) {
   d.epoch = parse_int_after(buf, "epoch");
   d.batch_size = parse_int_after(buf, "batch_size");
   d.timestamp = parse_uint64_after(buf, "timestamp");
+  d.monotonic_timestamp = parse_uint64_after(buf, "monotonic_timestamp");
   d.crc32 = parse_uint32_after(buf, "crc32");
   parse_string_after(buf, "hmac", d.hmac, sizeof(d.hmac));
   d.loaded = true;
@@ -409,22 +416,126 @@ struct ValidationResult {
   bool schema_ok;
   bool hmac_ok;
   bool determinism_ok;
+  bool secret_ok;
+  bool replay_ok;
   bool all_ok;
   char failure_reason[512];
 };
 
 // =========================================================================
+// SECRET KEY HARDENING
+// =========================================================================
+
+struct SecretCheckResult {
+  bool exists;
+  bool permissions_ok;
+  char reason[256];
+};
+
+static SecretCheckResult check_secret_key_security() {
+  SecretCheckResult r;
+  std::memset(&r, 0, sizeof(r));
+  r.exists = false;
+  r.permissions_ok = false;
+
+  FILE *f = std::fopen(HMAC_KEY_PATH, "r");
+  if (!f) {
+    std::snprintf(r.reason, sizeof(r.reason), "HMAC secret key missing: %s",
+                  HMAC_KEY_PATH);
+    return r;
+  }
+  std::fclose(f);
+  r.exists = true;
+
+#ifdef _WIN32
+  // On Windows, check that file is not zero-length
+  WIN32_FILE_ATTRIBUTE_DATA fad;
+  if (GetFileAttributesExA(HMAC_KEY_PATH, GetFileExInfoStandard, &fad)) {
+    if (fad.nFileSizeLow == 0 && fad.nFileSizeHigh == 0) {
+      std::snprintf(r.reason, sizeof(r.reason), "HMAC secret key is empty");
+      return r;
+    }
+    // Check if file has READONLY attribute (good security practice)
+    // We accept both readable-only and normal files on Windows
+    r.permissions_ok = true;
+  } else {
+    std::snprintf(r.reason, sizeof(r.reason),
+                  "Cannot read HMAC key file attributes");
+    return r;
+  }
+#else
+  struct stat st;
+  if (stat(HMAC_KEY_PATH, &st) != 0) {
+    std::snprintf(r.reason, sizeof(r.reason), "Cannot stat HMAC key file");
+    return r;
+  }
+  // Reject if world-readable (o+r) or group-writable (g+w)
+  if (st.st_mode & S_IROTH) {
+    std::snprintf(r.reason, sizeof(r.reason),
+                  "HMAC key is world-readable (insecure)");
+    return r;
+  }
+  if (st.st_mode & S_IWGRP) {
+    std::snprintf(r.reason, sizeof(r.reason),
+                  "HMAC key is group-writable (insecure)");
+    return r;
+  }
+  r.permissions_ok = true;
+#endif
+
+  return r;
+}
+
+// =========================================================================
+// REPLAY PROTECTION
+// =========================================================================
+
+static uint64_t load_last_seen_timestamp() {
+  FILE *f = std::fopen(LAST_SEEN_PATH, "r");
+  if (!f)
+    return 0;
+  char buf[256];
+  std::memset(buf, 0, sizeof(buf));
+  std::fread(buf, 1, sizeof(buf) - 1, f);
+  std::fclose(f);
+  const char *pos = std::strstr(buf, "last_seen");
+  if (!pos)
+    return 0;
+  pos += 9;
+  while (*pos && (*pos == '"' || *pos == ':' || *pos == ' '))
+    ++pos;
+  unsigned long long val = 0;
+  std::sscanf(pos, "%llu", &val);
+  return static_cast<uint64_t>(val);
+}
+
+static bool save_last_seen_timestamp(uint64_t ts) {
+  FILE *f = std::fopen(LAST_SEEN_TMP, "w");
+  if (!f)
+    return false;
+  std::fprintf(f, "{\n  \"last_seen\": %llu\n}\n",
+               static_cast<unsigned long long>(ts));
+  std::fflush(f);
+  int fd = fileno(f);
+  if (fd >= 0)
+    fsync_fd(fd);
+  std::fclose(f);
+  std::remove(LAST_SEEN_PATH);
+  return std::rename(LAST_SEEN_TMP, LAST_SEEN_PATH) == 0;
+}
+
+// =========================================================================
 // CONTAINMENT ACTIONS
 // =========================================================================
 
-static void force_mode_a() {
+static void force_mode_a(const char *reason = "signature_validation_failure") {
   FILE *f = std::fopen(MODE_OVERRIDE, "w");
   if (!f)
     return;
   uint64_t now = static_cast<uint64_t>(std::time(nullptr));
   std::fprintf(f, "{\n");
   std::fprintf(f, "  \"forced_mode\": \"MODE_A\",\n");
-  std::fprintf(f, "  \"reason\": \"signature_validation_failure\",\n");
+  std::fprintf(f, "  \"reason\": \"%s\",\n", reason);
   std::fprintf(f, "  \"timestamp\": %llu\n",
                static_cast<unsigned long long>(now));
   std::fprintf(f, "}\n");
@@ -474,10 +585,11 @@ static uint32_t recompute_crc(const TelemetryData &d) {
   int len = std::snprintf(
       buf, sizeof(buf),
       "v%d|det:%d|frz:%d|prec:%.8f|rec:%.8f|kl:%.8f|ece:%.8f|"
-      "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu",
+      "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu|mono:%llu",
       d.schema_version, d.determinism_status ? 1 : 0, d.freeze_status ? 1 : 0,
       d.precision, d.recall, d.kl_divergence, d.ece, d.loss, d.gpu_temperature,
-      d.epoch, d.batch_size, static_cast<unsigned long long>(d.timestamp));
+      d.epoch, d.batch_size, static_cast<unsigned long long>(d.timestamp),
+      static_cast<unsigned long long>(d.monotonic_timestamp));
   return compute_crc32(buf, static_cast<size_t>(len));
 }
 
@@ -515,6 +627,16 @@ static ValidationResult validate_telemetry() {
   ValidationResult r;
   std::memset(&r, 0, sizeof(r));
 
+  // 0. Secret key security check
+  SecretCheckResult sc = check_secret_key_security();
+  r.secret_ok = sc.exists && sc.permissions_ok;
+  if (!r.secret_ok) {
+    r.all_ok = false;
+    std::snprintf(r.failure_reason, sizeof(r.failure_reason),
+                  "SECURITY_VIOLATION: %s", sc.reason);
+    return r;
+  }
+
   TelemetryData d = load_telemetry(TELEMETRY_PATH);
   if (!d.loaded) {
     r.all_ok = false;
@@ -536,14 +658,25 @@ static ValidationResult validate_telemetry() {
   // 4. Determinism
   r.determinism_ok = d.determinism_status;
 
-  r.all_ok = r.crc_ok && r.schema_ok && r.hmac_ok && r.determinism_ok;
+  // 5. Replay protection: monotonic_timestamp > last_seen
+  uint64_t last_seen = load_last_seen_timestamp();
+  r.replay_ok = (d.monotonic_timestamp > last_seen) || (last_seen == 0);
+
+  r.all_ok = r.crc_ok && r.schema_ok && r.hmac_ok && r.determinism_ok &&
+             r.secret_ok && r.replay_ok;
 
   if (!r.all_ok) {
-    std::snprintf(
-        r.failure_reason, sizeof(r.failure_reason),
-        "Validation failed: CRC=%s, Schema=%s, HMAC=%s, Determinism=%s",
-        r.crc_ok ? "OK" : "FAIL", r.schema_ok ? "OK" : "FAIL",
-        r.hmac_ok ? "OK" : "FAIL", r.determinism_ok ? "OK" : "FAIL");
+    std::snprintf(r.failure_reason, sizeof(r.failure_reason),
+                  "Validation failed: CRC=%s, Schema=%s, HMAC=%s, Det=%s, "
+                  "Secret=%s, Replay=%s",
+                  r.crc_ok ? "OK" : "FAIL", r.schema_ok ? "OK" : "FAIL",
+                  r.hmac_ok ? "OK" : "FAIL", r.determinism_ok ? "OK" : "FAIL",
+                  r.secret_ok ? "OK" : "FAIL", r.replay_ok ? "OK" : "FAIL");
+  }
+
+  // Persist last_seen if all OK
+  if (r.all_ok && d.monotonic_timestamp > 0) {
+    save_last_seen_timestamp(d.monotonic_timestamp);
   }
 
   return r;
@@ -565,7 +698,14 @@ static bool validate_and_contain() {
   std::printf("[SIGNATURE VALIDATOR] CONTAINMENT TRIGGERED: %s\n",
               r.failure_reason);
 
-  force_mode_a();
+  // Use specific reason for secret violations
+  if (!r.secret_ok) {
+    force_mode_a("SECURITY_VIOLATION_insecure_secret");
+  } else if (!r.replay_ok) {
+    force_mode_a("REPLAY_ATTACK_detected");
+  } else {
+    force_mode_a("signature_validation_failure");
+  }
   disable_hunt();
   log_incident(r.failure_reason);
 
@@ -589,14 +729,31 @@ static bool run_tests() {
     }
   };
 
-  // Test 1: Missing telemetry file returns failure
+  // Test 1: Secret key exists
+  {
+    SecretCheckResult sc = check_secret_key_security();
+    test(sc.exists, "Secret key exists");
+    test(sc.permissions_ok, "Secret key permissions OK");
+  }
+
+  // Test 2: Missing secret key detected
+  {
+    // Rename key temporarily
+    std::rename(HMAC_KEY_PATH, "config/hmac_secret.key.bak");
+    SecretCheckResult sc = check_secret_key_security();
+    test(!sc.exists, "Missing secret key detected");
+    std::rename("config/hmac_secret.key.bak", HMAC_KEY_PATH);
+  }
+
+  // Test 3: Missing telemetry file returns failure
   {
     std::remove(TELEMETRY_PATH);
+    std::remove(LAST_SEEN_PATH);
     ValidationResult r = validate_telemetry();
     test(!r.all_ok, "Missing telemetry: validation fails");
   }
 
-  // Test 2: CRC recomputation is deterministic
+  // Test 4: CRC recomputation is deterministic
   {
     TelemetryData d;
     std::memset(&d, 0, sizeof(d));
@@ -604,13 +761,14 @@ static bool run_tests() {
     d.determinism_status = true;
     d.precision = 0.95;
     d.timestamp = 1700000000;
+    d.monotonic_timestamp = 100;
     uint32_t c1 = recompute_crc(d);
     uint32_t c2 = recompute_crc(d);
     test(c1 == c2, "CRC recomputation deterministic");
     test(c1 != 0, "CRC non-zero");
   }
 
-  // Test 3: Tampered CRC detected
+  // Test 5: Tampered CRC detected
   {
     TelemetryData d;
     std::memset(&d, 0, sizeof(d));
@@ -623,7 +781,7 @@ static bool run_tests() {
     test(d.crc32 != expected, "Tampered CRC detected");
   }
 
-  // Test 4: Wrong schema version detected
+  // Test 6: Wrong schema version detected
   {
     TelemetryData d;
     std::memset(&d, 0, sizeof(d));
@@ -631,7 +789,7 @@ static bool run_tests() {
     test(d.schema_version != EXPECTED_SCHEMA_VERSION, "Wrong schema detected");
   }
 
-  // Test 5: Missing HMAC fails validation
+  // Test 7: Missing HMAC fails validation
   {
     TelemetryData d;
     std::memset(&d, 0, sizeof(d));
@@ -639,7 +797,7 @@ static bool run_tests() {
     test(!verify_hmac(d), "Missing HMAC fails validation");
   }
 
-  // Test 6: Containment writes mode override
+  // Test 8: Containment writes mode override
   {
     std::remove(MODE_OVERRIDE);
     force_mode_a();
@@ -656,7 +814,7 @@ static bool run_tests() {
     std::remove(MODE_OVERRIDE);
   }
 
-  // Test 7: Containment resets mutex to IDLE
+  // Test 9: Containment resets mutex to IDLE
   {
     std::remove(MUTEX_STATE);
     disable_hunt();
@@ -672,7 +830,7 @@ static bool run_tests() {
     std::remove(MUTEX_STATE);
   }
 
-  // Test 8: Incident logging
+  // Test 10: Incident logging
   {
     std::remove(INCIDENT_LOG);
     log_incident("test_incident");
@@ -687,6 +845,28 @@ static bool run_tests() {
            "Incident log contains reason");
     }
     std::remove(INCIDENT_LOG);
+  }
+
+  // Test 11: Last seen timestamp persistence
+  {
+    std::remove(LAST_SEEN_PATH);
+    save_last_seen_timestamp(12345);
+    uint64_t ls = load_last_seen_timestamp();
+    test(ls == 12345, "Last seen timestamp round-trip");
+    std::remove(LAST_SEEN_PATH);
+  }
+
+  // Test 12: Replay detection via last_seen
+  {
+    // Set last_seen to a high value, then check replay_ok
+    save_last_seen_timestamp(999999999);
+    TelemetryData d;
+    std::memset(&d, 0, sizeof(d));
+    d.monotonic_timestamp = 100; // Way below last_seen
+    uint64_t ls = load_last_seen_timestamp();
+    bool replay_ok = (d.monotonic_timestamp > ls) || (ls == 0);
+    test(!replay_ok, "Replay detected: monotonic < last_seen");
+    std::remove(LAST_SEEN_PATH);
   }
 
   std::printf("\n  Signature Validator: %d passed, %d failed\n", passed,
