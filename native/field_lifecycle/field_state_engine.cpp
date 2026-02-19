@@ -1,7 +1,8 @@
 /**
  * field_state_engine.cpp — Field Lifecycle State Machine
  *
- * NOT_STARTED → TRAINING → STABILITY_CHECK → CERTIFIED → FROZEN → NEXT_FIELD
+ * NOT_STARTED → TRAINING → STABILITY_CHECK → CERTIFICATION_PENDING → CERTIFIED
+ * → FROZEN → NEXT_FIELD
  *
  * Rules:
  *   - Only forward transitions
@@ -15,7 +16,6 @@
 #include <cstdio>
 #include <cstring>
 
-
 namespace field_lifecycle {
 
 // =========================================================================
@@ -26,9 +26,10 @@ enum class FieldState : uint8_t {
   NOT_STARTED = 0,
   TRAINING = 1,
   STABILITY_CHECK = 2,
-  CERTIFIED = 3,
-  FROZEN = 4,
-  NEXT_FIELD = 5
+  CERTIFICATION_PENDING = 3,
+  CERTIFIED = 4,
+  FROZEN = 5,
+  NEXT_FIELD = 6
 };
 
 static const char *state_name(FieldState s) {
@@ -39,6 +40,8 @@ static const char *state_name(FieldState s) {
     return "TRAINING";
   case FieldState::STABILITY_CHECK:
     return "STABILITY_CHECK";
+  case FieldState::CERTIFICATION_PENDING:
+    return "CERTIFICATION_PENDING";
   case FieldState::CERTIFIED:
     return "CERTIFIED";
   case FieldState::FROZEN:
@@ -143,11 +146,20 @@ public:
       return r;
     }
 
-    // STABILITY_CHECK requires 7 days
-    if (target == FieldState::CERTIFIED && fields_[idx].stability_days < 7) {
+    // STABILITY_CHECK requires 7 days before CERTIFICATION_PENDING
+    if (target == FieldState::CERTIFICATION_PENDING &&
+        fields_[idx].stability_days < 7) {
       r.allowed = false;
       std::snprintf(r.reason, sizeof(r.reason), "STABILITY_GATE: %u/7 days",
                     fields_[idx].stability_days);
+      return r;
+    }
+
+    // CERTIFIED requires human approval
+    if (target == FieldState::CERTIFIED && !fields_[idx].human_approved) {
+      r.allowed = false;
+      std::snprintf(r.reason, sizeof(r.reason),
+                    "HUMAN_APPROVAL_REQUIRED: field '%s'", fields_[idx].name);
       return r;
     }
 
