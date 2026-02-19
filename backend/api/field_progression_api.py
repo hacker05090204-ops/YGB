@@ -266,6 +266,59 @@ def _calculate_progress(field: dict) -> dict:
 
 
 # =========================================================================
+# RUNTIME STATUS BUILDER — backend-authoritative, no frontend trust
+# =========================================================================
+
+RUNTIME_STATE_PATH = os.path.join(PROJECT_ROOT, 'data', 'runtime_status.json')
+
+
+def _build_runtime_status(ladder_state: dict) -> dict:
+    """Build runtime status from persisted runtime data.
+
+    All values default to safe/awaiting state when unavailable.
+    Frontend must NEVER trust its own cached state over this.
+    """
+    runtime = {
+        "containment_active": False,
+        "containment_reason": None,
+        "precision_breach": False,
+        "drift_alert": False,
+        "freeze_valid": None,
+        "freeze_reason": None,
+        "training_velocity_samples_hr": None,
+        "training_velocity_batches_sec": None,
+        "gpu_utilization": None,
+        "determinism_pass": None,
+        "data_freshness": None,
+        "merge_status": None,
+    }
+
+    # Load persisted runtime status if available
+    if os.path.exists(RUNTIME_STATE_PATH):
+        try:
+            with open(RUNTIME_STATE_PATH) as f:
+                persisted = json.load(f)
+
+            # Only use explicitly set values — no fallback assumptions
+            for key in runtime:
+                if key in persisted:
+                    runtime[key] = persisted[key]
+        except Exception as e:
+            logger.warning(f"Failed to load runtime status: {e}")
+
+    # Check for demoted fields — containment override
+    for field in ladder_state.get("fields", []):
+        if field.get("demoted", False):
+            runtime["containment_active"] = True
+            runtime["containment_reason"] = (
+                f"Field '{field.get('name', '?')}' demoted to TRAINING"
+            )
+            break
+
+    return runtime
+
+
+# =========================================================================
 # ENDPOINT HANDLERS
 # =========================================================================
 
@@ -277,10 +330,15 @@ def get_fields_state() -> dict:
     """
     state = _load_field_state()
 
-    # Enrich with progress and thresholds
+    # Enrich with progress, thresholds, and demotion flag
     for field in state["fields"]:
         field["progress"] = _calculate_progress(field)
         field["thresholds"] = TIERS[field["id"]]["thresholds"]
+        # Demoted flag: field previously CERTIFIED/FROZEN but now back to TRAINING
+        field["demoted"] = (
+            field.get("state") == "TRAINING" and
+            field.get("certified", False)
+        )
 
     # Authority lock status
     auth = AuthorityLock.verify_all_locked()
@@ -288,6 +346,9 @@ def get_fields_state() -> dict:
     # Approval ledger status
     ledger = ApprovalLedger(APPROVAL_LEDGER_PATH)
     ledger.load()
+
+    # Runtime status — backend-authoritative, no frontend-trusted state
+    runtime = _build_runtime_status(state)
 
     return {
         "status": "ok",
@@ -298,6 +359,7 @@ def get_fields_state() -> dict:
             "chain_hash": ledger.chain_hash,
             "chain_valid": ledger.verify_chain(),
         },
+        "runtime": runtime,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 

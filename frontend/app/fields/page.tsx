@@ -92,11 +92,27 @@ interface LedgerStatus {
     chain_valid: boolean
 }
 
+interface RuntimeStatus {
+    containment_active: boolean
+    containment_reason: string | null
+    precision_breach: boolean
+    drift_alert: boolean
+    freeze_valid: boolean
+    freeze_reason: string | null
+    training_velocity_samples_hr: number | null
+    training_velocity_batches_sec: number | null
+    gpu_utilization: number | null
+    determinism_pass: boolean | null
+    data_freshness: string | null
+    merge_status: string | null
+}
+
 interface ApiResponse {
     status: string
     ladder: LadderState
     authority_lock: AuthorityLock
     approval_ledger: LedgerStatus
+    runtime: RuntimeStatus | null
     timestamp: string
 }
 
@@ -154,6 +170,8 @@ export default function FieldProgressionDashboard() {
     const [error, setError] = useState<string | null>(null)
     const [selectedField, setSelectedField] = useState<number>(0)
     const [actionStatus, setActionStatus] = useState<string | null>(null)
+    const [lastFetchTime, setLastFetchTime] = useState<number>(Date.now())
+    const isStale = Date.now() - lastFetchTime > 60000
 
     const fetchData = useCallback(async () => {
         try {
@@ -162,6 +180,7 @@ export default function FieldProgressionDashboard() {
             const json = await res.json()
             setData(json)
             setError(null)
+            setLastFetchTime(Date.now())
         } catch {
             setError("Failed to connect to backend API")
         } finally {
@@ -171,7 +190,7 @@ export default function FieldProgressionDashboard() {
 
     useEffect(() => {
         fetchData()
-        const interval = setInterval(fetchData, 5000)
+        const interval = setInterval(fetchData, 30000)
         return () => clearInterval(interval)
     }, [fetchData])
 
@@ -317,6 +336,18 @@ export default function FieldProgressionDashboard() {
                 </div>
             )}
 
+            {isStale && !error && (
+                <div className="max-w-7xl mx-auto px-4 pt-2">
+                    <div className="bg-amber-950/30 border border-amber-800/50 rounded-lg px-3 py-2
+                                    text-sm text-amber-300 flex items-center justify-between">
+                        <span>⚠ Dashboard data is stale — last update &gt; 60s ago</span>
+                        <button onClick={fetchData} className="text-amber-400 hover:text-white text-xs underline">
+                            Refresh Now
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="max-w-7xl mx-auto px-4 py-4 space-y-4">
                 {/* Overview Cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -386,6 +417,7 @@ export default function FieldProgressionDashboard() {
                     <TabsList className="bg-zinc-900 border border-zinc-800">
                         <TabsTrigger value="ladder">Field Ladder</TabsTrigger>
                         <TabsTrigger value="metrics">Metrics Detail</TabsTrigger>
+                        <TabsTrigger value="runtime">Runtime</TabsTrigger>
                     </TabsList>
 
                     {/* ===== LADDER TAB ===== */}
@@ -419,6 +451,11 @@ export default function FieldProgressionDashboard() {
                                                     {stateIcon(field.state)}
                                                     <span className="ml-1 hidden sm:inline">{field.state}</span>
                                                 </Badge>
+                                                {(field as any).demoted && (
+                                                    <Badge className="text-[9px] px-1 py-0 bg-red-900/80 text-red-300 border-red-700">
+                                                        DEMOTED
+                                                    </Badge>
+                                                )}
                                                 {field.human_approved && (
                                                     <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
                                                 )}
@@ -538,6 +575,167 @@ export default function FieldProgressionDashboard() {
                                 </div>
                             </CardContent>
                         </Card>
+                    </TabsContent>
+
+                    {/* ===== RUNTIME TAB ===== */}
+                    <TabsContent value="runtime" className="space-y-3">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            {/* Containment Status */}
+                            <Card className="bg-zinc-900 border-zinc-800">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm flex items-center gap-2">
+                                        <Shield className="h-4 w-4 text-red-400" />
+                                        Runtime Containment
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className={`text-lg font-bold ${data?.runtime?.containment_active
+                                        ? "text-red-400" : data?.runtime
+                                            ? "text-emerald-400" : "text-zinc-600"
+                                        }`}>
+                                        {data?.runtime?.containment_active
+                                            ? "ACTIVE"
+                                            : data?.runtime
+                                                ? "CLEAR"
+                                                : "Awaiting Data"}
+                                    </p>
+                                    <p className="text-[10px] text-zinc-500 mt-1">
+                                        {data?.runtime?.containment_reason || "No containment events"}
+                                    </p>
+                                    <div className="mt-2 flex gap-3 text-[10px]">
+                                        <span className={data?.runtime?.precision_breach ? "text-red-400" : "text-zinc-500"}>
+                                            Precision: {data?.runtime?.precision_breach ? "BREACH" : data?.runtime ? "OK" : "Awaiting Data"}
+                                        </span>
+                                        <span className={data?.runtime?.drift_alert ? "text-amber-400" : "text-zinc-500"}>
+                                            Drift: {data?.runtime?.drift_alert ? "ALERT" : data?.runtime ? "OK" : "Awaiting Data"}
+                                        </span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Freeze Validity */}
+                            <Card className="bg-zinc-900 border-zinc-800">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm flex items-center gap-2">
+                                        <Lock className="h-4 w-4 text-cyan-400" />
+                                        Freeze Validity
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className={`text-lg font-bold ${data?.runtime?.freeze_valid === true
+                                        ? "text-cyan-400"
+                                        : data?.runtime?.freeze_valid === false
+                                            ? "text-red-400"
+                                            : "text-zinc-600"
+                                        }`}>
+                                        {data?.runtime?.freeze_valid === true
+                                            ? "VALID"
+                                            : data?.runtime?.freeze_valid === false
+                                                ? "INVALID"
+                                                : "Awaiting Data"}
+                                    </p>
+                                    <p className="text-[10px] text-zinc-500 mt-1">
+                                        {data?.runtime?.freeze_reason || "No freeze events"}
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            {/* Training Velocity */}
+                            <Card className="bg-zinc-900 border-zinc-800">
+                                <CardHeader className="pb-2">
+                                    <CardTitle className="text-sm flex items-center gap-2">
+                                        <Zap className="h-4 w-4 text-amber-400" />
+                                        Training Velocity
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="space-y-1.5">
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-zinc-500">Samples/hr</span>
+                                            <span className="text-sm font-bold">
+                                                {data?.runtime?.training_velocity_samples_hr != null
+                                                    ? data.runtime.training_velocity_samples_hr.toLocaleString()
+                                                    : "Awaiting Data"}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-zinc-500">Batches/sec</span>
+                                            <span className="text-sm font-bold">
+                                                {data?.runtime?.training_velocity_batches_sec != null
+                                                    ? data.runtime.training_velocity_batches_sec.toFixed(2)
+                                                    : "Awaiting Data"}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-zinc-500">GPU Util</span>
+                                            <span className="text-sm font-bold">
+                                                {data?.runtime?.gpu_utilization != null
+                                                    ? `${data.runtime.gpu_utilization}%`
+                                                    : "Awaiting Data"}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Second row: Determinism, Freshness, Merge */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <Card className="bg-zinc-900 border-zinc-800">
+                                <CardContent className="p-3">
+                                    <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                                        <Cpu className="h-3.5 w-3.5" />
+                                        Determinism Proof
+                                    </div>
+                                    <p className={`text-sm font-semibold ${data?.runtime?.determinism_pass === true
+                                        ? "text-emerald-400"
+                                        : data?.runtime?.determinism_pass === false
+                                            ? "text-red-400"
+                                            : "text-zinc-600"
+                                        }`}>
+                                        {data?.runtime?.determinism_pass === true
+                                            ? "3/3 PASS"
+                                            : data?.runtime?.determinism_pass === false
+                                                ? "FAIL"
+                                                : "Awaiting Data"}
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-zinc-900 border-zinc-800">
+                                <CardContent className="p-3">
+                                    <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                                        <Activity className="h-3.5 w-3.5" />
+                                        Data Freshness
+                                    </div>
+                                    <p className={`text-sm font-semibold ${data?.runtime?.data_freshness === "HEALTHY"
+                                        ? "text-emerald-400"
+                                        : data?.runtime?.data_freshness
+                                            ? "text-amber-400"
+                                            : "text-zinc-600"
+                                        }`}>
+                                        {data?.runtime?.data_freshness || "Awaiting Data"}
+                                    </p>
+                                </CardContent>
+                            </Card>
+
+                            <Card className="bg-zinc-900 border-zinc-800">
+                                <CardContent className="p-3">
+                                    <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                                        <RefreshCw className="h-3.5 w-3.5" />
+                                        Merge Status
+                                    </div>
+                                    <p className={`text-sm font-semibold ${data?.runtime?.merge_status === "APPROVED"
+                                        ? "text-emerald-400"
+                                        : data?.runtime?.merge_status
+                                            ? "text-amber-400"
+                                            : "text-zinc-600"
+                                        }`}>
+                                        {data?.runtime?.merge_status || "Awaiting Data"}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </TabsContent>
                 </Tabs>
             </div>
