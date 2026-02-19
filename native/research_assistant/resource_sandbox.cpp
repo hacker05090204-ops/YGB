@@ -60,7 +60,7 @@ enum class SandboxStatus {
   HTML_SIZE_EXCEEDED,
   OUTPUT_SIZE_EXCEEDED,
   PROCESS_KILLED,
-  ERROR
+  SANDBOX_ERROR
 };
 
 struct SandboxLimits {

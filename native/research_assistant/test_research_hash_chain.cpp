@@ -257,6 +257,12 @@ public:
   bool is_research_enabled() const { return research_enabled_; }
   int entry_count() const { return entry_count_; }
   const char *last_hash() const { return last_hash_; }
+
+  // Immutable guard methods — always return false
+  static bool can_delete_entries() { return false; }
+  static bool can_modify_hash() { return false; }
+  static bool can_skip_verification() { return false; }
+  static bool can_re_enable_after_tamper() { return false; }
 };
 
 // =========================================================================

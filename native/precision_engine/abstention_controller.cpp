@@ -11,9 +11,9 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <vector>
-
 
 namespace precision_engine {
 
