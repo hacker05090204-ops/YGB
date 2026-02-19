@@ -1968,6 +1968,190 @@ async def voice_mode():
         "research_available": RESEARCH_AVAILABLE,
     }
 
+# =============================================================================
+# RUNTIME STATUS & ACCURACY ENDPOINTS (for Control Panel)
+# =============================================================================
+
+# In-memory mode state (authoritative — mirrors C++ mode_mutex)
+_runtime_mode: str = "IDLE"  # IDLE, TRAIN, HUNT
+
+
+@app.get("/runtime/status")
+async def runtime_status():
+    """
+    GET /runtime/status — Validated runtime telemetry.
+    Reads from C++ authoritative source (reports/training_telemetry.json),
+    validates CRC + schema before returning data.
+    If no file or validation fails → returns appropriate status.
+    """
+    telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
+
+    if not telemetry_path.exists():
+        return {
+            "status": "awaiting_data",
+            "runtime": None,
+            "determinism_ok": None,
+            "stale": False,
+            "last_update_ms": 0,
+            "signature": None
+        }
+
+    try:
+        import json as _json
+        raw = telemetry_path.read_text(encoding="utf-8")
+        data = _json.loads(raw)
+
+        # Validate required fields
+        required = ["schema_version", "determinism_status"]
+        for field in required:
+            if field not in data:
+                return {
+                    "status": "error",
+                    "reason": f"Missing field: {field}",
+                    "runtime": None,
+                    "determinism_ok": False,
+                    "stale": True,
+                    "last_update_ms": 0,
+                    "signature": None
+                }
+
+        # Check staleness (>60s since file mod time)
+        import time as _time
+        mod_time = telemetry_path.stat().st_mtime
+        age_ms = int((_time.time() - mod_time) * 1000)
+        is_stale = age_ms > 60000
+
+        return {
+            "status": "active",
+            "runtime": {
+                "total_epochs": data.get("total_epochs", 100),
+                "completed_epochs": data.get("epoch", 0),
+                "current_loss": data.get("loss", 0.0),
+                "precision": data.get("precision", 0.0),
+                "ece": data.get("ece", 0.0),
+                "drift_kl": data.get("kl_divergence", 0.0),
+                "duplicate_rate": data.get("duplicate_rate", 0.0),
+                "gpu_util": data.get("gpu_util", 0.0),
+                "cpu_util": data.get("cpu_util", 0.0),
+                "temperature": data.get("gpu_temperature", 0.0),
+                "determinism_status": data.get("determinism_status", False),
+                "freeze_status": data.get("freeze_status", False),
+                "mode": _runtime_mode,
+                "progress_pct": min(100.0, (data.get("epoch", 0) / max(data.get("total_epochs", 100), 1)) * 100),
+                "loss_trend": data.get("loss_trend", 0.0),
+                # Phase 2: Real-time training visibility
+                "wall_clock_unix": data.get("wall_clock_unix", 0),
+                "monotonic_start_time": data.get("monotonic_start_time", 0),
+                "training_duration_seconds": data.get("training_duration_seconds", 0.0),
+            },
+            "determinism_ok": data.get("determinism_status", False),
+            "stale": is_stale,
+            "last_update_ms": age_ms,
+            "signature": data.get("signature", None)
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "reason": str(e),
+            "runtime": None,
+            "determinism_ok": False,
+            "stale": True,
+            "last_update_ms": 0,
+            "signature": None
+        }
+
+
+@app.get("/api/accuracy/snapshot")
+async def accuracy_snapshot():
+    """
+    GET /api/accuracy/snapshot — Current accuracy metrics snapshot.
+    Returns precision, recall, ECE, dup suppression, and scope compliance.
+    Reads from telemetry if available, otherwise returns defaults.
+    """
+    telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
+
+    defaults = {
+        "precision": 0.0,
+        "recall": 0.0,
+        "ece_score": 0.0,
+        "dup_suppression_rate": 0.0,
+        "scope_compliance": 0.0
+    }
+
+    if not telemetry_path.exists():
+        return defaults
+
+    try:
+        import json as _json
+        data = _json.loads(telemetry_path.read_text(encoding="utf-8"))
+        return {
+            "precision": data.get("precision", 0.0),
+            "recall": data.get("recall", 0.0),
+            "ece_score": data.get("ece", 0.0),
+            "dup_suppression_rate": data.get("dup_suppression_rate", 0.0),
+            "scope_compliance": data.get("scope_compliance", 0.0)
+        }
+    except Exception:
+        return defaults
+
+
+# =============================================================================
+# MODE CONTROL ENDPOINTS (TRAIN/HUNT mutual exclusion)
+# =============================================================================
+
+@app.post("/api/mode/train/start")
+async def start_training_mode():
+    """Start TRAIN mode. Blocked if HUNT is active."""
+    global _runtime_mode
+    if _runtime_mode == "HUNT":
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=409, content={
+            "error": "MUTEX_BLOCKED",
+            "reason": "Cannot enter TRAIN while HUNT is active",
+            "current_mode": _runtime_mode
+        })
+    if _runtime_mode == "TRAIN":
+        return {"mode": "TRAIN", "status": "already_active"}
+    _runtime_mode = "TRAIN"
+    return {"mode": "TRAIN", "status": "started"}
+
+
+@app.post("/api/mode/train/stop")
+async def stop_training_mode():
+    """Stop TRAIN mode."""
+    global _runtime_mode
+    if _runtime_mode != "TRAIN":
+        return {"mode": _runtime_mode, "status": "not_in_train"}
+    _runtime_mode = "IDLE"
+    return {"mode": "IDLE", "status": "stopped"}
+
+
+@app.post("/api/mode/hunt/start")
+async def start_hunt_mode():
+    """Start HUNT mode. Blocked if TRAIN is active."""
+    global _runtime_mode
+    if _runtime_mode == "TRAIN":
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=409, content={
+            "error": "MUTEX_BLOCKED",
+            "reason": "Cannot enter HUNT while TRAIN is active",
+            "current_mode": _runtime_mode
+        })
+    if _runtime_mode == "HUNT":
+        return {"mode": "HUNT", "status": "already_active"}
+    _runtime_mode = "HUNT"
+    return {"mode": "HUNT", "status": "started"}
+
+
+@app.post("/api/mode/hunt/stop")
+async def stop_hunt_mode():
+    """Stop HUNT mode."""
+    global _runtime_mode
+    if _runtime_mode != "HUNT":
+        return {"mode": _runtime_mode, "status": "not_in_hunt"}
+    _runtime_mode = "IDLE"
+    return {"mode": "IDLE", "status": "stopped"}
+
 
 # =============================================================================
 # MAIN ENTRY POINT

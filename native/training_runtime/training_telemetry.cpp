@@ -446,11 +446,15 @@ static uint32_t compute_payload_crc(const TelemetryPayload &p) {
   int len = std::snprintf(
       buf, sizeof(buf),
       "v%d|det:%d|frz:%d|prec:%.8f|rec:%.8f|kl:%.8f|ece:%.8f|"
-      "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu|mono:%llu",
+      "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu|mono:%llu|"
+      "start:%llu|wall:%llu|dur:%.8f|rate:%.8f",
       p.schema_version, p.determinism_status ? 1 : 0, p.freeze_status ? 1 : 0,
       p.precision, p.recall, p.kl_divergence, p.ece, p.loss, p.gpu_temperature,
       p.epoch, p.batch_size, static_cast<unsigned long long>(p.timestamp),
-      static_cast<unsigned long long>(p.monotonic_timestamp));
+      static_cast<unsigned long long>(p.monotonic_timestamp),
+      static_cast<unsigned long long>(p.monotonic_start_time),
+      static_cast<unsigned long long>(p.wall_clock_unix),
+      p.training_duration_seconds, p.samples_per_second);
   return compute_crc32(buf, static_cast<size_t>(len));
 }
 
