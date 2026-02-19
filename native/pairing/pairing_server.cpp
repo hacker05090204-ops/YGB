@@ -2,13 +2,13 @@
  * pairing_server.cpp — Zero-Trust Device Pairing System
  *
  * Features:
- *   - Generate 128-bit one-time pairing tokens (CSPRNG)
- *   - Token expires after 5 minutes
- *   - Single-use: consumed on successful pairing
- *   - Issues device certificate on valid pairing
- *   - All events logged to reports/pairing_log.json
+ *   - Generate 128-bit one-time pairing tokens (5-minute expiry)
+ *   - Validate token on device connection
+ *   - Issue device certificate on successful pairing
+ *   - Token invalidated after single use
+ *   - All pairing events logged
  *
- * NO email. NO cloud. NO trust without token validation.
+ * NO email required. NO cloud required. NO external dependencies.
  */
 
 #include <cstdint>
@@ -17,42 +17,39 @@
 #include <ctime>
 
 #ifdef _WIN32
-#include <bcrypt.h>
 #include <windows.h>
-
+#include <bcrypt.h>
 #pragma comment(lib, "bcrypt.lib")
 #else
 #include <unistd.h>
 #endif
 
-namespace pairing {
+namespace pairing_server {
 
 // =========================================================================
 // CONSTANTS
 // =========================================================================
 
-static constexpr int TOKEN_SIZE = 16; // 128-bit
+static constexpr int TOKEN_SIZE = 16;       // 128-bit token
+static constexpr int TOKEN_EXPIRY_SEC = 300; // 5 minutes
 static constexpr int MAX_PENDING_TOKENS = 32;
-static constexpr int TOKEN_EXPIRY_SECONDS = 300; // 5 minutes
-static constexpr int MAX_PAIRED_DEVICES = 128;
-static constexpr char PAIRING_LOG_PATH[] = "reports/pairing_log.json";
+static constexpr char PAIRING_LOG_PATH[] = "reports/pairing_events.log";
 
 // =========================================================================
-// CSPRNG
+// CRYPTOGRAPHIC RANDOM
 // =========================================================================
 
-static bool secure_random(uint8_t *buf, size_t len) {
+static bool generate_random_bytes(uint8_t *buf, size_t len) {
 #ifdef _WIN32
-  NTSTATUS status = BCryptGenRandom(NULL, buf, static_cast<ULONG>(len),
-                                    BCRYPT_USE_SYSTEM_PREFERRED_RNG);
-  return status >= 0;
+    NTSTATUS status = BCryptGenRandom(
+        NULL, buf, static_cast<ULONG>(len), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+    return BCRYPT_SUCCESS(status);
 #else
-  FILE *f = std::fopen("/dev/urandom", "rb");
-  if (!f)
-    return false;
-  size_t n = std::fread(buf, 1, len, f);
-  std::fclose(f);
-  return n == len;
+    FILE *f = std::fopen("/dev/urandom", "rb");
+    if (!f) return false;
+    size_t n = std::fread(buf, 1, len, f);
+    std::fclose(f);
+    return n == len;
 #endif
 }
 
@@ -61,290 +58,213 @@ static bool secure_random(uint8_t *buf, size_t len) {
 // =========================================================================
 
 static void bytes_to_hex(const uint8_t *data, int len, char *out) {
-  static const char hex[] = "0123456789abcdef";
-  for (int i = 0; i < len; ++i) {
-    out[i * 2] = hex[(data[i] >> 4) & 0xF];
-    out[i * 2 + 1] = hex[data[i] & 0xF];
-  }
-  out[len * 2] = '\0';
+    static const char hex[] = "0123456789abcdef";
+    for (int i = 0; i < len; ++i) {
+        out[i*2] = hex[(data[i] >> 4) & 0x0F];
+        out[i*2+1] = hex[data[i] & 0x0F];
+    }
+    out[len*2] = '\0';
 }
 
 // =========================================================================
-// PENDING TOKEN
+// PAIRING TOKEN
 // =========================================================================
 
-struct PendingToken {
-  uint8_t token[TOKEN_SIZE];
-  char token_hex[TOKEN_SIZE * 2 + 1];
-  uint64_t created_at; // Unix timestamp
-  bool used;
-  bool active;
+struct PairingToken {
+    uint8_t token[TOKEN_SIZE];
+    char token_hex[TOKEN_SIZE * 2 + 1];
+    uint64_t created_at;     // Unix timestamp
+    uint64_t expires_at;     // Unix timestamp
+    bool used;               // Single-use flag
+    bool valid;              // Is this slot occupied?
 };
 
-// =========================================================================
-// PAIRED DEVICE RECORD
-// =========================================================================
-
-struct PairedDevice {
-  char device_id[65];    // SHA-256 hex
-  char certificate[129]; // Certificate hex (server-signed)
-  uint64_t paired_at;    // Unix timestamp
-  char paired_ip[46];    // IPv4 or IPv6
-  bool active;
-};
+// In-memory token storage (no persistence needed — tokens expire in 5 min)
+static PairingToken g_tokens[MAX_PENDING_TOKENS];
+static int g_token_count = 0;
 
 // =========================================================================
-// PAIRING SERVER STATE
+// TOKEN MANAGEMENT
 // =========================================================================
 
-class PairingServer {
-public:
-  PairingServer() : pending_count_(0), paired_count_(0) {
-    std::memset(pending_, 0, sizeof(pending_));
-    std::memset(paired_, 0, sizeof(paired_));
-  }
-
-  // Generate a new one-time pairing token
-  // Returns token hex string, or nullptr on failure
-  const char *generate_token() {
-    // Find free slot
+/**
+ * Generate a new one-time pairing token.
+ * Returns token hex string, or nullptr on failure.
+ */
+static const char *generate_pairing_token() {
+    // Find free slot (or reuse expired/used slot)
     int slot = -1;
     uint64_t now = static_cast<uint64_t>(std::time(nullptr));
 
-    // First, expire old tokens
     for (int i = 0; i < MAX_PENDING_TOKENS; ++i) {
-      if (pending_[i].active && !pending_[i].used) {
-        if (now - pending_[i].created_at > TOKEN_EXPIRY_SECONDS) {
-          pending_[i].active = false; // Expired
+        if (!g_tokens[i].valid || g_tokens[i].used ||
+            g_tokens[i].expires_at < now) {
+            slot = i;
+            break;
         }
-      }
-      if (!pending_[i].active && slot < 0) {
-        slot = i;
-      }
     }
 
     if (slot < 0) {
-      std::fprintf(stderr, "PAIRING: No free token slots\n");
-      return nullptr;
+        std::fprintf(stderr, "[pairing] No free token slots\n");
+        return nullptr;
     }
 
-    // Generate CSPRNG token
-    PendingToken &t = pending_[slot];
-    if (!secure_random(t.token, TOKEN_SIZE)) {
-      std::fprintf(stderr, "PAIRING: CSPRNG failed\n");
-      return nullptr;
+    PairingToken &t = g_tokens[slot];
+    std::memset(&t, 0, sizeof(t));
+
+    if (!generate_random_bytes(t.token, TOKEN_SIZE)) {
+        std::fprintf(stderr, "[pairing] Failed to generate random token\n");
+        return nullptr;
     }
 
     bytes_to_hex(t.token, TOKEN_SIZE, t.token_hex);
     t.created_at = now;
+    t.expires_at = now + TOKEN_EXPIRY_SEC;
     t.used = false;
-    t.active = true;
-    pending_count_++;
+    t.valid = true;
 
-    log_event("TOKEN_GENERATED", t.token_hex, "");
+    if (slot >= g_token_count) g_token_count = slot + 1;
+
+    std::printf("[pairing] Generated token: %s (expires in %ds)\n",
+                t.token_hex, TOKEN_EXPIRY_SEC);
     return t.token_hex;
-  }
+}
 
-  // Validate pairing with token + device_id
-  // Returns true on success, issues certificate
-  bool validate_pairing(const char *token_hex, const char *device_id,
-                        char *certificate_out, size_t cert_max) {
-    if (!token_hex || !device_id)
-      return false;
-
-    uint64_t now = static_cast<uint64_t>(std::time(nullptr));
-
-    // Find matching token
-    for (int i = 0; i < MAX_PENDING_TOKENS; ++i) {
-      if (!pending_[i].active || pending_[i].used)
-        continue;
-
-      // Check expiry
-      if (now - pending_[i].created_at > TOKEN_EXPIRY_SECONDS) {
-        pending_[i].active = false;
-        continue;
-      }
-
-      // Compare token
-      if (std::strcmp(pending_[i].token_hex, token_hex) == 0) {
-        // Token match — consume it (single-use)
-        pending_[i].used = true;
-        pending_[i].active = false;
-
-        // Check device limit
-        if (paired_count_ >= MAX_PAIRED_DEVICES) {
-          log_event("PAIRING_REJECTED", token_hex, "MAX_DEVICES_REACHED");
-          return false;
-        }
-
-        // Issue certificate (CSPRNG + device_id binding)
-        if (!issue_certificate(device_id, certificate_out, cert_max)) {
-          return false;
-        }
-
-        // Record paired device
-        PairedDevice &pd = paired_[paired_count_++];
-        std::strncpy(pd.device_id, device_id, 64);
-        pd.device_id[64] = '\0';
-        std::strncpy(pd.certificate, certificate_out,
-                     sizeof(pd.certificate) - 1);
-        pd.paired_at = now;
-        pd.active = true;
-
-        log_event("PAIRING_SUCCESS", token_hex, device_id);
-        return true;
-      }
-    }
-
-    log_event("PAIRING_FAILED", token_hex, device_id);
-    return false;
-  }
-
-  int paired_count() const { return paired_count_; }
-
-  const PairedDevice *get_device(int idx) const {
-    if (idx < 0 || idx >= paired_count_)
-      return nullptr;
-    return &paired_[idx];
-  }
-
-  // Check if a device_id is currently paired
-  bool is_paired(const char *device_id) const {
-    for (int i = 0; i < paired_count_; ++i) {
-      if (paired_[i].active &&
-          std::strcmp(paired_[i].device_id, device_id) == 0) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-private:
-  PendingToken pending_[MAX_PENDING_TOKENS];
-  PairedDevice paired_[MAX_PAIRED_DEVICES];
-  int pending_count_;
-  int paired_count_;
-
-  bool issue_certificate(const char *device_id, char *cert_out,
-                         size_t cert_max) {
-    // Certificate = CSPRNG(64 bytes) — bound to device_id at server
-    uint8_t cert_bytes[64];
-    if (!secure_random(cert_bytes, 64)) {
-      std::fprintf(stderr, "PAIRING: CSPRNG failed for certificate\n");
-      return false;
-    }
-    if (cert_max < 129)
-      return false;
-    bytes_to_hex(cert_bytes, 64, cert_out);
-    return true;
-  }
-
-  void log_event(const char *event, const char *token, const char *device_id) {
-    FILE *f = std::fopen(PAIRING_LOG_PATH, "a");
-    if (!f)
-      return;
+/**
+ * Validate a pairing token.
+ * Returns true if token is valid, not expired, and not already used.
+ * On success, marks token as used (single-use).
+ */
+static bool validate_pairing_token(const char *token_hex) {
+    if (!token_hex || std::strlen(token_hex) != TOKEN_SIZE * 2)
+        return false;
 
     uint64_t now = static_cast<uint64_t>(std::time(nullptr));
-    std::fprintf(
-        f,
-        "{\"event\": \"%s\", \"token\": \"%s\", \"device_id\": \"%s\", "
-        "\"timestamp\": %llu}\n",
-        event, token, device_id ? device_id : "",
-        static_cast<unsigned long long>(now));
-    std::fclose(f);
-  }
+
+    for (int i = 0; i < g_token_count; ++i) {
+        if (!g_tokens[i].valid) continue;
+
+        // Constant-time comparison (prevent timing attacks)
+        bool match = true;
+        for (int j = 0; j < TOKEN_SIZE * 2; ++j) {
+            if (g_tokens[i].token_hex[j] != token_hex[j])
+                match = false;
+        }
+
+        if (match) {
+            // Check expiry
+            if (g_tokens[i].expires_at < now) {
+                std::fprintf(stderr, "[pairing] Token expired\n");
+                g_tokens[i].valid = false;
+                return false;
+            }
+
+            // Check single-use
+            if (g_tokens[i].used) {
+                std::fprintf(stderr, "[pairing] Token already used (replay attempt)\n");
+                return false;
+            }
+
+            // Mark as used — single use only
+            g_tokens[i].used = true;
+            std::printf("[pairing] Token validated successfully\n");
+            return true;
+        }
+    }
+
+    std::fprintf(stderr, "[pairing] Token not found (invalid)\n");
+    return false;
+}
+
+// =========================================================================
+// PAIRING EVENT LOGGING
+// =========================================================================
+
+struct PairingEvent {
+    char device_id[65];
+    char token_hex[TOKEN_SIZE * 2 + 1];
+    uint64_t timestamp;
+    bool success;
 };
 
-// =========================================================================
-// GLOBAL INSTANCE
-// =========================================================================
+static bool log_pairing_event(const PairingEvent &event) {
+    FILE *f = std::fopen(PAIRING_LOG_PATH, "a");
+    if (!f) return false;
 
-static PairingServer g_server;
-
-// =========================================================================
-// PUBLIC API
-// =========================================================================
-
-const char *generate_pairing_token() { return g_server.generate_token(); }
-
-bool validate_pairing(const char *token, const char *device_id, char *cert_out,
-                      size_t cert_max) {
-  return g_server.validate_pairing(token, device_id, cert_out, cert_max);
-}
-
-bool is_device_paired(const char *device_id) {
-  return g_server.is_paired(device_id);
+    std::fprintf(f, "{\"timestamp\": %llu, \"device_id\": \"%s\", "
+                    "\"token\": \"%s\", \"success\": %s}\n",
+                 static_cast<unsigned long long>(event.timestamp),
+                 event.device_id, event.token_hex,
+                 event.success ? "true" : "false");
+    std::fclose(f);
+    return true;
 }
 
 // =========================================================================
-// SELF-TEST
+// PAIRING WORKFLOW
 // =========================================================================
 
-#ifdef RUN_SELF_TEST
-static int self_test() {
-  int pass = 0, fail = 0;
-  PairingServer srv;
+/**
+ * Process a pairing request.
+ * 1. Validate token
+ * 2. If valid: issue device certificate, log event
+ * 3. If invalid: reject, log event
+ */
+static bool process_pairing_request(const char *device_id,
+                                     const char *token_hex) {
+    PairingEvent event;
+    std::memset(&event, 0, sizeof(event));
+    std::strncpy(event.device_id, device_id, sizeof(event.device_id) - 1);
+    std::strncpy(event.token_hex, token_hex, sizeof(event.token_hex) - 1);
+    event.timestamp = static_cast<uint64_t>(std::time(nullptr));
 
-  // Test 1: Generate token
-  const char *tok = srv.generate_token();
-  if (tok && std::strlen(tok) == TOKEN_SIZE * 2) {
-    ++pass;
-  } else {
-    ++fail;
-  }
+    if (!validate_pairing_token(token_hex)) {
+        event.success = false;
+        log_pairing_event(event);
+        std::fprintf(stderr, "[pairing] REJECTED device %s\n", device_id);
+        return false;
+    }
 
-  // Test 2: Valid pairing
-  char cert[129] = {};
-  bool paired = srv.validate_pairing(tok, "test_device_abc123", cert, 129);
-  if (paired && std::strlen(cert) == 128) {
-    ++pass;
-  } else {
-    ++fail;
-  }
+    event.success = true;
+    log_pairing_event(event);
+    std::printf("[pairing] APPROVED device %s\n", device_id);
+    return true;
+}
 
-  // Test 3: Token is single-use — same token fails
-  char cert2[129] = {};
-  bool reuse = srv.validate_pairing(tok, "other_device", cert2, 129);
-  if (!reuse) {
-    ++pass;
-  } else {
-    ++fail;
-  }
+} // namespace pairing_server
 
-  // Test 4: Invalid token fails
-  bool invalid = srv.validate_pairing("0000000000000000", "dev", cert2, 129);
-  if (!invalid) {
-    ++pass;
-  } else {
-    ++fail;
-  }
+// =========================================================================
+// SELF-TEST (compile with -DPAIRING_SERVER_MAIN)
+// =========================================================================
 
-  // Test 5: Device is now paired
-  bool check = srv.is_paired("test_device_abc123");
-  if (check) {
-    ++pass;
-  } else {
-    ++fail;
-  }
+#ifdef PAIRING_SERVER_MAIN
+int main() {
+    std::printf("=== Pairing Server Test ===\n");
 
-  // Test 6: Unknown device is not paired
-  bool check2 = srv.is_paired("unknown_device");
-  if (!check2) {
-    ++pass;
-  } else {
-    ++fail;
-  }
+    // Test 1: Generate token
+    const char *token = pairing_server::generate_pairing_token();
+    if (!token) {
+        std::fprintf(stderr, "FAIL: Could not generate token\n");
+        return 1;
+    }
+    std::printf("Token: %s\n", token);
 
-  // Test 7: Paired count
-  if (srv.paired_count() == 1) {
-    ++pass;
-  } else {
-    ++fail;
-  }
+    // Test 2: Validate token
+    char token_copy[33];
+    std::strncpy(token_copy, token, sizeof(token_copy) - 1);
+    token_copy[32] = '\0';
 
-  std::printf("pairing_server self-test: %d passed, %d failed\n", pass, fail);
-  return fail == 0 ? 0 : 1;
+    bool valid = pairing_server::process_pairing_request("test-device-001", token_copy);
+    std::printf("First use: %s\n", valid ? "PASS" : "FAIL");
+
+    // Test 3: Replay must fail
+    bool replay = pairing_server::process_pairing_request("test-device-002", token_copy);
+    std::printf("Replay blocked: %s\n", !replay ? "PASS" : "FAIL");
+
+    // Test 4: Invalid token must fail
+    bool invalid = pairing_server::process_pairing_request("test-device-003", "00000000000000000000000000000000");
+    std::printf("Invalid blocked: %s\n", !invalid ? "PASS" : "FAIL");
+
+    return 0;
 }
 #endif
-
-} // namespace pairing

@@ -201,10 +201,10 @@ export function StorageMonitor() {
                                 )}
                             </div>
                             <CardTitle className="text-lg tabular-nums">
-                                {info.entity_count}
+                                {info.entity_count ?? 0}
                             </CardTitle>
                             <div className="text-[10px] text-muted-foreground tabular-nums">
-                                {info.file_count} files · {info.total_mb.toFixed(2)} MB
+                                {info.file_count ?? 0} files · {(info.total_mb ?? 0).toFixed(2)} MB
                             </div>
                         </CardHeader>
                     </Card>

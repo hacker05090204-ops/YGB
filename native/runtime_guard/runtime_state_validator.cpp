@@ -54,7 +54,13 @@ enum class RuntimeStatus : uint8_t {
     FIELD_MISSING = 4,
     DETERMINISM_FAILED = 5,
     FREEZE_FAILED = 6,
-    CRC_MISMATCH = 7
+    CRC_MISMATCH = 7,
+    // Phase 9: Fail-safe enforcement
+    HMAC_INVALID = 8,
+    CLOCK_ROLLBACK = 9,
+    THERMAL_HALT = 10,
+    NOT_PAIRED = 11,
+    GOVERNANCE_LOCKED = 12
 };
 
 static const char *status_name(RuntimeStatus s) {
@@ -67,6 +73,11 @@ static const char *status_name(RuntimeStatus s) {
     case RuntimeStatus::DETERMINISM_FAILED: return "DETERMINISM_FAILED";
     case RuntimeStatus::FREEZE_FAILED: return "FREEZE_FAILED";
     case RuntimeStatus::CRC_MISMATCH: return "CRC_MISMATCH";
+    case RuntimeStatus::HMAC_INVALID: return "HMAC_INVALID";
+    case RuntimeStatus::CLOCK_ROLLBACK: return "CLOCK_ROLLBACK";
+    case RuntimeStatus::THERMAL_HALT: return "THERMAL_HALT";
+    case RuntimeStatus::NOT_PAIRED: return "NOT_PAIRED";
+    case RuntimeStatus::GOVERNANCE_LOCKED: return "GOVERNANCE_LOCKED";
     default: return "UNKNOWN";
     }
 }
@@ -181,18 +192,28 @@ static uint32_t recompute_crc(const char *buf) {
     int epoch = parse_int_after(buf, "epoch");
     int batch = parse_int_after(buf, "batch_size");
     uint64_t timestamp = parse_uint64_after(buf, "timestamp");
+    uint64_t mono = parse_uint64_after(buf, "monotonic_timestamp");
+    uint64_t start = parse_uint64_after(buf, "monotonic_start_time");
+    uint64_t wall = parse_uint64_after(buf, "wall_clock_unix");
+    double dur = parse_double_after(buf, "training_duration_seconds");
+    double rate = parse_double_after(buf, "samples_per_second");
 
     char payload[2048];
     int len = std::snprintf(payload, sizeof(payload),
         "v%d|det:%d|frz:%d|prec:%.8f|rec:%.8f|kl:%.8f|ece:%.8f|"
-        "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu",
+        "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu|mono:%llu|"
+        "start:%llu|wall:%llu|dur:%.8f|rate:%.8f",
         schema_version,
         determinism ? 1 : 0,
         freeze ? 1 : 0,
         precision, recall, kl, ece,
         loss, temp,
         epoch, batch,
-        static_cast<unsigned long long>(timestamp));
+        static_cast<unsigned long long>(timestamp),
+        static_cast<unsigned long long>(mono),
+        static_cast<unsigned long long>(start),
+        static_cast<unsigned long long>(wall),
+        dur, rate);
     return compute_crc32(payload, static_cast<size_t>(len));
 }
 
@@ -365,9 +386,75 @@ static ValidationResult validate() {
         return result;
     }
 
+    // All core checks passed — now Phase 9 fail-safe enforcement
+
+    // Step 8: HMAC field must be present (unsigned telemetry = rejected)
+    if (!has_field(buf, "hmac")) {
+        result.status = RuntimeStatus::HMAC_INVALID;
+        std::snprintf(result.reason, sizeof(result.reason),
+                      "HMAC field missing — unsigned telemetry rejected");
+        result.hunt_disabled = true;
+        result.mode_a_forced = true;
+        log_incident(result.status, result.reason);
+        force_mode_a();
+        return result;
+    }
+
+    // Step 9: Clock rollback detection (monotonic_timestamp must increase)
+    uint64_t mono_ts = parse_uint64_after(buf, "monotonic_timestamp");
+    uint64_t start_ts = parse_uint64_after(buf, "monotonic_start_time");
+    if (mono_ts > 0 && start_ts > 0 && mono_ts < start_ts) {
+        result.status = RuntimeStatus::CLOCK_ROLLBACK;
+        std::snprintf(result.reason, sizeof(result.reason),
+                      "Clock rollback detected: monotonic=%llu < start=%llu",
+                      static_cast<unsigned long long>(mono_ts),
+                      static_cast<unsigned long long>(start_ts));
+        result.hunt_disabled = true;
+        result.mode_a_forced = true;
+        log_incident(result.status, result.reason);
+        force_mode_a();
+        return result;
+    }
+
+    // Step 10: Thermal over 88°C → HALT training
+    double gpu_temp = parse_double_after(buf, "gpu_temperature");
+    if (gpu_temp > 88.0) {
+        result.status = RuntimeStatus::THERMAL_HALT;
+        std::snprintf(result.reason, sizeof(result.reason),
+                      "GPU temperature %.1f°C exceeds 88°C thermal limit — HALT",
+                      gpu_temp);
+        result.hunt_disabled = true;
+        result.mode_a_forced = true;
+        log_incident(result.status, result.reason);
+        force_mode_a();
+        return result;
+    }
+
+    // Step 11: Governance lock check
+    {
+        FILE *gov = std::fopen("reports/governance_lock.json", "r");
+        if (gov) {
+            char gov_buf[256];
+            std::memset(gov_buf, 0, sizeof(gov_buf));
+            std::fread(gov_buf, 1, sizeof(gov_buf) - 1, gov);
+            std::fclose(gov);
+            if (std::strstr(gov_buf, "\"locked\": true") ||
+                std::strstr(gov_buf, "\"locked\":true")) {
+                result.status = RuntimeStatus::GOVERNANCE_LOCKED;
+                std::snprintf(result.reason, sizeof(result.reason),
+                              "Governance lock active — training blocked");
+                result.hunt_disabled = true;
+                result.mode_a_forced = true;
+                log_incident(result.status, result.reason);
+                force_mode_a();
+                return result;
+            }
+        }
+    }
+
     // All checks passed
     std::snprintf(result.reason, sizeof(result.reason),
-                  "All validation checks passed");
+                  "All validation checks passed (including Phase 9 fail-safe)");
     return result;
 }
 

@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
-import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck } from "lucide-react"
+import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck, Clock } from "lucide-react"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -81,12 +81,21 @@ export default function ControlPage() {
             gpu_util: number; cpu_util: number; temperature: number;
             determinism_status: boolean; freeze_status: boolean;
             mode: string; progress_pct: number; loss_trend: number;
+            // Phase 2: Real-time training visibility
+            wall_clock_unix: number;
+            monotonic_start_time: number;
+            training_duration_seconds: number;
         };
         determinism_ok?: boolean;
         stale?: boolean;
         last_update_ms?: number;
         signature?: string;
     } | null>(null)
+
+    // Phase 2: Real-time clock and stall detection
+    const [liveTime, setLiveTime] = useState<number>(Date.now())
+    const lastTelemetryTs = useRef<number>(0)
+    const [isStalled, setIsStalled] = useState(false)
 
     // Initialize dashboard
     useEffect(() => {
@@ -119,7 +128,7 @@ export default function ControlPage() {
         initDashboard()
     }, [])
 
-    // Poll accuracy snapshot
+    // Poll accuracy snapshot — every 1s for real-time updates
     useEffect(() => {
         const fetchAccuracy = async () => {
             try {
@@ -131,11 +140,11 @@ export default function ControlPage() {
             } catch { /* offline fallback */ }
         }
         fetchAccuracy()
-        const interval = setInterval(fetchAccuracy, 10000)
+        const interval = setInterval(fetchAccuracy, 1000)
         return () => clearInterval(interval)
     }, [])
 
-    // Poll runtime status from backend (every 30s)
+    // Poll runtime status from backend — every 1s for real-time updates
     useEffect(() => {
         const fetchRuntimeStatus = async () => {
             try {
@@ -143,13 +152,39 @@ export default function ControlPage() {
                 if (res.ok) {
                     const data = await res.json()
                     setRuntimeStatus(data)
+                    // Phase 2: Track telemetry freshness for stall detection
+                    if (data.runtime?.wall_clock_unix) {
+                        const newTs = data.runtime.wall_clock_unix
+                        if (lastTelemetryTs.current > 0 && newTs === lastTelemetryTs.current) {
+                            // Timestamp hasn't changed — check stall threshold (30s)
+                            const elapsed = (Date.now() / 1000) - newTs
+                            setIsStalled(elapsed > 30)
+                        } else {
+                            setIsStalled(false)
+                        }
+                        lastTelemetryTs.current = newTs
+                    }
                 }
             } catch { /* backend offline — keep last known state */ }
         }
         fetchRuntimeStatus()
-        const interval = setInterval(fetchRuntimeStatus, 30000)
+        const interval = setInterval(fetchRuntimeStatus, 1000)
         return () => clearInterval(interval)
     }, [])
+
+    // Phase 2: Live clock tick every 1s
+    useEffect(() => {
+        const tick = setInterval(() => setLiveTime(Date.now()), 1000)
+        return () => clearInterval(tick)
+    }, [])
+
+    // Phase 2: Format seconds duration to HH:MM:SS
+    const formatDuration = (seconds: number): string => {
+        const h = Math.floor(seconds / 3600)
+        const m = Math.floor((seconds % 3600) / 60)
+        const s = Math.floor(seconds % 60)
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+    }
 
     // Mode transition handlers
     const handleStartTraining = useCallback(async () => {
@@ -554,18 +589,72 @@ export default function ControlPage() {
                                         <p className="text-xs text-muted-foreground">C++ Authoritative Source</p>
                                     </div>
                                 </div>
-                                {runtimeStatus?.stale && (
-                                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium animate-pulse">
-                                        <AlertTriangle className="w-3 h-3" />
-                                        STALE DATA
-                                    </div>
-                                )}
-                                {runtimeStatus?.status === "awaiting_data" && (
-                                    <div className="px-3 py-1 rounded-full bg-zinc-500/20 text-zinc-400 text-xs font-medium">
-                                        Awaiting Training Start
-                                    </div>
-                                )}
+                                <div className="flex items-center gap-2">
+                                    {isStalled && (
+                                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-medium animate-pulse">
+                                            <AlertTriangle className="w-3 h-3" />
+                                            ⚠ Training Stalled
+                                        </div>
+                                    )}
+                                    {runtimeStatus?.stale && (
+                                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium animate-pulse">
+                                            <AlertTriangle className="w-3 h-3" />
+                                            STALE DATA
+                                        </div>
+                                    )}
+                                    {runtimeStatus?.status === "awaiting_data" && (
+                                        <div className="px-3 py-1 rounded-full bg-zinc-500/20 text-zinc-400 text-xs font-medium">
+                                            Awaiting Training Start
+                                        </div>
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Phase 2: Real-time timestamp display */}
+                            {runtimeStatus?.status === "active" && runtimeStatus.runtime && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                                    <div className="p-2.5 rounded-xl bg-background/50 border border-emerald-500/20">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Clock className="w-3 h-3 text-emerald-400" />
+                                            <p className="text-[10px] text-emerald-400 uppercase tracking-wider font-medium">Training Started</p>
+                                        </div>
+                                        <p className="text-xs font-mono text-emerald-300">
+                                            {runtimeStatus.runtime.wall_clock_unix > 0
+                                                ? new Date((runtimeStatus.runtime.wall_clock_unix - runtimeStatus.runtime.training_duration_seconds) * 1000).toLocaleTimeString()
+                                                : "—"}
+                                        </p>
+                                    </div>
+                                    <div className="p-2.5 rounded-xl bg-background/50 border border-blue-500/20">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Clock className="w-3 h-3 text-blue-400" />
+                                            <p className="text-[10px] text-blue-400 uppercase tracking-wider font-medium">Elapsed Time</p>
+                                        </div>
+                                        <p className="text-xs font-mono text-blue-300">
+                                            {formatDuration(runtimeStatus.runtime.training_duration_seconds)}
+                                        </p>
+                                    </div>
+                                    <div className="p-2.5 rounded-xl bg-background/50 border border-violet-500/20">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Clock className="w-3 h-3 text-violet-400" />
+                                            <p className="text-[10px] text-violet-400 uppercase tracking-wider font-medium">Last Update</p>
+                                        </div>
+                                        <p className="text-xs font-mono text-violet-300">
+                                            {runtimeStatus.runtime.wall_clock_unix > 0
+                                                ? new Date(runtimeStatus.runtime.wall_clock_unix * 1000).toLocaleTimeString()
+                                                : "—"}
+                                        </p>
+                                    </div>
+                                    <div className="p-2.5 rounded-xl bg-background/50 border border-cyan-500/20">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Clock className="w-3 h-3 text-cyan-400" />
+                                            <p className="text-[10px] text-cyan-400 uppercase tracking-wider font-medium">Live Clock</p>
+                                        </div>
+                                        <p className="text-xs font-mono text-cyan-300">
+                                            {new Date(liveTime).toLocaleTimeString()}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
 
                             {runtimeStatus?.status === "active" && runtimeStatus.runtime ? (
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
