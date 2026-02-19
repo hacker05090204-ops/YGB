@@ -18,7 +18,8 @@ from dataclasses import dataclass
 from typing import List, Tuple
 from datetime import datetime, timedelta
 from enum import Enum
-import random
+import json
+from pathlib import Path
 
 
 # =============================================================================
@@ -67,58 +68,53 @@ class ReviewResult:
 # REPORT GENERATION
 # =============================================================================
 
-def generate_valid_reports(count: int = 100) -> List[BugReport]:
-    """Generate valid new bug reports."""
-    severities = ["critical", "high", "medium", "low"]
-    reports = []
-    
-    for i in range(count):
-        reports.append(BugReport(
-            id=f"NEW_{i:03d}",
-            report_type=ReportType.NEW_VALID,
-            title=f"Valid Security Bug #{i}",
-            severity=random.choice(severities),
-            clarity_score=random.uniform(0.7, 1.0),
-            completeness=random.uniform(0.8, 1.0),
-            submission_time=datetime.now().isoformat(),
-        ))
-    
-    return reports
+class RequireRealDataError(RuntimeError):
+    """Raised when no real report data is provided."""
+    pass
 
 
-def generate_duplicate_reports(count: int = 100) -> List[BugReport]:
-    """Generate duplicate bug reports."""
-    reports = []
-    
-    for i in range(count):
-        reports.append(BugReport(
-            id=f"DUP_{i:03d}",
-            report_type=ReportType.DUPLICATE,
-            title=f"Duplicate of Known Issue #{i % 20}",
-            severity="medium",
-            clarity_score=random.uniform(0.5, 0.9),
-            completeness=random.uniform(0.6, 0.9),
-            submission_time=datetime.now().isoformat(),
-        ))
-    
-    return reports
+def load_reports_from_dir(data_dir: str) -> List[BugReport]:
+    """
+    Load real bug reports from a data directory.
 
+    Each report is a JSON file with fields:
+      id, report_type, title, severity, clarity_score, completeness
 
-def generate_invalid_reports(count: int = 100) -> List[BugReport]:
-    """Generate invalid/rejected reports."""
-    reports = []
-    
-    for i in range(count):
-        reports.append(BugReport(
-            id=f"INV_{i:03d}",
-            report_type=ReportType.INVALID,
-            title=f"Not a Bug Report #{i}",
-            severity="none",
-            clarity_score=random.uniform(0.2, 0.6),
-            completeness=random.uniform(0.1, 0.5),
-            submission_time=datetime.now().isoformat(),
-        ))
-    
+    Args:
+        data_dir: Path to directory containing report JSON files.
+
+    Raises:
+        RequireRealDataError: If no reports are found.
+    """
+    reports: List[BugReport] = []
+    data_path = Path(data_dir)
+    if not data_path.exists():
+        raise RequireRealDataError(
+            f"Report data directory not found: {data_dir}. "
+            "Real report data is required — no simulated data allowed."
+        )
+
+    for f in sorted(data_path.glob("*.json")):
+        try:
+            raw = json.loads(f.read_text(encoding="utf-8"))
+            reports.append(BugReport(
+                id=raw["id"],
+                report_type=ReportType(raw["report_type"]),
+                title=raw["title"],
+                severity=raw.get("severity", "medium"),
+                clarity_score=float(raw.get("clarity_score", 0.5)),
+                completeness=float(raw.get("completeness", 0.5)),
+                submission_time=raw.get("submission_time", datetime.now().isoformat()),
+            ))
+        except (KeyError, ValueError, json.JSONDecodeError):
+            continue  # Skip malformed files
+
+    if not reports:
+        raise RequireRealDataError(
+            f"No valid report JSON files found in {data_dir}. "
+            "Real report data is required — no simulated data allowed."
+        )
+
     return reports
 
 
@@ -126,29 +122,26 @@ def generate_invalid_reports(count: int = 100) -> List[BugReport]:
 # REVIEW SIMULATION
 # =============================================================================
 
-def simulate_review(report: BugReport) -> ReviewResult:
-    """Simulate human review of a report."""
+def review_report(report: BugReport) -> ReviewResult:
+    """Review a report using deterministic heuristic logic (no random data)."""
     # Review time based on clarity
     base_time = 5.0  # minutes
-    review_time = base_time / report.clarity_score
-    
-    # Determine outcome
+    review_time = base_time / max(report.clarity_score, 0.1)
+
+    # Deterministic outcome based on report characteristics
     if report.report_type == ReportType.NEW_VALID:
-        # 95% correctly accepted
-        is_correct = random.random() < 0.95
-        outcome = ReportOutcome.ACCEPTED if is_correct else ReportOutcome.REJECTED
+        is_correct = report.clarity_score >= 0.6 and report.completeness >= 0.5
+        outcome = ReportOutcome.ACCEPTED if is_correct else ReportOutcome.NEEDS_INFO
     elif report.report_type == ReportType.DUPLICATE:
-        # 90% correctly marked duplicate
-        is_correct = random.random() < 0.90
+        is_correct = report.completeness >= 0.4
         outcome = ReportOutcome.DUPLICATE if is_correct else ReportOutcome.ACCEPTED
     else:  # Invalid
-        # 85% correctly rejected
-        is_correct = random.random() < 0.85
+        is_correct = report.clarity_score < 0.5 or report.completeness < 0.4
         outcome = ReportOutcome.REJECTED if is_correct else ReportOutcome.NEEDS_INFO
-    
+
     # Friction based on completeness
     friction = 1.0 - report.completeness
-    
+
     return ReviewResult(
         report_id=report.id,
         outcome=outcome,
@@ -215,26 +208,35 @@ def calculate_workflow_metrics(
 # SIMULATION RUNNER
 # =============================================================================
 
-def run_workflow_simulation() -> Tuple[WorkflowMetrics, dict]:
-    """Run full workflow simulation."""
-    # Generate reports
-    valid = generate_valid_reports(100)
-    duplicates = generate_duplicate_reports(100)
-    invalid = generate_invalid_reports(100)
-    all_reports = valid + duplicates + invalid
-    
-    # Simulate reviews
-    results = [simulate_review(r) for r in all_reports]
-    
+def run_workflow_validation(data_dir: str) -> tuple[WorkflowMetrics, dict]:
+    """Run workflow validation on real report data.
+
+    Args:
+        data_dir: Path to directory containing real report JSON files.
+
+    Raises:
+        RequireRealDataError: If no real data is found.
+    """
+    # Load real reports
+    all_reports = load_reports_from_dir(data_dir)
+
+    # Review using deterministic heuristic
+    results = [review_report(r) for r in all_reports]
+
     # Calculate metrics
     metrics = calculate_workflow_metrics(all_reports, results)
-    
+
+    valid_count = sum(1 for r in all_reports if r.report_type == ReportType.NEW_VALID)
+    dup_count = sum(1 for r in all_reports if r.report_type == ReportType.DUPLICATE)
+    inv_count = sum(1 for r in all_reports if r.report_type == ReportType.INVALID)
+
     report = {
         "timestamp": datetime.now().isoformat(),
-        "simulation": {
-            "valid_reports": 100,
-            "duplicate_reports": 100,
-            "invalid_reports": 100,
+        "data_source": data_dir,
+        "counts": {
+            "valid_reports": valid_count,
+            "duplicate_reports": dup_count,
+            "invalid_reports": inv_count,
         },
         "metrics": {
             "avg_clarity": metrics.avg_clarity,
@@ -245,5 +247,5 @@ def run_workflow_simulation() -> Tuple[WorkflowMetrics, dict]:
         },
         "verdict": "PASS" if metrics.false_rejection_rate < 0.10 else "REVIEW",
     }
-    
+
     return metrics, report

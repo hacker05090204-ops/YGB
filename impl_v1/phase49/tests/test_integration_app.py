@@ -91,7 +91,7 @@ class TestBrowserObservationFlow:
             "url": "https://hackerone.com/program/test",
             "text": "Scope: *.example.com, API",
         }
-        result = perform_observation(session.session_id, _mock_data=mock_data)
+        result = perform_observation(session.session_id, _native_data=mock_data)
         assert result.platform == Platform.HACKERONE
     
     def test_observation_detects_scope(self):
@@ -102,7 +102,7 @@ class TestBrowserObservationFlow:
             "url": "https://bugcrowd.com/test",
             "text": "In Scope: *.test.com, web applications",
         }
-        result = perform_observation(session.session_id, _mock_data=mock_data)
+        result = perform_observation(session.session_id, _native_data=mock_data)
         assert "SCOPE_SECTION_DETECTED" in result.scope_hints
     
     def test_observation_to_dashboard(self):
@@ -116,7 +116,7 @@ class TestBrowserObservationFlow:
             "url": "https://hackerone.com",
             "text": "Targets available",
         }
-        observation = perform_observation(session.session_id, _mock_data=mock_data)
+        observation = perform_observation(session.session_id, _native_data=mock_data)
         
         # Update dashboard with discovered targets
         targets = [{"domain": "example.com", "report_count": 10}]

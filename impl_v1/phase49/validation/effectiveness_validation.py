@@ -17,7 +17,7 @@ from typing import List, Dict, Tuple
 from pathlib import Path
 from enum import Enum
 import json
-import random
+from typing import Callable
 
 
 # =============================================================================
@@ -176,42 +176,65 @@ def calculate_metrics(
 
 
 # =============================================================================
-# MOCK SCANNER (for testing framework)
+# SCANNER INTERFACE — Real scanner required, no mock
 # =============================================================================
 
-def mock_scan(case: TestCase) -> ScanResult:
-    """Mock scanner with realistic behavior."""
-    # Simulate high TPR (~95%) and low FPR (~5%)
-    if case.is_vulnerable:
-        detected = random.random() < 0.95  # 95% detection
-    else:
-        detected = random.random() < 0.05  # 5% false positive
-    
-    return ScanResult(
-        test_id=case.id,
-        detected=detected,
-        confidence=random.uniform(0.7, 1.0) if detected else random.uniform(0.0, 0.3),
-        detection_type=case.vulnerability_type.value if detected and case.vulnerability_type else None,
-    )
+class RequireScannerError(RuntimeError):
+    """Raised when no real scanner is provided for validation."""
+    pass
+
+
+def scan_case(
+    case: TestCase,
+    scanner: Callable[[TestCase], ScanResult],
+) -> ScanResult:
+    """
+    Scan a test case using the provided REAL scanner.
+
+    Args:
+        case: Test case to scan.
+        scanner: A callable that implements real detection logic.
+
+    Returns:
+        ScanResult from the real scanner.
+    """
+    if scanner is None:
+        raise RequireScannerError(
+            "A real scanner implementation is required. "
+            "No mock/simulated scanning is allowed."
+        )
+    return scanner(case)
 
 
 # =============================================================================
 # TEST RUNNER
 # =============================================================================
 
-def run_effectiveness_validation() -> Tuple[EffectivenessMetrics, dict]:
-    """Run full effectiveness validation."""
+def run_effectiveness_validation(
+    scanner: Callable[[TestCase], ScanResult],
+) -> tuple[EffectivenessMetrics, dict]:
+    """
+    Run full effectiveness validation.
+
+    Args:
+        scanner: Real scanner callable — REQUIRED. No mock fallback.
+    """
+    if scanner is None:
+        raise RequireScannerError(
+            "Real scanner required for effectiveness validation."
+        )
+
     # Generate test cases
     vulnerable = generate_vulnerable_cases(100)
     clean = generate_clean_cases(100)
     all_cases = vulnerable + clean
-    
-    # Run scans
-    results = [mock_scan(case) for case in all_cases]
-    
+
+    # Run scans using real scanner
+    results = [scan_case(case, scanner) for case in all_cases]
+
     # Calculate metrics
     metrics = calculate_metrics(all_cases, results)
-    
+
     # Generate detailed report
     report = {
         "total_cases": len(all_cases),
@@ -231,5 +254,5 @@ def run_effectiveness_validation() -> Tuple[EffectivenessMetrics, dict]:
             "false_negatives": metrics.false_negatives,
         },
     }
-    
+
     return metrics, report

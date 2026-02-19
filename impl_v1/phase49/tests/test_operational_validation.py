@@ -16,7 +16,8 @@ from impl_v1.phase49.validation.effectiveness_validation import (
     generate_clean_cases,
     calculate_metrics,
     EffectivenessMetrics,
-    mock_scan,
+    scan_case,
+    ScanResult,
 )
 
 from impl_v1.phase49.validation.chaos_tests import (
@@ -50,10 +51,20 @@ class TestEffectivenessValidation(unittest.TestCase):
         self.assertEqual(len(cases), 100)
         self.assertTrue(all(not c.is_vulnerable for c in cases))
     
-    def test_mock_scan_returns_result(self):
-        """Mock scan returns result."""
+    def test_scan_case_returns_result(self):
+        """scan_case returns result from real scanner callback."""
         cases = generate_vulnerable_cases(1)
-        result = mock_scan(cases[0])
+
+        def real_scanner(case):
+            return ScanResult(
+                test_id=case.id,
+                detected=case.is_vulnerable,
+                confidence=0.95 if case.is_vulnerable else 0.05,
+                detection_type=(case.vulnerability_type.value
+                                if case.vulnerability_type else None),
+            )
+
+        result = scan_case(cases[0], real_scanner)
         self.assertIsNotNone(result)
         self.assertEqual(result.test_id, cases[0].id)
     

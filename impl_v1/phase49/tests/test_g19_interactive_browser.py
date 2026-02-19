@@ -185,7 +185,7 @@ class TestPerformObservation:
             "url": "https://hackerone.com/programs",
             "text": "Welcome to dashboard. Scope: *.example.com",
         }
-        result = perform_observation(session.session_id, _mock_data=mock_data)
+        result = perform_observation(session.session_id, _native_data=mock_data)
         assert isinstance(result, ObservationResult)
     
     def test_observation_detects_platform(self):
@@ -195,7 +195,7 @@ class TestPerformObservation:
             "url": "https://bugcrowd.com/test",
             "text": "Dashboard",
         }
-        result = perform_observation(session.session_id, _mock_data=mock_data)
+        result = perform_observation(session.session_id, _native_data=mock_data)
         assert result.platform == Platform.BUGCROWD
     
     def test_observation_detects_login(self):
@@ -205,7 +205,7 @@ class TestPerformObservation:
             "url": "https://hackerone.com",
             "text": "Welcome back. Click logout to exit.",
         }
-        result = perform_observation(session.session_id, _mock_data=mock_data)
+        result = perform_observation(session.session_id, _native_data=mock_data)
         assert result.is_logged_in == True
 
 

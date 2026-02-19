@@ -11,7 +11,8 @@ Human approval is ALWAYS verified before any browser launch.
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Tuple
-import ctypes
+import subprocess
+import shutil
 import os
 import uuid
 from pathlib import Path
@@ -63,46 +64,55 @@ class NativeLaunchResponse:
 class BrowserBindings:
     """
     Python bindings to C++ browser engine.
-    
-    MOCK IMPLEMENTATION for governance testing.
-    Real implementation would load shared library via ctypes.
+
+    Real implementation using subprocess to launch actual browser.
+    NO mock data. NO simulated processes.
     """
-    
+
+    # Known browser paths (Windows)
+    _BROWSER_PATHS = (
+        r"C:\Program Files\Chromium\Application\chrome.exe",
+        r"C:\Program Files (x86)\Chromium\Application\chrome.exe",
+        r"C:\Program Files\Ungoogled Chromium\chrome.exe",
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+    )
+
     def __init__(self):
-        self._lib = None
-        self._engine = None
+        self._browser_path: Optional[str] = None
         self._initialized = False
-        self._mock_processes = {}
-    
-    def _load_library(self) -> bool:
-        """
-        Load native browser engine library.
-        
-        NOTE: This is a mock - real implementation would use:
-        self._lib = ctypes.CDLL('./libbrowser_engine.so')
-        """
-        # Mock implementation for governance testing
-        return True
-    
+        self._active_processes: dict[int, subprocess.Popen] = {}
+
+    def _find_browser(self) -> Optional[str]:
+        """Find installed browser executable."""
+        for path in self._BROWSER_PATHS:
+            if Path(path).exists():
+                return path
+        # Fallback: search PATH
+        chromium = shutil.which("chrome") or shutil.which("chromium")
+        if chromium:
+            return chromium
+        edge = shutil.which("msedge")
+        if edge:
+            return edge
+        return None
+
     def initialize(self) -> bool:
-        """Initialize the browser engine."""
+        """Initialize the browser engine by locating the browser."""
         if self._initialized:
             return True
-        
-        if not self._load_library():
+        self._browser_path = self._find_browser()
+        if not self._browser_path:
             return False
-        
         self._initialized = True
         return True
-    
+
     def launch(self, request: NativeLaunchRequest) -> NativeLaunchResponse:
         """
-        Launch browser through native engine.
-        
+        Launch browser through real subprocess.
+
         CRITICAL: Validates governance and human approval before launch.
         """
-        # MOCK: In real implementation, would call C++ via ctypes
-        
         # Validate governance
         if not request.governance_approved:
             return NativeLaunchResponse(
@@ -112,7 +122,7 @@ class BrowserBindings:
                 error_message="Governance approval required",
                 fallback_used=False,
             )
-        
+
         # Validate human approval
         if not request.human_approved:
             return NativeLaunchResponse(
@@ -122,34 +132,68 @@ class BrowserBindings:
                 error_message="Human approval required",
                 fallback_used=False,
             )
-        
-        # Mock successful launch
-        import random
-        mock_pid = random.randint(1000, 9999)
-        self._mock_processes[mock_pid] = request
-        
-        return NativeLaunchResponse(
-            request_id=request.request_id,
-            result=NativeLaunchResult.SUCCESS,
-            process_id=mock_pid,
-            error_message="",
-            fallback_used=False,
-        )
-    
+
+        if not self._browser_path:
+            return NativeLaunchResponse(
+                request_id=request.request_id,
+                result=NativeLaunchResult.FAILED_BROWSER_NOT_FOUND,
+                process_id=-1,
+                error_message="No supported browser found on system",
+                fallback_used=False,
+            )
+
+        # Build command
+        cmd = [self._browser_path]
+        if request.mode == NativeLaunchMode.HEADLESS:
+            cmd.append("--headless")
+        cmd.append(request.target_url)
+
+        try:
+            proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            self._active_processes[proc.pid] = proc
+            return NativeLaunchResponse(
+                request_id=request.request_id,
+                result=NativeLaunchResult.SUCCESS,
+                process_id=proc.pid,
+                error_message="",
+                fallback_used=False,
+            )
+        except (OSError, FileNotFoundError) as exc:
+            return NativeLaunchResponse(
+                request_id=request.request_id,
+                result=NativeLaunchResult.FAILED_UNKNOWN,
+                process_id=-1,
+                error_message=str(exc),
+                fallback_used=False,
+            )
+
     def stop(self, process_id: int) -> bool:
         """Stop a running browser process."""
-        if process_id in self._mock_processes:
-            del self._mock_processes[process_id]
-            return True
-        return False
-    
+        proc = self._active_processes.pop(process_id, None)
+        if proc is None:
+            return False
+        try:
+            proc.terminate()
+            proc.wait(timeout=5)
+        except (OSError, subprocess.TimeoutExpired):
+            proc.kill()
+        return True
+
     def is_running(self, process_id: int) -> bool:
-        """Check if browser process is running."""
-        return process_id in self._mock_processes
-    
+        """Check if browser process is still running."""
+        proc = self._active_processes.get(process_id)
+        if proc is None:
+            return False
+        return proc.poll() is None
+
     def cleanup(self):
-        """Clean up all resources."""
-        self._mock_processes.clear()
+        """Terminate all active browser processes."""
+        for pid in list(self._active_processes):
+            self.stop(pid)
         self._initialized = False
 
 

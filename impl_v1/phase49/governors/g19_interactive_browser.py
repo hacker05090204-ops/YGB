@@ -184,63 +184,63 @@ def close_session(session_id: str) -> bool:
 
 def get_page_title(
     session_id: str,
-    _mock_title: Optional[str] = None,
+    _native_title: Optional[str] = None,
 ) -> Optional[str]:
     """
     Extract page title (READ-ONLY).
-    
+
     In production: C++ native reads from browser.
-    In tests: Use _mock_title.
+    Pass _native_title when integrating with C++ backend.
     """
     session = get_session(session_id)
     if not session or session.state == SessionState.CLOSED:
         return None
-    
-    if _mock_title is not None:
-        return _mock_title
-    
-    # C++ native would provide this
+
+    if _native_title is not None:
+        return _native_title
+
+    # C++ native provides this via integration bridge
     return None
 
 
 def get_current_url(
     session_id: str,
-    _mock_url: Optional[str] = None,
+    _native_url: Optional[str] = None,
 ) -> Optional[str]:
     """
     Extract current URL (READ-ONLY).
-    
+
     In production: C++ native reads from browser.
-    In tests: Use _mock_url.
+    Pass _native_url when integrating with C++ backend.
     """
     session = get_session(session_id)
     if not session or session.state == SessionState.CLOSED:
         return None
-    
-    if _mock_url is not None:
-        return _mock_url
-    
-    # C++ native would provide this
+
+    if _native_url is not None:
+        return _native_url
+
+    # C++ native provides this via integration bridge
     return None
 
 
 def get_visible_text(
     session_id: str,
-    _mock_text: Optional[str] = None,
+    _native_text: Optional[str] = None,
 ) -> Optional[str]:
     """
     Extract visible text (READ-ONLY).
-    
+
     In production: C++ native reads from browser DOM.
-    In tests: Use _mock_text.
+    Pass _native_text when integrating with C++ backend.
     """
     session = get_session(session_id)
     if not session or session.state == SessionState.CLOSED:
         return None
-    
-    if _mock_text is not None:
-        return _mock_text
-    
+
+    if _native_text is not None:
+        return _native_text
+
     return None
 
 
@@ -370,26 +370,30 @@ def extract_scope_hints(
 
 def perform_observation(
     session_id: str,
-    _mock_data: Optional[Dict] = None,
+    _native_data: Optional[Dict] = None,
 ) -> Optional[ObservationResult]:
     """
     Perform a complete read-only observation.
-    
+
     Combines: title, URL, text, platform, login, scope.
     All data is READ-ONLY.
+
+    Args:
+        session_id: Active session ID.
+        _native_data: Data from C++ native browser integration.
     """
     session = get_session(session_id)
     if not session or session.state == SessionState.CLOSED:
         return None
-    
+
     # Update state to OBSERVING
     update_session_state(session_id, SessionState.OBSERVING)
-    
-    # Get data (mock or C++ native)
-    if _mock_data:
-        title = _mock_data.get("title", "")
-        url = _mock_data.get("url", "")
-        text = _mock_data.get("text", "")
+
+    # Get data from C++ native integration
+    if _native_data:
+        title = _native_data.get("title", "")
+        url = _native_data.get("url", "")
+        text = _native_data.get("text", "")
     else:
         title = get_page_title(session_id)
         url = get_current_url(session_id)

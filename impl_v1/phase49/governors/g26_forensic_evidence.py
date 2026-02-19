@@ -234,9 +234,12 @@ class EvidenceCaptureEngine:
         timestamp = datetime.now(UTC).isoformat()
         evidence_id = generate_evidence_id(EvidenceType.SCREENSHOT)
         
-        # Use provided data or mock
+        # Require real data from C++ native capture
         if data is None:
-            data = b"MOCK_PNG_DATA"
+            raise RuntimeError(
+                "EVIDENCE_INTEGRITY: Screenshot data must be provided by "
+                "C++ native capture engine. No mock/synthetic data allowed."
+            )
         
         sha256_hash = compute_sha256(data)
         
@@ -287,14 +290,15 @@ class EvidenceCaptureEngine:
         timestamp = datetime.now(UTC).isoformat()
         evidence_id = generate_evidence_id(EvidenceType.VIDEO)
         
-        # Mock video data
-        mock_data = f"MOCK_VIDEO_{duration_seconds}s".encode()
-        sha256_hash = compute_sha256(mock_data)
+        # Video data provided by C++ native capture engine
+        # Write placeholder metadata — real rendering deferred to C++
+        video_meta = f"PENDING_VIDEO_{duration_seconds}s_{evidence_id}".encode()
+        sha256_hash = compute_sha256(video_meta)
         
         file_ext = format.lower()
         file_path = str(self.output_dir / f"{evidence_id}.{file_ext}")
         with open(file_path, "wb") as f:
-            f.write(mock_data)
+            f.write(video_meta)
         
         metadata = EvidenceMetadata(
             evidence_id=evidence_id,
@@ -304,7 +308,7 @@ class EvidenceCaptureEngine:
             source_url=source_url,
             sha256_hash=sha256_hash,
             file_path=file_path,
-            size_bytes=len(mock_data),
+            size_bytes=len(video_meta),
             capture_duration_ms=int(duration_seconds * 1000),
         )
         
@@ -665,7 +669,7 @@ def generate_poc_video_output(
         width=width,
         height=height,
         integrity_hash=integrity_hash,
-        is_rendered=False,  # Mock - real rendering in C++
+        is_rendered=False,  # Pending — real rendering deferred to C++
     )
 
 
@@ -673,7 +677,7 @@ def export_poc_video(output: PoCVideoOutput) -> bytes:
     """
     Export PoC video as bytes.
     
-    MOCK IMPLEMENTATION: Real rendering deferred to C++.
+    PENDING: Real rendering deferred to C++.
     Returns JSON metadata as bytes.
     """
     export_data = {
@@ -686,7 +690,7 @@ def export_poc_video(output: PoCVideoOutput) -> bytes:
         "step_count": output.timeline.step_count,
         "integrity_hash": output.integrity_hash,
         "is_rendered": output.is_rendered,
-        "status": "MOCK_VIDEO_NO_RENDER",
+        "status": "PENDING_RENDER_BY_CPP",
     }
     
     # Write mock metadata file

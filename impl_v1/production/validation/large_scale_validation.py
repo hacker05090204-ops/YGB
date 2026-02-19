@@ -97,7 +97,7 @@ def generate_large_scale_dataset() -> List[ValidationSample]:
         samples.append(ValidationSample(
             id=f"MALFORM_{i:03d}",
             sample_type=SampleType.MALFORMED,
-            ground_truth=random.choice([True, False]),
+            ground_truth=(i % 2 == 0),  # Deterministic: even=vuln, odd=clean
             payload=f"malformed_input_{i}",
         ))
     
