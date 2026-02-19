@@ -43,3 +43,9 @@ Thumbs.db
 *.key
 *.pem
 *.p12
+obj/
+run_cpp_tests.exe
+run_cpp_tests
+*.gcno
+*.gcda
+*.gcov
