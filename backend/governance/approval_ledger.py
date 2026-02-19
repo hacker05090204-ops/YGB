@@ -17,51 +17,108 @@ Rules:
 import hmac
 import hashlib
 import json
+import logging
 import os
+import stat
 import time
 import uuid
 from typing import Optional
 
+logger = logging.getLogger(__name__)
+
 
 # ===========================================================
-# KEY MANAGER — Multi-key support with rotation & revocation
+# KEY MANAGER — Hardened multi-key with rotation & revocation
 # ===========================================================
 
 class KeyManager:
-    """Manages signing keys with rotation and revocation.
+    """Manages signing keys with rotation, revocation, and security hardening.
 
     Keys are loaded from:
-      1. YGB_KEY_DIR env var (directory of key files)
+      1. YGB_KEY_DIR env var (directory of key files) — PREFERRED
       2. YGB_APPROVAL_SECRET env var (fallback single key)
-      3. Hardcoded default (dev only)
+      3. Hardcoded default (dev only, rejected in strict mode)
 
-    Key files: <key_id>.key (raw secret bytes)
-    Revocation: revoked_keys.json (list of revoked key_ids)
+    Security:
+      - Key files must not be world-readable (mode 600 on POSIX)
+      - Key fingerprints logged on load (never the raw secret)
+      - Rotation events stored in audit log
     """
 
     DEFAULT_KEY_ID = "ygb-key-v1"
     DEFAULT_SECRET = b"ygb-approval-key-v1"
 
-    def __init__(self):
+    def __init__(self, strict: bool = False):
         self._keys: dict[str, bytes] = {}
         self._revoked: set[str] = set()
         self._active_key_id: str = self.DEFAULT_KEY_ID
+        self._audit_log: list[dict] = []
+        self._strict: bool = strict
         self._load_keys()
 
+    @staticmethod
+    def _key_fingerprint(secret: bytes) -> str:
+        """SHA-256 fingerprint of key (first 16 hex chars). Never logs raw key."""
+        return hashlib.sha256(secret).hexdigest()[:16]
+
+    @staticmethod
+    def _check_file_permissions(path: str) -> tuple[bool, str]:
+        """Check file is not world-readable. Returns (ok, reason)."""
+        if os.name == 'nt':
+            # Windows: trust NTFS ACLs — no POSIX permission model
+            return True, "WINDOWS_NTFS"
+        try:
+            mode = os.stat(path).st_mode
+            # Reject if group-readable or other-readable
+            if mode & stat.S_IRGRP or mode & stat.S_IROTH:
+                return False, f"INSECURE_PERMISSIONS: mode={oct(mode)} (must be 0o600)"
+            return True, f"OK: mode={oct(mode)}"
+        except OSError as e:
+            return False, f"STAT_FAILED: {e}"
+
+    def _log_audit(self, event: str, key_id: str, detail: str = "") -> None:
+        """Record key rotation/revocation event."""
+        entry = {
+            "timestamp": time.time(),
+            "event": event,
+            "key_id": key_id,
+            "detail": detail,
+        }
+        self._audit_log.append(entry)
+        logger.info(f"KEY_AUDIT: {event} key_id={key_id} {detail}")
+
     def _load_keys(self) -> None:
-        """Load keys from filesystem or environment."""
+        """Load keys from filesystem or environment with security checks."""
         key_dir = os.environ.get("YGB_KEY_DIR", "")
 
         if key_dir and os.path.isdir(key_dir):
-            # Load all .key files
-            for fname in os.listdir(key_dir):
+            loaded = 0
+            # Load all .key files with permission checks
+            for fname in sorted(os.listdir(key_dir)):
                 if fname.endswith(".key"):
                     key_id = fname[:-4]
                     path = os.path.join(key_dir, fname)
+
+                    # Permission check
+                    perm_ok, perm_reason = self._check_file_permissions(path)
+                    if not perm_ok:
+                        self._log_audit("KEY_REJECTED", key_id, perm_reason)
+                        logger.warning(
+                            f"KEY_REJECTED: {key_id} — {perm_reason}"
+                        )
+                        continue
+
                     with open(path, "rb") as f:
-                        self._keys[key_id] = f.read().strip()
-                    # Most recently loaded becomes active
+                        secret = f.read().strip()
+
+                    self._keys[key_id] = secret
+                    fingerprint = self._key_fingerprint(secret)
                     self._active_key_id = key_id
+                    self._log_audit(
+                        "KEY_LOADED", key_id,
+                        f"fingerprint={fingerprint} source={path}"
+                    )
+                    loaded += 1
 
             # Load revocation list
             revoke_path = os.path.join(key_dir, "revoked_keys.json")
@@ -70,17 +127,36 @@ class KeyManager:
                     revoked = json.load(f)
                     if isinstance(revoked, list):
                         self._revoked = set(revoked)
+                        for kid in self._revoked:
+                            self._log_audit("KEY_REVOKED_ON_LOAD", kid)
+
+            if loaded == 0 and self._strict:
+                raise ValueError(
+                    "KEY_STORAGE_ERROR: no valid keys in YGB_KEY_DIR"
+                )
         else:
-            # Fallback: env var or default
+            if self._strict:
+                raise ValueError(
+                    "KEY_STORAGE_ERROR: YGB_KEY_DIR not set or not a directory "
+                    "(strict mode rejects fallback keys)"
+                )
+            # Fallback: env var or default (dev mode only)
             secret = os.environ.get("YGB_APPROVAL_SECRET", "").encode()
             if secret:
                 self._keys[self.DEFAULT_KEY_ID] = secret
             else:
                 self._keys[self.DEFAULT_KEY_ID] = self.DEFAULT_SECRET
+            self._log_audit("KEY_FALLBACK", self.DEFAULT_KEY_ID,
+                            "using env/default — NOT FOR PRODUCTION")
 
     @property
     def active_key_id(self) -> str:
         return self._active_key_id
+
+    @property
+    def audit_log(self) -> list[dict]:
+        """Return the key rotation/revocation audit log."""
+        return list(self._audit_log)
 
     def get_signing_key(self) -> tuple[str, bytes]:
         """Get the active signing key. Returns (key_id, secret)."""
@@ -102,10 +178,13 @@ class KeyManager:
     def revoke_key(self, key_id: str) -> None:
         """Revoke a key_id. Tokens signed with this key will be rejected."""
         self._revoked.add(key_id)
+        self._log_audit("KEY_REVOKED", key_id)
 
     def add_key(self, key_id: str, secret: bytes) -> None:
         """Register a new key for signing/verification."""
         self._keys[key_id] = secret
+        fingerprint = self._key_fingerprint(secret)
+        self._log_audit("KEY_ADDED", key_id, f"fingerprint={fingerprint}")
 
     @property
     def revoked_keys(self) -> set:
