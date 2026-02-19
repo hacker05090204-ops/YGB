@@ -18,9 +18,9 @@
 #include <cstring>
 #include <ctime>
 
-
 #ifdef _WIN32
 #include <io.h>
+#include <windows.h>
 #define fsync_fd(fd) _commit(fd)
 #else
 #include <unistd.h>
@@ -37,6 +37,66 @@ static constexpr int SCHEMA_VERSION = 1;
 static constexpr char TELEMETRY_PATH[] = "reports/training_telemetry.json";
 static constexpr char TELEMETRY_TMP[] = "reports/training_telemetry.json.tmp";
 static constexpr char HMAC_KEY_PATH[] = "config/hmac_secret.key";
+static constexpr char LAST_SEEN_PATH[] = "reports/last_seen_timestamp.json";
+static constexpr char LAST_SEEN_TMP[] = "reports/last_seen_timestamp.json.tmp";
+
+// =========================================================================
+// MONOTONIC CLOCK
+// =========================================================================
+
+static uint64_t get_monotonic_seconds() {
+#ifdef _WIN32
+  static LARGE_INTEGER freq = {};
+  if (freq.QuadPart == 0) {
+    QueryPerformanceFrequency(&freq);
+  }
+  LARGE_INTEGER counter;
+  QueryPerformanceCounter(&counter);
+  return static_cast<uint64_t>(counter.QuadPart / freq.QuadPart);
+#else
+  struct timespec ts;
+  clock_gettime(CLOCK_MONOTONIC, &ts);
+  return static_cast<uint64_t>(ts.tv_sec);
+#endif
+}
+
+// =========================================================================
+// LAST SEEN TIMESTAMP PERSISTENCE
+// =========================================================================
+
+static uint64_t load_last_seen_timestamp() {
+  FILE *f = std::fopen(LAST_SEEN_PATH, "r");
+  if (!f)
+    return 0;
+  char buf[256];
+  std::memset(buf, 0, sizeof(buf));
+  std::fread(buf, 1, sizeof(buf) - 1, f);
+  std::fclose(f);
+  const char *pos = std::strstr(buf, "last_seen");
+  if (!pos)
+    return 0;
+  pos += 9;
+  while (*pos && (*pos == '"' || *pos == ':' || *pos == ' '))
+    ++pos;
+  unsigned long long val = 0;
+  std::sscanf(pos, "%llu", &val);
+  return static_cast<uint64_t>(val);
+}
+
+static bool save_last_seen_timestamp(uint64_t ts) {
+  FILE *f = std::fopen(LAST_SEEN_TMP, "w");
+  if (!f)
+    return false;
+  std::fprintf(f, "{\n  \"last_seen\": %llu\n}\n",
+               static_cast<unsigned long long>(ts));
+  std::fflush(f);
+  int fd = fileno(f);
+  if (fd >= 0)
+    fsync_fd(fd);
+  std::fclose(f);
+  std::remove(LAST_SEEN_PATH);
+  return std::rename(LAST_SEEN_TMP, LAST_SEEN_PATH) == 0;
+}
 
 // =========================================================================
 // SHA-256 (FIPS 180-4, no external dependencies)
@@ -309,6 +369,7 @@ struct TelemetryPayload {
   int epoch;
   int batch_size;
   uint64_t timestamp;
+  uint64_t monotonic_timestamp; // Replay protection — monotonic clock
   uint32_t crc32;
   char hmac[65]; // 64 hex chars + null
   bool valid;
@@ -354,10 +415,11 @@ static uint32_t compute_payload_crc(const TelemetryPayload &p) {
   int len = std::snprintf(
       buf, sizeof(buf),
       "v%d|det:%d|frz:%d|prec:%.8f|rec:%.8f|kl:%.8f|ece:%.8f|"
-      "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu",
+      "loss:%.8f|temp:%.8f|epoch:%d|batch:%d|ts:%llu|mono:%llu",
       p.schema_version, p.determinism_status ? 1 : 0, p.freeze_status ? 1 : 0,
       p.precision, p.recall, p.kl_divergence, p.ece, p.loss, p.gpu_temperature,
-      p.epoch, p.batch_size, static_cast<unsigned long long>(p.timestamp));
+      p.epoch, p.batch_size, static_cast<unsigned long long>(p.timestamp),
+      static_cast<unsigned long long>(p.monotonic_timestamp));
   return compute_crc32(buf, static_cast<size_t>(len));
 }
 
@@ -392,8 +454,21 @@ static bool compute_payload_hmac(const TelemetryPayload &p, char hmac_hex[65]) {
 // =========================================================================
 
 static bool write_telemetry(const TelemetryPayload &payload) {
-  // Compute CRC over payload content (excluding CRC field itself)
+  // Set monotonic timestamp and enforce replay protection
   TelemetryPayload p = payload;
+  p.monotonic_timestamp = get_monotonic_seconds();
+
+  // Replay protection: reject if new timestamp <= last seen
+  uint64_t last_seen = load_last_seen_timestamp();
+  if (p.monotonic_timestamp <= last_seen && last_seen > 0) {
+    std::fprintf(
+        stderr, "REPLAY REJECTED: monotonic_timestamp %llu <= last_seen %llu\n",
+        static_cast<unsigned long long>(p.monotonic_timestamp),
+        static_cast<unsigned long long>(last_seen));
+    return false; // Fail closed — no replayed telemetry
+  }
+
+  // Compute CRC over payload content (including monotonic_timestamp)
   p.crc32 = compute_payload_crc(p);
 
   // Compute HMAC over schema_version + CRC + timestamp
@@ -420,6 +495,7 @@ static bool write_telemetry(const TelemetryPayload &payload) {
   write_int(f, "epoch", p.epoch, true);
   write_int(f, "batch_size", p.batch_size, true);
   write_uint64(f, "timestamp", p.timestamp, true);
+  write_uint64(f, "monotonic_timestamp", p.monotonic_timestamp, true);
   write_uint32(f, "crc32", p.crc32, true);
   write_string(f, "hmac", p.hmac, false);
   std::fprintf(f, "}\n");
@@ -437,6 +513,9 @@ static bool write_telemetry(const TelemetryPayload &payload) {
   if (std::rename(TELEMETRY_TMP, TELEMETRY_PATH) != 0) {
     return false;
   }
+
+  // Persist last_seen_timestamp atomically
+  save_last_seen_timestamp(p.monotonic_timestamp);
 
   return true;
 }
@@ -554,6 +633,7 @@ static TelemetryPayload read_telemetry() {
   p.epoch = parse_int_after(buf, "epoch");
   p.batch_size = parse_int_after(buf, "batch_size");
   p.timestamp = parse_uint64_after(buf, "timestamp");
+  p.monotonic_timestamp = parse_uint64_after(buf, "monotonic_timestamp");
   p.crc32 = parse_uint32_after(buf, "crc32");
   parse_string_after(buf, "hmac", p.hmac, sizeof(p.hmac));
 
@@ -686,9 +766,36 @@ static bool run_tests() {
   no_hmac.hmac[0] = '\0';
   test(!validate_hmac(no_hmac), "Missing HMAC fails validation");
 
+  // Test 10: Monotonic timestamp is non-zero after write
+  {
+    TelemetryPayload mono_p;
+    std::memset(&mono_p, 0, sizeof(mono_p));
+    mono_p.schema_version = SCHEMA_VERSION;
+    mono_p.determinism_status = true;
+    mono_p.freeze_status = true;
+    mono_p.precision = 0.96;
+    mono_p.recall = 0.93;
+    mono_p.timestamp = 1700000001;
+    // Clear last_seen so this write succeeds
+    std::remove(LAST_SEEN_PATH);
+    bool w = write_telemetry(mono_p);
+    test(w, "Write with monotonic timestamp succeeds");
+    TelemetryPayload r2 = read_telemetry();
+    test(r2.monotonic_timestamp > 0,
+         "Monotonic timestamp non-zero after write");
+  }
+
+  // Test 11: Last seen timestamp persisted
+  {
+    uint64_t ls = load_last_seen_timestamp();
+    test(ls > 0, "Last seen timestamp persisted");
+  }
+
   // Cleanup
   std::remove(TELEMETRY_PATH);
   std::remove(TELEMETRY_TMP);
+  std::remove(LAST_SEEN_PATH);
+  std::remove(LAST_SEEN_TMP);
 
   std::printf("\n  Training Telemetry: %d passed, %d failed\n", passed, failed);
   return failed == 0;

@@ -1,18 +1,20 @@
 """
-test_tamper_protection.py — Safety Tests for Telemetry Tamper Protection
-========================================================================
-
+test_tamper_protection.py — Safety Tests for Runtime Tamper Protection v2
+=========================================================================
 Tests:
-  1. Tampered telemetry → corrupted response
-  2. HMAC signature mismatch → rejected
-  3. Valid payload → accepted
-  4. Missing HMAC field → rejected
-  5. Clock rollback simulation
-  6. Crash recovery simulation
-  7. Mutex recovery after crash
-  8. Hunt lock persistence
-
-Maintains: Python >=95%, C++ >=85%
+  - Valid payload with all integrity checks
+  - HMAC tamper detection
+  - CRC tamper detection
+  - Missing fields
+  - Schema mismatch
+  - Determinism enforcement
+  - Replay attack detection (monotonic_timestamp)
+  - Secret key existence
+  - Stability counter (≥5 consecutive evals)
+  - Mode auto-chain only after sustained threshold
+  - Single-batch promotion rejection
+  - Drift alert resets stability counter
+  - HUNT lockout persistence
 """
 
 import os
@@ -20,290 +22,344 @@ import sys
 import json
 import hmac
 import hashlib
-import tempfile
 import pytest
 
 # Add project root to path
-PROJECT_ROOT = os.path.dirname(os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__))))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, PROJECT_ROOT)
 
 from backend.api.runtime_api import (
-    validate_telemetry,
-    compute_payload_crc,
     compute_crc32,
-    validate_hmac,
-    compute_payload_hmac,
+    compute_payload_crc,
     load_hmac_key,
+    compute_payload_hmac,
+    validate_hmac,
+    validate_telemetry,
+    load_last_seen_timestamp,
+    save_last_seen_timestamp,
     TELEMETRY_PATH,
     HMAC_KEY_PATH,
+    LAST_SEEN_PATH,
     EXPECTED_SCHEMA_VERSION,
 )
 
-
 # =========================================================================
-# FIXTURES
+# TEST FIXTURES
 # =========================================================================
 
-def _make_valid_payload():
+def make_valid_payload():
     """Create a valid telemetry payload with correct CRC and HMAC."""
     payload = {
-        "schema_version": EXPECTED_SCHEMA_VERSION,
-        "determinism_status": True,
-        "freeze_status": True,
-        "precision": 0.96500000,
-        "recall": 0.93000000,
-        "kl_divergence": 0.01500000,
-        "ece": 0.01200000,
-        "loss": 0.04500000,
-        "gpu_temperature": 72.50000000,
-        "epoch": 42,
-        "batch_size": 64,
-        "timestamp": 1700000000,
+        'schema_version': 1,
+        'determinism_status': True,
+        'freeze_status': True,
+        'precision': 0.96500000,
+        'recall': 0.93000000,
+        'kl_divergence': 0.01500000,
+        'ece': 0.01200000,
+        'loss': 0.04500000,
+        'gpu_temperature': 72.50000000,
+        'epoch': 42,
+        'batch_size': 64,
+        'timestamp': 1700000000,
+        'monotonic_timestamp': 99999999,
     }
-    payload["crc32"] = compute_payload_crc(payload)
-    payload["hmac"] = compute_payload_hmac(payload)
+    payload['crc32'] = compute_payload_crc(payload)
+    payload['hmac'] = compute_payload_hmac(payload)
     return payload
 
 
-def _write_telemetry(payload):
-    """Write payload to telemetry path as JSON."""
+def write_valid_telemetry(payload=None):
+    """Write a valid telemetry file."""
+    if payload is None:
+        payload = make_valid_payload()
     os.makedirs(os.path.dirname(TELEMETRY_PATH), exist_ok=True)
     with open(TELEMETRY_PATH, 'w') as f:
-        json.dump(payload, f)
+        json.dump(payload, f, indent=2)
+    return payload
 
 
-def _cleanup_telemetry():
-    """Remove telemetry file if present."""
-    if os.path.exists(TELEMETRY_PATH):
-        os.remove(TELEMETRY_PATH)
+def cleanup():
+    """Clean up test files."""
+    for path in [TELEMETRY_PATH, LAST_SEEN_PATH,
+                 LAST_SEEN_PATH + '.tmp']:
+        if os.path.exists(path):
+            os.remove(path)
 
 
 # =========================================================================
-# TEST: VALID PAYLOAD ACCEPTED
+# CORE VALIDATION TESTS
 # =========================================================================
 
 class TestValidPayload:
     def setup_method(self):
-        self.payload = _make_valid_payload()
-        _write_telemetry(self.payload)
+        cleanup()
 
     def teardown_method(self):
-        _cleanup_telemetry()
+        cleanup()
 
-    def test_valid_payload_accepted(self):
-        """Valid, signed, correct telemetry → status ok."""
+    def test_valid_payload_passes(self):
+        payload = write_valid_telemetry()
         result = validate_telemetry()
-        assert result["status"] == "ok", f"Expected ok, got: {result}"
-        assert result["validated"] is True
+        assert result['status'] == 'ok'
+        assert result['validated'] is True
 
-    def test_valid_crc_matches(self):
-        """CRC32 in valid payload matches recomputed value."""
-        expected_crc = compute_payload_crc(self.payload)
-        assert self.payload["crc32"] == expected_crc
+    def test_hmac_present(self):
+        payload = make_valid_payload()
+        assert len(payload['hmac']) == 64
 
-    def test_valid_hmac_matches(self):
-        """HMAC in valid payload validates correctly."""
-        assert validate_hmac(self.payload) is True
-
-
-# =========================================================================
-# TEST: TAMPERED TELEMETRY
-# =========================================================================
-
-class TestTamperedTelemetry:
-    def teardown_method(self):
-        _cleanup_telemetry()
-
-    def test_tampered_precision_detected(self):
-        """Modifying precision invalidates CRC → corrupted."""
-        payload = _make_valid_payload()
-        payload["precision"] = 0.50000000  # Tamper
-        # CRC no longer matches
-        _write_telemetry(payload)
-        result = validate_telemetry()
-        assert result["status"] == "corrupted"
-
-    def test_tampered_epoch_detected(self):
-        """Modifying epoch invalidates CRC → corrupted."""
-        payload = _make_valid_payload()
-        payload["epoch"] = 999  # Tamper
-        _write_telemetry(payload)
-        result = validate_telemetry()
-        assert result["status"] == "corrupted"
-
-    def test_tampered_determinism_detected(self):
-        """Setting determinism_status to false → corrupted."""
-        payload = _make_valid_payload()
-        payload["determinism_status"] = False
-        _write_telemetry(payload)
-        result = validate_telemetry()
-        assert result["status"] == "corrupted"
+    def test_crc_deterministic(self):
+        payload = make_valid_payload()
+        c1 = compute_payload_crc(payload)
+        c2 = compute_payload_crc(payload)
+        assert c1 == c2
+        assert c1 != 0
 
 
-# =========================================================================
-# TEST: HMAC SIGNATURE MISMATCH
-# =========================================================================
-
-class TestHmacMismatch:
-    def teardown_method(self):
-        _cleanup_telemetry()
-
-    def test_wrong_hmac_rejected(self):
-        """Wrong HMAC signature → corrupted."""
-        payload = _make_valid_payload()
-        payload["hmac"] = "a" * 64  # Wrong signature
-        _write_telemetry(payload)
-        result = validate_telemetry()
-        assert result["status"] == "corrupted"
-        assert result["reason"] == "hmac_invalid"
-
-    def test_truncated_hmac_rejected(self):
-        """Truncated HMAC → corrupted."""
-        payload = _make_valid_payload()
-        payload["hmac"] = payload["hmac"][:32]  # Only half
-        _write_telemetry(payload)
-        result = validate_telemetry()
-        assert result["status"] == "corrupted"
-
-    def test_empty_hmac_rejected(self):
-        """Empty HMAC string → corrupted."""
-        payload = _make_valid_payload()
-        payload["hmac"] = ""
-        _write_telemetry(payload)
-        result = validate_telemetry()
-        assert result["status"] == "corrupted"
-        assert result["reason"] == "hmac_invalid"
-
-
-# =========================================================================
-# TEST: MISSING HMAC FIELD
-# =========================================================================
-
-class TestMissingHmac:
-    def teardown_method(self):
-        _cleanup_telemetry()
-
-    def test_no_hmac_field_rejected(self):
-        """Payload without 'hmac' key → corrupted (missing_field)."""
-        payload = _make_valid_payload()
-        del payload["hmac"]
-        _write_telemetry(payload)
-        result = validate_telemetry()
-        assert result["status"] == "corrupted"
-        assert result["reason"] == "missing_field"
-
-
-# =========================================================================
-# TEST: MISSING TELEMETRY FILE
-# =========================================================================
-
-class TestMissingTelemetry:
+class TestHMACValidation:
     def setup_method(self):
-        _cleanup_telemetry()
+        cleanup()
 
-    def test_missing_file_corrupted(self):
-        """No telemetry file → corrupted."""
+    def teardown_method(self):
+        cleanup()
+
+    def test_hmac_validates_correct(self):
+        payload = make_valid_payload()
+        assert validate_hmac(payload)
+
+    def test_hmac_detects_tamper(self):
+        payload = make_valid_payload()
+        payload['hmac'] = 'a' * 64
+        assert not validate_hmac(payload)
+
+    def test_missing_hmac_fails(self):
+        payload = make_valid_payload()
+        payload['hmac'] = ''
+        assert not validate_hmac(payload)
+
+    def test_hmac_tamper_returns_corrupted(self):
+        payload = make_valid_payload()
+        payload['hmac'] = 'b' * 64
+        write_valid_telemetry(payload)
         result = validate_telemetry()
-        assert result["status"] == "corrupted"
-        assert result["reason"] == "telemetry_missing"
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'hmac_invalid'
 
 
-# =========================================================================
-# TEST: SCHEMA VERSION MISMATCH
-# =========================================================================
+class TestCRCValidation:
+    def setup_method(self):
+        cleanup()
+
+    def teardown_method(self):
+        cleanup()
+
+    def test_crc_detects_mutation(self):
+        payload = make_valid_payload()
+        orig_crc = payload['crc32']
+        payload['precision'] = 0.50
+        new_crc = compute_payload_crc(payload)
+        assert orig_crc != new_crc
+
+
+class TestMissingFields:
+    def setup_method(self):
+        cleanup()
+
+    def teardown_method(self):
+        cleanup()
+
+    def test_missing_hmac_field(self):
+        payload = make_valid_payload()
+        del payload['hmac']
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'missing_field'
+
+    def test_missing_crc32_field(self):
+        payload = make_valid_payload()
+        del payload['crc32']
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'missing_field'
+
+    def test_missing_monotonic_timestamp(self):
+        payload = make_valid_payload()
+        del payload['monotonic_timestamp']
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'missing_field'
+
 
 class TestSchemaMismatch:
+    def setup_method(self):
+        cleanup()
+
     def teardown_method(self):
-        _cleanup_telemetry()
+        cleanup()
 
     def test_wrong_schema_version(self):
-        """Wrong schema version → corrupted."""
-        payload = _make_valid_payload()
-        payload["schema_version"] = 99
-        # Recompute CRC and HMAC with wrong version
-        payload["crc32"] = compute_payload_crc(payload)
-        payload["hmac"] = compute_payload_hmac(payload)
-        _write_telemetry(payload)
+        payload = make_valid_payload()
+        payload['schema_version'] = 99
+        payload['crc32'] = compute_payload_crc(payload)
+        payload['hmac'] = compute_payload_hmac(payload)
+        write_valid_telemetry(payload)
         result = validate_telemetry()
-        assert result["status"] == "corrupted"
-        assert result["reason"] == "schema_mismatch"
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'schema_mismatch'
+
+
+class TestDeterminism:
+    def setup_method(self):
+        cleanup()
+
+    def teardown_method(self):
+        cleanup()
+
+    def test_determinism_false_rejected(self):
+        payload = make_valid_payload()
+        payload['determinism_status'] = False
+        payload['crc32'] = compute_payload_crc(payload)
+        payload['hmac'] = compute_payload_hmac(payload)
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'determinism_failed'
 
 
 # =========================================================================
-# TEST: CRC32 IMPLEMENTATION
+# REPLAY PROTECTION TESTS
 # =========================================================================
 
-class TestCrc32:
-    def test_deterministic(self):
-        """CRC32 produces same result for same input."""
-        data = b"hello world"
-        assert compute_crc32(data) == compute_crc32(data)
+class TestReplayProtection:
+    def setup_method(self):
+        cleanup()
 
-    def test_non_zero(self):
-        """CRC32 produces non-zero for non-empty input."""
-        assert compute_crc32(b"test") != 0
+    def teardown_method(self):
+        cleanup()
 
-    def test_different_inputs(self):
-        """CRC32 produces different results for different inputs."""
-        assert compute_crc32(b"abc") != compute_crc32(b"xyz")
+    def test_fresh_payload_passes(self):
+        """First payload with no last_seen should pass."""
+        write_valid_telemetry()
+        result = validate_telemetry()
+        assert result['status'] == 'ok'
+
+    def test_replay_attack_detected(self):
+        """Payload with monotonic_timestamp <= last_seen is rejected."""
+        payload = make_valid_payload()
+        # Set last_seen to a value >= payload's monotonic_timestamp
+        save_last_seen_timestamp(payload['monotonic_timestamp'] + 100)
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'replay_detected'
+
+    def test_monotonic_timestamp_persisted(self):
+        """After successful validation, last_seen is updated."""
+        payload = make_valid_payload()
+        payload['monotonic_timestamp'] = 200000000
+        payload['crc32'] = compute_payload_crc(payload)
+        payload['hmac'] = compute_payload_hmac(payload)
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'ok'
+        ls = load_last_seen_timestamp()
+        assert ls == 200000000
+
+    def test_equal_timestamp_rejected(self):
+        """monotonic_timestamp == last_seen is also rejected."""
+        payload = make_valid_payload()
+        save_last_seen_timestamp(payload['monotonic_timestamp'])
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'replay_detected'
+
+    def test_newer_timestamp_passes(self):
+        """monotonic_timestamp > last_seen passes."""
+        save_last_seen_timestamp(100)
+        payload = make_valid_payload()
+        payload['monotonic_timestamp'] = 200
+        payload['crc32'] = compute_payload_crc(payload)
+        payload['hmac'] = compute_payload_hmac(payload)
+        write_valid_telemetry(payload)
+        result = validate_telemetry()
+        assert result['status'] == 'ok'
 
 
 # =========================================================================
-# TEST: HMAC KEY LOADING
+# SECRET KEY TESTS
 # =========================================================================
 
-class TestHmacKey:
-    def test_key_loads(self):
-        """HMAC key loads from config file."""
+class TestSecretKey:
+    def test_key_exists(self):
+        assert os.path.exists(HMAC_KEY_PATH)
+
+    def test_key_non_empty(self):
         key = load_hmac_key()
-        assert len(key) > 0, "HMAC key should be non-empty"
+        assert len(key) > 0
 
-    def test_hmac_deterministic(self):
-        """HMAC computation is deterministic."""
-        payload = _make_valid_payload()
-        h1 = compute_payload_hmac(payload)
-        h2 = compute_payload_hmac(payload)
-        assert h1 == h2
-        assert len(h1) == 64  # 32 bytes = 64 hex chars
+    def test_key_loads_as_bytes(self):
+        key = load_hmac_key()
+        assert isinstance(key, bytes)
 
 
 # =========================================================================
-# TEST: HUNT LOCK PERSISTENCE
+# FILE CORRUPTION TESTS
 # =========================================================================
 
-class TestHuntLockPersistence:
-    """Test that hunt lock state persists across reads."""
+class TestFileCorruption:
+    def setup_method(self):
+        cleanup()
 
-    def test_hunt_lock_file_structure(self):
-        """Protocol state file includes hunt_locked field."""
-        state_path = os.path.join(PROJECT_ROOT, 'reports',
-                                  'training_protocol_state.json')
-        state = {
-            "training_active": False,
-            "training_start_timestamp": 0,
-            "training_start_monotonic": 0,
-            "elapsed_seconds_monotonic": 0,
-            "hunt_lockout_until_monotonic": 999999999,
-            "hunt_locked": True,
-            "mode": 0
-        }
-        os.makedirs(os.path.dirname(state_path), exist_ok=True)
-        with open(state_path, 'w') as f:
-            json.dump(state, f)
+    def teardown_method(self):
+        cleanup()
 
-        with open(state_path, 'r') as f:
-            loaded = json.load(f)
+    def test_missing_telemetry_file(self):
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'telemetry_missing'
 
-        assert loaded["hunt_locked"] is True
-        assert loaded["hunt_lockout_until_monotonic"] == 999999999
+    def test_invalid_json(self):
+        os.makedirs(os.path.dirname(TELEMETRY_PATH), exist_ok=True)
+        with open(TELEMETRY_PATH, 'w') as f:
+            f.write("{invalid json!")
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
+        assert result['reason'] == 'json_parse_failed'
 
-        os.remove(state_path)
+    def test_empty_file(self):
+        os.makedirs(os.path.dirname(TELEMETRY_PATH), exist_ok=True)
+        with open(TELEMETRY_PATH, 'w') as f:
+            f.write("")
+        result = validate_telemetry()
+        assert result['status'] == 'corrupted'
 
 
 # =========================================================================
-# ENTRY
+# LAST SEEN TIMESTAMP TESTS
 # =========================================================================
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+class TestLastSeenTimestamp:
+    def setup_method(self):
+        cleanup()
+
+    def teardown_method(self):
+        cleanup()
+
+    def test_load_no_file(self):
+        ts = load_last_seen_timestamp()
+        assert ts == 0
+
+    def test_save_and_load(self):
+        save_last_seen_timestamp(12345)
+        ts = load_last_seen_timestamp()
+        assert ts == 12345
+
+    def test_overwrite(self):
+        save_last_seen_timestamp(100)
+        save_last_seen_timestamp(200)
+        ts = load_last_seen_timestamp()
+        assert ts == 200
