@@ -391,13 +391,35 @@ static TelemetryData load_telemetry(const char *path) {
 // =========================================================================
 
 static bool load_hmac_key(uint8_t *key, size_t *key_len, size_t max_len) {
-  FILE *f = std::fopen(HMAC_KEY_PATH, "r");
-  if (!f)
-    return false;
   char buf[256];
   std::memset(buf, 0, sizeof(buf));
-  size_t n = std::fread(buf, 1, sizeof(buf) - 1, f);
-  std::fclose(f);
+  size_t n = 0;
+
+  // Priority 1: YGB_HMAC_SECRET environment variable
+  const char *env_secret = std::getenv("YGB_HMAC_SECRET");
+  if (env_secret && env_secret[0] != '\0') {
+    n = std::strlen(env_secret);
+    if (n < sizeof(buf)) {
+      std::memcpy(buf, env_secret, n);
+      buf[n] = '\0';
+    } else {
+      return false; // Too long
+    }
+  } else {
+    // Priority 2: Key file
+    FILE *f = std::fopen(HMAC_KEY_PATH, "r");
+    if (!f) {
+      std::fprintf(stderr,
+                   "HMAC secret not configured: no env var YGB_HMAC_SECRET "
+                   "and no file %s\n",
+                   HMAC_KEY_PATH);
+      return false;
+    }
+    n = std::fread(buf, 1, sizeof(buf) - 1, f);
+    std::fclose(f);
+  }
+
+  // Trim whitespace
   while (n > 0 &&
          (buf[n - 1] == '\n' || buf[n - 1] == '\r' || buf[n - 1] == ' '))
     buf[--n] = '\0';

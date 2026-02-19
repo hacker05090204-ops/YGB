@@ -295,14 +295,33 @@ static bool hex_to_bytes(const char *hex_str, uint8_t *out, int max_bytes) {
 // =========================================================================
 
 static bool load_hmac_key(uint8_t *key, size_t *key_len, size_t max_len) {
-  FILE *f = std::fopen(HMAC_KEY_PATH, "r");
-  if (!f)
-    return false; // Fail closed
-
   char buf[256];
   std::memset(buf, 0, sizeof(buf));
-  size_t n = std::fread(buf, 1, sizeof(buf) - 1, f);
-  std::fclose(f);
+  size_t n = 0;
+
+  // Priority 1: YGB_HMAC_SECRET environment variable
+  const char *env_secret = std::getenv("YGB_HMAC_SECRET");
+  if (env_secret && env_secret[0] != '\0') {
+    n = std::strlen(env_secret);
+    if (n < sizeof(buf)) {
+      std::memcpy(buf, env_secret, n);
+      buf[n] = '\0';
+    } else {
+      return false; // Too long
+    }
+  } else {
+    // Priority 2: Key file
+    FILE *f = std::fopen(HMAC_KEY_PATH, "r");
+    if (!f) {
+      std::fprintf(stderr,
+                   "HMAC secret not configured: no env var YGB_HMAC_SECRET "
+                   "and no file %s\n",
+                   HMAC_KEY_PATH);
+      return false; // Fail closed
+    }
+    n = std::fread(buf, 1, sizeof(buf) - 1, f);
+    std::fclose(f);
+  }
 
   // Trim whitespace
   while (n > 0 &&
@@ -312,7 +331,7 @@ static bool load_hmac_key(uint8_t *key, size_t *key_len, size_t max_len) {
   if (n == 0)
     return false;
 
-  // Key is hex-encoded in the file
+  // Key is hex-encoded
   if (n > max_len * 2)
     return false;
   *key_len = n / 2;
