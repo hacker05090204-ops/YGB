@@ -5,8 +5,9 @@
 # Prints all coverage values explicitly before failing.
 # Branch protection: require status checks before merge.
 #
-# Step order (Phase 4):
-#   1. Runtime safety tests
+# Step order:
+#   0. Environment setup (PYTHONPATH, HMAC secret, project root check)
+#   1. Runtime safety tests (with --tb=long)
 #   2. Python coverage
 #   3. C++ coverage
 #   4. JS/TS coverage
@@ -24,6 +25,9 @@ on:
 jobs:
   coverage-gate:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      YGB_HMAC_SECRET: "a]1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b"
     steps:
       - uses: actions/checkout@v4
 
@@ -47,26 +51,37 @@ jobs:
           pip install pytest pytest-cov coverage gcovr
           pip install -r requirements.txt || true
 
+      # ========== PHASE 2: ENSURE PROJECT ROOT ==========
+      - name: Ensure project root
+        run: |
+          pwd
+          ls
+          test -d backend || { echo "ERROR: backend/ directory not found"; exit 1; }
+
       # ========== PHASE 3: WORKING DIRECTORY DIAGNOSTICS ==========
       - name: Debug working directory
         run: |
           echo "PWD:"
           pwd
-          echo "Files:"
-          ls -R
+          echo "PYTHONPATH: $PYTHONPATH"
+          echo "YGB_HMAC_SECRET set: $([ -n \"$YGB_HMAC_SECRET\" ] && echo yes || echo no)"
+          echo "---"
+          echo "Backend structure:"
+          ls -la backend/
+          ls -la backend/tests/
           echo "---"
 
-      # ========== PHASE 4 STEP 1: RUNTIME SAFETY TESTS (before coverage) ==========
+      # ========== STEP 1: RUNTIME SAFETY TESTS (with long traceback) ==========
       - name: Runtime safety tests
-        run: pytest backend/tests/test_runtime_safety.py -v
+        run: pytest backend/tests/test_runtime_safety.py -v -s --tb=long
 
-      # ========== PHASE 4 STEP 2: PYTHON COVERAGE ==========
+      # ========== STEP 2: PYTHON COVERAGE ==========
       - name: Python coverage check (>=95%)
         id: python_cov
         continue-on-error: true
         run: |
           echo "=== PYTHON COVERAGE ==="
-          python -m pytest backend/tests/ \
+          pytest backend/tests/ \
             --cov=backend \
             --cov-report=xml:coverage_python.xml \
             --cov-report=json:coverage_python.json \
@@ -75,7 +90,7 @@ jobs:
           echo "---"
           coverage report || true
 
-      # ========== PHASE 4 STEP 3: C++ COVERAGE ==========
+      # ========== STEP 3: C++ COVERAGE ==========
       - name: Build and run C++ self-tests with coverage
         id: cpp_cov
         continue-on-error: true
@@ -83,7 +98,7 @@ jobs:
           chmod +x scripts/build_cpp_tests.sh
           bash scripts/build_cpp_tests.sh
 
-      # ========== PHASE 4 STEP 4: JS/TS COVERAGE ==========
+      # ========== STEP 4: JS/TS COVERAGE ==========
       - name: JS/TS coverage check (>=80%)
         id: js_cov
         continue-on-error: true
@@ -95,10 +110,10 @@ jobs:
             npm test -- --coverage 2>&1 || true
             cat coverage/coverage-summary.json 2>/dev/null || echo "No JS/TS coverage data"
           else
-            echo "No frontend directory — skipping JS/TS coverage"
+            echo "No frontend directory -- skipping JS/TS coverage"
           fi
 
-      # ========== PHASE 4 STEP 5: PRINT SUMMARY ==========
+      # ========== STEP 5: PRINT SUMMARY ==========
       - name: Print all coverage values
         run: |
           echo "============================================"
@@ -155,7 +170,7 @@ jobs:
           echo ""
           echo "============================================"
 
-      # ========== PHASE 4 STEP 6: COVERAGE GATE (final) ==========
+      # ========== STEP 6: COVERAGE GATE (final) ==========
       - name: Run coverage gate script
         run: python scripts/coverage_gate.py
 
@@ -173,6 +188,9 @@ jobs:
 
   governance-check:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      YGB_HMAC_SECRET: "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b"
     steps:
       - uses: actions/checkout@v4
 
@@ -182,20 +200,26 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt || true
+        run: |
+          pip install pytest pytest-cov
+          pip install -r requirements.txt || true
 
-      # Phase 2: Use pytest instead of python -m for all test execution
+      - name: Ensure project root
+        run: |
+          pwd
+          test -d backend || { echo "ERROR: backend/ not found"; exit 1; }
+
       - name: Governance lock verification
-        run: pytest backend/tests/test_governance_lock.py -v
+        run: pytest backend/tests/test_governance_lock.py -v -s --tb=long
 
       - name: Full pipeline integration
-        run: pytest backend/tests/test_full_pipeline.py -v
+        run: pytest backend/tests/test_full_pipeline.py -v -s --tb=long
 
       - name: Error path coverage
-        run: pytest backend/tests/test_error_paths.py -v
+        run: pytest backend/tests/test_error_paths.py -v -s --tb=long
 
       - name: Parallel scheduler stress
-        run: pytest backend/tests/test_parallel_scheduler_stress.py -v
+        run: pytest backend/tests/test_parallel_scheduler_stress.py -v -s --tb=long
 
       - name: Runtime safety tests
-        run: pytest backend/tests/test_runtime_safety.py -v
+        run: pytest backend/tests/test_runtime_safety.py -v -s --tb=long
