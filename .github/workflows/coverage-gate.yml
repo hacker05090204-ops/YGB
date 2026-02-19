@@ -4,6 +4,14 @@
 # Fails if Python coverage <95%, C++ coverage <85%, or JS/TS coverage <80%.
 # Prints all coverage values explicitly before failing.
 # Branch protection: require status checks before merge.
+#
+# Step order (Phase 4):
+#   1. Runtime safety tests
+#   2. Python coverage
+#   3. C++ coverage
+#   4. JS/TS coverage
+#   5. Print summary
+#   6. Run coverage_gate.py (final gate)
 
 name: Coverage Gate
 
@@ -39,7 +47,20 @@ jobs:
           pip install pytest pytest-cov coverage gcovr
           pip install -r requirements.txt || true
 
-      # ========== PYTHON COVERAGE ==========
+      # ========== PHASE 3: WORKING DIRECTORY DIAGNOSTICS ==========
+      - name: Debug working directory
+        run: |
+          echo "PWD:"
+          pwd
+          echo "Files:"
+          ls -R
+          echo "---"
+
+      # ========== PHASE 4 STEP 1: RUNTIME SAFETY TESTS (before coverage) ==========
+      - name: Runtime safety tests
+        run: pytest backend/tests/test_runtime_safety.py -v
+
+      # ========== PHASE 4 STEP 2: PYTHON COVERAGE ==========
       - name: Python coverage check (>=95%)
         id: python_cov
         continue-on-error: true
@@ -54,7 +75,7 @@ jobs:
           echo "---"
           coverage report || true
 
-      # ========== C++ COVERAGE ==========
+      # ========== PHASE 4 STEP 3: C++ COVERAGE ==========
       - name: Build and run C++ self-tests with coverage
         id: cpp_cov
         continue-on-error: true
@@ -62,18 +83,22 @@ jobs:
           chmod +x scripts/build_cpp_tests.sh
           bash scripts/build_cpp_tests.sh
 
-      # ========== JS/TS COVERAGE ==========
+      # ========== PHASE 4 STEP 4: JS/TS COVERAGE ==========
       - name: JS/TS coverage check (>=80%)
         id: js_cov
         continue-on-error: true
         run: |
           echo "=== JS/TS COVERAGE ==="
-          cd frontend
-          npm ci
-          npm test -- --coverage 2>&1 || true
-          cat coverage/coverage-summary.json 2>/dev/null || echo "No JS/TS coverage data"
+          if [ -d frontend ]; then
+            cd frontend
+            npm ci
+            npm test -- --coverage 2>&1 || true
+            cat coverage/coverage-summary.json 2>/dev/null || echo "No JS/TS coverage data"
+          else
+            echo "No frontend directory — skipping JS/TS coverage"
+          fi
 
-      # ========== FINAL GATE ==========
+      # ========== PHASE 4 STEP 5: PRINT SUMMARY ==========
       - name: Print all coverage values
         run: |
           echo "============================================"
@@ -91,6 +116,7 @@ jobs:
           print(f'  Python: {pct:.1f}% (threshold: 95%)')
           print(f'  Status: {\"PASS\" if pct >= 95 else \"FAIL\"}')" || echo "  Python: could not parse"
           else
+            echo "  Coverage artifact missing: coverage_python.json"
             echo "  Python: NO DATA"
           fi
 
@@ -107,6 +133,7 @@ jobs:
           print(f'  C++: {pct:.1f}% (threshold: 85%)')
           print(f'  Status: {\"PASS\" if pct >= 85 else \"FAIL\"}')" || echo "  C++: could not parse"
           else
+            echo "  Coverage artifact missing: coverage_cpp.json"
             echo "  C++: NO DATA (compile or gcovr failed)"
           fi
 
@@ -121,12 +148,14 @@ jobs:
           print(f'  JS/TS: {pct:.1f}% (threshold: 80%)')
           print(f'  Status: {\"PASS\" if pct >= 80 else \"FAIL\"}')" || echo "  JS/TS: could not parse"
           else
+            echo "  Coverage artifact missing: frontend/coverage/coverage-summary.json"
             echo "  JS/TS: NO DATA"
           fi
 
           echo ""
           echo "============================================"
 
+      # ========== PHASE 4 STEP 6: COVERAGE GATE (final) ==========
       - name: Run coverage gate script
         run: python scripts/coverage_gate.py
 
@@ -155,17 +184,18 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt || true
 
+      # Phase 2: Use pytest instead of python -m for all test execution
       - name: Governance lock verification
-        run: python -m backend.tests.test_governance_lock
+        run: pytest backend/tests/test_governance_lock.py -v
 
       - name: Full pipeline integration
-        run: python -m backend.tests.test_full_pipeline
+        run: pytest backend/tests/test_full_pipeline.py -v
 
       - name: Error path coverage
-        run: python -m backend.tests.test_error_paths
+        run: pytest backend/tests/test_error_paths.py -v
 
       - name: Parallel scheduler stress
-        run: python -m backend.tests.test_parallel_scheduler_stress
+        run: pytest backend/tests/test_parallel_scheduler_stress.py -v
 
       - name: Runtime safety tests
-        run: python -m backend.tests.test_runtime_safety
+        run: pytest backend/tests/test_runtime_safety.py -v

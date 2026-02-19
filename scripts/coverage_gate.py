@@ -4,6 +4,10 @@ coverage_gate.py — CI Coverage Enforcement (Python + C++ + JS/TS)
 Parses coverage reports from pytest-cov, gcovr, and vitest/jest.
 Prints all values explicitly, fails only if below threshold.
 
+PHASE 1: Checks file existence before failing.
+PHASE 3: Debug prints (cwd, listdir, resolved paths).
+PHASE 5: Wrapped in try/except for fail-fast with clear message.
+
 NO mock data. NO synthetic fallback. NO silent exit.
 """
 
@@ -18,6 +22,55 @@ from datetime import datetime, timezone
 PYTHON_COVERAGE_THRESHOLD = 95
 CPP_COVERAGE_THRESHOLD = 85
 JSTS_COVERAGE_THRESHOLD = 80
+
+# Expected coverage artifact paths (relative to project root)
+COVERAGE_ARTIFACTS = {
+    "python": "coverage_python.json",
+    "cpp": "coverage_cpp.json",
+    "jsts": os.path.join("frontend", "coverage", "coverage-summary.json"),
+}
+
+
+def debug_environment(project_root: str):
+    """Print debug info about working directory and file system."""
+    print("\n--- DEBUG: Environment ---")
+    print(f"  Working directory: {os.getcwd()}")
+    print(f"  Project root:     {project_root}")
+    print(f"  Script location:  {os.path.abspath(__file__)}")
+
+    print("\n--- DEBUG: Project root listing ---")
+    try:
+        entries = sorted(os.listdir(project_root))
+        for entry in entries:
+            full = os.path.join(project_root, entry)
+            kind = "DIR " if os.path.isdir(full) else "FILE"
+            print(f"  [{kind}] {entry}")
+    except Exception as e:
+        print(f"  ERROR listing project root: {e}")
+
+    print("\n--- DEBUG: Coverage artifact paths ---")
+    for name, rel_path in COVERAGE_ARTIFACTS.items():
+        full_path = os.path.join(project_root, rel_path)
+        exists = os.path.exists(full_path)
+        print(f"  {name:6s}: {full_path} -> {'EXISTS' if exists else 'MISSING'}")
+
+    print("--- END DEBUG ---\n")
+
+
+def check_coverage_artifacts(project_root: str) -> dict:
+    """
+    Check existence of all coverage artifact files.
+    Returns dict with status for each.
+    Prints explicit error for any missing file.
+    """
+    status = {}
+    for name, rel_path in COVERAGE_ARTIFACTS.items():
+        full_path = os.path.join(project_root, rel_path)
+        exists = os.path.exists(full_path)
+        status[name] = {"path": full_path, "exists": exists}
+        if not exists:
+            print(f"Coverage artifact missing: {full_path}")
+    return status
 
 
 def run_python_coverage(project_root: str) -> dict:
@@ -163,7 +216,8 @@ def run_cpp_coverage(project_root: str) -> dict:
                               errors="ignore") as f:
                         content = f.read()
                     if ("run_tests" in content or "self_test" in content
-                            or "RUN_SELF_TESTS" in content):
+                            or "RUN_SELF_TESTS" in content
+                            or "RUN_SELF_TEST" in content):
                         tested += 1
                 except Exception:
                     pass
@@ -196,7 +250,7 @@ def run_jsts_coverage(project_root: str) -> dict:
         "details": "",
     }
 
-    # Check multiple possible locations
+    # Use canonical path: frontend/coverage/coverage-summary.json
     possible_paths = [
         os.path.join(project_root, "frontend", "coverage",
                      "coverage-summary.json"),
@@ -293,6 +347,20 @@ def main():
     print("COVERAGE GATE — Production Quality Enforcement")
     print("=" * 60)
 
+    # --- Phase 3: Debug environment ---
+    debug_environment(project_root)
+
+    # --- Phase 1: Check artifact existence ---
+    print("[PRE] Checking coverage artifact existence...")
+    artifact_status = check_coverage_artifacts(project_root)
+    missing = [name for name, info in artifact_status.items()
+               if not info["exists"]]
+    if missing:
+        print(f"  WARNING: Missing artifacts: {', '.join(missing)}")
+        print("  (These may be generated during coverage runs below)")
+    else:
+        print("  All coverage artifacts present.")
+
     # ---- Python ----
     print(f"\n[1/3] Python coverage (threshold: {PYTHON_COVERAGE_THRESHOLD}%)...")
     py_result = run_python_coverage(project_root)
@@ -316,6 +384,16 @@ def main():
     if jsts_result["details"]:
         print(f"  {jsts_result['details']}")
 
+    # --- Post-run: Re-check artifacts ---
+    print("\n[POST] Re-checking coverage artifacts after runs...")
+    post_status = check_coverage_artifacts(project_root)
+    post_missing = [name for name, info in post_status.items()
+                    if not info["exists"]]
+    if post_missing:
+        for name in post_missing:
+            path = post_status[name]["path"]
+            print(f"  ERROR: Coverage artifact still missing: {path}")
+
     # ---- Generate report ----
     report_path = os.path.join(project_root,
                                "reports/coverage_report.json")
@@ -327,31 +405,38 @@ def main():
     print("COVERAGE SUMMARY")
     print("-" * 60)
     print(f"  Python:  {fmt_pct(py_result['coverage_pct']):>8}  "
-          f"(≥{PYTHON_COVERAGE_THRESHOLD}%)  [{py_status}]")
+          f"(>={PYTHON_COVERAGE_THRESHOLD}%)  [{py_status}]")
     print(f"  C++:     {fmt_pct(cpp_result['coverage_pct']):>8}  "
-          f"(≥{CPP_COVERAGE_THRESHOLD}%)  [{cpp_status}]")
+          f"(>={CPP_COVERAGE_THRESHOLD}%)  [{cpp_status}]")
     print(f"  JS/TS:   {fmt_pct(jsts_result['coverage_pct']):>8}  "
-          f"(≥{JSTS_COVERAGE_THRESHOLD}%)  [{jsts_status}]")
+          f"(>={JSTS_COVERAGE_THRESHOLD}%)  [{jsts_status}]")
     print("-" * 60)
 
     if report["overall_passed"]:
-        print("COVERAGE GATE: PASSED ✓")
+        print("COVERAGE GATE: PASSED [OK]")
         print("=" * 60)
         return 0
     else:
-        print("COVERAGE GATE: FAILED ✗")
+        print("COVERAGE GATE: FAILED [X]")
         if not py_result["passed"]:
-            print(f"  ✗ Python: {fmt_pct(py_result['coverage_pct'])} "
+            print(f"  [X] Python: {fmt_pct(py_result['coverage_pct'])} "
                   f"< {PYTHON_COVERAGE_THRESHOLD}%")
         if not cpp_result["passed"]:
-            print(f"  ✗ C++: {fmt_pct(cpp_result['coverage_pct'])} "
+            print(f"  [X] C++: {fmt_pct(cpp_result['coverage_pct'])} "
                   f"< {CPP_COVERAGE_THRESHOLD}%")
         if not jsts_result["passed"]:
-            print(f"  ✗ JS/TS: {fmt_pct(jsts_result['coverage_pct'])} "
+            print(f"  [X] JS/TS: {fmt_pct(jsts_result['coverage_pct'])} "
                   f"< {JSTS_COVERAGE_THRESHOLD}%")
         print("=" * 60)
         return 1
 
 
+# Phase 5: Fail-fast wrapper
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except Exception as e:
+        print(f"COVERAGE GATE INTERNAL ERROR: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
