@@ -29,6 +29,12 @@ static constexpr double PRECISION_FLOOR = 0.95;
 static constexpr double FP_RATE_CEILING = 0.03;
 static constexpr double DUPLICATE_ALERT = 0.20;
 
+// Thermal thresholds
+static constexpr double THERMAL_THROTTLE_TEMP = 83.0; // °C — reduce batch size
+static constexpr double THERMAL_PAUSE_TEMP    = 88.0; // °C — pause training
+static constexpr double THERMAL_RESUME_TEMP   = 75.0; // °C — resume normal
+static constexpr double THERMAL_BATCH_REDUCTION = 0.20; // 20% reduction
+
 enum class GpuStatus : uint8_t {
   UNKNOWN = 0,
   AVAILABLE = 1,
@@ -41,6 +47,12 @@ enum class ContainmentAction : uint8_t {
   WARNING = 1,
   LOCK_MODE = 2,
   FORCE_A = 3
+};
+
+enum class ThermalState : uint8_t {
+  THERMAL_NORMAL = 0,
+  THERMAL_THROTTLE = 1,  // >83°C — batch reduced
+  THERMAL_PAUSE = 2      // >88°C — training paused
 };
 
 struct RuntimeMetrics {
@@ -72,6 +84,14 @@ struct RuntimeMetrics {
   // GPU status (never fabricated)
   GpuStatus gpu_status;
   char gpu_status_detail[128];
+
+  // Thermal monitoring
+  ThermalState thermal_state;
+  double gpu_temperature;
+  int32_t batch_size_current;
+  int32_t batch_size_original;
+  double batch_reduction_pct;
+  char thermal_reason[256];
 };
 
 struct SampleOutcome {
@@ -90,6 +110,12 @@ public:
     metrics_.action = ContainmentAction::NONE;
     metrics_.gpu_status = GpuStatus::UNKNOWN;
     metrics_.gpu_status_detail[0] = '\0';
+    metrics_.thermal_state = ThermalState::THERMAL_NORMAL;
+    metrics_.gpu_temperature = 0.0;
+    metrics_.batch_size_current = 0;
+    metrics_.batch_size_original = 0;
+    metrics_.batch_reduction_pct = 0.0;
+    metrics_.thermal_reason[0] = '\0';
   }
 
   // --- GPU status (set from subprocess result, never fabricated) ---
@@ -101,6 +127,70 @@ public:
     } else {
       metrics_.gpu_status_detail[0] = '\0';
     }
+  }
+
+  // --- Set batch size (must be called before thermal monitoring) ---
+  void set_batch_size(int32_t batch_size) {
+    if (metrics_.batch_size_original == 0) {
+      metrics_.batch_size_original = batch_size;
+    }
+    metrics_.batch_size_current = batch_size;
+  }
+
+  // --- Thermal monitoring ---
+  void set_gpu_temperature(double temp) {
+    metrics_.gpu_temperature = temp;
+
+    if (temp > THERMAL_PAUSE_TEMP) {
+      // >88°C — PAUSE training
+      if (metrics_.thermal_state != ThermalState::THERMAL_PAUSE) {
+        metrics_.thermal_state = ThermalState::THERMAL_PAUSE;
+        std::snprintf(metrics_.thermal_reason,
+                      sizeof(metrics_.thermal_reason),
+                      "THERMAL_PAUSE: %.1f°C > %.1f°C — training paused",
+                      temp, THERMAL_PAUSE_TEMP);
+      }
+    } else if (temp > THERMAL_THROTTLE_TEMP) {
+      // >83°C — THROTTLE: reduce batch size by 20%
+      if (metrics_.thermal_state != ThermalState::THERMAL_THROTTLE) {
+        metrics_.thermal_state = ThermalState::THERMAL_THROTTLE;
+        metrics_.batch_reduction_pct = THERMAL_BATCH_REDUCTION;
+        if (metrics_.batch_size_original > 0) {
+          int32_t reduced = static_cast<int32_t>(
+              metrics_.batch_size_original * (1.0 - THERMAL_BATCH_REDUCTION));
+          if (reduced < 1) reduced = 1;
+          metrics_.batch_size_current = reduced;
+        }
+        std::snprintf(metrics_.thermal_reason,
+                      sizeof(metrics_.thermal_reason),
+                      "THERMAL_THROTTLE: %.1f°C > %.1f°C — batch reduced by "
+                      "%.0f%%, now %d (was %d)",
+                      temp, THERMAL_THROTTLE_TEMP,
+                      THERMAL_BATCH_REDUCTION * 100.0,
+                      metrics_.batch_size_current,
+                      metrics_.batch_size_original);
+      }
+    } else if (temp < THERMAL_RESUME_TEMP) {
+      // <75°C — RESUME normal
+      if (metrics_.thermal_state != ThermalState::THERMAL_NORMAL) {
+        metrics_.thermal_state = ThermalState::THERMAL_NORMAL;
+        metrics_.batch_reduction_pct = 0.0;
+        metrics_.batch_size_current = metrics_.batch_size_original;
+        std::snprintf(metrics_.thermal_reason,
+                      sizeof(metrics_.thermal_reason),
+                      "THERMAL_NORMAL: %.1f°C < %.1f°C — resumed normal",
+                      temp, THERMAL_RESUME_TEMP);
+      }
+    }
+    // Between 75-83°C: maintain current state (hysteresis zone)
+  }
+
+  bool is_thermal_paused() const {
+    return metrics_.thermal_state == ThermalState::THERMAL_PAUSE;
+  }
+
+  bool is_thermal_throttled() const {
+    return metrics_.thermal_state == ThermalState::THERMAL_THROTTLE;
   }
 
   // --- Record a sample outcome ---
@@ -235,6 +325,35 @@ public:
     }
     test(mon.metrics().window_size == ROLLING_WINDOW,
          "Window should cap at ROLLING_WINDOW");
+
+    // Test 7: Thermal throttle at >83°C
+    mon.reset();
+    mon.set_batch_size(100);
+    mon.set_gpu_temperature(85.0);
+    test(mon.metrics().thermal_state == ThermalState::THERMAL_THROTTLE,
+         "85°C triggers THERMAL_THROTTLE");
+    test(mon.metrics().batch_size_current == 80,
+         "Batch reduced by 20% (100 → 80)");
+    test(mon.is_thermal_throttled(), "is_thermal_throttled() true");
+
+    // Test 8: Thermal pause at >88°C
+    mon.set_gpu_temperature(90.0);
+    test(mon.metrics().thermal_state == ThermalState::THERMAL_PAUSE,
+         "90°C triggers THERMAL_PAUSE");
+    test(mon.is_thermal_paused(), "is_thermal_paused() true");
+
+    // Test 9: Thermal resume at <75°C
+    mon.set_gpu_temperature(70.0);
+    test(mon.metrics().thermal_state == ThermalState::THERMAL_NORMAL,
+         "70°C resumes THERMAL_NORMAL");
+    test(mon.metrics().batch_size_current == 100,
+         "Batch restored to original (100)");
+    test(!mon.is_thermal_paused(), "is_thermal_paused() false after resume");
+
+    // Test 10: Hysteresis zone (75-83°C keeps NORMAL)
+    mon.set_gpu_temperature(80.0);
+    test(mon.metrics().thermal_state == ThermalState::THERMAL_NORMAL,
+         "80°C in hysteresis zone — stays NORMAL");
 
     return failed == 0;
   }

@@ -1,147 +1,221 @@
 """
-runtime_api.py — Authoritative Runtime Status Endpoint
+runtime_api.py — Backend Runtime Hard Validation API
+=====================================================
+Endpoint:
+  GET  /runtime/status  — Validated runtime state
 
-GET /runtime/status
+Before returning runtime data:
+  1. Load reports/training_telemetry.json
+  2. Validate CRC32 (recompute and match)
+  3. Validate schema_version
+  4. Validate determinism_status == true
+  5. If ANY fail → return {"status": "error", "reason": "runtime_corrupted"}
 
-Rules:
-  - Reads runtime_state.json (written by C++ training_telemetry)
-  - Validates structure (all required fields present)
-  - Verifies determinism flag
-  - Returns signed response with HMAC
-  - If file missing → {"status": "awaiting_data"}
-  - No computed values — all from C++ runtime
-  - No mock data, no silent fallback
+Never trust partial state.
+NO silent fallback. NO telemetry trust without validation.
 """
 
-import hashlib
-import hmac
-import json
 import os
-import time
+import json
+import struct
 import logging
 
 logger = logging.getLogger(__name__)
 
-# Path to the runtime state file written by C++ telemetry
-RUNTIME_STATE_PATH = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "reports", "runtime_state.json"
-)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
 
-# HMAC signing key (env or fallback for dev)
-SIGNING_KEY = os.environ.get("YGB_RUNTIME_SIGN_KEY", "ygb-runtime-dev-key").encode()
-
-# Required fields in runtime_state.json
-REQUIRED_FIELDS = [
-    "total_epochs", "completed_epochs", "current_loss",
-    "precision", "ece", "drift_kl", "duplicate_rate",
-    "gpu_util", "cpu_util", "temperature",
-    "determinism_status", "freeze_status",
-    "mode", "last_update_ms",
-]
-
-# Stale threshold: 60 seconds
-STALE_THRESHOLD_MS = 60_000
+TELEMETRY_PATH = os.path.join(PROJECT_ROOT, 'reports', 'training_telemetry.json')
+EXPECTED_SCHEMA_VERSION = 1
 
 
-def _sign_payload(payload: dict) -> str:
-    """HMAC-SHA256 signature of the JSON payload."""
-    raw = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    return hmac.new(SIGNING_KEY, raw.encode(), hashlib.sha256).hexdigest()
+# =========================================================================
+# CRC32 (must match C++ training_telemetry.cpp implementation)
+# =========================================================================
+
+def _crc32_table():
+    """Build CRC32 lookup table (same polynomial as C++ impl)."""
+    table = []
+    for i in range(256):
+        crc = i
+        for _ in range(8):
+            if crc & 1:
+                crc = (crc >> 1) ^ 0xEDB88320
+            else:
+                crc >>= 1
+        table.append(crc)
+    return table
+
+_CRC_TABLE = _crc32_table()
 
 
-def _validate_structure(data: dict) -> list:
-    """Returns list of missing required fields."""
-    return [f for f in REQUIRED_FIELDS if f not in data]
+def compute_crc32(data: bytes) -> int:
+    """Compute CRC32 matching the C++ implementation."""
+    crc = 0xFFFFFFFF
+    for byte in data:
+        crc = (crc >> 8) ^ _CRC_TABLE[(crc ^ byte) & 0xFF]
+    return crc ^ 0xFFFFFFFF
 
 
-def get_runtime_status() -> dict:
+def compute_payload_crc(payload: dict) -> int:
+    """Compute CRC over payload fields (must match C++ format string)."""
+    crc_string = (
+        f"v{payload.get('schema_version', 0)}"
+        f"|det:{1 if payload.get('determinism_status') else 0}"
+        f"|frz:{1 if payload.get('freeze_status') else 0}"
+        f"|prec:{payload.get('precision', 0.0):.8f}"
+        f"|rec:{payload.get('recall', 0.0):.8f}"
+        f"|kl:{payload.get('kl_divergence', 0.0):.8f}"
+        f"|ece:{payload.get('ece', 0.0):.8f}"
+        f"|loss:{payload.get('loss', 0.0):.8f}"
+        f"|temp:{payload.get('gpu_temperature', 0.0):.8f}"
+        f"|epoch:{payload.get('epoch', 0)}"
+        f"|batch:{payload.get('batch_size', 0)}"
+        f"|ts:{payload.get('timestamp', 0)}"
+    )
+    return compute_crc32(crc_string.encode('ascii'))
+
+
+# =========================================================================
+# VALIDATION
+# =========================================================================
+
+def validate_telemetry() -> dict:
     """
-    Read runtime_state.json and return validated, signed status.
-
-    Returns dict suitable for JSON response.
+    Load and validate runtime telemetry.
+    Returns validated data or error response.
+    Never returns partial state.
     """
-    # Check if file exists
-    if not os.path.exists(RUNTIME_STATE_PATH):
-        return {
-            "status": "awaiting_data",
-            "message": "Runtime state not yet available. Training has not started.",
-            "timestamp": int(time.time() * 1000),
-        }
-
-    # Read file
-    try:
-        with open(RUNTIME_STATE_PATH, "r") as f:
-            data = json.load(f)
-    except (json.JSONDecodeError, IOError) as e:
-        logger.error("Failed to read runtime state: %s", e)
+    # Step 1: Load file
+    if not os.path.exists(TELEMETRY_PATH):
+        logger.error("Telemetry file missing: %s", TELEMETRY_PATH)
         return {
             "status": "error",
-            "message": f"Failed to read runtime state: {e}",
-            "timestamp": int(time.time() * 1000),
+            "reason": "runtime_corrupted",
+            "detail": "Telemetry file missing"
         }
 
-    # Validate structure
-    missing = _validate_structure(data)
-    if missing:
+    try:
+        with open(TELEMETRY_PATH, 'r') as f:
+            raw = f.read()
+    except Exception as e:
+        logger.error("Failed to read telemetry: %s", e)
         return {
-            "status": "invalid",
-            "message": f"Missing required fields: {', '.join(missing)}",
-            "timestamp": int(time.time() * 1000),
+            "status": "error",
+            "reason": "runtime_corrupted",
+            "detail": f"Read failed: {e}"
         }
 
-    # Check determinism
-    determinism_ok = data.get("determinism_status", False)
+    # Step 2: Parse JSON
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        logger.error("Telemetry JSON parse failed: %s", e)
+        return {
+            "status": "error",
+            "reason": "runtime_corrupted",
+            "detail": f"JSON parse failed: {e}"
+        }
 
-    # Check staleness
-    now_ms = int(time.time() * 1000)
-    last_update = data.get("last_update_ms", 0)
-    stale = (now_ms - last_update) > STALE_THRESHOLD_MS if last_update > 0 else True
+    # Step 3: Validate required fields
+    required_fields = ['schema_version', 'determinism_status', 'freeze_status', 'crc32']
+    for field in required_fields:
+        if field not in data:
+            logger.error("Telemetry missing field: %s", field)
+            return {
+                "status": "error",
+                "reason": "runtime_corrupted",
+                "detail": f"Missing required field: {field}"
+            }
 
-    # Build response payload (all values from C++ runtime, no computation)
-    payload = {
-        "status": "active",
-        "runtime": {
-            "total_epochs": data["total_epochs"],
-            "completed_epochs": data["completed_epochs"],
-            "current_loss": data["current_loss"],
-            "precision": data["precision"],
-            "ece": data["ece"],
-            "drift_kl": data["drift_kl"],
-            "duplicate_rate": data["duplicate_rate"],
-            "gpu_util": data["gpu_util"],
-            "cpu_util": data["cpu_util"],
-            "temperature": data["temperature"],
-            "determinism_status": data["determinism_status"],
-            "freeze_status": data["freeze_status"],
-            "mode": data["mode"],
-            "progress_pct": data.get("progress_pct", 0.0),
-            "loss_trend": data.get("loss_trend", 0.0),
-        },
-        "determinism_ok": determinism_ok,
-        "stale": stale,
-        "last_update_ms": last_update,
-        "timestamp": now_ms,
+    # Step 4: Validate schema version
+    if data['schema_version'] != EXPECTED_SCHEMA_VERSION:
+        logger.error(
+            "Schema version mismatch: got %s, expected %s",
+            data['schema_version'], EXPECTED_SCHEMA_VERSION
+        )
+        return {
+            "status": "error",
+            "reason": "runtime_corrupted",
+            "detail": f"Schema version mismatch: {data['schema_version']}"
+        }
+
+    # Step 5: Validate determinism_status
+    if data['determinism_status'] is not True:
+        logger.error("determinism_status is not true")
+        return {
+            "status": "error",
+            "reason": "runtime_corrupted",
+            "detail": "determinism_status is false"
+        }
+
+    # Step 6: Validate CRC32
+    stored_crc = data['crc32']
+    computed_crc = compute_payload_crc(data)
+    if stored_crc != computed_crc:
+        logger.error(
+            "CRC mismatch: stored=%d computed=%d",
+            stored_crc, computed_crc
+        )
+        return {
+            "status": "error",
+            "reason": "runtime_corrupted",
+            "detail": f"CRC mismatch: stored={stored_crc} computed={computed_crc}"
+        }
+
+    # All checks passed
+    return {
+        "status": "ok",
+        "data": data,
+        "validated": True
     }
 
-    # Sign the response
-    payload["signature"] = _sign_payload(payload)
 
-    return payload
+# =========================================================================
+# ENDPOINT HANDLERS
+# =========================================================================
+
+def get_runtime_status():
+    """
+    GET /runtime/status
+
+    Returns validated runtime state.
+    If corrupted → returns error with reason.
+    Never returns partial state.
+    """
+    result = validate_telemetry()
+    return result
 
 
-def register_runtime_routes(app):
-    """Register runtime API routes with a FastAPI or Flask-like app."""
-    try:
-        # Try FastAPI-style
-        from fastapi import APIRouter
-        router = APIRouter()
+# =========================================================================
+# FLASK REGISTRATION
+# =========================================================================
 
-        @router.get("/runtime/status")
-        async def runtime_status():
-            return get_runtime_status()
+def register_routes(app):
+    """Register runtime API endpoints with Flask app."""
+    from functools import wraps
 
-        app.include_router(router)
-        logger.info("Registered /runtime/status (FastAPI)")
-    except ImportError:
-        logger.warning("FastAPI not available, skipping runtime route registration")
+    @app.route('/runtime/status', methods=['GET'])
+    def runtime_status_route():
+        result = get_runtime_status()
+        status_code = 200 if result.get('status') == 'ok' else 500
+        return json.dumps(result), status_code, {'Content-Type': 'application/json'}
+
+    logger.info("Registered runtime API routes: /runtime/status")
+
+
+# =========================================================================
+# SELF-TEST
+# =========================================================================
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
+    print("=== Runtime API Self-Test ===")
+    result = get_runtime_status()
+    print(json.dumps(result, indent=2))
+
+    if result.get('status') == 'ok':
+        print("\n✅ Runtime telemetry validated successfully")
+    else:
+        print(f"\n⚠️  Runtime telemetry validation failed: {result.get('detail', 'unknown')}")

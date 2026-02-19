@@ -166,3 +166,6 @@ jobs:
 
       - name: Parallel scheduler stress
         run: python -m backend.tests.test_parallel_scheduler_stress
+
+      - name: Runtime safety tests
+        run: python -m backend.tests.test_runtime_safety
