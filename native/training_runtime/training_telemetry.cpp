@@ -60,6 +60,13 @@ static uint64_t get_monotonic_seconds() {
 #endif
 }
 
+static uint64_t get_wall_clock_unix() {
+  return static_cast<uint64_t>(std::time(nullptr));
+}
+
+// Global: set once on first telemetry write, never reset
+static uint64_t g_monotonic_start_time = 0;
+
 // =========================================================================
 // LAST SEEN TIMESTAMP PERSISTENCE
 // =========================================================================
@@ -389,6 +396,11 @@ struct TelemetryPayload {
   int batch_size;
   uint64_t timestamp;
   uint64_t monotonic_timestamp; // Replay protection — monotonic clock
+  // Phase 2: Real-time training visibility fields
+  uint64_t wall_clock_unix;         // time(NULL) — real wall clock
+  uint64_t monotonic_start_time;    // set once at first write
+  double training_duration_seconds; // monotonic_current - monotonic_start
+  double samples_per_second;        // throughput metric
   uint32_t crc32;
   char hmac[65]; // 64 hex chars + null
   bool valid;
@@ -477,6 +489,16 @@ static bool write_telemetry(const TelemetryPayload &payload) {
   TelemetryPayload p = payload;
   p.monotonic_timestamp = get_monotonic_seconds();
 
+  // Phase 2: Set timing fields
+  p.wall_clock_unix = get_wall_clock_unix();
+  if (g_monotonic_start_time == 0) {
+    g_monotonic_start_time = p.monotonic_timestamp;
+  }
+  p.monotonic_start_time = g_monotonic_start_time;
+  p.training_duration_seconds =
+      static_cast<double>(p.monotonic_timestamp - g_monotonic_start_time);
+  // samples_per_second is set by caller; keep as-is
+
   // Replay protection: reject if new timestamp <= last seen
   uint64_t last_seen = load_last_seen_timestamp();
   if (p.monotonic_timestamp <= last_seen && last_seen > 0) {
@@ -515,6 +537,12 @@ static bool write_telemetry(const TelemetryPayload &payload) {
   write_int(f, "batch_size", p.batch_size, true);
   write_uint64(f, "timestamp", p.timestamp, true);
   write_uint64(f, "monotonic_timestamp", p.monotonic_timestamp, true);
+  // Phase 2: Real-time visibility fields
+  write_uint64(f, "wall_clock_unix", p.wall_clock_unix, true);
+  write_uint64(f, "monotonic_start_time", p.monotonic_start_time, true);
+  write_double(f, "training_duration_seconds", p.training_duration_seconds,
+               true);
+  write_double(f, "samples_per_second", p.samples_per_second, true);
   write_uint32(f, "crc32", p.crc32, true);
   write_string(f, "hmac", p.hmac, false);
   std::fprintf(f, "}\n");
