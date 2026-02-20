@@ -10,6 +10,7 @@
 .venv/
 venv/
 env/
+.env
 
 # Model artifacts — NEVER push to git
 *.pt
