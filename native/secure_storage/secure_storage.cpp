@@ -301,7 +301,33 @@ private:
   CertValidator cert_validator_;
 
   AccessResult validate_access(const StorageRequest &req, const char *op) {
-    // Check 0: Block localhost bypass (Phase 7)
+    // Check 0a: Device certificate file MUST exist (zero-trust bootstrap)
+    {
+      FILE *cert_f = std::fopen("storage/certs/device_cert.json", "r");
+      if (!cert_f) {
+        log_access(op, req.device_id, req.client_ip, req.path,
+                   AccessResult::DENIED_CERT);
+        return AccessResult::DENIED_CERT;
+      }
+      // Check cert expiry: read expires_at from cert file
+      char cert_buf[4096] = {0};
+      std::fread(cert_buf, 1, sizeof(cert_buf) - 1, cert_f);
+      std::fclose(cert_f);
+
+      const char *exp_key = "\"expires_at\": ";
+      const char *exp_pos = std::strstr(cert_buf, exp_key);
+      if (exp_pos) {
+        uint64_t expires_at = (uint64_t)std::strtoull(
+            exp_pos + std::strlen(exp_key), nullptr, 10);
+        if (expires_at > 0 && (uint64_t)std::time(nullptr) > expires_at) {
+          log_access(op, req.device_id, req.client_ip, req.path,
+                     AccessResult::DENIED_CERT);
+          return AccessResult::DENIED_CERT;
+        }
+      }
+    }
+
+    // Check 0b: Block localhost bypass (Phase 7)
     if (is_localhost(req.client_ip)) {
       log_access(op, req.device_id, req.client_ip, req.path,
                  AccessResult::DENIED_LOCALHOST);
