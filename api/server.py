@@ -502,7 +502,7 @@ async def create_dashboard(request: CreateDashboardRequest):
 
 
 @app.get("/api/dashboard/state")
-async def get_dashboard_state(dashboard_id: str = None):
+async def get_dashboard_state(dashboard_id: Optional[str] = None):
     """Get current dashboard state."""
     if dashboard_id and dashboard_id in dashboard_states:
         return dashboard_states[dashboard_id]
@@ -512,7 +512,7 @@ async def get_dashboard_state(dashboard_id: str = None):
 
 
 @app.get("/api/execution/state")
-async def get_execution_state(kernel_id: str = None):
+async def get_execution_state(kernel_id: Optional[str] = None):
     """Get execution kernel state."""
     if kernel_id and kernel_id in execution_kernels:
         return execution_kernels[kernel_id]
@@ -550,7 +550,7 @@ async def execution_transition(request: ExecutionTransitionRequest):
     if not kernel:
         kernel = {"state": "IDLE", "human_approved": False, "deny_reason": None}
     
-    current_state = kernel.get("state", "IDLE")
+    current_state: str = kernel.get("state", "IDLE")  # type: ignore[assignment]
     transition = request.transition
     
     key = (current_state, transition)
@@ -1200,7 +1200,7 @@ async def manual_training_progress():
 @app.get("/gpu/status")
 async def gpu_status():
     """Get GPU utilization and memory metrics. Real data only."""
-    result = {
+    result: Dict[str, Any] = {
         "gpu_available": False,
         "device_name": None,
         "utilization_percent": None,
@@ -1858,7 +1858,7 @@ async def voice_parse(request: VoiceParseRequest):
             "status": "INVALID",
             "block_reason": "Empty voice input",
             "active_mode": _active_voice_mode,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
     
     # Determine mode
@@ -1891,7 +1891,7 @@ async def voice_parse(request: VoiceParseRequest):
                 "status": "BLOCKED",
                 "block_reason": isolation_check.reason,
                 "active_mode": "RESEARCH",
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
             }
         
         # Execute research search
@@ -1956,7 +1956,7 @@ async def voice_parse(request: VoiceParseRequest):
             "status": "INVALID",
             "block_reason": "Voice parser not available",
             "active_mode": "SECURITY",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
 
