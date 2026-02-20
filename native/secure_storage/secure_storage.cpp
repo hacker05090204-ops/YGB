@@ -14,22 +14,111 @@
  *
  * NO cloud. NO public access. NO unauthenticated operations.
  */
-
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
+
+
+#ifdef _WIN32
+#include <direct.h>
+#include <io.h>
+
+#define access_check(p, m) _access(p, m)
+#define W_OK 2
+#else
+#include <unistd.h>
+#define access_check(p, m) access(p, m)
+#endif
 
 namespace secure_storage {
 
 // =========================================================================
-// CONSTANTS
+// CONSTANTS (Phase 1: No hardcoded drive letters)
 // =========================================================================
 
-static constexpr char STORAGE_ROOT[] = "secure_data/";
+static constexpr char DEFAULT_STORAGE_ROOT[] = "./storage";
 static constexpr char AUDIT_LOG_PATH[] = "reports/storage_audit.json";
 static constexpr char MESH_PREFIX[] = "10.0.0.";
 static constexpr size_t MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB max
+static constexpr char KNOWN_DEMO_KEY[] =
+    "0000000000000000000000000000000000000000000000000000000000000000";
+
+// Phase 1: Resolve storage root from environment
+static const char *get_storage_root() {
+  const char *root = std::getenv("YGB_STORAGE_ROOT");
+  if (!root || root[0] == '\0') {
+    root = DEFAULT_STORAGE_ROOT;
+  }
+  return root;
+}
+
+// Phase 5: Reject known demo HMAC key at runtime
+static bool is_demo_hmac_key() {
+  const char *key = std::getenv("YGB_HMAC_SECRET");
+  if (!key)
+    return false;
+  return std::strcmp(key, KNOWN_DEMO_KEY) == 0;
+}
+
+// Phase 4: Startup validation
+static bool validate_startup() {
+  const char *root = get_storage_root();
+
+  if (access_check(root, W_OK) != 0) {
+    std::fprintf(stderr, "ABORT: YGB_STORAGE_ROOT '%s' is not writable\n",
+                 root);
+    return false;
+  }
+
+#ifdef _WIN32
+  int enc = std::system(
+      "manage-bde -status C: 2>nul | findstr /C:\"Protection On\" >nul 2>&1");
+#else
+  int enc = std::system(
+      "cryptsetup status $(findmnt -n -o SOURCE /) >/dev/null 2>&1");
+#endif
+  if (enc != 0) {
+    std::fprintf(stderr, "WARNING: Disk encryption not confirmed\n");
+  }
+
+  if (is_demo_hmac_key()) {
+    std::fprintf(stderr,
+                 "ABORT: HMAC key matches known demo value. Rotate secret.\n");
+    return false;
+  }
+
+  return true;
+}
+
+// Phase 7: Log cluster topology at startup
+static void log_cluster_topology() {
+  const char *public_ip = std::getenv("YGB_PUBLIC_IP");
+  if (public_ip && public_ip[0] != '\0') {
+    std::fprintf(stdout, "[TOPOLOGY] Cluster node has public IP: %s\n",
+                 public_ip);
+  } else {
+    std::fprintf(
+        stdout,
+        "[TOPOLOGY] Cluster is private-only (LAN/VPN reachable only)\n");
+  }
+}
+
+// Phase 6: Storage replication stub (rsync over WireGuard)
+static void trigger_replication(const char *node_role) {
+  if (!node_role || std::strcmp(node_role, "STORAGE") != 0)
+    return;
+  const char *peer_ips = std::getenv("YGB_STORAGE_PEERS");
+  if (!peer_ips || peer_ips[0] == '\0')
+    return;
+  const char *root = get_storage_root();
+  char cmd[512];
+  std::snprintf(cmd, sizeof(cmd),
+                "rsync -az --timeout=30 %s/ %s:%s/ 2>/dev/null", root, peer_ips,
+                root);
+  std::system(cmd);
+}
 
 // =========================================================================
 // ACCESS CONTROL
@@ -158,7 +247,8 @@ public:
       return check;
 
     char full_path[512];
-    std::snprintf(full_path, sizeof(full_path), "%s%s", STORAGE_ROOT, req.path);
+    std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
+                  req.path);
 
     FILE *f = std::fopen(full_path, "rb");
     if (!f) {
@@ -189,7 +279,8 @@ public:
     }
 
     char full_path[512];
-    std::snprintf(full_path, sizeof(full_path), "%s%s", STORAGE_ROOT, req.path);
+    std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
+                  req.path);
 
     FILE *f = std::fopen(full_path, "wb");
     if (!f) {

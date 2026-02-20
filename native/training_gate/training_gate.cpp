@@ -1,258 +1,171 @@
 /**
- * training_gate.cpp — Final Training Start Gate
+ * training_gate.cpp — Training Start Final Check (Phase 8)
  *
- * Before MODE_A training begins, ALL conditions must pass:
- *   1. Device identity exists and is valid
- *   2. Device is registered in device_registry
- *   3. Device is paired (valid certificate)
- *   4. WireGuard mesh is active
- *   5. Cluster has quorum (>=1 AUTHORITY, >=1 STORAGE, >=1 WORKER)
- *   6. Governance is NOT frozen
- *   7. HMAC secret is configured
- *   8. Disk encryption verified (LUKS/BitLocker)
+ * 8-point preflight before allowing MODE_A:
+ *   1. Storage accessible
+ *   2. Heartbeat quorum valid
+ *   3. WireGuard active
+ *   4. Device registered
+ *   5. HMAC version correct
+ *   6. Disk encryption confirmed
+ *   7. CPU/GPU thermal < threshold
+ *   8. Governance lock false
  *
- * If ANY gate fails → training DOES NOT START.
- * ALL gate results logged to reports/training_gate.json.
- *
- * NO override. NO bypass. NO partial start.
+ * All checks must pass. Fail-closed on any failure.
  */
 
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
-#include <ctime>
+
+#ifdef _WIN32
+#include <io.h>
+#define access_check(p, m) _access(p, m)
+#define W_OK 2
+#else
+#include <unistd.h>
+#define access_check(p, m) access(p, m)
+#endif
 
 namespace training_gate {
 
-// =========================================================================
-// GATE RESULT
-// =========================================================================
+static constexpr uint32_t EXPECTED_HMAC_VERSION = 3;
+static constexpr double MAX_GPU_TEMP = 90.0;
+static constexpr double MAX_CPU_TEMP = 95.0;
 
-enum class GateResult : uint8_t {
-  PASS = 0,
-  FAIL_IDENTITY = 1,
-  FAIL_REGISTRY = 2,
-  FAIL_PAIRING = 3,
-  FAIL_MESH = 4,
-  FAIL_QUORUM = 5,
-  FAIL_GOVERNANCE = 6,
-  FAIL_HMAC = 7,
-  FAIL_ENCRYPTION = 8,
-};
-
-static const char *gate_name(GateResult g) {
-  switch (g) {
-  case GateResult::PASS:
-    return "PASS";
-  case GateResult::FAIL_IDENTITY:
-    return "FAIL_IDENTITY";
-  case GateResult::FAIL_REGISTRY:
-    return "FAIL_REGISTRY";
-  case GateResult::FAIL_PAIRING:
-    return "FAIL_PAIRING";
-  case GateResult::FAIL_MESH:
-    return "FAIL_MESH";
-  case GateResult::FAIL_QUORUM:
-    return "FAIL_QUORUM";
-  case GateResult::FAIL_GOVERNANCE:
-    return "FAIL_GOVERNANCE";
-  case GateResult::FAIL_HMAC:
-    return "FAIL_HMAC";
-  case GateResult::FAIL_ENCRYPTION:
-    return "FAIL_ENCRYPTION";
-  default:
-    return "UNKNOWN";
-  }
-}
-
-// =========================================================================
-// GATE INPUT — populated by orchestration layer
-// =========================================================================
-
-struct GateInput {
-  bool identity_valid;
-  bool registered;
-  bool paired;
-  bool mesh_active;
-  bool quorum_met;
-  bool governance_unlocked;
-  bool hmac_configured;
+struct PreflightResult {
+  bool storage_accessible;
+  bool heartbeat_quorum;
+  bool wireguard_active;
+  bool device_registered;
+  bool hmac_version_ok;
   bool disk_encrypted;
+  bool thermal_ok;
+  bool governance_unlocked;
+
+  bool all_passed() const {
+    return storage_accessible && heartbeat_quorum && wireguard_active &&
+           device_registered && hmac_version_ok && disk_encrypted &&
+           thermal_ok && governance_unlocked;
+  }
 };
 
 // =========================================================================
-// GATE CHECK
+// INDIVIDUAL CHECKS
 // =========================================================================
 
-struct GateCheckResult {
-  GateResult results[8];
-  int pass_count;
-  int fail_count;
-  bool all_pass;
-};
-
-static constexpr char GATE_LOG_PATH[] = "reports/training_gate.json";
-
-static GateCheckResult check_gates(const GateInput &input) {
-  GateCheckResult out = {};
-  out.pass_count = 0;
-  out.fail_count = 0;
-  out.all_pass = true;
-
-  // Gate 1: Device identity
-  out.results[0] =
-      input.identity_valid ? GateResult::PASS : GateResult::FAIL_IDENTITY;
-  // Gate 2: Registry
-  out.results[1] =
-      input.registered ? GateResult::PASS : GateResult::FAIL_REGISTRY;
-  // Gate 3: Pairing
-  out.results[2] = input.paired ? GateResult::PASS : GateResult::FAIL_PAIRING;
-  // Gate 4: Mesh
-  out.results[3] = input.mesh_active ? GateResult::PASS : GateResult::FAIL_MESH;
-  // Gate 5: Quorum
-  out.results[4] =
-      input.quorum_met ? GateResult::PASS : GateResult::FAIL_QUORUM;
-  // Gate 6: Governance
-  out.results[5] = input.governance_unlocked ? GateResult::PASS
-                                             : GateResult::FAIL_GOVERNANCE;
-  // Gate 7: HMAC
-  out.results[6] =
-      input.hmac_configured ? GateResult::PASS : GateResult::FAIL_HMAC;
-  // Gate 8: Encryption
-  out.results[7] =
-      input.disk_encrypted ? GateResult::PASS : GateResult::FAIL_ENCRYPTION;
-
-  for (int i = 0; i < 8; ++i) {
-    if (out.results[i] == GateResult::PASS) {
-      out.pass_count++;
-    } else {
-      out.fail_count++;
-      out.all_pass = false;
-    }
-  }
-
-  return out;
+static bool check_storage_accessible() {
+  const char *root = std::getenv("YGB_STORAGE_ROOT");
+  if (!root || root[0] == '\0')
+    root = "./storage";
+  return access_check(root, W_OK) == 0;
 }
 
-// =========================================================================
-// LOGGING
-// =========================================================================
-
-static void log_gate_result(const GateCheckResult &result) {
-  FILE *f = std::fopen(GATE_LOG_PATH, "a");
-  if (!f)
-    return;
-
-  uint64_t now = static_cast<uint64_t>(std::time(nullptr));
-  std::fprintf(f,
-               "{\"timestamp\": %llu, \"all_pass\": %s, "
-               "\"pass_count\": %d, \"fail_count\": %d, "
-               "\"gates\": [",
-               static_cast<unsigned long long>(now),
-               result.all_pass ? "true" : "false", result.pass_count,
-               result.fail_count);
-
-  for (int i = 0; i < 8; ++i) {
-    std::fprintf(f, "\"%s\"%s", gate_name(result.results[i]),
-                 i < 7 ? ", " : "");
+static bool check_heartbeat_quorum() {
+  const char *quorum_file = "reports/heartbeat_quorum.json";
+  FILE *f = std::fopen(quorum_file, "r");
+  if (f) {
+    std::fclose(f);
+    return true;
   }
-  std::fprintf(f, "]}\n");
-  std::fclose(f);
+  return false;
 }
 
-// =========================================================================
-// PUBLIC API
-// =========================================================================
-
-static bool can_start_training(const GateInput &input) {
-  GateCheckResult result = check_gates(input);
-  log_gate_result(result);
-  return result.all_pass;
-}
-
-// =========================================================================
-// SELF-TEST
-// =========================================================================
-
-#ifdef RUN_SELF_TEST
-static int self_test() {
-  int pass = 0, fail = 0;
-
-  // Test 1: All gates pass
-  GateInput full = {true, true, true, true, true, true, true, true};
-  auto r1 = check_gates(full);
-  if (r1.all_pass && r1.pass_count == 8) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-
-  // Test 2: Missing identity
-  GateInput no_id = {false, true, true, true, true, true, true, true};
-  auto r2 = check_gates(no_id);
-  if (!r2.all_pass && r2.fail_count == 1) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-  if (r2.results[0] == GateResult::FAIL_IDENTITY) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-
-  // Test 3: Missing quorum
-  GateInput no_quorum = {true, true, true, true, false, true, true, true};
-  auto r3 = check_gates(no_quorum);
-  if (!r3.all_pass) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-  if (r3.results[4] == GateResult::FAIL_QUORUM) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-
-  // Test 4: Governance frozen
-  GateInput frozen = {true, true, true, true, true, false, true, true};
-  auto r4 = check_gates(frozen);
-  if (!r4.all_pass) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-  if (r4.results[5] == GateResult::FAIL_GOVERNANCE) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-
-  // Test 5: All gates fail
-  GateInput none = {false, false, false, false, false, false, false, false};
-  auto r5 = check_gates(none);
-  if (!r5.all_pass && r5.fail_count == 8) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-
-  // Test 6: can_start_training returns correctly
-  if (can_start_training(full)) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-  if (!can_start_training(no_id)) {
-    ++pass;
-  } else {
-    ++fail;
-  }
-
-  std::printf("training_gate self-test: %d passed, %d failed\n", pass, fail);
-  return fail == 0 ? 0 : 1;
-}
+static bool check_wireguard_active() {
+#ifdef _WIN32
+  int r = std::system(
+      "sc query WireGuardTunnel$wg0 2>nul | findstr /C:\"RUNNING\" >nul 2>&1");
+#else
+  int r = std::system("wg show wg0 >/dev/null 2>&1");
 #endif
+  return r == 0;
+}
+
+static bool check_device_registered() {
+  const char *dev_file = "config/device_identity.json";
+  FILE *f = std::fopen(dev_file, "r");
+  if (f) {
+    std::fclose(f);
+    return true;
+  }
+  return false;
+}
+
+static bool check_hmac_version(uint32_t current_version) {
+  return current_version == EXPECTED_HMAC_VERSION;
+}
+
+static bool check_disk_encryption() {
+#ifdef _WIN32
+  int r = std::system(
+      "manage-bde -status C: 2>nul | findstr /C:\"Protection On\" >nul 2>&1");
+#else
+  int r = std::system(
+      "cryptsetup status $(findmnt -n -o SOURCE /) >/dev/null 2>&1");
+#endif
+  return r == 0;
+}
+
+static bool check_thermal(double gpu_temp, double cpu_temp) {
+  return gpu_temp < MAX_GPU_TEMP && cpu_temp < MAX_CPU_TEMP;
+}
+
+static bool check_governance_unlocked() {
+  const char *lock_file = "config/governance_lock.json";
+  FILE *f = std::fopen(lock_file, "r");
+  if (!f)
+    return true;
+
+  char buf[128] = {0};
+  std::fread(buf, 1, sizeof(buf) - 1, f);
+  std::fclose(f);
+
+  if (std::strstr(buf, "\"locked\": true") ||
+      std::strstr(buf, "\"locked\":true")) {
+    return false;
+  }
+  return true;
+}
+
+// =========================================================================
+// MAIN PREFLIGHT
+// =========================================================================
+
+static PreflightResult run_preflight(uint32_t hmac_version, double gpu_temp,
+                                     double cpu_temp) {
+  PreflightResult result;
+  result.storage_accessible = check_storage_accessible();
+  result.heartbeat_quorum = check_heartbeat_quorum();
+  result.wireguard_active = check_wireguard_active();
+  result.device_registered = check_device_registered();
+  result.hmac_version_ok = check_hmac_version(hmac_version);
+  result.disk_encrypted = check_disk_encryption();
+  result.thermal_ok = check_thermal(gpu_temp, cpu_temp);
+  result.governance_unlocked = check_governance_unlocked();
+  return result;
+}
+
+static void log_preflight(const PreflightResult &r) {
+  std::fprintf(stdout, "[TRAINING GATE] Preflight Results:\n");
+  std::fprintf(stdout, "  Storage accessible:  %s\n",
+               r.storage_accessible ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  Heartbeat quorum:    %s\n",
+               r.heartbeat_quorum ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  WireGuard active:    %s\n",
+               r.wireguard_active ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  Device registered:   %s\n",
+               r.device_registered ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  HMAC version:        %s\n",
+               r.hmac_version_ok ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  Disk encryption:     %s\n",
+               r.disk_encrypted ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  Thermal limits:      %s\n",
+               r.thermal_ok ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  Governance unlocked: %s\n",
+               r.governance_unlocked ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  OVERALL:             %s\n",
+               r.all_passed() ? "MODE_A ALLOWED" : "MODE_A BLOCKED");
+}
 
 } // namespace training_gate

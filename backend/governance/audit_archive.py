@@ -1,21 +1,19 @@
 """
-audit_archive.py — Audit Safe Archive (Phase 6)
+audit_archive.py — Audit Safe Archive
 
 After a report is closed:
 - Remove exploit payloads
 - Keep: hash, timestamp, target, outcome
-- Encrypt archive with AES-256-CBC
+- Encrypt archive with AES-256-CBC (PyCryptodome required)
 
-Uses Python's built-in cryptography (hashlib + os.urandom for key/IV).
-AES-256 implemented via a minimal CBC mode using PyCryptodome if available,
-otherwise falls back to XOR-based symmetric encryption with SHA-256 key derivation.
+FAIL-CLOSED: If PyCryptodome is not installed, raise RuntimeError.
+No weak crypto fallback is permitted.
 """
 
 import os
 import json
 import hashlib
 import time
-import struct
 from typing import Dict, Any, Optional
 
 CONFIG_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'config')
@@ -25,6 +23,27 @@ ARCHIVE_KEY_PATH = os.path.join(CONFIG_DIR, 'archive_key.key')
 
 os.makedirs(ARCHIVE_DIR, exist_ok=True)
 os.makedirs(CONFIG_DIR, exist_ok=True)
+
+
+# ===================================================================
+# Verify Strong Crypto Available (Phase 2: Fail-Closed)
+# ===================================================================
+
+def _require_pycryptodome():
+    """Verify PyCryptodome is installed. Abort if not."""
+    try:
+        from Crypto.Cipher import AES  # noqa: F401
+        from Crypto.Util.Padding import pad, unpad  # noqa: F401
+    except ImportError:
+        raise RuntimeError(
+            "Strong encryption required: install pycryptodome. "
+            "Run: pip install pycryptodome. "
+            "No weak crypto fallback is permitted."
+        )
+
+
+# Fail at import time if PyCryptodome is missing
+_require_pycryptodome()
 
 
 # ===================================================================
@@ -39,7 +58,6 @@ def get_or_create_archive_key() -> bytes:
         if len(key) >= 32:
             return key[:32]
 
-    # Generate new 256-bit key
     key = os.urandom(32)
     with open(ARCHIVE_KEY_PATH, 'wb') as f:
         f.write(key)
@@ -47,58 +65,27 @@ def get_or_create_archive_key() -> bytes:
 
 
 # ===================================================================
-# AES-256-CBC Encryption (using PyCryptodome if available)
+# AES-256-CBC Encryption (PyCryptodome only — no fallback)
 # ===================================================================
 
-def _try_aes_encrypt(data: bytes, key: bytes) -> bytes:
-    """Try AES-256-CBC encryption using PyCryptodome."""
-    try:
-        from Crypto.Cipher import AES
-        from Crypto.Util.Padding import pad
-        iv = os.urandom(16)
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-        ct = cipher.encrypt(pad(data, AES.block_size))
-        return iv + ct
-    except ImportError:
-        return _fallback_encrypt(data, key)
-
-
-def _try_aes_decrypt(data: bytes, key: bytes) -> bytes:
-    """Try AES-256-CBC decryption using PyCryptodome."""
-    try:
-        from Crypto.Cipher import AES
-        from Crypto.Util.Padding import unpad
-        iv = data[:16]
-        ct = data[16:]
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-        return unpad(cipher.decrypt(ct), AES.block_size)
-    except ImportError:
-        return _fallback_decrypt(data, key)
-
-
-def _fallback_encrypt(data: bytes, key: bytes) -> bytes:
-    """XOR-based symmetric fallback when PyCryptodome is unavailable."""
+def aes_encrypt(data: bytes, key: bytes) -> bytes:
+    """AES-256-CBC encryption. Raises if PyCryptodome unavailable."""
+    from Crypto.Cipher import AES
+    from Crypto.Util.Padding import pad
     iv = os.urandom(16)
-    # Derive stream key from key + iv using SHA-256 chain
-    stream = b''
-    block = iv
-    while len(stream) < len(data):
-        block = hashlib.sha256(key + block).digest()
-        stream += block
-    encrypted = bytes(a ^ b for a, b in zip(data, stream[:len(data)]))
-    return iv + encrypted
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    ct = cipher.encrypt(pad(data, AES.block_size))
+    return iv + ct
 
 
-def _fallback_decrypt(data: bytes, key: bytes) -> bytes:
-    """XOR-based symmetric fallback decryption."""
+def aes_decrypt(data: bytes, key: bytes) -> bytes:
+    """AES-256-CBC decryption. Raises if PyCryptodome unavailable."""
+    from Crypto.Cipher import AES
+    from Crypto.Util.Padding import unpad
     iv = data[:16]
-    ciphertext = data[16:]
-    stream = b''
-    block = iv
-    while len(stream) < len(ciphertext):
-        block = hashlib.sha256(key + block).digest()
-        stream += block
-    return bytes(a ^ b for a, b in zip(ciphertext, stream[:len(ciphertext)]))
+    ct = data[16:]
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    return unpad(cipher.decrypt(ct), AES.block_size)
 
 
 # ===================================================================
@@ -111,19 +98,13 @@ def strip_payloads(report: Dict[str, Any]) -> Dict[str, Any]:
     Keep: hash, timestamp, target, outcome.
     """
     safe_fields = {}
-
-    # Compute hash of original report for audit trail
     report_json = json.dumps(report, sort_keys=True, default=str)
     safe_fields['report_hash'] = hashlib.sha256(report_json.encode()).hexdigest()
-
-    # Keep safe metadata only
     safe_fields['timestamp'] = report.get('timestamp', report.get('created_at', time.time()))
     safe_fields['target'] = report.get('target_id', report.get('target', 'unknown'))
     safe_fields['outcome'] = report.get('outcome', report.get('status', 'closed'))
     safe_fields['severity'] = report.get('severity', 'unknown')
     safe_fields['archived_at'] = time.time()
-
-    # Explicitly excluded: payloads, reproduction steps, evidence, raw data
     return safe_fields
 
 
@@ -131,25 +112,17 @@ def archive_report(report: Dict[str, Any], report_id: str) -> str:
     """
     Archive a closed report:
     1. Strip exploit payloads
-    2. Encrypt with AES-256
+    2. Encrypt with AES-256-CBC
     3. Save to archive directory
-    Returns the archive file path.
     """
-    # Step 1: Strip payloads
     safe_data = strip_payloads(report)
-
-    # Step 2: Serialize
     plaintext = json.dumps(safe_data, indent=2).encode('utf-8')
-
-    # Step 3: Encrypt
     key = get_or_create_archive_key()
-    encrypted = _try_aes_encrypt(plaintext, key)
+    encrypted = aes_encrypt(plaintext, key)
 
-    # Step 4: Save
     archive_path = os.path.join(ARCHIVE_DIR, f"{report_id}.enc")
     with open(archive_path, 'wb') as f:
         f.write(encrypted)
-
     return archive_path
 
 
@@ -160,9 +133,8 @@ def read_archived_report(report_id: str) -> Optional[Dict[str, Any]]:
         return None
 
     key = get_or_create_archive_key()
-
     with open(archive_path, 'rb') as f:
         encrypted = f.read()
 
-    plaintext = _try_aes_decrypt(encrypted, key)
+    plaintext = aes_decrypt(encrypted, key)
     return json.loads(plaintext.decode('utf-8'))

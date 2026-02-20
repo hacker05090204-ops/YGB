@@ -55,6 +55,7 @@ interface G38Status {
         wall_clock_unix?: number
         monotonic_start_time?: number
         training_duration_seconds?: number
+        monotonic_last_update?: number
     }
     guards?: {
         main_guards: number
@@ -70,6 +71,9 @@ export default function TrainingDashboard() {
     const [events, setEvents] = useState<TrainingEvent[]>([])
     const [loading, setLoading] = useState(true)
     const [startingTraining, setStartingTraining] = useState(false)
+    const [lastMonotonic, setLastMonotonic] = useState<number | null>(null)
+    const [lastMonotonicTime, setLastMonotonicTime] = useState<number>(Date.now())
+    const [trainingStalled, setTrainingStalled] = useState(false)
 
     const fetchData = async () => {
         try {
@@ -81,6 +85,20 @@ export default function TrainingDashboard() {
             if (statusRes.ok) {
                 const statusData = await statusRes.json()
                 setStatus(statusData)
+
+                // Phase 9: Track monotonic_last_update for stall detection
+                const newMono = statusData?.auto_training?.monotonic_last_update
+                if (newMono !== undefined && newMono !== null) {
+                    if (lastMonotonic !== null && newMono === lastMonotonic) {
+                        if (Date.now() - lastMonotonicTime > 15000) {
+                            setTrainingStalled(true)
+                        }
+                    } else {
+                        setLastMonotonic(newMono)
+                        setLastMonotonicTime(Date.now())
+                        setTrainingStalled(false)
+                    }
+                }
             }
 
             if (eventsRes.ok) {
@@ -284,7 +302,7 @@ export default function TrainingDashboard() {
                                     <div className="space-y-3">
                                         <div className="flex justify-between">
                                             <span className="text-[#525252]">Uptime Status</span>
-                                            {status?.auto_training?.is_training && status?.auto_training?.training_duration_seconds === 0 ? (
+                                            {trainingStalled || (status?.auto_training?.is_training && status?.auto_training?.training_duration_seconds === 0) ? (
                                                 <span className="text-red-400 font-bold animate-pulse">TRAINING STALLED</span>
                                             ) : (
                                                 <span className="text-green-400">Verifiable</span>
