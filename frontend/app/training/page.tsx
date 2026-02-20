@@ -52,6 +52,9 @@ interface G38Status {
         dataset_size: number
         training_mode: string
         continuous_mode?: boolean
+        wall_clock_unix?: number
+        monotonic_start_time?: number
+        training_duration_seconds?: number
     }
     guards?: {
         main_guards: number
@@ -272,28 +275,63 @@ export default function TrainingDashboard() {
                                     </div>
                                 </div>
 
-                                {/* Quick Actions */}
+                                {/* Authenticity Metrics (Phase 8) */}
                                 <div className="p-6 rounded-2xl bg-[#0A0A0A] border border-white/[0.06]">
                                     <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                        <Play className="w-5 h-5 text-[#525252]" />
-                                        Start Training
+                                        <Shield className="w-5 h-5 text-green-400" />
+                                        Training Authenticity
                                     </h2>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {[5, 10, 20, 50, 100, 200].map((epochs) => (
-                                            <button
-                                                key={epochs}
-                                                onClick={() => startTraining(epochs)}
-                                                disabled={startingTraining || status?.auto_training?.is_training}
-                                                className="px-4 py-3 rounded-xl bg-[#171717] border border-white/[0.06] hover:bg-[#262626] hover:border-white/[0.1] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                <div className="text-lg font-bold">{epochs}</div>
-                                                <div className="text-xs text-[#525252]">epochs</div>
-                                            </button>
-                                        ))}
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Uptime Status</span>
+                                            {status?.auto_training?.is_training && status?.auto_training?.training_duration_seconds === 0 ? (
+                                                <span className="text-red-400 font-bold animate-pulse">TRAINING STALLED</span>
+                                            ) : (
+                                                <span className="text-green-400">Verifiable</span>
+                                            )}
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Wall Clock (Unix)</span>
+                                            <span className="font-mono text-xs mt-1 text-[#737373]">
+                                                {status?.auto_training?.wall_clock_unix || "N/A"}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Monotonic Start</span>
+                                            <span className="font-mono text-xs mt-1 text-[#737373]">
+                                                {status?.auto_training?.monotonic_start_time || "N/A"}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[#525252]">Training Duration</span>
+                                            <span className="text-purple-400">
+                                                {status?.auto_training?.training_duration_seconds?.toFixed(1) || 0}s
+                                            </span>
+                                        </div>
                                     </div>
-                                    {status?.auto_training?.is_training && (
-                                        <p className="text-sm text-purple-400 mt-4 text-center">Training in progress...</p>
-                                    )}
+
+                                    <div className="mt-8">
+                                        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                            <Play className="w-5 h-5 text-[#525252]" />
+                                            Start Training
+                                        </h2>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {[5, 10, 20, 50, 100, 200].map((epochs) => (
+                                                <button
+                                                    key={epochs}
+                                                    onClick={() => startTraining(epochs)}
+                                                    disabled={startingTraining || status?.auto_training?.is_training}
+                                                    className="px-4 py-3 rounded-xl bg-[#171717] border border-white/[0.06] hover:bg-[#262626] hover:border-white/[0.1] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <div className="text-lg font-bold">{epochs}</div>
+                                                    <div className="text-xs text-[#525252]">epochs</div>
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {status?.auto_training?.is_training && (
+                                            <p className="text-sm text-purple-400 mt-4 text-center">Training in progress...</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 

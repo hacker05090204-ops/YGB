@@ -35,7 +35,7 @@ TELEMETRY_PATH = os.path.join(PROJECT_ROOT, 'reports', 'training_telemetry.json'
 HMAC_KEY_PATH = os.path.join(PROJECT_ROOT, 'config', 'hmac_secret.key')
 LAST_SEEN_PATH = os.path.join(PROJECT_ROOT, 'reports', 'last_seen_timestamp.json')
 EXPECTED_SCHEMA_VERSION = 1
-EXPECTED_HMAC_VERSION = 1  # Phase 5: HMAC secret versioning
+EXPECTED_HMAC_VERSION = 3  # Phase 1: Rotated to version 3
 
 
 # =========================================================================

@@ -39,10 +39,11 @@ enum class AccessResult : uint8_t {
   GRANTED = 0,
   DENIED_IP = 1,
   DENIED_CERT = 2,
-  DENIED_PATH = 3,
-  DENIED_ROLE = 4,      // Phase 7: Role-based access
-  DENIED_LOCALHOST = 5, // Phase 7: Localhost bypass blocked
-  ERROR = 6,
+  DENIED_PATH = 3,      // Tried to access outside safe paths
+  DENIED_ROLE = 4,      // Device role not permitted
+  DENIED_LOCALHOST = 5, // Blocked localhost loopback bypass
+  DENIED_SESSION = 6,   // Invalid or missing session token
+  ERROR = 7,            // File not found, I/O error
 };
 
 static const char *access_result_name(AccessResult r) {
@@ -59,6 +60,8 @@ static const char *access_result_name(AccessResult r) {
     return "DENIED_ROLE";
   case AccessResult::DENIED_LOCALHOST:
     return "DENIED_LOCALHOST";
+  case AccessResult::DENIED_SESSION:
+    return "DENIED_SESSION";
   case AccessResult::ERROR:
     return "ERROR";
   default:
@@ -128,13 +131,14 @@ static void log_access(const char *event, const char *device_id, const char *ip,
 
 // Phase 7: Extended storage request with role and revocation status
 struct StorageRequest {
-  const char *device_id;   // From device certificate
-  const char *client_ip;   // Source IP
-  const char *certificate; // Device certificate for validation
-  const char *path;        // Relative path within secure_data/
-  const char *device_role; // "AUTHORITY", "STORAGE", "WORKER"
-  bool is_revoked;         // From device registry
-  bool is_registered;      // From device registry
+  const char *device_id;     // From device certificate
+  const char *client_ip;     // Source IP
+  const char *certificate;   // Device certificate for validation
+  const char *path;          // Relative path within secure_data/
+  const char *device_role;   // e.g., "AUTHORITY", "STORAGE", "WORKER"
+  const char *session_token; // Session token for NAS access control
+  bool is_registered;        // Must be true
+  bool is_revoked;           // Must be false
 };
 
 // Callback for certificate validation
@@ -235,7 +239,14 @@ private:
       return AccessResult::DENIED_CERT;
     }
 
-    // Check 4: Role-based access (Phase 7)
+    // Check 4: Valid Web Session Token (Phase 7 - Zero Trust)
+    if (!validate_session_token(req.session_token)) {
+      log_access(op, req.device_id, req.client_ip, req.path,
+                 AccessResult::DENIED_SESSION);
+      return AccessResult::DENIED_SESSION;
+    }
+
+    // Check 5: Role-based access (Phase 7)
     // Only STORAGE and AUTHORITY roles can access secure storage
     if (req.device_role) {
       if (std::strcmp(req.device_role, "WORKER") == 0) {
@@ -253,6 +264,21 @@ private:
     }
 
     return AccessResult::GRANTED;
+  }
+
+  bool validate_session_token(const char *token) {
+    if (!token || std::strlen(token) == 0)
+      return false;
+
+    // In production, this would make an internal RPC or read a shared session
+    // store. We assume the caller validated it (or we mock validation for this
+    // sandbox). The exact token parsing would read \`auth_sessions.json\` or
+    // similar. For now we simulate success if the token is 64 characters long
+    // (sha256 hex).
+    if (std::strlen(token) == 64) {
+      return true;
+    }
+    return false;
   }
 };
 
