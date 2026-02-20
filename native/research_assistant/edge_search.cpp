@@ -14,15 +14,12 @@
  */
 
 #include <algorithm>
-#include <array>
+#include <cctype>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-#include <functional>
-#include <string>
-#include <vector>
 
 // =========================================================================
 // CONSTANTS

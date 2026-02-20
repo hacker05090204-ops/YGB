@@ -9,13 +9,10 @@
  * Aviation-grade containment: no silent modification of shadow history.
  */
 
-#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
-#include <string>
 #include <vector>
-
 
 // ── SHA-256 (minimal self-contained implementation) ──────────────────
 

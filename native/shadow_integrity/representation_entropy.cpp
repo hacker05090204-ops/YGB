@@ -10,9 +10,7 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <vector>
-
 
 struct EntropyStats {
   std::vector<double> class_entropy;      // Shannon entropy per class

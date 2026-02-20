@@ -35,6 +35,7 @@ TELEMETRY_PATH = os.path.join(PROJECT_ROOT, 'reports', 'training_telemetry.json'
 HMAC_KEY_PATH = os.path.join(PROJECT_ROOT, 'config', 'hmac_secret.key')
 LAST_SEEN_PATH = os.path.join(PROJECT_ROOT, 'reports', 'last_seen_timestamp.json')
 EXPECTED_SCHEMA_VERSION = 1
+EXPECTED_HMAC_VERSION = 1  # Phase 5: HMAC secret versioning
 
 
 # =========================================================================
@@ -306,6 +307,17 @@ def validate_telemetry() -> dict:
             "status": "corrupted",
             "reason": "governance_lock",
             "detail": "Governance freeze is active — training halted"
+        }
+
+    # Step 11: HMAC VERSION CHECK (Phase 5)
+    hmac_ver = data.get('hmac_version')
+    if hmac_ver is not None and hmac_ver != EXPECTED_HMAC_VERSION:
+        logger.error("HMAC version mismatch: got %s, expected %s",
+                     hmac_ver, EXPECTED_HMAC_VERSION)
+        return {
+            "status": "corrupted",
+            "reason": "hmac_version_mismatch",
+            "detail": f"HMAC version {hmac_ver} != expected {EXPECTED_HMAC_VERSION}"
         }
 
     # All checks passed — update last_seen atomically
