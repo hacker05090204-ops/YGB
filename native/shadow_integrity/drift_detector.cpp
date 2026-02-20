@@ -9,10 +9,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <deque>
 #include <vector>
-
 
 struct DriftStats {
   double max_mean_shift_sigma;       // Maximum shift across all dims (in σ)

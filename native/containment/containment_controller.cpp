@@ -16,13 +16,10 @@
  * No silent failure allowed. Every state transition is logged.
  */
 
-#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
-#include <string>
 #include <vector>
-
 
 enum class ContainmentTrigger {
   NONE = 0,
