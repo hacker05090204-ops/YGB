@@ -35,6 +35,114 @@ static constexpr int TOKEN_EXPIRY_SEC = 300; // 5 minutes
 static constexpr int MAX_PENDING_TOKENS = 32;
 static constexpr char PAIRING_LOG_PATH[] = "reports/pairing_events.log";
 
+// Rate-limit constants
+static constexpr int MAX_TRACKED_IPS = 64;
+static constexpr int MAX_FAILURES = 5;
+static constexpr int FAILURE_WINDOW_SEC = 600;    // 10 minutes
+static constexpr int LOCKOUT_DURATION_SEC = 1800; // 30 minutes
+
+// =========================================================================
+// RATE LIMITER
+// =========================================================================
+
+struct FailedAttempt {
+  char ip[46];
+  int count;
+  uint64_t first_attempt;
+  uint64_t last_attempt;
+  uint64_t locked_until; // 0 = not locked
+  bool active;
+};
+
+class RateLimiter {
+public:
+  RateLimiter() : count_(0) { std::memset(entries_, 0, sizeof(entries_)); }
+
+  // Returns true if IP is currently blocked
+  bool is_blocked(const char *ip) {
+    if (!ip)
+      return false;
+    uint64_t now = static_cast<uint64_t>(std::time(nullptr));
+    for (int i = 0; i < count_; ++i) {
+      if (entries_[i].active && std::strcmp(entries_[i].ip, ip) == 0) {
+        if (entries_[i].locked_until > 0 && now < entries_[i].locked_until) {
+          return true; // Still locked
+        }
+        if (entries_[i].locked_until > 0 && now >= entries_[i].locked_until) {
+          // Lockout expired — reset
+          entries_[i].count = 0;
+          entries_[i].locked_until = 0;
+        }
+        return false;
+      }
+    }
+    return false;
+  }
+
+  // Record a failed attempt from IP. Returns true if IP is now locked out.
+  bool record_failure(const char *ip) {
+    if (!ip)
+      return false;
+    uint64_t now = static_cast<uint64_t>(std::time(nullptr));
+
+    // Find existing entry
+    for (int i = 0; i < count_; ++i) {
+      if (entries_[i].active && std::strcmp(entries_[i].ip, ip) == 0) {
+        FailedAttempt &e = entries_[i];
+        // Reset if outside window
+        if (now - e.first_attempt > FAILURE_WINDOW_SEC) {
+          e.count = 0;
+          e.first_attempt = now;
+        }
+        e.count++;
+        e.last_attempt = now;
+        if (e.count >= MAX_FAILURES) {
+          e.locked_until = now + LOCKOUT_DURATION_SEC;
+          return true; // LOCKED
+        }
+        return false;
+      }
+    }
+
+    // New entry
+    if (count_ >= MAX_TRACKED_IPS) {
+      // Evict oldest
+      int oldest = 0;
+      for (int i = 1; i < count_; ++i) {
+        if (entries_[i].last_attempt < entries_[oldest].last_attempt)
+          oldest = i;
+      }
+      entries_[oldest].active = false;
+      entries_[oldest] = {};
+      // Reuse slot
+      FailedAttempt &e = entries_[oldest];
+      std::strncpy(e.ip, ip, 45);
+      e.ip[45] = '\0';
+      e.count = 1;
+      e.first_attempt = now;
+      e.last_attempt = now;
+      e.locked_until = 0;
+      e.active = true;
+    } else {
+      FailedAttempt &e = entries_[count_++];
+      std::strncpy(e.ip, ip, 45);
+      e.ip[45] = '\0';
+      e.count = 1;
+      e.first_attempt = now;
+      e.last_attempt = now;
+      e.locked_until = 0;
+      e.active = true;
+    }
+    return false;
+  }
+
+private:
+  FailedAttempt entries_[MAX_TRACKED_IPS];
+  int count_;
+};
+
+static RateLimiter g_rate_limiter;
+
 // =========================================================================
 // CRYPTOGRAPHIC RANDOM
 // =========================================================================

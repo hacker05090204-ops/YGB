@@ -401,6 +401,11 @@ struct TelemetryPayload {
   uint64_t monotonic_start_time;    // set once at first write
   double training_duration_seconds; // monotonic_current - monotonic_start
   double samples_per_second;        // throughput metric
+  // Phase 5: HMAC secret versioning
+  uint32_t hmac_version; // Default 1, increments on rotation
+  // Phase 6: Training process validation
+  uint32_t training_pid;          // PID of training process
+  uint64_t monotonic_last_update; // Last update monotonic timestamp
   uint32_t crc32;
   char hmac[65]; // 64 hex chars + null
   bool valid;
