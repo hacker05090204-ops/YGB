@@ -402,12 +402,13 @@ struct TelemetryPayload {
   double training_duration_seconds; // monotonic_current - monotonic_start
   double samples_per_second;        // throughput metric
   // Phase 5: HMAC secret versioning
-  uint32_t hmac_version; // Default 1, increments on rotation
+  uint32_t hmac_version; // Current: 3 (rotated)
   // Phase 6: Training process validation
   uint32_t training_pid;          // PID of training process
   uint64_t monotonic_last_update; // Last update monotonic timestamp
   uint32_t crc32;
-  char hmac[65]; // 64 hex chars + null
+  char hmac[65];          // 64 hex chars + null
+  char training_hash[65]; // Phase 9: SHA256(mono_start + epochs + sps)
   bool valid;
 };
 
@@ -518,6 +519,23 @@ static bool write_telemetry(const TelemetryPayload &payload) {
     return false; // Fail closed — no replayed telemetry
   }
 
+  // Phase 9: Training validity proof hash
+  // training_hash = SHA256(monotonic_start_time + epoch + samples_per_second)
+  {
+    char hash_input[256];
+    int hash_len =
+        std::snprintf(hash_input, sizeof(hash_input), "%llu|%d|%.8f",
+                      static_cast<unsigned long long>(p.monotonic_start_time),
+                      p.epoch, p.samples_per_second);
+    uint8_t hash_digest[32];
+    Sha256State hs;
+    sha256_init(hs);
+    sha256_update(hs, reinterpret_cast<const uint8_t *>(hash_input),
+                  static_cast<size_t>(hash_len));
+    sha256_final(hs, hash_digest);
+    bytes_to_hex(hash_digest, 32, p.training_hash);
+  }
+
   // Compute CRC over payload content (including monotonic_timestamp)
   p.crc32 = compute_payload_crc(p);
 
@@ -553,6 +571,7 @@ static bool write_telemetry(const TelemetryPayload &payload) {
                true);
   write_double(f, "samples_per_second", p.samples_per_second, true);
   write_uint32(f, "crc32", p.crc32, true);
+  write_string(f, "training_hash", p.training_hash, true);
   write_string(f, "hmac", p.hmac, false);
   std::fprintf(f, "}\n");
 
