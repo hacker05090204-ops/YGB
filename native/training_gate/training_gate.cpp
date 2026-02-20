@@ -30,7 +30,7 @@
 
 namespace training_gate {
 
-static constexpr uint32_t EXPECTED_HMAC_VERSION = 3;
+static constexpr uint32_t EXPECTED_HMAC_VERSION = 4;
 static constexpr double MAX_GPU_TEMP = 90.0;
 static constexpr double MAX_CPU_TEMP = 95.0;
 

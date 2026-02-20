@@ -402,7 +402,7 @@ struct TelemetryPayload {
   double training_duration_seconds; // monotonic_current - monotonic_start
   double samples_per_second;        // throughput metric
   // Phase 5: HMAC secret versioning
-  uint32_t hmac_version; // Current: 3 (rotated)
+  uint32_t hmac_version; // Current: 4 (emergency rotation)
   // Phase 6: Training process validation
   uint32_t training_pid;          // PID of training process
   uint64_t monotonic_last_update; // Last update monotonic timestamp
