@@ -27,8 +27,11 @@ SESSIONS_FILE = os.path.join(CONFIG_DIR, 'auth_sessions.json')
 OTPS_FILE = os.path.join(CONFIG_DIR, 'auth_otps.json')
 AUDIT_LOG = os.path.join(REPORTS_DIR, 'auth_audit.log')
 
-os.makedirs(CONFIG_DIR, exist_ok=True)
-os.makedirs(REPORTS_DIR, exist_ok=True)
+
+def _ensure_auth_dirs():
+    """Create auth directories lazily, not at import time."""
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+    os.makedirs(REPORTS_DIR, exist_ok=True)
 
 # ===================================================================
 # Rate Limit Constants

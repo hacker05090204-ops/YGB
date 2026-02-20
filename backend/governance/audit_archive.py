@@ -6,8 +6,10 @@ After a report is closed:
 - Keep: hash, timestamp, target, outcome
 - Encrypt archive with AES-256-CBC (PyCryptodome required)
 
-FAIL-CLOSED: If PyCryptodome is not installed, raise RuntimeError.
+FAIL-CLOSED: If PyCryptodome is not installed, aes_encrypt/aes_decrypt raise RuntimeError.
 No weak crypto fallback is permitted.
+
+NOTE: No import-time side effects. All checks deferred to function calls.
 """
 
 import os
@@ -21,37 +23,20 @@ REPORTS_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'reports')
 ARCHIVE_DIR = os.path.join(REPORTS_DIR, 'archived')
 ARCHIVE_KEY_PATH = os.path.join(CONFIG_DIR, 'archive_key.key')
 
-os.makedirs(ARCHIVE_DIR, exist_ok=True)
-os.makedirs(CONFIG_DIR, exist_ok=True)
-
-
-# ===================================================================
-# Verify Strong Crypto Available (Phase 2: Fail-Closed)
-# ===================================================================
-
-def _require_pycryptodome():
-    """Verify PyCryptodome is installed. Abort if not."""
-    try:
-        from Crypto.Cipher import AES  # noqa: F401
-        from Crypto.Util.Padding import pad, unpad  # noqa: F401
-    except ImportError:
-        raise RuntimeError(
-            "Strong encryption required: install pycryptodome. "
-            "Run: pip install pycryptodome. "
-            "No weak crypto fallback is permitted."
-        )
-
-
-# Fail at import time if PyCryptodome is missing
-_require_pycryptodome()
-
 
 # ===================================================================
 # Key Management
 # ===================================================================
 
+def _ensure_dirs():
+    """Create directories lazily, not at import time."""
+    os.makedirs(ARCHIVE_DIR, exist_ok=True)
+    os.makedirs(CONFIG_DIR, exist_ok=True)
+
+
 def get_or_create_archive_key() -> bytes:
     """Load or generate AES-256 archive encryption key."""
+    _ensure_dirs()
     if os.path.exists(ARCHIVE_KEY_PATH):
         with open(ARCHIVE_KEY_PATH, 'rb') as f:
             key = f.read()
@@ -69,9 +54,15 @@ def get_or_create_archive_key() -> bytes:
 # ===================================================================
 
 def aes_encrypt(data: bytes, key: bytes) -> bytes:
-    """AES-256-CBC encryption. Raises if PyCryptodome unavailable."""
-    from Crypto.Cipher import AES
-    from Crypto.Util.Padding import pad
+    """AES-256-CBC encryption. Raises RuntimeError if PyCryptodome unavailable."""
+    try:
+        from Crypto.Cipher import AES
+        from Crypto.Util.Padding import pad
+    except ImportError:
+        raise RuntimeError(
+            "Strong encryption required: install pycryptodome. "
+            "No weak crypto fallback is permitted."
+        )
     iv = os.urandom(16)
     cipher = AES.new(key, AES.MODE_CBC, iv)
     ct = cipher.encrypt(pad(data, AES.block_size))
@@ -79,9 +70,15 @@ def aes_encrypt(data: bytes, key: bytes) -> bytes:
 
 
 def aes_decrypt(data: bytes, key: bytes) -> bytes:
-    """AES-256-CBC decryption. Raises if PyCryptodome unavailable."""
-    from Crypto.Cipher import AES
-    from Crypto.Util.Padding import unpad
+    """AES-256-CBC decryption. Raises RuntimeError if PyCryptodome unavailable."""
+    try:
+        from Crypto.Cipher import AES
+        from Crypto.Util.Padding import unpad
+    except ImportError:
+        raise RuntimeError(
+            "Strong encryption required: install pycryptodome. "
+            "No weak crypto fallback is permitted."
+        )
     iv = data[:16]
     ct = data[16:]
     cipher = AES.new(key, AES.MODE_CBC, iv)
@@ -109,12 +106,8 @@ def strip_payloads(report: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def archive_report(report: Dict[str, Any], report_id: str) -> str:
-    """
-    Archive a closed report:
-    1. Strip exploit payloads
-    2. Encrypt with AES-256-CBC
-    3. Save to archive directory
-    """
+    """Archive a closed report: strip payloads, encrypt, save."""
+    _ensure_dirs()
     safe_data = strip_payloads(report)
     plaintext = json.dumps(safe_data, indent=2).encode('utf-8')
     key = get_or_create_archive_key()

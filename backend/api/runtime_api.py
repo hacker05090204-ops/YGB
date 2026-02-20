@@ -37,6 +37,48 @@ LAST_SEEN_PATH = os.path.join(PROJECT_ROOT, 'reports', 'last_seen_timestamp.json
 EXPECTED_SCHEMA_VERSION = 1
 EXPECTED_HMAC_VERSION = 4  # Emergency rotation: previous key exposed in git
 
+# Runtime state file (used by get_runtime_status for non-telemetry state)
+RUNTIME_STATE_PATH = os.path.join(PROJECT_ROOT, 'reports', 'runtime_state.json')
+
+# Required fields for valid runtime state
+REQUIRED_FIELDS = [
+    'total_epochs', 'completed_epochs', 'current_loss', 'best_loss',
+    'precision', 'ece', 'drift_kl', 'duplicate_rate',
+    'gpu_util', 'cpu_util', 'temperature',
+    'determinism_status', 'freeze_status', 'mode',
+    'progress_pct', 'loss_trend', 'last_update_ms',
+    'training_start_ms', 'total_errors'
+]
+
+STALE_THRESHOLD_MS = 30_000  # 30 seconds
+
+
+def _validate_structure(data: dict) -> list:
+    """Return list of missing required fields."""
+    return [f for f in REQUIRED_FIELDS if f not in data]
+
+
+def _sign_payload(payload: dict) -> str:
+    """Compute deterministic signature for a runtime payload."""
+    import hashlib
+    canonical = json.dumps(payload, sort_keys=True, separators=(',', ':'))
+    return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+
+
+# =========================================================================
+# SAFE SECRET LOADER (Phase 3: Never access at import time)
+# =========================================================================
+
+def get_hmac_secret() -> str:
+    """Get HMAC secret safely. Returns test fallback in non-production."""
+    secret = os.environ.get('YGB_HMAC_SECRET', '').strip()
+    if not secret:
+        if os.environ.get('YGB_ENV') == 'production':
+            raise RuntimeError("Missing HMAC secret in production")
+        else:
+            return 'TEST_SECRET'
+    return secret
+
 
 # =========================================================================
 # CRC32 (must match C++ training_telemetry.cpp implementation)
@@ -346,12 +388,59 @@ def get_runtime_status():
     """
     GET /runtime/status
 
-    Returns validated runtime state.
-    If corrupted → returns error with reason.
-    Never returns partial state.
+    Returns validated runtime state from RUNTIME_STATE_PATH.
+    Falls back to HMAC-validated telemetry if state file missing.
     """
-    result = validate_telemetry()
-    return result
+    import time as _time
+
+    # Try runtime state file first
+    if os.path.exists(RUNTIME_STATE_PATH):
+        try:
+            with open(RUNTIME_STATE_PATH, 'r') as f:
+                data = json.load(f)
+
+            missing = _validate_structure(data)
+            if missing:
+                return {
+                    "status": "invalid",
+                    "message": f"Missing required fields: {', '.join(missing)}",
+                    "timestamp": int(_time.time() * 1000)
+                }
+
+            now_ms = int(_time.time() * 1000)
+            last_update = data.get('last_update_ms', 0)
+            stale = (now_ms - last_update) > STALE_THRESHOLD_MS
+
+            return {
+                "status": "active",
+                "runtime": data,
+                "signature": _sign_payload(data),
+                "stale": stale,
+                "determinism_ok": data.get('determinism_status', False),
+                "timestamp": now_ms
+            }
+        except json.JSONDecodeError:
+            return {
+                "status": "error",
+                "message": "Corrupt runtime state file",
+                "timestamp": int(_time.time() * 1000)
+            }
+        except OSError as e:
+            return {
+                "status": "error",
+                "message": str(e),
+                "timestamp": int(_time.time() * 1000)
+            }
+
+    # Fall back to HMAC-validated telemetry
+    if os.path.exists(TELEMETRY_PATH):
+        return validate_telemetry()
+
+    return {
+        "status": "awaiting_data",
+        "message": "No runtime state yet",
+        "timestamp": int(_time.time() * 1000)
+    }
 
 
 # =========================================================================
@@ -372,11 +461,47 @@ def register_routes(app):
 
 
 # =========================================================================
+# RUNTIME INITIALIZATION (Phase 2: Explicit init, never at import)
+# =========================================================================
+
+def initialize_runtime():
+    """Production startup checks. Only call explicitly, never at import."""
+    if os.environ.get('YGB_ENV') != 'production':
+        logger.info("Skipping production checks (YGB_ENV != production)")
+        return
+
+    # Verify HMAC secret is configured
+    secret = os.environ.get('YGB_HMAC_SECRET', '').strip()
+    if not secret:
+        raise RuntimeError("FATAL: YGB_HMAC_SECRET not set in production")
+
+    # Verify HMAC key file exists
+    if not os.path.exists(HMAC_KEY_PATH):
+        logger.warning("HMAC key file not found at %s", HMAC_KEY_PATH)
+
+    # Phase 5: Invalidate old telemetry on version bump
+    if os.path.exists(TELEMETRY_PATH):
+        try:
+            with open(TELEMETRY_PATH, 'r') as f:
+                data = json.load(f)
+            ver = data.get('hmac_version')
+            if ver is not None and ver != EXPECTED_HMAC_VERSION:
+                os.remove(TELEMETRY_PATH)
+                logger.info("Invalidated old telemetry (version %s != %s)",
+                            ver, EXPECTED_HMAC_VERSION)
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    logger.info("Production runtime initialized")
+
+
+# =========================================================================
 # SELF-TEST
 # =========================================================================
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+    initialize_runtime()
 
     print("=== Runtime API Self-Test ===")
     result = get_runtime_status()
