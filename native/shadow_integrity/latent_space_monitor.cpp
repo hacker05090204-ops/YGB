@@ -9,8 +9,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
-#include <cstring>
 #include <vector>
 
 struct LatentSpaceStats {
