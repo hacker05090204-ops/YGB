@@ -20,7 +20,6 @@
 #include <cstring>
 #include <ctime>
 
-
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
@@ -361,15 +360,30 @@ private:
     if (!token || std::strlen(token) == 0)
       return false;
 
-    // In production, this would make an internal RPC or read a shared session
-    // store. We assume the caller validated it (or we mock validation for this
-    // sandbox). The exact token parsing would read \`auth_sessions.json\` or
-    // similar. For now we simulate success if the token is 64 characters long
-    // (sha256 hex).
-    if (std::strlen(token) == 64) {
-      return true;
+    // Real validation: token must be hex sha256 (64 chars) AND exist in
+    // auth_sessions.json. No simulated/mock validation permitted.
+    if (std::strlen(token) != 64)
+      return false;
+
+    // Validate hex characters
+    for (size_t i = 0; i < 64; ++i) {
+      char c = token[i];
+      if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
+            (c >= 'A' && c <= 'F')))
+        return false;
     }
-    return false;
+
+    // Read auth_sessions.json and verify token exists
+    FILE *f = std::fopen("config/auth_sessions.json", "r");
+    if (!f)
+      return false;
+
+    char buf[16384] = {0};
+    std::fread(buf, 1, sizeof(buf) - 1, f);
+    std::fclose(f);
+
+    // Search for the token string in the sessions file
+    return std::strstr(buf, token) != nullptr;
   }
 };
 

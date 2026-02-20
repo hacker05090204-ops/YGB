@@ -70,13 +70,14 @@ def _sign_payload(payload: dict) -> str:
 # =========================================================================
 
 def get_hmac_secret() -> str:
-    """Get HMAC secret safely. Returns test fallback in non-production."""
+    """Get HMAC secret. Always requires a real secret — no mock fallback."""
     secret = os.environ.get('YGB_HMAC_SECRET', '').strip()
     if not secret:
-        if os.environ.get('YGB_ENV') == 'production':
-            raise RuntimeError("Missing HMAC secret in production")
-        else:
-            return 'TEST_SECRET'
+        raise RuntimeError(
+            "YGB_HMAC_SECRET not set. "
+            "Set it via env var or config/hmac_secret.key. "
+            "No mock/test fallback permitted."
+        )
     return secret
 
 
@@ -135,8 +136,8 @@ def compute_payload_crc(payload: dict) -> int:
 def load_hmac_key() -> bytes:
     """Load HMAC secret key. Priority: env var > file.
 
-    In CI (CI env var set): raises RuntimeError if no secret found.
-    Locally: returns empty bytes on failure (fail closed).
+    Always fail-closed: raises RuntimeError if no secret found.
+    No mock/empty fallback permitted.
     """
     # Priority 1: Environment variable (works in CI and local)
     env_secret = os.environ.get('YGB_HMAC_SECRET', '').strip()
@@ -155,15 +156,11 @@ def load_hmac_key() -> bytes:
             raise ValueError("key file empty")
         return bytes.fromhex(hex_key)
     except (FileNotFoundError, ValueError) as e:
-        # In CI, this is fatal
-        if os.environ.get('CI'):
-            raise RuntimeError(
-                f"HMAC secret not configured: {e}. "
-                "Set YGB_HMAC_SECRET in GitHub Secrets."
-            )
-        # Locally, log and return empty (fail closed)
-        logger.error("HMAC secret not configured: %s", e)
-        return b''
+        raise RuntimeError(
+            f"HMAC secret not configured: {e}. "
+            "Set YGB_HMAC_SECRET env var or create config/hmac_secret.key. "
+            "No fallback permitted."
+        )
 
 
 def compute_payload_hmac(payload: dict) -> str:
