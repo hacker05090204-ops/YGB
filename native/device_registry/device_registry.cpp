@@ -25,6 +25,8 @@ namespace device_registry {
 static constexpr int MAX_DEVICES = 128;
 static constexpr char REGISTRY_PATH[] = "config/devices.json";
 static constexpr char REGISTRY_TMP[] = "config/devices.json.tmp";
+static constexpr int HEARTBEAT_TIMEOUT_SEC = 120; // Phase 9: 2 min timeout
+static constexpr char HEALTH_LOG_PATH[] = "reports/cluster_health.json";
 
 // =========================================================================
 // DEVICE STATUS
@@ -58,10 +60,26 @@ struct DeviceEntry {
   char hostname[64];
   char mesh_ip[46];      // WireGuard IP
   char certificate[129]; // Issued on pairing
+  char role[16];         // Phase 9: AUTHORITY / STORAGE / WORKER
   uint64_t paired_at;
   uint64_t last_seen;
   DeviceStatus status;
   bool active;
+};
+
+// =========================================================================
+// CLUSTER HEALTH (Phase 9)
+// =========================================================================
+
+struct ClusterHealth {
+  int total;
+  int online;
+  int offline;
+  int revoked;
+  int authority_online;
+  int storage_online;
+  int worker_online;
+  bool has_quorum; // >= 1 of each role online
 };
 
 // =========================================================================
@@ -73,7 +91,6 @@ public:
   DeviceRegistry() : count_(0) { std::memset(devices_, 0, sizeof(devices_)); }
 
   // Register a new device
-  // Returns slot index, or -1 on failure
   int register_device(const char *device_id, const char *hostname,
                       const char *mesh_ip, const char *certificate) {
     if (count_ >= MAX_DEVICES) {
@@ -85,7 +102,6 @@ public:
     for (int i = 0; i < count_; ++i) {
       if (devices_[i].active &&
           std::strcmp(devices_[i].device_id, device_id) == 0) {
-        // Already registered — update last_seen
         devices_[i].last_seen = static_cast<uint64_t>(std::time(nullptr));
         devices_[i].status = DeviceStatus::ONLINE;
         return i;
@@ -101,6 +117,8 @@ public:
     d.mesh_ip[45] = '\0';
     std::strncpy(d.certificate, certificate ? certificate : "", 128);
     d.certificate[128] = '\0';
+    std::strncpy(d.role, "WORKER", 15); // Default role
+    d.role[15] = '\0';
     d.paired_at = static_cast<uint64_t>(std::time(nullptr));
     d.last_seen = d.paired_at;
     d.status = DeviceStatus::ONLINE;
@@ -132,6 +150,83 @@ public:
       }
     }
     return false;
+  }
+
+  // Phase 9: Set device role
+  bool set_role(const char *device_id, const char *role) {
+    for (int i = 0; i < count_; ++i) {
+      if (devices_[i].active &&
+          std::strcmp(devices_[i].device_id, device_id) == 0) {
+        std::strncpy(devices_[i].role, role ? role : "", 15);
+        devices_[i].role[15] = '\0';
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Phase 9: Mark stale devices as OFFLINE
+  int mark_stale_devices() {
+    uint64_t now = static_cast<uint64_t>(std::time(nullptr));
+    int stale_count = 0;
+    for (int i = 0; i < count_; ++i) {
+      if (devices_[i].active && devices_[i].status == DeviceStatus::ONLINE &&
+          (now - devices_[i].last_seen) > HEARTBEAT_TIMEOUT_SEC) {
+        devices_[i].status = DeviceStatus::OFFLINE;
+        ++stale_count;
+      }
+    }
+    return stale_count;
+  }
+
+  // Phase 9: Cluster health check
+  ClusterHealth cluster_health_check() {
+    mark_stale_devices();
+    ClusterHealth h = {};
+    h.total = count_;
+    for (int i = 0; i < count_; ++i) {
+      if (!devices_[i].active)
+        continue;
+      switch (devices_[i].status) {
+      case DeviceStatus::ONLINE:
+        h.online++;
+        if (std::strcmp(devices_[i].role, "AUTHORITY") == 0)
+          h.authority_online++;
+        else if (std::strcmp(devices_[i].role, "STORAGE") == 0)
+          h.storage_online++;
+        else if (std::strcmp(devices_[i].role, "WORKER") == 0)
+          h.worker_online++;
+        break;
+      case DeviceStatus::OFFLINE:
+        h.offline++;
+        break;
+      case DeviceStatus::REVOKED:
+        h.revoked++;
+        break;
+      default:
+        break;
+      }
+    }
+    h.has_quorum = (h.authority_online >= 1) && (h.storage_online >= 1) &&
+                   (h.worker_online >= 1);
+    return h;
+  }
+
+  // Phase 9: Log health status
+  void log_health() {
+    ClusterHealth h = cluster_health_check();
+    FILE *f = std::fopen(HEALTH_LOG_PATH, "a");
+    if (!f)
+      return;
+    uint64_t now = static_cast<uint64_t>(std::time(nullptr));
+    std::fprintf(f,
+                 "{\"timestamp\": %llu, \"total\": %d, \"online\": %d, "
+                 "\"offline\": %d, \"revoked\": %d, \"quorum\": %s, "
+                 "\"authority\": %d, \"storage\": %d, \"worker\": %d}\n",
+                 static_cast<unsigned long long>(now), h.total, h.online,
+                 h.offline, h.revoked, h.has_quorum ? "true" : "false",
+                 h.authority_online, h.storage_online, h.worker_online);
+    std::fclose(f);
   }
 
   // Check if device is registered and not revoked
@@ -177,11 +272,13 @@ public:
                    "      \"device_id\": \"%s\",\n"
                    "      \"hostname\": \"%s\",\n"
                    "      \"mesh_ip\": \"%s\",\n"
+                   "      \"role\": \"%s\",\n"
                    "      \"status\": \"%s\",\n"
                    "      \"paired_at\": %llu,\n"
                    "      \"last_seen\": %llu\n"
                    "    }%s\n",
-                   d.device_id, d.hostname, d.mesh_ip, status_name(d.status),
+                   d.device_id, d.hostname, d.mesh_ip, d.role,
+                   status_name(d.status),
                    static_cast<unsigned long long>(d.paired_at),
                    static_cast<unsigned long long>(d.last_seen),
                    (i < count_ - 1) ? "," : "");

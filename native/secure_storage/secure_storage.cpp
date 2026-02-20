@@ -40,7 +40,9 @@ enum class AccessResult : uint8_t {
   DENIED_IP = 1,
   DENIED_CERT = 2,
   DENIED_PATH = 3,
-  ERROR = 4,
+  DENIED_ROLE = 4,      // Phase 7: Role-based access
+  DENIED_LOCALHOST = 5, // Phase 7: Localhost bypass blocked
+  ERROR = 6,
 };
 
 static const char *access_result_name(AccessResult r) {
@@ -53,6 +55,10 @@ static const char *access_result_name(AccessResult r) {
     return "DENIED_CERT";
   case AccessResult::DENIED_PATH:
     return "DENIED_PATH";
+  case AccessResult::DENIED_ROLE:
+    return "DENIED_ROLE";
+  case AccessResult::DENIED_LOCALHOST:
+    return "DENIED_LOCALHOST";
   case AccessResult::ERROR:
     return "ERROR";
   default:
@@ -61,11 +67,21 @@ static const char *access_result_name(AccessResult r) {
 }
 
 // =========================================================================
-// IP VALIDATION — mesh only
+// IP VALIDATION — mesh only, block localhost
 // =========================================================================
+
+static bool is_localhost(const char *ip) {
+  if (!ip)
+    return false;
+  return std::strcmp(ip, "127.0.0.1") == 0 || std::strcmp(ip, "::1") == 0 ||
+         std::strcmp(ip, "localhost") == 0;
+}
 
 static bool is_mesh_ip(const char *ip) {
   if (!ip)
+    return false;
+  // Block localhost explicitly
+  if (is_localhost(ip))
     return false;
   return std::strncmp(ip, MESH_PREFIX, std::strlen(MESH_PREFIX)) == 0;
 }
@@ -77,13 +93,10 @@ static bool is_mesh_ip(const char *ip) {
 static bool is_safe_path(const char *path) {
   if (!path || path[0] == '\0')
     return false;
-  // Reject path traversal
   if (std::strstr(path, "..") != nullptr)
     return false;
-  // Reject absolute paths
   if (path[0] == '/' || path[0] == '\\')
     return false;
-  // Reject drive letters (Windows)
   if (std::strlen(path) >= 2 && path[1] == ':')
     return false;
   return true;
@@ -113,15 +126,18 @@ static void log_access(const char *event, const char *device_id, const char *ip,
 // STORAGE OPERATIONS
 // =========================================================================
 
+// Phase 7: Extended storage request with role and revocation status
 struct StorageRequest {
   const char *device_id;   // From device certificate
   const char *client_ip;   // Source IP
   const char *certificate; // Device certificate for validation
   const char *path;        // Relative path within secure_data/
+  const char *device_role; // "AUTHORITY", "STORAGE", "WORKER"
+  bool is_revoked;         // From device registry
+  bool is_registered;      // From device registry
 };
 
 // Callback for certificate validation
-// In production, this checks against the pairing server's records
 typedef bool (*CertValidator)(const char *device_id, const char *cert);
 
 class SecureStorage {
@@ -191,6 +207,13 @@ private:
   CertValidator cert_validator_;
 
   AccessResult validate_access(const StorageRequest &req, const char *op) {
+    // Check 0: Block localhost bypass (Phase 7)
+    if (is_localhost(req.client_ip)) {
+      log_access(op, req.device_id, req.client_ip, req.path,
+                 AccessResult::DENIED_LOCALHOST);
+      return AccessResult::DENIED_LOCALHOST;
+    }
+
     // Check 1: Mesh IP only
     if (!is_mesh_ip(req.client_ip)) {
       log_access(op, req.device_id, req.client_ip, req.path,
@@ -205,7 +228,24 @@ private:
       return AccessResult::DENIED_CERT;
     }
 
-    // Check 3: Safe path
+    // Check 3: Device must be registered and not revoked (Phase 7)
+    if (!req.is_registered || req.is_revoked) {
+      log_access(op, req.device_id, req.client_ip, req.path,
+                 AccessResult::DENIED_CERT);
+      return AccessResult::DENIED_CERT;
+    }
+
+    // Check 4: Role-based access (Phase 7)
+    // Only STORAGE and AUTHORITY roles can access secure storage
+    if (req.device_role) {
+      if (std::strcmp(req.device_role, "WORKER") == 0) {
+        log_access(op, req.device_id, req.client_ip, req.path,
+                   AccessResult::DENIED_ROLE);
+        return AccessResult::DENIED_ROLE;
+      }
+    }
+
+    // Check 5: Safe path
     if (!is_safe_path(req.path)) {
       log_access(op, req.device_id, req.client_ip, req.path,
                  AccessResult::DENIED_PATH);
