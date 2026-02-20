@@ -10,11 +10,8 @@
  *   - No governance modification
  */
 
-#include <algorithm>
 #include <cctype>
-#include <cmath>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 
 #ifdef _WIN32

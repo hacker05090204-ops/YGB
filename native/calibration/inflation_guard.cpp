@@ -15,10 +15,8 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstddef>
 #include <deque>
 #include <vector>
-
 
 struct InflationStats {
   double rolling_ece;
