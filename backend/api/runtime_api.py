@@ -309,9 +309,16 @@ def validate_telemetry() -> dict:
             "detail": "Governance freeze is active — training halted"
         }
 
-    # Step 11: HMAC VERSION CHECK (Phase 5)
+    # Step 11: STRICT HMAC VERSION CHECK — no backward compatibility
     hmac_ver = data.get('hmac_version')
-    if hmac_ver is not None and hmac_ver != EXPECTED_HMAC_VERSION:
+    if hmac_ver is None:
+        logger.error("HMAC version MISSING from telemetry — strict rejection")
+        return {
+            "status": "corrupted",
+            "reason": "hmac_version_missing",
+            "detail": f"hmac_version field required, expected {EXPECTED_HMAC_VERSION}"
+        }
+    if hmac_ver != EXPECTED_HMAC_VERSION:
         logger.error("HMAC version mismatch: got %s, expected %s",
                      hmac_ver, EXPECTED_HMAC_VERSION)
         return {

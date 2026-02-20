@@ -53,9 +53,15 @@ jobs:
       - name: Validate environment
         run: |
           echo "=== Environment ==="
+          # Phase 5: Mask HMAC secret — never print
+          echo "::add-mask::$YGB_HMAC_SECRET"
           pwd
           echo "PYTHONPATH: $PYTHONPATH"
-          echo "YGB_HMAC_SECRET configured: $([ -n \"$YGB_HMAC_SECRET\" ] && echo YES || echo NO)"
+          if [ -z "$YGB_HMAC_SECRET" ]; then
+            echo "FATAL: YGB_HMAC_SECRET not configured"
+            exit 1
+          fi
+          echo "YGB_HMAC_SECRET configured: YES (masked)"
           test -d backend || { echo "FATAL: backend/ not found"; exit 1; }
           test -f backend/__init__.py || { echo "FATAL: backend/__init__.py missing"; exit 1; }
           test -f backend/tests/__init__.py || { echo "FATAL: backend/tests/__init__.py missing"; exit 1; }
