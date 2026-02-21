@@ -1,0 +1,12 @@
+{
+  "NVIDIA GeForce RTX 2050_8.6": {
+    "device_name": "NVIDIA GeForce RTX 2050",
+    "compute_capability": "8.6",
+    "vram_total_mb": 4095.5,
+    "optimal_batch_size": 8192,
+    "samples_per_sec": 52191.68545444689,
+    "vram_peak_mb": 77.79736328125,
+    "amp_enabled": true,
+    "measured_at": "2026-02-21T18:14:43Z"
+  }
+}
