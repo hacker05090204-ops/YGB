@@ -44,6 +44,7 @@ class SpeedTelemetry:
     gpu_util_avg: float = 0.0
     mode_a_time: float = 0.0
     mode_b_time: float = 0.0
+    amp_enabled: bool = False
     total_epochs: int = 0
     total_samples: int = 0
     avg_epoch_time: float = 0.0

@@ -339,7 +339,7 @@ class AutoTrainer:
             # Create optimized DataLoader (pin_memory, workers)
             train_loader, holdout_loader, stats = create_training_dataloader(
                 batch_size=1024,
-                num_workers=8,
+                num_workers=4,
                 pin_memory=True,
                 prefetch_factor=2,
                 seed=42,
@@ -454,7 +454,7 @@ class AutoTrainer:
                 
                 # AMP: Mixed precision forward pass
                 if AMP_AVAILABLE and self._scaler is not None:
-                    with autocast():
+                    with autocast(dtype=torch.float16):
                         outputs = self._gpu_model(batch_features)
                         loss = self._gpu_criterion(outputs, batch_labels)
                         loss = loss / accumulation_steps  # Scale for accumulation

@@ -163,7 +163,7 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
             
             # Forward pass with AMP
             if scaler is not None:
-                with autocast():
+                with autocast(dtype=torch.float16):
                     logits = model(bx)
                     ce_loss = criterion(logits, by)
             else:

@@ -211,7 +211,7 @@ def train_expanded(epochs: int = 30, batch_size: int = 256,
             by = torch.tensor(ep_l[start:end], dtype=torch.long).to(device)
 
             if scaler is not None:
-                with autocast():
+                with autocast(dtype=torch.float16):
                     logits = model(bx)
                     loss = criterion(logits, by)
                 scaler.scale(loss / grad_accum).backward()

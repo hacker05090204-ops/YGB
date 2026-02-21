@@ -215,7 +215,7 @@ class RealTrainingDataset(Dataset):
 
 def create_training_dataloader(
     batch_size: int = 1024,
-    num_workers: int = 8,
+    num_workers: int = 4,
     pin_memory: bool = True,
     prefetch_factor: int = 2,
     seed: int = FIXED_SEED,
@@ -225,7 +225,7 @@ def create_training_dataloader(
     
     Args:
         batch_size: Samples per batch (default 1024 for RTX 2050)
-        num_workers: Parallel data loading workers (default 8 for >85% GPU util)
+        num_workers: Parallel data loading workers (default 4 for laptop safety)
         pin_memory: Pin memory for faster GPU transfer
         prefetch_factor: Batches to prefetch per worker
         seed: Random seed for determinism

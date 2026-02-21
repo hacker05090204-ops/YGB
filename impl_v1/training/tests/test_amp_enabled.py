@@ -45,7 +45,7 @@ class TestAMPEnabled:
         
         x = torch.randn(32, 256, device='cuda')
         
-        with autocast():
+        with autocast(dtype=torch.float16):
             y = x @ x.T  # Matrix multiply
             assert y.dtype in [torch.float16, torch.bfloat16, torch.float32], \
                 "autocast should use mixed precision"

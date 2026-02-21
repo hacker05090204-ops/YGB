@@ -77,7 +77,7 @@ def get_balanced_config() -> SafeAccelerationConfig:
         mixed_precision_enabled=True,   # AMP verified deterministic with GradScaler
         gradient_accumulation_steps=4,  # Effective batch = batch_size * 4
         batch_size=32,
-        num_workers=8,
+        num_workers=4,
         pin_memory=True,
         prefetch_factor=2,
         mode=AccelerationMode.BALANCED,
@@ -93,7 +93,7 @@ def get_aggressive_config() -> SafeAccelerationConfig:
         mixed_precision_enabled=True,   # AMP verified deterministic with GradScaler
         gradient_accumulation_steps=4,  # Effective batch = batch_size * 4
         batch_size=64,
-        num_workers=8,
+        num_workers=4,
         pin_memory=True,
         prefetch_factor=4,
         max_gpu_memory_fraction=0.90,
