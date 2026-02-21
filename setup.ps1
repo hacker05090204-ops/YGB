@@ -20,17 +20,16 @@ $env:CUBLAS_WORKSPACE_CONFIG = ":4096:8"
 $env:YGB_CLUSTER_MODE = if ($env:YGB_CLUSTER_MODE) { $env:YGB_CLUSTER_MODE } else { "auto" }
 
 Write-Host ""
-Write-Host "[1/7] Detecting GPU..."
+Write-Host "[1/8] Classifying device..."
 python -c "
-import torch
-if torch.cuda.is_available():
-    p = torch.cuda.get_device_properties(0)
-    print(f'  GPU: {p.name}')
-    print(f'  VRAM: {p.total_memory/(1024**2):.0f} MB')
-    print(f'  CUDA: {torch.version.cuda}')
-    print(f'  Count: {torch.cuda.device_count()}')
-else:
-    print('  No CUDA GPU')
+from impl_v1.training.distributed.device_classifier import classify_device
+c = classify_device()
+print(f'  Device: {c.device_name}')
+print(f'  Backend: {c.backend}')
+print(f'  Role: {c.role}')
+print(f'  GPUs: {c.gpu_count}')
+print(f'  DDP eligible: {c.ddp_eligible}')
+print(f'  Can train: {c.can_train}')
 "
 
 Write-Host ""
