@@ -1,8 +1,11 @@
 {
     "python.analysis.extraPaths": [
-        "${workspaceFolder}"
+        "${workspaceFolder}",
+        "${workspaceFolder}/backend"
     ],
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "python.analysis.autoSearchPaths": true,
+    "C_Cpp.default.compilerPath": "C:/Users/KINETIC04/AppData/Local/Microsoft/WinGet/Packages/BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe/mingw64/bin/g++.exe",
     "github-actions.workflows.parameters": {
         "secrets": {
             "YGB_HMAC_SECRET": ""

@@ -22,11 +22,11 @@
 #include <cstring>
 #include <ctime>
 
-
 #ifdef _WIN32
+#include <windows.h>
 #include <bcrypt.h>
 #include <direct.h>
-#include <windows.h>
+
 
 #define mkdir_p(dir) _mkdir(dir)
 #pragma comment(lib, "bcrypt.lib")
