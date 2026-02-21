@@ -1,0 +1,10 @@
+{
+  "original_batch_size": 1024,
+  "optimal_batch_size": 8192,
+  "scale_factor": 8,
+  "vram_used_pct": 2.376321953973874,
+  "gpu_util_pct": 1.5626907581491882,
+  "oom_occurred": false,
+  "attempts": 3,
+  "deterministic": true
+}
