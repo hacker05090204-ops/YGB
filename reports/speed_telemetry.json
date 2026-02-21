@@ -1,0 +1,14 @@
+{
+  "samples_per_sec": 16788.18,
+  "vram_peak_mb": 36.31,
+  "batch_size": 256,
+  "gpu_count": 1,
+  "world_size": 1,
+  "amp_enabled": true,
+  "device_type": "cuda",
+  "model_name": "G38_BugClassifier_Hardened",
+  "dataset_hash": "aa40d79a6b667d6e",
+  "total_epoch_time": 15.44,
+  "final_accuracy": 0.9778,
+  "device_name": "NVIDIA GeForce RTX 3050 Laptop GPU"
+}
