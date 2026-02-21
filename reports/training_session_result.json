@@ -1,6 +1,6 @@
 {
   "world_size": 1,
-  "total_samples_per_sec": 37216.94,
+  "total_samples_per_sec": 37187.39,
   "per_node_batch": 32768,
   "effective_batch": 262144,
   "merged_weight_hash": "0e3afe82d5e0180a",
@@ -22,10 +22,10 @@
     "gpu": "NVIDIA GeForce RTX 3050 Laptop GPU",
     "vram_mb": 4095.5,
     "optimal_batch": 32768,
-    "throughput_samples_sec": 115948.28,
+    "throughput_samples_sec": 114788.29,
     "vram_peak_mb": 2334.25,
     "sm_count": 16,
-    "capacity_score": 7.3461
+    "capacity_score": 7.2881
   },
   "dataset_meta": {
     "samples": 45000,
@@ -52,7 +52,7 @@
     "deterministic": true
   },
   "results": {
-    "total_time_sec": 29.02,
+    "total_time_sec": 29.04,
     "vram_peak_mb": 2334.14,
     "vram_utilization_pct": 57.0,
     "final_train_acc": 0.9793,
@@ -75,8 +75,8 @@
       "max_grad_norm": 0.359,
       "lr": 0.00097555,
       "vram_mb": 2262.72,
-      "samples_per_sec": 38111.36,
-      "epoch_time_sec": 0.94
+      "samples_per_sec": 39581.11,
+      "epoch_time_sec": 0.91
     },
     {
       "epoch": 2,
@@ -86,7 +86,7 @@
       "max_grad_norm": 0.5518,
       "lr": 0.0009046,
       "vram_mb": 2334.14,
-      "samples_per_sec": 36513.98,
+      "samples_per_sec": 36468.38,
       "epoch_time_sec": 0.99
     },
     {
@@ -97,8 +97,8 @@
       "max_grad_norm": 1.282,
       "lr": 0.0007941,
       "vram_mb": 2334.14,
-      "samples_per_sec": 42144.59,
-      "epoch_time_sec": 0.85
+      "samples_per_sec": 40732.39,
+      "epoch_time_sec": 0.88
     },
     {
       "epoch": 4,
@@ -108,8 +108,8 @@
       "max_grad_norm": 0.2135,
       "lr": 0.00065485,
       "vram_mb": 2334.14,
-      "samples_per_sec": 43635.5,
-      "epoch_time_sec": 0.83
+      "samples_per_sec": 44293.87,
+      "epoch_time_sec": 0.81
     },
     {
       "epoch": 5,
@@ -119,7 +119,7 @@
       "max_grad_norm": 0.0881,
       "lr": 0.0005005,
       "vram_mb": 2334.14,
-      "samples_per_sec": 36842.94,
+      "samples_per_sec": 36607.67,
       "epoch_time_sec": 0.98
     },
     {
@@ -130,8 +130,8 @@
       "max_grad_norm": 0.1199,
       "lr": 0.00034615,
       "vram_mb": 2334.14,
-      "samples_per_sec": 40141.17,
-      "epoch_time_sec": 0.9
+      "samples_per_sec": 38864.29,
+      "epoch_time_sec": 0.93
     },
     {
       "epoch": 7,
@@ -141,8 +141,8 @@
       "max_grad_norm": 0.1612,
       "lr": 0.0002069,
       "vram_mb": 2334.14,
-      "samples_per_sec": 33219.19,
-      "epoch_time_sec": 1.08
+      "samples_per_sec": 32483.03,
+      "epoch_time_sec": 1.11
     },
     {
       "epoch": 8,
@@ -152,8 +152,8 @@
       "max_grad_norm": 0.1962,
       "lr": 9.64e-05,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39423.16,
-      "epoch_time_sec": 0.91
+      "samples_per_sec": 38621.99,
+      "epoch_time_sec": 0.93
     },
     {
       "epoch": 9,
@@ -163,8 +163,8 @@
       "max_grad_norm": 0.2308,
       "lr": 2.545e-05,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39580.53,
-      "epoch_time_sec": 0.91
+      "samples_per_sec": 40154.61,
+      "epoch_time_sec": 0.9
     },
     {
       "epoch": 10,
@@ -174,8 +174,8 @@
       "max_grad_norm": 0.2489,
       "lr": 0.001,
       "vram_mb": 2334.14,
-      "samples_per_sec": 33405.95,
-      "epoch_time_sec": 1.08
+      "samples_per_sec": 33603.15,
+      "epoch_time_sec": 1.07
     },
     {
       "epoch": 11,
@@ -185,8 +185,8 @@
       "max_grad_norm": 0.2524,
       "lr": 0.00099385,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39333.99,
-      "epoch_time_sec": 0.92
+      "samples_per_sec": 39868.36,
+      "epoch_time_sec": 0.9
     },
     {
       "epoch": 12,
@@ -196,8 +196,8 @@
       "max_grad_norm": 0.2946,
       "lr": 0.00097555,
       "vram_mb": 2334.14,
-      "samples_per_sec": 40084.48,
-      "epoch_time_sec": 0.9
+      "samples_per_sec": 40245.84,
+      "epoch_time_sec": 0.89
     },
     {
       "epoch": 13,
@@ -207,8 +207,8 @@
       "max_grad_norm": 0.4456,
       "lr": 0.00094556,
       "vram_mb": 2334.14,
-      "samples_per_sec": 33263.5,
-      "epoch_time_sec": 1.08
+      "samples_per_sec": 33707.79,
+      "epoch_time_sec": 1.07
     },
     {
       "epoch": 14,
@@ -218,8 +218,8 @@
       "max_grad_norm": 0.2093,
       "lr": 0.0009046,
       "vram_mb": 2334.14,
-      "samples_per_sec": 38912.89,
-      "epoch_time_sec": 0.93
+      "samples_per_sec": 39690.44,
+      "epoch_time_sec": 0.91
     },
     {
       "epoch": 15,
@@ -229,8 +229,8 @@
       "max_grad_norm": 0.1773,
       "lr": 0.0008537,
       "vram_mb": 2334.14,
-      "samples_per_sec": 32727.47,
-      "epoch_time_sec": 1.1
+      "samples_per_sec": 33079.85,
+      "epoch_time_sec": 1.09
     },
     {
       "epoch": 16,
@@ -240,8 +240,8 @@
       "max_grad_norm": 0.0795,
       "lr": 0.0007941,
       "vram_mb": 2334.14,
-      "samples_per_sec": 38796.38,
-      "epoch_time_sec": 0.93
+      "samples_per_sec": 38411.98,
+      "epoch_time_sec": 0.94
     },
     {
       "epoch": 17,
@@ -251,7 +251,7 @@
       "max_grad_norm": 0.1293,
       "lr": 0.00072727,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39951.34,
+      "samples_per_sec": 40223.21,
       "epoch_time_sec": 0.9
     },
     {
@@ -262,8 +262,8 @@
       "max_grad_norm": 0.1533,
       "lr": 0.00065485,
       "vram_mb": 2334.14,
-      "samples_per_sec": 33112.83,
-      "epoch_time_sec": 1.09
+      "samples_per_sec": 32629.98,
+      "epoch_time_sec": 1.1
     },
     {
       "epoch": 19,
@@ -273,8 +273,8 @@
       "max_grad_norm": 0.05,
       "lr": 0.00057864,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39423.55,
-      "epoch_time_sec": 0.91
+      "samples_per_sec": 39195.4,
+      "epoch_time_sec": 0.92
     },
     {
       "epoch": 20,
@@ -284,8 +284,8 @@
       "max_grad_norm": 0.0344,
       "lr": 0.0005005,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39074.33,
-      "epoch_time_sec": 0.92
+      "samples_per_sec": 40372.69,
+      "epoch_time_sec": 0.89
     },
     {
       "epoch": 21,
@@ -295,7 +295,7 @@
       "max_grad_norm": 0.0494,
       "lr": 0.00042236,
       "vram_mb": 2334.14,
-      "samples_per_sec": 33339.93,
+      "samples_per_sec": 33296.69,
       "epoch_time_sec": 1.08
     },
     {
@@ -306,7 +306,7 @@
       "max_grad_norm": 0.0894,
       "lr": 0.00034615,
       "vram_mb": 2334.14,
-      "samples_per_sec": 38537.7,
+      "samples_per_sec": 38848.89,
       "epoch_time_sec": 0.93
     },
     {
@@ -317,8 +317,8 @@
       "max_grad_norm": 0.0745,
       "lr": 0.00027373,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39988.45,
-      "epoch_time_sec": 0.9
+      "samples_per_sec": 38976.99,
+      "epoch_time_sec": 0.92
     },
     {
       "epoch": 24,
@@ -328,7 +328,7 @@
       "max_grad_norm": 0.0411,
       "lr": 0.0002069,
       "vram_mb": 2334.14,
-      "samples_per_sec": 32693.42,
+      "samples_per_sec": 32605.3,
       "epoch_time_sec": 1.1
     },
     {
@@ -339,8 +339,8 @@
       "max_grad_norm": 0.0423,
       "lr": 0.0001473,
       "vram_mb": 2334.14,
-      "samples_per_sec": 38654.6,
-      "epoch_time_sec": 0.93
+      "samples_per_sec": 38107.5,
+      "epoch_time_sec": 0.94
     },
     {
       "epoch": 26,
@@ -350,8 +350,8 @@
       "max_grad_norm": 0.0306,
       "lr": 9.64e-05,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39043.27,
-      "epoch_time_sec": 0.92
+      "samples_per_sec": 37070.46,
+      "epoch_time_sec": 0.97
     },
     {
       "epoch": 27,
@@ -361,8 +361,8 @@
       "max_grad_norm": 0.0393,
       "lr": 5.544e-05,
       "vram_mb": 2334.14,
-      "samples_per_sec": 39430.09,
-      "epoch_time_sec": 0.91
+      "samples_per_sec": 40243.4,
+      "epoch_time_sec": 0.89
     },
     {
       "epoch": 28,
@@ -372,8 +372,8 @@
       "max_grad_norm": 0.0343,
       "lr": 2.545e-05,
       "vram_mb": 2334.14,
-      "samples_per_sec": 33065.92,
-      "epoch_time_sec": 1.09
+      "samples_per_sec": 33697.92,
+      "epoch_time_sec": 1.07
     },
     {
       "epoch": 29,
@@ -383,8 +383,8 @@
       "max_grad_norm": 0.0515,
       "lr": 7.15e-06,
       "vram_mb": 2334.14,
-      "samples_per_sec": 40374.96,
-      "epoch_time_sec": 0.89
+      "samples_per_sec": 39785.17,
+      "epoch_time_sec": 0.9
     },
     {
       "epoch": 30,
@@ -394,8 +394,8 @@
       "max_grad_norm": 0.0395,
       "lr": 0.001,
       "vram_mb": 2334.14,
-      "samples_per_sec": 32888.26,
-      "epoch_time_sec": 1.09
+      "samples_per_sec": 33214.74,
+      "epoch_time_sec": 1.08
     }
   ]
 }
