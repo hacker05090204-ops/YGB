@@ -284,5 +284,67 @@ jobs:
 
       # Run ALL tests in backend/tests/ via directory discovery
       - name: Run all governance and safety tests
-        run: pytest backend/tests/ -v -s --tb=long
+        continue-on-error: true
+        run: |
+          mkdir -p test-results-gov
+          pytest backend/tests/ -v -s --tb=long --junitxml=test-results-gov/junit.xml 2>&1 | tee test-results-gov/test-output.txt
 
+      - name: Upload governance test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: governance-test-results
+          path: test-results-gov/
+
+      - name: Check governance test results
+        if: always()
+        run: |
+          python3 - <<'PYEOF'
+          import xml.etree.ElementTree as ET
+          import sys, os
+
+          junit_path = "test-results-gov/junit.xml"
+          txt_path = "test-results-gov/test-output.txt"
+
+          if not os.path.exists(junit_path):
+              print("::error::JUnit XML not found — tests may not have run")
+              if os.path.exists(txt_path):
+                  with open(txt_path) as f:
+                      for l in f.readlines()[-30:]:
+                          print(l, end='')
+              sys.exit(1)
+
+          tree = ET.parse(junit_path)
+          root = tree.getroot()
+          tests = int(root.attrib.get('tests', 0))
+          failures = int(root.attrib.get('failures', 0))
+          errors = int(root.attrib.get('errors', 0))
+          skipped = int(root.attrib.get('skipped', 0))
+
+          print(f"Tests: {tests}, Failures: {failures}, Errors: {errors}, Skipped: {skipped}")
+
+          if failures == 0 and errors == 0:
+              print(f"ALL {tests} TESTS PASSED ({skipped} skipped)")
+              sys.exit(0)
+
+          for suite in root.iter('testsuite'):
+              for tc in suite.iter('testcase'):
+                  fail = tc.find('failure')
+                  err = tc.find('error')
+                  if fail is not None:
+                      name = tc.attrib.get('name', '?')
+                      cls = tc.attrib.get('classname', '?')
+                      msg = fail.attrib.get('message', fail.text or '(no message)')
+                      print(f"::error::FAILED: {cls}::{name} — {msg[:200]}")
+                  elif err is not None:
+                      name = tc.attrib.get('name', '?')
+                      cls = tc.attrib.get('classname', '?')
+                      msg = err.attrib.get('message', err.text or '(no message)')
+                      print(f"::error::ERROR: {cls}::{name} — {msg[:200]}")
+
+          if os.path.exists(txt_path):
+              with open(txt_path) as f:
+                  for l in f.readlines()[-30:]:
+                      print(l, end='')
+          sys.exit(1)
+          PYEOF
