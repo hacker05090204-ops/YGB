@@ -58,8 +58,10 @@ jobs:
           pip install numpy
           pip install pytest pytest-cov pytest-asyncio coverage gcovr
           pip install pycryptodome bcrypt
+          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
+          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
 
       # ========== PHASE 1: Verify numpy ==========
       - name: Verify numpy
@@ -87,6 +89,13 @@ jobs:
           echo "Backend test files:"
           ls -la backend/tests/test_*.py
           echo "=== OK ==="
+
+      # ========== DIAGNOSTIC: Collect tests first ==========
+      - name: Collect tests (diagnostic)
+        run: |
+          echo "=== Collecting tests ==="
+          pytest backend/tests/ --collect-only -q 2>&1 || true
+          echo "=== Collection complete ==="
 
       # ========== STEP 1: RUNTIME SAFETY TESTS ==========
       - name: Runtime safety tests
@@ -176,8 +185,10 @@ jobs:
           pip install numpy
           pip install pytest pytest-cov pytest-asyncio
           pip install pycryptodome bcrypt
+          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
+          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
 
       - name: Verify numpy
         run: python -c "import numpy; print('numpy', numpy.__version__)"
@@ -192,6 +203,14 @@ jobs:
           test -f backend/__init__.py || { echo "FATAL: backend/__init__.py missing"; exit 1; }
           test -f backend/tests/__init__.py || { echo "FATAL: backend/tests/__init__.py missing"; exit 1; }
 
+      # Diagnostic: collect first to identify import errors
+      - name: Collect tests (diagnostic)
+        run: |
+          echo "=== Collecting tests ==="
+          pytest backend/tests/ --collect-only -q 2>&1 || true
+          echo "=== Collection complete ==="
+
       # Run ALL tests in backend/tests/ via directory discovery
       - name: Run all governance and safety tests
         run: pytest backend/tests/ -v -s --tb=long
+
