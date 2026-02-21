@@ -1,0 +1,15 @@
+{
+  "samples_per_sec": 16788.18,
+  "vram_peak_mb": 36.31,
+  "batch_size": 256,
+  "gpu_count": 1,
+  "world_size": 1,
+  "amp_enabled": true,
+  "device_type": "cuda",
+  "dataset_hash": "aa40d79a6b667d6e",
+  "epoch_time_sec": 15.44,
+  "determinism_match": true,
+  "weight_hash_run1": "909c50bfbb205d34",
+  "weight_hash_run2": "909c50bfbb205d34",
+  "weight_hash_run3": "909c50bfbb205d34"
+}
