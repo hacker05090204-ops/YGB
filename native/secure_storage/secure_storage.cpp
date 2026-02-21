@@ -20,7 +20,6 @@
 #include <cstring>
 #include <ctime>
 
-
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
@@ -239,16 +238,22 @@ public:
 
   void set_cert_validator(CertValidator v) { cert_validator_ = v; }
 
-  // Read file from secure storage
+  // Read file from secure storage (per-user isolated)
   AccessResult read_file(const StorageRequest &req, char *buf, size_t buf_size,
                          size_t *bytes_read) {
     AccessResult check = validate_access(req, "READ");
     if (check != AccessResult::GRANTED)
       return check;
 
+    // Phase 6: Per-user data isolation — scope path by device_id
     char full_path[512];
-    std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
-                  req.path);
+    if (req.device_id && std::strlen(req.device_id) > 0) {
+      std::snprintf(full_path, sizeof(full_path), "%s/%s/%s",
+                    get_storage_root(), req.device_id, req.path);
+    } else {
+      std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
+                    req.path);
+    }
 
     FILE *f = std::fopen(full_path, "rb");
     if (!f) {
@@ -265,7 +270,7 @@ public:
     return AccessResult::GRANTED;
   }
 
-  // Write file to secure storage
+  // Write file to secure storage (per-user isolated)
   AccessResult write_file(const StorageRequest &req, const char *data,
                           size_t data_len) {
     AccessResult check = validate_access(req, "WRITE");
@@ -278,9 +283,28 @@ public:
       return AccessResult::ERROR;
     }
 
+    // Phase 6: Per-user data isolation — scope path by device_id
     char full_path[512];
-    std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
-                  req.path);
+    if (req.device_id && std::strlen(req.device_id) > 0) {
+      // Ensure user directory exists
+      char user_dir[512];
+      std::snprintf(user_dir, sizeof(user_dir), "%s/%s", get_storage_root(),
+                    req.device_id);
+#ifdef _WIN32
+      char cmd[600];
+      std::snprintf(cmd, sizeof(cmd), "mkdir \"%s\" 2>nul", user_dir);
+      std::system(cmd);
+#else
+      char cmd[600];
+      std::snprintf(cmd, sizeof(cmd), "mkdir -p '%s'", user_dir);
+      std::system(cmd);
+#endif
+      std::snprintf(full_path, sizeof(full_path), "%s/%s/%s",
+                    get_storage_root(), req.device_id, req.path);
+    } else {
+      std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
+                    req.path);
+    }
 
     FILE *f = std::fopen(full_path, "wb");
     if (!f) {
@@ -302,7 +326,33 @@ private:
   CertValidator cert_validator_;
 
   AccessResult validate_access(const StorageRequest &req, const char *op) {
-    // Check 0: Block localhost bypass (Phase 7)
+    // Check 0a: Device certificate file MUST exist (zero-trust bootstrap)
+    {
+      FILE *cert_f = std::fopen("storage/certs/device_cert.json", "r");
+      if (!cert_f) {
+        log_access(op, req.device_id, req.client_ip, req.path,
+                   AccessResult::DENIED_CERT);
+        return AccessResult::DENIED_CERT;
+      }
+      // Check cert expiry: read expires_at from cert file
+      char cert_buf[4096] = {0};
+      std::fread(cert_buf, 1, sizeof(cert_buf) - 1, cert_f);
+      std::fclose(cert_f);
+
+      const char *exp_key = "\"expires_at\": ";
+      const char *exp_pos = std::strstr(cert_buf, exp_key);
+      if (exp_pos) {
+        uint64_t expires_at = (uint64_t)std::strtoull(
+            exp_pos + std::strlen(exp_key), nullptr, 10);
+        if (expires_at > 0 && (uint64_t)std::time(nullptr) > expires_at) {
+          log_access(op, req.device_id, req.client_ip, req.path,
+                     AccessResult::DENIED_CERT);
+          return AccessResult::DENIED_CERT;
+        }
+      }
+    }
+
+    // Check 0b: Block localhost bypass (Phase 7)
     if (is_localhost(req.client_ip)) {
       log_access(op, req.device_id, req.client_ip, req.path,
                  AccessResult::DENIED_LOCALHOST);
@@ -361,15 +411,30 @@ private:
     if (!token || std::strlen(token) == 0)
       return false;
 
-    // In production, this would make an internal RPC or read a shared session
-    // store. We assume the caller validated it (or we mock validation for this
-    // sandbox). The exact token parsing would read \`auth_sessions.json\` or
-    // similar. For now we simulate success if the token is 64 characters long
-    // (sha256 hex).
-    if (std::strlen(token) == 64) {
-      return true;
+    // Real validation: token must be hex sha256 (64 chars) AND exist in
+    // auth_sessions.json. No simulated/mock validation permitted.
+    if (std::strlen(token) != 64)
+      return false;
+
+    // Validate hex characters
+    for (size_t i = 0; i < 64; ++i) {
+      char c = token[i];
+      if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') ||
+            (c >= 'A' && c <= 'F')))
+        return false;
     }
-    return false;
+
+    // Read auth_sessions.json and verify token exists
+    FILE *f = std::fopen("config/auth_sessions.json", "r");
+    if (!f)
+      return false;
+
+    char buf[16384] = {0};
+    std::fread(buf, 1, sizeof(buf) - 1, f);
+    std::fclose(f);
+
+    // Search for the token string in the sessions file
+    return std::strstr(buf, token) != nullptr;
   }
 };
 

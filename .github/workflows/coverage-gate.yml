@@ -26,8 +26,13 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}
       YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
+      YGB_ENV: test
     steps:
       - uses: actions/checkout@v4
+
+      # ========== PHASE 2: Show commit for debugging ==========
+      - name: Show commit
+        run: git log -1 --oneline
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -44,18 +49,38 @@ jobs:
           sudo apt-get update -q
           sudo apt-get install -y gcovr g++
 
+      # ========== PHASE 1: Install ALL Python dependencies ==========
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Install Python dependencies
         run: |
-          pip install pytest pytest-cov coverage gcovr
-          pip install -r requirements.txt || true
+          pip install numpy
+          pip install pytest pytest-cov pytest-asyncio coverage gcovr
+          pip install pycryptodome bcrypt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
+
+      # ========== PHASE 1: Verify numpy ==========
+      - name: Verify numpy
+        run: python -c "import numpy; print('numpy', numpy.__version__)"
+
+      # ========== PHASE 4: Verify _validate_structure exists ==========
+      - name: Verify _validate_structure
+        run: grep "_validate_structure" backend/api/runtime_api.py
 
       # ========== STEP 0: ENVIRONMENT VALIDATION ==========
       - name: Validate environment
         run: |
           echo "=== Environment ==="
+          echo "::add-mask::$YGB_HMAC_SECRET"
           pwd
           echo "PYTHONPATH: $PYTHONPATH"
-          echo "YGB_HMAC_SECRET configured: $([ -n \"$YGB_HMAC_SECRET\" ] && echo YES || echo NO)"
+          if [ -z "$YGB_HMAC_SECRET" ]; then
+            echo "FATAL: YGB_HMAC_SECRET not configured"
+            exit 1
+          fi
+          echo "YGB_HMAC_SECRET configured: YES (masked)"
           test -d backend || { echo "FATAL: backend/ not found"; exit 1; }
           test -f backend/__init__.py || { echo "FATAL: backend/__init__.py missing"; exit 1; }
           test -f backend/tests/__init__.py || { echo "FATAL: backend/tests/__init__.py missing"; exit 1; }
@@ -103,7 +128,7 @@ jobs:
           echo "=== JS/TS COVERAGE ==="
           if [ -d frontend ]; then
             cd frontend
-            npm ci
+            npm ci --legacy-peer-deps
             npm test -- --coverage 2>&1 || true
             test -f coverage/coverage-summary.json || echo "WARNING: coverage-summary.json not generated"
           else
@@ -131,18 +156,34 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}
       YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
+      YGB_ENV: test
     steps:
       - uses: actions/checkout@v4
+
+      - name: Show commit
+        run: git log -1 --oneline
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
       - name: Install dependencies
         run: |
-          pip install pytest pytest-cov
-          pip install -r requirements.txt || true
+          pip install numpy
+          pip install pytest pytest-cov pytest-asyncio
+          pip install pycryptodome bcrypt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
+
+      - name: Verify numpy
+        run: python -c "import numpy; print('numpy', numpy.__version__)"
+
+      - name: Verify _validate_structure
+        run: grep "_validate_structure" backend/api/runtime_api.py
 
       - name: Validate environment
         run: |

@@ -1,0 +1,10 @@
+{
+    "trusted_devices": [],
+    "description": "Pre-approved devices for auto-pairing. Add device_id entries here.",
+    "example_entry": {
+        "device_id": "abc123...",
+        "name": "Admin Workstation",
+        "added_at": 0,
+        "added_by": "admin"
+    }
+}

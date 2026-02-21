@@ -41,6 +41,7 @@ from backend.api.runtime_api import (
     HMAC_KEY_PATH,
     LAST_SEEN_PATH,
     EXPECTED_SCHEMA_VERSION,
+    EXPECTED_HMAC_VERSION,
 )
 
 # =========================================================================
@@ -52,7 +53,7 @@ def make_valid_payload():
     payload = {
         'schema_version': 1,
         'determinism_status': True,
-        'freeze_status': True,
+        'freeze_status': False,
         'precision': 0.96500000,
         'recall': 0.93000000,
         'kl_divergence': 0.01500000,
@@ -63,6 +64,7 @@ def make_valid_payload():
         'batch_size': 64,
         'timestamp': 1700000000,
         'monotonic_timestamp': 99999999,
+        'hmac_version': EXPECTED_HMAC_VERSION,
     }
     payload['crc32'] = compute_payload_crc(payload)
     payload['hmac'] = compute_payload_hmac(payload)

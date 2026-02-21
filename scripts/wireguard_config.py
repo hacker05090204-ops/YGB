@@ -1,111 +1,170 @@
 """
-wireguard_config.py — WireGuard Mesh Config Generator
-=====================================================
+wireguard_config.py — WireGuard Auto-Configuration Script
 
-Generates wg0.conf files for each device in the mesh.
-IP range: 10.0.0.0/24 (max 254 devices).
-Reads device list from config/devices.json.
-Outputs configs to config/wireguard/<device_id>.conf.
+Only runs AFTER device certificate is issued.
+Reads device cert and generates wg0.conf.
 
-MANUAL STEPS REQUIRED:
-  1. Install WireGuard on each device
-  2. Copy generated config to /etc/wireguard/wg0.conf
-  3. Enable: wg-quick up wg0
-  4. Configure firewall to block all public inbound except WireGuard port
+NO config without valid certificate.
+Authority pushes config only after cert issuance.
 """
 
-import os
 import json
+import os
 import sys
+import time
+
+# =========================================================================
+# PATHS
+# =========================================================================
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEVICES_PATH = os.path.join(PROJECT_ROOT, "config", "devices.json")
-OUTPUT_DIR = os.path.join(PROJECT_ROOT, "config", "wireguard")
-MESH_SUBNET = "10.0.0"
-LISTEN_PORT = 51820
+CERT_PATH = os.path.join(PROJECT_ROOT, 'storage', 'certs', 'device_cert.json')
+WG_CONFIG_PATH = os.path.join(PROJECT_ROOT, 'config', 'wg0.conf')
+PRIVATE_KEY_PATH = os.path.join(
+    PROJECT_ROOT, 'config', 'device_identity', 'device_private.key')
+PUBLIC_KEY_PATH = os.path.join(
+    PROJECT_ROOT, 'config', 'device_identity', 'device_public.key')
+
+# =========================================================================
+# AUTHORITY ENDPOINT (configurable via env)
+# =========================================================================
+
+AUTHORITY_ENDPOINT = os.environ.get(
+    'YGB_AUTHORITY_ENDPOINT', '10.0.0.1:51820')
+AUTHORITY_PUBLIC_KEY = os.environ.get(
+    'YGB_AUTHORITY_PUBKEY', '')
+WG_LISTEN_PORT = 51820
+WG_DNS = '10.0.0.1'
 
 
-def load_devices() -> list:
-    """Load device registry."""
-    if not os.path.exists(DEVICES_PATH):
-        print(f"ERROR: {DEVICES_PATH} not found. Run pairing first.")
-        return []
-    with open(DEVICES_PATH) as f:
-        return json.load(f).get("devices", [])
+# =========================================================================
+# CERTIFICATE VALIDATION
+# =========================================================================
+
+def load_certificate() -> dict:
+    """Load and validate device certificate."""
+    if not os.path.exists(CERT_PATH):
+        print("[WG-CONFIG] ERROR: No device certificate found.")
+        print(f"           Expected at: {CERT_PATH}")
+        print("           Run device bootstrap first.")
+        sys.exit(1)
+
+    with open(CERT_PATH, 'r') as f:
+        cert = json.load(f)
+
+    required_fields = ['device_id', 'role', 'mesh_ip', 'issued_at',
+                       'expires_at', 'signature']
+    missing = [f for f in required_fields if f not in cert]
+    if missing:
+        print(f"[WG-CONFIG] ERROR: Certificate missing fields: {missing}")
+        sys.exit(1)
+
+    # Check expiry
+    if cert['expires_at'] < int(time.time()):
+        print("[WG-CONFIG] ERROR: Device certificate has expired.")
+        print("           Re-run device bootstrap to get a new certificate.")
+        sys.exit(1)
+
+    return cert
 
 
-def generate_configs(devices: list):
-    """Generate WireGuard config for each device."""
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+def load_private_key() -> str:
+    """Load device private key."""
+    if not os.path.exists(PRIVATE_KEY_PATH):
+        print("[WG-CONFIG] ERROR: No device private key found.")
+        sys.exit(1)
+    with open(PRIVATE_KEY_PATH, 'r') as f:
+        return f.read().strip()
 
-    if not devices:
-        print("No devices registered. Nothing to generate.")
-        return
 
-    for i, device in enumerate(devices):
-        device_id = device.get("device_id", f"device_{i}")
-        ip = f"{MESH_SUBNET}.{i + 1}"
+# =========================================================================
+# WIREGUARD CONFIGURATION GENERATION
+# =========================================================================
 
-        # Generate config
-        conf_lines = [
-            "[Interface]",
-            f"# Device: {device_id}",
-            f"Address = {ip}/24",
-            f"ListenPort = {LISTEN_PORT}",
-            f"# PrivateKey = <PASTE DEVICE PRIVATE KEY HERE>",
-            "",
-        ]
+def generate_wg_config(cert: dict, private_key: str) -> str:
+    """Generate wg0.conf contents."""
+    mesh_ip = cert['mesh_ip']
+    device_id = cert['device_id']
 
-        # Add peers (all other devices)
-        for j, peer in enumerate(devices):
-            if j == i:
-                continue
-            peer_id = peer.get("device_id", f"device_{j}")
-            peer_ip = f"{MESH_SUBNET}.{j + 1}"
-            conf_lines.extend([
-                f"[Peer]",
-                f"# {peer_id}",
-                f"# PublicKey = <PASTE {peer_id} PUBLIC KEY HERE>",
-                f"AllowedIPs = {peer_ip}/32",
-                f"PersistentKeepalive = 25",
-                "",
-            ])
+    config = f"""# WireGuard Configuration — Auto-generated by device bootstrap
+# Device ID: {device_id}
+# Role: {cert['role']}
+# Generated: {int(time.time())}
+# Expires: {cert['expires_at']}
+#
+# DO NOT EDIT MANUALLY. Re-run bootstrap to regenerate.
 
-        # Write config
-        conf_path = os.path.join(OUTPUT_DIR, f"{device_id}.conf")
-        with open(conf_path, "w") as f:
-            f.write("\n".join(conf_lines))
-        print(f"  Generated: {conf_path}")
+[Interface]
+PrivateKey = {private_key}
+Address = {mesh_ip}/24
+ListenPort = {WG_LISTEN_PORT}
+DNS = {WG_DNS}
 
-    # Write firewall rules template
-    fw_path = os.path.join(OUTPUT_DIR, "firewall_rules.sh")
-    with open(fw_path, "w") as f:
-        f.write("#!/bin/bash\n")
-        f.write("# Firewall rules for WireGuard mesh\n")
-        f.write("# Run on each device after WireGuard is configured\n\n")
-        f.write(f"# Allow WireGuard\n")
-        f.write(f"sudo ufw allow {LISTEN_PORT}/udp\n\n")
-        f.write(f"# Allow mesh traffic\n")
-        f.write(f"sudo ufw allow from {MESH_SUBNET}.0/24\n\n")
-        f.write(f"# Block all other inbound\n")
-        f.write(f"sudo ufw default deny incoming\n")
-        f.write(f"sudo ufw default allow outgoing\n")
-        f.write(f"sudo ufw enable\n")
-    print(f"  Generated: {fw_path}")
+[Peer]
+# Authority Node
+PublicKey = {AUTHORITY_PUBLIC_KEY}
+Endpoint = {AUTHORITY_ENDPOINT}
+AllowedIPs = 10.0.0.0/24
+PersistentKeepalive = 25
+"""
+    return config
 
+
+def write_wg_config(config: str):
+    """Write WireGuard configuration file."""
+    os.makedirs(os.path.dirname(WG_CONFIG_PATH), exist_ok=True)
+    with open(WG_CONFIG_PATH, 'w') as f:
+        f.write(config)
+
+    # Restrict permissions
+    if os.name != 'nt':
+        os.chmod(WG_CONFIG_PATH, 0o600)
+
+    print(f"[WG-CONFIG] Configuration written to: {WG_CONFIG_PATH}")
+
+
+# =========================================================================
+# MAIN
+# =========================================================================
 
 def main():
-    print("=== WireGuard Mesh Config Generator ===")
-    devices = load_devices()
-    print(f"  Devices registered: {len(devices)}")
-    generate_configs(devices)
-    print("\nDone. Manual steps:")
-    print("  1. Install WireGuard: sudo apt install wireguard")
-    print("  2. Generate keys: wg genkey | tee privatekey | wg pubkey > publickey")
-    print("  3. Edit config with real keys")
-    print("  4. Copy to /etc/wireguard/wg0.conf")
-    print("  5. Enable: sudo wg-quick up wg0")
+    print("\n========================================")
+    print("  WireGuard Auto-Configuration")
+    print("========================================\n")
+
+    # Step 1: Load and validate certificate
+    print("[WG-CONFIG] Loading device certificate...")
+    cert = load_certificate()
+    print(f"  Device ID: {cert['device_id'][:16]}...")
+    print(f"  Role: {cert['role']}")
+    print(f"  Mesh IP: {cert['mesh_ip']}")
+
+    # Step 2: Load private key
+    print("[WG-CONFIG] Loading device private key...")
+    private_key = load_private_key()
+    print("  Private key: loaded")
+
+    # Step 3: Generate config
+    print("[WG-CONFIG] Generating wg0.conf...")
+    config = generate_wg_config(cert, private_key)
+    write_wg_config(config)
+
+    # Step 4: Log result
+    print("\n[WG-CONFIG] ✅ WireGuard configured successfully.")
+    print(f"  Interface: wg0")
+    print(f"  Address: {cert['mesh_ip']}/24")
+    print(f"  Authority: {AUTHORITY_ENDPOINT}")
+
+    if not AUTHORITY_PUBLIC_KEY:
+        print("\n[WG-CONFIG] ⚠️  YGB_AUTHORITY_PUBKEY not set.")
+        print("  Set it to the authority's WireGuard public key.")
+
+    print("\nTo activate WireGuard:")
+    if os.name == 'nt':
+        print("  Import wg0.conf into WireGuard client")
+    else:
+        print("  sudo wg-quick up config/wg0.conf")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

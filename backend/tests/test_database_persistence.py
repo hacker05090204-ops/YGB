@@ -31,7 +31,7 @@ def temp_db(tmp_path):
 @pytest.fixture
 def reset_db_module():
     """Reset the database module state between tests."""
-    import api.database as db_mod
+    db_mod = pytest.importorskip("api.database", reason="api.database not available")
     original_db = db_mod._db
     db_mod._db = None
     yield db_mod

@@ -1,0 +1,5 @@
+{
+    "revoked_devices": [],
+    "last_updated": 0,
+    "description": "Revoked device IDs. Devices in this list are denied all access."
+}

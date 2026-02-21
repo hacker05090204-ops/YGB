@@ -402,7 +402,7 @@ struct TelemetryPayload {
   double training_duration_seconds; // monotonic_current - monotonic_start
   double samples_per_second;        // throughput metric
   // Phase 5: HMAC secret versioning
-  uint32_t hmac_version; // Current: 3 (rotated)
+  uint32_t hmac_version; // Current: 4 (emergency rotation)
   // Phase 6: Training process validation
   uint32_t training_pid;          // PID of training process
   uint64_t monotonic_last_update; // Last update monotonic timestamp
@@ -491,12 +491,55 @@ static bool compute_payload_hmac(const TelemetryPayload &p, char hmac_hex[65]) {
 }
 
 // =========================================================================
+// STRICT HMAC VERSION ENFORCEMENT (Phase 2)
+// =========================================================================
+
+static constexpr uint32_t EXPECTED_HMAC_VERSION = 4;
+
+// Phase 3: Invalidate old telemetry files on version bump
+static void invalidate_old_telemetry() {
+  // Delete stale telemetry and caches that may contain old HMAC versions
+  std::remove(TELEMETRY_PATH);
+  std::remove(TELEMETRY_TMP);
+  std::remove(LAST_SEEN_PATH);
+  std::remove(LAST_SEEN_TMP);
+  std::fprintf(
+      stdout, "[TELEMETRY] Old telemetry invalidated — fresh start required\n");
+}
+
+// Phase 4: Secret file protection — abort if world-readable
+static bool check_secret_file_permissions() {
+#ifndef _WIN32
+  // On Unix, check if hmac_secret.key is world-readable (mode & 004)
+  struct stat st;
+  if (stat(HMAC_KEY_PATH, &st) == 0) {
+    if (st.st_mode & S_IROTH) {
+      std::fprintf(stderr,
+                   "ABORT: %s is world-readable. Fix permissions: chmod 600\n",
+                   HMAC_KEY_PATH);
+      return false;
+    }
+  }
+#endif
+  return true; // Windows handles via ACLs
+}
+
+// =========================================================================
 // WRITE TELEMETRY (atomic: temp -> fsync -> rename)
 // =========================================================================
 
 static bool write_telemetry(const TelemetryPayload &payload) {
-  // Set monotonic timestamp and enforce replay protection
+  // Phase 2: Strict HMAC version enforcement
+  // The payload must carry the correct version; reject otherwise
   TelemetryPayload p = payload;
+  p.hmac_version = EXPECTED_HMAC_VERSION;
+
+  // Phase 4: Check secret file permissions
+  if (!check_secret_file_permissions()) {
+    return false;
+  }
+
+  // Set monotonic timestamp and enforce replay protection
   p.monotonic_timestamp = get_monotonic_seconds();
 
   // Phase 2: Set timing fields

@@ -32,6 +32,7 @@ from backend.api.runtime_api import (
     compute_payload_hmac,
     load_hmac_key,
     EXPECTED_SCHEMA_VERSION,
+    EXPECTED_HMAC_VERSION,
     TELEMETRY_PATH,
     LAST_SEEN_PATH,
 )
@@ -89,6 +90,7 @@ class RuntimeSafetyTest:
             "batch_size": 64,
             "timestamp": 1700000000,
             "monotonic_timestamp": 99999999,
+            "hmac_version": EXPECTED_HMAC_VERSION,
         }
         payload["crc32"] = compute_payload_crc(payload)
         payload["hmac"] = compute_payload_hmac(payload)

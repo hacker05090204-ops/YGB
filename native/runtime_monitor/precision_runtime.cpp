@@ -17,6 +17,7 @@
  * NO mock data. NO auto-submit. NO authority unlock.
  */
 
+#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -30,8 +31,8 @@ static constexpr double DUPLICATE_ALERT = 0.20;
 
 // Thermal thresholds
 static constexpr double THERMAL_THROTTLE_TEMP = 83.0; // °C — reduce batch size
-static constexpr double THERMAL_PAUSE_TEMP = 88.0;    // °C — pause training
-static constexpr double THERMAL_RESUME_TEMP = 75.0;   // °C — resume normal
+static constexpr double THERMAL_PAUSE_TEMP    = 88.0; // °C — pause training
+static constexpr double THERMAL_RESUME_TEMP   = 75.0; // °C — resume normal
 static constexpr double THERMAL_BATCH_REDUCTION = 0.20; // 20% reduction
 
 enum class GpuStatus : uint8_t {
@@ -50,8 +51,8 @@ enum class ContainmentAction : uint8_t {
 
 enum class ThermalState : uint8_t {
   THERMAL_NORMAL = 0,
-  THERMAL_THROTTLE = 1, // >83°C — batch reduced
-  THERMAL_PAUSE = 2     // >88°C — training paused
+  THERMAL_THROTTLE = 1,  // >83°C — batch reduced
+  THERMAL_PAUSE = 2      // >88°C — training paused
 };
 
 struct RuntimeMetrics {
@@ -144,9 +145,10 @@ public:
       // >88°C — PAUSE training
       if (metrics_.thermal_state != ThermalState::THERMAL_PAUSE) {
         metrics_.thermal_state = ThermalState::THERMAL_PAUSE;
-        std::snprintf(metrics_.thermal_reason, sizeof(metrics_.thermal_reason),
-                      "THERMAL_PAUSE: %.1f°C > %.1f°C — training paused", temp,
-                      THERMAL_PAUSE_TEMP);
+        std::snprintf(metrics_.thermal_reason,
+                      sizeof(metrics_.thermal_reason),
+                      "THERMAL_PAUSE: %.1f°C > %.1f°C — training paused",
+                      temp, THERMAL_PAUSE_TEMP);
       }
     } else if (temp > THERMAL_THROTTLE_TEMP) {
       // >83°C — THROTTLE: reduce batch size by 20%
@@ -156,16 +158,17 @@ public:
         if (metrics_.batch_size_original > 0) {
           int32_t reduced = static_cast<int32_t>(
               metrics_.batch_size_original * (1.0 - THERMAL_BATCH_REDUCTION));
-          if (reduced < 1)
-            reduced = 1;
+          if (reduced < 1) reduced = 1;
           metrics_.batch_size_current = reduced;
         }
-        std::snprintf(
-            metrics_.thermal_reason, sizeof(metrics_.thermal_reason),
-            "THERMAL_THROTTLE: %.1f°C > %.1f°C — batch reduced by "
-            "%.0f%%, now %d (was %d)",
-            temp, THERMAL_THROTTLE_TEMP, THERMAL_BATCH_REDUCTION * 100.0,
-            metrics_.batch_size_current, metrics_.batch_size_original);
+        std::snprintf(metrics_.thermal_reason,
+                      sizeof(metrics_.thermal_reason),
+                      "THERMAL_THROTTLE: %.1f°C > %.1f°C — batch reduced by "
+                      "%.0f%%, now %d (was %d)",
+                      temp, THERMAL_THROTTLE_TEMP,
+                      THERMAL_BATCH_REDUCTION * 100.0,
+                      metrics_.batch_size_current,
+                      metrics_.batch_size_original);
       }
     } else if (temp < THERMAL_RESUME_TEMP) {
       // <75°C — RESUME normal
@@ -173,9 +176,10 @@ public:
         metrics_.thermal_state = ThermalState::THERMAL_NORMAL;
         metrics_.batch_reduction_pct = 0.0;
         metrics_.batch_size_current = metrics_.batch_size_original;
-        std::snprintf(metrics_.thermal_reason, sizeof(metrics_.thermal_reason),
-                      "THERMAL_NORMAL: %.1f°C < %.1f°C — resumed normal", temp,
-                      THERMAL_RESUME_TEMP);
+        std::snprintf(metrics_.thermal_reason,
+                      sizeof(metrics_.thermal_reason),
+                      "THERMAL_NORMAL: %.1f°C < %.1f°C — resumed normal",
+                      temp, THERMAL_RESUME_TEMP);
       }
     }
     // Between 75-83°C: maintain current state (hysteresis zone)

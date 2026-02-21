@@ -30,11 +30,16 @@
 
 namespace training_gate {
 
-static constexpr uint32_t EXPECTED_HMAC_VERSION = 3;
+static constexpr uint32_t EXPECTED_HMAC_VERSION = 4;
 static constexpr double MAX_GPU_TEMP = 90.0;
 static constexpr double MAX_CPU_TEMP = 95.0;
+static constexpr char KNOWN_DEMO_KEY[] =
+    "0000000000000000000000000000000000000000000000000000000000000000";
+static constexpr char TELEMETRY_PATH[] = "reports/training_telemetry.json";
 
 struct PreflightResult {
+  bool production_env;
+  bool no_demo_key;
   bool storage_accessible;
   bool heartbeat_quorum;
   bool wireguard_active;
@@ -43,11 +48,13 @@ struct PreflightResult {
   bool disk_encrypted;
   bool thermal_ok;
   bool governance_unlocked;
+  bool no_old_telemetry;
 
   bool all_passed() const {
-    return storage_accessible && heartbeat_quorum && wireguard_active &&
-           device_registered && hmac_version_ok && disk_encrypted &&
-           thermal_ok && governance_unlocked;
+    return production_env && no_demo_key && storage_accessible &&
+           heartbeat_quorum && wireguard_active && device_registered &&
+           hmac_version_ok && disk_encrypted && thermal_ok &&
+           governance_unlocked && no_old_telemetry;
   }
 };
 
@@ -132,9 +139,46 @@ static bool check_governance_unlocked() {
 // MAIN PREFLIGHT
 // =========================================================================
 
+// Phase 6: Production environment check
+static bool check_production_env() {
+  const char *env = std::getenv("YGB_ENV");
+  return env && std::strcmp(env, "production") == 0;
+}
+
+// Phase 6: Demo key detection
+static bool check_no_demo_key() {
+  const char *key = std::getenv("YGB_HMAC_SECRET");
+  if (!key)
+    return false;
+  return std::strcmp(key, KNOWN_DEMO_KEY) != 0;
+}
+
+// Phase 6: Reject telemetry with old HMAC version
+static bool check_no_old_telemetry() {
+  FILE *f = std::fopen(TELEMETRY_PATH, "r");
+  if (!f)
+    return true; // No telemetry = clean state
+  char buf[4096] = {0};
+  std::fread(buf, 1, sizeof(buf) - 1, f);
+  std::fclose(f);
+  // Look for hmac_version field — if present and != 4, reject
+  const char *pos = std::strstr(buf, "hmac_version");
+  if (!pos)
+    return true;
+  // skip to the number
+  pos += 12;
+  while (*pos && (*pos == '"' || *pos == ':' || *pos == ' '))
+    ++pos;
+  int ver = 0;
+  std::sscanf(pos, "%d", &ver);
+  return ver == 0 || static_cast<uint32_t>(ver) == EXPECTED_HMAC_VERSION;
+}
+
 static PreflightResult run_preflight(uint32_t hmac_version, double gpu_temp,
                                      double cpu_temp) {
   PreflightResult result;
+  result.production_env = check_production_env();
+  result.no_demo_key = check_no_demo_key();
   result.storage_accessible = check_storage_accessible();
   result.heartbeat_quorum = check_heartbeat_quorum();
   result.wireguard_active = check_wireguard_active();
@@ -143,11 +187,16 @@ static PreflightResult run_preflight(uint32_t hmac_version, double gpu_temp,
   result.disk_encrypted = check_disk_encryption();
   result.thermal_ok = check_thermal(gpu_temp, cpu_temp);
   result.governance_unlocked = check_governance_unlocked();
+  result.no_old_telemetry = check_no_old_telemetry();
   return result;
 }
 
 static void log_preflight(const PreflightResult &r) {
-  std::fprintf(stdout, "[TRAINING GATE] Preflight Results:\n");
+  std::fprintf(stdout, "[TRAINING GATE] Production Preflight:\n");
+  std::fprintf(stdout, "  YGB_ENV=production:  %s\n",
+               r.production_env ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  No demo key:         %s\n",
+               r.no_demo_key ? "PASS" : "FAIL");
   std::fprintf(stdout, "  Storage accessible:  %s\n",
                r.storage_accessible ? "PASS" : "FAIL");
   std::fprintf(stdout, "  Heartbeat quorum:    %s\n",
@@ -164,6 +213,8 @@ static void log_preflight(const PreflightResult &r) {
                r.thermal_ok ? "PASS" : "FAIL");
   std::fprintf(stdout, "  Governance unlocked: %s\n",
                r.governance_unlocked ? "PASS" : "FAIL");
+  std::fprintf(stdout, "  No old telemetry:    %s\n",
+               r.no_old_telemetry ? "PASS" : "FAIL");
   std::fprintf(stdout, "  OVERALL:             %s\n",
                r.all_passed() ? "MODE_A ALLOWED" : "MODE_A BLOCKED");
 }
