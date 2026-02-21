@@ -238,10 +238,17 @@ def destroy_session(token: str):
 # =========================================================================
 
 def _get_jwt_secret() -> str:
-    """Get JWT signing secret from environment."""
+    """Get JWT signing secret from environment.
+
+    If not configured, auto-generates a random 32-byte hex secret.
+    Auto-generated secrets persist for the server session only.
+    Regeneration invalidates all JWTs — no data corruption.
+    """
     secret = os.environ.get('YGB_JWT_SECRET', '').strip()
     if not secret:
-        raise RuntimeError("YGB_JWT_SECRET not configured")
+        # Auto-generate and persist for this server session
+        secret = secrets.token_hex(32)
+        os.environ['YGB_JWT_SECRET'] = secret
     return secret
 
 

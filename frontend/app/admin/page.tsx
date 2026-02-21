@@ -10,9 +10,11 @@ export default function AdminLogin() {
     const router = useRouter()
     const [email, setEmail] = useState("")
     const [totpCode, setTotpCode] = useState("")
+    const [vaultPassword, setVaultPassword] = useState("")
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
     const [showCode, setShowCode] = useState(false)
+    const [showVaultPass, setShowVaultPass] = useState(false)
     const [attemptsLeft, setAttemptsLeft] = useState(5)
     const [lockedUntil, setLockedUntil] = useState<number | null>(null)
 
@@ -66,6 +68,25 @@ export default function AdminLogin() {
                 if (data.jwt_token) {
                     localStorage.setItem("ygb_jwt", data.jwt_token)
                 }
+
+                // Unlock vault with password (server-side key derivation)
+                if (vaultPassword) {
+                    try {
+                        await fetch(`${API_BASE}/admin/vault-unlock`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${data.session_token}`,
+                            },
+                            body: JSON.stringify({ vault_password: vaultPassword }),
+                        })
+                    } catch {
+                        // Vault unlock is best-effort — login still succeeds
+                    }
+                }
+
+                // Clear vault password from memory immediately
+                setVaultPassword("")
                 router.push("/admin/panel")
             } else if (data.status === "locked_out") {
                 setLockedUntil(Date.now() / 1000 + 1800)
@@ -79,6 +100,7 @@ export default function AdminLogin() {
         } finally {
             setLoading(false)
             setTotpCode("")
+            setVaultPassword("")  // Always clear vault password
         }
     }
 
@@ -171,6 +193,33 @@ export default function AdminLogin() {
                             </div>
                             <p className="mt-1 text-xs text-white/30">
                                 {attemptsLeft < 5 && `${attemptsLeft} attempts remaining`}
+                            </p>
+                        </div>
+
+                        {/* Vault Password */}
+                        <div>
+                            <label className="block text-sm font-medium text-white/60 mb-1.5">
+                                Vault Password
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type={showVaultPass ? "text" : "password"}
+                                    value={vaultPassword}
+                                    onChange={(e) => setVaultPassword(e.target.value)}
+                                    placeholder="Vault encryption password"
+                                    disabled={!!lockedUntil}
+                                    className="w-full px-4 py-3 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all disabled:opacity-40"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowVaultPass(!showVaultPass)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60"
+                                >
+                                    {showVaultPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                            </div>
+                            <p className="mt-1 text-xs text-white/25">
+                                Optional — unlocks encrypted vault on login
                             </p>
                         </div>
 

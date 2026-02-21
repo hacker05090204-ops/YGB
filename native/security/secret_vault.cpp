@@ -3,7 +3,7 @@
  *
  * Features:
  *   - AES-256-GCM encryption (no external deps, portable impl)
- *   - Master key loaded from environment (YGB_VAULT_KEY)
+ *   - Master key injected via vault_set_master_key() API (PBKDF2-derived)
  *   - Encrypted storage in ./secure_data/
  *   - Per-user data isolation (user_id scoping)
  *   - Startup permission check (abort if world-readable)
@@ -23,7 +23,6 @@
 #ifdef _WIN32
 #include <wincrypt.h>
 #include <windows.h>
-
 
 #else
 #include <sys/stat.h>
@@ -355,24 +354,55 @@ struct VaultResult {
 };
 
 // =========================================================================
-// MASTER KEY
+// MASTER KEY — API-injected (from PBKDF2 derivation in Python layer)
 // =========================================================================
 
+static uint8_t g_master_key[32] = {0};
+static bool g_master_key_set = false;
+
+// Set the master key from an external source (Python PBKDF2 derivation).
+// Key must be exactly 32 bytes (AES-256).
+void vault_set_master_key(const uint8_t key[32]) {
+  std::memcpy(g_master_key, key, 32);
+  g_master_key_set = true;
+  std::fprintf(stderr, "[VAULT] Master key set via API\n");
+}
+
+// Securely clear the master key from memory.
+void vault_clear_master_key() {
+  volatile uint8_t *p = g_master_key;
+  for (int i = 0; i < 32; ++i)
+    p[i] = 0;
+  g_master_key_set = false;
+  std::fprintf(stderr, "[VAULT] Master key cleared\n");
+}
+
+// Check if vault is unlocked (master key set).
+bool vault_is_unlocked() { return g_master_key_set; }
+
 static bool load_master_key(uint8_t key[32]) {
+  // Primary: use API-injected key (from PBKDF2 derivation)
+  if (g_master_key_set) {
+    std::memcpy(key, g_master_key, 32);
+    return true;
+  }
+
+  // Fallback: legacy env var (for backward compatibility during migration)
   const char *env = std::getenv("YGB_VAULT_KEY");
-  if (!env || std::strlen(env) == 0) {
-    std::fprintf(stderr, "[VAULT] FATAL: YGB_VAULT_KEY not set\n");
-    return false;
+  if (env && std::strlen(env) > 0) {
+    std::fprintf(stderr, "[VAULT] WARNING: Using legacy YGB_VAULT_KEY env var. "
+                         "Migrate to password-derived key.\n");
+    if (std::strlen(env) == 64) {
+      return hex_to_bytes(env, key, 32);
+    }
+    sha256((const uint8_t *)env, std::strlen(env), key);
+    return true;
   }
 
-  // If hex (64 chars), decode directly
-  if (std::strlen(env) == 64) {
-    return hex_to_bytes(env, key, 32);
-  }
-
-  // Otherwise, derive via SHA-256
-  sha256((const uint8_t *)env, std::strlen(env), key);
-  return true;
+  std::fprintf(stderr,
+               "[VAULT] FATAL: No master key. Call vault_set_master_key() "
+               "or set YGB_VAULT_KEY.\n");
+  return false;
 }
 
 // =========================================================================
