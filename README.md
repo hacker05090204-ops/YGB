@@ -1,4 +1,4 @@
-# 🎯 YGB - Bug Bounty Research System
+# 🎯 YGB - Bug Research System
 
 A comprehensive bug bounty research platform with AI-powered target discovery, execution governance, and voice controls.
 
@@ -136,3 +136,4 @@ All actions are governed by Phase-49 security model:
 <p align="center">
   <b>Built with ❤️ for security researchers</b>
 </p>
+
