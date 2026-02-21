@@ -45,6 +45,9 @@ class SpeedTelemetry:
     mode_a_time: float = 0.0
     mode_b_time: float = 0.0
     amp_enabled: bool = False
+    vram_peak_mb: float = 0.0
+    batch_size: int = 0
+    gpu_count: int = 0
     total_epochs: int = 0
     total_samples: int = 0
     avg_epoch_time: float = 0.0
@@ -66,7 +69,9 @@ def get_gpu_utilization() -> dict:
         'gpu_util_pct': 0.0,
         'memory_used_mb': 0.0,
         'memory_total_mb': 0.0,
+        'memory_peak_mb': 0.0,
         'available': False,
+        'gpu_count': 0,
     }
     
     try:
@@ -75,7 +80,9 @@ def get_gpu_utilization() -> dict:
             return result
         
         result['available'] = True
+        result['gpu_count'] = torch.cuda.device_count()
         result['memory_used_mb'] = torch.cuda.memory_allocated() / (1024 * 1024)
+        result['memory_peak_mb'] = torch.cuda.max_memory_allocated() / (1024 * 1024)
         result['memory_total_mb'] = torch.cuda.get_device_properties(0).total_mem / (1024 * 1024)
         
         # GPU utilization from memory ratio (approximate)

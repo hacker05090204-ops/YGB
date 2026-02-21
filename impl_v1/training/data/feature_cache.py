@@ -13,8 +13,10 @@ Deterministic: Same config + seed always produces same cache.
 import hashlib
 import json
 import os
+import sys
 import time
 import logging
+from contextlib import contextmanager
 from typing import Optional, Tuple
 
 import numpy as np
@@ -34,13 +36,25 @@ CACHE_DIR = os.path.join(PROJECT_ROOT, 'secure_data', 'feature_cache')
 # HASH COMPUTATION
 # =============================================================================
 
+def _get_gpu_architecture() -> str:
+    """Get GPU architecture string for cache keying."""
+    try:
+        import torch
+        if torch.cuda.is_available():
+            props = torch.cuda.get_device_properties(0)
+            return f"{props.name}_cc{props.major}.{props.minor}"
+    except Exception:
+        pass
+    return "cpu"
+
+
 def compute_dataset_hash(
     total_samples: int = 20000,
     seed: int = 42,
     feature_dim: int = 256,
     extra_config: dict = None,
 ) -> str:
-    """Compute SHA-256 hash of dataset configuration.
+    """Compute SHA-256 hash of dataset configuration + GPU architecture.
     
     Args:
         total_samples: Number of samples in dataset.
@@ -55,6 +69,7 @@ def compute_dataset_hash(
         'total_samples': total_samples,
         'seed': seed,
         'feature_dim': feature_dim,
+        'gpu_architecture': _get_gpu_architecture(),
     }
     if extra_config:
         config.update(extra_config)
@@ -70,6 +85,48 @@ def compute_dataset_hash(
 def _cache_path(dataset_hash: str) -> str:
     """Get cache file path for a given dataset hash."""
     return os.path.join(CACHE_DIR, f'{dataset_hash}.npz')
+
+
+def _lock_path(dataset_hash: str) -> str:
+    """Get lock file path for concurrent write prevention."""
+    return os.path.join(CACHE_DIR, f'{dataset_hash}.lock')
+
+
+@contextmanager
+def _file_lock(dataset_hash: str):
+    """Cross-platform file lock for cache write prevention."""
+    lock_file = _lock_path(dataset_hash)
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    
+    fd = None
+    try:
+        fd = open(lock_file, 'w')
+        if sys.platform == 'win32':
+            import msvcrt
+            msvcrt.locking(fd.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        yield
+    except (IOError, OSError):
+        logger.warning("[CACHE] Lock contention — another process is writing")
+        yield  # Proceed without lock (graceful degradation)
+    finally:
+        if fd:
+            try:
+                if sys.platform == 'win32':
+                    import msvcrt
+                    msvcrt.locking(fd.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(fd.fileno(), fcntl.LOCK_UN)
+            except Exception:
+                pass
+            fd.close()
+            try:
+                os.remove(lock_file)
+            except Exception:
+                pass
 
 
 def cache_exists(dataset_hash: str) -> bool:
@@ -94,26 +151,27 @@ def save_to_cache(
     Returns:
         Path to saved cache file.
     """
-    os.makedirs(CACHE_DIR, exist_ok=True)
-    path = _cache_path(dataset_hash)
-    
-    save_dict = {
-        'features': features,
-        'labels': labels,
-        'hash': np.array([dataset_hash], dtype='U64'),
-        'created_at': np.array([time.time()]),
-    }
-    
-    if metadata:
-        save_dict['metadata'] = np.array([json.dumps(metadata)], dtype='U1024')
-    
-    np.savez_compressed(path, **save_dict)
-    
-    logger.info(
-        f"[CACHE] Saved features to cache: {path} "
-        f"({features.shape[0]} samples, {features.shape[1]} dims)"
-    )
-    return path
+    with _file_lock(dataset_hash):
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        path = _cache_path(dataset_hash)
+        
+        save_dict = {
+            'features': features,
+            'labels': labels,
+            'hash': np.array([dataset_hash], dtype='U64'),
+            'created_at': np.array([time.time()]),
+        }
+        
+        if metadata:
+            save_dict['metadata'] = np.array([json.dumps(metadata)], dtype='U1024')
+        
+        np.savez_compressed(path, **save_dict)
+        
+        logger.info(
+            f"[CACHE] Saved features to cache: {path} "
+            f"({features.shape[0]} samples, {features.shape[1]} dims)"
+        )
+        return path
 
 
 def load_from_cache(dataset_hash: str) -> Optional[Tuple[np.ndarray, np.ndarray]]:
@@ -139,6 +197,22 @@ def load_from_cache(dataset_hash: str) -> Optional[Tuple[np.ndarray, np.ndarray]
         # Verify hash integrity
         if stored_hash != dataset_hash:
             logger.warning(f"[CACHE] Hash mismatch — invalidating cache")
+            os.remove(path)
+            return None
+        
+        # Validate shape and dtype
+        if features.dtype != np.float32:
+            logger.warning(f"[CACHE] Invalid dtype {features.dtype} — invalidating")
+            os.remove(path)
+            return None
+        
+        if len(features.shape) != 2 or len(labels.shape) != 1:
+            logger.warning(f"[CACHE] Invalid shape — invalidating")
+            os.remove(path)
+            return None
+        
+        if features.shape[0] != labels.shape[0]:
+            logger.warning(f"[CACHE] Feature/label count mismatch — invalidating")
             os.remove(path)
             return None
         
