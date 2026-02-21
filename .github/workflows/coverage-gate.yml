@@ -116,23 +116,66 @@ jobs:
           path: test-results/
 
       - name: Check test results
+        if: always()
         run: |
-          if [ -f test-results/junit.xml ]; then
-            FAILURES=$(grep -o 'failures="[0-9]*"' test-results/junit.xml | head -1 | grep -o '[0-9]*')
-            ERRORS=$(grep -o 'errors="[0-9]*"' test-results/junit.xml | head -1 | grep -o '[0-9]*')
-            echo "Failures: $FAILURES, Errors: $ERRORS"
-            if [ "$FAILURES" != "0" ] || [ "$ERRORS" != "0" ]; then
-              echo "=== FAILED TESTS ==="
-              grep -A5 'failure message' test-results/junit.xml || true
-              echo "=== LAST 50 LINES OF OUTPUT ==="
-              tail -50 test-results/test-output.txt
-              exit 1
-            fi
-          else
-            echo "FATAL: test-results/junit.xml not found"
-            tail -50 test-results/test-output.txt 2>/dev/null || true
-            exit 1
-          fi
+          python3 - <<'PYEOF'
+          import xml.etree.ElementTree as ET
+          import sys, os
+
+          junit_path = "test-results/junit.xml"
+          txt_path = "test-results/test-output.txt"
+
+          if not os.path.exists(junit_path):
+              print("::error::JUnit XML not found — tests may not have run")
+              if os.path.exists(txt_path):
+                  with open(txt_path) as f:
+                      lines = f.readlines()
+                  print("=== LAST 30 LINES ===")
+                  for l in lines[-30:]:
+                      print(l, end='')
+              sys.exit(1)
+
+          tree = ET.parse(junit_path)
+          root = tree.getroot()
+
+          # Get totals
+          tests = int(root.attrib.get('tests', 0))
+          failures = int(root.attrib.get('failures', 0))
+          errors = int(root.attrib.get('errors', 0))
+          skipped = int(root.attrib.get('skipped', 0))
+
+          print(f"Tests: {tests}, Failures: {failures}, Errors: {errors}, Skipped: {skipped}")
+
+          if failures == 0 and errors == 0:
+              print(f"ALL {tests} TESTS PASSED ({skipped} skipped)")
+              sys.exit(0)
+
+          # Print each failure as a GitHub annotation
+          for suite in root.iter('testsuite'):
+              for tc in suite.iter('testcase'):
+                  fail = tc.find('failure')
+                  err = tc.find('error')
+                  if fail is not None:
+                      name = tc.attrib.get('name', '?')
+                      cls = tc.attrib.get('classname', '?')
+                      msg = fail.attrib.get('message', fail.text or '(no message)')
+                      print(f"::error::FAILED: {cls}::{name} — {msg[:200]}")
+                  elif err is not None:
+                      name = tc.attrib.get('name', '?')
+                      cls = tc.attrib.get('classname', '?')
+                      msg = err.attrib.get('message', err.text or '(no message)')
+                      print(f"::error::ERROR: {cls}::{name} — {msg[:200]}")
+
+          # Also print last 30 lines of output
+          if os.path.exists(txt_path):
+              with open(txt_path) as f:
+                  lines = f.readlines()
+              print("\n=== LAST 30 LINES OF OUTPUT ===")
+              for l in lines[-30:]:
+                  print(l, end='')
+
+          sys.exit(1)
+          PYEOF
 
       # ========== STEP 3: PYTHON COVERAGE ==========
       - name: Python coverage (>=95%)
