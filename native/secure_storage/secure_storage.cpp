@@ -238,16 +238,22 @@ public:
 
   void set_cert_validator(CertValidator v) { cert_validator_ = v; }
 
-  // Read file from secure storage
+  // Read file from secure storage (per-user isolated)
   AccessResult read_file(const StorageRequest &req, char *buf, size_t buf_size,
                          size_t *bytes_read) {
     AccessResult check = validate_access(req, "READ");
     if (check != AccessResult::GRANTED)
       return check;
 
+    // Phase 6: Per-user data isolation — scope path by device_id
     char full_path[512];
-    std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
-                  req.path);
+    if (req.device_id && std::strlen(req.device_id) > 0) {
+      std::snprintf(full_path, sizeof(full_path), "%s/%s/%s",
+                    get_storage_root(), req.device_id, req.path);
+    } else {
+      std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
+                    req.path);
+    }
 
     FILE *f = std::fopen(full_path, "rb");
     if (!f) {
@@ -264,7 +270,7 @@ public:
     return AccessResult::GRANTED;
   }
 
-  // Write file to secure storage
+  // Write file to secure storage (per-user isolated)
   AccessResult write_file(const StorageRequest &req, const char *data,
                           size_t data_len) {
     AccessResult check = validate_access(req, "WRITE");
@@ -277,9 +283,28 @@ public:
       return AccessResult::ERROR;
     }
 
+    // Phase 6: Per-user data isolation — scope path by device_id
     char full_path[512];
-    std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
-                  req.path);
+    if (req.device_id && std::strlen(req.device_id) > 0) {
+      // Ensure user directory exists
+      char user_dir[512];
+      std::snprintf(user_dir, sizeof(user_dir), "%s/%s", get_storage_root(),
+                    req.device_id);
+#ifdef _WIN32
+      char cmd[600];
+      std::snprintf(cmd, sizeof(cmd), "mkdir \"%s\" 2>nul", user_dir);
+      std::system(cmd);
+#else
+      char cmd[600];
+      std::snprintf(cmd, sizeof(cmd), "mkdir -p '%s'", user_dir);
+      std::system(cmd);
+#endif
+      std::snprintf(full_path, sizeof(full_path), "%s/%s/%s",
+                    get_storage_root(), req.device_id, req.path);
+    } else {
+      std::snprintf(full_path, sizeof(full_path), "%s/%s", get_storage_root(),
+                    req.path);
+    }
 
     FILE *f = std::fopen(full_path, "wb");
     if (!f) {
