@@ -206,6 +206,12 @@ class AutoTrainer:
         self._last_loss = 0.0  # Last training loss
         self._last_accuracy = 0.0  # Last training accuracy
         self._samples_per_sec = 0.0  # Training throughput
+        
+        # === MODE_A EARLY STOPPING ===
+        self._best_accuracy = 0.0
+        self._no_improvement_count = 0
+        self._early_stop_patience = 5  # Stop after 5 epochs without improvement
+        self._early_stop_baseline = 0.80  # Min accuracy before early stop allowed
     
     @property
     def state(self) -> TrainingState:
@@ -333,7 +339,7 @@ class AutoTrainer:
             # Create optimized DataLoader (pin_memory, workers)
             train_loader, holdout_loader, stats = create_training_dataloader(
                 batch_size=1024,
-                num_workers=4,
+                num_workers=8,
                 pin_memory=True,
                 prefetch_factor=2,
                 seed=42,
@@ -432,6 +438,9 @@ class AutoTrainer:
             total_correct = 0
             total_samples = 0
             batch_count = 0
+            accumulation_steps = 4  # Gradient accumulation for larger effective batch
+            
+            self._gpu_optimizer.zero_grad()
             
             # === ITERATE OVER FULL DATALOADER (all batches, all 20K+ samples) ===
             for batch_features, batch_labels in self._gpu_dataloader:
@@ -443,31 +452,47 @@ class AutoTrainer:
                 batch_labels = batch_labels.to(self._gpu_device, non_blocking=True)
                 batch_size = batch_labels.size(0)
                 
-                self._gpu_optimizer.zero_grad()
-                
                 # AMP: Mixed precision forward pass
                 if AMP_AVAILABLE and self._scaler is not None:
                     with autocast():
                         outputs = self._gpu_model(batch_features)
                         loss = self._gpu_criterion(outputs, batch_labels)
+                        loss = loss / accumulation_steps  # Scale for accumulation
                     
-                    # AMP: Scaled backward pass
+                    # AMP: Scaled backward pass (accumulate gradients)
                     self._scaler.scale(loss).backward()
-                    self._scaler.step(self._gpu_optimizer)
-                    self._scaler.update()
+                    
+                    # Step optimizer every accumulation_steps batches
+                    if (batch_count + 1) % accumulation_steps == 0:
+                        self._scaler.step(self._gpu_optimizer)
+                        self._scaler.update()
+                        self._gpu_optimizer.zero_grad()
                 else:
                     # Fallback: Standard FP32 training
                     outputs = self._gpu_model(batch_features)
                     loss = self._gpu_criterion(outputs, batch_labels)
+                    loss = loss / accumulation_steps
                     loss.backward()
-                    self._gpu_optimizer.step()
+                    
+                    if (batch_count + 1) % accumulation_steps == 0:
+                        self._gpu_optimizer.step()
+                        self._gpu_optimizer.zero_grad()
                 
-                # Accumulate batch stats
-                total_loss += loss.item() * batch_size
+                # Accumulate batch stats (use unscaled loss for metrics)
+                total_loss += loss.item() * accumulation_steps * batch_size
                 _, predicted = torch.max(outputs.data, 1)
                 total_correct += (predicted == batch_labels).sum().item()
                 total_samples += batch_size
                 batch_count += 1
+            
+            # Handle remaining accumulated gradients
+            if batch_count % accumulation_steps != 0:
+                if AMP_AVAILABLE and self._scaler is not None:
+                    self._scaler.step(self._gpu_optimizer)
+                    self._scaler.update()
+                else:
+                    self._gpu_optimizer.step()
+                self._gpu_optimizer.zero_grad()
             
             # Also update the cached batch reference for status queries
             if total_samples > 0:
@@ -634,6 +659,26 @@ class AutoTrainer:
             ds_total = self._gpu_dataset_stats.get('train', {}).get('total', 0) if self._gpu_dataset_stats else 0
             self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
             
+            # === MODE_A EARLY STOPPING CHECK ===
+            if accuracy > self._best_accuracy:
+                self._best_accuracy = accuracy
+                self._no_improvement_count = 0
+            else:
+                self._no_improvement_count += 1
+            
+            early_stopped = False
+            if (self._best_accuracy >= self._early_stop_baseline
+                    and self._no_improvement_count >= self._early_stop_patience):
+                early_stopped = True
+                self._emit_event(
+                    "EARLY_STOP",
+                    f"MODE_A early stop: accuracy={self._best_accuracy:.2%} "
+                    f"(>={self._early_stop_baseline:.0%}), no improvement for "
+                    f"{self._no_improvement_count} epochs. Certification in MODE_C.",
+                    epoch=self._epoch,
+                    gpu_used=True,
+                )
+            
             # Save checkpoint
             checkpoint_hash = hashlib.sha256(f"epoch-{self._epoch}-gpu".encode()).hexdigest()[:16]
             self._emit_event(
@@ -649,6 +694,10 @@ class AutoTrainer:
                 epoch=self._epoch,
                 gpu_used=True,
             )
+            
+            # If early stopped, return False to signal training session should end
+            if early_stopped:
+                return False
             
             return True
             

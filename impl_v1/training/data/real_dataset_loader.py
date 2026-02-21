@@ -215,7 +215,7 @@ class RealTrainingDataset(Dataset):
 
 def create_training_dataloader(
     batch_size: int = 1024,
-    num_workers: int = 4,
+    num_workers: int = 8,
     pin_memory: bool = True,
     prefetch_factor: int = 2,
     seed: int = FIXED_SEED,
@@ -225,7 +225,7 @@ def create_training_dataloader(
     
     Args:
         batch_size: Samples per batch (default 1024 for RTX 2050)
-        num_workers: Parallel data loading workers
+        num_workers: Parallel data loading workers (default 8 for >85% GPU util)
         pin_memory: Pin memory for faster GPU transfer
         prefetch_factor: Batches to prefetch per worker
         seed: Random seed for determinism
@@ -246,6 +246,10 @@ def create_training_dataloader(
         is_holdout=True,
     )
     
+    # Deterministic generator for shuffle reproducibility
+    g = torch.Generator()
+    g.manual_seed(seed)
+    
     # Create DataLoaders with CUDA optimizations
     train_loader = DataLoader(
         train_dataset,
@@ -256,6 +260,7 @@ def create_training_dataloader(
         prefetch_factor=prefetch_factor if num_workers > 0 else None,
         persistent_workers=num_workers > 0,
         drop_last=True,  # Consistent batch sizes
+        generator=g,     # Deterministic shuffle order
     )
     
     holdout_loader = DataLoader(

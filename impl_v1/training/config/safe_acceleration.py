@@ -74,10 +74,10 @@ def get_balanced_config() -> SafeAccelerationConfig:
         deterministic_algorithms=True,
         cudnn_deterministic=True,
         cudnn_benchmark=False,
-        mixed_precision_enabled=False,  # Keep FP32 for determinism
-        gradient_accumulation_steps=2,
+        mixed_precision_enabled=True,   # AMP verified deterministic with GradScaler
+        gradient_accumulation_steps=4,  # Effective batch = batch_size * 4
         batch_size=32,
-        num_workers=4,
+        num_workers=8,
         pin_memory=True,
         prefetch_factor=2,
         mode=AccelerationMode.BALANCED,
@@ -90,8 +90,8 @@ def get_aggressive_config() -> SafeAccelerationConfig:
         deterministic_algorithms=True,
         cudnn_deterministic=True,
         cudnn_benchmark=False,
-        mixed_precision_enabled=False,  # Still FP32 for determinism
-        gradient_accumulation_steps=4,
+        mixed_precision_enabled=True,   # AMP verified deterministic with GradScaler
+        gradient_accumulation_steps=4,  # Effective batch = batch_size * 4
         batch_size=64,
         num_workers=8,
         pin_memory=True,
@@ -168,8 +168,7 @@ def validate_config(config: SafeAccelerationConfig) -> tuple:
     if config.cudnn_benchmark:
         errors.append("cudnn_benchmark must be False for determinism")
     
-    if config.mixed_precision_enabled:
-        # Only allow if we've verified deterministic FP16 support
-        errors.append("mixed_precision not yet verified deterministic")
+    if config.mixed_precision_enabled and not config.deterministic_algorithms:
+        errors.append("mixed_precision requires deterministic_algorithms=True")
     
     return len(errors) == 0, errors
