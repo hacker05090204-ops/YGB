@@ -1,0 +1,18 @@
+{
+  "failure_detected": true,
+  "dropout_nodes": [
+    {
+      "node_id": "test_node",
+      "detected_at": "2026-02-22T11:05:48.547647",
+      "last_heartbeat": "2026-02-22T11:05:48.036463",
+      "epoch_at_failure": 5,
+      "reason": "Node marked dead"
+    }
+  ],
+  "authority_saved": false,
+  "nccl_cleaned": true,
+  "training_aborted": true,
+  "abort_reason": "Simulated failure: test_node killed at epoch 5",
+  "state_preserved": false,
+  "timestamp": "2026-02-22T11:05:49.238099"
+}
