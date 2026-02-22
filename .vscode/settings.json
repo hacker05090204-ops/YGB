@@ -1,12 +1,23 @@
 {
+    "python.defaultInterpreterPath": "C:/Users/KINETIC04/AppData/Local/Programs/Python/Python311/python.exe",
     "python.analysis.extraPaths": [
-        "${workspaceFolder}"
+        "${workspaceFolder}",
+        "${workspaceFolder}/backend"
     ],
-    "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportMissingImports": "none",
+        "reportMissingModuleSource": "none",
+        "reportOptionalMemberAccess": "none",
+        "reportGeneralTypeIssues": "none",
+        "reportCallIssue": "none",
+        "reportIndexIssue": "none",
+        "reportArgumentType": "none",
+        "reportReturnType": "none"
+    },
     "github-actions.workflows.parameters": {
         "secrets": {
             "YGB_HMAC_SECRET": ""
         }
-    },
-    "cmake.sourceDirectory": "C:/Users/Unkno/YGB/impl_v1/phase49/native"
+    }
 }

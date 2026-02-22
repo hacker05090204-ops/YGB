@@ -71,7 +71,7 @@ class GradientCompressionPolicy:
 
     MAX_ACCURACY_DELTA = 0.005  # ±0.5%
 
-    def __init__(self, config: CompressionConfig = None):
+    def __init__(self, config: Optional[CompressionConfig] = None):
         self.config = config or CompressionConfig()
         logger.info(
             f"[COMPRESSION] Policy initialized: mode={self.config.mode}"

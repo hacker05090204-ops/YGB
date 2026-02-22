@@ -65,7 +65,7 @@ DEFAULT_SEARCH_SPACE = {
 
 
 def generate_grid_search(
-    search_space: Dict[str, List[Any]] = None,
+    search_space: Optional[Dict[str, List[Any]]] = None,
     max_trials: int = 20,
 ) -> List[Dict[str, Any]]:
     """Generate grid search configurations.
@@ -92,7 +92,7 @@ def generate_grid_search(
 
 
 def generate_random_search(
-    search_space: Dict[str, List[Any]] = None,
+    search_space: Optional[Dict[str, List[Any]]] = None,
     num_trials: int = 10,
     seed: int = 42,
 ) -> List[Dict[str, Any]]:
@@ -151,7 +151,7 @@ class HPOCoordinator:
 
     def generate_trials(
         self,
-        search_space: Dict[str, List[Any]] = None,
+        search_space: Optional[Dict[str, List[Any]]] = None,
         seed: int = 42,
     ) -> List[HPOTrial]:
         """Generate trial configurations.
