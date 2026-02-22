@@ -1,0 +1,45 @@
+{
+  "world_size": 2,
+  "cluster_samples_per_sec": 215883.06,
+  "scaling_efficiency": 1.6705,
+  "merged_weight_hash": "7ef36d7d492f17c66f71da89428fa5d35a95c7c3efbd282b616a15e474e37b5e",
+  "dataset_hash": "9149f32f34aa7c77761166bb856c0108f6ea9ffc5d570d7c6ab40040c64293b1",
+  "determinism_match": true,
+  "leader_term": 1,
+  "fencing_token": 1803,
+  "epochs_completed": 3,
+  "per_epoch": [
+    {
+      "epoch": 0,
+      "loss": 0.69743,
+      "accuracy": 0.5054,
+      "samples_per_sec": 64618.22,
+      "weight_hash": "8baca2382a7f57df71d72dbc2f405d23795be2400f93dd22a398ceec97f5d621",
+      "elapsed_sec": 0.1238
+    },
+    {
+      "epoch": 1,
+      "loss": 0.667254,
+      "accuracy": 0.6152,
+      "samples_per_sec": 103397.11,
+      "weight_hash": "f762a1ca290d39da1b96e45cb7654bbec024ef4b752767052c1d5ba0f035de8d",
+      "elapsed_sec": 0.0774
+    },
+    {
+      "epoch": 2,
+      "loss": 0.623173,
+      "accuracy": 0.6733,
+      "samples_per_sec": 107941.53,
+      "weight_hash": "7ef36d7d492f17c66f71da89428fa5d35a95c7c3efbd282b616a15e474e37b5e",
+      "elapsed_sec": 0.0741
+    }
+  ],
+  "deterministic_hashes": [
+    "6fbebb31e5c4e6561494f114ea611e3ae620086d66662ff8d14aa3373b57a50b",
+    "6fbebb31e5c4e6561494f114ea611e3ae620086d66662ff8d14aa3373b57a50b",
+    "6fbebb31e5c4e6561494f114ea611e3ae620086d66662ff8d14aa3373b57a50b"
+  ],
+  "cuda_device": "NVIDIA GeForce RTX 2050",
+  "driver_version": "591.74",
+  "timestamp": "2026-02-22T15:53:25.315576"
+}
