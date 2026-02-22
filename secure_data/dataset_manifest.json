@@ -1,0 +1,10 @@
+{
+  "dataset_hash": "9149f32f34aa7c77761166bb856c0108f6ea9ffc5d570d7c6ab40040c64293b1",
+  "sample_count": 8000,
+  "feature_dim": 256,
+  "num_classes": 2,
+  "entropy": 0.9998,
+  "status": "TRAINABLE",
+  "frozen_at": "2026-02-23T02:05:55.931542",
+  "seed": 42
+}

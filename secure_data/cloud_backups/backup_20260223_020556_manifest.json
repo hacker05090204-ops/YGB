@@ -1,0 +1,21 @@
+{
+  "backup_id": "backup_20260223_020556",
+  "shard_ids": [
+    "v_20260223_020556"
+  ],
+  "total_size_bytes": 1024,
+  "compressed_size_bytes": 256,
+  "encrypted": true,
+  "checksum": "173c2a92d818898b332ba77802ddabf0d835bf96f65826e8614dc8b4b238f9ea",
+  "targets": [
+    "nas_local",
+    "gdrive_1",
+    "gdrive_2"
+  ],
+  "uploaded_to": [
+    "nas_local",
+    "gdrive_1",
+    "gdrive_2"
+  ],
+  "timestamp": "2026-02-23T02:05:56.810034"
+}

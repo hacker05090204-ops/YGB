@@ -1,0 +1,13 @@
+{
+  "world_size": 2,
+  "cluster_samples_per_sec": 127319.5,
+  "merged_weight_hash": "34e48536a092a4c12330f073384f184b3f6a85040df359865175125cb2c7a163",
+  "dataset_hash": "9149f32f34aa7c77761166bb856c0108f6ea9ffc5d570d7c6ab40040c64293b1",
+  "determinism_match": true,
+  "leader_term": 1,
+  "best_accuracy": 0.839,
+  "epochs_completed": 5,
+  "drift_aborted": false,
+  "model_version": "v_20260223_020556",
+  "architecture_frozen": true
+}

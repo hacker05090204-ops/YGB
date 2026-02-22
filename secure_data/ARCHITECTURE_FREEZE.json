@@ -1,0 +1,27 @@
+{
+  "frozen": true,
+  "frozen_at": "2026-02-23T02:05:53.076279",
+  "git_commit": "1d63a46",
+  "modules_locked": [
+    "shard_storage",
+    "incremental_sync",
+    "nas_service",
+    "compression_engine",
+    "storage_engine",
+    "data_enforcement",
+    "drift_guard",
+    "storage_limit_policy",
+    "model_versioning",
+    "redundancy_gate",
+    "cloud_backup",
+    "auto_recovery",
+    "namespace_manager",
+    "report_sync"
+  ],
+  "rules": {
+    "no_new_storage": true,
+    "no_new_replication": true,
+    "no_new_governance": true,
+    "training_only": true
+  }
+}

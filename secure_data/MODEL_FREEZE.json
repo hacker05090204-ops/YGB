@@ -1,0 +1,11 @@
+{
+  "version_id": "v_20260223_020556",
+  "weight_hash": "75add9e7ff83899cc25a29f05afd527d50149761652f7d5c08c29f441e7233c6",
+  "dataset_hash": "9149f32f34aa7c77761166bb856c0108f6ea9ffc5d570d7c6ab40040c64293b1",
+  "accuracy": 0.839,
+  "fp16": true,
+  "archive_path": "C:\\Users\\Unkno\\YGB\\secure_data\\model_versions\\v_20260223_020556.zip",
+  "weights_path": "secure_data\\model_versions\\v_20260223_020556\\model_fp16.pt",
+  "redundancy_verified": false,
+  "frozen_at": "2026-02-23T02:05:56.806746"
+}
