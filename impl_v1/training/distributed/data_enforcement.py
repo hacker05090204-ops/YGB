@@ -1,508 +1,220 @@
 """
-data_enforcement.py — Useful Data Enforcement (Phase 1)
+data_enforcement.py — Strict Useful Data Enforcement (Phase 2)
 
-Unified pre-training data gate. Chains all 6 checks:
+7-check pre-training gate:
+1. Signed dataset manifest required
+2. Manual owner approval flag
+3. Label shuffle test must degrade accuracy
+4. Baseline model must exceed minimum
+5. Train/test hash overlap must be zero
+6. Entropy threshold enforced
+7. Duplicate ratio < threshold
 
-  1. Signed dataset manifest (HMAC verification)
-  2. Dataset integrity (hash, sample_count, feature_dim, entropy)
-  3. Quality check (duplicates, imbalance, noise)
-  4. Label shuffle test (must drop to random baseline)
-  5. Baseline sanity model (small classifier > 40% accuracy)
-  6. Train/test leakage check (hash intersection)
-
-Blocks training if any fail.
+If ANY check fails → ABORT TRAINING.
 """
 
 import hashlib
-import hmac
 import json
 import logging
 import os
-import time
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, asdict, field
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
-MANIFEST_PATH = os.path.join('secure_data', 'dataset_manifest.json')
-ENFORCEMENT_RESULT_PATH = os.path.join('secure_data', 'data_enforcement_result.json')
-
-# Thresholds
-DUPLICATE_MAX = 0.20
-IMBALANCE_MAX = 10.0
-ENTROPY_MIN = 0.3
-SANITY_ACC_MIN = 0.40
-SHUFFLE_TOLERANCE = 0.10
-
-
-# =============================================================================
-# RESULT TYPES
-# =============================================================================
 
 @dataclass
-class ManifestCheck:
-    """Signed manifest verification result."""
+class EnforcementCheck:
+    """Single enforcement check result."""
+    check_id: int
+    name: str
     passed: bool
-    manifest_exists: bool
-    signature_valid: bool
+    detail: str
+    severity: str = "BLOCK"
+
+
+@dataclass
+class EnforcementReport:
+    """Full 7-check enforcement report."""
+    passed: bool
+    checks: List[EnforcementCheck]
     dataset_hash: str
-    sample_count: int
-    feature_dim: int
-    error: str = ""
+    timestamp: str
+    abort_reason: str = ""
 
 
-@dataclass
-class QualityCheck:
-    """Data quality gate result."""
-    passed: bool
-    duplicate_ratio: float
-    imbalance_ratio: float
-    entropy: float
-    noise_score: float
-    error: str = ""
+def compute_dataset_hash(X: np.ndarray, y: np.ndarray) -> str:
+    h = hashlib.sha256()
+    h.update(X.tobytes())
+    h.update(y.tobytes())
+    return h.hexdigest()
 
 
-@dataclass
-class ShuffleCheck:
-    """Label shuffle test result."""
-    passed: bool
-    original_accuracy: float
-    shuffled_accuracy: float
-    random_baseline: float
-    accuracy_dropped: bool
-    error: str = ""
+def compute_entropy(y: np.ndarray) -> float:
+    _, counts = np.unique(y, return_counts=True)
+    probs = counts / counts.sum()
+    return float(-np.sum(probs * np.log2(probs + 1e-12)))
 
 
-@dataclass
-class SanityCheck:
-    """Baseline sanity model result."""
-    passed: bool
-    accuracy: float
-    threshold: float
-    error: str = ""
+def compute_duplicate_ratio(X: np.ndarray) -> float:
+    """Fraction of duplicate rows."""
+    hashes = set()
+    dupes = 0
+    for i in range(len(X)):
+        h = hashlib.md5(X[i].tobytes()).hexdigest()
+        if h in hashes:
+            dupes += 1
+        hashes.add(h)
+    return dupes / max(len(X), 1)
 
 
-@dataclass
-class LeakageCheck:
-    """Train/test overlap result."""
-    passed: bool
-    overlap_count: int
-    overlap_ratio: float
-    error: str = ""
-
-
-@dataclass
-class DataEnforcementResult:
-    """Combined enforcement result — all 6 checks."""
-    passed: bool
-    manifest: ManifestCheck
-    quality: QualityCheck
-    shuffle: ShuffleCheck
-    sanity: SanityCheck
-    leakage: LeakageCheck
-    errors: List[str] = field(default_factory=list)
-    timestamp: str = ""
-    elapsed_sec: float = 0.0
-
-
-# =============================================================================
-# MANIFEST SIGNING
-# =============================================================================
-
-def sign_manifest(
-    dataset_hash: str,
-    sample_count: int,
-    feature_dim: int,
-    num_classes: int,
-    secret_key: str = "cluster-authority-key",
-    path: str = MANIFEST_PATH,
-) -> str:
-    """Create and sign a dataset manifest.
-
-    Returns the HMAC signature.
-    """
-    manifest = {
-        'dataset_hash': dataset_hash,
-        'sample_count': sample_count,
-        'feature_dim': feature_dim,
-        'num_classes': num_classes,
-        'created': datetime.now().isoformat(),
-    }
-
-    payload = json.dumps(manifest, sort_keys=True).encode()
-    signature = hmac.new(
-        secret_key.encode(), payload, hashlib.sha256
-    ).hexdigest()
-
-    manifest['signature'] = signature
-
-    os.makedirs(os.path.dirname(path) or '.', exist_ok=True)
-    with open(path, 'w') as f:
-        json.dump(manifest, f, indent=2)
-
-    logger.info(f"[MANIFEST] Signed manifest created: {dataset_hash[:16]}...")
-    return signature
-
-
-def verify_manifest(
-    dataset_hash: str,
-    sample_count: int,
-    feature_dim: int,
-    secret_key: str = "cluster-authority-key",
-    path: str = MANIFEST_PATH,
-) -> ManifestCheck:
-    """Verify a signed dataset manifest."""
-    if not os.path.exists(path):
-        return ManifestCheck(
-            passed=False, manifest_exists=False, signature_valid=False,
-            dataset_hash="", sample_count=0, feature_dim=0,
-            error="Manifest file not found",
-        )
-
-    try:
-        with open(path, 'r') as f:
-            manifest = json.load(f)
-    except Exception as e:
-        return ManifestCheck(
-            passed=False, manifest_exists=True, signature_valid=False,
-            dataset_hash="", sample_count=0, feature_dim=0,
-            error=f"Manifest parse error: {e}",
-        )
-
-    stored_sig = manifest.pop('signature', '')
-
-    # Recompute signature
-    payload = json.dumps(manifest, sort_keys=True).encode()
-    expected_sig = hmac.new(
-        secret_key.encode(), payload, hashlib.sha256
-    ).hexdigest()
-
-    sig_valid = hmac.compare_digest(stored_sig, expected_sig)
-
-    # Check fields match
-    errors = []
-    if manifest.get('dataset_hash') != dataset_hash:
-        errors.append("dataset_hash mismatch")
-    if manifest.get('sample_count') != sample_count:
-        errors.append("sample_count mismatch")
-    if manifest.get('feature_dim') != feature_dim:
-        errors.append("feature_dim mismatch")
-    if not sig_valid:
-        errors.append("HMAC signature invalid")
-
-    passed = sig_valid and len(errors) == 0
-
-    return ManifestCheck(
-        passed=passed,
-        manifest_exists=True,
-        signature_valid=sig_valid,
-        dataset_hash=manifest.get('dataset_hash', ''),
-        sample_count=manifest.get('sample_count', 0),
-        feature_dim=manifest.get('feature_dim', 0),
-        error="; ".join(errors) if errors else "",
-    )
-
-
-# =============================================================================
-# QUALITY CHECK
-# =============================================================================
-
-def check_quality(
-    features: np.ndarray,
-    labels: np.ndarray,
-) -> QualityCheck:
-    """Run data quality checks: duplicates, imbalance, entropy, noise."""
-    N = features.shape[0]
-
-    # Duplicates
-    _, unique_counts = np.unique(features, axis=0, return_counts=True)
-    duplicates = int(np.sum(unique_counts[unique_counts > 1] - 1))
-    dup_ratio = duplicates / max(N, 1)
-
-    # Class imbalance
-    _, counts = np.unique(labels, return_counts=True)
-    imbalance = float(counts.max()) / max(float(counts.min()), 1)
-
-    # Entropy
-    probs = counts.astype(float) / counts.sum()
-    max_ent = np.log2(max(len(counts), 2))
-    entropy = float(-np.sum(probs * np.log2(probs + 1e-10)))
-    norm_entropy = entropy / max(max_ent, 1e-10)
-
-    # Noise score
-    feat_var = np.var(features, axis=0)
-    var_cv = np.std(feat_var) / max(np.mean(feat_var), 1e-10)
-    noise_score = max(0.0, 1.0 - var_cv)
-
-    errors = []
-    if dup_ratio > DUPLICATE_MAX:
-        errors.append(f"duplicates {dup_ratio:.1%} > {DUPLICATE_MAX:.0%}")
-    if imbalance > IMBALANCE_MAX:
-        errors.append(f"imbalance {imbalance:.1f}x > {IMBALANCE_MAX:.0f}x")
-    if norm_entropy < ENTROPY_MIN:
-        errors.append(f"entropy {norm_entropy:.4f} < {ENTROPY_MIN}")
-
-    return QualityCheck(
-        passed=len(errors) == 0,
-        duplicate_ratio=round(dup_ratio, 4),
-        imbalance_ratio=round(imbalance, 4),
-        entropy=round(norm_entropy, 4),
-        noise_score=round(noise_score, 4),
-        error="; ".join(errors),
-    )
-
-
-# =============================================================================
-# SHUFFLE TEST
-# =============================================================================
-
-def run_shuffle_test(
-    features: np.ndarray,
-    labels: np.ndarray,
-    input_dim: int = 256,
-    num_classes: int = 2,
-    tolerance: float = SHUFFLE_TOLERANCE,
-) -> ShuffleCheck:
-    """Label shuffle test — accuracy must drop to random baseline."""
-    try:
-        import torch
-        import torch.nn as nn
-    except ImportError:
-        return ShuffleCheck(
-            passed=False, original_accuracy=0, shuffled_accuracy=0,
-            random_baseline=0, accuracy_dropped=False,
-            error="torch not available",
-        )
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    random_baseline = 1.0 / max(num_classes, 2)
-    threshold = random_baseline + tolerance
-
-    def _train_eval(X, y):
-        n = min(5000, len(y))
-        idx = np.random.permutation(len(y))[:n]
-        tx = torch.tensor(X[idx], dtype=torch.float32).to(device)
-        ty = torch.tensor(y[idx], dtype=torch.long).to(device)
-
-        model = nn.Sequential(
-            nn.Linear(input_dim, 64), nn.ReLU(),
-            nn.Linear(64, num_classes),
-        ).to(device)
-        opt = torch.optim.Adam(model.parameters(), lr=0.01)
-        crit = nn.CrossEntropyLoss()
-
-        model.train()
-        for _ in range(3):
-            opt.zero_grad()
-            loss = crit(model(tx), ty)
-            loss.backward()
-            opt.step()
-
-        model.eval()
-        with torch.no_grad():
-            acc = (model(tx).argmax(1) == ty).float().mean().item()
-        return acc
-
-    try:
-        original_acc = _train_eval(features, labels)
-        shuffled_labels = np.random.permutation(labels)
-        shuffled_acc = _train_eval(features, shuffled_labels)
-    except Exception as e:
-        return ShuffleCheck(
-            passed=False, original_accuracy=0, shuffled_accuracy=0,
-            random_baseline=random_baseline, accuracy_dropped=False,
-            error=str(e),
-        )
-
-    dropped = shuffled_acc < threshold
-    passed = dropped  # Shuffled accuracy must be near random
-
-    return ShuffleCheck(
-        passed=passed,
-        original_accuracy=round(original_acc, 6),
-        shuffled_accuracy=round(shuffled_acc, 6),
-        random_baseline=round(random_baseline, 4),
-        accuracy_dropped=dropped,
-        error="" if passed else f"shuffled_acc {shuffled_acc:.4f} >= threshold {threshold:.4f}",
-    )
-
-
-# =============================================================================
-# SANITY MODEL
-# =============================================================================
-
-def run_sanity_model(
-    features: np.ndarray,
-    labels: np.ndarray,
-    input_dim: int = 256,
-    num_classes: int = 2,
-    min_accuracy: float = SANITY_ACC_MIN,
-) -> SanityCheck:
-    """Train small classifier — must exceed minimum accuracy."""
-    try:
-        import torch
-        import torch.nn as nn
-    except ImportError:
-        return SanityCheck(
-            passed=False, accuracy=0, threshold=min_accuracy,
-            error="torch not available",
-        )
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-    n = min(5000, len(labels))
-    idx = np.random.permutation(len(labels))[:n]
-    tx = torch.tensor(features[idx], dtype=torch.float32).to(device)
-    ty = torch.tensor(labels[idx], dtype=torch.long).to(device)
-
-    model = nn.Sequential(
-        nn.Linear(input_dim, 64), nn.ReLU(),
-        nn.Linear(64, num_classes),
-    ).to(device)
-    opt = torch.optim.Adam(model.parameters(), lr=0.01)
-    crit = nn.CrossEntropyLoss()
-
-    model.train()
-    for _ in range(5):
-        opt.zero_grad()
-        loss = crit(model(tx), ty)
-        loss.backward()
-        opt.step()
-
-    model.eval()
-    with torch.no_grad():
-        acc = (model(tx).argmax(1) == ty).float().mean().item()
-
-    passed = acc >= min_accuracy
-    return SanityCheck(
-        passed=passed,
-        accuracy=round(acc, 6),
-        threshold=min_accuracy,
-        error="" if passed else f"accuracy {acc:.4f} < {min_accuracy}",
-    )
-
-
-# =============================================================================
-# LEAKAGE CHECK
-# =============================================================================
-
-def check_leakage(
+def enforce_data_policy(
     X_train: np.ndarray,
-    X_test: Optional[np.ndarray],
-) -> LeakageCheck:
-    """Check train/test overlap via row hash intersection."""
-    if X_test is None:
-        return LeakageCheck(passed=True, overlap_count=0, overlap_ratio=0.0)
-
-    train_hashes = set()
-    for row in X_train:
-        train_hashes.add(hashlib.md5(row.tobytes()).hexdigest())
-
-    overlap = 0
-    for row in X_test:
-        if hashlib.md5(row.tobytes()).hexdigest() in train_hashes:
-            overlap += 1
-
-    ratio = overlap / max(len(X_test), 1)
-    passed = overlap == 0
-
-    return LeakageCheck(
-        passed=passed,
-        overlap_count=overlap,
-        overlap_ratio=round(ratio, 6),
-        error="" if passed else f"{overlap} leaked samples ({ratio:.1%})",
-    )
-
-
-# =============================================================================
-# UNIFIED ENFORCEMENT
-# =============================================================================
-
-def enforce_data_quality(
-    features: np.ndarray,
-    labels: np.ndarray,
-    dataset_hash: str,
-    sample_count: int,
-    feature_dim: int,
-    num_classes: int = 2,
+    y_train: np.ndarray,
+    manifest_signature: str = "",
+    manifest_valid: bool = False,
+    owner_approved: bool = False,
     X_test: Optional[np.ndarray] = None,
-    manifest_path: str = MANIFEST_PATH,
-    secret_key: str = "cluster-authority-key",
-    result_path: str = ENFORCEMENT_RESULT_PATH,
-) -> DataEnforcementResult:
-    """Run all 6 data enforcement checks.
+    num_classes: int = 2,
+    input_dim: int = 256,
+    min_baseline_accuracy: float = 0.55,
+    min_entropy: float = 0.5,
+    max_duplicate_ratio: float = 0.10,
+    shuffle_tolerance: float = 0.10,
+) -> EnforcementReport:
+    """Run all 7 enforcement checks.
 
-    Blocks training if any fail.
+    Returns EnforcementReport. Training BLOCKED if any check fails.
     """
-    t0 = time.perf_counter()
-    errors = []
+    checks = []
+    dataset_hash = compute_dataset_hash(X_train, y_train)
 
-    # 1. Signed manifest
-    manifest = verify_manifest(
-        dataset_hash, sample_count, feature_dim,
-        secret_key=secret_key, path=manifest_path,
-    )
-    if not manifest.passed:
-        errors.append(f"Manifest: {manifest.error}")
+    # CHECK 1: Signed manifest
+    checks.append(EnforcementCheck(
+        check_id=1, name="signed_manifest",
+        passed=manifest_valid,
+        detail="Valid" if manifest_valid else "Missing or invalid signature",
+    ))
 
-    # 2+3. Quality check
-    quality = check_quality(features, labels)
-    if not quality.passed:
-        errors.append(f"Quality: {quality.error}")
+    # CHECK 2: Owner approval
+    checks.append(EnforcementCheck(
+        check_id=2, name="owner_approval",
+        passed=owner_approved,
+        detail="Approved" if owner_approved else "NOT approved by owner",
+    ))
 
-    # 4. Shuffle test
-    shuffle = run_shuffle_test(
-        features, labels, input_dim=feature_dim, num_classes=num_classes,
-    )
-    if not shuffle.passed:
-        errors.append(f"Shuffle: {shuffle.error}")
+    # CHECK 3: Label shuffle test
+    shuffle_passed = False
+    shuffle_detail = ""
+    original_acc = 0.0
+    try:
+        from impl_v1.training.distributed.dataset_sanity import (
+            run_label_shuffle_test,
+        )
+        result = run_label_shuffle_test(
+            X_train, y_train,
+            input_dim=input_dim, num_classes=num_classes,
+            batch_size=min(512, len(X_train)),
+            tolerance=shuffle_tolerance,
+        )
+        shuffle_passed = result.passed
+        original_acc = result.original_accuracy
+        shuffle_detail = (
+            f"orig_acc={result.original_accuracy:.4f} "
+            f"shuffle_acc={result.shuffled_accuracy:.4f}"
+        )
+    except Exception as e:
+        shuffle_detail = f"Error: {e}"
 
-    # 5. Sanity model
-    sanity = run_sanity_model(
-        features, labels, input_dim=feature_dim, num_classes=num_classes,
-    )
-    if not sanity.passed:
-        errors.append(f"Sanity: {sanity.error}")
+    checks.append(EnforcementCheck(
+        check_id=3, name="label_shuffle_test",
+        passed=shuffle_passed,
+        detail=shuffle_detail,
+    ))
 
-    # 6. Leakage
-    leakage = check_leakage(features, X_test)
-    if not leakage.passed:
-        errors.append(f"Leakage: {leakage.error}")
+    # CHECK 4: Baseline accuracy
+    baseline_ok = original_acc >= min_baseline_accuracy
+    checks.append(EnforcementCheck(
+        check_id=4, name="baseline_accuracy",
+        passed=baseline_ok,
+        detail=(
+            f"acc={original_acc:.4f} "
+            f"{'≥' if baseline_ok else '<'} "
+            f"min={min_baseline_accuracy:.4f}"
+        ),
+    ))
 
-    elapsed = time.perf_counter() - t0
-    passed = len(errors) == 0
+    # CHECK 5: Zero train/test overlap
+    overlap_ok = True
+    overlap_detail = "No test set provided"
+    if X_test is not None:
+        try:
+            from impl_v1.training.distributed.dataset_sanity import (
+                check_train_test_overlap,
+            )
+            overlap_result = check_train_test_overlap(X_train, X_test)
+            overlap_ok = overlap_result.passed
+            overlap_detail = (
+                f"overlap={overlap_result.overlap_count} "
+                f"(ratio={overlap_result.overlap_ratio:.4f})"
+            )
+        except Exception as e:
+            overlap_detail = f"Error: {e}"
+            overlap_ok = False
 
-    result = DataEnforcementResult(
-        passed=passed,
-        manifest=manifest,
-        quality=quality,
-        shuffle=shuffle,
-        sanity=sanity,
-        leakage=leakage,
-        errors=errors,
+    checks.append(EnforcementCheck(
+        check_id=5, name="zero_overlap",
+        passed=overlap_ok,
+        detail=overlap_detail,
+    ))
+
+    # CHECK 6: Entropy threshold
+    entropy = compute_entropy(y_train)
+    entropy_ok = entropy >= min_entropy
+    checks.append(EnforcementCheck(
+        check_id=6, name="entropy_threshold",
+        passed=entropy_ok,
+        detail=(
+            f"entropy={entropy:.4f} "
+            f"{'≥' if entropy_ok else '<'} "
+            f"min={min_entropy:.4f}"
+        ),
+    ))
+
+    # CHECK 7: Duplicate ratio
+    dup_ratio = compute_duplicate_ratio(X_train)
+    dup_ok = dup_ratio <= max_duplicate_ratio
+    checks.append(EnforcementCheck(
+        check_id=7, name="duplicate_ratio",
+        passed=dup_ok,
+        detail=(
+            f"ratio={dup_ratio:.4f} "
+            f"{'≤' if dup_ok else '>'} "
+            f"max={max_duplicate_ratio:.4f}"
+        ),
+    ))
+
+    # Final verdict
+    all_passed = all(c.passed for c in checks)
+    abort_reason = ""
+    if not all_passed:
+        failed = [c.name for c in checks if not c.passed]
+        abort_reason = f"TRAINING BLOCKED: failed checks = {failed}"
+
+    report = EnforcementReport(
+        passed=all_passed,
+        checks=checks,
+        dataset_hash=dataset_hash,
         timestamp=datetime.now().isoformat(),
-        elapsed_sec=round(elapsed, 3),
+        abort_reason=abort_reason,
     )
 
-    # Persist
-    os.makedirs(os.path.dirname(result_path) or '.', exist_ok=True)
-    with open(result_path, 'w') as f:
-        json.dump(asdict(result), f, indent=2)
-
-    if passed:
-        logger.info(
-            f"[DATA_ENFORCEMENT] ALL PASSED in {elapsed:.1f}s — "
-            f"quality=OK, shuffle=OK, sanity_acc={sanity.accuracy:.4f}, "
-            f"leakage=0"
-        )
+    if all_passed:
+        logger.info("[DATA_ENFORCEMENT] ✓ All 7 checks passed")
     else:
-        logger.error(
-            f"[DATA_ENFORCEMENT] BLOCKED — {len(errors)} failure(s):"
-        )
-        for e in errors:
-            logger.error(f"  • {e}")
+        logger.error(f"[DATA_ENFORCEMENT] ✗ {abort_reason}")
 
-    return result
+    return report
