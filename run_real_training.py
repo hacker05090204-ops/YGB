@@ -1,349 +1,80 @@
 """
-<<<<<<< HEAD
-MAX GPU POWER — Push RTX 3050 to full utilization.
+═══════════════════════════════════════════════════════════════════════
+  CUDA NODE RTX3050 — Distributed Training Protocol
+═══════════════════════════════════════════════════════════════════════
 
-Changes vs previous run:
-  - batch_size: 256 → 4096 (16x)
-  - model: deeper & wider (256→1024→2048→1024→512→256→128→2)
-  - dataset: 18K → 50K samples
-  - grad_accum: 2 → 8
-  - epochs: 20 → 30
-  - DataLoader workers: 4, pin_memory, prefetch
-=======
-<<<<<<< HEAD
-run_real_training.py — Full GPU Training Session with Telemetry Capture
+  ROLE: CUDA compute node (RTX 3050 Laptop GPU)
+  GOAL: Maximize compute while maintaining determinism.
 
-Runs actual training with:
-  - Real dataset (from real_dataset_loader)
-  - AMP enabled (BALANCED mode)
-  - Feature cache active
-  - Gradient accumulation (steps=4)
-  - Deterministic mode
-  - Full telemetry capture
-  - 3-run determinism validation
-
-Output: JSON report to stdout
+  PROTOCOL:
+    1. Verify CUDA + driver
+    2. Validate dataset + feature_dim
+    3. Adaptive batch scaling → optimal_batch_3050
+    4. Send GPU capacity score to authority
+    5. Authority calculates shard proportion
+    6. Join NCCL DDP (single-GPU fallback)
+    7. Train: grad_clip=1.0, cosine_warm_restart, encoder_freeze
+    8. Post-epoch telemetry
+═══════════════════════════════════════════════════════════════════════
 """
-
-import hashlib
-import json
-import os
-import sys
-import time
-
-import numpy as np
-
-# Deterministic environment FIRST
-os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
-os.environ["PYTHONHASHSEED"] = "42"
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-
-# Enforce determinism
-torch.manual_seed(42)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-try:
-    torch.use_deterministic_algorithms(True)
-except Exception:
-    pass
-
-# ============================================================
-# DEVICE SETUP
-# ============================================================
-
-device_type = "cpu"
-device_name = "CPU"
-gpu_count = 0
-vram_total_mb = 0
-
-if torch.cuda.is_available():
-    device_type = "cuda"
-    gpu_count = torch.cuda.device_count()
-    props = torch.cuda.get_device_properties(0)
-    device_name = props.name
-    vram_total_mb = props.total_memory / (1024 ** 2)
-    torch.cuda.reset_peak_memory_stats()
-    print(f"[GPU] {device_name}, VRAM={vram_total_mb:.0f}MB, count={gpu_count}", file=sys.stderr)
-elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-    device_type = "mps"
-    device_name = "Apple MPS"
-    print(f"[MPS] Apple Silicon", file=sys.stderr)
-else:
-    print(f"[CPU] No GPU available", file=sys.stderr)
-
-device = torch.device(device_type)
-
-# ============================================================
-# AMP SETUP
-# ============================================================
-
-amp_enabled = (device_type == "cuda")
-scaler = None
-if amp_enabled:
-    from torch.cuda.amp import GradScaler, autocast
-    scaler = GradScaler()
-    print(f"[AMP] Enabled (FP16)", file=sys.stderr)
-
-# ============================================================
-# DATASET — Real data from real_dataset_loader
-# ============================================================
-
-print(f"[DATA] Loading real dataset...", file=sys.stderr)
-data_start = time.perf_counter()
-
-try:
-    from impl_v1.training.data.real_dataset_loader import create_training_dataloader
-    train_loader, holdout_loader, stats = create_training_dataloader(
-        batch_size=1024,
-        num_workers=0,
-        pin_memory=True,
-        prefetch_factor=2,
-        seed=42,
-    )
-    total_samples = stats.get('train', {}).get('total', 0)
-    dataset_hash_input = json.dumps(stats, sort_keys=True).encode('utf-8')
-    dataset_hash = hashlib.sha256(dataset_hash_input).hexdigest()
-    print(f"[DATA] Loaded {total_samples} samples in {time.perf_counter()-data_start:.2f}s", file=sys.stderr)
-    print(f"[DATA] Hash: {dataset_hash[:16]}...", file=sys.stderr)
-except Exception as e:
-    print(f"[DATA] real_dataset_loader failed: {e}", file=sys.stderr)
-    print(f"[DATA] Falling back to generated dataset", file=sys.stderr)
-    
-    # Generate deterministic dataset
-    rng = np.random.RandomState(42)
-    num_samples = 20000
-    input_dim = 256
-    features = rng.randn(num_samples, input_dim).astype(np.float32)
-    labels = rng.randint(0, 2, num_samples).astype(np.int64)
-    
-    from torch.utils.data import TensorDataset, DataLoader
-    
-    g = torch.Generator()
-    g.manual_seed(42)
-    
-    ds = TensorDataset(torch.from_numpy(features), torch.from_numpy(labels))
-    train_loader = DataLoader(
-        ds, batch_size=1024, shuffle=True, generator=g,
-        num_workers=0, pin_memory=(device_type == "cuda"),
-    )
-    total_samples = num_samples
-    dataset_hash = hashlib.sha256(features.tobytes() + labels.tobytes()).hexdigest()
-    stats = {"train": {"total": num_samples}, "input_dim": input_dim}
-    input_dim_val = input_dim
-    print(f"[DATA] Generated {num_samples} samples, hash={dataset_hash[:16]}...", file=sys.stderr)
-
-# Detect input dimension from first batch
-for batch_x, batch_y in train_loader:
-    input_dim_val = batch_x.shape[1]
-    break
-
-# ============================================================
-# MODEL
-# ============================================================
-
-model = nn.Sequential(
-    nn.Linear(input_dim_val, 512),
-    nn.ReLU(),
-    nn.Dropout(0.3),
-    nn.Linear(512, 256),
-    nn.ReLU(),
-    nn.Dropout(0.2),
-    nn.Linear(256, 128),
-    nn.ReLU(),
-    nn.Linear(128, 2),
-).to(device)
-
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-criterion = nn.CrossEntropyLoss()
-
-print(f"[MODEL] {sum(p.numel() for p in model.parameters())} parameters", file=sys.stderr)
-
-# ============================================================
-# TRAINING — 1 Full Epoch with Gradient Accumulation
-# ============================================================
-
-accumulation_steps = 4
-batch_size_actual = 1024
-epochs_to_run = 3  # Run 3 epochs for better metrics
-
-print(f"[TRAIN] Starting {epochs_to_run} epochs, accum={accumulation_steps}, batch={batch_size_actual}", file=sys.stderr)
-
-model.train()
-epoch_start = time.perf_counter()
-total_loss = 0.0
-total_correct = 0
-total_processed = 0
-batch_count = 0
-
-for epoch in range(epochs_to_run):
-    optimizer.zero_grad()
-    epoch_loss = 0.0
-    epoch_correct = 0
-    epoch_samples = 0
-    
-    for batch_x, batch_y in train_loader:
-        batch_x = batch_x.to(device, non_blocking=True)
-        batch_y = batch_y.to(device, non_blocking=True)
-        bs = batch_y.size(0)
-        
-        if amp_enabled and scaler is not None:
-            with autocast(dtype=torch.float16):
-                outputs = model(batch_x)
-                loss = criterion(outputs, batch_y) / accumulation_steps
-            scaler.scale(loss).backward()
-            
-            if (batch_count + 1) % accumulation_steps == 0:
-                scaler.step(optimizer)
-                scaler.update()
-                optimizer.zero_grad()
-        else:
-            outputs = model(batch_x)
-            loss = criterion(outputs, batch_y) / accumulation_steps
-            loss.backward()
-            
-            if (batch_count + 1) % accumulation_steps == 0:
-                optimizer.step()
-                optimizer.zero_grad()
-        
-        epoch_loss += loss.item() * accumulation_steps * bs
-        _, preds = torch.max(outputs.data, 1)
-        epoch_correct += (preds == batch_y).sum().item()
-        epoch_samples += bs
-        batch_count += 1
-    
-    # Handle remainder
-    if batch_count % accumulation_steps != 0:
-        if amp_enabled and scaler:
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            optimizer.step()
-        optimizer.zero_grad()
-    
-    total_loss += epoch_loss
-    total_correct += epoch_correct
-    total_processed += epoch_samples
-    
-    acc = epoch_correct / max(epoch_samples, 1)
-    avg_loss = epoch_loss / max(epoch_samples, 1)
-    print(f"[TRAIN] Epoch {epoch+1}: loss={avg_loss:.4f}, acc={acc:.4f}, samples={epoch_samples}", file=sys.stderr)
-
-epoch_time = time.perf_counter() - epoch_start
-samples_per_sec = total_processed / max(epoch_time, 0.001)
-
-# ============================================================
-# GPU TELEMETRY
-# ============================================================
-
-vram_peak_mb = 0.0
-if device_type == "cuda":
-    vram_peak_mb = torch.cuda.max_memory_allocated() / (1024 ** 2)
-
-print(f"[TELEMETRY] {samples_per_sec:.0f} samples/sec, VRAM peak={vram_peak_mb:.1f}MB", file=sys.stderr)
-
-# ============================================================
-# DETERMINISM VALIDATION (3-run)
-# ============================================================
-
-print(f"[DETERMINISM] Running 3-run hash comparison...", file=sys.stderr)
-
-def single_determinism_run(seed=42):
-    """Run a quick deterministic training and return weight hash."""
-    torch.manual_seed(seed)
-    np.random.seed(seed)
-    
-    m = nn.Sequential(
-        nn.Linear(input_dim_val, 128), nn.ReLU(), nn.Dropout(0.3),
-        nn.Linear(128, 64), nn.ReLU(), nn.Linear(64, 2),
-    ).to(device)
-    
-    opt = optim.Adam(m.parameters(), lr=0.001)
-    crit = nn.CrossEntropyLoss()
-    
-    rng2 = np.random.RandomState(seed)
-    X2 = torch.from_numpy(rng2.randn(2000, input_dim_val).astype(np.float32)).to(device)
-    y2 = torch.from_numpy(rng2.randint(0, 2, 2000).astype(np.int64)).to(device)
-    
-    m.train()
-    for ep in range(3):
-        opt.zero_grad()
-        out = m(X2)
-        loss = crit(out, y2)
-        loss.backward()
-        opt.step()
-    
-    weight_bytes = b""
-    for name, param in sorted(m.named_parameters()):
-        weight_bytes += param.detach().cpu().numpy().tobytes()
-    return hashlib.sha256(weight_bytes).hexdigest()
-
-hash1 = single_determinism_run(42)
-hash2 = single_determinism_run(42)
-hash3 = single_determinism_run(42)
-det_match = (hash1 == hash2 == hash3)
-
-print(f"[DETERMINISM] Run1: {hash1[:16]}...", file=sys.stderr)
-print(f"[DETERMINISM] Run2: {hash2[:16]}...", file=sys.stderr)
-print(f"[DETERMINISM] Run3: {hash3[:16]}...", file=sys.stderr)
-print(f"[DETERMINISM] Match: {det_match}", file=sys.stderr)
-
-# ============================================================
-# STRUCTURED OUTPUT
-# ============================================================
-
-result = {
-    "samples_per_sec": round(samples_per_sec, 2),
-    "vram_peak_mb": round(vram_peak_mb, 2),
-    "batch_size": batch_size_actual,
-    "gpu_count": gpu_count,
-    "world_size": gpu_count if gpu_count > 0 else 1,
-    "amp_enabled": amp_enabled,
-    "device_type": device_type,
-    "device_name": device_name,
-    "dataset_hash": dataset_hash,
-    "epoch_time_sec": round(epoch_time, 3),
-    "total_epochs": epochs_to_run,
-    "total_samples_processed": total_processed,
-    "final_accuracy": round(total_correct / max(total_processed, 1), 4),
-    "final_loss": round(total_loss / max(total_processed, 1), 4),
-    "determinism_match": det_match,
-    "weight_hash_run1": hash1,
-    "weight_hash_run2": hash2,
-    "weight_hash_run3": hash3,
-}
-
-# Save to reports
-os.makedirs("reports", exist_ok=True)
-with open("reports/speed_telemetry.json", "w") as f:
-    json.dump(result, f, indent=2)
-
-# Output to stdout
-print(json.dumps(result, indent=2))
-=======
-Real GPU Training Session — captures telemetry and runs determinism check.
-Uses hardened_trainer.py pipeline with AMP, gradient accumulation, deterministic mode.
->>>>>>> 1dc79242ace8d8d71763b2556ad93e4399e26121
-"""
-import sys, os, time, json, hashlib
+import sys, os, time, json, hashlib, logging, math
 sys.path.insert(0, os.path.dirname(__file__))
 
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from torch.cuda.amp import autocast, GradScaler
 
-# ── Verify CUDA ───────────────────────────────────────────────────────
-assert torch.cuda.is_available(), "FATAL: CUDA not available"
-device = torch.device("cuda")
-gpu_name = torch.cuda.get_device_name(0)
-total_vram = torch.cuda.get_device_properties(0).total_memory / (1024**2)
-print(f"[GPU] {gpu_name}, VRAM: {total_vram:.0f} MB, CUDA {torch.version.cuda}")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [NODE-RTX3050] %(message)s",
+)
+log = logging.getLogger("cuda_node")
 
-# ── Deterministic ─────────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 1 — VERIFY CUDA + DRIVER
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 1: Verify CUDA + Driver ═══")
+
+assert torch.cuda.is_available(), "FATAL: CUDA not available — node cannot participate"
+device = torch.device("cuda:0")
+
+gpu_props = torch.cuda.get_device_properties(0)
+gpu_name = gpu_props.name
+gpu_vram_mb = gpu_props.total_memory / (1024 ** 2)
+gpu_sm_count = gpu_props.multi_processor_count
+gpu_compute = f"{gpu_props.major}.{gpu_props.minor}"
+cuda_version = torch.version.cuda
+driver_version = torch.cuda.get_device_capability(0)
+
+node_info = {
+    "node_id": f"RTX3050-{hashlib.sha256(gpu_name.encode()).hexdigest()[:8]}",
+    "gpu_name": gpu_name,
+    "vram_mb": round(gpu_vram_mb, 1),
+    "sm_count": gpu_sm_count,
+    "compute_capability": gpu_compute,
+    "cuda_version": cuda_version,
+    "driver_capability": f"{driver_version[0]}.{driver_version[1]}",
+    "amp_supported": True,
+    "fp16_supported": gpu_props.major >= 7,
+    "tensor_cores": gpu_props.major >= 7,
+}
+
+log.info(f"  GPU: {gpu_name}")
+log.info(f"  VRAM: {gpu_vram_mb:.0f} MB")
+log.info(f"  SMs: {gpu_sm_count}, Compute: {gpu_compute}")
+log.info(f"  CUDA: {cuda_version}")
+log.info(f"  Node ID: {node_info['node_id']}")
+log.info("  ✅ CUDA + Driver VERIFIED")
+
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 2 — VALIDATE DATASET + FEATURE_DIM
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 2: Validate Dataset + Feature Dim ═══")
+
+# Enforce determinism from the start
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 torch.manual_seed(42)
 torch.cuda.manual_seed_all(42)
@@ -352,51 +83,6 @@ torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 torch.use_deterministic_algorithms(True, warn_only=True)
 
-# ── Large model to fill GPU ──────────────────────────────────────────
-class MaxPowerModel(nn.Module):
-    """Deeper & wider model to maximize GPU memory and compute."""
-    def __init__(self, input_dim=256):
-        super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, 1024),
-            nn.GELU(),
-            nn.LayerNorm(1024),
-            nn.Dropout(0.2),
-
-            nn.Linear(1024, 2048),
-            nn.GELU(),
-            nn.LayerNorm(2048),
-            nn.Dropout(0.2),
-
-            nn.Linear(2048, 2048),
-            nn.GELU(),
-            nn.LayerNorm(2048),
-            nn.Dropout(0.15),
-
-            nn.Linear(2048, 1024),
-            nn.GELU(),
-            nn.LayerNorm(1024),
-            nn.Dropout(0.15),
-
-            nn.Linear(1024, 512),
-            nn.GELU(),
-            nn.LayerNorm(512),
-            nn.Dropout(0.1),
-
-            nn.Linear(512, 256),
-            nn.GELU(),
-            nn.Dropout(0.1),
-
-            nn.Linear(256, 128),
-            nn.GELU(),
-
-            nn.Linear(128, 2),
-        )
-
-    def forward(self, x):
-        return self.net(x)
-
-# ── Load LARGE dataset ───────────────────────────────────────────────
 from impl_v1.training.data.scaled_dataset import DatasetConfig
 from impl_v1.training.data.real_dataset_loader import RealTrainingDataset
 
@@ -404,59 +90,353 @@ config = DatasetConfig(total_samples=50000)
 dataset = RealTrainingDataset(config=config)
 features = dataset._features_tensor.numpy()
 labels = dataset._labels_tensor.numpy()
+
+FEATURE_DIM = features.shape[1]
+N_SAMPLES = len(labels)
+N_CLASSES = len(np.unique(labels))
 dataset_hash = hashlib.sha256(features.tobytes() + labels.tobytes()).hexdigest()[:16]
 
-N = len(labels)
-idx = np.random.permutation(N)
-split = int(0.8 * N)
+# Integrity checks
+assert FEATURE_DIM == 256, f"FATAL: Expected feature_dim=256, got {FEATURE_DIM}"
+assert N_CLASSES == 2, f"FATAL: Expected 2 classes, got {N_CLASSES}"
+assert N_SAMPLES > 0, "FATAL: Empty dataset"
+assert not np.isnan(features).any(), "FATAL: NaN in features"
+assert not np.isinf(features).any(), "FATAL: Inf in features"
+
+# Class balance check
+class_counts = np.bincount(labels)
+balance_ratio = min(class_counts) / max(class_counts)
+
+dataset_meta = {
+    "samples": N_SAMPLES,
+    "feature_dim": FEATURE_DIM,
+    "classes": N_CLASSES,
+    "class_balance": round(balance_ratio, 4),
+    "hash": dataset_hash,
+    "dtype": str(features.dtype),
+    "range": [round(float(features.min()), 4), round(float(features.max()), 4)],
+}
+
+log.info(f"  Samples: {N_SAMPLES}, Dim: {FEATURE_DIM}, Classes: {N_CLASSES}")
+log.info(f"  Balance: {balance_ratio:.4f}")
+log.info(f"  Hash: {dataset_hash}")
+log.info("  ✅ Dataset VALIDATED")
+
+# Train/test split
+idx = np.random.permutation(N_SAMPLES)
+split = int(0.8 * N_SAMPLES)
 train_f, train_l = features[idx[:split]], labels[idx[:split]]
 test_f, test_l = features[idx[split:]], labels[idx[split:]]
 
-print(f"[DATA] {N} samples, {features.shape[1]}D, hash={dataset_hash}")
-print(f"[DATA] Train: {len(train_l)}, Test: {len(test_l)}")
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 3 — ADAPTIVE BATCH SCALING → optimal_batch_3050
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 3: Adaptive Batch Scaling ═══")
 
-# ── DataLoader with maximum throughput ────────────────────────────────
-BATCH_SIZE = 4096
-train_dataset = TensorDataset(
-    torch.tensor(train_f, dtype=torch.float32),
-    torch.tensor(train_l, dtype=torch.long),
-)
-train_loader = DataLoader(
-    train_dataset, batch_size=BATCH_SIZE, shuffle=True,
-    num_workers=0, pin_memory=True,
-    drop_last=False,
-)
 
-# ── Model, optimizer, scheduler ───────────────────────────────────────
-model = MaxPowerModel(features.shape[1]).to(device)
+class MaxPowerEncoder(nn.Module):
+    """8-layer model with freezable encoder head."""
+    def __init__(self, input_dim=256, freeze_encoder=False):
+        super().__init__()
+        # Encoder (layers 0-5, freezable)
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 1024),
+            nn.GELU(),
+            nn.LayerNorm(1024),
+            nn.Dropout(0.2),
+            nn.Linear(1024, 2048),
+            nn.GELU(),
+            nn.LayerNorm(2048),
+            nn.Dropout(0.2),
+            nn.Linear(2048, 2048),
+            nn.GELU(),
+            nn.LayerNorm(2048),
+            nn.Dropout(0.15),
+            nn.Linear(2048, 1024),
+            nn.GELU(),
+            nn.LayerNorm(1024),
+            nn.Dropout(0.15),
+        )
+        # Classifier head (always trainable)
+        self.head = nn.Sequential(
+            nn.Linear(1024, 512),
+            nn.GELU(),
+            nn.LayerNorm(512),
+            nn.Dropout(0.1),
+            nn.Linear(512, 256),
+            nn.GELU(),
+            nn.Dropout(0.1),
+            nn.Linear(256, 128),
+            nn.GELU(),
+            nn.Linear(128, 2),
+        )
+        if freeze_encoder:
+            self.freeze_encoder()
+
+    def freeze_encoder(self):
+        for p in self.encoder.parameters():
+            p.requires_grad = False
+        log.info("  Encoder FROZEN (head-only training)")
+
+    def unfreeze_encoder(self):
+        for p in self.encoder.parameters():
+            p.requires_grad = True
+
+    def forward(self, x):
+        return self.head(self.encoder(x))
+
+
+def find_optimal_batch(model, feature_dim, device, max_vram_pct=0.85):
+    """
+    Binary search for largest batch size that fits in VRAM.
+    Target: use up to max_vram_pct of total GPU memory.
+    """
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats()
+
+    total_mem = torch.cuda.get_device_properties(0).total_memory
+    target_mem = total_mem * max_vram_pct
+
+    batch_sizes = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768]
+    optimal = 256
+    scaler = GradScaler()
+    criterion = nn.CrossEntropyLoss()
+
+    for bs in batch_sizes:
+        try:
+            torch.cuda.empty_cache()
+            torch.cuda.reset_peak_memory_stats()
+
+            dummy_x = torch.randn(bs, feature_dim, device=device)
+            dummy_y = torch.randint(0, 2, (bs,), device=device)
+
+            model.train()
+            with autocast(dtype=torch.float16):
+                out = model(dummy_x)
+                loss = criterion(out, dummy_y)
+            scaler.scale(loss).backward()
+
+            peak = torch.cuda.max_memory_allocated()
+            if peak < target_mem:
+                optimal = bs
+                log.info(f"  batch={bs:6d} → VRAM={peak / 1024**2:.0f} MB — OK")
+            else:
+                log.info(f"  batch={bs:6d} → VRAM={peak / 1024**2:.0f} MB — EXCEEDS {max_vram_pct*100:.0f}%")
+                break
+
+            # Cleanup
+            del dummy_x, dummy_y, out, loss
+            model.zero_grad(set_to_none=True)
+
+        except RuntimeError as e:
+            if "out of memory" in str(e).lower():
+                log.info(f"  batch={bs:6d} → OOM")
+                torch.cuda.empty_cache()
+                break
+            raise
+
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats()
+    return optimal
+
+
+# Build model for batch calibration
+model = MaxPowerEncoder(FEATURE_DIM, freeze_encoder=False).to(device)
 param_count = sum(p.numel() for p in model.parameters())
-print(f"[MODEL] MaxPowerModel — {param_count:,} parameters")
+trainable_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
+log.info(f"  Model: {param_count:,} params ({trainable_count:,} trainable)")
 
-optimizer = torch.optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-4)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=30)
+optimal_batch_3050 = find_optimal_batch(model, FEATURE_DIM, device, max_vram_pct=0.85)
+log.info(f"  ✅ optimal_batch_3050 = {optimal_batch_3050}")
+
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 4 — GPU CAPACITY SCORE → AUTHORITY
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 4: GPU Capacity Score ═══")
+
+# Benchmark: measure actual throughput at optimal batch
+torch.cuda.empty_cache()
+torch.cuda.reset_peak_memory_stats()
+model.train()
+scaler = GradScaler()
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.AdamW(model.parameters(), lr=0.001)
+
+bench_x = torch.randn(optimal_batch_3050, FEATURE_DIM, device=device)
+bench_y = torch.randint(0, 2, (optimal_batch_3050,), device=device)
+
+# Warmup
+for _ in range(3):
+    with autocast(dtype=torch.float16):
+        out = model(bench_x)
+        loss = criterion(out, bench_y)
+    scaler.scale(loss).backward()
+    scaler.step(optimizer)
+    scaler.update()
+    optimizer.zero_grad()
+torch.cuda.synchronize()
+
+# Timed run
+t0 = time.perf_counter()
+BENCH_ITERS = 20
+for _ in range(BENCH_ITERS):
+    with autocast(dtype=torch.float16):
+        out = model(bench_x)
+        loss = criterion(out, bench_y)
+    scaler.scale(loss).backward()
+    scaler.step(optimizer)
+    scaler.update()
+    optimizer.zero_grad()
+torch.cuda.synchronize()
+bench_time = time.perf_counter() - t0
+
+throughput = (optimal_batch_3050 * BENCH_ITERS) / bench_time
+vram_peak_bench = torch.cuda.max_memory_allocated() / (1024 ** 2)
+
+# Capacity score: composite of VRAM + throughput + SM count
+capacity_score = round(
+    (gpu_vram_mb / 1000) * 0.3 +          # VRAM weight
+    (throughput / 10000) * 0.5 +           # Throughput weight
+    (gpu_sm_count / 10) * 0.2,            # SM weight
+    4
+)
+
+capacity_report = {
+    "node_id": node_info["node_id"],
+    "gpu": gpu_name,
+    "vram_mb": round(gpu_vram_mb, 1),
+    "optimal_batch": optimal_batch_3050,
+    "throughput_samples_sec": round(throughput, 2),
+    "vram_peak_mb": round(vram_peak_bench, 2),
+    "sm_count": gpu_sm_count,
+    "capacity_score": capacity_score,
+}
+
+log.info(f"  Throughput: {throughput:.0f} samples/sec at batch={optimal_batch_3050}")
+log.info(f"  VRAM peak: {vram_peak_bench:.0f} MB / {gpu_vram_mb:.0f} MB")
+log.info(f"  Capacity score: {capacity_score}")
+log.info("  ✅ Capacity report ready for authority")
+
+del bench_x, bench_y, out, loss
+torch.cuda.empty_cache()
+
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 5 — AUTHORITY CALCULATES SHARD PROPORTION
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 5: Authority Shard Calculation ═══")
+
+# Single-node: this node gets 100% of the shard
+total_capacity = capacity_score  # Sum of all nodes in cluster
+shard_proportion = capacity_score / total_capacity  # = 1.0 for single node
+
+shard_samples = int(len(train_l) * shard_proportion)
+log.info(f"  Shard proportion: {shard_proportion:.4f}")
+log.info(f"  Shard samples: {shard_samples} / {len(train_l)}")
+log.info("  ✅ Shard assigned")
+
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 6 — JOIN NCCL DDP
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 6: DDP Initialization ═══")
+
+gpu_count = torch.cuda.device_count()
+USE_DDP = gpu_count > 1
+
+if USE_DDP:
+    import torch.distributed as dist
+    from torch.nn.parallel import DistributedDataParallel as DDP
+    dist.init_process_group(backend="nccl")
+    local_rank = int(os.environ.get("LOCAL_RANK", 0))
+    torch.cuda.set_device(local_rank)
+    device = torch.device(f"cuda:{local_rank}")
+    log.info(f"  NCCL DDP initialized — rank {local_rank}/{gpu_count}")
+else:
+    local_rank = 0
+    log.info(f"  Single GPU mode — DDP not required (gpu_count={gpu_count})")
+
+world_size = gpu_count
+
+# Re-initialize model fresh for training (deterministic init)
+torch.manual_seed(42)
+torch.cuda.manual_seed_all(42)
+model = MaxPowerEncoder(FEATURE_DIM, freeze_encoder=False).to(device)
+
+if USE_DDP:
+    model = DDP(model, device_ids=[local_rank])
+
+log.info(f"  World size: {world_size}")
+log.info("  ✅ DDP ready")
+
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 7 — TRAINING: grad_clip=1.0, cosine_warm_restart, encoder_freeze
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 7: Training Protocol ═══")
+
+GRAD_CLIP = 1.0
+EPOCHS = 30
+GRAD_ACCUM = 8
+ENCODER_FREEZE_EPOCHS = 0  # Set > 0 to freeze encoder for first N epochs
+T_0 = 10          # Cosine warm restart period
+T_MULT = 2        # Period multiplier after each restart
+ETA_MIN = 1e-6    # Minimum LR
+
+optimizer = optim.AdamW(
+    filter(lambda p: p.requires_grad, model.parameters()),
+    lr=0.001, weight_decay=1e-4,
+)
+scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+    optimizer, T_0=T_0, T_mult=T_MULT, eta_min=ETA_MIN,
+)
 criterion = nn.CrossEntropyLoss()
 scaler = GradScaler()
 
-GRAD_ACCUM = 8
-EPOCHS = 30
+# Build DataLoader with optimal batch
+train_ds = TensorDataset(
+    torch.tensor(train_f[:shard_samples], dtype=torch.float32),
+    torch.tensor(train_l[:shard_samples], dtype=torch.long),
+)
+train_loader = DataLoader(
+    train_ds, batch_size=optimal_batch_3050, shuffle=True,
+    num_workers=0, pin_memory=True, drop_last=False,
+)
 
-# ── Reset VRAM tracking ──────────────────────────────────────────────
-torch.cuda.reset_peak_memory_stats()
+log.info(f"  Batch: {optimal_batch_3050}, Grad accum: {GRAD_ACCUM}")
+log.info(f"  Effective batch: {optimal_batch_3050 * GRAD_ACCUM}")
+log.info(f"  Grad clip: {GRAD_CLIP}")
+log.info(f"  Scheduler: CosineAnnealingWarmRestarts(T_0={T_0}, T_mult={T_MULT})")
+log.info(f"  Encoder freeze epochs: {ENCODER_FREEZE_EPOCHS}")
+
 torch.cuda.empty_cache()
+torch.cuda.reset_peak_memory_stats()
 
-# ── TRAINING LOOP ─────────────────────────────────────────────────────
-print(f"\n{'='*60}")
-print(f"TRAINING: {EPOCHS} epochs, batch={BATCH_SIZE}, grad_accum={GRAD_ACCUM}")
-print(f"{'='*60}\n")
-
-t0 = time.perf_counter()
+epoch_reports = []
+t_total = time.perf_counter()
 
 for epoch in range(EPOCHS):
-    model.train()
     ep_start = time.perf_counter()
+
+    # Encoder freeze logic
+    raw_model = model.module if USE_DDP else model
+    if ENCODER_FREEZE_EPOCHS > 0:
+        if epoch < ENCODER_FREEZE_EPOCHS:
+            raw_model.freeze_encoder()
+        elif epoch == ENCODER_FREEZE_EPOCHS:
+            raw_model.unfreeze_encoder()
+            # Re-add encoder params to optimizer
+            optimizer = optim.AdamW(
+                filter(lambda p: p.requires_grad, model.parameters()),
+                lr=0.001, weight_decay=1e-4,
+            )
+            scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+                optimizer, T_0=T_0, T_mult=T_MULT, eta_min=ETA_MIN,
+            )
+            log.info(f"  Epoch {epoch+1}: Encoder UNFROZEN, optimizer re-initialized")
+
+    model.train()
     total_loss = 0.0
     total_correct = 0
     total_samples = 0
+    max_grad_norm = 0.0
     optimizer.zero_grad()
 
     for b_idx, (bx, by) in enumerate(train_loader):
@@ -470,6 +450,12 @@ for epoch in range(EPOCHS):
         scaler.scale(loss).backward()
 
         if (b_idx + 1) % GRAD_ACCUM == 0:
+            # Unscale before clipping
+            scaler.unscale_(optimizer)
+            grad_norm = torch.nn.utils.clip_grad_norm_(
+                model.parameters(), max_norm=GRAD_CLIP
+            )
+            max_grad_norm = max(max_grad_norm, grad_norm.item())
             scaler.step(optimizer)
             scaler.update()
             optimizer.zero_grad()
@@ -478,117 +464,187 @@ for epoch in range(EPOCHS):
         total_correct += (logits.argmax(1) == by).sum().item()
         total_samples += bx.size(0)
 
-    # Flush remaining grads
+    # Flush remaining
     if (b_idx + 1) % GRAD_ACCUM != 0:
+        scaler.unscale_(optimizer)
+        grad_norm = torch.nn.utils.clip_grad_norm_(
+            model.parameters(), max_norm=GRAD_CLIP
+        )
+        max_grad_norm = max(max_grad_norm, grad_norm.item())
         scaler.step(optimizer)
         scaler.update()
         optimizer.zero_grad()
 
-    scheduler.step()
+    scheduler.step(epoch + 1)
 
     # Eval
     model.eval()
     with torch.no_grad():
-        tx = torch.tensor(test_f, dtype=torch.float32).to(device)
-        tl = torch.tensor(test_l, dtype=torch.long).to(device)
+        tx = torch.tensor(test_f, dtype=torch.float32, device=device)
+        tl = torch.tensor(test_l, dtype=torch.long, device=device)
         test_logits = model(tx)
         test_acc = (test_logits.argmax(1) == tl).float().mean().item()
+        del tx, tl, test_logits
 
     ep_time = time.perf_counter() - ep_start
     avg_loss = total_loss / max(total_samples, 1)
     train_acc = total_correct / max(total_samples, 1)
-    vram_now = torch.cuda.max_memory_allocated() / (1024**2)
+    vram_now = torch.cuda.max_memory_allocated() / (1024 ** 2)
     sps = total_samples / max(ep_time, 0.001)
+    lr_now = optimizer.param_groups[0]["lr"]
 
-    print(
-        f"Epoch {epoch+1:3d}/{EPOCHS}: "
+    log.info(
+        f"  E{epoch+1:3d}/{EPOCHS}: "
         f"train={train_acc:.4f} test={test_acc:.4f} "
         f"loss={avg_loss:.4f} "
+        f"grad={max_grad_norm:.3f} "
+        f"lr={lr_now:.2e} "
         f"VRAM={vram_now:.0f}MB "
-        f"speed={sps:.0f} samp/s "
+        f"speed={sps:.0f}s/s "
         f"time={ep_time:.1f}s"
     )
 
-total_time = time.perf_counter() - t0
-vram_peak = torch.cuda.max_memory_allocated() / (1024**2)
-vram_reserved = torch.cuda.memory_reserved() / (1024**2)
-final_sps = (len(train_l) * EPOCHS) / max(total_time, 0.001)
+    epoch_reports.append({
+        "epoch": epoch + 1,
+        "train_acc": round(train_acc, 4),
+        "test_acc": round(test_acc, 4),
+        "loss": round(avg_loss, 6),
+        "max_grad_norm": round(max_grad_norm, 4),
+        "lr": round(lr_now, 8),
+        "vram_mb": round(vram_now, 2),
+        "samples_per_sec": round(sps, 2),
+        "epoch_time_sec": round(ep_time, 2),
+    })
 
-# ── GPU VALIDATION ────────────────────────────────────────────────────
-model_dev = str(next(model.parameters()).device)
-assert "cuda" in model_dev, f"Model on {model_dev}, not CUDA!"
-assert vram_peak > 0, "VRAM peak == 0!"
-print(f"\n[GPU] VALIDATED — {model_dev}, VRAM peak {vram_peak:.1f} MB / {total_vram:.0f} MB ({vram_peak/total_vram*100:.1f}%)")
+total_time = time.perf_counter() - t_total
+vram_peak_final = torch.cuda.max_memory_allocated() / (1024 ** 2)
+final_sps = (total_samples * EPOCHS) / max(total_time, 0.001)
 
-# ── DETERMINISM (3 single-epoch runs) ─────────────────────────────────
-print("\n[DETERMINISM] 3-run hash check...")
-hashes = []
+log.info("  ✅ Training COMPLETE")
+
+# ═══════════════════════════════════════════════════════════════════════
+# STEP 8 — POST-EPOCH TELEMETRY REPORT
+# ═══════════════════════════════════════════════════════════════════════
+log.info("═══ STEP 8: Post-Epoch Telemetry ═══")
+
+# Compute merged weight hash
+raw_model = model.module if USE_DDP else model
+h = hashlib.sha256()
+for k in sorted(raw_model.state_dict().keys()):
+    h.update(raw_model.state_dict()[k].cpu().numpy().tobytes())
+merged_weight_hash = h.hexdigest()[:16]
+
+# Determinism check (3 single-epoch runs)
+log.info("  Running determinism verification (3 runs)...")
+det_hashes = []
 for run_i in range(3):
-    torch.manual_seed(42); torch.cuda.manual_seed_all(42); np.random.seed(42)
-    m = MaxPowerModel(features.shape[1]).to(device)
-    opt = torch.optim.AdamW(m.parameters(), lr=0.001, weight_decay=1e-4)
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
+    np.random.seed(42)
+    m = MaxPowerEncoder(FEATURE_DIM).to(device)
+    opt = optim.AdamW(m.parameters(), lr=0.001, weight_decay=1e-4)
     sc = GradScaler()
+    cr = nn.CrossEntropyLoss()
     m.train()
     opt.zero_grad()
     for b_idx, (bx, by) in enumerate(train_loader):
         bx, by = bx.to(device, non_blocking=True), by.to(device, non_blocking=True)
         with autocast(dtype=torch.float16):
             out = m(bx)
-            l = criterion(out, by) / GRAD_ACCUM
+            l = cr(out, by) / GRAD_ACCUM
         sc.scale(l).backward()
         if (b_idx + 1) % GRAD_ACCUM == 0:
-            sc.step(opt); sc.update(); opt.zero_grad()
+            sc.unscale_(opt)
+            torch.nn.utils.clip_grad_norm_(m.parameters(), max_norm=GRAD_CLIP)
+            sc.step(opt)
+            sc.update()
+            opt.zero_grad()
     if (b_idx + 1) % GRAD_ACCUM != 0:
-        sc.step(opt); sc.update(); opt.zero_grad()
-    h = hashlib.sha256()
+        sc.unscale_(opt)
+        torch.nn.utils.clip_grad_norm_(m.parameters(), max_norm=GRAD_CLIP)
+        sc.step(opt)
+        sc.update()
+        opt.zero_grad()
+    dh = hashlib.sha256()
     for k in sorted(m.state_dict().keys()):
-        h.update(m.state_dict()[k].cpu().numpy().tobytes())
-    wh = h.hexdigest()[:16]
-    hashes.append(wh)
-    print(f"  Run {run_i+1}: {wh}")
-    del m, opt, sc
+        dh.update(m.state_dict()[k].cpu().numpy().tobytes())
+    wh = dh.hexdigest()[:16]
+    det_hashes.append(wh)
+    log.info(f"    Run {run_i+1}: {wh}")
+    del m, opt, sc, cr
 
-det_match = len(set(hashes)) == 1
-print(f"  Match: {det_match}")
+det_match = len(set(det_hashes)) == 1
+log.info(f"  Determinism: {'PASS' if det_match else 'FAIL'}")
 
-# ── SAVE RESULTS ──────────────────────────────────────────────────────
-result = {
-    "samples_per_sec": round(final_sps, 2),
-    "vram_peak_mb": round(vram_peak, 2),
-    "vram_total_mb": round(total_vram, 2),
-    "vram_utilization_pct": round(vram_peak / total_vram * 100, 1),
-    "batch_size": BATCH_SIZE,
-    "gpu_count": 1,
-    "world_size": 1,
-    "amp_enabled": True,
-    "device_type": "cuda",
-    "device_name": gpu_name,
-    "model_name": "MaxPowerModel",
-    "model_params": param_count,
-    "dataset_hash": dataset_hash,
-    "dataset_samples": N,
-    "epoch_time_sec": round(total_time, 2),
-    "epochs": EPOCHS,
-    "grad_accumulation": GRAD_ACCUM,
-    "determinism_match": det_match,
-    "weight_hash_run1": hashes[0],
-    "weight_hash_run2": hashes[1],
-    "weight_hash_run3": hashes[2],
-    "final_test_accuracy": round(test_acc, 4),
+# Dataset hash consensus (single node = self-consensus)
+dataset_hash_consensus = dataset_hash
+
+# Final telemetry
+telemetry = {
+    "world_size": world_size,
+    "total_samples_per_sec": round(final_sps, 2),
+    "per_node_batch": optimal_batch_3050,
+    "effective_batch": optimal_batch_3050 * GRAD_ACCUM,
+    "merged_weight_hash": merged_weight_hash,
+    "dataset_hash_consensus": dataset_hash_consensus,
+    "node_info": node_info,
+    "capacity_report": capacity_report,
+    "dataset_meta": dataset_meta,
+    "training_config": {
+        "epochs": EPOCHS,
+        "grad_clip": GRAD_CLIP,
+        "grad_accumulation": GRAD_ACCUM,
+        "scheduler": "CosineAnnealingWarmRestarts",
+        "T_0": T_0,
+        "T_mult": T_MULT,
+        "eta_min": ETA_MIN,
+        "encoder_freeze_epochs": ENCODER_FREEZE_EPOCHS,
+        "amp_enabled": True,
+        "deterministic": True,
+    },
+    "results": {
+        "total_time_sec": round(total_time, 2),
+        "vram_peak_mb": round(vram_peak_final, 2),
+        "vram_utilization_pct": round(vram_peak_final / gpu_vram_mb * 100, 1),
+        "final_train_acc": epoch_reports[-1]["train_acc"],
+        "final_test_acc": epoch_reports[-1]["test_acc"],
+        "final_loss": epoch_reports[-1]["loss"],
+        "model_params": param_count,
+    },
+    "determinism": {
+        "match": det_match,
+        "hash_run1": det_hashes[0],
+        "hash_run2": det_hashes[1],
+        "hash_run3": det_hashes[2],
+    },
+    "epoch_reports": epoch_reports,
 }
 
+# Save
 os.makedirs("reports", exist_ok=True)
 with open("reports/speed_telemetry.json", "w") as f:
-    json.dump(result, f, indent=2)
+    json.dump(telemetry, f, indent=2)
 with open("reports/training_session_result.json", "w") as f:
-<<<<<<< HEAD
-    json.dump(result, f, indent=2)
+    json.dump(telemetry, f, indent=2)
+
+log.info(f"  Weight hash: {merged_weight_hash}")
+log.info(f"  Dataset consensus: {dataset_hash_consensus}")
+log.info(f"  Total time: {total_time:.1f}s")
+log.info(f"  VRAM peak: {vram_peak_final:.0f} MB / {gpu_vram_mb:.0f} MB ({vram_peak_final/gpu_vram_mb*100:.1f}%)")
+log.info(f"  Throughput: {final_sps:.0f} samples/sec")
+log.info(f"  Final accuracy: {epoch_reports[-1]['test_acc']:.4f}")
 
 print(f"\n{'='*60}")
-print("FINAL RESULTS")
+print("NODE RTX3050 — FINAL TELEMETRY")
 print(f"{'='*60}")
-print(json.dumps(result, indent=2))
-=======
-    json.dump(final_result, f, indent=2)
->>>>>>> 07dac0b6cb396c305664595737e0c860829001c1
->>>>>>> 1dc79242ace8d8d71763b2556ad93e4399e26121
+print(json.dumps({
+    "world_size": telemetry["world_size"],
+    "total_samples_per_sec": telemetry["total_samples_per_sec"],
+    "per_node_batch": telemetry["per_node_batch"],
+    "merged_weight_hash": telemetry["merged_weight_hash"],
+    "dataset_hash_consensus": telemetry["dataset_hash_consensus"],
+    "vram_peak_mb": telemetry["results"]["vram_peak_mb"],
+    "vram_utilization_pct": telemetry["results"]["vram_utilization_pct"],
+    "determinism_match": telemetry["determinism"]["match"],
+    "final_accuracy": telemetry["results"]["final_test_acc"],
+}, indent=2))
