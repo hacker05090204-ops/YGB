@@ -1593,8 +1593,118 @@ def get_active_sessions_endpoint():
 
 
 # =============================================================================
+# HUNTING ENDPOINTS (wired to hunting-control-panel.tsx + HuntingPanel.tsx)
+# =============================================================================
+
+# In-memory hunting auto-mode state
+_hunting_auto_mode = {
+    "enabled": False,
+    "shadow_only": True,
+    "integrity_score": 0,
+    "conditions_met": False,
+    "blocked_reasons": ["System not yet calibrated", "No verified fields"],
+}
+
+
+@app.get("/api/hunting/targets")
+async def get_hunting_targets():
+    """Get AI-suggested hunting targets from the database."""
+    try:
+        # Pull real targets from HDD storage
+        db_targets = get_all_targets()
+        suggestions = []
+        for t in db_targets:
+            suggestions.append({
+                "domain": t.get("scope", "unknown"),
+                "program_name": t.get("program_name", "Unknown"),
+                "platform": t.get("platform", "Unknown"),
+                "scope_size": 1,
+                "api_endpoint_count": 0,
+                "wildcard_count": 1 if "*" in t.get("scope", "") else 0,
+                "likelihood_percent": 50,
+                "difficulty": "MEDIUM",
+                "bounty_range": {"min_usd": 100, "max_usd": 5000},
+                "analysis": f"Target from {t.get('platform', 'unknown')} program",
+            })
+        return {"targets": suggestions, "total": len(suggestions)}
+    except Exception as e:
+        return {"targets": [], "total": 0, "error": str(e)}
+
+
+@app.get("/api/hunting/auto-mode")
+async def get_hunting_auto_mode():
+    """Get current hunting auto-mode state with integrity score."""
+    # Read integrity score from supervisor if available
+    if INTEGRITY_AVAILABLE:
+        try:
+            supervisor = get_integrity_supervisor()
+            probe = supervisor.probe_all()
+            score = probe.get("overall_integrity", {}).get("score", 0)
+            _hunting_auto_mode["integrity_score"] = score
+            # Auto-mode can be enabled if integrity >= 80
+            _hunting_auto_mode["conditions_met"] = score >= 80
+            if score < 80:
+                _hunting_auto_mode["blocked_reasons"] = [
+                    f"Integrity score {score}% < 80% required"
+                ]
+            else:
+                _hunting_auto_mode["blocked_reasons"] = []
+        except Exception:
+            pass
+    return _hunting_auto_mode
+
+
+# =============================================================================
 # WEBSOCKET ENDPOINTS
 # =============================================================================
+
+# In-memory hunting WS connections
+hunting_connections: Dict[str, WebSocket] = {}
+
+
+@app.websocket("/ws/hunting")
+async def hunting_websocket(websocket: WebSocket):
+    """WebSocket endpoint for live hunting chat (HuntingPanel.tsx)."""
+    await websocket.accept()
+    conn_id = uuid.uuid4().hex[:8]
+    hunting_connections[conn_id] = websocket
+
+    try:
+        while True:
+            data = await websocket.receive_json()
+            msg_type = data.get("type", "chat")
+
+            if msg_type == "chat":
+                # Echo back as assistant response
+                user_text = data.get("content", "")
+                await websocket.send_json({
+                    "type": "response",
+                    "content": f"Acknowledged: {user_text}. Hunting assistant is in shadow-only mode.",
+                })
+            elif msg_type == "detect":
+                # Return a detection status
+                await websocket.send_json({
+                    "type": "detection",
+                    "result": {
+                        "exploit_type": "Awaiting scan",
+                        "confidence": 0.0,
+                        "field_name": "N/A",
+                        "features": [],
+                        "cvss_score": 0.0,
+                        "severity": "INFO",
+                        "reasoning": "No active scan in progress",
+                        "poc": "",
+                        "mitigation": "",
+                    },
+                })
+
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        pass
+    finally:
+        hunting_connections.pop(conn_id, None)
+
 
 @app.websocket("/ws/hunter/{workflow_id}")
 async def hunter_websocket(websocket: WebSocket, workflow_id: str):
@@ -2093,6 +2203,100 @@ async def accuracy_snapshot():
         }
     except Exception:
         return defaults
+
+
+# =============================================================================
+# TRAINING DATA SOURCE TRANSPARENCY
+# =============================================================================
+
+@app.get("/api/training/data-source")
+async def training_data_source():
+    """
+    GET /api/training/data-source — Training pipeline source transparency.
+    
+    Reads secure_data/dataset_manifest.json to report:
+    - Data source (INGESTION_PIPELINE / SYNTHETIC / NONE)
+    - Dataset hash
+    - Sample count
+    - Source registry status
+    """
+    _api_dir = os.path.dirname(os.path.abspath(__file__))
+    _project_root = os.path.dirname(_api_dir)
+    manifest_path = os.path.join(_project_root, "secure_data", "dataset_manifest.json")
+
+    if not os.path.exists(manifest_path):
+        return {
+            "data_source": "NO_DATA",
+            "dataset_hash": "",
+            "sample_count": 0,
+            "registry_status": "NO_MANIFEST",
+            "strict_real_mode": True,
+            "ingestion_manifest_hash": "",
+        }
+
+    try:
+        import json as _json
+        with open(manifest_path, 'r', encoding='utf-8') as _f:
+            data = _json.load(_f)
+        source = data.get("dataset_source", "UNKNOWN")
+
+        # Determine registry status
+        if source == "INGESTION_PIPELINE":
+            registry = "VERIFIED"
+        elif source == "SYNTHETIC_GENERATOR":
+            registry = "BLOCKED"
+        else:
+            registry = "UNKNOWN"
+
+        # Bridge integrity check
+        bridge_hash = ""
+        dll_integrity = "UNKNOWN"
+        try:
+            import ctypes
+            _bridge_path = os.path.join(_project_root, "native", "distributed", "ingestion_bridge.dll")
+            if os.path.exists(_bridge_path):
+                _bridge = ctypes.CDLL(_bridge_path)
+                _bridge.bridge_self_verify(_bridge_path.encode())
+                hash_buf = ctypes.create_string_buffer(65)
+                _bridge.bridge_get_self_hash(hash_buf, 65)
+                bridge_hash = hash_buf.value.decode()
+                dll_integrity = "VERIFIED" if _bridge.bridge_is_self_verified() else "FAILED"
+        except Exception:
+            dll_integrity = "CHECK_FAILED"
+
+        # Module guard status
+        guard_status = "UNKNOWN"
+        try:
+            _guard_path = os.path.join(_project_root, "native", "security", "module_integrity_guard.dll")
+            guard_status = "ACTIVE" if os.path.exists(_guard_path) else "MISSING"
+        except Exception:
+            pass
+
+        return {
+            "data_source": source,
+            "dataset_hash": data.get("dataset_hash", data.get("tensor_hash", "")),
+            "sample_count": data.get("sample_count", 0),
+            "registry_status": registry,
+            "strict_real_mode": data.get("strict_real_mode", True),
+            "ingestion_manifest_hash": data.get("ingestion_manifest_hash", ""),
+            "bridge_hash": bridge_hash,
+            "dll_integrity": dll_integrity,
+            "integrity_guard": guard_status,
+            "synthetic_status": "BLOCKED",
+        }
+    except Exception as e:
+        return {
+            "data_source": "ERROR",
+            "dataset_hash": "",
+            "sample_count": 0,
+            "registry_status": f"ERROR: {str(e)}",
+            "strict_real_mode": True,
+            "ingestion_manifest_hash": "",
+            "bridge_hash": "",
+            "dll_integrity": "ERROR",
+            "integrity_guard": "ERROR",
+            "synthetic_status": "BLOCKED",
+        }
 
 
 # =============================================================================

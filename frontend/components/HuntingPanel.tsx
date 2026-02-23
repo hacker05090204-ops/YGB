@@ -67,7 +67,8 @@ export default function HuntingPanel() {
         let ws: WebSocket | null = null;
         function connect() {
             try {
-                ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8765/hunting');
+                ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws/hunting');
+                wsRef.current = ws;
                 ws.onopen = () => setConnected(true);
                 ws.onmessage = (e) => {
                     try {
@@ -99,12 +100,22 @@ export default function HuntingPanel() {
         chatEnd.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
+    const wsRef = useRef<WebSocket | null>(null);
+
+    // Store WS ref for sending
+    useEffect(() => {
+        // This effect runs after the main WS effect, so we capture the ref
+        // by checking connected state
+    }, [connected]);
+
     const send = () => {
         if (!input.trim()) return;
-        setMessages(prev => [...prev, {
-            role: 'user', content: input,
-            timestamp: new Date().toISOString(),
-        }]);
+        const msg = { role: 'user' as const, content: input, timestamp: new Date().toISOString() };
+        setMessages(prev => [...prev, msg]);
+        // Send over WebSocket
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({ type: 'chat', content: input }));
+        }
         setInput('');
     };
 

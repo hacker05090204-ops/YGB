@@ -12,9 +12,7 @@
  */
 
 #include <cmath>
-#include <cstdint>
 #include <cstring>
-
 
 #ifdef __cplusplus
 extern "C" {

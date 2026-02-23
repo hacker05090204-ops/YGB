@@ -30,6 +30,19 @@ interface BountyStatus {
     active_field: string;
 }
 
+interface DataSourceInfo {
+    data_source: string;
+    dataset_hash: string;
+    sample_count: number;
+    registry_status: string;
+    strict_real_mode: boolean;
+    ingestion_manifest_hash: string;
+    bridge_hash: string;
+    dll_integrity: string;
+    integrity_guard: string;
+    synthetic_status: string;
+}
+
 function Gauge({ value, max, label, color, unit }: {
     value: number; max: number; label: string; color: string; unit?: string;
 }) {
@@ -100,6 +113,33 @@ export default function BountyStatusPanel() {
         active_field: '',
     });
     const [connected, setConnected] = useState(false);
+    const [dataSource, setDataSource] = useState<DataSourceInfo>({
+        data_source: 'LOADING',
+        dataset_hash: '',
+        sample_count: 0,
+        registry_status: 'LOADING',
+        strict_real_mode: true,
+        ingestion_manifest_hash: '',
+        bridge_hash: '',
+        dll_integrity: 'LOADING',
+        integrity_guard: 'LOADING',
+        synthetic_status: 'BLOCKED',
+    });
+
+    // Fetch data source info
+    useEffect(() => {
+        const fetchDataSource = async () => {
+            try {
+                const res = await fetch(
+                    (process.env.NEXT_PUBLIC_YGB_API_URL || 'http://localhost:8000') + '/api/training/data-source'
+                );
+                if (res.ok) setDataSource(await res.json());
+            } catch { /* backend offline */ }
+        };
+        fetchDataSource();
+        const interval = setInterval(fetchDataSource, 10000);
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         let ws: WebSocket | null = null;
@@ -222,6 +262,98 @@ export default function BountyStatusPanel() {
                         <span style={{ color: item.ok ? '#9ca3af' : '#6b7280' }}>{item.label}</span>
                     </div>
                 ))}
+            </div>
+
+            {/* Data Source Transparency + Integrity */}
+            <div style={{ borderTop: '1px solid #1e293b', paddingTop: '8px', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '6px', fontWeight: 700 }}>Data Source &amp; Integrity</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#6b7280' }}>Source</span>
+                    <span style={{
+                        fontWeight: 700,
+                        color: dataSource.data_source === 'INGESTION_PIPELINE' ? '#10b981'
+                            : dataSource.data_source === 'NO_DATA' ? '#f59e0b'
+                                : '#ef4444',
+                    }}>
+                        {dataSource.data_source === 'INGESTION_PIPELINE' ? 'REAL'
+                            : dataSource.data_source === 'SYNTHETIC_GENERATOR' ? 'SYNTHETIC (blocked)'
+                                : dataSource.data_source}
+                    </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#6b7280' }}>Samples</span>
+                    <span style={{ fontWeight: 700, color: '#9ca3af' }}>{dataSource.sample_count.toLocaleString()}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#6b7280' }}>Dataset Hash</span>
+                    <span style={{ fontWeight: 600, color: '#525252', fontFamily: 'monospace', fontSize: '10px' }}>
+                        {dataSource.dataset_hash ? dataSource.dataset_hash.slice(0, 16) + '…' : '—'}
+                    </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#6b7280' }}>Bridge Hash</span>
+                    <span style={{ fontWeight: 600, color: '#525252', fontFamily: 'monospace', fontSize: '10px' }}>
+                        {dataSource.bridge_hash ? dataSource.bridge_hash.slice(0, 16) + '…' : '—'}
+                    </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#6b7280' }}>DLL Integrity</span>
+                    <span style={{
+                        fontWeight: 700, fontSize: '10px', padding: '1px 6px', borderRadius: '4px',
+                        background: dataSource.dll_integrity === 'VERIFIED' ? '#064e3b'
+                            : dataSource.dll_integrity === 'LOADING' ? '#1e293b' : '#7f1d1d',
+                        color: dataSource.dll_integrity === 'VERIFIED' ? '#10b981'
+                            : dataSource.dll_integrity === 'LOADING' ? '#6b7280' : '#ef4444',
+                    }}>
+                        {dataSource.dll_integrity}
+                    </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#6b7280' }}>Integrity Guard</span>
+                    <span style={{
+                        fontWeight: 700, fontSize: '10px', padding: '1px 6px', borderRadius: '4px',
+                        background: dataSource.integrity_guard === 'ACTIVE' ? '#064e3b'
+                            : dataSource.integrity_guard === 'LOADING' ? '#1e293b' : '#7f1d1d',
+                        color: dataSource.integrity_guard === 'ACTIVE' ? '#10b981'
+                            : dataSource.integrity_guard === 'LOADING' ? '#6b7280' : '#ef4444',
+                    }}>
+                        {dataSource.integrity_guard}
+                    </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', marginBottom: '3px' }}>
+                    <span style={{ color: '#6b7280' }}>Synthetic Status</span>
+                    <span style={{
+                        fontWeight: 700, fontSize: '10px', padding: '1px 6px', borderRadius: '4px',
+                        background: '#7f1d1d', color: '#ef4444',
+                    }}>
+                        {dataSource.synthetic_status || 'BLOCKED'}
+                    </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+                    <span style={{ color: '#6b7280' }}>Registry</span>
+                    <span style={{
+                        fontWeight: 700, fontSize: '10px', padding: '1px 6px', borderRadius: '4px',
+                        background: dataSource.registry_status === 'VERIFIED' ? '#064e3b' : '#422006',
+                        color: dataSource.registry_status === 'VERIFIED' ? '#10b981' : '#f59e0b',
+                    }}>
+                        {dataSource.registry_status}
+                    </span>
+                </div>
+                {/* Red warning bar for critical failures */}
+                {(dataSource.data_source === 'NO_DATA' || dataSource.data_source === 'ERROR'
+                    || dataSource.dll_integrity === 'FAILED' || dataSource.dll_integrity === 'ERROR'
+                    || dataSource.registry_status === 'NO_MANIFEST') && (
+                        <div style={{
+                            marginTop: '6px', padding: '6px 8px', borderRadius: '6px',
+                            background: '#7f1d1d', border: '1px solid #ef4444',
+                            fontSize: '10px', color: '#fca5a5', fontWeight: 700,
+                        }}>
+                            ⚠ INTEGRITY WARNING: {dataSource.data_source === 'NO_DATA' ? 'No training data available'
+                                : dataSource.dll_integrity === 'FAILED' ? 'Bridge DLL hash mismatch'
+                                    : dataSource.data_source === 'ERROR' ? 'Data source error'
+                                        : 'Verification incomplete'}
+                        </div>
+                    )}
             </div>
         </div>
     );

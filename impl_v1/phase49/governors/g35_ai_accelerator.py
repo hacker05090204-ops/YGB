@@ -537,22 +537,29 @@ def simulate_gpu_training(
     mode: TrainingMode,
 ) -> TrainingResult:
     """
-    Simulate GPU training (mock for Python, real in C++).
-    
-    Returns mock training result.
+    GPU training stub — BLOCKED in production.
+
+    Real training runs through g37_pytorch_backend.py or the C++ GPU kernel.
+    This function exists only for interface compatibility and MUST NOT
+    return fabricated results in strict mode.
     """
-    if can_ai_approve()[0]:  # pragma: no cover
-        raise RuntimeError("SECURITY: AI cannot approve - training aborted")
-    
-    # Mock results - real implementation in C++ GPU kernel
+    import os
+    if os.environ.get("YGB_ALLOW_MOCK_TRAINING") != "1":
+        raise RuntimeError(
+            "BLOCKED: simulate_gpu_training() is a mock stub. "
+            "Real training must use g37_pytorch_backend or C++ GPU kernel. "
+            "Set YGB_ALLOW_MOCK_TRAINING=1 to override for testing only."
+        )
+
+    # TEST-ONLY fallback — never reached in production
     return TrainingResult(
         result_id=_generate_id("TRR"),
         mode=mode,
-        epochs_completed=config.epochs,
-        loss_final=0.05,  # Mock low loss
-        accuracy_estimate=0.97,  # Mock ~97% accuracy
-        gpu_time_seconds=batch.total_items * 0.01,  # Mock time
-        is_mock=True,  # Flag as mock
+        epochs_completed=0,
+        loss_final=float('inf'),
+        accuracy_estimate=0.0,
+        gpu_time_seconds=0.0,
+        is_mock=True,
     )
 
 

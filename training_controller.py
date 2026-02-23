@@ -138,20 +138,143 @@ class DatasetState:
     trainable: bool
     manifest_path: str
     enforcement_passed: bool
+    dataset_source: str = ""  # "INGESTION_PIPELINE" or "SYNTHETIC_GENERATOR"
 
 
 def phase2_dataset_finalization(
     config: TrainingControllerConfig,
 ) -> Tuple[DatasetState, np.ndarray, np.ndarray]:
-    """Finalize dataset with 7-check gate."""
+    """Finalize dataset with 7-check gate. Sources from INGESTION PIPELINE ONLY."""
     logger.info("\n╔══════════════════════════════════════════════════╗")
     logger.info("║  PHASE 2 — DATASET FINALIZATION                 ║")
     logger.info("╚══════════════════════════════════════════════════╝")
 
-    # Generate dataset
-    rng = np.random.RandomState(config.seed)
-    X = rng.randn(config.num_samples, config.input_dim).astype(np.float32)
-    y = rng.randint(0, config.num_classes, config.num_samples).astype(np.int64)
+    # =========================================================================
+    # PHASE 4: C++ MODULE INTEGRITY GUARD — runs BEFORE dataset loading
+    # =========================================================================
+    module_guard_passed = False
+    bridge_hash = ""
+    dll_hash = ""
+    try:
+        import ctypes
+        import sys
+
+        # Load module integrity guard
+        _guard_path = os.path.join(
+            os.path.dirname(__file__), "native", "security", "module_integrity_guard.dll"
+        )
+        if os.path.exists(_guard_path):
+            _guard = ctypes.CDLL(_guard_path)
+
+            # Scan loaded Python modules for blocked patterns
+            module_names = "\n".join(sys.modules.keys())
+            violations = _guard.scan_module_names(module_names.encode())
+            if violations > 0:
+                viol_buf = ctypes.create_string_buffer(256)
+                _guard.get_last_violation(viol_buf, 256)
+                logger.error(f"  ✗ MODULE GUARD: {violations} violations — {viol_buf.value.decode()}")
+                raise RuntimeError(f"Module integrity guard: {viol_buf.value.decode()}")
+            logger.info(f"  ✓ Module guard: 0 violations (scanned {len(sys.modules)} modules)")
+
+            # Verify bridge DLL
+            _bridge_dll = os.path.join(
+                os.path.dirname(__file__), "native", "distributed", "ingestion_bridge.dll"
+            )
+            if os.path.exists(_bridge_dll):
+                _guard.verify_bridge_integrity(_bridge_dll.encode())
+                hash_buf = ctypes.create_string_buffer(65)
+                _guard.get_bridge_hash(hash_buf, 65)
+                bridge_hash = hash_buf.value.decode()
+                logger.info(f"  ✓ Bridge hash: {bridge_hash[:32]}...")
+
+            module_guard_passed = True
+            logger.info("  ✓ Module integrity guard: PASSED")
+        else:
+            logger.warning(f"  ⚠ Module guard DLL not found: {_guard_path}")
+    except RuntimeError:
+        raise
+    except Exception as e:
+        logger.warning(f"  ⚠ Module guard check skipped: {e}")
+
+    # =========================================================================
+    # STRICT: Load from Ingestion Pipeline — NO synthetic data
+    # =========================================================================
+    dataset_source = "UNKNOWN"
+    try:
+        from impl_v1.training.data.real_dataset_loader import (
+            IngestionPipelineDataset, STRICT_REAL_MODE,
+        )
+
+        if STRICT_REAL_MODE:
+            logger.info("  STRICT_REAL_MODE=True — loading from ingestion pipeline")
+
+        pipeline_dataset = IngestionPipelineDataset(
+            feature_dim=config.input_dim,
+            min_samples=100,
+            seed=config.seed,
+        )
+
+        # Source validation
+        dataset_source = pipeline_dataset.dataset_source
+        if dataset_source != "INGESTION_PIPELINE":
+            logger.error(
+                f"  ✗ ABORT: dataset_source={dataset_source}, "
+                f"expected INGESTION_PIPELINE"
+            )
+            raise RuntimeError(
+                f"Training source mismatch: {dataset_source} != INGESTION_PIPELINE"
+            )
+
+        logger.info(f"  ✓ Dataset source: {dataset_source}")
+
+        # Extract tensors → numpy
+        X = pipeline_dataset._features_tensor.numpy()
+        y = pipeline_dataset._labels_tensor.numpy()
+
+        # Verify manifest hash matches ingestion
+        manifest_hash = pipeline_dataset._manifest_hash
+        stats = pipeline_dataset.get_statistics()
+        logger.info(f"  ✓ Ingestion hash: {manifest_hash[:32]}...")
+        logger.info(f"  ✓ Samples: {stats['total']} (real, verified)")
+
+    except (FileNotFoundError, RuntimeError) as e:
+        # No fallback — ABORT
+        logger.error(f"  ✗ Ingestion pipeline unavailable: {e}")
+        logger.error("  ✗ NO SYNTHETIC FALLBACK. Training ABORTED.")
+        logger.error("  ✗ SYSTEM STATE: FIELD_FROZEN_WAITING_REAL_DATA")
+
+        state = DatasetState(
+            hash="", sample_count=0, feature_dim=config.input_dim,
+            num_classes=config.num_classes, entropy=0.0,
+            trainable=False, manifest_path="",
+            enforcement_passed=False, dataset_source="NONE",
+        )
+        empty_X = np.zeros((0, config.input_dim), dtype=np.float32)
+        empty_y = np.zeros((0,), dtype=np.int64)
+
+        # Log rejection to truth ledger
+        try:
+            from impl_v1.training.data.training_truth_ledger import (
+                TruthLedgerEntry, append_truth_entry, create_run_id,
+            )
+            append_truth_entry(TruthLedgerEntry(
+                timestamp=datetime.now().isoformat(),
+                run_id=create_run_id(),
+                dataset_hash="", bridge_hash=bridge_hash, dll_hash=dll_hash,
+                manifest_hash="", registry_status="UNAVAILABLE",
+                dataset_source="NONE", sample_count=0,
+                feature_dim=config.input_dim, num_classes=config.num_classes,
+                shannon_entropy=0.0, label_balance_score=0.0,
+                duplicate_ratio=0.0, rng_autocorrelation=0.0,
+                integrity_verified=False, module_guard_passed=module_guard_passed,
+                data_enforcer_passed=False, strict_real_mode=True,
+                synthetic_blocked=True, verdict="REJECTED",
+                rejection_reason=str(e),
+            ))
+        except Exception:
+            pass
+
+        return state, empty_X, empty_y
 
     # Hash
     h = hashlib.sha256()
@@ -187,7 +310,9 @@ def phase2_dataset_finalization(
 
     # Generate manifest
     manifest = {
+        "dataset_source": dataset_source,
         "dataset_hash": dataset_hash,
+        "ingestion_manifest_hash": manifest_hash,
         "sample_count": len(X),
         "feature_dim": X.shape[1],
         "num_classes": int(len(np.unique(y))),
@@ -210,10 +335,12 @@ def phase2_dataset_finalization(
         trainable=enforcement_passed,
         manifest_path=manifest_path,
         enforcement_passed=enforcement_passed,
+        dataset_source=dataset_source,
     )
 
     status = "✓ TRAINABLE" if state.trainable else "✗ BLOCKED"
     logger.info(f"\n  Dataset: {status}")
+    logger.info(f"  source: {dataset_source}")
     logger.info(f"  hash: {dataset_hash[:32]}...")
     logger.info(f"  samples: {state.sample_count}, features: {state.feature_dim}")
     logger.info(f"  entropy: {state.entropy}")

@@ -818,7 +818,7 @@ class AutoTrainer:
                 stopped_at=stopped_at,
                 checkpoints_saved=len(checkpoint_events),
                 last_checkpoint_hash=last_hash,
-                samples_processed=epochs_trained * 100,  # Mock samples
+                samples_processed=getattr(self, '_real_samples_processed', 0),  # Real sample count from ingestion
                 training_mode=ReportTrainingMode.MODE_A,
                 reports_dir="reports/g38_training",
             )

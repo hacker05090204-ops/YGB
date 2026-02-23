@@ -1,6 +1,16 @@
-# G37 GPU Training Backend (C++ Interface)
+# ██████████████████████████████████████████████████████████████████████
+# ██  MOCK MODULE — NEVER USED IN PRODUCTION                        ██
+# ██  All functions return hardcoded/formula values, NOT real GPU    ██
+# ██  training. Production training uses g37_pytorch_backend.py      ██
+# ██████████████████████████████████████████████████████████████████████
+
+# G37 GPU Training Backend (C++ Interface) — MOCK ONLY
 """
-GPU TRAINING BACKEND FOR G37.
+GPU TRAINING BACKEND FOR G37 — MOCK IMPLEMENTATION.
+
+WARNING: This module contains MOCK functions that return hardcoded values.
+It does NOT perform real GPU training, inference, or feature extraction.
+Production training MUST use g37_pytorch_backend.py instead.
 
 This module provides the Python interface to the C++ GPU training backend.
 The actual training is deferred to C++/CUDA for performance.
@@ -8,14 +18,27 @@ The actual training is deferred to C++/CUDA for performance.
 DESIGN:
 - Python: Orchestration, data preparation, permission checks
 - C++: Actual GPU compute, model training, inference
-
-TRAINING DATA SOURCES:
-- Verified bugs (G33)
-- Rejected bugs (G33)
-- Duplicate decisions (G34)
-- Auto verification results (G36)
-- Human corrections
 """
+
+# ═══════════════════════════════════════════════════════════════════════
+# STRICT PRODUCTION MODE — BLOCKS IMPORT IN PRODUCTION
+# ═══════════════════════════════════════════════════════════════════════
+
+MOCK_MODULE = True
+PRODUCTION_ALLOWED = False
+STRICT_PRODUCTION_MODE = True
+
+if STRICT_PRODUCTION_MODE:
+    import os as _os
+    # Allow import ONLY if explicitly disabled for testing
+    if _os.environ.get("YGB_ALLOW_MOCK_BACKEND") != "1":
+        raise RuntimeError(
+            "g37_gpu_training_backend is MOCK ONLY. "
+            "Production usage prohibited. "
+            "This module returns hardcoded values, NOT real GPU training. "
+            "Use g37_pytorch_backend.py for production training. "
+            "Set YGB_ALLOW_MOCK_BACKEND=1 to override (testing only)."
+        )
 
 from dataclasses import dataclass
 from enum import Enum

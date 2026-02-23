@@ -1,10 +1,13 @@
 {
-  "dataset_hash": "9149f32f34aa7c77761166bb856c0108f6ea9ffc5d570d7c6ab40040c64293b1",
-  "sample_count": 8000,
+  "dataset_source": "INGESTION_PIPELINE",
+  "ingestion_manifest_hash": "00000000ef6f774a0000000027b0924900000000c8dfe5030000000017200993",
+  "tensor_hash": "94c37120761bbf9cea119774075f2181931b956f624b4ed4d3ea4926a0e3a3b6",
+  "sample_count": 145,
   "feature_dim": 256,
-  "num_classes": 2,
-  "entropy": 0.9998,
-  "status": "TRAINABLE",
-  "frozen_at": "2026-02-23T02:05:55.931542",
-  "seed": 42
+  "num_classes": 1,
+  "accepted": 145,
+  "rejected_policy": 0,
+  "rejected_quality": 5,
+  "strict_real_mode": true,
+  "frozen_at": "2026-02-23T23:57:58.312659"
 }
