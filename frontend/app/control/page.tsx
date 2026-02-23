@@ -25,6 +25,8 @@ import { ActiveDevices } from "@/components/active-devices"
 import { SessionHistory } from "@/components/session-history"
 import { LoginAlerts } from "@/components/login-alerts"
 import { StorageMonitor } from "@/components/storage-monitor"
+import BountyStatusPanel from "@/components/bounty-status-panel"
+import FieldMasteryDashboard from "@/components/field-mastery-dashboard"
 
 // API Base URL
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
@@ -857,6 +859,16 @@ export default function ControlPage() {
                                         )}>{i === 0 ? "ACTIVE" : "LOCKED"}</span>
                                     </div>
                                 ))}
+                            </div>
+                        </div>
+
+                        {/* ═══ Bounty Readiness + Field Mastery ═══ */}
+                        <div className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div className="p-5 rounded-2xl bg-card/50 border border-border/50">
+                                <BountyStatusPanel />
+                            </div>
+                            <div className="p-5 rounded-2xl bg-card/50 border border-border/50">
+                                <FieldMasteryDashboard />
                             </div>
                         </div>
 
