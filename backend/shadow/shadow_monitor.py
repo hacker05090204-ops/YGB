@@ -646,32 +646,5 @@ class ShadowMonitor:
         }
 
 
-if __name__ == '__main__':
-    # Self-test
-    print("Shadow Monitor self-test...")
-    monitor = ShadowMonitor(feature_dim=256, n_classes=2)
 
-    # Create deterministic test baseline
-    np.random.seed(42)
-    features = np.random.randn(1000, 256).astype(np.float64)
-    labels = np.random.randint(0, 2, 1000)
-    confidences = np.random.uniform(0.5, 1.0, 1000)
-
-    monitor.set_baselines(features, labels, confidences)
-    monitor.enable_shadow()
-    print(f"  Mode: {monitor.containment.current_mode}")
-
-    # Simulate normal decisions
-    for i in range(100):
-        f = np.random.randn(256)
-        logits = np.array([0.3, 0.7])
-        monitor.record_decision(f, logits, 1.0, 1, 0.85, True)
-
-    status = monitor.check_health()
-    print(f"  Decisions: {status['n_decisions']}")
-    print(f"  Chain valid: {status['chain_valid']}")
-    print(f"  Drift alert: {status['drift']['alert']}")
-    print(f"  Entropy alert: {status['entropy']['alert']}")
-    print(f"  Mode: {status['mode']}")
-    print(f"  Locked: {status['locked']}")
-    print("  PASS")
+# No __main__ self-test — use pytest test suite for validation

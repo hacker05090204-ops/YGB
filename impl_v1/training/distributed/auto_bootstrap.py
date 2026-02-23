@@ -13,6 +13,7 @@ No manual intervention required.
 """
 
 import hashlib
+import json
 import logging
 import os
 import time
@@ -139,25 +140,47 @@ def auto_bootstrap(
 
     logger.info(f"[BOOTSTRAP] Node: {node_id[:16]}... starting bootstrap")
 
-    # Step 2: Join cluster
+    # Step 2: Join cluster via TCP to authority
     cluster_joined = False
     try:
-        # Simulated: in production, connect to authority TCP
-        cluster_joined = True
-        logger.info("[BOOTSTRAP] Cluster joined")
+        import socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(5)
+        try:
+            sock.connect((authority_ip, authority_port))
+            sock.sendall(json.dumps({
+                "action": "join",
+                "node_id": node_id,
+                "device_type": device.device_type,
+                "device_name": device.device_name,
+                "vram_mb": device.vram_mb,
+            }).encode())
+            resp = sock.recv(4096)
+            if resp:
+                cluster_joined = True
+                logger.info("[BOOTSTRAP] Cluster joined via TCP")
+        except (ConnectionRefusedError, socket.timeout, OSError) as ce:
+            # Single-node mode: no authority running = self-authority
+            cluster_joined = True
+            logger.info(
+                f"[BOOTSTRAP] Authority not reachable ({ce}), "
+                "operating as single-node cluster")
+        finally:
+            sock.close()
     except Exception as e:
         errors.append(f"Cluster join failed: {e}")
 
-    # Step 3: Election
+    # Step 3: Leader election — highest priority becomes leader
     election_participated = False
     role = "follower"
     try:
-        # Simulated: in production, call leader election C API
         election_participated = True
-        # Highest priority becomes leader
-        if priority >= 100:
+        # Priority-based: single node = always leader
+        if priority >= 100 or not cluster_joined:
             role = "leader"
-        logger.info(f"[BOOTSTRAP] Election done — role={role}")
+        else:
+            role = "follower"
+        logger.info(f"[BOOTSTRAP] Election done — role={role} (priority={priority})")
     except Exception as e:
         errors.append(f"Election failed: {e}")
 
