@@ -23,6 +23,11 @@ interface BountyStatus {
     required_cycles: number;
     mode: 'A' | 'B';
     live_ready: boolean;
+    divergence_score: number;
+    dup_risk: number;
+    chaos_stability: number;
+    eta_minutes: number;
+    active_field: string;
 }
 
 function Gauge({ value, max, label, color, unit }: {
@@ -88,6 +93,11 @@ export default function BountyStatusPanel() {
         required_cycles: 5,
         mode: 'A',
         live_ready: false,
+        divergence_score: 0,
+        dup_risk: 0,
+        chaos_stability: 0,
+        eta_minutes: 0,
+        active_field: '',
     });
     const [connected, setConnected] = useState(false);
 
@@ -171,6 +181,47 @@ export default function BountyStatusPanel() {
                 <span style={{ fontWeight: 700, color: status.stable_cycles >= status.required_cycles ? '#10b981' : '#f59e0b' }}>
                     {status.stable_cycles} / {status.required_cycles}
                 </span>
+            </div>
+
+            {/* Divergence + Dup Risk + Chaos */}
+            <div>
+                <Gauge value={status.divergence_score} max={0.10} label="Divergence Score" color="#8b5cf6" />
+                <Gauge value={status.dup_risk} max={1.0} label="Duplicate Risk" color="#f43f5e" unit="%" />
+                <Gauge value={1 - status.chaos_stability} max={1.0} label="Chaos Variance" color="#06b6d4" unit="%" />
+            </div>
+
+            {/* Active Field + ETA */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: '#6b7280' }}>Active Field</span>
+                <span style={{ fontWeight: 700, color: '#a78bfa', fontSize: '11px' }}>
+                    {status.active_field || '—'}
+                </span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span style={{ color: '#6b7280' }}>ETA</span>
+                <span style={{ fontWeight: 700, color: '#9ca3af' }}>
+                    {status.eta_minutes > 0 ? `${Math.floor(status.eta_minutes / 60)}h ${status.eta_minutes % 60}m` : '—'}
+                </span>
+            </div>
+
+            {/* Promotion Readiness Checklist */}
+            <div style={{ borderTop: '1px solid #1e293b', paddingTop: '8px', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', color: '#6b7280', marginBottom: '6px', fontWeight: 700 }}>Promotion Checklist</div>
+                {[
+                    { label: 'FPR < 1%', ok: status.fpr < 0.01 },
+                    { label: 'Hallucination < 0.5%', ok: status.hallucination_rate < 0.005 },
+                    { label: 'Exploit Verified', ok: status.exploit_verified },
+                    { label: 'Chaos Stable ≥ 95%', ok: status.chaos_stability >= 0.95 },
+                    { label: 'Dup Risk < 50%', ok: status.dup_risk < 0.5 },
+                    { label: `${status.stable_cycles}/${status.required_cycles} Stable Cycles`, ok: status.stable_cycles >= status.required_cycles },
+                ].map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', marginBottom: '2px' }}>
+                        <span style={{ color: item.ok ? '#10b981' : '#ef4444', fontWeight: 800 }}>
+                            {item.ok ? '✓' : '✗'}
+                        </span>
+                        <span style={{ color: item.ok ? '#9ca3af' : '#6b7280' }}>{item.label}</span>
+                    </div>
+                ))}
             </div>
         </div>
     );
