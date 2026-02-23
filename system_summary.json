@@ -1,0 +1,588 @@
+{
+    "project": "YGB — Autonomous Bug Bounty Hunting System",
+    "generated": "2026-02-23T12:06:00+05:30",
+    "status": "REIMPLEMENTED-2026",
+    "overview": {
+        "total_governance_phases": 50,
+        "total_training_architectures": 9,
+        "total_training_tests": 186,
+        "total_training_fields": 23,
+        "total_learned_features": 4710,
+        "native_cpp_modules": 60,
+        "python_foundation_modules": 19,
+        "backend_modules": 17,
+        "frontend_components": 27,
+        "governors_phase49": 31
+    },
+    "layer_1_governance_phases": {
+        "description": "Phase 01-49: Immutable governance from constants to runtime governors",
+        "total": 50,
+        "status": "ALL FROZEN",
+        "phases": [
+            {
+                "phase": "01",
+                "name": "Core Constants, Identities, and Invariants",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "02",
+                "name": "Actor & Role Model",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "03",
+                "name": "Trust Zones",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "04",
+                "name": "Action Validation",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "05",
+                "name": "Workflow State Model",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "06",
+                "name": "Decision Aggregation & Authority Resolution",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "07",
+                "name": "Bug Intelligence & Knowledge Resolution",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "08",
+                "name": "Evidence & Explanation Orchestration",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "09",
+                "name": "Bug Bounty Policy, Scope & Eligibility",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "10",
+                "name": "Target Coordination & De-Duplication",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "11",
+                "name": "Work Scheduling, Fair Distribution & Delegation",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "12",
+                "name": "Evidence Consistency, Replay & Confidence",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "13",
+                "name": "Human Readiness, Safety Gate & Browser Handoff",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "14",
+                "name": "Backend Connector & Integration Verification",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "15",
+                "name": "Frontend ↔ Backend Contract Authority",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "16",
+                "name": "Execution Boundary & Browser Invocation",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "17",
+                "name": "Browser Execution Interface Contract",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "18",
+                "name": "Execution State & Provenance Ledger",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "19",
+                "name": "Browser Capability Governance",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "20",
+                "name": "HUMANOID HUNTER Executor Adapter",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "21",
+                "name": "HUMANOID HUNTER Sandbox & Fault Isolation",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "22",
+                "name": "Native Runtime Boundary & OS Isolation",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "23",
+                "name": "Native Evidence Integrity & Verification",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "24",
+                "name": "Execution Orchestration & Deterministic Action Planning",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "25",
+                "name": "Orchestration Binding & Execution Intent Sealing",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "26",
+                "name": "Execution Readiness & Pre-Execution Gatekeeping",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "27",
+                "name": "Execution Instruction Synthesis & Immutable Command Envelope",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "28",
+                "name": "Executor Handshake & Runtime Contract Validation",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "29",
+                "name": "Governed Execution Loop Definition (NO EXECUTION)",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "30",
+                "name": "Executor Response Governance & Result Normalization",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "31",
+                "name": "Runtime Observation & Controlled Execution Evidence Capture",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "32",
+                "name": "Human-Mediated Execution Decision & Continuation Governance",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "33",
+                "name": "Human Decision → Execution Intent Binding",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "34",
+                "name": "Execution Authorization & Controlled Invocation Boundary",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "35",
+                "name": "Native Execution Safety Boundary",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "36-40",
+                "name": "Native Sandbox & Interface Specifications",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "41-48",
+                "name": "AMSE & Runtime Optimization",
+                "status": "FROZEN",
+                "coverage": "100%"
+            },
+            {
+                "phase": "49",
+                "name": "Governed Runtime Governors (G01-G31)",
+                "status": "COMPLETE",
+                "coverage": "100%"
+            }
+        ]
+    },
+    "layer_2_python_foundation": {
+        "description": "Phase 01-19 Python implementations",
+        "directory": "python/",
+        "modules": [
+            "phase01_core — Constants, identities, invariants",
+            "phase02_actors — Actor & role model",
+            "phase03_trust — Trust zones",
+            "phase04_validation — Action validation",
+            "phase05_workflow — Workflow state model",
+            "phase06_decision — Decision aggregation",
+            "phase07_knowledge — Bug intelligence",
+            "phase08_evidence — Evidence orchestration",
+            "phase09_bounty — Bounty policy & scope",
+            "phase10_coordination — Target coordination",
+            "phase11_scheduling — Work scheduling",
+            "phase12_evidence — Evidence consistency & replay",
+            "phase13_handoff — Human readiness & browser handoff",
+            "phase14_connector — Backend connector",
+            "phase15_contract — Frontend↔Backend contract",
+            "phase16_execution — Execution boundary",
+            "phase17_interface — Browser interface contract",
+            "phase18_ledger — Execution state & provenance",
+            "phase19_capability — Browser capability governance"
+        ]
+    },
+    "layer_3_native_cpp": {
+        "description": "60+ C++ modules across 60 directories",
+        "directory": "native/",
+        "categories": [
+            {
+                "category": "Autonomy Supervisor",
+                "modules": [
+                    "resource_monitor",
+                    "system_integrity"
+                ]
+            },
+            {
+                "category": "Governance Guard",
+                "modules": [
+                    "automation_guard"
+                ]
+            },
+            {
+                "category": "Runtime Guard",
+                "modules": [
+                    "runtime_guard",
+                    "runtime_monitor",
+                    "runtime_optimizer"
+                ]
+            },
+            {
+                "category": "Research Assistant",
+                "modules": [
+                    "content_extractor",
+                    "resource_sandbox",
+                    "domain_whitelist",
+                    "result_summarizer"
+                ]
+            },
+            {
+                "category": "Hunt Engine",
+                "modules": [
+                    "hdd_engine",
+                    "hunt_guard",
+                    "hunt_engine"
+                ]
+            },
+            {
+                "category": "Evidence Engine",
+                "modules": [
+                    "evidence",
+                    "replay_engine"
+                ]
+            },
+            {
+                "category": "Precision Engine",
+                "modules": [
+                    "precision_engine",
+                    "confidence_engine",
+                    "calibration"
+                ]
+            },
+            {
+                "category": "Field Controllers",
+                "modules": [
+                    "field_controller",
+                    "field_lifecycle"
+                ]
+            },
+            {
+                "category": "Security",
+                "modules": [
+                    "secure_storage",
+                    "shadow_integrity",
+                    "merge_guard"
+                ]
+            },
+            {
+                "category": "Performance",
+                "modules": [
+                    "performance",
+                    "gpu_stability"
+                ]
+            },
+            {
+                "category": "Distributed Training",
+                "modules": [
+                    "ingestion_engine",
+                    "gpu_optimizer",
+                    "shard_storage",
+                    "shard_sync"
+                ]
+            },
+            {
+                "category": "Network",
+                "modules": [
+                    "wireguard",
+                    "web_client",
+                    "client_side",
+                    "browser_curriculum"
+                ]
+            }
+        ]
+    },
+    "layer_4_impl_v1_phases": {
+        "description": "Phase 20-50 implementation code",
+        "directory": "impl_v1/",
+        "phases_implemented": [
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
+            "32",
+            "33",
+            "34",
+            "35",
+            "37",
+            "38",
+            "39",
+            "40",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "48",
+            "49",
+            "50"
+        ],
+        "total_impl_phases": 30
+    },
+    "layer_5_phase49_governors": {
+        "description": "31 runtime governors (G01-G31)",
+        "directory": "impl_v1/phase49/governors/",
+        "governors": [
+            "G01 — Core Identity",
+            "G02 — Role Authority",
+            "G03 — Trust Boundary",
+            "G04 — Action Validator",
+            "G05 — Workflow State",
+            "G06 — Decision Arbiter",
+            "G07 — Knowledge Guard",
+            "G08 — Evidence Guard",
+            "G09 — Bounty Policy",
+            "G10 — Target Coordinator",
+            "G11 — Scheduler",
+            "G12 — Voice Input",
+            "G13 — Human Readiness",
+            "G14 — Backend Connector",
+            "G15 — Contract Authority",
+            "G16 — Execution Boundary",
+            "G17 — Interface Guard",
+            "G18 — Provenance Ledger",
+            "G19 — Capability Guard",
+            "G20 — Executor Adapter",
+            "G21 — Sandbox Guard",
+            "G22 — OS Isolation",
+            "G23 — Evidence Integrity",
+            "G24 — Action Planner",
+            "G25 — Intent Sealer",
+            "G26 — Readiness Gate",
+            "G27 — Command Envelope",
+            "G28 — Handshake Guard",
+            "G29 — Execution Loop",
+            "G30 — Response Governor",
+            "G31 — Observation Guard"
+        ]
+    },
+    "layer_6_backend": {
+        "description": "Backend API, governance, auth, shadow, training",
+        "directory": "backend/",
+        "modules": [
+            "api — Server endpoints, targets, dashboard",
+            "assistant — Query router, isolation guard",
+            "auth — Authentication",
+            "governance — 17 governance modules",
+            "shadow — Shadow monitor",
+            "mode — Mode management",
+            "training — Training API",
+            "voice — Voice controls",
+            "browser — Browser integration",
+            "alerts — Alert system",
+            "approval — Human approval flow",
+            "integrity — Integrity verification",
+            "security — Security layer",
+            "storage — Data storage",
+            "startup — Startup sequence",
+            "tests — 34 test files"
+        ]
+    },
+    "layer_7_frontend": {
+        "description": "Next.js frontend with 27 components",
+        "directory": "frontend/",
+        "framework": "Next.js + React + TypeScript + Tailwind",
+        "components": [
+            "HuntingPanel.tsx — Live hunting assistant",
+            "auto-training-dashboard.tsx — Training orchestrator dashboard",
+            "training-dashboard-v2.tsx — V2 training dashboard",
+            "live-training-panel.tsx — Real-time training progress",
+            "training-progress.tsx — Training progress display",
+            "hunting-control-panel.tsx — Hunting controls",
+            "scope-target-panel.tsx — Scope & target management",
+            "target-discovery-panel.tsx — Target discovery",
+            "browser-assistant.tsx — Browser automation assistant",
+            "voice-controls.tsx — Voice control interface",
+            "storage-monitor.tsx — Storage monitoring",
+            "gpu-monitor.tsx — GPU monitoring",
+            "mode-selector.tsx — Mode A/B selector",
+            "approval-panel.tsx — Human approval panel",
+            "data-table.tsx — Data table component",
+            "active-devices.tsx — Device registry",
+            "execution-state.tsx — Execution state display",
+            "session-history.tsx — Session history",
+            "login-alerts.tsx — Login alerts",
+            "chart-area-interactive.tsx — Interactive charts",
+            "section-cards.tsx — Dashboard cards",
+            "app-sidebar.tsx — Application sidebar",
+            "site-header.tsx — Site header",
+            "+ 25 UI primitives (shadcn/ui)"
+        ]
+    },
+    "layer_8_training_infrastructure": {
+        "description": "9 training architectures, 186+ tests",
+        "directory": "impl_v1/training/",
+        "learned_features": 4710,
+        "training_fields": 23,
+        "architectures": [
+            {
+                "name": "Shard Replication",
+                "phases": 9,
+                "tests": "24/24",
+                "commit": "1d63a46"
+            },
+            {
+                "name": "Training Controller",
+                "phases": 5,
+                "tests": "CUDA 83.9%",
+                "commit": "d68cca8"
+            },
+            {
+                "name": "Production Stabilizer",
+                "phases": 6,
+                "tests": "22/22",
+                "commit": "1b4ad70"
+            },
+            {
+                "name": "Autonomous Orchestrator",
+                "phases": 8,
+                "tests": "25/25",
+                "commit": "693229b"
+            },
+            {
+                "name": "Execution Orchestrator",
+                "phases": 7,
+                "tests": "23/23",
+                "commit": "0e1e0f9"
+            },
+            {
+                "name": "Production Finalization",
+                "phases": 5,
+                "tests": "20/20",
+                "commit": "35b74d4"
+            },
+            {
+                "name": "Mode Governance",
+                "phases": 5,
+                "tests": "26/26",
+                "commit": "a12faed"
+            },
+            {
+                "name": "Risk Elimination",
+                "phases": 5,
+                "tests": "19/19",
+                "commit": "2582c5d"
+            },
+            {
+                "name": "Intelligence Layer",
+                "phases": 7,
+                "tests": "27/27",
+                "commit": "ef37efb"
+            }
+        ]
+    },
+    "layer_9_data_training": {
+        "description": "Training data and learned features",
+        "training_data": {
+            "learned_features": 4710,
+            "not_learned": 3,
+            "summaries": 3,
+            "validation_sets": 20,
+            "checkpoints": "active"
+        }
+    },
+    "storage": {
+        "global_cap_gb": 110,
+        "shard_size_mb": 256,
+        "persistence": "JSON flat files in secure_data/",
+        "database": "None"
+    },
+    "security_model": {
+        "human_authority": "All AI actions human-initiated, human-approved, human-auditable, human-revocable",
+        "phase01_immutable": true,
+        "ai_autonomous_authority": "PROHIBITED",
+        "mode_governance": "Strict A→B with 7-gate promotion",
+        "shadow_mode": "Shadow-only with immutability, drift detection, auto-containment"
+    }
+}

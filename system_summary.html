@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YGB — Complete System Summary</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #050810;
+            color: #e2e8f0;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 48px 24px 32px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero .sub {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .stat {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .stat-val.green {
+            color: #10b981;
+        }
+
+        .stat-val.purple {
+            color: #a78bfa;
+        }
+
+        .stat-val.blue {
+            color: #60a5fa;
+        }
+
+        .stat-val.amber {
+            color: #f59e0b;
+        }
+
+        .stat-val.pink {
+            color: #f472b6;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section-head {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-head .num {
+            background: #312e81;
+            color: #a78bfa;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
+
+        /* Cards */
+        .card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #c4b5fd;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 10px;
+            border-radius: 20px;
+        }
+
+        .badge-green {
+            background: #064e3b;
+            color: #10b981;
+        }
+
+        .badge-blue {
+            background: #1e3a5f;
+            color: #60a5fa;
+        }
+
+        .badge-amber {
+            background: #422006;
+            color: #f59e0b;
+        }
+
+        .card-meta {
+            font-size: 11px;
+            color: #6b7280;
+            margin-bottom: 6px;
+        }
+
+        /* Phase table */
+        .phase-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .phase-table th {
+            text-align: left;
+            padding: 6px 8px;
+            color: #6b7280;
+            font-weight: 600;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .phase-table td {
+            padding: 5px 8px;
+            border-bottom: 1px solid #0f172a;
+        }
+
+        .phase-table tr:hover {
+            background: #1a1f2e;
+        }
+
+        .frozen {
+            color: #10b981;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* Component grid */
+        .comp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 6px;
+        }
+
+        .comp {
+            font-size: 11px;
+            padding: 6px 8px;
+            background: #0a0e14;
+            border-radius: 6px;
+            border: 1px solid #1e293b;
+        }
+
+        .comp-name {
+            font-weight: 700;
+            color: #93c5fd;
+        }
+
+        .comp-desc {
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .tag {
+            display: inline-block;
+            font-size: 9px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        .tag-cpp {
+            background: #1e3a5f;
+            color: #60a5fa;
+        }
+
+        .tag-py {
+            background: #1a3a2a;
+            color: #4ade80;
+        }
+
+        .tag-tsx {
+            background: #3b1f5e;
+            color: #c084fc;
+        }
+
+        .tag-md {
+            background: #422006;
+            color: #f59e0b;
+        }
+
+        /* Arch cards */
+        .arch-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+        }
+
+        .arch {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .arch-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #c4b5fd;
+        }
+
+        .arch-meta {
+            font-size: 11px;
+            color: #6b7280;
+            margin: 4px 0;
+        }
+
+        /* Config */
+        .cfg-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .cfg-table th,
+        .cfg-table td {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 13px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .cfg-table th {
+            color: #6b7280;
+            font-weight: 600;
+            width: 45%;
+        }
+
+        footer {
+            text-align: center;
+            color: #374151;
+            font-size: 11px;
+            margin-top: 40px;
+            padding: 20px;
+            border-top: 1px solid #1e293b;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero">
+        <h1>YGB — Complete System Summary</h1>
+        <div class="sub">Autonomous Bug Bounty Hunting · Phase 01 → Intelligence Layer · 23 Feb 2026</div>
+    </div>
+
+    <div class="container">
+
+        <!-- ═══════════════ GLOBAL STATS ═══════════════ -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-val purple">50</div>
+                <div class="stat-label">Governance Phases</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val green">9</div>
+                <div class="stat-label">Training Architectures</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val blue">60+</div>
+                <div class="stat-label">C++ Modules</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val amber">27</div>
+                <div class="stat-label">Frontend Components</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val pink">4,710</div>
+                <div class="stat-label">Learned Features</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val green">186+</div>
+                <div class="stat-label">Tests Passed</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val blue">31</div>
+                <div class="stat-label">Runtime Governors</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val amber">23</div>
+                <div class="stat-label">Training Fields</div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 1: GOVERNANCE ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L1</span> Governance Foundation — 50 Phases</div>
+            <div class="card">
+                <div class="card-head">
+                    <span class="card-title">Phase 01–49 · All FROZEN · 100% Coverage</span>
+                    <span class="badge badge-green">IMMUTABLE</span>
+                </div>
+                <table class="phase-table">
+                    <tr>
+                        <th>#</th>
+                        <th>Phase Name</th>
+                        <th>Status</th>
+                    </tr>
+                    <tr>
+                        <td>01</td>
+                        <td>Core Constants, Identities, and Invariants</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>02</td>
+                        <td>Actor & Role Model</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>03</td>
+                        <td>Trust Zones</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>04</td>
+                        <td>Action Validation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>05</td>
+                        <td>Workflow State Model</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>06</td>
+                        <td>Decision Aggregation & Authority Resolution</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>07</td>
+                        <td>Bug Intelligence & Knowledge Resolution</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>08</td>
+                        <td>Evidence & Explanation Orchestration</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>09</td>
+                        <td>Bug Bounty Policy, Scope & Eligibility</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Target Coordination & De-Duplication</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Work Scheduling, Fair Distribution & Delegation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>Evidence Consistency, Replay & Confidence</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>Human Readiness, Safety Gate & Browser Handoff</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>Backend Connector & Integration Verification</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>Frontend ↔ Backend Contract Authority</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>Execution Boundary & Browser Invocation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>Browser Execution Interface Contract</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td>Execution State & Provenance Ledger</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>Browser Capability Governance</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>20</td>
+                        <td>HUMANOID HUNTER Executor Adapter</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>21</td>
+                        <td>HUMANOID HUNTER Sandbox & Fault Isolation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>22</td>
+                        <td>Native Runtime Boundary & OS Isolation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>23</td>
+                        <td>Native Evidence Integrity & Verification</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>24</td>
+                        <td>Execution Orchestration & Deterministic Action Planning</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>25</td>
+                        <td>Orchestration Binding & Execution Intent Sealing</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>Execution Readiness & Pre-Execution Gatekeeping</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>27</td>
+                        <td>Execution Instruction Synthesis & Immutable Command Envelope</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>28</td>
+                        <td>Executor Handshake & Runtime Contract Validation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>29</td>
+                        <td>Governed Execution Loop (NO EXECUTION)</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>30</td>
+                        <td>Executor Response Governance & Result Normalization</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>31</td>
+                        <td>Runtime Observation & Controlled Evidence Capture</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>Human-Mediated Execution Decision & Continuation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>33</td>
+                        <td>Human Decision → Execution Intent Binding</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>Execution Authorization & Controlled Invocation</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>35</td>
+                        <td>Native Execution Safety Boundary</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>36-40</td>
+                        <td>Native Sandbox & Interface Specifications</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>41-48</td>
+                        <td>AMSE & Runtime Optimization</td>
+                        <td class="frozen">🔒 FROZEN</td>
+                    </tr>
+                    <tr>
+                        <td>49</td>
+                        <td>Governed Runtime Governors (G01-G31)</td>
+                        <td class="frozen">✅ COMPLETE</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 2: PYTHON FOUNDATION ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L2</span> Python Foundation — 19 Modules <span
+                    class="tag tag-py">python/</span></div>
+            <div class="comp-grid">
+                <div class="comp">
+                    <div class="comp-name">phase01_core</div>
+                    <div class="comp-desc">Constants, identities, invariants</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase02_actors</div>
+                    <div class="comp-desc">Actor & role model</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase03_trust</div>
+                    <div class="comp-desc">Trust zones</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase04_validation</div>
+                    <div class="comp-desc">Action validation</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase05_workflow</div>
+                    <div class="comp-desc">Workflow state model</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase06_decision</div>
+                    <div class="comp-desc">Decision aggregation</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase07_knowledge</div>
+                    <div class="comp-desc">Bug intelligence</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase08_evidence</div>
+                    <div class="comp-desc">Evidence orchestration</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase09_bounty</div>
+                    <div class="comp-desc">Bounty scope & eligibility</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase10_coordination</div>
+                    <div class="comp-desc">Target coordination</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase11_scheduling</div>
+                    <div class="comp-desc">Work scheduling</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase12_evidence</div>
+                    <div class="comp-desc">Evidence replay & confidence</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase13_handoff</div>
+                    <div class="comp-desc">Browser handoff</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase14_connector</div>
+                    <div class="comp-desc">Backend connector</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase15_contract</div>
+                    <div class="comp-desc">Frontend↔Backend contract</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase16_execution</div>
+                    <div class="comp-desc">Execution boundary</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase17_interface</div>
+                    <div class="comp-desc">Browser interface</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase18_ledger</div>
+                    <div class="comp-desc">Provenance ledger</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">phase19_capability</div>
+                    <div class="comp-desc">Browser capability</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 3: NATIVE C++ ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L3</span> Native C++ — 60+ Modules <span
+                    class="tag tag-cpp">native/</span></div>
+            <div class="comp-grid">
+                <div class="comp">
+                    <div class="comp-name">autonomy_supervisor</div>
+                    <div class="comp-desc">Resource monitor, system integrity</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">governance_guard</div>
+                    <div class="comp-desc">Automation guard</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">runtime_guard</div>
+                    <div class="comp-desc">Runtime protection</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">research_assistant</div>
+                    <div class="comp-desc">Content extractor, sandbox, whitelist</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">hunt_engine</div>
+                    <div class="comp-desc">HDD engine, hunt guard</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">evidence</div>
+                    <div class="comp-desc">Evidence capture & replay</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">precision_engine</div>
+                    <div class="comp-desc">Confidence, calibration</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">field_controller</div>
+                    <div class="comp-desc">Field lifecycle management</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">shadow_integrity</div>
+                    <div class="comp-desc">Shadow mode hardening</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">performance</div>
+                    <div class="comp-desc">GPU stability, optimization</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">distributed</div>
+                    <div class="comp-desc">Ingestion engine, GPU optimizer, shards</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">web_client</div>
+                    <div class="comp-desc">Browser, WireGuard, client-side</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 4: PHASE 49 GOVERNORS ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L4</span> Runtime Governors — G01-G31 <span
+                    class="tag tag-py">impl_v1/phase49/</span></div>
+            <div class="card">
+                <div class="card-head">
+                    <span class="card-title">31 Autonomous Governors</span>
+                    <span class="badge badge-green">ALL ACTIVE</span>
+                </div>
+                <div class="comp-grid">
+                    <div class="comp">
+                        <div class="comp-name">G01</div>
+                        <div class="comp-desc">Core Identity</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G02</div>
+                        <div class="comp-desc">Role Authority</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G03</div>
+                        <div class="comp-desc">Trust Boundary</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G04</div>
+                        <div class="comp-desc">Action Validator</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G05</div>
+                        <div class="comp-desc">Workflow State</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G06</div>
+                        <div class="comp-desc">Decision Arbiter</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G07</div>
+                        <div class="comp-desc">Knowledge Guard</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G08</div>
+                        <div class="comp-desc">Evidence Guard</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G09</div>
+                        <div class="comp-desc">Bounty Policy</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G10-G15</div>
+                        <div class="comp-desc">Coordinator→Contract</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G16-G19</div>
+                        <div class="comp-desc">Execution→Capability</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G20-G23</div>
+                        <div class="comp-desc">Executor→Integrity</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G24-G27</div>
+                        <div class="comp-desc">Planner→Envelope</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">G28-G31</div>
+                        <div class="comp-desc">Handshake→Observation</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 5: BACKEND ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L5</span> Backend API — 17 Modules <span
+                    class="tag tag-py">backend/</span></div>
+            <div class="comp-grid">
+                <div class="comp">
+                    <div class="comp-name">api/</div>
+                    <div class="comp-desc">Server endpoints, targets, dashboard</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">assistant/</div>
+                    <div class="comp-desc">Query router, isolation guard</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">auth/</div>
+                    <div class="comp-desc">Authentication system</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">governance/</div>
+                    <div class="comp-desc">17 governance modules</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">shadow/</div>
+                    <div class="comp-desc">Shadow mode monitor</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">training/</div>
+                    <div class="comp-desc">Training API</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">voice/</div>
+                    <div class="comp-desc">Voice controls</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">browser/</div>
+                    <div class="comp-desc">Browser integration</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">tests/</div>
+                    <div class="comp-desc">34 test files</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 6: FRONTEND ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L6</span> Frontend — 27 Components <span
+                    class="tag tag-tsx">Next.js + React</span></div>
+            <div class="comp-grid">
+                <div class="comp">
+                    <div class="comp-name">HuntingPanel</div>
+                    <div class="comp-desc">Live hunting assistant, chat/voice/POC</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">hunting-control-panel</div>
+                    <div class="comp-desc">Hunting controls, targeting</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">auto-training-dashboard</div>
+                    <div class="comp-desc">Training orchestrator</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">training-dashboard-v2</div>
+                    <div class="comp-desc">V2 with global storage</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">live-training-panel</div>
+                    <div class="comp-desc">Real-time training progress</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">browser-assistant</div>
+                    <div class="comp-desc">Browser automation assistant</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">voice-controls</div>
+                    <div class="comp-desc">Voice interface</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">scope-target-panel</div>
+                    <div class="comp-desc">Scope & target management</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">gpu-monitor</div>
+                    <div class="comp-desc">GPU utilization monitor</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">storage-monitor</div>
+                    <div class="comp-desc">Storage monitoring</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">mode-selector</div>
+                    <div class="comp-desc">Mode A/B governance</div>
+                </div>
+                <div class="comp">
+                    <div class="comp-name">approval-panel</div>
+                    <div class="comp-desc">Human approval workflow</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 7: TRAINING ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L7</span> Training Infrastructure — 9 Architectures</div>
+            <div class="arch-row">
+                <div class="arch">
+                    <div class="arch-name">1. Shard Replication</div>
+                    <div class="arch-meta">9 phases · 24/24 ✅ · 1d63a46</div>
+                    <div style="font-size:11px;color:#9ca3af">256MB shards, CRC32, cross-node sync</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">2. Training Controller</div>
+                    <div class="arch-meta">5 phases · CUDA 83.9% ✅ · d68cca8</div>
+                    <div style="font-size:11px;color:#9ca3af">Freeze→finalize→train→model_freeze→sync</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">3. Production Stabilizer</div>
+                    <div class="arch-meta">6 phases · 22/22 ✅ · 1b4ad70</div>
+                    <div style="font-size:11px;color:#9ca3af">Telemetry, WebSocket, auto-heal, regression</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">4. Autonomous Orchestrator</div>
+                    <div class="arch-meta">8 phases · 25/25 ✅ · 693229b</div>
+                    <div style="font-size:11px;color:#9ca3af">Field scheduler, GPU control, convergence</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">5. Execution Orchestrator</div>
+                    <div class="arch-meta">7 phases · 23/23 ✅ · 0e1e0f9</div>
+                    <div style="font-size:11px;color:#9ca3af">110GB cap, auto-start, 23-field rotation</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">6. Production Finalization</div>
+                    <div class="arch-meta">5 phases · 20/20 ✅ · 35b74d4</div>
+                    <div style="font-size:11px;color:#9ca3af">Single-node, semantic gate, cross-field</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">7. Mode Governance</div>
+                    <div class="arch-meta">5 phases · 26/26 ✅ · a12faed</div>
+                    <div style="font-size:11px;color:#9ca3af">7-gate A→B, rollback, cluster lock</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">8. Risk Elimination</div>
+                    <div class="arch-meta">5 phases · 19/19 ✅ · 2582c5d</div>
+                    <div style="font-size:11px;color:#9ca3af">Adversarial, sub-pattern, decay detection</div>
+                </div>
+                <div class="arch">
+                    <div class="arch-name">9. Intelligence Layer</div>
+                    <div class="arch-meta">7 phases · 27/27 ✅ · ef37efb</div>
+                    <div style="font-size:11px;color:#9ca3af">Auto-ingest, curate, reinforce, hunt assist</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ LAYER 8: DATA ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">L8</span> Training Data</div>
+            <div class="card">
+                <div class="comp-grid">
+                    <div class="comp">
+                        <div class="comp-name">4,710</div>
+                        <div class="comp-desc">Learned features</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">23</div>
+                        <div class="comp-desc">Training fields</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">20</div>
+                        <div class="comp-desc">Validation sets</div>
+                    </div>
+                    <div class="comp">
+                        <div class="comp-name">50K-100K</div>
+                        <div class="comp-desc">Samples per field target</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════ CONFIG ═══════════════ -->
+        <div class="section">
+            <div class="section-head"><span class="num">CFG</span> System Configuration</div>
+            <table class="cfg-table">
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Storage Cap</td>
+                    <td>110 GB single pool</td>
+                </tr>
+                <tr>
+                    <td>Shard Size</td>
+                    <td>256 MB fixed</td>
+                </tr>
+                <tr>
+                    <td>GPU Target</td>
+                    <td>65–80% utilization</td>
+                </tr>
+                <tr>
+                    <td>Promotion Accuracy</td>
+                    <td>≥ 95% + 7 gates</td>
+                </tr>
+                <tr>
+                    <td>LIVE_READY</td>
+                    <td>5 consecutive stable cycles</td>
+                </tr>
+                <tr>
+                    <td>Rollback Trigger</td>
+                    <td>acc &lt; 92% or regression &gt; 2%</td>
+                </tr>
+                <tr>
+                    <td>Reinforcement</td>
+                    <td>Every 24 hours</td>
+                </tr>
+                <tr>
+                    <td>Maintenance</td>
+                    <td>Every 6 hours</td>
+                </tr>
+                <tr>
+                    <td>Mixed Precision</td>
+                    <td>FP16 + TF32</td>
+                </tr>
+                <tr>
+                    <td>Human Authority</td>
+                    <td>All actions human-initiated, approved, revocable</td>
+                </tr>
+                <tr>
+                    <td>AI Autonomous Authority</td>
+                    <td>PROHIBITED by Phase 01</td>
+                </tr>
+                <tr>
+                    <td>Database</td>
+                    <td>None (JSON flat files)</td>
+                </tr>
+            </table>
+        </div>
+
+        <footer>
+            YGB Autonomous Bug Bounty Hunting System · 50 Governance Phases · 9 Training Architectures · 186+ Tests<br>
+            60+ C++ Modules · 27 Frontend Components · 31 Runtime Governors · 4,710 Learned Features<br>
+            Generated 23 Feb 2026
+        </footer>
+
+    </div>
+</body>
+
+</html>
