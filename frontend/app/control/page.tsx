@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
-import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck, Clock } from "lucide-react"
+import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck, Clock, RefreshCw } from "lucide-react"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -99,36 +99,42 @@ export default function ControlPage() {
     const lastTelemetryTs = useRef<number>(0)
     const [isStalled, setIsStalled] = useState(false)
 
-    // Initialize dashboard
-    useEffect(() => {
-        const initDashboard = async () => {
-            try {
-                const response = await fetch(`${API_BASE}/api/dashboard/create`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ user_id: "user-001", user_name: "Researcher" })
-                })
+    // Initialize dashboard with timeout
+    const initDashboard = useCallback(async () => {
+        setIsLoading(true)
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 5000)
 
-                if (response.ok) {
-                    const data = await response.json()
-                    setDashboardId(data.dashboard_id)
-                    setIsConnected(true)
-                } else {
-                    console.error("Dashboard init failed: non-OK response")
-                    setDashboardId(null)
-                    setIsConnected(false)
-                }
-            } catch (error) {
-                console.error("Dashboard init failed:", error)
-                setDashboardId(null)
+        try {
+            const response = await fetch(`${API_BASE}/api/dashboard/create`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: "user-001", user_name: "Researcher" }),
+                signal: controller.signal
+            })
+
+            if (response.ok) {
+                const data = await response.json()
+                setDashboardId(data.dashboard_id)
+                setIsConnected(true)
+            } else {
+                console.error("Dashboard init failed: non-OK response")
+                setDashboardId("OFFLINE")
                 setIsConnected(false)
-            } finally {
-                setIsLoading(false)
             }
+        } catch (error) {
+            console.error("Dashboard init failed:", error)
+            setDashboardId("OFFLINE")
+            setIsConnected(false)
+        } finally {
+            clearTimeout(timeout)
+            setIsLoading(false)
         }
-
-        initDashboard()
     }, [])
+
+    useEffect(() => {
+        initDashboard()
+    }, [initDashboard])
 
     // Poll accuracy snapshot — every 1s for real-time updates
     useEffect(() => {
@@ -458,6 +464,15 @@ export default function ControlPage() {
                     </div>
 
                     <div className="flex items-center gap-4 pr-4">
+                        {!isConnected && (
+                            <button
+                                onClick={initDashboard}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 transition-colors"
+                            >
+                                <RefreshCw className="w-3 h-3" />
+                                Retry
+                            </button>
+                        )}
                         <div className={cn(
                             "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium",
                             isConnected

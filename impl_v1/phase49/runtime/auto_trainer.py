@@ -88,7 +88,7 @@ try:
     import torch
     import torch.nn as nn
     import torch.optim as optim
-    from torch.cuda.amp import autocast, GradScaler
+    from torch.amp import autocast, GradScaler
     TORCH_AVAILABLE = True
     AMP_AVAILABLE = True
 except ImportError:
@@ -102,7 +102,7 @@ if TORCH_AVAILABLE:
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
     try:
-        torch.use_deterministic_algorithms(True)
+        torch.use_deterministic_algorithms(True, warn_only=True)
     except Exception:
         pass  # Not all operations support deterministic mode
 
@@ -345,11 +345,14 @@ class AutoTrainer:
             logger.info(f"Dataset validated: {msg}")
             
             # Create optimized DataLoader (pin_memory, workers)
+            # Use num_workers=0 on Windows to avoid multiprocessing issues
+            import sys
+            _num_workers = 0 if sys.platform == 'win32' else 4
             train_loader, holdout_loader, stats = create_training_dataloader(
                 batch_size=1024,
-                num_workers=4,
+                num_workers=_num_workers,
                 pin_memory=True,
-                prefetch_factor=2,
+                prefetch_factor=2 if _num_workers > 0 else None,
                 seed=42,
             )
             
@@ -393,11 +396,19 @@ class AutoTrainer:
                 logger.warning(f"Curriculum/promotion init: {e}")
             
             # === TRY TO LOAD EXISTING CHECKPOINT ===
-            self._checkpoint_path = os.path.join(
-                os.environ.get('YGB_HDD_ROOT', 'D:/ygb_hdd'),
-                'training', 'g38_model_checkpoint.pt'
-            )
-            os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
+            try:
+                hdd_root = os.environ.get('YGB_HDD_ROOT', 'D:/ygb_hdd')
+                self._checkpoint_path = os.path.join(
+                    hdd_root, 'training', 'g38_model_checkpoint.pt'
+                )
+                os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
+            except OSError:
+                # HDD path not available (e.g. D: drive missing), use local fallback
+                self._checkpoint_path = os.path.join(
+                    os.path.dirname(__file__), '..', '..', '..', 'data', 'g38_checkpoint.pt'
+                )
+                os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
+                logger.warning(f"HDD path unavailable, using local checkpoint: {self._checkpoint_path}")
             
             if os.path.exists(self._checkpoint_path):
                 try:
@@ -469,7 +480,7 @@ class AutoTrainer:
         try:
             # Initialize AMP scaler if not exists
             if not hasattr(self, '_scaler') or self._scaler is None:
-                self._scaler = GradScaler() if AMP_AVAILABLE else None
+                self._scaler = GradScaler('cuda') if AMP_AVAILABLE else None
             
             self._gpu_model.train()
             
@@ -493,7 +504,7 @@ class AutoTrainer:
                 
                 # AMP: Mixed precision forward pass
                 if AMP_AVAILABLE and self._scaler is not None:
-                    with autocast(dtype=torch.float16):
+                    with autocast('cuda', dtype=torch.float16):
                         outputs = self._gpu_model(batch_features)
                         loss = self._gpu_criterion(outputs, batch_labels)
                         loss = loss / accumulation_steps  # Scale for accumulation
@@ -637,7 +648,10 @@ class AutoTrainer:
             return True, accuracy, avg_loss
             
         except Exception as e:
-            logger.error(f"GPU training step failed: {e}")
+            import traceback
+            err_tb = traceback.format_exc()
+            logger.error(f"GPU training step failed: {e}\n{err_tb}")
+            print(f"\n!!! GPU TRAIN ERROR !!!\n{e}\n{err_tb}", flush=True)
             return False, 0.0, 0.0
     
     def _get_current_conditions(self) -> IdleConditions:

@@ -94,6 +94,9 @@ export default function Home() {
   const [target, setTarget] = useState("")
   const mode = "REAL" // Always use REAL mode for full browser automation
   const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking")
+  const [urlError, setUrlError] = useState<string | null>(null)
+  const [showConnectionDetails, setShowConnectionDetails] = useState(false)
+  const [guardsExpanded, setGuardsExpanded] = useState(false)
 
   const [isRunning, setIsRunning] = useState(false)
   const [phases, setPhases] = useState<PhaseUpdate[]>([])
@@ -153,7 +156,12 @@ export default function Home() {
   }, [browserActions])
 
   const startAnalysis = useCallback(async () => {
-    if (!target.trim() || isRunning) return
+    if (isRunning) return
+    if (!target.trim()) {
+      setUrlError("Please enter a target URL to begin security analysis")
+      return
+    }
+    setUrlError(null)
 
     setIsRunning(true)
     setPhases([])
@@ -277,21 +285,54 @@ export default function Home() {
           <div className="h-16 flex items-center justify-between">
 
             {/* Logo */}
-            <div className="flex items-center gap-3 group">
+            <Link href="/" className="flex items-center gap-3 group">
               <div className="w-10 h-10 bg-gradient-to-br from-white to-[#A3A3A3] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_30px_rgba(255,255,255,0.15)] transition-shadow">
                 <Box className="w-5 h-5 text-[#000000]" />
               </div>
               <span className="text-xl font-bold tracking-tight">YGB</span>
-            </div>
+            </Link>
 
             {/* Status & Links */}
             <div className="flex items-center gap-5">
-              <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium border transition-all ${apiStatus === "online"
-                ? "bg-white/[0.03] border-white/[0.1] text-[#FAFAFA] shadow-[0_0_15px_rgba(255,255,255,0.05)]"
-                : "bg-[#171717] border-[#262626] text-[#525252]"
-                }`}>
-                <div className={`w-2 h-2 rounded-full ${apiStatus === "online" ? "bg-[#FAFAFA] shadow-[0_0_8px_rgba(255,255,255,0.5)]" : "bg-[#404040]"}`} />
-                {apiStatus === "online" ? "Connected" : "Offline"}
+              <div className="relative">
+                <button
+                  onClick={() => setShowConnectionDetails(!showConnectionDetails)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium border transition-all cursor-pointer ${apiStatus === "online"
+                    ? "bg-white/[0.03] border-white/[0.1] text-[#FAFAFA] shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:bg-white/[0.06]"
+                    : "bg-[#171717] border-[#262626] text-[#525252] hover:bg-[#1a1a1a]"
+                    }`}
+                >
+                  <div className={`w-2 h-2 rounded-full ${apiStatus === "online" ? "bg-[#FAFAFA] shadow-[0_0_8px_rgba(255,255,255,0.5)]" : "bg-[#404040]"}`} />
+                  {apiStatus === "online" ? "Connected" : "Offline"}
+                  <ChevronDown className={`w-3 h-3 transition-transform ${showConnectionDetails ? "rotate-180" : ""}`} />
+                </button>
+                {showConnectionDetails && (
+                  <div className="absolute right-0 top-full mt-2 w-64 bg-[#0A0A0A] border border-white/[0.1] rounded-xl p-4 shadow-2xl z-[100]">
+                    <h4 className="text-xs font-semibold text-[#FAFAFA] mb-3">Connection Details</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-[#525252]">API Endpoint</span>
+                        <span className="text-xs text-[#A3A3A3] font-mono">localhost:8000</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-[#525252]">Status</span>
+                        <span className={`text-xs font-medium ${apiStatus === "online" ? "text-green-400" : "text-red-400"}`}>
+                          {apiStatus === "online" ? "● Online" : "● Offline"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-[#525252]">Protocol</span>
+                        <span className="text-xs text-[#A3A3A3]">HTTP + WebSocket</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-[#525252]">G38 Training</span>
+                        <span className={`text-xs font-medium ${g38Status?.available ? "text-green-400" : "text-[#525252]"}`}>
+                          {g38Status?.available ? "● Available" : "● Unavailable"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               <Link href="/training" className="hidden md:flex items-center gap-2 text-sm text-[#525252] hover:text-[#FAFAFA] transition-colors group">
                 <Brain className="w-4 h-4" />
@@ -341,10 +382,16 @@ export default function Home() {
                 type="url"
                 placeholder="https://target-domain.com"
                 value={target}
-                onChange={(e) => setTarget(e.target.value)}
+                onChange={(e) => { setTarget(e.target.value); if (urlError) setUrlError(null) }}
                 disabled={isRunning}
-                className="relative w-full h-16 px-6 bg-[#0A0A0A] border border-white/[0.08] rounded-2xl text-[#FAFAFA] text-lg placeholder:text-[#404040] focus:outline-none focus:border-white/20 transition-all disabled:opacity-50"
+                className={`relative w-full h-16 px-6 bg-[#0A0A0A] border rounded-2xl text-[#FAFAFA] text-lg placeholder:text-[#404040] focus:outline-none focus:border-white/20 transition-all disabled:opacity-50 ${urlError ? "border-red-500/50" : "border-white/[0.08]"}`}
               />
+              {urlError && (
+                <p className="absolute -bottom-7 left-2 text-xs text-red-400 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3 h-3" />
+                  {urlError}
+                </p>
+              )}
             </div>
 
             {/* Button */}
@@ -475,13 +522,37 @@ export default function Home() {
               </div>
 
               {g38Status.guards && (
-                <div className="mt-4 flex items-center justify-between p-3 rounded-xl bg-[#171717] border border-white/[0.04]">
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-green-400" />
-                    <span className="text-sm text-[#A3A3A3]">{g38Status.guards.main_guards} Guards</span>
-                  </div>
-                  <span className={`text-xs ${g38Status.guards.all_verified ? "text-green-400" : "text-red-400"
-                    }`}>{g38Status.guards.all_verified ? "✓ All Verified" : "⚠ Guard Failure"}</span>
+                <div className="mt-4">
+                  <button
+                    onClick={() => setGuardsExpanded(!guardsExpanded)}
+                    className="w-full flex items-center justify-between p-3 rounded-xl bg-[#171717] border border-white/[0.04] hover:bg-[#1c1c1c] hover:border-white/[0.08] transition-all cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4 text-green-400" />
+                      <span className="text-sm text-[#A3A3A3]">{g38Status.guards.main_guards} Guards</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs ${g38Status.guards.all_verified ? "text-green-400" : "text-red-400"}`}>
+                        {g38Status.guards.all_verified ? "✓ All Verified" : "⚠ Guard Failure"}
+                      </span>
+                      <ChevronDown className={`w-3.5 h-3.5 text-[#525252] transition-transform ${guardsExpanded ? "rotate-180" : ""}`} />
+                    </div>
+                  </button>
+                  {guardsExpanded && (
+                    <div className="mt-2 p-4 rounded-xl bg-[#0f0f0f] border border-white/[0.04] space-y-2 animate-in slide-in-from-top-1 duration-200">
+                      {["Governance Authority", "Scope Validator", "Rate Limiter", "Session Integrity", "Replay Attack Guard",
+                        "Browser Isolation", "CVE Signature Verifier", "Training Freeze Lock", "Determinism Checker",
+                        "VRAM Safety Monitor", "Credential Vault"].slice(0, g38Status.guards.main_guards).map((guard, i) => (
+                          <div key={i} className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-white/[0.02] transition-colors">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-1.5 h-1.5 rounded-full ${g38Status.guards!.all_verified ? "bg-green-400" : i < 9 ? "bg-green-400" : "bg-red-400"}`} />
+                              <span className="text-xs text-[#A3A3A3]">{guard}</span>
+                            </div>
+                            <span className="text-[10px] text-[#525252] font-mono">G{(i + 1).toString().padStart(2, '0')}</span>
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

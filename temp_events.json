@@ -1,0 +1,137 @@
+﻿[
+    {
+        "event_id":  "EVT-F3D94FAE6074",
+        "event_type":  "TRAINING_STARTED",
+        "timestamp":  "2026-02-23T20:13:47.894197+00:00",
+        "details":  "Starting epoch 1 on GPU (NVIDIA GeForce RTX 3050 Laptop GPU)",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  1
+    },
+    {
+        "event_id":  "EVT-D2C3CB89B2E0",
+        "event_type":  "ERROR",
+        "timestamp":  "2026-02-23T20:13:54.288829+00:00",
+        "details":  "GPU training step failed",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  1
+    },
+    {
+        "event_id":  "EVT-38C827EB8DCC",
+        "event_type":  "REPORT_GENERATED",
+        "timestamp":  "2026-02-23T20:13:54.386910+00:00",
+        "details":  "Training report saved: reports\\g38_training\\training_summary_G38-20260223_201354.txt",
+        "idle_seconds":  0,
+        "gpu_used":  false,
+        "epoch":  null
+    },
+    {
+        "event_id":  "EVT-E59C5FDABDCA",
+        "event_type":  "IDLE_DETECTED",
+        "timestamp":  "2026-02-23T20:14:24.403113+00:00",
+        "details":  "System idle for 124s - checking guards",
+        "idle_seconds":  124,
+        "gpu_used":  false,
+        "epoch":  null
+    },
+    {
+        "event_id":  "EVT-DAF6C4E490EF",
+        "event_type":  "TRAINING_STARTED",
+        "timestamp":  "2026-02-23T20:14:24.403113+00:00",
+        "details":  "Starting epoch 2 on GPU (NVIDIA GeForce RTX 3050 Laptop GPU)",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  2
+    },
+    {
+        "event_id":  "EVT-CE28AEB932B0",
+        "event_type":  "ERROR",
+        "timestamp":  "2026-02-23T20:14:30.869725+00:00",
+        "details":  "GPU training step failed",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  2
+    },
+    {
+        "event_id":  "EVT-574DB1E5F581",
+        "event_type":  "REPORT_GENERATED",
+        "timestamp":  "2026-02-23T20:14:30.986176+00:00",
+        "details":  "Training report saved: reports\\g38_training\\training_summary_G38-20260223_201430.txt",
+        "idle_seconds":  0,
+        "gpu_used":  false,
+        "epoch":  null
+    },
+    {
+        "event_id":  "EVT-6F697C91FB3F",
+        "event_type":  "IDLE_DETECTED",
+        "timestamp":  "2026-02-23T20:15:00.997072+00:00",
+        "details":  "System idle for 161s - checking guards",
+        "idle_seconds":  161,
+        "gpu_used":  false,
+        "epoch":  null
+    },
+    {
+        "event_id":  "EVT-3B862E567B01",
+        "event_type":  "TRAINING_STARTED",
+        "timestamp":  "2026-02-23T20:15:00.997072+00:00",
+        "details":  "Starting epoch 3 on GPU (NVIDIA GeForce RTX 3050 Laptop GPU)",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  3
+    },
+    {
+        "event_id":  "EVT-DF4E6886C1E6",
+        "event_type":  "ERROR",
+        "timestamp":  "2026-02-23T20:15:07.384550+00:00",
+        "details":  "GPU training step failed",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  3
+    },
+    {
+        "event_id":  "EVT-8EF1EB5A375B",
+        "event_type":  "REPORT_GENERATED",
+        "timestamp":  "2026-02-23T20:15:07.507038+00:00",
+        "details":  "Training report saved: reports\\g38_training\\training_summary_G38-20260223_201507.txt",
+        "idle_seconds":  0,
+        "gpu_used":  false,
+        "epoch":  null
+    },
+    {
+        "event_id":  "EVT-B1753E9AEA6E",
+        "event_type":  "IDLE_DETECTED",
+        "timestamp":  "2026-02-23T20:15:37.505399+00:00",
+        "details":  "System idle for 197s - checking guards",
+        "idle_seconds":  197,
+        "gpu_used":  false,
+        "epoch":  null
+    },
+    {
+        "event_id":  "EVT-E72605203C0D",
+        "event_type":  "TRAINING_STARTED",
+        "timestamp":  "2026-02-23T20:15:37.505399+00:00",
+        "details":  "Starting epoch 4 on GPU (NVIDIA GeForce RTX 3050 Laptop GPU)",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  4
+    },
+    {
+        "event_id":  "EVT-A1B42F14A3D5",
+        "event_type":  "ERROR",
+        "timestamp":  "2026-02-23T20:15:44.117035+00:00",
+        "details":  "GPU training step failed",
+        "idle_seconds":  0,
+        "gpu_used":  true,
+        "epoch":  4
+    },
+    {
+        "event_id":  "EVT-B20F70A5EFBC",
+        "event_type":  "REPORT_GENERATED",
+        "timestamp":  "2026-02-23T20:15:44.238798+00:00",
+        "details":  "Training report saved: reports\\g38_training\\training_summary_G38-20260223_201544.txt",
+        "idle_seconds":  0,
+        "gpu_used":  false,
+        "epoch":  null
+    }
+]
