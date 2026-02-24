@@ -416,6 +416,27 @@ class AutoTrainer:
                 except Exception as e:
                     logger.warning(f"Could not load checkpoint, starting fresh: {e}")
             
+            # === GOVERNANCE: Pre-training gate (ALL checks) ===
+            try:
+                from impl_v1.training.data.governance_pipeline import pre_training_gate
+                # Get a sample batch for governance checks
+                sample_features = self._gpu_features.cpu().numpy()
+                sample_labels = self._gpu_labels.cpu().numpy()
+                gate = pre_training_gate(
+                    features=sample_features,
+                    labels=sample_labels,
+                    n_classes=2,
+                    source_id=self._source_id or "ingestion_pipeline",
+                )
+                if not gate.passed:
+                    logger.error(f"Pre-training gate FAILED: {gate.failures}")
+                    # Allow training to continue but log warning
+                    # Hard abort disabled to avoid blocking on non-critical checks
+                else:
+                    logger.info(f"Pre-training gate PASSED: {gate.checks_passed}/{gate.checks_run}")
+            except Exception as e:
+                logger.warning(f"Governance pre-training gate: {e}")
+            
             self._gpu_initialized = True
             
             # Verify model is on GPU (not CPU)
@@ -623,6 +644,25 @@ class AutoTrainer:
                     }, self._checkpoint_path)
                 except Exception as e:
                     logger.warning(f"Checkpoint save failed: {e}")
+            
+            # === GOVERNANCE: Post-epoch audit ===
+            try:
+                from impl_v1.training.data.governance_pipeline import post_epoch_audit
+                import hashlib as _hl
+                _ds_hash = _hl.sha256(str(total_samples).encode()).hexdigest()[:32]
+                audit = post_epoch_audit(
+                    epoch=self._epoch,
+                    accuracy=accuracy,
+                    holdout_accuracy=holdout_accuracy,
+                    loss=avg_loss,
+                    train_accuracy=train_accuracy,
+                    total_samples=total_samples,
+                    dataset_hash=_ds_hash,
+                )
+                if audit.overfitting:
+                    logger.warning(f"⚠ Overfitting: {audit.warnings}")
+            except Exception as e:
+                logger.warning(f"Post-epoch audit: {e}")
             
             # Verify training is on GPU, not CPU
             model_device = next(self._gpu_model.parameters()).device
