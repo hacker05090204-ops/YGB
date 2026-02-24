@@ -18,7 +18,7 @@ export function GpuMonitor({ className = "", refreshInterval = 5000 }) {
 
     const fetchStatus = React.useCallback(async () => {
         try {
-            const res = await fetch("http://localhost:8000/gpu/status")
+            const res = await fetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/gpu/status")
             if (!res.ok) throw new Error("Backend unavailable")
             const data = await res.json()
             setStatus(data)

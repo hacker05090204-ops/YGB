@@ -52,25 +52,30 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
     """
     Authenticate a WebSocket during handshake.
 
-    Token extraction order:
-      1. Query param: ?token=...
-      2. Sec-WebSocket-Protocol header (bearer.{token})
+    Token extraction: Sec-WebSocket-Protocol header (bearer.{token}) ONLY.
+    Query-string tokens are rejected (token leakage risk via logs/referrer).
 
     Returns decoded JWT payload on success, None on failure.
     """
+    import logging
+    _ws_logger = logging.getLogger("ygb.ws_auth")
+
     token = None
 
-    # 1. Query parameter
-    token = websocket.query_params.get("token")
+    # REJECTED: Query parameter tokens (security risk — leaks in logs/referrer)
+    if websocket.query_params.get("token"):
+        _ws_logger.warning(
+            "WS auth via query param rejected — use Sec-WebSocket-Protocol instead"
+        )
+        return None
 
-    # 2. Sec-WebSocket-Protocol header
-    if not token:
-        protocols = websocket.headers.get("sec-websocket-protocol", "")
-        for proto in protocols.split(","):
-            proto = proto.strip()
-            if proto.startswith("bearer."):
-                token = proto[7:]
-                break
+    # ONLY: Sec-WebSocket-Protocol header
+    protocols = websocket.headers.get("sec-websocket-protocol", "")
+    for proto in protocols.split(","):
+        proto = proto.strip()
+        if proto.startswith("bearer."):
+            token = proto[7:]
+            break
 
     if not token:
         return None
@@ -192,23 +197,29 @@ def preflight_check_secrets() -> None:
     """
     errors = []
 
-    # JWT_SECRET
-    jwt_secret = os.getenv("JWT_SECRET", "")
-    if jwt_secret.lower() in _PLACEHOLDER_SECRETS:
-        errors.append(
-            "JWT_SECRET is missing or is a placeholder. "
-            "Set a strong (32+ char) JWT_SECRET environment variable."
-        )
-    elif any(pat in jwt_secret for pat in _PLACEHOLDER_PATTERNS):
-        errors.append(
-            "JWT_SECRET contains a placeholder pattern (e.g. 'change-me'). "
-            "Generate a real secret: python -c \"import secrets; print(secrets.token_hex(32))\""
-        )
-    elif len(jwt_secret) < 32:
-        errors.append(
-            f"JWT_SECRET is too short ({len(jwt_secret)} chars). "
-            "Minimum 32 characters required."
-        )
+    def _check_secret(env_name: str, min_length: int = 32):
+        """Check a single secret env var."""
+        val = os.getenv(env_name, "")
+        if val.lower() in _PLACEHOLDER_SECRETS:
+            errors.append(
+                f"{env_name} is missing or is a placeholder. "
+                f"Set a strong ({min_length}+ char) {env_name} environment variable."
+            )
+        elif any(pat in val for pat in _PLACEHOLDER_PATTERNS):
+            errors.append(
+                f"{env_name} contains a placeholder pattern (e.g. 'change-me'). "
+                f"Generate a real secret: python -c \"import secrets; print(secrets.token_hex(32))\""
+            )
+        elif len(val) < min_length:
+            errors.append(
+                f"{env_name} is too short ({len(val)} chars). "
+                f"Minimum {min_length} characters required."
+            )
+
+    # All required secrets
+    _check_secret("JWT_SECRET", 32)
+    _check_secret("YGB_HMAC_SECRET", 32)
+    _check_secret("YGB_VIDEO_JWT_SECRET", 32)
 
     if errors:
         msg = "\n".join(f"  ✗ {e}" for e in errors)

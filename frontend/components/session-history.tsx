@@ -19,7 +19,7 @@ export function SessionHistory({ className = "", refreshInterval = 5000 }) {
 
     const fetchSessions = React.useCallback(async () => {
         try {
-            const res = await fetch("http://localhost:8000/admin/active-sessions")
+            const res = await fetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/admin/active-sessions")
             if (!res.ok) throw new Error("Backend unavailable")
             const data = await res.json()
             setSessions(data.sessions || [])

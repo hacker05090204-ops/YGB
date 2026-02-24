@@ -14,6 +14,9 @@ import uuid
 import json
 import asyncio
 import hashlib
+import logging
+
+logger = logging.getLogger("ygb.server")
 from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List, Optional, Any
@@ -336,17 +339,15 @@ async def health_check():
     
     return {
         "status": "ok",
-        "ygb_root": str(PROJECT_ROOT),
         "python_phases": len([p for p in phases if p["number"] <= 19]),
         "impl_phases": len([p for p in phases if p["number"] >= 20]),
         "hunter_modules": len(hunter_modules),
-        "hunter_integration": hunter_modules,
         "timestamp": datetime.now(UTC).isoformat()
     }
 
 
 @app.get("/api/bounty/phases")
-async def get_bounty_phases():
+async def get_bounty_phases(user=Depends(require_auth)):
     """Get all available bounty phases."""
     phases = discover_python_phases()
     return {
@@ -360,8 +361,8 @@ async def get_bounty_phases():
 
 
 @app.get("/api/reports")
-async def list_reports():
-    """List all security reports in the report directory."""
+async def list_reports(user=Depends(require_auth)):
+    """List all security reports in the report directory. Auth required."""
     report_dir = PROJECT_ROOT / "report"
     if not report_dir.exists():
         return {"reports": [], "count": 0}
@@ -371,7 +372,6 @@ async def list_reports():
         stat = file.stat()
         reports.append({
             "filename": file.name,
-            "path": str(file),
             "size": stat.st_size,
             "created": datetime.fromtimestamp(stat.st_mtime).isoformat(),
             "download_url": f"/api/reports/{file.name}"
@@ -381,7 +381,7 @@ async def list_reports():
 
 
 @app.get("/api/reports/{filename}")
-async def download_report(filename: str):
+async def download_report(filename: str, user=Depends(require_auth)):
     """Download a specific report file."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
@@ -401,7 +401,7 @@ async def download_report(filename: str):
 
 
 @app.get("/api/reports/{filename}/content")
-async def get_report_content(filename: str):
+async def get_report_content(filename: str, user=Depends(require_auth)):
     """Get report content as text."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
@@ -422,6 +422,11 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
     """Start a V1 Hunter workflow."""
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
+    
+    # SSRF protection
+    is_safe, violations = validate_target_url(request.target)
+    if not is_safe:
+        raise HTTPException(status_code=400, detail=f"Target URL rejected: {violations[0]['message']}")
     
     workflow_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
     
@@ -450,6 +455,11 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
     target = request.target.strip()
     if not target.startswith(("http://", "https://")):
         target = f"https://{target}"
+    
+    # SSRF protection
+    is_safe, violations = validate_target_url(target)
+    if not is_safe:
+        raise HTTPException(status_code=400, detail=f"Target URL rejected: {violations[0]['message']}")
     
     report_id = f"RPT-{uuid.uuid4().hex[:12].upper()}"
     
@@ -641,12 +651,13 @@ async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require
             "timestamp": datetime.now(UTC).isoformat()
         }
     except Exception as e:
+        logger.exception("Error discovering targets")
         return {
             "result_id": f"DIS-{uuid.uuid4().hex[:16].upper()}",
             "candidates": [],
             "total_found": 0,
             "filtered_count": 0,
-            "error": str(e),
+            "error": "Internal error while discovering targets",
             "timestamp": datetime.now(UTC).isoformat()
         }
 
@@ -984,7 +995,8 @@ async def get_g38_training_reports(user=Depends(require_auth)):
             import json
             try:
                 report["learned_features"] = json.loads(learned_file.read_text())
-            except:
+            except Exception:
+                logger.exception("Failed to parse learned features JSON")
                 report["learned_features"] = None
         
         reports.append(report)
@@ -992,7 +1004,6 @@ async def get_g38_training_reports(user=Depends(require_auth)):
     return {
         "reports": reports[:20],  # Last 20 reports
         "count": len(reports),
-        "reports_dir": str(reports_dir),
     }
 
 
@@ -1189,7 +1200,8 @@ async def dataset_stats(user=Depends(require_auth)):
             "source": "real_dataset_loader",
         }
     except Exception as e:
-        return {"available": False, "error": str(e)}
+        logger.exception("Error in dataset_stats")
+        return {"available": False, "error": "Internal error"}
 # =============================================================================
 
 @app.get("/api/db/users")
@@ -1199,7 +1211,8 @@ def list_users(user=Depends(require_auth)):
         users = get_all_users()
         return {"users": users, "total": len(users)}
     except Exception as e:
-        return {"users": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing users")
+        return {"users": [], "total": 0, "error": "Internal error"}
 
 
 @app.post("/api/db/users")
@@ -1210,7 +1223,8 @@ def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
         log_activity(str(new_user['id']), "USER_CREATED", f"User {request.name} created")
         return {"success": True, "user": new_user}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("Error creating user")
+        raise HTTPException(status_code=400, detail="Failed to create user")
 
 
 @app.get("/api/db/users/{user_id}")
@@ -1222,7 +1236,8 @@ def get_single_user(user_id: str, user=Depends(require_auth)):
             return {"success": True, "user": user}
         return {"success": False, "error": "User not found"}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("Error fetching user")
+        raise HTTPException(status_code=400, detail="Failed to fetch user")
 
 
 @app.get("/api/db/users/{user_id}/bounties")
@@ -1232,7 +1247,8 @@ def get_user_bounties_endpoint(user_id: str, user=Depends(require_auth)):
         bounties = get_user_bounties(user_id)
         return {"bounties": bounties, "total": len(bounties)}
     except Exception as e:
-        return {"bounties": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing user bounties")
+        return {"bounties": [], "total": 0, "error": "Internal error"}
 
 
 @app.get("/api/db/targets")
@@ -1242,7 +1258,8 @@ def list_targets(user=Depends(require_auth)):
         targets = get_all_targets()
         return {"targets": targets, "total": len(targets)}
     except Exception as e:
-        return {"targets": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing targets")
+        return {"targets": [], "total": 0, "error": "Internal error"}
 
 
 @app.post("/api/db/targets")
@@ -1259,7 +1276,8 @@ def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
         log_activity(None, "TARGET_CREATED", f"Target {request.program_name} created")
         return {"success": True, "target": target}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("Error creating target")
+        raise HTTPException(status_code=400, detail="Failed to create target")
 
 
 @app.get("/api/db/bounties")
@@ -1269,7 +1287,8 @@ def list_bounties(user=Depends(require_auth)):
         bounties = get_all_bounties()
         return {"bounties": bounties, "total": len(bounties)}
     except Exception as e:
-        return {"bounties": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing bounties")
+        return {"bounties": [], "total": 0, "error": "Internal error"}
 
 
 @app.post("/api/db/bounties")
@@ -1286,7 +1305,8 @@ def add_bounty(request: CreateBountyRequest, user=Depends(require_admin)):
         log_activity(request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}")
         return {"success": True, "bounty": bounty}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("Error creating bounty")
+        raise HTTPException(status_code=400, detail="Failed to create bounty")
 
 
 @app.put("/api/db/bounties")
@@ -1297,7 +1317,8 @@ def update_bounty(request: UpdateBountyRequest, user=Depends(require_admin)):
         log_activity(None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}")
         return {"success": True, "bounty_id": request.bounty_id, "status": request.status}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("Error updating bounty")
+        raise HTTPException(status_code=400, detail="Failed to update bounty")
 
 
 @app.post("/api/db/sessions")
@@ -1308,7 +1329,8 @@ def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
         log_activity(request.user_id, "SESSION_STARTED", f"Mode: {request.mode}")
         return {"success": True, "session": session}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("Error creating session")
+        raise HTTPException(status_code=400, detail="Failed to create session")
 
 
 @app.get("/api/db/activity")
@@ -1318,7 +1340,8 @@ def list_activity(limit: int = 50, user=Depends(require_auth)):
         activities = get_recent_activity(limit)
         return {"activities": activities, "total": len(activities)}
     except Exception as e:
-        return {"activities": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing activity")
+        return {"activities": [], "total": 0, "error": "Internal error"}
 
 
 @app.get("/api/db/admin/stats")
@@ -1328,7 +1351,8 @@ def get_admin_statistics(user=Depends(require_admin)):
         stats = get_admin_stats()
         return {"success": True, "stats": stats}
     except Exception as e:
-        return {"success": False, "stats": None, "error": str(e)}
+        logger.exception("Error fetching admin stats")
+        return {"success": False, "stats": None, "error": "Internal error"}
 
 
 # =============================================================================
@@ -1361,7 +1385,10 @@ def delete_preview_endpoint(entity_type: Optional[str] = None, user=Depends(requ
 
 @app.get("/api/video/list")
 def video_list_endpoint(user_id: Optional[str] = None, user=Depends(require_auth)):
-    """List stored videos."""
+    """List stored videos. Non-admin users can only see their own videos."""
+    # IDOR: Force user_id to authenticated user for non-admins
+    if user.get("role") != "admin":
+        user_id = user.get("sub")
     return list_videos(user_id)
 
 
@@ -1369,8 +1396,12 @@ def video_list_endpoint(user_id: Optional[str] = None, user=Depends(require_auth
 async def video_token_endpoint(request: Request, user=Depends(require_auth)):
     """Generate a signed video streaming token. Auth required."""
     body = await request.json()
+    # IDOR: Force user_id to authenticated user for non-admins
+    requested_user_id = body.get("user_id", "")
+    if user.get("role") != "admin":
+        requested_user_id = user.get("sub", "")
     return get_video_stream_token(
-        body.get("user_id", ""),
+        requested_user_id,
         body.get("session_id", ""),
         body.get("filename", "video.webm"),
     )
@@ -1389,7 +1420,8 @@ class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
-    role: str = "hunter"
+    # NOTE: 'role' field removed — all registrations are 'hunter'
+    # Admin promotion requires existing admin via /api/db/users endpoint
 
 
 @app.post("/auth/register")
@@ -1400,7 +1432,7 @@ async def register_user(request: RegisterRequest, req: Request):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     pw_hash = hash_password(request.password)
-    user = create_user(request.name, request.email, request.role)
+    user = create_user(request.name, request.email, "hunter")  # Always hunter — no privilege escalation
     update_user_password(user["id"], pw_hash)
 
     ip = req.client.host if req.client else "unknown"
@@ -1522,7 +1554,8 @@ def get_active_devices_endpoint(user=Depends(require_admin)):
         devices = get_all_active_devices()
         return {"devices": devices, "total": len(devices)}
     except Exception as e:
-        return {"devices": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing active devices")
+        return {"devices": [], "total": 0, "error": "Internal error"}
 
 
 @app.get("/admin/active-sessions")
@@ -1532,7 +1565,8 @@ def get_active_sessions_endpoint(user=Depends(require_admin)):
         sessions = get_active_sessions()
         return {"sessions": sessions, "total": len(sessions)}
     except Exception as e:
-        return {"sessions": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing active sessions")
+        return {"sessions": [], "total": 0, "error": "Internal error"}
 
 
 # =============================================================================
@@ -1571,7 +1605,8 @@ async def get_hunting_targets(user=Depends(require_auth)):
             })
         return {"targets": suggestions, "total": len(suggestions)}
     except Exception as e:
-        return {"targets": [], "total": 0, "error": str(e)}
+        logger.exception("Error listing hunting targets")
+        return {"targets": [], "total": 0, "error": "Internal error"}
 
 
 @app.get("/api/hunting/auto-mode")
@@ -1820,10 +1855,10 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
     except WebSocketDisconnect:
         print(f"[WS] WebSocket disconnected: {report_id}")
     except Exception as e:
-        print(f"[!] WebSocket error: {e}")
+        logger.exception(f"WebSocket error: {report_id}")
         try:
-            await websocket.send_json({"type": "error", "message": str(e)})
-        except:
+            await websocket.send_json({"type": "error", "message": "Internal server error"})
+        except Exception:
             pass
     finally:
         bounty_connections.pop(report_id, None)
@@ -2131,7 +2166,7 @@ async def runtime_status(user=Depends(require_auth)):
     except Exception as e:
         return {
             "status": "error",
-            "reason": str(e),
+            "reason": "Internal error",
             "runtime": None,
             "determinism_ok": False,
             "stale": True,
@@ -2258,7 +2293,7 @@ async def training_data_source(user=Depends(require_auth)):
             "data_source": "ERROR",
             "dataset_hash": "",
             "sample_count": 0,
-            "registry_status": f"ERROR: {str(e)}",
+            "registry_status": "ERROR",
             "strict_real_mode": True,
             "ingestion_manifest_hash": "",
             "bridge_hash": "",

@@ -64,7 +64,7 @@ interface G38Status {
     }
 }
 
-const API_BASE = "http://localhost:8000"
+const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 export default function TrainingDashboard() {
     const [status, setStatus] = useState<G38Status | null>(null)

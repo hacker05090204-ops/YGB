@@ -86,11 +86,11 @@ def capture_environment_fingerprint() -> EnvironmentFingerprint:
     except Exception:
         libc = "unknown"
     
-    # GPU info (would be from C++ in production)
-    gpu_info = os.environ.get("GPU_INFO", "mock-gpu")
+    # GPU info (from C++ bridge or env override)
+    gpu_info = os.environ.get("GPU_INFO", "undetected")
     
-    # Browser version (would be from browser module)
-    browser = os.environ.get("BROWSER_VERSION", "ungoogled-chromium-mock")
+    # Browser version (from browser module or env override)
+    browser = os.environ.get("BROWSER_VERSION", "undetected")
     
     # Combine for hash
     combined = f"{os_name}|{os_version}|{kernel}|{py_version}|{machine}|{libc}|{gpu_info}|{browser}"

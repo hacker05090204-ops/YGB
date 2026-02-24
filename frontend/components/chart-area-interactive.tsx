@@ -70,7 +70,7 @@ export function ChartAreaInteractive() {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const response = await fetch("http://localhost:8000/api/db/activity?limit=90")
+        const response = await fetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/api/db/activity?limit=90")
         if (!response.ok) throw new Error("Backend unavailable")
         const data = await response.json()
 

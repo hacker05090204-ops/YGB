@@ -29,7 +29,7 @@ export function LoginAlerts({ className = "", refreshInterval = 5000 }) {
 
     const fetchEvents = React.useCallback(async () => {
         try {
-            const res = await fetch("http://localhost:8000/api/db/activity?limit=20")
+            const res = await fetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/api/db/activity?limit=20")
             if (!res.ok) throw new Error("Backend unavailable")
             const data = await res.json()
             // Filter to login-related events

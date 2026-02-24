@@ -37,7 +37,12 @@ MAX_DURATION_SECONDS = 7200  # 2 hours
 STREAM_CHUNK_SIZE = 1024 * 1024  # 1 MB chunks
 MAX_CONCURRENT_STREAMS = 10
 JWT_EXPIRY_SECONDS = 300  # 5 minutes
-JWT_SECRET = os.getenv("YGB_VIDEO_JWT_SECRET", "ygb-video-stream-secret-change-me")
+JWT_SECRET = os.getenv("YGB_VIDEO_JWT_SECRET", "")
+if not JWT_SECRET or len(JWT_SECRET) < 32:
+    raise RuntimeError(
+        "[FATAL] YGB_VIDEO_JWT_SECRET is not set or too short (min 32 chars). "
+        "Set it as an environment variable before starting the server."
+    )
 
 # Active stream tracking
 _active_streams: int = 0
