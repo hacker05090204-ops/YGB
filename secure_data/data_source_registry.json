@@ -1,0 +1,21 @@
+{
+  "8ef5522bf3bd0c8b": {
+    "source_id": "8ef5522bf3bd0c8b",
+    "name": "ingestion_pipeline",
+    "source_type": "INGESTION_PIPELINE",
+    "trust_score": 90.0,
+    "total_samples_provided": 0,
+    "successful_runs": 0,
+    "failed_runs": 0,
+    "last_verified": "2026-02-24T11:39:07.640599",
+    "last_used": "",
+    "created_at": "2026-02-24T11:39:07.638096",
+    "hash_fingerprint": "",
+    "blocked": false,
+    "block_reason": "",
+    "tags": [
+      "real",
+      "production"
+    ]
+  }
+}

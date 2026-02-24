@@ -95,16 +95,14 @@ except ImportError:
     TORCH_AVAILABLE = False
     AMP_AVAILABLE = False
 
-# Enforce deterministic mode for reproducibility
+# GPU performance optimizations
 if TORCH_AVAILABLE:
-    # Required for CUDA >= 10.2 deterministic CuBLAS
-    os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
-    try:
-        torch.use_deterministic_algorithms(True, warn_only=True)
-    except Exception:
-        pass  # Not all operations support deterministic mode
+    # Enable cudnn auto-tuner — selects fastest kernels for fixed input sizes
+    torch.backends.cudnn.benchmark = True
+    torch.backends.cudnn.deterministic = False
+    # Enable TF32 tensor core math (RTX 30-series) — ~3x faster matmul
+    torch.backends.cuda.matmul.allow_tf32 = True
+    torch.backends.cudnn.allow_tf32 = True
 
 
 # =============================================================================
@@ -344,8 +342,8 @@ class AutoTrainer:
                 return False
             logger.info(f"Dataset validated: {msg}")
             
-            # Create optimized DataLoader (pin_memory, workers)
-            # Use num_workers=0 on Windows to avoid multiprocessing issues
+            # Create optimized DataLoader (pin_memory for fast GPU transfer)
+            # num_workers=0 on Windows: worker processes trigger STRICT_REAL_MODE
             import sys
             _num_workers = 0 if sys.platform == 'win32' else 4
             train_loader, holdout_loader, stats = create_training_dataloader(
@@ -427,6 +425,9 @@ class AutoTrainer:
                 except Exception as e:
                     logger.warning(f"Could not load checkpoint, starting fresh: {e}")
             
+            # NOTE: torch.compile skipped — model is too small to benefit,
+            # and torch._dynamo can silently corrupt outputs on Windows.
+            
             self._gpu_initialized = True
             
             # Verify model is on GPU (not CPU)
@@ -488,18 +489,43 @@ class AutoTrainer:
             total_correct = 0
             total_samples = 0
             batch_count = 0
-            accumulation_steps = 4  # Gradient accumulation for larger effective batch
             
-            self._gpu_optimizer.zero_grad()
+            self._gpu_optimizer.zero_grad(set_to_none=True)
+            
+            # === CUDA STREAM PREFETCHING ===
+            # Overlap data transfer with computation
+            prefetch_stream = torch.cuda.Stream()
             
             # === ITERATE OVER FULL DATALOADER (all batches, all 20K+ samples) ===
-            for batch_features, batch_labels in self._gpu_dataloader:
+            data_iter = iter(self._gpu_dataloader)
+            
+            # Pre-fetch first batch
+            try:
+                next_batch = next(data_iter)
+                with torch.cuda.stream(prefetch_stream):
+                    next_features = next_batch[0].to(self._gpu_device, non_blocking=True)
+                    next_labels = next_batch[1].to(self._gpu_device, non_blocking=True)
+            except StopIteration:
+                return False, 0.0, 0.0
+            
+            while next_features is not None:
                 if self._abort_flag.is_set():
                     return False, 0.0, 0.0
                 
-                # Move batch to GPU
-                batch_features = batch_features.to(self._gpu_device, non_blocking=True)
-                batch_labels = batch_labels.to(self._gpu_device, non_blocking=True)
+                # Wait for prefetch to complete
+                torch.cuda.current_stream().wait_stream(prefetch_stream)
+                batch_features = next_features
+                batch_labels = next_labels
+                
+                # Start prefetching NEXT batch while we compute
+                try:
+                    next_batch = next(data_iter)
+                    with torch.cuda.stream(prefetch_stream):
+                        next_features = next_batch[0].to(self._gpu_device, non_blocking=True)
+                        next_labels = next_batch[1].to(self._gpu_device, non_blocking=True)
+                except StopIteration:
+                    next_features = None
+                    next_labels = None
                 batch_size = batch_labels.size(0)
                 
                 # AMP: Mixed precision forward pass
@@ -507,42 +533,29 @@ class AutoTrainer:
                     with autocast('cuda', dtype=torch.float16):
                         outputs = self._gpu_model(batch_features)
                         loss = self._gpu_criterion(outputs, batch_labels)
-                        loss = loss / accumulation_steps  # Scale for accumulation
                     
-                    # AMP: Scaled backward pass (accumulate gradients)
+                    # AMP: Scaled backward + step every batch (no accumulation)
                     self._scaler.scale(loss).backward()
-                    
-                    # Step optimizer every accumulation_steps batches
-                    if (batch_count + 1) % accumulation_steps == 0:
-                        self._scaler.step(self._gpu_optimizer)
-                        self._scaler.update()
-                        self._gpu_optimizer.zero_grad()
+                    self._scaler.step(self._gpu_optimizer)
+                    self._scaler.update()
+                    self._gpu_optimizer.zero_grad(set_to_none=True)
                 else:
                     # Fallback: Standard FP32 training
                     outputs = self._gpu_model(batch_features)
                     loss = self._gpu_criterion(outputs, batch_labels)
-                    loss = loss / accumulation_steps
                     loss.backward()
-                    
-                    if (batch_count + 1) % accumulation_steps == 0:
-                        self._gpu_optimizer.step()
-                        self._gpu_optimizer.zero_grad()
+                    self._gpu_optimizer.step()
+                    self._gpu_optimizer.zero_grad(set_to_none=True)
                 
-                # Accumulate batch stats (use unscaled loss for metrics)
-                total_loss += loss.item() * accumulation_steps * batch_size
+                # Accumulate batch stats
+                total_loss += loss.item() * batch_size
                 _, predicted = torch.max(outputs.data, 1)
                 total_correct += (predicted == batch_labels).sum().item()
                 total_samples += batch_size
                 batch_count += 1
             
-            # Handle remaining accumulated gradients
-            if batch_count % accumulation_steps != 0:
-                if AMP_AVAILABLE and self._scaler is not None:
-                    self._scaler.step(self._gpu_optimizer)
-                    self._scaler.update()
-                else:
-                    self._gpu_optimizer.step()
-                self._gpu_optimizer.zero_grad()
+            # Synchronize CUDA streams before computing metrics
+            torch.cuda.synchronize()
             
             # Also update the cached batch reference for status queries
             if total_samples > 0:
