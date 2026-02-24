@@ -27,15 +27,19 @@ from collections import defaultdict
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-# Try loading env
-try:  # pragma: no cover
-    from dotenv import load_dotenv  # pragma: no cover
-    load_dotenv(PROJECT_ROOT / ".env")  # pragma: no cover
-except ImportError:  # pragma: no cover
-    pass  # pragma: no cover
+# SECURITY: No .env loading — secrets MUST come from environment variables only.
+# Removed dotenv loading to prevent accidental secret leaks from .env files.
 
 # JWT config from env
 JWT_SECRET = os.getenv("JWT_SECRET", "")
+if not JWT_SECRET:
+    import warnings
+    warnings.warn(
+        "[AUTH] JWT_SECRET not set. Token operations will fail. "
+        "Set JWT_SECRET environment variable before starting the server.",
+        RuntimeWarning,
+        stacklevel=2,
+    )
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_EXPIRATION_HOURS = int(os.getenv("JWT_EXPIRATION_HOURS", "24"))
 
@@ -45,23 +49,53 @@ LOGIN_RATE_LIMIT_WINDOW = int(os.getenv("LOGIN_RATE_LIMIT_WINDOW_SECONDS", "60")
 
 
 # =============================================================================
-# PASSWORD HASHING (using hashlib + salt — no bcrypt dependency required)
+# PASSWORD HASHING (iterative HMAC + migration)
 # =============================================================================
 
+_HASH_ITERATIONS = 100_000
+_HASH_VERSION = "v2"  # v2 = iterative HMAC-SHA256
+
 def hash_password(password: str) -> str:
-    """Hash a password with a random salt using SHA-256."""
+    """Hash a password with iterative HMAC-SHA256 (100K iterations)."""
     salt = secrets.token_hex(16)
-    hashed = hashlib.sha256(f"{salt}:{password}".encode()).hexdigest()
-    return f"{salt}:{hashed}"
+    hashed = _iterative_hash(password, salt)
+    return f"{_HASH_VERSION}:{salt}:{hashed}"
+
+
+def _iterative_hash(password: str, salt: str) -> str:
+    """Iterative HMAC-SHA256 key derivation."""
+    key = f"{salt}:{password}".encode()
+    digest = hashlib.sha256(key).digest()
+    for _ in range(_HASH_ITERATIONS):
+        digest = hmac.new(key, digest, hashlib.sha256).digest()
+    return digest.hex()
 
 
 def verify_password(password: str, stored_hash: str) -> bool:
-    """Verify a password against a stored hash."""
+    """Verify password — supports v2 (iterative) and v1 (legacy SHA-256)."""
+    if not stored_hash or not password:
+        return False
+
+    # v2 format: v2:salt:hash
+    if stored_hash.startswith("v2:"):
+        parts = stored_hash.split(":", 2)
+        if len(parts) != 3:
+            return False
+        _, salt, expected = parts
+        actual = _iterative_hash(password, salt)
+        return hmac.compare_digest(actual, expected)
+
+    # Legacy v1 format: salt:hash (SHA-256)
     if ":" not in stored_hash:
         return False
     salt, expected_hash = stored_hash.split(":", 1)
     actual_hash = hashlib.sha256(f"{salt}:{password}".encode()).hexdigest()
     return hmac.compare_digest(actual_hash, expected_hash)
+
+
+def needs_rehash(stored_hash: str) -> bool:
+    """Check if a stored hash needs upgrade to v2."""
+    return not stored_hash.startswith(f"{_HASH_VERSION}:")
 
 
 # =============================================================================

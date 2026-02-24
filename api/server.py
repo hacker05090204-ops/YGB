@@ -17,10 +17,18 @@ from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
+
+# Centralized auth guard
+from backend.auth.auth_guard import (
+    require_auth, require_admin,
+    revoke_token, revoke_session,
+    preflight_check_secrets,
+    validate_target_url,
+)
 
 # Add project root to path for imports
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -407,7 +415,7 @@ async def get_report_content(filename: str):
 
 
 @app.post("/api/hunter/start")
-async def start_hunter(request: StartWorkflowRequest):
+async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)):
     """Start a V1 Hunter workflow."""
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
@@ -430,7 +438,7 @@ async def start_hunter(request: StartWorkflowRequest):
 
 @app.post("/api/bounty/start")
 @app.post("/api/workflow/bounty/start")  # Alias for frontend compatibility
-async def start_bounty(request: StartWorkflowRequest):
+async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)):
     """Start a Bounty Finder workflow with REAL browser automation."""
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
@@ -524,7 +532,7 @@ async def get_execution_state(kernel_id: Optional[str] = None):
 
 
 @app.post("/api/execution/transition")
-async def execution_transition(request: ExecutionTransitionRequest):
+async def execution_transition(request: ExecutionTransitionRequest, user=Depends(require_auth)):
     """Request a state transition on the execution kernel."""
     # Valid transitions based on G01
     valid_transitions = {
@@ -650,36 +658,15 @@ scope_violations: List[Dict[str, Any]] = []
 
 
 @app.post("/scope/validate")
-async def validate_scope(request: Request):
-    """Validate a scope definition against security rules."""
+async def validate_scope(request: Request, user=Depends(require_auth)):
+    """Validate a scope definition against security rules. Auth required."""
     data = await request.json()
     target_url = data.get("target_url", "")
-    scope_definition = data.get("scope_definition", {})
     now = datetime.now(UTC).isoformat()
 
-    violations = []
+    # Use robust SSRF-safe validation from auth_guard
+    is_valid, violations = validate_target_url(target_url)
 
-    # Rule 1: Reject empty target
-    if not target_url.strip():
-        violations.append({"rule": "EMPTY_TARGET", "message": "Target URL cannot be empty"})
-
-    # Rule 2: Reject wildcards at TLD level (e.g. *.com, *.io)
-    import re
-    if re.match(r'^\*\.[a-z]{2,4}$', target_url):
-        violations.append({"rule": "WILDCARD_TLD", "message": f"Wildcard at TLD level not allowed: {target_url}"})
-
-    # Rule 3: Reject localhost/internal targets
-    forbidden_hosts = ["localhost", "127.0.0.1", "0.0.0.0", "10.", "192.168.", "172.16."]
-    for host in forbidden_hosts:
-        if host in target_url.lower():
-            violations.append({"rule": "INTERNAL_TARGET", "message": f"Internal/localhost targets are forbidden: {target_url}"})
-            break
-
-    # Rule 4: Reject if no valid domain pattern
-    if not re.search(r'[a-zA-Z0-9][a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', target_url):
-        violations.append({"rule": "INVALID_DOMAIN", "message": f"No valid domain found in: {target_url}"})
-
-    is_valid = len(violations) == 0
     return {
         "valid": is_valid,
         "target_url": target_url,
@@ -689,16 +676,18 @@ async def validate_scope(request: Request):
 
 
 @app.post("/target/start")
-async def start_target_session(request: Request):
-    """Start a target scanning session."""
+async def start_target_session(request: Request, user=Depends(require_auth)):
+    """Start a target scanning session. Auth required. Scope validation enforced."""
     data = await request.json()
     target_url = data.get("target_url", "")
     scope_definition = data.get("scope_definition", {})
     mode = data.get("mode", "READ_ONLY")
     now = datetime.now(UTC).isoformat()
 
-    if not target_url.strip():
-        return {"error": "target_url is required", "started": False}
+    # Enforce scope validation before starting session (SSRF protection)
+    is_safe, violations = validate_target_url(target_url)
+    if not is_safe:
+        return {"error": "Scope validation failed", "started": False, "violations": violations}
 
     session_id = f"TSESS-{uuid.uuid4().hex[:12].upper()}"
     target_sessions[session_id] = {
@@ -759,81 +748,9 @@ async def get_target_status():
     }
 
 
-@app.post("/api/voice/parse")
-async def parse_voice_input(request: VoiceParseRequest):
-    """Parse voice input and extract intent."""
-    import re
-    
-    text = request.text.strip().lower()
-    now = datetime.now(UTC).isoformat()
-    
-    # Forbidden patterns (from G12)
-    forbidden = [r'\b(execute|run|start|launch|attack|exploit|hack)\b',
-                 r'\b(approve|confirm|yes\s+do\s+it)\b',
-                 r'\b(submit|send|post)\b']
-    
-    for pattern in forbidden:
-        if re.search(pattern, text, re.IGNORECASE):
-            return {
-                "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
-                "intent_type": "UNKNOWN",
-                "raw_text": request.text,
-                "extracted_value": None,
-                "confidence": 0.0,
-                "status": "BLOCKED",
-                "block_reason": f"Forbidden pattern detected",
-                "timestamp": now
-            }
-    
-    # Intent patterns
-    if re.search(r'(?:find|discover|search\s+for)\s+targets?', text):
-        return {
-            "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
-            "intent_type": "FIND_TARGETS",
-            "raw_text": request.text,
-            "extracted_value": None,
-            "confidence": 0.8,
-            "status": "PARSED",
-            "block_reason": None,
-            "timestamp": now
-        }
-    
-    if re.search(r'(?:set\s+)?target\s+(?:is\s+|to\s+)?(.+)', text):
-        match = re.search(r'(?:set\s+)?target\s+(?:is\s+|to\s+)?(.+)', text)
-        return {
-            "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
-            "intent_type": "SET_TARGET",
-            "raw_text": request.text,
-            "extracted_value": match.group(1) if match else None,
-            "confidence": 0.8,
-            "status": "PARSED",
-            "block_reason": None,
-            "timestamp": now
-        }
-    
-    if re.search(r'(?:what\s+is\s+the\s+)?status', text):
-        return {
-            "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
-            "intent_type": "QUERY_STATUS",
-            "raw_text": request.text,
-            "extracted_value": None,
-            "confidence": 0.8,
-            "status": "PARSED",
-            "block_reason": None,
-            "timestamp": now
-        }
-    
-    # Unknown intent
-    return {
-        "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
-        "intent_type": "UNKNOWN",
-        "raw_text": request.text,
-        "extracted_value": None,
-        "confidence": 0.0,
-        "status": "INVALID",
-        "block_reason": "Could not parse intent",
-        "timestamp": now
-    }
+# NOTE: /api/voice/parse is defined below under DUAL-MODE VOICE ENDPOINTS
+# The duplicate simple route has been removed to avoid ambiguity.
+
 
 
 @app.post("/api/autonomy/session")
@@ -964,7 +881,7 @@ async def get_g38_events(limit: int = 50):
 
 
 @app.post("/api/g38/abort")
-async def abort_g38_training():
+async def abort_g38_training(user=Depends(require_auth)):
     """Abort current G38 training."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -980,7 +897,7 @@ async def abort_g38_training():
 
 
 @app.post("/api/g38/start")
-async def start_g38_training(epochs: int = 10):
+async def start_g38_training(epochs: int = 10, user=Depends(require_auth)):
     """Manually start G38 training for demo/testing."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1114,7 +1031,7 @@ async def get_g38_latest_report():
 # =============================================================================
 
 @app.post("/training/start")
-async def manual_start_training(epochs: int = 10):
+async def manual_start_training(epochs: int = 10, user=Depends(require_auth)):
     """Manually start GPU training. No auto-trigger."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1144,7 +1061,7 @@ async def manual_start_training(epochs: int = 10):
 
 
 @app.post("/training/continuous")
-async def start_24_7_training(epochs: int = 0):
+async def start_24_7_training(epochs: int = 0, user=Depends(require_auth)):
     """Start 24/7 continuous GPU training. epochs=0 means infinite."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1154,7 +1071,7 @@ async def start_24_7_training(epochs: int = 0):
 
 
 @app.post("/training/continuous/stop")
-async def stop_24_7_training():
+async def stop_24_7_training(user=Depends(require_auth)):
     """Stop 24/7 continuous training."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1164,7 +1081,7 @@ async def stop_24_7_training():
 
 
 @app.post("/training/stop")
-async def manual_stop_training():
+async def manual_stop_training(user=Depends(require_auth)):
     """Stop training immediately."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1446,8 +1363,8 @@ def video_list_endpoint(user_id: Optional[str] = None):
 
 
 @app.post("/api/video/token")
-async def video_token_endpoint(request: Request):
-    """Generate a signed video streaming token."""
+async def video_token_endpoint(request: Request, user=Depends(require_auth)):
+    """Generate a signed video streaming token. Auth required."""
     body = await request.json()
     return get_video_stream_token(
         body.get("user_id", ""),
@@ -1565,16 +1482,33 @@ async def login(request: LoginRequest, req: Request):
 
 
 @app.post("/auth/logout")
-async def logout(req: Request):
-    """End current session."""
+async def logout(req: Request, user=Depends(require_auth)):
+    """End current session. Revokes token and invalidates session."""
     ip = req.client.host if req.client else "unknown"
-    log_activity(None, "LOGOUT", f"Logout from {ip}", ip_address=ip)
-    return {"success": True, "message": "Logged out"}
+
+    # Extract and revoke the Bearer token
+    auth_header = req.headers.get("authorization", "")
+    if auth_header.startswith("Bearer "):
+        token = auth_header[7:]
+        revoke_token(token)
+
+    # Revoke session if present in user payload
+    session_id = user.get("session_id")
+    if session_id:
+        revoke_session(session_id)
+        try:
+            end_session(session_id)
+        except Exception:
+            pass  # Best effort
+
+    user_id = user.get("sub")
+    log_activity(user_id, "LOGOUT", f"Logout from {ip} — token+session revoked", ip_address=ip)
+    return {"success": True, "message": "Logged out — token and session revoked"}
 
 
 @app.get("/admin/active-devices")
-def get_active_devices_endpoint():
-    """Get all active devices. HDD data only."""
+def get_active_devices_endpoint(user=Depends(require_admin)):
+    """Get all active devices. Admin only. HDD data only."""
     try:
         devices = get_all_active_devices()
         return {"devices": devices, "total": len(devices)}
@@ -1583,8 +1517,8 @@ def get_active_devices_endpoint():
 
 
 @app.get("/admin/active-sessions")
-def get_active_sessions_endpoint():
-    """Get all active sessions. HDD data only."""
+def get_active_sessions_endpoint(user=Depends(require_admin)):
+    """Get all active sessions. Admin only. HDD data only."""
     try:
         sessions = get_active_sessions()
         return {"sessions": sessions, "total": len(sessions)}
@@ -1874,6 +1808,9 @@ from contextlib import asynccontextmanager
 async def lifespan(app):
     """Lifespan context manager for startup/shutdown."""
     # Startup
+    # SECURITY: Preflight checks — fail-closed on missing/weak secrets
+    preflight_check_secrets()
+    
     phases = discover_python_phases()
     hunter = discover_hunter_modules()
     print(f"[*] YGB API Server starting...")
@@ -2304,7 +2241,7 @@ async def training_data_source():
 # =============================================================================
 
 @app.post("/api/mode/train/start")
-async def start_training_mode():
+async def start_training_mode(user=Depends(require_auth)):
     """Start TRAIN mode. Blocked if HUNT is active."""
     global _runtime_mode
     if _runtime_mode == "HUNT":
@@ -2321,7 +2258,7 @@ async def start_training_mode():
 
 
 @app.post("/api/mode/train/stop")
-async def stop_training_mode():
+async def stop_training_mode(user=Depends(require_auth)):
     """Stop TRAIN mode."""
     global _runtime_mode
     if _runtime_mode != "TRAIN":
@@ -2331,7 +2268,7 @@ async def stop_training_mode():
 
 
 @app.post("/api/mode/hunt/start")
-async def start_hunt_mode():
+async def start_hunt_mode(user=Depends(require_auth)):
     """Start HUNT mode. Blocked if TRAIN is active."""
     global _runtime_mode
     if _runtime_mode == "TRAIN":
@@ -2348,7 +2285,7 @@ async def start_hunt_mode():
 
 
 @app.post("/api/mode/hunt/stop")
-async def stop_hunt_mode():
+async def stop_hunt_mode(user=Depends(require_auth)):
     """Stop HUNT mode."""
     global _runtime_mode
     if _runtime_mode != "HUNT":

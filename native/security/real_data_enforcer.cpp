@@ -14,9 +14,7 @@
  * STRICT_REAL_MODE is ALWAYS TRUE — hardcoded. No override.
  */
 
-#include <cstdint>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 
 #ifdef _WIN32

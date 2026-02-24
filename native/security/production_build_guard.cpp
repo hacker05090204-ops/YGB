@@ -13,7 +13,6 @@
  * production_build_guard.cpp
  */
 
-#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
