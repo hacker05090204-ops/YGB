@@ -70,10 +70,22 @@ class TestFetchCVEsPassive:
     def test_returns_cve_api_result(self):
         result = fetch_cves_passive("apache")
         assert isinstance(result, CVEAPIResult)
-    
+
     def test_result_has_result_id(self):
         result = fetch_cves_passive("nginx")
-        assert result.result_id.startswith("API-") or result.result_id.startswith("CACHE-")
+        assert result.result_id.startswith("API-") or result.result_id.startswith("CACHE-") or result.result_id.startswith("ERR-")
+
+    def test_result_without_key_returns_invalid_key(self):
+        """Without CVE_API_KEY, fetch_cves_passive returns INVALID_KEY status."""
+        import os
+        original = os.environ.pop("CVE_API_KEY", None)
+        try:
+            clear_api_cache()
+            result = fetch_cves_passive("test")
+            assert result.status == APIStatus.INVALID_KEY
+        finally:
+            if original:
+                os.environ["CVE_API_KEY"] = original
     
     def test_result_has_status(self):
         result = fetch_cves_passive("test")
@@ -84,6 +96,7 @@ class TestFetchCVEsPassive:
         assert result.timestamp is not None
     
     def test_mock_response_connected(self):
+        config = CVEAPIConfig(api_key="test-key-for-mock")
         mock = {
             "vulnerabilities": [
                 {
@@ -97,10 +110,11 @@ class TestFetchCVEsPassive:
                 }
             ]
         }
-        result = fetch_cves_passive("test", _mock_response=mock)
+        result = fetch_cves_passive("test", config=config, _mock_response=mock)
         assert result.status == APIStatus.CONNECTED
     
     def test_mock_response_has_records(self):
+        config = CVEAPIConfig(api_key="test-key-for-mock")
         mock = {
             "vulnerabilities": [
                 {
@@ -114,23 +128,26 @@ class TestFetchCVEsPassive:
                 }
             ]
         }
-        result = fetch_cves_passive("test", _mock_response=mock)
+        result = fetch_cves_passive("test", config=config, _mock_response=mock)
         assert len(result.records) == 1
     
     def test_mock_error_returns_offline(self):
+        config = CVEAPIConfig(api_key="test-key-for-mock")
         mock = {"error": "Connection refused"}
-        result = fetch_cves_passive("test", _mock_response=mock)
+        result = fetch_cves_passive("test", config=config, _mock_response=mock)
         assert result.status == APIStatus.OFFLINE
     
     def test_mock_invalid_key_returns_invalid_key(self):
+        config = CVEAPIConfig(api_key="test-key-for-mock")
         mock = {"error": "Invalid API key"}
-        result = fetch_cves_passive("test", _mock_response=mock)
+        result = fetch_cves_passive("test", config=config, _mock_response=mock)
         assert result.status == APIStatus.INVALID_KEY
     
     def test_caching_works(self):
+        config = CVEAPIConfig(api_key="test-key-for-mock")
         mock = {"vulnerabilities": []}
-        result1 = fetch_cves_passive("cached-test", _mock_response=mock)
-        result2 = fetch_cves_passive("cached-test")
+        result1 = fetch_cves_passive("cached-test", config=config, _mock_response=mock)
+        result2 = fetch_cves_passive("cached-test", config=config)
         assert result2.from_cache == True
 
 
@@ -183,14 +200,22 @@ class TestGetRiskContext:
 
 
 class TestDefaultAPIKey:
-    """Tests for default API key."""
+    """Tests for default API key removal — no hardcoded keys."""
     
-    def test_default_key_exists(self):
-        assert DEFAULT_API_KEY is not None
+    def test_default_key_is_empty(self):
+        """DEFAULT_API_KEY must be empty — no hardcoded secrets."""
+        assert DEFAULT_API_KEY == ""
     
     def test_default_key_is_string(self):
         assert isinstance(DEFAULT_API_KEY, str)
     
-    def test_default_key_format(self):
-        # Should be a UUID-like format
-        assert len(DEFAULT_API_KEY) > 20
+    def test_get_config_fails_without_env(self):
+        """get_config must fail-closed when CVE_API_KEY not set."""
+        import os
+        original = os.environ.pop("CVE_API_KEY", None)
+        try:
+            with pytest.raises(RuntimeError, match="CVE_API_KEY"):
+                get_config()
+        finally:
+            if original:
+                os.environ["CVE_API_KEY"] = original

@@ -38,12 +38,21 @@ class TestPasswordHashing(unittest.TestCase):
         from auth.auth import hash_password
         h = hash_password("pwd")
         self.assertIn(":", h)
-        salt, hashed = h.split(":", 1)
-        self.assertEqual(len(salt), 32)  # hex encoded 16 bytes
+        # v3 format: v3:<argon2id hash> or v3s:salt:hash (scrypt)
+        self.assertTrue(
+            h.startswith("v3:") or h.startswith("v3s:"),
+            f"Expected v3/v3s prefix, got: {h[:10]}"
+        )
 
-    def test_verify_invalid_format(self):
+    def test_verify_legacy_v1_hash(self):
+        """Verify backward compat with legacy v1 salt:hash format."""
+        import hashlib as _hl, secrets as _sec
         from auth.auth import verify_password
-        self.assertFalse(verify_password("x", "no-colon-here"))
+        salt = _sec.token_hex(16)
+        legacy_hash = _hl.sha256(f"{salt}:legacypw".encode()).hexdigest()
+        stored = f"{salt}:{legacy_hash}"
+        self.assertTrue(verify_password("legacypw", stored))
+        self.assertFalse(verify_password("wrong", stored))
 
 
 class TestJWT(unittest.TestCase):

@@ -30,37 +30,58 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from backend.auth.auth import verify_jwt
 
 # =============================================================================
-# TOKEN REVOCATION STORE (in-memory — cleared on restart)
+# TOKEN REVOCATION STORE (pluggable — see revocation_store.py)
 # =============================================================================
 
-_revoked_tokens: Set[str] = set()
-_revoked_sessions: Set[str] = set()
+from backend.auth.revocation_store import (
+    revoke_token,
+    revoke_session,
+    is_token_revoked,
+    is_session_revoked,
+)
 
 # Bearer token scheme
 _bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def revoke_token(token: str) -> None:
-    """Add a token to the revocation list."""
-    # Store hash of token to avoid keeping raw tokens in memory
-    token_hash = hashlib.sha256(token.encode()).hexdigest()
-    _revoked_tokens.add(token_hash)
+# =============================================================================
+# WEBSOCKET AUTHENTICATION HELPER
+# =============================================================================
 
+async def ws_authenticate(websocket) -> Optional[Dict]:
+    """
+    Authenticate a WebSocket during handshake.
 
-def revoke_session(session_id: str) -> None:
-    """Mark a session as revoked."""
-    _revoked_sessions.add(session_id)
+    Token extraction order:
+      1. Query param: ?token=...
+      2. Sec-WebSocket-Protocol header (bearer.{token})
 
+    Returns decoded JWT payload on success, None on failure.
+    """
+    token = None
 
-def is_token_revoked(token: str) -> bool:
-    """Check if a token has been revoked."""
-    token_hash = hashlib.sha256(token.encode()).hexdigest()
-    return token_hash in _revoked_tokens
+    # 1. Query parameter
+    token = websocket.query_params.get("token")
 
+    # 2. Sec-WebSocket-Protocol header
+    if not token:
+        protocols = websocket.headers.get("sec-websocket-protocol", "")
+        for proto in protocols.split(","):
+            proto = proto.strip()
+            if proto.startswith("bearer."):
+                token = proto[7:]
+                break
 
-def is_session_revoked(session_id: str) -> bool:
-    """Check if a session has been revoked."""
-    return session_id in _revoked_sessions
+    if not token:
+        return None
+
+    # Check revocation
+    if is_token_revoked(token):
+        return None
+
+    # Verify JWT
+    payload = verify_jwt(token)
+    return payload
 
 
 # =============================================================================
@@ -154,6 +175,13 @@ _PLACEHOLDER_SECRETS = frozenset([
     "mysecret", "my_secret", "super_secret", "supersecret",
 ])
 
+# Patterns that indicate placeholder secrets (substring match)
+_PLACEHOLDER_PATTERNS = [
+    "change-me", "change_me", "changeme", "replace-me", "replace_me",
+    "your-secret", "your_secret", "example", "placeholder",
+    "CHANGE_ME", "REPLACE_ME", "YOUR_SECRET",
+]
+
 
 def preflight_check_secrets() -> None:
     """
@@ -170,6 +198,11 @@ def preflight_check_secrets() -> None:
         errors.append(
             "JWT_SECRET is missing or is a placeholder. "
             "Set a strong (32+ char) JWT_SECRET environment variable."
+        )
+    elif any(pat in jwt_secret for pat in _PLACEHOLDER_PATTERNS):
+        errors.append(
+            "JWT_SECRET contains a placeholder pattern (e.g. 'change-me'). "
+            "Generate a real secret: python -c \"import secrets; print(secrets.token_hex(32))\""
         )
     elif len(jwt_secret) < 32:
         errors.append(

@@ -95,14 +95,18 @@ except ImportError:
     TORCH_AVAILABLE = False
     AMP_AVAILABLE = False
 
-# GPU performance optimizations
+# GPU performance + deterministic settings
 if TORCH_AVAILABLE:
-    # Enable cudnn auto-tuner — selects fastest kernels for fixed input sizes
-    torch.backends.cudnn.benchmark = True
-    torch.backends.cudnn.deterministic = False
+    # DETERMINISTIC: Required for reproducible training
+    # benchmark=False because benchmark and deterministic are contradictory
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
     # Enable TF32 tensor core math (RTX 30-series) — ~3x faster matmul
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.allow_tf32 = True
+
+# CUBLAS deterministic workspace config
+os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
 
 
 # =============================================================================
@@ -977,25 +981,23 @@ class AutoTrainer:
         Manual training via API always available regardless.
         """
         self._running = True
-        self._training_mode_label = "AUTO"
-        logger.info("G38 Trainer started in IDLE AUTO-TRAINING MODE")
+        self._training_mode_label = "MANUAL"
+        logger.info("G38 Trainer started in MANUAL training mode — API-only trigger")
         
         while self._running:
             try:
-                # Only auto-trigger if not already training
+                # MANUAL MODE: scheduler loop runs but does NOT auto-trigger training.
+                # Training is triggered ONLY via explicit API call (force_start_training).
+                # This loop monitors system conditions for dashboard reporting only.
                 if self._state != TrainingState.TRAINING:
                     conditions = self._get_current_conditions()
                     if conditions.idle_seconds >= IDLE_THRESHOLD_SECONDS:
-                        logger.info(
-                            f"Idle detected ({conditions.idle_seconds}s) — "
-                            f"attempting auto-training"
-                        )
-                        # check_and_train has ALL safety guards built in
-                        await asyncio.get_event_loop().run_in_executor(
-                            None, self.check_and_train
+                        logger.debug(
+                            f"System idle ({conditions.idle_seconds}s) — "
+                            f"awaiting manual training trigger via API"
                         )
             except Exception as e:
-                logger.error(f"Auto-training scheduler error: {e}")
+                logger.error(f"Scheduler monitoring error: {e}")
             
             await asyncio.sleep(self.CHECK_INTERVAL_SECONDS)
         
@@ -1242,7 +1244,7 @@ class AutoTrainer:
             "last_accuracy": round(self._last_accuracy, 4),
             "samples_per_sec": round(self._samples_per_sec, 1),
             "dataset_size": self._gpu_dataset_stats["train"]["total"] if self._gpu_dataset_stats else 0,
-            "training_mode": "CONTINUOUS" if is_continuous else getattr(self, '_training_mode_label', 'AUTO'),
+            "training_mode": "CONTINUOUS" if is_continuous else getattr(self, '_training_mode_label', 'MANUAL'),
             "continuous_mode": is_continuous,
         }
 
@@ -1263,13 +1265,14 @@ def get_auto_trainer() -> AutoTrainer:
 
 
 def start_auto_training() -> None:
-    """Initialize trainer in IDLE AUTO-TRAINING mode.
+    """Initialize trainer in MANUAL training mode.
     
-    Starts background scheduler that auto-triggers training
-    when system is idle >= 60 seconds. All guards enforced.
+    Starts background scheduler for system monitoring.
+    Training is triggered ONLY via explicit API call.
+    MANUAL mode — no idle auto-trigger. All guards enforced.
     """
     trainer = get_auto_trainer()
-    trainer.start()  # Starts background loop with idle auto-training
+    trainer.start()  # Starts MANUAL mode background monitor
 
 
 def stop_auto_training() -> None:

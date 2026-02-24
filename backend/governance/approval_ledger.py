@@ -48,11 +48,16 @@ class KeyManager:
     DEFAULT_KEY_ID = "ygb-key-v1"
     DEFAULT_SECRET = b"ygb-approval-key-v1"
 
-    def __init__(self, strict: bool = False):
+    def __init__(self, strict: bool = None):
         self._keys: dict[str, bytes] = {}
         self._revoked: set[str] = set()
         self._active_key_id: str = self.DEFAULT_KEY_ID
         self._audit_log: list[dict] = []
+        # Default to strict=True in production environments
+        if strict is None:
+            env = os.environ.get("YGB_ENV", "").lower()
+            prod_flag = os.environ.get("YGB_PRODUCTION", "0")
+            strict = (env == "production" or prod_flag == "1")
         self._strict: bool = strict
         self._load_keys()
 

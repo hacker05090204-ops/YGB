@@ -257,3 +257,63 @@ def get_approved_commands() -> List[str]:
     """Get list of approved commands for current platform."""
     plat = _get_platform()
     return list(APPROVED_COMMANDS.get(plat, {}).keys())
+
+
+# =============================================================================
+# LONG-RUNNING PROCESS MANAGEMENT
+# =============================================================================
+
+def safe_popen(
+    args: List[str],
+    *,
+    stdout=subprocess.DEVNULL,
+    stderr=subprocess.DEVNULL,
+) -> subprocess.Popen:
+    """
+    Launch a long-running process securely.
+
+    Unlike secure_run, this returns a Popen handle for processes that
+    need to run asynchronously (e.g. browser windows).
+
+    Security:
+        - shell=False always
+        - Clean environment
+        - Returns Popen handle for lifecycle management
+    """
+    if not args:
+        raise ValueError("Empty command list")
+
+    clean_env = _get_clean_environment()
+    # Inherit PATH for browser discovery on Windows
+    if "PATH" in os.environ:
+        clean_env["PATH"] = os.environ["PATH"]
+    if "SYSTEMROOT" in os.environ:
+        clean_env["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
+
+    return subprocess.Popen(
+        args,
+        stdout=stdout,
+        stderr=stderr,
+        shell=False,
+        env=clean_env,
+    )
+
+
+def safe_terminate(proc: subprocess.Popen, timeout: int = 5) -> bool:
+    """
+    Safely terminate a long-running process.
+
+    Tries graceful terminate first, then force-kills if needed.
+    """
+    if proc is None:
+        return False
+    try:
+        proc.terminate()
+        proc.wait(timeout=timeout)
+    except (OSError, subprocess.TimeoutExpired):
+        try:
+            proc.kill()
+        except OSError:
+            pass
+    return True
+

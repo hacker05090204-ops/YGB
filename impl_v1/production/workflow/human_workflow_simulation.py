@@ -249,3 +249,86 @@ def run_workflow_validation(data_dir: str) -> tuple[WorkflowMetrics, dict]:
     }
 
     return metrics, report
+
+
+# =============================================================================
+# CONVENIENCE FUNCTIONS FOR TESTING
+# =============================================================================
+
+import hashlib as _hl
+
+def generate_valid_reports(count: int = 300) -> List[BugReport]:
+    """
+    Generate deterministic test reports for workflow simulation.
+
+    Uses hash-based deterministic values — no RNG, no synthetic fallback.
+    Distribution: 1/3 valid, 1/3 duplicate, 1/3 invalid.
+    """
+    reports: List[BugReport] = []
+    types = [ReportType.NEW_VALID, ReportType.DUPLICATE,
+             ReportType.INVALID, ReportType.EDGE_CASE]
+    severities = ["critical", "high", "medium", "low"]
+
+    for i in range(count):
+        h = _hl.sha256(f"report-{i}".encode()).hexdigest()
+        # Deterministic type cycling
+        rtype = types[i % len(types)]
+        sev = severities[i % len(severities)]
+        # Deterministic scores from hash bytes
+        clarity = (int(h[:2], 16) % 80 + 20) / 100.0    # 0.20 .. 0.99
+        completeness = (int(h[2:4], 16) % 70 + 30) / 100.0  # 0.30 .. 0.99
+
+        reports.append(BugReport(
+            id=f"RPT-{i:04d}",
+            report_type=rtype,
+            title=f"Test Report {i}: {sev} {rtype.value}",
+            severity=sev,
+            clarity_score=clarity,
+            completeness=completeness,
+            submission_time=datetime.now().isoformat(),
+        ))
+
+    return reports
+
+
+def simulate_review(report: BugReport) -> ReviewResult:
+    """Simulate human review of a single report (alias for review_report)."""
+    return review_report(report)
+
+
+def run_workflow_simulation(
+    count: int = 300,
+) -> tuple:
+    """
+    Run a full workflow simulation with deterministic data.
+
+    Returns (WorkflowMetrics, summary_dict).
+    """
+    reports = generate_valid_reports(count)
+    results = [review_report(r) for r in reports]
+    metrics = calculate_workflow_metrics(reports, results)
+
+    valid_count = sum(1 for r in reports if r.report_type == ReportType.NEW_VALID)
+    dup_count = sum(1 for r in reports if r.report_type == ReportType.DUPLICATE)
+    inv_count = sum(1 for r in reports if r.report_type == ReportType.INVALID)
+
+    summary = {
+        "timestamp": datetime.now().isoformat(),
+        "data_source": "deterministic_simulation",
+        "counts": {
+            "valid_reports": valid_count,
+            "duplicate_reports": dup_count,
+            "invalid_reports": inv_count,
+        },
+        "metrics": {
+            "avg_clarity": metrics.avg_clarity,
+            "avg_review_time_minutes": metrics.avg_review_time_minutes,
+            "false_rejection_rate": metrics.false_rejection_rate,
+            "false_acceptance_rate": metrics.false_acceptance_rate,
+            "friction_index": metrics.friction_index,
+        },
+        "verdict": "PASS" if metrics.false_rejection_rate < 0.10 else "REVIEW",
+    }
+
+    return metrics, summary
+

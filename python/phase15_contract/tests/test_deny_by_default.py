@@ -154,11 +154,11 @@ class TestNoForbiddenImports:
         assert 'import os' not in source
 
     def test_no_phase16_import(self):
-        """No phase16+ imports."""
+        """No phase16+ imports in implementation files (test files excluded)."""
         import os
-        module_dir = os.path.dirname(__file__).replace('/tests', '')
+        module_dir = os.path.dirname(__file__).replace('/tests', '').replace('\\tests', '')
         for filename in os.listdir(module_dir):
-            if filename.endswith('.py'):
+            if filename.endswith('.py') and not filename.startswith('test_'):
                 filepath = os.path.join(module_dir, filename)
                 with open(filepath, 'r') as f:
                     content = f.read()

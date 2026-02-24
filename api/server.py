@@ -11,6 +11,7 @@ IT CANNOT EXECUTE BROWSER ACTIONS OR BYPASS GOVERNANCE.
 import os
 import sys
 import uuid
+import json
 import asyncio
 import hashlib
 from datetime import datetime, UTC
@@ -28,6 +29,7 @@ from backend.auth.auth_guard import (
     revoke_token, revoke_session,
     preflight_check_secrets,
     validate_target_url,
+    ws_authenticate,
 )
 
 # Add project root to path for imports
@@ -58,7 +60,8 @@ from backend.training.state_manager import get_training_state_manager
 # Import auth and alerts
 from backend.auth.auth import (
     hash_password, verify_password, generate_jwt, verify_jwt,
-    compute_device_hash, get_rate_limiter, generate_csrf_token
+    compute_device_hash, get_rate_limiter, generate_csrf_token,
+    needs_rehash,
 )
 from backend.alerts.email_alerts import (
     alert_new_login, alert_new_device, alert_multiple_devices,
@@ -478,7 +481,7 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
 # =============================================================================
 
 @app.post("/api/dashboard/create")
-async def create_dashboard(request: CreateDashboardRequest):
+async def create_dashboard(request: CreateDashboardRequest, user=Depends(require_auth)):
     """Create a new dashboard for a user."""
     dashboard_id = f"DASH-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.now(UTC).isoformat()
@@ -510,7 +513,7 @@ async def create_dashboard(request: CreateDashboardRequest):
 
 
 @app.get("/api/dashboard/state")
-async def get_dashboard_state(dashboard_id: Optional[str] = None):
+async def get_dashboard_state(dashboard_id: Optional[str] = None, user=Depends(require_auth)):
     """Get current dashboard state."""
     if dashboard_id and dashboard_id in dashboard_states:
         return dashboard_states[dashboard_id]
@@ -520,7 +523,7 @@ async def get_dashboard_state(dashboard_id: Optional[str] = None):
 
 
 @app.get("/api/execution/state")
-async def get_execution_state(kernel_id: Optional[str] = None):
+async def get_execution_state(kernel_id: Optional[str] = None, user=Depends(require_auth)):
     """Get execution kernel state."""
     if kernel_id and kernel_id in execution_kernels:
         return execution_kernels[kernel_id]
@@ -587,7 +590,7 @@ async def execution_transition(request: ExecutionTransitionRequest, user=Depends
 
 
 @app.post("/api/approval/decision")
-async def submit_approval_decision(request: ApprovalDecisionRequest):
+async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depends(require_admin)):
     """Submit an approval decision."""
     now = datetime.now(UTC).isoformat()
     
@@ -608,7 +611,7 @@ async def submit_approval_decision(request: ApprovalDecisionRequest):
 
 
 @app.post("/api/targets/discover")
-async def discover_targets(request: TargetDiscoveryRequest):
+async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require_auth)):
     """Discover potential bug bounty targets from the database."""
     try:
         targets = await get_all_targets()
@@ -712,7 +715,7 @@ async def start_target_session(request: Request, user=Depends(require_auth)):
 
 
 @app.post("/target/stop")
-async def stop_target_session(request: Request):
+async def stop_target_session(request: Request, user=Depends(require_auth)):
     """Stop an active target scanning session."""
     data = await request.json()
     session_id = data.get("session_id", "")
@@ -734,7 +737,7 @@ async def stop_target_session(request: Request):
 
 
 @app.get("/target/status")
-async def get_target_status():
+async def get_target_status(user=Depends(require_auth)):
     """Get status of all target sessions."""
     active = [s for s in target_sessions.values() if s["status"] == "ACTIVE"]
     stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED"]
@@ -754,7 +757,7 @@ async def get_target_status():
 
 
 @app.post("/api/autonomy/session")
-async def create_autonomy_session(request: AutonomySessionRequest):
+async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(require_auth)):
     """Create an autonomy session."""
     now = datetime.now(UTC)
     session_id = f"AUT-{uuid.uuid4().hex[:16].upper()}"
@@ -799,7 +802,7 @@ async def create_autonomy_session(request: AutonomySessionRequest):
 # =============================================================================
 
 @app.get("/api/g38/status")
-async def get_g38_status():
+async def get_g38_status(user=Depends(require_auth)):
     """Get G38 auto-training status."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
@@ -855,7 +858,7 @@ async def get_g38_status():
 
 
 @app.get("/api/g38/events")
-async def get_g38_events(limit: int = 50):
+async def get_g38_events(limit: int = 50, user=Depends(require_auth)):
     """Get recent G38 training events."""
     if not G38_AVAILABLE:
         return {"events": [], "error": "G38 modules not loaded"}
@@ -928,7 +931,7 @@ async def start_g38_training(epochs: int = 10, user=Depends(require_auth)):
 
 
 @app.get("/api/g38/guards")
-async def get_g38_guards():
+async def get_g38_guards(user=Depends(require_auth)):
     """Get all G38 guard statuses."""
     if not G38_AVAILABLE:
         return {"guards": [], "error": "G38 modules not loaded"}
@@ -950,7 +953,7 @@ async def get_g38_guards():
 
 
 @app.get("/api/g38/reports")
-async def get_g38_training_reports():
+async def get_g38_training_reports(user=Depends(require_auth)):
     """Get G38 training reports."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
     
@@ -994,7 +997,7 @@ async def get_g38_training_reports():
 
 
 @app.get("/api/g38/reports/latest")
-async def get_g38_latest_report():
+async def get_g38_latest_report(user=Depends(require_auth)):
     """Get the latest G38 training report."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
     
@@ -1097,7 +1100,7 @@ async def manual_stop_training(user=Depends(require_auth)):
 
 
 @app.get("/training/status")
-async def manual_training_status():
+async def manual_training_status(user=Depends(require_auth)):
     """Get current training status."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
@@ -1107,7 +1110,7 @@ async def manual_training_status():
 
 
 @app.get("/training/progress")
-async def manual_training_progress():
+async def manual_training_progress(user=Depends(require_auth)):
     """Get real-time training progress. Returns null if unavailable."""
     mgr = get_training_state_manager()
     metrics = mgr.get_training_progress()
@@ -1115,7 +1118,7 @@ async def manual_training_progress():
 
 
 @app.get("/gpu/status")
-async def gpu_status():
+async def gpu_status(user=Depends(require_auth)):
     """Get GPU utilization and memory metrics. Real data only."""
     result: Dict[str, Any] = {
         "gpu_available": False,
@@ -1164,7 +1167,7 @@ async def gpu_status():
 
 
 @app.get("/dataset/stats")
-async def dataset_stats():
+async def dataset_stats(user=Depends(require_auth)):
     """Get training dataset statistics."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
@@ -1190,7 +1193,7 @@ async def dataset_stats():
 # =============================================================================
 
 @app.get("/api/db/users")
-def list_users():
+def list_users(user=Depends(require_auth)):
     """Get all users from HDD storage."""
     try:
         users = get_all_users()
@@ -1200,18 +1203,18 @@ def list_users():
 
 
 @app.post("/api/db/users")
-def add_user(request: CreateUserRequest):
+def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
     """Create a new user."""
     try:
-        user = create_user(request.name, request.email, request.role)
-        log_activity(str(user['id']), "USER_CREATED", f"User {request.name} created")
-        return {"success": True, "user": user}
+        new_user = create_user(request.name, request.email, request.role)
+        log_activity(str(new_user['id']), "USER_CREATED", f"User {request.name} created")
+        return {"success": True, "user": new_user}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/users/{user_id}")
-def get_single_user(user_id: str):
+def get_single_user(user_id: str, user=Depends(require_auth)):
     """Get a specific user by ID."""
     try:
         user = get_user(user_id)
@@ -1223,7 +1226,7 @@ def get_single_user(user_id: str):
 
 
 @app.get("/api/db/users/{user_id}/bounties")
-def get_user_bounties_endpoint(user_id: str):
+def get_user_bounties_endpoint(user_id: str, user=Depends(require_auth)):
     """Get all bounties for a specific user."""
     try:
         bounties = get_user_bounties(user_id)
@@ -1233,7 +1236,7 @@ def get_user_bounties_endpoint(user_id: str):
 
 
 @app.get("/api/db/targets")
-def list_targets():
+def list_targets(user=Depends(require_auth)):
     """Get all targets from HDD storage."""
     try:
         targets = get_all_targets()
@@ -1243,7 +1246,7 @@ def list_targets():
 
 
 @app.post("/api/db/targets")
-def add_target(request: CreateTargetRequest):
+def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
     """Create a new target."""
     try:
         target = create_target(
@@ -1260,7 +1263,7 @@ def add_target(request: CreateTargetRequest):
 
 
 @app.get("/api/db/bounties")
-def list_bounties():
+def list_bounties(user=Depends(require_auth)):
     """Get all bounties."""
     try:
         bounties = get_all_bounties()
@@ -1270,7 +1273,7 @@ def list_bounties():
 
 
 @app.post("/api/db/bounties")
-def add_bounty(request: CreateBountyRequest):
+def add_bounty(request: CreateBountyRequest, user=Depends(require_admin)):
     """Create a new bounty submission."""
     try:
         bounty = create_bounty(
@@ -1287,7 +1290,7 @@ def add_bounty(request: CreateBountyRequest):
 
 
 @app.put("/api/db/bounties")
-def update_bounty(request: UpdateBountyRequest):
+def update_bounty(request: UpdateBountyRequest, user=Depends(require_admin)):
     """Update bounty status and reward."""
     try:
         update_bounty_status(request.bounty_id, request.status, request.reward)
@@ -1298,7 +1301,7 @@ def update_bounty(request: UpdateBountyRequest):
 
 
 @app.post("/api/db/sessions")
-def add_session(request: CreateSessionRequest):
+def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
     """Create a new session."""
     try:
         session = create_session(request.user_id, request.mode, request.target_scope)
@@ -1309,7 +1312,7 @@ def add_session(request: CreateSessionRequest):
 
 
 @app.get("/api/db/activity")
-def list_activity(limit: int = 50):
+def list_activity(limit: int = 50, user=Depends(require_auth)):
     """Get recent activity log."""
     try:
         activities = get_recent_activity(limit)
@@ -1319,7 +1322,7 @@ def list_activity(limit: int = 50):
 
 
 @app.get("/api/db/admin/stats")
-def get_admin_statistics():
+def get_admin_statistics(user=Depends(require_admin)):
     """Get admin dashboard statistics."""
     try:
         stats = get_admin_stats()
@@ -1333,31 +1336,31 @@ def get_admin_statistics():
 # =============================================================================
 
 @app.get("/api/storage/stats")
-def storage_stats_endpoint():
+def storage_stats_endpoint(user=Depends(require_auth)):
     """Get HDD storage engine statistics."""
     return get_storage_stats()
 
 
 @app.get("/api/storage/lifecycle")
-def lifecycle_status_endpoint():
+def lifecycle_status_endpoint(user=Depends(require_auth)):
     """Get lifecycle status and deletion preview."""
     return get_lifecycle_status()
 
 
 @app.get("/api/storage/disk")
-def disk_status_endpoint():
+def disk_status_endpoint(user=Depends(require_auth)):
     """Get HDD disk usage, alerts, and health."""
     return get_disk_status()
 
 
 @app.get("/api/storage/delete-preview")
-def delete_preview_endpoint(entity_type: Optional[str] = None):
+def delete_preview_endpoint(entity_type: Optional[str] = None, user=Depends(require_admin)):
     """Preview which entities would be auto-deleted."""
     return get_delete_preview(entity_type)
 
 
 @app.get("/api/video/list")
-def video_list_endpoint(user_id: Optional[str] = None):
+def video_list_endpoint(user_id: Optional[str] = None, user=Depends(require_auth)):
     """List stored videos."""
     return list_videos(user_id)
 
@@ -1444,6 +1447,12 @@ async def login(request: LoginRequest, req: Request):
 
     # Success — reset rate limiter
     limiter.reset(ip)
+
+    # B9: Auto-rehash legacy password to v2 on successful login
+    if needs_rehash(user["password_hash"]):
+        new_hash = hash_password(request.password)
+        update_user_password(user["id"], new_hash)
+        log_activity(user["id"], "PASSWORD_REHASHED", "Legacy hash upgraded to v2", ip_address=ip)
 
     # Compute device hash and register device
     dh = compute_device_hash(ua, ip)
@@ -1541,7 +1550,7 @@ _hunting_auto_mode = {
 
 
 @app.get("/api/hunting/targets")
-async def get_hunting_targets():
+async def get_hunting_targets(user=Depends(require_auth)):
     """Get AI-suggested hunting targets from the database."""
     try:
         # Pull real targets from HDD storage
@@ -1566,7 +1575,7 @@ async def get_hunting_targets():
 
 
 @app.get("/api/hunting/auto-mode")
-async def get_hunting_auto_mode():
+async def get_hunting_auto_mode(user=Depends(require_auth)):
     """Get current hunting auto-mode state with integrity score."""
     # Read integrity score from supervisor if available
     if INTEGRITY_AVAILABLE:
@@ -1599,6 +1608,12 @@ hunting_connections: Dict[str, WebSocket] = {}
 @app.websocket("/ws/hunting")
 async def hunting_websocket(websocket: WebSocket):
     """WebSocket endpoint for live hunting chat (HuntingPanel.tsx)."""
+    # B8: Auth gating — verify token before accepting
+    user = await ws_authenticate(websocket)
+    if user is None:
+        await websocket.close(code=4001, reason="Authentication required")
+        return
+
     await websocket.accept()
     conn_id = uuid.uuid4().hex[:8]
     hunting_connections[conn_id] = websocket
@@ -1643,6 +1658,12 @@ async def hunting_websocket(websocket: WebSocket):
 @app.websocket("/ws/hunter/{workflow_id}")
 async def hunter_websocket(websocket: WebSocket, workflow_id: str):
     """WebSocket endpoint for Hunter workflow updates."""
+    # B8: Auth gating — verify token before accepting
+    user = await ws_authenticate(websocket)
+    if user is None:
+        await websocket.close(code=4001, reason="Authentication required")
+        return
+
     await websocket.accept()
     hunter_connections[workflow_id] = websocket
     
@@ -1693,6 +1714,12 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
 @app.websocket("/ws/bounty/{report_id}")
 async def bounty_websocket(websocket: WebSocket, report_id: str):
     """WebSocket endpoint for HTTP-based security analysis."""
+    # B8: Auth gating — verify token before accepting
+    user = await ws_authenticate(websocket)
+    if user is None:
+        await websocket.close(code=4001, reason="Authentication required")
+        return
+
     await websocket.accept()
     bounty_connections[report_id] = websocket
     ws_closed = False
@@ -1777,7 +1804,12 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                 }
                 for r in context.phase_results
             ],
-            "report_hash": hashlib.md5(str(context.phase_results).encode()).hexdigest()
+            "report_hash": hashlib.sha256(
+                json.dumps(
+                    [{"number": r.phase_number, "name": r.phase_name, "status": r.status, "duration_ms": r.duration_ms} for r in context.phase_results],
+                    sort_keys=True, default=str
+                ).encode()
+            ).hexdigest()
         }
         
         try:
@@ -1856,7 +1888,7 @@ app.router.lifespan_context = lifespan
 # =============================================================================
 
 @app.get("/system/integrity")
-async def system_integrity():
+async def system_integrity(user=Depends(require_auth)):
     """Unified system integrity dashboard. Real data only — no mocks."""
     if not INTEGRITY_AVAILABLE:
         return {
@@ -1884,7 +1916,7 @@ class VoiceParseRequest(BaseModel):
 
 
 @app.post("/api/voice/parse")
-async def voice_parse(request: VoiceParseRequest):
+async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
     """
     Dual-mode voice parser.
     
@@ -2008,7 +2040,7 @@ async def voice_parse(request: VoiceParseRequest):
 
 
 @app.get("/api/voice/mode")
-async def voice_mode():
+async def voice_mode(user=Depends(require_auth)):
     """Return current active voice mode."""
     return {
         "mode": _active_voice_mode,
@@ -2024,7 +2056,7 @@ _runtime_mode: str = "IDLE"  # IDLE, TRAIN, HUNT
 
 
 @app.get("/runtime/status")
-async def runtime_status():
+async def runtime_status(user=Depends(require_auth)):
     """
     GET /runtime/status — Validated runtime telemetry.
     Reads from C++ authoritative source (reports/training_telemetry.json),
@@ -2109,7 +2141,7 @@ async def runtime_status():
 
 
 @app.get("/api/accuracy/snapshot")
-async def accuracy_snapshot():
+async def accuracy_snapshot(user=Depends(require_auth)):
     """
     GET /api/accuracy/snapshot — Current accuracy metrics snapshot.
     Returns precision, recall, ECE, dup suppression, and scope compliance.
@@ -2147,7 +2179,7 @@ async def accuracy_snapshot():
 # =============================================================================
 
 @app.get("/api/training/data-source")
-async def training_data_source():
+async def training_data_source(user=Depends(require_auth)):
     """
     GET /api/training/data-source — Training pipeline source transparency.
     

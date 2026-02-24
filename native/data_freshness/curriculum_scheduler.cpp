@@ -14,7 +14,6 @@
 #include <cstdio>
 #include <cstring>
 
-
 namespace data_freshness {
 
 static constexpr uint32_t MAX_CYCLE_HISTORY = 200;
@@ -45,7 +44,8 @@ struct SchedulerState {
   uint32_t stagnation_limit;
   double best_val_loss;
   double current_val_loss;
-  double overfit_gap; // train_loss - val_loss gap
+  double overfit_gap;  // val_loss - train_loss gap
+  double previous_gap; // previous cycle's gap for trend detection
   bool data_injection_required;
   bool overfitting_detected;
   SchedulerAction action;
@@ -61,6 +61,7 @@ public:
     std::memset(history_, 0, sizeof(history_));
     state_.stagnation_limit = stagnation_limit_;
     state_.best_val_loss = best_val_loss_;
+    state_.previous_gap = -1.0; // sentinel: no prior gap
   }
 
   void set_stagnation_limit(uint32_t limit) {
@@ -91,6 +92,7 @@ public:
     std::memset(history_, 0, sizeof(history_));
     state_.stagnation_limit = stagnation_limit_;
     state_.best_val_loss = best_val_loss_;
+    state_.previous_gap = -1.0; // sentinel: no prior gap
   }
 
   // ---- Self-test ----
@@ -178,10 +180,15 @@ private:
     }
     state_.best_val_loss = best_val_loss_;
 
-    // Overfitting: train_loss much better than val_loss
-    state_.overfit_gap = latest.val_loss - latest.train_loss;
+    // Overfitting: gap between val and train is WIDENING
+    double current_gap = latest.val_loss - latest.train_loss;
+    bool gap_widening =
+        (state_.previous_gap >= 0.0 &&
+         current_gap > state_.previous_gap + IMPROVEMENT_EPSILON);
+    state_.overfit_gap = current_gap;
     state_.overfitting_detected =
-        (state_.overfit_gap > OVERFITTING_THRESHOLD && count_ >= 5);
+        (current_gap > OVERFITTING_THRESHOLD && gap_widening && count_ >= 5);
+    state_.previous_gap = current_gap;
 
     // Determine action
     if (state_.overfitting_detected) {

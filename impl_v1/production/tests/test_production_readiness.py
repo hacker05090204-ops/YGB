@@ -62,9 +62,17 @@ class TestLargeScaleValidation(unittest.TestCase):
         self.assertEqual(len(types), 4)
     
     def test_production_scan(self):
-        """Production scan returns result."""
+        """Production scan returns result with deterministic scanner."""
+        import hashlib
+        def deterministic_scanner(payload: str):
+            """Deterministic scanner — hash-based prediction, no RNG."""
+            h = hashlib.sha256(payload.encode()).hexdigest()
+            predicted = int(h[0], 16) > 7  # top nibble > 7  
+            confidence = (int(h[:2], 16) % 80 + 20) / 100.0
+            return predicted, confidence
+
         dataset = generate_large_scale_dataset()
-        result = production_scan(dataset[0])
+        result = production_scan(dataset[0], scan_func=deterministic_scanner)
         self.assertIsNotNone(result.sample_id)
 
 

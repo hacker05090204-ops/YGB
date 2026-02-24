@@ -65,17 +65,24 @@ class CVEAPIResult:
     timestamp: str
 
 
-# Real NVD API key (can be overridden via CVE_API_KEY env variable)
-DEFAULT_API_KEY = "1d3c5870-f713-4ed3-87d3-e4cf93e97eaa"
+# CVE API key: MUST be provided via CVE_API_KEY environment variable.
+# No hardcoded defaults — fail closed if missing.
+DEFAULT_API_KEY = ""
 
 # In-memory cache with TTL
 _api_cache: Dict[str, tuple] = {}  # {query: (records, timestamp)}
 
 
 def get_config() -> CVEAPIConfig:
-    """Get CVE API configuration from environment or defaults."""
+    """Get CVE API configuration from environment. Fails if key missing."""
+    api_key = os.environ.get("CVE_API_KEY", "")
+    if not api_key:
+        raise RuntimeError(
+            "CVE_API_KEY environment variable required but not set. "
+            "Register at https://nvd.nist.gov/developers/request-an-api-key"
+        )
     return CVEAPIConfig(
-        api_key=os.environ.get("CVE_API_KEY", DEFAULT_API_KEY),
+        api_key=api_key,
         base_url=os.environ.get("CVE_API_URL", "https://services.nvd.nist.gov/rest/json/cves/2.0"),
         timeout=int(os.environ.get("CVE_API_TIMEOUT", "30")),
         cache_ttl_hours=int(os.environ.get("CVE_CACHE_TTL", "24")),
@@ -144,7 +151,17 @@ def fetch_cves_passive(
         CVEAPIResult with records or error
     """
     if config is None:
-        config = get_config()
+        try:
+            config = get_config()
+        except RuntimeError as e:
+            return CVEAPIResult(
+                result_id=f"ERR-{uuid.uuid4().hex[:16].upper()}",
+                status=APIStatus.INVALID_KEY,
+                records=tuple(),
+                from_cache=False,
+                error_message=str(e),
+                timestamp=datetime.now(UTC).isoformat(),
+            )
     
     # Check cache first
     cached = get_from_cache(product, config)

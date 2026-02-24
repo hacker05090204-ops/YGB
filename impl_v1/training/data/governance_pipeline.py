@@ -38,6 +38,10 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+_IS_PRODUCTION = (
+    os.environ.get("YGB_ENV", "").lower() == "production"
+    or os.environ.get("YGB_PRODUCTION", "0") == "1"
+)
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -146,6 +150,8 @@ def pre_training_gate(
                 return False, f"{scan.violations_found} mock data violations"
             return True, f"0 violations in {scan.files_scanned} files"
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "mock_data_scanner REQUIRED but not importable in production"
             return True, "scanner not available (skip)"
     _check("Mock Data Scanner", _mock_scan)
 
@@ -158,6 +164,8 @@ def pre_training_gate(
                 return True, f"entropy={report.entropy:.2f}"
             return False, report.rejection_reason
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "dataset_quality_gate REQUIRED but not importable in production"
             return True, "quality gate not available (skip)"
     _check("Dataset Quality Gate", _quality_gate)
 
@@ -170,6 +178,8 @@ def pre_training_gate(
                 return True, f"KL={valid.kl_divergence:.4f}"
             return False, valid.rejection_reason
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "label_consistency_validator REQUIRED but not importable in production"
             return True, "label validator not available (skip)"
     _check("Label Consistency", _label_check)
 
@@ -183,6 +193,8 @@ def pre_training_gate(
                 return True, f"ratio={analysis.max_ratio:.2f}"
             return False, f"imbalanced: ratio={analysis.max_ratio:.2f}"
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "dataset_balance_controller REQUIRED but not importable in production"
             return True, "balance controller not available (skip)"
     _check("Dataset Balance", _balance_check)
 
@@ -195,6 +207,8 @@ def pre_training_gate(
                 return True, f"loss {sanity.epoch_losses[0]:.3f}→{sanity.epoch_losses[-1]:.3f}"
             return False, sanity.rejection_reason
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "semantic_quality_gate REQUIRED but not importable in production"
             return True, "sanity gate not available (skip)"
     _check("Semantic Quality (3-epoch)", _sanity_check)
 
@@ -208,6 +222,8 @@ def pre_training_gate(
                 return True, "all 3 gates passed"
             return False, decision.rejection_reason
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "ingestion_policy REQUIRED but not importable in production"
             return True, "ingestion policy not available (skip)"
     _check("Ingestion Policy", _ingestion_check)
 
@@ -240,6 +256,8 @@ def pre_training_gate(
                 return True, f"source={source_id} verified"
             return False, audit.rejection_reason
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "data_source_audit REQUIRED but not importable in production"
             return True, "audit not available (skip)"
     _check("Data Source Audit", _audit_check)
 
@@ -252,6 +270,8 @@ def pre_training_gate(
                 return True, f"risk={risk.risk_score:.2f}"
             return False, f"overfitting risk: {risk.reason}"
         except ImportError:
+            if _IS_PRODUCTION:
+                return False, "overfit_guard REQUIRED but not importable in production"
             return True, "overfit guard not available (skip)"
     _check("Overfit Guard", _overfit_check)
 
@@ -385,7 +405,9 @@ def verify_report(
         if not result.passed:
             return False, f"Report validation failed: {result.rejection_reason}"
     except ImportError:
-        pass
+        if _IS_PRODUCTION:
+            return False, "report_validation_gate REQUIRED but not importable in production"
+        pass  # Dev mode: skip if not available
 
     # ── C++ deterministic exploit verification ──
     dee = _load_dll("deterministic_exploit_engine")

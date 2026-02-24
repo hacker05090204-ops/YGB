@@ -25,6 +25,185 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
+# =============================================================================
+# CONSTANTS (thresholds)
+# =============================================================================
+
+DUPLICATE_MAX = 0.10
+IMBALANCE_MAX = 5.0
+ENTROPY_MIN = 0.5
+
+
+# =============================================================================
+# RESULT TYPES for test-expected APIs
+# =============================================================================
+
+@dataclass
+class ManifestCheck:
+    """Result of manifest sign/verify."""
+    passed: bool
+    manifest_exists: bool = True
+    signature_valid: bool = True
+    hash_match: bool = True
+
+
+@dataclass
+class QualityCheck:
+    """Result of data quality check."""
+    passed: bool
+    duplicate_ratio: float = 0.0
+    imbalance_ratio: float = 1.0
+    entropy: float = 1.0
+
+
+@dataclass
+class ShuffleCheck:
+    """Result of label shuffle test."""
+    passed: bool
+    original_accuracy: float = 0.0
+    shuffled_accuracy: float = 0.0
+
+
+@dataclass
+class SanityCheck:
+    """Result of dataset sanity check."""
+    passed: bool
+    detail: str = ""
+
+
+@dataclass
+class LeakageCheck:
+    """Result of train/test leakage check."""
+    passed: bool
+    overlap_count: int = 0
+    overlap_ratio: float = 0.0
+
+
+@dataclass
+class DataEnforcementResult:
+    """Combined enforcement result."""
+    passed: bool
+    manifest: Optional[ManifestCheck] = None
+    quality: Optional[QualityCheck] = None
+    leakage: Optional[LeakageCheck] = None
+
+
+# =============================================================================
+# MANIFEST SIGNING/VERIFICATION
+# =============================================================================
+
+import hmac as _hmac
+
+def sign_manifest(
+    dataset_hash: str,
+    num_samples: int,
+    feature_dim: int,
+    num_classes: int,
+    *,
+    secret_key: str = "",
+    path: str = "manifest.json",
+) -> None:
+    """Sign and persist a dataset manifest."""
+    manifest = {
+        "dataset_hash": dataset_hash,
+        "num_samples": num_samples,
+        "feature_dim": feature_dim,
+        "num_classes": num_classes,
+        "timestamp": datetime.now().isoformat(),
+    }
+    payload = json.dumps(manifest, sort_keys=True).encode()
+    signature = _hmac.new(
+        secret_key.encode(), payload, hashlib.sha256
+    ).hexdigest()
+    manifest["signature"] = signature
+
+    with open(path, "w") as f:
+        json.dump(manifest, f, indent=2)
+
+
+def verify_manifest(
+    expected_hash: str,
+    expected_samples: int,
+    expected_dim: int,
+    *,
+    secret_key: str = "",
+    path: str = "manifest.json",
+) -> ManifestCheck:
+    """Verify a signed manifest."""
+    if not os.path.exists(path):
+        return ManifestCheck(passed=False, manifest_exists=False,
+                             signature_valid=False, hash_match=False)
+
+    with open(path) as f:
+        manifest = json.load(f)
+
+    stored_sig = manifest.pop("signature", "")
+
+    payload = json.dumps(manifest, sort_keys=True).encode()
+    expected_sig = _hmac.new(
+        secret_key.encode(), payload, hashlib.sha256
+    ).hexdigest()
+
+    sig_valid = _hmac.compare_digest(stored_sig, expected_sig)
+    hash_match = manifest.get("dataset_hash") == expected_hash
+
+    return ManifestCheck(
+        passed=sig_valid and hash_match,
+        manifest_exists=True,
+        signature_valid=sig_valid,
+        hash_match=hash_match,
+    )
+
+
+# =============================================================================
+# QUALITY & LEAKAGE CHECKS
+# =============================================================================
+
+def check_quality(
+    features: np.ndarray,
+    labels: np.ndarray,
+) -> QualityCheck:
+    """Run data quality checks: duplicates, imbalance, entropy."""
+    dup_ratio = compute_duplicate_ratio(features)
+
+    _, counts = np.unique(labels, return_counts=True)
+    imbalance = float(counts.max()) / float(max(counts.min(), 1))
+
+    entropy = compute_entropy(labels)
+
+    passed = (
+        dup_ratio <= DUPLICATE_MAX
+        and imbalance <= IMBALANCE_MAX
+        and entropy >= ENTROPY_MIN
+    )
+    return QualityCheck(
+        passed=passed,
+        duplicate_ratio=dup_ratio,
+        imbalance_ratio=imbalance,
+        entropy=entropy,
+    )
+
+
+def check_leakage(
+    X_train: np.ndarray,
+    X_test: Optional[np.ndarray],
+) -> LeakageCheck:
+    """Check for train/test data leakage via row-hash overlap."""
+    if X_test is None:
+        return LeakageCheck(passed=True, overlap_count=0, overlap_ratio=0.0)
+
+    train_hashes = {hashlib.md5(r.tobytes()).hexdigest() for r in X_train}
+    overlap = sum(
+        1 for r in X_test
+        if hashlib.md5(r.tobytes()).hexdigest() in train_hashes
+    )
+    ratio = overlap / max(len(X_test), 1)
+    return LeakageCheck(
+        passed=(overlap == 0),
+        overlap_count=overlap,
+        overlap_ratio=ratio,
+    )
+
 
 @dataclass
 class EnforcementCheck:

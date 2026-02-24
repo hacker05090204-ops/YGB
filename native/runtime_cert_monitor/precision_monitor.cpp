@@ -24,7 +24,7 @@ static constexpr uint32_t ROLLING_WINDOW = 1000;
 static constexpr double DEFAULT_PRECISION_THRESHOLD = 0.95;
 static constexpr uint32_t EVAL_INTERVAL_DECISIONS = 50;
 static constexpr uint64_t EVAL_INTERVAL_MS = 300000; // 5 minutes
-static constexpr double RAPID_DROP_THRESHOLD = 0.10; // >10% drop → emergency
+static constexpr double RAPID_DROP_THRESHOLD = 0.25; // >25% drop → emergency
 
 enum class DemotionAction : uint8_t {
   NONE = 0,
@@ -100,13 +100,13 @@ public:
         (state_.decisions_since_eval >= EVAL_INTERVAL_DECISIONS);
 
     if (time_trigger || decision_trigger) {
+      // Periodic eval: check rapid drop FIRST (uses previous_precision
+      // from last eval), then run demotion (which updates previous_precision).
+      check_rapid_drop();
       check_demotion();
       state_.decisions_since_eval = 0;
       state_.last_eval_time_ms = outcome.timestamp_ms;
     }
-
-    // Always check rapid drop — this is immediate, not periodic
-    check_rapid_drop();
   }
 
   const PrecisionState &state() const { return state_; }
@@ -279,6 +279,10 @@ private:
   }
 
   void check_demotion() {
+    // Never downgrade from EMERGENCY_HALT (set by rapid-drop between evals)
+    if (state_.rapid_drop_detected)
+      return;
+
     // Only check after minimum samples
     if (count_ < 50) {
       state_.action = DemotionAction::NONE;

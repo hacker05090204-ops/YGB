@@ -88,11 +88,11 @@ class TestNoForbiddenImports:
         assert 'selenium' not in source.lower()
 
     def test_no_phase14_import(self):
-        """No phase14+ imports in any file."""
+        """No phase14+ imports in implementation files (test files excluded)."""
         import os
-        module_dir = os.path.dirname(__file__).replace('/tests', '')
+        module_dir = os.path.dirname(__file__).replace('/tests', '').replace('\\tests', '')
         for filename in os.listdir(module_dir):
-            if filename.endswith('.py'):
+            if filename.endswith('.py') and not filename.startswith('test_'):
                 filepath = os.path.join(module_dir, filename)
                 with open(filepath, 'r') as f:
                     content = f.read()

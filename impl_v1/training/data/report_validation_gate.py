@@ -142,9 +142,14 @@ def validate_report(
                 result.warnings.append(f"Evidence binding: {viol.value.decode()}")
         except Exception as e:
             logger.warning(f"[REPORT_GATE] Evidence binding check failed: {e}")
-            result.evidence_bound = True  # Graceful
+            result.evidence_bound = False  # FAIL-CLOSED: DLL error blocks promotion
+            result.warnings.append(f"Evidence binding DLL failed: {e}")
     else:
-        result.evidence_bound = True  # DLL not available
+        if os.environ.get("YGB_ENV", "").lower() == "production":
+            result.evidence_bound = False  # FAIL-CLOSED in production
+            result.warnings.append("evidence_binding_enforcer.dll not available in production")
+        else:
+            result.evidence_bound = True  # Dev mode: DLL optional
 
     # ── Check 3: Deterministic exploit verification ──
     result.confidence = exploit_confidence

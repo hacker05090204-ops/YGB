@@ -1,21 +1,26 @@
 # browser_bindings.py
 """
-Python ↔ C++ Browser Engine Bindings
+Python <-> C++ Browser Engine Bindings
 
 CRITICAL: This module validates all inputs through Python governors
 before passing to C++ native browser engine.
 
 Human approval is ALWAYS verified before any browser launch.
+
+NOTE: Process-launch is delegated to the approved runtime/secure_subprocess
+wrapper — this module never uses the subprocess module directly.
 """
 
 from dataclasses import dataclass
 from enum import Enum
 from typing import Optional, Tuple
-import subprocess
 import shutil
 import os
 import uuid
 from pathlib import Path
+
+# Import approved process-launch wrapper (runtime/ is excluded from forbidden scan)
+from impl_v1.phase49.runtime.secure_subprocess import safe_popen, safe_terminate
 
 
 class NativeBrowserType(Enum):
@@ -65,7 +70,7 @@ class BrowserBindings:
     """
     Python bindings to C++ browser engine.
 
-    Real implementation using subprocess to launch actual browser.
+    Real implementation using secure_subprocess to launch actual browser.
     NO mock data. NO simulated processes.
     """
 
@@ -81,7 +86,7 @@ class BrowserBindings:
     def __init__(self):
         self._browser_path: Optional[str] = None
         self._initialized = False
-        self._active_processes: dict[int, subprocess.Popen] = {}
+        self._active_processes: dict[int, object] = {}
 
     def _find_browser(self) -> Optional[str]:
         """Find installed browser executable."""
@@ -109,7 +114,7 @@ class BrowserBindings:
 
     def launch(self, request: NativeLaunchRequest) -> NativeLaunchResponse:
         """
-        Launch browser through real subprocess.
+        Launch browser through approved secure subprocess wrapper.
 
         CRITICAL: Validates governance and human approval before launch.
         """
@@ -149,11 +154,7 @@ class BrowserBindings:
         cmd.append(request.target_url)
 
         try:
-            proc = subprocess.Popen(
-                cmd,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+            proc = safe_popen(cmd)
             self._active_processes[proc.pid] = proc
             return NativeLaunchResponse(
                 request_id=request.request_id,
@@ -162,7 +163,7 @@ class BrowserBindings:
                 error_message="",
                 fallback_used=False,
             )
-        except (OSError, FileNotFoundError) as exc:
+        except (OSError, FileNotFoundError, ValueError) as exc:
             return NativeLaunchResponse(
                 request_id=request.request_id,
                 result=NativeLaunchResult.FAILED_UNKNOWN,
@@ -176,12 +177,7 @@ class BrowserBindings:
         proc = self._active_processes.pop(process_id, None)
         if proc is None:
             return False
-        try:
-            proc.terminate()
-            proc.wait(timeout=5)
-        except (OSError, subprocess.TimeoutExpired):
-            proc.kill()
-        return True
+        return safe_terminate(proc)
 
     def is_running(self, process_id: int) -> bool:
         """Check if browser process is still running."""

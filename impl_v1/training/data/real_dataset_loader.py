@@ -660,7 +660,7 @@ class IngestionPipelineDataset(Dataset):
         return hash_buf.value.decode("utf-8", errors="replace")
 
     def _write_manifest(self, accepted, rejected_policy, rejected_quality):
-        """Write dataset_manifest.json to secure_data/."""
+        """Write dataset_manifest.json to secure_data/ with hardened quality metrics."""
         _SECURE_DATA.mkdir(parents=True, exist_ok=True)
         manifest_path = _SECURE_DATA / "dataset_manifest.json"
 
@@ -669,6 +669,24 @@ class IngestionPipelineDataset(Dataset):
         h.update(self._features_tensor.numpy().tobytes())
         h.update(self._labels_tensor.numpy().tobytes())
         tensor_hash = h.hexdigest()
+
+        # Class histogram
+        class_histogram = {}
+        for lbl in self._labels:
+            class_histogram[lbl] = class_histogram.get(lbl, 0) + 1
+
+        # Class entropy (Shannon)
+        total = len(self._labels)
+        class_entropy = 0.0
+        if total > 0:
+            for count in class_histogram.values():
+                p = count / total
+                if p > 0:
+                    class_entropy -= p * math.log2(p)
+
+        # Source trust summary
+        trust_scores = [s.get("reliability", 0.0) for s in self._raw_samples]
+        avg_trust = sum(trust_scores) / len(trust_scores) if trust_scores else 0.0
 
         manifest = {
             "dataset_source": "INGESTION_PIPELINE",
@@ -681,6 +699,11 @@ class IngestionPipelineDataset(Dataset):
             "rejected_policy": rejected_policy,
             "rejected_quality": rejected_quality,
             "strict_real_mode": STRICT_REAL_MODE,
+            "class_histogram": class_histogram,
+            "class_entropy": round(class_entropy, 4),
+            "source_trust_avg": round(avg_trust, 4),
+            "source_trust_min": round(min(trust_scores), 4) if trust_scores else 0.0,
+            "training_mode": "PRODUCTION_REAL" if STRICT_REAL_MODE else "LAB_COMPLEX",
             "frozen_at": __import__("datetime").datetime.now().isoformat(),
         }
 

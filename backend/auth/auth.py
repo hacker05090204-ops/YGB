@@ -49,21 +49,45 @@ LOGIN_RATE_LIMIT_WINDOW = int(os.getenv("LOGIN_RATE_LIMIT_WINDOW_SECONDS", "60")
 
 
 # =============================================================================
-# PASSWORD HASHING (iterative HMAC + migration)
+# PASSWORD HASHING (Argon2id primary, scrypt fallback, HMAC-SHA256 legacy)
 # =============================================================================
 
 _HASH_ITERATIONS = 100_000
-_HASH_VERSION = "v2"  # v2 = iterative HMAC-SHA256
+_HASH_VERSION_V2 = "v2"  # v2 = iterative HMAC-SHA256 (legacy)
+
+# Try Argon2id first, fall back to scrypt
+try:
+    from argon2 import PasswordHasher as _Argon2Hasher
+    from argon2.exceptions import VerifyMismatchError as _Argon2Mismatch
+    _argon2_hasher = _Argon2Hasher(
+        time_cost=3, memory_cost=65536, parallelism=4, hash_len=32, salt_len=16
+    )
+    _HASH_VERSION = "v3"  # v3 = Argon2id
+    _USE_ARGON2 = True
+except ImportError:
+    _HASH_VERSION = "v3s"  # v3s = scrypt (Argon2 not available)
+    _USE_ARGON2 = False
+    _argon2_hasher = None
+    _Argon2Mismatch = None
+
 
 def hash_password(password: str) -> str:
-    """Hash a password with iterative HMAC-SHA256 (100K iterations)."""
-    salt = secrets.token_hex(16)
-    hashed = _iterative_hash(password, salt)
-    return f"{_HASH_VERSION}:{salt}:{hashed}"
+    """Hash a password with Argon2id (preferred) or scrypt fallback."""
+    if _USE_ARGON2:
+        # Argon2id — salt is embedded in the hash output
+        hashed = _argon2_hasher.hash(password)
+        return f"v3:{hashed}"
+    else:
+        # scrypt fallback
+        salt = secrets.token_bytes(16)
+        key = hashlib.scrypt(
+            password.encode(), salt=salt, n=2**14, r=8, p=1, dklen=32
+        )
+        return f"v3s:{salt.hex()}:{key.hex()}"
 
 
 def _iterative_hash(password: str, salt: str) -> str:
-    """Iterative HMAC-SHA256 key derivation."""
+    """Iterative HMAC-SHA256 key derivation (v2 legacy)."""
     key = f"{salt}:{password}".encode()
     digest = hashlib.sha256(key).digest()
     for _ in range(_HASH_ITERATIONS):
@@ -72,11 +96,38 @@ def _iterative_hash(password: str, salt: str) -> str:
 
 
 def verify_password(password: str, stored_hash: str) -> bool:
-    """Verify password — supports v2 (iterative) and v1 (legacy SHA-256)."""
+    """Verify password — supports v3 (Argon2id), v3s (scrypt), v2 (HMAC-SHA256), v1 (SHA-256)."""
     if not stored_hash or not password:
         return False
 
-    # v2 format: v2:salt:hash
+    # v3 format: v3:<argon2id hash>
+    if stored_hash.startswith("v3:") and not stored_hash.startswith("v3s:"):
+        if not _USE_ARGON2:
+            return False  # Cannot verify Argon2 without argon2-cffi
+        argon2_hash = stored_hash[3:]
+        try:
+            return _argon2_hasher.verify(argon2_hash, password)
+        except _Argon2Mismatch:
+            return False
+        except Exception:
+            return False
+
+    # v3s format: v3s:salt_hex:key_hex (scrypt)
+    if stored_hash.startswith("v3s:"):
+        parts = stored_hash.split(":", 2)
+        if len(parts) != 3:
+            return False
+        _, salt_hex, expected_hex = parts
+        try:
+            salt = bytes.fromhex(salt_hex)
+            key = hashlib.scrypt(
+                password.encode(), salt=salt, n=2**14, r=8, p=1, dklen=32
+            )
+            return hmac.compare_digest(key.hex(), expected_hex)
+        except Exception:
+            return False
+
+    # v2 format: v2:salt:hash (iterative HMAC-SHA256)
     if stored_hash.startswith("v2:"):
         parts = stored_hash.split(":", 2)
         if len(parts) != 3:
@@ -94,7 +145,7 @@ def verify_password(password: str, stored_hash: str) -> bool:
 
 
 def needs_rehash(stored_hash: str) -> bool:
-    """Check if a stored hash needs upgrade to v2."""
+    """Check if a stored hash needs upgrade to current version (v3/v3s)."""
     return not stored_hash.startswith(f"{_HASH_VERSION}:")
 
 

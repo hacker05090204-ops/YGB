@@ -43,13 +43,15 @@ class TestNoForbiddenImports:
     def test_no_phase18_import(self):
         """No phase18+ imports."""
         import os
-        module_dir = os.path.dirname(__file__).replace('/tests', '')
+        from pathlib import Path
+        module_dir = str(Path(__file__).parent.parent)
         for filename in os.listdir(module_dir):
-            if filename.endswith('.py'):
+            if filename.endswith('.py') and not filename.startswith('test_'):
                 filepath = os.path.join(module_dir, filename)
                 with open(filepath, 'r') as f:
                     content = f.read()
-                    assert 'phase18' not in content
+                    assert 'phase18' not in content, \
+                        f"File {filename} contains forbidden 'phase18' import"
 
 
 class TestEnumCounts:

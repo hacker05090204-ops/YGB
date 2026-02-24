@@ -3,8 +3,8 @@
   "dropout_nodes": [
     {
       "node_id": "test_node",
-      "detected_at": "2026-02-22T11:05:48.547647",
-      "last_heartbeat": "2026-02-22T11:05:48.036463",
+      "detected_at": "2026-02-24T23:59:28.500084",
+      "last_heartbeat": "2026-02-24T23:59:27.985310",
       "epoch_at_failure": 5,
       "reason": "Node marked dead"
     }
@@ -14,5 +14,5 @@
   "training_aborted": true,
   "abort_reason": "Simulated failure: test_node killed at epoch 5",
   "state_preserved": false,
-  "timestamp": "2026-02-22T11:05:49.238099"
+  "timestamp": "2026-02-24T23:59:29.187433"
 }
