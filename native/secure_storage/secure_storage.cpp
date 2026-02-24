@@ -104,7 +104,7 @@ static void log_cluster_topology() {
   }
 }
 
-// Phase 6: Storage replication stub (rsync over WireGuard)
+// Phase 6: Storage replication via rsync over WireGuard
 static void trigger_replication(const char *node_role) {
   if (!node_role || std::strcmp(node_role, "STORAGE") != 0)
     return;

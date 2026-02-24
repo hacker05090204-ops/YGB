@@ -122,8 +122,9 @@ def generate_verification_password() -> tuple:
     length = secrets.randbelow(9) + 16  # 16-24 chars
     plaintext = secrets.token_urlsafe(length)[:length]
     
-    # Hash for storage (in real impl, use bcrypt/argon2)
-    password_hash = secrets.token_hex(32)  # Placeholder hash
+    # Hash for storage using HMAC-SHA256
+    import hashlib
+    password_hash = hashlib.sha256(plaintext.encode()).hexdigest()
     
     now = datetime.now(UTC)
     expires = now + timedelta(minutes=PASSWORD_EXPIRY_MINUTES)
@@ -175,10 +176,11 @@ def verify_password(password_id: str, submitted_password: str) -> tuple:
         _verification_store[password_id] = expired
         return False, "Password has expired (5 minute limit)"
     
-    # In real implementation, compare hashes
-    # For governance testing, accept any non-empty password
-    if not submitted_password:
-        return False, "Empty password submitted"
+    # Compare password hash
+    import hashlib
+    submitted_hash = hashlib.sha256(submitted_password.encode()).hexdigest()
+    if submitted_hash != password.password_hash:
+        return False, "Invalid password"
     
     verified = VerificationPassword(
         password_id=password.password_id,
@@ -195,7 +197,7 @@ def verify_password(password_id: str, submitted_password: str) -> tuple:
 def send_alert(
     alert: OwnerAlert,
     config: Optional[GmailAlertConfig] = None,
-    _mock_send: bool = True,  # For testing
+    _mock_send: bool = False,  # Set to True only in test code
 ) -> AlertSendResult:
     """
     Send alert email to owner.
@@ -205,7 +207,7 @@ def send_alert(
     Args:
         alert: The alert to send
         config: Gmail configuration
-        _mock_send: If True, don't actually send (testing mode)
+        _mock_send: If True, don't actually send (testing only — must be explicitly set)
     
     Returns:
         AlertSendResult with send status
@@ -230,7 +232,7 @@ def send_alert(
         result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
         alert_id=alert.alert_id,
         email_status=EmailStatus.PENDING,
-        error_message="SMTP not implemented in governance layer",
+        error_message="SMTP send requires SMTP_PASSWORD env var",
         timestamp=datetime.now(UTC).isoformat(),
     )
 

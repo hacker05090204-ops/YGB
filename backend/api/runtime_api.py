@@ -423,9 +423,10 @@ def get_runtime_status():
                 "timestamp": int(_time.time() * 1000)
             }
         except OSError as e:
+            logger.exception("Failed to read runtime state")
             return {
                 "status": "error",
-                "message": str(e),
+                "message": "Failed to read runtime state",
                 "timestamp": int(_time.time() * 1000)
             }
 

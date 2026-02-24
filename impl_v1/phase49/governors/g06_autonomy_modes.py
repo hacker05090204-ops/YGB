@@ -3,10 +3,9 @@
 Autonomy and interaction mode management.
 
 MODES:
-1. MOCK (default) - No real actions
-2. READ_ONLY - Analysis only
-3. AUTONOMOUS_FIND - Timed discovery
-4. REAL - Human explicit enable required
+1. READ_ONLY (default) - Analysis only
+2. AUTONOMOUS_FIND - Timed discovery
+3. REAL - Human explicit enable required
 
 AUTONOMOUS_FIND RULES:
 - Hours selectable (0 = infinite until STOP)
@@ -23,9 +22,8 @@ from datetime import datetime, timedelta, UTC
 
 
 class AutonomyMode(Enum):
-    """CLOSED ENUM - 4 modes"""
-    MOCK = "MOCK"                      # Default - no real actions
-    READ_ONLY = "READ_ONLY"            # Analysis only
+    """CLOSED ENUM - 3 modes (MOCK removed)"""
+    READ_ONLY = "READ_ONLY"            # Analysis only (default)
     AUTONOMOUS_FIND = "AUTONOMOUS_FIND"  # Timed discovery
     REAL = "REAL"                      # Full execution (human enabled)
 
@@ -110,9 +108,6 @@ def create_session(
             AutonomyAction.STATE_CHANGE,
             AutonomyAction.BROWSER_ACTION,
         ])
-    elif mode == AutonomyMode.MOCK:
-        # Everything is mocked
-        blocked = tuple(AutonomyAction)
     
     return AutonomySession(
         session_id=f"AUT-{uuid.uuid4().hex[:16].upper()}",

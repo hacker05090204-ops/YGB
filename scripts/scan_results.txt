@@ -1,0 +1,114 @@
+﻿============================================================
+PATTERN SUMMARY BY CLASSIFICATION
+============================================================
+  mock                 | PRODUCTION      |   175 hits
+  mock                 | TEST            |   169 hits
+  not_implemented      | CONFIG/DOCS     |     1 hits
+  not_implemented      | PRODUCTION      |     9 hits
+  partial              | PRODUCTION      |    35 hits
+  partial              | TEST            |    23 hits
+  placeholder          | PRODUCTION      |    64 hits
+  placeholder          | TEST            |    16 hits
+  simulate             | CONFIG/DOCS     |     2 hits
+  simulate             | PRODUCTION      |   176 hits
+  simulate             | TEST            |    96 hits
+  stimulate            | PRODUCTION      |     1 hits
+  stub                 | PRODUCTION      |     9 hits
+  synthetic            | PRODUCTION      |    71 hits
+  synthetic            | TEST            |    30 hits
+
+============================================================
+PRODUCTION-PATH HITS (need remediation)
+============================================================
+
+--- mock (175 production hits) ---
+  api/server.py:789
+    elif request.mode == "MOCK":
+  api/server.py:793
+    content={"error": "MOCK mode is disabled. Use READ_ONLY, AUTONOMOUS_FIND, or REAL."}
+  backend/alerts/email_alerts.py:15
+    ZERO placeholder emails. ZERO mock connections.
+  backend/api/browser_endpoints.py:4
+    Serves real data from daily curriculum runs (NO mock data).
+  backend/api/field_progression_api.py:14
+    - No mock data ù "Awaiting Data" if unavailable
+  backend/api/field_progression_api.py:190
+    """Calculate weighted progress for a field. No mock data."""
+  backend/api/runtime_api.py:73
+    """Get HMAC secret. Always requires a real secret ù no mock fallback."""
+  backend/api/runtime_api.py:79
+    "No mock/test fallback permitted."
+  backend/api/runtime_api.py:140
+    No mock/empty fallback permitted.
+  backend/api/training_progress.py:11
+    NO mock data. Python is governance only.
+  backend/approval/report_orchestrator.py:12
+    NO mock data. NO auto-submit. NO authority unlock.
+  backend/auth/auth.py:12
+    ZERO mock users. ZERO bypass tokens. ZERO hardcoded credentials.
+  backend/integrity/integrity_bridge.py:7
+    No mock data. No fallbacks. Real metrics only.
+  backend/startup/preflight.py:14
+    NO mock data. NO auto-approve. NO bypass.
+  backend/storage/storage_bridge.py:8
+    No mock data. No fallback. No SQLite. No JSON pseudo-database.
+  backend/training/parallel_scheduler.py:7
+    NO mock data. NO auto-submit. NO authority unlock.
+  backend/training/state_manager.py:7
+    ZERO mock data. ZERO fallback values. ZERO random values.
+  backend/training/state_manager.py:155
+    NEVER returns mock/hardcoded metrics.
+  frontend/components/hunting-control-panel.tsx:127
+    // --- Data Fetching (real endpoints, no mock) ---
+  impl_v1/enterprise/process_isolation.py:108
+    self.inference_process.pid = os.getpid() + 1000  # Mock
+  impl_v1/enterprise/process_isolation.py:120
+    self.training_process.pid = os.getpid() + 2000  # Mock
+  impl_v1/phase49/governors/g04_voice_proxy.py:124
+    NOTE: This is a mock implementation for governance testing.
+  impl_v1/phase49/governors/g04_voice_proxy.py:149
+    # Build URL (mock - doesn't actually call API)
+  impl_v1/phase49/governors/g06_autonomy_modes.py:6
+    1. MOCK (default) - No real actions
+  impl_v1/phase49/governors/g06_autonomy_modes.py:27
+    MOCK = "MOCK"                      # Default - no real actions
+  impl_v1/phase49/governors/g06_autonomy_modes.py:113
+    elif mode == AutonomyMode.MOCK:
+  impl_v1/phase49/governors/g07_cve_intelligence.py:134
+    NOTE: This is a mock implementation for governance testing.
+  impl_v1/phase49/governors/g08_licensing.py:114
+    NOTE: This is a mock implementation for governance testing.
+  impl_v1/phase49/governors/g08_licensing.py:133
+    # Check against known valid keys (mock)
+  impl_v1/phase49/governors/g09_device_trust.py:131
+    expires_at="2026-02-01T00:00:00Z",  # Mock expiry
+  ... and 145 more
+
+--- not_implemented (9 production hits) ---
+  impl_v1/phase49/governors/g15_cve_api.py:182
+    error_message="API call not implemented in governance layer - use mock for testing",
+  impl_v1/phase49/governors/g16_gmail_alerts.py:233
+    error_message="SMTP not implemented in governance layer",
+  impl_v1/phase49/native/sandbox.cpp:157
+    // Non-Linux: privilege drop not implemented
+  native/report_engine/narrative_builder.cpp:112
+    "The %s parameter at %s does not implement proper input "
+  python/phase09_bounty/bounty_engine.py:94
+    - NR-001: Scope ambiguity (not implemented - requires partial matching)
+  python/phase09_bounty/bounty_engine.py:95
+    - NR-002: Novel vulnerability type (not implemented - requires ML)
+  python/phase09_bounty/bounty_engine.py:96
+    - NR-003: Partial duplicate overlap (not implemented)
+  python/phase09_bounty/bounty_engine.py:98
+    - NR-005: Policy edge case (not implementable generically)
+  scripts/remediation_scan.py:19
+    'not_implemented': re.compile(r'not.implement|NotImplemented', re.IGNORECASE),
+
+--- partial (35 production hits) ---
+  backend/api/runtime_api.py:16
+    Never trust partial state.
+  backend/api/runtime_api.py:228
+    Never returns partial state.
+  HUMANOID_HUNTER/executor_response/response_engine.py:26
+    ExecutorResponseType.PARTIAL: 0.50,    # Medium
+  HUMANOID_HUNTER/executor_response/response_engine.py:46

@@ -229,8 +229,8 @@ def safe_fetch(url: str,
     except FileNotFoundError:
         result.error = "Edge browser not found at configured path"
     except Exception as e:
-        result.error = f"Fetch error: {str(e)[:200]}"
-        logger.error(f"Safe fetch failed: {e}")
+        result.error = "Fetch error: internal failure"
+        logger.exception("Safe fetch failed for %s", url)
 
     return result
 

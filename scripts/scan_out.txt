@@ -1,0 +1,1248 @@
+SUMMARY\n  mock|PROD: 139\n  mock|TEST: 1\n  not_impl|PROD: 6\n  partial|PROD: 25\n  placeholder|PROD: 37\n  simulate|PROD: 82\n  simulate|TEST: 2\n  stub|PROD: 6\n  synthetic|PROD: 41\n\nTOTAL PROD HITS: 336\n\nsimulate|run_cluster_authority.py:3|")
+
+log.info("═══ PHASE 1: CUDA Verification ═══")
+
+authority = ClusterAuthority(
+    reference_cuda\nsimulate|run_leader_ddp.py:5|{'='*60}")
+    logger.info(f"STEP 3 — DATASET LOCK: {status}")
+    logger.info(f"{'='*60}")
+    logg\nsynthetic|training_controller.py:4|".join(sys.modules.keys())
+            violations = _guard.scan_module_names(module_names.encode())
+\nmock|api\server.py:1|"""
+YGB API Server
+
+FastAPI backend providing REST and WebSocket endpoints for the YGB frontend.
+Bri\nsimulate|api\server.py:1|"""
+YGB API Server
+
+FastAPI backend providing REST and WebSocket endpoints for the YGB frontend.
+Bri\nsynthetic|api\server.py:1|"""
+YGB API Server
+
+FastAPI backend providing REST and WebSocket endpoints for the YGB frontend.
+Bri\nmock|backend\alerts\email_alerts.py:1|"""
+YGB Email Alert System — SMTP-based Notifications
+
+Sends real email alerts for:
+- New login even\nplaceholder|backend\alerts\email_alerts.py:1|"""
+YGB Email Alert System — SMTP-based Notifications
+
+Sends real email alerts for:
+- New login even\nmock|backend\api\browser_endpoints.py:1|"""
+Browser API Endpoints — Daily Summary, CVE List, Representation Impact.
+
+Serves real data from d\nmock|backend\api\field_progression_api.py:1|"""
+FIELD PROGRESSION API — Real-Time Field Ladder State
+===========================================\nmock|backend\api\runtime_api.py:1|"""
+runtime_api.py — Backend Runtime Hard Validation API with HMAC + Replay Protection
+=============\npartial|backend\api\runtime_api.py:1|"""
+runtime_api.py — Backend Runtime Hard Validation API with HMAC + Replay Protection
+=============\nmock|backend\api\training_progress.py:1|"""
+training_progress.py — Real-Time Training Progress API
+=========================================\nmock|backend\approval\report_orchestrator.py:1|"""
+report_orchestrator.py — Human Approval Layer
+
+Workflow:
+1) Generate structured report
+2) Attach\nmock|backend\auth\auth.py:1|"""
+YGB Authentication Module — JWT + bcrypt + Rate Limiting
+
+Production auth with:
+- JWT token gene\nplaceholder|backend\auth\auth_guard.py:1|"""
+Auth Guard — Centralized Authentication & Authorization Middleware
+
+Provides reusable FastAPI de\nsimulate|backend\auth\revocation_store.py:1|"""
+Revocation Store — Redis-backed token/session revocation with TTL.
+
+Backend: controlled by REVOC\nsimulate|backend\browser\daily_curriculum.py:1|"""
+Daily Browser Curriculum — Safe Knowledge Expansion Orchestrator.
+
+Pipeline:
+  1. Fetch new CVE/\nsimulate|backend\governance\clock_guard.py:1|"""
+clock_guard.py — Clock Skew Protection for Governance
+==========================================\nmock|backend\integrity\integrity_bridge.py:1|"""
+System Integrity Bridge — Python Implementation of C++ Autonomy Supervisor
+
+Mirrors all C++ algo\nmock|backend\startup\preflight.py:1|"""
+Startup Preflight Check — Production Readiness Validator
+
+Verifies all critical subsystems befor\nmock|backend\storage\storage_bridge.py:1|"""
+Storage Bridge — Python Governance Layer
+==========================================
+
+Bridges the\nmock|backend\tests\test_auto_rehash.py:1|"""
+Tests for B9 — Auto-rehash on login.
+
+Proves:
+  - Legacy (v1) hash user logs in -> auth succeeds\nsimulate|backend\tests\test_auto_rehash.py:1|"""
+Tests for B9 — Auto-rehash on login.
+
+Proves:
+  - Legacy (v1) hash user logs in -> auth succeeds\nsimulate|backend\tests\test_clock_skew.py:1|"""
+test_clock_skew.py — Clock Skew Guard Tests
+============================================
+Tests f\nsimulate|backend\tests\test_coverage_boost.py:1|"""
+test_coverage_boost.py — Targeted coverage for auth, automation_enforcer,
+                      \nsimulate|backend\tests\test_coverage_boost_2.py:1|"""
+test_coverage_boost_2.py — Additional targeted tests for 95% coverage
+
+Covers:
+  - auto_mode_con\nmock|backend\tests\test_device_tracking.py:1|"""
+Tests for Device Tracking
+
+Verifies:
+- Login creates DB record with correct IP/UA
+- Device hash \nmock|backend\tests\test_email_alerts.py:1|"""
+Tests for Email Alert System
+
+Verifies:
+- Alert email composition is correct
+- SMTP connection a\nmock|backend\tests\test_error_paths.py:1|"""
+test_error_paths.py — Error Path Coverage
+
+Explicitly tests:
+- File write failure
+- HDD full sce\nsimulate|backend\tests\test_error_paths.py:1|"""
+test_error_paths.py — Error Path Coverage
+
+Explicitly tests:
+- File write failure
+- HDD full sce\nmock|backend\tests\test_full_pipeline.py:1|"""
+test_full_pipeline.py — Full Pipeline Integration Test
+
+End-to-end flow:
+1) Detection
+2) Precisi\nsimulate|backend\tests\test_full_pipeline.py:2|Pipeline Integration: {self.passed} passed, "
+              f"{self.failed} failed")
+        for sta\nmock|backend\tests\test_governance_lock.py:1|"""
+test_governance_lock.py — Governance Lock Verification
+
+Verifies:
+- Auto-submit permanently disa\nmock|backend\tests\test_no_mock_data.py:1|"""
+Tests to verify NO mock data exists anywhere in the codebase.
+
+This is the final gate test — sca\nplaceholder|backend\tests\test_no_mock_data.py:1|"""
+Tests to verify NO mock data exists anywhere in the codebase.
+
+This is the final gate test — sca\nmock|backend\tests\test_no_mock_data.py:3|".join(f"  - {v}" for v in violations)
+            )
+
+    def test_database_not_json_file_based(self\nplaceholder|backend\tests\test_no_mock_data.py:5|".join(f"  - {v}" for v in violations)
+            )
+
+    def test_chart_component_uses_api(self):
+ \nmock|backend\tests\test_p0_security.py:1|"""
+Test P0 Security Fixes — Comprehensive Verification Suite
+
+Tests for all 10 P0 security items:
+1\nsimulate|backend\tests\test_p0_security.py:1|"""
+Test P0 Security Fixes — Comprehensive Verification Suite
+
+Tests for all 10 P0 security items:
+1\nplaceholder|backend\tests\test_p0_security.py:1|"""
+Test P0 Security Fixes — Comprehensive Verification Suite
+
+Tests for all 10 P0 security items:
+1\nsynthetic|backend\tests\test_p0_security.py:1|"""
+Test P0 Security Fixes — Comprehensive Verification Suite
+
+Tests for all 10 P0 security items:
+1\nmock|backend\tests\test_parallel_scheduler_stress.py:1|"""
+test_parallel_scheduler_stress.py — Parallel Training Stress Test
+
+Simulates:
+- 2 node training
+\nsimulate|backend\tests\test_parallel_scheduler_stress.py:1|"""
+test_parallel_scheduler_stress.py — Parallel Training Stress Test
+
+Simulates:
+- 2 node training
+\nsimulate|backend\tests\test_parallel_scheduler_stress.py:2|Parallel Scheduler Stress: {self.passed} passed, "
+              f"{self.failed} failed")
+        fo\nmock|backend\tests\test_production_build_guard.py:1|"""
+Test Production Build Guard — Verify no mock/synthetic/forgery patterns remain.
+
+Tests that:
+- N\nplaceholder|backend\tests\test_production_build_guard.py:1|"""
+Test Production Build Guard — Verify no mock/synthetic/forgery patterns remain.
+
+Tests that:
+- N\nsynthetic|backend\tests\test_production_build_guard.py:1|"""
+Test Production Build Guard — Verify no mock/synthetic/forgery patterns remain.
+
+Tests that:
+- N\nsynthetic|backend\tests\test_production_build_guard.py:3|".join(f"  - {v}" for v in violations)
+            )
+
+    def test_no_synthetic_fallback_in_any_sour\nmock|backend\tests\test_production_build_guard.py:5|".join(f"  - {v}" for v in violations)
+            )
+
+
+class TestFailClosedGuarantees:
+    """Cross-\nsimulate|backend\tests\test_production_simulations.py:1|"""
+test_production_simulations.py — Final Production Validation Simulations
+=======================\nsimulate|backend\tests\test_revocation_persistence.py:1|"""
+Tests for B7 — Revocation persistence across re-initialization.
+
+Proves:
+  - revoke_token persis\nmock|backend\tests\test_runtime_api.py:1|"""
+test_runtime_api.py — Tests for GET /runtime/status
+
+Covers:
+  - Missing file → awaiting_data
+  \nmock|backend\tests\test_runtime_safety.py:1|"""
+test_runtime_safety.py — Runtime Safety Test Suite
+=============================================\nsimulate|backend\tests\test_runtime_safety.py:1|"""
+test_runtime_safety.py — Runtime Safety Test Suite
+=============================================\npartial|backend\tests\test_runtime_safety.py:2|Runtime Safety: {self.passed} passed, "
+              f"{self.failed} failed")
+        for status, n\nmock|backend\tests\test_scope_normalization.py:1|"""
+test_scope_normalization.py — Scope Normalization Hardening
+
+Tests:
+- Percent-encoded domains (%\nmock|backend\tests\test_system_integrity.py:1|"""
+System Integrity Supervisor — Test Suite
+
+Tests:
+  1. Score computation — weighted aggregation
+ \nplaceholder|backend\tests\test_system_integrity.py:1|"""
+System Integrity Supervisor — Test Suite
+
+Tests:
+  1. Score computation — weighted aggregation
+ \nmock|backend\tests\test_thermal_io_stress.py:1|"""
+test_thermal_io_stress.py — Thermal + IO Stress Check
+
+Simulates:
+- 4-node parallel training
+- I\nsimulate|backend\tests\test_thermal_io_stress.py:1|"""
+test_thermal_io_stress.py — Thermal + IO Stress Check
+
+Simulates:
+- 4-node parallel training
+- I\nsimulate|backend\tests\test_thermal_io_stress.py:2|Thermal + IO Stress: {self.passed} passed, "
+              f"{self.failed} failed")
+        for stat\nmock|backend\tests\test_websocket_auth.py:1|"""
+Tests for B8 — WebSocket auth gating.
+
+Unit tests for ws_authenticate (always run) and
+integrati\nmock|backend\training\parallel_scheduler.py:1|"""
+parallel_scheduler.py — Parallel Training Orchestration
+
+Deterministic gradient merge, reproduci\nmock|backend\training\state_manager.py:1|"""
+YGB Training State Manager — Production-Grade Telemetry
+
+Reads REAL training state from the G38 \nmock|backend\training\tests\test_gpu_status_endpoint.py:1|"""
+Tests for GPU Status Endpoint
+
+Verifies:
+- GPU unavailable returns gpu_available=false, all else\nsimulate|backend\training\tests\test_gpu_status_endpoint.py:1|"""
+Tests for GPU Status Endpoint
+
+Verifies:
+- GPU unavailable returns gpu_available=false, all else\nplaceholder|backend\training\tests\test_gpu_status_endpoint.py:1|"""
+Tests for GPU Status Endpoint
+
+Verifies:
+- GPU unavailable returns gpu_available=false, all else\nmock|backend\training\tests\test_training_progress_endpoint.py:1|"""
+Tests for Training Progress Endpoint
+
+Verifies:
+- Idle state returns status="idle" with null met\nsimulate|backend\training\tests\test_training_progress_endpoint.py:1|"""
+Tests for Training Progress Endpoint
+
+Verifies:
+- Idle state returns status="idle" with null met\nplaceholder|backend\training\tests\test_training_progress_endpoint.py:1|"""
+Tests for Training Progress Endpoint
+
+Verifies:
+- Idle state returns status="idle" with null met\nplaceholder|frontend\app\page.tsx:1|"use client"
+
+import { useState, useEffect, useRef, useCallback } from "react"
+import Link from "nex\nplaceholder|frontend\app\admin\page.tsx:1|"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation\nplaceholder|frontend\app\dashboard\page.tsx:1|"use client"
+
+import { useState, useEffect } from "react"
+import { Area, AreaChart, CartesianGrid, X\nplaceholder|frontend\app\runner\page.tsx:1|"use client"
+
+import { useState, useEffect, useRef, useCallback } from "react"
+import {
+    Play,
+  \nplaceholder|frontend\components\approval-panel.tsx:1|"use client"
+
+import { useState } from "react"
+import { cn } from "@/lib/utils"
+import { Check, X, S\nsynthetic|frontend\components\bounty-status-panel.tsx:1|'use client';
+
+import React, { useEffect, useState } from 'react';
+
+/**
+ * BountyStatusPanel — Bount\nplaceholder|frontend\components\chart-area-interactive.tsx:1|"use client"
+
+import * as React from "react"
+import { Area, AreaChart, CartesianGrid, XAxis } from "\nplaceholder|frontend\components\data-table.tsx:1|"use client"
+
+import * as React from "react"
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSenso\nsimulate|frontend\components\execution-state.tsx:1|"use client"
+
+import { cn } from "@/lib/utils"
+
+// Execution states from G01 ExecutionKernel
+export \nmock|frontend\components\hunting-control-panel.tsx:1|"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { cn } from "@/lib/uti\nplaceholder|frontend\components\HuntingPanel.tsx:1|'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
+
+/**
+ * HuntingPanel — Li\nplaceholder|frontend\components\scope-target-panel.tsx:1|"use client"
+
+import { useState, useEffect, useCallback } from "react"
+import { cn } from "@/lib/uti\nplaceholder|frontend\components\ui\input.tsx:1|import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+function Input({ className, type, \nplaceholder|frontend\components\ui\select.tsx:1|"use client"
+
+import * as React from "react"
+import * as SelectPrimitive from "@radix-ui/react-selec\nmock|frontend\__tests__\ygb-api.test.ts:1|/**
+ * Tests for lib/ygb-api.ts — YGB API Client
+ *
+ * Tests all exported API functions with mocked \nplaceholder|HUMANOID_HUNTER\contracts\executor_contract.h:1|/*
+ * HUMANOID_HUNTER Executor Contract
+ * 
+ * C/C++ Header for Executor Interface
+ * 
+ * THIS IS A \npartial|HUMANOID_HUNTER\executor_response\response_engine.py:1|"""
+Phase-30 Response Engine.
+
+This module provides executor response governance functions.
+
+All fun\npartial|HUMANOID_HUNTER\executor_response\response_types.py:1|"""
+Phase-30 Response Types.
+
+This module defines enums for executor response governance.
+
+CLOSED EN\npartial|HUMANOID_HUNTER\executor_response\__init__.py:1|"""
+Phase-30 Executor Response Governance & Result Normalization.
+
+This module provides executor res\npartial|HUMANOID_HUNTER\executor_response\tests\test_timeout_handling.py:1|"""
+Tests for Phase-30 Timeout Handling.
+
+Tests:
+- TIMEOUT response → FAILURE decision
+- PARTIAL res\npartial|HUMANOID_HUNTER\sandbox\sandbox_engine.py:1|"""
+Phase-21 Sandbox Engine.
+
+This module provides sandbox & fault isolation functions.
+
+All functio\npartial|HUMANOID_HUNTER\sandbox\sandbox_types.py:1|"""
+Phase-21 Sandbox Types.
+
+This module defines enums for sandbox & fault isolation.
+
+CLOSED ENUMS \npartial|HUMANOID_HUNTER\sandbox\tests\test_fault_classification.py:1|"""
+Tests for Phase-21 Fault Classification.
+
+Tests:
+- classify_fault for each fault type
+- Retry po\npartial|HUMANOID_HUNTER\sandbox\tests\test_sandbox_decision.py:1|"""
+Tests for Phase-21 Sandbox Decision.
+
+Tests:
+- decide_sandbox_outcome for various faults
+"""
+imp\nmock|impl_v1\enterprise\process_isolation.py:1|"""
+Process Isolation
+==================
+
+Inference engine: Separate OS process
+Training engine: Sep\nsimulate|impl_v1\enterprise\tests\test_enterprise.py:1|"""
+Enterprise Control Plane Tests
+================================
+
+Tests for enterprise 24/7 contr\npartial|impl_v1\governance\human_factor_safety.py:1|"""
+Human Factor Safety Layer
+==========================
+
+Prevent operator misuse:
+- Confidence expl\nplaceholder|impl_v1\phase20\phase20_engine.py:1|"""
+impl_v1 Phase-20 System Root Boundary Engine.
+
+NON-AUTHORITATIVE MIRROR of governance Phase-20.
+\npartial|impl_v1\phase30\phase30_engine.py:1|"""
+impl_v1 Phase-30 Response Engine.
+
+NON-AUTHORITATIVE MIRROR of governance Phase-30.
+Contains PUR\npartial|impl_v1\phase30\phase30_types.py:1|"""
+impl_v1 Phase-30 Response Types.
+
+NON-AUTHORITATIVE MIRROR of governance Phase-30.
+Contains CLOS\npartial|impl_v1\phase30\tests\test_phase30_engine.py:1|"""
+Phase-30 Engine Tests.
+
+Tests for VALIDATION-ONLY functions:
+- validate_executor_response
+- norm\npartial|impl_v1\phase30\tests\test_phase30_types.py:1|"""
+Phase-30 Types Tests.
+
+Tests for CLOSED enums:
+- ExecutorResponseType: 5 members
+- ResponseDecis\nplaceholder|impl_v1\phase31\tests\test_phase31_engine.py:1|"""
+Phase-31 Engine Tests.
+
+Tests for VALIDATION-ONLY functions:
+- validate_evidence_record
+- valida\nsimulate|impl_v1\phase38\browser_engine.py:1|# Phase-38: Browser Boundary Governor - Decision Engine
+# GOVERNANCE LAYER ONLY - No browser executi\nsimulate|impl_v1\phase38\browser_types.py:1|# Phase-38: Browser Boundary Governor - Types Module
+# GOVERNANCE LAYER ONLY - No browser execution
+\nsimulate|impl_v1\phase38\browser_validator.py:1|# Phase-38: Browser Boundary Governor - Validator Module
+# GOVERNANCE LAYER ONLY - No browser execut\nsimulate|impl_v1\phase38\tests\test_browser_engine.py:1|# Phase-38 Tests: Browser Engine
+"""
+Tests for Phase-38 browser decision engine.
+100% coverage requi\nsimulate|impl_v1\phase38\tests\test_browser_types.py:1|# Phase-38 Tests: Browser Types and Validation
+"""
+Tests for Phase-38 browser governance types and v\nsimulate|impl_v1\phase39\tests\test_coverage.py:1|# Phase-39 Additional Coverage Tests
+"""Additional tests for full coverage."""
+
+import pytest
+
+from \nsimulate|impl_v1\phase46\mutex_contracts.py:1|# Phase-46: Mutual Exclusion Contract Engine
+"""Vector-level locks, pre-browser enforcement, determi\nsimulate|impl_v1\phase49\governors\g01_execution_kernel.py:1|# G01: Execution Kernel
+"""
+Deterministic state machine for execution control.
+
+CRITICAL RULES:
+- DE\nmock|impl_v1\phase49\governors\g04_voice_proxy.py:1|# G04: Voice Proxy
+"""
+TTS voice output integration using proxy API.
+
+STRICT RULE: Voice is OUTPUT O\nmock|impl_v1\phase49\governors\g06_autonomy_modes.py:1|# G06: Autonomy Modes
+"""
+Autonomy and interaction mode management.
+
+MODES:
+1. MOCK (default) - No r\nmock|impl_v1\phase49\governors\g07_cve_intelligence.py:1|# G07: CVE Intelligence
+"""
+READ-ONLY CVE/NVD intelligence integration.
+
+STRICT RULE: CVE data NEVER\nmock|impl_v1\phase49\governors\g08_licensing.py:1|# G08: Licensing & Privacy
+"""
+License validation, device fingerprinting, and privacy protection.
+
+L\nmock|impl_v1\phase49\governors\g09_device_trust.py:1|# G09: Device Trust
+"""
+Device access control and trust management.
+
+RULES:
+- Max 2-3 devices per ac\nmock|impl_v1\phase49\governors\g14_target_discovery.py:1|# G14: Target Discovery Assistant
+"""
+READ-ONLY target discovery from public sources.
+
+SOURCES (PUBL\nmock|impl_v1\phase49\governors\g15_cve_api.py:1|# G15: CVE API Integration (Passive Mode)
+"""
+Real NVD CVE API integration in PASSIVE MODE ONLY.
+
+RU\nsimulate|impl_v1\phase49\governors\g15_cve_api.py:1|# G15: CVE API Integration (Passive Mode)
+"""
+Real NVD CVE API integration in PASSIVE MODE ONLY.
+
+RU\nnot_impl|impl_v1\phase49\governors\g15_cve_api.py:1|# G15: CVE API Integration (Passive Mode)
+"""
+Real NVD CVE API integration in PASSIVE MODE ONLY.
+
+RU\nmock|impl_v1\phase49\governors\g16_gmail_alerts.py:1|# G16: Gmail Owner Alerts
+"""
+Owner notification system via Gmail SMTP.
+
+OWNER EMAIL: Configurable v\nplaceholder|impl_v1\phase49\governors\g16_gmail_alerts.py:1|# G16: Gmail Owner Alerts
+"""
+Owner notification system via Gmail SMTP.
+
+OWNER EMAIL: Configurable v\nnot_impl|impl_v1\phase49\governors\g16_gmail_alerts.py:1|# G16: Gmail Owner Alerts
+"""
+Owner notification system via Gmail SMTP.
+
+OWNER EMAIL: Configurable v\nmock|impl_v1\phase49\governors\g18_screen_inspection.py:1|# G18: Screen Read-Only Inspection
+"""
+Screen inspection in READ-ONLY mode only.
+
+If user says "take\nstub|impl_v1\phase49\governors\g18_screen_inspection.py:1|# G18: Screen Read-Only Inspection
+"""
+Screen inspection in READ-ONLY mode only.
+
+If user says "take\nmock|impl_v1\phase49\governors\g21_auto_update.py:1|# G21: Auto-Update Governance
+"""
+Governance for application auto-updates.
+
+RULES:
+✓ Updates must be\nplaceholder|impl_v1\phase49\governors\g21_auto_update.py:1|# G21: Auto-Update Governance
+"""
+Governance for application auto-updates.
+
+RULES:
+✓ Updates must be\nsimulate|impl_v1\phase49\governors\g24_system_evolution.py:1|# G24: System Evolution & Stability Governor
+"""
+GOVERNANCE-ONLY layer for future-proofing and stabi\nmock|impl_v1\phase49\governors\g25_ungoogled_chromium.py:1|# G25: Ungoogled Chromium Enforcement Governor
+"""
+HARD ENFORCEMENT: Ungoogled Chromium ONLY.
+
+NO fa\nmock|impl_v1\phase49\governors\g26_forensic_evidence.py:1|# G26: Forensic Evidence Capture Governor
+"""
+Forensic-grade evidence capture system.
+
+Captures:
+✓ S\nplaceholder|impl_v1\phase49\governors\g26_forensic_evidence.py:1|# G26: Forensic Evidence Capture Governor
+"""
+Forensic-grade evidence capture system.
+
+Captures:
+✓ S\nsynthetic|impl_v1\phase49\governors\g26_forensic_evidence.py:1|# G26: Forensic Evidence Capture Governor
+"""
+Forensic-grade evidence capture system.
+
+Captures:
+✓ S\nmock|impl_v1\phase49\governors\g29_voice_stt.py:1|# G29: Real Voice Input (STT) Governor
+"""
+Real voice input with speech-to-text.
+
+Features:
+✓ Microp\nmock|impl_v1\phase49\governors\g30_parallel_tasks.py:1|# G30: Parallel Task Governor
+"""
+Safe parallel task execution engine.
+
+Features:
+✓ Task queue with \nmock|impl_v1\phase49\governors\g32_reasoning_scope_engine.py:2|") if line.strip()]
+    
+    allowed = []
+    conditional = []
+    forbidden = []
+    read_only = []\npartial|impl_v1\phase49\governors\g34_duplicate_intelligence.py:1|# G34: Duplicate Intelligence
+"""
+DUPLICATE INTELLIGENCE ENGINE.
+
+Detects likely duplicate reports b\nmock|impl_v1\phase49\governors\g35_ai_accelerator.py:1|# G35: AI Accelerator (Advisory Only)
+"""
+AI ACCELERATOR - ADVISORY ONLY.
+
+Speeds up triage but NEVE\nsimulate|impl_v1\phase49\governors\g35_ai_accelerator.py:1|# G35: AI Accelerator (Advisory Only)
+"""
+AI ACCELERATOR - ADVISORY ONLY.
+
+Speeds up triage but NEVE\nstub|impl_v1\phase49\governors\g35_ai_accelerator.py:1|# G35: AI Accelerator (Advisory Only)
+"""
+AI ACCELERATOR - ADVISORY ONLY.
+
+Speeds up triage but NEVE\nmock|impl_v1\phase49\governors\g37_gpu_training_backend.py:1|# ██████████████████████████████████████████████████████████████████████
+# ██  MOCK MODULE — NEVER U\nmock|impl_v1\phase49\governors\g37_pytorch_backend.py:1|# G37 PyTorch Training Backend (REAL)
+"""
+REAL GPU TRAINING BACKEND USING PYTORCH.
+
+This module repl\nmock|impl_v1\phase49\governors\g38_self_trained_model.py:1|# G38: Large Self-Trained Intelligence Model
+"""
+LARGE SELF-TRAINED INTELLIGENCE MODEL (Option-A).
+
+\nmock|impl_v1\phase49\native\browser_bindings.py:1|# browser_bindings.py
+"""
+Python <-> C++ Browser Engine Bindings
+
+CRITICAL: This module validates al\nsimulate|impl_v1\phase49\native\browser_bindings.py:1|# browser_bindings.py
+"""
+Python <-> C++ Browser Engine Bindings
+
+CRITICAL: This module validates al\nnot_impl|impl_v1\phase49\native\sandbox.cpp:2|");
+  }
+
+  // Ensure we cannot regain privileges
+  if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) != 0) \nsynthetic|impl_v1\phase49\runtime\auto_trainer.py:1|# G38 Runtime - Auto Trainer
+"""
+AUTOMATIC IDLE-BASED TRAINING FOR G38.
+
+PURPOSE:
+Run background sch\nmock|impl_v1\phase49\runtime\idle_detector.py:1|# G38 Runtime - Idle Detector
+"""
+REAL OS IDLE DETECTION FOR G38 AUTO-TRAINING.
+
+PURPOSE:
+Get REAL s\nplaceholder|impl_v1\phase49\runtime\idle_detector.py:2|")
+            if len(lines) >= 2 and lines[0].lower() == "yes":
+                # IdleSinceHint is \nmock|impl_v1\phase49\runtime\training_reports.py:1|# G38 Training Report Generator
+"""
+TRAINING TRANSPARENCY REPORTS.
+
+PURPOSE:
+Generate transparent re\nmock|impl_v1\phase49\tests\conftest.py:1|"""
+Phase49 test configuration.
+
+Sets environment variables needed for test collection:
+- YGB_ALLOW_\nmock|impl_v1\phase49\tests\test_auto_trainer.py:1|# Test G38 Runtime - Auto Trainer
+"""
+Tests for automatic idle-based training.
+
+Tests cover:
+- Sched\nmock|impl_v1\phase49\tests\test_crossplatform_determinism.py:1|"""
+Cross-Platform Determinism Tests - Phase 49
+============================================
+
+Verify\nmock|impl_v1\phase49\tests\test_deterministic_training.py:1|"""
+Deterministic Training Tests - Phase 49
+========================================
+
+Tests for dete\nsimulate|impl_v1\phase49\tests\test_g01_execution_kernel.py:1|# test_g01_execution_kernel.py
+"""Tests for G01: Execution Kernel"""
+
+import pytest
+from impl_v1.pha\nmock|impl_v1\phase49\tests\test_g06_autonomy.py:1|# test_g06_autonomy.py
+"""Tests for G06: Autonomy Modes"""
+
+import pytest
+from impl_v1.phase49.gover\nmock|impl_v1\phase49\tests\test_g15_cve_api.py:1|# test_g15_cve_api.py
+"""Tests for G15 CVE API governor."""
+
+import pytest
+from datetime import date\nmock|impl_v1\phase49\tests\test_g21_auto_update.py:1|# test_g21_auto_update.py
+"""Tests for G21 Auto-Update Governance."""
+
+import pytest
+
+from impl_v1.p\nsimulate|impl_v1\phase49\tests\test_g24_system_evolution.py:1|# test_g24_system_evolution.py
+"""Tests for G24 System Evolution & Stability Governor."""
+
+import py\nmock|impl_v1\phase49\tests\test_g25_ungoogled_chromium.py:1|# Test G25: Ungoogled Chromium Enforcement
+"""
+Tests for Ungoogled Chromium enforcement governor.
+
+1\nmock|impl_v1\phase49\tests\test_g26_forensic_evidence.py:1|# Test G26: Forensic Evidence Capture
+"""
+Tests for forensic evidence capture governor.
+
+100% covera\nmock|impl_v1\phase49\tests\test_g29_voice_stt.py:1|# Test G29: Real Voice Input (STT)
+"""
+Tests for voice STT governor.
+
+100% coverage required.
+"""
+
+i\nmock|impl_v1\phase49\tests\test_g30_parallel_tasks.py:1|# Test G30: Parallel Task Governor
+"""
+Tests for parallel task governor.
+
+100% coverage required.
+""\nmock|impl_v1\phase49\tests\test_g31_password_governance.py:1|# Test G31: Cryptographic Multilingual Password Governance
+"""
+Tests for password governance governo\nmock|impl_v1\phase49\tests\test_g35_ai_accelerator.py:1|# test_g35_ai_accelerator.py
+"""Tests for G35 AI Accelerator (Advisory Only)."""
+
+import pytest
+
+fro\nsimulate|impl_v1\phase49\tests\test_g35_ai_accelerator.py:1|# test_g35_ai_accelerator.py
+"""Tests for G35 AI Accelerator (Advisory Only)."""
+
+import pytest
+
+fro\nmock|impl_v1\phase49\tests\test_g37_gpu_training_backend.py:1|# Test G37 GPU Training Backend
+"""
+Tests for G37 GPU training backend.
+
+100% coverage required.
+"""\nmock|impl_v1\phase49\tests\test_g38_external_failover.py:1|# Test G38 External Failover
+"""
+Comprehensive tests for G38 External AI Failover Governance.
+
+Tests\nmock|impl_v1\phase49\tests\test_g38_self_trained_model.py:1|# Test G38 Self-Trained Model
+"""
+Comprehensive tests for G38 Large Self-Trained Intelligence Model.\nmock|impl_v1\phase49\tests\test_gpu_backend.py:1|"""
+GPU Backend Mock Tests for G38 Training.
+
+Phase-49 ONLY — tests GPU detection and CPU fallback.
+\nsimulate|impl_v1\phase49\tests\test_gpu_backend.py:1|"""
+GPU Backend Mock Tests for G38 Training.
+
+Phase-49 ONLY — tests GPU detection and CPU fallback.
+\nmock|impl_v1\phase49\tests\test_idle_detector.py:1|# Test G38 Runtime - Idle Detector
+"""
+Tests for real OS idle detection.
+
+Mocks are allowed ONLY in \nmock|impl_v1\phase49\tests\test_integration_app.py:1|# test_integration_app.py
+"""Integration tests for Full App Mode flow."""
+
+import pytest
+
+from impl_\nmock|impl_v1\phase49\tests\test_root_of_trust.py:1|"""
+Root of Trust Tests - Phase 49
+================================
+
+Tests for root-of-trust verific\nmock|impl_v1\phase49\tests\test_runtime_attestation.py:1|"""
+Runtime Attestation Tests - Phase 49
+=====================================
+
+Tests for runtime at\nmock|impl_v1\phase49\tests\test_sandbox_specification.py:1|"""
+Native Sandbox Regression Tests - Phase 49
+==========================================
+
+C++ SANDB\nmock|impl_v1\phase49\tests\test_security_monitor.py:1|"""
+Security Monitor Tests - Phase 49
+==================================
+
+Tests proving the security\nmock|impl_v1\phase49\tests\test_subprocess_security.py:1|"""
+Subprocess Security Tests - Phase 49
+=====================================
+
+Tests for subprocess\nsimulate|impl_v1\phase49\tests\test_subprocess_security.py:1|"""
+Subprocess Security Tests - Phase 49
+=====================================
+
+Tests for subprocess\nmock|impl_v1\phase49\tests\test_voice_sandbox.py:1|"""
+Voice Assistant Sandbox Tests - Phase 49
+=========================================
+
+Verifies tha\nsimulate|impl_v1\phase49\validation\chaos_tests.py:1|"""
+Chaos Engineering Tests - Phase 49
+===================================
+
+Simulate adverse conditi\nmock|impl_v1\phase49\validation\effectiveness_validation.py:1|"""
+Effectiveness Validation - Phase 49
+=====================================
+
+Test scanning pipelin\nsimulate|impl_v1\phase49\validation\effectiveness_validation.py:1|"""
+Effectiveness Validation - Phase 49
+=====================================
+
+Test scanning pipelin\nmock|impl_v1\phase49\validation\stability_tests.py:1|"""
+Stability and Performance Tests - Phase 49
+============================================
+
+Long-ru\nsimulate|impl_v1\phase49\validation\stability_tests.py:1|"""
+Stability and Performance Tests - Phase 49
+============================================
+
+Long-ru\nmock|impl_v1\phase50\monitoring\incident_simulation.py:1|"""
+Incident Simulation Tests - Phase 50
+=====================================
+
+Simulate security in\nsimulate|impl_v1\phase50\monitoring\incident_simulation.py:1|"""
+Incident Simulation Tests - Phase 50
+=====================================
+
+Simulate security in\nmock|impl_v1\phase50\tests\test_lifecycle_monitoring.py:1|"""
+Lifecycle Monitoring Tests - Phase 50
+======================================
+
+Tests for continuo\nsimulate|impl_v1\phase50\tests\test_lifecycle_monitoring.py:1|"""
+Lifecycle Monitoring Tests - Phase 50
+======================================
+
+Tests for continuo\nmock|impl_v1\production\observability\metrics_exporter.py:2|".join(lines)
+
+
+# =============================================================================
+# SY\nsimulate|impl_v1\production\tests\test_production_readiness.py:1|"""
+Production Readiness Tests
+==========================
+
+Tests for production-grade validation.
+""\nmock|impl_v1\production\validation\large_scale_validation.py:1|"""
+Large Scale Validation - Production Grade
+==========================================
+
+Validation\nsimulate|impl_v1\production\workflow\human_workflow_simulation.py:1|"""
+Human Workflow Simulation - Production Grade
+=============================================
+
+Simu\nsynthetic|impl_v1\production\workflow\human_workflow_simulation.py:1|"""
+Human Workflow Simulation - Production Grade
+=============================================
+
+Simu\nmock|impl_v1\training\data\data_source_audit.py:1|"""
+data_source_audit.py — Data Source Audit Module (Phase 5)
+
+Scans Python files in the training pa\nsynthetic|impl_v1\training\data\data_source_audit.py:1|"""
+data_source_audit.py — Data Source Audit Module (Phase 5)
+
+Scans Python files in the training pa\nsynthetic|impl_v1\training\data\data_source_audit.py:2|".join(
+            f"  {v.file_path}:{v.line_number} — {v.pattern}"
+            for v in report.vio\nsynthetic|impl_v1\training\data\data_source_audit.py:4|"
+            f"Remove synthetic data sources before training."
+        )
+
+    logger.info("[AUDIT] \nsynthetic|impl_v1\training\data\feature_cache.py:1|"""
+feature_cache.py — SHA-256 Feature Cache for Training Acceleration
+
+Pre-computes feature vectors\nmock|impl_v1\training\data\governance_pipeline.py:1|"""
+governance_pipeline.py — Unified Governance Pipeline Orchestrator
+
+█████████████████████████████\nsimulate|impl_v1\training\data\human_simulated_curriculum.py:1|"""
+human_simulated_curriculum.py — Human-Simulated Curriculum (Phase 5)
+
+██████████████████████████\nmock|impl_v1\training\data\ingestion_policy.py:1|"""
+ingestion_policy.py — Ingestion Policy Engine (Phase 1)
+
+███████████████████████████████████████\nsynthetic|impl_v1\training\data\ingestion_policy.py:1|"""
+ingestion_policy.py — Ingestion Policy Engine (Phase 1)
+
+███████████████████████████████████████\nsynthetic|impl_v1\training\data\real_dataset_loader.py:1|"""
+Dataset Loader — Training Data Source
+======================================
+
+STRICT_REAL_MODE (\nsynthetic|impl_v1\training\data\real_dataset_loader.py:2|"
+            f"Run: python native/distributed/build_bridge.py"
+        )
+    lib = ctypes.CDLL(str(\nsimulate|impl_v1\training\distributed\auto_recovery.py:1|"""
+auto_recovery.py — Auto-Recovery Engine (Phase 6)
+
+If node missing shards:
+1. Query cluster peer\nsimulate|impl_v1\training\distributed\cloud_backup.py:1|"""
+cloud_backup.py — Cloud Cold Backup (Phase 5)
+
+Weekly snapshot:
+1. Bundle compressed shards
+2. E\nsimulate|impl_v1\training\distributed\cluster_training.py:1|"""
+cluster_training.py — Multi-Node True Scaling (2050 + 3050 cluster)
+
+Enables:
+  - world_size >= \nsimulate|impl_v1\training\distributed\curriculum_loop.py:1|"""
+curriculum_loop.py — Human-Like Curriculum Loop (Phase 6)
+
+Lab train → Simulated exploit → Hard \nsynthetic|impl_v1\training\distributed\curriculum_loop.py:1|"""
+curriculum_loop.py — Human-Like Curriculum Loop (Phase 6)
+
+Lab train → Simulated exploit → Hard \nsynthetic|impl_v1\training\distributed\data_scale_config.py:1|"""
+data_scale_config.py — Field Data Scale Up (Phase 7)
+
+Minimum 50,000 samples per field.
+Target 1\nsimulate|impl_v1\training\distributed\failure_resilience.py:1|"""
+failure_resilience.py — Failure Simulation & Resilience (Phase 7)
+
+Handles:
+  - Node dropout det\npartial|impl_v1\training\distributed\global_consensus.py:1|"""
+global_consensus.py — Global Dataset Consensus for Distributed Training
+
+Before distributed trai\nmock|impl_v1\training\distributed\report_structural_compiler.py:1|"""
+report_structural_compiler.py — Structured Report Compiler (Phase 8)
+
+Evidence-bound structured \nmock|impl_v1\training\distributed\semantic_entropy_guard.py:1|"""
+semantic_entropy_guard.py — Semantic Entropy Guard (Phase 6)
+
+Prevent training data poisoning an\nsynthetic|impl_v1\training\distributed\semantic_entropy_guard.py:1|"""
+semantic_entropy_guard.py — Semantic Entropy Guard (Phase 6)
+
+Prevent training data poisoning an\nmock|impl_v1\training\distributed\tests\test_governance.py:1|"""
+test_governance.py — Tests for 8-Phase Cluster Governance
+
+Tests all 5 governance modules with m\nsynthetic|impl_v1\training\safety\adversarial_drift.py:1|"""
+Adversarial Drift Test
+=======================
+
+Generate synthetic adversarial payloads:
+- Obfus\nmock|impl_v1\training\safety\dataset_quality_gate.py:1|"""
+dataset_quality_gate.py — Extended Dataset Validation Before Training
+
+Validates:
+  1. dataset_h\nsynthetic|impl_v1\training\safety\dataset_quality_gate.py:1|"""
+dataset_quality_gate.py — Extended Dataset Validation Before Training
+
+Validates:
+  1. dataset_h\nsynthetic|impl_v1\training\safety\dataset_quality_validator.py:1|"""
+dataset_quality_validator.py — Deep Data Quality Enforcement
+
+Checks:
+  1. Label distribution (c\nmock|impl_v1\training\safety\mock_data_scanner.py:1|"""
+mock_data_scanner.py — Production Mock Data Scanner
+
+Scans production code for dangerous pattern\nplaceholder|impl_v1\training\safety\mock_data_scanner.py:1|"""
+mock_data_scanner.py — Production Mock Data Scanner
+
+Scans production code for dangerous pattern\nsynthetic|impl_v1\training\safety\mock_data_scanner.py:1|"""
+mock_data_scanner.py — Production Mock Data Scanner
+
+Scans production code for dangerous pattern\nmock|impl_v1\training\safety\schema_validator.py:1|"""
+Canonical 23-Field Dataset Schema Validator
+===========================================
+
+Defines\nsynthetic|impl_v1\training\safety\schema_validator.py:1|"""
+Canonical 23-Field Dataset Schema Validator
+===========================================
+
+Defines\nsimulate|impl_v1\training\safety\stress_lock.py:1|"""
+Auto-Mode Stress Lock
+======================
+
+Stress testing for auto-mode:
+- 500 scans burst
+- \nsynthetic|impl_v1\training\safety\training_mode.py:1|"""
+Training Mode Architecture — PRODUCTION_REAL / LAB_COMPLEX Split
+===============================\nsimulate|impl_v1\training\tests\test_autonomous_v2.py:1|"""
+test_autonomous_v2.py — Tests for Autonomous Training v2 (Phases A-H)
+
+Tests governance Python m\nsimulate|impl_v1\training\tests\test_bounty_ready.py:1|"""
+test_bounty_ready.py — Tests for 8-Phase Bounty-Ready Upgrade
+"""
+
+import os
+import sys
+import h\nsynthetic|impl_v1\training\tests\test_bounty_ready_v2.py:1|"""
+test_bounty_ready_v2.py — Comprehensive Test Suite for Bounty-Ready System
+
+Tests all 9 phases:
+\nmock|impl_v1\training\tests\test_cluster_hardening.py:1|"""
+test_cluster_hardening.py — Tests for 9-Phase Cluster Hardening
+
+All tests mock CUDA/NCCL so the\nmock|impl_v1\training\tests\test_cuda_node_rtx2050.py:1|"""
+test_cuda_node_rtx2050.py — Tests for CUDA RTX 2050 DDP Node
+
+All tests mock torch.cuda so they \nmock|impl_v1\training\tests\test_ha_cluster.py:1|"""
+test_ha_cluster.py — Tests for 9-Phase HA Cluster
+
+All tests mock CUDA/NCCL so they run on any m\nsimulate|impl_v1\training\tests\test_ha_cluster.py:1|"""
+test_ha_cluster.py — Tests for 9-Phase HA Cluster
+
+All tests mock CUDA/NCCL so they run on any m\nmock|impl_v1\training\tests\test_no_synthetic_fallback.py:1|"""
+Test No Synthetic Fallback
+===========================
+
+Validates:
+- No synthetic data in traini\nsynthetic|impl_v1\training\tests\test_no_synthetic_fallback.py:1|"""
+Test No Synthetic Fallback
+===========================
+
+Validates:
+- No synthetic data in traini\nsynthetic|impl_v1\training\tests\test_no_synthetic_fallback.py:2|')
+            if 'synthetic' in line and 'no synthetic' not in line
+        ]
+        assert len(li\nmock|impl_v1\training\tests\test_production_arch.py:1|"""
+test_production_arch.py — Tests for 9-Phase Production Architecture
+
+All tests mock CUDA so they\nmock|impl_v1\training\tests\test_production_ddp.py:1|"""
+test_production_ddp.py — Tests for 7-Phase Production DDP Hardening
+
+All tests mock CUDA/NCCL so\nsimulate|impl_v1\training\tests\test_production_ddp.py:1|"""
+test_production_ddp.py — Tests for 7-Phase Production DDP Hardening
+
+All tests mock CUDA/NCCL so\npartial|impl_v1\training\tests\test_risk_elimination.py:1|"""
+test_risk_elimination.py — Tests for 5-Phase Risk Elimination
+"""
+
+import os
+import sys
+
+import \nmock|impl_v1\training\validation\cluster_validator.py:1|"""
+cluster_validator.py — 7-Step Final Validation Sequence
+
+1. Determinism validator (3 runs)
+2. Cr\nsimulate|native\accuracy\accuracy_provenance.cpp:1|/**
+ * accuracy_provenance.cpp — Accuracy Provenance Engine
+ *
+ * Accuracy displayed MUST be:
+ *   -\nmock|native\confidence_engine\confidence_scorer.cpp:1|/**
+ * confidence_scorer.cpp — Structured Confidence Band Output
+ *
+ * Replaces binary "Bug Found" w\nmock|native\confidence_engine\evidence_strength.cpp:1|/**
+ * evidence_strength.cpp — Evidence Weight Engine
+ *
+ * Computes evidence weight from: PoC, scre\nmock|native\confidence_engine\reproducibility_score.cpp:1|/**
+ * reproducibility_score.cpp — PoC Reproducibility Scorer
+ *
+ * Re-runs PoC N times, computes su\npartial|native\confidence_engine\reproducibility_score.cpp:1|/**
+ * reproducibility_score.cpp — PoC Reproducibility Scorer
+ *
+ * Re-runs PoC N times, computes su\nsimulate|native\distributed\async_allreduce.cpp:5|", MAX_BUCKETS);
+    return -1;
+  }
+
+  int id = g_manager.num_buckets++;
+  GradientBucket &b = g_man\nsimulate|native\distributed\compression_engine.cpp:2|");
+  return 0;
+}
+
+/**
+ * Check if a data chunk is a duplicate.
+ *
+ * @param data     Pointer to dat\nsimulate|native\distributed\multi_environment_simulator.cpp:1|/*
+ * multi_environment_simulator.cpp — Multi-Environment Simulator (Phase 0)
+ *
+ * Randomize sandbo\nmock|native\duplicate_engine\cve_similarity_matcher.cpp:1|/**
+ * cve_similarity_matcher.cpp — CVE Similarity Matching Engine
+ *
+ * Matches findings against kn\nmock|native\duplicate_engine\duplicate_probability.cpp:1|/**
+ * duplicate_probability.cpp — Duplicate Probability Estimator
+ *
+ * Outputs: duplicate_risk_sco\nmock|native\duplicate_engine\similarity_index.cpp:1|/**
+ * similarity_index.cpp — TF-IDF Vector Store for CVE Descriptions
+ *
+ * Builds TF-IDF vectors f\nsynthetic|native\duplicate_engine\similarity_index.cpp:1|/**
+ * similarity_index.cpp — TF-IDF Vector Store for CVE Descriptions
+ *
+ * Builds TF-IDF vectors f\nmock|native\field_lifecycle\field_progress_calculator.cpp:1|// ============================================================
+// FIELD PROGRESS CALCULATOR — REAL \nsynthetic|native\lab_training\accuracy_tracker.cpp:1|/**
+ * accuracy_tracker.cpp — Lab Accuracy Report Generator
+ *
+ * Generates lab_accuracy_report.json\nsimulate|native\lab_training\lab_scheduler.cpp:1|/**
+ * lab_scheduler.cpp — Lab Auto-Train Scheduler
+ *
+ * Orchestrates daily-scheduled lab training \nsynthetic|native\lab_training\lab_scheduler.cpp:1|/**
+ * lab_scheduler.cpp — Lab Auto-Train Scheduler
+ *
+ * Orchestrates daily-scheduled lab training \nsynthetic|native\lab_training\regression_suite.cpp:1|/**
+ * regression_suite.cpp — Lab Regression Test Suite
+ *
+ * Automated regression checks after each\nsimulate|native\lab_training\stress_simulator.cpp:1|/**
+ * stress_simulator.cpp — Synthetic Stress Injection for Lab Training
+ *
+ * Generates synthetic \nsynthetic|native\lab_training\stress_simulator.cpp:1|/**
+ * stress_simulator.cpp — Synthetic Stress Injection for Lab Training
+ *
+ * Generates synthetic \nsimulate|native\performance\gradient_accumulator.cpp:1|/**
+ * gradient_accumulator.cpp — Gradient Accumulation Engine
+ *
+ * When VRAM is limited (RTX 2050/\nsimulate|native\performance\stress_robustness_loop.cpp:1|/**
+ * stress_robustness_loop.cpp — Daily Stress & Robustness Cycle
+ *
+ * Automated daily stress tes\nmock|native\precision_engine\abstention_controller.cpp:1|/**
+ * abstention_controller.cpp — Abstention Preference Engine
+ *
+ * If confidence < dynamic_thresh\nsynthetic|native\precision_engine\abstention_controller.cpp:1|/**
+ * abstention_controller.cpp — Abstention Preference Engine
+ *
+ * If confidence < dynamic_thresh\nmock|native\precision_engine\false_positive_suppressor.cpp:1|/**
+ * false_positive_suppressor.cpp — Multi-Signal False Positive Suppression
+ *
+ * Requires agreem\nmock|native\precision_engine\high_confidence_filter.cpp:1|/**
+ * high_confidence_filter.cpp — Dynamic Threshold Engine
+ *
+ * Raises decision threshold until l\nsynthetic|native\precision_engine\high_confidence_filter.cpp:1|/**
+ * high_confidence_filter.cpp — Dynamic Threshold Engine
+ *
+ * Raises decision threshold until l\nnot_impl|native\report_engine\narrative_builder.cpp:4|"
+        "The %s parameter at %s does not implement proper input "
+        "validation or output en\nmock|native\report_engine\tone_controller.cpp:1|/**
+ * tone_controller.cpp — Report Tone & Language Controller
+ *
+ * Controls report tone: professio\npartial|native\research_assistant\source_consensus.py:1|"""
+Source Consensus Engine — Multi-Source Truth Verification
+======================================\nmock|native\runtime_cert_monitor\drift_monitor.cpp:1|/**
+ * drift_monitor.cpp — Post-Certification Drift & Calibration Monitor
+ *
+ * Rules:
+ *   - ECE > \nmock|native\runtime_cert_monitor\precision_monitor.cpp:1|/**
+ * precision_monitor.cpp — Post-Certification Precision Monitor
+ *
+ * Rolling 1000-decision prec\npartial|native\runtime_guard\runtime_state_validator.cpp:1|/**
+ * runtime_state_validator.cpp — Runtime State Validator
+ *
+ * On load validates:
+ *   1. JSON p\nmock|native\runtime_monitor\drift_runtime.cpp:1|/**
+ * drift_runtime.cpp — Drift Telemetry + Duplicate Rate Monitor
+ *
+ * Tracks:
+ * - Rolling KL di\nsimulate|native\runtime_monitor\drift_runtime.cpp:1|/**
+ * drift_runtime.cpp — Drift Telemetry + Duplicate Rate Monitor
+ *
+ * Tracks:
+ * - Rolling KL di\nmock|native\runtime_monitor\precision_runtime.cpp:1|/**
+ * precision_runtime.cpp — Runtime Precision Monitor
+ *
+ * Tracks:
+ * - Rolling 1000-sample prec\nmock|native\runtime_monitor\state_persistence.cpp:1|/**
+ * state_persistence.cpp — Runtime State Persistence
+ *
+ * Persists and restores runtime monitor\nmock|native\runtime_optimizer\utilization_controller.cpp:1|// ============================================================
+// UTILIZATION CONTROLLER — GPU/CPU \nmock|native\scope_engine\scope_parser.cpp:1|/**
+ * scope_parser.cpp — Program Scope Parser
+ *
+ * Parses scope from bug bounty program policy tex\nmock|native\scope_engine\subdomain_validator.cpp:1|/**
+ * subdomain_validator.cpp — Subdomain & Out-of-Scope Detection
+ *
+ * Validates targets against \nmock|native\scope_engine\wildcard_matcher.cpp:1|/**
+ * wildcard_matcher.cpp — Wildcard Domain & Path Matcher
+ *
+ * Matches targets against *.domain.\nstub|native\secure_storage\secure_storage.cpp:6|");
+  }
+}
+
+// Phase 6: Storage replication stub (rsync over WireGuard)
+static void trigger_replicati\nmock|native\secure_storage\secure_storage.cpp:7|",
+               event, device_id ? device_id : "", ip ? ip : "",
+               path ? path : "", \nsimulate|native\secure_storage\secure_storage.cpp:7|",
+               event, device_id ? device_id : "", ip ? ip : "",
+               path ? path : "", \nsynthetic|native\security\data_truth_enforcer.cpp:1|/*
+ * data_truth_enforcer.cpp — Real Data Enforcement Guard (Phase 2)
+ *
+ * ████████████████████████\npartial|native\security\deterministic_exploit_engine.cpp:1|/*
+ * deterministic_exploit_engine.cpp — Deterministic Exploit Verification (Phase
+ * 3)
+ *
+ * █████\nsynthetic|native\security\module_integrity_guard.cpp:1|/*
+ * module_integrity_guard.cpp — Native Module Integrity Lock (Phase 1)
+ *
+ * ████████████████████\nmock|native\security\production_build_guard.cpp:1|/**
+ * production_build_guard.cpp — Build-Time Protection (Phase 6)
+ *
+ * Enforces production build \nsynthetic|native\security\production_build_guard.cpp:1|/**
+ * production_build_guard.cpp — Build-Time Protection (Phase 6)
+ *
+ * Enforces production build \nmock|native\security\production_build_guard.cpp:2|", msg);
+}
+
+/* ================================================================== */
+/*  PUBLIC API \nplaceholder|native\security\production_build_guard.cpp:2|", msg);
+}
+
+/* ================================================================== */
+/*  PUBLIC API \nmock|native\security\secure_password_verifier.cpp:1|/**
+ * secure_password_verifier.cpp — Argon2id Password Hashing (Phase 4)
+ *
+ * Security-critical pa\nplaceholder|native\security\secure_password_verifier.cpp:1|/**
+ * secure_password_verifier.cpp — Argon2id Password Hashing (Phase 4)
+ *
+ * Security-critical pa\nplaceholder|native\security\secure_password_verifier.cpp:2|");
+    return 0;
+  }
+
+  /* Derive key */
+  uint8_t hash[HASH_LEN];
+  kdf_derive((const uint8_t *)pa\nmock|native\security\secure_secret_loader.cpp:1|/**
+ * secure_secret_loader.cpp — Hardened Secret Loader (Phase 1)
+ *
+ * Security-critical JWT secre\nplaceholder|native\security\secure_secret_loader.cpp:1|/**
+ * secure_secret_loader.cpp — Hardened Secret Loader (Phase 1)
+ *
+ * Security-critical JWT secre\nplaceholder|native\security\secure_secret_loader.cpp:4|");
+    return 0;
+  }
+
+  int len = (int)std::strlen(env_secret);
+
+  if (is_placeholder(env_secret, l\nmock|native\security\update_signature_verifier.cpp:1|/**
+ * update_signature_verifier.cpp — Ed25519 Update Signature Verifier (Phase 5)
+ *
+ * Cryptograph\nplaceholder|native\security\update_signature_verifier.cpp:1|/**
+ * update_signature_verifier.cpp — Ed25519 Update Signature Verifier (Phase 5)
+ *
+ * Cryptograph\nsimulate|native\temporal_stability\catastrophic_forgetting_detector.cpp:1|/**
+ * Catastrophic Forgetting Detector — Sequential Expansion Monitor.
+ *
+ * Simulates 5 sequential\nsimulate|native\temporal_stability\rolling_drift_engine.cpp:1|/**
+ * Rolling Drift Engine — Temporal Distribution Shift Simulator.
+ *
+ * Simulates 7-day rolling d\nstub|native\training\gpu_distributor.cpp:1|/*
+ * gpu_distributor.cpp — Multi-GPU Distribution & Verification
+ *
+ * Detects CUDA GPUs, verifies \nstub|native\training\gpu_monitor.cpp:1|/*
+ * gpu_monitor.cpp — CUDA GPU Utilization & Memory Monitor
+ *
+ * Monitors:
+ *   - cudaMemGetInfo(\nmock|native\training_runtime\training_telemetry.cpp:1|/**
+ * training_telemetry.cpp — Training Telemetry with HMAC Tamper Protection
+ *
+ * Features:
+ *   \nmock|native\validation\duplicate_stress.cpp:1|/**
+ * duplicate_stress.cpp — Duplicate Adversarial Test Suite
+ *
+ * Tests:
+ * - Paraphrased vulnera\nmock|native\validation\precision_proof.cpp:1|/**
+ * precision_proof.cpp — Precision Proof Engine
+ *
+ * Simulates 10,000 mixed samples with:
+ * - \nsimulate|native\validation\precision_proof.cpp:1|/**
+ * precision_proof.cpp — Precision Proof Engine
+ *
+ * Simulates 10,000 mixed samples with:
+ * - \nmock|native\validation\scope_fuzz.cpp:1|/**
+ * scope_fuzz.cpp — Scope Adversarial Fuzz Suite
+ *
+ * Tests:
+ * - IDN domains (internationalize\npartial|native\vulnerability_signature\vulnerability_signature.cpp:1|/**
+ * vulnerability_signature.cpp — Internal Duplicate Reduction (Phase 3)
+ *
+ * Computes a SHA-256\nsimulate|native\wireguard\wireguard_rotation.cpp:1|/**
+ * wireguard_rotation.cpp — WireGuard Key Rotation System
+ *
+ * Every 30 days:
+ *   - Generate n\nplaceholder|native\wireguard\wireguard_rotation.cpp:2|");
+    return false;
+  }
+
+  // Derive public key (simplified — in production, use Curve25519)
+  // \npartial|python\phase09_bounty\bounty_engine.py:1|"""
+Phase-09 Bounty Engine.
+
+Core decision engine for bounty eligibility.
+
+All functions are:
+- Pure\nnot_impl|python\phase09_bounty\bounty_engine.py:1|"""
+Phase-09 Bounty Engine.
+
+Core decision engine for bounty eligibility.
+
+All functions are:
+- Pure\nmock|python\phase12_evidence\tests\test_confidence_assignment.py:1|"""
+Tests for Phase-12 Confidence Assignment.
+
+Tests:
+- Confidence decision table
+- No confidence wi\nmock|scripts\ci_security_scan.py:1|"""
+CI Security Guard — Automated security scanning for CI/CD pipeline
+
+Scans the codebase for:
+1. H\nsimulate|scripts\ci_security_scan.py:1|"""
+CI Security Guard — Automated security scanning for CI/CD pipeline
+
+Scans the codebase for:
+1. H\nplaceholder|scripts\ci_security_scan.py:1|"""
+CI Security Guard — Automated security scanning for CI/CD pipeline
+
+Scans the codebase for:
+1. H\nmock|scripts\coverage_gate.py:1|"""
+coverage_gate.py — CI Coverage Gate (Python + C++ + JS/TS)
+
+Reads pre-generated coverage artifac\nsynthetic|scripts\coverage_gate.py:1|"""
+coverage_gate.py — CI Coverage Gate (Python + C++ + JS/TS)
+
+Reads pre-generated coverage artifac\nmock|scripts\remediation_scan.py:1|"""
+Full codebase scan for remediation patterns.
+Classifies hits as: PRODUCTION, TEST, THIRD_PARTY, \nsimulate|scripts\remediation_scan.py:1|"""
+Full codebase scan for remediation patterns.
+Classifies hits as: PRODUCTION, TEST, THIRD_PARTY, \npartial|scripts\remediation_scan.py:1|"""
+Full codebase scan for remediation patterns.
+Classifies hits as: PRODUCTION, TEST, THIRD_PARTY, \nstub|scripts\remediation_scan.py:1|"""
+Full codebase scan for remediation patterns.
+Classifies hits as: PRODUCTION, TEST, THIRD_PARTY, \nplaceholder|scripts\remediation_scan.py:1|"""
+Full codebase scan for remediation patterns.
+Classifies hits as: PRODUCTION, TEST, THIRD_PARTY, \nsynthetic|scripts\remediation_scan.py:1|"""
+Full codebase scan for remediation patterns.
+Classifies hits as: PRODUCTION, TEST, THIRD_PARTY, \nnot_impl|scripts\remediation_scan.py:1|"""
+Full codebase scan for remediation patterns.
+Classifies hits as: PRODUCTION, TEST, THIRD_PARTY, \nsynthetic|training\validation\data_audit.py:1|"""
+Phase 1: Data Validation Audit for MODE-B Gate.
+
+Statistical audit of dataset composition, featu\nsimulate|training\validation\drift_simulation.py:1|"""
+Phase 6: Drift Simulation for MODE-B Gate.
+
+Simulate:
+  - Feature distribution shift +10%
+  - Ne\nsimulate|training\validation\drift_simulation.py:2|".join(lines)
+
+
+if __name__ == "__main__":
+    from impl_v1.training.data.scaled_dataset import Data\nsimulate|training\validation\long_run_stability.py:1|"""
+Phase 4: Long Run Stability — 24-hour Continuous Training Simulation.
+
+Simulates 48 micro-cycles\nsimulate|training\validation\long_run_stability.py:2|{'=' * 60}")
+    logger.info(f"RESULT: {'PASS' if result.passed else 'FAIL'}")
+    logger.info(f"  P\nsimulate|training\validation\mode_b_gate.py:1|"""
+Phase 9: Final MODE-B Gate Decision.
+
+Runs ALL phases (1-8) and produces consolidated gate repor\nsimulate|training\validation\shadow_mode_simulation.py:1|"""
+Phase 7: Shadow Mode Simulation for MODE-B Gate.
+
+Simulate 1000 decisions:
+  AI outputs confiden\nsimulate|training\validation\temporal_drift_runner.py:1|"""
+Phase 1: Temporal Drift Runner — Python orchestrator for drift simulation.
+
+Mirrors the C++ roll\n

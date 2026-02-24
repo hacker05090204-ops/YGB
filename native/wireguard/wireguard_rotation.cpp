@@ -123,9 +123,13 @@ static bool generate_keypair(WgKeypair &kp, uint32_t version) {
     return false;
   }
 
-  // Derive public key (simplified — in production, use Curve25519)
-  // For now: public_key = bitwise complement of private_key
-  // This is a placeholder; real WireGuard uses Curve25519.
+  // KEY DERIVATION: CSPRNG-seeded deterministic transform.
+  // NOTE: Real WireGuard uses Curve25519 scalar multiplication.
+  // This uses a bitwise complement as a deterministic placeholder.
+  // The private key is CSPRNG-generated (secure), but the public key
+  // derivation is NOT Curve25519. When integrating a real Curve25519
+  // library (e.g., libsodium crypto_scalarmult_base), replace this block.
+  // FAIL-CLOSED: Do not deploy without real Curve25519 if peers require it.
   for (int i = 0; i < WG_KEY_SIZE; ++i) {
     kp.public_key[i] = ~kp.private_key[i];
   }
