@@ -303,12 +303,12 @@ def get_or_compute_features(
         elapsed = time.perf_counter() - start
         logger.info(f"[CACHE] Computed features in {elapsed:.2f}s")
         
-    except ImportError:
-        # Fallback: synthetic for testing
-        logger.warning("[CACHE] Dataset not available, using synthetic data")
-        rng = np.random.RandomState(seed)
-        features = rng.randn(total_samples, feature_dim).astype(np.float32)
-        labels = rng.randint(0, 2, total_samples).astype(np.int64)
+    except ImportError as e:
+        # FAIL-CLOSED: No synthetic fallback allowed in STRICT_REAL_MODE
+        raise RuntimeError(
+            f"[CACHE] FATAL: Real dataset unavailable and synthetic fallback "
+            f"is DISABLED in STRICT_REAL_MODE. Cannot proceed. Error: {e}"
+        )
     
     # Save to cache
     save_to_cache(dataset_hash, features, labels, {

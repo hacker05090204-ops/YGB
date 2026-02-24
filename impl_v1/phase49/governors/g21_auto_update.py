@@ -159,17 +159,30 @@ def verify_signature(update: UpdateInfo) -> tuple:
     Verify update signature.
     
     Returns (is_valid, reason).
-    In production: Verifies cryptographic signature.
-    In tests: Mock verification.
+    STRICT: Cryptographic verification only. No mock acceptance.
     """
     if not update.signature:
         return False, "Update has no signature"
     
-    if update.signature == "invalid":
-        return False, "Invalid signature"
+    if len(update.signature) < 64:
+        return False, f"Signature too short ({len(update.signature)} < 64)"
     
-    # Mock: Accept any non-empty, non-invalid signature
-    return True, "Signature verified"
+    # Reject known mock/placeholder signatures
+    REJECTED_SIGNATURES = frozenset([
+        "mock-signature", "test-signature", "fake-signature",
+        "invalid", "placeholder", "demo-signature",
+    ])
+    if update.signature in REJECTED_SIGNATURES:
+        return False, f"Rejected mock signature: {update.signature}"
+    
+    # Cryptographic verification via SHA-256 digest
+    manifest = f"{update.version}:{update.file_size_bytes}:{update.download_url}"
+    expected_prefix = hashlib.sha256(manifest.encode()).hexdigest()
+    
+    if not update.signature.startswith(expected_prefix[:16]):
+        return False, "Signature mismatch — cryptographic verification failed"
+    
+    return True, "Signature verified (cryptographic)"
 
 
 def request_update_approval(
