@@ -20,8 +20,8 @@ from impl_v1.phase49.governors.g06_autonomy_modes import (
 class TestEnumClosure:
     """Verify enums are closed."""
     
-    def test_autonomy_mode_4_members(self):
-        assert len(AutonomyMode) == 4
+    def test_autonomy_mode_3_members(self):
+        assert len(AutonomyMode) == 3
     
     def test_autonomy_action_8_members(self):
         assert len(AutonomyAction) == 8
@@ -53,12 +53,8 @@ class TestCreateSession:
     """Test session creation."""
     
     def test_session_has_id(self):
-        session = create_session(AutonomyMode.MOCK)
+        session = create_session(AutonomyMode.READ_ONLY)
         assert session.session_id.startswith("AUT-")
-    
-    def test_mock_mode_blocks_all(self):
-        session = create_session(AutonomyMode.MOCK)
-        assert len(session.actions_blocked) == len(AutonomyAction)
     
     def test_read_only_blocks_dangerous(self):
         session = create_session(AutonomyMode.READ_ONLY)
@@ -80,16 +76,16 @@ class TestCreateSession:
         assert session.expires_at is None
     
     def test_session_starts_active(self):
-        session = create_session(AutonomyMode.MOCK)
+        session = create_session(AutonomyMode.READ_ONLY)
         assert session.status == SessionStatus.ACTIVE
 
 
 class TestIsActionAllowed:
     """Test action permission checking."""
     
-    def test_mock_blocks_all(self):
-        session = create_session(AutonomyMode.MOCK)
-        allowed, reason = is_action_allowed(session, AutonomyAction.TARGET_ANALYSIS)
+    def test_read_only_blocks_exploit(self):
+        session = create_session(AutonomyMode.READ_ONLY)
+        allowed, reason = is_action_allowed(session, AutonomyAction.EXPLOIT)
         assert not allowed
         assert "BLOCKED" in reason
     
@@ -127,7 +123,7 @@ class TestSessionExpiry:
         assert status == SessionStatus.ACTIVE
     
     def test_stopped_stays_stopped(self):
-        session = create_session(AutonomyMode.MOCK)
+        session = create_session(AutonomyMode.READ_ONLY)
         stopped = stop_session(session)
         status = check_session_expiry(stopped)
         assert status == SessionStatus.STOPPED
@@ -156,6 +152,6 @@ class TestDataclassFrozen:
     """Verify dataclasses are frozen."""
     
     def test_session_frozen(self):
-        session = create_session(AutonomyMode.MOCK)
+        session = create_session(AutonomyMode.READ_ONLY)
         with pytest.raises(AttributeError):
             session.status = SessionStatus.STOPPED

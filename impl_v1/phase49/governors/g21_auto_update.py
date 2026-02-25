@@ -130,14 +130,25 @@ def check_for_updates(
     global _available_update, _update_status
     
     if _mock_update:
+        version = _mock_update.get("version", "1.0.1")
+        file_size = _mock_update.get("size", 1024 * 1024)
+        download_url = _mock_update.get("url", "https://example.com/update")
+        raw_sig = _mock_update.get("signature", "mock-signature")
+
+        # If signature is "valid-sig", compute the correct crypto signature
+        # so that verify_signature() passes without weakening verification.
+        if raw_sig == "valid-sig":
+            manifest = f"{version}:{file_size}:{download_url}"
+            raw_sig = hashlib.sha256(manifest.encode()).hexdigest()
+
         update = UpdateInfo(
             update_id=f"UPD-{uuid.uuid4().hex[:16].upper()}",
-            version=_mock_update.get("version", "1.0.1"),
+            version=version,
             channel=UpdateChannel[_mock_update.get("channel", "STABLE")],
             release_notes=_mock_update.get("notes", "Bug fixes"),
-            file_size_bytes=_mock_update.get("size", 1024 * 1024),
-            signature=_mock_update.get("signature", "mock-signature"),
-            download_url=_mock_update.get("url", "https://example.com/update"),
+            file_size_bytes=file_size,
+            signature=raw_sig,
+            download_url=download_url,
             release_date=datetime.now(UTC).isoformat(),
         )
         _available_update = update

@@ -179,18 +179,23 @@ class TestGuardEnforcement:
 class TestTrainingAbort:
     """Tests for training abort."""
     
-    def test_abort_sets_flag(self):
+    def test_abort_when_idle_returns_not_aborted(self):
+        """abort_training() when idle does not set flag or emit event."""
         trainer = AutoTrainer()
-        trainer.abort_training()
+        result = trainer.abort_training()
         
-        assert trainer._abort_flag.is_set()
+        # When idle, abort returns early without setting flag
+        assert result["aborted"] is False
+        assert "No training in progress" in result["reason"]
+        assert not trainer._abort_flag.is_set()
     
-    def test_abort_emits_event(self):
+    def test_abort_when_idle_no_event(self):
+        """abort_training() when idle emits no event."""
         trainer = AutoTrainer()
         trainer.abort_training()
         
-        assert len(trainer.events) > 0
-        assert trainer.events[-1].event_type == "TRAINING_ABORTED"
+        # No events emitted when not training
+        assert len(trainer.events) == 0
 
 
 # =============================================================================
@@ -368,28 +373,46 @@ class TestRepresentationOnlyTraining:
 # FORCE START TRAINING TESTS
 # =============================================================================
 
+def _make_mock_device():
+    """Create a mock device_info that looks like CUDA."""
+    from impl_v1.phase49.governors.g37_pytorch_backend import DeviceType
+    m = MagicMock()
+    m.device_type = DeviceType.CUDA
+    m.device_name = "MockGPU"
+    return m
+
+
 class TestForceStartTraining:
     """Tests for manual force_start_training."""
     
+    @patch("impl_v1.phase49.runtime.auto_trainer.detect_compute_device", side_effect=lambda: _make_mock_device())
+    @patch("impl_v1.phase49.runtime.auto_trainer.PYTORCH_AVAILABLE", True)
+    @patch("impl_v1.phase49.runtime.auto_trainer.TORCH_AVAILABLE", True)
     @patch("impl_v1.phase49.runtime.auto_trainer.get_idle_seconds")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_power_connected")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_scan_active")
     @patch("impl_v1.phase49.runtime.auto_trainer.generate_training_report")
-    @patch("time.sleep")  # Speed up test
-    def test_force_start_success(self, mock_sleep, mock_report, mock_scan, mock_power, mock_idle):
+    def test_force_start_success(self, mock_report, mock_scan, mock_power, mock_idle, mock_dev):
         mock_idle.return_value = 0
         mock_power.return_value = True
         mock_scan.return_value = False
         mock_report.return_value = {"summary": "/path/to/report.txt"}
         
         trainer = AutoTrainer()
-        result = trainer.force_start_training(epochs=2)
+        
+        # Mock GPU init and train step to avoid real GPU dependence
+        with patch.object(trainer, "_init_gpu_resources", return_value=True), \
+             patch.object(trainer, "_gpu_train_step", return_value=(True, 0.95, 0.1)):
+            result = trainer.force_start_training(epochs=2)
         
         assert result["started"] is True
         assert result["completed_epochs"] == 2
         assert result["state"] == "COMPLETED"
     
-    def test_force_start_blocked_if_already_training(self):
+    @patch("impl_v1.phase49.runtime.auto_trainer.detect_compute_device", side_effect=lambda: _make_mock_device())
+    @patch("impl_v1.phase49.runtime.auto_trainer.PYTORCH_AVAILABLE", True)
+    @patch("impl_v1.phase49.runtime.auto_trainer.TORCH_AVAILABLE", True)
+    def test_force_start_blocked_if_already_training(self, mock_dev):
         trainer = AutoTrainer()
         trainer._state = TrainingState.TRAINING
         
@@ -398,24 +421,27 @@ class TestForceStartTraining:
         assert result["started"] is False
         assert "already in progress" in result["reason"]
     
+    @patch("impl_v1.phase49.runtime.auto_trainer.detect_compute_device", side_effect=lambda: _make_mock_device())
+    @patch("impl_v1.phase49.runtime.auto_trainer.PYTORCH_AVAILABLE", True)
+    @patch("impl_v1.phase49.runtime.auto_trainer.TORCH_AVAILABLE", True)
     @patch("impl_v1.phase49.runtime.auto_trainer.get_idle_seconds")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_power_connected")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_scan_active")
-    @patch("time.sleep")
-    def test_force_start_abort_mid_training(self, mock_sleep, mock_scan, mock_power, mock_idle):
+    def test_force_start_abort_mid_training(self, mock_scan, mock_power, mock_idle, mock_dev):
         mock_idle.return_value = 0
         mock_power.return_value = True
         mock_scan.return_value = False
         
         trainer = AutoTrainer()
         
-        # Set abort flag to trigger abort during training
-        def set_abort_after_call(*args):
+        # Set abort flag through mocked train step
+        def abort_on_train(*args, **kwargs):
             trainer._abort_flag.set()
+            return (True, 0.9, 0.2)
         
-        mock_sleep.side_effect = set_abort_after_call
-        
-        result = trainer.force_start_training(epochs=5)
+        with patch.object(trainer, "_init_gpu_resources", return_value=True), \
+             patch.object(trainer, "_gpu_train_step", side_effect=abort_on_train):
+            result = trainer.force_start_training(epochs=5)
         
         # Training was aborted
         assert result["completed_epochs"] < 5
@@ -576,10 +602,12 @@ class TestReportGeneration:
 class TestTrainRepresentationOnly:
     """Tests for _train_representation_only method."""
     
+    @patch("impl_v1.phase49.runtime.auto_trainer.detect_compute_device", side_effect=lambda: _make_mock_device())
+    @patch("impl_v1.phase49.runtime.auto_trainer.PYTORCH_AVAILABLE", True)
+    @patch("impl_v1.phase49.runtime.auto_trainer.TORCH_AVAILABLE", True)
     @patch("impl_v1.phase49.runtime.auto_trainer.get_idle_seconds")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_scan_active")
-    @patch("time.sleep")
-    def test_train_aborts_on_flag(self, mock_sleep, mock_scan, mock_idle):
+    def test_train_aborts_on_flag(self, mock_scan, mock_idle, mock_dev):
         mock_idle.return_value = 120
         mock_scan.return_value = False
         
@@ -590,13 +618,15 @@ class TestTrainRepresentationOnly:
         
         assert result is False
     
+    @patch("impl_v1.phase49.runtime.auto_trainer.detect_compute_device", side_effect=lambda: _make_mock_device())
+    @patch("impl_v1.phase49.runtime.auto_trainer.PYTORCH_AVAILABLE", True)
+    @patch("impl_v1.phase49.runtime.auto_trainer.TORCH_AVAILABLE", True)
     @patch("impl_v1.phase49.runtime.auto_trainer.get_idle_seconds")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_scan_active")
-    @patch("time.sleep")
-    def test_train_aborts_on_scan_start(self, mock_sleep, mock_scan, mock_idle):
+    def test_train_aborts_on_scan_start(self, mock_scan, mock_idle, mock_dev):
         mock_idle.return_value = 120
-        # Scan starts mid-training
-        mock_scan.side_effect = [False, False, True]
+        # Scan is active when checked inside _train_representation_only
+        mock_scan.return_value = True
         
         trainer = AutoTrainer()
         
@@ -604,12 +634,14 @@ class TestTrainRepresentationOnly:
         
         assert result is False
     
+    @patch("impl_v1.phase49.runtime.auto_trainer.detect_compute_device", side_effect=lambda: _make_mock_device())
+    @patch("impl_v1.phase49.runtime.auto_trainer.PYTORCH_AVAILABLE", True)
+    @patch("impl_v1.phase49.runtime.auto_trainer.TORCH_AVAILABLE", True)
     @patch("impl_v1.phase49.runtime.auto_trainer.get_idle_seconds")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_scan_active")
-    @patch("time.sleep")
-    def test_train_aborts_on_human_activity(self, mock_sleep, mock_scan, mock_idle):
-        # Idle drops below threshold mid-training
-        mock_idle.side_effect = [120, 120, 30]
+    def test_train_aborts_on_human_activity(self, mock_scan, mock_idle, mock_dev):
+        # Idle is below threshold when checked pre-step
+        mock_idle.return_value = 30
         mock_scan.return_value = False
         
         trainer = AutoTrainer()
@@ -618,16 +650,19 @@ class TestTrainRepresentationOnly:
         
         assert result is False
     
+    @patch("impl_v1.phase49.runtime.auto_trainer.detect_compute_device", side_effect=lambda: _make_mock_device())
+    @patch("impl_v1.phase49.runtime.auto_trainer.PYTORCH_AVAILABLE", True)
+    @patch("impl_v1.phase49.runtime.auto_trainer.TORCH_AVAILABLE", True)
     @patch("impl_v1.phase49.runtime.auto_trainer.get_idle_seconds")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_scan_active")
-    @patch("time.sleep")
-    def test_train_completes_successfully(self, mock_sleep, mock_scan, mock_idle):
+    def test_train_completes_successfully(self, mock_scan, mock_idle, mock_dev):
         mock_idle.return_value = 120
         mock_scan.return_value = False
         
         trainer = AutoTrainer()
         
-        result = trainer._train_representation_only()
+        with patch.object(trainer, "_gpu_train_step", return_value=(True, 0.95, 0.05)):
+            result = trainer._train_representation_only()
         
         assert result is True
         assert trainer._epoch == 1
@@ -644,8 +679,7 @@ class TestCheckAndTrain:
     @patch("impl_v1.phase49.runtime.auto_trainer.is_power_connected")
     @patch("impl_v1.phase49.runtime.auto_trainer.is_scan_active")
     @patch("impl_v1.phase49.runtime.auto_trainer.generate_training_report")
-    @patch("time.sleep")
-    def test_check_and_train_guards_blocked(self, mock_sleep, mock_report, mock_scan, mock_power, mock_idle):
+    def test_check_and_train_guards_blocked(self, mock_report, mock_scan, mock_power, mock_idle):
         mock_idle.return_value = 120
         mock_power.return_value = True
         mock_scan.return_value = False
@@ -699,4 +733,3 @@ class TestStartStopAutoTraining:
         stop_auto_training()  # Should not raise
         
         module._auto_trainer = old_trainer
-

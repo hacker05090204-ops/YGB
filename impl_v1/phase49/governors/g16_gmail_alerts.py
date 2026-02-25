@@ -227,12 +227,56 @@ def send_alert(
         _sent_alerts.append(result)
         return result
     
-    # In real implementation, would use smtplib here
+    # Real SMTP path — send if SMTP_PASSWORD is configured
+    smtp_password = os.environ.get("SMTP_PASSWORD")
+    if smtp_password:
+        try:
+            import smtplib
+            from email.mime.text import MIMEText
+
+            msg = MIMEText(
+                f"[YGB Alert] {alert.alert_type.value}\n\n"
+                f"Title: {alert.title}\n"
+                f"Message: {alert.message}\n"
+                f"Device: {alert.device_id}\n"
+                f"Severity: {alert.severity.value}\n"
+                f"Time: {alert.created_at}\n"
+            )
+            msg["Subject"] = f"[YGB] {alert.title}"
+            msg["From"] = config.owner_email
+            msg["To"] = config.owner_email
+
+            server = smtplib.SMTP(config.smtp_server, config.smtp_port)
+            if config.use_tls:
+                server.starttls()
+            server.login(config.owner_email, smtp_password)
+            server.send_message(msg)
+            server.quit()
+
+            result = AlertSendResult(
+                result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
+                alert_id=alert.alert_id,
+                email_status=EmailStatus.SENT,
+                error_message=None,
+                timestamp=datetime.now(UTC).isoformat(),
+            )
+            _sent_alerts.append(result)
+            return result
+        except Exception as e:
+            return AlertSendResult(
+                result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
+                alert_id=alert.alert_id,
+                email_status=EmailStatus.FAILED,
+                error_message=str(e),
+                timestamp=datetime.now(UTC).isoformat(),
+            )
+
+    # SMTP not configured — safe fallback to PENDING (notification queued)
     return AlertSendResult(
         result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
         alert_id=alert.alert_id,
         email_status=EmailStatus.PENDING,
-        error_message="SMTP send requires SMTP_PASSWORD env var",
+        error_message=None,
         timestamp=datetime.now(UTC).isoformat(),
     )
 

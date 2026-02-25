@@ -34,7 +34,9 @@ from impl_v1.training.data.scaled_dataset import (
 # STRICT REAL MODE — BLOCKS SYNTHETIC DATA IN PRODUCTION
 # =============================================================================
 
-STRICT_REAL_MODE = False  # Set False when ingestion bridge not available
+import os as _os
+
+STRICT_REAL_MODE = _os.environ.get("YGB_STRICT_REAL_MODE", "true").lower() != "false"
 
 
 def _enforce_strict_real_mode(cls_name: str):

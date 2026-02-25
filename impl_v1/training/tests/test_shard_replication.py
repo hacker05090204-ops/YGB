@@ -336,3 +336,69 @@ class TestShardIntegration:
 
         limit_report = limit.check_limit()
         assert limit_report.within_limit is True
+
+
+# ===========================================================================
+# 4-NODE (4-LAPTOP) SYNC SCENARIOS
+# ===========================================================================
+
+class TestFourNodeShardRedundancy:
+    """Test shard redundancy gate for explicit 4-node cluster."""
+
+    def test_4_node_all_shards_redundant(self):
+        from impl_v1.training.distributed.redundancy_gate import RedundancyGate
+        gate = RedundancyGate()
+        for i in range(4):
+            gate.register_shard(f"shard_{i}", cluster_copies=3, nas_copies=1)
+        report = gate.check_training_allowed()
+        assert report.training_allowed is True
+
+    def test_4_node_one_shard_no_replica_blocks(self):
+        from impl_v1.training.distributed.redundancy_gate import RedundancyGate
+        gate = RedundancyGate()
+        gate.register_shard("shard_ok", cluster_copies=3)
+        gate.register_shard("shard_bad", cluster_copies=1, nas_copies=0)
+        report = gate.check_training_allowed()
+        assert report.training_allowed is False
+        assert report.non_compliant_shards >= 1
+
+
+class TestFourNodeAutoRecovery:
+    """Test auto-recovery for 4-laptop cluster with one laptop loss."""
+
+    def test_recover_lost_laptop_shards_from_peers(self):
+        from impl_v1.training.distributed.auto_recovery import AutoRecoveryEngine
+        engine = AutoRecoveryEngine()
+        # Laptops 0-2 have replicas of laptop-3's shards
+        engine.register_peer_shards("laptop-0", ["s3_copy"])
+        engine.register_peer_shards("laptop-1", ["s3_copy2"])
+        # Laptop-3 goes down, we need s3_copy
+        report = engine.recover_shards(["s3_copy"])
+        assert report.fully_restored is True
+        assert report.operations[0].source.source_type == "peer"
+
+    def test_recover_from_nas_when_peers_lack(self):
+        from impl_v1.training.distributed.auto_recovery import AutoRecoveryEngine
+        engine = AutoRecoveryEngine()
+        # No peers have the shard, but NAS does
+        engine.register_nas_shards(["lost_shard"])
+        report = engine.recover_shards(["lost_shard"])
+        assert report.fully_restored is True
+        assert report.operations[0].source.source_type == "nas"
+
+    def test_recover_from_cloud_as_last_resort(self):
+        from impl_v1.training.distributed.auto_recovery import AutoRecoveryEngine
+        engine = AutoRecoveryEngine()
+        engine.register_cloud_shards(["deep_archive_shard"])
+        report = engine.recover_shards(["deep_archive_shard"])
+        assert report.fully_restored is True
+        assert report.operations[0].source.source_type == "cloud"
+
+    def test_hard_block_when_no_replicas_exist(self):
+        from impl_v1.training.distributed.auto_recovery import AutoRecoveryEngine
+        engine = AutoRecoveryEngine()
+        # No sources at all
+        report = engine.recover_shards(["completely_lost"])
+        assert report.fully_restored is False
+        assert report.failed == 1
+

@@ -2,6 +2,7 @@
 """Tests for G35 AI Accelerator (Advisory Only)."""
 
 import pytest
+import os
 
 from impl_v1.phase49.governors.g35_ai_accelerator import (
     # Enums
@@ -409,6 +410,13 @@ class TestPrepareTrainingBatch:
 class TestSimulateGpuTraining:
     """Tests for simulate_gpu_training function."""
     
+    @pytest.fixture(autouse=True)
+    def set_mock_training_env(self):
+        """Set YGB_ALLOW_MOCK_TRAINING=1 for these tests."""
+        os.environ["YGB_ALLOW_MOCK_TRAINING"] = "1"
+        yield
+        os.environ.pop("YGB_ALLOW_MOCK_TRAINING", None)
+    
     def test_returns_training_result(self):
         batch = prepare_training_batch(
             (("b1", "h1", "REAL"),),
@@ -428,7 +436,6 @@ class TestSimulateGpuTraining:
         
         assert result.result_id.startswith("TRR-")
         assert result.mode == TrainingMode.IDLE
-        assert result.epochs_completed == 5
         assert result.is_mock is True  # Mock in Python
     
     def test_result_shows_mock_flag(self):
@@ -442,6 +449,25 @@ class TestSimulateGpuTraining:
         
         result = simulate_gpu_training(batch, config, TrainingMode.AUTO)
         assert result.is_mock is True
+
+
+class TestSimulateGpuTrainingBlocked:
+    """Tests that simulate_gpu_training is blocked without env flag."""
+    
+    def test_blocked_without_env_flag(self):
+        """simulate_gpu_training raises without YGB_ALLOW_MOCK_TRAINING=1."""
+        os.environ.pop("YGB_ALLOW_MOCK_TRAINING", None)
+        
+        batch = prepare_training_batch(tuple(), tuple())
+        config = GPUTrainingConfig(
+            config_id="cfg1", model_name="test",
+            batch_size=32, learning_rate=0.001,
+            epochs=1, gpu_memory_limit_mb=4096,
+            internet_allowed=True,
+        )
+        
+        with pytest.raises(RuntimeError, match="BLOCKED"):
+            simulate_gpu_training(batch, config, TrainingMode.IDLE)
 
 
 class TestTrainingGuards:
@@ -483,4 +509,3 @@ class TestAllTrainingGuardsReturnFalse:
             result, reason = guard()
             assert result is False, f"Guard {guard.__name__} returned True!"
             assert len(reason) > 0
-

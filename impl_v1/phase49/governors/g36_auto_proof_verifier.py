@@ -150,7 +150,7 @@ def is_scanner_noise(finding_text: str) -> Tuple[bool, str]:
     """
     text_lower = finding_text.lower()
     
-    for pattern in SCANNER_NOISE_PATTERNS:
+    for pattern in sorted(SCANNER_NOISE_PATTERNS, key=len, reverse=True):
         if pattern in text_lower:
             return True, f"Scanner noise: {pattern}"
     

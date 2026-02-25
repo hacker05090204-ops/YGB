@@ -325,5 +325,139 @@ class TestShardAllocation(unittest.TestCase):
         self.assertAlmostEqual(auth.state.shard_proportions["n2"], 0.4)
 
 
+class TestFourNodeCluster(unittest.TestCase):
+    """Explicit 4-laptop cluster tests for world_size=4."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.state_path = os.path.join(self.tmp, 'state.json')
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_register_4_nodes(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        self.assertEqual(len(auth.state.active_nodes), 4)
+
+    def test_lock_world_size_4(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        auth.lock_world_size(4)
+        self.assertTrue(auth.state.world_size_locked)
+        self.assertEqual(auth.state.world_size, 4)
+
+    def test_quorum_requires_all_4_nodes(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        auth.lock_world_size(4)
+        # All 4 present
+        result = auth.validate_quorum([f"laptop-{i}" for i in range(4)])
+        self.assertTrue(result['valid'])
+        self.assertEqual(len(result['missing']), 0)
+
+    def test_one_node_loss_detected(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        auth.lock_world_size(4)
+        # Only 3 present — quorum fails because 1 node missing
+        result = auth.validate_quorum([f"laptop-{i}" for i in range(3)])
+        self.assertFalse(result['valid'])
+        self.assertEqual(len(result['missing']), 1)
+        self.assertIn("laptop-3", result['missing'])
+
+    def test_reject_5th_node_when_locked_to_4(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        auth.lock_world_size(4)
+        ok = auth.register_node(make_node("laptop-extra", rank=4))
+        self.assertFalse(ok)
+
+    def test_shard_allocation_4_nodes(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        auth.allocate_shards({
+            "laptop-0": 0.25, "laptop-1": 0.25,
+            "laptop-2": 0.25, "laptop-3": 0.25,
+        })
+        for i in range(4):
+            self.assertAlmostEqual(
+                auth.state.shard_proportions[f"laptop-{i}"], 0.25
+            )
+
+    def test_4_node_epoch_cycle(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i, baseline_sps=10000))
+        auth.lock_world_size(4)
+        auth.start_training()
+        auth.complete_epoch(
+            epoch=1,
+            merged_weight_hash="wh_4node_e1",
+            cluster_sps=36000.0,
+            per_node_sps={f"laptop-{i}": 9000 for i in range(4)},
+            baseline_sum=40000.0,
+        )
+        self.assertEqual(auth.state.epoch_number, 1)
+        self.assertGreater(auth.state.scaling_efficiency, 0.5)
+
+    def test_4_node_report_shows_all(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i, device_type="cuda"))
+        auth.lock_world_size(4)
+        auth.lock_dataset("dhash_4node")
+        auth.start_training()
+        report = auth.get_final_report()
+        self.assertEqual(report['world_size'], 4)
+        self.assertEqual(report['cuda_nodes'], 4)
+
+
+class TestFourNodeRecoveryScenarios(unittest.TestCase):
+    """Test data loss resilience for 4-laptop cluster."""
+
+    def setUp(self):
+        self.tmp = tempfile.mkdtemp()
+        self.state_path = os.path.join(self.tmp, 'state.json')
+
+    def tearDown(self):
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def test_restart_from_checkpoint_4_nodes(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        auth.lock_world_size(4)
+        auth.start_training()
+        auth.complete_epoch(
+            1, "wh1", 36000,
+            {f"laptop-{i}": 9000 for i in range(4)},
+            40000, "ckpt-e1-4node"
+        )
+        ok, msg = auth.restart_from_state()
+        self.assertTrue(ok)
+        self.assertIn("epoch 2", msg)
+
+    def test_restart_without_checkpoint_blocks(self):
+        auth = ClusterAuthority(state_path=self.state_path)
+        for i in range(4):
+            auth.register_node(make_node(f"laptop-{i}", rank=i))
+        auth.lock_world_size(4)
+        auth.start_training()
+        auth.complete_epoch(
+            1, "wh1", 36000,
+            {f"laptop-{i}": 9000 for i in range(4)},
+            40000  # no checkpoint
+        )
+        ok, msg = auth.restart_from_state()
+        self.assertFalse(ok)
+
+
 if __name__ == '__main__':
     unittest.main()

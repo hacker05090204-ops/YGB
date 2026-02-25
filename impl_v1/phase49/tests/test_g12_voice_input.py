@@ -14,8 +14,8 @@ from impl_v1.phase49.governors.g12_voice_input import (
 
 
 class TestEnumClosure:
-    def test_voice_intent_type_8_members(self):
-        assert len(VoiceIntentType) == 8
+    def test_voice_intent_type_11_members(self):
+        assert len(VoiceIntentType) == 11
     
     def test_voice_input_status_4_members(self):
         assert len(VoiceInputStatus) == 4

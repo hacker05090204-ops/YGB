@@ -117,8 +117,9 @@ class TestVerifyPassword:
         clear_verification_store()
     
     def test_valid_password_verifies(self):
-        _, verification = generate_verification_password()
-        verified, reason = verify_password(verification.password_id, "test-password")
+        """verify_password must use actual generated plaintext."""
+        plaintext, verification = generate_verification_password()
+        verified, reason = verify_password(verification.password_id, plaintext)
         assert verified == True
     
     def test_invalid_id_fails(self):
@@ -130,6 +131,13 @@ class TestVerifyPassword:
         _, verification = generate_verification_password()
         verified, reason = verify_password(verification.password_id, "")
         assert verified == False
+    
+    def test_wrong_password_fails(self):
+        """Passing wrong plaintext must fail hash comparison."""
+        _, verification = generate_verification_password()
+        verified, reason = verify_password(verification.password_id, "wrong-password")
+        assert verified == False
+        assert "Invalid password" in reason
 
 
 class TestIsPasswordExpired:
@@ -159,30 +167,31 @@ class TestSendAlert:
         clear_alerts()
     
     def test_send_new_device_alert(self):
+        """Default send path returns PENDING (no SMTP creds)."""
         result = send_new_device_alert("device-123", "192.168.1.1")
         assert isinstance(result, AlertSendResult)
-        assert result.email_status == EmailStatus.SENT
+        assert result.email_status == EmailStatus.PENDING
     
     def test_send_new_ip_alert(self):
         result = send_new_ip_alert("device-123", "192.168.1.1", "10.0.0.1")
-        assert result.email_status == EmailStatus.SENT
+        assert result.email_status == EmailStatus.PENDING
     
     def test_send_geo_mismatch_alert(self):
         result = send_geo_mismatch_alert("device-123", "US", "RU")
-        assert result.email_status == EmailStatus.SENT
+        assert result.email_status == EmailStatus.PENDING
     
     def test_send_license_violation_alert(self):
         result = send_license_violation_alert("device-123", "Invalid license key")
-        assert result.email_status == EmailStatus.SENT
+        assert result.email_status == EmailStatus.PENDING
     
     def test_send_risk_escalation_alert(self):
         result = send_risk_escalation_alert("device-123", "HIGH", "Unusual activity")
-        assert result.email_status == EmailStatus.SENT
+        assert result.email_status == EmailStatus.PENDING
     
-    def test_alerts_are_recorded(self):
-        send_new_device_alert("test", "127.0.0.1")
-        alerts = get_sent_alerts()
-        assert len(alerts) >= 1
+    def test_alerts_have_result_id(self):
+        """All alert results have a valid result_id."""
+        result = send_new_device_alert("test", "127.0.0.1")
+        assert result.result_id.startswith("SND-")
 
 
 class TestCanEmailApproveExecution:

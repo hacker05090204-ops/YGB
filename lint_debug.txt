@@ -1,0 +1,12 @@
+TypeError: Error while loading rule 'react/display-name': contextOrFilename.getFilename is not a function
+Occurred while linting C:\Users\Unkno\YGB\frontend\test.ts
+    at resolveBasedir (C:\Users\Unkno\YGB\frontend\node_modules\eslint-config-next\node_modules\eslint-plugin-react\lib\util\version.js:31:100)
+    at detectReactVersion (C:\Users\Unkno\YGB\frontend\node_modules\eslint-config-next\node_modules\eslint-plugin-react\lib\util\version.js:85:19)
+    at getReactVersionFromContext (C:\Users\Unkno\YGB\frontend\node_modules\eslint-config-next\node_modules\eslint-plugin-react\lib\util\version.js:116:25)
+    at testReactVersion (C:\Users\Unkno\YGB\frontend\node_modules\eslint-config-next\node_modules\eslint-plugin-react\lib\util\version.js:181:28)
+    at usedPropTypesInstructions (C:\Users\Unkno\YGB\frontend\node_modules\eslint-config-next\node_modules\eslint-plugin-react\lib\util\usedPropTypes.js:307:36)
+    at Components.componentRule (C:\Users\Unkno\YGB\frontend\node_modules\eslint-config-next\node_modules\eslint-plugin-react\lib\util\Components.js:940:37)
+    at createRuleListeners (C:\Users\Unkno\YGB\frontend\node_modules\eslint\lib\linter\linter.js:497:15)
+    at C:\Users\Unkno\YGB\frontend\node_modules\eslint\lib\linter\linter.js:623:7
+    at Array.forEach (<anonymous>)
+    at runRules (C:\Users\Unkno\YGB\frontend\node_modules\eslint\lib\linter\linter.js:557:31)

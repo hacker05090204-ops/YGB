@@ -201,6 +201,7 @@ class TestEvidenceCaptureEngine:
                 source_url="https://example.com",
                 width=1920,
                 height=1080,
+                data=b"DETERMINISTIC_TEST_PNG",
             )
             
             assert screenshot.width == 1920
@@ -323,7 +324,7 @@ class TestEvidenceCaptureEngine:
             session_id, engine = create_evidence_session(tmpdir)
             
             # Capture various evidence
-            engine.capture_screenshot("https://example.com")
+            engine.capture_screenshot("https://example.com", data=b"BUNDLE_TEST_PNG")
             engine.capture_video("https://example.com", 5.0)
             engine.capture_dom_snapshot("https://example.com", "<html></html>")
             engine.capture_network_metadata(
@@ -353,7 +354,7 @@ class TestEvidenceIntegrity:
         with tempfile.TemporaryDirectory() as tmpdir:
             session_id, engine = create_evidence_session(tmpdir)
             
-            engine.capture_screenshot("https://example.com")
+            engine.capture_screenshot("https://example.com", data=b"INTEGRITY_TEST_PNG")
             bundle = engine.finalize_bundle()
             
             assert verify_evidence_integrity(bundle) is True
@@ -493,8 +494,8 @@ class TestPoCTimeline:
         """Build timeline from evidence bundle."""
         with tempfile.TemporaryDirectory() as tmpdir:
             session_id, engine = create_evidence_session(tmpdir)
-            engine.capture_screenshot("https://example.com")
-            engine.capture_screenshot("https://example.com/login")
+            engine.capture_screenshot("https://example.com", data=b"TIMELINE_STEP_1")
+            engine.capture_screenshot("https://example.com/login", data=b"TIMELINE_STEP_2")
             bundle = engine.finalize_bundle()
             
             timeline = build_poc_timeline(
@@ -511,7 +512,7 @@ class TestPoCTimeline:
         """Timeline has determinism hash."""
         with tempfile.TemporaryDirectory() as tmpdir:
             session_id, engine = create_evidence_session(tmpdir)
-            engine.capture_screenshot("https://example.com")
+            engine.capture_screenshot("https://example.com", data=b"HASH_TEST_PNG")
             bundle = engine.finalize_bundle()
             
             timeline = build_poc_timeline(bundle, ("Step 1",))
@@ -535,7 +536,7 @@ class TestPoCVideoOutput:
         """Generate video output structure."""
         with tempfile.TemporaryDirectory() as tmpdir:
             session_id, engine = create_evidence_session(tmpdir)
-            engine.capture_screenshot("https://example.com")
+            engine.capture_screenshot("https://example.com", data=b"VID_OUTPUT_PNG")
             bundle = engine.finalize_bundle()
             
             timeline = build_poc_timeline(bundle, ("Navigate", "Execute"))

@@ -51,31 +51,33 @@ class TestWsAuthenticateUnit(unittest.TestCase):
         self.assertIsNone(result)
 
     def test_returns_none_invalid_token(self):
-        """ws_authenticate returns None for invalid JWT."""
+        """ws_authenticate returns None for invalid JWT via protocol header."""
         from backend.auth.auth_guard import ws_authenticate
 
         mock_ws = MagicMock()
-        mock_ws.query_params = {"token": "invalid.jwt.garbage"}
-        mock_ws.headers = {}
+        mock_ws.query_params = {}
+        mock_ws.headers = {"sec-websocket-protocol": "bearer.invalid.jwt.garbage"}
 
         result = _run(ws_authenticate(mock_ws))
         self.assertIsNone(result)
 
     def test_returns_payload_valid_token(self):
-        """ws_authenticate returns payload for valid token."""
+        """ws_authenticate returns payload for valid token via protocol header."""
         from backend.auth.auth_guard import ws_authenticate
+        from backend.auth.revocation_store import reset_store
 
+        reset_store()
         token = _valid_token()
         mock_ws = MagicMock()
-        mock_ws.query_params = {"token": token}
-        mock_ws.headers = {}
+        mock_ws.query_params = {}
+        mock_ws.headers = {"sec-websocket-protocol": f"bearer.{token}"}
 
         result = _run(ws_authenticate(mock_ws))
         self.assertIsNotNone(result)
         self.assertEqual(result["sub"], "ws-test-user")
 
     def test_rejects_revoked_token(self):
-        """ws_authenticate returns None for revoked token."""
+        """ws_authenticate returns None for revoked token via protocol header."""
         from backend.auth.auth_guard import ws_authenticate
         from backend.auth.revocation_store import revoke_token, reset_store
 
@@ -84,8 +86,8 @@ class TestWsAuthenticateUnit(unittest.TestCase):
         revoke_token(token)
 
         mock_ws = MagicMock()
-        mock_ws.query_params = {"token": token}
-        mock_ws.headers = {}
+        mock_ws.query_params = {}
+        mock_ws.headers = {"sec-websocket-protocol": f"bearer.{token}"}
 
         result = _run(ws_authenticate(mock_ws))
         self.assertIsNone(result)
@@ -104,6 +106,20 @@ class TestWsAuthenticateUnit(unittest.TestCase):
         result = _run(ws_authenticate(mock_ws))
         self.assertIsNotNone(result)
         self.assertEqual(result["sub"], "ws-test-user")
+
+    def test_rejects_query_param_token(self):
+        """ws_authenticate rejects valid token passed via query param."""
+        from backend.auth.auth_guard import ws_authenticate
+        from backend.auth.revocation_store import reset_store
+
+        reset_store()
+        token = _valid_token()
+        mock_ws = MagicMock()
+        mock_ws.query_params = {"token": token}
+        mock_ws.headers = {}
+
+        result = _run(ws_authenticate(mock_ws))
+        self.assertIsNone(result)
 
 
 if __name__ == "__main__":
