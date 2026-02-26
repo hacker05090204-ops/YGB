@@ -3,19 +3,19 @@
     {
       "event_type": "leader_lost",
       "node_id": "n1",
-      "detected_at": "2026-02-25T14:11:23.781761",
+      "detected_at": "2026-02-26T06:13:56.877829",
       "action_taken": "election_triggered"
     },
     {
       "event_type": "all_offline",
       "node_id": "",
-      "detected_at": "2026-02-25T14:11:23.781761",
+      "detected_at": "2026-02-26T06:13:56.877829",
       "action_taken": "cluster_halted"
     },
     {
       "event_type": "all_offline",
       "node_id": "",
-      "detected_at": "2026-02-25T14:11:23.782408",
+      "detected_at": "2026-02-26T06:13:56.878458",
       "action_taken": "cluster_halted"
     }
   ],
@@ -23,5 +23,5 @@
   "state_preserved": true,
   "new_leader": "",
   "training_continued": false,
-  "timestamp": "2026-02-25T14:11:23.782408"
+  "timestamp": "2026-02-26T06:13:56.878458"
 }

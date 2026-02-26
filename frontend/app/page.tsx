@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import Link from "next/link"
+import { createAuthWebSocket } from "@/lib/ws-auth"
 import {
   CheckCircle,
   XCircle,
@@ -184,53 +185,58 @@ export default function Home() {
       const data = await res.json()
 
       // Connect WebSocket for real-time updates
-      const ws = new WebSocket(`ws://localhost:8000/ws/bounty/${data.report_id}`)
+      const ws = createAuthWebSocket(
+        `/ws/bounty/${data.report_id}`,
+        (e) => {
+          const msg = JSON.parse(e.data)
+
+          if (msg.type === "workflow_start") {
+            setPhases(prev => [...prev, { type: "start", ...msg }])
+          }
+          else if (msg.type === "phase_start") {
+            setCurrentPhase(msg.phase || 0)
+            setProgress(msg.progress || 0)
+            setPhases(prev => [...prev, { type: "phase_start", ...msg }])
+          }
+          else if (msg.type === "phase_complete") {
+            setPhases(prev => [...prev, { type: "phase_complete", ...msg }])
+          }
+          else if (msg.type === "browser_action") {
+            setBrowserActions(prev => [...prev, msg])
+          }
+          else if (msg.type === "finding") {
+            setFindings(prev => [...prev, msg])
+          }
+          else if (msg.type === "workflow_complete") {
+            setProgress(100)
+            setPhases(prev => [...prev, { type: "complete", ...msg }])
+          }
+          else if (msg.type === "complete") {
+            setResult(msg.result)
+            setIsRunning(false)
+            ws?.close()
+          }
+          else if (msg.error) {
+            setError(msg.error)
+            setIsRunning(false)
+            ws?.close()
+          }
+        },
+        () => {
+          setError("WebSocket connection failed")
+          setIsRunning(false)
+        },
+        () => {
+          setIsRunning(false)
+        }
+      )
+
+      if (!ws) {
+        setError("Authentication required for live updates")
+        setIsRunning(false)
+        return
+      }
       wsRef.current = ws
-
-      ws.onmessage = (e) => {
-        const msg = JSON.parse(e.data)
-
-        if (msg.type === "workflow_start") {
-          setPhases(prev => [...prev, { type: "start", ...msg }])
-        }
-        else if (msg.type === "phase_start") {
-          setCurrentPhase(msg.phase || 0)
-          setProgress(msg.progress || 0)
-          setPhases(prev => [...prev, { type: "phase_start", ...msg }])
-        }
-        else if (msg.type === "phase_complete") {
-          setPhases(prev => [...prev, { type: "phase_complete", ...msg }])
-        }
-        else if (msg.type === "browser_action") {
-          setBrowserActions(prev => [...prev, msg])
-        }
-        else if (msg.type === "finding") {
-          setFindings(prev => [...prev, msg])
-        }
-        else if (msg.type === "workflow_complete") {
-          setProgress(100)
-          setPhases(prev => [...prev, { type: "complete", ...msg }])
-        }
-        else if (msg.type === "complete") {
-          setResult(msg.result)
-          setIsRunning(false)
-          ws.close()
-        }
-        else if (msg.error) {
-          setError(msg.error)
-          setIsRunning(false)
-          ws.close()
-        }
-      }
-
-      ws.onerror = () => {
-        setError("WebSocket connection failed")
-        setIsRunning(false)
-      }
-
-      ws.onclose = () => {
-        setIsRunning(false)
-      }
 
     } catch (err: any) {
       setError(err.message)

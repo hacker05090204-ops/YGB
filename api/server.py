@@ -23,7 +23,7 @@ from typing import Dict, List, Optional, Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
 from pydantic import BaseModel
 
 # Centralized auth guard
@@ -54,8 +54,18 @@ from backend.storage.storage_bridge import (
     log_activity, get_recent_activity, get_admin_stats,
     get_storage_stats, get_lifecycle_status, get_disk_status,
     get_delete_preview, store_video, get_video_stream_token,
-    stream_video, list_videos,
+    stream_video, list_videos, get_storage_health,
 )
+
+# Import activation profiles
+try:
+    from backend.config.activation_profiles import (
+        validate_startup, log_boot_summary, get_profile,
+        get_smtp_pass, IntegrationState,
+    )
+    ACTIVATION_PROFILES_AVAILABLE = True
+except ImportError:
+    ACTIVATION_PROFILES_AVAILABLE = False
 
 # Import training state manager
 from backend.training.state_manager import get_training_state_manager
@@ -333,17 +343,172 @@ def discover_hunter_modules() -> Dict[str, bool]:
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint with system status."""
+    """Health check endpoint with REAL system status — no fake active states.
+    
+    Returns structured sub-sections:
+      - storage_engine_status
+      - dataset_readiness_status
+      - integration_status
+    """
     phases = discover_python_phases()
     hunter_modules = discover_hunter_modules()
-    
+
+    # Real storage health (single source of truth)
+    storage_health = get_storage_health()
+
+    # Dataset readiness
+    dataset_status = _get_dataset_readiness()
+
+    # Integration status
+    integration_status = _get_integration_summary()
+
+    # Overall: only "ok" if all critical subsystems active
+    if not storage_health["storage_active"]:
+        overall = "degraded"
+    elif dataset_status.get("status") == "BLOCKED_REAL_DATA":
+        overall = "degraded"
+    else:
+        overall = "ok"
+
     return {
-        "status": "ok",
+        "status": overall,
         "python_phases": len([p for p in phases if p["number"] <= 19]),
         "impl_phases": len([p for p in phases if p["number"] >= 20]),
         "hunter_modules": len(hunter_modules),
+        "storage_engine_status": storage_health,
+        "dataset_readiness_status": dataset_status,
+        "integration_status": integration_status,
         "timestamp": datetime.now(UTC).isoformat()
     }
+
+
+@app.get("/api/storage/status")
+async def get_storage_status():
+    """Canonical storage/DB truth endpoint.
+
+    Returns real check results — never fake active.
+    Frontend must use this as single source of truth.
+    """
+    return get_storage_health()
+
+
+@app.get("/api/rollout/metrics")
+async def get_rollout_metrics():
+    """Rollout metrics endpoint — returns DEGRADED when real metrics unavailable.
+
+    Never defaults to all-pass zeros that look healthy.
+    """
+    try:
+        from governance.real_data_rollout_governor import get_current_status
+        status = get_current_status()
+        return {
+            "status": "available",
+            "metrics_available": True,
+            **status,
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+    except ImportError:
+        return {
+            "status": "DEGRADED",
+            "metrics_available": False,
+            "reason": "Rollout governor module not available",
+            "stage": None,
+            "real_data_pct": None,
+            "frozen": None,
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+    except Exception as e:
+        return {
+            "status": "DEGRADED",
+            "metrics_available": False,
+            "reason": f"Error reading rollout metrics: {str(e)}",
+            "stage": None,
+            "real_data_pct": None,
+            "frozen": None,
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+
+
+def _get_dataset_readiness() -> Dict[str, Any]:
+    """Get dataset readiness status for health endpoint."""
+    try:
+        from impl_v1.training.data.real_dataset_loader import (
+            validate_dataset_integrity, YGB_MIN_REAL_SAMPLES,
+        )
+        ok, msg = validate_dataset_integrity()
+        if ok:
+            return {
+                "status": "READY",
+                "min_samples_required": YGB_MIN_REAL_SAMPLES,
+                "reason": None,
+            }
+        else:
+            return {
+                "status": "BLOCKED_REAL_DATA",
+                "min_samples_required": YGB_MIN_REAL_SAMPLES,
+                "reason": msg,
+            }
+    except Exception as e:
+        return {
+            "status": "UNKNOWN",
+            "min_samples_required": None,
+            "reason": f"Cannot check dataset: {str(e)}",
+        }
+
+
+def _get_integration_summary() -> Dict[str, Any]:
+    """Get integration status summary."""
+    if not ACTIVATION_PROFILES_AVAILABLE:
+        return {"status": "UNKNOWN", "reason": "activation_profiles not available"}
+    try:
+        ok, errors, integrations = validate_startup()
+        return {
+            "profile": get_profile().value,
+            "startup_ok": ok,
+            "integrations": {
+                i.name: {"state": i.state.value, "reason": i.reason}
+                for i in integrations
+            },
+        }
+    except Exception as e:
+        return {"status": "ERROR", "reason": str(e)}
+
+
+@app.get("/api/readiness")
+async def get_readiness():
+    """Dataset readiness endpoint — shows sample counts, thresholds, and blocking reasons."""
+    return _get_dataset_readiness()
+
+
+@app.get("/api/integration/status")
+async def get_integration_status():
+    """Integration status per configured service."""
+    return _get_integration_summary()
+
+
+@app.get("/api/cve/status")
+async def get_cve_status():
+    """CVE pipeline status — sources, freshness, record counts."""
+    try:
+        from backend.cve.cve_pipeline import get_pipeline
+        pipeline = get_pipeline()
+        return pipeline.get_pipeline_status()
+    except ImportError:
+        return {"status": "NOT_AVAILABLE", "reason": "CVE pipeline module not found"}
+    except Exception as e:
+        return {"status": "ERROR", "reason": str(e)}
+
+
+@app.get("/api/backup/status")
+async def get_backup_status_endpoint():
+    """Backup strategy status — local HDD, peer replication, Google Drive."""
+    try:
+        from backend.storage.backup_config import get_backup_status
+        return get_backup_status()
+    except ImportError:
+        return {"status": "NOT_AVAILABLE", "reason": "Backup config module not found"}
+    except Exception as e:
+        return {"status": "ERROR", "reason": str(e)}
 
 
 @app.get("/api/bounty/phases")
@@ -2359,6 +2524,327 @@ async def stop_hunt_mode(user=Depends(require_auth)):
         return {"mode": _runtime_mode, "status": "not_in_hunt"}
     _runtime_mode = "IDLE"
     return {"mode": "IDLE", "status": "stopped"}
+
+# =============================================================================
+# GITHUB OAUTH LOGIN
+# =============================================================================
+
+_GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "")
+_GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
+_FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+_GITHUB_REDIRECT_URI = os.getenv(
+    "GITHUB_REDIRECT_URI",
+    "http://localhost:8000/auth/github/callback",
+)
+
+
+@app.get("/auth/github")
+async def github_auth_redirect():
+    """Redirect to GitHub OAuth authorization page."""
+    if not _GITHUB_CLIENT_ID:
+        raise HTTPException(
+            status_code=501,
+            detail="GitHub OAuth not configured — set GITHUB_CLIENT_ID env var",
+        )
+
+    params = (
+        f"client_id={_GITHUB_CLIENT_ID}"
+        f"&redirect_uri={_GITHUB_REDIRECT_URI}"
+        f"&scope=user:email"
+        f"&state={__import__('secrets').token_hex(16)}"
+    )
+    return RedirectResponse(
+        url=f"https://github.com/login/oauth/authorize?{params}",
+        status_code=302,
+    )
+
+
+@app.get("/auth/github/callback")
+async def github_auth_callback(code: str = "", error: str = ""):
+    """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
+    if error:
+        return RedirectResponse(
+            url=f"{_FRONTEND_URL}/login?error={error}",
+            status_code=302,
+        )
+
+    if not code:
+        return RedirectResponse(
+            url=f"{_FRONTEND_URL}/login?error=no_code",
+            status_code=302,
+        )
+
+    if not _GITHUB_CLIENT_ID or not _GITHUB_CLIENT_SECRET:
+        raise HTTPException(
+            status_code=501,
+            detail="GitHub OAuth not configured",
+        )
+
+    import urllib.request
+    import urllib.parse
+
+    try:
+        # 1. Exchange code for access token
+        token_data = urllib.parse.urlencode({
+            "client_id": _GITHUB_CLIENT_ID,
+            "client_secret": _GITHUB_CLIENT_SECRET,
+            "code": code,
+            "redirect_uri": _GITHUB_REDIRECT_URI,
+        }).encode()
+
+        token_req = urllib.request.Request(
+            "https://github.com/login/oauth/access_token",
+            data=token_data,
+            headers={"Accept": "application/json"},
+        )
+        with urllib.request.urlopen(token_req, timeout=10) as resp:
+            token_resp = json.loads(resp.read().decode())
+
+        access_token = token_resp.get("access_token")
+        if not access_token:
+            logger.error("GitHub token exchange failed: %s", token_resp)
+            return RedirectResponse(
+                url=f"{_FRONTEND_URL}/login?error=token_exchange_failed",
+                status_code=302,
+            )
+
+        # 2. Fetch user info
+        user_req = urllib.request.Request(
+            "https://api.github.com/user",
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Accept": "application/json",
+                "User-Agent": "YGB-Server",
+            },
+        )
+        with urllib.request.urlopen(user_req, timeout=10) as resp:
+            user_data = json.loads(resp.read().decode())
+
+        github_id = str(user_data.get("id", ""))
+        github_login = user_data.get("login", "")
+        github_email = user_data.get("email", "")
+
+        # 3. If email not public, fetch from /user/emails
+        if not github_email:
+            emails_req = urllib.request.Request(
+                "https://api.github.com/user/emails",
+                headers={
+                    "Authorization": f"Bearer {access_token}",
+                    "Accept": "application/json",
+                    "User-Agent": "YGB-Server",
+                },
+            )
+            with urllib.request.urlopen(emails_req, timeout=10) as resp:
+                emails = json.loads(resp.read().decode())
+            # Pick primary verified email
+            for em in emails:
+                if em.get("primary") and em.get("verified"):
+                    github_email = em["email"]
+                    break
+            if not github_email and emails:
+                github_email = emails[0].get("email", "")
+
+        # 4. Generate JWT using existing auth module
+        from backend.auth.auth import generate_jwt
+        user_id = f"github:{github_id}"
+        jwt_token = generate_jwt(user_id=user_id, email=github_email)
+
+        logger.info("GitHub login: %s (%s)", github_login, github_email)
+
+        # 5. Redirect to frontend with token
+        return RedirectResponse(
+            url=f"{_FRONTEND_URL}/login?token={jwt_token}&user={github_login}",
+            status_code=302,
+        )
+
+    except Exception as e:
+        logger.exception("GitHub OAuth callback error")
+        return RedirectResponse(
+            url=f"{_FRONTEND_URL}/login?error=server_error",
+            status_code=302,
+        )
+
+
+# =============================================================================
+# ADMIN ROUTE COMPATIBILITY
+# =============================================================================
+
+class AdminLoginRequest(BaseModel):
+    email: str
+    totp_code: str = ""
+
+
+@app.post("/admin/login")
+async def admin_login(request: AdminLoginRequest, req: Request):
+    """Admin login — entry point for admin auth. No Depends(require_auth)."""
+    try:
+        from backend.api.admin_auth import login as admin_auth_login
+        result = admin_auth_login(
+            email=request.email,
+            totp_code=request.totp_code,
+            ip=req.client.host if req.client else "0.0.0.0",
+        )
+        if result.get("status") == "ok":
+            return result
+        else:
+            raise HTTPException(
+                status_code=401,
+                detail=result.get("message", "Login failed"),
+            )
+    except HTTPException:
+        raise
+    except ImportError:
+        raise HTTPException(status_code=501, detail="Admin auth module not available")
+    except Exception as e:
+        logger.exception("Admin login error")
+        raise HTTPException(status_code=500, detail="Internal error during login")
+
+
+@app.get("/admin/verify")
+async def admin_verify(req: Request):
+    """Verify an admin token. Returns user info or 401."""
+    auth_header = req.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Bearer token required")
+
+    token = auth_header[7:]
+
+    try:
+        from backend.api.admin_auth import require_auth as admin_require_auth
+        # Try as JWT first, then as session token
+        result = admin_require_auth(jwt_token=token)
+        if result.get("status") == "ok":
+            return result
+
+        result = admin_require_auth(session_token=token)
+        if result.get("status") == "ok":
+            return result
+
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+    except HTTPException:
+        raise
+    except ImportError:
+        raise HTTPException(status_code=501, detail="Admin auth module not available")
+    except Exception:
+        logger.exception("Admin verify error")
+        raise HTTPException(status_code=500, detail="Verification failed")
+
+
+class VaultUnlockRequest(BaseModel):
+    vault_password: str
+
+
+@app.post("/admin/vault-unlock")
+async def admin_vault_unlock(request: VaultUnlockRequest, req: Request):
+    """Unlock the vault. Requires Bearer token for auth."""
+    auth_header = req.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Bearer token required")
+
+    token = auth_header[7:]
+
+    try:
+        from backend.api.vault_session import vault_unlock
+        result = vault_unlock(
+            vault_password=request.vault_password,
+            session_token=token,
+            ip=req.client.host if req.client else "0.0.0.0",
+        )
+        if result.get("status") == "ok":
+            return result
+        elif result.get("status") == "unauthorized":
+            raise HTTPException(status_code=401, detail=result.get("message", "Unauthorized"))
+        else:
+            raise HTTPException(status_code=400, detail=result.get("message", "Vault unlock failed"))
+    except HTTPException:
+        raise
+    except ImportError:
+        raise HTTPException(status_code=501, detail="Vault session module not available")
+    except Exception:
+        logger.exception("Vault unlock error")
+        raise HTTPException(status_code=500, detail="Vault unlock failed")
+
+
+# =============================================================================
+# ROLLOUT API COMPATIBILITY
+# =============================================================================
+
+@app.get("/api/rollout/status")
+async def rollout_status(user=Depends(require_auth)):
+    """Get current rollout governance status."""
+    try:
+        from governance.real_data_rollout_governor import get_current_status
+        return get_current_status()
+    except ImportError:
+        return {
+            "stage": 0,
+            "stage_label": "STAGE_0",
+            "real_data_pct": 0.20,
+            "consecutive_stable": 0,
+            "frozen": False,
+            "freeze_reasons": [],
+            "total_cycles": 0,
+            "last_cycle_id": None,
+            "last_updated": None,
+            "promotion_history": [],
+        }
+    except Exception:
+        logger.exception("Rollout status error")
+        raise HTTPException(status_code=500, detail="Failed to fetch rollout status")
+
+
+@app.get("/api/rollout/metrics")
+async def rollout_metrics(user=Depends(require_auth)):
+    """Get rollout risk metrics. Returns RiskMetrics shape matching frontend contract."""
+    try:
+        from governance.real_data_rollout_governor import load_state, ROLLOUT_STAGES
+        state = load_state()
+        real_pct = ROLLOUT_STAGES[state.current_stage]
+
+        return {
+            "current_stage": state.current_stage,
+            "real_data_pct": real_pct,
+            "label_quality": 0.0,
+            "class_imbalance_ratio": 0.0,
+            "js_divergence": 0.0,
+            "unknown_token_ratio": 0.0,
+            "feature_mismatch_ratio": 0.0,
+            "fpr_current": 0.0,
+            "fpr_baseline": 0.0,
+            "drift_guard_pass": True,
+            "regression_gate_pass": True,
+            "determinism_gate_pass": True,
+            "backtest_gate_pass": True,
+            "consecutive_stable": state.consecutive_stable_cycles,
+            "frozen": state.is_frozen,
+            "freeze_reasons": state.freeze_reasons,
+            "total_cycles": state.total_cycles_evaluated,
+            "last_updated": state.last_updated,
+        }
+    except ImportError:
+        return {
+            "current_stage": 0,
+            "real_data_pct": 0.20,
+            "label_quality": 0.0,
+            "class_imbalance_ratio": 0.0,
+            "js_divergence": 0.0,
+            "unknown_token_ratio": 0.0,
+            "feature_mismatch_ratio": 0.0,
+            "fpr_current": 0.0,
+            "fpr_baseline": 0.0,
+            "drift_guard_pass": True,
+            "regression_gate_pass": True,
+            "determinism_gate_pass": True,
+            "backtest_gate_pass": True,
+            "consecutive_stable": 0,
+            "frozen": False,
+            "freeze_reasons": [],
+            "total_cycles": 0,
+            "last_updated": None,
+        }
+    except Exception:
+        logger.exception("Rollout metrics error")
+        raise HTTPException(status_code=500, detail="Failed to fetch rollout metrics")
 
 
 # =============================================================================

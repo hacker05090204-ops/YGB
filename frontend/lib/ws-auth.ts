@@ -5,14 +5,15 @@
  * Query-string tokens are NOT used (security risk — leaks in logs/referrer).
  */
 
+import { getAuthToken } from "./auth-token";
+
 const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
 
 /**
- * Get the current auth token from sessionStorage.
+ * Get the current auth token using unified lookup.
  */
 function getToken(): string | null {
-    if (typeof window === "undefined") return null;
-    return sessionStorage.getItem("ygb_token");
+    return getAuthToken();
 }
 
 /**

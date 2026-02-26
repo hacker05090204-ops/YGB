@@ -610,6 +610,64 @@ def get_delete_preview(entity_type: str = None) -> List[Dict[str, Any]]:
     return []
 
 
+def get_storage_health() -> Dict[str, Any]:
+    """
+    Canonical storage health truth response.
+
+    Performs REAL checks — never returns active/ok unless verified.
+    If any subsystem is unavailable, returns INACTIVE/DEGRADED with reason.
+
+    Returns:
+        Dict with storage_active, db_active, lifecycle_ok, reason, checked_at
+    """
+    checked_at = datetime.now(timezone.utc).isoformat()
+    reasons = []
+
+    # Check engine
+    storage_active = False
+    if _engine is None:
+        reasons.append("Storage engine not initialized")
+    else:
+        try:
+            root = _engine.root
+            if root and root.exists():
+                storage_active = True
+            else:
+                reasons.append(f"Storage root missing or inaccessible: {root}")
+        except Exception as e:
+            reasons.append(f"Storage engine error: {str(e)}")
+
+    # db_active mirrors storage_active (HDD engine IS the database)
+    db_active = storage_active
+
+    # Check lifecycle
+    lifecycle_ok = False
+    if _lifecycle is not None:
+        lifecycle_ok = True
+    else:
+        reasons.append("Lifecycle manager not initialized")
+
+    # Check disk monitor
+    disk_monitor_ok = _disk_monitor is not None
+    if not disk_monitor_ok:
+        reasons.append("Disk monitor not initialized")
+
+    reason = "; ".join(reasons) if reasons else None
+    overall_status = "ACTIVE" if (storage_active and db_active and lifecycle_ok) else "INACTIVE"
+    if storage_active and not lifecycle_ok:
+        overall_status = "DEGRADED"
+
+    return {
+        "status": overall_status,
+        "storage_active": storage_active,
+        "db_active": db_active,
+        "lifecycle_ok": lifecycle_ok,
+        "disk_monitor_ok": disk_monitor_ok,
+        "reason": reason,
+        "checked_at": checked_at,
+    }
+
+
 # =============================================================================
 # VIDEO BRIDGE
 # =============================================================================

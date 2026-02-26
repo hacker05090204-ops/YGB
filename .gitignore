@@ -50,3 +50,6 @@ run_cpp_tests
 *.gcno
 *.gcda
 *.gcov
+
+# Service account keys
+secure_data/

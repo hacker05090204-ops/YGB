@@ -86,6 +86,27 @@ class InspectionResult:
 _inspection_requests: Dict[str, ScreenInspectionRequest] = {}
 _inspection_results: Dict[str, InspectionResult] = {}
 
+# =============================================================================
+# STUB MODE INDICATOR — Python stub, no native screen capture driver
+# =============================================================================
+
+NATIVE_CAPTURE_AVAILABLE = False  # True only when C++ capture library loaded
+
+
+def get_inspection_mode_info() -> Dict:
+    """Return explicit mode info for truthful status reporting."""
+    return {
+        "is_stub": not NATIVE_CAPTURE_AVAILABLE,
+        "native_capture_available": NATIVE_CAPTURE_AVAILABLE,
+        "mode": "STUB_READ_ONLY" if not NATIVE_CAPTURE_AVAILABLE else "NATIVE_READ_ONLY",
+        "description": (
+            "Python stub — screen findings are mock/test data. "
+            "Native C++ capture driver required for real inspection."
+        ) if not NATIVE_CAPTURE_AVAILABLE else (
+            "Native C++ capture driver active — real screen inspection."
+        ),
+    }
+
 
 def clear_inspection_store():
     """Clear inspection store (for testing)."""

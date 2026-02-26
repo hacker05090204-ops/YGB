@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { createAuthWebSocket } from '@/lib/ws-auth';
 
 /**
  * HuntingPanel — Live Hunting Assistant (Phase 4)
@@ -67,29 +68,36 @@ export default function HuntingPanel() {
         let ws: WebSocket | null = null;
         function connect() {
             try {
-                ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws/hunting');
+                ws = createAuthWebSocket(
+                    '/ws/hunting',
+                    (e) => {
+                        try {
+                            const data = JSON.parse(e.data);
+                            if (data.type === 'detection') {
+                                setDetection(data.result);
+                                setMessages(prev => [...prev, {
+                                    role: 'system',
+                                    content: `Detection: ${data.result.exploit_type} (${(data.result.confidence * 100).toFixed(0)}%)`,
+                                    timestamp: new Date().toISOString(),
+                                }]);
+                            } else if (data.type === 'response') {
+                                setMessages(prev => [...prev, {
+                                    role: 'assistant', content: data.content,
+                                    timestamp: new Date().toISOString(),
+                                }]);
+                            }
+                        } catch { /* skip */ }
+                    },
+                    () => ws?.close(),
+                    () => { setConnected(false); setTimeout(connect, 3000); }
+                );
+                if (!ws) {
+                    // No auth token available
+                    setConnected(false);
+                    return;
+                }
                 wsRef.current = ws;
                 ws.onopen = () => setConnected(true);
-                ws.onmessage = (e) => {
-                    try {
-                        const data = JSON.parse(e.data);
-                        if (data.type === 'detection') {
-                            setDetection(data.result);
-                            setMessages(prev => [...prev, {
-                                role: 'system',
-                                content: `Detection: ${data.result.exploit_type} (${(data.result.confidence * 100).toFixed(0)}%)`,
-                                timestamp: new Date().toISOString(),
-                            }]);
-                        } else if (data.type === 'response') {
-                            setMessages(prev => [...prev, {
-                                role: 'assistant', content: data.content,
-                                timestamp: new Date().toISOString(),
-                            }]);
-                        }
-                    } catch { /* skip */ }
-                };
-                ws.onclose = () => { setConnected(false); setTimeout(connect, 3000); };
-                ws.onerror = () => ws?.close();
             } catch { setTimeout(connect, 3000); }
         }
         connect();

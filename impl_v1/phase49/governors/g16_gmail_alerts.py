@@ -227,8 +227,9 @@ def send_alert(
         _sent_alerts.append(result)
         return result
     
-    # Real SMTP path — send if SMTP_PASSWORD is configured
-    smtp_password = os.environ.get("SMTP_PASSWORD")
+    # Real SMTP path — send if SMTP password is configured
+    # Unified key: SMTP_PASS (canonical) or SMTP_PASSWORD (backward compat)
+    smtp_password = os.environ.get("SMTP_PASS") or os.environ.get("SMTP_PASSWORD")
     if smtp_password:
         try:
             import smtplib

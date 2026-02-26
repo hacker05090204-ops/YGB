@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck, Clock, RefreshCw } from "lucide-react"
+import { buildAuthHeaders } from "@/lib/auth-token"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -30,6 +31,14 @@ import FieldMasteryDashboard from "@/components/field-mastery-dashboard"
 
 // API Base URL
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
+
+/** Fetch wrapper that injects auth headers for protected endpoints. */
+async function protectedFetch(url: string, options: RequestInit = {}): Promise<Response> {
+    const headers = buildAuthHeaders(
+        options.headers as Record<string, string> || {}
+    )
+    return fetch(url, { ...options, headers })
+}
 
 export default function ControlPage() {
     // Dashboard State
@@ -106,7 +115,7 @@ export default function ControlPage() {
         const timeout = setTimeout(() => controller.abort(), 5000)
 
         try {
-            const response = await fetch(`${API_BASE}/api/dashboard/create`, {
+            const response = await protectedFetch(`${API_BASE}/api/dashboard/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id: "user-001", user_name: "Researcher" }),
@@ -140,7 +149,7 @@ export default function ControlPage() {
     useEffect(() => {
         const fetchAccuracy = async () => {
             try {
-                const res = await fetch(`${API_BASE}/api/accuracy/snapshot`)
+                const res = await protectedFetch(`${API_BASE}/api/accuracy/snapshot`)
                 if (res.ok) {
                     const data = await res.json()
                     setAccuracySnapshot(data)
@@ -156,7 +165,7 @@ export default function ControlPage() {
     useEffect(() => {
         const fetchRuntimeStatus = async () => {
             try {
-                const res = await fetch(`${API_BASE}/runtime/status`)
+                const res = await protectedFetch(`${API_BASE}/runtime/status`)
                 if (res.ok) {
                     const data = await res.json()
                     setRuntimeStatus(data)
@@ -198,7 +207,7 @@ export default function ControlPage() {
     const handleStartTraining = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await fetch(`${API_BASE}/api/mode/train/start`, { method: "POST" })
+            const res = await protectedFetch(`${API_BASE}/api/mode/train/start`, { method: "POST" })
             if (res.ok) setRuntimeMode("TRAIN")
         } catch (e) { console.error("Start training failed:", e) }
         finally { setModeLoading(false) }
@@ -207,7 +216,7 @@ export default function ControlPage() {
     const handleStopTraining = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await fetch(`${API_BASE}/api/mode/train/stop`, { method: "POST" })
+            const res = await protectedFetch(`${API_BASE}/api/mode/train/stop`, { method: "POST" })
             if (res.ok) setRuntimeMode("IDLE")
         } catch (e) { console.error("Stop training failed:", e) }
         finally { setModeLoading(false) }
@@ -216,7 +225,7 @@ export default function ControlPage() {
     const handleStartHunting = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await fetch(`${API_BASE}/api/mode/hunt/start`, { method: "POST" })
+            const res = await protectedFetch(`${API_BASE}/api/mode/hunt/start`, { method: "POST" })
             if (res.ok) setRuntimeMode("HUNT")
         } catch (e) { console.error("Start hunting failed:", e) }
         finally { setModeLoading(false) }
@@ -225,7 +234,7 @@ export default function ControlPage() {
     const handleStopHunting = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await fetch(`${API_BASE}/api/mode/hunt/stop`, { method: "POST" })
+            const res = await protectedFetch(`${API_BASE}/api/mode/hunt/stop`, { method: "POST" })
             if (res.ok) setRuntimeMode("IDLE")
         } catch (e) { console.error("Stop hunting failed:", e) }
         finally { setModeLoading(false) }
@@ -236,7 +245,7 @@ export default function ControlPage() {
         setAutonomyMode(mode)
 
         try {
-            await fetch(`${API_BASE}/api/autonomy/session`, {
+            await protectedFetch(`${API_BASE}/api/autonomy/session`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ mode, duration_hours: hours || 0 })
@@ -251,7 +260,7 @@ export default function ControlPage() {
         setApprovalLoading(true)
 
         try {
-            const response = await fetch(`${API_BASE}/api/approval/decision`, {
+            const response = await protectedFetch(`${API_BASE}/api/approval/decision`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -280,7 +289,7 @@ export default function ControlPage() {
         setApprovalLoading(true)
 
         try {
-            const response = await fetch(`${API_BASE}/api/approval/decision`, {
+            const response = await protectedFetch(`${API_BASE}/api/approval/decision`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -305,7 +314,7 @@ export default function ControlPage() {
 
     const handleStop = useCallback(async () => {
         try {
-            await fetch(`${API_BASE}/api/execution/transition`, {
+            await protectedFetch(`${API_BASE}/api/execution/transition`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -329,7 +338,7 @@ export default function ControlPage() {
         setIsDiscovering(true)
 
         try {
-            const response = await fetch(`${API_BASE}/api/targets/discover`, {
+            const response = await protectedFetch(`${API_BASE}/api/targets/discover`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ min_payout: "LOW", max_density: "MEDIUM", public_only: true })
@@ -383,7 +392,7 @@ export default function ControlPage() {
         setVoiceProcessing(true)
 
         try {
-            const response = await fetch(`${API_BASE}/api/voice/parse`, {
+            const response = await protectedFetch(`${API_BASE}/api/voice/parse`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text, mode: voiceMode })
@@ -396,7 +405,28 @@ export default function ControlPage() {
                 if (intent.intent_type === "FIND_TARGETS" && intent.status === "PARSED") {
                     handleDiscoverTargets()
                 }
+            } else if (response.status === 401 || response.status === 403) {
+                // Auth failure — surface as BLOCKED, not INVALID
+                setLastIntent({
+                    intent_id: `VOC-${Date.now()}`,
+                    intent_type: "UNKNOWN",
+                    raw_text: text,
+                    extracted_value: null,
+                    confidence: 0,
+                    status: "BLOCKED",
+                    block_reason: response.status === 401
+                        ? "Authentication required — please log in"
+                        : "Permission denied — insufficient privileges",
+                    timestamp: new Date().toISOString()
+                })
             } else {
+                // Other error — prefer backend detail if available
+                let errorDetail = "Could not parse intent"
+                try {
+                    const errBody = await response.json()
+                    if (errBody.detail) errorDetail = errBody.detail
+                    else if (errBody.block_reason) errorDetail = errBody.block_reason
+                } catch { /* use fallback */ }
                 setLastIntent({
                     intent_id: `VOC-${Date.now()}`,
                     intent_type: "UNKNOWN",
@@ -404,7 +434,7 @@ export default function ControlPage() {
                     extracted_value: null,
                     confidence: 0,
                     status: "INVALID",
-                    block_reason: "Could not parse intent",
+                    block_reason: errorDetail,
                     timestamp: new Date().toISOString()
                 })
             }

@@ -320,42 +320,117 @@ def create_training_dataloader(
 # VALIDATION
 # =============================================================================
 
+# Minimum real samples threshold (configurable via env)
+YGB_MIN_REAL_SAMPLES = int(_os.environ.get("YGB_MIN_REAL_SAMPLES", "125000"))
+
+
 def validate_dataset_integrity() -> Tuple[bool, str]:
     """
     Validate dataset meets all requirements:
-    - Min 20,000 samples
+    - Min YGB_MIN_REAL_SAMPLES samples (default 18000)
     - No forbidden fields
     - Class balance within 10%
-    
+
+    STRICT_REAL_MODE (default True):
+      - Uses IngestionPipelineDataset ONLY — never SyntheticTrainingDataset.
+      - Returns explicit fail reasons:
+        INSUFFICIENT_REAL_SAMPLES, INGESTION_SOURCE_INVALID,
+        STRICT_REAL_MODE_VIOLATION
+
+    Lab mode (STRICT_REAL_MODE=False):
+      - Uses SyntheticTrainingDataset for development convenience.
+
     Returns:
         Tuple of (passed, message)
     """
-    try:
-        dataset = SyntheticTrainingDataset(
-            config=DatasetConfig(total_samples=20000),
-            seed=FIXED_SEED,
-        )
-        
+    min_samples = YGB_MIN_REAL_SAMPLES
+
+    if STRICT_REAL_MODE:
+        # ── STRICT PATH: IngestionPipelineDataset only ──────────────
+        # NEVER instantiate SyntheticTrainingDataset here.
+        try:
+            dataset = IngestionPipelineDataset(
+                feature_dim=256,
+                min_samples=min_samples,
+                seed=FIXED_SEED,
+            )
+        except FileNotFoundError:
+            return False, (
+                "INGESTION_SOURCE_INVALID: Ingestion bridge library not found. "
+                "Real ingestion pipeline is required when STRICT_REAL_MODE=True."
+            )
+        except RuntimeError as e:
+            msg = str(e)
+            if "Insufficient" in msg:
+                return False, (
+                    f"INSUFFICIENT_REAL_SAMPLES: {msg} "
+                    f"(threshold: {min_samples})"
+                )
+            return False, f"STRICT_REAL_MODE_VIOLATION: {msg}"
+        except Exception as e:
+            return False, f"INGESTION_SOURCE_INVALID: {str(e)}"
+
         stats = dataset.get_statistics()
-        
+
         # Check minimum samples
-        if stats["total"] < 18000:  # 20000 - 10% holdout
-            return False, f"Insufficient samples: {stats['total']} < 18000"
-        
+        if stats["total"] < min_samples:
+            return False, (
+                f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples}"
+            )
+
         # Check class balance (within 10%)
-        positive_ratio = stats["positive"] / stats["total"]
-        if not (0.40 <= positive_ratio <= 0.60):
-            return False, f"Class imbalance: {positive_ratio:.2%} positive"
-        
-        # Validate no forbidden fields in first sample
-        sample = dataset.samples[0]
-        if not validate_no_forbidden_fields(sample.features):
-            return False, "Forbidden fields detected in samples"
-        
-        return True, f"Dataset valid: {stats['total']} samples, {positive_ratio:.2%} positive"
-        
-    except Exception as e:
-        return False, f"Validation failed: {str(e)}"
+        if stats["total"] > 0:
+            positive_ratio = stats["positive"] / stats["total"]
+            if not (0.40 <= positive_ratio <= 0.60):
+                return False, (
+                    f"STRICT_REAL_MODE_VIOLATION: Class imbalance: "
+                    f"{positive_ratio:.2%} positive"
+                )
+        else:
+            return False, "INSUFFICIENT_REAL_SAMPLES: 0 samples available"
+
+        return True, (
+            f"Dataset valid (STRICT_REAL): {stats['total']} samples, "
+            f"{positive_ratio:.2%} positive, source={stats.get('dataset_source', 'INGESTION_PIPELINE')}"
+        )
+
+    else:
+        # ── LAB MODE (LAB_ONLY): SyntheticTrainingDataset (development only) ──
+        # Generate enough synthetic samples to meet lab threshold
+        lab_sample_count = max(min_samples, 20000)
+        try:
+            dataset = SyntheticTrainingDataset(
+                config=DatasetConfig(total_samples=lab_sample_count),
+                seed=FIXED_SEED,
+            )
+
+            stats = dataset.get_statistics()
+
+            # Check minimum samples
+            if stats["total"] < min_samples:
+                return False, (
+                    f"Insufficient samples: {stats['total']} < {min_samples}"
+                )
+
+            # Check class balance (within 10%)
+            positive_ratio = stats["positive"] / stats["total"]
+            if not (0.40 <= positive_ratio <= 0.60):
+                return False, (
+                    f"Class imbalance: {positive_ratio:.2%} positive"
+                )
+
+            # Validate no forbidden fields in first sample
+            sample = dataset.samples[0]
+            if not validate_no_forbidden_fields(sample.features):
+                return False, "Forbidden fields detected in samples"
+
+            return True, (
+                f"Dataset valid (LAB): {stats['total']} samples, "
+                f"{positive_ratio:.2%} positive"
+            )
+
+        except Exception as e:
+            return False, f"Validation failed: {str(e)}"
 
 
 # =============================================================================

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { createAuthWebSocket } from "@/lib/ws-auth"
 import {
     Play,
     Square,
@@ -139,50 +140,55 @@ export default function RunnerPage() {
             const { report_id } = await startRes.json()
 
             // Connect WebSocket
-            const ws = new WebSocket(`ws://localhost:8000/ws/bounty/${report_id}`)
+            const ws = createAuthWebSocket(
+                `/ws/bounty/${report_id}`,
+                (event) => {
+                    const data = JSON.parse(event.data)
+
+                    if (data.type === "workflow_start") {
+                        setPhases(prev => [...prev, { type: "start", ...data }])
+                    }
+                    else if (data.type === "phase_start") {
+                        setCurrentPhase(data.phase || 0)
+                        setProgress(data.progress || 0)
+                        setPhases(prev => [...prev, { type: "phase_start", ...data }])
+                    }
+                    else if (data.type === "phase_complete") {
+                        setPhases(prev => [...prev, { type: "phase_complete", ...data }])
+                    }
+                    else if (data.type === "browser_action") {
+                        setBrowserActions(prev => [...prev, data])
+                    }
+                    else if (data.type === "workflow_complete") {
+                        setProgress(100)
+                        setPhases(prev => [...prev, { type: "complete", ...data }])
+                    }
+                    else if (data.type === "complete") {
+                        setResult(data.result)
+                        setIsRunning(false)
+                        ws?.close()
+                    }
+                    else if (data.error) {
+                        setError(data.error)
+                        setIsRunning(false)
+                        ws?.close()
+                    }
+                },
+                () => {
+                    setError("WebSocket connection failed")
+                    setIsRunning(false)
+                },
+                () => {
+                    setIsRunning(false)
+                }
+            )
+
+            if (!ws) {
+                setError("Authentication required for live updates")
+                setIsRunning(false)
+                return
+            }
             wsRef.current = ws
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data)
-
-                if (data.type === "workflow_start") {
-                    setPhases(prev => [...prev, { type: "start", ...data }])
-                }
-                else if (data.type === "phase_start") {
-                    setCurrentPhase(data.phase || 0)
-                    setProgress(data.progress || 0)
-                    setPhases(prev => [...prev, { type: "phase_start", ...data }])
-                }
-                else if (data.type === "phase_complete") {
-                    setPhases(prev => [...prev, { type: "phase_complete", ...data }])
-                }
-                else if (data.type === "browser_action") {
-                    setBrowserActions(prev => [...prev, data])
-                }
-                else if (data.type === "workflow_complete") {
-                    setProgress(100)
-                    setPhases(prev => [...prev, { type: "complete", ...data }])
-                }
-                else if (data.type === "complete") {
-                    setResult(data.result)
-                    setIsRunning(false)
-                    ws.close()
-                }
-                else if (data.error) {
-                    setError(data.error)
-                    setIsRunning(false)
-                    ws.close()
-                }
-            }
-
-            ws.onerror = () => {
-                setError("WebSocket connection failed")
-                setIsRunning(false)
-            }
-
-            ws.onclose = () => {
-                setIsRunning(false)
-            }
 
         } catch (err: any) {
             setError(err.message)
@@ -241,10 +247,10 @@ export default function RunnerPage() {
                         <div className="ml-4 text-lg font-semibold">Phase Runner</div>
                     </div>
                     <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${apiStatus === "online"
-                            ? "bg-green-500/10 border-green-500/20 text-green-400"
-                            : apiStatus === "offline"
-                                ? "bg-red-500/10 border-red-500/20 text-red-400"
-                                : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                        ? "bg-green-500/10 border-green-500/20 text-green-400"
+                        : apiStatus === "offline"
+                            ? "bg-red-500/10 border-red-500/20 text-red-400"
+                            : "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
                         }`}>
                         <Server className="w-3 h-3" />
                         {apiStatus === "online" ? "API Online" : apiStatus === "offline" ? "Offline" : "Checking..."}
@@ -332,12 +338,12 @@ export default function RunnerPage() {
                                         <div
                                             key={idx}
                                             className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${phase.type === "phase_start"
-                                                    ? "bg-yellow-500/5 border-yellow-500/20"
-                                                    : phase.status === "SUCCESS"
-                                                        ? "bg-green-500/5 border-green-500/20"
-                                                        : phase.status === "FAILED"
-                                                            ? "bg-red-500/5 border-red-500/20"
-                                                            : "bg-white/[0.02] border-white/[0.06]"
+                                                ? "bg-yellow-500/5 border-yellow-500/20"
+                                                : phase.status === "SUCCESS"
+                                                    ? "bg-green-500/5 border-green-500/20"
+                                                    : phase.status === "FAILED"
+                                                        ? "bg-red-500/5 border-red-500/20"
+                                                        : "bg-white/[0.02] border-white/[0.06]"
                                                 }`}
                                         >
                                             {getPhaseStatus(phase)}
