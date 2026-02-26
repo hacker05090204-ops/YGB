@@ -254,37 +254,85 @@ def create_training_dataloader(
 ) -> Tuple[DataLoader, DataLoader, dict]:
     """
     Create optimized DataLoaders for GPU training.
-    
+
+    STRICT_REAL_MODE (default True):
+      Uses IngestionPipelineDataset — real data from ingestion bridge ONLY.
+      SyntheticTrainingDataset is BLOCKED.
+
+    Lab mode (STRICT_REAL_MODE=False):
+      Falls back to SyntheticTrainingDataset for development.
+
     Args:
         batch_size: Samples per batch (default 1024 for RTX 2050)
         num_workers: Parallel data loading workers (default 4 for laptop safety)
         pin_memory: Pin memory for faster GPU transfer
         prefetch_factor: Batches to prefetch per worker
         seed: Random seed for determinism
-    
+
     Returns:
         Tuple of (train_loader, holdout_loader, stats)
     """
-    # Create datasets
-    train_dataset = SyntheticTrainingDataset(
-        config=DatasetConfig(total_samples=20000),
-        seed=seed,
-        is_holdout=False,
-    )
-    
-    holdout_dataset = SyntheticTrainingDataset(
-        config=DatasetConfig(total_samples=20000),
-        seed=seed,
-        is_holdout=True,
-    )
-    
+    min_samples = YGB_MIN_REAL_SAMPLES
+
+    if STRICT_REAL_MODE:
+        # === STRICT PATH: IngestionPipelineDataset only ===
+        # SyntheticTrainingDataset is BLOCKED — never instantiated here.
+        train_dataset = IngestionPipelineDataset(
+            feature_dim=256,
+            min_samples=min_samples,
+            seed=seed,
+        )
+        # Holdout: use a portion of the same pipeline data
+        # (IngestionPipelineDataset does not support is_holdout,
+        #  so we split the single dataset via random_split)
+        total = len(train_dataset)
+        holdout_size = max(1, int(total * 0.1))
+        train_size = total - holdout_size
+        train_subset, holdout_subset = torch.utils.data.random_split(
+            train_dataset,
+            [train_size, holdout_size],
+            generator=torch.Generator().manual_seed(seed),
+        )
+        stats = {
+            "train": {**train_dataset.get_statistics(), "total": train_size},
+            "holdout": {**train_dataset.get_statistics(), "total": holdout_size},
+            "batch_size": batch_size,
+            "num_workers": num_workers,
+            "pin_memory": pin_memory,
+            "dataset_source": "INGESTION_PIPELINE",
+        }
+        effective_train = train_subset
+        effective_holdout = holdout_subset
+    else:
+        # === LAB MODE: SyntheticTrainingDataset (development only) ===
+        train_dataset = SyntheticTrainingDataset(
+            config=DatasetConfig(total_samples=20000),
+            seed=seed,
+            is_holdout=False,
+        )
+        holdout_dataset = SyntheticTrainingDataset(
+            config=DatasetConfig(total_samples=20000),
+            seed=seed,
+            is_holdout=True,
+        )
+        stats = {
+            "train": train_dataset.get_statistics(),
+            "holdout": holdout_dataset.get_statistics(),
+            "batch_size": batch_size,
+            "num_workers": num_workers,
+            "pin_memory": pin_memory,
+            "dataset_source": "SYNTHETIC_GENERATOR",
+        }
+        effective_train = train_dataset
+        effective_holdout = holdout_dataset
+
     # Deterministic generator for shuffle reproducibility
     g = torch.Generator()
     g.manual_seed(seed)
-    
+
     # Create DataLoaders with CUDA optimizations
     train_loader = DataLoader(
-        train_dataset,
+        effective_train,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
@@ -294,9 +342,9 @@ def create_training_dataloader(
         drop_last=True,  # Consistent batch sizes
         generator=g,     # Deterministic shuffle order
     )
-    
+
     holdout_loader = DataLoader(
-        holdout_dataset,
+        effective_holdout,
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers,
@@ -304,15 +352,7 @@ def create_training_dataloader(
         prefetch_factor=prefetch_factor if num_workers > 0 else None,
         persistent_workers=num_workers > 0,
     )
-    
-    stats = {
-        "train": train_dataset.get_statistics(),
-        "holdout": holdout_dataset.get_statistics(),
-        "batch_size": batch_size,
-        "num_workers": num_workers,
-        "pin_memory": pin_memory,
-    }
-    
+
     return train_loader, holdout_loader, stats
 
 

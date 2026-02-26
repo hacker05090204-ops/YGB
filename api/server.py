@@ -149,10 +149,34 @@ except ImportError as e:
 # APP CONFIGURATION
 # =============================================================================
 
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app):
+    """Server lifespan: start CVE scheduler on boot, stop on shutdown."""
+    # --- STARTUP ---
+    try:
+        from backend.cve.cve_scheduler import get_scheduler
+        scheduler = get_scheduler()
+        scheduler.start()
+        print("✅ CVE scheduler started (5-minute interval)")
+    except Exception as e:
+        print(f"⚠️  CVE scheduler not started: {e}")
+    yield
+    # --- SHUTDOWN ---
+    try:
+        from backend.cve.cve_scheduler import get_scheduler
+        scheduler = get_scheduler()
+        await scheduler.stop()
+        print("CVE scheduler stopped")
+    except Exception:
+        pass
+
 app = FastAPI(
     title="YGB API",
     description="Bug Bounty Governance Backend",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan,
 )
 
 # CORS configuration for frontend
@@ -532,6 +556,50 @@ async def get_cve_pipeline_full_status():
         }
     except Exception as e:
         return {"status": "ERROR", "reason": str(e)}
+
+
+@app.get("/health")
+async def health_alias():
+    """Alias for /api/health — some frontend pages use /health."""
+    return await health_check()
+
+
+@app.get("/api/cve/summary")
+async def get_cve_summary():
+    """Quick CVE summary — total records, sources, freshness."""
+    try:
+        from backend.cve.cve_pipeline import get_pipeline
+        pipeline = get_pipeline()
+        status = pipeline.get_pipeline_status()
+        return {
+            "total_records": status.get("total_records", 0),
+            "sources_connected": status.get("sources_connected", 0),
+            "last_ingest": status.get("last_ingest_at"),
+            "freshness": status.get("freshness", "UNKNOWN"),
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+    except ImportError:
+        return {"total_records": 0, "sources_connected": 0, "freshness": "NOT_AVAILABLE"}
+    except Exception as e:
+        return {"total_records": 0, "sources_connected": 0, "freshness": "ERROR", "reason": str(e)}
+
+
+@app.get("/api/cve/search")
+async def search_cves(q: str = "", user=Depends(require_auth)):
+    """Search CVE records by ID or keyword."""
+    if not q or len(q) < 3:
+        return {"results": [], "query": q, "reason": "Query must be at least 3 characters"}
+    try:
+        from backend.cve.cve_pipeline import get_pipeline
+        pipeline = get_pipeline()
+        results = pipeline.search(q)
+        return {"results": results[:50], "query": q, "total": len(results)}
+    except ImportError:
+        return {"results": [], "query": q, "reason": "CVE pipeline not available"}
+    except AttributeError:
+        return {"results": [], "query": q, "reason": "Search not implemented in pipeline"}
+    except Exception as e:
+        return {"results": [], "query": q, "reason": str(e)}
 
 
 @app.get("/api/training/readiness")
@@ -1200,6 +1268,105 @@ async def start_g38_training(epochs: int = 10, user=Depends(require_auth)):
         "message": f"Training started for {epochs} epochs",
         "state": "TRAINING",
     }
+
+
+# =============================================================================
+# ADMIN PANEL TRAINING/GPU ROUTES
+# (frontend admin/panel/page.tsx calls these)
+# =============================================================================
+
+@app.get("/gpu/status")
+async def gpu_status(user=Depends(require_auth)):
+    """GPU status for admin panel — real GPU info."""
+    gpu_info = {
+        "gpu_available": False,
+        "device_name": None,
+        "utilization_percent": None,
+        "memory_allocated_mb": None,
+        "memory_total_mb": None,
+        "temperature": None,
+        "compute_capability": None,
+    }
+    try:
+        import torch
+        if torch.cuda.is_available():
+            gpu_info["gpu_available"] = True
+            gpu_info["device_name"] = torch.cuda.get_device_name(0)
+            gpu_info["memory_allocated_mb"] = round(torch.cuda.memory_allocated(0) / 1024 / 1024, 1)
+            gpu_info["memory_total_mb"] = round(torch.cuda.get_device_properties(0).total_mem / 1024 / 1024, 1)
+            cap = torch.cuda.get_device_capability(0)
+            gpu_info["compute_capability"] = f"{cap[0]}.{cap[1]}"
+    except Exception:
+        pass
+    return gpu_info
+
+
+@app.get("/training/status")
+async def training_status(user=Depends(require_admin)):
+    """Training status for admin panel."""
+    if not G38_AVAILABLE:
+        return {"is_training": False, "error": "G38 not available"}
+    trainer = get_auto_trainer()
+    return {
+        "is_training": trainer.is_training,
+        "state": trainer.state.value,
+        "epoch": trainer._epoch,
+        "continuous_mode": trainer._continuous_mode,
+        "continuous_target": trainer._continuous_target,
+    }
+
+
+@app.post("/training/start")
+async def training_start(user=Depends(require_admin)):
+    """Start training via admin panel."""
+    if not G38_AVAILABLE:
+        raise HTTPException(status_code=503, detail="G38 not available")
+    trainer = get_auto_trainer()
+    if trainer.is_training:
+        return {"success": False, "message": "Already training"}
+    import threading
+    def _run():
+        trainer.force_start_training(epochs=10)
+    threading.Thread(target=_run, daemon=True).start()
+    return {"success": True, "message": "Training started"}
+
+
+@app.post("/training/stop")
+async def training_stop(user=Depends(require_admin)):
+    """Stop training via admin panel."""
+    if not G38_AVAILABLE:
+        raise HTTPException(status_code=503, detail="G38 not available")
+    trainer = get_auto_trainer()
+    result = trainer.abort_training()
+    return {"success": True, "message": "Training stop requested", **result}
+
+
+@app.post("/training/continuous")
+async def training_continuous(request: Request, user=Depends(require_admin)):
+    """Toggle continuous training mode via admin panel."""
+    if not G38_AVAILABLE:
+        raise HTTPException(status_code=503, detail="G38 not available")
+    data = await request.json()
+    enabled = data.get("enabled", False)
+    target_epochs = data.get("target_epochs", 0)
+    if enabled:
+        start_continuous_training(target_epochs=target_epochs)
+        return {"success": True, "message": "Continuous mode enabled"}
+    else:
+        stop_continuous_training()
+        return {"success": True, "message": "Continuous mode disabled"}
+
+
+@app.post("/training/interval")
+async def training_interval(request: Request, user=Depends(require_admin)):
+    """Set training check interval via admin panel."""
+    if not G38_AVAILABLE:
+        raise HTTPException(status_code=503, detail="G38 not available")
+    data = await request.json()
+    interval = data.get("interval", 30)
+    trainer = get_auto_trainer()
+    trainer.CHECK_INTERVAL_SECONDS = max(10, min(interval, 3600))
+    return {"success": True, "interval": trainer.CHECK_INTERVAL_SECONDS}
 
 
 @app.get("/api/g38/guards")
