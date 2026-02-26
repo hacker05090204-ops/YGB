@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { authFetch } from '@/lib/ygb-api';
 
 /**
  * BountyStatusPanel — Bounty Readiness Dashboard (Phase 8)
@@ -130,7 +131,7 @@ export default function BountyStatusPanel() {
     useEffect(() => {
         const fetchDataSource = async () => {
             try {
-                const res = await fetch(
+                const res = await authFetch(
                     (process.env.NEXT_PUBLIC_YGB_API_URL || 'http://localhost:8000') + '/api/training/data-source'
                 );
                 if (res.ok) setDataSource(await res.json());

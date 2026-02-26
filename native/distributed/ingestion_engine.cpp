@@ -17,7 +17,6 @@
 #include <cstring>
 #include <ctime>
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,7 +27,7 @@ extern "C" {
 
 #define MAX_FIELD_LEN 512
 #define MAX_SOURCES 64
-#define MAX_INGESTED 65536
+#define MAX_INGESTED 300000
 #define RATE_LIMIT_SEC 1
 #define SHA256_HEX_LEN 65
 

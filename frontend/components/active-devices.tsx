@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { authFetch } from "@/lib/ygb-api"
 
 interface Device {
     id: string
@@ -20,7 +21,7 @@ export function ActiveDevices({ className = "", refreshInterval = 5000 }) {
 
     const fetchDevices = React.useCallback(async () => {
         try {
-            const res = await fetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/admin/active-devices")
+            const res = await authFetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/admin/active-devices")
             if (!res.ok) throw new Error("Backend unavailable")
             const data = await res.json()
             setDevices(data.devices || [])

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { createAuthWebSocket } from "@/lib/ws-auth"
+import { authFetch } from "@/lib/ygb-api"
 import {
     Play,
     Square,
@@ -84,7 +85,7 @@ export default function RunnerPage() {
     useEffect(() => {
         async function checkApi() {
             try {
-                const res = await fetch(`${API_BASE}/health`)
+                const res = await authFetch(`${API_BASE}/health`)
                 if (res.ok) {
                     setApiStatus("online")
                 } else {
@@ -124,7 +125,7 @@ export default function RunnerPage() {
 
         try {
             // Start workflow via REST API
-            const startRes = await fetch(`${API_BASE}/api/workflow/bounty/start`, {
+            const startRes = await authFetch(`${API_BASE}/api/workflow/bounty/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

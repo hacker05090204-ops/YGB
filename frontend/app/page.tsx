@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import Link from "next/link"
 import { createAuthWebSocket } from "@/lib/ws-auth"
+import { authFetch } from "@/lib/ygb-api"
 import {
   CheckCircle,
   XCircle,
@@ -115,7 +116,7 @@ export default function Home() {
   useEffect(() => {
     async function checkAPI() {
       try {
-        const res = await fetch(`${API_BASE}/api/health`)
+        const res = await authFetch(`${API_BASE}/api/health`)
         if (res.ok) {
           setApiStatus("online")
         } else {
@@ -132,7 +133,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchG38Status() {
       try {
-        const res = await fetch(`${API_BASE}/api/g38/status`)
+        const res = await authFetch(`${API_BASE}/api/g38/status`)
         if (res.ok) {
           const data = await res.json()
           setG38Status(data)
@@ -175,7 +176,7 @@ export default function Home() {
 
     try {
       // Start workflow via REST API - uses phase_runner.py
-      const res = await fetch(`${API_BASE}/api/workflow/bounty/start`, {
+      const res = await authFetch(`${API_BASE}/api/workflow/bounty/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ target, mode })

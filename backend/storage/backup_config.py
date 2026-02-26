@@ -152,14 +152,61 @@ def get_google_drive_status() -> BackupTargetInfo:
             total_backups=0,
         )
 
-    # Credentials configured but connection not verified
-    return BackupTargetInfo(
-        name="google_drive",
-        status=BackupTargetStatus.DEGRADED,
-        reason="Credentials configured, connection verification pending",
-        last_backup_at=None,
-        total_backups=0,
-    )
+    # Real verification: check file exists and is valid service account JSON
+    creds_path = Path(creds)
+    if not creds_path.exists():
+        return BackupTargetInfo(
+            name="google_drive",
+            status=BackupTargetStatus.ERROR,
+            reason=f"Credentials file not found: {creds}",
+            last_backup_at=None,
+            total_backups=0,
+        )
+
+    try:
+        with open(creds_path, "r", encoding="utf-8") as f:
+            key_data = json.load(f)
+        required_fields = ["type", "project_id", "private_key", "client_email"]
+        missing = [k for k in required_fields if k not in key_data]
+        if missing:
+            return BackupTargetInfo(
+                name="google_drive",
+                status=BackupTargetStatus.ERROR,
+                reason=f"Service account key missing fields: {', '.join(missing)}",
+                last_backup_at=None,
+                total_backups=0,
+            )
+        if key_data.get("type") != "service_account":
+            return BackupTargetInfo(
+                name="google_drive",
+                status=BackupTargetStatus.ERROR,
+                reason=f"Key type is '{key_data.get('type')}', expected 'service_account'",
+                last_backup_at=None,
+                total_backups=0,
+            )
+        return BackupTargetInfo(
+            name="google_drive",
+            status=BackupTargetStatus.DEGRADED,
+            reason=f"Credentials verified (project: {key_data['project_id']}, email: {key_data['client_email']}), API connection not tested",
+            last_backup_at=None,
+            total_backups=0,
+        )
+    except json.JSONDecodeError:
+        return BackupTargetInfo(
+            name="google_drive",
+            status=BackupTargetStatus.ERROR,
+            reason=f"Credentials file is not valid JSON: {creds}",
+            last_backup_at=None,
+            total_backups=0,
+        )
+    except Exception as e:
+        return BackupTargetInfo(
+            name="google_drive",
+            status=BackupTargetStatus.ERROR,
+            reason=f"Failed to read credentials: {e}",
+            last_backup_at=None,
+            total_backups=0,
+        )
 
 
 # =============================================================================

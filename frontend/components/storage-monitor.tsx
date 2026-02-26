@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { authFetch } from "@/lib/ygb-api"
 import {
     HardDrive,
     Database,
@@ -90,8 +91,8 @@ export function StorageMonitor() {
         setLoading(true)
         try {
             const [diskRes, statsRes] = await Promise.all([
-                fetch(`${API_BASE}/api/storage/disk`),
-                fetch(`${API_BASE}/api/storage/stats`),
+                authFetch(`${API_BASE}/api/storage/disk`),
+                authFetch(`${API_BASE}/api/storage/stats`),
             ])
 
             if (diskRes.ok) {

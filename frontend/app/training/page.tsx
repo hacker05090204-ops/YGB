@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { authFetch } from "@/lib/ygb-api"
 import Link from "next/link"
 import {
     ArrowLeft,
@@ -78,8 +79,8 @@ export default function TrainingDashboard() {
     const fetchData = async () => {
         try {
             const [statusRes, eventsRes] = await Promise.all([
-                fetch(`${API_BASE}/api/g38/status`),
-                fetch(`${API_BASE}/api/g38/events?limit=100`)
+                authFetch(`${API_BASE}/api/g38/status`),
+                authFetch(`${API_BASE}/api/g38/events?limit=100`)
             ])
 
             if (statusRes.ok) {
@@ -115,7 +116,7 @@ export default function TrainingDashboard() {
     const startTraining = async (epochs: number) => {
         setStartingTraining(true)
         try {
-            await fetch(`${API_BASE}/api/g38/start?epochs=${epochs}`, { method: "POST" })
+            await authFetch(`${API_BASE}/api/g38/start?epochs=${epochs}`, { method: "POST" })
             await fetchData()
         } catch (error) {
             console.error("Failed to start training:", error)

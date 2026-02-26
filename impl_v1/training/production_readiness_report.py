@@ -176,7 +176,7 @@ def generate_report(
 
     # SMTP status
     if smtp is None:
-        smtp_configured = bool(os.environ.get("SMTP_PASSWORD"))
+        smtp_configured = bool(os.environ.get("SMTP_PASS") or os.environ.get("SMTP_PASSWORD"))
         smtp = SmtpStatus(
             configured=smtp_configured,
             last_send_status=None,

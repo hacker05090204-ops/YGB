@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { authFetch } from "@/lib/ygb-api"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -70,7 +71,7 @@ export function ChartAreaInteractive() {
     const fetchData = async () => {
       setLoading(true)
       try {
-        const response = await fetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/api/db/activity?limit=90")
+        const response = await authFetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/api/db/activity?limit=90")
         if (!response.ok) throw new Error("Backend unavailable")
         const data = await response.json()
 

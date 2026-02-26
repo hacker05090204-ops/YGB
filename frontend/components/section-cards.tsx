@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { authFetch } from "@/lib/ygb-api"
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -29,7 +30,7 @@ export function SectionCards() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/db/admin/stats`)
+        const res = await authFetch(`${API_BASE}/api/db/admin/stats`)
         if (res.ok) {
           const data = await res.json()
           setStats(data.stats || null)

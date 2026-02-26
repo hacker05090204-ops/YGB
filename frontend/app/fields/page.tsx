@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { authFetch } from "@/lib/ygb-api"
 import Link from "next/link"
 import {
     ArrowLeft,
@@ -175,7 +176,7 @@ export default function FieldProgressionDashboard() {
 
     const fetchData = useCallback(async () => {
         try {
-            const res = await fetch(`${API_BASE}/fields/state`)
+            const res = await authFetch(`${API_BASE}/fields/state`)
             if (!res.ok) throw new Error(`HTTP ${res.status}`)
             const json = await res.json()
             setData(json)
@@ -197,7 +198,7 @@ export default function FieldProgressionDashboard() {
     const handleTrain = async () => {
         setActionStatus("Starting training...")
         try {
-            const res = await fetch(`${API_BASE}/training/start`, { method: "POST" })
+            const res = await authFetch(`${API_BASE}/training/start`, { method: "POST" })
             const json = await res.json()
             setActionStatus(json.message || json.status)
             fetchData()
@@ -209,7 +210,7 @@ export default function FieldProgressionDashboard() {
     const handleHunt = async () => {
         setActionStatus("Checking hunt gates...")
         try {
-            const res = await fetch(`${API_BASE}/hunt/start`, { method: "POST" })
+            const res = await authFetch(`${API_BASE}/hunt/start`, { method: "POST" })
             const json = await res.json()
             setActionStatus(json.message || json.status)
             fetchData()
@@ -221,7 +222,7 @@ export default function FieldProgressionDashboard() {
     const handleApprove = async (fieldId: number) => {
         setActionStatus(`Approving field ${fieldId}...`)
         try {
-            const res = await fetch(`${API_BASE}/fields/approve/${fieldId}`, {
+            const res = await authFetch(`${API_BASE}/fields/approve/${fieldId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { authFetch } from "@/lib/ygb-api"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 import {
   Users,
@@ -90,35 +91,35 @@ export default function Dashboard() {
       setApiStatus("loading")
 
       // Fetch users
-      const usersRes = await fetch(`${API_BASE}/api/db/users`)
+      const usersRes = await authFetch(`${API_BASE}/api/db/users`)
       if (usersRes.ok) {
         const data = await usersRes.json()
         setUsers(data.users || [])
       }
 
       // Fetch bounties
-      const bountiesRes = await fetch(`${API_BASE}/api/db/bounties`)
+      const bountiesRes = await authFetch(`${API_BASE}/api/db/bounties`)
       if (bountiesRes.ok) {
         const data = await bountiesRes.json()
         setBounties(data.bounties || [])
       }
 
       // Fetch targets
-      const targetsRes = await fetch(`${API_BASE}/api/db/targets`)
+      const targetsRes = await authFetch(`${API_BASE}/api/db/targets`)
       if (targetsRes.ok) {
         const data = await targetsRes.json()
         setTargets(data.targets || [])
       }
 
       // Fetch admin stats
-      const statsRes = await fetch(`${API_BASE}/api/db/admin/stats`)
+      const statsRes = await authFetch(`${API_BASE}/api/db/admin/stats`)
       if (statsRes.ok) {
         const data = await statsRes.json()
         setAdminStats(data.stats)
       }
 
       // Fetch activity
-      const activityRes = await fetch(`${API_BASE}/api/db/activity?limit=20`)
+      const activityRes = await authFetch(`${API_BASE}/api/db/activity?limit=20`)
       if (activityRes.ok) {
         const data = await activityRes.json()
         setActivities(data.activities || [])
@@ -140,7 +141,7 @@ export default function Dashboard() {
   const addUser = async () => {
     if (!newUserName.trim()) return
     try {
-      const res = await fetch(`${API_BASE}/api/db/users`, {
+      const res = await authFetch(`${API_BASE}/api/db/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: newUserName, email: newUserEmail || null })
@@ -159,7 +160,7 @@ export default function Dashboard() {
   const addTarget = async () => {
     if (!newTargetName.trim() || !newTargetScope.trim()) return
     try {
-      const res = await fetch(`${API_BASE}/api/db/targets`, {
+      const res = await authFetch(`${API_BASE}/api/db/targets`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

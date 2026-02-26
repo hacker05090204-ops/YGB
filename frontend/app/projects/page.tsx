@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { authFetch } from "@/lib/ygb-api"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
 import { FolderOpen, Calendar, Clock, Plus, RefreshCw, AlertCircle } from "lucide-react"
@@ -35,7 +36,7 @@ export default function ProjectsPage() {
     const fetchProjects = async () => {
         try {
             setApiStatus("loading")
-            const res = await fetch(`${API_BASE}/api/db/targets`)
+            const res = await authFetch(`${API_BASE}/api/db/targets`)
             if (res.ok) {
                 const data = await res.json()
                 const targets = data.targets || []
@@ -95,8 +96,8 @@ export default function ProjectsPage() {
                             <RefreshCw className={`w-4 h-4 text-muted-foreground ${apiStatus === "loading" ? "animate-spin" : ""}`} />
                         </button>
                         <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${apiStatus === "online" ? "bg-green-500/10 border-green-500/20 text-green-400"
-                                : apiStatus === "loading" ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
-                                    : "bg-red-500/10 border-red-500/20 text-red-400"
+                            : apiStatus === "loading" ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                                : "bg-red-500/10 border-red-500/20 text-red-400"
                             }`}>
                             <div className={`w-1.5 h-1.5 rounded-full ${apiStatus === "online" ? "bg-green-400" : apiStatus === "loading" ? "bg-yellow-400 animate-pulse" : "bg-red-400"
                                 }`} />

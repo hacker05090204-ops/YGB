@@ -11,7 +11,7 @@ const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
  * Centralized fetch wrapper that includes Authorization header.
  * Uses unified token lookup from auth-token.ts.
  */
-async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
+export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
   const headers = buildAuthHeaders(
     options.headers as Record<string, string> || {}
   );

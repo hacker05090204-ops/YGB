@@ -387,8 +387,20 @@ def get_runtime_status():
 
     Returns validated runtime state from RUNTIME_STATE_PATH.
     Falls back to HMAC-validated telemetry if state file missing.
+    Separates storage_engine_status from dataset_readiness_status.
+    Blocks 'training ready' if dataset is blocked.
     """
     import time as _time
+
+    # Determine dataset readiness (strict real mode check)
+    strict_real = os.environ.get("YGB_STRICT_REAL_MODE", "true").lower() != "false"
+    min_samples = int(os.environ.get("YGB_MIN_REAL_SAMPLES", "125000"))
+    dataset_readiness = {
+        "status": "BLOCKED_REAL_DATA",
+        "strict_real_mode": strict_real,
+        "min_samples_required": min_samples,
+        "reason": f"Strict real mode active — need {min_samples} verified samples before training"
+    }
 
     # Try runtime state file first
     if os.path.exists(RUNTIME_STATE_PATH):
@@ -400,6 +412,8 @@ def get_runtime_status():
             if missing:
                 return {
                     "status": "invalid",
+                    "storage_engine_status": "ERROR",
+                    "dataset_readiness": dataset_readiness,
                     "message": f"Missing required fields: {', '.join(missing)}",
                     "timestamp": int(_time.time() * 1000)
                 }
@@ -408,8 +422,26 @@ def get_runtime_status():
             last_update = data.get('last_update_ms', 0)
             stale = (now_ms - last_update) > STALE_THRESHOLD_MS
 
+            # Determine storage engine status
+            if stale:
+                storage_status = "STALE"
+            elif data.get('total_errors', 0) > 0:
+                storage_status = "DEGRADED"
+            else:
+                storage_status = "ACTIVE"
+
+            # Block training_ready if dataset is blocked
+            training_ready = (
+                not stale
+                and data.get('determinism_status', False)
+                and dataset_readiness["status"] != "BLOCKED_REAL_DATA"
+            )
+
             return {
                 "status": "active",
+                "storage_engine_status": storage_status,
+                "dataset_readiness": dataset_readiness,
+                "training_ready": training_ready,
                 "runtime": data,
                 "signature": _sign_payload(data),
                 "stale": stale,
@@ -419,6 +451,8 @@ def get_runtime_status():
         except json.JSONDecodeError:
             return {
                 "status": "error",
+                "storage_engine_status": "ERROR",
+                "dataset_readiness": dataset_readiness,
                 "message": "Corrupt runtime state file",
                 "timestamp": int(_time.time() * 1000)
             }
@@ -426,16 +460,25 @@ def get_runtime_status():
             logger.exception("Failed to read runtime state")
             return {
                 "status": "error",
+                "storage_engine_status": "ERROR",
+                "dataset_readiness": dataset_readiness,
                 "message": "Failed to read runtime state",
                 "timestamp": int(_time.time() * 1000)
             }
 
     # Fall back to HMAC-validated telemetry
     if os.path.exists(TELEMETRY_PATH):
-        return validate_telemetry()
+        result = validate_telemetry()
+        result["storage_engine_status"] = "ACTIVE" if result.get("status") == "ok" else "ERROR"
+        result["dataset_readiness"] = dataset_readiness
+        result["training_ready"] = False  # Always blocked until dataset ready
+        return result
 
     return {
         "status": "awaiting_data",
+        "storage_engine_status": "NOT_INITIALIZED",
+        "dataset_readiness": dataset_readiness,
+        "training_ready": False,
         "message": "No runtime state yet",
         "timestamp": int(_time.time() * 1000)
     }

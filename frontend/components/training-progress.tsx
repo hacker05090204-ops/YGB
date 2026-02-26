@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { authFetch } from "@/lib/ygb-api"
 import { cn } from "@/lib/utils"
 import {
     Activity,
@@ -87,8 +88,8 @@ export function TrainingProgress({
     const fetchStatus = useCallback(async () => {
         try {
             const [statusRes, eventsRes] = await Promise.all([
-                fetch(`${API_BASE}/api/g38/status`),
-                fetch(`${API_BASE}/api/g38/events?limit=5`)
+                authFetch(`${API_BASE}/api/g38/status`),
+                authFetch(`${API_BASE}/api/g38/events?limit=5`)
             ])
 
             if (statusRes.ok) {
@@ -113,7 +114,7 @@ export function TrainingProgress({
     const startTraining = useCallback(async () => {
         setIsStarting(true)
         try {
-            const res = await fetch(`${API_BASE}/api/g38/start?epochs=${selectedEpochs}`, {
+            const res = await authFetch(`${API_BASE}/api/g38/start?epochs=${selectedEpochs}`, {
                 method: 'POST'
             })
             if (res.ok) {
@@ -129,7 +130,7 @@ export function TrainingProgress({
     const stopTraining = useCallback(async () => {
         setIsStopping(true)
         try {
-            const res = await fetch(`${API_BASE}/api/g38/abort`, {
+            const res = await authFetch(`${API_BASE}/api/g38/abort`, {
                 method: 'POST'
             })
             if (res.ok) {

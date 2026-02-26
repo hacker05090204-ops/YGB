@@ -33,7 +33,7 @@ extern "C" {
 
 #define MAX_FIELD_LEN 512
 #define SHA256_HEX_LEN 65
-#define MAX_INGESTED 65536
+#define MAX_INGESTED 300000
 
 typedef struct {
   char endpoint[MAX_FIELD_LEN];

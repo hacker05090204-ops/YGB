@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { authFetch } from "@/lib/ygb-api"
 
 interface ActivityEvent {
     id: string
@@ -29,7 +30,7 @@ export function LoginAlerts({ className = "", refreshInterval = 5000 }) {
 
     const fetchEvents = React.useCallback(async () => {
         try {
-            const res = await fetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/api/db/activity?limit=20")
+            const res = await authFetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/api/db/activity?limit=20")
             if (!res.ok) throw new Error("Backend unavailable")
             const data = await res.json()
             // Filter to login-related events
