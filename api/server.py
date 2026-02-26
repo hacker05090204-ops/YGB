@@ -499,6 +499,101 @@ async def get_cve_status():
         return {"status": "ERROR", "reason": str(e)}
 
 
+@app.get("/api/cve/scheduler/health")
+async def get_cve_scheduler_health():
+    """CVE scheduler SLO metrics and health status."""
+    try:
+        from backend.cve.cve_scheduler import get_scheduler
+        scheduler = get_scheduler()
+        return scheduler.get_health()
+    except ImportError:
+        return {"status": "NOT_AVAILABLE", "reason": "Scheduler module not found"}
+    except Exception as e:
+        return {"status": "ERROR", "reason": str(e)}
+
+
+@app.get("/api/cve/pipeline/status")
+async def get_cve_pipeline_full_status():
+    """Full CVE pipeline status with promotion, dedup/drift, and anti-hallucination."""
+    try:
+        from backend.cve.cve_pipeline import get_pipeline
+        from backend.cve.promotion_policy import get_promotion_policy
+        from backend.cve.dedup_drift import get_dedup_drift_engine
+        from backend.cve.anti_hallucination import get_anti_hallucination_validator
+        from backend.cve.cve_scheduler import get_scheduler
+
+        return {
+            "pipeline": get_pipeline().get_pipeline_status(),
+            "scheduler": get_scheduler().get_health(),
+            "promotion": get_promotion_policy().get_counts(),
+            "dedup_drift": get_dedup_drift_engine().get_status(),
+            "anti_hallucination": get_anti_hallucination_validator().get_status(),
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+    except Exception as e:
+        return {"status": "ERROR", "reason": str(e)}
+
+
+@app.get("/api/training/readiness")
+async def get_training_readiness():
+    """Training readiness truth table — per-field status with exact block reasons."""
+    try:
+        from impl_v1.training.data.real_dataset_loader import (
+            validate_dataset_integrity, YGB_MIN_REAL_SAMPLES,
+            STRICT_REAL_MODE,
+        )
+        ok, msg = validate_dataset_integrity()
+
+        # Build per-field readiness
+        fields = {}
+        storage_health = get_storage_health()
+
+        fields["storage_engine"] = {
+            "status": "READY" if storage_health.get("storage_active") else "BLOCKED",
+            "reason": None if storage_health.get("storage_active") else "Storage engine not active",
+        }
+        fields["dataset_source"] = {
+            "status": "READY" if ok else "BLOCKED",
+            "reason": None if ok else msg,
+        }
+        fields["strict_real_mode"] = {
+            "status": "READY" if STRICT_REAL_MODE else "PARTIAL",
+            "reason": None if STRICT_REAL_MODE else "STRICT_REAL_MODE=false (lab mode)",
+        }
+        fields["min_samples"] = {
+            "status": "READY" if ok else "BLOCKED",
+            "threshold": YGB_MIN_REAL_SAMPLES,
+            "reason": None if ok else msg,
+        }
+
+        # Overall readiness
+        blocked = [f for f in fields.values() if f["status"] == "BLOCKED"]
+        partial = [f for f in fields.values() if f["status"] == "PARTIAL"]
+
+        if blocked:
+            overall = "BLOCKED"
+        elif partial:
+            overall = "PARTIAL"
+        else:
+            overall = "READY"
+
+        return {
+            "overall": overall,
+            "fields": fields,
+            "training_allowed": overall == "READY",
+            "go_no_go": "GO" if overall == "READY" else "NO_GO",
+            "remediation": msg if not ok else None,
+            "timestamp": datetime.now(UTC).isoformat(),
+        }
+    except Exception as e:
+        return {
+            "overall": "BLOCKED",
+            "training_allowed": False,
+            "go_no_go": "NO_GO",
+            "reason": str(e),
+        }
+
+
 @app.get("/api/backup/status")
 async def get_backup_status_endpoint():
     """Backup strategy status — local HDD, peer replication, Google Drive."""
@@ -509,6 +604,7 @@ async def get_backup_status_endpoint():
         return {"status": "NOT_AVAILABLE", "reason": "Backup config module not found"}
     except Exception as e:
         return {"status": "ERROR", "reason": str(e)}
+
 
 
 @app.get("/api/bounty/phases")

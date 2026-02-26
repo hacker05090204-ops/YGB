@@ -114,7 +114,7 @@ async def require_auth(
     if not credentials:
         raise HTTPException(
             status_code=401,
-            detail="Authentication required",
+            detail={"error": "AUTH_REQUIRED", "detail": "Authentication required"},
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -124,7 +124,7 @@ async def require_auth(
     if is_token_revoked(token):
         raise HTTPException(
             status_code=401,
-            detail="Token has been revoked",
+            detail={"error": "AUTH_REQUIRED", "detail": "Token has been revoked"},
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -133,7 +133,7 @@ async def require_auth(
     if payload is None:
         raise HTTPException(
             status_code=401,
-            detail="Invalid or expired token",
+            detail={"error": "AUTH_REQUIRED", "detail": "Invalid or expired token"},
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -142,7 +142,7 @@ async def require_auth(
     if session_id and is_session_revoked(session_id):
         raise HTTPException(
             status_code=401,
-            detail="Session has been invalidated",
+            detail={"error": "AUTH_REQUIRED", "detail": "Session has been invalidated"},
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -164,7 +164,7 @@ async def require_admin(
     if role != "admin":
         raise HTTPException(
             status_code=403,
-            detail="Admin access required",
+            detail={"error": "AUTH_REQUIRED", "detail": "Insufficient permissions — admin access required"},
         )
     return user
 

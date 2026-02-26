@@ -181,6 +181,99 @@ def check_scope_registry() -> CheckResult:
 
 
 # =========================================================================
+# BOOT SUMMARY — ENABLED/DISABLED/BLOCKED per feature
+# =========================================================================
+
+def check_secrets() -> CheckResult:
+    """Verify strong secrets are set (≥32 chars)."""
+    required = {
+        "JWT_SECRET": os.environ.get("JWT_SECRET", ""),
+        "YGB_HMAC_SECRET": os.environ.get("YGB_HMAC_SECRET", ""),
+        "YGB_VIDEO_JWT_SECRET": os.environ.get("YGB_VIDEO_JWT_SECRET", ""),
+    }
+    weak = []
+    for name, val in required.items():
+        if len(val) < 32:
+            weak.append(f"{name} ({len(val)} chars)")
+    if weak:
+        return CheckResult(
+            "secrets", False,
+            f"Weak/missing secrets: {', '.join(weak)} — need ≥32 chars",
+            critical=False,
+        )
+    return CheckResult("secrets", True, "All required secrets ≥32 chars")
+
+
+def check_boot_summary() -> CheckResult:
+    """Generate boot summary showing ENABLED/DISABLED/BLOCKED per feature."""
+    profile = os.environ.get("YGB_PROFILE", "PRIVACY")
+    features = {}
+
+    # CVE Pipeline
+    features["cve_pipeline"] = "ENABLED"
+
+    # SMTP
+    smtp_host = os.environ.get("SMTP_HOST", "")
+    smtp_user = os.environ.get("SMTP_USER", "")
+    smtp_pass = os.environ.get("SMTP_PASS", "") or os.environ.get("SMTP_PASSWORD", "")
+    if smtp_host and smtp_user and smtp_pass:
+        features["smtp_alerts"] = "ENABLED"
+    elif profile == "CONNECTED":
+        features["smtp_alerts"] = "BLOCKED (SMTP_HOST/SMTP_USER/SMTP_PASS required)"
+    else:
+        features["smtp_alerts"] = "DISABLED (privacy mode)"
+
+    # GitHub OAuth
+    gh_id = os.environ.get("GITHUB_CLIENT_ID", "")
+    gh_secret = os.environ.get("GITHUB_CLIENT_SECRET", "")
+    gh_redirect = os.environ.get("GITHUB_REDIRECT_URI", "")
+    if gh_id and gh_secret:
+        features["github_oauth"] = "ENABLED"
+    elif profile == "CONNECTED":
+        features["github_oauth"] = "BLOCKED (GITHUB_CLIENT_ID/SECRET required)"
+    else:
+        features["github_oauth"] = "DISABLED (privacy mode)"
+
+    # Google Drive
+    gdrive = os.environ.get("GOOGLE_DRIVE_CREDENTIALS", "")
+    if gdrive and Path(gdrive).exists() if gdrive else False:
+        features["google_drive_backup"] = "ENABLED"
+    elif gdrive:
+        features["google_drive_backup"] = "BLOCKED (credentials file not found)"
+    else:
+        features["google_drive_backup"] = "DISABLED (no credentials)"
+
+    # CVE API Key
+    cve_key = os.environ.get("CVE_API_KEY", "")
+    if cve_key:
+        features["cve_api_key"] = "ENABLED (NVD rate limit bypass)"
+    else:
+        features["cve_api_key"] = "DISABLED (using free tier)"
+
+    # Training
+    strict = os.environ.get("YGB_STRICT_REAL_MODE", "true").lower() != "false"
+    features["strict_real_mode"] = "ENABLED" if strict else "DISABLED (lab mode)"
+
+    # Accelerator
+    accel = os.environ.get("ACCELERATOR_API_URL", "")
+    features["accelerator"] = "ENABLED" if accel else "DISABLED"
+
+    summary_lines = [f"  {k}: {v}" for k, v in features.items()]
+    summary = f"Boot Summary (profile={profile}):\n" + "\n".join(summary_lines)
+
+    blocked = [v for v in features.values() if v.startswith("BLOCKED")]
+    if blocked and profile == "CONNECTED":
+        return CheckResult(
+            "boot_summary", False,
+            summary,
+            critical=False,
+        )
+
+    logger.info(summary)
+    return CheckResult("boot_summary", True, summary)
+
+
+# =========================================================================
 # PREFLIGHT RUNNER
 # =========================================================================
 
@@ -193,6 +286,8 @@ def run_preflight() -> PreflightReport:
         check_precision_baseline(),
         check_drift_baseline(),
         check_scope_registry(),
+        check_secrets(),
+        check_boot_summary(),
     ]
 
     fatal_errors = []
