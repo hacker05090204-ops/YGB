@@ -414,8 +414,10 @@ def validate_dataset_integrity() -> Tuple[bool, str]:
 
         # Check minimum samples
         if stats["total"] < min_samples:
+            deficit = min_samples - stats["total"]
             return False, (
-                f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples}"
+                f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples} "
+                f"(deficit: {deficit} samples needed)"
             )
 
         # Check class balance (within 10%)
@@ -437,7 +439,10 @@ def validate_dataset_integrity() -> Tuple[bool, str]:
     else:
         # ── LAB MODE (LAB_ONLY): SyntheticTrainingDataset (development only) ──
         # Generate enough synthetic samples to meet lab threshold
-        lab_sample_count = max(min_samples, 20000)
+        # Request 25% more than threshold so that after the 80/20
+        # train/holdout split inside ScaledDatasetGenerator, the train
+        # portion still exceeds min_samples.
+        lab_sample_count = max(int(min_samples * 1.25), 20000)
         try:
             dataset = SyntheticTrainingDataset(
                 config=DatasetConfig(total_samples=lab_sample_count),
@@ -448,8 +453,10 @@ def validate_dataset_integrity() -> Tuple[bool, str]:
 
             # Check minimum samples
             if stats["total"] < min_samples:
+                deficit = min_samples - stats["total"]
                 return False, (
-                    f"Insufficient samples: {stats['total']} < {min_samples}"
+                    f"Insufficient samples: {stats['total']} < {min_samples} "
+                    f"(deficit: {deficit} samples needed)"
                 )
 
             # Check class balance (within 10%)
@@ -580,13 +587,15 @@ class IngestionPipelineDataset(Dataset):
 
         if verified_count < min_samples:
             # NO FALLBACK — freeze field, abort
+            deficit = min_samples - verified_count
             logger.error(
                 f"[INGESTION] ABORT: Only {verified_count} verified samples "
-                f"(minimum: {min_samples}). Field FROZEN. "
+                f"(minimum: {min_samples}, deficit: {deficit}). Field FROZEN. "
                 f"NO synthetic fallback permitted."
             )
             raise RuntimeError(
-                f"Insufficient ingestion data: {verified_count} < {min_samples}. "
+                f"Insufficient ingestion data: {verified_count} < {min_samples} "
+                f"(deficit: {deficit} samples needed). "
                 f"Field frozen. No synthetic fallback."
             )
 
@@ -705,9 +714,11 @@ class IngestionPipelineDataset(Dataset):
         )
 
         if accepted < min_samples:
+            deficit = min_samples - accepted
             raise RuntimeError(
                 f"Insufficient quality samples after filtering: "
-                f"{accepted} < {min_samples}. No synthetic fallback."
+                f"{accepted} < {min_samples} (deficit: {deficit} samples needed). "
+                f"No synthetic fallback."
             )
 
         # Convert to tensors
@@ -898,3 +909,118 @@ def create_real_training_dataloader(
     stats["pin_memory"] = pin_memory
 
     return loader, stats
+
+
+# =============================================================================
+# PER-FIELD REPORT (for /api/training/readiness endpoint)
+# =============================================================================
+
+def get_per_field_report() -> dict:
+    """
+    Generate a per-field readiness report for the training readiness endpoint.
+
+    Reports bridge counter state, thresholds, and deficits.
+    Does NOT raise — always returns a dict.
+    """
+    min_samples = YGB_MIN_REAL_SAMPLES
+    report = {
+        "strict_real_mode": STRICT_REAL_MODE,
+        "threshold": min_samples,
+        "bridge_loaded": False,
+        "bridge_count": 0,
+        "bridge_verified_count": 0,
+        "deficit": min_samples,
+        "status": "BLOCKED",
+        "reason": "Not checked",
+        "manifest_exists": False,
+    }
+
+    # Check manifest file
+    manifest_path = _SECURE_DATA / "dataset_manifest.json"
+    report["manifest_exists"] = manifest_path.exists()
+    if manifest_path.exists():
+        try:
+            with open(manifest_path) as f:
+                manifest = json.load(f)
+            report["manifest"] = {
+                "sample_count": manifest.get("sample_count", 0),
+                "dataset_source": manifest.get("dataset_source", "UNKNOWN"),
+                "frozen_at": manifest.get("frozen_at"),
+                "class_entropy": manifest.get("class_entropy", 0),
+                "training_mode": manifest.get("training_mode", "UNKNOWN"),
+            }
+        except Exception:
+            report["manifest"] = None
+
+    # Check bridge
+    try:
+        lib = _load_bridge()
+        report["bridge_loaded"] = True
+        report["bridge_count"] = lib.bridge_get_count()
+        report["bridge_verified_count"] = lib.bridge_get_verified_count()
+        report["deficit"] = max(0, min_samples - report["bridge_verified_count"])
+
+        if report["bridge_verified_count"] >= min_samples:
+            report["status"] = "READY"
+            report["reason"] = (
+                f"{report['bridge_verified_count']} verified samples "
+                f"(threshold: {min_samples})"
+            )
+        else:
+            report["status"] = "BLOCKED"
+            report["reason"] = (
+                f"Insufficient samples: {report['bridge_verified_count']}/{min_samples} "
+                f"(deficit: {report['deficit']})"
+            )
+    except FileNotFoundError:
+        report["status"] = "BLOCKED"
+        report["reason"] = "Ingestion bridge DLL not found"
+    except Exception as e:
+        report["status"] = "BLOCKED"
+        report["reason"] = f"Bridge error: {str(e)}"
+
+    return report
+
+
+def generate_dataset_manifest() -> dict:
+    """
+    Generate dataset_manifest.json from current ingestion state.
+
+    Returns the manifest dict or error info.
+    Does NOT raise — always returns a dict.
+    """
+    try:
+        lib = _load_bridge()
+        verified = lib.bridge_get_verified_count()
+        total = lib.bridge_get_count()
+
+        # Get hash from bridge
+        hash_buf = ctypes.create_string_buffer(65)
+        lib.bridge_get_dataset_manifest_hash(hash_buf, 65)
+        manifest_hash = hash_buf.value.decode("utf-8", errors="replace")
+
+        manifest = {
+            "dataset_source": "INGESTION_PIPELINE",
+            "ingestion_manifest_hash": manifest_hash,
+            "total_ingested": total,
+            "verified_count": verified,
+            "threshold": YGB_MIN_REAL_SAMPLES,
+            "deficit": max(0, YGB_MIN_REAL_SAMPLES - verified),
+            "strict_real_mode": STRICT_REAL_MODE,
+            "ready": verified >= YGB_MIN_REAL_SAMPLES,
+            "generated_at": __import__("datetime").datetime.now().isoformat(),
+        }
+
+        # Write to disk
+        _SECURE_DATA.mkdir(parents=True, exist_ok=True)
+        manifest_path = _SECURE_DATA / "dataset_manifest.json"
+        with open(manifest_path, "w") as f:
+            json.dump(manifest, f, indent=2)
+
+        return {"success": True, "manifest": manifest, "path": str(manifest_path)}
+
+    except FileNotFoundError:
+        return {"success": False, "error": "Ingestion bridge DLL not found"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+

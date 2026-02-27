@@ -172,14 +172,36 @@ def fetch_cves_passive(
     if _mock_response is not None:
         return _handle_mock_response(product, _mock_response, config)
     
-    # In real implementation, would make HTTP request here
-    # For governance testing, return degraded status
+    # Real HTTP call to NVD API
+    import urllib.request
+    import urllib.error
+
+    url = f"{config.base_url}?keywordSearch={urllib.request.quote(product)}"
+    req = urllib.request.Request(
+        url,
+        headers={"apiKey": config.api_key, "User-Agent": "YGB-CVE-Scanner/1.0"},
+    )
+
+    try:
+        response = urllib.request.urlopen(req, timeout=config.timeout)
+        data = json.loads(response.read().decode("utf-8"))
+        return _handle_mock_response(product, data, config)
+    except urllib.error.HTTPError as e:
+        error_msg = f"NVD API HTTP {e.code}: {e.reason}"
+        status = APIStatus.INVALID_KEY if e.code == 403 else APIStatus.OFFLINE
+    except urllib.error.URLError as e:
+        error_msg = f"NVD API connection failed: {e.reason}"
+        status = APIStatus.OFFLINE
+    except Exception as e:
+        error_msg = f"NVD API error: {str(e)}"
+        status = APIStatus.DEGRADED
+
     return CVEAPIResult(
         result_id=f"API-{uuid.uuid4().hex[:16].upper()}",
-        status=APIStatus.DEGRADED,
+        status=status,
         records=tuple(),
         from_cache=False,
-        error_message="API call not implemented in governance layer - use mock for testing",
+        error_message=error_msg,
         timestamp=datetime.now(UTC).isoformat(),
     )
 

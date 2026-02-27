@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { createAuthWebSocket } from '@/lib/ws-auth';
 
 /**
  * TrainingDashboardV2 — Live Training Dashboard (Phase 5)
@@ -122,21 +123,27 @@ export default function TrainingDashboardV2() {
         let ws: WebSocket | null = null;
         function connect() {
             try {
-                ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8765/training/v2');
-                ws.onopen = () => setConnected(true);
-                ws.onmessage = (e) => {
-                    try {
-                        const d: DashboardV2Frame = JSON.parse(e.data);
-                        setFrame(d);
-                        setSpsHistory(p => [...p.slice(-100), d.samples_per_sec]);
-                        if (timer.current) clearTimeout(timer.current);
-                        timer.current = setTimeout(() => {
-                            setFrame(prev => prev ? { ...prev, stalled: true } : null);
-                        }, 10000);
-                    } catch { /* skip */ }
-                };
-                ws.onclose = () => { setConnected(false); setTimeout(connect, 3000); };
-                ws.onerror = () => ws?.close();
+                ws = createAuthWebSocket(
+                    '/training/v2',
+                    (e) => {
+                        try {
+                            const d: DashboardV2Frame = JSON.parse(e.data);
+                            setFrame(d);
+                            setSpsHistory(p => [...p.slice(-100), d.samples_per_sec]);
+                            if (timer.current) clearTimeout(timer.current);
+                            timer.current = setTimeout(() => {
+                                setFrame(prev => prev ? { ...prev, stalled: true } : null);
+                            }, 10000);
+                        } catch { /* skip */ }
+                    },
+                    () => ws?.close(),
+                    () => { setConnected(false); setTimeout(connect, 3000); },
+                );
+                if (ws) {
+                    ws.onopen = () => setConnected(true);
+                } else {
+                    setConnected(false);
+                }
             } catch { setTimeout(connect, 3000); }
         }
         connect();

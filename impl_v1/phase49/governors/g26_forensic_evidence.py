@@ -200,7 +200,7 @@ def generate_bundle_id() -> str:
 
 
 # =============================================================================
-# CAPTURE FUNCTIONS (MOCK FOR TESTING, REAL C++ INTEGRATION LATER)
+# CAPTURE ENGINE — C++ BACKEND REQUIRED FOR REAL DATA
 # =============================================================================
 
 class EvidenceCaptureEngine:

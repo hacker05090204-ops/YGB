@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { authFetch } from '@/lib/ygb-api';
+import { createAuthWebSocket } from '@/lib/ws-auth';
 
 /**
  * BountyStatusPanel — Bounty Readiness Dashboard (Phase 8)
@@ -146,13 +147,19 @@ export default function BountyStatusPanel() {
         let ws: WebSocket | null = null;
         function connect() {
             try {
-                ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8765/bounty');
-                ws.onopen = () => setConnected(true);
-                ws.onmessage = (e) => {
-                    try { setStatus(JSON.parse(e.data)); } catch { }
-                };
-                ws.onclose = () => { setConnected(false); setTimeout(connect, 3000); };
-                ws.onerror = () => ws?.close();
+                ws = createAuthWebSocket(
+                    '/bounty',
+                    (e) => {
+                        try { setStatus(JSON.parse(e.data)); } catch { }
+                    },
+                    () => ws?.close(),
+                    () => { setConnected(false); setTimeout(connect, 3000); },
+                );
+                if (ws) {
+                    ws.onopen = () => setConnected(true);
+                } else {
+                    setConnected(false);
+                }
             } catch { setTimeout(connect, 3000); }
         }
         connect();

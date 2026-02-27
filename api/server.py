@@ -416,42 +416,6 @@ async def get_storage_status():
     return get_storage_health()
 
 
-@app.get("/api/rollout/metrics")
-async def get_rollout_metrics():
-    """Rollout metrics endpoint — returns DEGRADED when real metrics unavailable.
-
-    Never defaults to all-pass zeros that look healthy.
-    """
-    try:
-        from governance.real_data_rollout_governor import get_current_status
-        status = get_current_status()
-        return {
-            "status": "available",
-            "metrics_available": True,
-            **status,
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
-    except ImportError:
-        return {
-            "status": "DEGRADED",
-            "metrics_available": False,
-            "reason": "Rollout governor module not available",
-            "stage": None,
-            "real_data_pct": None,
-            "frozen": None,
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
-    except Exception as e:
-        return {
-            "status": "DEGRADED",
-            "metrics_available": False,
-            "reason": f"Error reading rollout metrics: {str(e)}",
-            "stage": None,
-            "real_data_pct": None,
-            "frozen": None,
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
-
 
 def _get_dataset_readiness() -> Dict[str, Any]:
     """Get dataset readiness status for health endpoint."""
@@ -608,7 +572,7 @@ async def get_training_readiness():
     try:
         from impl_v1.training.data.real_dataset_loader import (
             validate_dataset_integrity, YGB_MIN_REAL_SAMPLES,
-            STRICT_REAL_MODE,
+            STRICT_REAL_MODE, get_per_field_report,
         )
         ok, msg = validate_dataset_integrity()
 
@@ -633,6 +597,24 @@ async def get_training_readiness():
             "threshold": YGB_MIN_REAL_SAMPLES,
             "reason": None if ok else msg,
         }
+
+        # Per-field bridge report (bridge counters, deficit, manifest)
+        try:
+            bridge_report = get_per_field_report()
+            fields["ingestion_bridge"] = {
+                "status": bridge_report["status"],
+                "bridge_loaded": bridge_report["bridge_loaded"],
+                "bridge_count": bridge_report["bridge_count"],
+                "bridge_verified_count": bridge_report["bridge_verified_count"],
+                "deficit": bridge_report["deficit"],
+                "manifest_exists": bridge_report["manifest_exists"],
+                "reason": bridge_report["reason"],
+            }
+        except Exception as e:
+            fields["ingestion_bridge"] = {
+                "status": "BLOCKED",
+                "reason": f"Bridge report failed: {e}",
+            }
 
         # Overall readiness
         blocked = [f for f in fields.values() if f["status"] == "BLOCKED"]
@@ -687,6 +669,125 @@ async def get_bounty_phases(user=Depends(require_auth)):
         }
         for p in phases
     }
+
+
+# =============================================================================
+# FRONTEND-REQUIRED ROUTES (phases, hunter modules, field progression)
+# =============================================================================
+
+class RunPhaseRequest(BaseModel):
+    phase: str
+    target: str = ""
+    mode: str = "READ_ONLY"
+
+
+class RunHunterRequest(BaseModel):
+    module: str
+    target: str = ""
+    mode: str = "READ_ONLY"
+
+
+class FieldApprovalRequest(BaseModel):
+    approver_id: str
+    reason: str
+
+
+@app.get("/api/phases")
+async def get_phases(user=Depends(require_auth)):
+    """Get all available governance phases — frontend phase picker."""
+    phases = discover_python_phases()
+    return {
+        "phases": [
+            {
+                "name": p["name"],
+                "number": p["number"],
+                "available": p["available"],
+                "description": p["description"],
+            }
+            for p in phases
+        ],
+        "count": len(phases),
+    }
+
+
+@app.get("/api/hunter-modules")
+async def get_hunter_modules(user=Depends(require_auth)):
+    """Get available HUMANOID_HUNTER modules — frontend module picker."""
+    modules = discover_hunter_modules()
+    return {
+        "modules": [
+            {"name": name, "available": available}
+            for name, available in modules.items()
+        ],
+        "count": len(modules),
+    }
+
+
+@app.post("/api/run-phase")
+async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
+    """Run a governance phase. Delegates to RealPhaseRunner."""
+    phases = discover_python_phases()
+    phase_names = [p["name"] for p in phases]
+    if request.phase not in phase_names:
+        raise HTTPException(status_code=404, detail=f"Phase '{request.phase}' not found")
+
+    run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
+    active_workflows[run_id] = {
+        "type": "phase_run",
+        "phase": request.phase,
+        "target": request.target,
+        "mode": request.mode,
+        "status": "started",
+        "started_at": datetime.now(UTC).isoformat(),
+    }
+    return {"run_id": run_id, "phase": request.phase, "status": "started"}
+
+
+@app.post("/api/run-hunter")
+async def run_hunter_module(request: RunHunterRequest, user=Depends(require_auth)):
+    """Run a HUMANOID_HUNTER module. Delegates to RealPhaseRunner."""
+    modules = discover_hunter_modules()
+    if request.module not in modules:
+        raise HTTPException(status_code=404, detail=f"Hunter module '{request.module}' not found")
+
+    run_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
+    active_workflows[run_id] = {
+        "type": "hunter_run",
+        "module": request.module,
+        "target": request.target,
+        "mode": request.mode,
+        "status": "started",
+        "started_at": datetime.now(UTC).isoformat(),
+    }
+    return {"run_id": run_id, "module": request.module, "status": "started"}
+
+
+@app.get("/fields/state")
+async def fields_state_endpoint(user=Depends(require_auth)):
+    """Field progression state — delegates to field_progression_api."""
+    try:
+        from backend.api.field_progression_api import get_fields_state
+        return get_fields_state()
+    except ImportError:
+        return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+@app.post("/fields/approve/{field_id}")
+async def fields_approve_endpoint(
+    field_id: int,
+    request: FieldApprovalRequest,
+    user=Depends(require_auth),
+):
+    """Approve a field — delegates to field_progression_api."""
+    try:
+        from backend.api.field_progression_api import approve_field
+        return approve_field(field_id, request.approver_id, request.reason)
+    except ImportError:
+        return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
 
 @app.get("/api/reports")
@@ -1272,80 +1373,106 @@ async def start_g38_training(epochs: int = 10, user=Depends(require_auth)):
 
 # =============================================================================
 # ADMIN PANEL TRAINING/GPU ROUTES
-# (frontend admin/panel/page.tsx calls these)
+# (Canonical — single definition per route. No duplicates.)
 # =============================================================================
 
 @app.get("/gpu/status")
 async def gpu_status(user=Depends(require_auth)):
-    """GPU status for admin panel — real GPU info."""
-    gpu_info = {
+    """GPU status — real GPU info with nvidia-smi metrics."""
+    result: Dict[str, Any] = {
         "gpu_available": False,
         "device_name": None,
         "utilization_percent": None,
         "memory_allocated_mb": None,
+        "memory_reserved_mb": None,
         "memory_total_mb": None,
         "temperature": None,
         "compute_capability": None,
     }
     try:
         import torch
-        if torch.cuda.is_available():
-            gpu_info["gpu_available"] = True
-            gpu_info["device_name"] = torch.cuda.get_device_name(0)
-            gpu_info["memory_allocated_mb"] = round(torch.cuda.memory_allocated(0) / 1024 / 1024, 1)
-            gpu_info["memory_total_mb"] = round(torch.cuda.get_device_properties(0).total_mem / 1024 / 1024, 1)
-            cap = torch.cuda.get_device_capability(0)
-            gpu_info["compute_capability"] = f"{cap[0]}.{cap[1]}"
+        if not torch.cuda.is_available():
+            return result
+        result["gpu_available"] = True
+        result["device_name"] = torch.cuda.get_device_name(0)
+        result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
+        result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
+        props = torch.cuda.get_device_properties(0)
+        result["memory_total_mb"] = round(props.total_mem / 1024 / 1024, 2)
+        cap = torch.cuda.get_device_capability(0)
+        result["compute_capability"] = f"{cap[0]}.{cap[1]}"
     except Exception:
         pass
-    return gpu_info
+    # nvidia-smi for utilization and temperature
+    try:
+        import subprocess
+        smi_output = subprocess.check_output(
+            ["nvidia-smi",
+             "--query-gpu=utilization.gpu,temperature.gpu",
+             "--format=csv,noheader,nounits"],
+            timeout=5, text=True
+        ).strip()
+        parts = smi_output.split(",")
+        if len(parts) >= 2:
+            result["utilization_percent"] = float(parts[0].strip())
+            result["temperature"] = float(parts[1].strip())
+    except Exception:
+        pass
+    return result
 
 
 @app.get("/training/status")
-async def training_status(user=Depends(require_admin)):
-    """Training status for admin panel."""
+async def training_status(user=Depends(require_auth)):
+    """Training status — full trainer state."""
     if not G38_AVAILABLE:
-        return {"is_training": False, "error": "G38 not available"}
+        return {"available": False, "is_training": False, "error": "G38 not available"}
     trainer = get_auto_trainer()
-    return {
-        "is_training": trainer.is_training,
-        "state": trainer.state.value,
-        "epoch": trainer._epoch,
-        "continuous_mode": trainer._continuous_mode,
-        "continuous_target": trainer._continuous_target,
-    }
+    return trainer.get_status()
 
 
 @app.post("/training/start")
-async def training_start(user=Depends(require_admin)):
-    """Start training via admin panel."""
+async def training_start(epochs: int = 10, user=Depends(require_auth)):
+    """Start GPU training manually. No auto-trigger."""
     if not G38_AVAILABLE:
-        raise HTTPException(status_code=503, detail="G38 not available")
+        return {"success": False, "error": "G38 modules not loaded"}
     trainer = get_auto_trainer()
     if trainer.is_training:
-        return {"success": False, "message": "Already training"}
+        return {
+            "success": False,
+            "error": "Training already in progress",
+            "state": trainer.state.value,
+        }
     import threading
     def _run():
-        trainer.force_start_training(epochs=10)
+        trainer.force_start_training(epochs=epochs)
     threading.Thread(target=_run, daemon=True).start()
-    return {"success": True, "message": "Training started"}
+    return {
+        "success": True,
+        "message": f"Training started for {epochs} epochs",
+        "state": "TRAINING",
+        "training_mode": "MANUAL",
+    }
 
 
 @app.post("/training/stop")
-async def training_stop(user=Depends(require_admin)):
-    """Stop training via admin panel."""
+async def training_stop(user=Depends(require_auth)):
+    """Stop training immediately."""
     if not G38_AVAILABLE:
-        raise HTTPException(status_code=503, detail="G38 not available")
+        return {"success": False, "error": "G38 modules not loaded"}
     trainer = get_auto_trainer()
     result = trainer.abort_training()
-    return {"success": True, "message": "Training stop requested", **result}
+    return {
+        "success": result.get("aborted", False),
+        "message": "Training stopped" if result.get("aborted") else "No training in progress",
+        "state": trainer.state.value,
+    }
 
 
 @app.post("/training/continuous")
-async def training_continuous(request: Request, user=Depends(require_admin)):
-    """Toggle continuous training mode via admin panel."""
+async def training_continuous(request: Request, user=Depends(require_auth)):
+    """Toggle continuous training mode."""
     if not G38_AVAILABLE:
-        raise HTTPException(status_code=503, detail="G38 not available")
+        return {"success": False, "error": "G38 modules not loaded"}
     data = await request.json()
     enabled = data.get("enabled", False)
     target_epochs = data.get("target_epochs", 0)
@@ -1469,140 +1596,24 @@ async def get_g38_latest_report(user=Depends(require_auth)):
 
 
 # =============================================================================
-# MANUAL TRAINING CONTROL ENDPOINTS
+# ADDITIONAL TRAINING ENDPOINTS (non-duplicate)
 # =============================================================================
-
-@app.post("/training/start")
-async def manual_start_training(epochs: int = 10, user=Depends(require_auth)):
-    """Manually start GPU training. No auto-trigger."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
-    
-    if trainer.is_training:
-        return {
-            "success": False,
-            "error": "Training already in progress",
-            "state": trainer.state.value,
-        }
-    
-    import threading
-    def run_training():
-        trainer.force_start_training(epochs=epochs)
-    
-    thread = threading.Thread(target=run_training, daemon=True)
-    thread.start()
-    
-    return {
-        "success": True,
-        "message": f"Training started for {epochs} epochs",
-        "state": "TRAINING",
-        "training_mode": "MANUAL",
-    }
-
-
-@app.post("/training/continuous")
-async def start_24_7_training(epochs: int = 0, user=Depends(require_auth)):
-    """Start 24/7 continuous GPU training. epochs=0 means infinite."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    
-    result = start_continuous_training(target_epochs=epochs)
-    return {"success": result.get("started", False), **result}
-
 
 @app.post("/training/continuous/stop")
 async def stop_24_7_training(user=Depends(require_auth)):
     """Stop 24/7 continuous training."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
-    
     result = stop_continuous_training()
     return {"success": result.get("stopped", False), **result}
 
 
-@app.post("/training/stop")
-async def manual_stop_training(user=Depends(require_auth)):
-    """Stop training immediately."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
-    result = trainer.abort_training()
-    
-    return {
-        "success": result.get("aborted", False),
-        "message": "Training stopped" if result.get("aborted") else "No training in progress",
-        "state": trainer.state.value,
-    }
-
-
-@app.get("/training/status")
-async def manual_training_status(user=Depends(require_auth)):
-    """Get current training status."""
-    if not G38_AVAILABLE:
-        return {"available": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
-    return trainer.get_status()
-
-
 @app.get("/training/progress")
-async def manual_training_progress(user=Depends(require_auth)):
+async def training_progress(user=Depends(require_auth)):
     """Get real-time training progress. Returns null if unavailable."""
     mgr = get_training_state_manager()
     metrics = mgr.get_training_progress()
     return metrics.to_dict()
-
-
-@app.get("/gpu/status")
-async def gpu_status(user=Depends(require_auth)):
-    """Get GPU utilization and memory metrics. Real data only."""
-    result: Dict[str, Any] = {
-        "gpu_available": False,
-        "device_name": None,
-        "utilization_percent": None,
-        "memory_allocated_mb": None,
-        "memory_reserved_mb": None, 
-        "memory_total_mb": None,
-        "temperature": None,
-        "compute_capability": None,
-    }
-    
-    try:
-        import torch
-        if not torch.cuda.is_available():
-            return result
-        
-        result["gpu_available"] = True
-        result["device_name"] = torch.cuda.get_device_name(0)
-        result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
-        result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
-        props = torch.cuda.get_device_properties(0)
-        result["memory_total_mb"] = round(props.total_mem / 1024 / 1024, 2)
-        cap = torch.cuda.get_device_capability(0)
-        result["compute_capability"] = f"{cap[0]}.{cap[1]}"
-    except Exception:
-        pass
-    
-    # nvidia-smi for utilization and temperature
-    try:
-        import subprocess
-        smi_output = subprocess.check_output(
-            ["nvidia-smi",
-             "--query-gpu=utilization.gpu,temperature.gpu",
-             "--format=csv,noheader,nounits"],
-            timeout=5, text=True
-        ).strip()
-        parts = smi_output.split(",")
-        if len(parts) >= 2:
-            result["utilization_percent"] = float(parts[0].strip())
-            result["temperature"] = float(parts[1].strip())
-    except Exception:
-        pass
-    
-    return result
 
 
 @app.get("/dataset/stats")

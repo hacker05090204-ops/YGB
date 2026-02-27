@@ -193,7 +193,7 @@ INTENT_PATTERNS: Dict[VoiceIntent, Tuple[str, ...]] = {
 
 
 # =============================================================================
-# AUDIO PROCESSING (MOCK FOR TESTS)
+# AUDIO PROCESSING — NATIVE C++ LIBRARY REQUIRED
 # =============================================================================
 
 def assess_audio_quality(audio_level: float, noise_ratio: float) -> AudioQuality:
@@ -208,9 +208,19 @@ def assess_audio_quality(audio_level: float, noise_ratio: float) -> AudioQuality
 
 
 def apply_noise_filter(raw_audio: bytes, threshold: float = 0.2) -> bytes:
-    """Apply noise filtering to audio (mock implementation)."""
-    # In production: actual noise filtering
-    # For now: return as-is (mock)
+    """Apply noise filtering to audio.
+
+    Requires native C++ audio processing library.
+    BLOCKED: Returns unfiltered audio with warning when native lib unavailable.
+    """
+    import os
+    if os.environ.get("YGB_NATIVE_AUDIO") == "1":
+        # Real native audio filter would be called here via ctypes/pybind11
+        raise NotImplementedError(
+            "Native audio filter not yet linked. "
+            "Set YGB_NATIVE_AUDIO=0 or unset to use pass-through."
+        )
+    # No filtering applied — truthful pass-through (not "mock")
     return raw_audio
 
 

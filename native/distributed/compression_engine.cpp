@@ -16,7 +16,6 @@
 #include <string>
 #include <unordered_map>
 
-
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -131,8 +130,9 @@ int compress_check_dedup(const void *data, uint64_t size, char *out_hash) {
 }
 
 /**
- * Simulate Zstandard compression (actual zstd needs linking).
- * Returns estimated compressed size.
+ * Estimate Zstandard compressed size (no real zstd linked).
+ * Returns estimated compressed size using typical ratio heuristics.
+ * Use compress_is_real_zstd() to check if real zstd is available.
  *
  * @param original_size Input size
  * @param level         Compression level (1-22)
@@ -150,6 +150,18 @@ uint64_t compress_estimate_size(uint64_t original_size, int level) {
     compressed = 64;
 
   return compressed;
+}
+
+/**
+ * Check if real zstd compression is linked.
+ * @return 1 if real zstd is available, 0 if using estimation only.
+ */
+int compress_is_real_zstd(void) {
+#ifdef ZSTD_VERSION_NUMBER
+  return 1;
+#else
+  return 0; // Estimation mode — real zstd not linked
+#endif
 }
 
 /**
@@ -203,6 +215,20 @@ int compress_get_stats(uint64_t *out_original, uint64_t *out_compressed,
     *out_dedup_ratio = g_compress.stats.dedup_ratio;
 
   return 0;
+}
+
+/**
+ * Get compression mode as string.
+ * Writes "REAL" if zstd is linked, "DEGRADED" if using estimation only.
+ * @param out_mode Output buffer (at least 16 bytes)
+ * @param max_len  Buffer size
+ */
+void compress_get_mode(char *out_mode, int max_len) {
+#ifdef ZSTD_VERSION_NUMBER
+  snprintf(out_mode, max_len, "REAL");
+#else
+  snprintf(out_mode, max_len, "DEGRADED");
+#endif
 }
 
 } // extern "C"

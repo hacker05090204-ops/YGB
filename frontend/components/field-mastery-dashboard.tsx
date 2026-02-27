@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { createAuthWebSocket } from '@/lib/ws-auth';
 
 /**
  * FieldMasteryDashboard — Field Mastery Dashboard (Phase H)
@@ -125,11 +126,17 @@ export default function FieldMasteryDashboard() {
         let ws: WebSocket | null = null;
         function connect() {
             try {
-                ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8765/mastery');
-                ws.onopen = () => setConnected(true);
-                ws.onmessage = (e) => { try { setData(JSON.parse(e.data)); } catch { } };
-                ws.onclose = () => { setConnected(false); setTimeout(connect, 3000); };
-                ws.onerror = () => ws?.close();
+                ws = createAuthWebSocket(
+                    '/mastery',
+                    (e) => { try { setData(JSON.parse(e.data)); } catch { } },
+                    () => ws?.close(),
+                    () => { setConnected(false); setTimeout(connect, 3000); },
+                );
+                if (ws) {
+                    ws.onopen = () => setConnected(true);
+                } else {
+                    setConnected(false);
+                }
             } catch { setTimeout(connect, 3000); }
         }
         connect();

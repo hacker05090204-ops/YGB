@@ -207,6 +207,24 @@ def perform_inspection(
     
     if request.status != InspectionStatus.AUTHORIZED:
         return None
+
+    # PRODUCTION GUARD: If no native capture and no test mock, return BLOCKED
+    if _mock_findings is None and not NATIVE_CAPTURE_AVAILABLE:
+        return InspectionResult(
+            result_id=f"RES-{uuid.uuid4().hex[:16].upper()}",
+            request_id=request_id,
+            status=InspectionStatus.COMPLETED,
+            findings=(),
+            voice_explanation_en=(
+                "BLOCKED: Native screen capture driver not available. "
+                "No findings captured."
+            ),
+            voice_explanation_hi=(
+                "BLOCKED: Native screen capture driver upalabdh nahi. "
+                "Koi findings capture nahi hui."
+            ),
+            completed_at=datetime.now(UTC).isoformat(),
+        )
     
     # Update status to in progress
     in_progress = ScreenInspectionRequest(

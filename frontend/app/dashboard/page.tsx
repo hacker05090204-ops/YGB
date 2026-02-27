@@ -76,6 +76,10 @@ export default function Dashboard() {
   const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
   const [activeTab, setActiveTab] = useState<"overview" | "users" | "bounties" | "targets">("overview")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [trainingReadiness, setTrainingReadiness] = useState<{
+    overall: string; go_no_go: string; remediation?: string;
+    fields?: Record<string, { status: string; reason?: string }>;
+  } | null>(null)
 
   // Form states
   const [showAddUser, setShowAddUser] = useState(false)
@@ -123,6 +127,18 @@ export default function Dashboard() {
       if (activityRes.ok) {
         const data = await activityRes.json()
         setActivities(data.activities || [])
+      }
+
+      // Fetch training readiness (truthful status)
+      try {
+        const readinessRes = await fetch(`${API_BASE}/api/training/readiness`)
+        if (readinessRes.ok) {
+          const data = await readinessRes.json()
+          setTrainingReadiness(data)
+        }
+      } catch {
+        // Training readiness API not available — show unknown
+        setTrainingReadiness(null)
       }
 
       setApiStatus("online")
@@ -262,8 +278,26 @@ export default function Dashboard() {
               }`}>
               <div className={`w-1.5 h-1.5 rounded-full ${apiStatus === "online" ? "bg-green-400" : apiStatus === "loading" ? "bg-yellow-400 animate-pulse" : "bg-red-400"
                 }`} />
-              {apiStatus === "online" ? "Database Connected" : apiStatus === "loading" ? "Loading..." : "Offline"}
+              {apiStatus === "online" ? "API Online" : apiStatus === "loading" ? "Loading..." : "Offline"}
             </div>
+            {/* Training readiness — truthful status from /api/training/readiness */}
+            {apiStatus === "online" && trainingReadiness && (
+              <div
+                className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border cursor-help ${trainingReadiness.overall === "READY"
+                    ? "bg-green-500/10 border-green-500/20 text-green-400"
+                    : trainingReadiness.overall === "PARTIAL"
+                      ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                      : "bg-red-500/10 border-red-500/20 text-red-400"
+                  }`}
+                title={trainingReadiness.remediation || trainingReadiness.overall}
+              >
+                <div className={`w-1.5 h-1.5 rounded-full ${trainingReadiness.overall === "READY" ? "bg-green-400"
+                    : trainingReadiness.overall === "PARTIAL" ? "bg-yellow-400"
+                      : "bg-red-400"
+                  }`} />
+                Training: {trainingReadiness.go_no_go}
+              </div>
+            )}
           </div>
         </header>
 

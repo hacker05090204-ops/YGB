@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
+import { createAuthWebSocket } from '@/lib/ws-auth';
 
 /**
  * AutoTrainingDashboard — Live Multi-Field Training Dashboard (Phase 5)
@@ -97,22 +98,29 @@ export default function AutoTrainingDashboard() {
         let ws: WebSocket | null = null;
         function connect() {
             try {
-                ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8765/training/dashboard');
-                ws.onopen = () => setConnected(true);
-                ws.onmessage = (e) => {
-                    try {
-                        const d: DashboardFrame = JSON.parse(e.data);
-                        setFrame(d);
-                        setGpuHistory(p => [...p.slice(-100), d.gpu_utilization * 100]);
-                        setSpsHistory(p => [...p.slice(-100), d.samples_per_sec]);
-                        if (timer.current) clearTimeout(timer.current);
-                        timer.current = setTimeout(() => {
-                            setFrame(prev => prev ? { ...prev, stalled: true } : null);
-                        }, 10000);
-                    } catch { /* skip */ }
-                };
-                ws.onclose = () => { setConnected(false); setTimeout(connect, 3000); };
-                ws.onerror = () => ws?.close();
+                ws = createAuthWebSocket(
+                    '/training/dashboard',
+                    (e) => {
+                        try {
+                            const d: DashboardFrame = JSON.parse(e.data);
+                            setFrame(d);
+                            setGpuHistory(p => [...p.slice(-100), d.gpu_utilization * 100]);
+                            setSpsHistory(p => [...p.slice(-100), d.samples_per_sec]);
+                            if (timer.current) clearTimeout(timer.current);
+                            timer.current = setTimeout(() => {
+                                setFrame(prev => prev ? { ...prev, stalled: true } : null);
+                            }, 10000);
+                        } catch { /* skip */ }
+                    },
+                    () => ws?.close(),
+                    () => { setConnected(false); setTimeout(connect, 3000); },
+                );
+                if (ws) {
+                    ws.onopen = () => setConnected(true);
+                } else {
+                    // No auth token
+                    setConnected(false);
+                }
             } catch { setTimeout(connect, 3000); }
         }
         connect();
