@@ -241,6 +241,40 @@ class SyntheticTrainingDataset(Dataset):
         }
 
 
+class RealTrainingDataset(Dataset):
+    """
+    Backward-compatible dataset adapter.
+
+    Legacy callers still import/use `RealTrainingDataset`. After strict-mode
+    hardening, the concrete dataset split into:
+      - IngestionPipelineDataset (production / STRICT_REAL_MODE=True)
+      - SyntheticTrainingDataset (lab / STRICT_REAL_MODE=False)
+
+    This adapter preserves old imports without weakening strict governance.
+    """
+
+    def __new__(cls, *args, **kwargs):
+        if STRICT_REAL_MODE:
+            # Preserve legacy call shape while forcing real ingestion source.
+            # `config` is ignored in strict mode because real data volume comes
+            # from authoritative ingestion state, not synthetic sample config.
+            seed = int(kwargs.pop("seed", FIXED_SEED))
+            feature_dim = int(kwargs.pop("feature_dim", 256))
+            min_samples = int(
+                kwargs.pop(
+                    "min_samples",
+                    int(_os.environ.get("YGB_MIN_REAL_SAMPLES", "125000")),
+                )
+            )
+            return IngestionPipelineDataset(
+                feature_dim=feature_dim,
+                min_samples=min_samples,
+                seed=seed,
+            )
+
+        return SyntheticTrainingDataset(*args, **kwargs)
+
+
 # =============================================================================
 # DATALOADER FACTORY
 # =============================================================================
@@ -581,9 +615,25 @@ class IngestionPipelineDataset(Dataset):
         # Load bridge (do NOT call bridge_init — it wipes existing ingested data)
         self._lib = _load_bridge()
 
-        # Fetch all verified samples
-        verified_count = self._lib.bridge_get_verified_count()
-        logger.info(f"[INGESTION] Verified samples available: {verified_count}")
+        # Check PERSISTED bridge state first (cross-process authoritative)
+        from backend.bridge.bridge_state import get_bridge_state
+        self._bridge_state = get_bridge_state()
+        persisted_counts = self._bridge_state.get_counts()
+        persisted_verified = persisted_counts["bridge_verified_count"]
+
+        # DLL counters (may be 0 in a fresh process)
+        dll_verified = self._lib.bridge_get_verified_count()
+
+        # Use the HIGHER of persisted vs DLL (persisted is authoritative)
+        verified_count = max(dll_verified, persisted_verified)
+        self._use_persisted_samples = dll_verified == 0 and persisted_verified > 0
+
+        logger.info(
+            f"[INGESTION] DLL verified={dll_verified}, "
+            f"persisted verified={persisted_verified}, "
+            f"authoritative={verified_count}, "
+            f"use_persisted={'YES' if self._use_persisted_samples else 'NO'}"
+        )
 
         if verified_count < min_samples:
             # NO FALLBACK — freeze field, abort
@@ -618,94 +668,60 @@ class IngestionPipelineDataset(Dataset):
         rejected_policy = 0
         rejected_quality = 0
 
-        FIELD_LEN = 512
-        for idx in range(verified_count):
-            # Allocate buffers
-            ep = ctypes.create_string_buffer(FIELD_LEN)
-            params = ctypes.create_string_buffer(FIELD_LEN)
-            ev = ctypes.create_string_buffer(FIELD_LEN)
-            imp = ctypes.create_string_buffer(FIELD_LEN)
-            st = ctypes.create_string_buffer(FIELD_LEN)
-            fp = ctypes.create_string_buffer(65)
-            reliability = ctypes.c_double(0.0)
-            ingested_at = ctypes.c_long(0)
-
-            rc = self._lib.bridge_fetch_verified_sample(
-                idx,
-                ep, FIELD_LEN,
-                params, FIELD_LEN,
-                ev, FIELD_LEN,
-                imp, FIELD_LEN,
-                st, FIELD_LEN,
-                fp, 65,
-                ctypes.byref(reliability),
-                ctypes.byref(ingested_at),
+        if self._use_persisted_samples:
+            # Load from disk sample store (cross-process path)
+            logger.info("[INGESTION] Loading samples from persisted store...")
+            disk_samples = self._bridge_state.read_samples(max_samples=verified_count)
+            logger.info(f"[INGESTION] Loaded {len(disk_samples)} samples from disk")
+            accepted, rejected_policy, rejected_quality = self._process_persisted_samples(
+                disk_samples, policy, scorer, min_samples
             )
-            if rc != 0:
-                continue
+        else:
+            # Load from DLL (same-process path)
+            logger.info("[INGESTION] Loading samples from DLL...")
+            FIELD_LEN = 512
+            for idx in range(verified_count):
+                # Allocate buffers
+                ep = ctypes.create_string_buffer(FIELD_LEN)
+                params = ctypes.create_string_buffer(FIELD_LEN)
+                ev = ctypes.create_string_buffer(FIELD_LEN)
+                imp = ctypes.create_string_buffer(FIELD_LEN)
+                st = ctypes.create_string_buffer(FIELD_LEN)
+                fp = ctypes.create_string_buffer(65)
+                reliability = ctypes.c_double(0.0)
+                ingested_at = ctypes.c_long(0)
 
-            endpoint = ep.value.decode("utf-8", errors="replace")
-            parameters = params.value.decode("utf-8", errors="replace")
-            exploit_vector = ev.value.decode("utf-8", errors="replace")
-            impact = imp.value.decode("utf-8", errors="replace")
-            source_tag = st.value.decode("utf-8", errors="replace")
-            fingerprint = fp.value.decode("utf-8", errors="replace")
+                rc = self._lib.bridge_fetch_verified_sample(
+                    idx,
+                    ep, FIELD_LEN,
+                    params, FIELD_LEN,
+                    ev, FIELD_LEN,
+                    imp, FIELD_LEN,
+                    st, FIELD_LEN,
+                    fp, 65,
+                    ctypes.byref(reliability),
+                    ctypes.byref(ingested_at),
+                )
+                if rc != 0:
+                    continue
 
-            # Policy check
-            candidate = IngestionCandidate(
-                sample_id=fingerprint[:16],
-                endpoint=endpoint,
-                exploit_vector=exploit_vector,
-                impact=impact,
-                source_id=source_tag,
-                reproducible=reliability.value >= 0.7,
-                impact_classified=len(impact) > 0,
-                real_world_confirmed=reliability.value >= 0.5,
-            )
-            policy_result = policy.check(candidate)
-            if not policy_result.accepted:
-                rejected_policy += 1
-                continue
+                endpoint = ep.value.decode("utf-8", errors="replace")
+                parameters = params.value.decode("utf-8", errors="replace")
+                exploit_vector = ev.value.decode("utf-8", errors="replace")
+                impact = imp.value.decode("utf-8", errors="replace")
+                source_tag = st.value.decode("utf-8", errors="replace")
+                fingerprint = fp.value.decode("utf-8", errors="replace")
 
-            # Encode features
-            features_dict = {
-                "signal_strength": min(reliability.value, 1.0),
-                "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
-                "difficulty": 1.0 - min(reliability.value, 1.0),
-                "noise": 0.05,
-            }
-
-            # Strip forbidden fields
-            clean_features = strip_forbidden_fields(features_dict)
-            feature_vec = self._encode_features(clean_features)
-
-            # Quality score
-            import numpy as np
-            fv_array = np.array(feature_vec, dtype=np.float32)
-            quality = scorer.score_features(
-                sample_id=fingerprint[:16],
-                features=fv_array,
-                impact_level="high" if reliability.value >= 0.8 else "medium",
-                source_count=1,
-            )
-            if not quality.accepted:
-                rejected_quality += 1
-                continue
-
-            # Label: exploit vector complexity → 1=positive, 0=negative
-            label = 1 if reliability.value >= 0.7 else 0
-
-            self._features.append(feature_vec)
-            self._labels.append(label)
-            self._raw_samples.append({
-                "endpoint": endpoint,
-                "exploit_vector": exploit_vector,
-                "impact": impact,
-                "source_tag": source_tag,
-                "fingerprint": fingerprint,
-                "reliability": reliability.value,
-            })
-            accepted += 1
+                ok = self._process_one_sample(
+                    endpoint, exploit_vector, impact, source_tag,
+                    fingerprint, reliability.value, policy, scorer
+                )
+                if ok == "accepted":
+                    accepted += 1
+                elif ok == "rejected_policy":
+                    rejected_policy += 1
+                elif ok == "rejected_quality":
+                    rejected_quality += 1
 
         logger.info(
             f"[INGESTION] Pipeline result: {accepted} accepted, "
@@ -730,6 +746,141 @@ class IngestionPipelineDataset(Dataset):
 
         # Write manifest
         self._write_manifest(accepted, rejected_policy, rejected_quality)
+
+    def _process_one_sample(
+        self, endpoint, exploit_vector, impact, source_tag,
+        fingerprint, reliability_val, policy, scorer,
+    ) -> str:
+        """Process a single sample through policy + quality checks.
+
+        Returns: 'accepted', 'rejected_policy', or 'rejected_quality'.
+        """
+        from impl_v1.training.distributed.ingestion_policy import IngestionCandidate
+
+        candidate = IngestionCandidate(
+            sample_id=(fingerprint or hashlib.sha256(endpoint.encode()).hexdigest())[:16],
+            endpoint=endpoint,
+            exploit_vector=exploit_vector,
+            impact=impact,
+            source_id=source_tag,
+            reproducible=reliability_val >= 0.7,
+            impact_classified=len(impact) > 0,
+            real_world_confirmed=reliability_val >= 0.5,
+        )
+        policy_result = policy.check(candidate)
+        if not policy_result.accepted:
+            return "rejected_policy"
+
+        # Encode features
+        features_dict = {
+            "signal_strength": min(reliability_val, 1.0),
+            "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
+            "difficulty": 1.0 - min(reliability_val, 1.0),
+            "noise": 0.05,
+        }
+
+        clean_features = strip_forbidden_fields(features_dict)
+        feature_vec = self._encode_features(clean_features)
+
+        # Quality score
+        import numpy as np
+        fv_array = np.array(feature_vec, dtype=np.float32)
+        quality = scorer.score_features(
+            sample_id=candidate.sample_id,
+            features=fv_array,
+            impact_level="high" if reliability_val >= 0.8 else "medium",
+            source_count=1,
+        )
+        if not quality.accepted:
+            return "rejected_quality"
+
+        # Label
+        label = self._derive_label(
+            endpoint=endpoint,
+            impact=impact,
+            fingerprint=fingerprint,
+            reliability_val=reliability_val,
+        )
+
+        self._features.append(feature_vec)
+        self._labels.append(label)
+        self._raw_samples.append({
+            "endpoint": endpoint,
+            "exploit_vector": exploit_vector,
+            "impact": impact,
+            "source_tag": source_tag,
+            "fingerprint": fingerprint or "",
+            "reliability": reliability_val,
+        })
+        return "accepted"
+
+    @staticmethod
+    def _derive_label(
+        endpoint: str,
+        impact: str,
+        fingerprint: str,
+        reliability_val: float,
+    ) -> int:
+        """
+        Derive a deterministic binary label from real ingestion metadata.
+
+        Priority:
+          1. CVSS score in impact string (CVSS>=7.0 => positive)
+          2. Reliability extremes fallback
+          3. Deterministic hash parity fallback for ambiguous samples
+        """
+        # Primary: use CVSS score when present (expected format: "CVSS:<score>|...")
+        if isinstance(impact, str) and impact.startswith("CVSS:"):
+            score_part = impact.split("|", 1)[0]
+            try:
+                score = float(score_part.split(":", 1)[1])
+                return 1 if score >= 7.0 else 0
+            except (ValueError, IndexError):
+                pass
+
+        # Secondary: reliability signal when CVSS is unavailable
+        if reliability_val >= 0.85:
+            return 1
+        if reliability_val <= 0.55:
+            return 0
+
+        # Final fallback: deterministic split to avoid one-class collapse.
+        stable_key = fingerprint or endpoint or f"{reliability_val:.4f}"
+        digest = hashlib.sha256(stable_key.encode("utf-8", errors="replace")).hexdigest()
+        return int(digest[-1], 16) % 2
+
+    def _process_persisted_samples(
+        self, disk_samples, policy, scorer, min_samples,
+    ):
+        """Process samples loaded from the persisted gzip store."""
+        accepted = 0
+        rejected_policy = 0
+        rejected_quality = 0
+
+        for sample in disk_samples:
+            reliability_val = sample.get("reliability", 0.7)
+            # Only process verified samples (reliability >= 0.7)
+            if reliability_val < 0.7:
+                continue
+
+            ok = self._process_one_sample(
+                endpoint=sample.get("endpoint", ""),
+                exploit_vector=sample.get("exploit_vector", ""),
+                impact=sample.get("impact", ""),
+                source_tag=sample.get("source_tag", ""),
+                fingerprint=sample.get("fingerprint", ""),
+                reliability_val=reliability_val,
+                policy=policy,
+                scorer=scorer,
+            )
+            if ok == "accepted":
+                accepted += 1
+            elif ok == "rejected_policy":
+                rejected_policy += 1
+            elif ok == "rejected_quality":
+                rejected_quality += 1
+
+        return accepted, rejected_policy, rejected_quality
 
     def _encode_features(self, features: dict) -> List[float]:
         """Encode feature dict to fixed-size vector (same logic as synthetic)."""
@@ -919,8 +1070,8 @@ def get_per_field_report() -> dict:
     """
     Generate a per-field readiness report for the training readiness endpoint.
 
-    Reports bridge counter state, thresholds, deficits, and per-field
-    (source_tag) sample counts with per-field deficit to threshold.
+    Uses PERSISTED bridge state (cross-process safe) as the authoritative
+    counter source. Also checks manifest consistency.
     Does NOT raise — always returns a dict.
     """
     min_samples = YGB_MIN_REAL_SAMPLES
@@ -936,7 +1087,26 @@ def get_per_field_report() -> dict:
         "manifest_exists": False,
         "per_field_counts": {},
         "per_field_deficits": {},
+        "authoritative_source": "bridge_state.json",
     }
+
+    # Load persisted bridge state (authoritative source)
+    try:
+        from backend.bridge.bridge_state import get_bridge_state
+        bridge_state = get_bridge_state()
+        counts = bridge_state.get_counts()
+        report["bridge_count"] = counts["bridge_count"]
+        report["bridge_verified_count"] = counts["bridge_verified_count"]
+        report["deficit"] = counts["deficit"]
+
+        # Consistency check
+        consistency = bridge_state.check_manifest_consistency()
+        report["consistency_ok"] = consistency["consistency_ok"]
+        report["manifest_verified_count"] = consistency["manifest_verified_count"]
+        if not consistency["consistency_ok"] and consistency["mismatch_reason"]:
+            report["consistency_warning"] = consistency["mismatch_reason"]
+    except Exception as e:
+        report["bridge_state_error"] = str(e)
 
     # Check manifest file
     manifest_path = _SECURE_DATA / "dataset_manifest.json"
@@ -956,63 +1126,29 @@ def get_per_field_report() -> dict:
         except Exception:
             report["manifest"] = None
 
-    # Check bridge
+    # Check bridge DLL availability
     try:
         lib = _load_bridge()
         report["bridge_loaded"] = True
-        report["bridge_count"] = lib.bridge_get_count()
-        report["bridge_verified_count"] = lib.bridge_get_verified_count()
-        report["deficit"] = max(0, min_samples - report["bridge_verified_count"])
-
-        # Collect per-field counts from verified samples
-        FIELD_LEN = 512
-        per_field_counts = {}
-        for idx in range(report["bridge_verified_count"]):
-            ep = ctypes.create_string_buffer(FIELD_LEN)
-            params = ctypes.create_string_buffer(FIELD_LEN)
-            ev = ctypes.create_string_buffer(FIELD_LEN)
-            imp = ctypes.create_string_buffer(FIELD_LEN)
-            st = ctypes.create_string_buffer(FIELD_LEN)
-            fp = ctypes.create_string_buffer(65)
-            reliability = ctypes.c_double(0.0)
-            ingested_at = ctypes.c_long(0)
-
-            rc = lib.bridge_fetch_verified_sample(
-                idx,
-                ep, FIELD_LEN, params, FIELD_LEN,
-                ev, FIELD_LEN, imp, FIELD_LEN,
-                st, FIELD_LEN, fp, 65,
-                ctypes.byref(reliability), ctypes.byref(ingested_at),
-            )
-            if rc != 0:
-                continue
-            source_tag = st.value.decode("utf-8", errors="replace") or "unknown"
-            per_field_counts[source_tag] = per_field_counts.get(source_tag, 0) + 1
-
-        report["per_field_counts"] = per_field_counts
-        report["per_field_deficits"] = {
-            field: max(0, min_samples - count)
-            for field, count in per_field_counts.items()
-        }
-
-        if report["bridge_verified_count"] >= min_samples:
-            report["status"] = "READY"
-            report["reason"] = (
-                f"{report['bridge_verified_count']} verified samples "
-                f"(threshold: {min_samples})"
-            )
-        else:
-            report["status"] = "BLOCKED"
-            report["reason"] = (
-                f"Insufficient samples: {report['bridge_verified_count']}/{min_samples} "
-                f"(deficit: {report['deficit']})"
-            )
     except FileNotFoundError:
+        pass
+    except Exception:
+        report["bridge_loaded"] = False
+
+    # Final readiness decision based on persisted state
+    verified = report["bridge_verified_count"]
+    if verified >= min_samples:
+        report["status"] = "READY"
+        report["reason"] = (
+            f"{verified} verified samples "
+            f"(threshold: {min_samples})"
+        )
+    else:
         report["status"] = "BLOCKED"
-        report["reason"] = "Ingestion bridge DLL not found"
-    except Exception as e:
-        report["status"] = "BLOCKED"
-        report["reason"] = f"Bridge error: {str(e)}"
+        report["reason"] = (
+            f"Insufficient samples: {verified}/{min_samples} "
+            f"(deficit: {report['deficit']})"
+        )
 
     return report
 

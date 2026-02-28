@@ -1,19 +1,21 @@
 {
-  "version": "2.0",
-  "generated_at": "2026-02-28T13:56:15Z",
-  "source": "NVD_API_v2_bulk_ingest",
-  "sample_count": 126000,
-  "verified_count": 126000,
-  "field_schema": [
-    "endpoint",
-    "parameters",
-    "exploit_vector",
-    "impact",
-    "source_tag",
-    "reliability"
-  ],
+  "dataset_source": "INGESTION_PIPELINE",
+  "ingestion_manifest_hash": "000000007c5d0f850000000013c1f793000000006f9cf81600000000901f0718",
+  "tensor_hash": "d7bcdb89e8e2d7cde45d5e6a693e80149e0a43186161c347da02ff5993d1b5fc",
+  "sample_count": 125996,
+  "feature_dim": 256,
+  "num_classes": 2,
+  "accepted": 125996,
+  "rejected_policy": 0,
+  "rejected_quality": 4,
   "strict_real_mode": true,
-  "threshold": 125000,
-  "deficit": 0,
-  "go_no_go": "GO"
+  "class_histogram": {
+    "1": 57296,
+    "0": 68700
+  },
+  "class_entropy": 0.9941,
+  "source_trust_avg": 0.9116,
+  "source_trust_min": 0.7,
+  "training_mode": "PRODUCTION_REAL",
+  "frozen_at": "2026-02-28T20:35:50.675172"
 }

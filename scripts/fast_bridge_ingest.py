@@ -5,6 +5,9 @@ Runs in one process so bridge DLL counters persist across the entire ingestion l
 Uses batched NVD fetches with aggressive retry+backoff. Writes manifest at end.
 Reports truthful GO/NO_GO with exact deficit.
 
+PERSISTENCE: After each batch, persists counters to secure_data/bridge_state.json
+so that any other process (server, training loader) can read authoritative counts.
+
 Usage: python scripts/fast_bridge_ingest.py [target]
 """
 
@@ -17,6 +20,12 @@ import time
 import urllib.request
 import urllib.error
 
+# Add project root to path for bridge_state import
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+
+from backend.bridge.bridge_state import get_bridge_state
+
 TARGET = int(sys.argv[1]) if len(sys.argv) > 1 else 125_000
 BATCH_SIZE = 2000
 NVD_BASE = "https://services.nvd.nist.gov/rest/json/cves/2.0"
@@ -25,7 +34,6 @@ RETRY_WAIT = 6
 MAX_RETRIES = 5
 
 # Paths
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DLL_PATH = os.path.join(PROJECT_ROOT, "native", "distributed", "ingestion_bridge.dll")
 MANIFEST_PATH = os.path.join(PROJECT_ROOT, "secure_data", "dataset_manifest.json")
 REPORT_PATH = os.path.join(PROJECT_ROOT, "reports", "ingest_result.json")
@@ -48,7 +56,12 @@ try:
 except:
     pass
 
+# Initialize persistent bridge state
+bridge_state = get_bridge_state()
+print(f"[BRIDGE_STATE] Loaded persisted state: count={bridge_state.get_counts()['bridge_count']}, verified={bridge_state.get_counts()['bridge_verified_count']}")
+
 seen = set()
+all_samples = []  # collect samples for disk persistence
 stats = {"ingested": 0, "dropped": 0, "deduped": 0, "fetch_errors": 0}
 t_start = time.time()
 
@@ -119,6 +132,15 @@ def extract_and_ingest(vuln):
     if rc == 0:
         stats["ingested"] += 1
         seen.add(ik)
+        # Collect sample for disk persistence
+        all_samples.append({
+            "endpoint": cve_id,
+            "parameters": params,
+            "exploit_vector": desc[:511],
+            "impact": impact,
+            "source_tag": source,
+            "reliability": reliability,
+        })
         return 1
     elif rc == -3:
         stats["deduped"] += 1
@@ -191,6 +213,16 @@ while True:
     batch_ok = sum(extract_and_ingest(v) for v in vulns)
     print(f"  +{batch_ok} ingested ({len(vulns)} fetched, "
           f"total={stats['ingested']:,} drop={stats['dropped']} dedup={stats['deduped']})")
+
+    # Persist counters after each batch
+    if batch_ok > 0:
+        bridge_state.set_counts(
+            bridge_count=lib.bridge_get_count(),
+            bridge_verified_count=lib.bridge_get_verified_count(),
+            total_ingested=stats["ingested"],
+            total_dropped=stats["dropped"],
+            total_deduped=stats["deduped"],
+        )
     
     idx += BATCH_SIZE
     time.sleep(RETRY_WAIT)  # NVD rate limit
@@ -203,6 +235,19 @@ deficit = max(0, TARGET - final_verified)
 go = "GO" if deficit == 0 else "NO_GO"
 
 manifest = write_manifest()
+
+# PERSIST final state and all samples to disk
+bridge_state.set_counts(
+    bridge_count=final_count,
+    bridge_verified_count=final_verified,
+    total_ingested=stats["ingested"],
+    total_dropped=stats["dropped"],
+    total_deduped=stats["deduped"],
+)
+if all_samples:
+    print(f"  Writing {len(all_samples)} samples to disk...")
+    bridge_state.write_all_samples(all_samples)
+    print(f"  Samples persisted to {bridge_state._samples_path}")
 
 report = {
     "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -224,4 +269,5 @@ print(f"  FINAL: count={final_count:,} verified={final_verified:,}")
 print(f"  TARGET={TARGET:,} DEFICIT={deficit:,} STATUS={go}")
 print(f"  Elapsed: {elapsed:.1f}s | Rate: {report['throughput_per_sec']}/s")
 print(f"  Report: {REPORT_PATH}")
+print(f"  Bridge state: {bridge_state._state_path}")
 print(f"{'='*60}")

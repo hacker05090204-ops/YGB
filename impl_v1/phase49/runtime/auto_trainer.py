@@ -29,6 +29,8 @@ RULES:
 
 import asyncio
 import os
+import subprocess
+import sys
 import threading
 import time
 import logging
@@ -284,6 +286,75 @@ class AutoTrainer:
                 pass
         
         return event
+
+    def _attempt_ingestion_recovery(self, target_samples: int) -> Tuple[bool, str]:
+        """
+        Attempt automatic recovery when bridge persistence is missing.
+
+        Runs scripts/fast_bridge_ingest.py to regenerate:
+          - secure_data/bridge_state.json
+          - secure_data/bridge_samples.jsonl.gz
+        """
+        auto_recovery = os.environ.get("YGB_AUTO_INGEST_RECOVERY", "true").lower()
+        if auto_recovery in ("0", "false", "no", "off"):
+            return False, "auto recovery disabled (YGB_AUTO_INGEST_RECOVERY=false)"
+
+        project_root = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "..")
+        )
+        script_path = os.path.join(project_root, "scripts", "fast_bridge_ingest.py")
+        if not os.path.exists(script_path):
+            return False, f"recovery script not found: {script_path}"
+
+        env_target = os.environ.get("YGB_AUTO_INGEST_TARGET", "")
+        try:
+            target = max(target_samples, int(env_target)) if env_target else target_samples
+        except ValueError:
+            target = target_samples
+        timeout_sec = int(os.environ.get("YGB_AUTO_INGEST_TIMEOUT_SEC", "7200"))
+
+        self._emit_event(
+            "INGESTION_RECOVERY_STARTED",
+            f"Regenerating bridge persistence via fast ingest (target={target})",
+            gpu_used=False,
+        )
+        logger.warning(
+            f"Auto-ingestion recovery triggered: python {script_path} {target}"
+        )
+
+        try:
+            env = os.environ.copy()
+            env.setdefault("PYTHONUTF8", "1")
+            result = subprocess.run(
+                [sys.executable, script_path, str(target)],
+                cwd=project_root,
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=timeout_sec,
+            )
+        except Exception as e:
+            msg = f"auto-ingest recovery execution failed: {e}"
+            logger.error(msg)
+            self._emit_event("INGESTION_RECOVERY_FAILED", msg, gpu_used=False)
+            return False, msg
+
+        if result.returncode != 0:
+            stderr_tail = "\n".join((result.stderr or "").strip().splitlines()[-8:])
+            stdout_tail = "\n".join((result.stdout or "").strip().splitlines()[-8:])
+            tail = stderr_tail or stdout_tail or "<no output>"
+            msg = f"fast_bridge_ingest failed (rc={result.returncode})"
+            logger.error(f"{msg}\n{tail}")
+            self._emit_event("INGESTION_RECOVERY_FAILED", msg, gpu_used=False)
+            return False, msg
+
+        self._emit_event(
+            "INGESTION_RECOVERY_COMPLETED",
+            "Bridge persistence regenerated",
+            gpu_used=False,
+        )
+        logger.info("Auto-ingestion recovery completed")
+        return True, "Bridge persistence regenerated"
     
     def _init_gpu_resources(self) -> bool:
         """
@@ -336,19 +407,50 @@ class AutoTrainer:
             # === REAL DATA PIPELINE (NO SYNTHETIC DATA) ===
             from impl_v1.training.data.real_dataset_loader import (
                 create_training_dataloader,
+                get_per_field_report,
                 validate_dataset_integrity,
+                YGB_MIN_REAL_SAMPLES,
             )
             
             # Validate dataset before use
             valid, msg = validate_dataset_integrity()
             if not valid:
                 logger.error(f"Dataset validation failed: {msg}")
-                return False
+
+                # Auto-heal known mismatch:
+                # manifest says READY but authoritative bridge persistence is missing.
+                recovery_attempted = False
+                try:
+                    report = get_per_field_report()
+                    threshold = int(report.get("threshold", YGB_MIN_REAL_SAMPLES))
+                    manifest_verified = int(report.get("manifest_verified_count", 0) or 0)
+                    bridge_verified = int(report.get("bridge_verified_count", 0) or 0)
+                    consistency_warning = str(report.get("consistency_warning", ""))
+                    has_manifest_bridge_mismatch = (
+                        "bridge=0 but manifest=" in consistency_warning
+                        or (bridge_verified == 0 and manifest_verified >= threshold)
+                    )
+
+                    if has_manifest_bridge_mismatch:
+                        recovered, rec_msg = self._attempt_ingestion_recovery(threshold)
+                        recovery_attempted = True
+                        if not recovered:
+                            logger.error(f"Auto-ingestion recovery failed: {rec_msg}")
+                        else:
+                            valid, msg = validate_dataset_integrity()
+                except Exception as e:
+                    logger.warning(f"Recovery precheck skipped: {e}")
+
+                if not valid:
+                    logger.error(f"Dataset validation failed: {msg}")
+                    return False
+
+                if recovery_attempted:
+                    logger.info(f"Dataset validated after recovery: {msg}")
             logger.info(f"Dataset validated: {msg}")
             
             # Create optimized DataLoader (pin_memory for fast GPU transfer)
             # num_workers=0 on Windows: worker processes trigger STRICT_REAL_MODE
-            import sys
             _num_workers = 0 if sys.platform == 'win32' else 4
             train_loader, holdout_loader, stats = create_training_dataloader(
                 batch_size=1024,

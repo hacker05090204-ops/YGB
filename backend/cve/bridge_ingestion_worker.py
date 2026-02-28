@@ -59,6 +59,9 @@ class BridgeIngestionWorker:
         self._total_deduped: int = 0
         self._last_ingest_at: Optional[str] = None
         self._load_bridge()
+        # Load persistent bridge state
+        from backend.bridge.bridge_state import get_bridge_state
+        self._bridge_state = get_bridge_state()
 
     def _load_bridge(self):
         """Try to load the ingestion bridge DLL."""
@@ -98,19 +101,14 @@ class BridgeIngestionWorker:
         return self._lib is not None
 
     def get_bridge_counts(self) -> Dict[str, int]:
-        """Get current bridge counters."""
-        if not self._lib:
-            return {"bridge_count": 0, "bridge_verified_count": 0,
-                    "bridge_loaded": False}
-        try:
-            return {
-                "bridge_count": self._lib.bridge_get_count(),
-                "bridge_verified_count": self._lib.bridge_get_verified_count(),
-                "bridge_loaded": True,
-            }
-        except Exception:
-            return {"bridge_count": 0, "bridge_verified_count": 0,
-                    "bridge_loaded": True}
+        """Get current bridge counters from PERSISTED state (cross-process safe)."""
+        # Always return persisted state as authoritative source
+        counts = self._bridge_state.get_counts()
+        return {
+            "bridge_count": counts["bridge_count"],
+            "bridge_verified_count": counts["bridge_verified_count"],
+            "bridge_loaded": self._lib is not None,
+        }
 
     def get_status(self) -> Dict[str, Any]:
         """Get worker status."""
@@ -282,12 +280,24 @@ class BridgeIngestionWorker:
                 ingested += 1
                 self._ingested_keys.add(ik)
                 self._total_ingested += 1
+                # Persist sample
+                self._bridge_state.append_sample({
+                    "endpoint": fields["endpoint"],
+                    "parameters": fields["parameters"],
+                    "exploit_vector": fields["exploit_vector"],
+                    "impact": fields["impact"],
+                    "source_tag": fields["source_tag"],
+                    "reliability": reliability,
+                })
             elif rc == -3:
                 self._total_deduped += 1
                 self._ingested_keys.add(ik)
 
         if ingested > 0:
             self._last_ingest_at = datetime.now(timezone.utc).isoformat()
+            # Persist counters
+            self._bridge_state.record_ingest_batch(ingested, ingested)
+            self._bridge_state.flush_samples()
 
         return ingested
 
@@ -340,6 +350,15 @@ class BridgeIngestionWorker:
                 ingested += 1
                 self._ingested_keys.add(ik)
                 self._total_ingested += 1
+                # Persist sample
+                self._bridge_state.append_sample({
+                    "endpoint": fields["endpoint"],
+                    "parameters": fields["parameters"],
+                    "exploit_vector": fields["exploit_vector"],
+                    "impact": fields["impact"],
+                    "source_tag": fields["source_tag"],
+                    "reliability": reliability,
+                })
             elif rc == -3:
                 deduped += 1
                 self._ingested_keys.add(ik)
@@ -347,6 +366,17 @@ class BridgeIngestionWorker:
 
         elapsed = time.time() - t0
         self._last_ingest_at = datetime.now(timezone.utc).isoformat()
+
+        # Flush samples and persist counters
+        self._bridge_state.flush_samples()
+        if self._lib:
+            self._bridge_state.set_counts(
+                bridge_count=self._lib.bridge_get_count(),
+                bridge_verified_count=self._lib.bridge_get_verified_count(),
+                total_ingested=self._total_ingested,
+                total_dropped=self._total_dropped,
+                total_deduped=self._total_deduped,
+            )
 
         # Update manifest after backfill
         self.update_manifest()
