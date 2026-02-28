@@ -1,14 +1,21 @@
 {
-  "dataset_source": "INGESTION_PIPELINE",
-  "ingestion_manifest_hash": "000000007c5d0f850000000013c1f793000000006f9cf81600000000901f0718",
-  "total_samples": 0,
-  "verified_samples": 0,
-  "positive_ratio": 0.0,
-  "threshold": 125000,
-  "deficit": 125000,
+  "total_samples": 5,
+  "verified_samples": 3,
+  "per_field_counts": {
+    "endpoint": 5,
+    "parameters": 5,
+    "exploit_vector": 5,
+    "impact": 5,
+    "source_tag": 5,
+    "reliability": 5
+  },
+  "source_mix": {},
   "strict_real_mode": true,
-  "ready": false,
-  "per_field_counts": {},
-  "per_field_deficits": {},
-  "updated_at": "2026-02-28T10:27:21.649872"
+  "updated_at": "2026-02-28T12:25:14.328859+00:00",
+  "ingestion_manifest_hash": "9180996a33c52a68",
+  "worker_stats": {
+    "total_ingested": 5,
+    "total_dropped": 0,
+    "total_deduped": 0
+  }
 }

@@ -131,7 +131,7 @@ export default function Dashboard() {
 
       // Fetch training readiness (truthful status)
       try {
-        const readinessRes = await fetch(`${API_BASE}/api/training/readiness`)
+        const readinessRes = await authFetch(`${API_BASE}/api/training/readiness`)
         if (readinessRes.ok) {
           const data = await readinessRes.json()
           setTrainingReadiness(data)
@@ -284,16 +284,16 @@ export default function Dashboard() {
             {apiStatus === "online" && trainingReadiness && (
               <div
                 className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border cursor-help ${trainingReadiness.overall === "READY"
-                    ? "bg-green-500/10 border-green-500/20 text-green-400"
-                    : trainingReadiness.overall === "PARTIAL"
-                      ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
-                      : "bg-red-500/10 border-red-500/20 text-red-400"
+                  ? "bg-green-500/10 border-green-500/20 text-green-400"
+                  : trainingReadiness.overall === "PARTIAL"
+                    ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                    : "bg-red-500/10 border-red-500/20 text-red-400"
                   }`}
                 title={trainingReadiness.remediation || trainingReadiness.overall}
               >
                 <div className={`w-1.5 h-1.5 rounded-full ${trainingReadiness.overall === "READY" ? "bg-green-400"
-                    : trainingReadiness.overall === "PARTIAL" ? "bg-yellow-400"
-                      : "bg-red-400"
+                  : trainingReadiness.overall === "PARTIAL" ? "bg-yellow-400"
+                    : "bg-red-400"
                   }`} />
                 Training: {trainingReadiness.go_no_go}
               </div>

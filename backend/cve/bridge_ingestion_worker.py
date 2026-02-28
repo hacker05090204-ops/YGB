@@ -126,6 +126,18 @@ class BridgeIngestionWorker:
         }
 
     # =========================================================================
+    # SAFE FIELD ACCESSOR (dataclass + dict support)
+    # =========================================================================
+
+    @staticmethod
+    def _get(record, key: str, default=None):
+        """Safe accessor: works for both dataclass objects and dicts."""
+        if isinstance(record, dict):
+            return record.get(key, default)
+        val = getattr(record, key, default)
+        return val if val is not None else default
+
+    # =========================================================================
     # FIELD MAPPING
     # =========================================================================
 
@@ -160,61 +172,60 @@ class BridgeIngestionWorker:
         # Unknown / headless-only → drop
         return 0.0
 
-    @staticmethod
-    def _map_cve_to_sample(record) -> Optional[Dict[str, str]]:
-        """Map a CVE pipeline record to training sample fields."""
-        cve_id = getattr(record, "cve_id", "") or record.get("cve_id", "")
+    def _map_cve_to_sample(self, record) -> Optional[Dict[str, str]]:
+        """Map a CVE pipeline record to training sample fields.
+
+        Supports BOTH:
+          - dataclass CVERecord objects (getattr)
+          - plain dict records (.get)
+        Never raises AttributeError.
+        """
+        _g = self._get
+        cve_id = _g(record, "cve_id", "")
         if not cve_id:
             return None
 
-        # Determine affected products string
-        products = getattr(record, "affected_products", None)
-        if products is None:
-            products = record.get("affected_products", [])
+        # Affected products
+        products = _g(record, "affected_products", [])
         if isinstance(products, list):
             products_str = json.dumps(products)[:511]
         else:
             products_str = str(products)[:511]
 
         # Description
-        desc = getattr(record, "description", "") or record.get("description", "")
-        desc = str(desc)[:511]
+        desc = str(_g(record, "description", "") or "")[:511]
 
         # Severity / impact
-        severity = getattr(record, "severity", "") or record.get("severity", "UNKNOWN")
-        cvss = getattr(record, "cvss_score", None) or record.get("cvss_score")
+        severity = _g(record, "severity", "UNKNOWN") or "UNKNOWN"
+        cvss = _g(record, "cvss_score", None)
         if cvss is not None:
             impact = f"{severity}|CVSS:{cvss}"
         else:
             impact = str(severity)
 
-        # Source tag
-        provenance = getattr(record, "provenance", None)
+        # Source tag from provenance chain
+        provenance = _g(record, "provenance", None)
         sources = []
         if provenance:
             if isinstance(provenance, list):
                 for p in provenance:
-                    s = getattr(p, "source", None) or (
-                        p.get("source", "") if isinstance(p, dict) else "")
+                    s = self._get(p, "source", "")
                     if s:
                         sources.append(s)
             elif isinstance(provenance, dict):
                 s = provenance.get("source", "")
                 if s:
                     sources.append(s)
-        source_tag = "|".join(sources) if sources else record.get("source_id", "UNKNOWN")
+        source_tag = "|".join(sources) if sources else _g(record, "source_id", "UNKNOWN")
 
-        promotion_status = (
-            getattr(record, "promotion_status", "RESEARCH_PENDING")
-            or record.get("promotion_status", "RESEARCH_PENDING")
-        )
+        promotion_status = _g(record, "promotion_status", "RESEARCH_PENDING") or "RESEARCH_PENDING"
 
         return {
             "endpoint": cve_id,
             "parameters": products_str,
             "exploit_vector": desc,
             "impact": impact[:511],
-            "source_tag": source_tag[:511],
+            "source_tag": str(source_tag)[:511],
             "sources": sources,
             "promotion_status": promotion_status,
         }
@@ -241,22 +252,41 @@ class BridgeIngestionWorker:
             logger.error(f"[BRIDGE] ingest error: {e}")
             return -99
 
-    def stream_ingest_new(self, pipeline) -> int:
+    def stream_ingest_new(self, pipeline) -> Dict[str, Any]:
         """
         Stream-ingest new records from the pipeline into the bridge.
-        Called each scheduler cycle. Returns count of new samples ingested.
+        Called each scheduler cycle.
+        Returns dict with debug counters.
         """
-        if not self._lib:
-            return 0
+        result = {
+            "ingested_ok": 0,
+            "dropped_low_reliability": 0,
+            "dropped_mapping_invalid": 0,
+            "dropped_missing_id": 0,
+            "deduped": 0,
+            "total_scanned": 0,
+            "bridge_loaded": self.is_bridge_loaded,
+        }
 
-        ingested = 0
+        if not self._lib:
+            return result
+
         records = getattr(pipeline, "_records", {})
         if not records:
-            return 0
+            return result
 
         for cve_id, record in records.items():
+            result["total_scanned"] += 1
+
             fields = self._map_cve_to_sample(record)
-            if not fields:
+            if fields is None:
+                result["dropped_missing_id"] += 1
+                self._total_dropped += 1
+                continue
+
+            if not fields.get("endpoint") or not fields.get("exploit_vector"):
+                result["dropped_mapping_invalid"] += 1
+                self._total_dropped += 1
                 continue
 
             # Compute idempotency key
@@ -264,6 +294,7 @@ class BridgeIngestionWorker:
                 fields["endpoint"], fields["exploit_vector"]
             )
             if ik in self._ingested_keys:
+                result["deduped"] += 1
                 self._total_deduped += 1
                 continue
 
@@ -273,40 +304,54 @@ class BridgeIngestionWorker:
                 fields.get("promotion_status", "RESEARCH_PENDING"),
             )
             if reliability < RELIABILITY_DROP_THRESHOLD:
+                result["dropped_low_reliability"] += 1
                 self._total_dropped += 1
                 continue
 
             # Ingest
             rc = self._ingest_one(fields, reliability)
             if rc == 0:
-                ingested += 1
+                result["ingested_ok"] += 1
                 self._ingested_keys.add(ik)
                 self._total_ingested += 1
             elif rc == -3:
+                result["deduped"] += 1
                 self._total_deduped += 1
                 self._ingested_keys.add(ik)
 
-        if ingested > 0:
+        if result["ingested_ok"] > 0:
             self._last_ingest_at = datetime.now(timezone.utc).isoformat()
+            # Auto-sync manifest when new samples ingested
+            self.update_manifest()
 
-        return ingested
+        return result
 
     def backfill(self, pipeline, max_samples: int = 0) -> Dict[str, Any]:
         """
         One-shot backfill: ingest all pipeline records into bridge.
-        Returns progress dict.
+        Returns truthful structured result.
         """
         if not self._lib:
             return {
                 "success": False,
                 "reason": "Bridge DLL not loaded",
+                "total_available": 0,
+                "attempted": 0,
                 "ingested": 0,
+                "dropped": 0,
+                "deduped": 0,
+                "bridge_count": 0,
+                "bridge_verified_count": 0,
+                "duration_ms": 0,
             }
 
         t0 = time.time()
         ingested = 0
         dropped = 0
         deduped = 0
+        attempted = 0
+        dropped_missing = 0
+        dropped_invalid = 0
 
         records = getattr(pipeline, "_records", {})
         total = len(records)
@@ -315,8 +360,16 @@ class BridgeIngestionWorker:
             if max_samples and ingested >= max_samples:
                 break
 
+            attempted += 1
             fields = self._map_cve_to_sample(record)
-            if not fields:
+            if fields is None:
+                dropped_missing += 1
+                dropped += 1
+                continue
+
+            if not fields.get("endpoint") or not fields.get("exploit_vector"):
+                dropped_invalid += 1
+                dropped += 1
                 continue
 
             ik = self._compute_idempotency_key(
@@ -345,7 +398,7 @@ class BridgeIngestionWorker:
                 self._ingested_keys.add(ik)
                 self._total_deduped += 1
 
-        elapsed = time.time() - t0
+        elapsed_ms = int((time.time() - t0) * 1000)
         self._last_ingest_at = datetime.now(timezone.utc).isoformat()
 
         # Update manifest after backfill
@@ -355,12 +408,15 @@ class BridgeIngestionWorker:
         return {
             "success": True,
             "total_available": total,
+            "attempted": attempted,
             "ingested": ingested,
             "dropped": dropped,
+            "dropped_missing_id": dropped_missing,
+            "dropped_mapping_invalid": dropped_invalid,
             "deduped": deduped,
-            "elapsed_seconds": round(elapsed, 2),
             "bridge_count": counts.get("bridge_count", 0),
             "bridge_verified_count": counts.get("bridge_verified_count", 0),
+            "duration_ms": elapsed_ms,
         }
 
     # =========================================================================

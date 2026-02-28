@@ -165,12 +165,13 @@ class CVEIngestScheduler:
         try:
             from backend.cve.bridge_ingestion_worker import get_bridge_worker
             worker = get_bridge_worker()
-            bridge_count = worker.stream_ingest_new(pipeline)
-            if bridge_count > 0:
+            ingest_result = worker.stream_ingest_new(pipeline)
+            ingested_count = ingest_result.get("ingested_ok", 0) if isinstance(ingest_result, dict) else ingest_result
+            if ingested_count > 0:
                 logger.info(
-                    f"[CVE_SCHEDULER] Bridge ingested {bridge_count} new samples"
+                    f"[CVE_SCHEDULER] Bridge ingested {ingested_count} new samples "
+                    f"(details={ingest_result})"
                 )
-                worker.update_manifest()
         except Exception as e:
             logger.warning(f"[CVE_SCHEDULER] Bridge ingest skipped: {e}")
 
