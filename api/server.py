@@ -11,19 +11,18 @@ IT CANNOT EXECUTE BROWSER ACTIONS OR BYPASS GOVERNANCE.
 import os
 import sys
 import uuid
-import json
 import asyncio
 import hashlib
 import logging
-
-logger = logging.getLogger("ygb.server")
 from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
+_log = logging.getLogger("ygb.api")
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import FileResponse, PlainTextResponse
 from pydantic import BaseModel
 
 # Centralized auth guard
@@ -32,7 +31,6 @@ from backend.auth.auth_guard import (
     revoke_token, revoke_session,
     preflight_check_secrets,
     validate_target_url,
-    ws_authenticate,
 )
 
 # Add project root to path for imports
@@ -54,18 +52,8 @@ from backend.storage.storage_bridge import (
     log_activity, get_recent_activity, get_admin_stats,
     get_storage_stats, get_lifecycle_status, get_disk_status,
     get_delete_preview, store_video, get_video_stream_token,
-    stream_video, list_videos, get_storage_health,
+    stream_video, list_videos,
 )
-
-# Import activation profiles
-try:
-    from backend.config.activation_profiles import (
-        validate_startup, log_boot_summary, get_profile,
-        get_smtp_pass, IntegrationState,
-    )
-    ACTIVATION_PROFILES_AVAILABLE = True
-except ImportError:
-    ACTIVATION_PROFILES_AVAILABLE = False
 
 # Import training state manager
 from backend.training.state_manager import get_training_state_manager
@@ -73,8 +61,7 @@ from backend.training.state_manager import get_training_state_manager
 # Import auth and alerts
 from backend.auth.auth import (
     hash_password, verify_password, generate_jwt, verify_jwt,
-    compute_device_hash, get_rate_limiter, generate_csrf_token,
-    needs_rehash,
+    compute_device_hash, get_rate_limiter, generate_csrf_token
 )
 from backend.alerts.email_alerts import (
     alert_new_login, alert_new_device, alert_multiple_devices,
@@ -149,40 +136,18 @@ except ImportError as e:
 # APP CONFIGURATION
 # =============================================================================
 
-from contextlib import asynccontextmanager
-
-@asynccontextmanager
-async def lifespan(app):
-    """Server lifespan: start CVE scheduler on boot, stop on shutdown."""
-    # --- STARTUP ---
-    try:
-        from backend.cve.cve_scheduler import get_scheduler
-        scheduler = get_scheduler()
-        scheduler.start()
-        print("✅ CVE scheduler started (5-minute interval)")
-    except Exception as e:
-        print(f"⚠️  CVE scheduler not started: {e}")
-    yield
-    # --- SHUTDOWN ---
-    try:
-        from backend.cve.cve_scheduler import get_scheduler
-        scheduler = get_scheduler()
-        await scheduler.stop()
-        print("CVE scheduler stopped")
-    except Exception:
-        pass
-
 app = FastAPI(
     title="YGB API",
     description="Bug Bounty Governance Backend",
-    version="1.0.0",
-    lifespan=lifespan,
+    version="1.0.0"
 )
 
 # CORS configuration for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=os.getenv(
+        "CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+    ).split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -367,298 +332,23 @@ def discover_hunter_modules() -> Dict[str, bool]:
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint with REAL system status — no fake active states.
-    
-    Returns structured sub-sections:
-      - storage_engine_status
-      - dataset_readiness_status
-      - integration_status
-    """
+    """Health check endpoint with system status."""
     phases = discover_python_phases()
     hunter_modules = discover_hunter_modules()
-
-    # Real storage health (single source of truth)
-    storage_health = get_storage_health()
-
-    # Dataset readiness
-    dataset_status = _get_dataset_readiness()
-
-    # Integration status
-    integration_status = _get_integration_summary()
-
-    # Overall: only "ok" if all critical subsystems active
-    if not storage_health["storage_active"]:
-        overall = "degraded"
-    elif dataset_status.get("status") == "BLOCKED_REAL_DATA":
-        overall = "degraded"
-    else:
-        overall = "ok"
-
+    
     return {
-        "status": overall,
+        "status": "ok",
+        "ygb_root": str(PROJECT_ROOT),
         "python_phases": len([p for p in phases if p["number"] <= 19]),
         "impl_phases": len([p for p in phases if p["number"] >= 20]),
         "hunter_modules": len(hunter_modules),
-        "storage_engine_status": storage_health,
-        "dataset_readiness_status": dataset_status,
-        "integration_status": integration_status,
+        "hunter_integration": hunter_modules,
         "timestamp": datetime.now(UTC).isoformat()
     }
 
 
-@app.get("/api/storage/status")
-async def get_storage_status():
-    """Canonical storage/DB truth endpoint.
-
-    Returns real check results — never fake active.
-    Frontend must use this as single source of truth.
-    """
-    return get_storage_health()
-
-
-
-def _get_dataset_readiness() -> Dict[str, Any]:
-    """Get dataset readiness status for health endpoint."""
-    try:
-        from impl_v1.training.data.real_dataset_loader import (
-            validate_dataset_integrity, YGB_MIN_REAL_SAMPLES,
-        )
-        ok, msg = validate_dataset_integrity()
-        if ok:
-            return {
-                "status": "READY",
-                "min_samples_required": YGB_MIN_REAL_SAMPLES,
-                "reason": None,
-            }
-        else:
-            return {
-                "status": "BLOCKED_REAL_DATA",
-                "min_samples_required": YGB_MIN_REAL_SAMPLES,
-                "reason": msg,
-            }
-    except Exception as e:
-        return {
-            "status": "UNKNOWN",
-            "min_samples_required": None,
-            "reason": f"Cannot check dataset: {str(e)}",
-        }
-
-
-def _get_integration_summary() -> Dict[str, Any]:
-    """Get integration status summary."""
-    if not ACTIVATION_PROFILES_AVAILABLE:
-        return {"status": "UNKNOWN", "reason": "activation_profiles not available"}
-    try:
-        ok, errors, integrations = validate_startup()
-        return {
-            "profile": get_profile().value,
-            "startup_ok": ok,
-            "integrations": {
-                i.name: {"state": i.state.value, "reason": i.reason}
-                for i in integrations
-            },
-        }
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
-
-
-@app.get("/api/readiness")
-async def get_readiness():
-    """Dataset readiness endpoint — shows sample counts, thresholds, and blocking reasons."""
-    return _get_dataset_readiness()
-
-
-@app.get("/api/integration/status")
-async def get_integration_status():
-    """Integration status per configured service."""
-    return _get_integration_summary()
-
-
-@app.get("/api/cve/status")
-async def get_cve_status():
-    """CVE pipeline status — sources, freshness, record counts."""
-    try:
-        from backend.cve.cve_pipeline import get_pipeline
-        pipeline = get_pipeline()
-        return pipeline.get_pipeline_status()
-    except ImportError:
-        return {"status": "NOT_AVAILABLE", "reason": "CVE pipeline module not found"}
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
-
-
-@app.get("/api/cve/scheduler/health")
-async def get_cve_scheduler_health():
-    """CVE scheduler SLO metrics and health status."""
-    try:
-        from backend.cve.cve_scheduler import get_scheduler
-        scheduler = get_scheduler()
-        return scheduler.get_health()
-    except ImportError:
-        return {"status": "NOT_AVAILABLE", "reason": "Scheduler module not found"}
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
-
-
-@app.get("/api/cve/pipeline/status")
-async def get_cve_pipeline_full_status():
-    """Full CVE pipeline status with promotion, dedup/drift, and anti-hallucination."""
-    try:
-        from backend.cve.cve_pipeline import get_pipeline
-        from backend.cve.promotion_policy import get_promotion_policy
-        from backend.cve.dedup_drift import get_dedup_drift_engine
-        from backend.cve.anti_hallucination import get_anti_hallucination_validator
-        from backend.cve.cve_scheduler import get_scheduler
-
-        return {
-            "pipeline": get_pipeline().get_pipeline_status(),
-            "scheduler": get_scheduler().get_health(),
-            "promotion": get_promotion_policy().get_counts(),
-            "dedup_drift": get_dedup_drift_engine().get_status(),
-            "anti_hallucination": get_anti_hallucination_validator().get_status(),
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
-
-
-@app.get("/health")
-async def health_alias():
-    """Alias for /api/health — some frontend pages use /health."""
-    return await health_check()
-
-
-@app.get("/api/cve/summary")
-async def get_cve_summary():
-    """Quick CVE summary — total records, sources, freshness."""
-    try:
-        from backend.cve.cve_pipeline import get_pipeline
-        pipeline = get_pipeline()
-        status = pipeline.get_pipeline_status()
-        return {
-            "total_records": status.get("total_records", 0),
-            "sources_connected": status.get("sources_connected", 0),
-            "last_ingest": status.get("last_ingest_at"),
-            "freshness": status.get("freshness", "UNKNOWN"),
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
-    except ImportError:
-        return {"total_records": 0, "sources_connected": 0, "freshness": "NOT_AVAILABLE"}
-    except Exception as e:
-        return {"total_records": 0, "sources_connected": 0, "freshness": "ERROR", "reason": str(e)}
-
-
-@app.get("/api/cve/search")
-async def search_cves(q: str = "", user=Depends(require_auth)):
-    """Search CVE records by ID or keyword."""
-    if not q or len(q) < 3:
-        return {"results": [], "query": q, "reason": "Query must be at least 3 characters"}
-    try:
-        from backend.cve.cve_pipeline import get_pipeline
-        pipeline = get_pipeline()
-        results = pipeline.search(q)
-        return {"results": results[:50], "query": q, "total": len(results)}
-    except ImportError:
-        return {"results": [], "query": q, "reason": "CVE pipeline not available"}
-    except AttributeError:
-        return {"results": [], "query": q, "reason": "Search not implemented in pipeline"}
-    except Exception as e:
-        return {"results": [], "query": q, "reason": str(e)}
-
-
-@app.get("/api/training/readiness")
-async def get_training_readiness():
-    """Training readiness truth table — per-field status with exact block reasons."""
-    try:
-        from impl_v1.training.data.real_dataset_loader import (
-            validate_dataset_integrity, YGB_MIN_REAL_SAMPLES,
-            STRICT_REAL_MODE, get_per_field_report,
-        )
-        ok, msg = validate_dataset_integrity()
-
-        # Build per-field readiness
-        fields = {}
-        storage_health = get_storage_health()
-
-        fields["storage_engine"] = {
-            "status": "READY" if storage_health.get("storage_active") else "BLOCKED",
-            "reason": None if storage_health.get("storage_active") else "Storage engine not active",
-        }
-        fields["dataset_source"] = {
-            "status": "READY" if ok else "BLOCKED",
-            "reason": None if ok else msg,
-        }
-        fields["strict_real_mode"] = {
-            "status": "READY" if STRICT_REAL_MODE else "PARTIAL",
-            "reason": None if STRICT_REAL_MODE else "STRICT_REAL_MODE=false (lab mode)",
-        }
-        fields["min_samples"] = {
-            "status": "READY" if ok else "BLOCKED",
-            "threshold": YGB_MIN_REAL_SAMPLES,
-            "reason": None if ok else msg,
-        }
-
-        # Per-field bridge report (bridge counters, deficit, manifest)
-        try:
-            bridge_report = get_per_field_report()
-            fields["ingestion_bridge"] = {
-                "status": bridge_report["status"],
-                "bridge_loaded": bridge_report["bridge_loaded"],
-                "bridge_count": bridge_report["bridge_count"],
-                "bridge_verified_count": bridge_report["bridge_verified_count"],
-                "deficit": bridge_report["deficit"],
-                "manifest_exists": bridge_report["manifest_exists"],
-                "reason": bridge_report["reason"],
-            }
-        except Exception as e:
-            fields["ingestion_bridge"] = {
-                "status": "BLOCKED",
-                "reason": f"Bridge report failed: {e}",
-            }
-
-        # Overall readiness
-        blocked = [f for f in fields.values() if f["status"] == "BLOCKED"]
-        partial = [f for f in fields.values() if f["status"] == "PARTIAL"]
-
-        if blocked:
-            overall = "BLOCKED"
-        elif partial:
-            overall = "PARTIAL"
-        else:
-            overall = "READY"
-
-        return {
-            "overall": overall,
-            "fields": fields,
-            "training_allowed": overall == "READY",
-            "go_no_go": "GO" if overall == "READY" else "NO_GO",
-            "remediation": msg if not ok else None,
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
-    except Exception as e:
-        return {
-            "overall": "BLOCKED",
-            "training_allowed": False,
-            "go_no_go": "NO_GO",
-            "reason": str(e),
-        }
-
-
-@app.get("/api/backup/status")
-async def get_backup_status_endpoint():
-    """Backup strategy status — local HDD, peer replication, Google Drive."""
-    try:
-        from backend.storage.backup_config import get_backup_status
-        return get_backup_status()
-    except ImportError:
-        return {"status": "NOT_AVAILABLE", "reason": "Backup config module not found"}
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
-
-
-
 @app.get("/api/bounty/phases")
-async def get_bounty_phases(user=Depends(require_auth)):
+async def get_bounty_phases():
     """Get all available bounty phases."""
     phases = discover_python_phases()
     return {
@@ -671,128 +361,9 @@ async def get_bounty_phases(user=Depends(require_auth)):
     }
 
 
-# =============================================================================
-# FRONTEND-REQUIRED ROUTES (phases, hunter modules, field progression)
-# =============================================================================
-
-class RunPhaseRequest(BaseModel):
-    phase: str
-    target: str = ""
-    mode: str = "READ_ONLY"
-
-
-class RunHunterRequest(BaseModel):
-    module: str
-    target: str = ""
-    mode: str = "READ_ONLY"
-
-
-class FieldApprovalRequest(BaseModel):
-    approver_id: str
-    reason: str
-
-
-@app.get("/api/phases")
-async def get_phases(user=Depends(require_auth)):
-    """Get all available governance phases — frontend phase picker."""
-    phases = discover_python_phases()
-    return {
-        "phases": [
-            {
-                "name": p["name"],
-                "number": p["number"],
-                "available": p["available"],
-                "description": p["description"],
-            }
-            for p in phases
-        ],
-        "count": len(phases),
-    }
-
-
-@app.get("/api/hunter-modules")
-async def get_hunter_modules(user=Depends(require_auth)):
-    """Get available HUMANOID_HUNTER modules — frontend module picker."""
-    modules = discover_hunter_modules()
-    return {
-        "modules": [
-            {"name": name, "available": available}
-            for name, available in modules.items()
-        ],
-        "count": len(modules),
-    }
-
-
-@app.post("/api/run-phase")
-async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
-    """Run a governance phase. Delegates to RealPhaseRunner."""
-    phases = discover_python_phases()
-    phase_names = [p["name"] for p in phases]
-    if request.phase not in phase_names:
-        raise HTTPException(status_code=404, detail=f"Phase '{request.phase}' not found")
-
-    run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
-    active_workflows[run_id] = {
-        "type": "phase_run",
-        "phase": request.phase,
-        "target": request.target,
-        "mode": request.mode,
-        "status": "started",
-        "started_at": datetime.now(UTC).isoformat(),
-    }
-    return {"run_id": run_id, "phase": request.phase, "status": "started"}
-
-
-@app.post("/api/run-hunter")
-async def run_hunter_module(request: RunHunterRequest, user=Depends(require_auth)):
-    """Run a HUMANOID_HUNTER module. Delegates to RealPhaseRunner."""
-    modules = discover_hunter_modules()
-    if request.module not in modules:
-        raise HTTPException(status_code=404, detail=f"Hunter module '{request.module}' not found")
-
-    run_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
-    active_workflows[run_id] = {
-        "type": "hunter_run",
-        "module": request.module,
-        "target": request.target,
-        "mode": request.mode,
-        "status": "started",
-        "started_at": datetime.now(UTC).isoformat(),
-    }
-    return {"run_id": run_id, "module": request.module, "status": "started"}
-
-
-@app.get("/fields/state")
-async def fields_state_endpoint(user=Depends(require_auth)):
-    """Field progression state — delegates to field_progression_api."""
-    try:
-        from backend.api.field_progression_api import get_fields_state
-        return get_fields_state()
-    except ImportError:
-        return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-
-@app.post("/fields/approve/{field_id}")
-async def fields_approve_endpoint(
-    field_id: int,
-    request: FieldApprovalRequest,
-    user=Depends(require_auth),
-):
-    """Approve a field — delegates to field_progression_api."""
-    try:
-        from backend.api.field_progression_api import approve_field
-        return approve_field(field_id, request.approver_id, request.reason)
-    except ImportError:
-        return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-
 @app.get("/api/reports")
-async def list_reports(user=Depends(require_auth)):
-    """List all security reports in the report directory. Auth required."""
+async def list_reports():
+    """List all security reports in the report directory."""
     report_dir = PROJECT_ROOT / "report"
     if not report_dir.exists():
         return {"reports": [], "count": 0}
@@ -802,6 +373,7 @@ async def list_reports(user=Depends(require_auth)):
         stat = file.stat()
         reports.append({
             "filename": file.name,
+            "path": str(file),
             "size": stat.st_size,
             "created": datetime.fromtimestamp(stat.st_mtime).isoformat(),
             "download_url": f"/api/reports/{file.name}"
@@ -811,7 +383,7 @@ async def list_reports(user=Depends(require_auth)):
 
 
 @app.get("/api/reports/{filename}")
-async def download_report(filename: str, user=Depends(require_auth)):
+async def download_report(filename: str):
     """Download a specific report file."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
@@ -831,7 +403,7 @@ async def download_report(filename: str, user=Depends(require_auth)):
 
 
 @app.get("/api/reports/{filename}/content")
-async def get_report_content(filename: str, user=Depends(require_auth)):
+async def get_report_content(filename: str):
     """Get report content as text."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
@@ -852,11 +424,6 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
     """Start a V1 Hunter workflow."""
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
-    
-    # SSRF protection
-    is_safe, violations = validate_target_url(request.target)
-    if not is_safe:
-        raise HTTPException(status_code=400, detail=f"Target URL rejected: {violations[0]['message']}")
     
     workflow_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
     
@@ -885,11 +452,6 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
     target = request.target.strip()
     if not target.startswith(("http://", "https://")):
         target = f"https://{target}"
-    
-    # SSRF protection
-    is_safe, violations = validate_target_url(target)
-    if not is_safe:
-        raise HTTPException(status_code=400, detail=f"Target URL rejected: {violations[0]['message']}")
     
     report_id = f"RPT-{uuid.uuid4().hex[:12].upper()}"
     
@@ -921,7 +483,7 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
 # =============================================================================
 
 @app.post("/api/dashboard/create")
-async def create_dashboard(request: CreateDashboardRequest, user=Depends(require_auth)):
+async def create_dashboard(request: CreateDashboardRequest):
     """Create a new dashboard for a user."""
     dashboard_id = f"DASH-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.now(UTC).isoformat()
@@ -953,7 +515,7 @@ async def create_dashboard(request: CreateDashboardRequest, user=Depends(require
 
 
 @app.get("/api/dashboard/state")
-async def get_dashboard_state(dashboard_id: Optional[str] = None, user=Depends(require_auth)):
+async def get_dashboard_state(dashboard_id: Optional[str] = None):
     """Get current dashboard state."""
     if dashboard_id and dashboard_id in dashboard_states:
         return dashboard_states[dashboard_id]
@@ -964,7 +526,7 @@ async def get_dashboard_state(dashboard_id: Optional[str] = None, user=Depends(r
 
 @app.get("/api/execution/state")
 async def get_execution_state(kernel_id: Optional[str] = None, user=Depends(require_auth)):
-    """Get execution kernel state."""
+    """Get execution kernel state. Auth required."""
     if kernel_id and kernel_id in execution_kernels:
         return execution_kernels[kernel_id]
     
@@ -1030,7 +592,7 @@ async def execution_transition(request: ExecutionTransitionRequest, user=Depends
 
 
 @app.post("/api/approval/decision")
-async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depends(require_admin)):
+async def submit_approval_decision(request: ApprovalDecisionRequest):
     """Submit an approval decision."""
     now = datetime.now(UTC).isoformat()
     
@@ -1051,7 +613,7 @@ async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depend
 
 
 @app.post("/api/targets/discover")
-async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require_auth)):
+async def discover_targets(request: TargetDiscoveryRequest):
     """Discover potential bug bounty targets from the database."""
     try:
         targets = await get_all_targets()
@@ -1081,13 +643,12 @@ async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require
             "timestamp": datetime.now(UTC).isoformat()
         }
     except Exception as e:
-        logger.exception("Error discovering targets")
         return {
             "result_id": f"DIS-{uuid.uuid4().hex[:16].upper()}",
             "candidates": [],
             "total_found": 0,
             "filtered_count": 0,
-            "error": "Internal error while discovering targets",
+            "error": str(e),
             "timestamp": datetime.now(UTC).isoformat()
         }
 
@@ -1156,7 +717,7 @@ async def start_target_session(request: Request, user=Depends(require_auth)):
 
 
 @app.post("/target/stop")
-async def stop_target_session(request: Request, user=Depends(require_auth)):
+async def stop_target_session(request: Request):
     """Stop an active target scanning session."""
     data = await request.json()
     session_id = data.get("session_id", "")
@@ -1178,7 +739,7 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
 
 
 @app.get("/target/status")
-async def get_target_status(user=Depends(require_auth)):
+async def get_target_status():
     """Get status of all target sessions."""
     active = [s for s in target_sessions.values() if s["status"] == "ACTIVE"]
     stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED"]
@@ -1198,7 +759,7 @@ async def get_target_status(user=Depends(require_auth)):
 
 
 @app.post("/api/autonomy/session")
-async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(require_auth)):
+async def create_autonomy_session(request: AutonomySessionRequest):
     """Create an autonomy session."""
     now = datetime.now(UTC)
     session_id = f"AUT-{uuid.uuid4().hex[:16].upper()}"
@@ -1216,12 +777,7 @@ async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(
         blocked = ["EXPLOIT", "SUBMISSION", "STATE_CHANGE", "BROWSER_ACTION"]
     elif request.mode == "READ_ONLY":
         blocked = ["EXPLOIT", "SUBMISSION", "STATE_CHANGE", "BROWSER_ACTION"]
-    elif request.mode == "MOCK":
-        from fastapi.responses import JSONResponse
-        return JSONResponse(
-            status_code=400,
-            content={"error": "MOCK mode is disabled. Use READ_ONLY, AUTONOMOUS_FIND, or REAL."}
-        )
+    # MOCK mode removed — only READ_ONLY, AUTONOMOUS_FIND, and REAL are valid modes.
     
     session = {
         "session_id": session_id,
@@ -1243,7 +799,7 @@ async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(
 # =============================================================================
 
 @app.get("/api/g38/status")
-async def get_g38_status(user=Depends(require_auth)):
+async def get_g38_status():
     """Get G38 auto-training status."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
@@ -1299,7 +855,7 @@ async def get_g38_status(user=Depends(require_auth)):
 
 
 @app.get("/api/g38/events")
-async def get_g38_events(limit: int = 50, user=Depends(require_auth)):
+async def get_g38_events(limit: int = 50):
     """Get recent G38 training events."""
     if not G38_AVAILABLE:
         return {"events": [], "error": "G38 modules not loaded"}
@@ -1371,133 +927,8 @@ async def start_g38_training(epochs: int = 10, user=Depends(require_auth)):
     }
 
 
-# =============================================================================
-# ADMIN PANEL TRAINING/GPU ROUTES
-# (Canonical — single definition per route. No duplicates.)
-# =============================================================================
-
-@app.get("/gpu/status")
-async def gpu_status(user=Depends(require_auth)):
-    """GPU status — real GPU info with nvidia-smi metrics."""
-    result: Dict[str, Any] = {
-        "gpu_available": False,
-        "device_name": None,
-        "utilization_percent": None,
-        "memory_allocated_mb": None,
-        "memory_reserved_mb": None,
-        "memory_total_mb": None,
-        "temperature": None,
-        "compute_capability": None,
-    }
-    try:
-        import torch
-        if not torch.cuda.is_available():
-            return result
-        result["gpu_available"] = True
-        result["device_name"] = torch.cuda.get_device_name(0)
-        result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
-        result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
-        props = torch.cuda.get_device_properties(0)
-        result["memory_total_mb"] = round(props.total_mem / 1024 / 1024, 2)
-        cap = torch.cuda.get_device_capability(0)
-        result["compute_capability"] = f"{cap[0]}.{cap[1]}"
-    except Exception:
-        pass
-    # nvidia-smi for utilization and temperature
-    try:
-        import subprocess
-        smi_output = subprocess.check_output(
-            ["nvidia-smi",
-             "--query-gpu=utilization.gpu,temperature.gpu",
-             "--format=csv,noheader,nounits"],
-            timeout=5, text=True
-        ).strip()
-        parts = smi_output.split(",")
-        if len(parts) >= 2:
-            result["utilization_percent"] = float(parts[0].strip())
-            result["temperature"] = float(parts[1].strip())
-    except Exception:
-        pass
-    return result
-
-
-@app.get("/training/status")
-async def training_status(user=Depends(require_auth)):
-    """Training status — full trainer state."""
-    if not G38_AVAILABLE:
-        return {"available": False, "is_training": False, "error": "G38 not available"}
-    trainer = get_auto_trainer()
-    return trainer.get_status()
-
-
-@app.post("/training/start")
-async def training_start(epochs: int = 10, user=Depends(require_auth)):
-    """Start GPU training manually. No auto-trigger."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    trainer = get_auto_trainer()
-    if trainer.is_training:
-        return {
-            "success": False,
-            "error": "Training already in progress",
-            "state": trainer.state.value,
-        }
-    import threading
-    def _run():
-        trainer.force_start_training(epochs=epochs)
-    threading.Thread(target=_run, daemon=True).start()
-    return {
-        "success": True,
-        "message": f"Training started for {epochs} epochs",
-        "state": "TRAINING",
-        "training_mode": "MANUAL",
-    }
-
-
-@app.post("/training/stop")
-async def training_stop(user=Depends(require_auth)):
-    """Stop training immediately."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    trainer = get_auto_trainer()
-    result = trainer.abort_training()
-    return {
-        "success": result.get("aborted", False),
-        "message": "Training stopped" if result.get("aborted") else "No training in progress",
-        "state": trainer.state.value,
-    }
-
-
-@app.post("/training/continuous")
-async def training_continuous(request: Request, user=Depends(require_auth)):
-    """Toggle continuous training mode."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    data = await request.json()
-    enabled = data.get("enabled", False)
-    target_epochs = data.get("target_epochs", 0)
-    if enabled:
-        start_continuous_training(target_epochs=target_epochs)
-        return {"success": True, "message": "Continuous mode enabled"}
-    else:
-        stop_continuous_training()
-        return {"success": True, "message": "Continuous mode disabled"}
-
-
-@app.post("/training/interval")
-async def training_interval(request: Request, user=Depends(require_admin)):
-    """Set training check interval via admin panel."""
-    if not G38_AVAILABLE:
-        raise HTTPException(status_code=503, detail="G38 not available")
-    data = await request.json()
-    interval = data.get("interval", 30)
-    trainer = get_auto_trainer()
-    trainer.CHECK_INTERVAL_SECONDS = max(10, min(interval, 3600))
-    return {"success": True, "interval": trainer.CHECK_INTERVAL_SECONDS}
-
-
 @app.get("/api/g38/guards")
-async def get_g38_guards(user=Depends(require_auth)):
+async def get_g38_guards():
     """Get all G38 guard statuses."""
     if not G38_AVAILABLE:
         return {"guards": [], "error": "G38 modules not loaded"}
@@ -1519,7 +950,7 @@ async def get_g38_guards(user=Depends(require_auth)):
 
 
 @app.get("/api/g38/reports")
-async def get_g38_training_reports(user=Depends(require_auth)):
+async def get_g38_training_reports():
     """Get G38 training reports."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
     
@@ -1550,8 +981,7 @@ async def get_g38_training_reports(user=Depends(require_auth)):
             import json
             try:
                 report["learned_features"] = json.loads(learned_file.read_text())
-            except Exception:
-                logger.exception("Failed to parse learned features JSON")
+            except:
                 report["learned_features"] = None
         
         reports.append(report)
@@ -1559,11 +989,12 @@ async def get_g38_training_reports(user=Depends(require_auth)):
     return {
         "reports": reports[:20],  # Last 20 reports
         "count": len(reports),
+        "reports_dir": str(reports_dir),
     }
 
 
 @app.get("/api/g38/reports/latest")
-async def get_g38_latest_report(user=Depends(require_auth)):
+async def get_g38_latest_report():
     """Get the latest G38 training report."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
     
@@ -1596,28 +1027,144 @@ async def get_g38_latest_report(user=Depends(require_auth)):
 
 
 # =============================================================================
-# ADDITIONAL TRAINING ENDPOINTS (non-duplicate)
+# MANUAL TRAINING CONTROL ENDPOINTS
 # =============================================================================
+
+@app.post("/training/start")
+async def manual_start_training(epochs: int = 10, user=Depends(require_auth)):
+    """Manually start GPU training. No auto-trigger."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    
+    if trainer.is_training:
+        return {
+            "success": False,
+            "error": "Training already in progress",
+            "state": trainer.state.value,
+        }
+    
+    import threading
+    def run_training():
+        trainer.force_start_training(epochs=epochs)
+    
+    thread = threading.Thread(target=run_training, daemon=True)
+    thread.start()
+    
+    return {
+        "success": True,
+        "message": f"Training started for {epochs} epochs",
+        "state": "TRAINING",
+        "training_mode": "MANUAL",
+    }
+
+
+@app.post("/training/continuous")
+async def start_24_7_training(epochs: int = 0, user=Depends(require_auth)):
+    """Start 24/7 continuous GPU training. epochs=0 means infinite."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    result = start_continuous_training(target_epochs=epochs)
+    return {"success": result.get("started", False), **result}
+
 
 @app.post("/training/continuous/stop")
 async def stop_24_7_training(user=Depends(require_auth)):
     """Stop 24/7 continuous training."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
+    
     result = stop_continuous_training()
     return {"success": result.get("stopped", False), **result}
 
 
+@app.post("/training/stop")
+async def manual_stop_training(user=Depends(require_auth)):
+    """Stop training immediately."""
+    if not G38_AVAILABLE:
+        return {"success": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    result = trainer.abort_training()
+    
+    return {
+        "success": result.get("aborted", False),
+        "message": "Training stopped" if result.get("aborted") else "No training in progress",
+        "state": trainer.state.value,
+    }
+
+
+@app.get("/training/status")
+async def manual_training_status():
+    """Get current training status."""
+    if not G38_AVAILABLE:
+        return {"available": False, "error": "G38 modules not loaded"}
+    
+    trainer = get_auto_trainer()
+    return trainer.get_status()
+
+
 @app.get("/training/progress")
-async def training_progress(user=Depends(require_auth)):
+async def manual_training_progress():
     """Get real-time training progress. Returns null if unavailable."""
     mgr = get_training_state_manager()
     metrics = mgr.get_training_progress()
     return metrics.to_dict()
 
 
+@app.get("/gpu/status")
+async def gpu_status():
+    """Get GPU utilization and memory metrics. Real data only."""
+    result: Dict[str, Any] = {
+        "gpu_available": False,
+        "device_name": None,
+        "utilization_percent": None,
+        "memory_allocated_mb": None,
+        "memory_reserved_mb": None, 
+        "memory_total_mb": None,
+        "temperature": None,
+        "compute_capability": None,
+    }
+    
+    try:
+        import torch
+        if not torch.cuda.is_available():
+            return result
+        
+        result["gpu_available"] = True
+        result["device_name"] = torch.cuda.get_device_name(0)
+        result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
+        result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
+        props = torch.cuda.get_device_properties(0)
+        result["memory_total_mb"] = round(props.total_mem / 1024 / 1024, 2)
+        cap = torch.cuda.get_device_capability(0)
+        result["compute_capability"] = f"{cap[0]}.{cap[1]}"
+    except Exception:
+        pass
+    
+    # nvidia-smi for utilization and temperature
+    try:
+        import subprocess
+        smi_output = subprocess.check_output(
+            ["nvidia-smi",
+             "--query-gpu=utilization.gpu,temperature.gpu",
+             "--format=csv,noheader,nounits"],
+            timeout=5, text=True
+        ).strip()
+        parts = smi_output.split(",")
+        if len(parts) >= 2:
+            result["utilization_percent"] = float(parts[0].strip())
+            result["temperature"] = float(parts[1].strip())
+    except Exception:
+        pass
+    
+    return result
+
+
 @app.get("/dataset/stats")
-async def dataset_stats(user=Depends(require_auth)):
+async def dataset_stats():
     """Get training dataset statistics."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
@@ -1639,35 +1186,32 @@ async def dataset_stats(user=Depends(require_auth)):
             "source": "real_dataset_loader",
         }
     except Exception as e:
-        logger.exception("Error in dataset_stats")
-        return {"available": False, "error": "Internal error"}
+        return {"available": False, "error": str(e)}
 # =============================================================================
 
 @app.get("/api/db/users")
-def list_users(user=Depends(require_auth)):
+def list_users():
     """Get all users from HDD storage."""
     try:
         users = get_all_users()
         return {"users": users, "total": len(users)}
     except Exception as e:
-        logger.exception("Error listing users")
-        return {"users": [], "total": 0, "error": "Internal error"}
+        return {"users": [], "total": 0, "error": str(e)}
 
 
 @app.post("/api/db/users")
-def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
+def add_user(request: CreateUserRequest):
     """Create a new user."""
     try:
-        new_user = create_user(request.name, request.email, request.role)
-        log_activity(str(new_user['id']), "USER_CREATED", f"User {request.name} created")
-        return {"success": True, "user": new_user}
+        user = create_user(request.name, request.email, request.role)
+        log_activity(str(user['id']), "USER_CREATED", f"User {request.name} created")
+        return {"success": True, "user": user}
     except Exception as e:
-        logger.exception("Error creating user")
-        raise HTTPException(status_code=400, detail="Failed to create user")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/users/{user_id}")
-def get_single_user(user_id: str, user=Depends(require_auth)):
+def get_single_user(user_id: str):
     """Get a specific user by ID."""
     try:
         user = get_user(user_id)
@@ -1675,34 +1219,31 @@ def get_single_user(user_id: str, user=Depends(require_auth)):
             return {"success": True, "user": user}
         return {"success": False, "error": "User not found"}
     except Exception as e:
-        logger.exception("Error fetching user")
-        raise HTTPException(status_code=400, detail="Failed to fetch user")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/users/{user_id}/bounties")
-def get_user_bounties_endpoint(user_id: str, user=Depends(require_auth)):
+def get_user_bounties_endpoint(user_id: str):
     """Get all bounties for a specific user."""
     try:
         bounties = get_user_bounties(user_id)
         return {"bounties": bounties, "total": len(bounties)}
     except Exception as e:
-        logger.exception("Error listing user bounties")
-        return {"bounties": [], "total": 0, "error": "Internal error"}
+        return {"bounties": [], "total": 0, "error": str(e)}
 
 
 @app.get("/api/db/targets")
-def list_targets(user=Depends(require_auth)):
+def list_targets():
     """Get all targets from HDD storage."""
     try:
         targets = get_all_targets()
         return {"targets": targets, "total": len(targets)}
     except Exception as e:
-        logger.exception("Error listing targets")
-        return {"targets": [], "total": 0, "error": "Internal error"}
+        return {"targets": [], "total": 0, "error": str(e)}
 
 
 @app.post("/api/db/targets")
-def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
+def add_target(request: CreateTargetRequest):
     """Create a new target."""
     try:
         target = create_target(
@@ -1715,24 +1256,23 @@ def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
         log_activity(None, "TARGET_CREATED", f"Target {request.program_name} created")
         return {"success": True, "target": target}
     except Exception as e:
-        logger.exception("Error creating target")
-        raise HTTPException(status_code=400, detail="Failed to create target")
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/bounties")
 def list_bounties(user=Depends(require_auth)):
-    """Get all bounties."""
+    """Get all bounties. Auth required."""
     try:
         bounties = get_all_bounties()
         return {"bounties": bounties, "total": len(bounties)}
     except Exception as e:
-        logger.exception("Error listing bounties")
+        _log.exception("bounty list failed")
         return {"bounties": [], "total": 0, "error": "Internal error"}
 
 
 @app.post("/api/db/bounties")
-def add_bounty(request: CreateBountyRequest, user=Depends(require_admin)):
-    """Create a new bounty submission."""
+def add_bounty(request: CreateBountyRequest, user=Depends(require_auth)):
+    """Create a new bounty submission. Auth required."""
     try:
         bounty = create_bounty(
             request.user_id,
@@ -1744,53 +1284,53 @@ def add_bounty(request: CreateBountyRequest, user=Depends(require_admin)):
         log_activity(request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}")
         return {"success": True, "bounty": bounty}
     except Exception as e:
-        logger.exception("Error creating bounty")
-        raise HTTPException(status_code=400, detail="Failed to create bounty")
+        _log.exception("bounty creation failed")
+        raise HTTPException(status_code=400, detail="Bounty creation failed")
 
 
 @app.put("/api/db/bounties")
-def update_bounty(request: UpdateBountyRequest, user=Depends(require_admin)):
-    """Update bounty status and reward."""
+def update_bounty(request: UpdateBountyRequest, user=Depends(require_auth)):
+    """Update bounty status and reward. Auth required."""
     try:
         update_bounty_status(request.bounty_id, request.status, request.reward)
         log_activity(None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}")
         return {"success": True, "bounty_id": request.bounty_id, "status": request.status}
     except Exception as e:
-        logger.exception("Error updating bounty")
-        raise HTTPException(status_code=400, detail="Failed to update bounty")
+        _log.exception("bounty update failed")
+        raise HTTPException(status_code=400, detail="Bounty update failed")
 
 
 @app.post("/api/db/sessions")
-def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
-    """Create a new session."""
+def add_session(request: CreateSessionRequest, user=Depends(require_auth)):
+    """Create a new session. Auth required."""
     try:
         session = create_session(request.user_id, request.mode, request.target_scope)
         log_activity(request.user_id, "SESSION_STARTED", f"Mode: {request.mode}")
         return {"success": True, "session": session}
     except Exception as e:
-        logger.exception("Error creating session")
-        raise HTTPException(status_code=400, detail="Failed to create session")
+        _log.exception("session creation failed")
+        raise HTTPException(status_code=400, detail="Session creation failed")
 
 
 @app.get("/api/db/activity")
 def list_activity(limit: int = 50, user=Depends(require_auth)):
-    """Get recent activity log."""
+    """Get recent activity log. Auth required."""
     try:
         activities = get_recent_activity(limit)
         return {"activities": activities, "total": len(activities)}
     except Exception as e:
-        logger.exception("Error listing activity")
+        _log.exception("activity list failed")
         return {"activities": [], "total": 0, "error": "Internal error"}
 
 
 @app.get("/api/db/admin/stats")
 def get_admin_statistics(user=Depends(require_admin)):
-    """Get admin dashboard statistics."""
+    """Get admin dashboard statistics. Admin only."""
     try:
         stats = get_admin_stats()
         return {"success": True, "stats": stats}
     except Exception as e:
-        logger.exception("Error fetching admin stats")
+        _log.exception("admin stats failed")
         return {"success": False, "stats": None, "error": "Internal error"}
 
 
@@ -1800,34 +1340,31 @@ def get_admin_statistics(user=Depends(require_admin)):
 
 @app.get("/api/storage/stats")
 def storage_stats_endpoint(user=Depends(require_auth)):
-    """Get HDD storage engine statistics."""
+    """Get HDD storage engine statistics. Auth required."""
     return get_storage_stats()
 
 
 @app.get("/api/storage/lifecycle")
 def lifecycle_status_endpoint(user=Depends(require_auth)):
-    """Get lifecycle status and deletion preview."""
+    """Get lifecycle status and deletion preview. Auth required."""
     return get_lifecycle_status()
 
 
 @app.get("/api/storage/disk")
 def disk_status_endpoint(user=Depends(require_auth)):
-    """Get HDD disk usage, alerts, and health."""
+    """Get HDD disk usage, alerts, and health. Auth required."""
     return get_disk_status()
 
 
 @app.get("/api/storage/delete-preview")
 def delete_preview_endpoint(entity_type: Optional[str] = None, user=Depends(require_admin)):
-    """Preview which entities would be auto-deleted."""
+    """Preview which entities would be auto-deleted. Admin only."""
     return get_delete_preview(entity_type)
 
 
 @app.get("/api/video/list")
 def video_list_endpoint(user_id: Optional[str] = None, user=Depends(require_auth)):
-    """List stored videos. Non-admin users can only see their own videos."""
-    # IDOR: Force user_id to authenticated user for non-admins
-    if user.get("role") != "admin":
-        user_id = user.get("sub")
+    """List stored videos. Auth required."""
     return list_videos(user_id)
 
 
@@ -1835,12 +1372,8 @@ def video_list_endpoint(user_id: Optional[str] = None, user=Depends(require_auth
 async def video_token_endpoint(request: Request, user=Depends(require_auth)):
     """Generate a signed video streaming token. Auth required."""
     body = await request.json()
-    # IDOR: Force user_id to authenticated user for non-admins
-    requested_user_id = body.get("user_id", "")
-    if user.get("role") != "admin":
-        requested_user_id = user.get("sub", "")
     return get_video_stream_token(
-        requested_user_id,
+        body.get("user_id", ""),
         body.get("session_id", ""),
         body.get("filename", "video.webm"),
     )
@@ -1859,8 +1392,7 @@ class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
-    # NOTE: 'role' field removed — all registrations are 'hunter'
-    # Admin promotion requires existing admin via /api/db/users endpoint
+    role: str = "hunter"
 
 
 @app.post("/auth/register")
@@ -1871,7 +1403,7 @@ async def register_user(request: RegisterRequest, req: Request):
         raise HTTPException(status_code=400, detail="Email already registered")
 
     pw_hash = hash_password(request.password)
-    user = create_user(request.name, request.email, "hunter")  # Always hunter — no privilege escalation
+    user = create_user(request.name, request.email, request.role)
     update_user_password(user["id"], pw_hash)
 
     ip = req.client.host if req.client else "unknown"
@@ -1918,12 +1450,6 @@ async def login(request: LoginRequest, req: Request):
 
     # Success — reset rate limiter
     limiter.reset(ip)
-
-    # B9: Auto-rehash legacy password to v2 on successful login
-    if needs_rehash(user["password_hash"]):
-        new_hash = hash_password(request.password)
-        update_user_password(user["id"], new_hash)
-        log_activity(user["id"], "PASSWORD_REHASHED", "Legacy hash upgraded to v2", ip_address=ip)
 
     # Compute device hash and register device
     dh = compute_device_hash(ua, ip)
@@ -1993,8 +1519,7 @@ def get_active_devices_endpoint(user=Depends(require_admin)):
         devices = get_all_active_devices()
         return {"devices": devices, "total": len(devices)}
     except Exception as e:
-        logger.exception("Error listing active devices")
-        return {"devices": [], "total": 0, "error": "Internal error"}
+        return {"devices": [], "total": 0, "error": str(e)}
 
 
 @app.get("/admin/active-sessions")
@@ -2004,8 +1529,7 @@ def get_active_sessions_endpoint(user=Depends(require_admin)):
         sessions = get_active_sessions()
         return {"sessions": sessions, "total": len(sessions)}
     except Exception as e:
-        logger.exception("Error listing active sessions")
-        return {"sessions": [], "total": 0, "error": "Internal error"}
+        return {"sessions": [], "total": 0, "error": str(e)}
 
 
 # =============================================================================
@@ -2023,7 +1547,7 @@ _hunting_auto_mode = {
 
 
 @app.get("/api/hunting/targets")
-async def get_hunting_targets(user=Depends(require_auth)):
+async def get_hunting_targets():
     """Get AI-suggested hunting targets from the database."""
     try:
         # Pull real targets from HDD storage
@@ -2044,12 +1568,11 @@ async def get_hunting_targets(user=Depends(require_auth)):
             })
         return {"targets": suggestions, "total": len(suggestions)}
     except Exception as e:
-        logger.exception("Error listing hunting targets")
-        return {"targets": [], "total": 0, "error": "Internal error"}
+        return {"targets": [], "total": 0, "error": str(e)}
 
 
 @app.get("/api/hunting/auto-mode")
-async def get_hunting_auto_mode(user=Depends(require_auth)):
+async def get_hunting_auto_mode():
     """Get current hunting auto-mode state with integrity score."""
     # Read integrity score from supervisor if available
     if INTEGRITY_AVAILABLE:
@@ -2082,12 +1605,6 @@ hunting_connections: Dict[str, WebSocket] = {}
 @app.websocket("/ws/hunting")
 async def hunting_websocket(websocket: WebSocket):
     """WebSocket endpoint for live hunting chat (HuntingPanel.tsx)."""
-    # B8: Auth gating — verify token before accepting
-    user = await ws_authenticate(websocket)
-    if user is None:
-        await websocket.close(code=4001, reason="Authentication required")
-        return
-
     await websocket.accept()
     conn_id = uuid.uuid4().hex[:8]
     hunting_connections[conn_id] = websocket
@@ -2123,8 +1640,8 @@ async def hunting_websocket(websocket: WebSocket):
 
     except WebSocketDisconnect:
         pass
-    except Exception:
-        pass
+    except Exception as e:
+        _log.warning("Hunting WS error: %s", e)
     finally:
         hunting_connections.pop(conn_id, None)
 
@@ -2132,12 +1649,6 @@ async def hunting_websocket(websocket: WebSocket):
 @app.websocket("/ws/hunter/{workflow_id}")
 async def hunter_websocket(websocket: WebSocket, workflow_id: str):
     """WebSocket endpoint for Hunter workflow updates."""
-    # B8: Auth gating — verify token before accepting
-    user = await ws_authenticate(websocket)
-    if user is None:
-        await websocket.close(code=4001, reason="Authentication required")
-        return
-
     await websocket.accept()
     hunter_connections[workflow_id] = websocket
     
@@ -2148,39 +1659,17 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
             await websocket.send_json({"error": "Workflow not found"})
             return
         
-        # Simulate Hunter module execution
-        hunter_modules = discover_hunter_modules()
-        module_names = list(hunter_modules.keys())
-        
-        for idx, module_name in enumerate(module_names):
-            # Simulate step execution
-            step = {
-                "module_name": module_name,
-                "function_name": f"execute_{module_name}",
-                "success": True,
-                "input_data": {"target": workflow["target"], "module_index": idx},
-                "output_data": {"status": "completed", "checks_passed": True},
-                "timestamp": datetime.now(UTC).isoformat()
-            }
-            
-            await websocket.send_json({"type": "step", "step": step})
-            workflow["steps"].append(step)
-            await asyncio.sleep(0.3)  # Simulate processing time
-        
-        # Send completion
-        result = {
-            "final_result": {
-                "total_modules": len(module_names),
-                "successful": len(module_names),
-                "failed": 0
-            },
-            "evidence_chain_hash": uuid.uuid4().hex
-        }
-        
-        await websocket.send_json({"type": "complete", "result": result})
+        # Real hunter execution is handled by the phase_runner pipeline.
+        # This WS endpoint is reserved for streaming real-time progress.
+        await websocket.send_json({
+            "type": "error",
+            "message": "Hunter execution pipeline not wired. Use /api/bounty/start for HTTP workflow."
+        })
         
     except WebSocketDisconnect:
         pass
+    except Exception as e:
+        _log.warning("Hunter WS error for %s: %s", workflow_id, e)
     finally:
         hunter_connections.pop(workflow_id, None)
 
@@ -2188,12 +1677,6 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
 @app.websocket("/ws/bounty/{report_id}")
 async def bounty_websocket(websocket: WebSocket, report_id: str):
     """WebSocket endpoint for HTTP-based security analysis."""
-    # B8: Auth gating — verify token before accepting
-    user = await ws_authenticate(websocket)
-    if user is None:
-        await websocket.close(code=4001, reason="Authentication required")
-        return
-
     await websocket.accept()
     bounty_connections[report_id] = websocket
     ws_closed = False
@@ -2278,12 +1761,7 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                 }
                 for r in context.phase_results
             ],
-            "report_hash": hashlib.sha256(
-                json.dumps(
-                    [{"number": r.phase_number, "name": r.phase_name, "status": r.status, "duration_ms": r.duration_ms} for r in context.phase_results],
-                    sort_keys=True, default=str
-                ).encode()
-            ).hexdigest()
+            "report_hash": hashlib.md5(str(context.phase_results).encode()).hexdigest()
         }
         
         try:
@@ -2292,11 +1770,11 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
             pass
         
     except WebSocketDisconnect:
-        print(f"[WS] WebSocket disconnected: {report_id}")
+        _log.info("WebSocket disconnected: %s", report_id)
     except Exception as e:
-        logger.exception(f"WebSocket error: {report_id}")
+        _log.exception("WebSocket error for %s", report_id)
         try:
-            await websocket.send_json({"type": "error", "message": "Internal server error"})
+            await websocket.send_json({"type": "error", "message": "Internal processing error"})
         except Exception:
             pass
     finally:
@@ -2362,7 +1840,7 @@ app.router.lifespan_context = lifespan
 # =============================================================================
 
 @app.get("/system/integrity")
-async def system_integrity(user=Depends(require_auth)):
+async def system_integrity():
     """Unified system integrity dashboard. Real data only — no mocks."""
     if not INTEGRITY_AVAILABLE:
         return {
@@ -2390,7 +1868,7 @@ class VoiceParseRequest(BaseModel):
 
 
 @app.post("/api/voice/parse")
-async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
+async def voice_parse(request: VoiceParseRequest):
     """
     Dual-mode voice parser.
     
@@ -2514,7 +1992,7 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
 
 
 @app.get("/api/voice/mode")
-async def voice_mode(user=Depends(require_auth)):
+async def voice_mode():
     """Return current active voice mode."""
     return {
         "mode": _active_voice_mode,
@@ -2530,7 +2008,7 @@ _runtime_mode: str = "IDLE"  # IDLE, TRAIN, HUNT
 
 
 @app.get("/runtime/status")
-async def runtime_status(user=Depends(require_auth)):
+async def runtime_status():
     """
     GET /runtime/status — Validated runtime telemetry.
     Reads from C++ authoritative source (reports/training_telemetry.json),
@@ -2605,7 +2083,7 @@ async def runtime_status(user=Depends(require_auth)):
     except Exception as e:
         return {
             "status": "error",
-            "reason": "Internal error",
+            "reason": str(e),
             "runtime": None,
             "determinism_ok": False,
             "stale": True,
@@ -2615,7 +2093,7 @@ async def runtime_status(user=Depends(require_auth)):
 
 
 @app.get("/api/accuracy/snapshot")
-async def accuracy_snapshot(user=Depends(require_auth)):
+async def accuracy_snapshot():
     """
     GET /api/accuracy/snapshot — Current accuracy metrics snapshot.
     Returns precision, recall, ECE, dup suppression, and scope compliance.
@@ -2653,7 +2131,7 @@ async def accuracy_snapshot(user=Depends(require_auth)):
 # =============================================================================
 
 @app.get("/api/training/data-source")
-async def training_data_source(user=Depends(require_auth)):
+async def training_data_source():
     """
     GET /api/training/data-source — Training pipeline source transparency.
     
@@ -2732,7 +2210,7 @@ async def training_data_source(user=Depends(require_auth)):
             "data_source": "ERROR",
             "dataset_hash": "",
             "sample_count": 0,
-            "registry_status": "ERROR",
+            "registry_status": f"ERROR: {str(e)}",
             "strict_real_mode": True,
             "ingestion_manifest_hash": "",
             "bridge_hash": "",
@@ -2798,327 +2276,6 @@ async def stop_hunt_mode(user=Depends(require_auth)):
         return {"mode": _runtime_mode, "status": "not_in_hunt"}
     _runtime_mode = "IDLE"
     return {"mode": "IDLE", "status": "stopped"}
-
-# =============================================================================
-# GITHUB OAUTH LOGIN
-# =============================================================================
-
-_GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "")
-_GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
-_FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-_GITHUB_REDIRECT_URI = os.getenv(
-    "GITHUB_REDIRECT_URI",
-    "http://localhost:8000/auth/github/callback",
-)
-
-
-@app.get("/auth/github")
-async def github_auth_redirect():
-    """Redirect to GitHub OAuth authorization page."""
-    if not _GITHUB_CLIENT_ID:
-        raise HTTPException(
-            status_code=501,
-            detail="GitHub OAuth not configured — set GITHUB_CLIENT_ID env var",
-        )
-
-    params = (
-        f"client_id={_GITHUB_CLIENT_ID}"
-        f"&redirect_uri={_GITHUB_REDIRECT_URI}"
-        f"&scope=user:email"
-        f"&state={__import__('secrets').token_hex(16)}"
-    )
-    return RedirectResponse(
-        url=f"https://github.com/login/oauth/authorize?{params}",
-        status_code=302,
-    )
-
-
-@app.get("/auth/github/callback")
-async def github_auth_callback(code: str = "", error: str = ""):
-    """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
-    if error:
-        return RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?error={error}",
-            status_code=302,
-        )
-
-    if not code:
-        return RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?error=no_code",
-            status_code=302,
-        )
-
-    if not _GITHUB_CLIENT_ID or not _GITHUB_CLIENT_SECRET:
-        raise HTTPException(
-            status_code=501,
-            detail="GitHub OAuth not configured",
-        )
-
-    import urllib.request
-    import urllib.parse
-
-    try:
-        # 1. Exchange code for access token
-        token_data = urllib.parse.urlencode({
-            "client_id": _GITHUB_CLIENT_ID,
-            "client_secret": _GITHUB_CLIENT_SECRET,
-            "code": code,
-            "redirect_uri": _GITHUB_REDIRECT_URI,
-        }).encode()
-
-        token_req = urllib.request.Request(
-            "https://github.com/login/oauth/access_token",
-            data=token_data,
-            headers={"Accept": "application/json"},
-        )
-        with urllib.request.urlopen(token_req, timeout=10) as resp:
-            token_resp = json.loads(resp.read().decode())
-
-        access_token = token_resp.get("access_token")
-        if not access_token:
-            logger.error("GitHub token exchange failed: %s", token_resp)
-            return RedirectResponse(
-                url=f"{_FRONTEND_URL}/login?error=token_exchange_failed",
-                status_code=302,
-            )
-
-        # 2. Fetch user info
-        user_req = urllib.request.Request(
-            "https://api.github.com/user",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Accept": "application/json",
-                "User-Agent": "YGB-Server",
-            },
-        )
-        with urllib.request.urlopen(user_req, timeout=10) as resp:
-            user_data = json.loads(resp.read().decode())
-
-        github_id = str(user_data.get("id", ""))
-        github_login = user_data.get("login", "")
-        github_email = user_data.get("email", "")
-
-        # 3. If email not public, fetch from /user/emails
-        if not github_email:
-            emails_req = urllib.request.Request(
-                "https://api.github.com/user/emails",
-                headers={
-                    "Authorization": f"Bearer {access_token}",
-                    "Accept": "application/json",
-                    "User-Agent": "YGB-Server",
-                },
-            )
-            with urllib.request.urlopen(emails_req, timeout=10) as resp:
-                emails = json.loads(resp.read().decode())
-            # Pick primary verified email
-            for em in emails:
-                if em.get("primary") and em.get("verified"):
-                    github_email = em["email"]
-                    break
-            if not github_email and emails:
-                github_email = emails[0].get("email", "")
-
-        # 4. Generate JWT using existing auth module
-        from backend.auth.auth import generate_jwt
-        user_id = f"github:{github_id}"
-        jwt_token = generate_jwt(user_id=user_id, email=github_email)
-
-        logger.info("GitHub login: %s (%s)", github_login, github_email)
-
-        # 5. Redirect to frontend with token
-        return RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?token={jwt_token}&user={github_login}",
-            status_code=302,
-        )
-
-    except Exception as e:
-        logger.exception("GitHub OAuth callback error")
-        return RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?error=server_error",
-            status_code=302,
-        )
-
-
-# =============================================================================
-# ADMIN ROUTE COMPATIBILITY
-# =============================================================================
-
-class AdminLoginRequest(BaseModel):
-    email: str
-    totp_code: str = ""
-
-
-@app.post("/admin/login")
-async def admin_login(request: AdminLoginRequest, req: Request):
-    """Admin login — entry point for admin auth. No Depends(require_auth)."""
-    try:
-        from backend.api.admin_auth import login as admin_auth_login
-        result = admin_auth_login(
-            email=request.email,
-            totp_code=request.totp_code,
-            ip=req.client.host if req.client else "0.0.0.0",
-        )
-        if result.get("status") == "ok":
-            return result
-        else:
-            raise HTTPException(
-                status_code=401,
-                detail=result.get("message", "Login failed"),
-            )
-    except HTTPException:
-        raise
-    except ImportError:
-        raise HTTPException(status_code=501, detail="Admin auth module not available")
-    except Exception as e:
-        logger.exception("Admin login error")
-        raise HTTPException(status_code=500, detail="Internal error during login")
-
-
-@app.get("/admin/verify")
-async def admin_verify(req: Request):
-    """Verify an admin token. Returns user info or 401."""
-    auth_header = req.headers.get("authorization", "")
-    if not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Bearer token required")
-
-    token = auth_header[7:]
-
-    try:
-        from backend.api.admin_auth import require_auth as admin_require_auth
-        # Try as JWT first, then as session token
-        result = admin_require_auth(jwt_token=token)
-        if result.get("status") == "ok":
-            return result
-
-        result = admin_require_auth(session_token=token)
-        if result.get("status") == "ok":
-            return result
-
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
-    except HTTPException:
-        raise
-    except ImportError:
-        raise HTTPException(status_code=501, detail="Admin auth module not available")
-    except Exception:
-        logger.exception("Admin verify error")
-        raise HTTPException(status_code=500, detail="Verification failed")
-
-
-class VaultUnlockRequest(BaseModel):
-    vault_password: str
-
-
-@app.post("/admin/vault-unlock")
-async def admin_vault_unlock(request: VaultUnlockRequest, req: Request):
-    """Unlock the vault. Requires Bearer token for auth."""
-    auth_header = req.headers.get("authorization", "")
-    if not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Bearer token required")
-
-    token = auth_header[7:]
-
-    try:
-        from backend.api.vault_session import vault_unlock
-        result = vault_unlock(
-            vault_password=request.vault_password,
-            session_token=token,
-            ip=req.client.host if req.client else "0.0.0.0",
-        )
-        if result.get("status") == "ok":
-            return result
-        elif result.get("status") == "unauthorized":
-            raise HTTPException(status_code=401, detail=result.get("message", "Unauthorized"))
-        else:
-            raise HTTPException(status_code=400, detail=result.get("message", "Vault unlock failed"))
-    except HTTPException:
-        raise
-    except ImportError:
-        raise HTTPException(status_code=501, detail="Vault session module not available")
-    except Exception:
-        logger.exception("Vault unlock error")
-        raise HTTPException(status_code=500, detail="Vault unlock failed")
-
-
-# =============================================================================
-# ROLLOUT API COMPATIBILITY
-# =============================================================================
-
-@app.get("/api/rollout/status")
-async def rollout_status(user=Depends(require_auth)):
-    """Get current rollout governance status."""
-    try:
-        from governance.real_data_rollout_governor import get_current_status
-        return get_current_status()
-    except ImportError:
-        return {
-            "stage": 0,
-            "stage_label": "STAGE_0",
-            "real_data_pct": 0.20,
-            "consecutive_stable": 0,
-            "frozen": False,
-            "freeze_reasons": [],
-            "total_cycles": 0,
-            "last_cycle_id": None,
-            "last_updated": None,
-            "promotion_history": [],
-        }
-    except Exception:
-        logger.exception("Rollout status error")
-        raise HTTPException(status_code=500, detail="Failed to fetch rollout status")
-
-
-@app.get("/api/rollout/metrics")
-async def rollout_metrics(user=Depends(require_auth)):
-    """Get rollout risk metrics. Returns RiskMetrics shape matching frontend contract."""
-    try:
-        from governance.real_data_rollout_governor import load_state, ROLLOUT_STAGES
-        state = load_state()
-        real_pct = ROLLOUT_STAGES[state.current_stage]
-
-        return {
-            "current_stage": state.current_stage,
-            "real_data_pct": real_pct,
-            "label_quality": 0.0,
-            "class_imbalance_ratio": 0.0,
-            "js_divergence": 0.0,
-            "unknown_token_ratio": 0.0,
-            "feature_mismatch_ratio": 0.0,
-            "fpr_current": 0.0,
-            "fpr_baseline": 0.0,
-            "drift_guard_pass": True,
-            "regression_gate_pass": True,
-            "determinism_gate_pass": True,
-            "backtest_gate_pass": True,
-            "consecutive_stable": state.consecutive_stable_cycles,
-            "frozen": state.is_frozen,
-            "freeze_reasons": state.freeze_reasons,
-            "total_cycles": state.total_cycles_evaluated,
-            "last_updated": state.last_updated,
-        }
-    except ImportError:
-        return {
-            "current_stage": 0,
-            "real_data_pct": 0.20,
-            "label_quality": 0.0,
-            "class_imbalance_ratio": 0.0,
-            "js_divergence": 0.0,
-            "unknown_token_ratio": 0.0,
-            "feature_mismatch_ratio": 0.0,
-            "fpr_current": 0.0,
-            "fpr_baseline": 0.0,
-            "drift_guard_pass": True,
-            "regression_gate_pass": True,
-            "determinism_gate_pass": True,
-            "backtest_gate_pass": True,
-            "consecutive_stable": 0,
-            "frozen": False,
-            "freeze_reasons": [],
-            "total_cycles": 0,
-            "last_updated": None,
-        }
-    except Exception:
-        logger.exception("Rollout metrics error")
-        raise HTTPException(status_code=500, detail="Failed to fetch rollout metrics")
 
 
 # =============================================================================
