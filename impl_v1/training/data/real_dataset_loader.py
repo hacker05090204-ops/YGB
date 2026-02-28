@@ -20,6 +20,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from typing import List, Tuple, Optional
 import random
+from dataclasses import dataclass
 
 # Import the scaled dataset generator
 from impl_v1.training.data.scaled_dataset import (
@@ -273,6 +274,47 @@ class RealTrainingDataset(Dataset):
             )
 
         return SyntheticTrainingDataset(*args, **kwargs)
+
+
+@dataclass
+class _LegacyCompatSample:
+    """Minimal legacy sample object for compatibility with old callers/tests."""
+    id: str
+    features: dict
+
+
+class _LegacySampleCollection:
+    """
+    Lazy view that emulates the legacy `dataset.samples` list shape.
+
+    It avoids duplicating all sample objects in memory for large real datasets.
+    """
+
+    def __init__(self, dataset: "IngestionPipelineDataset"):
+        self._dataset = dataset
+
+    def __len__(self) -> int:
+        return len(self._dataset._raw_samples)
+
+    def __iter__(self):
+        for idx in range(len(self)):
+            yield self[idx]
+
+    def __getitem__(self, idx: int) -> _LegacyCompatSample:
+        raw = self._dataset._raw_samples[idx]
+        sample_id = (
+            raw.get("fingerprint")
+            or hashlib.sha256(raw.get("endpoint", "").encode()).hexdigest()[:16]
+        )
+        reliability = float(raw.get("reliability", 0.7))
+        exploit_vector = raw.get("exploit_vector", "")
+        features = strip_forbidden_fields({
+            "signal_strength": min(reliability, 1.0),
+            "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
+            "difficulty": 1.0 - min(reliability, 1.0),
+            "noise": 0.05,
+        })
+        return _LegacyCompatSample(id=sample_id, features=features)
 
 
 # =============================================================================
@@ -740,6 +782,8 @@ class IngestionPipelineDataset(Dataset):
         # Convert to tensors
         self._features_tensor = torch.tensor(self._features, dtype=torch.float32)
         self._labels_tensor = torch.tensor(self._labels, dtype=torch.long)
+        # Legacy compatibility for callers/tests that iterate dataset.samples.
+        self.samples = _LegacySampleCollection(self)
 
         # Generate manifest hash
         self._manifest_hash = self._compute_manifest_hash()
