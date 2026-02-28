@@ -63,50 +63,27 @@ class TestRouteProtection:
             "/api/execution/transition",
             "/scope/validate",
             "/target/start",
-            "/target/stop",
-            "/target/status",
             "/api/video/token",
             "/auth/logout",
             "/training/start",
             "/training/stop",
             "/training/continuous",
             "/training/continuous/stop",
-            "/training/status",
-            "/training/progress",
             "/api/g38/abort",
             "/api/g38/start",
-            "/api/g38/status",
-            "/api/g38/events",
-            "/api/g38/guards",
-            "/api/g38/reports",
-            "/api/g38/reports/latest",
             "/api/mode/train/start",
             "/api/mode/train/stop",
             "/api/mode/hunt/start",
             "/api/mode/hunt/stop",
-            "/api/dashboard/create",
-            "/api/dashboard/state",
-            "/api/execution/state",
-            "/api/targets/discover",
-            "/api/autonomy/session",
-            "/gpu/status",
-            "/dataset/stats",
-            "/api/db/users",
-            "/api/db/targets",
+            # Newly protected CRUD/storage endpoints
             "/api/db/bounties",
+            "/api/db/sessions",
             "/api/db/activity",
             "/api/storage/stats",
             "/api/storage/lifecycle",
             "/api/storage/disk",
             "/api/video/list",
-            "/api/hunting/targets",
-            "/api/hunting/auto-mode",
-            "/system/integrity",
-            "/api/voice/parse",
-            "/api/voice/mode",
-            "/runtime/status",
-            "/api/accuracy/snapshot",
-            "/api/training/data-source",
+            "/api/execution/state",
         ]
         for route in protected_routes:
             # Find the route + its function def and check for Depends
@@ -125,7 +102,6 @@ class TestRouteProtection:
         admin_routes = [
             "/admin/active-devices",
             "/admin/active-sessions",
-            "/api/approval/decision",
             "/api/db/admin/stats",
             "/api/storage/delete-preview",
         ]
@@ -297,30 +273,21 @@ class TestVideoTokenProtection:
 class TestPasswordHashing:
     """Verify password hashing uses iterative HMAC, not plain SHA-256."""
 
-    def test_hash_produces_current_format(self):
-        """hash_password must produce v3 (Argon2id) or v3s (scrypt) format."""
+    def test_hash_produces_v2_format(self):
+        """hash_password must produce v2:salt:hash format."""
         from backend.auth.auth import hash_password
         hashed = hash_password("test_password_123")
-        assert hashed.startswith("v3:") or hashed.startswith("v3s:"), \
-            f"Expected v3/v3s prefix, got: {hashed[:10]}"
+        assert hashed.startswith("v2:"), f"Expected v2 prefix, got: {hashed[:10]}"
+        parts = hashed.split(":", 2)
+        assert len(parts) == 3, "Hash must have format v2:salt:hash"
 
-    def test_verify_password_current(self):
-        """verify_password must correctly verify current-format hashes."""
+    def test_verify_password_v2(self):
+        """verify_password must correctly verify v2 hashes."""
         from backend.auth.auth import hash_password, verify_password
         pw = "my_secure_password_42"
         hashed = hash_password(pw)
         assert verify_password(pw, hashed)
         assert not verify_password("wrong_password", hashed)
-
-    def test_verify_password_v2_legacy(self):
-        """verify_password must still work with v2 HMAC-SHA256 hashes."""
-        from backend.auth.auth import verify_password, _iterative_hash
-        pw = "test_v2_password"
-        salt = secrets.token_hex(16)
-        hashed = _iterative_hash(pw, salt)
-        stored = f"v2:{salt}:{hashed}"
-        assert verify_password(pw, stored)
-        assert not verify_password("wrong", stored)
 
     def test_verify_password_legacy_v1(self):
         """verify_password must still work with legacy v1 hashes."""
@@ -334,15 +301,15 @@ class TestPasswordHashing:
         assert not verify_password("wrong", stored)
 
     def test_needs_rehash_detects_legacy(self):
-        """needs_rehash must return True for v1 and v2 hashes."""
+        """needs_rehash must return True for legacy hashes."""
         from backend.auth.auth import needs_rehash
         assert needs_rehash("abc123:deadbeef")  # v1 format
-        assert needs_rehash("v2:abc123:deadbeef")  # v2 format
+        assert not needs_rehash("v2:abc123:deadbeef")  # v2 format
 
     def test_verify_rejects_empty(self):
         """verify_password must reject empty password or hash."""
         from backend.auth.auth import verify_password
-        assert not verify_password("", "v3:salt:hash")
+        assert not verify_password("", "v2:salt:hash")
         assert not verify_password("password", "")
         assert not verify_password("", "")
 

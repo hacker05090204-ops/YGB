@@ -1,0 +1,16 @@
+{
+    "site_package_search_strategy": "pep561",
+    "search_path": [
+        ".",
+        "C:/Users/KINETIC04/AppData/Local/Programs/Python/Python311/Lib/site-packages"
+    ],
+    "source_directories": [
+        "."
+    ],
+    "exclude": [
+        ".*/node_modules/.*",
+        ".*/.next/.*",
+        ".*/__pycache__/.*",
+        ".*/\\.venv/.*"
+    ]
+}
