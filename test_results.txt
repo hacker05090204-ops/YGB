@@ -1,0 +1,48 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-9.0.2, pluggy-1.6.0 -- C:\Users\KINETIC04\AppData\Local\Programs\Python\Python311\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\KINETIC04\Pictures\YGB
+configfile: pyproject.toml
+plugins: anyio-4.12.1, asyncio-1.3.0, cov-7.0.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 31 items
+
+backend/tests/test_p0_security.py::TestRouteProtection::test_auth_guard_module_exists PASSED [  3%]
+backend/tests/test_p0_security.py::TestRouteProtection::test_server_imports_auth_guard PASSED [  6%]
+backend/tests/test_p0_security.py::TestRouteProtection::test_sensitive_routes_have_auth PASSED [  9%]
+backend/tests/test_p0_security.py::TestRouteProtection::test_admin_routes_require_admin_role PASSED [ 12%]
+backend/tests/test_p0_security.py::TestTokenVerification::test_token_revocation_store PASSED [ 16%]
+backend/tests/test_p0_security.py::TestTokenVerification::test_session_revocation_store PASSED [ 19%]
+backend/tests/test_p0_security.py::TestLogout::test_logout_endpoint_has_revocation PASSED [ 22%]
+backend/tests/test_p0_security.py::TestVoiceRouteDeduplicated::test_single_voice_parse_handler PASSED [ 25%]
+backend/tests/test_p0_security.py::TestSecretHandling::test_no_dotenv_loading_in_auth PASSED [ 29%]
+backend/tests/test_p0_security.py::TestSecretHandling::test_jwt_secret_warns_if_empty PASSED [ 32%]
+backend/tests/test_p0_security.py::TestSecretHandling::test_preflight_check_rejects_placeholder_secrets PASSED [ 35%]
+backend/tests/test_p0_security.py::TestSecretHandling::test_preflight_check_rejects_short_secrets PASSED [ 38%]
+backend/tests/test_p0_security.py::TestSecretHandling::test_preflight_check_accepts_strong_secret PASSED [ 41%]
+backend/tests/test_p0_security.py::TestSecretHandling::test_startup_calls_preflight PASSED [ 45%]
+backend/tests/test_p0_security.py::TestVideoTokenProtection::test_video_token_requires_auth PASSED [ 48%]
+backend/tests/test_p0_security.py::TestPasswordHashing::test_hash_produces_v2_format PASSED [ 51%]
+backend/tests/test_p0_security.py::TestPasswordHashing::test_verify_password_v2 PASSED [ 54%]
+backend/tests/test_p0_security.py::TestPasswordHashing::test_verify_password_legacy_v1 PASSED [ 58%]
+backend/tests/test_p0_security.py::TestPasswordHashing::test_needs_rehash_detects_legacy PASSED [ 61%]
+backend/tests/test_p0_security.py::TestPasswordHashing::test_verify_rejects_empty PASSED [ 64%]
+backend/tests/test_p0_security.py::TestSSRFProtection::test_blocks_localhost PASSED [ 67%]
+backend/tests/test_p0_security.py::TestSSRFProtection::test_blocks_private_ips PASSED [ 70%]
+backend/tests/test_p0_security.py::TestSSRFProtection::test_blocks_metadata_endpoints PASSED [ 74%]
+backend/tests/test_p0_security.py::TestSSRFProtection::test_allows_public_domains PASSED [ 77%]
+backend/tests/test_p0_security.py::TestSSRFProtection::test_blocks_empty_url PASSED [ 80%]
+backend/tests/test_p0_security.py::TestSSRFProtection::test_scope_validation_in_target_start PASSED [ 83%]
+backend/tests/test_p0_security.py::TestSyntheticDataBlocked::test_feature_cache_no_synthetic PASSED [ 87%]
+backend/tests/test_p0_security.py::TestSyntheticDataBlocked::test_real_data_enforcer_cpp_exists PASSED [ 90%]
+backend/tests/test_p0_security.py::TestSignatureVerification::test_g21_rejects_mock_signatures PASSED [ 93%]
+backend/tests/test_p0_security.py::TestSignatureVerification::test_update_signature_verifier_cpp_exists PASSED [ 96%]
+backend/tests/test_p0_security.py::TestSignatureVerification::test_g21_requires_minimum_signature_length PASSED [100%]
+
+============================== warnings summary ===============================
+backend/tests/test_p0_security.py::TestRouteProtection::test_auth_guard_module_exists
+  C:\Users\KINETIC04\Pictures\YGB\backend\auth\auth_guard.py:30: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
+    from backend.auth.auth import verify_jwt
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 31 passed, 1 warning in 0.96s ========================
