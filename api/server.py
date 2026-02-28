@@ -754,6 +754,8 @@ async def get_training_readiness():
             "training_allowed": overall == "READY",
             "go_no_go": "GO" if overall == "READY" else "NO_GO",
             "remediation": msg if not ok else None,
+            "consistency_ok": bridge_report.get("consistency_ok", False) if 'bridge_report' in locals() else None,
+            "authoritative_source": "bridge_state.json",
             "timestamp": datetime.now(UTC).isoformat(),
         }
     except Exception as e:
@@ -1452,6 +1454,13 @@ async def abort_g38_training(user=Depends(require_auth)):
         return {"success": False, "error": "G38 modules not loaded"}
     
     trainer = get_auto_trainer()
+    if getattr(trainer, "_continuous_mode", False):
+        result = stop_continuous_training()
+        return {
+            "success": result.get("stopped", False),
+            "state": trainer.state.value,
+            "message": "Continuous training stop requested",
+        }
     result = trainer.abort_training()
     
     return {
@@ -1462,8 +1471,8 @@ async def abort_g38_training(user=Depends(require_auth)):
 
 
 @app.post("/api/g38/start")
-async def start_g38_training(epochs: int = 10, user=Depends(require_auth)):
-    """Manually start G38 training for demo/testing."""
+async def start_g38_training(epochs: int = 0, user=Depends(require_auth)):
+    """Start G38 training in continuous mode (default infinite)."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     
@@ -1477,18 +1486,23 @@ async def start_g38_training(epochs: int = 10, user=Depends(require_auth)):
             "state": trainer.state.value,
         }
     
-    # Start training in background thread (async)
-    import threading
-    def run_training():
-        trainer.force_start_training(epochs=epochs)
-    
-    thread = threading.Thread(target=run_training, daemon=True)
-    thread.start()
-    
+    result = start_continuous_training(target_epochs=max(0, epochs))
+    if not result.get("started", False):
+        return {
+            "success": False,
+            "error": result.get("reason", "Failed to start training"),
+            "state": result.get("state", "ERROR"),
+        }
+    target_msg = "infinite" if epochs <= 0 else str(epochs)
     return {
         "success": True,
-        "message": f"Training started for {epochs} epochs",
+        "message": (
+            f"Continuous training started (target_epochs={target_msg}). "
+            "Training continues even during user activity until stopped or target reached."
+        ),
         "state": "TRAINING",
+        "training_mode": "CONTINUOUS",
+        "target_epochs": epochs if epochs > 0 else 0,
     }
 
 
@@ -1552,8 +1566,8 @@ async def training_status(user=Depends(require_auth)):
 
 
 @app.post("/training/start")
-async def training_start(epochs: int = 10, user=Depends(require_auth)):
-    """Start GPU training manually. No auto-trigger."""
+async def training_start(epochs: int = 0, user=Depends(require_auth)):
+    """Start continuous GPU training (default infinite)."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     trainer = get_auto_trainer()
@@ -1563,15 +1577,23 @@ async def training_start(epochs: int = 10, user=Depends(require_auth)):
             "error": "Training already in progress",
             "state": trainer.state.value,
         }
-    import threading
-    def _run():
-        trainer.force_start_training(epochs=epochs)
-    threading.Thread(target=_run, daemon=True).start()
+    result = start_continuous_training(target_epochs=max(0, epochs))
+    if not result.get("started", False):
+        return {
+            "success": False,
+            "error": result.get("reason", "Failed to start training"),
+            "state": result.get("state", "ERROR"),
+        }
+    target_msg = "infinite" if epochs <= 0 else str(epochs)
     return {
         "success": True,
-        "message": f"Training started for {epochs} epochs",
+        "message": (
+            f"Continuous training started (target_epochs={target_msg}). "
+            "Training continues even during user activity until stopped or target reached."
+        ),
         "state": "TRAINING",
-        "training_mode": "MANUAL",
+        "training_mode": "CONTINUOUS",
+        "target_epochs": epochs if epochs > 0 else 0,
     }
 
 
@@ -1581,6 +1603,13 @@ async def training_stop(user=Depends(require_auth)):
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     trainer = get_auto_trainer()
+    if getattr(trainer, "_continuous_mode", False):
+        result = stop_continuous_training()
+        return {
+            "success": result.get("stopped", False),
+            "message": "Continuous training stopped",
+            "state": trainer.state.value,
+        }
     result = trainer.abort_training()
     return {
         "success": result.get("aborted", False),
