@@ -207,21 +207,29 @@ def assess_audio_quality(audio_level: float, noise_ratio: float) -> AudioQuality
     return AudioQuality.GOOD
 
 
-def apply_noise_filter(raw_audio: bytes, threshold: float = 0.2) -> bytes:
+def apply_noise_filter(raw_audio: bytes, threshold: float = 0.2) -> tuple:
     """Apply noise filtering to audio.
 
     Requires native C++ audio processing library.
-    BLOCKED: Returns unfiltered audio with warning when native lib unavailable.
+    Returns (filtered_audio, is_filtered).
+    DEGRADED: Returns (unfiltered_audio, False) when native lib unavailable.
     """
     import os
+    import logging
+    _logger = logging.getLogger("ygb.voice.g29")
+
     if os.environ.get("YGB_NATIVE_AUDIO") == "1":
         # Real native audio filter would be called here via ctypes/pybind11
         raise NotImplementedError(
             "Native audio filter not yet linked. "
             "Set YGB_NATIVE_AUDIO=0 or unset to use pass-through."
         )
-    # No filtering applied — truthful pass-through (not "mock")
-    return raw_audio
+    # DEGRADED: Native audio library not available — pass-through with status
+    _logger.warning(
+        "[VOICE] Noise filter DEGRADED: native audio library not loaded. "
+        "Audio returned unfiltered."
+    )
+    return (raw_audio, False)
 
 
 # =============================================================================

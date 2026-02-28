@@ -210,7 +210,7 @@ def perform_inspection(
 
     # PRODUCTION GUARD: If no native capture and no test mock, return BLOCKED
     if _mock_findings is None and not NATIVE_CAPTURE_AVAILABLE:
-        return InspectionResult(
+        result = InspectionResult(
             result_id=f"RES-{uuid.uuid4().hex[:16].upper()}",
             request_id=request_id,
             status=InspectionStatus.COMPLETED,
@@ -225,6 +225,20 @@ def perform_inspection(
             ),
             completed_at=datetime.now(UTC).isoformat(),
         )
+        # Persist result so get_inspection_result() returns it
+        _inspection_results[request_id] = result
+        # Update request status to COMPLETED
+        _inspection_requests[request_id] = ScreenInspectionRequest(
+            request_id=request.request_id,
+            device_id=request.device_id,
+            user_id=request.user_id,
+            device_trusted=request.device_trusted,
+            user_verified=request.user_verified,
+            mode=request.mode,
+            status=InspectionStatus.COMPLETED,
+            created_at=request.created_at,
+        )
+        return result
     
     # Update status to in progress
     in_progress = ScreenInspectionRequest(

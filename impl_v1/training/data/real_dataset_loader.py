@@ -919,7 +919,8 @@ def get_per_field_report() -> dict:
     """
     Generate a per-field readiness report for the training readiness endpoint.
 
-    Reports bridge counter state, thresholds, and deficits.
+    Reports bridge counter state, thresholds, deficits, and per-field
+    (source_tag) sample counts with per-field deficit to threshold.
     Does NOT raise — always returns a dict.
     """
     min_samples = YGB_MIN_REAL_SAMPLES
@@ -933,6 +934,8 @@ def get_per_field_report() -> dict:
         "status": "BLOCKED",
         "reason": "Not checked",
         "manifest_exists": False,
+        "per_field_counts": {},
+        "per_field_deficits": {},
     }
 
     # Check manifest file
@@ -943,11 +946,12 @@ def get_per_field_report() -> dict:
             with open(manifest_path) as f:
                 manifest = json.load(f)
             report["manifest"] = {
-                "sample_count": manifest.get("sample_count", 0),
+                "sample_count": manifest.get("sample_count", manifest.get("total_samples", 0)),
                 "dataset_source": manifest.get("dataset_source", "UNKNOWN"),
-                "frozen_at": manifest.get("frozen_at"),
+                "frozen_at": manifest.get("frozen_at", manifest.get("updated_at")),
                 "class_entropy": manifest.get("class_entropy", 0),
                 "training_mode": manifest.get("training_mode", "UNKNOWN"),
+                "per_field_counts": manifest.get("per_field_counts", {}),
             }
         except Exception:
             report["manifest"] = None
@@ -959,6 +963,37 @@ def get_per_field_report() -> dict:
         report["bridge_count"] = lib.bridge_get_count()
         report["bridge_verified_count"] = lib.bridge_get_verified_count()
         report["deficit"] = max(0, min_samples - report["bridge_verified_count"])
+
+        # Collect per-field counts from verified samples
+        FIELD_LEN = 512
+        per_field_counts = {}
+        for idx in range(report["bridge_verified_count"]):
+            ep = ctypes.create_string_buffer(FIELD_LEN)
+            params = ctypes.create_string_buffer(FIELD_LEN)
+            ev = ctypes.create_string_buffer(FIELD_LEN)
+            imp = ctypes.create_string_buffer(FIELD_LEN)
+            st = ctypes.create_string_buffer(FIELD_LEN)
+            fp = ctypes.create_string_buffer(65)
+            reliability = ctypes.c_double(0.0)
+            ingested_at = ctypes.c_long(0)
+
+            rc = lib.bridge_fetch_verified_sample(
+                idx,
+                ep, FIELD_LEN, params, FIELD_LEN,
+                ev, FIELD_LEN, imp, FIELD_LEN,
+                st, FIELD_LEN, fp, 65,
+                ctypes.byref(reliability), ctypes.byref(ingested_at),
+            )
+            if rc != 0:
+                continue
+            source_tag = st.value.decode("utf-8", errors="replace") or "unknown"
+            per_field_counts[source_tag] = per_field_counts.get(source_tag, 0) + 1
+
+        report["per_field_counts"] = per_field_counts
+        report["per_field_deficits"] = {
+            field: max(0, min_samples - count)
+            for field, count in per_field_counts.items()
+        }
 
         if report["bridge_verified_count"] >= min_samples:
             report["status"] = "READY"
@@ -986,6 +1021,9 @@ def generate_dataset_manifest() -> dict:
     """
     Generate dataset_manifest.json from current ingestion state.
 
+    Required keys: total_samples, verified_samples, positive_ratio,
+    dataset_source, strict_real_mode, updated_at, per_field_counts.
+
     Returns the manifest dict or error info.
     Does NOT raise — always returns a dict.
     """
@@ -999,16 +1037,54 @@ def generate_dataset_manifest() -> dict:
         lib.bridge_get_dataset_manifest_hash(hash_buf, 65)
         manifest_hash = hash_buf.value.decode("utf-8", errors="replace")
 
+        # Collect per-field (source_tag) counts by iterating verified samples
+        per_field_counts = {}
+        FIELD_LEN = 512
+        positive_count = 0
+        for idx in range(verified):
+            ep = ctypes.create_string_buffer(FIELD_LEN)
+            params = ctypes.create_string_buffer(FIELD_LEN)
+            ev = ctypes.create_string_buffer(FIELD_LEN)
+            imp = ctypes.create_string_buffer(FIELD_LEN)
+            st = ctypes.create_string_buffer(FIELD_LEN)
+            fp = ctypes.create_string_buffer(65)
+            reliability = ctypes.c_double(0.0)
+            ingested_at = ctypes.c_long(0)
+
+            rc = lib.bridge_fetch_verified_sample(
+                idx,
+                ep, FIELD_LEN, params, FIELD_LEN,
+                ev, FIELD_LEN, imp, FIELD_LEN,
+                st, FIELD_LEN, fp, 65,
+                ctypes.byref(reliability), ctypes.byref(ingested_at),
+            )
+            if rc != 0:
+                continue
+            source_tag = st.value.decode("utf-8", errors="replace") or "unknown"
+            per_field_counts[source_tag] = per_field_counts.get(source_tag, 0) + 1
+            if reliability.value >= 0.7:
+                positive_count += 1
+
+        positive_ratio = positive_count / verified if verified > 0 else 0.0
+
+        # Per-field deficit calculation
+        per_field_deficits = {}
+        for field, count in per_field_counts.items():
+            per_field_deficits[field] = max(0, YGB_MIN_REAL_SAMPLES - count)
+
         manifest = {
             "dataset_source": "INGESTION_PIPELINE",
             "ingestion_manifest_hash": manifest_hash,
-            "total_ingested": total,
-            "verified_count": verified,
+            "total_samples": total,
+            "verified_samples": verified,
+            "positive_ratio": round(positive_ratio, 4),
             "threshold": YGB_MIN_REAL_SAMPLES,
             "deficit": max(0, YGB_MIN_REAL_SAMPLES - verified),
             "strict_real_mode": STRICT_REAL_MODE,
             "ready": verified >= YGB_MIN_REAL_SAMPLES,
-            "generated_at": __import__("datetime").datetime.now().isoformat(),
+            "per_field_counts": per_field_counts,
+            "per_field_deficits": per_field_deficits,
+            "updated_at": __import__("datetime").datetime.now().isoformat(),
         }
 
         # Write to disk

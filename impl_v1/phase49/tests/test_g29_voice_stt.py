@@ -78,10 +78,11 @@ class TestAudioQuality:
         assert quality == AudioQuality.UNUSABLE
     
     def test_apply_noise_filter(self):
-        """Apply noise filter."""
+        """Apply noise filter — returns (audio, is_filtered) tuple."""
         raw = b"audio data"
-        filtered = apply_noise_filter(raw)
-        assert filtered == raw  # Mock returns as-is
+        filtered_audio, is_filtered = apply_noise_filter(raw)
+        assert filtered_audio == raw  # Pass-through when native lib unavailable
+        assert is_filtered is False  # DEGRADED: not actually filtered
 
 
 class TestIntentParsing:
