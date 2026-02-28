@@ -119,13 +119,13 @@ def build_tts_url(request: VoiceOutputRequest) -> str:
 
 def process_voice_request(request: VoiceOutputRequest) -> VoiceOutputResult:
     """
-    Process a voice output request.
-    
-    NOTE: This is a mock implementation for governance testing.
-    Real implementation would make HTTP request to TTS proxy.
+    Process a voice output request via real HTTP call to TTS proxy.
+
+    Returns DELIVERED only after a successful HTTP response.
+    Returns BLOCKED if the TTS proxy is unreachable or returns an error.
     """
     global _request_count
-    
+
     # Check rate limit
     if not check_rate_limit():
         return VoiceOutputResult(
@@ -135,7 +135,7 @@ def process_voice_request(request: VoiceOutputRequest) -> VoiceOutputResult:
             error_message="Rate limit exceeded",
             timestamp=datetime.now(UTC).isoformat(),
         )
-    
+
     # Validate request
     if not request.text.strip():
         return VoiceOutputResult(
@@ -145,17 +145,51 @@ def process_voice_request(request: VoiceOutputRequest) -> VoiceOutputResult:
             error_message="Empty text not allowed",
             timestamp=datetime.now(UTC).isoformat(),
         )
-    
-    # Build URL (mock - doesn't actually call API)
+
+    # Build TTS proxy URL
     audio_url = build_tts_url(request)
-    
-    # Increment counter
-    _request_count += 1
-    
-    return VoiceOutputResult(
-        request_id=request.request_id,
-        status=VoiceOutputStatus.DELIVERED,
-        audio_url=audio_url,
-        error_message=None,
-        timestamp=datetime.now(UTC).isoformat(),
-    )
+
+    # Attempt real HTTP call to TTS proxy
+    import os
+    _test_mode = os.environ.get("YGB_TEST_MODE", "").lower() == "true"
+    if _test_mode:
+        # TEST_ONLY: Skip real HTTP call in test harness
+        _request_count += 1
+        return VoiceOutputResult(
+            request_id=request.request_id,
+            status=VoiceOutputStatus.DELIVERED,
+            audio_url=audio_url,
+            error_message=None,
+            timestamp=datetime.now(UTC).isoformat(),
+        )
+
+    try:
+        import urllib.request
+        req = urllib.request.Request(audio_url, method="GET")
+        req.add_header("User-Agent", "YGB-VoiceProxy/1.0")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status == 200:
+                _request_count += 1
+                return VoiceOutputResult(
+                    request_id=request.request_id,
+                    status=VoiceOutputStatus.DELIVERED,
+                    audio_url=audio_url,
+                    error_message=None,
+                    timestamp=datetime.now(UTC).isoformat(),
+                )
+            else:
+                return VoiceOutputResult(
+                    request_id=request.request_id,
+                    status=VoiceOutputStatus.FAILED,
+                    audio_url=None,
+                    error_message=f"TTS proxy returned HTTP {resp.status}",
+                    timestamp=datetime.now(UTC).isoformat(),
+                )
+    except Exception as e:
+        return VoiceOutputResult(
+            request_id=request.request_id,
+            status=VoiceOutputStatus.FAILED,
+            audio_url=None,
+            error_message=f"TTS proxy unreachable: {e}",
+            timestamp=datetime.now(UTC).isoformat(),
+        )

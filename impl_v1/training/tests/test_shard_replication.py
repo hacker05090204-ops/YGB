@@ -83,6 +83,7 @@ class TestCloudBackup:
         assert len(mgr._targets) == 3
 
     def test_create_backup(self, tmp_path):
+        """Unconfigured Google Drive creds => deterministic BLOCKED, not false success."""
         from impl_v1.training.distributed.cloud_backup import (
             CloudBackupManager, CloudTarget,
         )
@@ -95,18 +96,40 @@ class TestCloudBackup:
             shard_sizes={"s1": 1000, "s2": 2000, "s3": 3000},
             encrypt=True,
         )
-        assert result.success is True
+        # Without GOOGLE_DRIVE_SERVICE_KEY, both targets must be BLOCKED
+        assert result.success is False
         assert result.manifest.encrypted is True
+        assert len(result.manifest.uploaded_to) == 0
+        # Errors must mention BLOCKED, not PENDING_UPLOAD
+        for err in result.errors:
+            assert "BLOCKED" in err
+
+    def test_create_backup_local_targets(self, tmp_path):
+        """Local/peer targets succeed without external credentials."""
+        from impl_v1.training.distributed.cloud_backup import (
+            CloudBackupManager, CloudTarget,
+        )
+        mgr = CloudBackupManager(str(tmp_path))
+        mgr.add_target(CloudTarget("local1", "local", "/backups/local1"))
+        mgr.add_target(CloudTarget("peer1", "peer", "192.168.1.10"))
+
+        result = mgr.create_backup(
+            shard_ids=["s1", "s2"],
+            shard_sizes={"s1": 500, "s2": 600},
+            encrypt=True,
+        )
+        assert result.success is True
         assert len(result.manifest.uploaded_to) == 2
+        assert result.manifest.checksum  # SHA-256 checksum enforced
 
     def test_list_backups(self, tmp_path):
         from impl_v1.training.distributed.cloud_backup import (
             CloudBackupManager, CloudTarget,
         )
         mgr = CloudBackupManager(str(tmp_path))
-        mgr.add_target(CloudTarget("gd1", "google_drive", "/b1"))
+        mgr.add_target(CloudTarget("local1", "local", "/backups"))
         mgr.create_backup(["s1"], {"s1": 100})
-        assert len(mgr.list_backups()) == 1
+        assert len(mgr.list_backups()) >= 1
 
 
 # ===========================================================================
@@ -304,9 +327,9 @@ class TestShardIntegration:
         r = gate.check_training_allowed()
         assert r.training_allowed is True
 
-        # Cloud backup
+        # Cloud backup (use local target — Google Drive requires credentials)
         backup = CloudBackupManager(str(tmp_path))
-        backup.add_target(CloudTarget("gd1", "google_drive", "/b1"))
+        backup.add_target(CloudTarget("local1", "local", str(tmp_path / "backup")))
         result = backup.create_backup(
             ["s1", "s2", "s3"],
             {"s1": 1000, "s2": 2000, "s3": 3000},

@@ -123,8 +123,11 @@ class TestNoMockDataInFrontend:
         chart_path = PROJECT_ROOT / "frontend" / "components" / "chart-area-interactive.tsx"
         if chart_path.exists():
             content = chart_path.read_text(errors="ignore")
-            assert "fetch(" in content, \
-                "chart-area-interactive.tsx must use fetch() for real data"
+            # Accept both fetch() and authFetch() — authFetch is a secure
+            # wrapper around fetch that adds JWT auth headers.
+            has_fetch = "fetch(" in content or "authFetch(" in content or "authFetch`" in content
+            assert has_fetch, \
+                "chart-area-interactive.tsx must use fetch() or authFetch() for real data"
             assert "const chartData = [" not in content, \
                 "chart-area-interactive.tsx still has hardcoded chartData"
 

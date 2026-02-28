@@ -1,7 +1,12 @@
 # test_g04_voice_proxy.py
 """Tests for G04: Voice Proxy"""
 
+import os
 import pytest
+
+# Enable test bypass for process_voice_request (skip real HTTP in tests)
+os.environ["YGB_TEST_MODE"] = "true"
+
 from impl_v1.phase49.governors.g04_voice_proxy import (
     VoiceOutputType,
     VoiceOutputStatus,

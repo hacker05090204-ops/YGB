@@ -19,21 +19,27 @@ from backend.voice.language_detector import LanguageDetector
 
 
 class VoiceIntent:
-    """Represents a classified voice intent."""
+    """Represents a classified voice intent with risk scoring."""
 
-    def __init__(self, mode: str, action: str, allowed: bool, reason: str):
+    def __init__(self, mode: str, action: str, allowed: bool, reason: str,
+                 risk_score: float = 0.0, requires_confirmation: bool = False):
         self.mode = mode
         self.action = action
         self.allowed = allowed
         self.reason = reason
+        self.risk_score = max(0.0, min(1.0, risk_score))
+        self.requires_confirmation = requires_confirmation or risk_score > 0.7
 
     def to_dict(self) -> dict:
         return {
             "mode": self.mode,
             "action": self.action,
             "allowed": self.allowed,
-            "reason": self.reason
+            "reason": self.reason,
+            "risk_score": self.risk_score,
+            "requires_confirmation": self.requires_confirmation,
         }
+
 
 
 class IntentRouter:
@@ -76,6 +82,14 @@ class IntentRouter:
         "disable safety", "bypass gate", "unlock authority",
     ]
 
+    # DENYLIST: app launch/download/click automation — ALWAYS blocked from voice
+    DENYLIST_ACTIONS = {
+        "download", "install", "uninstall", "delete", "remove",
+        "launch", "open app", "run program", "click", "press",
+        "type", "paste", "copy", "move", "drag",
+        "sudo", "admin", "root", "chmod", "rm",
+    }
+
     def __init__(self):
         self._detector = LanguageDetector()
         self._total_routed = 0
@@ -101,7 +115,8 @@ class IntentRouter:
                 self._total_blocked += 1
                 return VoiceIntent(
                     "blocked", phrase, False,
-                    f"VOICE_BLOCKED: phrase '{phrase}' is not allowed via voice"
+                    f"VOICE_BLOCKED: phrase '{phrase}' is not allowed via voice",
+                    risk_score=1.0,
                 )
 
         # Check blocked KEYWORDS (single dangerous words)
@@ -111,7 +126,18 @@ class IntentRouter:
                 self._total_blocked += 1
                 return VoiceIntent(
                     "blocked", kw, False,
-                    f"VOICE_BLOCKED: '{kw}' cannot be triggered by voice"
+                    f"VOICE_BLOCKED: '{kw}' cannot be triggered by voice",
+                    risk_score=1.0,
+                )
+
+        # Check DENYLIST actions (app launch/download/click)
+        for action in self.DENYLIST_ACTIONS:
+            if action in text_lower:
+                self._total_blocked += 1
+                return VoiceIntent(
+                    "blocked", action, False,
+                    f"VOICE_DENYLIST: '{action}' is deny-listed for voice control",
+                    risk_score=1.0,
                 )
 
         # Compute confidence: ratio of recognized keywords to total words
@@ -130,7 +156,8 @@ class IntentRouter:
                 )
             self._total_routed += 1
             return VoiceIntent("clarification", "explain", True,
-                             f"CLARIFY_MODE: lang={lang} conf={confidence:.2f}")
+                             f"CLARIFY_MODE: lang={lang} conf={confidence:.2f}",
+                             risk_score=0.1)
 
         # Research mode
         research = self.RESEARCH_KEYWORDS.get(lang, set())
@@ -145,7 +172,8 @@ class IntentRouter:
                 )
             self._total_routed += 1
             return VoiceIntent("research", "search", True,
-                             f"RESEARCH_MODE: lang={lang} conf={confidence:.2f}")
+                             f"RESEARCH_MODE: lang={lang} conf={confidence:.2f}",
+                             risk_score=0.3)
 
         # Status mode
         status = self.STATUS_KEYWORDS.get(lang, set())
@@ -160,7 +188,8 @@ class IntentRouter:
                 )
             self._total_routed += 1
             return VoiceIntent("status", "query", True,
-                             f"STATUS_MODE: lang={lang} conf={confidence:.2f}")
+                             f"STATUS_MODE: lang={lang} conf={confidence:.2f}",
+                             risk_score=0.1)
 
         # Default: clarification (safe fallback)
         self._total_routed += 1

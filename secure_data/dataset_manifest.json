@@ -1,13 +1,14 @@
 {
   "dataset_source": "INGESTION_PIPELINE",
-  "ingestion_manifest_hash": "00000000ef6f774a0000000027b0924900000000c8dfe5030000000017200993",
-  "tensor_hash": "94c37120761bbf9cea119774075f2181931b956f624b4ed4d3ea4926a0e3a3b6",
-  "sample_count": 145,
-  "feature_dim": 256,
-  "num_classes": 1,
-  "accepted": 145,
-  "rejected_policy": 0,
-  "rejected_quality": 5,
+  "ingestion_manifest_hash": "000000007c5d0f850000000013c1f793000000006f9cf81600000000901f0718",
+  "total_samples": 0,
+  "verified_samples": 0,
+  "positive_ratio": 0.0,
+  "threshold": 125000,
+  "deficit": 125000,
   "strict_real_mode": true,
-  "frozen_at": "2026-02-23T23:57:58.312659"
+  "ready": false,
+  "per_field_counts": {},
+  "per_field_deficits": {},
+  "updated_at": "2026-02-28T10:27:21.649872"
 }

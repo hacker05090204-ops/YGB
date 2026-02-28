@@ -25,6 +25,15 @@ _BACKOFF_BASE = 30  # seconds
 class CVEIngestScheduler:
     """Async scheduler for CVE feed ingestion every 5 minutes."""
 
+    # Health state constants
+    STATE_BOOTING = "BOOTING"
+    STATE_RUNNING = "RUNNING"
+    STATE_DEGRADED = "DEGRADED"
+    STATE_BLOCKED = "BLOCKED"
+    STATE_STOPPED = "STOPPED"
+
+    _DEGRADED_THRESHOLD = 3  # consecutive failures before DEGRADED
+
     def __init__(self):
         self._running = False
         self._task: Optional[asyncio.Task] = None
@@ -32,6 +41,7 @@ class CVEIngestScheduler:
         self._consecutive_failures: int = 0
         self._total_runs: int = 0
         self._successful_runs: int = 0
+        self._health_state: str = self.STATE_BOOTING
 
     @property
     def interval_seconds(self) -> int:
@@ -41,10 +51,22 @@ class CVEIngestScheduler:
     def is_running(self) -> bool:
         return self._running
 
+    @property
+    def health_state(self) -> str:
+        """Current health state: BOOTING, RUNNING, DEGRADED, BLOCKED, STOPPED."""
+        if not self._running:
+            return self.STATE_STOPPED if self._total_runs > 0 else self.STATE_BOOTING
+        if self._consecutive_failures >= self._DEGRADED_THRESHOLD:
+            return self.STATE_DEGRADED
+        if self._total_runs > 0:
+            return self.STATE_RUNNING
+        return self.STATE_BOOTING
+
     def get_health(self) -> Dict[str, Any]:
         """Get scheduler health status."""
         return {
             "running": self._running,
+            "health_state": self.health_state,
             "interval_seconds": _INGEST_INTERVAL,
             "last_run_at": self._last_run_at,
             "total_runs": self._total_runs,
@@ -138,6 +160,19 @@ class CVEIngestScheduler:
             f"[CVE_SCHEDULER] Cycle #{self._total_runs} complete "
             f"(success={cycle_success})"
         )
+
+        # Stream new records to training bridge
+        try:
+            from backend.cve.bridge_ingestion_worker import get_bridge_worker
+            worker = get_bridge_worker()
+            bridge_count = worker.stream_ingest_new(pipeline)
+            if bridge_count > 0:
+                logger.info(
+                    f"[CVE_SCHEDULER] Bridge ingested {bridge_count} new samples"
+                )
+                worker.update_manifest()
+        except Exception as e:
+            logger.warning(f"[CVE_SCHEDULER] Bridge ingest skipped: {e}")
 
     async def _fetch_source_with_retry(
         self, pipeline, source_id: str
