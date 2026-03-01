@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useRef } from "react"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 import {
   LayoutDashboard,
   Bug,
@@ -115,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/" className="group">
+              <Link href="/" className="group">
                 <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary/20 text-primary ring-1 ring-primary/50 group-hover:bg-primary/30 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-all duration-300">
                   <ShieldAlert className="size-6" />
                 </div>
@@ -123,7 +124,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate text-xl font-bold tracking-tight text-foreground">BugBounty</span>
                   <span className="truncate text-xs text-muted-foreground font-mono">v2.0 Secure</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

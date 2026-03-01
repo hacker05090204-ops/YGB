@@ -22,7 +22,7 @@ from enum import Enum
 
 logger = logging.getLogger(__name__)
 
-SIMULATION_MODE = os.environ.get("YGB_ACCELERATOR_SIMULATION", "true").lower() == "true"
+SIMULATION_MODE = os.environ.get("YGB_ACCELERATOR_SIMULATION", "false").lower() == "true"
 
 
 class AcceleratorStatus(Enum):

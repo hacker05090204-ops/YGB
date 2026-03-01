@@ -726,7 +726,8 @@ def get_storage_health() -> Dict[str, Any]:
             else:
                 reasons.append(f"Storage root missing or inaccessible: {root}")
         except Exception as e:
-            reasons.append(f"Storage engine error: {str(e)}")
+            logger.error("Storage engine error during health check: %s", e)
+            reasons.append(f"Storage engine error: {type(e).__name__}")
 
     # db_active mirrors storage_active (HDD engine IS the database)
     db_active = storage_active

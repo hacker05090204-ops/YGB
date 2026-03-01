@@ -109,7 +109,7 @@ export default function AdminPanel() {
 
     // Live refresh
     const [autoRefresh, setAutoRefresh] = useState(true)
-    const [lastRefresh, setLastRefresh] = useState(Date.now())
+    const [lastRefresh, setLastRefresh] = useState(0)
 
     // Auth check
     useEffect(() => {
@@ -405,8 +405,8 @@ export default function AdminPanel() {
                                 <button
                                     onClick={toggleTraining}
                                     className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${training.is_training
-                                            ? "bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400 shadow-lg shadow-emerald-500/20"
-                                            : "bg-white/5 border-2 border-white/10 text-white/40 hover:border-white/20"
+                                        ? "bg-emerald-500/20 border-2 border-emerald-500 text-emerald-400 shadow-lg shadow-emerald-500/20"
+                                        : "bg-white/5 border-2 border-white/10 text-white/40 hover:border-white/20"
                                         }`}
                                 >
                                     {training.is_training ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 ml-1" />}

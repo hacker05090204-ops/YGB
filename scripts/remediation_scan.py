@@ -86,6 +86,41 @@ REVIEWED_ALLOWLIST = [
     ("not_implemented", "api/server.py", "Search not-implemented fallback — returns empty results safely"),
     ("not_implemented", "impl_v1/training/distributed/cloud_backup.py",
      "Upload not-yet-implemented for specific cloud target — fails closed"),
+    # --- not_implemented: base class abstract method ---
+    ("not_implemented", "impl_v1/training/voice/stt_adapter.py",
+     "BaseSTTAdapter.transcribe() abstract — enforces subclass override, not missing impl"),
+    # --- placeholder: detection / rejection code ---
+    ("placeholder", "backend/config/config_validator.py",
+     "_PLACEHOLDER_PATTERNS list and error message — code that DETECTS/REJECTS placeholder secrets"),
+    ("placeholder", "impl_v1/phase20/phase20_engine.py",
+     "Return value comment '# Placeholder, not used' — no runtime risk"),
+    ("placeholder", "impl_v1/training/safety/mock_data_scanner.py",
+     "Regex pattern r'placeholder\\s*=' in scanner that DETECTS placeholder usage"),
+    ("placeholder", "native/security/secure_password_verifier.cpp",
+     "Blocklist value — code REJECTS this placeholder bcrypt hash"),
+    ("placeholder", "native/security/secure_secret_loader.cpp",
+     "FATAL error message that BLOCKS placeholder secrets at startup"),
+    ("placeholder", "native/security/update_signature_verifier.cpp",
+     "Blocked signature list — code REJECTS placeholder/demo signatures"),
+    # --- simulate: training validation infrastructure ---
+    ("simulate", "impl_v1/training/distributed/curriculum_loop.py",
+     "Curriculum stage name 'simulated_exploit' — test harness step label"),
+    ("simulate", "impl_v1/training/distributed/failure_resilience.py",
+     "FailureSimulator class — explicit resilience testing infrastructure"),
+    # --- simulate: native validation proof engine ---
+    ("simulate", "native/validation/precision_proof.cpp",
+     "SimulatedSample struct in validation proof engine — not production bypass"),
+    # --- simulate: training validation scripts ---
+    ("simulate", "training/validation/drift_simulation.py",
+     "Drift simulation validation script — MODE-B gate testing"),
+    ("simulate", "training/validation/long_run_stability.py",
+     "Long-run stability test — 24hr simulated test cycle"),
+    ("simulate", "training/validation/mode_b_gate.py",
+     "Gate runner calling drift/shadow simulation validation phases"),
+    ("simulate", "training/validation/shadow_mode_simulation.py",
+     "Shadow mode validation script — MODE-B gate testing"),
+    ("simulate", "training/validation/temporal_drift_runner.py",
+     "Temporal drift test runner log message"),
 ]
 
 

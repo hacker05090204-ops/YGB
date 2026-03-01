@@ -5,57 +5,67 @@ rootdir: C:\Users\Unkno\YGB
 configfile: pyproject.toml
 plugins: anyio-4.12.1, asyncio-1.3.0, cov-7.0.0
 asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
-collecting ... collected 50 items
+collecting ... collected 39 items
 
-backend/tests/test_no_duplicate_routes.py::TestNoDuplicateRoutes::test_server_file_exists PASSED [  2%]
-backend/tests/test_no_duplicate_routes.py::TestNoDuplicateRoutes::test_no_duplicate_routes PASSED [  4%]
-backend/tests/test_no_duplicate_routes.py::TestNoDuplicateRoutes::test_no_duplicate_function_names PASSED [  6%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_source_initialization PASSED [  8%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_ingest_new_record PASSED [ 10%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_ingest_exact_duplicate PASSED [ 12%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_ingest_merge_update PASSED [ 14%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_deterministic_content_hash PASSED [ 16%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_circuit_breaker_transitions PASSED [ 18%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_provenance_fields PASSED [ 20%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_slo_counters PASSED [ 22%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_source_status_transitions PASSED [ 24%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_no_delta_reporting PASSED [ 26%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_get_pipeline_status PASSED [ 28%]
-backend/tests/test_cve_pipeline.py::TestCVEPipeline::test_merge_conflict_logging PASSED [ 30%]
-backend/tests/test_cve_pipeline.py::TestPromotionPolicy::test_canonical_source_promoted PASSED [ 32%]
-backend/tests/test_cve_pipeline.py::TestPromotionPolicy::test_corroborated_two_sources PASSED [ 34%]
-backend/tests/test_cve_pipeline.py::TestPromotionPolicy::test_single_source_research_pending PASSED [ 36%]
-backend/tests/test_cve_pipeline.py::TestPromotionPolicy::test_headless_only_blocked PASSED [ 38%]
-backend/tests/test_cve_pipeline.py::TestPromotionPolicy::test_frozen_cve_blocked PASSED [ 40%]
-backend/tests/test_cve_pipeline.py::TestPromotionPolicy::test_unverifiable_claim_rate PASSED [ 42%]
-backend/tests/test_cve_pipeline.py::TestPromotionPolicy::test_audit_log PASSED [ 44%]
-backend/tests/test_cve_pipeline.py::TestDedupDrift::test_exact_dedup PASSED [ 46%]
-backend/tests/test_cve_pipeline.py::TestDedupDrift::test_simhash_near_dup PASSED [ 48%]
-backend/tests/test_cve_pipeline.py::TestDedupDrift::test_schema_drift_detection PASSED [ 50%]
-backend/tests/test_cve_pipeline.py::TestDedupDrift::test_distribution_drift PASSED [ 52%]
-backend/tests/test_cve_pipeline.py::TestDedupDrift::test_weak_source_ratio PASSED [ 54%]
-backend/tests/test_cve_pipeline.py::TestDedupDrift::test_freeze_on_critical PASSED [ 56%]
-backend/tests/test_cve_pipeline.py::TestAntiHallucination::test_valid_provenance PASSED [ 58%]
-backend/tests/test_cve_pipeline.py::TestAntiHallucination::test_missing_provenance_fields PASSED [ 60%]
-backend/tests/test_cve_pipeline.py::TestAntiHallucination::test_unverifiable_rate_zero PASSED [ 62%]
-backend/tests/test_cve_pipeline.py::TestAntiHallucination::test_production_ready PASSED [ 64%]
-backend/tests/test_cve_pipeline.py::TestHeadlessResearch::test_allowed_domains PASSED [ 66%]
-backend/tests/test_cve_pipeline.py::TestHeadlessResearch::test_cve_id_extraction PASSED [ 68%]
-backend/tests/test_cve_pipeline.py::TestHeadlessResearch::test_high_confidence_extraction PASSED [ 70%]
-backend/tests/test_cve_pipeline.py::TestHeadlessResearch::test_low_confidence_quarantine PASSED [ 72%]
-backend/tests/test_cve_pipeline.py::TestHeadlessResearch::test_schema_fail PASSED [ 74%]
-backend/tests/test_cve_pipeline.py::TestScheduler::test_scheduler_singleton PASSED [ 76%]
-backend/tests/test_cve_pipeline.py::TestScheduler::test_scheduler_health PASSED [ 78%]
-backend/tests/test_cve_pipeline.py::TestScheduler::test_scheduler_not_running_initially PASSED [ 80%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestNoSyntheticFallback::test_no_random_data_in_init_gpu PASSED [ 82%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestNoSyntheticFallback::test_no_512_samples_hardcoded PASSED [ 84%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestNoSyntheticFallback::test_uses_real_dataset_loader PASSED [ 86%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestNoSyntheticFallback::test_uses_validate_dataset_integrity PASSED [ 88%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestNoSyntheticFallback::test_real_dataset_has_minimum_samples PASSED [ 90%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestNoSyntheticFallback::test_no_mock_keyword_in_init PASSED [ 92%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestNoSyntheticFallback::test_batch_size_is_1024 PASSED [ 94%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestStrictModeEnforcement::test_strict_mode_never_instantiates_synthetic PASSED [ 96%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestStrictModeEnforcement::test_strict_mode_explicit_fail_reason PASSED [ 98%]
-impl_v1/training/tests/test_no_synthetic_fallback.py::TestStrictModeEnforcement::test_lab_mode_can_use_synthetic PASSED [100%]
+backend/tests/test_config_validator.py::TestIsPlaceholder::test_case_insensitive PASSED [  2%]
+backend/tests/test_config_validator.py::TestIsPlaceholder::test_embedded_placeholder PASSED [  5%]
+backend/tests/test_config_validator.py::TestIsPlaceholder::test_empty_string PASSED [  7%]
+backend/tests/test_config_validator.py::TestIsPlaceholder::test_obvious_placeholders PASSED [ 10%]
+backend/tests/test_config_validator.py::TestIsPlaceholder::test_real_secrets_pass PASSED [ 12%]
+backend/tests/test_config_validator.py::TestValidateRequiredSecrets::test_all_missing PASSED [ 15%]
+backend/tests/test_config_validator.py::TestValidateRequiredSecrets::test_all_valid PASSED [ 17%]
+backend/tests/test_config_validator.py::TestValidateRequiredSecrets::test_connected_profile_all_valid PASSED [ 20%]
+backend/tests/test_config_validator.py::TestValidateRequiredSecrets::test_connected_profile_checks_extra PASSED [ 23%]
+backend/tests/test_config_validator.py::TestValidateRequiredSecrets::test_placeholder_detected PASSED [ 25%]
+backend/tests/test_config_validator.py::TestValidateRequiredSecrets::test_too_short PASSED [ 28%]
+backend/tests/test_config_validator.py::TestValidateBindHost::test_default_is_localhost PASSED [ 30%]
+backend/tests/test_config_validator.py::TestValidateBindHost::test_no_warning_for_localhost PASSED [ 33%]
+backend/tests/test_config_validator.py::TestValidateBindHost::test_warns_on_all_interfaces PASSED [ 35%]
+backend/tests/test_config_validator.py::TestValidateConfig::test_non_strict_does_not_raise PASSED [ 38%]
+backend/tests/test_config_validator.py::TestValidateConfig::test_passes_with_valid_config PASSED [ 41%]
+backend/tests/test_config_validator.py::TestValidateConfig::test_strict_raises_on_violations PASSED [ 43%]
+backend/tests/test_config_validator.py::TestConfigurationError::test_empty_violations PASSED [ 46%]
+backend/tests/test_config_validator.py::TestConfigurationError::test_stores_violations PASSED [ 48%]
+backend/tests/test_incident_reconciler.py::TestReconciliationReport::test_add_failing_check PASSED [ 51%]
+backend/tests/test_incident_reconciler.py::TestReconciliationReport::test_add_passing_check PASSED [ 53%]
+backend/tests/test_incident_reconciler.py::TestReconciliationReport::test_default_state PASSED [ 56%]
+backend/tests/test_incident_reconciler.py::TestReconciliationReport::test_to_dict PASSED [ 58%]
+backend/tests/test_incident_reconciler.py::TestLoadJsonFile::test_load_invalid_json PASSED [ 61%]
+backend/tests/test_incident_reconciler.py::TestLoadJsonFile::test_load_nonexistent PASSED [ 64%]
+backend/tests/test_incident_reconciler.py::TestLoadJsonFile::test_load_valid_json PASSED [ 66%]
+backend/tests/test_incident_reconciler.py::TestFindIncidentFiles::test_finds_incident_files FAILED [ 69%]
+backend/tests/test_incident_reconciler.py::TestFindIncidentFiles::test_no_incident_files PASSED [ 71%]
+backend/tests/test_incident_reconciler.py::TestFindIncidentFiles::test_nonexistent_directory PASSED [ 74%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_fresh_timestamp PASSED [ 76%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_incidents_and_no_drift_false PASSED [ 79%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_incidents_and_no_drift_true_inconsistent PASSED [ 82%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_incidents_and_no_drift_true_with_window PASSED [ 84%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_missing_auto_mode_state PASSED [ 87%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_no_drift_field_missing PASSED [ 89%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_no_incidents_no_drift_true PASSED [ 92%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_no_timestamp_field PASSED [ 94%]
+backend/tests/test_incident_reconciler.py::TestReconcile::test_stale_timestamp PASSED [ 97%]
+backend/tests/test_incident_reconciler.py::TestRunReconciliation::test_returns_dict PASSED [100%]
 
-============================= 50 passed in 29.18s =============================
+================================== FAILURES ===================================
+_______________ TestFindIncidentFiles.test_finds_incident_files _______________
+
+self = <backend.tests.test_incident_reconciler.TestFindIncidentFiles testMethod=test_finds_incident_files>
+
+    def test_finds_incident_files(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create matching files
+            (Path(tmpdir) / "incident_20260301.json").write_text("{}")
+            (Path(tmpdir) / "incidents.json").write_text("{}")
+            (Path(tmpdir) / "incident_log_001.json").write_text("{}")
+            # Create non-matching file
+            (Path(tmpdir) / "other_file.json").write_text("{}")
+    
+            files = _find_incident_files(Path(tmpdir))
+>           self.assertEqual(len(files), 3)
+E           AssertionError: 5 != 3
+
+backend\tests\test_incident_reconciler.py:117: AssertionError
+=========================== short test summary info ===========================
+FAILED backend/tests/test_incident_reconciler.py::TestFindIncidentFiles::test_finds_incident_files
+======================== 1 failed, 38 passed in 0.26s =========================

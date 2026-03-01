@@ -97,10 +97,11 @@ def get_local_backup_status() -> BackupTargetInfo:
                 total_backups=0,
             )
     except Exception as e:
+        logger.error("Local backup status check failed: %s", e)
         return BackupTargetInfo(
             name="local_hdd",
             status=BackupTargetStatus.ERROR,
-            reason=str(e),
+            reason=f"Local backup check failed: {type(e).__name__}",
             last_backup_at=None,
             total_backups=0,
         )

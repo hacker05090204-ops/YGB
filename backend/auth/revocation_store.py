@@ -3,6 +3,7 @@ Revocation Store — Redis-backed token/session revocation with TTL.
 
 Backend: controlled by REVOCATION_BACKEND env var.
     "redis"     -> Redis-backed (fail-closed if unavailable)
+    "file"      -> File-backed (survives restart, no expiration)
     "memory"    -> In-memory (default, lost on restart)
 
 Redis keys:
@@ -14,8 +15,10 @@ return True (i.e. treat as revoked -> deny access).
 """
 
 import hashlib
+import json
 import logging
 import os
+from pathlib import Path
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -50,6 +53,60 @@ class _MemoryStore:
         """For testing: simulate process restart."""
         self._tokens.clear()
         self._sessions.clear()
+
+
+class _FileStore:
+    """File-backed revocation store — survives process restarts.
+
+    Stores revocations as a JSON file on disk.
+    No TTL enforcement (revocations persist until manually cleared).
+    Recommended as a durable fallback when Redis is unavailable.
+    """
+
+    def __init__(self, path: Optional[str] = None) -> None:
+        default_path = str(
+            Path(__file__).parent.parent.parent / "secure_data" / "revocations.json"
+        )
+        self._path = Path(path or os.getenv("REVOCATION_FILE_PATH", default_path))
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        self._data = self._load()
+
+    def _load(self) -> dict:
+        if self._path.exists():
+            try:
+                return json.loads(self._path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError) as exc:
+                logger.warning("[REVOCATION] File load failed, starting empty: %s", exc)
+        return {"tokens": [], "sessions": []}
+
+    def _save(self) -> None:
+        try:
+            self._path.write_text(
+                json.dumps(self._data, indent=2), encoding="utf-8"
+            )
+        except OSError as exc:
+            logger.error("[REVOCATION] File save failed: %s", exc)
+
+    def revoke_token(self, token_hash: str, ttl: int = _DEFAULT_TTL) -> None:
+        if token_hash not in self._data["tokens"]:
+            self._data["tokens"].append(token_hash)
+            self._save()
+
+    def revoke_session(self, session_id: str, ttl: int = _DEFAULT_TTL) -> None:
+        if session_id not in self._data["sessions"]:
+            self._data["sessions"].append(session_id)
+            self._save()
+
+    def is_token_revoked(self, token_hash: str) -> bool:
+        return token_hash in self._data["tokens"]
+
+    def is_session_revoked(self, session_id: str) -> bool:
+        return session_id in self._data["sessions"]
+
+    def clear(self) -> None:
+        """For testing: clear all revocations."""
+        self._data = {"tokens": [], "sessions": []}
+        self._save()
 
 
 class _RedisStore:
@@ -136,6 +193,8 @@ def _get_store():
     if backend == "redis":
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
         _store = _RedisStore(redis_url)
+    elif backend == "file":
+        _store = _FileStore()
     else:
         _store = _MemoryStore()
 
@@ -146,6 +205,26 @@ def reset_store() -> None:
     """Reset module-level store. Used in tests to simulate process restart."""
     global _store
     _store = None
+
+
+def get_backend_health() -> dict:
+    """Return health status of the revocation backend for monitoring."""
+    store = _get_store()
+    backend = os.getenv("REVOCATION_BACKEND", "memory").lower()
+    health = {
+        "backend": backend,
+        "type": type(store).__name__,
+        "available": True,
+    }
+    if isinstance(store, _RedisStore):
+        health["available"] = store._is_available()
+        health["fail_mode"] = "closed"
+    elif isinstance(store, _FileStore):
+        health["file_path"] = str(store._path)
+        health["file_exists"] = store._path.exists()
+    elif isinstance(store, _MemoryStore):
+        health["warning"] = "In-memory store — revocations lost on restart"
+    return health
 
 
 # ---------------------------------------------------------------------------
@@ -174,3 +253,4 @@ def is_token_revoked(token: str) -> bool:
 def is_session_revoked(session_id: str) -> bool:
     """Check if a session has been revoked."""
     return _get_store().is_session_revoked(session_id)
+

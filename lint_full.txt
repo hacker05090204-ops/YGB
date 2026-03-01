@@ -1,0 +1,23 @@
+﻿node.exe : [eslint-config] 
+active path: modern-flat
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : 
+    NotSpecified: ([eslint-c  
+  onfig] active path: moder   
+ n-flat:String) [], Remote    
+Exception
+    + FullyQualifiedErrorId : 
+    NativeCommandError
+ 
+The compact formatter is no 
+longer part of core ESLint. 
+Install it manually with `npm 
+install -D 
+eslint-formatter-compact`

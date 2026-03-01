@@ -327,6 +327,6 @@ async def voice_stream(ws: WebSocket):
     except Exception as e:
         logger.error(f"[VOICE_GW] WebSocket error: {e}")
         try:
-            await ws.close(code=1011, reason=str(e))
+            await ws.close(code=1011, reason="Internal server error")
         except Exception:
             pass
