@@ -76,6 +76,7 @@ from backend.auth.auth import (
     compute_device_hash, get_rate_limiter, generate_csrf_token,
     needs_rehash,
 )
+from backend.auth.geoip import resolve_ip_geolocation
 from backend.alerts.email_alerts import (
     alert_new_login, alert_new_device, alert_multiple_devices,
     alert_suspicious_activity, alert_rate_limit_exceeded
@@ -2122,6 +2123,24 @@ async def video_token_endpoint(request: Request, user=Depends(require_auth)):
 # AUTH / LOGIN / DEVICE TRACKING ENDPOINTS
 # =============================================================================
 
+_ALLOW_PASSWORD_LOGIN = os.getenv("ALLOW_PASSWORD_LOGIN", "false").lower() == "true"
+
+
+def _extract_client_ip(req: Request) -> str:
+    """Extract client IP from proxy headers when available, else socket peer IP."""
+    xff = req.headers.get("x-forwarded-for", "")
+    if xff:
+        first = xff.split(",")[0].strip()
+        if first:
+            return first
+
+    xrip = req.headers.get("x-real-ip", "").strip()
+    if xrip:
+        return xrip
+
+    return req.client.host if req.client else "unknown"
+
+
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -2146,7 +2165,7 @@ async def register_user(request: RegisterRequest, req: Request):
     user = create_user(request.name, request.email, "hunter")  # Always hunter — no privilege escalation
     update_user_password(user["id"], pw_hash)
 
-    ip = req.client.host if req.client else "unknown"
+    ip = _extract_client_ip(req)
     log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
 
     token = generate_jwt(user["id"], request.email)
@@ -2160,8 +2179,18 @@ async def register_user(request: RegisterRequest, req: Request):
 @app.post("/auth/login")
 async def login(request: LoginRequest, req: Request):
     """Login with email/password. Captures IP, UA, device hash. Sends alerts."""
-    ip = req.client.host if req.client else "unknown"
+    if not _ALLOW_PASSWORD_LOGIN:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "error": "GITHUB_AUTH_REQUIRED",
+                "detail": "Password login is disabled. Use /auth/github for authentication.",
+            },
+        )
+
+    ip = _extract_client_ip(req)
     ua = req.headers.get("user-agent", "unknown")
+    location = resolve_ip_geolocation(ip)
 
     # Rate limiting
     limiter = get_rate_limiter()
@@ -2199,7 +2228,7 @@ async def login(request: LoginRequest, req: Request):
 
     # Compute device hash and register device
     dh = compute_device_hash(ua, ip)
-    device = register_device(user["id"], dh, ip, ua)
+    device = register_device(user["id"], dh, ip, ua, location=location)
 
     # Create session on HDD
     session = create_session(
@@ -2208,13 +2237,18 @@ async def login(request: LoginRequest, req: Request):
     )
 
     # Log activity
-    log_activity(user["id"], "LOGIN_SUCCESS", f"Login from {ip}", ip_address=ip)
+    log_activity(
+        user["id"],
+        "LOGIN_SUCCESS",
+        f"Login from {ip} ({location})",
+        ip_address=ip,
+    )
 
     # Send alerts
-    alert_new_login(user["name"], ip, ua)
+    alert_new_login(user["name"], ip, ua, location)
 
     if device.get("is_new"):
-        alert_new_device(user["name"], dh, ip, ua)
+        alert_new_device(user["name"], dh, ip, ua, location)
 
     active_count = get_active_device_count(user["id"])
     if active_count > 1:
@@ -3102,32 +3136,58 @@ async def github_auth_redirect():
             detail="GitHub OAuth not configured — set GITHUB_CLIENT_ID env var",
         )
 
-    params = (
-        f"client_id={_GITHUB_CLIENT_ID}"
-        f"&redirect_uri={_GITHUB_REDIRECT_URI}"
-        f"&scope=user:email"
-        f"&state={__import__('secrets').token_hex(16)}"
-    )
-    return RedirectResponse(
+    import urllib.parse
+
+    state = __import__("secrets").token_hex(16)
+    params = urllib.parse.urlencode({
+        "client_id": _GITHUB_CLIENT_ID,
+        "redirect_uri": _GITHUB_REDIRECT_URI,
+        "scope": "user:email",
+        "state": state,
+    })
+    resp = RedirectResponse(
         url=f"https://github.com/login/oauth/authorize?{params}",
         status_code=302,
     )
+    resp.set_cookie(
+        key="ygb_oauth_state",
+        value=state,
+        max_age=600,
+        httponly=True,
+        samesite="lax",
+        secure=_FRONTEND_URL.startswith("https://"),
+    )
+    return resp
 
 
 @app.get("/auth/github/callback")
-async def github_auth_callback(code: str = "", error: str = ""):
+async def github_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
     """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
     if error:
-        return RedirectResponse(
+        resp = RedirectResponse(
             url=f"{_FRONTEND_URL}/login?error={error}",
             status_code=302,
         )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
 
     if not code:
-        return RedirectResponse(
+        resp = RedirectResponse(
             url=f"{_FRONTEND_URL}/login?error=no_code",
             status_code=302,
         )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
+
+    expected_state = req.cookies.get("ygb_oauth_state", "")
+    if not state or not expected_state or state != expected_state:
+        logger.warning("GitHub OAuth state mismatch")
+        resp = RedirectResponse(
+            url=f"{_FRONTEND_URL}/login?error=state_mismatch",
+            status_code=302,
+        )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
 
     if not _GITHUB_CLIENT_ID or not _GITHUB_CLIENT_SECRET:
         raise HTTPException(
@@ -3137,6 +3197,10 @@ async def github_auth_callback(code: str = "", error: str = ""):
 
     import urllib.request
     import urllib.parse
+
+    ip = _extract_client_ip(req)
+    ua = req.headers.get("user-agent", "unknown")
+    location = resolve_ip_geolocation(ip)
 
     try:
         # 1. Exchange code for access token
@@ -3158,10 +3222,12 @@ async def github_auth_callback(code: str = "", error: str = ""):
         access_token = token_resp.get("access_token")
         if not access_token:
             logger.error("GitHub token exchange failed: %s", token_resp)
-            return RedirectResponse(
+            resp = RedirectResponse(
                 url=f"{_FRONTEND_URL}/login?error=token_exchange_failed",
                 status_code=302,
             )
+            resp.delete_cookie("ygb_oauth_state")
+            return resp
 
         # 2. Fetch user info
         user_req = urllib.request.Request(
@@ -3176,6 +3242,14 @@ async def github_auth_callback(code: str = "", error: str = ""):
             user_data = json.loads(resp.read().decode())
 
         github_id = str(user_data.get("id", ""))
+        if not github_id:
+            logger.error("GitHub user payload missing id: %s", user_data)
+            resp = RedirectResponse(
+                url=f"{_FRONTEND_URL}/login?error=invalid_github_profile",
+                status_code=302,
+            )
+            resp.delete_cookie("ygb_oauth_state")
+            return resp
         github_login = user_data.get("login", "")
         github_email = user_data.get("email", "")
 
@@ -3199,25 +3273,84 @@ async def github_auth_callback(code: str = "", error: str = ""):
             if not github_email and emails:
                 github_email = emails[0].get("email", "")
 
-        # 4. Generate JWT using existing auth module
-        from backend.auth.auth import generate_jwt
-        user_id = f"github:{github_id}"
-        jwt_token = generate_jwt(user_id=user_id, email=github_email)
+        if not github_email:
+            # Stable fallback identifier when account email is unavailable.
+            github_email = f"github-{github_id}@users.noreply.local"
 
-        logger.info("GitHub login: %s (%s)", github_login, github_email)
+        # 4. Create or resolve local user account
+        user = get_user_by_email(github_email)
+        if not user:
+            display_name = github_login or f"github-{github_id}"
+            user = create_user(display_name, github_email, "hunter")
+            log_activity(
+                user["id"],
+                "USER_REGISTERED_GITHUB",
+                f"GitHub account linked: {github_login}",
+                ip_address=ip,
+            )
 
-        # 5. Redirect to frontend with token
-        return RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?token={jwt_token}&user={github_login}",
-            status_code=302,
+        # 5. Device/session tracking + security alerts
+        dh = compute_device_hash(ua, ip)
+        device = register_device(user["id"], dh, ip, ua, location=location)
+        session = create_session(
+            user["id"],
+            "AUTHENTICATED",
+            None,
+            ip_address=ip,
+            user_agent=ua,
+            device_hash=dh,
+        )
+        log_activity(
+            user["id"],
+            "LOGIN_SUCCESS_GITHUB",
+            f"GitHub login from {ip} ({location})",
+            ip_address=ip,
+            metadata={"github_login": github_login, "github_id": github_id},
+        )
+        alert_new_login(user["name"], ip, ua, location)
+        if device.get("is_new"):
+            alert_new_device(user["name"], dh, ip, ua, location)
+
+        active_count = get_active_device_count(user["id"])
+        if active_count > 1:
+            devices = get_user_devices(user["id"])
+            alert_multiple_devices(user["name"], active_count, devices)
+
+        # 6. Issue JWT and return frontend redirect
+        jwt_token = generate_jwt(user_id=user["id"], email=user.get("email"))
+        safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
+        safe_token = urllib.parse.quote_plus(jwt_token)
+        safe_session = urllib.parse.quote_plus(session["id"])
+
+        logger.info(
+            "GitHub login success user=%s email=%s ip=%s location=%s",
+            github_login,
+            github_email,
+            ip,
+            location,
         )
 
-    except Exception as e:
+        resp = RedirectResponse(
+            url=(
+                f"{_FRONTEND_URL}/login"
+                f"?token={safe_token}"
+                f"&user={safe_user}"
+                f"&session_id={safe_session}"
+                f"&auth=github"
+            ),
+            status_code=302,
+        )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
+
+    except Exception:
         logger.exception("GitHub OAuth callback error")
-        return RedirectResponse(
+        resp = RedirectResponse(
             url=f"{_FRONTEND_URL}/login?error=server_error",
             status_code=302,
         )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
 
 
 # =============================================================================

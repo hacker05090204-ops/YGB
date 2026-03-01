@@ -348,10 +348,33 @@ def register_device(
     user_id: str, device_hash: str, ip_address: str = None,
     user_agent: str = None, location: str = None
 ) -> Dict[str, Any]:
-    """Register a device."""
-    device_id = str(uuid.uuid4())
+    """Register a device, or update an existing device's last-seen metadata."""
     now = datetime.now(timezone.utc).isoformat()
 
+    # Deduplicate by (user_id, device_hash) so alerting is accurate.
+    metas = _engine.list_entities("devices", limit=5000)
+    for meta in metas:
+        entity = _engine.read_entity("devices", meta["entity_id"])
+        if not entity or not entity.get("latest"):
+            continue
+        latest = entity["latest"]
+        if latest.get("user_id") != user_id:
+            continue
+        if latest.get("device_hash") != device_hash:
+            continue
+
+        updated = {
+            **latest,
+            "ip_address": ip_address,
+            "user_agent": user_agent or latest.get("user_agent"),
+            "location": location,
+            "last_seen": now,
+            "is_new": False,
+        }
+        _engine.append_record("devices", meta["entity_id"], updated)
+        return {"id": meta["entity_id"], **updated}
+
+    device_id = str(uuid.uuid4())
     data = {
         "user_id": user_id,
         "device_hash": device_hash,
