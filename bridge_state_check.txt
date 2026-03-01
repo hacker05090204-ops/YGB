@@ -1,3 +1,5 @@
-﻿Counts: {'bridge_count': 0, 'bridge_verified_count': 0, 'total_ingested': 0, 'total_dropped': 0, 'total_deduped': 0, 'last_ingest_at': None, 'threshold': 125000, 'deficit': 125000, 'go_no_go': 'NO_GO', 'authoritative_source': 'bridge_state.json'}
-Readiness: NO_GO
-Consistency: {'bridge_verified_count': 0, 'manifest_verified_count': 126000, 'manifest_exists': True, 'consistency_ok': False, 'mismatch_reason': 'bridge=0 but manifest=126000 ù bridge state not persisted or reset'}
+Counts: {'bridge_count': 140116, 'bridge_verified_count': 140116, 'total_ingested': 140116, 'total_dropped': 0, 'total_deduped': 0, 'last_ingest_at': '2026-03-01T05:59:13Z', 'threshold': 125000, 'deficit': 0, 'go_no_go': 'GO', 'authoritative_source': 'bridge_state.json'}
+Readiness: GO_WITH_WARNING
+Consistency: {'bridge_verified_count': 140116, 'manifest_verified_count': 125996, 'manifest_exists': True, 'consistency_ok': False, 'mismatch_reason': 'bridge=140116 vs manifest=125996 — delta=14120'}
+Integrity: {'ok': True, 'msg': 'Dataset valid (STRICT_REAL): 125996 samples, 45.47% positive, source=INGESTION_PIPELINE'}
+PerField: {'status': 'READY', 'deficit': 0, 'bridge_verified_count': 140116}

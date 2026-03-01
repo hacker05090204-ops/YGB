@@ -99,8 +99,85 @@ function LoginContent() {
                     ) : (
                         <div>
                             <h2 className="text-lg font-semibold text-white mb-1 text-center">Sign in to continue</h2>
-                            <p className="text-sm text-gray-500 mb-8 text-center">Authenticate with your GitHub account</p>
+                            <p className="text-sm text-gray-500 mb-6 text-center">Choose your authentication method</p>
 
+                            {/* Email/Password Login Form */}
+                            <form
+                                id="login-form"
+                                onSubmit={async (e) => {
+                                    e.preventDefault()
+                                    const formData = new FormData(e.currentTarget)
+                                    const email = formData.get("email") as string
+                                    const password = formData.get("password") as string
+                                    if (!email || !password) {
+                                        setStatus("error")
+                                        setMessage("Please enter both email and password")
+                                        return
+                                    }
+                                    try {
+                                        const res = await fetch(`${API_BASE}/auth/login`, {
+                                            method: "POST",
+                                            headers: { "Content-Type": "application/json" },
+                                            body: JSON.stringify({ email, password }),
+                                        })
+                                        const data = await res.json()
+                                        if (!res.ok) {
+                                            setStatus("error")
+                                            setMessage(data.detail?.detail || data.detail || "Login failed")
+                                            return
+                                        }
+                                        sessionStorage.setItem("ygb_token", data.token)
+                                        if (data.session_id) sessionStorage.setItem("ygb_session_id", data.session_id)
+                                        setUserName(data.user?.name || email)
+                                        setStatus("success")
+                                        setMessage(`Welcome, ${data.user?.name || email}!`)
+                                        setTimeout(() => router.push("/control"), 1500)
+                                    } catch {
+                                        setStatus("error")
+                                        setMessage("Network error — is the backend running?")
+                                    }
+                                }}
+                                className="space-y-4"
+                            >
+                                <div>
+                                    <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5">Email</label>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        placeholder="you@example.com"
+                                        className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-1.5">Password</label>
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        autoComplete="current-password"
+                                        placeholder="••••••••"
+                                        className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    id="password-login-button"
+                                    className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+                                >
+                                    Sign In
+                                </button>
+                            </form>
+
+                            {/* Divider */}
+                            <div className="flex items-center gap-3 my-6">
+                                <div className="flex-1 h-px bg-gray-800/60" />
+                                <span className="text-xs text-gray-600 uppercase tracking-wider">or</span>
+                                <div className="flex-1 h-px bg-gray-800/60" />
+                            </div>
+
+                            {/* GitHub OAuth */}
                             <button
                                 onClick={handleGitHubLogin}
                                 id="github-login-button"

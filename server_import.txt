@@ -1,0 +1,50 @@
+﻿python : Traceback 
+(most recent call 
+last):
+At line:1 char:1
++ python -c "from 
+api.server import app; 
+print('Server imported 
+OK')" 2 ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : 
+NotSpecified: (Tra    
+ceback (most recent ca 
+   ll last)::String) 
+[],     RemoteException
+    + 
+FullyQualifiedErrorI   
+ d : NativeCommandError
+ 
+  File "<string>", 
+line 1, in <module>
+  File "C:\Users\Unkno\
+YGB\api\server.py", 
+line 48, in <module>
+    from backend.storag
+e.storage_bridge 
+import (
+  File "C:\Users\Unkno\
+YGB\backend\storage\sto
+rage_bridge.py", line 
+28, in <module>
+    from native.hdd_eng
+ine.video_streamer 
+import VideoStreamer
+  File "C:\Users\Unkno\
+YGB\native\hdd_engine\v
+ideo_streamer.py", 
+line 42, in <module>
+    raise RuntimeError(
+RuntimeError: [FATAL] 
+YGB_VIDEO_JWT_SECRET 
+is not set or too 
+short (min 32 chars). 
+Set it as an 
+environment variable 
+before starting the 
+server.

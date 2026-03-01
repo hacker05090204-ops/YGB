@@ -40,6 +40,17 @@ async function protectedFetch(url: string, options: RequestInit = {}): Promise<R
     return fetch(url, { ...options, headers })
 }
 
+function isAbortError(error: unknown): boolean {
+    return (
+        error instanceof DOMException && error.name === "AbortError"
+    ) || (
+        typeof error === "object" &&
+        error !== null &&
+        "name" in error &&
+        (error as { name?: string }).name === "AbortError"
+    )
+}
+
 export default function ControlPage() {
     // Dashboard State
     const [dashboardId, setDashboardId] = useState<string | null>(null)
@@ -66,7 +77,7 @@ export default function ControlPage() {
     // Browser Assistant (from G05)
     const [assistantActive, setAssistantActive] = useState(false)
     const [currentAction, setCurrentAction] = useState<string | undefined>()
-    const [explanations, setExplanations] = useState<AssistantExplanation[]>([])
+    const [explanations] = useState<AssistantExplanation[]>([])
 
     // Voice (from G12)
     const [lastIntent, setLastIntent] = useState<VoiceIntent | null>(null)
@@ -80,7 +91,7 @@ export default function ControlPage() {
         precision: number; recall: number; ece_score: number;
         dup_suppression_rate: number; scope_compliance: number;
     } | null>(null)
-    const [targetsActive, setTargetsActive] = useState(0)
+    const [targetsActive] = useState(0)
     const maxTargets = 5
 
     // Runtime telemetry — polled from /runtime/status (C++ authoritative source)
@@ -108,11 +119,33 @@ export default function ControlPage() {
     const lastTelemetryTs = useRef<number>(0)
     const [isStalled, setIsStalled] = useState(false)
 
+    // Connectivity comes from unprotected health checks, not dashboard creation.
+    const checkServerHealth = useCallback(async () => {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort("health_timeout"), 3000)
+
+        try {
+            const response = await fetch(`${API_BASE}/health`, {
+                method: "GET",
+                cache: "no-store",
+                signal: controller.signal,
+            })
+            setIsConnected(response.ok)
+        } catch (error) {
+            if (!isAbortError(error)) {
+                console.warn("Health check failed:", error)
+            }
+            setIsConnected(false)
+        } finally {
+            clearTimeout(timeout)
+        }
+    }, [])
+
     // Initialize dashboard with timeout
     const initDashboard = useCallback(async () => {
         setIsLoading(true)
         const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 5000)
+        const timeout = setTimeout(() => controller.abort("dashboard_init_timeout"), 5000)
 
         try {
             const response = await protectedFetch(`${API_BASE}/api/dashboard/create`, {
@@ -125,16 +158,18 @@ export default function ControlPage() {
             if (response.ok) {
                 const data = await response.json()
                 setDashboardId(data.dashboard_id)
-                setIsConnected(true)
             } else {
-                console.error("Dashboard init failed: non-OK response")
-                setDashboardId("OFFLINE")
-                setIsConnected(false)
+                const statusTag = response.status === 401 || response.status === 403
+                    ? "AUTH_REQUIRED"
+                    : "UNAVAILABLE"
+                console.warn(`Dashboard init unavailable (${response.status})`)
+                setDashboardId(statusTag)
             }
         } catch (error) {
-            console.error("Dashboard init failed:", error)
-            setDashboardId("OFFLINE")
-            setIsConnected(false)
+            if (!isAbortError(error)) {
+                console.error("Dashboard init failed:", error)
+            }
+            setDashboardId("UNAVAILABLE")
         } finally {
             clearTimeout(timeout)
             setIsLoading(false)
@@ -145,16 +180,40 @@ export default function ControlPage() {
         initDashboard()
     }, [initDashboard])
 
+    useEffect(() => {
+        checkServerHealth()
+        const interval = setInterval(checkServerHealth, 3000)
+        return () => clearInterval(interval)
+    }, [checkServerHealth])
+
     // Poll accuracy snapshot — every 1s for real-time updates
     useEffect(() => {
+        let inFlight = false
+
         const fetchAccuracy = async () => {
+            if (inFlight) {
+                return
+            }
+            inFlight = true
+            const controller = new AbortController()
+            const timeout = setTimeout(() => controller.abort("accuracy_timeout"), 2500)
+
             try {
-                const res = await protectedFetch(`${API_BASE}/api/accuracy/snapshot`)
+                const res = await protectedFetch(`${API_BASE}/api/accuracy/snapshot`, {
+                    signal: controller.signal
+                })
                 if (res.ok) {
                     const data = await res.json()
                     setAccuracySnapshot(data)
+                } else {
+                    setAccuracySnapshot(null)
                 }
-            } catch { /* offline fallback */ }
+            } catch {
+                setAccuracySnapshot(null)
+            } finally {
+                clearTimeout(timeout)
+                inFlight = false
+            }
         }
         fetchAccuracy()
         const interval = setInterval(fetchAccuracy, 1000)
@@ -163,9 +222,20 @@ export default function ControlPage() {
 
     // Poll runtime status from backend — every 1s for real-time updates
     useEffect(() => {
+        let inFlight = false
+
         const fetchRuntimeStatus = async () => {
+            if (inFlight) {
+                return
+            }
+            inFlight = true
+            const controller = new AbortController()
+            const timeout = setTimeout(() => controller.abort("runtime_status_timeout"), 2500)
+
             try {
-                const res = await protectedFetch(`${API_BASE}/runtime/status`)
+                const res = await protectedFetch(`${API_BASE}/runtime/status`, {
+                    signal: controller.signal
+                })
                 if (res.ok) {
                     const data = await res.json()
                     setRuntimeStatus(data)
@@ -181,8 +251,19 @@ export default function ControlPage() {
                         }
                         lastTelemetryTs.current = newTs
                     }
+                } else {
+                    setRuntimeStatus({ status: "error", stale: true })
+                    setIsStalled(false)
+                    lastTelemetryTs.current = 0
                 }
-            } catch { /* backend offline — keep last known state */ }
+            } catch {
+                setRuntimeStatus({ status: "error", stale: true })
+                setIsStalled(false)
+                lastTelemetryTs.current = 0
+            } finally {
+                clearTimeout(timeout)
+                inFlight = false
+            }
         }
         fetchRuntimeStatus()
         const interval = setInterval(fetchRuntimeStatus, 1000)
@@ -363,7 +444,11 @@ export default function ControlPage() {
     const handleSelectTarget = useCallback((id: string) => {
         setSelectedTargets(prev => {
             const next = new Set(prev)
-            next.has(id) ? next.delete(id) : next.add(id)
+            if (next.has(id)) {
+                next.delete(id)
+            } else {
+                next.add(id)
+            }
             return next
         })
 
@@ -445,6 +530,23 @@ export default function ControlPage() {
         }
     }, [handleDiscoverTargets, voiceMode])
 
+    const authRequired = isConnected && dashboardId === "AUTH_REQUIRED"
+    const connectionBadgeClass = authRequired
+        ? "bg-amber-500/20 text-amber-500"
+        : isConnected
+            ? "bg-emerald-500/20 text-emerald-500"
+            : "bg-red-500/20 text-red-500"
+    const connectionDotClass = authRequired
+        ? "bg-amber-400"
+        : isConnected
+            ? "bg-emerald-400"
+            : "bg-red-400"
+    const connectionLabel = authRequired
+        ? "Auth Required"
+        : isConnected
+            ? "Connected"
+            : "Offline"
+
     // Loading State
     if (isLoading) {
         return (
@@ -494,7 +596,7 @@ export default function ControlPage() {
                     </div>
 
                     <div className="flex items-center gap-4 pr-4">
-                        {!isConnected && (
+                        {(!isConnected || !dashboardId || dashboardId === "UNAVAILABLE" || dashboardId === "AUTH_REQUIRED") && (
                             <button
                                 onClick={initDashboard}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-violet-500/20 text-violet-400 hover:bg-violet-500/30 transition-colors"
@@ -505,15 +607,13 @@ export default function ControlPage() {
                         )}
                         <div className={cn(
                             "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium",
-                            isConnected
-                                ? "bg-emerald-500/20 text-emerald-500"
-                                : "bg-red-500/20 text-red-500"
+                            connectionBadgeClass
                         )}>
                             <div className={cn(
                                 "w-2 h-2 rounded-full",
-                                isConnected ? "bg-emerald-400" : "bg-red-400"
+                                connectionDotClass
                             )} />
-                            {isConnected ? "Connected" : "Offline"}
+                            {connectionLabel}
                         </div>
                     </div>
                 </header>
