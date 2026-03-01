@@ -56,6 +56,7 @@ from backend.storage.storage_bridge import (
     get_storage_stats, get_lifecycle_status, get_disk_status,
     get_delete_preview, store_video, get_video_stream_token,
     stream_video, list_videos, get_storage_health,
+    update_user_auth_profile, get_admin_user_security_view,
 )
 
 # Import activation profiles
@@ -1918,7 +1919,7 @@ async def dataset_stats(user=Depends(require_auth)):
 # =============================================================================
 
 @app.get("/api/db/users")
-def list_users(user=Depends(require_auth)):
+def list_users(user=Depends(require_admin)):
     """Get all users from HDD storage."""
     try:
         users = get_all_users()
@@ -1941,7 +1942,7 @@ def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
 
 
 @app.get("/api/db/users/{user_id}")
-def get_single_user(user_id: str, user=Depends(require_auth)):
+def get_single_user(user_id: str, user=Depends(require_admin)):
     """Get a specific user by ID."""
     try:
         user = get_user(user_id)
@@ -1954,7 +1955,7 @@ def get_single_user(user_id: str, user=Depends(require_auth)):
 
 
 @app.get("/api/db/users/{user_id}/bounties")
-def get_user_bounties_endpoint(user_id: str, user=Depends(require_auth)):
+def get_user_bounties_endpoint(user_id: str, user=Depends(require_admin)):
     """Get all bounties for a specific user."""
     try:
         bounties = get_user_bounties(user_id)
@@ -2047,7 +2048,7 @@ def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
 
 
 @app.get("/api/db/activity")
-def list_activity(limit: int = 50, user=Depends(require_auth)):
+def list_activity(limit: int = 50, user=Depends(require_admin)):
     """Get recent activity log."""
     try:
         activities = get_recent_activity(limit)
@@ -2125,6 +2126,27 @@ async def video_token_endpoint(request: Request, user=Depends(require_auth)):
 # =============================================================================
 
 _ALLOW_PASSWORD_LOGIN = os.getenv("ALLOW_PASSWORD_LOGIN", "false").lower() == "true"
+_TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "true").lower() in ("1", "true", "yes", "on")
+_TRUSTED_PROXY_CIDRS_RAW = os.getenv(
+    "TRUSTED_PROXY_CIDRS",
+    "127.0.0.1/32,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16",
+)
+
+
+def _parse_cidrs(raw: str) -> list:
+    nets: list = []
+    for token in (raw or "").split(","):
+        cidr = token.strip()
+        if not cidr:
+            continue
+        try:
+            nets.append(ipaddress.ip_network(cidr, strict=False))
+        except ValueError:
+            logger.warning("Invalid TRUSTED_PROXY_CIDRS entry ignored: %s", cidr)
+    return nets
+
+
+_TRUSTED_PROXY_NETWORKS = _parse_cidrs(_TRUSTED_PROXY_CIDRS_RAW)
 
 
 def _extract_client_ip(req: Request) -> str:
@@ -2198,15 +2220,33 @@ def _extract_client_ip(req: Request) -> str:
     if peer_ip:
         candidates.append(peer_ip)
 
-    # Prefer public routable IP.
+    peer_ip = _normalize(req.client.host if req.client else "")
+
+    # If proxy headers are disabled or peer is not a trusted proxy, never trust forwarded headers.
+    if not _TRUST_PROXY_HEADERS:
+        return peer_ip or "unknown"
+
+    if peer_ip:
+        try:
+            peer_obj = ipaddress.ip_address(peer_ip)
+            trusted_peer = any(peer_obj in net for net in _TRUSTED_PROXY_NETWORKS)
+        except ValueError:
+            trusted_peer = False
+    else:
+        trusted_peer = False
+
+    if not trusted_peer:
+        return peer_ip or "unknown"
+
+    # Prefer public routable IP from trusted proxy headers.
     for ip in candidates:
         if _is_public(ip):
             return ip
 
-    # Otherwise return first valid candidate.
+    # Otherwise return first valid candidate from trusted proxy chain.
     if candidates:
         return candidates[0]
-    return "unknown"
+    return peer_ip or "unknown"
 
 
 class LoginRequest(BaseModel):
@@ -2309,6 +2349,12 @@ async def login(request: LoginRequest, req: Request):
                 "geolocation": location,
             },
         )
+        update_user_auth_profile(
+            user["id"],
+            auth_provider="password",
+            ip_address=ip,
+            geolocation=location,
+        )
         log_activity(user["id"], "LOGIN_SUCCESS", f"Login from {ip} ({location})", ip_address=ip)
 
         try:
@@ -2366,7 +2412,7 @@ async def logout(req: Request, user=Depends(require_auth)):
 
 @app.get("/auth/profile")
 async def auth_profile(user=Depends(require_auth)):
-    """Return authenticated profile + latest network/device context."""
+    """Return authenticated profile. Sensitive auth intel is admin-only."""
     user_id = user.get("sub", "")
     if not user_id:
         raise HTTPException(status_code=401, detail="Invalid auth token payload")
@@ -2374,6 +2420,21 @@ async def auth_profile(user=Depends(require_auth)):
     record = get_user(user_id)
     if not record:
         raise HTTPException(status_code=404, detail="User not found")
+
+    base = {
+        "success": True,
+        "user": {
+            "id": record["id"],
+            "name": record.get("name", ""),
+            "email": record.get("email"),
+            "role": record.get("role", "hunter"),
+        },
+        "session_id": user.get("session_id"),
+    }
+
+    # Do not expose network/github auth intel to non-admin users.
+    if record.get("role", "").lower() != "admin":
+        return base
 
     devices = get_user_devices(user_id)
     latest_device = None
@@ -2392,20 +2453,51 @@ async def auth_profile(user=Depends(require_auth)):
             break
 
     return {
-        "success": True,
-        "user": {
-            "id": record["id"],
-            "name": record.get("name", ""),
-            "email": record.get("email"),
-            "role": record.get("role", "hunter"),
-        },
-        "session_id": user.get("session_id"),
+        **base,
         "network": {
             "ip_address": latest_device.get("ip_address") if latest_device else None,
             "geolocation": latest_device.get("location") if latest_device else None,
         },
         "device": latest_device,
         "github_profile": github_profile,
+    }
+
+
+@app.get("/admin/auth/intel")
+async def admin_auth_intel(req: Request, limit: int = 200):
+    """
+    Admin-only sensitive auth view:
+      - username/email/role
+      - password hash (never plaintext)
+      - github id/login/profile details
+      - last login IP + geolocation
+    """
+    auth_header = req.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Bearer token required")
+
+    token = auth_header[7:]
+    try:
+        from backend.api.admin_auth import require_auth as admin_require_auth, ROLE_ADMIN
+        admin_result = admin_require_auth(jwt_token=token, required_role=ROLE_ADMIN)
+        if admin_result.get("status") != "ok":
+            admin_result = admin_require_auth(session_token=token, required_role=ROLE_ADMIN)
+        if admin_result.get("status") != "ok":
+            raise HTTPException(status_code=403, detail="Admin role required")
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("admin auth intel auth failure")
+        raise HTTPException(status_code=401, detail="Invalid admin token")
+
+    safe_limit = max(1, min(limit, 1000))
+    users = get_admin_user_security_view(limit=safe_limit)
+
+    return {
+        "success": True,
+        "total": len(users),
+        "users": users,
+        "note": "password values are one-way hashes only; plaintext passwords are never stored",
     }
 
 
@@ -3443,6 +3535,13 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                 "github_id": github_id,
                 "geolocation": location,
             },
+        )
+        update_user_auth_profile(
+            user["id"],
+            auth_provider="github",
+            ip_address=ip,
+            geolocation=location,
+            github_profile=github_profile,
         )
         log_activity(
             user["id"],

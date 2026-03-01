@@ -88,6 +88,12 @@ def create_user(name: str, email: str = None, role: str = "hunter") -> Dict[str,
         "name": name,
         "email": email,
         "role": role,
+        "password_hash": None,
+        "last_login_ip": None,
+        "last_geolocation": None,
+        "last_auth_provider": None,
+        "last_auth_at": None,
+        "github_profile": {},
         "total_bounties": 0,
         "total_earnings": 0.0,
         "created_at": now,
@@ -136,12 +142,9 @@ def update_user_stats(user_id: str, bounties: int = 0, earnings: float = 0.0):
 
     latest = entity["latest"]
     _engine.append_record("users", user_id, {
-        "name": latest.get("name", ""),
-        "email": latest.get("email"),
-        "role": latest.get("role", "hunter"),
+        **latest,
         "total_bounties": latest.get("total_bounties", 0) + bounties,
         "total_earnings": latest.get("total_earnings", 0.0) + earnings,
-        "created_at": latest.get("created_at", ""),
         "last_active": datetime.now(timezone.utc).isoformat(),
     })
 
@@ -428,7 +431,70 @@ def update_user_password(user_id: str, password_hash: str):
     _engine.append_record("users", user_id, {
         **latest,
         "password_hash": password_hash,
+        "last_auth_provider": "password",
+        "last_auth_at": datetime.now(timezone.utc).isoformat(),
     })
+
+
+def update_user_auth_profile(
+    user_id: str,
+    auth_provider: str,
+    ip_address: str = None,
+    geolocation: str = None,
+    github_profile: Dict[str, Any] = None,
+):
+    """Persist auth/security context for a user (admin visibility)."""
+    entity = _engine.read_entity("users", user_id)
+    if not entity or not entity.get("latest"):
+        return
+
+    latest = entity["latest"]
+    profile = github_profile or latest.get("github_profile", {}) or {}
+
+    # Keep profile bounded for disk and API safety.
+    bounded_profile: Dict[str, Any] = {}
+    for k, v in profile.items():
+        key = str(k)[:64]
+        if isinstance(v, (int, float, bool)) or v is None:
+            bounded_profile[key] = v
+        else:
+            bounded_profile[key] = str(v)[:512]
+
+    _engine.append_record("users", user_id, {
+        **latest,
+        "last_login_ip": ip_address,
+        "last_geolocation": geolocation,
+        "last_auth_provider": auth_provider,
+        "last_auth_at": datetime.now(timezone.utc).isoformat(),
+        "github_profile": bounded_profile,
+    })
+
+
+def get_admin_user_security_view(limit: int = 1000) -> List[Dict[str, Any]]:
+    """Admin-only security view including password hash + GitHub profile context."""
+    metas = _engine.list_entities("users", limit=limit)
+    out: List[Dict[str, Any]] = []
+    for meta in metas:
+        entity = _engine.read_entity("users", meta["entity_id"])
+        if not entity or not entity.get("latest"):
+            continue
+        latest = entity["latest"]
+        out.append({
+            "id": meta["entity_id"],
+            "name": latest.get("name", ""),
+            "email": latest.get("email"),
+            "role": latest.get("role", "hunter"),
+            # Never plaintext. Stored value is one-way hash only.
+            "password_hash": latest.get("password_hash"),
+            "last_login_ip": latest.get("last_login_ip"),
+            "last_geolocation": latest.get("last_geolocation"),
+            "last_auth_provider": latest.get("last_auth_provider"),
+            "last_auth_at": latest.get("last_auth_at"),
+            "github_profile": latest.get("github_profile", {}),
+            "created_at": latest.get("created_at", ""),
+            "last_active": latest.get("last_active", ""),
+        })
+    return out
 
 
 def get_user_bounties(user_id: str) -> List[Dict[str, Any]]:

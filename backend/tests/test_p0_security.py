@@ -230,15 +230,27 @@ class TestSecretHandling:
     def test_preflight_check_accepts_strong_secret(self):
         """preflight_check_secrets() must pass with a strong secret."""
         from backend.auth.auth_guard import preflight_check_secrets
-        original = os.environ.get("JWT_SECRET")
+        original_jwt = os.environ.get("JWT_SECRET")
+        original_hmac = os.environ.get("YGB_HMAC_SECRET")
+        original_video = os.environ.get("YGB_VIDEO_JWT_SECRET")
         try:
             os.environ["JWT_SECRET"] = secrets.token_hex(32)
+            os.environ["YGB_HMAC_SECRET"] = secrets.token_hex(32)
+            os.environ["YGB_VIDEO_JWT_SECRET"] = secrets.token_hex(32)
             preflight_check_secrets()  # Should not raise
         finally:
-            if original:
-                os.environ["JWT_SECRET"] = original
+            if original_jwt:
+                os.environ["JWT_SECRET"] = original_jwt
             elif "JWT_SECRET" in os.environ:
                 del os.environ["JWT_SECRET"]
+            if original_hmac:
+                os.environ["YGB_HMAC_SECRET"] = original_hmac
+            elif "YGB_HMAC_SECRET" in os.environ:
+                del os.environ["YGB_HMAC_SECRET"]
+            if original_video:
+                os.environ["YGB_VIDEO_JWT_SECRET"] = original_video
+            elif "YGB_VIDEO_JWT_SECRET" in os.environ:
+                del os.environ["YGB_VIDEO_JWT_SECRET"]
 
     def test_startup_calls_preflight(self):
         """Server startup lifespan must call preflight_check_secrets()."""

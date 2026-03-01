@@ -41,14 +41,19 @@ async function protectedFetch(url: string, options: RequestInit = {}): Promise<R
 }
 
 function isAbortError(error: unknown): boolean {
-    return (
-        error instanceof DOMException && error.name === "AbortError"
-    ) || (
-        typeof error === "object" &&
-        error !== null &&
-        "name" in error &&
-        (error as { name?: string }).name === "AbortError"
-    )
+    if (error instanceof DOMException) {
+        return error.name === "AbortError"
+    }
+    if (error instanceof Error) {
+        return error.name === "AbortError"
+    }
+    if (typeof error === "string") {
+        return error.endsWith("_timeout") || error.toLowerCase().includes("abort")
+    }
+    if (typeof error === "object" && error !== null && "name" in error) {
+        return (error as { name?: string }).name === "AbortError"
+    }
+    return false
 }
 
 export default function ControlPage() {
