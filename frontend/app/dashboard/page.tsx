@@ -92,8 +92,6 @@ export default function Dashboard() {
 
   const fetchData = async () => {
     try {
-      setApiStatus("loading")
-
       // Fetch users
       const usersRes = await authFetch(`${API_BASE}/api/db/users`)
       if (usersRes.ok) {
@@ -140,13 +138,25 @@ export default function Dashboard() {
         // Training readiness API not available — show unknown
         setTrainingReadiness(null)
       }
-
-      setApiStatus("online")
     } catch (e) {
       console.error("Failed to fetch data:", e)
-      setApiStatus("offline")
     }
   }
+
+  // Separate server health check — uses plain fetch (no auth required)
+  useEffect(() => {
+    async function checkHealth() {
+      try {
+        const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+        setApiStatus(res.ok ? "online" : "offline")
+      } catch {
+        setApiStatus("offline")
+      }
+    }
+    checkHealth()
+    const interval = setInterval(checkHealth, 15000)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     fetchData()
@@ -284,16 +294,16 @@ export default function Dashboard() {
             {apiStatus === "online" && trainingReadiness && (
               <div
                 className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border cursor-help ${trainingReadiness.overall === "READY"
-                    ? "bg-green-500/10 border-green-500/20 text-green-400"
-                    : trainingReadiness.overall === "PARTIAL"
-                      ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
-                      : "bg-red-500/10 border-red-500/20 text-red-400"
+                  ? "bg-green-500/10 border-green-500/20 text-green-400"
+                  : trainingReadiness.overall === "PARTIAL"
+                    ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
+                    : "bg-red-500/10 border-red-500/20 text-red-400"
                   }`}
                 title={trainingReadiness.remediation || trainingReadiness.overall}
               >
                 <div className={`w-1.5 h-1.5 rounded-full ${trainingReadiness.overall === "READY" ? "bg-green-400"
-                    : trainingReadiness.overall === "PARTIAL" ? "bg-yellow-400"
-                      : "bg-red-400"
+                  : trainingReadiness.overall === "PARTIAL" ? "bg-yellow-400"
+                    : "bg-red-400"
                   }`} />
                 Training: {trainingReadiness.go_no_go}
               </div>

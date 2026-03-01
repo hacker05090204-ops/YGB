@@ -35,7 +35,6 @@ export default function ProjectsPage() {
 
     const fetchProjects = async () => {
         try {
-            setApiStatus("loading")
             const res = await authFetch(`${API_BASE}/api/db/targets`)
             if (res.ok) {
                 const data = await res.json()
@@ -49,15 +48,26 @@ export default function ProjectsPage() {
                     due: t.created_at ? new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : "TBD",
                 }))
                 setProjects(mapped)
-                setApiStatus("online")
-            } else {
-                setApiStatus("offline")
             }
         } catch (e) {
             console.error("Failed to fetch projects:", e)
-            setApiStatus("offline")
         }
     }
+
+    // Separate server health check — plain fetch, no auth required
+    useEffect(() => {
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+                setApiStatus(res.ok ? "online" : "offline")
+            } catch {
+                setApiStatus("offline")
+            }
+        }
+        checkHealth()
+        const interval = setInterval(checkHealth, 15000)
+        return () => clearInterval(interval)
+    }, [])
 
     useEffect(() => {
         fetchProjects()

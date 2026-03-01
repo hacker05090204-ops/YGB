@@ -81,11 +81,11 @@ export default function RunnerPage() {
     const phaseListRef = useRef<HTMLDivElement>(null)
     const browserListRef = useRef<HTMLDivElement>(null)
 
-    // Check API status on mount
+    // Check API status on mount — use plain fetch, health requires no auth
     useEffect(() => {
         async function checkApi() {
             try {
-                const res = await authFetch(`${API_BASE}/health`)
+                const res = await fetch(`${API_BASE}/health`, { cache: "no-store" })
                 if (res.ok) {
                     setApiStatus("online")
                 } else {
