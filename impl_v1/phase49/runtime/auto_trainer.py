@@ -193,6 +193,7 @@ class AutoTrainer:
         # 24/7 CONTINUOUS MODE - training runs regardless of user activity
         self._continuous_mode = False
         self._continuous_target = 0  # Target epochs for continuous training (0 = infinite)
+        self._continuous_thread: Optional[threading.Thread] = None
         # Track last completed session for progress display
         self._last_completed_epochs = 0
         self._last_target_epochs = 0
@@ -213,6 +214,9 @@ class AutoTrainer:
         self._last_holdout_accuracy = 0.0  # Last holdout (real) accuracy
         self._samples_per_sec = 0.0  # Training throughput
         self._real_samples_processed = 0  # Total real samples processed
+        self._last_batch_index = 0  # Live batch index in current epoch
+        self._last_total_batches = 0  # Total batches in current epoch
+        self._last_epoch_samples = 0  # Samples processed in current epoch
         
         # === GOVERNANCE INTEGRATION ===
         self._curriculum = None  # HumanSimulatedCurriculum instance
@@ -365,6 +369,10 @@ class AutoTrainer:
         """
         if self._gpu_initialized:
             return True
+
+        if self._abort_flag.is_set():
+            logger.info("GPU initialization skipped: abort requested")
+            return False
         
         if not TORCH_AVAILABLE or not PYTORCH_AVAILABLE:
             return False
@@ -448,6 +456,10 @@ class AutoTrainer:
                 if recovery_attempted:
                     logger.info(f"Dataset validated after recovery: {msg}")
             logger.info(f"Dataset validated: {msg}")
+
+            if self._abort_flag.is_set():
+                logger.info("GPU initialization aborted before DataLoader creation")
+                return False
             
             # Create optimized DataLoader (pin_memory for fast GPU transfer)
             # num_workers=0 on Windows: worker processes trigger STRICT_REAL_MODE
@@ -463,6 +475,10 @@ class AutoTrainer:
             self._gpu_dataloader = train_loader
             self._gpu_holdout_loader = holdout_loader  # Store holdout for validation
             self._gpu_dataset_stats = stats
+
+            if self._abort_flag.is_set():
+                logger.info("GPU initialization aborted after DataLoader creation")
+                return False
             
             # Pre-load first batch to GPU for fast access
             first_batch = next(iter(train_loader))
@@ -595,6 +611,12 @@ class AutoTrainer:
             total_correct = 0
             total_samples = 0
             batch_count = 0
+            try:
+                self._last_total_batches = len(self._gpu_dataloader)
+            except Exception:
+                self._last_total_batches = 0
+            self._last_batch_index = 0
+            self._last_epoch_samples = 0
             
             self._gpu_optimizer.zero_grad(set_to_none=True)
             
@@ -659,6 +681,8 @@ class AutoTrainer:
                 total_correct += (predicted == batch_labels).sum().item()
                 total_samples += batch_size
                 batch_count += 1
+                self._last_batch_index = batch_count
+                self._last_epoch_samples = total_samples
             
             # Synchronize CUDA streams before computing metrics
             torch.cuda.synchronize()
@@ -1425,6 +1449,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
         trainer._continuous_target = target_epochs
         trainer._state = TrainingState.TRAINING
         trainer._abort_flag.clear()
+        trainer._continuous_thread = None
         trainer._target_epochs = target_epochs if target_epochs > 0 else 999999
         trainer._session_epoch = 0
         trainer._current_session = TrainingSession(
@@ -1446,10 +1471,21 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
         # Initialize GPU resources ONCE (uses real 20K+ dataset)
         if not trainer._gpu_initialized:
             if not trainer._init_gpu_resources():
-                trainer._emit_event("ERROR", "Failed to initialize GPU resources", gpu_used=True)
                 trainer._continuous_mode = False
                 with trainer._training_lock:
-                    trainer._state = TrainingState.ERROR
+                    if trainer._abort_flag.is_set():
+                        trainer._state = TrainingState.IDLE
+                    else:
+                        trainer._state = TrainingState.ERROR
+                    trainer._continuous_thread = None
+                if trainer._abort_flag.is_set():
+                    trainer._emit_event(
+                        "CONTINUOUS_STOP",
+                        "Continuous training stopped during GPU initialization",
+                        gpu_used=True,
+                    )
+                else:
+                    trainer._emit_event("ERROR", "Failed to initialize GPU resources", gpu_used=True)
                 return
         
         epoch_count = 0
@@ -1508,6 +1544,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             if trainer._current_session:
                 trainer._generate_session_report()
             trainer._current_session = None
+            trainer._continuous_thread = None
         
         trainer._emit_event(
             "CONTINUOUS_STOP",
@@ -1516,7 +1553,8 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             gpu_used=True,
         )
     
-    thread = threading.Thread(target=_run_continuous, daemon=True)
+    thread = threading.Thread(target=_run_continuous, daemon=True, name="g38_continuous_trainer")
+    trainer._continuous_thread = thread
     thread.start()
     
     return {
@@ -1529,14 +1567,43 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
     }
 
 
-def stop_continuous_training() -> dict:
+def stop_continuous_training(wait_timeout_seconds: float = 5.0) -> dict:
     """Stop 24/7 continuous training."""
     trainer = get_auto_trainer()
     trainer._continuous_mode = False
     trainer._abort_flag.set()
-    
+    thread = getattr(trainer, "_continuous_thread", None)
+
+    # Reflect stop intent immediately for API status consumers.
+    with trainer._training_lock:
+        if trainer._state == TrainingState.TRAINING:
+            trainer._state = TrainingState.ABORTING
+
+    trainer._emit_event(
+        "CONTINUOUS_STOP_REQUESTED",
+        f"Continuous training stop requested (timeout={wait_timeout_seconds:.1f}s)",
+        gpu_used=True,
+    )
+
+    thread_alive = False
+    if isinstance(thread, threading.Thread) and thread.is_alive():
+        thread.join(timeout=max(0.0, float(wait_timeout_seconds)))
+        thread_alive = thread.is_alive()
+
+    # If the worker thread has exited, finalize state eagerly.
+    if not thread_alive:
+        with trainer._training_lock:
+            trainer._state = TrainingState.IDLE
+            trainer._continuous_mode = False
+            trainer._continuous_thread = None
+            if trainer._current_session:
+                trainer._generate_session_report()
+            trainer._current_session = None
+
     return {
-        "stopped": True,
+        "stopped": not thread_alive,
+        "stop_requested": True,
+        "thread_alive": thread_alive,
         "state": trainer._state.value,
         "total_completed": trainer._epoch,
     }

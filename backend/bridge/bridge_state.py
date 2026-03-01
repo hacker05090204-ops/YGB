@@ -285,8 +285,16 @@ class BridgeState:
             with open(manifest_path, "r") as f:
                 manifest = json.load(f)
             result["manifest_exists"] = True
-            result["manifest_verified_count"] = manifest.get(
-                "verified_count", manifest.get("verified_samples", 0)
+            # Support both legacy and current manifest schemas.
+            # Current ingestion manifests expose accepted/sample_count.
+            result["manifest_verified_count"] = int(
+                manifest.get(
+                    "verified_count",
+                    manifest.get(
+                        "verified_samples",
+                        manifest.get("accepted", manifest.get("sample_count", 0)),
+                    ),
+                )
             )
 
             bridge_v = self._state["bridge_verified_count"]

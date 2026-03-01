@@ -15,7 +15,10 @@ import re
 import subprocess
 import html
 import os
+import shutil
 import logging
+import urllib.request
+from urllib.parse import quote_plus
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, List, Dict, Tuple
@@ -264,7 +267,7 @@ BLOCKED_RESEARCH_PATTERNS = [
 class ResearchSearchPipeline:
     """
     Performs isolated web searches for research queries.
-    Uses headless Edge browser (mirrors C++ engine logic).
+    Uses headless Edge when available, with HTTP fallback for reliability.
     """
 
     # Allowed search domains (mirrors C++ whitelist)
@@ -282,6 +285,116 @@ class ResearchSearchPipeline:
     MAX_RESPONSE_BYTES = 65536
     TIMEOUT_SECONDS = 10
     MAX_SUMMARY_WORDS = 500
+    HTTP_USER_AGENT = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/120.0.0.0 Safari/537.36"
+    )
+
+    _EDGE_CANDIDATES = (
+        os.environ.get("YGB_EDGE_PATH", "").strip(),
+        "msedge",
+        "msedge.exe",
+        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    )
+
+    _BOT_CHALLENGE_MARKERS = (
+        "solve the challenge below to continue",
+        "detected unusual traffic",
+        "please verify you are a human",
+        "captcha",
+        "cf-challenge",
+    )
+
+    def _resolve_edge_binary(self) -> Optional[str]:
+        """Resolve Edge binary path from env/PATH/common install locations."""
+        for candidate in self._EDGE_CANDIDATES:
+            if not candidate:
+                continue
+            if os.path.isabs(candidate) and os.path.exists(candidate):
+                return candidate
+            resolved = shutil.which(candidate)
+            if resolved:
+                return resolved
+        return None
+
+    def _fetch_html_over_http(self, url: str) -> str:
+        """Fetch HTML directly over HTTPS (fallback when Edge is unavailable)."""
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": self.HTTP_USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=self.TIMEOUT_SECONDS) as resp:
+            body = resp.read(self.MAX_RESPONSE_BYTES)
+        return body.decode("utf-8", errors="replace")
+
+    def _looks_like_bot_challenge(self, html_text: str) -> bool:
+        """Detect anti-bot challenge pages that should not be summarized."""
+        lower = html_text.lower()
+        return any(marker in lower for marker in self._BOT_CHALLENGE_MARKERS)
+
+    def _fetch_search_html(self, query: str) -> Tuple[str, str]:
+        """
+        Retrieve search HTML using a robust chain:
+          1) Edge headless dump-dom (preferred)
+          2) Bing HTTP HTML fallback
+          3) DuckDuckGo HTTP HTML fallback
+        Returns (html, source_domain_label).
+        """
+        encoded_query = quote_plus(query)
+        bing_url = f"https://www.bing.com/search?q={encoded_query}"
+        ddg_url = f"https://duckduckgo.com/html/?q={encoded_query}"
+
+        edge_binary = self._resolve_edge_binary()
+        if edge_binary:
+            result = subprocess.run(
+                [
+                    edge_binary,
+                    "--headless",
+                    "--disable-gpu",
+                    "--no-sandbox",
+                    "--disable-extensions",
+                    "--disable-plugins",
+                    "--disable-background-networking",
+                    "--disable-sync",
+                    "--disable-translate",
+                    "--no-first-run",
+                    "--inprivate",
+                    "--dump-dom",
+                    bing_url,
+                ],
+                capture_output=True,
+                text=False,
+                timeout=self.TIMEOUT_SECONDS,
+            )
+            raw_html = (result.stdout or b"")[: self.MAX_RESPONSE_BYTES].decode(
+                "utf-8", errors="replace"
+            )
+            if raw_html.strip() and not self._looks_like_bot_challenge(raw_html):
+                return raw_html, "bing.com"
+            if raw_html.strip():
+                logger.warning("Research Edge result looked like a bot challenge; falling back to HTTP")
+
+        # Fallback chain: direct HTTPS fetch from allowlisted domains.
+        try:
+            raw_html = self._fetch_html_over_http(ddg_url)
+            if raw_html.strip() and not self._looks_like_bot_challenge(raw_html):
+                return raw_html, "duckduckgo.com"
+        except Exception as e:
+            logger.warning(f"Research HTTP fallback (duckduckgo) failed: {e}")
+
+        try:
+            raw_html = self._fetch_html_over_http(bing_url)
+            if raw_html.strip() and not self._looks_like_bot_challenge(raw_html):
+                return raw_html, "bing.com"
+        except Exception as e:
+            logger.warning(f"Research HTTP fallback (bing) failed: {e}")
+
+        return "", ""
 
     def search(self, query: str) -> ResearchResult:
         """Execute a research search query."""
@@ -308,35 +421,8 @@ class ResearchSearchPipeline:
         t_start = time.monotonic()
 
         try:
-            # Build search URL
-            from urllib.parse import quote_plus
-            encoded_query = quote_plus(query)
-            search_url = f"https://www.bing.com/search?q={encoded_query}"
-
-            # Launch headless Edge with --dump-dom
-            result = subprocess.run(
-                [
-                    "msedge",
-                    "--headless",
-                    "--disable-gpu",
-                    "--no-sandbox",
-                    "--disable-extensions",
-                    "--disable-plugins",
-                    "--disable-background-networking",
-                    "--disable-sync",
-                    "--disable-translate",
-                    "--no-first-run",
-                    "--inprivate",
-                    "--dump-dom",
-                    search_url,
-                ],
-                capture_output=True,
-                text=True,
-                timeout=self.TIMEOUT_SECONDS,
-            )
-
+            raw_html, source_domain = self._fetch_search_html(query)
             elapsed = (time.monotonic() - t_start) * 1000
-            raw_html = result.stdout[:self.MAX_RESPONSE_BYTES]
 
             if not raw_html:
                 return ResearchResult(
@@ -344,7 +430,7 @@ class ResearchSearchPipeline:
                     status=ResearchStatus.NO_RESULTS,
                     title="",
                     summary="I couldn't find results for that query. Could you rephrase your question?",
-                    source="bing.com",
+                    source=source_domain or "",
                     key_terms=(),
                     word_count=0,
                     elapsed_ms=elapsed,
@@ -381,7 +467,7 @@ class ResearchSearchPipeline:
                 status=ResearchStatus.SUCCESS,
                 title=query.title(),
                 summary=summary,
-                source="bing.com",
+                source=source_domain or "web",
                 key_terms=tuple(key_terms[:10]),
                 word_count=len(summary.split()),
                 elapsed_ms=elapsed,

@@ -88,13 +88,17 @@ from backend.storage.storage_bridge import (
 
 # Import REAL phase runner with actual browser automation
 try:
-    from phase_runner import RealPhaseRunner, run_real_workflow
+    from api.phase_runner import RealPhaseRunner, run_real_workflow
     PHASE_RUNNER_AVAILABLE = True
 except ImportError:
-    PHASE_RUNNER_AVAILABLE = False
-    RealPhaseRunner = None
-    run_real_workflow = None
-    logger.warning("[BOOT] phase_runner not available — browser automation routes degraded")
+    try:
+        from phase_runner import RealPhaseRunner, run_real_workflow
+        PHASE_RUNNER_AVAILABLE = True
+    except ImportError:
+        PHASE_RUNNER_AVAILABLE = False
+        RealPhaseRunner = None
+        run_real_workflow = None
+        logger.warning("[BOOT] phase_runner not available — browser automation routes degraded")
 
 # =============================================================================
 # G38 AUTO-TRAINING IMPORTS
@@ -1456,10 +1460,15 @@ async def abort_g38_training(user=Depends(require_auth)):
     trainer = get_auto_trainer()
     if getattr(trainer, "_continuous_mode", False):
         result = stop_continuous_training()
+        thread_alive = result.get("thread_alive", False)
         return {
-            "success": result.get("stopped", False),
+            "success": result.get("stop_requested", False),
             "state": trainer.state.value,
-            "message": "Continuous training stop requested",
+            "message": (
+                "Continuous training stop requested; worker thread still draining"
+                if thread_alive
+                else "Continuous training stopped"
+            ),
         }
     result = trainer.abort_training()
     
@@ -1533,7 +1542,7 @@ async def gpu_status(user=Depends(require_auth)):
         result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
         result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
         props = torch.cuda.get_device_properties(0)
-        result["memory_total_mb"] = round(props.total_mem / 1024 / 1024, 2)
+        result["memory_total_mb"] = round(props.total_memory / 1024 / 1024, 2)
         cap = torch.cuda.get_device_capability(0)
         result["compute_capability"] = f"{cap[0]}.{cap[1]}"
     except Exception:
@@ -1605,9 +1614,14 @@ async def training_stop(user=Depends(require_auth)):
     trainer = get_auto_trainer()
     if getattr(trainer, "_continuous_mode", False):
         result = stop_continuous_training()
+        thread_alive = result.get("thread_alive", False)
         return {
-            "success": result.get("stopped", False),
-            "message": "Continuous training stopped",
+            "success": result.get("stop_requested", False),
+            "message": (
+                "Continuous training stop requested; worker thread still draining"
+                if thread_alive
+                else "Continuous training stopped"
+            ),
             "state": trainer.state.value,
         }
     result = trainer.abort_training()
@@ -1664,7 +1678,7 @@ async def get_g38_guards(user=Depends(require_auth)):
     return {
         "guards": guards,
         "total": len(guards),
-        "all_passing": all(not g["returns_false"] is False for g in guards),
+        "all_passing": all(not g["returns_false"] for g in guards),
     }
 
 
@@ -1755,7 +1769,7 @@ async def stop_24_7_training(user=Depends(require_auth)):
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     result = stop_continuous_training()
-    return {"success": result.get("stopped", False), **result}
+    return {"success": result.get("stop_requested", False), **result}
 
 
 @app.get("/training/progress")
@@ -1764,6 +1778,114 @@ async def training_progress(user=Depends(require_auth)):
     mgr = get_training_state_manager()
     metrics = mgr.get_training_progress()
     return metrics.to_dict()
+
+
+@app.websocket("/training/stream")
+async def training_stream(websocket: WebSocket):
+    """Live training telemetry stream for frontend dashboard."""
+    user = await ws_authenticate(websocket)
+    if not user:
+        await websocket.close(code=4001, reason="Authentication required")
+        return
+
+    await websocket.accept()
+
+    if not G38_AVAILABLE:
+        await websocket.send_json({
+            "error": "G38 modules not loaded",
+            "stalled": True,
+            "timestamp": datetime.now(UTC).isoformat(),
+        })
+        await websocket.close(code=1011, reason="G38 unavailable")
+        return
+
+    trainer = get_auto_trainer()
+    mgr = get_training_state_manager()
+    prev_samples_processed = -1
+    unchanged_ticks = 0
+
+    try:
+        while True:
+            status = trainer.get_status()
+            gpu_metrics = mgr.get_gpu_metrics()
+
+            # Batch telemetry from real trainer internals (no synthetic values).
+            total_batches = int(getattr(trainer, "_last_total_batches", 0) or 0)
+            batch_index = int(getattr(trainer, "_last_batch_index", 0) or 0)
+            epoch_samples = int(getattr(trainer, "_last_epoch_samples", 0) or 0)
+            samples_processed = int(getattr(trainer, "_real_samples_processed", 0) or 0)
+            total_samples = int(status.get("dataset_size", 0) or 0)
+
+            if samples_processed == prev_samples_processed:
+                unchanged_ticks += 1
+            else:
+                unchanged_ticks = 0
+            prev_samples_processed = samples_processed
+
+            is_training = bool(status.get("is_training", False))
+            stalled = is_training and unchanged_ticks >= 10
+
+            # GPU utilization fraction expected by frontend [0,1].
+            gpu_usage_percent = gpu_metrics.get("gpu_usage_percent")
+            if gpu_usage_percent is not None:
+                gpu_utilization = max(0.0, min(float(gpu_usage_percent) / 100.0, 1.0))
+            else:
+                gpu_memory_total = float(gpu_metrics.get("gpu_memory_total_mb") or 0.0)
+                gpu_memory_used = float(
+                    gpu_metrics.get("gpu_memory_used_mb")
+                    or status.get("gpu_mem_reserved_mb")
+                    or 0.0
+                )
+                gpu_utilization = (
+                    max(0.0, min(gpu_memory_used / gpu_memory_total, 1.0))
+                    if gpu_memory_total > 0
+                    else 0.0
+                )
+
+            samples_per_sec = float(status.get("samples_per_sec", 0.0) or 0.0)
+            eta_seconds = 0.0
+            if is_training and total_samples > 0 and samples_per_sec > 0:
+                remaining = max(total_samples - epoch_samples, 0)
+                eta_seconds = remaining / samples_per_sec
+
+            lr = 0.0
+            optimizer = getattr(trainer, "_gpu_optimizer", None)
+            try:
+                if optimizer and optimizer.param_groups:
+                    lr = float(optimizer.param_groups[0].get("lr", 0.0) or 0.0)
+            except Exception:
+                lr = 0.0
+
+            frame = {
+                "epoch": int(status.get("epoch", 0) or 0),
+                "batch": batch_index,
+                "total_batches": total_batches,
+                "samples_processed": samples_processed,
+                "total_samples": total_samples,
+                "samples_per_sec": samples_per_sec,
+                "gpu_utilization": gpu_utilization,
+                "gpu_memory_mb": float(status.get("gpu_mem_allocated_mb", 0.0) or 0.0),
+                "gpu_temp": float(gpu_metrics.get("temperature") or 0.0),
+                "loss": float(status.get("last_loss", 0.0) or 0.0),
+                "running_accuracy": float(status.get("last_accuracy", 0.0) or 0.0),
+                "learning_rate": lr,
+                "eta_seconds": eta_seconds,
+                "stalled": stalled,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+            await websocket.send_json(frame)
+            await asyncio.sleep(1.0)
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        logger.exception("Training stream websocket error")
+        try:
+            await websocket.send_json({
+                "error": "Training stream failed",
+                "timestamp": datetime.now(UTC).isoformat(),
+            })
+        except Exception:
+            pass
 
 
 @app.get("/dataset/stats")
