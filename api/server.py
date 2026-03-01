@@ -59,6 +59,22 @@ from backend.storage.storage_bridge import (
     update_user_auth_profile, get_admin_user_security_view,
 )
 
+# Import tiered storage manager (SSD cap + HDD overflow)
+try:
+    from backend.storage.tiered_storage import (
+        get_storage_report as get_tiered_report,
+        enforce_ssd_cap,
+        start_enforcement_loop as start_storage_enforcement,
+        resolve_path as resolve_storage_path,
+    )
+    TIERED_STORAGE_AVAILABLE = True
+    # Start background SSD cap enforcement (every 5 min)
+    start_storage_enforcement(300)
+    logger.info("[BOOT] Tiered storage active — SSD cap enforcement running")
+except Exception as _ts_err:
+    TIERED_STORAGE_AVAILABLE = False
+    logger.warning("[BOOT] Tiered storage not available: %s", _ts_err)
+
 # Import activation profiles
 try:
     from backend.config.activation_profiles import (
@@ -2499,6 +2515,24 @@ async def admin_auth_intel(req: Request, limit: int = 200):
         "users": users,
         "note": "password values are one-way hashes only; plaintext passwords are never stored",
     }
+
+
+@app.get("/api/storage/status")
+async def storage_status(user=Depends(require_auth)):
+    """Get SSD/HDD storage tiering status."""
+    if not TIERED_STORAGE_AVAILABLE:
+        return {"available": False, "error": "Tiered storage not loaded"}
+    report = await asyncio.to_thread(get_tiered_report)
+    return {"available": True, **report}
+
+
+@app.post("/api/storage/enforce")
+async def storage_enforce(user=Depends(require_auth)):
+    """Manually trigger SSD cap enforcement (compress + migrate)."""
+    if not TIERED_STORAGE_AVAILABLE:
+        return {"available": False, "error": "Tiered storage not loaded"}
+    result = await asyncio.to_thread(enforce_ssd_cap)
+    return {"available": True, **result.to_dict()}
 
 
 @app.get("/admin/active-devices")
