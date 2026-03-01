@@ -1,3 +1,27 @@
+"""
+DEPRECATED: This auth module is unmounted dead code.
+
+It provides a file-based (JSON) authentication system that was replaced by
+the HDD storage bridge + JWT auth system in server.py.
+
+This router is NOT mounted via app.include_router() and has NO effect
+on the running application. It is kept per the constraint
+"do NOT delete files" but should NOT be used or referenced.
+
+If you need auth functionality, use:
+- backend/auth/auth.py (JWT generation/verification)
+- backend/auth/auth_guard.py (require_auth/require_admin dependencies)
+- api/server.py (/auth/login, /auth/register, /auth/logout endpoints)
+"""
+
+import warnings
+warnings.warn(
+    "auth_server.py is deprecated and unmounted. "
+    "Use backend/auth/auth.py and auth_guard.py instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 import os
 import json
 import secrets

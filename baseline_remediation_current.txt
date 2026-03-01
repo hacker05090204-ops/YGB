@@ -1,0 +1,307 @@
+﻿============================================================
+PATTERN SUMMARY BY CLASSIFICATION
+============================================================
+  fixme                | CI_TOOLING      |     1 hits
+  mock                 | CI_TOOLING      |    93 hits
+  mock                 | COMMENT         |    68 hits
+  mock                 | CONFIG/DOCS     |     1 hits
+  mock                 | PRODUCTION      |    17 hits
+  mock                 | TEST            |   175 hits
+  not_implemented      | CI_TOOLING      |     3 hits
+  not_implemented      | COMMENT         |     5 hits
+  not_implemented      | CONFIG/DOCS     |     1 hits
+  not_implemented      | PRODUCTION      |     7 hits
+  partial              | CI_TOOLING      |     2 hits
+  partial              | COMMENT         |    16 hits
+  partial              | CONFIG/DOCS     |     1 hits
+  partial              | PRODUCTION      |    22 hits
+  partial              | TEST            |    24 hits
+  placeholder          | CI_TOOLING      |    14 hits
+  placeholder          | COMMENT         |    14 hits
+  placeholder          | PRODUCTION      |    51 hits
+  placeholder          | TEST            |    16 hits
+  simulate             | CI_TOOLING      |    63 hits
+  simulate             | COMMENT         |    79 hits
+  simulate             | CONFIG/DOCS     |     4 hits
+  simulate             | PRODUCTION      |    56 hits
+  simulate             | TEST            |   104 hits
+  stimulate            | CI_TOOLING      |     2 hits
+  stub                 | CI_TOOLING      |     9 hits
+  stub                 | COMMENT         |     7 hits
+  stub                 | TEST            |     6 hits
+  synthetic            | CI_TOOLING      |     8 hits
+  synthetic            | COMMENT         |    52 hits
+  synthetic            | CONFIG/DOCS     |     1 hits
+  synthetic            | PRODUCTION      |    19 hits
+  synthetic            | TEST            |    33 hits
+  todo                 | CI_TOOLING      |     1 hits
+
+============================================================
+PRODUCTION-PATH HITS (need remediation)
+============================================================
+
+--- mock (17 production hits) ---
+  api/server.py:1424
+    elif request.mode == "MOCK":
+  api/server.py:1428
+    content={"error": "MOCK mode is disabled. Use READ_ONLY, AUTONOMOUS_FIND, or REAL."}
+  backend/api/runtime_api.py:79
+    "No mock/test fallback permitted."
+  impl_v1/enterprise/process_isolation.py:108
+    self.inference_process.pid = os.getpid() + 1000  # Mock
+  impl_v1/enterprise/process_isolation.py:120
+    self.training_process.pid = os.getpid() + 2000  # Mock
+  impl_v1/phase49/runtime/training_reports.py:236
+    confidence_calibration=0.85,  # Mock calibration
+  impl_v1/training/data/governance_pipeline.py:150
+    return False, f"{scan.violations_found} mock data violations"
+  impl_v1/training/data/governance_pipeline.py:156
+    _check("Mock Data Scanner", _mock_scan)
+  impl_v1/training/safety/dataset_quality_gate.py:106
+    mock = _detect_mock_data(features, labels)
+  impl_v1/training/safety/dataset_quality_gate.py:107
+    if mock:
+  impl_v1/training/safety/dataset_quality_gate.py:108
+    abort = "Mock/synthetic data pattern detected"
+  impl_v1/training/safety/mock_data_scanner.py:40
+    r'np\.random\.randn.*#.*mock',
+  impl_v1/training/safety/mock_data_scanner.py:41
+    r'torch\.randn.*#.*mock',
+  impl_v1/training/safety/schema_validator.py:60
+    "synthetic", "mock", "test_only", "debug_override",
+  native/security/production_build_guard.cpp:49
+    "mock-signature",
+  native/security/update_signature_verifier.cpp:259
+    "mock-signature", "test-signature", "fake-signature", "invalid",
+  native/security/update_signature_verifier.cpp:264
+    std::snprintf(reason, reason_len, "Rejected mock signature: %s",
+
+--- not_implemented (7 production hits) ---
+  api/server.py:761
+    return {"results": [], "query": q, "reason": "Search not implemented in pipeline"}
+  backend/errors.py:36
+    NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
+  backend/errors.py:50
+    ErrorCode.NOT_IMPLEMENTED: 501,
+  impl_v1/training/distributed/cloud_backup.py:159
+    f"{target.service} upload not implemented"
+  impl_v1/training/distributed/cloud_backup.py:163
+    f"BLOCKED ΓÇö upload not implemented"
+  impl_v1/training/voice/stt_adapter.py:142
+    raise NotImplementedError
+  native/report_engine/narrative_builder.cpp:112
+    "The %s parameter at %s does not implement proper input "
+
+--- partial (22 production hits) ---
+  api/server.py:790
+    "status": "READY" if STRICT_REAL_MODE else "PARTIAL",
+  api/server.py:820
+    partial = [f for f in fields.values() if f["status"] == "PARTIAL"]
+  api/server.py:824
+    elif partial:
+  api/server.py:825
+    overall = "PARTIAL"
+  frontend/app/dashboard/page.tsx:288
+    : trainingReadiness.overall === "PARTIAL"
+  frontend/app/dashboard/page.tsx:295
+    : trainingReadiness.overall === "PARTIAL" ? "bg-yellow-400"
+  HUMANOID_HUNTER/executor_response/response_engine.py:26
+    ExecutorResponseType.PARTIAL: 0.50,    # Medium
+  HUMANOID_HUNTER/executor_response/response_engine.py:52
+    if response_type == ExecutorResponseType.PARTIAL:
+  HUMANOID_HUNTER/executor_response/response_engine.py:138
+    ExecutorResponseType.PARTIAL: "Executor reported partial completion - escalating to human",
+  HUMANOID_HUNTER/executor_response/response_types.py:29
+    PARTIAL = auto()
+  HUMANOID_HUNTER/sandbox/sandbox_engine.py:97
+    if fault_type in (ExecutionFaultType.PARTIAL, ExecutionFaultType.INVALID_RESPONSE):
+  HUMANOID_HUNTER/sandbox/sandbox_types.py:18
+    PARTIAL = auto()
+  HUMANOID_HUNTER/sandbox/sandbox_types.py:49
+    ExecutionFaultType.PARTIAL: RetryPolicy.NO_RETRY,
+  impl_v1/phase30/phase30_engine.py:56
+    ExecutorResponseType.PARTIAL: (ResponseDecision.ESCALATE, 0.50),
+  impl_v1/phase30/phase30_engine.py:187
+    ExecutorResponseType.PARTIAL: "Executor returned partial result - requires human review",
+  impl_v1/phase30/phase30_types.py:36
+    PARTIAL = auto()
+  native/confidence_engine/reproducibility_score.cpp:155
+    std::vector<ReproductionAttempt> partial = {
+  native/confidence_engine/reproducibility_score.cpp:161
+    auto r2 = scorer.score(partial);
+  native/research_assistant/source_consensus.py:31
+    LIKELY = "LIKELY"            # 1 trusted source OR 2+ partial matches
+  native/security/deterministic_exploit_engine.cpp:121
+    matches = 2; /* Partial ΓÇö at least 2 match */
+  native/security/deterministic_exploit_engine.cpp:248
+    g_verify.verified = 0; /* Partial ΓÇö not sufficient */
+  native/security/deterministic_exploit_engine.cpp:250
+    "Partial determinism: %d/%d replays, stability=%.2f", matches,
+
+--- placeholder (51 production hits) ---
+  backend/auth/auth_guard.py:201
+    "your-secret", "your_secret", "example", "placeholder",
+  backend/auth/auth_guard.py:220
+    f"{env_name} is missing or is a placeholder. "
+  backend/auth/auth_guard.py:225
+    f"{env_name} contains a placeholder pattern (e.g. 'change-me'). "
+  frontend/app/page.tsx:390
+    placeholder="https://target-domain.com"
+  frontend/app/page.tsx:394
+    className={`relative w-full h-16 px-6 bg-[#0A0A0A] border rounded-2xl text-[#FAFAFA] text-lg placeholder:text-[#404040] 
+  frontend/app/admin/page.tsx:160
+    placeholder="admin@example.com"
+  frontend/app/admin/page.tsx:163
+    className="w-full px-4 py-3 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder:text-white/20 focus
+  frontend/app/admin/page.tsx:180
+    placeholder="000000"
+  frontend/app/admin/page.tsx:184
+    className="w-full px-4 py-3 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder:text-white/20 focus
+  frontend/app/admin/page.tsx:209
+    placeholder="Vault encryption password"
+  frontend/app/admin/page.tsx:211
+    className="w-full px-4 py-3 rounded-lg bg-white/[0.04] border border-white/10 text-white placeholder:text-white/20 focus
+  frontend/app/dashboard/page.tsx:465
+    placeholder="Name"
+  frontend/app/dashboard/page.tsx:468
+    className="px-4 py-2 bg-[#171717] border border-white/[0.1] rounded-lg text-[#FAFAFA] placeholder-[#525252] focus:border
+  frontend/app/dashboard/page.tsx:472
+    placeholder="Email (optional)"
+  frontend/app/dashboard/page.tsx:475
+    className="px-4 py-2 bg-[#171717] border border-white/[0.1] rounded-lg text-[#FAFAFA] placeholder-[#525252] focus:border
+  frontend/app/dashboard/page.tsx:621
+    placeholder="Program Name"
+  frontend/app/dashboard/page.tsx:624
+    className="px-4 py-2 bg-[#171717] border border-white/[0.1] rounded-lg text-[#FAFAFA] placeholder-[#525252] focus:border
+  frontend/app/dashboard/page.tsx:628
+    placeholder="Scope (e.g., *.example.com)"
+  frontend/app/dashboard/page.tsx:631
+    className="px-4 py-2 bg-[#171717] border border-white/[0.1] rounded-lg text-[#FAFAFA] placeholder-[#525252] focus:border
+  frontend/app/dashboard/page.tsx:635
+    placeholder="Link (optional)"
+  frontend/app/dashboard/page.tsx:638
+    className="px-4 py-2 bg-[#171717] border border-white/[0.1] rounded-lg text-[#FAFAFA] placeholder-[#525252] focus:border
+  frontend/app/login/page.tsx:172
+    placeholder="you@example.com"
+  frontend/app/login/page.tsx:173
+    className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 fo
+  frontend/app/login/page.tsx:183
+    placeholder="ΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇóΓÇó"
+  frontend/app/login/page.tsx:184
+    className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 fo
+  frontend/app/runner/page.tsx:272
+    placeholder="https://target-domain.com"
+  frontend/app/runner/page.tsx:276
+    className="flex-1 px-4 py-2 bg-[#0A0A0A] border border-white/[0.1] rounded-lg text-[#FAFAFA] placeholder-[#525252] focus
+  frontend/components/approval-panel.tsx:120
+    placeholder="Rejection reason (optional)"
+  frontend/components/approval-panel.tsx:123
+    className="w-full px-4 py-2 rounded-lg bg-[#171717] border border-[#262626] text-[#FAFAFA] text-sm placeholder:text-[#40
+  frontend/components/chart-area-interactive.tsx:160
+    <SelectValue placeholder="Last 3 months" />
+  ... and 21 more
+
+--- simulate (56 production hits) ---
+  api/server.py:383
+    transition: str  # PLAN, SIMULATE, REQUEST_APPROVAL, HUMAN_APPROVE, HUMAN_DENY, COMPLETE, ABORT
+  api/server.py:1188
+    ("PLANNED", "SIMULATE"): "SIMULATED",
+  api/server.py:1189
+    ("SIMULATED", "REQUEST_APPROVAL"): "AWAIT_HUMAN",
+  api/server.py:1196
+    ("SIMULATED", "ABORT"): "STOPPED",
+  api/server.py:2818
+    await asyncio.sleep(0.3)  # Simulate processing time
+  backend/browser/daily_curriculum.py:314
+    logger.info("TEST MODE ΓÇö simulating feed processing")
+  frontend/components/execution-state.tsx:9
+    | "SIMULATED"
+  frontend/components/execution-state.tsx:24
+    "SIMULATED",
+  frontend/components/execution-state.tsx:33
+    SIMULATED: "Simulated",
+  frontend/components/execution-state.tsx:42
+    SIMULATED: "bg-[#737373]",
+  frontend/components/execution-state.tsx:130
+    {currentState === "SIMULATED" && "Simulation complete, ready for approval"}
+  impl_v1/phase38/browser_engine.py:142
+    simulated_result=False,
+  impl_v1/phase38/browser_engine.py:154
+    simulated_result=False,
+  impl_v1/phase38/browser_engine.py:176
+    simulated_result=executed,
+  impl_v1/phase38/browser_engine.py:185
+    simulated_result=False,
+  impl_v1/phase38/browser_engine.py:196
+    simulated_result=False,
+  impl_v1/phase38/browser_engine.py:207
+    simulated_result=executed,
+  impl_v1/phase38/browser_types.py:158
+    simulated_result: bool  # Would have succeeded (NO ACTUAL EXECUTION)
+  impl_v1/production/workflow/human_workflow_simulation.py:94
+    "Real report data is required ΓÇö no simulated data allowed."
+  impl_v1/production/workflow/human_workflow_simulation.py:115
+    "Real report data is required ΓÇö no simulated data allowed."
+  impl_v1/production/workflow/human_workflow_simulation.py:294
+    def simulate_review(report: BugReport) -> ReviewResult:
+  impl_v1/training/ai_accelerator_integration.py:25
+    SIMULATION_MODE = os.environ.get("YGB_ACCELERATOR_SIMULATION", "true").lower() == "true"
+  impl_v1/training/ai_accelerator_integration.py:43
+    simulation: bool
+  impl_v1/training/ai_accelerator_integration.py:64
+    if SIMULATION_MODE:
+  impl_v1/training/ai_accelerator_integration.py:67
+    logger.info(f"[ACCELERATOR] Simulation connected: {self._session_id}")
+  impl_v1/training/ai_accelerator_integration.py:68
+    return True, f"Simulation connected: {self._session_id}"
+  impl_v1/training/ai_accelerator_integration.py:100
+    simulation=SIMULATION_MODE,
+  impl_v1/training/ai_accelerator_integration.py:111
+    simulation=SIMULATION_MODE,
+  impl_v1/training/ai_accelerator_integration.py:118
+    if SIMULATION_MODE:
+  impl_v1/training/ai_accelerator_integration.py:128
+    simulation=True,
+  ... and 26 more
+
+--- synthetic (19 production hits) ---
+  training_controller.py:243
+    logger.error("  Γ£ù NO SYNTHETIC FALLBACK. Training ABORTED.")
+  frontend/components/bounty-status-panel.tsx:287
+    : dataSource.data_source === 'SYNTHETIC_GENERATOR' ? 'SYNTHETIC (blocked)'
+  frontend/components/bounty-status-panel.tsx:332
+    <span style={{ color: '#6b7280' }}>Synthetic Status</span>
+  impl_v1/training/data/data_source_audit.py:49
+    "scaled_dataset.py",          # Renamed synthetic module (blocked)
+  impl_v1/training/data/data_source_audit.py:213
+    f"{len(report.violations)} synthetic patterns detected:\n"
+  impl_v1/training/data/data_source_audit.py:215
+    f"Remove synthetic data sources before training."
+  impl_v1/training/data/data_source_audit.py:218
+    logger.info("[AUDIT] Γ£ô Pipeline CLEAN ΓÇö no synthetic data detected")
+  impl_v1/training/data/feature_cache.py:309
+    f"[CACHE] FATAL: Real dataset unavailable and synthetic fallback "
+  impl_v1/training/data/real_dataset_loader.py:686
+    f"NO synthetic fallback permitted."
+  impl_v1/training/data/real_dataset_loader.py:691
+    f"Field frozen. No synthetic fallback."
+  impl_v1/training/data/real_dataset_loader.py:779
+    f"No synthetic fallback."
+  impl_v1/training/distributed/semantic_entropy_guard.py:63
+    SYNTHETIC_RATIO_MAX = 0.0           # Zero synthetic-only (strict)
+  impl_v1/training/distributed/semantic_entropy_guard.py:149
+    violation = "Synthetic-only batch rejected (no real data)"
+  impl_v1/training/distributed/semantic_entropy_guard.py:245
+    synthetic_ok=not self._frozen or "SYNTHETIC" not in self._freeze_reason,
+  impl_v1/training/safety/dataset_quality_gate.py:108
+    abort = "Mock/synthetic data pattern detected"
+  impl_v1/training/safety/schema_validator.py:60
+    "synthetic", "mock", "test_only", "debug_override",
+  native/lab_training/lab_scheduler.cpp:137
+    result.scope_mutations_passed = 49; // deterministic synthetic
+  native/security/data_truth_enforcer.cpp:247
+    "Synthetic flag is TRUE ΓÇö training BLOCKED");
+  training/validation/data_audit.py:301
+    f"  Synthetic Ratio:        {a.get('synthetic_ratio', 0):.1%}",
+
+TOTAL PRODUCTION HITS: 172

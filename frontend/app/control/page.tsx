@@ -26,6 +26,7 @@ import { ActiveDevices } from "@/components/active-devices"
 import { SessionHistory } from "@/components/session-history"
 import { LoginAlerts } from "@/components/login-alerts"
 import { StorageMonitor } from "@/components/storage-monitor"
+import { ReportGeneratorSession } from "@/components/report-generator-session"
 import BountyStatusPanel from "@/components/bounty-status-panel"
 import FieldMasteryDashboard from "@/components/field-mastery-dashboard"
 
@@ -123,11 +124,12 @@ export default function ControlPage() {
     const [liveTime, setLiveTime] = useState<number>(Date.now())
     const lastTelemetryTs = useRef<number>(0)
     const [isStalled, setIsStalled] = useState(false)
+    const healthFailureCount = useRef(0)
 
     // Connectivity comes from unprotected health checks, not dashboard creation.
     const checkServerHealth = useCallback(async () => {
         const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort("health_timeout"), 3000)
+        const timeout = setTimeout(() => controller.abort("health_timeout"), 5000)
 
         try {
             const response = await fetch(`${API_BASE}/health`, {
@@ -135,12 +137,23 @@ export default function ControlPage() {
                 cache: "no-store",
                 signal: controller.signal,
             })
-            setIsConnected(response.ok)
+            if (response.ok) {
+                healthFailureCount.current = 0
+                setIsConnected(true)
+            } else {
+                healthFailureCount.current += 1
+                if (healthFailureCount.current >= 2) {
+                    setIsConnected(false)
+                }
+            }
         } catch (error) {
             if (!isAbortError(error)) {
                 console.warn("Health check failed:", error)
             }
-            setIsConnected(false)
+            healthFailureCount.current += 1
+            if (healthFailureCount.current >= 2) {
+                setIsConnected(false)
+            }
         } finally {
             clearTimeout(timeout)
         }
@@ -184,6 +197,15 @@ export default function ControlPage() {
     useEffect(() => {
         initDashboard()
     }, [initDashboard])
+
+    // Recover from transient startup/API blips automatically once backend is healthy.
+    useEffect(() => {
+        if (!isConnected) return
+        if (dashboardId === "AUTH_REQUIRED") return
+        if (!dashboardId || dashboardId === "UNAVAILABLE") {
+            initDashboard()
+        }
+    }, [isConnected, dashboardId, initDashboard])
 
     useEffect(() => {
         checkServerHealth()
@@ -1101,6 +1123,7 @@ export default function ControlPage() {
                                 </div>
                                 <ActiveDevices refreshInterval={5000} />
                                 <SessionHistory refreshInterval={5000} />
+                                <ReportGeneratorSession refreshInterval={8000} />
                                 <LoginAlerts refreshInterval={5000} />
 
                                 <BrowserAssistant

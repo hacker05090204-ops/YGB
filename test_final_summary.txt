@@ -1,0 +1,2739 @@
+﻿
+============================= 
+test session starts 
+=============================
+backend/tests/test_approval_ledger
+.py::TestTokenSigning::test_sign_r
+eturns_token PASSED [  0%]
+backend/tests/test_approval_ledger
+.py::TestTokenSigning::test_sign_r
+equires_approver_id PASSED [  0%]
+backend/tests/test_approval_ledger
+.py::TestTokenSigning::test_sign_r
+equires_reason PASSED [  0%]
+backend/tests/test_approval_ledger
+.py::TestTokenSigning::test_token_
+not_boolean PASSED [  0%]
+backend/tests/test_approval_ledger
+.py::TestTokenVerification::test_v
+alid_token_verifies PASSED [  0%]
+backend/tests/test_approval_ledger
+.py::TestTokenVerification::test_t
+ampered_signature_fails PASSED [  
+0%]
+backend/tests/test_approval_ledger
+.py::TestTokenVerification::test_t
+ampered_field_id_fails PASSED [  
+0%]
+backend/tests/test_approval_ledger
+.py::TestAppendOnlyChain::test_gen
+esis_hash PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestAppendOnlyChain::test_sin
+gle_append PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestAppendOnlyChain::test_cha
+in_links PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestAppendOnlyChain::test_ver
+ify_chain_valid PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestAppendOnlyChain::test_ver
+ify_chain_tampered PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestFieldLookup::test_no_appr
+oval PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestFieldLookup::test_has_app
+roval_after_append PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestFieldLookup::test_get_app
+roval_returns_entry PASSED [  1%]
+backend/tests/test_approval_ledger
+.py::TestLedgerPersistence::test_s
+ave_and_reload PASSED [  2%]
+backend/tests/test_auth_guard_role
+_hydration.py::test_require_auth_h
+ydrates_role_from_storage PASSED 
+[  2%]
+backend/tests/test_auth_guard_role
+_hydration.py::test_require_auth_s
+till_succeeds_when_role_lookup_fai
+ls PASSED [  2%]
+backend/tests/test_auth_guard_role
+_hydration.py::test_require_admin_
+blocks_non_admin PASSED [  2%]
+backend/tests/test_auth_security.p
+y::TestPasswordHashing::test_hash_
+produces_salt PASSED [  2%]
+backend/tests/test_auth_security.p
+y::TestPasswordHashing::test_same_
+password_different_hash PASSED [  
+2%]
+backend/tests/test_auth_security.p
+y::TestPasswordHashing::test_verif
+y_correct_password PASSED [  2%]
+backend/tests/test_auth_security.p
+y::TestPasswordHashing::test_verif
+y_wrong_password PASSED [  2%]
+backend/tests/test_auth_security.p
+y::TestPasswordHashing::test_verif
+y_empty_hash PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestJWT::test_generate_and_veri
+fy PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestJWT::test_invalid_token_ret
+urns_none PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestJWT::test_empty_token_retur
+ns_none PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestRateLimiting::test_allows_u
+nder_limit PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestRateLimiting::test_blocks_a
+t_limit PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestRateLimiting::test_differen
+t_ips_independent PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestRateLimiting::test_reset_cl
+ears_limit PASSED [  3%]
+backend/tests/test_auth_security.p
+y::TestRateLimiting::test_remainin
+g_count PASSED [  4%]
+backend/tests/test_auth_security.p
+y::TestCSRF::test_generate_returns
+_string PASSED [  4%]
+backend/tests/test_auth_security.p
+y::TestCSRF::test_verify_correct_t
+oken PASSED [  4%]
+backend/tests/test_auth_security.p
+y::TestCSRF::test_verify_wrong_tok
+en PASSED [  4%]
+backend/tests/test_auth_security.p
+y::TestNoHardcodedCredentials::tes
+t_no_hardcoded_passwords PASSED [ 
+ 4%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_auto_submit PASSED [  4%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_authority_unlock PASSED [  4%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_company_targeting PASSED [  
+5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_mid_training_merge PASSED [  
+5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_voice_hunt_trigger PASSED [  
+5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_voice_submit PASSED [  5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_auto_negotiate PASSED [  5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_skip_certification PASSED [  
+5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_cross_field_data PASSED [  5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_time_forced_completion PASSED 
+[  5%]
+backend/tests/test_authority_lock_
+guards.py::TestIndividualGuards::t
+est_parallel_field_training 
+PASSED [  6%]
+backend/tests/test_authority_lock_
+guards.py::TestBulkVerification::t
+est_verify_all_locked PASSED [  
+6%]
+backend/tests/test_authority_lock_
+guards.py::TestBulkVerification::t
+est_total_lock_count PASSED [  6%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[auto_submit] 
+PASSED [  6%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[unlock_authority]
+ PASSED [  6%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[target_company] 
+PASSED [  6%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[merge_mid_trainin
+g] PASSED [  6%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[voice_hunt] 
+PASSED [  6%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[voice_submit] 
+PASSED [  7%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[auto_negotiate] 
+PASSED [  7%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[skip_cert] 
+PASSED [  7%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[cross_field] 
+PASSED [  7%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[force_time] 
+PASSED [  7%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_blocked_action[parallel_train] 
+PASSED [  7%]
+backend/tests/test_authority_lock_
+guards.py::TestActionBlocking::tes
+t_unrestricted_action_allowed 
+PASSED [  7%]
+backend/tests/test_authority_lock_
+guards.py::TestImmutability::test_
+class_attributes_are_bool PASSED 
+[  7%]
+backend/tests/test_authority_lock_
+guards.py::TestImmutability::test_
+no_setter_bypass PASSED [  8%]
+backend/tests/test_auto_mode.py::T
+estAutoModeShadowOnly::test_shadow
+_only_default PASSED [  8%]
+backend/tests/test_auto_mode.py::T
+estAutoModeShadowOnly::test_shadow
+_only_after_activation PASSED [  
+8%]
+backend/tests/test_auto_mode.py::T
+estAutoModeShadowOnly::test_cannot
+_disable_shadow PASSED [  8%]
+backend/tests/test_auto_mode.py::T
+estAutoModeShadowOnly::test_cannot
+_auto_export PASSED [  8%]
+backend/tests/test_auto_mode.py::T
+estAutoModeShadowOnly::test_cannot
+_auto_submit PASSED [  8%]
+backend/tests/test_auto_mode.py::T
+estConditionEvaluation::test_all_c
+onditions_met PASSED [  8%]
+backend/tests/test_auto_mode.py::T
+estConditionEvaluation::test_integ
+rity_below_95_blocks PASSED [  9%]
+backend/tests/test_auto_mode.py::T
+estConditionEvaluation::test_conta
+inment_blocks PASSED [  9%]
+backend/tests/test_auto_mode.py::T
+estConditionEvaluation::test_drift
+_unstable_blocks PASSED [  9%]
+backend/tests/test_auto_mode.py::T
+estConditionEvaluation::test_multi
+ple_blocks PASSED [  9%]
+backend/tests/test_auto_mode.py::T
+estActivation::test_activation_wit
+h_all_conditions PASSED [  9%]
+backend/tests/test_auto_mode.py::T
+estActivation::test_activation_blo
+cked_without_conditions PASSED [  
+9%]
+backend/tests/test_auto_mode.py::T
+estActivation::test_deactivation 
+PASSED [  9%]
+backend/tests/test_auto_mode.py::T
+estActivation::test_activation_log
+_populated PASSED [  9%]
+backend/tests/test_auto_mode.py::T
+estExportApproval::test_export_blo
+cked_without_approval PASSED [ 
+10%]
+backend/tests/test_auto_mode.py::T
+estExportApproval::test_export_all
+owed_with_approval PASSED [ 10%]
+backend/tests/test_auto_mode.py::T
+estExportApproval::test_export_req
+uires_approval_always PASSED [ 
+10%]
+backend/tests/test_auto_rehash.py:
+:TestAutoRehash::test_current_veri
+fy_does_not_downgrade PASSED [ 
+10%]
+backend/tests/test_auto_rehash.py:
+:TestAutoRehash::test_legacy_hash_
+gets_upgraded PASSED [ 10%]
+backend/tests/test_auto_rehash.py:
+:TestAutoRehash::test_rehash_integ
+ration_with_login_flow PASSED [ 
+10%]
+backend/tests/test_auto_rehash.py:
+:TestAutoRehash::test_v2_hash_need
+s_rehash PASSED [ 10%]
+backend/tests/test_auto_rehash.py:
+:TestAutoRehash::test_wrong_passwo
+rd_never_rehashes PASSED [ 10%]
+backend/tests/test_bridge_persiste
+nce.py::TestBridgeStatePersistence
+::test_cross_process_persistence 
+PASSED [ 11%]
+backend/tests/test_bridge_persiste
+nce.py::TestBridgeStatePersistence
+::test_fresh_state_is_zero PASSED 
+[ 11%]
+backend/tests/test_bridge_persiste
+nce.py::TestBridgeStatePersistence
+::test_persistence_file_written 
+PASSED [ 11%]
+backend/tests/test_bridge_persiste
+nce.py::TestBridgeStatePersistence
+::test_record_ingest_batch_increme
+nts PASSED [ 11%]
+backend/tests/test_bridge_persiste
+nce.py::TestBridgeStatePersistence
+::test_sample_store_write_and_read
+ PASSED [ 11%]
+backend/tests/test_bridge_persiste
+nce.py::TestReadinessTruth::test_z
+ero_counters_is_no_go PASSED [ 
+11%]
+backend/tests/test_bridge_persiste
+nce.py::TestReadinessTruth::test_a
+bove_threshold_is_go PASSED [ 11%]
+backend/tests/test_bridge_persiste
+nce.py::TestReadinessTruth::test_b
+elow_threshold_is_no_go PASSED [ 
+11%]
+backend/tests/test_bridge_persiste
+nce.py::TestMismatchDetection::tes
+t_manifest_says_go_bridge_says_zer
+o PASSED [ 12%]
+backend/tests/test_bridge_persiste
+nce.py::TestMismatchDetection::tes
+t_matching_counts_is_consistent 
+PASSED [ 12%]
+backend/tests/test_bridge_persiste
+nce.py::TestMismatchDetection::tes
+t_no_manifest_is_inconsistent 
+PASSED [ 12%]
+backend/tests/test_clock_skew.py::
+TestClockSkewSimulated::test_large
+_skew_blocks PASSED [ 12%]
+backend/tests/test_clock_skew.py::
+TestClockSkewSimulated::test_negat
+ive_skew_handled PASSED [ 12%]
+backend/tests/test_clock_skew.py::
+TestClockSkewSimulated::test_skew_
+exactly_5s_passes PASSED [ 12%]
+backend/tests/test_clock_skew.py::
+TestClockSkewSimulated::test_skew_
+exceeds_tolerance_blocks PASSED [ 
+12%]
+backend/tests/test_clock_skew.py::
+TestClockSkewSimulated::test_skew_
+within_tolerance_passes PASSED [ 
+12%]
+backend/tests/test_clock_skew.py::
+TestClockSkewSimulated::test_zero_
+skew_passes PASSED [ 13%]
+backend/tests/test_clock_skew.py::
+TestCertificationBlocking::test_ce
+rtification_blocked_on_skew 
+PASSED [ 13%]
+backend/tests/test_clock_skew.py::
+TestCertificationBlocking::test_no
+_certification_without_ntp PASSED 
+[ 13%]
+backend/tests/test_clock_skew.py::
+TestClockGuardHistory::test_empty_
+history_returns_none PASSED [ 13%]
+backend/tests/test_clock_skew.py::
+TestClockGuardHistory::test_histor
+y_accumulates PASSED [ 13%]
+backend/tests/test_clock_skew.py::
+TestClockGuardHistory::test_last_r
+esult_available PASSED [ 13%]
+backend/tests/test_clock_skew.py::
+TestClockGuardHistory::test_result
+_to_dict PASSED [ 13%]
+backend/tests/test_clock_skew.py::
+TestCustomThresholds::test_loose_t
+hreshold_30s PASSED [ 14%]
+backend/tests/test_clock_skew.py::
+TestCustomThresholds::test_tight_t
+hreshold_1s PASSED [ 14%]
+backend/tests/test_coverage_boost.
+py::TestPasswordHashing::test_hash
+_and_verify PASSED [ 14%]
+backend/tests/test_coverage_boost.
+py::TestPasswordHashing::test_hash
+_contains_salt PASSED [ 14%]
+backend/tests/test_coverage_boost.
+py::TestPasswordHashing::test_veri
+fy_legacy_v1_hash PASSED [ 14%]
+backend/tests/test_coverage_boost.
+py::TestPasswordHashing::test_wron
+g_password_fails PASSED [ 14%]
+backend/tests/test_coverage_boost.
+py::TestJWT::test_generate_simple_
+token PASSED [ 14%]
+backend/tests/test_coverage_boost.
+py::TestJWT::test_verify_expired_t
+oken PASSED [ 14%]
+backend/tests/test_coverage_boost.
+py::TestJWT::test_verify_invalid_t
+oken_format PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestJWT::test_verify_non_numer
+ic_expiry PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestJWT::test_verify_simple_to
+ken PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestJWT::test_verify_tampered_
+signature PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestRateLimiter::test_get_rate
+_limiter_singleton PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestRateLimiter::test_limited_
+after_max_attempts PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestRateLimiter::test_not_limi
+ted_initially PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestRateLimiter::test_remainin
+g_count PASSED [ 15%]
+backend/tests/test_coverage_boost.
+py::TestRateLimiter::test_reset_cl
+ears_limit PASSED [ 16%]
+backend/tests/test_coverage_boost.
+py::TestCSRFAndDevice::test_csrf_t
+oken_generation PASSED [ 16%]
+backend/tests/test_coverage_boost.
+py::TestCSRFAndDevice::test_csrf_v
+erification PASSED [ 16%]
+backend/tests/test_coverage_boost.
+py::TestCSRFAndDevice::test_device
+_hash PASSED [ 16%]
+backend/tests/test_coverage_boost.
+py::TestCSRFAndDevice::test_device
+_hash_deterministic PASSED [ 16%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_a
+udit_entry_has_hash PASSED [ 16%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_a
+udit_log_tracking PASSED [ 16%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_b
+lock_authority_unlock PASSED [ 
+16%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_b
+lock_submission PASSED [ 17%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_c
+onstants_immutable PASSED [ 17%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_l
+og_evidence PASSED [ 17%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_l
+og_hunt_step PASSED [ 17%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_l
+og_voice_command PASSED [ 17%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_v
+alidate_hunt_start_no_scope 
+PASSED [ 17%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_v
+alidate_hunt_start_not_approved 
+PASSED [ 17%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_v
+alidate_hunt_start_ok PASSED [ 
+18%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_v
+alidate_report_export_approved 
+PASSED [ 18%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_v
+alidate_report_export_denied 
+PASSED [ 18%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_v
+alidate_target_approved PASSED [ 
+18%]
+backend/tests/test_coverage_boost.
+py::TestAutomationEnforcer::test_v
+alidate_target_not_approved 
+PASSED [ 18%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+approve_field_invalid_id PASSED [ 
+18%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+approve_field_missing_approver 
+PASSED [ 18%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+approve_field_too_high_id PASSED 
+[ 18%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+approve_field_valid PASSED [ 19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+build_runtime_status_keys PASSED 
+[ 19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+calculate_progress_returns_dict 
+PASSED [ 19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+default_state_structure PASSED [ 
+19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+get_active_progress PASSED [ 19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+get_active_progress_all_complete 
+PASSED [ 19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+get_fields_state_has_runtime 
+PASSED [ 19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+start_hunt_blocked_no_certificatio
+n PASSED [ 19%]
+backend/tests/test_coverage_boost.
+py::TestFieldProgressionAPI::test_
+start_training PASSED [ 20%]
+backend/tests/test_coverage_boost.
+py::TestClockGuardNTPFailure::test
+_query_ntp_invalid_host PASSED [ 
+20%]
+backend/tests/test_coverage_boost.
+py::TestClockGuardNTPFailure::test
+_unreachable_ntp_blocks PASSED [ 
+20%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_a
+ctivation_log PASSED [ 20%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_c
+annot_bypass_integrity PASSED [ 
+20%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_c
+annot_disable_shadow PASSED [ 20%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_d
+eactivate PASSED [ 20%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_e
+valuate_conditions_all_pass 
+PASSED [ 20%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_e
+valuate_conditions_some_fail 
+PASSED [ 21%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_e
+xport_approval_denied PASSED [ 
+21%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_e
+xport_approval_granted PASSED [ 
+21%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_i
+mport_and_state PASSED [ 21%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_i
+s_shadow_only_always_true PASSED 
+[ 21%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_n
+o_auto_export_constant PASSED [ 
+21%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_n
+o_auto_submit_constant PASSED [ 
+21%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_r
+equest_activation_blocked_conditio
+ns PASSED [ 22%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_r
+equest_activation_blocked_no_eval 
+PASSED [ 22%]
+backend/tests/test_coverage_boost.
+py::TestAutoModeController::test_r
+equest_activation_success PASSED 
+[ 22%]
+backend/tests/test_coverage_boost_
+2.py::TestAutoModeConditionDetails
+::test_blocked_reasons_all_false 
+PASSED [ 22%]
+backend/tests/test_coverage_boost_
+2.py::TestAutoModeConditionDetails
+::test_blocked_reasons_partial 
+PASSED [ 22%]
+backend/tests/test_coverage_boost_
+2.py::TestAutoModeConditionDetails
+::test_can_activate_no_conditions 
+PASSED [ 22%]
+backend/tests/test_coverage_boost_
+2.py::TestAutoModeConditionDetails
+::test_can_activate_with_condition
+s_met PASSED [ 22%]
+backend/tests/test_coverage_boost_
+2.py::TestAutoModeConditionDetails
+::test_can_activate_with_condition
+s_not_met PASSED [ 22%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_compute_score_critical PASSED 
+[ 23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_compute_score_healthy PASSED [ 
+23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_compute_score_intermediate_gpu 
+PASSED [ 23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_compute_score_low_hdd PASSED [ 
+23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_compute_score_mid_io PASSED [ 
+23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_compute_score_mid_memory 
+PASSED [ 23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_disk_probe PASSED [ 23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_get_alerts_all PASSED [ 23%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_get_alerts_empty PASSED [ 24%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_gpu_probe_no_nvidia PASSED [ 
+24%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_io_latency PASSED [ 24%]
+backend/tests/test_coverage_boost_
+2.py::TestResourceMonitorEdges::te
+st_memory_probe PASSED [ 24%]
+backend/tests/test_coverage_boost_
+2.py::TestMLIntegrityScorerPenalti
+es::test_all_healthy PASSED [ 24%]
+backend/tests/test_coverage_boost_
+2.py::TestMLIntegrityScorerPenalti
+es::test_drift_penalty PASSED [ 
+24%]
+backend/tests/test_coverage_boost_
+2.py::TestMLIntegrityScorerPenalti
+es::test_entropy_penalty PASSED [ 
+24%]
+backend/tests/test_coverage_boost_
+2.py::TestMLIntegrityScorerPenalti
+es::test_inflation_penalty PASSED 
+[ 24%]
+backend/tests/test_coverage_boost_
+2.py::TestMLIntegrityScorerPenalti
+es::test_model_age_penalty PASSED 
+[ 25%]
+backend/tests/test_coverage_boost_
+2.py::TestStorageScoreAndAutonomy:
+:test_get_integrity_supervisor_sin
+gleton PASSED [ 25%]
+backend/tests/test_coverage_boost_
+2.py::TestStorageScoreAndAutonomy:
+:test_has_containment_24h_none 
+PASSED [ 25%]
+backend/tests/test_coverage_boost_
+2.py::TestStorageScoreAndAutonomy:
+:test_has_containment_24h_old 
+PASSED [ 25%]
+backend/tests/test_coverage_boost_
+2.py::TestStorageScoreAndAutonomy:
+:test_has_containment_24h_recent 
+PASSED [ 25%]
+backend/tests/test_coverage_boost_
+2.py::TestStorageScoreAndAutonomy:
+:test_storage_score_critical 
+PASSED [ 25%]
+backend/tests/test_coverage_boost_
+2.py::TestStorageScoreAndAutonomy:
+:test_storage_score_healthy 
+PASSED [ 25%]
+backend/tests/test_coverage_boost_
+2.py::TestStorageScoreAndAutonomy:
+:test_storage_score_low PASSED [ 
+25%]
+backend/tests/test_coverage_boost_
+2.py::TestClockGuardExtras::test_c
+ertification_allowed_simulated 
+PASSED [ 26%]
+backend/tests/test_coverage_boost_
+2.py::TestClockGuardExtras::test_h
+istory_grows PASSED [ 26%]
+backend/tests/test_coverage_boost_
+2.py::TestFieldProgressionAdvanced
+::test_load_field_state PASSED [ 
+26%]
+backend/tests/test_coverage_boost_
+2.py::TestFieldProgressionAdvanced
+::test_register_routes_no_flask 
+PASSED [ 26%]
+backend/tests/test_coverage_boost_
+2.py::TestFieldProgressionAdvanced
+::test_save_and_load_state PASSED 
+[ 26%]
+backend/tests/test_coverage_boost_
+2.py::TestFieldProgressionAdvanced
+::test_start_hunt_all_gates 
+PASSED [ 26%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalTokenFromDict::t
+est_from_dict PASSED [ 26%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerEdgePaths:
+:test_get_signing_key_missing 
+PASSED [ 27%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerEdgePaths:
+:test_load_existing_file PASSED [ 
+27%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerEdgePaths:
+:test_load_nonexistent_path 
+PASSED [ 27%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerEdgePaths:
+:test_validate_expired_token 
+PASSED [ 27%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerEdgePaths:
+:test_validate_reused_signature 
+PASSED [ 27%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerEdgePaths:
+:test_verify_chain_tampered 
+PASSED [ 27%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerKeyDir::te
+st_key_loading_fallback_env 
+PASSED [ 27%]
+backend/tests/test_coverage_boost_
+3.py::TestApprovalLedgerKeyDir::te
+st_key_loading_with_key_dir 
+PASSED [ 27%]
+backend/tests/test_coverage_boost_
+3.py::TestDatasetWatchdogBatch::te
+st_imbalance_ratio_single_class 
+PASSED [ 28%]
+backend/tests/test_coverage_boost_
+3.py::TestDatasetWatchdogBatch::te
+st_record_batch PASSED [ 28%]
+backend/tests/test_coverage_boost_
+3.py::TestGovernanceReaderError::t
+est_compute_score_no_data PASSED 
+[ 28%]
+backend/tests/test_coverage_boost_
+3.py::TestGovernanceReaderError::t
+est_read_nonexistent_state PASSED 
+[ 28%]
+backend/tests/test_coverage_boost_
+3.py::TestAutonomyStorageWarning::
+test_storage_warning_blocks_shadow
+ PASSED [ 28%]
+backend/tests/test_coverage_boost_
+3.py::TestScoreToStatus::test_gree
+n PASSED [ 28%]
+backend/tests/test_coverage_boost_
+3.py::TestScoreToStatus::test_red 
+PASSED [ 28%]
+backend/tests/test_coverage_boost_
+3.py::TestScoreToStatus::test_yell
+ow PASSED [ 28%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_source_ini
+tialization PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_ingest_new
+_record PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_ingest_exa
+ct_duplicate PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_ingest_mer
+ge_update PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_determinis
+tic_content_hash PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_circuit_br
+eaker_transitions PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_provenance
+_fields PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_slo_counte
+rs PASSED [ 29%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_source_sta
+tus_transitions PASSED [ 30%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_no_delta_r
+eporting PASSED [ 30%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_get_pipeli
+ne_status PASSED [ 30%]
+backend/tests/test_cve_pipeline.py
+::TestCVEPipeline::test_merge_conf
+lict_logging PASSED [ 30%]
+backend/tests/test_cve_pipeline.py
+::TestPromotionPolicy::test_canoni
+cal_source_promoted PASSED [ 30%]
+backend/tests/test_cve_pipeline.py
+::TestPromotionPolicy::test_corrob
+orated_two_sources PASSED [ 30%]
+backend/tests/test_cve_pipeline.py
+::TestPromotionPolicy::test_single
+_source_research_pending PASSED [ 
+30%]
+backend/tests/test_cve_pipeline.py
+::TestPromotionPolicy::test_headle
+ss_only_blocked PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestPromotionPolicy::test_frozen
+_cve_blocked PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestPromotionPolicy::test_unveri
+fiable_claim_rate PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestPromotionPolicy::test_audit_
+log PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestDedupDrift::test_exact_dedup
+ PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestDedupDrift::test_simhash_nea
+r_dup PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestDedupDrift::test_schema_drif
+t_detection PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestDedupDrift::test_distributio
+n_drift PASSED [ 31%]
+backend/tests/test_cve_pipeline.py
+::TestDedupDrift::test_weak_source
+_ratio PASSED [ 32%]
+backend/tests/test_cve_pipeline.py
+::TestDedupDrift::test_freeze_on_c
+ritical PASSED [ 32%]
+backend/tests/test_cve_pipeline.py
+::TestAntiHallucination::test_vali
+d_provenance PASSED [ 32%]
+backend/tests/test_cve_pipeline.py
+::TestAntiHallucination::test_miss
+ing_provenance_fields PASSED [ 
+32%]
+backend/tests/test_cve_pipeline.py
+::TestAntiHallucination::test_unve
+rifiable_rate_zero PASSED [ 32%]
+backend/tests/test_cve_pipeline.py
+::TestAntiHallucination::test_prod
+uction_ready PASSED [ 32%]
+backend/tests/test_cve_pipeline.py
+::TestHeadlessResearch::test_allow
+ed_domains PASSED [ 32%]
+backend/tests/test_cve_pipeline.py
+::TestHeadlessResearch::test_cve_i
+d_extraction PASSED [ 32%]
+backend/tests/test_cve_pipeline.py
+::TestHeadlessResearch::test_high_
+confidence_extraction PASSED [ 
+33%]
+backend/tests/test_cve_pipeline.py
+::TestHeadlessResearch::test_low_c
+onfidence_quarantine PASSED [ 33%]
+backend/tests/test_cve_pipeline.py
+::TestHeadlessResearch::test_schem
+a_fail PASSED [ 33%]
+backend/tests/test_cve_pipeline.py
+::TestScheduler::test_scheduler_si
+ngleton PASSED [ 33%]
+backend/tests/test_cve_pipeline.py
+::TestScheduler::test_scheduler_he
+alth PASSED [ 33%]
+backend/tests/test_cve_pipeline.py
+::TestScheduler::test_scheduler_no
+t_running_initially PASSED [ 33%]
+backend/tests/test_database_persis
+tence.py::test_database_creates_fi
+le SKIPPED [ 33%]
+backend/tests/test_database_persis
+tence.py::test_create_and_get_user
+ SKIPPED [ 33%]
+backend/tests/test_database_persis
+tence.py::test_data_persists_after
+_reconnect SKIPPED [ 34%]
+backend/tests/test_database_persis
+tence.py::test_create_target 
+SKIPPED   [ 34%]
+backend/tests/test_database_persis
+tence.py::test_create_bounty 
+SKIPPED   [ 34%]
+backend/tests/test_database_persis
+tence.py::test_session_crud 
+SKIPPED    [ 34%]
+backend/tests/test_database_persis
+tence.py::test_device_registration
+ SKIPPED [ 34%]
+backend/tests/test_database_persis
+tence.py::test_audit_log SKIPPED 
+(...) [ 34%]
+backend/tests/test_database_persis
+tence.py::test_admin_stats 
+SKIPPED     [ 34%]
+backend/tests/test_database_persis
+tence.py::test_no_in_memory_only_s
+torage SKIPPED [ 35%]
+backend/tests/test_device_tracking
+.py::TestDeviceHash::test_consiste
+nt_hash PASSED [ 35%]
+backend/tests/test_device_tracking
+.py::TestDeviceHash::test_differen
+t_ua_different_hash PASSED [ 35%]
+backend/tests/test_device_tracking
+.py::TestDeviceHash::test_hash_is_
+16_chars PASSED [ 35%]
+backend/tests/test_device_tracking
+.py::TestDeviceHash::test_unknown_
+user_agent PASSED [ 35%]
+backend/tests/test_device_tracking
+.py::TestDeviceHash::test_no_mock_
+in_hash PASSED [ 35%]
+backend/tests/test_email_alerts.py
+::TestEmailAlertComposition::test_
+new_login_alert_contains_user_info
+ PASSED [ 35%]
+backend/tests/test_email_alerts.py
+::TestEmailAlertComposition::test_
+new_device_alert_contains_device_h
+ash PASSED [ 35%]
+backend/tests/test_email_alerts.py
+::TestEmailAlertComposition::test_
+multiple_devices_alert PASSED [ 
+36%]
+backend/tests/test_email_alerts.py
+::TestEmailAlertComposition::test_
+suspicious_activity_alert PASSED 
+[ 36%]
+backend/tests/test_email_alerts.py
+::TestSMTPFallback::test_not_confi
+gured_returns_false PASSED [ 36%]
+backend/tests/test_email_alerts.py
+::TestSMTPFallback::test_no_mock_e
+mails_sent PASSED [ 36%]
+backend/tests/test_email_alerts.py
+::TestRateLimitAlert::test_rate_li
+mit_alert PASSED [ 36%]
+backend/tests/test_error_taxonomy.
+py::TestErrorCodes::test_all_codes
+_have_status_mapping PASSED [ 36%]
+backend/tests/test_error_taxonomy.
+py::TestErrorCodes::test_status_co
+des_are_valid_http PASSED [ 36%]
+backend/tests/test_error_taxonomy.
+py::TestApiError::test_custom_stat
+us_code PASSED [ 36%]
+backend/tests/test_error_taxonomy.
+py::TestApiError::test_error_forma
+t PASSED [ 37%]
+backend/tests/test_error_taxonomy.
+py::TestApiError::test_extra_field
+s PASSED [ 37%]
+backend/tests/test_error_taxonomy.
+py::TestApiError::test_includes_co
+rrelation_id PASSED [ 37%]
+backend/tests/test_error_taxonomy.
+py::TestApiError::test_no_internal
+_details_exposed PASSED [ 37%]
+backend/tests/test_error_taxonomy.
+py::TestApiError::test_returns_htt
+p_exception PASSED [ 37%]
+backend/tests/test_error_taxonomy.
+py::TestInternalError::test_does_n
+ot_leak_exception_details PASSED 
+[ 37%]
+backend/tests/test_error_taxonomy.
+py::TestInternalError::test_wraps_
+exception PASSED [ 37%]
+backend/tests/test_error_taxonomy.
+py::TestLogInternalError::test_ret
+urns_correlation_id PASSED [ 37%]
+backend/tests/test_error_taxonomy.
+py::TestNoMockPatterns::test_no_fo
+rbidden_patterns PASSED [ 38%]
+backend/tests/test_field_lifecycle
+.py::TestLifecycleStates::test_tot
+al_states PASSED [ 38%]
+backend/tests/test_field_lifecycle
+.py::TestLifecycleStates::test_sta
+te_order PASSED [ 38%]
+backend/tests/test_field_lifecycle
+.py::TestLifecycleStates::test_cer
+tification_pending_exists PASSED 
+[ 38%]
+backend/tests/test_field_lifecycle
+.py::TestLifecycleStates::test_no_
+duplicate_states PASSED [ 38%]
+backend/tests/test_field_lifecycle
+.py::TestFieldLadder::test_total_f
+ields PASSED [ 38%]
+backend/tests/test_field_lifecycle
+.py::TestFieldLadder::test_field_n
+ames_count PASSED [ 38%]
+backend/tests/test_field_lifecycle
+.py::TestFieldLadder::test_master_
+fields PASSED [ 38%]
+backend/tests/test_field_lifecycle
+.py::TestFieldLadder::test_master_
+tier PASSED [ 39%]
+backend/tests/test_field_lifecycle
+.py::TestFieldLadder::test_extende
+d_fields_tier PASSED [ 39%]
+backend/tests/test_field_lifecycle
+.py::TestDefaultState::test_defaul
+t_active_field PASSED [ 39%]
+backend/tests/test_field_lifecycle
+.py::TestDefaultState::test_first_
+field_training PASSED [ 39%]
+backend/tests/test_field_lifecycle
+.py::TestDefaultState::test_all_ot
+her_fields_locked PASSED [ 39%]
+backend/tests/test_field_lifecycle
+.py::TestDefaultState::test_no_moc
+k_data_in_metrics PASSED [ 39%]
+backend/tests/test_field_lifecycle
+.py::TestDefaultState::test_zero_s
+tability PASSED [ 39%]
+backend/tests/test_field_lifecycle
+.py::TestDefaultState::test_determ
+inistic PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_client_s
+ide_precision PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_client_s
+ide_fpr PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_client_s
+ide_dup PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_client_s
+ide_ece PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_client_s
+ide_stability PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_api_prec
+ision PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_api_fpr 
+PASSED [ 40%]
+backend/tests/test_field_lifecycle
+.py::TestThresholds::test_api_stab
+ility PASSED [ 41%]
+backend/tests/test_field_lifecycle
+.py::TestProgressCalculator::test_
+no_data_zero_percent PASSED [ 41%]
+backend/tests/test_field_lifecycle
+.py::TestProgressCalculator::test_
+partial_data_still_works PASSED [ 
+41%]
+backend/tests/test_field_lifecycle
+.py::TestProgressCalculator::test_
+perfect_scores PASSED [ 41%]
+backend/tests/test_field_lifecycle
+.py::TestProgressCalculator::test_
+awaiting_data_status PASSED [ 41%]
+backend/tests/test_field_lifecycle
+.py::TestProgressCalculator::test_
+weights_sum_to_one PASSED [ 41%]
+backend/tests/test_field_lifecycle
+.py::TestPersistence::test_save_an
+d_load PASSED [ 41%]
+backend/tests/test_field_lifecycle
+.py::TestPersistence::test_missing
+_file_returns_default PASSED [ 
+41%]
+backend/tests/test_field_lifecycle
+.py::TestTrainingStart::test_train
+ing_requires_authority_locks 
+PASSED [ 42%]
+backend/tests/test_field_lifecycle
+.py::TestTrainingStart::test_train
+ing_returns_field_info PASSED [ 
+42%]
+backend/tests/test_governance_guar
+ds.py::TestAutoSubmissionBlocking:
+:test_block_submission_hackerone 
+PASSED [ 42%]
+backend/tests/test_governance_guar
+ds.py::TestAutoSubmissionBlocking:
+:test_block_submission_bugcrowd 
+PASSED [ 42%]
+backend/tests/test_governance_guar
+ds.py::TestAutoSubmissionBlocking:
+:test_block_submission_unknown_pla
+tform PASSED [ 42%]
+backend/tests/test_governance_guar
+ds.py::TestAutoSubmissionBlocking:
+:test_block_submission_empty_platf
+orm PASSED [ 42%]
+backend/tests/test_governance_guar
+ds.py::TestAuthorityUnlockBlocking
+::test_block_severity_unlock 
+PASSED [ 42%]
+backend/tests/test_governance_guar
+ds.py::TestAuthorityUnlockBlocking
+::test_block_exploit_unlock 
+PASSED [ 42%]
+backend/tests/test_governance_guar
+ds.py::TestAuthorityUnlockBlocking
+::test_block_governance_unlock 
+PASSED [ 43%]
+backend/tests/test_governance_guar
+ds.py::TestHuntStartValidation::te
+st_hunt_start_approved_with_scope 
+PASSED [ 43%]
+backend/tests/test_governance_guar
+ds.py::TestHuntStartValidation::te
+st_hunt_start_no_scope_blocked 
+PASSED [ 43%]
+backend/tests/test_governance_guar
+ds.py::TestHuntStartValidation::te
+st_hunt_start_no_approval_blocked 
+PASSED [ 43%]
+backend/tests/test_governance_guar
+ds.py::TestHuntStartValidation::te
+st_hunt_start_no_scope_no_approval
+_blocked PASSED [ 43%]
+backend/tests/test_governance_guar
+ds.py::TestAuditLogging::test_acti
+ons_are_logged PASSED [ 43%]
+backend/tests/test_governance_guar
+ds.py::TestAuditLogging::test_log_
+entries_have_hashes PASSED [ 43%]
+backend/tests/test_governance_guar
+ds.py::TestAuditLogging::test_bloc
+ked_count_increments PASSED [ 44%]
+backend/tests/test_governance_guar
+ds.py::TestImmutableRules::test_au
+to_submit_constant_false PASSED [ 
+44%]
+backend/tests/test_governance_guar
+ds.py::TestImmutableRules::test_au
+thority_unlock_constant_false 
+PASSED [ 44%]
+backend/tests/test_governance_guar
+ds.py::TestImmutableRules::test_co
+nstants_cannot_change PASSED [ 
+44%]
+backend/tests/test_gpu_optimizer.p
+y::TestThermalProtection::test_shu
+tdown_forces_min_batch PASSED [ 
+44%]
+backend/tests/test_gpu_optimizer.p
+y::TestThermalProtection::test_thr
+ottle_reduces_batch PASSED [ 44%]
+backend/tests/test_gpu_optimizer.p
+y::TestThermalProtection::test_nor
+mal_temp_no_throttle PASSED [ 44%]
+backend/tests/test_gpu_optimizer.p
+y::TestThermalProtection::test_edg
+e_temp_85 PASSED [ 44%]
+backend/tests/test_gpu_optimizer.p
+y::TestMemoryPressure::test_high_m
+emory_reduces_batch PASSED [ 45%]
+backend/tests/test_gpu_optimizer.p
+y::TestMemoryPressure::test_normal
+_memory_no_reduction PASSED [ 45%]
+backend/tests/test_gpu_optimizer.p
+y::TestUtilizationTargeting::test_
+under_utilized_scales_up PASSED [ 
+45%]
+backend/tests/test_gpu_optimizer.p
+y::TestUtilizationTargeting::test_
+over_utilized_scales_down PASSED 
+[ 45%]
+backend/tests/test_gpu_optimizer.p
+y::TestUtilizationTargeting::test_
+optimal_holds PASSED [ 45%]
+backend/tests/test_gpu_optimizer.p
+y::TestUtilizationTargeting::test_
+under_utilized_but_high_memory_hol
+ds PASSED [ 45%]
+backend/tests/test_gpu_optimizer.p
+y::TestBatchBounds::test_never_bel
+ow_min PASSED [ 45%]
+backend/tests/test_gpu_optimizer.p
+y::TestBatchBounds::test_never_abo
+ve_max PASSED [ 45%]
+backend/tests/test_gpu_optimizer.p
+y::TestBatchBounds::test_batch_ste
+p_aligned PASSED [ 46%]
+backend/tests/test_gpu_optimizer.p
+y::TestSeedPreservation::test_dete
+rministic PASSED [ 46%]
+backend/tests/test_gpu_optimizer.p
+y::TestSeedPreservation::test_diff
+erent_batch_different_seed PASSED 
+[ 46%]
+backend/tests/test_gpu_optimizer.p
+y::TestSeedPreservation::test_diff
+erent_epoch_different_seed PASSED 
+[ 46%]
+backend/tests/test_gpu_optimizer.p
+y::TestSeedPreservation::test_diff
+erent_field_different_seed PASSED 
+[ 46%]
+backend/tests/test_gpu_optimizer.p
+y::TestSeedPreservation::test_seed
+_is_nonzero PASSED [ 46%]
+backend/tests/test_gpu_optimizer.p
+y::TestMixedPrecisionDefaults::tes
+t_default_config PASSED [ 46%]
+backend/tests/test_intent_scoring.
+py::TestConfidenceThreshold::test_
+threshold_immutable PASSED [ 46%]
+backend/tests/test_intent_scoring.
+py::TestConfidenceThreshold::test_
+threshold_is_075 PASSED [ 47%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_all
+_research_weights_positive PASSED 
+[ 47%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_all
+_security_weights_positive PASSED 
+[ 47%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_bac
+kward_compat_frozensets PASSED [ 
+47%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_fro
+zenset_matches_weights_keys 
+PASSED [ 47%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_res
+earch_triggers_high_weight PASSED 
+[ 47%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_res
+earch_weights_exist PASSED [ 47%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_sec
+urity_weights_exist PASSED [ 48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedKeywords::test_vul
+n_types_high_weight PASSED [ 48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_ambiguous_defaults_clarificatio
+n PASSED [ 48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_below_threshold_falls_to_clarif
+ication PASSED [ 48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_bounty_query PASSED [ 48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_confidence_capped_at_099 
+PASSED [ 48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_confidence_exposed_in_decision 
+PASSED [ 48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_confidence_in_range PASSED [ 
+48%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_define_research_query PASSED [ 
+49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_difference_research PASSED [ 
+49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_empty_defaults_security PASSED 
+[ 49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_gibberish_defaults_clarificatio
+n PASSED [ 49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_high_weight_research_dominates 
+PASSED [ 49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_high_weight_security_dominates 
+PASSED [ 49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_hindi_research_query PASSED [ 
+49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_pattern_boost_helps_research 
+PASSED [ 49%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_pure_research_query PASSED [ 
+50%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_pure_security_query PASSED [ 
+50%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_tell_me_research PASSED [ 50%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_tool_security_query PASSED [ 
+50%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_who_research_query PASSED [ 
+50%]
+backend/tests/test_intent_scoring.
+py::TestWeightedClassification::te
+st_xss_vuln_query PASSED [ 50%]
+backend/tests/test_intent_scoring.
+py::TestBackwardCompatibility::tes
+t_blocked_patterns_exist PASSED [ 
+50%]
+backend/tests/test_intent_scoring.
+py::TestBackwardCompatibility::tes
+t_research_what_is PASSED [ 50%]
+backend/tests/test_intent_scoring.
+py::TestBackwardCompatibility::tes
+t_security_vuln_query PASSED [ 
+51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_block_training_import PASSED [ 
+51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_block_training_submodule 
+PASSED [ 51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_block_integrity_import PASSED 
+[ 51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_block_storage_import PASSED [ 
+51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_block_containment_import 
+PASSED [ 51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_allow_safe_import PASSED [ 51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_allow_research_module PASSED [ 
+51%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardImports::te
+st_allow_stdlib_import PASSED [ 
+52%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_block_training_path PASSED [ 52%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_block_models_path PASSED [ 52%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_block_datasets_path PASSED [ 52%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_block_governance_path PASSED [ 
+52%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_block_integrity_path PASSED [ 
+52%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_block_windows_path PASSED [ 52%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_allow_safe_path PASSED [ 53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPaths::test
+_block_all_writes PASSED [ 53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardExtensions:
+:test_block_pytorch_model PASSED 
+[ 53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardExtensions:
+:test_block_onnx_model PASSED [ 
+53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardExtensions:
+:test_block_h5_model PASSED [ 53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardExtensions:
+:test_block_safetensors PASSED [ 
+53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardExtensions:
+:test_allow_text_file PASSED [ 
+53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardExtensions:
+:test_allow_json_file PASSED [ 
+53%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardGovernanceS
+torage::test_governance_access_blo
+cked PASSED [ 54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardGovernanceS
+torage::test_storage_engine_access
+_blocked PASSED [ 54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardAudit::test
+_audit_log_entry_created PASSED [ 
+54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardAudit::test
+_audit_log_accumulates PASSED [ 
+54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardAudit::test
+_audit_log_truncates_long_queries 
+PASSED [ 54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardAudit::test
+_audit_log_records_violations 
+PASSED [ 54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardAudit::test
+_clear_audit_log PASSED [ 54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPreQueryChe
+ck::test_pre_query_check_passes 
+PASSED [ 54%]
+backend/tests/test_isolation_guard
+.py::TestIsolationGuardPreQueryChe
+ck::test_pre_query_check_has_times
+tamp PASSED [ 55%]
+backend/tests/test_isolation_guard
+.py::TestIsolationBlacklists::test
+_blocked_imports_not_empty PASSED 
+[ 55%]
+backend/tests/test_isolation_guard
+.py::TestIsolationBlacklists::test
+_blocked_paths_not_empty PASSED [ 
+55%]
+backend/tests/test_isolation_guard
+.py::TestIsolationBlacklists::test
+_blocked_extensions_not_empty 
+PASSED [ 55%]
+backend/tests/test_key_permissions
+.py::TestKeyFingerprint::test_diff
+erent_keys_different_fingerprints 
+PASSED [ 55%]
+backend/tests/test_key_permissions
+.py::TestKeyFingerprint::test_fing
+erprint_is_16_hex PASSED [ 55%]
+backend/tests/test_key_permissions
+.py::TestKeyFingerprint::test_fing
+erprint_is_deterministic PASSED [ 
+55%]
+backend/tests/test_key_permissions
+.py::TestKeyFingerprint::test_fing
+erprint_matches_manual_sha256 
+PASSED [ 55%]
+backend/tests/test_key_permissions
+.py::TestFilePermissions::test_gro
+up_readable_rejected SKIPPED [ 
+56%]
+backend/tests/test_key_permissions
+.py::TestFilePermissions::test_mod
+e_600_passes SKIPPED [ 56%]
+backend/tests/test_key_permissions
+.py::TestFilePermissions::test_win
+dows_always_passes PASSED [ 56%]
+backend/tests/test_key_permissions
+.py::TestFilePermissions::test_wor
+ld_readable_rejected SKIPPED [ 
+56%]
+backend/tests/test_key_permissions
+.py::TestAuditLog::test_add_key_lo
+gged PASSED [ 56%]
+backend/tests/test_key_permissions
+.py::TestAuditLog::test_audit_entr
+ies_have_timestamps PASSED [ 56%]
+backend/tests/test_key_permissions
+.py::TestAuditLog::test_audit_log_
+immutable PASSED [ 56%]
+backend/tests/test_key_permissions
+.py::TestAuditLog::test_default_ke
+y_logs_fallback PASSED [ 57%]
+backend/tests/test_key_permissions
+.py::TestAuditLog::test_full_rotat
+ion_audit_trail PASSED [ 57%]
+backend/tests/test_key_permissions
+.py::TestAuditLog::test_revoke_key
+_logged PASSED [ 57%]
+backend/tests/test_key_permissions
+.py::TestStrictMode::test_strict_m
+ode_empty_dir_fails PASSED [ 57%]
+backend/tests/test_key_permissions
+.py::TestStrictMode::test_strict_m
+ode_rejects_fallback PASSED [ 57%]
+backend/tests/test_key_permissions
+.py::TestStrictMode::test_strict_m
+ode_with_valid_dir PASSED [ 57%]
+backend/tests/test_key_permissions
+.py::TestKeyDirLoading::test_key_l
+oaded_from_dir PASSED [ 57%]
+backend/tests/test_key_permissions
+.py::TestKeyDirLoading::test_revoc
+ation_list_loaded PASSED [ 57%]
+backend/tests/test_key_rotation.py
+::TestKeyManager::test_add_key 
+PASSED  [ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyManager::test_default_key
+_exists PASSED [ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyManager::test_load_keys_f
+rom_directory PASSED [ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyManager::test_multiple_ke
+ys_active PASSED [ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyManager::test_revoke_key 
+PASSED [ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyManager::test_revoked_act
+ive_key_raises PASSED [ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyManager::test_unknown_key
+_returns_none PASSED [ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_bo
+th_keys_verify_own_tokens PASSED 
+[ 58%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_ch
+ain_integrity_after_rotation 
+PASSED [ 59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_cr
+oss_key_signature_fails PASSED [ 
+59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_ke
+y_id_stored_in_entry PASSED [ 59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_re
+load_preserves_entries PASSED [ 
+59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_re
+voked_key_rejected PASSED [ 59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_si
+gn_and_verify_with_key_a PASSED [ 
+59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_si
+gn_and_verify_with_key_b PASSED [ 
+59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_si
+gn_with_key_b_after_a_revoked 
+PASSED [ 59%]
+backend/tests/test_key_rotation.py
+::TestKeyRotationInLedger::test_un
+known_key_id_rejected PASSED [ 
+60%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestDuplicateNonce::
+test_first_use_accepted PASSED [ 
+60%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestDuplicateNonce::
+test_duplicate_nonce_rejected 
+PASSED [ 60%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestDuplicateNonce::
+test_different_nonce_accepted 
+PASSED [ 60%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestExpiredToken::te
+st_fresh_token_accepted PASSED [ 
+60%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestExpiredToken::te
+st_expired_token_rejected PASSED 
+[ 60%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestExpiredToken::te
+st_default_expiration_is_one_hour 
+PASSED [ 60%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestFieldMismatch::t
+est_matching_field_accepted 
+PASSED [ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestFieldMismatch::t
+est_mismatched_field_rejected 
+PASSED [ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestFieldMismatch::t
+est_no_field_check_if_not_specifie
+d PASSED [ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestReusedToken::tes
+t_signature_tracked PASSED [ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestReusedToken::tes
+t_reused_signature_rejected 
+PASSED [ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestModelHash::test_
+model_hash_stored PASSED [ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestModelHash::test_
+model_hash_in_dict PASSED [ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestModelHash::test_
+model_hash_in_ledger_entry PASSED 
+[ 61%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestNonceReload::tes
+t_nonces_survive_reload PASSED [ 
+62%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestNonceReload::tes
+t_cannot_replay_after_reload 
+PASSED [ 62%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestTokenFields::tes
+t_all_fields_present PASSED [ 62%]
+backend/tests/test_ledger_replay_p
+rotection.py::TestTokenFields::tes
+t_nonce_is_unique PASSED [ 62%]
+backend/tests/test_no_duplicate_ro
+utes.py::TestNoDuplicateRoutes::te
+st_server_file_exists PASSED [ 
+62%]
+backend/tests/test_no_duplicate_ro
+utes.py::TestNoDuplicateRoutes::te
+st_no_duplicate_routes PASSED [ 
+62%]
+backend/tests/test_no_duplicate_ro
+utes.py::TestNoDuplicateRoutes::te
+st_no_duplicate_function_names 
+PASSED [ 62%]
+backend/tests/test_no_mock_data.py
+::TestNoMockDataInBackend::test_no
+_mock_patterns_in_python PASSED [ 
+62%]
+backend/tests/test_no_mock_data.py
+::TestNoMockDataInBackend::test_da
+tabase_not_json_file_based PASSED 
+[ 63%]
+backend/tests/test_no_mock_data.py
+::TestNoMockDataInBackend::test_no
+_default_zero_in_training PASSED 
+[ 63%]
+backend/tests/test_no_mock_data.py
+::TestNoMockDataInFrontend::test_n
+o_hardcoded_chart_data PASSED [ 
+63%]
+backend/tests/test_no_mock_data.py
+::TestNoMockDataInFrontend::test_c
+hart_component_uses_api PASSED [ 
+63%]
+backend/tests/test_no_mock_data.py
+::TestNoMockDataInFrontend::test_d
+ata_table_no_placeholder PASSED [ 
+63%]
+backend/tests/test_oauth_regressio
+n.py::TestOAuthStateValidation::te
+st_cookie_binding_strict PASSED [ 
+63%]
+backend/tests/test_oauth_regressio
+n.py::TestOAuthStateValidation::te
+st_state_different_urls_produce_di
+fferent_states PASSED [ 63%]
+backend/tests/test_oauth_regressio
+n.py::TestOAuthStateValidation::te
+st_state_includes_timestamp_for_ex
+piry PASSED [ 63%]
+backend/tests/test_oauth_regressio
+n.py::TestOAuthStateValidation::te
+st_state_rejects_empty PASSED [ 
+64%]
+backend/tests/test_oauth_regressio
+n.py::TestOAuthStateValidation::te
+st_state_rejects_garbage PASSED [ 
+64%]
+backend/tests/test_oauth_regressio
+n.py::TestOAuthStateValidation::te
+st_state_rejects_tampered_signatur
+e PASSED [ 64%]
+backend/tests/test_oauth_regressio
+n.py::TestOAuthStateValidation::te
+st_state_round_trip PASSED [ 64%]
+backend/tests/test_oauth_regressio
+n.py::TestLoginLogoutLoginCycle::t
+est_login_creates_valid_jwt_with_s
+ession PASSED [ 64%]
+backend/tests/test_oauth_regressio
+n.py::TestLoginLogoutLoginCycle::t
+est_logout_revokes_session PASSED 
+[ 64%]
+backend/tests/test_oauth_regressio
+n.py::TestLoginLogoutLoginCycle::t
+est_old_token_invalid_after_logout
+ PASSED [ 64%]
+backend/tests/test_oauth_regressio
+n.py::TestLoginLogoutLoginCycle::t
+est_relogin_creates_fresh_session 
+PASSED [ 64%]
+backend/tests/test_oauth_regressio
+n.py::TestCallbackReplayPrevention
+::test_cookie_deletion_prevents_re
+play PASSED [ 65%]
+backend/tests/test_p0_security.py:
+:TestRouteProtection::test_auth_gu
+ard_module_exists PASSED [ 65%]
+backend/tests/test_p0_security.py:
+:TestRouteProtection::test_server_
+imports_auth_guard PASSED [ 65%]
+backend/tests/test_p0_security.py:
+:TestRouteProtection::test_sensiti
+ve_routes_have_auth PASSED [ 65%]
+backend/tests/test_p0_security.py:
+:TestRouteProtection::test_admin_r
+outes_require_admin_role PASSED [ 
+65%]
+backend/tests/test_p0_security.py:
+:TestTokenVerification::test_token
+_revocation_store PASSED [ 65%]
+backend/tests/test_p0_security.py:
+:TestTokenVerification::test_sessi
+on_revocation_store PASSED [ 65%]
+backend/tests/test_p0_security.py:
+:TestLogout::test_logout_endpoint_
+has_revocation PASSED [ 66%]
+backend/tests/test_p0_security.py:
+:TestVoiceRouteDeduplicated::test_
+single_voice_parse_handler PASSED 
+[ 66%]
+backend/tests/test_p0_security.py:
+:TestSecretHandling::test_no_doten
+v_loading_in_auth PASSED [ 66%]
+backend/tests/test_p0_security.py:
+:TestSecretHandling::test_jwt_secr
+et_warns_if_empty PASSED [ 66%]
+backend/tests/test_p0_security.py:
+:TestSecretHandling::test_prefligh
+t_check_rejects_placeholder_secret
+s PASSED [ 66%]
+backend/tests/test_p0_security.py:
+:TestSecretHandling::test_prefligh
+t_check_rejects_short_secrets 
+PASSED [ 66%]
+backend/tests/test_p0_security.py:
+:TestSecretHandling::test_prefligh
+t_check_accepts_strong_secret 
+PASSED [ 66%]
+backend/tests/test_p0_security.py:
+:TestSecretHandling::test_startup_
+calls_preflight PASSED [ 66%]
+backend/tests/test_p0_security.py:
+:TestVideoTokenProtection::test_vi
+deo_token_requires_auth PASSED [ 
+67%]
+backend/tests/test_p0_security.py:
+:TestPasswordHashing::test_hash_pr
+oduces_current_format PASSED [ 
+67%]
+backend/tests/test_p0_security.py:
+:TestPasswordHashing::test_verify_
+password_current PASSED [ 67%]
+backend/tests/test_p0_security.py:
+:TestPasswordHashing::test_verify_
+password_legacy_v1 PASSED [ 67%]
+backend/tests/test_p0_security.py:
+:TestPasswordHashing::test_needs_r
+ehash_detects_legacy PASSED [ 67%]
+backend/tests/test_p0_security.py:
+:TestPasswordHashing::test_verify_
+rejects_empty PASSED [ 67%]
+backend/tests/test_p0_security.py:
+:TestSSRFProtection::test_blocks_l
+ocalhost PASSED [ 67%]
+backend/tests/test_p0_security.py:
+:TestSSRFProtection::test_blocks_p
+rivate_ips PASSED [ 67%]
+backend/tests/test_p0_security.py:
+:TestSSRFProtection::test_blocks_m
+etadata_endpoints PASSED [ 68%]
+backend/tests/test_p0_security.py:
+:TestSSRFProtection::test_allows_p
+ublic_domains PASSED [ 68%]
+backend/tests/test_p0_security.py:
+:TestSSRFProtection::test_blocks_e
+mpty_url PASSED [ 68%]
+backend/tests/test_p0_security.py:
+:TestSSRFProtection::test_scope_va
+lidation_in_target_start PASSED [ 
+68%]
+backend/tests/test_p0_security.py:
+:TestSyntheticDataBlocked::test_fe
+ature_cache_no_synthetic PASSED [ 
+68%]
+backend/tests/test_p0_security.py:
+:TestSyntheticDataBlocked::test_re
+al_data_enforcer_cpp_exists 
+PASSED [ 68%]
+backend/tests/test_p0_security.py:
+:TestSignatureVerification::test_g
+21_rejects_mock_signatures PASSED 
+[ 68%]
+backend/tests/test_p0_security.py:
+:TestSignatureVerification::test_u
+pdate_signature_verifier_cpp_exist
+s PASSED [ 68%]
+backend/tests/test_p0_security.py:
+:TestSignatureVerification::test_g
+21_requires_minimum_signature_leng
+th PASSED [ 69%]
+backend/tests/test_production_buil
+d_guard.py::TestSecretHardening::t
+est_no_empty_jwt_default PASSED [ 
+69%]
+backend/tests/test_production_buil
+d_guard.py::TestSecretHardening::t
+est_secure_secret_loader_exists 
+PASSED [ 69%]
+backend/tests/test_production_buil
+d_guard.py::TestRealDataEnforcer::
+test_real_data_enforcer_exists 
+PASSED [ 69%]
+backend/tests/test_production_buil
+d_guard.py::TestRealDataEnforcer::
+test_strict_real_mode_hardcoded 
+PASSED [ 69%]
+backend/tests/test_production_buil
+d_guard.py::TestDatasetContractLoc
+k::test_feature_cache_no_synthetic
+_fallback PASSED [ 69%]
+backend/tests/test_production_buil
+d_guard.py::TestDatasetContractLoc
+k::test_feature_cache_fails_closed
+ PASSED [ 69%]
+backend/tests/test_production_buil
+d_guard.py::TestPasswordVerifier::
+test_secure_password_verifier_exis
+ts PASSED [ 70%]
+backend/tests/test_production_buil
+d_guard.py::TestSignatureVerificat
+ion::test_update_signature_verifie
+r_exists PASSED [ 70%]
+backend/tests/test_production_buil
+d_guard.py::TestSignatureVerificat
+ion::test_g21_no_mock_acceptance 
+PASSED [ 70%]
+backend/tests/test_production_buil
+d_guard.py::TestBuildTimeProtectio
+n::test_production_build_guard_exi
+sts PASSED [ 70%]
+backend/tests/test_production_buil
+d_guard.py::TestBuildTimeProtectio
+n::test_no_mock_constants_in_produ
+ction_code PASSED [ 70%]
+backend/tests/test_production_buil
+d_guard.py::TestBuildTimeProtectio
+n::test_no_synthetic_fallback_in_a
+ny_source PASSED [ 70%]
+backend/tests/test_production_buil
+d_guard.py::TestFailClosedGuarante
+es::test_all_security_cpp_modules_
+exist PASSED [ 70%]
+backend/tests/test_production_buil
+d_guard.py::TestFailClosedGuarante
+es::test_no_generate_mock_in_sourc
+e PASSED [ 70%]
+backend/tests/test_production_simu
+lations.py::TestDeterminismProof::
+test_different_seeds_produce_diffe
+rent_hash PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestDeterminismProof::
+test_ece_identical_across_runs 
+PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestDeterminismProof::
+test_identical_runs_produce_same_h
+ash PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestDeterminismProof::
+test_precision_identical_across_ru
+ns PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestDeterminismProof::
+test_precision_mismatch_blocks_tra
+ining PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestDeterminismProof::
+test_training_blocked_until_3_runs
+_complete PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestCrossDeviceValidat
+ion::test_hash_mismatch_rejects_me
+rge PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestCrossDeviceValidat
+ion::test_identical_devices_pass 
+PASSED [ 71%]
+backend/tests/test_production_simu
+lations.py::TestCrossDeviceValidat
+ion::test_precision_outside_tolera
+nce_rejects PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestCrossDeviceValidat
+ion::test_single_device_insufficie
+nt PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestCrossDeviceValidat
+ion::test_three_devices_all_matchi
+ng_pass PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestCrossDeviceValidat
+ion::test_wrong_seed_rejects 
+PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestRuntimeDemotionSim
+ulation::test_demotion_state_persi
+sted_in_backend PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestRuntimeDemotionSim
+ulation::test_eval_interval_50_dec
+isions PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestRuntimeDemotionSim
+ulation::test_eval_interval_time_b
+ased_5min PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestRuntimeDemotionSim
+ulation::test_precision_above_thre
+shold_no_demotion PASSED [ 72%]
+backend/tests/test_production_simu
+lations.py::TestRuntimeDemotionSim
+ulation::test_precision_below_thre
+shold_demotes PASSED [ 73%]
+backend/tests/test_production_simu
+lations.py::TestRuntimeDemotionSim
+ulation::test_rapid_drop_triggers_
+emergency_halt PASSED [ 73%]
+backend/tests/test_production_simu
+lations.py::TestRuntimeDemotionSim
+ulation::test_small_drop_no_halt 
+PASSED [ 73%]
+backend/tests/test_production_simu
+lations.py::TestDriftSpikeSimulati
+on::test_2x_baseline_triggers_cont
+ainment PASSED [ 73%]
+backend/tests/test_production_simu
+lations.py::TestDriftSpikeSimulati
+on::test_baseline_not_set_before_1
+00_samples PASSED [ 73%]
+backend/tests/test_production_simu
+lations.py::TestDriftSpikeSimulati
+on::test_baseline_set_at_100_sampl
+es PASSED [ 73%]
+backend/tests/test_production_simu
+lations.py::TestDriftSpikeSimulati
+on::test_containment_freeze_invali
+dation PASSED [ 73%]
+backend/tests/test_production_simu
+lations.py::TestDriftSpikeSimulati
+on::test_exactly_2x_no_spike 
+PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestDriftSpikeSimulati
+on::test_spike_with_real_kl_values
+ PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestDriftSpikeSimulati
+on::test_stable_kl_no_spike 
+PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestMergeRollbackSimul
+ation::test_better_candidate_appro
+ved PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestMergeRollbackSimul
+ation::test_mid_training_merge_not
+_possible PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestMergeRollbackSimul
+ation::test_rollback_preserves_cur
+rent_hash PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestMergeRollbackSimul
+ation::test_worse_calibration_reje
+cted PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestMergeRollbackSimul
+ation::test_worse_precision_reject
+ed_with_rollback PASSED [ 74%]
+backend/tests/test_production_simu
+lations.py::TestAllGuardsFalse::te
+st_containment_not_active_by_defau
+lt PASSED [ 75%]
+backend/tests/test_production_simu
+lations.py::TestAllGuardsFalse::te
+st_determinism_not_proven_by_defau
+lt PASSED [ 75%]
+backend/tests/test_production_simu
+lations.py::TestAllGuardsFalse::te
+st_freeze_validity_null_by_default
+ PASSED [ 75%]
+backend/tests/test_production_simu
+lations.py::TestAllGuardsFalse::te
+st_merge_status_null_by_default 
+PASSED [ 75%]
+backend/tests/test_production_simu
+lations.py::TestAllGuardsFalse::te
+st_no_authority_unlock PASSED [ 
+75%]
+backend/tests/test_production_simu
+lations.py::TestAllGuardsFalse::te
+st_no_auto_submit PASSED [ 75%]
+backend/tests/test_production_simu
+lations.py::TestAllGuardsFalse::te
+st_training_not_allowed_without_de
+terminism PASSED [ 75%]
+backend/tests/test_production_simu
+lations.py::TestFrontendStateMisma
+tch::test_backend_runtime_block_st
+ructure PASSED [ 75%]
+backend/tests/test_production_simu
+lations.py::TestFrontendStateMisma
+tch::test_demoted_field_detected_b
+y_backend PASSED [ 76%]
+backend/tests/test_production_simu
+lations.py::TestFrontendStateMisma
+tch::test_frontend_polls_every_30s
+ PASSED [ 76%]
+backend/tests/test_production_simu
+lations.py::TestFrontendStateMisma
+tch::test_no_runtime_file_returns_
+safe_defaults PASSED [ 76%]
+backend/tests/test_production_simu
+lations.py::TestFrontendStateMisma
+tch::test_runtime_containment_on_d
+emotion PASSED [ 76%]
+backend/tests/test_production_simu
+lations.py::TestAntiReplayKeyRotat
+ionIntegration::test_full_rotation
+_cycle PASSED [ 76%]
+backend/tests/test_production_simu
+lations.py::TestAntiReplayKeyRotat
+ionIntegration::test_no_key_reuse_
+possible PASSED [ 76%]
+backend/tests/test_production_simu
+lations.py::TestAntiReplayKeyRotat
+ionIntegration::test_replay_across
+_key_rotation PASSED [ 76%]
+backend/tests/test_production_simu
+lations.py::TestAntiReplayKeyRotat
+ionIntegration::test_revoked_key_b
+locks_even_valid_signature PASSED 
+[ 76%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_security_v
+ulnerability_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_security_s
+can_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_security_t
+ool_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_security_b
+ug_bounty_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_security_g
+pu_training_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_w
+hat_is_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_h
+ow_does_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_d
+efine_query PASSED [ 77%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_e
+xplain_query PASSED [ 78%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_h
+istory_query PASSED [ 78%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_w
+ho_query PASSED [ 78%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_h
+indi_query PASSED [ 78%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_t
+ell_me_query PASSED [ 78%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_d
+ifference_query PASSED [ 78%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_empty_quer
+y_defaults_security PASSED [ 78%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_ambiguous_
+defaults_clarification PASSED [ 
+79%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_route_deci
+sion_has_timestamp PASSED [ 79%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_security_k
+eywords_exist PASSED [ 79%]
+backend/tests/test_query_router.py
+::TestQueryRouter::test_research_k
+eywords_exist PASSED [ 79%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_blocked_execute_pattern PASSED [ 
+79%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_blocked_delete_pattern PASSED [ 
+79%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_blocked_sudo_pattern PASSED [ 
+79%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_blocked_approve_pattern PASSED [ 
+79%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_extract_text_strips_scripts 
+PASSED [ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_extract_text_strips_styles 
+PASSED [ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_extract_text_handles_entities 
+PASSED [ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_extract_text_caps_at_4kb PASSED 
+[ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_sanitize_removes_javascript_uri 
+PASSED [ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_sanitize_removes_data_uri PASSED 
+[ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_sanitize_removes_tracking_params 
+PASSED [ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_summarize_extracts_key_terms 
+PASSED [ 80%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_summarize_caps_at_500_words 
+PASSED [ 81%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_summarize_handles_empty_text 
+PASSED [ 81%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_cannot_access_training PASSED [ 
+81%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_cannot_modify_governance PASSED 
+[ 81%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_cannot_execute_commands PASSED [ 
+81%]
+backend/tests/test_query_router.py
+::TestResearchSearchPipeline::test
+_cannot_persist_data PASSED [ 81%]
+backend/tests/test_report_generato
+r.py::TestReportGeneratorModule::t
+est_generate_id_format PASSED [ 
+81%]
+backend/tests/test_report_generato
+r.py::TestReportGeneratorModule::t
+est_module_imports PASSED [ 81%]
+backend/tests/test_report_generato
+r.py::TestReportGeneratorModule::t
+est_now_iso_format PASSED [ 82%]
+backend/tests/test_report_generato
+r.py::TestReportGeneratorModule::t
+est_router_has_expected_routes 
+PASSED [ 82%]
+backend/tests/test_report_generato
+r.py::TestReportTablesCreation::te
+st_ensure_tables_creates_schema 
+PASSED [ 82%]
+backend/tests/test_report_generato
+r.py::TestReportTablesCreation::te
+st_no_mock_keywords_in_source 
+PASSED [ 82%]
+backend/tests/test_report_generato
+r.py::TestVideoRecordingMetadata::
+test_unique_ids PASSED [ 82%]
+backend/tests/test_report_generato
+r.py::TestVideoRecordingMetadata::
+test_video_id_format PASSED [ 82%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_auth_guard_uses_store 
+PASSED [ 82%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_multiple_sessions_indepe
+ndent PASSED [ 83%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_multiple_tokens_independ
+ent PASSED [ 83%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_non_revoked_session_pass
+es PASSED [ 83%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_non_revoked_token_passes
+ PASSED [ 83%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_reinit_clears_memory_sto
+re PASSED [ 83%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_revoke_session_and_check
+ PASSED [ 83%]
+backend/tests/test_revocation_pers
+istence.py::TestRevocationPersiste
+nce::test_revoke_token_and_check 
+PASSED [ 83%]
+backend/tests/test_runtime_api.py:
+:TestValidateStructure::test_all_f
+ields_present PASSED [ 83%]
+backend/tests/test_runtime_api.py:
+:TestValidateStructure::test_empty
+_dict PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestValidateStructure::test_missi
+ng_fields PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestSignPayload::test_determinist
+ic PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestSignPayload::test_different_p
+ayloads PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestGetRuntimeStatus::test_corrup
+t_file_returns_error PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestGetRuntimeStatus::test_determ
+inism_false_flagged PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestGetRuntimeStatus::test_fresh_
+data_not_stale PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestGetRuntimeStatus::test_invali
+d_structure_returns_invalid 
+PASSED [ 84%]
+backend/tests/test_runtime_api.py:
+:TestGetRuntimeStatus::test_missin
+g_file_returns_awaiting PASSED [ 
+85%]
+backend/tests/test_runtime_api.py:
+:TestGetRuntimeStatus::test_stale_
+data_detected PASSED [ 85%]
+backend/tests/test_runtime_api.py:
+:TestGetRuntimeStatus::test_valid_
+file_returns_active PASSED [ 85%]
+backend/tests/test_runtime_safety.
+py::test_runtime_safety_suite 
+PASSED   [ 85%]
+backend/tests/test_scheduler_start
+up.py::TestSchedulerStartup::test_
+not_running_initially PASSED [ 
+85%]
+backend/tests/test_scheduler_start
+up.py::TestSchedulerStartup::test_
+running_after_await_start PASSED 
+[ 85%]
+backend/tests/test_scheduler_start
+up.py::TestSchedulerStartup::test_
+not_running_after_stop PASSED [ 
+85%]
+backend/tests/test_scheduler_start
+up.py::TestSchedulerStartup::test_
+health_state_booting_before_start 
+PASSED [ 85%]
+backend/tests/test_scheduler_start
+up.py::TestSchedulerStartup::test_
+health_includes_state PASSED [ 
+86%]
+backend/tests/test_scheduler_start
+up.py::TestSchedulerStartup::test_
+double_start_idempotent PASSED [ 
+86%]
+backend/tests/test_system_integrit
+y.py::TestScoreToStatus::test_gree
+n PASSED [ 86%]
+backend/tests/test_system_integrit
+y.py::TestScoreToStatus::test_yell
+ow PASSED [ 86%]
+backend/tests/test_system_integrit
+y.py::TestScoreToStatus::test_red 
+PASSED [ 86%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_in
+itial_score_is_perfect PASSED [ 
+86%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_gp
+u_temp_degrades_score PASSED [ 
+86%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_gp
+u_temp_critical PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_gp
+u_throttle_penalty PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_hd
+d_low_space_penalty PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_hd
+d_critical_space PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_io
+_latency_tracking PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_me
+mory_pressure PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_al
+l_bad_conditions PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestResourceMonitor::test_al
+erts_list PASSED [ 87%]
+backend/tests/test_system_integrit
+y.py::TestDatasetIntegrityWatchdog
+::test_balanced_classes_no_alert 
+PASSED [ 88%]
+backend/tests/test_system_integrit
+y.py::TestDatasetIntegrityWatchdog
+::test_imbalanced_classes_triggers
+_alert PASSED [ 88%]
+backend/tests/test_system_integrit
+y.py::TestDatasetIntegrityWatchdog
+::test_duplicate_detection PASSED 
+[ 88%]
+backend/tests/test_system_integrit
+y.py::TestDatasetIntegrityWatchdog
+::test_kl_divergence_baseline 
+PASSED [ 88%]
+backend/tests/test_system_integrit
+y.py::TestDatasetIntegrityWatchdog
+::test_reset_clears_state PASSED 
+[ 88%]
+backend/tests/test_system_integrit
+y.py::TestDatasetIntegrityWatchdog
+::test_score_degrades_with_issues 
+PASSED [ 88%]
+backend/tests/test_system_integrit
+y.py::TestLogIntegrityMonitor::tes
+t_empty_chain_valid PASSED [ 88%]
+backend/tests/test_system_integrit
+y.py::TestLogIntegrityMonitor::tes
+t_append_and_verify PASSED [ 88%]
+backend/tests/test_system_integrit
+y.py::TestLogIntegrityMonitor::tes
+t_tamper_detection PASSED [ 89%]
+backend/tests/test_system_integrit
+y.py::TestLogIntegrityMonitor::tes
+t_gap_detection PASSED [ 89%]
+backend/tests/test_system_integrit
+y.py::TestLogIntegrityMonitor::tes
+t_score_zero_with_many_corruptions
+ PASSED [ 89%]
+backend/tests/test_system_integrit
+y.py::TestMLIntegrityScorer::test_
+default_perfect_score PASSED [ 
+89%]
+backend/tests/test_system_integrit
+y.py::TestMLIntegrityScorer::test_
+drift_degrades_score PASSED [ 89%]
+backend/tests/test_system_integrit
+y.py::TestMLIntegrityScorer::test_
+inflation_degrades_score PASSED [ 
+89%]
+backend/tests/test_system_integrit
+y.py::TestMLIntegrityScorer::test_
+model_age_degrades_score PASSED [ 
+89%]
+backend/tests/test_system_integrit
+y.py::TestMLIntegrityScorer::test_
+has_drift_alert PASSED [ 89%]
+backend/tests/test_system_integrit
+y.py::TestGovernanceIntegrityReade
+r::test_reads_real_file PASSED [ 
+90%]
+backend/tests/test_system_integrit
+y.py::TestGovernanceIntegrityReade
+r::test_missing_file_returns_zero 
+PASSED [ 90%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_probe_all_returns_structur
+e PASSED [ 90%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_all_scores_in_range 
+PASSED [ 90%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_status_values_valid 
+PASSED [ 90%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_shadow_blocked_when_govern
+ance_fails PASSED [ 90%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_forced_mode_a_when_blocked
+ PASSED [ 90%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_drift_blocks_shadow 
+PASSED [ 90%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_dataset_skew_blocks_shadow
+ PASSED [ 91%]
+backend/tests/test_system_integrit
+y.py::TestSystemIntegritySuperviso
+r::test_no_mock_data PASSED [ 91%]
+backend/tests/test_system_integrit
+y.py::TestAutonomyConditions::test
+_all_conditions_must_pass PASSED 
+[ 91%]
+backend/tests/test_system_integrit
+y.py::TestAutonomyConditions::test
+_single_failure_blocks_shadow 
+PASSED [ 91%]
+backend/tests/test_system_integrit
+y.py::TestAutonomyConditions::test
+_storage_warning_blocks_shadow 
+PASSED [ 91%]
+backend/tests/test_tamper_protecti
+on.py::TestValidPayload::test_vali
+d_payload_passes PASSED [ 91%]
+backend/tests/test_tamper_protecti
+on.py::TestValidPayload::test_hmac
+_present PASSED [ 91%]
+backend/tests/test_tamper_protecti
+on.py::TestValidPayload::test_crc_
+deterministic PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestHMACValidation::test_hm
+ac_validates_correct PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestHMACValidation::test_hm
+ac_detects_tamper PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestHMACValidation::test_mi
+ssing_hmac_fails PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestHMACValidation::test_hm
+ac_tamper_returns_corrupted 
+PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestCRCValidation::test_crc
+_detects_mutation PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestMissingFields::test_mis
+sing_hmac_field PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestMissingFields::test_mis
+sing_crc32_field PASSED [ 92%]
+backend/tests/test_tamper_protecti
+on.py::TestMissingFields::test_mis
+sing_monotonic_timestamp PASSED [ 
+93%]
+backend/tests/test_tamper_protecti
+on.py::TestSchemaMismatch::test_wr
+ong_schema_version PASSED [ 93%]
+backend/tests/test_tamper_protecti
+on.py::TestDeterminism::test_deter
+minism_false_rejected PASSED [ 
+93%]
+backend/tests/test_tamper_protecti
+on.py::TestReplayProtection::test_
+fresh_payload_passes PASSED [ 93%]
+backend/tests/test_tamper_protecti
+on.py::TestReplayProtection::test_
+replay_attack_detected PASSED [ 
+93%]
+backend/tests/test_tamper_protecti
+on.py::TestReplayProtection::test_
+monotonic_timestamp_persisted 
+PASSED [ 93%]
+backend/tests/test_tamper_protecti
+on.py::TestReplayProtection::test_
+equal_timestamp_rejected PASSED [ 
+93%]
+backend/tests/test_tamper_protecti
+on.py::TestReplayProtection::test_
+newer_timestamp_passes PASSED [ 
+93%]
+backend/tests/test_tamper_protecti
+on.py::TestSecretKey::test_key_exi
+sts PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestSecretKey::test_key_non
+_empty PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestSecretKey::test_key_loa
+ds_as_bytes PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestFileCorruption::test_mi
+ssing_telemetry_file PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestFileCorruption::test_in
+valid_json PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestFileCorruption::test_em
+pty_file PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestLastSeenTimestamp::test
+_load_no_file PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestLastSeenTimestamp::test
+_save_and_load PASSED [ 94%]
+backend/tests/test_tamper_protecti
+on.py::TestLastSeenTimestamp::test
+_overwrite PASSED [ 95%]
+backend/tests/test_vault_kdf.py::T
+estKeyDerivation::test_derives_32_
+byte_key PASSED [ 95%]
+backend/tests/test_vault_kdf.py::T
+estKeyDerivation::test_determinist
+ic PASSED [ 95%]
+backend/tests/test_vault_kdf.py::T
+estKeyDerivation::test_different_p
+asswords_different_keys PASSED [ 
+95%]
+backend/tests/test_vault_kdf.py::T
+estKeyDerivation::test_different_s
+alts_different_keys PASSED [ 95%]
+backend/tests/test_vault_kdf.py::T
+estKeyDerivation::test_empty_passw
+ord_raises PASSED [ 95%]
+backend/tests/test_vault_kdf.py::T
+estKeyDerivation::test_unicode_pas
+sword PASSED [ 95%]
+backend/tests/test_vault_kdf.py::T
+estConfiguration::test_iteration_c
+ount PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estConfiguration::test_key_length 
+PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estConfiguration::test_salt_length
+ PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estSaltManagement::test_salt_is_32
+_bytes PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estSaltManagement::test_salt_is_pe
+rsistent PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estVaultLockUnlock::test_unlock_se
+ts_key PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estVaultLockUnlock::test_lock_clea
+rs_key PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estVaultLockUnlock::test_get_key_w
+hen_locked_raises PASSED [ 96%]
+backend/tests/test_vault_kdf.py::T
+estVaultLockUnlock::test_unlock_pr
+oduces_consistent_key PASSED [ 
+97%]
+backend/tests/test_vault_kdf.py::T
+estTiming::test_derivation_takes_t
+ime PASSED [ 97%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_bloc
+ked_phrases PASSED [ 97%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_clea
+r_clarification PASSED [ 97%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_empt
+y_input PASSED [ 97%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_hunt
+_blocked PASSED [ 97%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_mult
+ilingual_hindi PASSED [ 97%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_nois
+y_input_safe_fallback PASSED [ 
+97%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_repo
+rt_not_blocked PASSED [ 98%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_safe
+ty_override_blocked PASSED [ 98%]
+backend/tests/test_voice_research.
+py::TestVoiceConfidence::test_subm
+it_report_blocked PASSED [ 98%]
+backend/tests/test_voice_research.
+py::TestSourceConsensus::test_clai
+m_to_dict PASSED [ 98%]
+backend/tests/test_voice_research.
+py::TestSourceConsensus::test_doma
+in_trust_scoring PASSED [ 98%]
+backend/tests/test_voice_research.
+py::TestSourceConsensus::test_like
+ly_single_trusted_source PASSED [ 
+98%]
+backend/tests/test_voice_research.
+py::TestSourceConsensus::test_math
+ematical_truth_always_verified 
+PASSED [ 98%]
+backend/tests/test_voice_research.
+py::TestSourceConsensus::test_same
+_domain_not_independent PASSED [ 
+98%]
+backend/tests/test_voice_research.
+py::TestSourceConsensus::test_unve
+rified_no_sources PASSED [ 99%]
+backend/tests/test_voice_research.
+py::TestSourceConsensus::test_veri
+fied_with_two_sources PASSED [ 
+99%]
+backend/tests/test_websocket_auth.
+py::TestWsAuthenticateUnit::test_e
+xtracts_from_protocol_header 
+PASSED [ 99%]
+backend/tests/test_websocket_auth.
+py::TestWsAuthenticateUnit::test_r
+ejects_query_param_token PASSED [ 
+99%]
+backend/tests/test_websocket_auth.
+py::TestWsAuthenticateUnit::test_r
+ejects_revoked_token PASSED [ 99%]
+backend/tests/test_websocket_auth.
+py::TestWsAuthenticateUnit::test_r
+eturns_none_invalid_token PASSED 
+[ 99%]
+backend/tests/test_websocket_auth.
+py::TestWsAuthenticateUnit::test_r
+eturns_none_no_token PASSED [ 99%]
+backend/tests/test_websocket_auth.
+py::TestWsAuthenticateUnit::test_r
+eturns_payload_valid_token PASSED 
+[100%]
+======================= 764 
+passed, 13 skipped in 7.08s 
+=======================
+
+

@@ -88,7 +88,7 @@ class LongRunStabilizer:
             ckpt_ok = False
             actions.append(MaintenanceAction(
                 action="checkpoint", success=False,
-                detail=str(e),
+                detail=f"failed: {type(e).__name__}",
                 timestamp=datetime.now().isoformat(),
             ))
 
@@ -113,7 +113,7 @@ class LongRunStabilizer:
             cache_ok = False
             actions.append(MaintenanceAction(
                 action="cache_clear", success=False,
-                detail=str(e),
+                detail=f"failed: {type(e).__name__}",
                 timestamp=datetime.now().isoformat(),
             ))
 
@@ -131,7 +131,7 @@ class LongRunStabilizer:
             shard_ok = False
             actions.append(MaintenanceAction(
                 action="shard_verify", success=False,
-                detail=str(e),
+                detail=f"failed: {type(e).__name__}",
                 timestamp=datetime.now().isoformat(),
             ))
 

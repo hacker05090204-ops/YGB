@@ -1,0 +1,87 @@
+﻿36: require_auth, require_admin,
+690: async def trigger_cve_backfill(max_samples: int = 0, user=Depends(require_auth)):
+749: async def search_cves(q: str = "", user=Depends(require_auth)):
+864: async def get_bounty_phases(user=Depends(require_auth)):
+899: async def get_phases(user=Depends(require_auth)):
+917: async def get_hunter_modules(user=Depends(require_auth)):
+930: async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
+950: async def run_hunter_module(request: RunHunterRequest, user=Depends(require_auth)):
+969: async def fields_state_endpoint(user=Depends(require_auth)):
+985: user=Depends(require_auth),
+999: async def list_reports(user=Depends(require_auth)):
+1019: async def download_report(filename: str, user=Depends(require_auth)):
+1039: async def get_report_content(filename: str, user=Depends(require_auth)):
+1056: async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)):
+1084: async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)):
+1129: async def create_dashboard(request: CreateDashboardRequest, user=Depends(require_auth)):
+1161: async def get_dashboard_state(dashboard_id: Optional[str] = None, user=Depends(require_auth)):
+1171: async def get_execution_state(kernel_id: Optional[str] = None, user=Depends(require_auth)):
+1183: async def execution_transition(request: ExecutionTransitionRequest, user=Depends(require_auth)):
+1238: async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depends(require_admin)):
+1259: async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require_auth)):
+1310: async def validate_scope(request: Request, user=Depends(require_auth)):
+1328: async def start_target_session(request: Request, user=Depends(require_auth)):
+1364: async def stop_target_session(request: Request, user=Depends(require_auth)):
+1386: async def get_target_status(user=Depends(require_auth)):
+1406: async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(require_auth)):
+1451: async def get_g38_status(user=Depends(require_auth)):
+1507: async def get_g38_events(limit: int = 50, user=Depends(require_auth)):
+1533: async def abort_g38_training(user=Depends(require_auth)):
+1561: async def start_g38_training(epochs: int = 0, user=Depends(require_auth)):
+1602: async def gpu_status(user=Depends(require_auth)):
+1647: async def training_status(user=Depends(require_auth)):
+1656: async def training_start(epochs: int = 0, user=Depends(require_auth)):
+1688: async def training_stop(user=Depends(require_auth)):
+1714: async def training_continuous(request: Request, user=Depends(require_auth)):
+1730: async def training_interval(request: Request, user=Depends(require_admin)):
+1742: async def get_g38_guards(user=Depends(require_auth)):
+1764: async def get_g38_training_reports(user=Depends(require_auth)):
+1808: async def get_g38_latest_report(user=Depends(require_auth)):
+1845: async def stop_24_7_training(user=Depends(require_auth)):
+1854: async def training_progress(user=Depends(require_auth)):
+1970: async def dataset_stats(user=Depends(require_auth)):
+1997: def list_users(user=Depends(require_admin)):
+2008: def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
+2020: def get_single_user(user_id: str, user=Depends(require_admin)):
+2033: def get_user_bounties_endpoint(user_id: str, user=Depends(require_admin)):
+2044: def list_targets(user=Depends(require_auth)):
+2055: def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
+2073: def list_bounties(user=Depends(require_auth)):
+2084: def add_bounty(request: CreateBountyRequest, user=Depends(require_admin)):
+2102: def update_bounty(request: UpdateBountyRequest, user=Depends(require_admin)):
+2114: def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
+2126: def list_activity(limit: int = 50, user=Depends(require_admin)):
+2137: def get_admin_statistics(user=Depends(require_admin)):
+2152: def storage_stats_endpoint(user=Depends(require_auth)):
+2158: def lifecycle_status_endpoint(user=Depends(require_auth)):
+2164: def disk_status_endpoint(user=Depends(require_auth)):
+2170: def delete_preview_endpoint(entity_type: Optional[str] = None, user=Depends(require_admin)):
+2176: def video_list_endpoint(user_id: Optional[str] = None, user=Depends(require_auth)):
+2185: async def video_token_endpoint(request: Request, user=Depends(require_auth)):
+2506: async def logout(req: Request, user=Depends(require_auth)):
+2531: async def auth_profile(user=Depends(require_auth)):
+2598: from backend.api.admin_auth import require_auth as admin_require_auth, ROLE_ADMIN
+2599: admin_result = admin_require_auth(jwt_token=token, required_role=ROLE_ADMIN)
+2601: admin_result = admin_require_auth(session_token=token, required_role=ROLE_ADMIN)
+2622: async def storage_status(user=Depends(require_auth)):
+2631: async def storage_enforce(user=Depends(require_auth)):
+2640: def get_active_devices_endpoint(user=Depends(require_admin)):
+2651: def get_active_sessions_endpoint(user=Depends(require_admin)):
+2676: async def get_hunting_targets(user=Depends(require_auth)):
+2702: async def get_hunting_auto_mode(user=Depends(require_auth)):
+2966: async def system_integrity(user=Depends(require_auth)):
+2994: async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
+3118: async def voice_mode(user=Depends(require_auth)):
+3267: async def runtime_status(user=Depends(require_auth)):
+3347: async def accuracy_snapshot(user=Depends(require_auth)):
+3388: async def training_data_source(user=Depends(require_auth)):
+3482: async def start_training_mode(user=Depends(require_auth)):
+3530: async def stop_training_mode(user=Depends(require_auth)):
+3548: async def start_hunt_mode(user=Depends(require_auth)):
+3565: async def stop_hunt_mode(user=Depends(require_auth)):
+3956: """Admin login — entry point for admin auth. No Depends(require_auth)."""
+3990: from backend.api.admin_auth import require_auth as admin_require_auth
+3992: result = admin_require_auth(jwt_token=token)
+3996: result = admin_require_auth(session_token=token)
+4050: async def rollout_status(user=Depends(require_auth)):
+4074: async def rollout_metrics(user=Depends(require_auth)):

@@ -1278,5 +1278,5 @@ def generate_dataset_manifest() -> dict:
     except FileNotFoundError:
         return {"success": False, "error": "Ingestion bridge DLL not found"}
     except Exception as e:
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": f"manifest_generation_failed: {type(e).__name__}"}
 
