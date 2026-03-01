@@ -1,11 +1,12 @@
 """
-CI Security Guard — Automated security scanning for CI/CD pipeline
+CI Security Guard - Automated security scanning for CI/CD pipeline
 
 Scans the codebase for:
 1. Hardcoded secrets / placeholder patterns
 2. Mock/simulated/fake keywords in production code
-3. str(e) error leakage in API responses
+3. Error leakage in API responses (str(e), f-string, format patterns)
 4. Insecure default secrets
+5. Forbidden kill patterns in startup scripts (.ps1)
 
 Exit code 0 = clean, 1 = violations found.
 """
@@ -27,30 +28,50 @@ SCAN_DIRS = ["api", "backend", "native", "scripts", "impl_v1"]
 # Directories to exclude
 EXCLUDE_DIRS = {"tests", "__pycache__", ".git", "node_modules", "__tests__"}
 
+# File extensions to scan
+SCAN_EXTENSIONS = {".py", ".ps1"}
+
 # Patterns that indicate hardcoded secrets
 SECRET_PATTERNS = [
-    re.compile(r'["\']change-me["\']', re.IGNORECASE),
-    re.compile(r'["\']change_me["\']', re.IGNORECASE),
-    re.compile(r'["\']changeme["\']', re.IGNORECASE),
-    re.compile(r'["\']replace-me["\']', re.IGNORECASE),
-    re.compile(r'["\']your-secret["\']', re.IGNORECASE),
-    re.compile(r'secret.*=.*["\'][a-f0-9]{32,}["\']', re.IGNORECASE),
+    re.compile(r"""["']change-me["']""", re.IGNORECASE),
+    re.compile(r"""["']change_me["']""", re.IGNORECASE),
+    re.compile(r"""["']changeme["']""", re.IGNORECASE),
+    re.compile(r"""["']replace-me["']""", re.IGNORECASE),
+    re.compile(r"""["']your-secret["']""", re.IGNORECASE),
+    re.compile(r"""secret.*=.*["'][a-f0-9]{32,}["']""", re.IGNORECASE),
 ]
 
 # Patterns that indicate mock/fake behavior in production code
 MOCK_PATTERNS = [
-    re.compile(r'["\']mock-gpu["\']'),
-    re.compile(r'["\'].*-mock["\']'),
+    re.compile(r"""["']mock-gpu["']"""),
+    re.compile(r"""["'].*-mock["']"""),
     re.compile(r'MOCK_[A-Z]+\s*='),
     re.compile(r'FAKE_[A-Z]+\s*='),
     re.compile(r'DEMO_[A-Z]+\s*='),
     re.compile(r'simulated\s*=\s*True'),
 ]
 
-# Error leakage patterns
+# Error leakage patterns - detect exception text leaking into API responses
+# Focus: dict response fields and HTTPException detail that expose raw exception text
+# Excludes: internal error tracking, error messages without exception vars, log lines
 ERROR_LEAKAGE_PATTERNS = [
-    re.compile(r'"error".*:\s*str\(e\)'),
-    re.compile(r'detail\s*=\s*str\(e\)'),
+    # Direct str(e) assigned to response dict fields
+    re.compile(r'"(detail|message|reason|error)"\s*:\s*str\((e|exc|err)\)'),
+    # f-string with exception var in response dict fields (key: f"...{e}")
+    re.compile(r'"(detail|message|reason|error)"\s*:\s*f"[^"]*\{(e|exc|err)\}'),
+    re.compile(r"'(detail|message|reason|error)'\s*:\s*f'[^']*\{(e|exc|err)\}"),
+    # HTTPException detail= with str(e)
+    re.compile(r'detail\s*=\s*str\((e|exc|err)\)'),
+    # HTTPException detail= with f-string containing exception var
+    re.compile(r'detail\s*=\s*f"[^"]*\{(e|exc|err)\}"'),
+]
+
+# Forbidden kill patterns in PowerShell scripts
+PS1_KILL_PATTERNS = [
+    # Stop-Process without ownership guard
+    re.compile(r'Stop-Process.*-Force', re.IGNORECASE),
+    # taskkill
+    re.compile(r'taskkill\s+/F', re.IGNORECASE),
 ]
 
 
@@ -66,11 +87,11 @@ ALLOWLIST = {
         # weak secrets at startup. These are the blocklist values, not actual
         # secrets. The scan regex `secret.*=.*"hex"` false-matches these lines.
         ("backend/auth/auth_guard.py", None,
-         "Placeholder secret validation lists — blocklist values, not real secrets"),
+         "Placeholder secret validation lists - blocklist values, not real secrets"),
         # config_validator.py: _PLACEHOLDER_PATTERNS used to DETECT placeholder
         # secrets at startup. These are the detection values, not actual secrets.
         ("backend/config/config_validator.py", None,
-         "Placeholder detection patterns — used to REJECT placeholder secrets"),
+         "Placeholder detection patterns - used to REJECT placeholder secrets"),
     ],
     "MOCK_PATTERN": [
         # g35_ai_accelerator.py: MOCK_TRAINING flag is behind
@@ -80,6 +101,14 @@ ALLOWLIST = {
         # ci_security_scan.py: MOCK_PATTERNS variable is the scan config itself.
         ("scripts/ci_security_scan.py", None,
          "Scanner configuration variable, not a production mock bypass"),
+    ],
+    "ERROR_LEAKAGE": [],
+    "PS1_KILL": [
+        # start_full_stack.ps1: Stop-Process is inside Stop-PortListener which
+        # has strict YGB-ownership check via command-line inspection. Foreign
+        # kill requires explicit -AllowForeignPortKill switch (off by default).
+        ("start_full_stack.ps1", None,
+         "Ownership-gated: only kills YGB-owned processes; foreign kill requires explicit opt-in switch"),
     ],
 }
 
@@ -113,6 +142,20 @@ def scan_file(filepath: Path, patterns: list, label: str) -> list:
     try:
         content = filepath.read_text(encoding="utf-8", errors="ignore")
         for i, line in enumerate(content.splitlines(), 1):
+            stripped = line.strip()
+
+            # For ERROR_LEAKAGE: skip log/print/comment lines (server-side only)
+            if label == "ERROR_LEAKAGE":
+                if (stripped.startswith("#") or
+                    stripped.startswith("//") or
+                    "logger." in stripped or
+                    "logging." in stripped or
+                    "print(" in stripped or
+                    "print(f" in stripped or
+                    stripped.startswith("raise ") or
+                    "warnings.warn" in stripped):
+                    continue
+
             for pat in patterns:
                 if pat.search(line):
                     if is_allowlisted(filepath, i, label):
@@ -121,7 +164,7 @@ def scan_file(filepath: Path, patterns: list, label: str) -> list:
                         "file": str(filepath.relative_to(PROJECT_ROOT)),
                         "line": i,
                         "type": label,
-                        "content": line.strip()[:120],
+                        "content": stripped[:120],
                     })
     except Exception:
         pass
@@ -140,24 +183,40 @@ def main():
         if not dir_path.exists():
             continue
 
-        for filepath in dir_path.rglob("*.py"):
-            if should_skip(filepath):
-                continue
+        for ext in SCAN_EXTENSIONS:
+            for filepath in dir_path.rglob("*" + ext):
+                if should_skip(filepath):
+                    continue
 
-            # Check for hardcoded secrets
-            all_violations.extend(
-                scan_file(filepath, SECRET_PATTERNS, "HARDCODED_SECRET")
-            )
+                if ext == ".py":
+                    # Check for hardcoded secrets
+                    all_violations.extend(
+                        scan_file(filepath, SECRET_PATTERNS, "HARDCODED_SECRET")
+                    )
 
-            # Check for mock patterns
-            all_violations.extend(
-                scan_file(filepath, MOCK_PATTERNS, "MOCK_PATTERN")
-            )
+                    # Check for mock patterns
+                    all_violations.extend(
+                        scan_file(filepath, MOCK_PATTERNS, "MOCK_PATTERN")
+                    )
 
-            # Check for error leakage
-            all_violations.extend(
-                scan_file(filepath, ERROR_LEAKAGE_PATTERNS, "ERROR_LEAKAGE")
-            )
+                    # Check for error leakage
+                    all_violations.extend(
+                        scan_file(filepath, ERROR_LEAKAGE_PATTERNS, "ERROR_LEAKAGE")
+                    )
+
+                elif ext == ".ps1":
+                    # Check for forbidden kill patterns
+                    all_violations.extend(
+                        scan_file(filepath, PS1_KILL_PATTERNS, "PS1_KILL")
+                    )
+
+    # Also scan root-level .ps1 files
+    for filepath in PROJECT_ROOT.glob("*.ps1"):
+        if should_skip(filepath):
+            continue
+        all_violations.extend(
+            scan_file(filepath, PS1_KILL_PATTERNS, "PS1_KILL")
+        )
 
     # Report
     if all_violations:

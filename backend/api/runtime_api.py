@@ -245,7 +245,7 @@ def validate_telemetry() -> dict:
         return {
             "status": "corrupted",
             "reason": "read_failed",
-            "detail": f"Read failed: {e}"
+            "detail": "Read failed — check server logs"
         }
 
     # Step 2: Parse JSON
@@ -256,7 +256,7 @@ def validate_telemetry() -> dict:
         return {
             "status": "corrupted",
             "reason": "json_parse_failed",
-            "detail": f"JSON parse failed: {e}"
+            "detail": "JSON parse failed — check server logs"
         }
 
     # Step 3: Validate required fields

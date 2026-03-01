@@ -279,3 +279,21 @@ export async function getRolloutMetrics(): Promise<RolloutMetrics> {
   if (!res.ok) throw new Error("Failed to fetch rollout metrics");
   return res.json();
 }
+
+// ============== USER PROFILE ==============
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  github_login?: string;
+  avatar_url?: string;
+  auth_provider?: string;
+}
+
+export async function getUserProfile(): Promise<UserProfile> {
+  const res = await authFetch(`${API_BASE}/api/user/profile`);
+  if (!res.ok) throw new Error("Failed to fetch user profile");
+  return res.json();
+}

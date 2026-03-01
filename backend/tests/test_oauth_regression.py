@@ -113,6 +113,11 @@ class TestLoginLogoutLoginCycle(unittest.TestCase):
 
     def setUp(self):
         os.environ.setdefault("JWT_SECRET", "test-secret-" + "a" * 50)
+        # Force memory backend for test isolation (prod default is 'file')
+        os.environ["REVOCATION_BACKEND"] = "memory"
+        os.environ.pop("REVOCATION_FILE_PATH", None)
+        from backend.auth.revocation_store import reset_store
+        reset_store()
         from backend.auth.auth import generate_jwt, verify_jwt
         from backend.auth.auth_guard import revoke_session, is_session_revoked
         self.generate_jwt = generate_jwt

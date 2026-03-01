@@ -189,7 +189,7 @@ def _get_store():
     if _store is not None:
         return _store
 
-    backend = os.getenv("REVOCATION_BACKEND", "memory").lower()
+    backend = os.getenv("REVOCATION_BACKEND", "file").lower()
     if backend == "redis":
         redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
         _store = _RedisStore(redis_url)

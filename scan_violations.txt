@@ -1,0 +1,87 @@
+============================================================
+  YGB CI Security Guard
+============================================================
+
+[FAIL] 27 violation(s) found:
+
+  [ERROR_LEAKAGE] backend\api\runtime_api.py:248
+    "detail": f"Read failed: {e}"
+
+  [ERROR_LEAKAGE] backend\api\runtime_api.py:248
+    "detail": f"Read failed: {e}"
+
+  [ERROR_LEAKAGE] backend\api\runtime_api.py:259
+    "detail": f"JSON parse failed: {e}"
+
+  [ERROR_LEAKAGE] backend\api\runtime_api.py:259
+    "detail": f"JSON parse failed: {e}"
+
+  [ERROR_LEAKAGE] backend\bridge\bridge_state.py:322
+    result["mismatch_reason"] = f"manifest_read_error: {e}"
+
+  [ERROR_LEAKAGE] backend\storage\backup_config.py:207
+    reason=f"Failed to read credentials: {e}",
+
+  [ERROR_LEAKAGE] native\hdd_engine\lifecycle_manager.py:306
+    "reason": str(e),
+
+  [ERROR_LEAKAGE] scripts\antigravity_harness.py:42
+    return {"label": label, "exit_code": -1, "passed": False, "reason": str(e)}
+
+  [ERROR_LEAKAGE] impl_v1\phase49\governors\g04_voice_proxy.py:193
+    error_message=f"TTS proxy unreachable: {e}",
+
+  [ERROR_LEAKAGE] impl_v1\phase49\runtime\auto_trainer.py:1313
+    "reason": str(e),
+
+  [ERROR_LEAKAGE] impl_v1\training\voice_command_executor.py:326
+    error=f"Retrying ({cmd.retries}/{cmd.max_retries}): {e}",
+
+  [ERROR_LEAKAGE] impl_v1\training\data\ingestion_policy.py:105
+    result.rejection_reason = f"Registry check failed: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\distributed\auto_bootstrap.py:171
+    errors.append(f"Cluster join failed: {e}")
+
+  [ERROR_LEAKAGE] impl_v1\training\distributed\auto_bootstrap.py:185
+    errors.append(f"Election failed: {e}")
+
+  [ERROR_LEAKAGE] impl_v1\training\distributed\auto_bootstrap.py:204
+    errors.append(f"State sync failed: {e}")
+
+  [ERROR_LEAKAGE] impl_v1\training\distributed\data_enforcement.py:309
+    shuffle_detail = f"Error: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\distributed\data_enforcement.py:344
+    overlap_detail = f"Error: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\distributed\strict_dataset_policy.py:172
+    detail=f"Error: {e}",
+
+  [ERROR_LEAKAGE] impl_v1\training\distributed\strict_dataset_policy.py:199
+    detail=f"Error: {e}",
+
+  [ERROR_LEAKAGE] impl_v1\training\safety\stress_lock.py:167
+    errors.append(f"train: {e}")
+
+  [ERROR_LEAKAGE] impl_v1\training\safety\stress_lock.py:174
+    errors.append(f"infer: {e}")
+
+  [ERROR_LEAKAGE] impl_v1\training\validation\cluster_validator.py:106
+    details = f"Error: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\validation\cluster_validator.py:128
+    details = f"Error: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\validation\cluster_validator.py:146
+    details = f"Error: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\validation\cluster_validator.py:181
+    details = f"Error: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\validation\cluster_validator.py:199
+    details = f"Error: {e}"
+
+  [ERROR_LEAKAGE] impl_v1\training\validation\cluster_validator.py:221
+    details = f"Error: {e}"
+

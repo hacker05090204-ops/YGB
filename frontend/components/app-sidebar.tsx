@@ -4,6 +4,7 @@ import * as React from "react"
 import { useRef } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import { useAuthUser } from "@/hooks/use-auth-user"
 import {
   LayoutDashboard,
   Bug,
@@ -34,11 +35,6 @@ import {
 
 // Data Structure
 const data = {
-  user: {
-    name: "BugHunter_01",
-    email: "hunter@bugbounty.com",
-    avatar: "/avatars/agnish.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -79,7 +75,7 @@ const data = {
     },
     {
       title: "Help",
-      url: "#",
+      url: "/admin",
       icon: HelpCircle,
     },
   ]
@@ -88,6 +84,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const containerRef = useRef(null)
   const pathname = usePathname()
+  const authUser = useAuthUser()
 
   useGSAP(() => {
     // Staggered entry for menu items
@@ -175,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter className="sidebar-item p-4">
-        <NavUser user={data.user} />
+        <NavUser user={authUser} />
       </SidebarFooter>
     </Sidebar>
   )

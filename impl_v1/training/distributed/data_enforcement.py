@@ -306,7 +306,8 @@ def enforce_data_policy(
             f"shuffle_acc={result.shuffled_accuracy:.4f}"
         )
     except Exception as e:
-        shuffle_detail = f"Error: {e}"
+        logger.error("Label shuffle test failed: %s", e)
+        shuffle_detail = "Shuffle test failed — see logs"
 
     checks.append(EnforcementCheck(
         check_id=3, name="label_shuffle_test",
@@ -341,7 +342,8 @@ def enforce_data_policy(
                 f"(ratio={overlap_result.overlap_ratio:.4f})"
             )
         except Exception as e:
-            overlap_detail = f"Error: {e}"
+            logger.error("Overlap check failed: %s", e)
+            overlap_detail = "Overlap check failed — see logs"
             overlap_ok = False
 
     checks.append(EnforcementCheck(

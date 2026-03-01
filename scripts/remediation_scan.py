@@ -44,7 +44,10 @@ REVIEWED_ALLOWLIST = [
     ("placeholder", "backend/auth/auth_guard.py", "Placeholder detection list — code that BLOCKS placeholder secrets"),
     # --- simulate/SIMULATED: legitimate execution state machine ---
     ("simulate", "frontend/components/execution-state.tsx", "PLAN→SIMULATE→APPROVE workflow state enum, not a bypass"),
-    ("simulate", "api/server.py", "State machine transition enum (PLANNED→SIMULATED→AWAIT_HUMAN), not bypass"),
+    # --- simulate: api/server.py line-specific allowlist ---
+    # Line 383: ExecutionTransitionRequest.transition docstring listing SIMULATE as valid enum value
+    # This is a state-machine enum definition, not a production bypass.
+    ("simulate", "api/server.py:383", "ExecutionTransitionRequest transition enum comment — not bypass"),
     # --- simulate: browser engine dry-run tracking field ---
     ("simulate", "impl_v1/phase38/browser_engine.py", "simulated_result field tracks whether action would succeed without execution"),
     ("simulate", "impl_v1/phase38/browser_types.py", "simulated_result dataclass field definition"),
@@ -124,10 +127,20 @@ REVIEWED_ALLOWLIST = [
 ]
 
 
-def _is_allowlisted(pattern_name, rel_path):
-    """Check if a hit is in the reviewed false-positive allowlist."""
+def _is_allowlisted(pattern_name, rel_path, line_num=None):
+    """Check if a hit is in the reviewed false-positive allowlist.
+    
+    Supports line-specific allowlist entries using 'path:LINE' format.
+    """
     for al_pattern, al_path_substr, _rationale in REVIEWED_ALLOWLIST:
-        if al_pattern == pattern_name and al_path_substr in rel_path:
+        if al_pattern != pattern_name:
+            continue
+        # Check for line-specific allowlist entry (e.g. 'api/server.py:383')
+        if ':' in al_path_substr and al_path_substr.rsplit(':', 1)[1].isdigit():
+            path_part, line_part = al_path_substr.rsplit(':', 1)
+            if path_part in rel_path and line_num == int(line_part):
+                return True
+        elif al_path_substr in rel_path:
             return True
     return False
 
@@ -142,8 +155,13 @@ def classify_path(filepath):
         return 'TEST'
     if 'node_modules' in parts or 'vendor' in parts:
         return 'THIRD_PARTY'
-    # Governance and documentation files
+    # Governance Python modules under backend/ are PRODUCTION (runtime-imported)
+    # Only root-level governance/ docs/config are CONFIG/DOCS
     if 'governance' in parts:
+        # backend/governance/*.py = PRODUCTION (runtime governance modules)
+        if 'backend' in parts and parts[-1].endswith('.py'):
+            return 'PRODUCTION'
+        # Root governance/ directory docs/reports = CONFIG/DOCS
         return 'CONFIG/DOCS'
     # Config/docs by extension
     if parts[-1].endswith(('.md', '.txt', '.yml', '.yaml', '.toml', '.cfg', '.json', '.env', '.css')):
@@ -155,13 +173,24 @@ def classify_path(filepath):
     if parts[-1] in ('ci_security_scan.py', 'ci_banned_tokens.py', 'remediation_scan.py',
                       'coverage_gate.py', 'training_readiness.py'):
         return 'CI_TOOLING'
-    # impl_v1 phase CI, monitoring, validation, governors directories are tooling
+    # impl_v1 phase CI, monitoring, validation directories are tooling
+    # BUT governors that are imported by runtime/api paths are PRODUCTION
     if 'impl_v1' in parts:
-        if any(p in ('ci', 'monitoring', 'validation', 'governors') for p in parts):
+        if any(p in ('ci', 'monitoring', 'validation') for p in parts):
+            return 'CI_TOOLING'
+        # Governors: only classify as CI_TOOLING if NOT imported by runtime
+        if 'governors' in parts:
+            # Known runtime-imported governors should be PRODUCTION
+            _RUNTIME_GOVERNORS = {
+                'g35_ai_accelerator.py', 'g38_auto_training.py',
+                'g21_auto_update.py',
+            }
+            if parts[-1] in _RUNTIME_GOVERNORS:
+                return 'PRODUCTION'
             return 'CI_TOOLING'
         # Phase governance/freeze Python files
         if any(p.startswith('phase') for p in parts):
-            if parts[-1].startswith(('governor', 'quality_gate', 'freeze_condition')):
+            if parts[-1].startswith(('quality_gate', 'freeze_condition')):
                 return 'CI_TOOLING'
     # Edge deployment tools
     if 'edge' in parts:
@@ -224,7 +253,7 @@ def scan():
                     for pname, pat in PATTERNS.items():
                         if pat.search(line):
                             # Check reviewed allowlist for production hits
-                            if effective_class == 'PRODUCTION' and _is_allowlisted(pname, rel):
+                            if effective_class == 'PRODUCTION' and _is_allowlisted(pname, rel, i):
                                 effective_class_final = 'REVIEWED'
                                 key = f"{pname}|REVIEWED"
                                 summary[key] = summary.get(key, 0) + 1

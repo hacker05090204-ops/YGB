@@ -166,10 +166,11 @@ def validate_dataset_policy(
         if not shuffle_result.passed:
             all_passed = False
     except Exception as e:
+        logger.error("Label shuffle test failed: %s", e)
         checks.append(PolicyCheckResult(
             check_name="label_shuffle",
             passed=False,
-            detail=f"Error: {e}",
+            detail="Shuffle test failed — see logs",
         ))
         all_passed = False
 
@@ -193,10 +194,11 @@ def validate_dataset_policy(
         if not baseline_ok:
             all_passed = False
     except Exception as e:
+        logger.error("Baseline accuracy check failed: %s", e)
         checks.append(PolicyCheckResult(
             check_name="baseline_accuracy",
             passed=False,
-            detail=f"Error: {e}",
+            detail="Baseline check failed — see logs",
         ))
         all_passed = False
 

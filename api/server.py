@@ -538,10 +538,11 @@ async def health_check():
     try:
         storage_health = get_storage_health()
     except Exception as e:
+        logger.error("Storage health probe failed: %s", e)
         storage_health = {
             "status": "INACTIVE",
             "storage_active": False,
-            "reason": f"Storage probe error: {e}",
+            "reason": "Storage probe failed — check server logs",
         }
 
     overall = "ok" if storage_health.get("storage_active") else "degraded"
@@ -2798,33 +2799,74 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
             await websocket.send_json({"error": "Workflow not found"})
             return
         
-        # Simulate Hunter module execution
+        # Real Hunter module execution — no simulated success
         hunter_modules = discover_hunter_modules()
         module_names = list(hunter_modules.keys())
         
+        successful_count = 0
+        failed_count = 0
+        step_hashes = []
+        
         for idx, module_name in enumerate(module_names):
-            # Simulate step execution
+            # Execute module directly — fail-closed, no simulated success
+            step_success = False
+            step_output = {}
+            try:
+                module_path = PROJECT_ROOT / "HUMANOID_HUNTER" / module_name / "__init__.py"
+                if module_path.exists():
+                    import importlib.util
+                    spec = importlib.util.spec_from_file_location(
+                        f"hunter.{module_name}", str(module_path)
+                    )
+                    mod = importlib.util.module_from_spec(spec)
+                    spec.loader.exec_module(mod)
+                    if hasattr(mod, "execute"):
+                        result_data = await asyncio.to_thread(
+                            mod.execute, workflow.get("target", "")
+                        )
+                        step_success = bool(result_data and result_data.get("success"))
+                        step_output = result_data or {}
+                    else:
+                        step_output = {"status": "no_execute_function"}
+                else:
+                    step_output = {"status": "module_not_found"}
+            except Exception as exec_err:
+                logger.error("Hunter module %s execution failed: %s", module_name, exec_err)
+                step_success = False
+                step_output = {"status": "execution_failed"}
+            
             step = {
                 "module_name": module_name,
                 "function_name": f"execute_{module_name}",
-                "success": True,
-                "input_data": {"target": workflow["target"], "module_index": idx},
-                "output_data": {"status": "completed", "checks_passed": True},
+                "success": step_success,
+                "input_data": {"target": workflow.get("target", ""), "module_index": idx},
+                "output_data": step_output,
                 "timestamp": datetime.now(UTC).isoformat()
             }
             
+            if step_success:
+                successful_count += 1
+            else:
+                failed_count += 1
+            
+            step_hashes.append(hashlib.sha256(
+                json.dumps(step, sort_keys=True, default=str).encode()
+            ).hexdigest())
+            
             await websocket.send_json({"type": "step", "step": step})
             workflow["steps"].append(step)
-            await asyncio.sleep(0.3)  # Simulate processing time
         
-        # Send completion
+        # Send completion with real counts and content-derived hash
+        chain_hash = hashlib.sha256(
+            "|".join(step_hashes).encode()
+        ).hexdigest()
         result = {
             "final_result": {
                 "total_modules": len(module_names),
-                "successful": len(module_names),
-                "failed": 0
+                "successful": successful_count,
+                "failed": failed_count
             },
-            "evidence_chain_hash": uuid.uuid4().hex
+            "evidence_chain_hash": chain_hash
         }
         
         await websocket.send_json({"type": "complete", "result": result})
@@ -4130,7 +4172,7 @@ async def rollout_metrics(user=Depends(require_auth)):
 
 if __name__ == "__main__":
     import uvicorn
-    host = os.getenv("API_HOST", "0.0.0.0")
+    host = os.getenv("API_HOST", "127.0.0.1")
     port = int(os.getenv("API_PORT", "8000"))
     reload_enabled = os.getenv("API_RELOAD", "false").lower() in ("1", "true", "yes", "on")
     uvicorn.run("server:app", host=host, port=port, reload=reload_enabled)
