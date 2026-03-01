@@ -288,7 +288,8 @@ def update_bounty_status(bounty_id: str, status: str, reward: float = None):
 def create_session(
     user_id: str, mode: str = "READ_ONLY",
     target_scope: str = None, ip_address: str = None,
-    user_agent: str = None, device_hash: str = None
+    user_agent: str = None, device_hash: str = None,
+    metadata: Dict[str, Any] = None
 ) -> Dict[str, Any]:
     """Create a new session."""
     session_id = str(uuid.uuid4())
@@ -303,6 +304,7 @@ def create_session(
         "ip_address": ip_address,
         "user_agent": user_agent,
         "device_hash": device_hash,
+        "metadata_json": metadata or {},
         "started_at": now,
     }
 

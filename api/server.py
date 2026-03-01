@@ -15,6 +15,7 @@ import json
 import asyncio
 import hashlib
 import logging
+import ipaddress
 
 logger = logging.getLogger("ygb.server")
 from datetime import datetime, UTC
@@ -2127,18 +2128,85 @@ _ALLOW_PASSWORD_LOGIN = os.getenv("ALLOW_PASSWORD_LOGIN", "false").lower() == "t
 
 
 def _extract_client_ip(req: Request) -> str:
-    """Extract client IP from proxy headers when available, else socket peer IP."""
+    """
+    Extract the most trustworthy client IP.
+
+    Preference order:
+    1) Public IPs from common proxy headers (Cloudflare/ELB/Nginx/etc.)
+    2) Any valid IP from those headers
+    3) Socket peer IP as final fallback
+    """
+
+    def _normalize(candidate: str) -> str:
+        if not candidate:
+            return ""
+        val = candidate.strip().strip('"').strip("'")
+        if not val or val.lower() == "unknown":
+            return ""
+        # RFC7239 Forwarded header token, e.g. for=1.2.3.4 or for="[2001:db8::1]:443"
+        if val.lower().startswith("for="):
+            val = val[4:].strip().strip('"').strip("'")
+        # Strip IPv6 brackets
+        if val.startswith("[") and "]" in val:
+            val = val[1:val.index("]")]
+        # Strip IPv4 :port suffix
+        if "." in val and val.count(":") == 1:
+            host, port = val.rsplit(":", 1)
+            if port.isdigit():
+                val = host
+        try:
+            return str(ipaddress.ip_address(val))
+        except ValueError:
+            return ""
+
+    def _is_public(ip: str) -> bool:
+        try:
+            parsed = ipaddress.ip_address(ip)
+        except ValueError:
+            return False
+        return parsed.is_global
+
+    candidates: list[str] = []
+
+    # Single-IP headers commonly set by trusted proxies/CDNs
+    for h in ("cf-connecting-ip", "true-client-ip", "x-client-ip", "x-real-ip"):
+        val = _normalize(req.headers.get(h, ""))
+        if val:
+            candidates.append(val)
+
+    # Multi-hop list: left-most is original client in standard deployments
     xff = req.headers.get("x-forwarded-for", "")
     if xff:
-        first = xff.split(",")[0].strip()
-        if first:
-            return first
+        for part in xff.split(","):
+            val = _normalize(part)
+            if val:
+                candidates.append(val)
 
-    xrip = req.headers.get("x-real-ip", "").strip()
-    if xrip:
-        return xrip
+    # RFC7239 Forwarded: for=...
+    forwarded = req.headers.get("forwarded", "")
+    if forwarded:
+        for group in forwarded.split(","):
+            for token in group.split(";"):
+                token = token.strip()
+                if token.lower().startswith("for="):
+                    val = _normalize(token)
+                    if val:
+                        candidates.append(val)
 
-    return req.client.host if req.client else "unknown"
+    # Final fallback: peer socket IP
+    peer_ip = _normalize(req.client.host if req.client else "")
+    if peer_ip:
+        candidates.append(peer_ip)
+
+    # Prefer public routable IP.
+    for ip in candidates:
+        if _is_public(ip):
+            return ip
+
+    # Otherwise return first valid candidate.
+    if candidates:
+        return candidates[0]
+    return "unknown"
 
 
 class LoginRequest(BaseModel):
@@ -2157,22 +2225,26 @@ class RegisterRequest(BaseModel):
 @app.post("/auth/register")
 async def register_user(request: RegisterRequest, req: Request):
     """Register a new user with hashed password."""
-    existing = get_user_by_email(request.email)
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    pw_hash = hash_password(request.password)
-    user = create_user(request.name, request.email, "hunter")  # Always hunter — no privilege escalation
-    update_user_password(user["id"], pw_hash)
-
     ip = _extract_client_ip(req)
-    log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
 
-    token = generate_jwt(user["id"], request.email)
+    def _sync_register():
+        existing = get_user_by_email(request.email)
+        if existing:
+            return None  # signal already exists
+        pw_hash = hash_password(request.password)
+        user = create_user(request.name, request.email, "hunter")
+        update_user_password(user["id"], pw_hash)
+        log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
+        token = generate_jwt(user["id"], request.email)
+        return {"user": user, "token": token}
+
+    result = await asyncio.to_thread(_sync_register)
+    if result is None:
+        raise HTTPException(status_code=400, detail="Email already registered")
     return {
         "success": True,
-        "user": {"id": user["id"], "name": user["name"], "email": user["email"]},
-        "token": token
+        "user": {"id": result["user"]["id"], "name": result["user"]["name"], "email": result["user"]["email"]},
+        "token": result["token"]
     }
 
 
@@ -2190,87 +2262,87 @@ async def login(request: LoginRequest, req: Request):
 
     ip = _extract_client_ip(req)
     ua = req.headers.get("user-agent", "unknown")
-    location = resolve_ip_geolocation(ip)
 
-    # Rate limiting
+    # Rate limiting (fast, no I/O)
     limiter = get_rate_limiter()
     if limiter.is_rate_limited(ip):
         alert_rate_limit_exceeded(ip, limiter.max_attempts)
-        log_activity(None, "RATE_LIMIT_EXCEEDED", f"IP {ip} exceeded login rate limit", ip_address=ip)
         raise HTTPException(status_code=429, detail="Too many login attempts. Try again later.")
-
     limiter.record_attempt(ip)
 
-    # Find user
-    user = get_user_by_email(request.email)
-    if not user:
-        log_activity(None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip)
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    def _sync_login():
+        """All blocking I/O (bcrypt, SQLite, SMTP alerts) runs in thread pool."""
+        location = resolve_ip_geolocation(ip)
 
-    # Verify password
-    if not user.get("password_hash") or not verify_password(request.password, user["password_hash"]):
-        log_activity(user["id"], "LOGIN_FAILED", "Invalid password", ip_address=ip)
-        alert_suspicious_activity(
-            f"Failed login attempt for {user['name']}",
-            ip_address=ip, user_name=user["name"],
-            metadata={"email": request.email}
+        user = get_user_by_email(request.email)
+        if not user:
+            log_activity(None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip)
+            return {"error": 401, "detail": "Invalid credentials"}
+
+        if not user.get("password_hash") or not verify_password(request.password, user["password_hash"]):
+            log_activity(user["id"], "LOGIN_FAILED", "Invalid password", ip_address=ip)
+            try:
+                alert_suspicious_activity(
+                    f"Failed login attempt for {user['name']}",
+                    ip_address=ip, user_name=user["name"],
+                    metadata={"email": request.email}
+                )
+            except Exception:
+                pass
+            return {"error": 401, "detail": "Invalid credentials"}
+
+        limiter.reset(ip)
+
+        if needs_rehash(user["password_hash"]):
+            new_hash = hash_password(request.password)
+            update_user_password(user["id"], new_hash)
+
+        dh = compute_device_hash(ua, ip)
+        device = register_device(user["id"], dh, ip, ua, location=location)
+        session = create_session(
+            user["id"], "AUTHENTICATED", None,
+            ip_address=ip,
+            user_agent=ua,
+            device_hash=dh,
+            metadata={
+                "auth_method": "password",
+                "geolocation": location,
+            },
         )
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        log_activity(user["id"], "LOGIN_SUCCESS", f"Login from {ip} ({location})", ip_address=ip)
 
-    # Success — reset rate limiter
-    limiter.reset(ip)
+        try:
+            alert_new_login(user["name"], ip, ua, location)
+            if device.get("is_new"):
+                alert_new_device(user["name"], dh, ip, ua, location)
+            active_count = get_active_device_count(user["id"])
+            if active_count > 1:
+                devices = get_user_devices(user["id"])
+                alert_multiple_devices(user["name"], active_count, devices)
+        except Exception:
+            pass  # alerts are best-effort
 
-    # B9: Auto-rehash legacy password to v2 on successful login
-    if needs_rehash(user["password_hash"]):
-        new_hash = hash_password(request.password)
-        update_user_password(user["id"], new_hash)
-        log_activity(user["id"], "PASSWORD_REHASHED", "Legacy hash upgraded to v2", ip_address=ip)
+        token = generate_jwt(user["id"], user.get("email"))
+        return {
+            "success": True,
+            "user": {"id": user["id"], "name": user["name"], "email": user.get("email")},
+            "token": token,
+            "session_id": session["id"],
+            "device": {"hash": dh, "is_new": device.get("is_new", False)},
+            "network": {"ip": ip, "geolocation": location},
+            "auth_method": "password",
+        }
 
-    # Compute device hash and register device
-    dh = compute_device_hash(ua, ip)
-    device = register_device(user["id"], dh, ip, ua, location=location)
-
-    # Create session on HDD
-    session = create_session(
-        user["id"], "AUTHENTICATED", None,
-        ip_address=ip, user_agent=ua, device_hash=dh
-    )
-
-    # Log activity
-    log_activity(
-        user["id"],
-        "LOGIN_SUCCESS",
-        f"Login from {ip} ({location})",
-        ip_address=ip,
-    )
-
-    # Send alerts
-    alert_new_login(user["name"], ip, ua, location)
-
-    if device.get("is_new"):
-        alert_new_device(user["name"], dh, ip, ua, location)
-
-    active_count = get_active_device_count(user["id"])
-    if active_count > 1:
-        devices = get_user_devices(user["id"])
-        alert_multiple_devices(user["name"], active_count, devices)
-
-    # Generate JWT
-    token = generate_jwt(user["id"], user.get("email"))
-
-    return {
-        "success": True,
-        "user": {"id": user["id"], "name": user["name"], "email": user.get("email")},
-        "token": token,
-        "session_id": session["id"],
-        "device": {"hash": dh, "is_new": device.get("is_new", False)}
-    }
+    result = await asyncio.to_thread(_sync_login)
+    if "error" in result:
+        raise HTTPException(status_code=result["error"], detail=result["detail"])
+    return result
 
 
 @app.post("/auth/logout")
 async def logout(req: Request, user=Depends(require_auth)):
     """End current session. Revokes token and invalidates session."""
-    ip = req.client.host if req.client else "unknown"
+    ip = _extract_client_ip(req)
 
     # Extract and revoke the Bearer token
     auth_header = req.headers.get("authorization", "")
@@ -2290,6 +2362,51 @@ async def logout(req: Request, user=Depends(require_auth)):
     user_id = user.get("sub")
     log_activity(user_id, "LOGOUT", f"Logout from {ip} — token+session revoked", ip_address=ip)
     return {"success": True, "message": "Logged out — token and session revoked"}
+
+
+@app.get("/auth/profile")
+async def auth_profile(user=Depends(require_auth)):
+    """Return authenticated profile + latest network/device context."""
+    user_id = user.get("sub", "")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid auth token payload")
+
+    record = get_user(user_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    devices = get_user_devices(user_id)
+    latest_device = None
+    if devices:
+        latest_device = max(devices, key=lambda d: d.get("last_seen", ""))
+
+    github_profile = None
+    for evt in get_recent_activity(limit=200):
+        if evt.get("user_id") != user_id:
+            continue
+        if evt.get("action_type") != "LOGIN_SUCCESS_GITHUB":
+            continue
+        md = evt.get("metadata_json") or {}
+        if isinstance(md, dict) and md.get("github_profile"):
+            github_profile = md.get("github_profile")
+            break
+
+    return {
+        "success": True,
+        "user": {
+            "id": record["id"],
+            "name": record.get("name", ""),
+            "email": record.get("email"),
+            "role": record.get("role", "hunter"),
+        },
+        "session_id": user.get("session_id"),
+        "network": {
+            "ip_address": latest_device.get("ip_address") if latest_device else None,
+            "geolocation": latest_device.get("location") if latest_device else None,
+        },
+        "device": latest_device,
+        "github_profile": github_profile,
+    }
 
 
 @app.get("/admin/active-devices")
@@ -3252,6 +3369,26 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             return resp
         github_login = user_data.get("login", "")
         github_email = user_data.get("email", "")
+        github_profile = {
+            "github_id": github_id,
+            "github_login": github_login,
+            "name": user_data.get("name") or github_login or "",
+            "email": github_email or "",
+            "avatar_url": user_data.get("avatar_url", ""),
+            "html_url": user_data.get("html_url", ""),
+            "company": user_data.get("company", ""),
+            "blog": user_data.get("blog", ""),
+            "location": user_data.get("location", ""),
+            "bio": user_data.get("bio", ""),
+            "public_repos": int(user_data.get("public_repos") or 0),
+            "followers": int(user_data.get("followers") or 0),
+            "following": int(user_data.get("following") or 0),
+            "geoip_location": location,
+            "ip_address": ip,
+        }
+        for key, value in list(github_profile.items()):
+            if isinstance(value, str):
+                github_profile[key] = value.strip()[:512]
 
         # 3. If email not public, fetch from /user/emails
         if not github_email:
@@ -3276,6 +3413,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         if not github_email:
             # Stable fallback identifier when account email is unavailable.
             github_email = f"github-{github_id}@users.noreply.local"
+        github_profile["email"] = github_email
 
         # 4. Create or resolve local user account
         user = get_user_by_email(github_email)
@@ -3299,13 +3437,23 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             ip_address=ip,
             user_agent=ua,
             device_hash=dh,
+            metadata={
+                "auth_method": "github",
+                "github_login": github_login,
+                "github_id": github_id,
+                "geolocation": location,
+            },
         )
         log_activity(
             user["id"],
             "LOGIN_SUCCESS_GITHUB",
             f"GitHub login from {ip} ({location})",
             ip_address=ip,
-            metadata={"github_login": github_login, "github_id": github_id},
+            metadata={
+                "github_login": github_login,
+                "github_id": github_id,
+                "github_profile": github_profile,
+            },
         )
         alert_new_login(user["name"], ip, ua, location)
         if device.get("is_new"):
@@ -3321,6 +3469,23 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
         safe_token = urllib.parse.quote_plus(jwt_token)
         safe_session = urllib.parse.quote_plus(session["id"])
+        safe_profile = urllib.parse.quote_plus(
+            json.dumps(github_profile, separators=(",", ":"), ensure_ascii=False)
+        )
+        # Avoid overly long callback URLs by degrading to a minimal profile payload.
+        if len(safe_profile) > 1800:
+            minimal_profile = {
+                "github_id": github_id,
+                "github_login": github_login,
+                "name": github_profile.get("name", ""),
+                "avatar_url": github_profile.get("avatar_url", ""),
+                "html_url": github_profile.get("html_url", ""),
+                "geoip_location": location,
+                "ip_address": ip,
+            }
+            safe_profile = urllib.parse.quote_plus(
+                json.dumps(minimal_profile, separators=(",", ":"), ensure_ascii=False)
+            )
 
         logger.info(
             "GitHub login success user=%s email=%s ip=%s location=%s",
@@ -3337,6 +3502,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                 f"&user={safe_user}"
                 f"&session_id={safe_session}"
                 f"&auth=github"
+                f"&profile={safe_profile}"
             ),
             status_code=302,
         )
@@ -3370,7 +3536,7 @@ async def admin_login(request: AdminLoginRequest, req: Request):
         result = admin_auth_login(
             email=request.email,
             totp_code=request.totp_code,
-            ip=req.client.host if req.client else "0.0.0.0",
+            ip=_extract_client_ip(req),
         )
         if result.get("status") == "ok":
             return result

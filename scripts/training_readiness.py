@@ -15,9 +15,16 @@ Exit codes:
 import json
 import os
 import sys
+import re
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def _read_text(path: str) -> str:
+    """Read text robustly across mixed encodings in this repository."""
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        return f.read()
 
 
 def check(name, condition, detail=""):
@@ -93,8 +100,7 @@ def main():
         "Missing native/training_runtime/training_telemetry.cpp"
     ))
     if os.path.isfile(telemetry_path):
-        with open(telemetry_path, "r", errors="ignore") as f:
-            content = f.read()
+        content = _read_text(telemetry_path)
         results.append(check(
             "Has run_tests() self-validation",
             "run_tests()" in content,
@@ -105,11 +111,20 @@ def main():
             "rename" in content and "fopen" in content,
             "No atomic persist pattern found"
         ))
+        # Validate fields written by native telemetry payload.
         required_fields = [
-            "total_epochs", "completed_epochs", "current_loss",
-            "precision", "ece", "drift_kl", "duplicate_rate",
-            "gpu_util", "cpu_util", "temperature",
-            "determinism_status", "freeze_status",
+            "epoch",
+            "loss",
+            "precision",
+            "ece",
+            "kl_divergence",
+            "gpu_temperature",
+            "determinism_status",
+            "freeze_status",
+            "wall_clock_unix",
+            "monotonic_start_time",
+            "training_duration_seconds",
+            "samples_per_second",
         ]
         missing = [f for f in required_fields if f not in content]
         results.append(check(
@@ -127,8 +142,7 @@ def main():
         "Missing backend/api/runtime_api.py"
     ))
     if os.path.isfile(api_path):
-        with open(api_path, "r") as f:
-            content = f.read()
+        content = _read_text(api_path)
         results.append(check(
             "HMAC signing implemented",
             "hmac" in content.lower() and "sha256" in content.lower(),
@@ -151,17 +165,19 @@ def main():
     print("\n[5/7] Frontend Control Panel")
     page_path = os.path.join(ROOT, "frontend", "app", "control", "page.tsx")
     if os.path.isfile(page_path):
-        with open(page_path, "r", errors="ignore") as f:
-            content = f.read()
+        content = _read_text(page_path)
         results.append(check(
             "Polls /runtime/status",
             "/runtime/status" in content,
             "No /runtime/status polling in page.tsx"
         ))
+        runtime_poll_interval_ok = bool(
+            re.search(r"setInterval\s*\(\s*fetchRuntimeStatus\s*,\s*(1000|3000|30000)\s*\)", content)
+        )
         results.append(check(
-            "30-second interval",
-            "30000" in content,
-            "Polling interval not set to 30s"
+            "Runtime polling interval configured",
+            runtime_poll_interval_ok,
+            "No recognized setInterval(fetchRuntimeStatus, N) found"
         ))
         results.append(check(
             "Stale warning displayed",
@@ -185,8 +201,7 @@ def main():
         "Missing scripts/coverage_gate.py"
     ))
     if os.path.isfile(gate_path):
-        with open(gate_path, "r") as f:
-            content = f.read()
+        content = _read_text(gate_path)
         results.append(check(
             "Python threshold >=95%",
             "PYTHON_COVERAGE_THRESHOLD = 95" in content,

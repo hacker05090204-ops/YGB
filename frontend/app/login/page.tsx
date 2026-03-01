@@ -10,17 +10,36 @@ function LoginContent() {
     const router = useRouter()
     const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
     const [message, setMessage] = useState("")
-    const [userName, setUserName] = useState("")
 
     useEffect(() => {
         const token = searchParams.get("token")
         const error = searchParams.get("error")
         const user = searchParams.get("user")
+        const sessionId = searchParams.get("session_id")
+        const authMethod = searchParams.get("auth")
+        const encodedProfile = searchParams.get("profile")
 
         if (token) {
             // Store token and redirect to control page
             sessionStorage.setItem("ygb_token", token)
-            if (user) setUserName(user)
+            if (sessionId) {
+                sessionStorage.setItem("ygb_session_id", sessionId)
+            }
+            if (authMethod) {
+                sessionStorage.setItem("ygb_auth_method", authMethod)
+            }
+            if (encodedProfile) {
+                try {
+                    const profile = JSON.parse(encodedProfile)
+                    sessionStorage.setItem("ygb_profile", JSON.stringify(profile))
+                    sessionStorage.setItem("ygb_network", JSON.stringify({
+                        ip: profile.ip_address || null,
+                        geolocation: profile.geoip_location || null,
+                    }))
+                } catch {
+                    // Ignore malformed profile payloads; token login still succeeds.
+                }
+            }
             setStatus("success")
             setMessage(`Welcome, ${user || "user"}!`)
 
@@ -34,6 +53,8 @@ function LoginContent() {
                 token_exchange_failed: "Failed to exchange code for token",
                 server_error: "Server error during authentication",
                 access_denied: "Access denied by GitHub",
+                state_mismatch: "OAuth state mismatch detected; please retry login",
+                invalid_github_profile: "GitHub profile data was incomplete",
             }
             setMessage(errorMessages[error] || `Authentication error: ${error}`)
         }
@@ -128,7 +149,8 @@ function LoginContent() {
                                         }
                                         sessionStorage.setItem("ygb_token", data.token)
                                         if (data.session_id) sessionStorage.setItem("ygb_session_id", data.session_id)
-                                        setUserName(data.user?.name || email)
+                                        if (data.auth_method) sessionStorage.setItem("ygb_auth_method", data.auth_method)
+                                        if (data.network) sessionStorage.setItem("ygb_network", JSON.stringify(data.network))
                                         setStatus("success")
                                         setMessage(`Welcome, ${data.user?.name || email}!`)
                                         setTimeout(() => router.push("/control"), 1500)
