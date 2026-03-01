@@ -14,9 +14,27 @@ import json
 from datetime import datetime, timezone
 
 
-PYTHON_COVERAGE_THRESHOLD = 50
-CPP_COVERAGE_THRESHOLD = 40
-JSTS_COVERAGE_THRESHOLD = 30
+PYTHON_COVERAGE_THRESHOLD = 95
+CPP_COVERAGE_THRESHOLD = 85
+JSTS_COVERAGE_THRESHOLD = 80
+
+
+def _is_ci() -> bool:
+    val = os.getenv("CI", "").strip().lower()
+    return val in {"1", "true", "yes", "on"}
+
+
+def _gate_mode() -> str:
+    """
+    Coverage gate behavior.
+    - strict: fail process when thresholds are not met (default in CI)
+    - advisory: report deficits but return success (default for local/dev)
+    """
+    mode = os.getenv(
+        "COVERAGE_GATE_MODE",
+        "strict" if _is_ci() else "advisory",
+    ).strip().lower()
+    return mode if mode in {"strict", "advisory"} else "advisory"
 
 
 def get_project_root() -> str:
@@ -24,67 +42,70 @@ def get_project_root() -> str:
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-def read_python_coverage(project_root: str) -> dict:
-    """Read Python coverage from coverage_python.json. Exit if missing."""
-    path = os.path.join(project_root, "coverage_python.json")
-    if not os.path.exists(path):
-        print(f"FATAL: coverage_python.json not found at {path}")
-        print("Python coverage step must run BEFORE coverage_gate.py")
-        sys.exit(1)
+def _pick_existing_file(paths: list[str]) -> str | None:
+    existing = [p for p in paths if os.path.exists(p)]
+    if not existing:
+        return None
+    # Prefer the most recently modified artifact.
+    existing.sort(key=lambda p: os.path.getmtime(p), reverse=True)
+    return existing[0]
 
-    with open(path) as f:
+
+def read_python_coverage(project_root: str, strict: bool) -> dict:
+    """Read Python coverage from available coverage JSON artifacts."""
+    path = _pick_existing_file([
+        os.path.join(project_root, "coverage_python.json"),
+        os.path.join(project_root, "coverage.json"),
+    ])
+    if not path:
+        msg = "No Python coverage artifact found (coverage_python.json / coverage.json)."
+        print(f"WARNING: {msg}")
+        return {
+            "tool": "pytest-cov",
+            "threshold": PYTHON_COVERAGE_THRESHOLD,
+            "coverage_pct": -1.0,
+            "passed": not strict,
+            "available": False,
+            "reason": msg,
+        }
+
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
 
-    pct = data["totals"]["percent_covered"]
+    totals = data.get("totals", {})
+    pct = totals.get("percent_covered", totals.get("percent_covered_display", 0.0))
+    try:
+        pct = float(pct)
+    except (TypeError, ValueError):
+        pct = 0.0
     return {
         "tool": "pytest-cov",
+        "artifact": os.path.basename(path),
         "threshold": PYTHON_COVERAGE_THRESHOLD,
         "coverage_pct": pct,
         "passed": pct >= PYTHON_COVERAGE_THRESHOLD,
+        "available": True,
     }
 
 
-def read_cpp_coverage(project_root: str) -> dict:
+def read_cpp_coverage(project_root: str, strict: bool) -> dict:
     """Read C++ coverage from coverage_cpp.json."""
     path = os.path.join(project_root, "coverage_cpp.json")
     result = {
         "tool": "gcovr",
         "threshold": CPP_COVERAGE_THRESHOLD,
-        "coverage_pct": 0.0,
+        "coverage_pct": -1.0,
         "passed": False,
+        "available": False,
     }
 
     if not os.path.exists(path):
         print(f"WARNING: coverage_cpp.json not found at {path}")
-        print("C++ coverage step may have failed — checking self-tests...")
-
-        # Fallback: count self-test files
-        native_dir = os.path.join(project_root, "native")
-        if os.path.isdir(native_dir):
-            cpp_files = []
-            tested = 0
-            for root_dir, _, files in os.walk(native_dir):
-                for f in files:
-                    if f.endswith(".cpp"):
-                        cpp_files.append(os.path.join(root_dir, f))
-                        try:
-                            with open(os.path.join(root_dir, f), "r",
-                                      encoding="utf-8", errors="ignore") as fh:
-                                content = fh.read()
-                            if any(k in content for k in (
-                                "run_tests", "self_test",
-                                "RUN_SELF_TESTS", "RUN_SELF_TEST")):
-                                tested += 1
-                        except Exception:
-                            pass
-            if cpp_files:
-                result["coverage_pct"] = (tested / len(cpp_files)) * 100
-                result["passed"] = result["coverage_pct"] >= CPP_COVERAGE_THRESHOLD
-                print(f"  Self-test coverage: {tested}/{len(cpp_files)} files "
-                      f"({result['coverage_pct']:.1f}%)")
+        result["reason"] = "coverage_cpp.json missing"
+        result["passed"] = not strict
         return result
 
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
 
     line_total = data.get("line_total", 0)
@@ -92,16 +113,18 @@ def read_cpp_coverage(project_root: str) -> dict:
     if line_total > 0:
         result["coverage_pct"] = (line_covered / line_total) * 100
     result["passed"] = result["coverage_pct"] >= CPP_COVERAGE_THRESHOLD
+    result["available"] = True
     return result
 
 
-def read_jsts_coverage(project_root: str) -> dict:
+def read_jsts_coverage(project_root: str, strict: bool) -> dict:
     """Read JS/TS coverage from coverage-summary.json."""
     result = {
         "tool": "vitest/jest",
         "threshold": JSTS_COVERAGE_THRESHOLD,
-        "coverage_pct": 0.0,
+        "coverage_pct": -1.0,
         "passed": False,
+        "available": False,
     }
 
     paths = [
@@ -110,23 +133,29 @@ def read_jsts_coverage(project_root: str) -> dict:
         os.path.join(project_root, "coverage", "coverage-summary.json"),
     ]
 
-    for path in paths:
-        if os.path.exists(path):
-            with open(path) as f:
-                data = json.load(f)
-            pct = data["total"]["lines"]["pct"]
-            result["coverage_pct"] = pct
-            result["passed"] = pct >= JSTS_COVERAGE_THRESHOLD
-            return result
+    path = _pick_existing_file(paths)
+    if path:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        pct = data["total"]["lines"]["pct"]
+        result["coverage_pct"] = pct
+        result["passed"] = pct >= JSTS_COVERAGE_THRESHOLD
+        result["available"] = True
+        result["artifact"] = path
+        return result
 
     # No frontend = not applicable
     frontend_dir = os.path.join(project_root, "frontend")
     if not os.path.isdir(frontend_dir):
         result["passed"] = True
         result["coverage_pct"] = -1
+        result["available"] = False
+        result["reason"] = "frontend directory not found"
         return result
 
     print("WARNING: frontend exists but no coverage-summary.json found")
+    result["passed"] = not strict
+    result["reason"] = "coverage-summary.json missing"
     return result
 
 
@@ -136,12 +165,21 @@ def fmt_pct(pct: float) -> str:
     return f"{pct:.1f}%"
 
 
+def _deficit(pct: float, threshold: int) -> str:
+    if pct < 0:
+        return "N/A"
+    return f"{max(0.0, threshold - pct):.1f}%"
+
+
 def main():
     project_root = get_project_root()
+    mode = _gate_mode()
+    strict = mode == "strict"
 
     print("=" * 60)
     print("COVERAGE GATE")
     print("=" * 60)
+    print(f"  Mode: {mode.upper()}")
 
     # Debug
     print(f"  Project root: {project_root}")
@@ -149,15 +187,15 @@ def main():
 
     # Read artifacts
     print("\n[1/3] Python coverage...")
-    py = read_python_coverage(project_root)
+    py = read_python_coverage(project_root, strict)
     print(f"  {fmt_pct(py['coverage_pct'])} (>={PYTHON_COVERAGE_THRESHOLD}%)")
 
     print("\n[2/3] C++ coverage...")
-    cpp = read_cpp_coverage(project_root)
+    cpp = read_cpp_coverage(project_root, strict)
     print(f"  {fmt_pct(cpp['coverage_pct'])} (>={CPP_COVERAGE_THRESHOLD}%)")
 
     print("\n[3/3] JS/TS coverage...")
-    jsts = read_jsts_coverage(project_root)
+    jsts = read_jsts_coverage(project_root, strict)
     print(f"  {fmt_pct(jsts['coverage_pct'])} (>={JSTS_COVERAGE_THRESHOLD}%)")
 
     # Generate report
@@ -182,15 +220,20 @@ def main():
     print("COVERAGE SUMMARY")
     print("-" * 60)
     print(f"  Python:  {fmt_pct(py['coverage_pct']):>8}  "
-          f"(>={PYTHON_COVERAGE_THRESHOLD}%)  [{py_s}]")
+          f"(>={PYTHON_COVERAGE_THRESHOLD}%)  [{py_s}]  deficit={_deficit(py['coverage_pct'], PYTHON_COVERAGE_THRESHOLD)}")
     print(f"  C++:     {fmt_pct(cpp['coverage_pct']):>8}  "
-          f"(>={CPP_COVERAGE_THRESHOLD}%)  [{cpp_s}]")
+          f"(>={CPP_COVERAGE_THRESHOLD}%)  [{cpp_s}]  deficit={_deficit(cpp['coverage_pct'], CPP_COVERAGE_THRESHOLD)}")
     print(f"  JS/TS:   {fmt_pct(jsts['coverage_pct']):>8}  "
-          f"(>={JSTS_COVERAGE_THRESHOLD}%)  [{jsts_s}]")
+          f"(>={JSTS_COVERAGE_THRESHOLD}%)  [{jsts_s}]  deficit={_deficit(jsts['coverage_pct'], JSTS_COVERAGE_THRESHOLD)}")
     print("-" * 60)
 
     if report["overall_passed"]:
         print("COVERAGE GATE: PASSED")
+        print("=" * 60)
+        return 0
+    elif not strict:
+        print("COVERAGE GATE: ADVISORY (thresholds not met, non-blocking mode)")
+        print("Set COVERAGE_GATE_MODE=strict (or CI=true) to enforce failure.")
         print("=" * 60)
         return 0
     else:

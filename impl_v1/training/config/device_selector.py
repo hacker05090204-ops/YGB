@@ -59,8 +59,8 @@ def _detect_cuda() -> Optional[DeviceSelection]:
 
         for i in range(gpu_count):
             props = torch.cuda.get_device_properties(i)
-            if props.total_mem > best_mem:
-                best_mem = props.total_mem
+            if props.total_memory > best_mem:
+                best_mem = props.total_memory
                 best_idx = i
 
         props = torch.cuda.get_device_properties(best_idx)
@@ -71,7 +71,7 @@ def _detect_cuda() -> Optional[DeviceSelection]:
             device_name=props.name,
             gpu_count=gpu_count,
             selected_gpu_index=best_idx,
-            vram_total_mb=props.total_mem / (1024 * 1024),
+            vram_total_mb=props.total_memory / (1024 * 1024),
             compute_capability=cc,
             ddp_available=gpu_count > 1,
             mps_available=False,

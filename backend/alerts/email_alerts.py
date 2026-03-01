@@ -116,7 +116,7 @@ def alert_new_login(user_name: str, ip_address: str, user_agent: str,
 
 
 def alert_new_device(user_name: str, device_hash: str, ip_address: str,
-                     user_agent: str) -> bool:
+                     user_agent: str, location: str = "Unknown") -> bool:
     """Send alert for login from a new/unrecognized device."""
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     subject = f"⚠️ New Device: {user_name}"
@@ -130,6 +130,7 @@ def alert_new_device(user_name: str, device_hash: str, ip_address: str,
         <tr><td><strong>Device Hash:</strong></td><td>{device_hash}</td></tr>
         <tr><td><strong>IP Address:</strong></td><td>{ip_address}</td></tr>
         <tr><td><strong>User Agent:</strong></td><td>{user_agent}</td></tr>
+        <tr><td><strong>Location:</strong></td><td>{location}</td></tr>
         <tr><td><strong>Time:</strong></td><td>{now}</td></tr>
     </table>
     <p>If this was not you, change your password immediately.</p>

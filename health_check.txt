@@ -1,0 +1,93 @@
+﻿python : Traceback (most 
+recent call last):
+At line:1 char:1
++ python -c "import 
+urllib.request,json; r=urll
+ib.request.urlopen('http 
+...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Tra  
+  ceback (most recent ca   
+ ll last)::String) [],     
+RemoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  File "<string>", line 1, 
+in <module>
+  File "C:\Program Files\Py
+thon311\Lib\urllib\request.
+py", line 216, in urlopen
+    return 
+opener.open(url, data, 
+timeout)
+           ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
+  File "C:\Program Files\Py
+thon311\Lib\urllib\request.
+py", line 519, in open
+    response = 
+self._open(req, data)
+               
+^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Py
+thon311\Lib\urllib\request.
+py", line 536, in _open
+    result = self._call_cha
+in(self.handle_open, 
+protocol, protocol +
+             ^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+  File "C:\Program Files\Py
+thon311\Lib\urllib\request.
+py", line 496, in 
+_call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "C:\Program Files\Py
+thon311\Lib\urllib\request.
+py", line 1377, in 
+http_open
+    return self.do_open(htt
+p.client.HTTPConnection, 
+req)
+           ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^
+  File "C:\Program Files\Py
+thon311\Lib\urllib\request.
+py", line 1352, in do_open
+    r = h.getresponse()
+        ^^^^^^^^^^^^^^^
+  File "C:\Program Files\Py
+thon311\Lib\http\client.py"
+, line 1395, in getresponse
+    response.begin()
+  File "C:\Program Files\Py
+thon311\Lib\http\client.py"
+, line 325, in begin
+    version, status, 
+reason = 
+self._read_status()
+                           
+   ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Py
+thon311\Lib\http\client.py"
+, line 286, in _read_status
+    line = str(self.fp.read
+line(_MAXLINE + 1), 
+"iso-8859-1")
+               ^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Py
+thon311\Lib\socket.py", 
+line 706, in readinto
+    return 
+self._sock.recv_into(b)
+           
+^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: timed out

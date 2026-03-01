@@ -109,7 +109,7 @@ class TrainingStateManager:
             )
             props = torch.cuda.get_device_properties(0)
             result["gpu_memory_total_mb"] = round(
-                props.total_mem / 1024 / 1024, 2
+                props.total_memory / 1024 / 1024, 2
             )
         except Exception:
             pass

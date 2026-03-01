@@ -83,7 +83,7 @@ def get_gpu_utilization() -> dict:
         result['gpu_count'] = torch.cuda.device_count()
         result['memory_used_mb'] = torch.cuda.memory_allocated() / (1024 * 1024)
         result['memory_peak_mb'] = torch.cuda.max_memory_allocated() / (1024 * 1024)
-        result['memory_total_mb'] = torch.cuda.get_device_properties(0).total_mem / (1024 * 1024)
+        result['memory_total_mb'] = torch.cuda.get_device_properties(0).total_memory / (1024 * 1024)
         
         # GPU utilization from memory ratio (approximate)
         if result['memory_total_mb'] > 0:

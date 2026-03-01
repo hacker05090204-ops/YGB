@@ -8,7 +8,7 @@ Tests for all 10 P0 security items:
 4. No duplicate /api/voice/parse route ambiguity
 5. No weak/default secret behavior
 6. Video token endpoint requires auth
-7. Password hashing upgraded to iterative HMAC
+7. Password hashing upgraded to modern versioned hashes (v3/v3s)
 8. SSRF/scope gating blocks private IPs
 9. Synthetic data fallback is impossible
 10. Update signature verification is strict
@@ -230,15 +230,27 @@ class TestSecretHandling:
     def test_preflight_check_accepts_strong_secret(self):
         """preflight_check_secrets() must pass with a strong secret."""
         from backend.auth.auth_guard import preflight_check_secrets
-        original = os.environ.get("JWT_SECRET")
+        original_jwt = os.environ.get("JWT_SECRET")
+        original_hmac = os.environ.get("YGB_HMAC_SECRET")
+        original_video = os.environ.get("YGB_VIDEO_JWT_SECRET")
         try:
             os.environ["JWT_SECRET"] = secrets.token_hex(32)
+            os.environ["YGB_HMAC_SECRET"] = secrets.token_hex(32)
+            os.environ["YGB_VIDEO_JWT_SECRET"] = secrets.token_hex(32)
             preflight_check_secrets()  # Should not raise
         finally:
-            if original:
-                os.environ["JWT_SECRET"] = original
+            if original_jwt:
+                os.environ["JWT_SECRET"] = original_jwt
             elif "JWT_SECRET" in os.environ:
                 del os.environ["JWT_SECRET"]
+            if original_hmac:
+                os.environ["YGB_HMAC_SECRET"] = original_hmac
+            elif "YGB_HMAC_SECRET" in os.environ:
+                del os.environ["YGB_HMAC_SECRET"]
+            if original_video:
+                os.environ["YGB_VIDEO_JWT_SECRET"] = original_video
+            elif "YGB_VIDEO_JWT_SECRET" in os.environ:
+                del os.environ["YGB_VIDEO_JWT_SECRET"]
 
     def test_startup_calls_preflight(self):
         """Server startup lifespan must call preflight_check_secrets()."""
@@ -271,18 +283,21 @@ class TestVideoTokenProtection:
 # =============================================================================
 
 class TestPasswordHashing:
-    """Verify password hashing uses iterative HMAC, not plain SHA-256."""
+    """Verify password hashing uses versioned modern hashes with legacy support."""
 
-    def test_hash_produces_v2_format(self):
-        """hash_password must produce v2:salt:hash format."""
+    def test_hash_produces_current_format(self):
+        """hash_password must produce current v3/v3s format."""
         from backend.auth.auth import hash_password
         hashed = hash_password("test_password_123")
-        assert hashed.startswith("v2:"), f"Expected v2 prefix, got: {hashed[:10]}"
-        parts = hashed.split(":", 2)
-        assert len(parts) == 3, "Hash must have format v2:salt:hash"
+        assert (
+            hashed.startswith("v3:") or hashed.startswith("v3s:")
+        ), f"Expected v3/v3s prefix, got: {hashed[:12]}"
+        if hashed.startswith("v3s:"):
+            parts = hashed.split(":", 2)
+            assert len(parts) == 3, "v3s hash must have format v3s:salt:key"
 
-    def test_verify_password_v2(self):
-        """verify_password must correctly verify v2 hashes."""
+    def test_verify_password_current(self):
+        """verify_password must correctly verify current hashes."""
         from backend.auth.auth import hash_password, verify_password
         pw = "my_secure_password_42"
         hashed = hash_password(pw)
@@ -301,10 +316,10 @@ class TestPasswordHashing:
         assert not verify_password("wrong", stored)
 
     def test_needs_rehash_detects_legacy(self):
-        """needs_rehash must return True for legacy hashes."""
+        """needs_rehash must return True for legacy/non-current hashes."""
         from backend.auth.auth import needs_rehash
         assert needs_rehash("abc123:deadbeef")  # v1 format
-        assert not needs_rehash("v2:abc123:deadbeef")  # v2 format
+        assert needs_rehash("v2:abc123:deadbeef")  # v2 format is legacy
 
     def test_verify_rejects_empty(self):
         """verify_password must reject empty password or hash."""

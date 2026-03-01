@@ -15,6 +15,7 @@ import json
 import asyncio
 import hashlib
 import logging
+import ipaddress
 
 logger = logging.getLogger("ygb.server")
 from datetime import datetime, UTC
@@ -55,7 +56,24 @@ from backend.storage.storage_bridge import (
     get_storage_stats, get_lifecycle_status, get_disk_status,
     get_delete_preview, store_video, get_video_stream_token,
     stream_video, list_videos, get_storage_health,
+    update_user_auth_profile, get_admin_user_security_view,
 )
+
+# Import tiered storage manager (SSD cap + HDD overflow)
+try:
+    from backend.storage.tiered_storage import (
+        get_storage_report as get_tiered_report,
+        enforce_ssd_cap,
+        start_enforcement_loop as start_storage_enforcement,
+        resolve_path as resolve_storage_path,
+    )
+    TIERED_STORAGE_AVAILABLE = True
+    # Start background SSD cap enforcement (every 5 min)
+    start_storage_enforcement(300)
+    logger.info("[BOOT] Tiered storage active — SSD cap enforcement running")
+except Exception as _ts_err:
+    TIERED_STORAGE_AVAILABLE = False
+    logger.warning("[BOOT] Tiered storage not available: %s", _ts_err)
 
 # Import activation profiles
 try:
@@ -76,6 +94,7 @@ from backend.auth.auth import (
     compute_device_hash, get_rate_limiter, generate_csrf_token,
     needs_rehash,
 )
+from backend.auth.geoip import resolve_ip_geolocation
 from backend.alerts.email_alerts import (
     alert_new_login, alert_new_device, alert_multiple_devices,
     alert_suspicious_activity, alert_rate_limit_exceeded
@@ -88,13 +107,17 @@ from backend.storage.storage_bridge import (
 
 # Import REAL phase runner with actual browser automation
 try:
-    from phase_runner import RealPhaseRunner, run_real_workflow
+    from api.phase_runner import RealPhaseRunner, run_real_workflow
     PHASE_RUNNER_AVAILABLE = True
 except ImportError:
-    PHASE_RUNNER_AVAILABLE = False
-    RealPhaseRunner = None
-    run_real_workflow = None
-    logger.warning("[BOOT] phase_runner not available — browser automation routes degraded")
+    try:
+        from phase_runner import RealPhaseRunner, run_real_workflow
+        PHASE_RUNNER_AVAILABLE = True
+    except ImportError:
+        PHASE_RUNNER_AVAILABLE = False
+        RealPhaseRunner = None
+        run_real_workflow = None
+        logger.warning("[BOOT] phase_runner not available — browser automation routes degraded")
 
 # =============================================================================
 # G38 AUTO-TRAINING IMPORTS
@@ -1456,10 +1479,15 @@ async def abort_g38_training(user=Depends(require_auth)):
     trainer = get_auto_trainer()
     if getattr(trainer, "_continuous_mode", False):
         result = stop_continuous_training()
+        thread_alive = result.get("thread_alive", False)
         return {
-            "success": result.get("stopped", False),
+            "success": result.get("stop_requested", False),
             "state": trainer.state.value,
-            "message": "Continuous training stop requested",
+            "message": (
+                "Continuous training stop requested; worker thread still draining"
+                if thread_alive
+                else "Continuous training stopped"
+            ),
         }
     result = trainer.abort_training()
     
@@ -1533,7 +1561,7 @@ async def gpu_status(user=Depends(require_auth)):
         result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
         result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
         props = torch.cuda.get_device_properties(0)
-        result["memory_total_mb"] = round(props.total_mem / 1024 / 1024, 2)
+        result["memory_total_mb"] = round(props.total_memory / 1024 / 1024, 2)
         cap = torch.cuda.get_device_capability(0)
         result["compute_capability"] = f"{cap[0]}.{cap[1]}"
     except Exception:
@@ -1605,9 +1633,14 @@ async def training_stop(user=Depends(require_auth)):
     trainer = get_auto_trainer()
     if getattr(trainer, "_continuous_mode", False):
         result = stop_continuous_training()
+        thread_alive = result.get("thread_alive", False)
         return {
-            "success": result.get("stopped", False),
-            "message": "Continuous training stopped",
+            "success": result.get("stop_requested", False),
+            "message": (
+                "Continuous training stop requested; worker thread still draining"
+                if thread_alive
+                else "Continuous training stopped"
+            ),
             "state": trainer.state.value,
         }
     result = trainer.abort_training()
@@ -1664,7 +1697,7 @@ async def get_g38_guards(user=Depends(require_auth)):
     return {
         "guards": guards,
         "total": len(guards),
-        "all_passing": all(not g["returns_false"] is False for g in guards),
+        "all_passing": all(not g["returns_false"] for g in guards),
     }
 
 
@@ -1755,7 +1788,7 @@ async def stop_24_7_training(user=Depends(require_auth)):
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     result = stop_continuous_training()
-    return {"success": result.get("stopped", False), **result}
+    return {"success": result.get("stop_requested", False), **result}
 
 
 @app.get("/training/progress")
@@ -1764,6 +1797,114 @@ async def training_progress(user=Depends(require_auth)):
     mgr = get_training_state_manager()
     metrics = mgr.get_training_progress()
     return metrics.to_dict()
+
+
+@app.websocket("/training/stream")
+async def training_stream(websocket: WebSocket):
+    """Live training telemetry stream for frontend dashboard."""
+    user = await ws_authenticate(websocket)
+    if not user:
+        await websocket.close(code=4001, reason="Authentication required")
+        return
+
+    await websocket.accept()
+
+    if not G38_AVAILABLE:
+        await websocket.send_json({
+            "error": "G38 modules not loaded",
+            "stalled": True,
+            "timestamp": datetime.now(UTC).isoformat(),
+        })
+        await websocket.close(code=1011, reason="G38 unavailable")
+        return
+
+    trainer = get_auto_trainer()
+    mgr = get_training_state_manager()
+    prev_samples_processed = -1
+    unchanged_ticks = 0
+
+    try:
+        while True:
+            status = trainer.get_status()
+            gpu_metrics = mgr.get_gpu_metrics()
+
+            # Batch telemetry from real trainer internals (no synthetic values).
+            total_batches = int(getattr(trainer, "_last_total_batches", 0) or 0)
+            batch_index = int(getattr(trainer, "_last_batch_index", 0) or 0)
+            epoch_samples = int(getattr(trainer, "_last_epoch_samples", 0) or 0)
+            samples_processed = int(getattr(trainer, "_real_samples_processed", 0) or 0)
+            total_samples = int(status.get("dataset_size", 0) or 0)
+
+            if samples_processed == prev_samples_processed:
+                unchanged_ticks += 1
+            else:
+                unchanged_ticks = 0
+            prev_samples_processed = samples_processed
+
+            is_training = bool(status.get("is_training", False))
+            stalled = is_training and unchanged_ticks >= 10
+
+            # GPU utilization fraction expected by frontend [0,1].
+            gpu_usage_percent = gpu_metrics.get("gpu_usage_percent")
+            if gpu_usage_percent is not None:
+                gpu_utilization = max(0.0, min(float(gpu_usage_percent) / 100.0, 1.0))
+            else:
+                gpu_memory_total = float(gpu_metrics.get("gpu_memory_total_mb") or 0.0)
+                gpu_memory_used = float(
+                    gpu_metrics.get("gpu_memory_used_mb")
+                    or status.get("gpu_mem_reserved_mb")
+                    or 0.0
+                )
+                gpu_utilization = (
+                    max(0.0, min(gpu_memory_used / gpu_memory_total, 1.0))
+                    if gpu_memory_total > 0
+                    else 0.0
+                )
+
+            samples_per_sec = float(status.get("samples_per_sec", 0.0) or 0.0)
+            eta_seconds = 0.0
+            if is_training and total_samples > 0 and samples_per_sec > 0:
+                remaining = max(total_samples - epoch_samples, 0)
+                eta_seconds = remaining / samples_per_sec
+
+            lr = 0.0
+            optimizer = getattr(trainer, "_gpu_optimizer", None)
+            try:
+                if optimizer and optimizer.param_groups:
+                    lr = float(optimizer.param_groups[0].get("lr", 0.0) or 0.0)
+            except Exception:
+                lr = 0.0
+
+            frame = {
+                "epoch": int(status.get("epoch", 0) or 0),
+                "batch": batch_index,
+                "total_batches": total_batches,
+                "samples_processed": samples_processed,
+                "total_samples": total_samples,
+                "samples_per_sec": samples_per_sec,
+                "gpu_utilization": gpu_utilization,
+                "gpu_memory_mb": float(status.get("gpu_mem_allocated_mb", 0.0) or 0.0),
+                "gpu_temp": float(gpu_metrics.get("temperature") or 0.0),
+                "loss": float(status.get("last_loss", 0.0) or 0.0),
+                "running_accuracy": float(status.get("last_accuracy", 0.0) or 0.0),
+                "learning_rate": lr,
+                "eta_seconds": eta_seconds,
+                "stalled": stalled,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+            await websocket.send_json(frame)
+            await asyncio.sleep(1.0)
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        logger.exception("Training stream websocket error")
+        try:
+            await websocket.send_json({
+                "error": "Training stream failed",
+                "timestamp": datetime.now(UTC).isoformat(),
+            })
+        except Exception:
+            pass
 
 
 @app.get("/dataset/stats")
@@ -1794,7 +1935,7 @@ async def dataset_stats(user=Depends(require_auth)):
 # =============================================================================
 
 @app.get("/api/db/users")
-def list_users(user=Depends(require_auth)):
+def list_users(user=Depends(require_admin)):
     """Get all users from HDD storage."""
     try:
         users = get_all_users()
@@ -1817,7 +1958,7 @@ def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
 
 
 @app.get("/api/db/users/{user_id}")
-def get_single_user(user_id: str, user=Depends(require_auth)):
+def get_single_user(user_id: str, user=Depends(require_admin)):
     """Get a specific user by ID."""
     try:
         user = get_user(user_id)
@@ -1830,7 +1971,7 @@ def get_single_user(user_id: str, user=Depends(require_auth)):
 
 
 @app.get("/api/db/users/{user_id}/bounties")
-def get_user_bounties_endpoint(user_id: str, user=Depends(require_auth)):
+def get_user_bounties_endpoint(user_id: str, user=Depends(require_admin)):
     """Get all bounties for a specific user."""
     try:
         bounties = get_user_bounties(user_id)
@@ -1923,7 +2064,7 @@ def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
 
 
 @app.get("/api/db/activity")
-def list_activity(limit: int = 50, user=Depends(require_auth)):
+def list_activity(limit: int = 50, user=Depends(require_admin)):
     """Get recent activity log."""
     try:
         activities = get_recent_activity(limit)
@@ -2000,6 +2141,130 @@ async def video_token_endpoint(request: Request, user=Depends(require_auth)):
 # AUTH / LOGIN / DEVICE TRACKING ENDPOINTS
 # =============================================================================
 
+_ALLOW_PASSWORD_LOGIN = os.getenv("ALLOW_PASSWORD_LOGIN", "false").lower() == "true"
+_TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "true").lower() in ("1", "true", "yes", "on")
+_TRUSTED_PROXY_CIDRS_RAW = os.getenv(
+    "TRUSTED_PROXY_CIDRS",
+    "127.0.0.1/32,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16",
+)
+
+
+def _parse_cidrs(raw: str) -> list:
+    nets: list = []
+    for token in (raw or "").split(","):
+        cidr = token.strip()
+        if not cidr:
+            continue
+        try:
+            nets.append(ipaddress.ip_network(cidr, strict=False))
+        except ValueError:
+            logger.warning("Invalid TRUSTED_PROXY_CIDRS entry ignored: %s", cidr)
+    return nets
+
+
+_TRUSTED_PROXY_NETWORKS = _parse_cidrs(_TRUSTED_PROXY_CIDRS_RAW)
+
+
+def _extract_client_ip(req: Request) -> str:
+    """
+    Extract the most trustworthy client IP.
+
+    Preference order:
+    1) Public IPs from common proxy headers (Cloudflare/ELB/Nginx/etc.)
+    2) Any valid IP from those headers
+    3) Socket peer IP as final fallback
+    """
+
+    def _normalize(candidate: str) -> str:
+        if not candidate:
+            return ""
+        val = candidate.strip().strip('"').strip("'")
+        if not val or val.lower() == "unknown":
+            return ""
+        # RFC7239 Forwarded header token, e.g. for=1.2.3.4 or for="[2001:db8::1]:443"
+        if val.lower().startswith("for="):
+            val = val[4:].strip().strip('"').strip("'")
+        # Strip IPv6 brackets
+        if val.startswith("[") and "]" in val:
+            val = val[1:val.index("]")]
+        # Strip IPv4 :port suffix
+        if "." in val and val.count(":") == 1:
+            host, port = val.rsplit(":", 1)
+            if port.isdigit():
+                val = host
+        try:
+            return str(ipaddress.ip_address(val))
+        except ValueError:
+            return ""
+
+    def _is_public(ip: str) -> bool:
+        try:
+            parsed = ipaddress.ip_address(ip)
+        except ValueError:
+            return False
+        return parsed.is_global
+
+    candidates: list[str] = []
+
+    # Single-IP headers commonly set by trusted proxies/CDNs
+    for h in ("cf-connecting-ip", "true-client-ip", "x-client-ip", "x-real-ip"):
+        val = _normalize(req.headers.get(h, ""))
+        if val:
+            candidates.append(val)
+
+    # Multi-hop list: left-most is original client in standard deployments
+    xff = req.headers.get("x-forwarded-for", "")
+    if xff:
+        for part in xff.split(","):
+            val = _normalize(part)
+            if val:
+                candidates.append(val)
+
+    # RFC7239 Forwarded: for=...
+    forwarded = req.headers.get("forwarded", "")
+    if forwarded:
+        for group in forwarded.split(","):
+            for token in group.split(";"):
+                token = token.strip()
+                if token.lower().startswith("for="):
+                    val = _normalize(token)
+                    if val:
+                        candidates.append(val)
+
+    # Final fallback: peer socket IP
+    peer_ip = _normalize(req.client.host if req.client else "")
+    if peer_ip:
+        candidates.append(peer_ip)
+
+    peer_ip = _normalize(req.client.host if req.client else "")
+
+    # If proxy headers are disabled or peer is not a trusted proxy, never trust forwarded headers.
+    if not _TRUST_PROXY_HEADERS:
+        return peer_ip or "unknown"
+
+    if peer_ip:
+        try:
+            peer_obj = ipaddress.ip_address(peer_ip)
+            trusted_peer = any(peer_obj in net for net in _TRUSTED_PROXY_NETWORKS)
+        except ValueError:
+            trusted_peer = False
+    else:
+        trusted_peer = False
+
+    if not trusted_peer:
+        return peer_ip or "unknown"
+
+    # Prefer public routable IP from trusted proxy headers.
+    for ip in candidates:
+        if _is_public(ip):
+            return ip
+
+    # Otherwise return first valid candidate from trusted proxy chain.
+    if candidates:
+        return candidates[0]
+    return peer_ip or "unknown"
+
+
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -2016,105 +2281,130 @@ class RegisterRequest(BaseModel):
 @app.post("/auth/register")
 async def register_user(request: RegisterRequest, req: Request):
     """Register a new user with hashed password."""
-    existing = get_user_by_email(request.email)
-    if existing:
+    ip = _extract_client_ip(req)
+
+    def _sync_register():
+        existing = get_user_by_email(request.email)
+        if existing:
+            return None  # signal already exists
+        pw_hash = hash_password(request.password)
+        user = create_user(request.name, request.email, "hunter")
+        update_user_password(user["id"], pw_hash)
+        log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
+        token = generate_jwt(user["id"], request.email)
+        return {"user": user, "token": token}
+
+    result = await asyncio.to_thread(_sync_register)
+    if result is None:
         raise HTTPException(status_code=400, detail="Email already registered")
-
-    pw_hash = hash_password(request.password)
-    user = create_user(request.name, request.email, "hunter")  # Always hunter — no privilege escalation
-    update_user_password(user["id"], pw_hash)
-
-    ip = req.client.host if req.client else "unknown"
-    log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
-
-    token = generate_jwt(user["id"], request.email)
     return {
         "success": True,
-        "user": {"id": user["id"], "name": user["name"], "email": user["email"]},
-        "token": token
+        "user": {"id": result["user"]["id"], "name": result["user"]["name"], "email": result["user"]["email"]},
+        "token": result["token"]
     }
 
 
 @app.post("/auth/login")
 async def login(request: LoginRequest, req: Request):
     """Login with email/password. Captures IP, UA, device hash. Sends alerts."""
-    ip = req.client.host if req.client else "unknown"
+    if not _ALLOW_PASSWORD_LOGIN:
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "error": "GITHUB_AUTH_REQUIRED",
+                "detail": "Password login is disabled. Use /auth/github for authentication.",
+            },
+        )
+
+    ip = _extract_client_ip(req)
     ua = req.headers.get("user-agent", "unknown")
 
-    # Rate limiting
+    # Rate limiting (fast, no I/O)
     limiter = get_rate_limiter()
     if limiter.is_rate_limited(ip):
         alert_rate_limit_exceeded(ip, limiter.max_attempts)
-        log_activity(None, "RATE_LIMIT_EXCEEDED", f"IP {ip} exceeded login rate limit", ip_address=ip)
         raise HTTPException(status_code=429, detail="Too many login attempts. Try again later.")
-
     limiter.record_attempt(ip)
 
-    # Find user
-    user = get_user_by_email(request.email)
-    if not user:
-        log_activity(None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip)
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    def _sync_login():
+        """All blocking I/O (bcrypt, SQLite, SMTP alerts) runs in thread pool."""
+        location = resolve_ip_geolocation(ip)
 
-    # Verify password
-    if not user.get("password_hash") or not verify_password(request.password, user["password_hash"]):
-        log_activity(user["id"], "LOGIN_FAILED", "Invalid password", ip_address=ip)
-        alert_suspicious_activity(
-            f"Failed login attempt for {user['name']}",
-            ip_address=ip, user_name=user["name"],
-            metadata={"email": request.email}
+        user = get_user_by_email(request.email)
+        if not user:
+            log_activity(None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip)
+            return {"error": 401, "detail": "Invalid credentials"}
+
+        if not user.get("password_hash") or not verify_password(request.password, user["password_hash"]):
+            log_activity(user["id"], "LOGIN_FAILED", "Invalid password", ip_address=ip)
+            try:
+                alert_suspicious_activity(
+                    f"Failed login attempt for {user['name']}",
+                    ip_address=ip, user_name=user["name"],
+                    metadata={"email": request.email}
+                )
+            except Exception:
+                pass
+            return {"error": 401, "detail": "Invalid credentials"}
+
+        limiter.reset(ip)
+
+        if needs_rehash(user["password_hash"]):
+            new_hash = hash_password(request.password)
+            update_user_password(user["id"], new_hash)
+
+        dh = compute_device_hash(ua, ip)
+        device = register_device(user["id"], dh, ip, ua, location=location)
+        session = create_session(
+            user["id"], "AUTHENTICATED", None,
+            ip_address=ip,
+            user_agent=ua,
+            device_hash=dh,
+            metadata={
+                "auth_method": "password",
+                "geolocation": location,
+            },
         )
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        update_user_auth_profile(
+            user["id"],
+            auth_provider="password",
+            ip_address=ip,
+            geolocation=location,
+        )
+        log_activity(user["id"], "LOGIN_SUCCESS", f"Login from {ip} ({location})", ip_address=ip)
 
-    # Success — reset rate limiter
-    limiter.reset(ip)
+        try:
+            alert_new_login(user["name"], ip, ua, location)
+            if device.get("is_new"):
+                alert_new_device(user["name"], dh, ip, ua, location)
+            active_count = get_active_device_count(user["id"])
+            if active_count > 1:
+                devices = get_user_devices(user["id"])
+                alert_multiple_devices(user["name"], active_count, devices)
+        except Exception:
+            pass  # alerts are best-effort
 
-    # B9: Auto-rehash legacy password to v2 on successful login
-    if needs_rehash(user["password_hash"]):
-        new_hash = hash_password(request.password)
-        update_user_password(user["id"], new_hash)
-        log_activity(user["id"], "PASSWORD_REHASHED", "Legacy hash upgraded to v2", ip_address=ip)
+        token = generate_jwt(user["id"], user.get("email"))
+        return {
+            "success": True,
+            "user": {"id": user["id"], "name": user["name"], "email": user.get("email")},
+            "token": token,
+            "session_id": session["id"],
+            "device": {"hash": dh, "is_new": device.get("is_new", False)},
+            "network": {"ip": ip, "geolocation": location},
+            "auth_method": "password",
+        }
 
-    # Compute device hash and register device
-    dh = compute_device_hash(ua, ip)
-    device = register_device(user["id"], dh, ip, ua)
-
-    # Create session on HDD
-    session = create_session(
-        user["id"], "AUTHENTICATED", None,
-        ip_address=ip, user_agent=ua, device_hash=dh
-    )
-
-    # Log activity
-    log_activity(user["id"], "LOGIN_SUCCESS", f"Login from {ip}", ip_address=ip)
-
-    # Send alerts
-    alert_new_login(user["name"], ip, ua)
-
-    if device.get("is_new"):
-        alert_new_device(user["name"], dh, ip, ua)
-
-    active_count = get_active_device_count(user["id"])
-    if active_count > 1:
-        devices = get_user_devices(user["id"])
-        alert_multiple_devices(user["name"], active_count, devices)
-
-    # Generate JWT
-    token = generate_jwt(user["id"], user.get("email"))
-
-    return {
-        "success": True,
-        "user": {"id": user["id"], "name": user["name"], "email": user.get("email")},
-        "token": token,
-        "session_id": session["id"],
-        "device": {"hash": dh, "is_new": device.get("is_new", False)}
-    }
+    result = await asyncio.to_thread(_sync_login)
+    if "error" in result:
+        raise HTTPException(status_code=result["error"], detail=result["detail"])
+    return result
 
 
 @app.post("/auth/logout")
 async def logout(req: Request, user=Depends(require_auth)):
     """End current session. Revokes token and invalidates session."""
-    ip = req.client.host if req.client else "unknown"
+    ip = _extract_client_ip(req)
 
     # Extract and revoke the Bearer token
     auth_header = req.headers.get("authorization", "")
@@ -2134,6 +2424,115 @@ async def logout(req: Request, user=Depends(require_auth)):
     user_id = user.get("sub")
     log_activity(user_id, "LOGOUT", f"Logout from {ip} — token+session revoked", ip_address=ip)
     return {"success": True, "message": "Logged out — token and session revoked"}
+
+
+@app.get("/auth/profile")
+async def auth_profile(user=Depends(require_auth)):
+    """Return authenticated profile. Sensitive auth intel is admin-only."""
+    user_id = user.get("sub", "")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid auth token payload")
+
+    record = get_user(user_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    base = {
+        "success": True,
+        "user": {
+            "id": record["id"],
+            "name": record.get("name", ""),
+            "email": record.get("email"),
+            "role": record.get("role", "hunter"),
+        },
+        "session_id": user.get("session_id"),
+    }
+
+    # Do not expose network/github auth intel to non-admin users.
+    if record.get("role", "").lower() != "admin":
+        return base
+
+    devices = get_user_devices(user_id)
+    latest_device = None
+    if devices:
+        latest_device = max(devices, key=lambda d: d.get("last_seen", ""))
+
+    github_profile = None
+    for evt in get_recent_activity(limit=200):
+        if evt.get("user_id") != user_id:
+            continue
+        if evt.get("action_type") != "LOGIN_SUCCESS_GITHUB":
+            continue
+        md = evt.get("metadata_json") or {}
+        if isinstance(md, dict) and md.get("github_profile"):
+            github_profile = md.get("github_profile")
+            break
+
+    return {
+        **base,
+        "network": {
+            "ip_address": latest_device.get("ip_address") if latest_device else None,
+            "geolocation": latest_device.get("location") if latest_device else None,
+        },
+        "device": latest_device,
+        "github_profile": github_profile,
+    }
+
+
+@app.get("/admin/auth/intel")
+async def admin_auth_intel(req: Request, limit: int = 200):
+    """
+    Admin-only sensitive auth view:
+      - username/email/role
+      - password hash (never plaintext)
+      - github id/login/profile details
+      - last login IP + geolocation
+    """
+    auth_header = req.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Bearer token required")
+
+    token = auth_header[7:]
+    try:
+        from backend.api.admin_auth import require_auth as admin_require_auth, ROLE_ADMIN
+        admin_result = admin_require_auth(jwt_token=token, required_role=ROLE_ADMIN)
+        if admin_result.get("status") != "ok":
+            admin_result = admin_require_auth(session_token=token, required_role=ROLE_ADMIN)
+        if admin_result.get("status") != "ok":
+            raise HTTPException(status_code=403, detail="Admin role required")
+    except HTTPException:
+        raise
+    except Exception:
+        logger.exception("admin auth intel auth failure")
+        raise HTTPException(status_code=401, detail="Invalid admin token")
+
+    safe_limit = max(1, min(limit, 1000))
+    users = get_admin_user_security_view(limit=safe_limit)
+
+    return {
+        "success": True,
+        "total": len(users),
+        "users": users,
+        "note": "password values are one-way hashes only; plaintext passwords are never stored",
+    }
+
+
+@app.get("/api/storage/status")
+async def storage_status(user=Depends(require_auth)):
+    """Get SSD/HDD storage tiering status."""
+    if not TIERED_STORAGE_AVAILABLE:
+        return {"available": False, "error": "Tiered storage not loaded"}
+    report = await asyncio.to_thread(get_tiered_report)
+    return {"available": True, **report}
+
+
+@app.post("/api/storage/enforce")
+async def storage_enforce(user=Depends(require_auth)):
+    """Manually trigger SSD cap enforcement (compress + migrate)."""
+    if not TIERED_STORAGE_AVAILABLE:
+        return {"available": False, "error": "Tiered storage not loaded"}
+    result = await asyncio.to_thread(enforce_ssd_cap)
+    return {"available": True, **result.to_dict()}
 
 
 @app.get("/admin/active-devices")
@@ -2980,32 +3379,58 @@ async def github_auth_redirect():
             detail="GitHub OAuth not configured — set GITHUB_CLIENT_ID env var",
         )
 
-    params = (
-        f"client_id={_GITHUB_CLIENT_ID}"
-        f"&redirect_uri={_GITHUB_REDIRECT_URI}"
-        f"&scope=user:email"
-        f"&state={__import__('secrets').token_hex(16)}"
-    )
-    return RedirectResponse(
+    import urllib.parse
+
+    state = __import__("secrets").token_hex(16)
+    params = urllib.parse.urlencode({
+        "client_id": _GITHUB_CLIENT_ID,
+        "redirect_uri": _GITHUB_REDIRECT_URI,
+        "scope": "user:email",
+        "state": state,
+    })
+    resp = RedirectResponse(
         url=f"https://github.com/login/oauth/authorize?{params}",
         status_code=302,
     )
+    resp.set_cookie(
+        key="ygb_oauth_state",
+        value=state,
+        max_age=600,
+        httponly=True,
+        samesite="lax",
+        secure=_FRONTEND_URL.startswith("https://"),
+    )
+    return resp
 
 
 @app.get("/auth/github/callback")
-async def github_auth_callback(code: str = "", error: str = ""):
+async def github_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
     """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
     if error:
-        return RedirectResponse(
+        resp = RedirectResponse(
             url=f"{_FRONTEND_URL}/login?error={error}",
             status_code=302,
         )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
 
     if not code:
-        return RedirectResponse(
+        resp = RedirectResponse(
             url=f"{_FRONTEND_URL}/login?error=no_code",
             status_code=302,
         )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
+
+    expected_state = req.cookies.get("ygb_oauth_state", "")
+    if not state or not expected_state or state != expected_state:
+        logger.warning("GitHub OAuth state mismatch")
+        resp = RedirectResponse(
+            url=f"{_FRONTEND_URL}/login?error=state_mismatch",
+            status_code=302,
+        )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
 
     if not _GITHUB_CLIENT_ID or not _GITHUB_CLIENT_SECRET:
         raise HTTPException(
@@ -3015,6 +3440,10 @@ async def github_auth_callback(code: str = "", error: str = ""):
 
     import urllib.request
     import urllib.parse
+
+    ip = _extract_client_ip(req)
+    ua = req.headers.get("user-agent", "unknown")
+    location = resolve_ip_geolocation(ip)
 
     try:
         # 1. Exchange code for access token
@@ -3036,10 +3465,12 @@ async def github_auth_callback(code: str = "", error: str = ""):
         access_token = token_resp.get("access_token")
         if not access_token:
             logger.error("GitHub token exchange failed: %s", token_resp)
-            return RedirectResponse(
+            resp = RedirectResponse(
                 url=f"{_FRONTEND_URL}/login?error=token_exchange_failed",
                 status_code=302,
             )
+            resp.delete_cookie("ygb_oauth_state")
+            return resp
 
         # 2. Fetch user info
         user_req = urllib.request.Request(
@@ -3054,8 +3485,36 @@ async def github_auth_callback(code: str = "", error: str = ""):
             user_data = json.loads(resp.read().decode())
 
         github_id = str(user_data.get("id", ""))
+        if not github_id:
+            logger.error("GitHub user payload missing id: %s", user_data)
+            resp = RedirectResponse(
+                url=f"{_FRONTEND_URL}/login?error=invalid_github_profile",
+                status_code=302,
+            )
+            resp.delete_cookie("ygb_oauth_state")
+            return resp
         github_login = user_data.get("login", "")
         github_email = user_data.get("email", "")
+        github_profile = {
+            "github_id": github_id,
+            "github_login": github_login,
+            "name": user_data.get("name") or github_login or "",
+            "email": github_email or "",
+            "avatar_url": user_data.get("avatar_url", ""),
+            "html_url": user_data.get("html_url", ""),
+            "company": user_data.get("company", ""),
+            "blog": user_data.get("blog", ""),
+            "location": user_data.get("location", ""),
+            "bio": user_data.get("bio", ""),
+            "public_repos": int(user_data.get("public_repos") or 0),
+            "followers": int(user_data.get("followers") or 0),
+            "following": int(user_data.get("following") or 0),
+            "geoip_location": location,
+            "ip_address": ip,
+        }
+        for key, value in list(github_profile.items()):
+            if isinstance(value, str):
+                github_profile[key] = value.strip()[:512]
 
         # 3. If email not public, fetch from /user/emails
         if not github_email:
@@ -3077,25 +3536,120 @@ async def github_auth_callback(code: str = "", error: str = ""):
             if not github_email and emails:
                 github_email = emails[0].get("email", "")
 
-        # 4. Generate JWT using existing auth module
-        from backend.auth.auth import generate_jwt
-        user_id = f"github:{github_id}"
-        jwt_token = generate_jwt(user_id=user_id, email=github_email)
+        if not github_email:
+            # Stable fallback identifier when account email is unavailable.
+            github_email = f"github-{github_id}@users.noreply.local"
+        github_profile["email"] = github_email
 
-        logger.info("GitHub login: %s (%s)", github_login, github_email)
+        # 4. Create or resolve local user account
+        user = get_user_by_email(github_email)
+        if not user:
+            display_name = github_login or f"github-{github_id}"
+            user = create_user(display_name, github_email, "hunter")
+            log_activity(
+                user["id"],
+                "USER_REGISTERED_GITHUB",
+                f"GitHub account linked: {github_login}",
+                ip_address=ip,
+            )
 
-        # 5. Redirect to frontend with token
-        return RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?token={jwt_token}&user={github_login}",
-            status_code=302,
+        # 5. Device/session tracking + security alerts
+        dh = compute_device_hash(ua, ip)
+        device = register_device(user["id"], dh, ip, ua, location=location)
+        session = create_session(
+            user["id"],
+            "AUTHENTICATED",
+            None,
+            ip_address=ip,
+            user_agent=ua,
+            device_hash=dh,
+            metadata={
+                "auth_method": "github",
+                "github_login": github_login,
+                "github_id": github_id,
+                "geolocation": location,
+            },
+        )
+        update_user_auth_profile(
+            user["id"],
+            auth_provider="github",
+            ip_address=ip,
+            geolocation=location,
+            github_profile=github_profile,
+        )
+        log_activity(
+            user["id"],
+            "LOGIN_SUCCESS_GITHUB",
+            f"GitHub login from {ip} ({location})",
+            ip_address=ip,
+            metadata={
+                "github_login": github_login,
+                "github_id": github_id,
+                "github_profile": github_profile,
+            },
+        )
+        alert_new_login(user["name"], ip, ua, location)
+        if device.get("is_new"):
+            alert_new_device(user["name"], dh, ip, ua, location)
+
+        active_count = get_active_device_count(user["id"])
+        if active_count > 1:
+            devices = get_user_devices(user["id"])
+            alert_multiple_devices(user["name"], active_count, devices)
+
+        # 6. Issue JWT and return frontend redirect
+        jwt_token = generate_jwt(user_id=user["id"], email=user.get("email"))
+        safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
+        safe_token = urllib.parse.quote_plus(jwt_token)
+        safe_session = urllib.parse.quote_plus(session["id"])
+        safe_profile = urllib.parse.quote_plus(
+            json.dumps(github_profile, separators=(",", ":"), ensure_ascii=False)
+        )
+        # Avoid overly long callback URLs by degrading to a minimal profile payload.
+        if len(safe_profile) > 1800:
+            minimal_profile = {
+                "github_id": github_id,
+                "github_login": github_login,
+                "name": github_profile.get("name", ""),
+                "avatar_url": github_profile.get("avatar_url", ""),
+                "html_url": github_profile.get("html_url", ""),
+                "geoip_location": location,
+                "ip_address": ip,
+            }
+            safe_profile = urllib.parse.quote_plus(
+                json.dumps(minimal_profile, separators=(",", ":"), ensure_ascii=False)
+            )
+
+        logger.info(
+            "GitHub login success user=%s email=%s ip=%s location=%s",
+            github_login,
+            github_email,
+            ip,
+            location,
         )
 
-    except Exception as e:
+        resp = RedirectResponse(
+            url=(
+                f"{_FRONTEND_URL}/login"
+                f"?token={safe_token}"
+                f"&user={safe_user}"
+                f"&session_id={safe_session}"
+                f"&auth=github"
+                f"&profile={safe_profile}"
+            ),
+            status_code=302,
+        )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
+
+    except Exception:
         logger.exception("GitHub OAuth callback error")
-        return RedirectResponse(
+        resp = RedirectResponse(
             url=f"{_FRONTEND_URL}/login?error=server_error",
             status_code=302,
         )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
 
 
 # =============================================================================
@@ -3115,7 +3669,7 @@ async def admin_login(request: AdminLoginRequest, req: Request):
         result = admin_auth_login(
             email=request.email,
             totp_code=request.totp_code,
-            ip=req.client.host if req.client else "0.0.0.0",
+            ip=_extract_client_ip(req),
         )
         if result.get("status") == "ok":
             return result

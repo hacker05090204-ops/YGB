@@ -146,6 +146,21 @@ async def require_auth(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # Role is required by admin guards, but older JWTs may not contain it.
+    # Hydrate role from storage as a compatibility path.
+    if not payload.get("role"):
+        user_id = payload.get("sub")
+        if user_id:
+            try:
+                from backend.storage.storage_bridge import get_user
+                user_record = get_user(user_id)
+                if user_record and user_record.get("role"):
+                    payload = {**payload, "role": user_record["role"]}
+            except Exception:
+                # Fail closed for auth token validity, but avoid breaking
+                # regular auth if role lookup backend is unavailable.
+                pass
+
     return payload
 
 

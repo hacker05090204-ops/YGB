@@ -161,26 +161,37 @@ class BridgeIngestionWorker:
     @staticmethod
     def _map_cve_to_sample(record) -> Optional[Dict[str, str]]:
         """Map a CVE pipeline record to training sample fields."""
-        cve_id = getattr(record, "cve_id", "") or record.get("cve_id", "")
+        def _read(key: str, default=None):
+            """
+            Read from dataclass/object records first, then dict-like records.
+            Avoid calling .get() on object records (e.g., CVERecord dataclass).
+            """
+            if hasattr(record, key):
+                val = getattr(record, key)
+                if val is not None:
+                    return val
+            if isinstance(record, dict):
+                return record.get(key, default)
+            return default
+
+        cve_id = _read("cve_id", "")
         if not cve_id:
             return None
 
         # Determine affected products string
-        products = getattr(record, "affected_products", None)
-        if products is None:
-            products = record.get("affected_products", [])
+        products = _read("affected_products", [])
         if isinstance(products, list):
             products_str = json.dumps(products)[:511]
         else:
             products_str = str(products)[:511]
 
         # Description
-        desc = getattr(record, "description", "") or record.get("description", "")
+        desc = _read("description", "")
         desc = str(desc)[:511]
 
         # Severity / impact
-        severity = getattr(record, "severity", "") or record.get("severity", "UNKNOWN")
-        cvss = getattr(record, "cvss_score", None) or record.get("cvss_score")
+        severity = _read("severity", "UNKNOWN")
+        cvss = _read("cvss_score", None)
         if cvss is not None:
             impact = f"{severity}|CVSS:{cvss}"
         else:
@@ -200,12 +211,9 @@ class BridgeIngestionWorker:
                 s = provenance.get("source", "")
                 if s:
                     sources.append(s)
-        source_tag = "|".join(sources) if sources else record.get("source_id", "UNKNOWN")
+        source_tag = "|".join(sources) if sources else _read("source_id", "UNKNOWN")
 
-        promotion_status = (
-            getattr(record, "promotion_status", "RESEARCH_PENDING")
-            or record.get("promotion_status", "RESEARCH_PENDING")
-        )
+        promotion_status = _read("promotion_status", "RESEARCH_PENDING")
 
         return {
             "endpoint": cve_id,
