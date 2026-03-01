@@ -98,7 +98,7 @@ def parse_python_coverage(coverage_json: Path) -> CoverageResult:
             measured=0.0,
             threshold=PYTHON_COVERAGE_THRESHOLD,
             status=CoverageStatus.FAIL,
-            details={"error": str(e)},
+            details={"error": f"parse_failed: {type(e).__name__}"},
         )
 
 

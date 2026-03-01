@@ -49,7 +49,7 @@ def backup_now() -> dict:
         }
     except Exception as e:
         logger.exception("Backup FAILED")
-        return {"success": False, "error": str(e)}
+        return {"success": False, "error": f"backup_failed: {type(e).__name__}"}
 
 
 def backup_loop(interval_seconds: int = 300):

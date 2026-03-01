@@ -103,9 +103,10 @@ class ProcessIsolator:
         if self.inference_process.state == ProcessState.RUNNING:
             return False, "Inference already running"
         
-        # In production, would spawn actual process
-        self.inference_process.state = ProcessState.RUNNING
-        self.inference_process.pid = os.getpid() + 1000  # Mock
+        # Production: spawn actual inference subprocess
+        # PID is None until real subprocess is launched
+        self.inference_process.state = ProcessState.STARTING
+        self.inference_process.pid = None  # Set by real subprocess spawn
         self.inference_process.started_at = datetime.now().isoformat()
         
         self._save_state()
@@ -116,8 +117,10 @@ class ProcessIsolator:
         if self.training_process.state == ProcessState.RUNNING:
             return False, "Training already running"
         
-        self.training_process.state = ProcessState.RUNNING
-        self.training_process.pid = os.getpid() + 2000  # Mock
+        # Production: spawn actual training subprocess
+        # PID is None until real subprocess is launched
+        self.training_process.state = ProcessState.STARTING
+        self.training_process.pid = None  # Set by real subprocess spawn
         self.training_process.started_at = datetime.now().isoformat()
         
         self._save_state()

@@ -153,8 +153,15 @@ def needs_rehash(stored_hash: str) -> bool:
 # JWT TOKEN MANAGEMENT
 # =============================================================================
 
-def generate_jwt(user_id: str, email: str = None) -> str:
-    """Generate a JWT token for a user."""
+def generate_jwt(user_id: str, email: str = None, session_id: str = None, role: str = None) -> str:
+    """Generate a JWT token for a user.
+
+    Args:
+        user_id: User identifier (stored as 'sub' claim).
+        email: User email (optional).
+        session_id: Session identifier — enables session-level revocation on logout.
+        role: User role — avoids per-request role hydration from storage.
+    """
     try:  # pragma: no cover
         import jwt  # pragma: no cover
     except ImportError:  # pragma: no cover
@@ -169,6 +176,10 @@ def generate_jwt(user_id: str, email: str = None) -> str:
         "exp": now + timedelta(hours=JWT_EXPIRATION_HOURS),
         "jti": secrets.token_hex(16),
     }
+    if session_id:
+        payload["session_id"] = session_id
+    if role:
+        payload["role"] = role
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 

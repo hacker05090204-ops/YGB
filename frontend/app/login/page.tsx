@@ -61,7 +61,8 @@ function LoginContent() {
     }, [searchParams, router])
 
     const handleGitHubLogin = () => {
-        window.location.href = `${API_BASE}/auth/github`
+        const origin = encodeURIComponent(window.location.origin)
+        window.location.href = `${API_BASE}/auth/github?frontend_origin=${origin}`
     }
 
     return (

@@ -244,7 +244,18 @@ def preflight_check_secrets() -> None:
             f"[PREFLIGHT] Set required environment variables and restart."
         )
 
-    print("[PREFLIGHT] ✓ All security preflight checks passed")
+    print("[PREFLIGHT] OK - All security preflight checks passed")
+
+    # Soft warnings for optional but important config
+    _warnings = []
+    if not os.getenv("GITHUB_CLIENT_SECRET"):
+        _warnings.append("GITHUB_CLIENT_SECRET is empty — GitHub OAuth will not work")
+    if not os.getenv("DATABASE_URL"):
+        _warnings.append("DATABASE_URL is not set — using default sqlite:///C:/ygb_data/ygb.db")
+    if os.getenv("API_HOST", "127.0.0.1") == "0.0.0.0":
+        _warnings.append("API_HOST=0.0.0.0 — server is binding to all interfaces (use 127.0.0.1 for local-only)")
+    for w in _warnings:
+        print(f"[PREFLIGHT] WARN: {w}")
 
 
 # =============================================================================

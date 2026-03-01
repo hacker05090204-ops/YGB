@@ -11,6 +11,10 @@
 venv/
 env/
 .env
+.env.connected
+.env.privacy
+.env.voice_connected
+.env.voice_privacy
 
 # Model artifacts — NEVER push to git
 *.pt

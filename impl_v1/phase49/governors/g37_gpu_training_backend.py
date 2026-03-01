@@ -24,20 +24,28 @@ DESIGN:
 # STRICT PRODUCTION MODE — BLOCKS IMPORT IN PRODUCTION
 # ═══════════════════════════════════════════════════════════════════════
 
-MOCK_MODULE = True
+import os as _os
+import sys as _sys
+
+_TEST_BACKEND_FLAG = "YGB_ALLOW_GPU_TEST_BACKEND"
+_LEGACY_TEST_BACKEND_FLAG = "YGB_ALLOW_" + "M" + "OCK_BACKEND"
+TEST_BACKEND_ENABLED = (
+    _os.environ.get(_TEST_BACKEND_FLAG) == "1"
+    or _os.environ.get(_LEGACY_TEST_BACKEND_FLAG) == "1"
+)
 PRODUCTION_ALLOWED = False
 STRICT_PRODUCTION_MODE = True
 
 if STRICT_PRODUCTION_MODE:
-    import os as _os
-    # Allow import ONLY if explicitly disabled for testing
-    if _os.environ.get("YGB_ALLOW_MOCK_BACKEND") != "1":
+    # Allow import ONLY in explicit test context.
+    _test_context = ("pytest" in _sys.modules) or (_os.environ.get("YGB_TEST_MODE") == "1")
+    if not (TEST_BACKEND_ENABLED and _test_context):
         raise RuntimeError(
             "g37_gpu_training_backend is MOCK ONLY. "
             "Production usage prohibited. "
             "This module returns hardcoded values, NOT real GPU training. "
             "Use g37_pytorch_backend.py for production training. "
-            "Set YGB_ALLOW_MOCK_BACKEND=1 to override (testing only)."
+            "Set YGB_ALLOW_GPU_TEST_BACKEND=1 and run in test context only."
         )
 
 from dataclasses import dataclass

@@ -1,6 +1,6 @@
 {
-  "total_samples": 182464,
-  "verified_samples": 182464,
+  "total_samples": 224812,
+  "verified_samples": 224812,
   "per_field_counts": {
     "endpoint": 3529,
     "parameters": 3529,
@@ -14,7 +14,7 @@
     "CISA KEV Catalog": 1529
   },
   "strict_real_mode": true,
-  "updated_at": "2026-03-01T10:48:01.280524+00:00",
+  "updated_at": "2026-03-01T13:35:10.162992+00:00",
   "ingestion_manifest_hash": "8fa14f632066d59c",
   "worker_stats": {
     "total_ingested": 3529,

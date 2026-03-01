@@ -14,6 +14,10 @@ import uuid
 import json
 import asyncio
 import hashlib
+import hmac
+import zlib
+import base64
+import secrets
 import logging
 import ipaddress
 
@@ -68,9 +72,9 @@ try:
         resolve_path as resolve_storage_path,
     )
     TIERED_STORAGE_AVAILABLE = True
-    # Start background SSD cap enforcement (every 5 min)
-    start_storage_enforcement(300)
-    logger.info("[BOOT] Tiered storage active — SSD cap enforcement running")
+    # NOTE: start_storage_enforcement() is called inside lifespan() to avoid
+    # spawning background threads at import time (test pollution / orphaned threads).
+    logger.info("[BOOT] Tiered storage module loaded (enforcement deferred to lifespan)")
 except Exception as _ts_err:
     TIERED_STORAGE_AVAILABLE = False
     logger.warning("[BOOT] Tiered storage not available: %s", _ts_err)
@@ -147,7 +151,7 @@ try:
     )
     G38_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️  G38 modules not available: {e}")
+    print(f"[WARN] G38 modules not available: {e}")
     G38_AVAILABLE = False
 
 # =============================================================================
@@ -158,7 +162,7 @@ try:
     from backend.integrity.integrity_bridge import get_integrity_supervisor
     INTEGRITY_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️  Integrity supervisor not available: {e}")
+    print(f"[WARN] Integrity supervisor not available: {e}")
     INTEGRITY_AVAILABLE = False
 
 # =============================================================================
@@ -172,7 +176,7 @@ try:
     from backend.assistant.isolation_guard import IsolationGuard
     RESEARCH_AVAILABLE = True
 except ImportError as e:
-    print(f"⚠️  Research assistant not available: {e}")
+    print(f"[WARN] Research assistant not available: {e}")
     RESEARCH_AVAILABLE = False
 
 # =============================================================================
@@ -186,12 +190,16 @@ async def lifespan(app):
     """Unified server lifespan: preflight → storage → CVE scheduler → G38."""
     # --- STARTUP ---
     logger.info("[BOOT] Server lifespan BOOTING")
+    g38_started = False
 
     # SECURITY: Preflight checks — fail-closed on missing/weak secrets
     preflight_check_secrets()
 
     phases = discover_python_phases()
     hunter = discover_hunter_modules()
+    _HEALTH_STATIC["python_phases"] = len([p for p in phases if p["number"] <= 19])
+    _HEALTH_STATIC["impl_phases"] = len([p for p in phases if p["number"] >= 20])
+    _HEALTH_STATIC["hunter_modules"] = len(hunter)
     print(f"[*] YGB API Server starting...")
     print(f"[*] Project root: {PROJECT_ROOT}")
     print(f"[*] Python phases: {len(phases)}")
@@ -215,10 +223,10 @@ async def lifespan(app):
             f"(interval={scheduler.interval_seconds}s, "
             f"running={scheduler.is_running})"
         )
-        print("✅ CVE scheduler started (5-minute interval)")
+        print("[OK] CVE scheduler started (5-minute interval)")
     except Exception as e:
         logger.error(f"[BOOT] CVE scheduler DEGRADED: {e}")
-        print(f"⚠️  CVE scheduler not started: {e}")
+        print(f"[WARN] CVE scheduler not started: {e}")
 
     # Start bridge ingestion worker (CVE → training bridge)
     try:
@@ -231,10 +239,19 @@ async def lifespan(app):
     except Exception as e:
         logger.warning(f"[BOOT] Bridge ingestion worker not available: {e}")
 
-    # Start G38 auto-training scheduler
-    if G38_AVAILABLE:
+    # Start G38 auto-training scheduler only when explicitly enabled.
+    if G38_AVAILABLE and _ENABLE_G38_AUTO_TRAINING:
         start_auto_training()
+        g38_started = True
         print("[*] G38 auto-training started")
+
+    # Start tiered-storage SSD cap enforcement inside lifespan (not at import)
+    if TIERED_STORAGE_AVAILABLE:
+        try:
+            start_storage_enforcement(300)
+            logger.info("[BOOT] Tiered storage SSD cap enforcement started (5 min interval)")
+        except Exception as _enf_err:
+            logger.warning("[BOOT] Tiered storage enforcement failed: %s", _enf_err)
 
     print(f"[+] Server ready at http://localhost:8000")
     logger.info("[BOOT] Server lifespan RUNNING")
@@ -252,7 +269,7 @@ async def lifespan(app):
         pass
 
     # Stop G38 auto-training
-    if G38_AVAILABLE:
+    if G38_AVAILABLE and g38_started:
         stop_auto_training()
         print("[*] G38 auto-training stopped")
 
@@ -276,6 +293,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# =============================================================================
+# GLOBAL EXCEPTION HANDLER — sanitize internal errors from API responses
+# =============================================================================
+from starlette.responses import JSONResponse
+
+@app.exception_handler(Exception)
+async def _global_exception_handler(request: Request, exc: Exception):
+    """
+    Catch-all for unhandled exceptions. Returns a sanitized 500 response
+    with a correlation ID for debugging. Raw traceback logged server-side only.
+    """
+    import traceback
+    correlation_id = secrets.token_hex(8)
+    logger.error(
+        "Unhandled exception [%s] %s %s: %s\n%s",
+        correlation_id,
+        request.method,
+        request.url.path,
+        str(exc),
+        traceback.format_exc(),
+    )
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "INTERNAL_SERVER_ERROR",
+            "detail": "An unexpected error occurred. Contact support with this ID.",
+            "correlation_id": correlation_id,
+        },
+    )
+
 # Voice pipeline router
 try:
     from api.voice_routes import voice_router
@@ -291,6 +339,14 @@ try:
     logger.info("[BOOT] Voice gateway routes registered")
 except ImportError as e:
     logger.warning(f"[BOOT] Voice gateway not available: {e}")
+
+# Report Generator router (reports + video recording metadata)
+try:
+    from backend.api.report_generator import router as report_router
+    app.include_router(report_router)
+    logger.info("[BOOT] Report Generator routes registered")
+except ImportError as e:
+    logger.warning(f"[BOOT] Report Generator not available: {e}")
 
 # =============================================================================
 # REQUEST/RESPONSE MODELS
@@ -406,6 +462,13 @@ execution_kernels: Dict[str, Dict[str, Any]] = {}
 approval_requests: Dict[str, Dict[str, Any]] = {}
 autonomy_sessions: Dict[str, Dict[str, Any]] = {}
 
+# Cached static health metadata for fast /health responses.
+_HEALTH_STATIC = {
+    "python_phases": 0,
+    "impl_phases": 0,
+    "hunter_modules": 0,
+}
+
 
 # =============================================================================
 # PHASE DISCOVERY
@@ -471,47 +534,30 @@ def discover_hunter_modules() -> Dict[str, bool]:
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint with REAL system status — no fake active states.
-    
-    Returns structured sub-sections:
-      - storage_engine_status
-      - dataset_readiness_status
-      - integration_status
-    """
-    phases = discover_python_phases()
-    hunter_modules = discover_hunter_modules()
+    """Fast liveness probe used by frontend connectivity checks."""
+    try:
+        storage_health = get_storage_health()
+    except Exception as e:
+        storage_health = {
+            "status": "INACTIVE",
+            "storage_active": False,
+            "reason": f"Storage probe error: {e}",
+        }
 
-    # Real storage health (single source of truth)
-    storage_health = get_storage_health()
-
-    # Dataset readiness
-    dataset_status = _get_dataset_readiness()
-
-    # Integration status
-    integration_status = _get_integration_summary()
-
-    # Overall: only "ok" if all critical subsystems active
-    if not storage_health["storage_active"]:
-        overall = "degraded"
-    elif dataset_status.get("status") == "BLOCKED_REAL_DATA":
-        overall = "degraded"
-    else:
-        overall = "ok"
-
+    overall = "ok" if storage_health.get("storage_active") else "degraded"
     return {
         "status": overall,
-        "python_phases": len([p for p in phases if p["number"] <= 19]),
-        "impl_phases": len([p for p in phases if p["number"] >= 20]),
-        "hunter_modules": len(hunter_modules),
+        "ygb_root": str(PROJECT_ROOT),
+        "python_phases": _HEALTH_STATIC["python_phases"],
+        "impl_phases": _HEALTH_STATIC["impl_phases"],
+        "hunter_modules": _HEALTH_STATIC["hunter_modules"],
         "storage_engine_status": storage_health,
-        "dataset_readiness_status": dataset_status,
-        "integration_status": integration_status,
-        "timestamp": datetime.now(UTC).isoformat()
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
 @app.get("/api/storage/status")
-async def get_storage_status():
+async def get_storage_status(user=Depends(require_auth)):
     """Canonical storage/DB truth endpoint.
 
     Returns real check results — never fake active.
@@ -540,11 +586,12 @@ def _get_dataset_readiness() -> Dict[str, Any]:
                 "min_samples_required": YGB_MIN_REAL_SAMPLES,
                 "reason": msg,
             }
-    except Exception as e:
+    except Exception:
+        logger.exception("_get_dataset_readiness failed")
         return {
             "status": "UNKNOWN",
             "min_samples_required": None,
-            "reason": f"Cannot check dataset: {str(e)}",
+            "reason": "Cannot check dataset",
         }
 
 
@@ -562,8 +609,9 @@ def _get_integration_summary() -> Dict[str, Any]:
                 for i in integrations
             },
         }
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
+    except Exception:
+        logger.exception("_get_integration_summary failed")
+        return {"status": "ERROR", "reason": "Internal error"}
 
 
 @app.get("/api/readiness")
@@ -587,8 +635,9 @@ async def get_cve_status():
         return pipeline.get_pipeline_status()
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "CVE pipeline module not found"}
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
+    except Exception:
+        logger.exception("get_cve_status failed")
+        return {"status": "ERROR", "reason": "Internal error"}
 
 
 @app.get("/api/cve/scheduler/health")
@@ -600,8 +649,9 @@ async def get_cve_scheduler_health():
         return scheduler.get_health()
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "Scheduler module not found"}
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
+    except Exception:
+        logger.exception("get_cve_scheduler_health failed")
+        return {"status": "ERROR", "reason": "Internal error"}
 
 
 @app.get("/api/cve/pipeline/status")
@@ -631,8 +681,9 @@ async def get_cve_pipeline_full_status():
             result["bridge_worker"] = {"status": "NOT_AVAILABLE"}
 
         return result
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
+    except Exception:
+        logger.exception("get_cve_pipeline_full_status failed")
+        return {"status": "ERROR", "reason": "Internal error"}
 
 
 @app.post("/api/cve/backfill")
@@ -662,8 +713,9 @@ async def trigger_cve_backfill(max_samples: int = 0, user=Depends(require_auth))
             "threshold": 125000,
             "go_no_go": "GO" if result.get("bridge_verified_count", 0) >= 125000 else "NO_GO",
         }
-    except Exception as e:
-        return {"success": False, "reason": str(e), "active_ingestion": False}
+    except Exception:
+        logger.exception("trigger_cve_backfill failed")
+        return {"success": False, "reason": "Internal error", "active_ingestion": False}
 
 
 @app.get("/health")
@@ -688,8 +740,9 @@ async def get_cve_summary():
         }
     except ImportError:
         return {"total_records": 0, "sources_connected": 0, "freshness": "NOT_AVAILABLE"}
-    except Exception as e:
-        return {"total_records": 0, "sources_connected": 0, "freshness": "ERROR", "reason": str(e)}
+    except Exception:
+        logger.exception("get_cve_summary failed")
+        return {"total_records": 0, "sources_connected": 0, "freshness": "ERROR", "reason": "Internal error"}
 
 
 @app.get("/api/cve/search")
@@ -706,8 +759,9 @@ async def search_cves(q: str = "", user=Depends(require_auth)):
         return {"results": [], "query": q, "reason": "CVE pipeline not available"}
     except AttributeError:
         return {"results": [], "query": q, "reason": "Search not implemented in pipeline"}
-    except Exception as e:
-        return {"results": [], "query": q, "reason": str(e)}
+    except Exception:
+        logger.exception("search_cves failed")
+        return {"results": [], "query": q, "reason": "Internal error"}
 
 
 @app.get("/api/training/readiness")
@@ -754,10 +808,11 @@ async def get_training_readiness():
                 "manifest_exists": bridge_report["manifest_exists"],
                 "reason": bridge_report["reason"],
             }
-        except Exception as e:
+        except Exception:
+            logger.exception("get_per_field_report failed")
             fields["ingestion_bridge"] = {
                 "status": "BLOCKED",
-                "reason": f"Bridge report failed: {e}",
+                "reason": "Bridge report failed",
             }
 
         # Overall readiness
@@ -781,12 +836,13 @@ async def get_training_readiness():
             "authoritative_source": "bridge_state.json",
             "timestamp": datetime.now(UTC).isoformat(),
         }
-    except Exception as e:
+    except Exception:
+        logger.exception("get_training_readiness failed")
         return {
             "overall": "BLOCKED",
             "training_allowed": False,
             "go_no_go": "NO_GO",
-            "reason": str(e),
+            "reason": "Internal error",
         }
 
 
@@ -798,8 +854,9 @@ async def get_backup_status_endpoint():
         return get_backup_status()
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "Backup config module not found"}
-    except Exception as e:
-        return {"status": "ERROR", "reason": str(e)}
+    except Exception:
+        logger.exception("get_backup_status_endpoint failed")
+        return {"status": "ERROR", "reason": "Internal error"}
 
 
 
@@ -916,8 +973,9 @@ async def fields_state_endpoint(user=Depends(require_auth)):
         return get_fields_state()
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    except Exception:
+        logger.exception("fields_state_endpoint failed")
+        return {"status": "error", "message": "Internal error"}
 
 
 @app.post("/fields/approve/{field_id}")
@@ -932,8 +990,9 @@ async def fields_approve_endpoint(
         return approve_field(field_id, request.approver_id, request.reason)
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    except Exception:
+        logger.exception("fields_approve_endpoint failed")
+        return {"status": "error", "message": "Internal error"}
 
 
 @app.get("/api/reports")
@@ -2147,6 +2206,9 @@ _TRUSTED_PROXY_CIDRS_RAW = os.getenv(
     "TRUSTED_PROXY_CIDRS",
     "127.0.0.1/32,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16",
 )
+_ENABLE_G38_AUTO_TRAINING = os.getenv("ENABLE_G38_AUTO_TRAINING", "false").lower() in (
+    "1", "true", "yes", "on"
+)
 
 
 def _parse_cidrs(raw: str) -> list:
@@ -2282,6 +2344,7 @@ class RegisterRequest(BaseModel):
 async def register_user(request: RegisterRequest, req: Request):
     """Register a new user with hashed password."""
     ip = _extract_client_ip(req)
+    ua = req.headers.get("user-agent", "unknown")
 
     def _sync_register():
         existing = get_user_by_email(request.email)
@@ -2290,17 +2353,51 @@ async def register_user(request: RegisterRequest, req: Request):
         pw_hash = hash_password(request.password)
         user = create_user(request.name, request.email, "hunter")
         update_user_password(user["id"], pw_hash)
+
+        # Device + session tracking (same pattern as login)
+        location = resolve_ip_geolocation(ip)
+        dh = compute_device_hash(ua, ip)
+        device = register_device(user["id"], dh, ip, ua, location=location)
+        session = create_session(
+            user["id"], "AUTHENTICATED", None,
+            ip_address=ip,
+            user_agent=ua,
+            device_hash=dh,
+            metadata={"auth_method": "password", "geolocation": location},
+        )
+        update_user_auth_profile(
+            user["id"],
+            auth_provider="password",
+            ip_address=ip,
+            geolocation=location,
+        )
         log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
-        token = generate_jwt(user["id"], request.email)
-        return {"user": user, "token": token}
+        token = generate_jwt(
+            user["id"], request.email,
+            session_id=session["id"],
+            role="hunter",
+        )
+        return {
+            "user": user, "token": token,
+            "session_id": session["id"],
+            "device": {"hash": dh, "is_new": device.get("is_new", True)},
+            "network": {"ip": ip, "geolocation": location},
+        }
 
     result = await asyncio.to_thread(_sync_register)
     if result is None:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(
+            status_code=400,
+            detail={"error": "EMAIL_EXISTS", "detail": "Email already registered"},
+        )
     return {
         "success": True,
-        "user": {"id": result["user"]["id"], "name": result["user"]["name"], "email": result["user"]["email"]},
-        "token": result["token"]
+        "user": {"id": result["user"]["id"], "name": result["user"]["name"], "email": result["user"]["email"], "role": "hunter"},
+        "token": result["token"],
+        "session_id": result["session_id"],
+        "device": result["device"],
+        "network": result["network"],
+        "auth_method": "password",
     }
 
 
@@ -2333,7 +2430,7 @@ async def login(request: LoginRequest, req: Request):
         user = get_user_by_email(request.email)
         if not user:
             log_activity(None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip)
-            return {"error": 401, "detail": "Invalid credentials"}
+            return {"error": 401, "detail": {"error": "INVALID_CREDENTIALS", "detail": "Invalid credentials"}}
 
         if not user.get("password_hash") or not verify_password(request.password, user["password_hash"]):
             log_activity(user["id"], "LOGIN_FAILED", "Invalid password", ip_address=ip)
@@ -2345,7 +2442,7 @@ async def login(request: LoginRequest, req: Request):
                 )
             except Exception:
                 pass
-            return {"error": 401, "detail": "Invalid credentials"}
+            return {"error": 401, "detail": {"error": "INVALID_CREDENTIALS", "detail": "Invalid credentials"}}
 
         limiter.reset(ip)
 
@@ -2384,10 +2481,14 @@ async def login(request: LoginRequest, req: Request):
         except Exception:
             pass  # alerts are best-effort
 
-        token = generate_jwt(user["id"], user.get("email"))
+        token = generate_jwt(
+            user["id"], user.get("email"),
+            session_id=session["id"],
+            role=user.get("role", "hunter"),
+        )
         return {
             "success": True,
-            "user": {"id": user["id"], "name": user["name"], "email": user.get("email")},
+            "user": {"id": user["id"], "name": user["name"], "email": user.get("email"), "role": user.get("role", "hunter")},
             "token": token,
             "session_id": session["id"],
             "device": {"hash": dh, "is_new": device.get("is_new", False)},
@@ -2517,8 +2618,8 @@ async def admin_auth_intel(req: Request, limit: int = 200):
     }
 
 
-@app.get("/api/storage/status")
-async def storage_status(user=Depends(require_auth)):
+@app.get("/api/storage/tiered")
+async def storage_tiered_status(user=Depends(require_auth)):
     """Get SSD/HDD storage tiering status."""
     if not TIERED_STORAGE_AVAILABLE:
         return {"available": False, "error": "Tiered storage not loaded"}
@@ -3029,74 +3130,171 @@ async def voice_mode(user=Depends(require_auth)):
 _runtime_mode: str = "IDLE"  # IDLE, TRAIN, HUNT
 
 
+def _as_bool(value: Any) -> bool:
+    """Convert telemetry values to strict booleans."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return value != 0
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return False
+
+
+def _load_telemetry_hmac_secret() -> str:
+    """Load telemetry HMAC secret using native-priority sources."""
+    secret = os.getenv("YGB_HMAC_SECRET", "").strip()
+    if secret:
+        return secret
+
+    key_path = PROJECT_ROOT / "config" / "hmac_secret.key"
+    try:
+        if key_path.exists():
+            return key_path.read_text(encoding="utf-8").strip()
+    except Exception:
+        logger.exception("Failed reading telemetry key from %s", key_path)
+    return ""
+
+
+def _compute_telemetry_crc32(data: Dict[str, Any]) -> int:
+    """Compute CRC32 using the exact native payload format."""
+    payload = (
+        f"v{int(data['schema_version'])}|"
+        f"det:{1 if _as_bool(data['determinism_status']) else 0}|"
+        f"frz:{1 if _as_bool(data['freeze_status']) else 0}|"
+        f"prec:{float(data['precision']):.8f}|"
+        f"rec:{float(data['recall']):.8f}|"
+        f"kl:{float(data['kl_divergence']):.8f}|"
+        f"ece:{float(data['ece']):.8f}|"
+        f"loss:{float(data['loss']):.8f}|"
+        f"temp:{float(data['gpu_temperature']):.8f}|"
+        f"epoch:{int(data['epoch'])}|"
+        f"batch:{int(data['batch_size'])}|"
+        f"ts:{int(data['timestamp'])}|"
+        f"mono:{int(data['monotonic_timestamp'])}|"
+        f"start:{int(data['monotonic_start_time'])}|"
+        f"wall:{int(data['wall_clock_unix'])}|"
+        f"dur:{float(data['training_duration_seconds']):.8f}|"
+        f"rate:{float(data['samples_per_second']):.8f}"
+    )
+    return zlib.crc32(payload.encode("utf-8")) & 0xFFFFFFFF
+
+
+def _validate_runtime_telemetry(data: Dict[str, Any]) -> tuple[bool, str]:
+    """Validate schema, CRC32, and HMAC integrity for runtime telemetry."""
+    required = (
+        "schema_version",
+        "determinism_status",
+        "freeze_status",
+        "precision",
+        "recall",
+        "kl_divergence",
+        "ece",
+        "loss",
+        "gpu_temperature",
+        "epoch",
+        "batch_size",
+        "timestamp",
+        "monotonic_timestamp",
+        "monotonic_start_time",
+        "wall_clock_unix",
+        "training_duration_seconds",
+        "samples_per_second",
+        "crc32",
+        "hmac",
+    )
+    for field in required:
+        if field not in data:
+            return False, f"Missing field: {field}"
+
+    try:
+        schema_version = int(data["schema_version"])
+        stored_crc = int(data["crc32"])
+        timestamp = int(data["timestamp"])
+    except (TypeError, ValueError):
+        return False, "Invalid telemetry numeric fields"
+
+    if schema_version != 1:
+        return False, f"Unsupported schema_version: {schema_version}"
+
+    try:
+        computed_crc = _compute_telemetry_crc32(data)
+    except (TypeError, ValueError):
+        return False, "Invalid telemetry payload types"
+    if stored_crc != computed_crc:
+        return False, "CRC validation failed"
+
+    secret = _load_telemetry_hmac_secret()
+    if not secret:
+        return False, "HMAC secret unavailable"
+
+    stored_hmac = str(data.get("hmac", "")).strip().lower()
+    if len(stored_hmac) != 64 or any(ch not in "0123456789abcdef" for ch in stored_hmac):
+        return False, "Invalid HMAC format"
+
+    msg = f"{schema_version}|{stored_crc}|{timestamp}"
+    expected_hmac = hmac.new(
+        secret.encode("utf-8"),
+        msg.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest().lower()
+    if not hmac.compare_digest(stored_hmac, expected_hmac):
+        return False, "HMAC validation failed"
+
+    return True, ""
+
+
+def _read_validated_telemetry(telemetry_path: Path) -> tuple[Optional[Dict[str, Any]], Optional[str]]:
+    """Read telemetry JSON and enforce integrity checks."""
+    try:
+        import json as _json
+
+        raw = telemetry_path.read_text(encoding="utf-8")
+        data = _json.loads(raw)
+    except Exception:
+        logger.exception("Failed to parse telemetry file: %s", telemetry_path)
+        return None, "Telemetry parse failed"
+
+    ok, reason = _validate_runtime_telemetry(data)
+    if not ok:
+        logger.warning("Telemetry integrity check failed: %s", reason)
+        return None, reason
+
+    return data, None
+
+
 @app.get("/runtime/status")
 async def runtime_status(user=Depends(require_auth)):
     """
     GET /runtime/status — Validated runtime telemetry.
     Reads from C++ authoritative source (reports/training_telemetry.json),
-    validates CRC + schema before returning data.
+    validates schema + CRC + HMAC before returning data.
     If no file or validation fails → returns appropriate status.
     """
     telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
 
     if not telemetry_path.exists():
-        # If training mode is active, show initial telemetry instead of awaiting_data
-        if _runtime_mode == "TRAIN":
-            import time as _t
-            return {
-                "status": "active",
-                "runtime": {
-                    "total_epochs": 100,
-                    "completed_epochs": 0,
-                    "current_loss": 2.302,
-                    "precision": 0.0,
-                    "ece": 0.0,
-                    "drift_kl": 0.0,
-                    "duplicate_rate": 0.0,
-                    "gpu_util": 0.0,
-                    "cpu_util": 0.0,
-                    "temperature": 0.0,
-                    "determinism_status": True,
-                    "freeze_status": False,
-                    "mode": "TRAIN",
-                    "progress_pct": 0.0,
-                    "loss_trend": 0.0,
-                    "wall_clock_unix": _t.time(),
-                    "monotonic_start_time": _t.monotonic(),
-                    "training_duration_seconds": 0.0,
-                },
-                "determinism_ok": True,
-                "stale": False,
-                "last_update_ms": 0,
-                "signature": None
-            }
         return {
             "status": "awaiting_data",
             "runtime": None,
             "determinism_ok": None,
             "stale": False,
             "last_update_ms": 0,
-            "signature": None
+            "signature": None,
         }
 
     try:
-        import json as _json
-        raw = telemetry_path.read_text(encoding="utf-8")
-        data = _json.loads(raw)
-
-        # Validate required fields
-        required = ["schema_version", "determinism_status"]
-        for field in required:
-            if field not in data:
-                return {
-                    "status": "error",
-                    "reason": f"Missing field: {field}",
-                    "runtime": None,
-                    "determinism_ok": False,
-                    "stale": True,
-                    "last_update_ms": 0,
-                    "signature": None
-                }
+        data, validation_error = _read_validated_telemetry(telemetry_path)
+        if data is None:
+            return {
+                "status": "error",
+                "reason": validation_error or "Telemetry integrity validation failed",
+                "runtime": None,
+                "determinism_ok": False,
+                "stale": True,
+                "last_update_ms": 0,
+                "signature": None,
+            }
 
         # Check staleness (>60s since file mod time)
         import time as _time
@@ -3130,9 +3328,10 @@ async def runtime_status(user=Depends(require_auth)):
             "determinism_ok": data.get("determinism_status", False),
             "stale": is_stale,
             "last_update_ms": age_ms,
-            "signature": data.get("signature", None)
+            "signature": data.get("hmac", None)
         }
-    except Exception as e:
+    except Exception:
+        logger.exception("runtime_status failed")
         return {
             "status": "error",
             "reason": "Internal error",
@@ -3140,7 +3339,7 @@ async def runtime_status(user=Depends(require_auth)):
             "determinism_ok": False,
             "stale": True,
             "last_update_ms": 0,
-            "signature": None
+            "signature": None,
         }
 
 
@@ -3165,8 +3364,10 @@ async def accuracy_snapshot(user=Depends(require_auth)):
         return defaults
 
     try:
-        import json as _json
-        data = _json.loads(telemetry_path.read_text(encoding="utf-8"))
+        data, validation_error = _read_validated_telemetry(telemetry_path)
+        if data is None:
+            logger.warning("accuracy_snapshot using defaults: %s", validation_error)
+            return defaults
         return {
             "precision": data.get("precision", 0.0),
             "recall": data.get("recall", 0.0),
@@ -3175,6 +3376,7 @@ async def accuracy_snapshot(user=Depends(require_auth)):
             "scope_compliance": data.get("scope_compliance", 0.0)
         }
     except Exception:
+        logger.exception("accuracy_snapshot failed")
         return defaults
 
 
@@ -3289,36 +3491,39 @@ async def start_training_mode(user=Depends(require_auth)):
         })
     if _runtime_mode == "TRAIN":
         return {"mode": "TRAIN", "status": "already_active"}
+
+    # Truthful behavior: start real training pipeline or fail.
+    if not G38_AVAILABLE:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "TRAIN_UNAVAILABLE",
+                "reason": "G38 modules not loaded",
+                "mode": _runtime_mode,
+            },
+        )
+
+    result = start_continuous_training(target_epochs=100)
+    if not result.get("started", False):
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "TRAIN_START_FAILED",
+                "reason": result.get("reason", "Failed to start training"),
+                "state": result.get("state", "ERROR"),
+                "mode": _runtime_mode,
+            },
+        )
+
     _runtime_mode = "TRAIN"
-
-    # Create seed telemetry file so /runtime/status shows active state
-    import json as _json, time as _t
-    telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
-    telemetry_path.parent.mkdir(parents=True, exist_ok=True)
-    seed = {
-        "schema_version": "1.0",
-        "total_epochs": 100,
-        "epoch": 0,
-        "loss": 2.302,
-        "precision": 0.0,
-        "ece": 0.0,
-        "kl_divergence": 0.0,
-        "duplicate_rate": 0.0,
-        "gpu_util": 0.0,
-        "cpu_util": 0.0,
-        "gpu_temperature": 0.0,
-        "determinism_status": True,
-        "freeze_status": False,
-        "loss_trend": 0.0,
-        "wall_clock_unix": _t.time(),
-        "monotonic_start_time": _t.monotonic(),
-        "training_duration_seconds": 0.0,
-        "mode": "TRAIN"
+    return {
+        "mode": "TRAIN",
+        "status": "started",
+        "training_mode": "CONTINUOUS",
+        "target_epochs": 100,
     }
-    telemetry_path.write_text(_json.dumps(seed, indent=2), encoding="utf-8")
-    logger.info("[TRAIN] Seed telemetry written to %s", telemetry_path)
-
-    return {"mode": "TRAIN", "status": "started"}
 
 
 @app.post("/api/mode/train/stop")
@@ -3327,6 +3532,14 @@ async def stop_training_mode(user=Depends(require_auth)):
     global _runtime_mode
     if _runtime_mode != "TRAIN":
         return {"mode": _runtime_mode, "status": "not_in_train"}
+
+    if G38_AVAILABLE:
+        trainer = get_auto_trainer()
+        if getattr(trainer, "_continuous_mode", False):
+            stop_continuous_training()
+        else:
+            trainer.abort_training()
+
     _runtime_mode = "IDLE"
     return {"mode": "IDLE", "status": "stopped"}
 
@@ -3368,10 +3581,77 @@ _GITHUB_REDIRECT_URI = os.getenv(
     "GITHUB_REDIRECT_URI",
     "http://localhost:8000/auth/github/callback",
 )
+_OAUTH_STATE_TTL_SECONDS = int(os.getenv("OAUTH_STATE_TTL_SECONDS", "600"))
+_OAUTH_STATE_SECRET = os.getenv("YGB_HMAC_SECRET", "") or os.getenv("JWT_SECRET", "")
+
+
+def _b64url_encode(raw: str) -> str:
+    return base64.urlsafe_b64encode(raw.encode("utf-8")).decode("ascii").rstrip("=")
+
+
+def _b64url_decode(raw: str) -> str:
+    padding = "=" * ((4 - len(raw) % 4) % 4)
+    return base64.urlsafe_b64decode((raw + padding).encode("ascii")).decode("utf-8")
+
+
+def _oauth_state_sign(payload: str) -> str:
+    if not _OAUTH_STATE_SECRET:
+        return ""
+    return hmac.new(
+        _OAUTH_STATE_SECRET.encode("utf-8"),
+        payload.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+
+def _allowed_frontend_urls() -> set[str]:
+    return {
+        _FRONTEND_URL.rstrip("/"),
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    }
+
+
+def _resolve_frontend_url(candidate: str = "") -> str:
+    val = (candidate or "").strip().rstrip("/")
+    if val in _allowed_frontend_urls():
+        return val
+    return _FRONTEND_URL.rstrip("/")
+
+
+def _build_oauth_state(frontend_url: str) -> str:
+    ts = str(int(datetime.now(UTC).timestamp()))
+    nonce = secrets.token_hex(16)
+    fe = _b64url_encode(frontend_url)
+    payload = f"v1.{ts}.{nonce}.{fe}"
+    return f"{payload}.{_oauth_state_sign(payload)}"
+
+
+def _parse_oauth_state(state: str) -> tuple[bool, Optional[str]]:
+    try:
+        parts = state.split(".")
+        if len(parts) != 5 or parts[0] != "v1":
+            return False, None
+
+        payload = ".".join(parts[:4])
+        sig = parts[4]
+        expected = _oauth_state_sign(payload)
+        if not expected or not hmac.compare_digest(sig, expected):
+            return False, None
+
+        ts = int(parts[1])
+        now = int(datetime.now(UTC).timestamp())
+        if now - ts > _OAUTH_STATE_TTL_SECONDS:
+            return False, None
+
+        frontend_url = _resolve_frontend_url(_b64url_decode(parts[3]))
+        return True, frontend_url
+    except Exception:
+        return False, None
 
 
 @app.get("/auth/github")
-async def github_auth_redirect():
+async def github_auth_redirect(frontend_origin: str = ""):
     """Redirect to GitHub OAuth authorization page."""
     if not _GITHUB_CLIENT_ID:
         raise HTTPException(
@@ -3381,7 +3661,8 @@ async def github_auth_redirect():
 
     import urllib.parse
 
-    state = __import__("secrets").token_hex(16)
+    frontend_url = _resolve_frontend_url(frontend_origin)
+    state = _build_oauth_state(frontend_url)
     params = urllib.parse.urlencode({
         "client_id": _GITHUB_CLIENT_ID,
         "redirect_uri": _GITHUB_REDIRECT_URI,
@@ -3395,10 +3676,10 @@ async def github_auth_redirect():
     resp.set_cookie(
         key="ygb_oauth_state",
         value=state,
-        max_age=600,
+        max_age=_OAUTH_STATE_TTL_SECONDS,
         httponly=True,
         samesite="lax",
-        secure=_FRONTEND_URL.startswith("https://"),
+        secure=frontend_url.startswith("https://"),
     )
     return resp
 
@@ -3406,9 +3687,12 @@ async def github_auth_redirect():
 @app.get("/auth/github/callback")
 async def github_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
     """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
+    parsed_ok, parsed_frontend = _parse_oauth_state(state) if state else (False, None)
+    frontend_url = parsed_frontend or _FRONTEND_URL
+
     if error:
         resp = RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?error={error}",
+            url=f"{frontend_url}/login?error={error}",
             status_code=302,
         )
         resp.delete_cookie("ygb_oauth_state")
@@ -3416,17 +3700,18 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
     if not code:
         resp = RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?error=no_code",
+            url=f"{frontend_url}/login?error=no_code",
             status_code=302,
         )
         resp.delete_cookie("ygb_oauth_state")
         return resp
 
     expected_state = req.cookies.get("ygb_oauth_state", "")
-    if not state or not expected_state or state != expected_state:
+    cookie_ok = bool(state and expected_state and state == expected_state)
+    if not (cookie_ok and parsed_ok):
         logger.warning("GitHub OAuth state mismatch")
         resp = RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?error=state_mismatch",
+            url=f"{frontend_url}/login?error=state_mismatch",
             status_code=302,
         )
         resp.delete_cookie("ygb_oauth_state")
@@ -3443,9 +3728,11 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
     ip = _extract_client_ip(req)
     ua = req.headers.get("user-agent", "unknown")
-    location = resolve_ip_geolocation(ip)
 
-    try:
+    def _sync_github_exchange():
+        """All blocking I/O (GitHub API + DB) runs in thread pool."""
+        location = resolve_ip_geolocation(ip)
+
         # 1. Exchange code for access token
         token_data = urllib.parse.urlencode({
             "client_id": _GITHUB_CLIENT_ID,
@@ -3459,18 +3746,13 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             data=token_data,
             headers={"Accept": "application/json"},
         )
-        with urllib.request.urlopen(token_req, timeout=10) as resp:
-            token_resp = json.loads(resp.read().decode())
+        with urllib.request.urlopen(token_req, timeout=10) as _resp:
+            token_resp = json.loads(_resp.read().decode())
 
         access_token = token_resp.get("access_token")
         if not access_token:
             logger.error("GitHub token exchange failed: %s", token_resp)
-            resp = RedirectResponse(
-                url=f"{_FRONTEND_URL}/login?error=token_exchange_failed",
-                status_code=302,
-            )
-            resp.delete_cookie("ygb_oauth_state")
-            return resp
+            return {"error": "token_exchange_failed"}
 
         # 2. Fetch user info
         user_req = urllib.request.Request(
@@ -3481,18 +3763,13 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                 "User-Agent": "YGB-Server",
             },
         )
-        with urllib.request.urlopen(user_req, timeout=10) as resp:
-            user_data = json.loads(resp.read().decode())
+        with urllib.request.urlopen(user_req, timeout=10) as _resp:
+            user_data = json.loads(_resp.read().decode())
 
         github_id = str(user_data.get("id", ""))
         if not github_id:
             logger.error("GitHub user payload missing id: %s", user_data)
-            resp = RedirectResponse(
-                url=f"{_FRONTEND_URL}/login?error=invalid_github_profile",
-                status_code=302,
-            )
-            resp.delete_cookie("ygb_oauth_state")
-            return resp
+            return {"error": "invalid_github_profile"}
         github_login = user_data.get("login", "")
         github_email = user_data.get("email", "")
         github_profile = {
@@ -3526,8 +3803,8 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                     "User-Agent": "YGB-Server",
                 },
             )
-            with urllib.request.urlopen(emails_req, timeout=10) as resp:
-                emails = json.loads(resp.read().decode())
+            with urllib.request.urlopen(emails_req, timeout=10) as _resp:
+                emails = json.loads(_resp.read().decode())
             # Pick primary verified email
             for em in emails:
                 if em.get("primary") and em.get("verified"):
@@ -3588,17 +3865,24 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                 "github_profile": github_profile,
             },
         )
-        alert_new_login(user["name"], ip, ua, location)
-        if device.get("is_new"):
-            alert_new_device(user["name"], dh, ip, ua, location)
+        try:
+            alert_new_login(user["name"], ip, ua, location)
+            if device.get("is_new"):
+                alert_new_device(user["name"], dh, ip, ua, location)
+            active_count = get_active_device_count(user["id"])
+            if active_count > 1:
+                devices = get_user_devices(user["id"])
+                alert_multiple_devices(user["name"], active_count, devices)
+        except Exception:
+            pass  # alerts are best-effort
 
-        active_count = get_active_device_count(user["id"])
-        if active_count > 1:
-            devices = get_user_devices(user["id"])
-            alert_multiple_devices(user["name"], active_count, devices)
-
-        # 6. Issue JWT and return frontend redirect
-        jwt_token = generate_jwt(user_id=user["id"], email=user.get("email"))
+        # 6. Issue JWT
+        jwt_token = generate_jwt(
+            user_id=user["id"],
+            email=user.get("email"),
+            session_id=session["id"],
+            role=user.get("role", "hunter"),
+        )
         safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
         safe_token = urllib.parse.quote_plus(jwt_token)
         safe_session = urllib.parse.quote_plus(session["id"])
@@ -3628,28 +3912,34 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             location,
         )
 
-        resp = RedirectResponse(
-            url=(
-                f"{_FRONTEND_URL}/login"
+        return {
+            "redirect_url": (
+                f"{frontend_url}/login"
                 f"?token={safe_token}"
                 f"&user={safe_user}"
                 f"&session_id={safe_session}"
                 f"&auth=github"
                 f"&profile={safe_profile}"
             ),
+        }
+
+    try:
+        result = await asyncio.to_thread(_sync_github_exchange)
+    except Exception:
+        logger.exception("GitHub OAuth callback error")
+        result = {"error": "server_error"}
+
+    if "error" in result:
+        resp = RedirectResponse(
+            url=f"{frontend_url}/login?error={result['error']}",
             status_code=302,
         )
         resp.delete_cookie("ygb_oauth_state")
         return resp
 
-    except Exception:
-        logger.exception("GitHub OAuth callback error")
-        resp = RedirectResponse(
-            url=f"{_FRONTEND_URL}/login?error=server_error",
-            status_code=302,
-        )
-        resp.delete_cookie("ygb_oauth_state")
-        return resp
+    resp = RedirectResponse(url=result["redirect_url"], status_code=302)
+    resp.delete_cookie("ygb_oauth_state")
+    return resp
 
 
 # =============================================================================
@@ -3840,5 +4130,8 @@ async def rollout_metrics(user=Depends(require_auth)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
+    host = os.getenv("API_HOST", "0.0.0.0")
+    port = int(os.getenv("API_PORT", "8000"))
+    reload_enabled = os.getenv("API_RELOAD", "false").lower() in ("1", "true", "yes", "on")
+    uvicorn.run("server:app", host=host, port=port, reload=reload_enabled)
 

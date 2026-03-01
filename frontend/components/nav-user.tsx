@@ -7,6 +7,8 @@ import {
   Bell,
   User,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { buildAuthHeaders } from "@/lib/auth-token"
 
 import {
   Avatar,
@@ -39,6 +41,35 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
+  const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
+
+  const handleLogout = async () => {
+    try {
+      await fetch(`${API_BASE}/auth/logout`, {
+        method: "POST",
+        headers: buildAuthHeaders({ "Content-Type": "application/json" }),
+      })
+    } catch {
+      // Ignore network failures and still clear local auth state.
+    } finally {
+      const keys = [
+        "ygb_token",
+        "ygb_jwt",
+        "ygb_session",
+        "ygb_session_id",
+        "ygb_auth_method",
+        "ygb_profile",
+        "ygb_network",
+      ]
+      for (const key of keys) {
+        sessionStorage.removeItem(key)
+        localStorage.removeItem(key)
+      }
+      router.push("/login")
+      router.refresh()
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -98,7 +129,13 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-500 focus:bg-red-50 dark:focus:bg-red-950/20">
+            <DropdownMenuItem
+              className="text-red-500 focus:bg-red-50 dark:focus:bg-red-950/20"
+              onSelect={(e) => {
+                e.preventDefault()
+                void handleLogout()
+              }}
+            >
               <LogOut className="size-4" />
               Log out
             </DropdownMenuItem>

@@ -104,6 +104,14 @@ class CVEIngestScheduler:
 
     async def _run_loop(self):
         """Main scheduler loop."""
+        # Defer first ingest cycle so API startup stays responsive.
+        # Without this delay, first-cycle ingest/parsing can monopolize
+        # the event loop on boot for large feeds.
+        try:
+            await asyncio.sleep(_INGEST_INTERVAL)
+        except asyncio.CancelledError:
+            return
+
         while self._running:
             try:
                 await self._execute_ingest_cycle()

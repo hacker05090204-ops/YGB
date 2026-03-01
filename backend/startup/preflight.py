@@ -185,23 +185,36 @@ def check_scope_registry() -> CheckResult:
 # =========================================================================
 
 def check_secrets() -> CheckResult:
-    """Verify strong secrets are set (≥32 chars)."""
-    required = {
-        "JWT_SECRET": os.environ.get("JWT_SECRET", ""),
-        "YGB_HMAC_SECRET": os.environ.get("YGB_HMAC_SECRET", ""),
-        "YGB_VIDEO_JWT_SECRET": os.environ.get("YGB_VIDEO_JWT_SECRET", ""),
-    }
-    weak = []
-    for name, val in required.items():
-        if len(val) < 32:
-            weak.append(f"{name} ({len(val)} chars)")
-    if weak:
-        return CheckResult(
-            "secrets", False,
-            f"Weak/missing secrets: {', '.join(weak)} — need ≥32 chars",
-            critical=False,
-        )
-    return CheckResult("secrets", True, "All required secrets ≥32 chars")
+    """Verify strong secrets are set (≥32 chars) and not placeholders."""
+    try:
+        from backend.config.config_validator import validate_required_secrets, validate_bind_host
+        violations = validate_required_secrets()
+        bind_warnings = validate_bind_host()
+        if violations:
+            detail = "; ".join(f"{k}: {r}" for k, r in violations)
+            return CheckResult("secrets", False, f"Secret violations: {detail}", critical=False)
+        if bind_warnings:
+            warn_detail = "; ".join(f"{k}: {r}" for k, r in bind_warnings)
+            logger.warning("[PREFLIGHT] %s", warn_detail)
+        return CheckResult("secrets", True, "All required secrets valid (≥32 chars, not placeholders)")
+    except ImportError:
+        # Fallback to basic check if config_validator not available
+        required = {
+            "JWT_SECRET": os.environ.get("JWT_SECRET", ""),
+            "YGB_HMAC_SECRET": os.environ.get("YGB_HMAC_SECRET", ""),
+            "YGB_VIDEO_JWT_SECRET": os.environ.get("YGB_VIDEO_JWT_SECRET", ""),
+        }
+        weak = []
+        for name, val in required.items():
+            if len(val) < 32:
+                weak.append(f"{name} ({len(val)} chars)")
+        if weak:
+            return CheckResult(
+                "secrets", False,
+                f"Weak/missing secrets: {', '.join(weak)} — need ≥32 chars",
+                critical=False,
+            )
+        return CheckResult("secrets", True, "All required secrets ≥32 chars")
 
 
 def check_boot_summary() -> CheckResult:

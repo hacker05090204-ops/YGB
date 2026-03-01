@@ -75,7 +75,7 @@ def run_operational_validation() -> tuple:
         metrics, report = run_effectiveness_validation()
         return True, report
     except Exception as e:
-        return False, {"error": str(e)}
+        return False, {"error": f"validation_failed: {type(e).__name__}"}
 
 
 def run_chaos_suite() -> tuple:
@@ -87,7 +87,7 @@ def run_chaos_suite() -> tuple:
         passed = report["verdict"] == "PASS"
         return passed, report
     except Exception as e:
-        return False, {"error": str(e)}
+        return False, {"error": f"chaos_failed: {type(e).__name__}"}
 
 
 def run_calibration_suite() -> tuple:

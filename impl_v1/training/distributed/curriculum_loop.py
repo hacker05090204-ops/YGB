@@ -98,7 +98,7 @@ class CurriculumLoop:
             except Exception as e:
                 elapsed = time.perf_counter() - st
                 stages.append(CurriculumStage(
-                    name, "error", round(elapsed, 4), {"error": str(e)},
+                    name, "error", round(elapsed, 4), {"error": type(e).__name__},
                 ))
                 all_ok = False
 

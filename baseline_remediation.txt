@@ -1,0 +1,183 @@
+﻿============================================================
+PATTERN SUMMARY BY CLASSIFICATION
+============================================================
+  fixme                | PRODUCTION      |     1 hits
+  mock                 | CONFIG/DOCS     |     1 hits
+  mock                 | PRODUCTION      |   176 hits
+  mock                 | TEST            |   173 hits
+  not_implemented      | CONFIG/DOCS     |     1 hits
+  not_implemented      | PRODUCTION      |    13 hits
+  partial              | PRODUCTION      |    41 hits
+  partial              | TEST            |    24 hits
+  placeholder          | PRODUCTION      |    77 hits
+  placeholder          | TEST            |    16 hits
+  simulate             | CONFIG/DOCS     |     2 hits
+  simulate             | PRODUCTION      |   200 hits
+  simulate             | TEST            |   101 hits
+  stimulate            | PRODUCTION      |     2 hits
+  stub                 | PRODUCTION      |    16 hits
+  stub                 | TEST            |     6 hits
+  synthetic            | CONFIG/DOCS     |     1 hits
+  synthetic            | PRODUCTION      |    79 hits
+  synthetic            | TEST            |    33 hits
+  todo                 | PRODUCTION      |     1 hits
+
+============================================================
+PRODUCTION-PATH HITS (need remediation)
+============================================================
+
+--- fixme (1 production hits) ---
+  scripts/ci_banned_tokens.py:51
+    (r'\bFIXME\b', "FIXME"),
+
+--- mock (176 production hits) ---
+  api/server.py:1385
+    elif request.mode == "MOCK":
+  api/server.py:1389
+    content={"error": "MOCK mode is disabled. Use READ_ONLY, AUTONOMOUS_FIND, or REAL."}
+  backend/alerts/email_alerts.py:15
+    ZERO placeholder emails. ZERO mock connections.
+  backend/api/browser_endpoints.py:4
+    Serves real data from daily curriculum runs (NO mock data).
+  backend/api/field_progression_api.py:14
+    - No mock data ù "Awaiting Data" if unavailable
+  backend/api/field_progression_api.py:190
+    """Calculate weighted progress for a field. No mock data."""
+  backend/api/runtime_api.py:73
+    """Get HMAC secret. Always requires a real secret ù no mock fallback."""
+  backend/api/runtime_api.py:79
+    "No mock/test fallback permitted."
+  backend/api/runtime_api.py:140
+    No mock/empty fallback permitted.
+  backend/api/training_progress.py:11
+    NO mock data. Python is governance only.
+  backend/approval/report_orchestrator.py:12
+    NO mock data. NO auto-submit. NO authority unlock.
+  backend/auth/auth.py:12
+    ZERO mock users. ZERO bypass tokens. ZERO hardcoded credentials.
+  backend/integrity/integrity_bridge.py:7
+    No mock data. No fallbacks. Real metrics only.
+  backend/startup/preflight.py:14
+    NO mock data. NO auto-approve. NO bypass.
+  backend/storage/storage_bridge.py:8
+    No mock data. No fallback. No SQLite. No JSON pseudo-database.
+  backend/training/parallel_scheduler.py:7
+    NO mock data. NO auto-submit. NO authority unlock.
+  backend/training/state_manager.py:7
+    ZERO mock data. ZERO fallback values. ZERO random values.
+  backend/training/state_manager.py:155
+    NEVER returns mock/hardcoded metrics.
+  frontend/components/hunting-control-panel.tsx:128
+    // --- Data Fetching (real endpoints, no mock) ---
+  impl_v1/enterprise/process_isolation.py:108
+    self.inference_process.pid = os.getpid() + 1000  # Mock
+  impl_v1/enterprise/process_isolation.py:120
+    self.training_process.pid = os.getpid() + 2000  # Mock
+  impl_v1/phase49/governors/g06_autonomy_modes.py:25
+    """CLOSED ENUM - 3 modes (MOCK removed)"""
+  impl_v1/phase49/governors/g07_cve_intelligence.py:134
+    NOTE: This is a mock implementation for governance testing.
+  impl_v1/phase49/governors/g08_licensing.py:114
+    NOTE: This is a mock implementation for governance testing.
+  impl_v1/phase49/governors/g08_licensing.py:133
+    # Check against known valid keys (mock)
+  impl_v1/phase49/governors/g09_device_trust.py:131
+    expires_at="2026-02-01T00:00:00Z",  # Mock expiry
+  impl_v1/phase49/governors/g14_target_discovery.py:89
+    Raises RuntimeError if no programs file exists ù never uses mock data.
+  impl_v1/phase49/governors/g15_cve_api.py:148
+    _mock_response: Mock response for testing (internal use)
+  impl_v1/phase49/governors/g15_cve_api.py:171
+    # Mock for testing - simulates API response
+  impl_v1/phase49/governors/g15_cve_api.py:214
+    """Handle mock API response for testing."""
+  ... and 146 more
+
+--- not_implemented (13 production hits) ---
+  api/server.py:722
+    return {"results": [], "query": q, "reason": "Search not implemented in pipeline"}
+  impl_v1/phase49/governors/g29_voice_stt.py:223
+    raise NotImplementedError(
+  impl_v1/phase49/native/sandbox.cpp:157
+    // Non-Linux: privilege drop not implemented
+  impl_v1/training/distributed/cloud_backup.py:159
+    f"{target.service} upload not implemented"
+  impl_v1/training/distributed/cloud_backup.py:163
+    f"BLOCKED ù upload not implemented"
+  impl_v1/training/voice/stt_adapter.py:142
+    raise NotImplementedError
+  native/report_engine/narrative_builder.cpp:112
+    "The %s parameter at %s does not implement proper input "
+  python/phase09_bounty/bounty_engine.py:94
+    - NR-001: Scope ambiguity (not implemented - requires partial matching)
+  python/phase09_bounty/bounty_engine.py:95
+    - NR-002: Novel vulnerability type (not implemented - requires ML)
+  python/phase09_bounty/bounty_engine.py:96
+    - NR-003: Partial duplicate overlap (not implemented)
+  python/phase09_bounty/bounty_engine.py:98
+    - NR-005: Policy edge case (not implementable generically)
+  scripts/ci_banned_tokens.py:49
+    (r'\bnot implemented\b', "not implemented"),
+  scripts/remediation_scan.py:19
+    'not_implemented': re.compile(r'not.implement|NotImplemented', re.IGNORECASE),
+
+--- partial (41 production hits) ---
+  api/server.py:751
+    "status": "READY" if STRICT_REAL_MODE else "PARTIAL",
+  api/server.py:781
+    partial = [f for f in fields.values() if f["status"] == "PARTIAL"]
+  api/server.py:785
+    elif partial:
+  api/server.py:786
+    overall = "PARTIAL"
+  backend/api/runtime_api.py:16
+    Never trust partial state.
+  backend/api/runtime_api.py:228
+    Never returns partial state.
+  frontend/app/dashboard/page.tsx:288
+    : trainingReadiness.overall === "PARTIAL"
+  frontend/app/dashboard/page.tsx:295
+    : trainingReadiness.overall === "PARTIAL" ? "bg-yellow-400"
+  HUMANOID_HUNTER/executor_response/response_engine.py:26
+python : Traceback (most 
+recent call last):
+At line:1 char:41
++ ... Unkno\YGB"; python C:
+\Users\Unkno\YGB\scripts\re
+mediation_scan.py 2>& ...
++                 ~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Tra  
+  ceback (most recent ca   
+ ll last)::String) [],     
+RemoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+  File "C:\Users\Unkno\YGB\
+scripts\remediation_scan.py
+", line 107, in <module>
+    scan()
+  File "C:\Users\Unkno\YGB\
+scripts\remediation_scan.py
+", line 98, in scan
+    print(f"    
+{h['content']}")
+  File "C:\Program Files\Py
+thon311\Lib\encodings\cp125
+2.py", line 19, in encode
+    return codecs.charmap_e
+ncode(input,self.errors,enc
+oding_table)[0]
+           ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^
+UnicodeEncodeError: 
+'charmap' codec can't 
+encode character '\u2192' 
+in position 14: character 
+maps to <undefined>
+    ExecutorResponseType.PARTIAL: 0.50,    # Medium
+  HUMANOID_HUNTER/executor_response/response_engine.py:46

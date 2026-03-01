@@ -130,9 +130,9 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
         }
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logger.exception("Voice command error")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal error")
 
 
 @voice_router.post("/api/voice/confirm/{intent_id}")

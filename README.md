@@ -20,6 +20,11 @@ npm install
 
 ### 2. Start the System
 
+**One command (recommended, wired + fast defaults):**
+```bash
+powershell -ExecutionPolicy Bypass -File .\start_full_stack.ps1
+```
+
 **Terminal 1 - Backend API:**
 ```bash
 cd api

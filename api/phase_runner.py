@@ -22,6 +22,9 @@ import hashlib
 import traceback
 from urllib.parse import urlparse, urljoin
 import re
+import logging
+
+logger = logging.getLogger("ygb.phase_runner")
 
 # ==============================================================================
 # PATHS
@@ -544,10 +547,10 @@ class UnifiedPhaseRunner:
             result = await func(context)
             if result:
                 output = result
-        except Exception as e:
+        except Exception:
             status = "FAILED"
-            output = {"error": str(e)}
-            print(f"[ERROR] Phase {phase_num} error: {e}")
+            output = {"error": "Phase execution failed"}
+            logger.exception("Phase %s (%s) failed", phase_num, name)
         
         duration = int((datetime.now(UTC) - phase_start).total_seconds() * 1000)
         
@@ -622,8 +625,9 @@ class UnifiedPhaseRunner:
                 await self._emit_action("NAVIGATE", url, {"title": title}, duration)
                 
                 return {"status": 200, "title": title}
-            except Exception as e:
-                return {"error": str(e)}
+            except Exception:
+                logger.exception("Navigation phase failed for url=%s", url)
+                return {"error": "Navigation failed"}
         else:
             # HTTP fallback
             async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
@@ -1859,8 +1863,8 @@ class UnifiedPhaseRunner:
                     "severity": results.get("severity", {}),
                     "findings": cve_findings
                 }
-            except Exception as e:
-                print(f"⚠️ CVE scan error: {e}")
+            except Exception:
+                logger.exception("CVE scan error")
         else:
             # Basic CVE pattern matching if scanner not available
             cve_patterns = [
