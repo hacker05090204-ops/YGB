@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useRef } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import gsap from "gsap"
@@ -28,7 +30,7 @@ interface Project {
     due: string
 }
 
-export default function ProjectsPage() {
+function ProjectsPageContent() {
     const containerRef = useRef(null)
     const [projects, setProjects] = useState<Project[]>([])
     const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
@@ -176,4 +178,8 @@ export default function ProjectsPage() {
             </SidebarInset>
         </SidebarProvider>
     )
+}
+
+export default function ProjectsPage() {
+    return <AuthGuard><ProjectsPageContent /></AuthGuard>
 }

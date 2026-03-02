@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useRef, useCallback } from "react"
 import { createAuthWebSocket } from "@/lib/ws-auth"
 import { authFetch } from "@/lib/ygb-api"
@@ -64,7 +66,7 @@ interface WorkflowResult {
     phases?: any[]
 }
 
-export default function RunnerPage() {
+function RunnerPageContent() {
     const [targetUrl, setTargetUrl] = useState("")
     const [mode, setMode] = useState<"READ_ONLY" | "REAL">("READ_ONLY")
     const [isRunning, setIsRunning] = useState(false)
@@ -468,4 +470,8 @@ export default function RunnerPage() {
             </SidebarInset>
         </SidebarProvider>
     )
+}
+
+export default function RunnerPage() {
+    return <AuthGuard><RunnerPageContent /></AuthGuard>
 }

@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useRef } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import gsap from "gsap"
@@ -28,7 +30,7 @@ interface BugReport {
     status: string
 }
 
-export default function BugReportsPage() {
+function BugReportsPageContent() {
     const containerRef = useRef(null)
     const [bugs, setBugs] = useState<BugReport[]>([])
     const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
@@ -215,4 +217,8 @@ function BugCard({ bug }: { bug: BugReport }) {
             </CardFooter>
         </Card>
     )
+}
+
+export default function BugReportsPage() {
+    return <AuthGuard><BugReportsPageContent /></AuthGuard>
 }

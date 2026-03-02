@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
@@ -67,7 +69,7 @@ interface AdminStats {
   sessions: { active: number }
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const [users, setUsers] = useState<User[]>([])
   const [bounties, setBounties] = useState<Bounty[]>([])
   const [targets, setTargets] = useState<TargetType[]>([])
@@ -718,4 +720,8 @@ export default function Dashboard() {
       </SidebarInset>
     </SidebarProvider>
   )
+}
+
+export default function Dashboard() {
+  return <AuthGuard><DashboardContent /></AuthGuard>
 }

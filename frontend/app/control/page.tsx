@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck, Clock, RefreshCw } from "lucide-react"
@@ -57,7 +59,7 @@ function isAbortError(error: unknown): boolean {
     return false
 }
 
-export default function ControlPage() {
+function ControlPageContent() {
     // Dashboard State
     const [dashboardId, setDashboardId] = useState<string | null>(null)
     const [isConnected, setIsConnected] = useState(false)
@@ -1139,4 +1141,8 @@ export default function ControlPage() {
             </SidebarInset>
         </SidebarProvider>
     )
+}
+
+export default function ControlPage() {
+    return <AuthGuard><ControlPageContent /></AuthGuard>
 }

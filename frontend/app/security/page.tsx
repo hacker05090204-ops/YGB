@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useRef } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import gsap from "gsap"
@@ -29,7 +31,7 @@ interface SecurityData {
     riskScore: number
 }
 
-export default function SecurityPage() {
+function SecurityPageContent() {
     const containerRef = useRef(null)
     const [secData, setSecData] = useState<SecurityData>({ critical: 0, high: 0, medium: 0, low: 0, passed: 0, failed: 0, warnings: 0, total: 0, riskScore: 0 })
     const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
@@ -259,4 +261,8 @@ export default function SecurityPage() {
             </SidebarInset>
         </SidebarProvider>
     )
+}
+
+export default function SecurityPage() {
+    return <AuthGuard><SecurityPageContent /></AuthGuard>
 }

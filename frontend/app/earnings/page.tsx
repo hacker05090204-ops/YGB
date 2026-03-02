@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useRef } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import gsap from "gsap"
@@ -38,7 +40,7 @@ const SEVERITY_COLORS: Record<string, string> = {
     LOW: "#94a3b8",
 }
 
-export default function EarningsPage() {
+function EarningsPageContent() {
     const containerRef = useRef(null)
     const [bounties, setBounties] = useState<Bounty[]>([])
     const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
@@ -317,4 +319,8 @@ export default function EarningsPage() {
             </SidebarInset>
         </SidebarProvider>
     )
+}
+
+export default function EarningsPage() {
+    return <AuthGuard><EarningsPageContent /></AuthGuard>
 }
