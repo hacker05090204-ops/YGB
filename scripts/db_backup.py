@@ -16,7 +16,7 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [BACKUP] %(message)s")
 logger = logging.getLogger("db_backup")
 
-SSD_DB = os.environ.get("DATABASE_URL", "sqlite:///C:/ygb_data/ygb.db").replace("sqlite:///", "")
+SSD_DB = os.environ.get("DATABASE_URL", "sqlite:///D:/ygb_data/ygb.db").replace("sqlite:///", "")
 HDD_DB = os.environ.get("DATABASE_BACKUP_PATH", "D:/ygb_data/ygb.db")
 
 
