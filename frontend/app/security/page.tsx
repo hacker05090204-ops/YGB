@@ -32,10 +32,21 @@ interface SecurityData {
 }
 
 function SecurityPageContent() {
+
+
+
+
+
+
+
+
     const containerRef = useRef(null)
     const [secData, setSecData] = useState<SecurityData>({ critical: 0, high: 0, medium: 0, low: 0, passed: 0, failed: 0, warnings: 0, total: 0, riskScore: 0 })
     const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
-    const [lastScan, setLastScan] = useState<string | null>(null)
+
+
+
+
 
     const fetchSecurityData = async () => {
         try {

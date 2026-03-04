@@ -57,3 +57,8 @@ run_cpp_tests
 
 # Service account keys
 secure_data/
+dev_token.txt
+jwt_token.txt
+*.jwt
+*.token
+login_url.txt
