@@ -74,14 +74,28 @@ log.info("  ✅ CUDA + Driver VERIFIED")
 # ═══════════════════════════════════════════════════════════════════════
 log.info("═══ STEP 2: Validate Dataset + Feature Dim ═══")
 
-# Enforce determinism from the start
+# Training profile: deterministic (default) or fast
+TRAINING_PROFILE = os.environ.get("YGB_TRAINING_PROFILE", "deterministic").lower()
+FORCE_FRESH = os.environ.get("YGB_FORCE_FRESH_TRAIN", "0") == "1"
+
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 torch.manual_seed(42)
 torch.cuda.manual_seed_all(42)
 np.random.seed(42)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-torch.use_deterministic_algorithms(True, warn_only=True)
+
+if TRAINING_PROFILE == "fast":
+    torch.backends.cudnn.deterministic = False
+    torch.backends.cudnn.benchmark = True
+    torch.use_deterministic_algorithms(False)
+    log.info(f"  Training profile: FAST (benchmark=True, deterministic=False)")
+else:
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True, warn_only=True)
+    log.info(f"  Training profile: DETERMINISTIC (benchmark=False, deterministic=True)")
+
+if FORCE_FRESH:
+    log.info("  ⚡ FORCE_FRESH_TRAIN=1 — starting from scratch (no checkpoint resume)")
 
 from impl_v1.training.data.scaled_dataset import DatasetConfig
 from impl_v1.training.data.real_dataset_loader import RealTrainingDataset
@@ -395,10 +409,35 @@ train_ds = TensorDataset(
     torch.tensor(train_f[:shard_samples], dtype=torch.float32),
     torch.tensor(train_l[:shard_samples], dtype=torch.long),
 )
-train_loader = DataLoader(
-    train_ds, batch_size=optimal_batch_3050, shuffle=True,
-    num_workers=0, pin_memory=True, drop_last=False,
-)
+# Windows DataLoader: use 2 workers (was 0) with fallback
+import sys as _sys
+_dl_num_workers = 2 if _sys.platform == 'win32' else 4
+_dl_persistent = _dl_num_workers > 0
+_dl_prefetch = 2 if _dl_num_workers > 0 else None
+
+try:
+    train_loader = DataLoader(
+        train_ds, batch_size=optimal_batch_3050, shuffle=True,
+        num_workers=_dl_num_workers, pin_memory=True, drop_last=False,
+        persistent_workers=_dl_persistent,
+        prefetch_factor=_dl_prefetch,
+    )
+    # Force iteration to test workers
+    _test_iter = iter(train_loader)
+    next(_test_iter)
+    del _test_iter
+    log.info(f"  DataLoader: num_workers={_dl_num_workers}, persistent={_dl_persistent}")
+except Exception as e:
+    log.warning(f"  DataLoader with workers={_dl_num_workers} failed: {e}")
+    log.warning(f"  Retrying with num_workers=0")
+    _dl_num_workers = 0
+    _dl_persistent = False
+    _dl_prefetch = None
+    train_loader = DataLoader(
+        train_ds, batch_size=optimal_batch_3050, shuffle=True,
+        num_workers=0, pin_memory=True, drop_last=False,
+    )
+    log.info(f"  DataLoader: num_workers=0 (fallback)")
 
 log.info(f"  Batch: {optimal_batch_3050}, Grad accum: {GRAD_ACCUM}")
 log.info(f"  Effective batch: {optimal_batch_3050 * GRAD_ACCUM}")
@@ -408,6 +447,10 @@ log.info(f"  Encoder freeze epochs: {ENCODER_FREEZE_EPOCHS}")
 
 torch.cuda.empty_cache()
 torch.cuda.reset_peak_memory_stats()
+
+# Pre-allocate test tensors on GPU (avoid per-epoch CPU→GPU transfer)
+test_features_gpu = torch.tensor(test_f, dtype=torch.float32, device=device)
+test_labels_gpu = torch.tensor(test_l, dtype=torch.long, device=device)
 
 epoch_reports = []
 t_total = time.perf_counter()
@@ -433,8 +476,9 @@ for epoch in range(EPOCHS):
             log.info(f"  Epoch {epoch+1}: Encoder UNFROZEN, optimizer re-initialized")
 
     model.train()
-    total_loss = 0.0
-    total_correct = 0
+    # Accumulate metrics on GPU to avoid per-batch GPU→CPU sync stalls
+    total_loss_gpu = torch.zeros(1, device=device)
+    total_correct_gpu = torch.zeros(1, dtype=torch.long, device=device)
     total_samples = 0
     max_grad_norm = 0.0
     optimizer.zero_grad()
@@ -460,8 +504,8 @@ for epoch in range(EPOCHS):
             scaler.update()
             optimizer.zero_grad()
 
-        total_loss += loss.item() * GRAD_ACCUM * bx.size(0)
-        total_correct += (logits.argmax(1) == by).sum().item()
+        total_loss_gpu += loss.detach() * GRAD_ACCUM * bx.size(0)
+        total_correct_gpu += (logits.argmax(1) == by).sum()
         total_samples += bx.size(0)
 
     # Flush remaining
@@ -477,18 +521,18 @@ for epoch in range(EPOCHS):
 
     scheduler.step(epoch + 1)
 
-    # Eval
+    # Eval (using pre-allocated GPU tensors + AMP)
     model.eval()
     with torch.no_grad():
-        tx = torch.tensor(test_f, dtype=torch.float32, device=device)
-        tl = torch.tensor(test_l, dtype=torch.long, device=device)
-        test_logits = model(tx)
-        test_acc = (test_logits.argmax(1) == tl).float().mean().item()
-        del tx, tl, test_logits
+        with autocast(dtype=torch.float16):
+            test_logits = model(test_features_gpu)
+        test_acc = (test_logits.argmax(1) == test_labels_gpu).float().mean().item()
+        del test_logits
 
     ep_time = time.perf_counter() - ep_start
-    avg_loss = total_loss / max(total_samples, 1)
-    train_acc = total_correct / max(total_samples, 1)
+    # Single GPU→CPU sync point per epoch (instead of per-batch)
+    avg_loss = total_loss_gpu.item() / max(total_samples, 1)
+    train_acc = total_correct_gpu.item() / max(total_samples, 1)
     vram_now = torch.cuda.max_memory_allocated() / (1024 ** 2)
     sps = total_samples / max(ep_time, 0.001)
     lr_now = optimizer.param_groups[0]["lr"]
@@ -600,7 +644,12 @@ telemetry = {
         "eta_min": ETA_MIN,
         "encoder_freeze_epochs": ENCODER_FREEZE_EPOCHS,
         "amp_enabled": True,
-        "deterministic": True,
+        "training_profile": TRAINING_PROFILE,
+        "cudnn_benchmark": torch.backends.cudnn.benchmark,
+        "cudnn_deterministic": torch.backends.cudnn.deterministic,
+        "force_fresh_train": FORCE_FRESH,
+        "num_workers": _dl_num_workers,
+        "persistent_workers": _dl_persistent,
     },
     "results": {
         "total_time_sec": round(total_time, 2),

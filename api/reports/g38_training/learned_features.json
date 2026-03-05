@@ -1,6 +1,6 @@
 {
-  "session_id": "G38-20260305_110313",
-  "generated_at": "2026-03-05T11:03:13.629025+00:00",
+  "session_id": "G38-20260305_121452",
+  "generated_at": "2026-03-05T12:14:52.031287+00:00",
   "domains_learned": [
     "code_patterns",
     "ui_layouts",
@@ -15,7 +15,7 @@
   "duplicate_detection_accuracy": 0.78,
   "noise_detection_accuracy": 0.82,
   "proof_learning": false,
-  "total_samples_processed": 1126400,
+  "total_samples_processed": 40775680,
   "governance": {
     "ai_has_authority": false,
     "can_decide_bugs": false,

@@ -28,6 +28,7 @@ RULES:
 """
 
 import asyncio
+import concurrent.futures
 import os
 import subprocess
 import sys
@@ -97,18 +98,28 @@ except ImportError:
     TORCH_AVAILABLE = False
     AMP_AVAILABLE = False
 
-# GPU performance + deterministic settings
+# Training profile: deterministic (default) or fast
+_TRAINING_PROFILE = os.environ.get("YGB_TRAINING_PROFILE", "deterministic").lower()
+_FORCE_FRESH = os.environ.get("YGB_FORCE_FRESH_TRAIN", "0") == "1"
+
+# GPU performance settings (profile-dependent)
 if TORCH_AVAILABLE:
-    # DETERMINISTIC: Required for reproducible training
-    # benchmark=False because benchmark and deterministic are contradictory
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
+    if _TRAINING_PROFILE == "fast":
+        torch.backends.cudnn.deterministic = False
+        torch.backends.cudnn.benchmark = True
+        # deterministic algorithms OFF for speed
+    else:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
     # Enable TF32 tensor core math (RTX 30-series) — ~3x faster matmul
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.allow_tf32 = True
 
 # CUBLAS deterministic workspace config
 os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
+
+# Background thread pool for async checkpoint saving (1 worker = serialized saves)
+_checkpoint_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
 
 
 # =============================================================================
@@ -462,15 +473,33 @@ class AutoTrainer:
                 return False
             
             # Create optimized DataLoader (pin_memory for fast GPU transfer)
-            # num_workers=0 on Windows: worker processes trigger STRICT_REAL_MODE
-            _num_workers = 0 if sys.platform == 'win32' else 4
-            train_loader, holdout_loader, stats = create_training_dataloader(
-                batch_size=1024,
-                num_workers=_num_workers,
-                pin_memory=True,
-                prefetch_factor=2 if _num_workers > 0 else None,
-                seed=42,
-            )
+            # Windows DataLoader: use 2 workers with fallback if fails
+            _num_workers = 2 if sys.platform == 'win32' else 4
+            _dl_persistent = _num_workers > 0
+            _dl_prefetch = 2 if _num_workers > 0 else None
+            
+            try:
+                train_loader, holdout_loader, stats = create_training_dataloader(
+                    batch_size=1024,
+                    num_workers=_num_workers,
+                    pin_memory=True,
+                    prefetch_factor=_dl_prefetch,
+                    seed=42,
+                )
+                logger.info(f"DataLoader: num_workers={_num_workers}, persistent={_dl_persistent}, profile={_TRAINING_PROFILE}")
+            except Exception as e:
+                logger.warning(f"DataLoader with workers={_num_workers} failed: {e}")
+                logger.warning("Retrying with num_workers=0")
+                _num_workers = 0
+                _dl_persistent = False
+                train_loader, holdout_loader, stats = create_training_dataloader(
+                    batch_size=1024,
+                    num_workers=0,
+                    pin_memory=True,
+                    prefetch_factor=None,
+                    seed=42,
+                )
+                logger.info(f"DataLoader: num_workers=0 (fallback), profile={_TRAINING_PROFILE}")
             
             self._gpu_dataloader = train_loader
             self._gpu_holdout_loader = holdout_loader  # Store holdout for validation
@@ -607,8 +636,9 @@ class AutoTrainer:
             
             self._gpu_model.train()
             
-            total_loss = 0.0
-            total_correct = 0
+            # Accumulate metrics on GPU to avoid per-batch GPU→CPU sync stalls
+            total_loss_gpu = torch.zeros(1, device=self._gpu_device)
+            total_correct_gpu = torch.zeros(1, dtype=torch.long, device=self._gpu_device)
             total_samples = 0
             batch_count = 0
             try:
@@ -675,10 +705,10 @@ class AutoTrainer:
                     self._gpu_optimizer.step()
                     self._gpu_optimizer.zero_grad(set_to_none=True)
                 
-                # Accumulate batch stats
-                total_loss += loss.item() * batch_size
+                # Accumulate batch stats on GPU (no per-batch CPU sync)
+                total_loss_gpu += loss.detach() * batch_size
                 _, predicted = torch.max(outputs.data, 1)
-                total_correct += (predicted == batch_labels).sum().item()
+                total_correct_gpu += (predicted == batch_labels).sum()
                 total_samples += batch_size
                 batch_count += 1
                 self._last_batch_index = batch_count
@@ -695,26 +725,26 @@ class AutoTrainer:
             # Track real samples processed
             self._real_samples_processed += total_samples
             
-            # Epoch-level training metrics
-            avg_loss = total_loss / max(total_samples, 1)
-            train_accuracy = total_correct / max(total_samples, 1)
+            # Epoch-level training metrics (single GPU→CPU sync point)
+            avg_loss = total_loss_gpu.item() / max(total_samples, 1)
+            train_accuracy = total_correct_gpu.item() / max(total_samples, 1)
             
             # === HOLDOUT VALIDATION (real generalization accuracy) ===
             holdout_accuracy = train_accuracy  # Fallback if no holdout loader
             if self._gpu_holdout_loader is not None:
                 self._gpu_model.eval()
-                holdout_correct = 0
+                holdout_correct_gpu = torch.zeros(1, dtype=torch.long, device=self._gpu_device)
                 holdout_total = 0
-                with torch.no_grad():
+                with torch.no_grad(), autocast('cuda', dtype=torch.float16):
                     for h_features, h_labels in self._gpu_holdout_loader:
                         h_features = h_features.to(self._gpu_device, non_blocking=True)
                         h_labels = h_labels.to(self._gpu_device, non_blocking=True)
                         h_outputs = self._gpu_model(h_features)
                         _, h_predicted = torch.max(h_outputs.data, 1)
-                        holdout_correct += (h_predicted == h_labels).sum().item()
+                        holdout_correct_gpu += (h_predicted == h_labels).sum()
                         holdout_total += h_labels.size(0)
                 if holdout_total > 0:
-                    holdout_accuracy = holdout_correct / holdout_total
+                    holdout_accuracy = holdout_correct_gpu.item() / holdout_total
                 self._gpu_model.train()
             self._last_holdout_accuracy = holdout_accuracy
             
@@ -762,11 +792,12 @@ class AutoTrainer:
                 except Exception as e:
                     logger.warning(f"Promotion eval: {e}")
             
-            # Save checkpoint after every epoch
+            # Save checkpoint async (background thread — doesn't block GPU training)
             if hasattr(self, '_checkpoint_path') and self._checkpoint_path:
                 try:
-                    torch.save({
-                        'model_state': self._gpu_model.state_dict(),
+                    # Copy state dicts to CPU before submitting to background thread
+                    ckpt_data = {
+                        'model_state': {k: v.cpu().clone() for k, v in self._gpu_model.state_dict().items()},
                         'optimizer_state': self._gpu_optimizer.state_dict(),
                         'scheduler_state': self._gpu_scheduler.state_dict() if hasattr(self, '_gpu_scheduler') else None,
                         'epoch': self._epoch,
@@ -774,7 +805,8 @@ class AutoTrainer:
                         'holdout_accuracy': holdout_accuracy,
                         'loss': avg_loss,
                         'real_samples_processed': self._real_samples_processed,
-                    }, self._checkpoint_path)
+                    }
+                    _checkpoint_executor.submit(torch.save, ckpt_data, self._checkpoint_path)
                 except Exception as e:
                     logger.warning(f"Checkpoint save failed: {e}")
             

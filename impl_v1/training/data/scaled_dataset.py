@@ -102,32 +102,60 @@ class ScaledDatasetGenerator:
             pattern_type = "low_signal"
             response_ratio = self.rng.uniform(0.10, 0.45)
         
+        # New features: label-dependent distributions for richer signal
+        if label == 1:
+            endpoint_entropy = self.rng.uniform(0.55, 0.90)
+            exploit_complexity = self.rng.uniform(0.50, 0.85)
+            impact_severity = self.rng.uniform(0.60, 0.95)
+            fingerprint_density = self.rng.uniform(0.50, 0.85)
+        else:
+            endpoint_entropy = self.rng.uniform(0.15, 0.55)
+            exploit_complexity = self.rng.uniform(0.15, 0.50)
+            impact_severity = self.rng.uniform(0.10, 0.45)
+            fingerprint_density = self.rng.uniform(0.20, 0.55)
+        
         if is_edge:
-            # Edge case: harder — signal closer to the boundary
+            # Edge case: harder — all signals closer to boundary
             if label == 1:
                 signal_strength = self.rng.uniform(0.45, 0.65)
                 response_ratio = self.rng.uniform(0.40, 0.60)
+                endpoint_entropy = self.rng.uniform(0.40, 0.60)
+                exploit_complexity = self.rng.uniform(0.35, 0.60)
+                impact_severity = self.rng.uniform(0.40, 0.65)
+                fingerprint_density = self.rng.uniform(0.35, 0.60)
             else:
                 signal_strength = self.rng.uniform(0.35, 0.55)
                 response_ratio = self.rng.uniform(0.35, 0.55)
+                endpoint_entropy = self.rng.uniform(0.35, 0.55)
+                exploit_complexity = self.rng.uniform(0.30, 0.55)
+                impact_severity = self.rng.uniform(0.30, 0.55)
+                fingerprint_density = self.rng.uniform(0.30, 0.55)
             features = {
                 "type": "edge_case",
                 "difficulty": self.rng.uniform(0.8, 1.0),
-                "noise": self.rng.uniform(0.3, 0.5),
+                "noise": self.rng.uniform(0.05, 0.15),
                 "signal_strength": signal_strength,
                 "response_ratio": response_ratio,
                 "pattern_type": pattern_type,
                 "label_signal": float(label),
+                "endpoint_entropy": endpoint_entropy,
+                "exploit_complexity": exploit_complexity,
+                "impact_severity": impact_severity,
+                "fingerprint_density": fingerprint_density,
             }
         else:
             features = {
                 "type": "standard",
                 "difficulty": self.rng.uniform(0.1, 0.7),
-                "noise": self.rng.uniform(0.0, 0.2),
+                "noise": self.rng.uniform(0.0, 0.05),
                 "signal_strength": signal_strength,
                 "response_ratio": response_ratio,
                 "pattern_type": pattern_type,
                 "label_signal": float(label),
+                "endpoint_entropy": endpoint_entropy,
+                "exploit_complexity": exploit_complexity,
+                "impact_severity": impact_severity,
+                "fingerprint_density": fingerprint_density,
             }
         
         return Sample(

@@ -169,12 +169,12 @@ class SyntheticTrainingDataset(Dataset):
             if i < 64:
                 # Signal-strength features — PRIMARY label signal
                 base = signal
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 128:
                 # Response-ratio features — SECONDARY label signal
                 base = response
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 192:
                 # Diverse derived features — INDEPENDENT combinations
@@ -184,36 +184,56 @@ class SyntheticTrainingDataset(Dataset):
                 if sub_idx < 16:
                     # Polynomial: signal^2 with independent noise
                     base = signal * signal
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 32:
                     # Polynomial: response^2 with independent noise
                     base = response * response
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 40:
                     # Trigonometric: sin(signal * pi)
                     import math
                     base = 0.5 + 0.5 * math.sin(signal * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 48:
                     # Trigonometric: cos(response * pi)
                     import math
                     base = 0.5 + 0.5 * math.cos(response * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 56:
                     # Threshold: binary indicator with noise
-                    threshold = 0.5 + 0.05 * sample_rng.gauss(0, 1)
+                    threshold = 0.5 + 0.02 * sample_rng.gauss(0, 1)
                     base = 0.8 if signal > threshold else 0.2
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 else:
                     # Rank-based: difficulty-weighted signal magnitude
                     base = signal * (1.0 - difficulty * 0.3)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 
                 val = base + noise
             else:
-                # Controlled noise — small perturbation (NOT pure random)
-                base = 0.5
-                noise = 0.05 * sample_rng.gauss(0, 1)
+                # [192-255] Additional feature groups from raw metadata
+                sub_idx = i - 192  # 0-63
+                endpoint_entropy = features.get("endpoint_entropy", 0.5)
+                exploit_complexity = features.get("exploit_complexity", 0.5)
+                impact_severity_val = features.get("impact_severity", 0.5)
+                fingerprint_density = features.get("fingerprint_density", 0.5)
+                
+                if sub_idx < 16:
+                    # Endpoint entropy features
+                    base = endpoint_entropy
+                    noise = 0.04 * sample_rng.gauss(0, 1)
+                elif sub_idx < 32:
+                    # Exploit complexity features
+                    base = exploit_complexity
+                    noise = 0.04 * sample_rng.gauss(0, 1)
+                elif sub_idx < 48:
+                    # Impact severity features
+                    base = impact_severity_val
+                    noise = 0.04 * sample_rng.gauss(0, 1)
+                else:
+                    # Fingerprint density features
+                    base = fingerprint_density
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 val = base + noise
             
             # Clamp to [0, 1]
@@ -815,12 +835,62 @@ class IngestionPipelineDataset(Dataset):
         if not policy_result.accepted:
             return "rejected_policy"
 
-        # Encode features
+        # === COMPUTE RICHER RAW FEATURES (8 instead of 4) ===
+        # Endpoint entropy: Shannon entropy of endpoint characters
+        ep_entropy = 0.5
+        if endpoint:
+            from collections import Counter
+            char_counts = Counter(endpoint)
+            ep_len = len(endpoint)
+            ep_entropy = 0.0
+            for cnt in char_counts.values():
+                p = cnt / ep_len
+                if p > 0:
+                    ep_entropy -= p * math.log2(p)
+            ep_entropy = min(ep_entropy / 6.0, 1.0)  # normalize (max ~6 bits)
+        
+        # Exploit complexity: unique character ratio
+        exploit_cmplx = 0.5
+        if exploit_vector:
+            exploit_cmplx = min(len(set(exploit_vector)) / max(len(exploit_vector), 1), 1.0)
+        
+        # Impact severity: keyword + CVSS-based scoring
+        impact_sev = 0.5
+        if impact:
+            impact_lower = impact.lower()
+            if impact.startswith("CVSS:"):
+                try:
+                    score = float(impact.split("|", 1)[0].split(":", 1)[1])
+                    impact_sev = min(score / 10.0, 1.0)
+                except (ValueError, IndexError):
+                    pass
+            elif "critical" in impact_lower:
+                impact_sev = 0.95
+            elif "high" in impact_lower:
+                impact_sev = 0.75
+            elif "medium" in impact_lower:
+                impact_sev = 0.50
+            elif "low" in impact_lower:
+                impact_sev = 0.25
+        
+        # Fingerprint density: uniformity of hex character distribution
+        fp_density = 0.5
+        if fingerprint and len(fingerprint) >= 8:
+            from collections import Counter
+            hex_counts = Counter(fingerprint.lower())
+            hex_chars = len(hex_counts)
+            fp_density = min(hex_chars / 16.0, 1.0)  # 16 hex chars = maximum diversity
+        
+        # Encode all 8 features
         features_dict = {
             "signal_strength": min(reliability_val, 1.0),
             "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
             "difficulty": 1.0 - min(reliability_val, 1.0),
             "noise": 0.05,
+            "endpoint_entropy": ep_entropy,
+            "exploit_complexity": exploit_cmplx,
+            "impact_severity": impact_sev,
+            "fingerprint_density": fp_density,
         }
 
         clean_features = strip_forbidden_fields(features_dict)
@@ -838,12 +908,13 @@ class IngestionPipelineDataset(Dataset):
         if not quality.accepted:
             return "rejected_quality"
 
-        # Label
+        # Label (using enhanced composite scoring for ambiguous samples)
         label = self._derive_label(
             endpoint=endpoint,
             impact=impact,
             fingerprint=fingerprint,
             reliability_val=reliability_val,
+            exploit_vector=exploit_vector,
         )
 
         self._features.append(feature_vec)
@@ -864,6 +935,7 @@ class IngestionPipelineDataset(Dataset):
         impact: str,
         fingerprint: str,
         reliability_val: float,
+        exploit_vector: str = "",
     ) -> int:
         """
         Derive a deterministic binary label from real ingestion metadata.
@@ -871,7 +943,7 @@ class IngestionPipelineDataset(Dataset):
         Priority:
           1. CVSS score in impact string (CVSS>=7.0 => positive)
           2. Reliability extremes fallback
-          3. Deterministic hash parity fallback for ambiguous samples
+          3. Composite scoring for ambiguous samples (NOT random hash parity)
         """
         # Primary: use CVSS score when present (expected format: "CVSS:<score>|...")
         if isinstance(impact, str) and impact.startswith("CVSS:"):
@@ -888,10 +960,16 @@ class IngestionPipelineDataset(Dataset):
         if reliability_val <= 0.55:
             return 0
 
-        # Final fallback: deterministic split to avoid one-class collapse.
-        stable_key = fingerprint or endpoint or f"{reliability_val:.4f}"
-        digest = hashlib.sha256(stable_key.encode("utf-8", errors="replace")).hexdigest()
-        return int(digest[-1], 16) % 2
+        # Final fallback: composite scoring (weighted signals, NOT random hash)
+        # Uses reliability + exploit richness + impact detail for a meaningful label
+        exploit_richness = min(len(exploit_vector) / 100.0, 1.0) if exploit_vector else 0.3
+        impact_detail = 0.8 if (impact and len(impact) > 10) else 0.3
+        composite = (
+            reliability_val * 0.4
+            + exploit_richness * 0.3
+            + impact_detail * 0.3
+        )
+        return 1 if composite >= 0.55 else 0
 
     def _process_persisted_samples(
         self, disk_samples, policy, scorer, min_samples,
@@ -940,37 +1018,54 @@ class IngestionPipelineDataset(Dataset):
         for i in range(self.feature_dim):
             if i < 64:
                 base = signal
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 128:
                 base = response
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 192:
                 sub_idx = i - 128
                 if sub_idx < 16:
                     base = signal * signal
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 32:
                     base = response * response
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 40:
                     base = 0.5 + 0.5 * math.sin(signal * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 48:
                     base = 0.5 + 0.5 * math.cos(response * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 56:
-                    threshold = 0.5 + 0.05 * sample_rng.gauss(0, 1)
+                    threshold = 0.5 + 0.02 * sample_rng.gauss(0, 1)
                     base = 0.8 if signal > threshold else 0.2
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 else:
                     base = signal * (1.0 - difficulty * 0.3)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 val = base + noise
             else:
-                base = 0.5
-                noise = 0.05 * sample_rng.gauss(0, 1)
+                # [192-255] Additional feature groups from raw metadata
+                sub_idx = i - 192  # 0-63
+                endpoint_entropy = features.get("endpoint_entropy", 0.5)
+                exploit_complexity = features.get("exploit_complexity", 0.5)
+                impact_severity_val = features.get("impact_severity", 0.5)
+                fingerprint_density = features.get("fingerprint_density", 0.5)
+                
+                if sub_idx < 16:
+                    base = endpoint_entropy
+                    noise = 0.04 * sample_rng.gauss(0, 1)
+                elif sub_idx < 32:
+                    base = exploit_complexity
+                    noise = 0.04 * sample_rng.gauss(0, 1)
+                elif sub_idx < 48:
+                    base = impact_severity_val
+                    noise = 0.04 * sample_rng.gauss(0, 1)
+                else:
+                    base = fingerprint_density
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 val = base + noise
             vec.append(max(0.0, min(1.0, val)))
 
