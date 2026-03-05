@@ -1,0 +1,1 @@
+﻿__tests__/auth-user.test.ts(11,10): error TS2305: Module '"vitest"' has no exported member 'renderHook'.

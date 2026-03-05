@@ -54,7 +54,7 @@ def vault_unlock(vault_password: str, session_token: str = '',
 
     Args:
         vault_password: The admin vault password.
-        session_token: Active admin session token (for auth verification).
+        session_token: Active admin session token (REQUIRED — ADMIN role enforced).
         ip: Client IP address for audit logging.
 
     Returns:
@@ -62,16 +62,32 @@ def vault_unlock(vault_password: str, session_token: str = '',
     """
     from backend.security.vault_kdf import unlock_vault, is_vault_unlocked
 
-    # Verify admin session first
-    if session_token:
-        from backend.api.admin_auth import validate_session
-        session = validate_session(session_token)
-        if not session:
-            _audit_log('VAULT_UNLOCK_DENIED', ip, 'Invalid session')
-            return {
-                'status': 'unauthorized',
-                'message': 'Valid admin session required',
-            }
+    # ── MANDATORY session validation ──────────────────────────
+    # session_token MUST be present and valid with ADMIN role.
+    if not session_token:
+        _audit_log('VAULT_UNLOCK_DENIED', ip, 'No session token provided')
+        return {
+            'status': 'unauthorized',
+            'message': 'Valid admin session required — session token is mandatory',
+        }
+
+    from backend.api.admin_auth import validate_session, ROLE_ADMIN
+    session = validate_session(session_token)
+    if not session:
+        _audit_log('VAULT_UNLOCK_DENIED', ip, 'Invalid or expired session')
+        return {
+            'status': 'unauthorized',
+            'message': 'Valid admin session required',
+        }
+
+    # ── Enforce ADMIN role ────────────────────────────────────
+    if session.get('role', '') != ROLE_ADMIN:
+        _audit_log('VAULT_UNLOCK_DENIED', ip,
+                    f'Insufficient role: {session.get("role", "none")}')
+        return {
+            'status': 'forbidden',
+            'message': 'Vault unlock requires ADMIN role',
+        }
 
     # Don't re-unlock if already unlocked
     if is_vault_unlocked():
@@ -91,7 +107,8 @@ def vault_unlock(vault_password: str, session_token: str = '',
     success = unlock_vault(vault_password)
 
     if success:
-        _audit_log('VAULT_UNLOCKED', ip, 'Vault key derived from password')
+        _audit_log('VAULT_UNLOCKED', ip,
+                    f'By user={session.get("user_id", "?")} role=ADMIN')
         return {
             'status': 'ok',
             'vault_unlocked': True,
@@ -101,8 +118,9 @@ def vault_unlock(vault_password: str, session_token: str = '',
         _audit_log('VAULT_UNLOCK_FAILED', ip, 'Key derivation failed')
         return {
             'status': 'error',
-            'message': 'Vault unlock failed',
+            'message': 'Vault unlock failed — invalid password',
         }
+
 
 
 def vault_lock(session_token: str = '', ip: str = '0.0.0.0') -> dict:

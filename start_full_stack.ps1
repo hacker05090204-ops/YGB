@@ -1,7 +1,9 @@
 param(
     [int]$ApiPort = 8000,
     [int]$UiPort = 3000,
-    [switch]$AllowForeignPortKill
+    [switch]$AllowForeignPortKill,
+    [switch]$LanShare,
+    [switch]$BindAllInterfaces
 )
 
 $ErrorActionPreference = "Stop"
@@ -65,43 +67,67 @@ function Stop-PortListener {
     }
 }
 
-Import-DotEnv (Join-Path $root ".env")
+# ── VALIDATE REQUIRED ENV VARS ──
+$requiredVars = @("JWT_SECRET", "YGB_HMAC_SECRET", "YGB_VIDEO_JWT_SECRET")
+$missing = @()
+foreach ($v in $requiredVars) {
+    if (-not (Get-Item -Path "Env:$v" -ErrorAction SilentlyContinue)) {
+        $missing += $v
+    }
+}
+if ($missing.Count -gt 0) {
+    Write-Warning "MISSING required env vars: $($missing -join ', ')"
+    Write-Warning "Copy .env.example to .env and fill in values. See docs/ENV_SETUP.md"
+    # Don't exit — server will still start but will warn on preflight
+}
 
-# ── AUTO-START D: DRIVE NAS SHARE ──
-# Ensure SharedDrive SMB share exists and network is ready for all users
-$shareName = "SharedDrive"
-$shareExists = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
-if (-not $shareExists -and (Test-Path "D:\")) {
-    Write-Host "Creating D: drive share '$shareName'..."
-    Start-Process powershell -Verb RunAs -Wait -ArgumentList @(
-        '-NoProfile', '-Command',
-        "New-SmbShare -Name '$shareName' -Path 'D:\' -FullAccess 'Everyone' -Description 'YGB NAS'; " +
-        "Set-NetConnectionProfile -InterfaceAlias (Get-NetConnectionProfile | Where-Object {`$_.NetworkCategory -eq 'Public'} | Select-Object -First 1 -ExpandProperty InterfaceAlias) -NetworkCategory Private -ErrorAction SilentlyContinue; " +
-        "Set-NetFirewallRule -DisplayGroup 'Network Discovery' -Enabled True -Profile Private,Public -ErrorAction SilentlyContinue; " +
-        "Set-NetFirewallRule -DisplayGroup 'File and Printer Sharing' -Enabled True -Profile Private,Public -ErrorAction SilentlyContinue; " +
-        "New-NetFirewallRule -DisplayName 'YGB Backend 8000' -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow -ErrorAction SilentlyContinue; " +
-        "New-NetFirewallRule -DisplayName 'YGB Frontend 3000' -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow -ErrorAction SilentlyContinue"
-    )
-    Write-Host "Share '$shareName' created."
-} elseif ($shareExists) {
-    Write-Host "Share '$shareName' already exists."
+# ── SMB SHARE (opt-in only with -LanShare) ──
+if ($LanShare) {
+    $shareName = "SharedDrive"
+    $shareExists = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
+    if (-not $shareExists -and (Test-Path "D:\")) {
+        Write-Host "Creating D: drive share '$shareName' (LAN share enabled)..."
+        Start-Process powershell -Verb RunAs -Wait -ArgumentList @(
+            '-NoProfile', '-Command',
+            "New-SmbShare -Name '$shareName' -Path 'D:\' -ReadAccess '$env:USERNAME' -Description 'YGB NAS'; " +
+            "Set-NetConnectionProfile -InterfaceAlias (Get-NetConnectionProfile | Where-Object {`$_.NetworkCategory -eq 'Public'} | Select-Object -First 1 -ExpandProperty InterfaceAlias) -NetworkCategory Private -ErrorAction SilentlyContinue"
+        )
+        Write-Host "Share '$shareName' created with user-level access."
+    } elseif ($shareExists) {
+        Write-Host "Share '$shareName' already exists."
+    } else {
+        Write-Host "D: drive not found - skipping share creation."
+    }
 } else {
-    Write-Host "D: drive not found — skipping share creation."
+    Write-Host "LAN share disabled (use -LanShare to enable)."
 }
 
 # ── DYNAMIC NETWORK AUTH ──
-# Detect WiFi IP for OAuth redirect (so other devices on the network can use GitHub login)
-$wifiIP = (Get-NetIPAddress -AddressFamily IPv4 |
-    Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '100.*' -and $_.IPAddress -notlike '169.*' -and $_.PrefixOrigin -ne 'WellKnown' } |
-    Select-Object -First 1 -ExpandProperty IPAddress)
+# Detect the REAL network IP (interface with a default gateway = connected to router)
+$defaultRoute = Get-NetRoute -DestinationPrefix '0.0.0.0/0' -ErrorAction SilentlyContinue |
+    Sort-Object RouteMetric | Select-Object -First 1
+if ($defaultRoute) {
+    $wifiIP = (Get-NetIPAddress -InterfaceIndex $defaultRoute.InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue |
+        Select-Object -First 1 -ExpandProperty IPAddress)
+} else {
+    $wifiIP = $null
+}
 if ($wifiIP) {
     $env:GITHUB_REDIRECT_URI = "http://${wifiIP}:$ApiPort/auth/github/callback"
     $env:FRONTEND_URL = "http://${wifiIP}:$UiPort"
-    Write-Host "Network IP: $wifiIP — OAuth redirect: $($env:GITHUB_REDIRECT_URI)"
+    Write-Host "Network IP: $wifiIP - OAuth redirect: $($env:GITHUB_REDIRECT_URI)"
+} else {
+    Write-Host "WARNING: Could not detect network IP - using localhost"
 }
 
 $env:PYTHONPATH = $root
-$env:API_HOST = "0.0.0.0"
+# Default to localhost binding (secure). Use -BindAllInterfaces for LAN access.
+if ($BindAllInterfaces) {
+    $env:API_HOST = "0.0.0.0"
+    Write-Host "WARNING: Binding to all interfaces (0.0.0.0) — server exposed to LAN"
+} else {
+    $env:API_HOST = "127.0.0.1"
+}
 $env:API_PORT = "$ApiPort"
 $env:API_RELOAD = "false"
 if (-not $env:ENABLE_G38_AUTO_TRAINING) {
@@ -111,15 +137,32 @@ if (-not $env:ENABLE_G38_AUTO_TRAINING) {
 Stop-PortListener -Port $ApiPort -ForceKillForeign:$AllowForeignPortKill
 Stop-PortListener -Port $UiPort -ForceKillForeign:$AllowForeignPortKill
 
+$bindHost = $env:API_HOST
 $backend = Start-Process -FilePath "python" `
-    -ArgumentList "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "$ApiPort", "--log-level", "info" `
+    -ArgumentList "-m", "uvicorn", "server:app", "--host", $bindHost, "--port", "$ApiPort", "--log-level", "info" `
     -WorkingDirectory (Join-Path $root "api") `
     -WindowStyle Hidden -PassThru
 
-$frontendApiUrl = "http://${LoopbackHost}:$ApiPort"
+# ── Start Sync Engine (background daemon) ──
+$syncEngine = Start-Process -FilePath "python" `
+    -ArgumentList "-m", "backend.sync.sync_engine", "--watch" `
+    -WorkingDirectory $root `
+    -WindowStyle Hidden -PassThru
+Write-Host "Sync Engine PID: $($syncEngine.Id)"
+
+# Use network IP for API URL when binding all interfaces
+if ($BindAllInterfaces -and $wifiIP) {
+    $frontendApiUrl = "http://${wifiIP}:$ApiPort"
+} else {
+    $frontendApiUrl = "http://${LoopbackHost}:$ApiPort"
+}
+Write-Host "Frontend API URL: $frontendApiUrl"
+
+# Frontend hostname: only bind 0.0.0.0 if explicitly opted in
+$frontendHostname = if ($BindAllInterfaces) { "0.0.0.0" } else { "localhost" }
 $frontendCmdArgs = @(
     "/c",
-    "set NEXT_PUBLIC_YGB_API_URL=$frontendApiUrl&& npm run dev -- -p $UiPort --hostname 0.0.0.0"
+    "set NEXT_PUBLIC_YGB_API_URL=$frontendApiUrl&& npm run dev -- -p $UiPort --hostname $frontendHostname"
 )
 $frontend = Start-Process -FilePath "cmd.exe" `
     -ArgumentList $frontendCmdArgs `

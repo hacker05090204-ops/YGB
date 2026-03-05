@@ -8,7 +8,6 @@
  * - Malformed profile handling
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook } from 'vitest'
 
 // We test the underlying logic rather than the React hook to avoid
 // needing a full React testing renderer. The hook's logic is extracted.

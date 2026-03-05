@@ -12,12 +12,20 @@ function LoginContent() {
     const [message, setMessage] = useState("")
 
     useEffect(() => {
-        const token = searchParams.get("token")
+        // Helper to read cookies by name
+        const getCookie = (name: string): string | null => {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+            return match ? decodeURIComponent(match[2]) : null
+        }
+
+        // Token now comes via HTTP-only cookie, not URL params (security fix)
+        // Check both cookie and URL param for backward compatibility
+        const token = getCookie("ygb_token") || searchParams.get("token")
         const error = searchParams.get("error")
         const user = searchParams.get("user")
-        const sessionId = searchParams.get("session_id")
+        const sessionId = getCookie("ygb_session_id") || searchParams.get("session_id")
         const authMethod = searchParams.get("auth")
-        const encodedProfile = searchParams.get("profile")
+        const encodedProfile = getCookie("ygb_profile") || searchParams.get("profile")
 
         if (token) {
             // Store token and redirect to control page
@@ -40,6 +48,12 @@ function LoginContent() {
                     // Ignore malformed profile payloads; token login still succeeds.
                 }
             }
+
+            // Clear auth cookies after reading (one-time use)
+            document.cookie = "ygb_token=; max-age=0; path=/"
+            document.cookie = "ygb_session_id=; max-age=0; path=/"
+            document.cookie = "ygb_profile=; max-age=0; path=/"
+
             setStatus("success")
             setMessage(`Welcome, ${user || "user"}!`)
 

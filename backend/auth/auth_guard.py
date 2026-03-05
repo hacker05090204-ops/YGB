@@ -86,6 +86,18 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
 
     # Verify JWT
     payload = verify_jwt(token)
+    if not payload:
+        return None
+
+    # ── Session revocation parity with HTTP auth ──────────
+    # HTTP require_auth checks is_session_revoked (line 142).
+    # WS auth must enforce the same — otherwise revoking a session
+    # via HTTP would not disconnect active WS connections.
+    session_id = payload.get("session_id")
+    if session_id and is_session_revoked(session_id):
+        _ws_logger.warning("WS auth rejected — session %s revoked", session_id[:8])
+        return None
+
     return payload
 
 

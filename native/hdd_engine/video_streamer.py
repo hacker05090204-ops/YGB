@@ -37,12 +37,18 @@ MAX_DURATION_SECONDS = 7200  # 2 hours
 STREAM_CHUNK_SIZE = 1024 * 1024  # 1 MB chunks
 MAX_CONCURRENT_STREAMS = 10
 JWT_EXPIRY_SECONDS = 300  # 5 minutes
-JWT_SECRET = os.getenv("YGB_VIDEO_JWT_SECRET", "")
-if not JWT_SECRET or len(JWT_SECRET) < 32:
-    raise RuntimeError(
-        "[FATAL] YGB_VIDEO_JWT_SECRET is not set or too short (min 32 chars). "
-        "Set it as an environment variable before starting the server."
-    )
+_JWT_SECRET_ENV = os.getenv("YGB_VIDEO_JWT_SECRET", "")
+
+def _get_jwt_secret() -> str:
+    """Get and validate the video JWT secret. Fails at first use, not import time."""
+    secret = _JWT_SECRET_ENV or os.getenv("YGB_VIDEO_JWT_SECRET", "")
+    if not secret or len(secret) < 32:
+        raise RuntimeError(
+            "[FATAL] YGB_VIDEO_JWT_SECRET is not set or too short (min 32 chars). "
+            "Set it as an environment variable before using video streaming."
+        )
+    return secret
+
 
 # Active stream tracking
 _active_streams: int = 0
@@ -70,7 +76,7 @@ def _sign_token(payload: dict) -> str:
     body = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode().rstrip("=")
     signature_input = f"{header}.{body}"
     sig = hmac.new(
-        JWT_SECRET.encode(),
+        _get_jwt_secret().encode(),
         signature_input.encode(),
         hashlib.sha256,
     ).digest()
@@ -93,7 +99,7 @@ def _verify_token(token: str) -> Optional[dict]:
         # Verify signature
         signature_input = f"{header}.{body}"
         expected_sig = hmac.new(
-            JWT_SECRET.encode(),
+            _get_jwt_secret().encode(),
             signature_input.encode(),
             hashlib.sha256,
         ).digest()
@@ -256,7 +262,14 @@ class VideoStreamer:
 
         user_id = payload["uid"]
         session_id = payload["sid"]
-        filename = payload.get("fname", "video.webm")
+        raw_fname = payload.get("fname", "video.webm")
+
+        # ── Sanitize filename from token to block path traversal ──
+        # Extract basename to prevent ../../ attacks, then filter chars
+        raw_fname = os.path.basename(raw_fname)
+        filename = "".join(c for c in raw_fname if c.isalnum() or c in "-_.")
+        if not filename or filename.startswith("."):
+            filename = "video.webm"
 
         if not _validate_path_safe(user_id, session_id):
             return None

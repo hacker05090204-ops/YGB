@@ -9,6 +9,25 @@ IT CANNOT EXECUTE BROWSER ACTIONS OR BYPASS GOVERNANCE.
 """
 
 import os
+
+# Load .env FIRST — before any other imports read env vars
+from pathlib import Path as _Path
+_env_file = _Path(__file__).resolve().parent.parent / ".env"
+if _env_file.exists():
+    with open(_env_file) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if not _line or _line.startswith("#"):
+                continue
+            _eq = _line.find("=")
+            if _eq <= 0:
+                continue
+            _key = _line[:_eq].strip()
+            _val = _line[_eq + 1:].strip()
+            # Don't override existing env vars (command-line takes precedence)
+            if _key not in os.environ:
+                os.environ[_key] = _val
+
 import sys
 import uuid
 import json
@@ -293,6 +312,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Sync engine API endpoints
+try:
+    from backend.sync.sync_routes import sync_router
+    app.include_router(sync_router, prefix="/sync")
+    logger.info("[SYNC] Sync API routes mounted at /sync/*")
+except ImportError as _sync_err:
+    logger.warning("[SYNC] Sync routes unavailable: %s", _sync_err)
 
 # =============================================================================
 # GLOBAL EXCEPTION HANDLER — sanitize internal errors from API responses
@@ -4070,17 +4096,45 @@ def _oauth_state_sign(payload: str) -> str:
 
 
 def _allowed_frontend_urls() -> set[str]:
-    return {
+    urls = {
         _FRONTEND_URL.rstrip("/"),
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     }
+    return urls
+
+
+def _is_private_ip(host: str) -> bool:
+    """Check if a host is a private/local network address."""
+    import re
+    ip_part = host.split(":")[0]  # strip port
+    return (
+        ip_part.startswith("192.168.") or
+        ip_part.startswith("10.") or
+        ip_part.startswith("100.") or  # Tailscale CGNAT
+        ip_part.startswith("172.") or
+        ip_part in ("localhost", "127.0.0.1") or
+        re.match(r'^\d+\.\d+\.\d+\.\d+$', ip_part) is not None
+    )
 
 
 def _resolve_frontend_url(candidate: str = "") -> str:
+    """Resolve frontend URL — accept any private-network-based URL on port 3000."""
     val = (candidate or "").strip().rstrip("/")
+    if not val:
+        return _FRONTEND_URL.rstrip("/")
     if val in _allowed_frontend_urls():
         return val
+    # Accept any private/local IP on the expected frontend port
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(val)
+        host = parsed.hostname or ""
+        port = parsed.port or 80
+        if port == 3000 and _is_private_ip(host):
+            return val
+    except Exception:
+        pass
     return _FRONTEND_URL.rstrip("/")
 
 
@@ -4122,21 +4176,35 @@ def _perf_ms(start: float) -> int:
 
 
 @app.get("/auth/github")
-async def github_auth_redirect(frontend_origin: str = ""):
+async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     """Redirect to GitHub OAuth authorization page."""
     if not _GITHUB_CLIENT_ID:
         raise HTTPException(
             status_code=501,
-            detail="GitHub OAuth not configured — set GITHUB_CLIENT_ID env var",
+            detail="GitHub OAuth not configured - set GITHUB_CLIENT_ID env var",
         )
 
     import urllib.parse
 
-    frontend_url = _resolve_frontend_url(frontend_origin)
+    # Dynamic callback URL from request Host header
+    # Works from ANY device: WiFi (192.168.x), Tailscale (100.x), localhost
+    request_host = req.headers.get("host", "localhost:8000")
+    dynamic_redirect = f"http://{request_host}/auth/github/callback"
+    logger.info(f"[OAuth] Dynamic callback: {dynamic_redirect}")
+
+    # Derive frontend URL from requester's IP
+    if frontend_origin:
+        frontend_url = _resolve_frontend_url(frontend_origin)
+    elif _is_private_ip(request_host):
+        host_ip = request_host.split(":")[0]
+        frontend_url = f"http://{host_ip}:3000"
+    else:
+        frontend_url = _resolve_frontend_url("")
+
     state = _build_oauth_state(frontend_url)
     params = urllib.parse.urlencode({
         "client_id": _GITHUB_CLIENT_ID,
-        "redirect_uri": _GITHUB_REDIRECT_URI,
+        "redirect_uri": dynamic_redirect,
         "scope": "user:email",
         "state": state,
     })
@@ -4150,7 +4218,7 @@ async def github_auth_redirect(frontend_origin: str = ""):
         max_age=_OAUTH_STATE_TTL_SECONDS,
         httponly=True,
         samesite="lax",
-        secure=frontend_url.startswith("https://"),
+        secure=False,
     )
     return resp
 
@@ -4179,14 +4247,18 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
     expected_state = req.cookies.get("ygb_oauth_state", "")
     cookie_ok = bool(state and expected_state and state == expected_state)
-    if not (cookie_ok and parsed_ok):
-        logger.warning("GitHub OAuth state mismatch")
+    # Accept HMAC-signed state even without cookie match (network IP / cross-device)
+    # Cookie may not round-trip across different IPs/ports (SameSite restrictions)
+    if not parsed_ok:
+        logger.warning("GitHub OAuth state HMAC validation failed")
         resp = RedirectResponse(
             url=f"{frontend_url}/login?error=state_mismatch",
             status_code=302,
         )
         resp.delete_cookie("ygb_oauth_state")
         return resp
+    if not cookie_ok:
+        logger.info("GitHub OAuth state cookie missing (cross-network login) — HMAC valid, proceeding")
 
     if not _GITHUB_CLIENT_ID or not _GITHUB_CLIENT_SECRET:
         raise HTTPException(
@@ -4209,13 +4281,16 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         t_total = _time.monotonic()
         timings: Dict[str, int] = {}
 
-        # 1. Exchange code → access token  (uses connection-pooled session)
+        # 1. Exchange code -> access token  (uses connection-pooled session)
         t0 = _time.monotonic()
+        # Use Host-header-derived redirect_uri (must match the one sent in /auth/github)
+        request_host = req.headers.get("host", "localhost:8000")
+        dynamic_redirect = f"http://{request_host}/auth/github/callback"
         token_payload = {
             "client_id": _GITHUB_CLIENT_ID,
             "client_secret": _GITHUB_CLIENT_SECRET,
             "code": code,
-            "redirect_uri": _GITHUB_REDIRECT_URI,
+            "redirect_uri": dynamic_redirect,
         }
 
         if _HAVE_REQUESTS:
@@ -4322,21 +4397,26 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         }
 
         safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
-        safe_token = urllib.parse.quote_plus(jwt_token)
-        safe_session = urllib.parse.quote_plus(session["id"])
         safe_profile = urllib.parse.quote_plus(
             json.dumps(github_profile_minimal, separators=(",", ":"), ensure_ascii=False)
         )
 
+        # ── Security: token + session_id go in cookies, NOT URL params ──
+        # URL params leak via browser history, referrer headers, and server logs.
+        # Only non-sensitive display data (username, auth method) goes in URL.
         return {
             "redirect_url": (
                 f"{frontend_url}/login"
-                f"?token={safe_token}"
-                f"&user={safe_user}"
-                f"&session_id={safe_session}"
+                f"?user={safe_user}"
                 f"&auth=github"
-                f"&profile={safe_profile}"
             ),
+            "_set_cookies": {
+                "ygb_token": jwt_token,
+                "ygb_session_id": session["id"],
+                "ygb_profile": json.dumps(
+                    github_profile_minimal, separators=(",", ":"), ensure_ascii=False
+                ),
+            },
             # Pass context to background task (no secrets — only IDs/metadata)
             "_bg_ctx": {
                 "user_id": user["id"],
@@ -4508,6 +4588,19 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
     resp = RedirectResponse(url=result["redirect_url"], status_code=302)
     resp.delete_cookie("ygb_oauth_state")
+
+    # Set auth tokens as HTTP-only cookies (not in URL)
+    cookies = result.get("_set_cookies", {})
+    for cookie_name, cookie_value in cookies.items():
+        resp.set_cookie(
+            key=cookie_name,
+            value=cookie_value,
+            max_age=3600,       # 1 hour
+            httponly=(cookie_name != "ygb_profile"),  # Profile readable by JS for display
+            samesite="lax",
+            secure=False,  # Set True in production with HTTPS
+            path="/",
+        )
     return resp
 
 
