@@ -172,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter className="sidebar-item p-4">
-        <NavUser user={authUser} />
+        <NavUser user={{ ...authUser, name: authUser.name ?? "User", email: authUser.email ?? "", avatar: authUser.avatar ?? "" }} />
       </SidebarFooter>
     </Sidebar>
   )
