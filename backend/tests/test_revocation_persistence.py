@@ -16,14 +16,15 @@ ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
 # Force memory backend for these tests (Redis may not be available)
-os.environ.setdefault("REVOCATION_BACKEND", "memory")
+os.environ["REVOCATION_BACKEND"] = "memory"
 
 
 class TestRevocationPersistence(unittest.TestCase):
     """Test revocation store behavior."""
 
     def setUp(self):
-        """Reset store before each test."""
+        """Reset store before each test — force memory backend."""
+        os.environ["REVOCATION_BACKEND"] = "memory"
         from backend.auth.revocation_store import reset_store
         reset_store()
 

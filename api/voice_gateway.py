@@ -250,8 +250,17 @@ async def voice_stream(ws: WebSocket):
     audit = _get_audit()
     rl = _get_rate_limiter()
 
+    import time as _time
+
+    WS_SESSION_TIMEOUT = 14400  # 4 hours max session
+    _ws_start = _time.monotonic()
+
     try:
         while True:
+            if _time.monotonic() - _ws_start > WS_SESSION_TIMEOUT:
+                logger.info("[VOICE_GW] Session timeout (%ds)", WS_SESSION_TIMEOUT)
+                await ws.close(code=1000, reason="Session timeout")
+                break
             data = await ws.receive()
 
             if "bytes" in data and data["bytes"]:

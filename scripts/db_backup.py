@@ -57,9 +57,16 @@ def backup_loop(interval_seconds: int = 300):
     logger.info("Starting backup loop: every %ds", interval_seconds)
     logger.info("  SSD: %s", SSD_DB)
     logger.info("  HDD: %s", HDD_DB)
-    while True:
+    MAX_ITERATIONS = 100000  # Loop guard: ~347 days at 5-min interval
+    LOOP_TIMEOUT = 2592000  # 30 days max
+    _loop_start = time.time()
+    for _iter in range(MAX_ITERATIONS):
+        if time.time() - _loop_start > LOOP_TIMEOUT:
+            logger.warning("Loop guard: timeout (%ds) reached, restarting", LOOP_TIMEOUT)
+            break
         backup_now()
         time.sleep(interval_seconds)
+    logger.info("Backup loop ended after %d iterations", _iter + 1)
 
 
 if __name__ == "__main__":

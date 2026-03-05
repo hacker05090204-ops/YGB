@@ -328,12 +328,19 @@ def start_enforcement_loop(interval_seconds: int = 300):
 
     def _loop():
         logger.info("Storage enforcement loop started (every %ds)", interval_seconds)
-        while True:
+        MAX_ITERATIONS = 100000  # Loop guard
+        LOOP_TIMEOUT = 2592000  # 30 days
+        _start = time.time()
+        for _i in range(MAX_ITERATIONS):
+            if time.time() - _start > LOOP_TIMEOUT:
+                logger.warning("Enforcement loop guard: timeout reached")
+                break
             try:
                 enforce_ssd_cap()
             except Exception:
                 logger.exception("Error in storage enforcement loop")
             time.sleep(interval_seconds)
+        logger.info("Enforcement loop ended after %d iterations", _i + 1)
 
     _enforcement_thread = threading.Thread(target=_loop, daemon=True, name="storage-enforcement")
     _enforcement_thread.start()
@@ -356,8 +363,9 @@ if __name__ == "__main__":
         idx = sys.argv.index("--loop")
         interval = int(sys.argv[idx + 1]) if idx + 1 < len(sys.argv) else 300
         start_enforcement_loop(interval)
-        # Keep main alive
-        while True:
+        # Keep main alive with loop guard
+        MAX_KEEPALIVE = 100000
+        for _ka in range(MAX_KEEPALIVE):
             time.sleep(60)
     else:
         print(json.dumps(get_storage_report(), indent=2))

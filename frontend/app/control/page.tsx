@@ -268,6 +268,12 @@ function ControlPageContent() {
                 if (res.ok) {
                     const data = await res.json()
                     setRuntimeStatus(data)
+                    // Sync runtime mode from backend training state
+                    if (data.runtime?.training_state === "TRAINING" || data.status === "active") {
+                        setRuntimeMode("TRAIN")
+                    } else if (data.status === "idle" || data.runtime?.training_state === "IDLE") {
+                        setRuntimeMode(prev => prev === "TRAIN" ? "IDLE" : prev)
+                    }
                     // Phase 2: Track telemetry freshness for stall detection
                     if (data.runtime?.wall_clock_unix) {
                         const newTs = data.runtime.wall_clock_unix
@@ -317,7 +323,7 @@ function ControlPageContent() {
     const handleStartTraining = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await protectedFetch(`${API_BASE}/api/mode/train/start`, { method: "POST" })
+            const res = await protectedFetch(`${API_BASE}/api/g38/start?epochs=0`, { method: "POST" })
             if (res.ok) setRuntimeMode("TRAIN")
         } catch (e) { console.error("Start training failed:", e) }
         finally { setModeLoading(false) }
@@ -326,7 +332,7 @@ function ControlPageContent() {
     const handleStopTraining = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await protectedFetch(`${API_BASE}/api/mode/train/stop`, { method: "POST" })
+            const res = await protectedFetch(`${API_BASE}/api/g38/abort`, { method: "POST" })
             if (res.ok) setRuntimeMode("IDLE")
         } catch (e) { console.error("Stop training failed:", e) }
         finally { setModeLoading(false) }
@@ -787,8 +793,8 @@ function ControlPageContent() {
                             </div>
 
                             {/* Phase 2: Real-time timestamp display */}
-                            {runtimeStatus?.status === "active" && runtimeStatus.runtime && (
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                            {runtimeStatus?.runtime && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-4">
                                     <div className="p-2.5 rounded-xl bg-background/50 border border-emerald-500/20">
                                         <div className="flex items-center gap-1.5 mb-1">
                                             <Clock className="w-3 h-3 text-emerald-400" />
@@ -812,27 +818,43 @@ function ControlPageContent() {
                                     <div className="p-2.5 rounded-xl bg-background/50 border border-violet-500/20">
                                         <div className="flex items-center gap-1.5 mb-1">
                                             <Clock className="w-3 h-3 text-violet-400" />
-                                            <p className="text-[10px] text-violet-400 uppercase tracking-wider font-medium">Last Update</p>
+                                            <p className="text-[10px] text-violet-400 uppercase tracking-wider font-medium">Samples/sec</p>
                                         </div>
                                         <p className="text-xs font-mono text-violet-300">
-                                            {runtimeStatus.runtime.wall_clock_unix > 0
-                                                ? new Date(runtimeStatus.runtime.wall_clock_unix * 1000).toLocaleTimeString()
-                                                : "—"}
+                                            {((runtimeStatus.runtime as any).samples_per_sec ?? 0).toFixed(1)}
                                         </p>
                                     </div>
                                     <div className="p-2.5 rounded-xl bg-background/50 border border-cyan-500/20">
                                         <div className="flex items-center gap-1.5 mb-1">
                                             <Clock className="w-3 h-3 text-cyan-400" />
-                                            <p className="text-[10px] text-cyan-400 uppercase tracking-wider font-medium">Live Clock</p>
+                                            <p className="text-[10px] text-cyan-400 uppercase tracking-wider font-medium">Checkpoints</p>
                                         </div>
                                         <p className="text-xs font-mono text-cyan-300">
+                                            {(runtimeStatus.runtime as any).checkpoints_saved ?? 0}
+                                        </p>
+                                    </div>
+                                    <div className="p-2.5 rounded-xl bg-background/50 border border-orange-500/20">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Clock className="w-3 h-3 text-orange-400" />
+                                            <p className="text-[10px] text-orange-400 uppercase tracking-wider font-medium">Tensor Files</p>
+                                        </div>
+                                        <p className="text-xs font-mono text-orange-300">
+                                            {(runtimeStatus.runtime as any).safetensors_files ?? 0}
+                                        </p>
+                                    </div>
+                                    <div className="p-2.5 rounded-xl bg-background/50 border border-pink-500/20">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <Clock className="w-3 h-3 text-pink-400" />
+                                            <p className="text-[10px] text-pink-400 uppercase tracking-wider font-medium">Live Clock</p>
+                                        </div>
+                                        <p className="text-xs font-mono text-pink-300">
                                             {new Date(liveTime).toLocaleTimeString()}
                                         </p>
                                     </div>
                                 </div>
                             )}
 
-                            {runtimeStatus?.status === "active" && runtimeStatus.runtime ? (
+                            {(runtimeStatus?.status === "active" || (runtimeStatus?.status === "idle" && runtimeStatus?.runtime)) && runtimeStatus?.runtime ? (
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Epochs</p>
@@ -907,6 +929,45 @@ function ControlPageContent() {
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Freeze</p>
                                         <p className={cn("text-lg font-bold", runtimeStatus.runtime.freeze_status ? "text-emerald-400" : "text-amber-400")}>
                                             {runtimeStatus.runtime.freeze_status ? "✓ Valid" : "⚠ Invalid"}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : runtimeStatus?.status === "idle" && runtimeStatus.runtime ? (
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Epochs Done</p>
+                                        <p className="text-lg font-bold text-violet-400">
+                                            {runtimeStatus.runtime.completed_epochs}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Last Accuracy</p>
+                                        <p className="text-lg font-bold text-emerald-400">
+                                            {(runtimeStatus.runtime.precision * 100).toFixed(1)}%
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Last Loss</p>
+                                        <p className="text-lg font-bold text-amber-400">
+                                            {runtimeStatus.runtime.current_loss.toFixed(6)}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Checkpoints</p>
+                                        <p className="text-lg font-bold text-cyan-400">
+                                            {(runtimeStatus.runtime as any).checkpoints_saved ?? 0}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Tensor Files</p>
+                                        <p className="text-lg font-bold text-purple-400">
+                                            {(runtimeStatus.runtime as any).safetensors_files ?? 0}
+                                        </p>
+                                    </div>
+                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dataset</p>
+                                        <p className="text-lg font-bold text-blue-400">
+                                            {((runtimeStatus.runtime as any).dataset_size ?? 0).toLocaleString()}
                                         </p>
                                     </div>
                                 </div>

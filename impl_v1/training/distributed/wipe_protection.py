@@ -39,8 +39,10 @@ def check_local_weights(model_dir: str = MODEL_DIR) -> bool:
         return False
 
     for d in os.listdir(model_dir):
-        weights_path = os.path.join(model_dir, d, "model_fp16.pt")
-        if os.path.exists(weights_path):
+        # Prefer .safetensors, fallback to .pt
+        st_path = os.path.join(model_dir, d, "model_fp16.safetensors")
+        pt_path = os.path.join(model_dir, d, "model_fp16.pt")
+        if os.path.exists(st_path) or os.path.exists(pt_path):
             return True
 
     return False
@@ -99,13 +101,22 @@ def validate_weight_hash(
     If expected_hash is empty, just compute the hash.
     """
     try:
-        import torch
-        state_dict = torch.load(weights_path, map_location='cpu',
-                                weights_only=True)
+        # Try safetensors first
+        if weights_path.endswith('.safetensors'):
+            from safetensors.torch import load_file as st_load_file
+            state_dict = st_load_file(weights_path, device='cpu')
+        else:
+            import torch
+            state_dict = torch.load(weights_path, map_location='cpu',
+                                    weights_only=True)
 
         h = hashlib.sha256()
         for k in sorted(state_dict.keys()):
-            h.update(state_dict[k].numpy().tobytes())
+            t = state_dict[k]
+            if hasattr(t, 'numpy'):
+                h.update(t.numpy().tobytes())
+            elif hasattr(t, 'tobytes'):
+                h.update(t.tobytes())
         actual_hash = h.hexdigest()
 
         if expected_hash and actual_hash != expected_hash:
@@ -165,7 +176,10 @@ def run_wipe_protection(
 
     if os.path.exists(model_dir):
         for d in sorted(os.listdir(model_dir)):
-            weights_path = os.path.join(model_dir, d, "model_fp16.pt")
+            # Prefer .safetensors, fallback to .pt
+            st_path = os.path.join(model_dir, d, "model_fp16.safetensors")
+            pt_path = os.path.join(model_dir, d, "model_fp16.pt")
+            weights_path = st_path if os.path.exists(st_path) else pt_path
             meta_path = os.path.join(model_dir, d, "metadata.json")
             if os.path.exists(weights_path):
                 expected = ""
