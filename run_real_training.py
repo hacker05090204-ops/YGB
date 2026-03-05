@@ -409,6 +409,10 @@ log.info(f"  Encoder freeze epochs: {ENCODER_FREEZE_EPOCHS}")
 torch.cuda.empty_cache()
 torch.cuda.reset_peak_memory_stats()
 
+# Pre-allocate test tensors on GPU (avoid per-epoch CPU→GPU transfer)
+test_features_gpu = torch.tensor(test_f, dtype=torch.float32, device=device)
+test_labels_gpu = torch.tensor(test_l, dtype=torch.long, device=device)
+
 epoch_reports = []
 t_total = time.perf_counter()
 
@@ -433,8 +437,9 @@ for epoch in range(EPOCHS):
             log.info(f"  Epoch {epoch+1}: Encoder UNFROZEN, optimizer re-initialized")
 
     model.train()
-    total_loss = 0.0
-    total_correct = 0
+    # Accumulate metrics on GPU to avoid per-batch GPU→CPU sync stalls
+    total_loss_gpu = torch.zeros(1, device=device)
+    total_correct_gpu = torch.zeros(1, dtype=torch.long, device=device)
     total_samples = 0
     max_grad_norm = 0.0
     optimizer.zero_grad()
@@ -460,8 +465,8 @@ for epoch in range(EPOCHS):
             scaler.update()
             optimizer.zero_grad()
 
-        total_loss += loss.item() * GRAD_ACCUM * bx.size(0)
-        total_correct += (logits.argmax(1) == by).sum().item()
+        total_loss_gpu += loss.detach() * GRAD_ACCUM * bx.size(0)
+        total_correct_gpu += (logits.argmax(1) == by).sum()
         total_samples += bx.size(0)
 
     # Flush remaining
@@ -477,18 +482,18 @@ for epoch in range(EPOCHS):
 
     scheduler.step(epoch + 1)
 
-    # Eval
+    # Eval (using pre-allocated GPU tensors + AMP)
     model.eval()
     with torch.no_grad():
-        tx = torch.tensor(test_f, dtype=torch.float32, device=device)
-        tl = torch.tensor(test_l, dtype=torch.long, device=device)
-        test_logits = model(tx)
-        test_acc = (test_logits.argmax(1) == tl).float().mean().item()
-        del tx, tl, test_logits
+        with autocast(dtype=torch.float16):
+            test_logits = model(test_features_gpu)
+        test_acc = (test_logits.argmax(1) == test_labels_gpu).float().mean().item()
+        del test_logits
 
     ep_time = time.perf_counter() - ep_start
-    avg_loss = total_loss / max(total_samples, 1)
-    train_acc = total_correct / max(total_samples, 1)
+    # Single GPU→CPU sync point per epoch (instead of per-batch)
+    avg_loss = total_loss_gpu.item() / max(total_samples, 1)
+    train_acc = total_correct_gpu.item() / max(total_samples, 1)
     vram_now = torch.cuda.max_memory_allocated() / (1024 ** 2)
     sps = total_samples / max(ep_time, 0.001)
     lr_now = optimizer.param_groups[0]["lr"]
