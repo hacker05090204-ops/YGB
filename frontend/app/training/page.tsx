@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import Link from "next/link"
@@ -67,7 +69,7 @@ interface G38Status {
 
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
-export default function TrainingDashboard() {
+function TrainingDashboardContent() {
     const [status, setStatus] = useState<G38Status | null>(null)
     const [events, setEvents] = useState<TrainingEvent[]>([])
     const [loading, setLoading] = useState(true)
@@ -432,4 +434,8 @@ export default function TrainingDashboard() {
             </main>
         </div>
     )
+}
+
+export default function TrainingDashboard() {
+    return <AuthGuard><TrainingDashboardContent /></AuthGuard>
 }

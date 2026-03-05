@@ -96,8 +96,8 @@ BLOCKED_PATH_FRAGMENTS: List[str] = [
 # File extensions that research mode CANNOT access
 BLOCKED_EXTENSIONS: Set[str] = {
     ".pt", ".pth", ".onnx", ".h5", ".hdf5", ".pb",
-    ".tflite", ".safetensors", ".bin", ".model",
-    ".ckpt", ".pkl",
+    ".tflite", ".bin", ".model",
+    ".ckpt", ".pkl", ".safetensors",
 }
 
 # =========================================================================

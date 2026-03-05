@@ -272,7 +272,8 @@ class CVEIngestScheduler:
             )
             return False
         except Exception as e:
-            pipeline.mark_source_error(source_id, str(e))
+            logger.error("[CVE_SCHEDULER] %s fetch error: %s", source_id, e)
+            pipeline.mark_source_error(source_id, f"Fetch failed: {type(e).__name__}")
             return False
 
     def _parse_and_ingest(

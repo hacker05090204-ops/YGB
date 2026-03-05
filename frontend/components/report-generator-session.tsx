@@ -10,11 +10,17 @@ interface ReportItem {
 }
 
 interface VideoItem {
-    user_id: string
-    session_id: string
+    id: string
+    report_id: string | null
     filename: string
-    size_bytes: number
-    created_at: string
+    duration_seconds: number
+    file_size_bytes: number
+    status: string
+    started_at: string
+    stopped_at: string | null
+    storage_path: string | null
+    created_by: string
+    metadata_json: string
 }
 
 interface RuntimeSnapshot {
@@ -67,7 +73,7 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
 
             if (videosRes.ok) {
                 const videoData = await videosRes.json()
-                setVideos(Array.isArray(videoData) ? videoData : [])
+                setVideos(Array.isArray(videoData.videos) ? videoData.videos : [])
             } else {
                 setVideos([])
             }
@@ -151,9 +157,8 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
             let videoToken: string | null = null
             let selectedVideoMeta: VideoItem | null = null
             if (selectedVideo) {
-                const [userId, sessionId, fileName] = selectedVideo.split("|")
                 selectedVideoMeta = videos.find(v =>
-                    v.user_id === userId && v.session_id === sessionId && v.filename === fileName
+                    v.id === selectedVideo
                 ) || null
 
                 if (selectedVideoMeta) {
@@ -161,8 +166,8 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
-                            user_id: selectedVideoMeta.user_id,
-                            session_id: selectedVideoMeta.session_id,
+                            user_id: selectedVideoMeta.created_by,
+                            session_id: selectedVideoMeta.id,
                             filename: selectedVideoMeta.filename,
                         }),
                     })
@@ -208,11 +213,11 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
                         : null,
                     video: selectedVideoMeta
                         ? {
-                            user_id: selectedVideoMeta.user_id,
-                            session_id: selectedVideoMeta.session_id,
+                            user_id: selectedVideoMeta.created_by,
+                            session_id: selectedVideoMeta.id,
                             filename: selectedVideoMeta.filename,
-                            created_at: selectedVideoMeta.created_at,
-                            size_bytes: selectedVideoMeta.size_bytes,
+                            created_at: selectedVideoMeta.started_at,
+                            size_bytes: selectedVideoMeta.file_size_bytes,
                             stream_token: videoToken,
                         }
                         : null,
@@ -325,10 +330,9 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
                 >
                     <option value="">Attach recorded video (optional)</option>
                     {videos.map((v) => {
-                        const key = `${v.user_id}|${v.session_id}|${v.filename}`
                         return (
-                            <option key={key} value={key}>
-                                {v.session_id} · {v.filename} · {safeIso(v.created_at)}
+                            <option key={v.id} value={v.id}>
+                                {v.id} · {v.filename} · {safeIso(v.started_at)}
                             </option>
                         )
                     })}

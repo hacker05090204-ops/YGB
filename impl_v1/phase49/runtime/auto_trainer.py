@@ -1310,7 +1310,7 @@ class AutoTrainer:
             self._emit_event("ERROR", f"GPU training failed: {str(e)}", gpu_used=True)
             return {
                 "started": False,
-                "reason": str(e),
+                "reason": "GPU training failed — check server logs",
                 "state": "ERROR",
             }
     

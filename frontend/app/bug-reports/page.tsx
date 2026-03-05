@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useRef } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import gsap from "gsap"
@@ -28,14 +30,13 @@ interface BugReport {
     status: string
 }
 
-export default function BugReportsPage() {
+function BugReportsPageContent() {
     const containerRef = useRef(null)
     const [bugs, setBugs] = useState<BugReport[]>([])
     const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
 
     const fetchBugs = async () => {
         try {
-            setApiStatus("loading")
             const res = await authFetch(`${API_BASE}/api/db/bounties`)
             if (res.ok) {
                 const data = await res.json()
@@ -48,15 +49,26 @@ export default function BugReportsPage() {
                     status: b.status || "Open",
                 }))
                 setBugs(mapped)
-                setApiStatus("online")
-            } else {
-                setApiStatus("offline")
             }
         } catch (e) {
             console.error("Failed to fetch bug reports:", e)
-            setApiStatus("offline")
         }
     }
+
+    // Separate server health check — plain fetch, no auth required
+    useEffect(() => {
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+                setApiStatus(res.ok ? "online" : "offline")
+            } catch {
+                setApiStatus("offline")
+            }
+        }
+        checkHealth()
+        const interval = setInterval(checkHealth, 15000)
+        return () => clearInterval(interval)
+    }, [])
 
     useEffect(() => {
         fetchBugs()
@@ -205,4 +217,8 @@ function BugCard({ bug }: { bug: BugReport }) {
             </CardFooter>
         </Card>
     )
+}
+
+export default function BugReportsPage() {
+    return <AuthGuard><BugReportsPageContent /></AuthGuard>
 }

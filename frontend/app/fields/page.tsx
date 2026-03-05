@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useCallback } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import Link from "next/link"
@@ -165,7 +167,7 @@ function metricDisplay(value: number | null, label: string, unit: string = "%"):
 // COMPONENT
 // =========================================================================
 
-export default function FieldProgressionDashboard() {
+function FieldProgressionDashboardContent() {
     const [data, setData] = useState<ApiResponse | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -787,4 +789,8 @@ function MetricCard({
             )}
         </div>
     )
+}
+
+export default function FieldProgressionDashboard() {
+    return <AuthGuard><FieldProgressionDashboardContent /></AuthGuard>
 }

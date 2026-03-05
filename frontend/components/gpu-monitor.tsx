@@ -11,6 +11,12 @@ interface GPUStatus {
     memory_total_mb: number | null
     temperature: number | null
     compute_capability: string | null
+    cuda_version: string | null
+    driver_version: string | null
+    tensor_core_support: boolean | null
+    error_reason: string | null
+    sequence_id: number
+    timestamp: string
 }
 
 export function GpuMonitor({ className = "", refreshInterval = 5000 }) {
@@ -121,6 +127,29 @@ export function GpuMonitor({ className = "", refreshInterval = 5000 }) {
                         <div className="flex justify-between items-center">
                             <span className="text-xs text-muted-foreground">Compute</span>
                             <span className="text-xs font-mono text-muted-foreground">SM {status.compute_capability}</span>
+                        </div>
+                    )}
+
+                    {status.cuda_version && (
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs text-muted-foreground">CUDA</span>
+                            <span className="text-xs font-mono text-muted-foreground">{status.cuda_version}</span>
+                        </div>
+                    )}
+
+                    {status.driver_version && (
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs text-muted-foreground">Driver</span>
+                            <span className="text-xs font-mono text-muted-foreground">{status.driver_version}</span>
+                        </div>
+                    )}
+
+                    {status.tensor_core_support !== null && (
+                        <div className="flex justify-between items-center">
+                            <span className="text-xs text-muted-foreground">Tensor Cores</span>
+                            <span className={`text-xs font-mono ${status.tensor_core_support ? 'text-green-500' : 'text-muted-foreground'}`}>
+                                {status.tensor_core_support ? '✓ Supported' : '✗ N/A'}
+                            </span>
                         </div>
                     )}
                 </div>

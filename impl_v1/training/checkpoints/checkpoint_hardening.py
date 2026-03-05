@@ -102,20 +102,21 @@ class HardenedCheckpointManager:
         5. Update manifest
         """
         import torch
+        from safetensors.torch import save_file as st_save_file
         
         checkpoint_id = f"ckpt_e{epoch:04d}_s{step:06d}"
-        final_path = self.checkpoint_dir / f"{checkpoint_id}.pt"
+        final_path = self.checkpoint_dir / f"{checkpoint_id}.safetensors"
         
         # Step 1: Save to temp file
         with tempfile.NamedTemporaryFile(
             dir=self.checkpoint_dir,
             delete=False,
-            suffix=".tmp",
+            suffix=".safetensors.tmp",
         ) as tmp:
-            torch.save(state_dict, tmp)
-            tmp.flush()
-            os.fsync(tmp.fileno())
-            temp_path = Path(tmp.name)
+            tmp_name = tmp.name
+        # safetensors save_file needs a path, not file object
+        st_save_file(state_dict, tmp_name)
+        temp_path = Path(tmp_name)
         
         # Step 2: Compute SHA256
         sha256 = self._compute_hash(temp_path)
@@ -153,10 +154,13 @@ class HardenedCheckpointManager:
             return False, "Checkpoint not in manifest"
         
         metadata = self.checkpoints[checkpoint_id]
-        checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.pt"
+        checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.safetensors"
         
         if not checkpoint_path.exists():
-            return False, "Checkpoint file missing"
+            # Fallback to legacy .pt
+            checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.pt"
+            if not checkpoint_path.exists():
+                return False, "Checkpoint file missing"
         
         current_hash = self._compute_hash(checkpoint_path)
         if current_hash != metadata.sha256:
@@ -172,12 +176,23 @@ class HardenedCheckpointManager:
     ) -> Tuple[bool, str]:
         """Verify checkpoint with deterministic replay."""
         import torch
+        from safetensors.torch import load_file as st_load_file
         
-        checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.pt"
+        checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.safetensors"
+        if not checkpoint_path.exists():
+            # Fallback to legacy .pt
+            checkpoint_path = self.checkpoint_dir / f"{checkpoint_id}.pt"
         
         # Load checkpoint
-        state = torch.load(checkpoint_path, weights_only=False)
-        model.load_state_dict(state["model_state_dict"])
+        if str(checkpoint_path).endswith('.safetensors'):
+            state = st_load_file(str(checkpoint_path), device='cpu')
+        else:
+            state = torch.load(checkpoint_path, weights_only=False)
+        
+        if "model_state_dict" in state:
+            model.load_state_dict(state["model_state_dict"])
+        else:
+            model.load_state_dict(state)
         
         # Run forward pass
         with torch.no_grad():

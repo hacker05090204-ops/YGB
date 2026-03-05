@@ -6,7 +6,6 @@
  */
 
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
@@ -95,7 +94,9 @@ private:
   }
 
 public:
-  ReplaySerializer() : buffer_pos_(0) { std::memset(buffer_, 0, sizeof(buffer_)); }
+  ReplaySerializer() : buffer_pos_(0) {
+    std::memset(buffer_, 0, sizeof(buffer_));
+  }
 
   ReplayExportResult export_steps(const ReplayStepSummary *steps, int count,
                                   const char *target_domain,
@@ -125,7 +126,8 @@ public:
     std::snprintf(tmp, sizeof(tmp), "\"session_id\":\"%s\",", session_id);
     append(tmp);
 
-    std::snprintf(tmp, sizeof(tmp), "\"exported_at\":%ld,", (long)std::time(nullptr));
+    std::snprintf(tmp, sizeof(tmp), "\"exported_at\":%ld,",
+                  (long)std::time(nullptr));
     append(tmp);
 
     std::snprintf(tmp, sizeof(tmp), "\"step_count\":%d,", count);
@@ -152,7 +154,8 @@ public:
       append_escaped(steps[i].payload_preview);
       append("\",");
 
-      std::snprintf(tmp, sizeof(tmp), "\"http_pairs\":%d,", steps[i].http_pairs);
+      std::snprintf(tmp, sizeof(tmp), "\"http_pairs\":%d,",
+                    steps[i].http_pairs);
       append(tmp);
 
       std::snprintf(tmp, sizeof(tmp), "\"dom_diffs\":%d,", steps[i].dom_diffs);

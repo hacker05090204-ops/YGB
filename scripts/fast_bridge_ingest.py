@@ -181,8 +181,19 @@ print("=" * 60)
 
 idx = 0
 batch_num = 0
+MAX_BATCHES = 10000  # Loop guard: prevent infinite ingestion
+LOOP_TIMEOUT = 86400  # 24 hours max runtime
+_loop_start = time.time()
 
 while True:
+    # Loop guard checks
+    if batch_num >= MAX_BATCHES:
+        print(f"\n*** LOOP GUARD: max batches ({MAX_BATCHES}) reached ***")
+        break
+    if time.time() - _loop_start > LOOP_TIMEOUT:
+        print(f"\n*** LOOP GUARD: timeout ({LOOP_TIMEOUT}s) reached ***")
+        break
+
     verified = lib.bridge_get_verified_count()
     if verified >= TARGET:
         print(f"\n*** TARGET REACHED: {verified:,} >= {TARGET:,} ***")

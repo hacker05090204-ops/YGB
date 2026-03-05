@@ -13,6 +13,7 @@ import os
 import sys
 import json
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
@@ -167,7 +168,7 @@ class TestIncidentReconciler(unittest.TestCase):
         state_path = tmpdir / "auto_mode_state.json"
         state_path.write_text(json.dumps({
             "no_drift_events": True,
-            "last_updated": "2026-03-01T00:00:00+00:00",
+            "last_updated": datetime.now(timezone.utc).isoformat(),
         }))
         report = reconcile(reports_dir=tmpdir, auto_mode_path=state_path)
         self.assertTrue(report.consistent)
@@ -193,7 +194,7 @@ class TestIncidentReconciler(unittest.TestCase):
         state_path = tmpdir / "auto_mode_state.json"
         state_path.write_text(json.dumps({
             "no_drift_events": False,
-            "last_updated": "2026-03-01T00:00:00+00:00",
+            "last_updated": datetime.now(timezone.utc).isoformat(),
         }))
         report = reconcile(reports_dir=tmpdir, auto_mode_path=state_path)
         self.assertTrue(report.consistent)

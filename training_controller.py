@@ -540,11 +540,24 @@ def phase3_training_execution(
         per_epoch=per_epoch,
     )
 
-    # Save model state for Phase 4
+    # Save model state for Phase 4 as .safetensors (atomic write)
     os.makedirs(config.checkpoint_dir, exist_ok=True)
-    torch.save(model.state_dict(), os.path.join(
-        config.checkpoint_dir, 'latest_state_dict.pt'
-    ))
+    from safetensors.torch import save_file as _st_save
+    import tempfile as _tmpmod
+    _ckpt_path = os.path.join(config.checkpoint_dir, 'latest_state_dict.safetensors')
+    _tmp_fd, _tmp_ckpt = _tmpmod.mkstemp(
+        suffix='.safetensors.tmp', dir=config.checkpoint_dir,
+    )
+    try:
+        os.close(_tmp_fd)
+        _st_save(model.state_dict(), _tmp_ckpt)
+        os.replace(_tmp_ckpt, _ckpt_path)
+    except Exception:
+        try:
+            os.unlink(_tmp_ckpt)
+        except OSError:
+            pass
+        raise
 
     del X_t, y_t
     if torch.cuda.is_available():
@@ -569,9 +582,17 @@ def phase4_model_freeze(
     logger.info("║  PHASE 4 — MODEL FREEZE                         ║")
     logger.info("╚══════════════════════════════════════════════════╝")
 
-    # Load latest state dict
-    state_path = os.path.join(config.checkpoint_dir, 'latest_state_dict.pt')
-    state_dict = torch.load(state_path, map_location='cpu', weights_only=True)
+    # Load latest state dict (.safetensors with .pt fallback)
+    state_path_st = os.path.join(config.checkpoint_dir, 'latest_state_dict.safetensors')
+    state_path_pt = os.path.join(config.checkpoint_dir, 'latest_state_dict.pt')
+    if os.path.exists(state_path_st):
+        from safetensors.torch import load_file as _st_load
+        state_dict = _st_load(state_path_st, device='cpu')
+    elif os.path.exists(state_path_pt):
+        logger.warning("  ⚠ Loading legacy .pt checkpoint — run migration")
+        state_dict = torch.load(state_path_pt, map_location='cpu', weights_only=True)
+    else:
+        raise FileNotFoundError(f"No checkpoint found at {state_path_st} or {state_path_pt}")
 
     # Convert to FP16
     fp16_dict = {}

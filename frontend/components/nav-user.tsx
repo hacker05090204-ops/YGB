@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { buildAuthHeaders } from "@/lib/auth-token"
+import { toast } from "sonner"
 
 import {
   Avatar,
@@ -38,6 +39,7 @@ export function NavUser({
     name: string
     email: string
     avatar: string
+    githubLogin?: string | null
   }
 }) {
   const { isMobile } = useSidebar()
@@ -107,6 +109,9 @@ export function NavUser({
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
+                  {user.githubLogin && (
+                    <span className="truncate text-xs text-blue-400">@{user.githubLogin}</span>
+                  )}
                   <span className="text-muted-foreground truncate text-xs">
                     {user.email}
                   </span>
@@ -115,15 +120,15 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push("/admin")}>
                 <User className="size-4" />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push("/earnings")}>
                 <CreditCard className="size-4" />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => toast.info("No new notifications")}>
                 <Bell className="size-4" />
                 Notifications
               </DropdownMenuItem>

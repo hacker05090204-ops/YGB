@@ -3,6 +3,8 @@
 import * as React from "react"
 import { useRef } from "react"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { useAuthUser } from "@/hooks/use-auth-user"
 import {
   LayoutDashboard,
   Bug,
@@ -33,11 +35,6 @@ import {
 
 // Data Structure
 const data = {
-  user: {
-    name: "BugHunter_01",
-    email: "hunter@bugbounty.com",
-    avatar: "/avatars/agnish.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -78,7 +75,7 @@ const data = {
     },
     {
       title: "Help",
-      url: "#",
+      url: "/admin",
       icon: HelpCircle,
     },
   ]
@@ -87,6 +84,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const containerRef = useRef(null)
   const pathname = usePathname()
+  const authUser = useAuthUser()
 
   useGSAP(() => {
     // Staggered entry for menu items
@@ -115,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/" className="group">
+              <Link href="/" className="group">
                 <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary/20 text-primary ring-1 ring-primary/50 group-hover:bg-primary/30 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-all duration-300">
                   <ShieldAlert className="size-6" />
                 </div>
@@ -123,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate text-xl font-bold tracking-tight text-foreground">BugBounty</span>
                   <span className="truncate text-xs text-muted-foreground font-mono">v2.0 Secure</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -174,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter className="sidebar-item p-4">
-        <NavUser user={data.user} />
+        <NavUser user={authUser} />
       </SidebarFooter>
     </Sidebar>
   )

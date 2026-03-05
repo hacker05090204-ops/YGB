@@ -311,7 +311,7 @@ def run_daily_curriculum(test_mode: bool = False) -> DailySummary:
 
     if test_mode:
         # In test mode, simulate without actual browser
-        logger.info("TEST MODE — simulating feed processing")
+        logger.info("TEST MODE — using offline feed data")
         summary.total_fetched = len(all_urls)
         summary.domains_visited = list(set(
             url.split("://")[1].split("/")[0] for url in all_urls

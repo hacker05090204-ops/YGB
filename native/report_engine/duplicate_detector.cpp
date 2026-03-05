@@ -7,10 +7,8 @@
 
 #include <cctype>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
-
 
 // =========================================================================
 // CONSTANTS
@@ -120,8 +118,10 @@ public:
     f.report_id = report_id;
     f.created_at = std::time(nullptr);
     std::strncpy(f.endpoint, endpoint ? endpoint : "", sizeof(f.endpoint) - 1);
-    std::strncpy(f.parameter, parameter ? parameter : "", sizeof(f.parameter) - 1);
-    std::strncpy(f.vuln_type, vuln_type ? vuln_type : "", sizeof(f.vuln_type) - 1);
+    std::strncpy(f.parameter, parameter ? parameter : "",
+                 sizeof(f.parameter) - 1);
+    std::strncpy(f.vuln_type, vuln_type ? vuln_type : "",
+                 sizeof(f.vuln_type) - 1);
 
     f.term_count = extract_terms(full_text, f.terms, MAX_TERMS);
 
@@ -171,14 +171,15 @@ public:
 
     if (max_similarity >= DUPLICATE_THRESHOLD) {
       result.is_duplicate = true;
-      std::snprintf(result.reason, sizeof(result.reason),
-               "BLOCKED: %.0f%% similarity with report #%d (threshold: %.0f%%)",
-               max_similarity * 100, max_id, DUPLICATE_THRESHOLD * 100);
+      std::snprintf(
+          result.reason, sizeof(result.reason),
+          "BLOCKED: %.0f%% similarity with report #%d (threshold: %.0f%%)",
+          max_similarity * 100, max_id, DUPLICATE_THRESHOLD * 100);
     } else {
       result.is_duplicate = false;
       std::snprintf(result.reason, sizeof(result.reason),
-               "OK: %.0f%% similarity (below %.0f%% threshold)",
-               max_similarity * 100, DUPLICATE_THRESHOLD * 100);
+                    "OK: %.0f%% similarity (below %.0f%% threshold)",
+                    max_similarity * 100, DUPLICATE_THRESHOLD * 100);
     }
     return result;
   }

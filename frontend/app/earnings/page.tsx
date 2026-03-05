@@ -1,5 +1,7 @@
 "use client"
 
+import { AuthGuard } from "@/components/auth-guard"
+
 import { useState, useEffect, useRef } from "react"
 import { authFetch } from "@/lib/ygb-api"
 import gsap from "gsap"
@@ -38,27 +40,37 @@ const SEVERITY_COLORS: Record<string, string> = {
     LOW: "#94a3b8",
 }
 
-export default function EarningsPage() {
+function EarningsPageContent() {
     const containerRef = useRef(null)
     const [bounties, setBounties] = useState<Bounty[]>([])
     const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
 
     const fetchData = async () => {
         try {
-            setApiStatus("loading")
             const res = await authFetch(`${API_BASE}/api/db/bounties`)
             if (res.ok) {
                 const data = await res.json()
                 setBounties(data.bounties || [])
-                setApiStatus("online")
-            } else {
-                setApiStatus("offline")
             }
         } catch (e) {
             console.error("Failed to fetch earnings data:", e)
-            setApiStatus("offline")
         }
     }
+
+    // Separate server health check — plain fetch, no auth required
+    useEffect(() => {
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+                setApiStatus(res.ok ? "online" : "offline")
+            } catch {
+                setApiStatus("offline")
+            }
+        }
+        checkHealth()
+        const interval = setInterval(checkHealth, 15000)
+        return () => clearInterval(interval)
+    }, [])
 
     useEffect(() => {
         fetchData()
@@ -307,4 +319,8 @@ export default function EarningsPage() {
             </SidebarInset>
         </SidebarProvider>
     )
+}
+
+export default function EarningsPage() {
+    return <AuthGuard><EarningsPageContent /></AuthGuard>
 }

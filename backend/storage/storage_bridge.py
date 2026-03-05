@@ -39,6 +39,12 @@ _lifecycle: Optional[LifecycleManager] = None
 _disk_monitor: Optional[DiskMonitor] = None
 _video_streamer: Optional[VideoStreamer] = None
 
+# --- In-memory lookup indexes (eliminate full-table scans) ---
+_EMAIL_INDEX: Dict[str, str] = {}       # email → user entity_id
+_EMAIL_INDEX_BUILT = False
+_DEVICE_INDEX: Dict[str, str] = {}      # "user_id|device_hash" → device entity_id
+_DEVICE_INDEX_BUILT = False
+
 
 def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     """
@@ -101,6 +107,11 @@ def create_user(name: str, email: str = None, role: str = "hunter") -> Dict[str,
     }
 
     result = _engine.create_entity("users", user_id, data)
+
+    # Keep email index up to date
+    if email:
+        _EMAIL_INDEX[email] = user_id
+
     return {"id": user_id, **data}
 
 
@@ -349,6 +360,24 @@ def end_session(session_id: str):
 # DEVICE OPERATIONS
 # =============================================================================
 
+def _ensure_device_index():
+    """Lazily populate the (user_id, device_hash) → entity_id index."""
+    global _DEVICE_INDEX_BUILT
+    if _DEVICE_INDEX_BUILT:
+        return
+    metas = _engine.list_entities("devices", limit=5000)
+    for meta in metas:
+        entity = _engine.read_entity("devices", meta["entity_id"])
+        if not entity or not entity.get("latest"):
+            continue
+        latest = entity["latest"]
+        uid = latest.get("user_id", "")
+        dh = latest.get("device_hash", "")
+        if uid and dh:
+            _DEVICE_INDEX[f"{uid}|{dh}"] = meta["entity_id"]
+    _DEVICE_INDEX_BUILT = True
+
+
 def register_device(
     user_id: str, device_hash: str, ip_address: str = None,
     user_agent: str = None, location: str = None
@@ -356,28 +385,24 @@ def register_device(
     """Register a device, or update an existing device's last-seen metadata."""
     now = datetime.now(timezone.utc).isoformat()
 
-    # Deduplicate by (user_id, device_hash) so alerting is accurate.
-    metas = _engine.list_entities("devices", limit=5000)
-    for meta in metas:
-        entity = _engine.read_entity("devices", meta["entity_id"])
-        if not entity or not entity.get("latest"):
-            continue
-        latest = entity["latest"]
-        if latest.get("user_id") != user_id:
-            continue
-        if latest.get("device_hash") != device_hash:
-            continue
-
-        updated = {
-            **latest,
-            "ip_address": ip_address,
-            "user_agent": user_agent or latest.get("user_agent"),
-            "location": location,
-            "last_seen": now,
-            "is_new": False,
-        }
-        _engine.append_record("devices", meta["entity_id"], updated)
-        return {"id": meta["entity_id"], **updated}
+    # Use cached index for O(1) lookup instead of full-table scan
+    _ensure_device_index()
+    idx_key = f"{user_id}|{device_hash}"
+    cached_eid = _DEVICE_INDEX.get(idx_key)
+    if cached_eid:
+        entity = _engine.read_entity("devices", cached_eid)
+        if entity and entity.get("latest"):
+            latest = entity["latest"]
+            updated = {
+                **latest,
+                "ip_address": ip_address,
+                "user_agent": user_agent or latest.get("user_agent"),
+                "location": location,
+                "last_seen": now,
+                "is_new": False,
+            }
+            _engine.append_record("devices", cached_eid, updated)
+            return {"id": cached_eid, **updated}
 
     device_id = str(uuid.uuid4())
     data = {
@@ -393,6 +418,7 @@ def register_device(
     }
 
     _engine.create_entity("devices", device_id, data)
+    _DEVICE_INDEX[idx_key] = device_id
     return {"id": device_id, **data}
 
 
@@ -400,26 +426,42 @@ def register_device(
 # AUTH-RELATED USER OPERATIONS
 # =============================================================================
 
-def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
-    """Find a user by email address."""
+def _ensure_email_index():
+    """Lazily populate the email → user entity_id index."""
+    global _EMAIL_INDEX_BUILT
+    if _EMAIL_INDEX_BUILT:
+        return
     metas = _engine.list_entities("users", limit=10000)
     for meta in metas:
         entity = _engine.read_entity("users", meta["entity_id"])
         if entity and entity.get("latest"):
-            latest = entity["latest"]
-            if latest.get("email") == email:
-                return {
-                    "id": meta["entity_id"],
-                    "name": latest.get("name", ""),
-                    "email": latest.get("email"),
-                    "role": latest.get("role", "hunter"),
-                    "password_hash": latest.get("password_hash"),
-                    "total_bounties": latest.get("total_bounties", 0),
-                    "total_earnings": latest.get("total_earnings", 0.0),
-                    "created_at": latest.get("created_at", ""),
-                    "last_active": latest.get("last_active", ""),
-                }
-    return None
+            em = entity["latest"].get("email")
+            if em:
+                _EMAIL_INDEX[em] = meta["entity_id"]
+    _EMAIL_INDEX_BUILT = True
+
+
+def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
+    """Find a user by email address (uses cached index after first call)."""
+    _ensure_email_index()
+    entity_id = _EMAIL_INDEX.get(email)
+    if not entity_id:
+        return None
+    entity = _engine.read_entity("users", entity_id)
+    if not entity or not entity.get("latest"):
+        return None
+    latest = entity["latest"]
+    return {
+        "id": entity_id,
+        "name": latest.get("name", ""),
+        "email": latest.get("email"),
+        "role": latest.get("role", "hunter"),
+        "password_hash": latest.get("password_hash"),
+        "total_bounties": latest.get("total_bounties", 0),
+        "total_earnings": latest.get("total_earnings", 0.0),
+        "created_at": latest.get("created_at", ""),
+        "last_active": latest.get("last_active", ""),
+    }
 
 
 def update_user_password(user_id: str, password_hash: str):
@@ -726,7 +768,8 @@ def get_storage_health() -> Dict[str, Any]:
             else:
                 reasons.append(f"Storage root missing or inaccessible: {root}")
         except Exception as e:
-            reasons.append(f"Storage engine error: {str(e)}")
+            logger.error("Storage engine error during health check: %s", e)
+            reasons.append(f"Storage engine error: {type(e).__name__}")
 
     # db_active mirrors storage_active (HDD engine IS the database)
     db_active = storage_active

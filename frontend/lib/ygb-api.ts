@@ -10,13 +10,14 @@ const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
 /**
  * Centralized fetch wrapper that includes Authorization header.
  * Uses unified token lookup from auth-token.ts.
+ * Enforces cache: "no-store" for critical freshness — no stale caching.
  */
 export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
   const headers = buildAuthHeaders(
     options.headers as Record<string, string> || {}
   );
 
-  return fetch(url, { ...options, headers });
+  return fetch(url, { ...options, headers, cache: "no-store" });
 }
 
 // ============== TYPES ==============
@@ -277,5 +278,23 @@ export async function getBackupStatus(): Promise<BackupStatus> {
 export async function getRolloutMetrics(): Promise<RolloutMetrics> {
   const res = await authFetch(`${API_BASE}/api/rollout/metrics`);
   if (!res.ok) throw new Error("Failed to fetch rollout metrics");
+  return res.json();
+}
+
+// ============== USER PROFILE ==============
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  github_login?: string;
+  avatar_url?: string;
+  auth_provider?: string;
+}
+
+export async function getUserProfile(): Promise<UserProfile> {
+  const res = await authFetch(`${API_BASE}/api/user/profile`);
+  if (!res.ok) throw new Error("Failed to fetch user profile");
   return res.json();
 }

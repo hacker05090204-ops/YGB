@@ -49,7 +49,7 @@ def get_training_progress() -> dict:
         logger.error("Failed to read telemetry: %s", e)
         return {
             "status": "error",
-            "message": f"Cannot read telemetry: {e}",
+            "message": "Telemetry data unavailable — check server logs",
             "stalled": False,
         }
 

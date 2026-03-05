@@ -5,8 +5,6 @@
  * Records element changes, attribute mutations, text modifications.
  */
 
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 

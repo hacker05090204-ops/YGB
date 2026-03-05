@@ -9,11 +9,7 @@
  *   - Severity labels user-assigned only
  */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
 #include <ctime>
-
 
 // =========================================================================
 // CONSTANTS

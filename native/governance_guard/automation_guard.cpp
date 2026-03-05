@@ -11,7 +11,6 @@
  */
 
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
@@ -103,8 +102,8 @@ public:
   ActionResult request_submission(const char *platform, const char *report_id) {
     char desc[MAX_ACTION_DESC];
     std::snprintf(desc, sizeof(desc),
-             "BLOCKED: Auto-submission attempt to %s (report: %s)", platform,
-             report_id);
+                  "BLOCKED: Auto-submission attempt to %s (report: %s)",
+                  platform, report_id);
     std::fprintf(stderr, "[GOVERNANCE] %s\n", desc);
     return log_action(ActionType::REPORT_SUBMIT_ATTEMPT, ActionResult::BLOCKED,
                       "system", desc, false);
@@ -112,8 +111,8 @@ public:
 
   ActionResult request_authority_unlock(const char *authority_type) {
     char desc[MAX_ACTION_DESC];
-    std::snprintf(desc, sizeof(desc), "BLOCKED: Authority unlock request for '%s'",
-             authority_type);
+    std::snprintf(desc, sizeof(desc),
+                  "BLOCKED: Authority unlock request for '%s'", authority_type);
     std::fprintf(stderr, "[GOVERNANCE] %s\n", desc);
     return log_action(ActionType::AUTHORITY_REQUEST, ActionResult::BLOCKED,
                       "system", desc, false);
@@ -128,7 +127,7 @@ public:
                                     const char *hash) {
     char desc[MAX_ACTION_DESC];
     std::snprintf(desc, sizeof(desc), "Evidence captured: %s (hash: %.16s...)",
-             evidence_type, hash);
+                  evidence_type, hash);
     return log_action(ActionType::EVIDENCE_CAPTURE, ActionResult::ALLOWED,
                       "system", desc, true);
   }
@@ -147,8 +146,8 @@ public:
                                         bool user_approved) {
     char desc[MAX_ACTION_DESC];
     if (!user_approved) {
-      std::snprintf(desc, sizeof(desc), "BLOCKED: Target '%s' not user-approved",
-               domain);
+      std::snprintf(desc, sizeof(desc),
+                    "BLOCKED: Target '%s' not user-approved", domain);
       return log_action(ActionType::TARGET_SELECT, ActionResult::BLOCKED,
                         "system", desc, false);
     }

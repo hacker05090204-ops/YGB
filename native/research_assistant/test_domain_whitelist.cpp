@@ -3,10 +3,8 @@
  */
 
 #include <cassert>
-#include <cctype>
 #include <cstdio>
 #include <cstring>
-
 
 // =========================================================================
 // Inline from edge_search.cpp

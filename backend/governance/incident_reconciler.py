@@ -59,13 +59,15 @@ def _load_json_file(path: Path) -> Optional[dict]:
 
 
 def _find_incident_files(reports_dir: Path) -> List[Path]:
-    """Find all incident-related files in the reports directory."""
+    """Find all incident-related files in the reports directory (recursive)."""
     incidents = []
     if not reports_dir.exists():
         return incidents
+    # Search recursively so incidents under reports/incidents/ are found
     for pattern in ["incident*.json", "incidents*.json", "incident_log*.json"]:
-        incidents.extend(reports_dir.glob(pattern))
-    return incidents
+        incidents.extend(reports_dir.rglob(pattern))
+    # Deduplicate (rglob may overlap with direct matches)
+    return list(set(incidents))
 
 
 def reconcile(

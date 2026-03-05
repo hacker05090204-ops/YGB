@@ -12,7 +12,7 @@ import { createAuthWebSocket } from '@/lib/ws-auth';
  * - GPU utilization meter
  * - Loss/Accuracy graph (canvas)
  * - Epoch progress bar
- * - 10s stall detection
+ * - 5s stall detection
  */
 
 interface TelemetryFrame {
@@ -21,15 +21,16 @@ interface TelemetryFrame {
     total_batches: number;
     samples_processed: number;
     total_samples: number;
-    samples_per_sec: number;
-    gpu_utilization: number;
-    gpu_memory_mb: number;
-    gpu_temp: number;
-    loss: number;
-    running_accuracy: number;
-    learning_rate: number;
-    eta_seconds: number;
+    samples_per_sec: number | null;
+    gpu_utilization: number | null;
+    gpu_memory_mb: number | null;
+    gpu_temp: number | null;
+    loss: number | null;
+    running_accuracy: number | null;
+    learning_rate: number | null;
+    eta_seconds: number | null;
     stalled: boolean;
+    sequence_id: number;
     timestamp: string;
 }
 
@@ -112,10 +113,10 @@ export default function LiveTrainingPanel() {
                         try {
                             const d: TelemetryFrame = JSON.parse(e.data);
                             setFrame(d);
-                            setHistory(p => [...p.slice(-200), { loss: d.loss, accuracy: d.running_accuracy }]);
+                            setHistory(p => [...p.slice(-200), { loss: d.loss ?? 0, accuracy: d.running_accuracy ?? 0 }]);
                             setStalled(d.stalled);
                             if (timer.current) clearTimeout(timer.current);
-                            timer.current = setTimeout(() => setStalled(true), 10000);
+                            timer.current = setTimeout(() => setStalled(true), 5000);
                         } catch { /* skip */ }
                     },
                     () => ws?.close(),
@@ -154,7 +155,7 @@ export default function LiveTrainingPanel() {
         );
     }
 
-    const gpuPct = Math.min(frame.gpu_utilization * 100, 100);
+    const gpuPct = Math.min((frame.gpu_utilization ?? 0) * 100, 100);
     const gpuColor = gpuPct > 90 ? '#ef4444' : gpuPct > 70 ? '#f59e0b' : '#10b981';
     const batchPct = frame.total_batches > 0 ? (frame.batch / frame.total_batches) * 100 : 0;
 
@@ -172,15 +173,15 @@ export default function LiveTrainingPanel() {
             {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px' }}>
                 <div style={stat}>
-                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#00e5ff' }}>{formatSPS(frame.samples_per_sec)}</div>
+                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#00e5ff' }}>{frame.samples_per_sec != null ? formatSPS(frame.samples_per_sec) : '—'}</div>
                     <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px' }}>Samples/sec</div>
                 </div>
                 <div style={stat}>
-                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#f59e0b' }}>{formatETA(frame.eta_seconds)}</div>
+                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#f59e0b' }}>{frame.eta_seconds != null ? formatETA(frame.eta_seconds) : '—'}</div>
                     <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px' }}>ETA</div>
                 </div>
                 <div style={stat}>
-                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#10b981' }}>{(frame.running_accuracy * 100).toFixed(1)}%</div>
+                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#10b981' }}>{frame.running_accuracy != null ? `${(frame.running_accuracy * 100).toFixed(1)}%` : '—'}</div>
                     <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '4px' }}>Accuracy</div>
                 </div>
             </div>
@@ -200,7 +201,7 @@ export default function LiveTrainingPanel() {
             <div style={{ marginBottom: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#9ca3af' }}>
                     <span>GPU</span>
-                    <span>{gpuPct.toFixed(0)}% | {frame.gpu_temp.toFixed(0)}°C | {frame.gpu_memory_mb.toFixed(0)}MB</span>
+                    <span>{gpuPct.toFixed(0)}% | {frame.gpu_temp != null ? `${frame.gpu_temp.toFixed(0)}°C` : '—'} | {frame.gpu_memory_mb != null ? `${frame.gpu_memory_mb.toFixed(0)}MB` : '—'}</span>
                 </div>
                 <div style={{ width: '100%', height: '6px', background: '#1e293b', borderRadius: '3px', overflow: 'hidden', marginTop: '4px' }}>
                     <div style={{ width: `${gpuPct}%`, height: '100%', background: gpuColor, borderRadius: '3px', transition: 'width 0.5s' }} />
@@ -212,8 +213,8 @@ export default function LiveTrainingPanel() {
 
             {/* Footer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#6b7280', marginTop: '8px' }}>
-                <span>LR: {frame.learning_rate.toExponential(2)}</span>
-                <span>Loss: {frame.loss.toFixed(4)}</span>
+                <span>LR: {frame.learning_rate != null ? frame.learning_rate.toExponential(2) : '—'}</span>
+                <span>Loss: {frame.loss != null ? frame.loss.toFixed(4) : '—'}</span>
                 <span>{frame.samples_processed.toLocaleString()} / {frame.total_samples.toLocaleString()}</span>
             </div>
         </div>

@@ -112,11 +112,11 @@ export default function Home() {
 
   const wsRef = useRef<WebSocket | null>(null)
 
-  // Check API
+  // Check API — use plain fetch, health endpoint requires no auth
   useEffect(() => {
     async function checkAPI() {
       try {
-        const res = await authFetch(`${API_BASE}/api/health`)
+        const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
         if (res.ok) {
           setApiStatus("online")
         } else {

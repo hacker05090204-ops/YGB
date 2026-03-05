@@ -10,10 +10,8 @@
 
 #include <cctype>
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
-
 
 // =========================================================================
 // CONSTANTS
@@ -189,7 +187,7 @@ public:
       result.status = ScopeStatus::SCOPE_NOT_SET;
       result.allowed = false;
       std::snprintf(result.reason, sizeof(result.reason),
-               "No scope rules defined — scope must be set first");
+                    "No scope rules defined — scope must be set first");
       return result;
     }
 
@@ -199,7 +197,8 @@ public:
     if (!extract_domain(url, domain, MAX_DOMAIN_LENGTH)) {
       result.status = ScopeStatus::INVALID_URL;
       result.allowed = false;
-      std::snprintf(result.reason, sizeof(result.reason), "Cannot parse domain");
+      std::snprintf(result.reason, sizeof(result.reason),
+                    "Cannot parse domain");
       return result;
     }
 
@@ -220,11 +219,12 @@ public:
         match = wildcard_domain_match(r.domain, domain);
         break;
       case ScopeRuleType::PATH_PREFIX:
-        match =
-            (std::strcmp(domain, r.domain) == 0) && path_prefix_match(r.path, path);
+        match = (std::strcmp(domain, r.domain) == 0) &&
+                path_prefix_match(r.path, path);
         break;
       case ScopeRuleType::PATH_EXACT:
-        match = (std::strcmp(domain, r.domain) == 0) && (std::strcmp(path, r.path) == 0);
+        match = (std::strcmp(domain, r.domain) == 0) &&
+                (std::strcmp(path, r.path) == 0);
         break;
       case ScopeRuleType::URL_PATTERN:
         match = wildcard_domain_match(r.domain, domain) &&
@@ -236,8 +236,8 @@ public:
         result.status = ScopeStatus::IN_SCOPE;
         result.allowed = true;
         result.matched_rule_index = i;
-        std::snprintf(result.reason, sizeof(result.reason), "Matched rule %d: %s%s",
-                 i, r.domain, r.path);
+        std::snprintf(result.reason, sizeof(result.reason),
+                      "Matched rule %d: %s%s", i, r.domain, r.path);
         return result;
       }
     }
@@ -245,7 +245,7 @@ public:
     result.status = ScopeStatus::OUT_OF_SCOPE;
     result.allowed = false;
     std::snprintf(result.reason, sizeof(result.reason),
-             "URL '%s' does not match any approved scope rule", url);
+                  "URL '%s' does not match any approved scope rule", url);
     return result;
   }
 

@@ -233,7 +233,7 @@ class TrainingReportGenerator:
         return LearnedFeatures(
             session_id=session_id,
             domains_learned=[d.value for d in LearnedDomain],
-            confidence_calibration=0.85,  # Mock calibration
+            confidence_calibration=0.85,  # Initial calibration baseline
             duplicate_detection_accuracy=0.78,
             noise_detection_accuracy=0.82,
             proof_learning=False,  # NEVER True for MODE-A

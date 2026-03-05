@@ -13,7 +13,7 @@ import { createAuthWebSocket } from '@/lib/ws-auth';
  * - ETA per field
  * - World Size
  * - Auto Mode indicator
- * - 10s stall detection
+ * - 5s stall detection
  */
 
 interface FieldInfo {
@@ -27,19 +27,20 @@ interface FieldInfo {
 interface DashboardFrame {
     active_field: string;
     queue: FieldInfo[];
-    gpu_utilization: number;
-    gpu_temp: number;
-    vram_used_mb: number;
-    samples_per_sec: number;
-    eta_seconds: number;
+    gpu_utilization: number | null;
+    gpu_temp: number | null;
+    vram_used_mb: number | null;
+    samples_per_sec: number | null;
+    eta_seconds: number | null;
     epoch: number;
     total_epochs: number;
     world_size: number;
     auto_mode: boolean;
-    loss: number;
-    accuracy: number;
+    loss: number | null;
+    accuracy: number | null;
     stalled: boolean;
     mode: string;
+    sequence_id: number;
     timestamp: string;
 }
 
@@ -104,12 +105,12 @@ export default function AutoTrainingDashboard() {
                         try {
                             const d: DashboardFrame = JSON.parse(e.data);
                             setFrame(d);
-                            setGpuHistory(p => [...p.slice(-100), d.gpu_utilization * 100]);
-                            setSpsHistory(p => [...p.slice(-100), d.samples_per_sec]);
+                            setGpuHistory(p => [...p.slice(-100), (d.gpu_utilization ?? 0) * 100]);
+                            setSpsHistory(p => [...p.slice(-100), d.samples_per_sec ?? 0]);
                             if (timer.current) clearTimeout(timer.current);
                             timer.current = setTimeout(() => {
                                 setFrame(prev => prev ? { ...prev, stalled: true } : null);
-                            }, 10000);
+                            }, 5000);
                         } catch { /* skip */ }
                     },
                     () => ws?.close(),
@@ -170,9 +171,9 @@ export default function AutoTrainingDashboard() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '8px', marginBottom: '12px' }}>
                 {[
                     { label: 'Field', value: frame.active_field || '—', color: '#a78bfa' },
-                    { label: 'ETA', value: formatETA(frame.eta_seconds), color: '#f59e0b' },
+                    { label: 'ETA', value: frame.eta_seconds != null ? formatETA(frame.eta_seconds) : '—', color: '#f59e0b' },
                     { label: 'World', value: `${frame.world_size}`, color: '#00e5ff' },
-                    { label: 'Acc', value: `${(frame.accuracy * 100).toFixed(1)}%`, color: '#10b981' },
+                    { label: 'Acc', value: frame.accuracy != null ? `${(frame.accuracy * 100).toFixed(1)}%` : '—', color: '#10b981' },
                 ].map(s => (
                     <div key={s.label} style={{ background: '#1a1f2e', borderRadius: '6px', padding: '8px', textAlign: 'center' }}>
                         <div style={{ fontSize: '16px', fontWeight: 700, color: s.color }}>{s.value}</div>
@@ -209,7 +210,7 @@ export default function AutoTrainingDashboard() {
 
             {/* Footer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#6b7280' }}>
-                <span>Loss: {frame.loss.toFixed(4)}</span>
+                <span>Loss: {frame.loss != null ? frame.loss.toFixed(4) : '—'}</span>
                 <span>E{frame.epoch}/{frame.total_epochs}</span>
                 <span>{connected ? '● Live' : '○'}</span>
             </div>

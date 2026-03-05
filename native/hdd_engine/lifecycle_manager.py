@@ -301,9 +301,10 @@ class LifecycleManager:
                             "reason": "Wipe verification failed",
                         })
                 except Exception as e:
+                    logger.error("Sweep wipe failed for %s/%s: %s", entity_type, entity_id, e)
                     results["errors"].append({
                         "entity": f"{entity_type}/{entity_id}",
-                        "reason": str(e),
+                        "reason": "Wipe failed — check server logs",
                     })
 
         # Log sweep result

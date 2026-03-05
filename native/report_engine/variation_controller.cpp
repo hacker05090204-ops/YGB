@@ -6,8 +6,6 @@
  * NO AI generation — just structured word substitution.
  */
 
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
