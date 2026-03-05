@@ -7,7 +7,6 @@
  */
 
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 
 // =========================================================================
@@ -89,8 +88,9 @@ public:
 
     std::strncpy(est.domain, domain ? domain : "", sizeof(est.domain) - 1);
     std::strncpy(est.program_name, program_name ? program_name : "",
-            sizeof(est.program_name) - 1);
-    std::strncpy(est.platform, platform ? platform : "", sizeof(est.platform) - 1);
+                 sizeof(est.program_name) - 1);
+    std::strncpy(est.platform, platform ? platform : "",
+                 sizeof(est.platform) - 1);
 
     est.scope_size = scope_size;
     est.api_endpoint_count = api_endpoint_count;
@@ -146,12 +146,12 @@ public:
     }
 
     std::snprintf(est.analysis, sizeof(est.analysis),
-             "%s: %d scope items, %d API endpoints, %d wildcards. "
-             "Difficulty: %s. Estimated likelihood: %.0f%%. "
-             "Bounty range: $%d - $%d.",
-             est.domain, scope_size, api_endpoint_count, wildcard_count,
-             diff_label, likelihood, est.bounty_range.min_usd,
-             est.bounty_range.max_usd);
+                  "%s: %d scope items, %d API endpoints, %d wildcards. "
+                  "Difficulty: %s. Estimated likelihood: %.0f%%. "
+                  "Bounty range: $%d - $%d.",
+                  est.domain, scope_size, api_endpoint_count, wildcard_count,
+                  diff_label, likelihood, est.bounty_range.min_usd,
+                  est.bounty_range.max_usd);
 
     return est;
   }

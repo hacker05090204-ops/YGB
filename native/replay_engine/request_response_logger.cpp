@@ -5,8 +5,6 @@
  * Content is truncated to prevent memory abuse.
  */
 
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
@@ -77,7 +75,8 @@ public:
     p.elapsed_ms = elapsed_ms;
 
     std::strncpy(p.url, url ? url : "", MAX_URL - 1);
-    std::strncpy(p.request_headers, req_headers ? req_headers : "", MAX_HEADERS - 1);
+    std::strncpy(p.request_headers, req_headers ? req_headers : "",
+                 MAX_HEADERS - 1);
 
     // Truncate body to prevent abuse
     int safe_req = req_len < MAX_BODY - 1 ? req_len : MAX_BODY - 1;
@@ -86,7 +85,7 @@ public:
     p.request_body_length = safe_req;
 
     std::strncpy(p.response_headers, resp_headers ? resp_headers : "",
-            MAX_HEADERS - 1);
+                 MAX_HEADERS - 1);
 
     int safe_resp = resp_len < MAX_BODY - 1 ? resp_len : MAX_BODY - 1;
     if (resp_body && safe_resp > 0)

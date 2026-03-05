@@ -6,12 +6,10 @@
  *             parameter, state_delta, screenshot_hash, video_frame_hash
  */
 
-#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
-
 
 // =========================================================================
 // CONSTANTS
@@ -193,16 +191,17 @@ public:
 
     std::strncpy(s.request, request ? request : "", MAX_FIELD_LENGTH - 1);
     std::strncpy(s.response, response ? response : "", MAX_FIELD_LENGTH - 1);
-    std::strncpy(s.dom_change, dom_change ? dom_change : "", MAX_FIELD_LENGTH - 1);
+    std::strncpy(s.dom_change, dom_change ? dom_change : "",
+                 MAX_FIELD_LENGTH - 1);
     std::strncpy(s.payload, payload ? payload : "", MAX_FIELD_LENGTH - 1);
     std::strncpy(s.endpoint, endpoint ? endpoint : "", MAX_FIELD_LENGTH - 1);
     std::strncpy(s.parameter, parameter ? parameter : "", MAX_FIELD_LENGTH - 1);
     std::strncpy(s.state_delta, state_delta ? state_delta : "",
-            MAX_FIELD_LENGTH - 1);
+                 MAX_FIELD_LENGTH - 1);
     std::strncpy(s.screenshot_hash, screenshot_hash ? screenshot_hash : "",
-            MAX_HASH_HEX - 1);
+                 MAX_HASH_HEX - 1);
     std::strncpy(s.video_frame_hash, video_frame_hash ? video_frame_hash : "",
-            MAX_HASH_HEX - 1);
+                 MAX_HASH_HEX - 1);
     std::strncpy(s.previous_hash, last_hash_, MAX_HASH_HEX - 1);
 
     compute_step_hash(s);

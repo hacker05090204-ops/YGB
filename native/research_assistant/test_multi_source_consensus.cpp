@@ -3,10 +3,8 @@
  */
 
 #include <cassert>
-#include <cctype>
 #include <cstdio>
 #include <cstring>
-
 
 // =========================================================================
 // Inline types from edge_search.cpp for isolated testing

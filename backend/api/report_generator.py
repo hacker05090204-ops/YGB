@@ -33,7 +33,7 @@ logger = logging.getLogger("ygb.report_generator")
 
 def _get_db_path() -> str:
     """Resolve SQLite path from DATABASE_URL env var."""
-    url = os.environ.get("DATABASE_URL", "sqlite:///D:/ygb_data/ygb.db")
+    url = os.environ.get("DATABASE_URL", "sqlite:///C:/ygb_data/ygb.db")
     return url.replace("sqlite:///", "")
 
 

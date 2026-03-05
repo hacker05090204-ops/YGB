@@ -455,6 +455,10 @@ class BridgeIngestionWorker:
             },
         }
 
+        # Canonicalize: add signed fields for DatasetManifest compatibility
+        from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+        canonicalize_manifest(manifest)
+
         try:
             with open(_MANIFEST_PATH, "w") as f:
                 json.dump(manifest, f, indent=2)

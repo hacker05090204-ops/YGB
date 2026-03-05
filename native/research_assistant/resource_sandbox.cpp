@@ -17,7 +17,22 @@
 #include <ctime>
 
 #ifdef _WIN32
-#include <windows.h>
+// Forward-declare the minimal Windows API surface needed (OpenProcess,
+// TerminateProcess, CloseHandle) instead of including <windows.h>, which
+// pulls in <intrin.h> and triggers a clang builtin-redefinition error for
+// __rdtsc.
+extern "C" {
+typedef void *HANDLE;
+typedef unsigned long DWORD;
+typedef int BOOL;
+#ifndef FALSE
+#define FALSE 0
+#endif
+#define PROCESS_TERMINATE 0x0001
+__declspec(dllimport) HANDLE __stdcall OpenProcess(DWORD, BOOL, DWORD);
+__declspec(dllimport) BOOL __stdcall TerminateProcess(HANDLE, unsigned int);
+__declspec(dllimport) BOOL __stdcall CloseHandle(HANDLE);
+}
 #else
 #include <signal.h>
 #include <sys/resource.h>

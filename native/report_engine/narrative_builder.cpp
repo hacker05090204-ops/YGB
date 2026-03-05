@@ -6,9 +6,7 @@
  */
 
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
-#include <ctime>
 
 // =========================================================================
 // CONSTANTS
@@ -87,23 +85,24 @@ public:
 
     // Title
     std::snprintf(out.title, sizeof(out.title), title_template, vuln.vuln_type,
-             vuln.endpoint, vuln.parameter);
+                  vuln.endpoint, vuln.parameter);
 
     // Summary
-    std::snprintf(out.summary, sizeof(out.summary), summary_template, vuln.endpoint,
-             vuln.vuln_type, vuln.parameter, vuln.impact_description);
+    std::snprintf(out.summary, sizeof(out.summary), summary_template,
+                  vuln.endpoint, vuln.vuln_type, vuln.parameter,
+                  vuln.impact_description);
 
     // Affected endpoint
     std::snprintf(out.affected_endpoint, sizeof(out.affected_endpoint), "%s",
-             vuln.endpoint);
+                  vuln.endpoint);
 
     // Parameter
     std::snprintf(out.parameter, sizeof(out.parameter), "%s", vuln.parameter);
 
     // Reproduction steps
     std::snprintf(out.reproduction_steps, sizeof(out.reproduction_steps),
-             repro_template, vuln.endpoint, vuln.parameter, vuln.payload,
-             vuln.observed_response);
+                  repro_template, vuln.endpoint, vuln.parameter, vuln.payload,
+                  vuln.observed_response);
 
     // Technical explanation (from recorded root cause)
     std::snprintf(
@@ -116,34 +115,37 @@ public:
 
     // Impact (observable only)
     std::snprintf(out.impact, sizeof(out.impact), impact_template,
-             vuln.impact_description, vuln.observed_response);
+                  vuln.impact_description, vuln.observed_response);
 
     // Scope confirmation
     std::snprintf(out.scope_confirmation, sizeof(out.scope_confirmation),
-             "This finding is within the approved scope: %s. "
-             "The affected endpoint %s is part of the target application.",
-             vuln.scope_domain, vuln.endpoint);
+                  "This finding is within the approved scope: %s. "
+                  "The affected endpoint %s is part of the target application.",
+                  vuln.scope_domain, vuln.endpoint);
 
     // Evidence list
     int pos = 0;
-    pos += std::snprintf(out.evidence_list + pos, sizeof(out.evidence_list) - pos,
-                    "Attached Evidence:\n");
+    pos +=
+        std::snprintf(out.evidence_list + pos, sizeof(out.evidence_list) - pos,
+                      "Attached Evidence:\n");
     for (int i = 0;
          i < evidence_count_ && pos < (int)sizeof(out.evidence_list) - 128;
          i++) {
-      pos += std::snprintf(out.evidence_list + pos, sizeof(out.evidence_list) - pos,
-                      "  %d. [%s] %s (hash: %.16s...)\n", i + 1,
-                      evidence_[i].type, evidence_[i].path, evidence_[i].hash);
+      pos += std::snprintf(
+          out.evidence_list + pos, sizeof(out.evidence_list) - pos,
+          "  %d. [%s] %s (hash: %.16s...)\n", i + 1, evidence_[i].type,
+          evidence_[i].path, evidence_[i].hash);
     }
 
     // Remediation
-    std::snprintf(out.remediation, sizeof(out.remediation), remediation_template,
-             vuln.parameter);
+    std::snprintf(out.remediation, sizeof(out.remediation),
+                  remediation_template, vuln.parameter);
 
-    out.total_length = (int)(std::strlen(out.title) + std::strlen(out.summary) +
-                             std::strlen(out.reproduction_steps) +
-                             std::strlen(out.technical_explanation) +
-                             std::strlen(out.impact) + std::strlen(out.remediation));
+    out.total_length =
+        (int)(std::strlen(out.title) + std::strlen(out.summary) +
+              std::strlen(out.reproduction_steps) +
+              std::strlen(out.technical_explanation) + std::strlen(out.impact) +
+              std::strlen(out.remediation));
     out.valid = (out.total_length > 100);
     return out;
   }

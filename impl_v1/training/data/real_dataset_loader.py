@@ -1030,6 +1030,10 @@ class IngestionPipelineDataset(Dataset):
             "frozen_at": __import__("datetime").datetime.now().isoformat(),
         }
 
+        # Canonicalize: add signed fields for DatasetManifest compatibility
+        from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+        canonicalize_manifest(manifest)
+
         with open(manifest_path, "w") as f:
             json.dump(manifest, f, indent=2)
 
@@ -1266,6 +1270,10 @@ def generate_dataset_manifest() -> dict:
             "per_field_deficits": per_field_deficits,
             "updated_at": __import__("datetime").datetime.now().isoformat(),
         }
+
+        # Canonicalize: add signed fields for DatasetManifest compatibility
+        from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+        canonicalize_manifest(manifest)
 
         # Write to disk
         _SECURE_DATA.mkdir(parents=True, exist_ok=True)

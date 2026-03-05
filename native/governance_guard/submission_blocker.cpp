@@ -9,7 +9,6 @@
  */
 
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 
@@ -81,9 +80,9 @@ public:
     if (type == ExportType::NETWORK_SUBMIT) {
       log_attempt(type, ExportStatus::BLOCKED, report_id, destination, false,
                   "BLOCKED: Network submission permanently disabled");
-      std::fprintf(stderr,
-              "[SUBMISSION BLOCKER] Network submit BLOCKED for report %s\n",
-              report_id);
+      std::fprintf(
+          stderr, "[SUBMISSION BLOCKER] Network submit BLOCKED for report %s\n",
+          report_id);
       return ExportStatus::BLOCKED;
     }
 
@@ -107,9 +106,10 @@ public:
     log_attempt(ExportType::NETWORK_SUBMIT, ExportStatus::BLOCKED, report_id,
                 dest, false,
                 "BLOCKED: Auto-submission to external platform is prohibited");
-    std::fprintf(stderr,
-            "[SUBMISSION BLOCKER] Auto-submit to '%s' BLOCKED (report: %s)\n",
-            platform, report_id);
+    std::fprintf(
+        stderr,
+        "[SUBMISSION BLOCKER] Auto-submit to '%s' BLOCKED (report: %s)\n",
+        platform, report_id);
     return ExportStatus::BLOCKED;
   }
 

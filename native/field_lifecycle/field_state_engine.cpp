@@ -11,7 +11,6 @@
  *   - Atomic state persistence (temp→fsync→rename)
  */
 
-#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>

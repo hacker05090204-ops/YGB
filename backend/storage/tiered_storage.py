@@ -33,7 +33,7 @@ logger = logging.getLogger("tiered_storage")
 _GB = 1024 ** 3
 _MB = 1024 ** 2
 
-SSD_ROOT = Path(os.environ.get("YGB_SSD_ROOT", "D:/ygb_data"))
+SSD_ROOT = Path(os.environ.get("YGB_SSD_ROOT", "C:/ygb_data"))
 HDD_ROOT = Path(os.environ.get("YGB_HDD_ROOT", "D:/ygb_hdd"))
 HDD_BACKUP = Path(os.environ.get("DATABASE_BACKUP_PATH", "D:/ygb_data/ygb.db")).parent
 

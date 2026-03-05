@@ -138,3 +138,13 @@ class TestNoMockDataInFrontend:
             content = dt_path.read_text(errors="ignore")
             assert "some random text" not in content, \
                 "data-table.tsx still contains placeholder text"
+
+    def test_no_hardcoded_default_user_profile(self):
+        """Frontend hooks must not contain hardcoded default user profiles."""
+        hook_path = PROJECT_ROOT / "frontend" / "hooks" / "use-auth-user.ts"
+        if hook_path.exists():
+            content = hook_path.read_text(errors="ignore")
+            assert "BugHunter_01" not in content, \
+                "use-auth-user.ts still has hardcoded BugHunter_01 default"
+            assert "hunter@bugbounty.com" not in content, \
+                "use-auth-user.ts still has hardcoded hunter@bugbounty.com default"

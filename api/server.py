@@ -28,7 +28,7 @@ from typing import Dict, List, Optional, Any
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse
+from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse, Response
 from pydantic import BaseModel
 
 # Centralized auth guard
@@ -1599,9 +1599,18 @@ async def start_g38_training(epochs: int = 0, user=Depends(require_auth)):
 # (Canonical — single definition per route. No duplicates.)
 # =============================================================================
 
+_gpu_seq_id = 0
+
 @app.get("/gpu/status")
 async def gpu_status(user=Depends(require_auth)):
-    """GPU status — real GPU info with nvidia-smi metrics."""
+    """GPU status — real GPU info with nvidia-smi metrics.
+
+    Returns null + error_reason for any field that cannot be read from
+    real hardware at runtime. Never returns fake zeros.
+    """
+    global _gpu_seq_id
+    _gpu_seq_id += 1
+
     result: Dict[str, Any] = {
         "gpu_available": False,
         "device_name": None,
@@ -1611,11 +1620,22 @@ async def gpu_status(user=Depends(require_auth)):
         "memory_total_mb": None,
         "temperature": None,
         "compute_capability": None,
+        "cuda_version": None,
+        "driver_version": None,
+        "tensor_core_support": None,
+        "error_reason": None,
+        "sequence_id": _gpu_seq_id,
+        "timestamp": datetime.now(UTC).isoformat(),
     }
     try:
         import torch
         if not torch.cuda.is_available():
-            return result
+            result["error_reason"] = "CUDA not available on this system"
+            return Response(
+                content=json.dumps(result),
+                media_type="application/json",
+                headers={"Cache-Control": "no-store"},
+            )
         result["gpu_available"] = True
         result["device_name"] = torch.cuda.get_device_name(0)
         result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
@@ -1624,14 +1644,19 @@ async def gpu_status(user=Depends(require_auth)):
         result["memory_total_mb"] = round(props.total_memory / 1024 / 1024, 2)
         cap = torch.cuda.get_device_capability(0)
         result["compute_capability"] = f"{cap[0]}.{cap[1]}"
-    except Exception:
-        pass
-    # nvidia-smi for utilization and temperature
+        # Tensor cores available on compute capability >= 7.0
+        result["tensor_core_support"] = cap[0] >= 7
+        # CUDA runtime version
+        result["cuda_version"] = torch.version.cuda
+    except Exception as e:
+        result["error_reason"] = f"torch GPU probe failed: {type(e).__name__}"
+
+    # nvidia-smi for utilization, temperature, and driver version
     try:
         import subprocess
         smi_output = subprocess.check_output(
             ["nvidia-smi",
-             "--query-gpu=utilization.gpu,temperature.gpu",
+             "--query-gpu=utilization.gpu,temperature.gpu,driver_version",
              "--format=csv,noheader,nounits"],
             timeout=5, text=True
         ).strip()
@@ -1639,9 +1664,17 @@ async def gpu_status(user=Depends(require_auth)):
         if len(parts) >= 2:
             result["utilization_percent"] = float(parts[0].strip())
             result["temperature"] = float(parts[1].strip())
-    except Exception:
-        pass
-    return result
+        if len(parts) >= 3:
+            result["driver_version"] = parts[2].strip()
+    except Exception as e:
+        if result["error_reason"] is None:
+            result["error_reason"] = f"nvidia-smi unavailable: {type(e).__name__}"
+
+    return Response(
+        content=json.dumps(result),
+        media_type="application/json",
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.get("/training/status")
@@ -1859,9 +1892,12 @@ async def training_progress(user=Depends(require_auth)):
     return metrics.to_dict()
 
 
+_stream_seq_id = 0
+
 @app.websocket("/training/stream")
 async def training_stream(websocket: WebSocket):
     """Live training telemetry stream for frontend dashboard."""
+    global _stream_seq_id
     user = await ws_authenticate(websocket)
     if not user:
         await websocket.close(code=4001, reason="Authentication required")
@@ -1885,8 +1921,11 @@ async def training_stream(websocket: WebSocket):
 
     try:
         while True:
+            _stream_seq_id += 1
             status = trainer.get_status()
             gpu_metrics = mgr.get_gpu_metrics()
+
+            is_training = bool(status.get("is_training", False))
 
             # Batch telemetry from real trainer internals (no synthetic values).
             total_batches = int(getattr(trainer, "_last_total_batches", 0) or 0)
@@ -1901,7 +1940,6 @@ async def training_stream(websocket: WebSocket):
                 unchanged_ticks = 0
             prev_samples_processed = samples_processed
 
-            is_training = bool(status.get("is_training", False))
             stalled = is_training and unchanged_ticks >= 10
 
             # GPU utilization fraction expected by frontend [0,1].
@@ -1918,22 +1956,36 @@ async def training_stream(websocket: WebSocket):
                 gpu_utilization = (
                     max(0.0, min(gpu_memory_used / gpu_memory_total, 1.0))
                     if gpu_memory_total > 0
-                    else 0.0
+                    else None
                 )
 
-            samples_per_sec = float(status.get("samples_per_sec", 0.0) or 0.0)
-            eta_seconds = 0.0
-            if is_training and total_samples > 0 and samples_per_sec > 0:
+            # When idle, return null for telemetry — no fake progress.
+            if is_training:
+                samples_per_sec = float(status.get("samples_per_sec", 0.0) or 0.0)
+                loss = float(status.get("last_loss", 0.0) or 0.0)
+                accuracy = float(status.get("last_accuracy", 0.0) or 0.0)
+                gpu_temp = float(gpu_metrics.get("temperature") or 0.0)
+                gpu_mem = float(status.get("gpu_mem_allocated_mb", 0.0) or 0.0)
+            else:
+                samples_per_sec = None
+                loss = None
+                accuracy = None
+                gpu_temp = float(gpu_metrics.get("temperature") or 0.0) if gpu_metrics.get("temperature") is not None else None
+                gpu_mem = None
+
+            eta_seconds = None
+            if is_training and total_samples > 0 and (samples_per_sec or 0) > 0:
                 remaining = max(total_samples - epoch_samples, 0)
                 eta_seconds = remaining / samples_per_sec
 
-            lr = 0.0
-            optimizer = getattr(trainer, "_gpu_optimizer", None)
-            try:
-                if optimizer and optimizer.param_groups:
-                    lr = float(optimizer.param_groups[0].get("lr", 0.0) or 0.0)
-            except Exception:
-                lr = 0.0
+            lr = None
+            if is_training:
+                optimizer = getattr(trainer, "_gpu_optimizer", None)
+                try:
+                    if optimizer and optimizer.param_groups:
+                        lr = float(optimizer.param_groups[0].get("lr", 0.0) or 0.0)
+                except Exception:
+                    lr = None
 
             frame = {
                 "epoch": int(status.get("epoch", 0) or 0),
@@ -1943,13 +1995,14 @@ async def training_stream(websocket: WebSocket):
                 "total_samples": total_samples,
                 "samples_per_sec": samples_per_sec,
                 "gpu_utilization": gpu_utilization,
-                "gpu_memory_mb": float(status.get("gpu_mem_allocated_mb", 0.0) or 0.0),
-                "gpu_temp": float(gpu_metrics.get("temperature") or 0.0),
-                "loss": float(status.get("last_loss", 0.0) or 0.0),
-                "running_accuracy": float(status.get("last_accuracy", 0.0) or 0.0),
+                "gpu_memory_mb": gpu_mem,
+                "gpu_temp": gpu_temp,
+                "loss": loss,
+                "running_accuracy": accuracy,
                 "learning_rate": lr,
                 "eta_seconds": eta_seconds,
                 "stalled": stalled,
+                "sequence_id": _stream_seq_id,
                 "timestamp": datetime.now(UTC).isoformat(),
             }
             await websocket.send_json(frame)
@@ -1961,6 +2014,165 @@ async def training_stream(websocket: WebSocket):
         try:
             await websocket.send_json({
                 "error": "Training stream failed",
+                "timestamp": datetime.now(UTC).isoformat(),
+            })
+        except Exception:
+            pass
+
+
+_dashboard_seq_id = 0
+
+@app.websocket("/training/dashboard")
+async def training_dashboard(websocket: WebSocket):
+    """Live training dashboard stream for auto-training-dashboard.tsx.
+
+    Emits DashboardFrame-shaped JSON at 1-second cadence.
+    Auth: Sec-WebSocket-Protocol bearer.<jwt> only (no query tokens).
+    Close 4001 on auth failure.
+    """
+    global _dashboard_seq_id
+    user = await ws_authenticate(websocket)
+    if not user:
+        await websocket.close(code=4001, reason="Authentication required")
+        return
+
+    # Accept with the bearer subprotocol so the browser sees the handshake
+    protocols = websocket.headers.get("sec-websocket-protocol", "")
+    accept_proto = None
+    for proto in protocols.split(","):
+        proto = proto.strip()
+        if proto.startswith("bearer."):
+            accept_proto = proto
+            break
+    await websocket.accept(subprotocol=accept_proto)
+
+    if not G38_AVAILABLE:
+        await websocket.send_json({
+            "error": "G38 modules not loaded",
+            "stalled": True,
+            "mode": "idle",
+            "timestamp": datetime.now(UTC).isoformat(),
+        })
+        await websocket.close(code=1011, reason="G38 unavailable")
+        return
+
+    trainer = get_auto_trainer()
+    mgr = get_training_state_manager()
+    prev_samples = -1
+    unchanged_ticks = 0
+
+    try:
+        while True:
+            _dashboard_seq_id += 1
+            status = trainer.get_status()
+            gpu_metrics = mgr.get_gpu_metrics()
+
+            is_training = bool(status.get("is_training", False))
+
+            # Stall detection
+            samples_processed = int(getattr(trainer, "_real_samples_processed", 0) or 0)
+            if samples_processed == prev_samples:
+                unchanged_ticks += 1
+            else:
+                unchanged_ticks = 0
+            prev_samples = samples_processed
+            stalled = is_training and unchanged_ticks >= 10
+
+            # GPU utilization [0,1]
+            gpu_usage_percent = gpu_metrics.get("gpu_usage_percent")
+            if gpu_usage_percent is not None:
+                gpu_utilization = max(0.0, min(float(gpu_usage_percent) / 100.0, 1.0))
+            else:
+                mem_total = float(gpu_metrics.get("gpu_memory_total_mb") or 0.0)
+                mem_used = float(
+                    gpu_metrics.get("gpu_memory_used_mb")
+                    or status.get("gpu_mem_reserved_mb")
+                    or 0.0
+                )
+                gpu_utilization = (
+                    max(0.0, min(mem_used / mem_total, 1.0))
+                    if mem_total > 0 else None
+                )
+
+            total_samples = int(status.get("dataset_size", 0) or 0)
+            epoch_samples = int(getattr(trainer, "_last_epoch_samples", 0) or 0)
+
+            # When idle, return null for telemetry — no fake progress.
+            if is_training:
+                samples_per_sec = float(status.get("samples_per_sec", 0.0) or 0.0)
+                loss_val = float(status.get("last_loss", 0.0) or 0.0)
+                accuracy_val = float(status.get("last_accuracy", 0.0) or 0.0)
+                gpu_temp = float(gpu_metrics.get("temperature") or 0.0)
+                vram_used = float(
+                    gpu_metrics.get("gpu_memory_used_mb")
+                    or status.get("gpu_mem_allocated_mb")
+                    or 0.0
+                )
+            else:
+                samples_per_sec = None
+                loss_val = None
+                accuracy_val = None
+                gpu_temp = float(gpu_metrics.get("temperature") or 0.0) if gpu_metrics.get("temperature") is not None else None
+                vram_used = None
+
+            eta_seconds = None
+            if is_training and total_samples > 0 and (samples_per_sec or 0) > 0:
+                remaining = max(total_samples - epoch_samples, 0)
+                eta_seconds = remaining / samples_per_sec
+
+            epoch = int(status.get("epoch", 0) or 0)
+            total_epochs = int(status.get("total_epochs", 0) or 0)
+
+            # Active field and queue from trainer
+            active_field = getattr(trainer, "_current_field", None) or "default"
+            field_queue_raw = getattr(trainer, "_field_queue", None) or []
+            queue = []
+            for fq in field_queue_raw:
+                if isinstance(fq, dict):
+                    queue.append({
+                        "field_name": fq.get("field_name", "unknown"),
+                        "priority": fq.get("priority", 0),
+                        "status": fq.get("status", "queued"),
+                        "best_accuracy": float(fq.get("best_accuracy", 0.0) or 0.0),
+                        "epochs_completed": int(fq.get("epochs_completed", 0) or 0),
+                    })
+
+            # Mode
+            if is_training:
+                mode = "training"
+            elif stalled:
+                mode = "monitoring"
+            else:
+                mode = "idle"
+
+            frame = {
+                "active_field": active_field,
+                "queue": queue,
+                "gpu_utilization": gpu_utilization,
+                "gpu_temp": gpu_temp,
+                "vram_used_mb": vram_used,
+                "samples_per_sec": samples_per_sec,
+                "eta_seconds": eta_seconds,
+                "epoch": epoch,
+                "total_epochs": total_epochs,
+                "world_size": int(getattr(trainer, "_world_size", 1) or 1),
+                "auto_mode": bool(getattr(trainer, "_continuous_mode", False)),
+                "loss": loss_val,
+                "accuracy": accuracy_val,
+                "stalled": stalled,
+                "mode": mode,
+                "sequence_id": _dashboard_seq_id,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+            await websocket.send_json(frame)
+            await asyncio.sleep(1.0)
+    except WebSocketDisconnect:
+        pass
+    except Exception:
+        logger.exception("Training dashboard websocket error")
+        try:
+            await websocket.send_json({
+                "error": "Dashboard stream failed",
                 "timestamp": datetime.now(UTC).isoformat(),
             })
         except Exception:
@@ -2580,6 +2792,39 @@ async def auth_profile(user=Depends(require_auth)):
         "github_profile": github_profile,
     }
 
+
+@app.get("/auth/me")
+async def auth_me(user=Depends(require_auth)):
+    """Current authenticated user session — no-cache, always fresh.
+
+    Returns user identity, auth provider, session linkage.
+    Frontend uses this as source of truth (no hardcoded defaults).
+    Rejects stale/revoked tokens via require_auth guard.
+    """
+    user_id = user.get("sub", "")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid auth token payload")
+
+    record = get_user(user_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    result = {
+        "user_id": record["id"],
+        "name": record.get("name", ""),
+        "email": record.get("email"),
+        "role": record.get("role", "hunter"),
+        "github_login": record.get("github_login"),
+        "avatar_url": record.get("avatar_url"),
+        "auth_provider": record.get("auth_provider", "email"),
+        "session_id": user.get("session_id"),
+        "timestamp": datetime.now(UTC).isoformat(),
+    }
+    return Response(
+        content=json.dumps(result),
+        media_type="application/json",
+        headers={"Cache-Control": "no-store"},
+    )
 
 @app.get("/admin/auth/intel")
 async def admin_auth_intel(req: Request, limit: int = 200):
@@ -3626,6 +3871,19 @@ _GITHUB_REDIRECT_URI = os.getenv(
 _OAUTH_STATE_TTL_SECONDS = int(os.getenv("OAUTH_STATE_TTL_SECONDS", "600"))
 _OAUTH_STATE_SECRET = os.getenv("YGB_HMAC_SECRET", "") or os.getenv("JWT_SECRET", "")
 
+# --- HTTP session pool for GitHub API (connection reuse / keep-alive) ---
+try:
+    import requests as _http_lib
+    _github_http = _http_lib.Session()
+    _github_http.headers.update({
+        "Accept": "application/json",
+        "User-Agent": "YGB-Server",
+    })
+    _HAVE_REQUESTS = True
+except ImportError:
+    _HAVE_REQUESTS = False
+    _github_http = None
+
 
 def _b64url_encode(raw: str) -> str:
     return base64.urlsafe_b64encode(raw.encode("utf-8")).decode("ascii").rstrip("=")
@@ -3690,6 +3948,12 @@ def _parse_oauth_state(state: str) -> tuple[bool, Optional[str]]:
         return True, frontend_url
     except Exception:
         return False, None
+
+
+def _perf_ms(start: float) -> int:
+    """Milliseconds elapsed since *start* (time.monotonic)."""
+    import time as _t
+    return int((_t.monotonic() - start) * 1000)
 
 
 @app.get("/auth/github")
@@ -3765,48 +4029,75 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             detail="GitHub OAuth not configured",
         )
 
-    import urllib.request
     import urllib.parse
+    import time as _time
 
     ip = _extract_client_ip(req)
     ua = req.headers.get("user-agent", "unknown")
 
-    def _sync_github_exchange():
-        """All blocking I/O (GitHub API + DB) runs in thread pool."""
-        location = resolve_ip_geolocation(ip)
+    # ------------------------------------------------------------------
+    # FAST PATH — runs in thread pool, returns JWT + redirect ASAP
+    # Only does: token exchange → /user → DB upsert → JWT
+    # ------------------------------------------------------------------
+    def _sync_github_fast_path():
+        """Critical-path GitHub exchange: token + user + DB + JWT."""
+        t_total = _time.monotonic()
+        timings: Dict[str, int] = {}
 
-        # 1. Exchange code for access token
-        token_data = urllib.parse.urlencode({
+        # 1. Exchange code → access token  (uses connection-pooled session)
+        t0 = _time.monotonic()
+        token_payload = {
             "client_id": _GITHUB_CLIENT_ID,
             "client_secret": _GITHUB_CLIENT_SECRET,
             "code": code,
             "redirect_uri": _GITHUB_REDIRECT_URI,
-        }).encode()
+        }
 
-        token_req = urllib.request.Request(
-            "https://github.com/login/oauth/access_token",
-            data=token_data,
-            headers={"Accept": "application/json"},
-        )
-        with urllib.request.urlopen(token_req, timeout=10) as _resp:
-            token_resp = json.loads(_resp.read().decode())
+        if _HAVE_REQUESTS:
+            token_resp_raw = _github_http.post(
+                "https://github.com/login/oauth/access_token",
+                data=token_payload,
+                timeout=5,
+            )
+            token_resp = token_resp_raw.json()
+        else:
+            import urllib.request as _ureq
+            _data = urllib.parse.urlencode(token_payload).encode()
+            _req = _ureq.Request(
+                "https://github.com/login/oauth/access_token",
+                data=_data, headers={"Accept": "application/json"},
+            )
+            with _ureq.urlopen(_req, timeout=5) as _r:
+                token_resp = json.loads(_r.read().decode())
+
+        timings["token_exchange"] = _perf_ms(t0)
 
         access_token = token_resp.get("access_token")
         if not access_token:
             logger.error("GitHub token exchange failed: %s", token_resp)
             return {"error": "token_exchange_failed"}
 
-        # 2. Fetch user info
-        user_req = urllib.request.Request(
-            "https://api.github.com/user",
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Accept": "application/json",
-                "User-Agent": "YGB-Server",
-            },
-        )
-        with urllib.request.urlopen(user_req, timeout=10) as _resp:
-            user_data = json.loads(_resp.read().decode())
+        # 2. Fetch /user  (reuses same TCP+TLS connection via requests.Session)
+        t0 = _time.monotonic()
+        auth_hdr = {"Authorization": f"Bearer {access_token}"}
+
+        if _HAVE_REQUESTS:
+            user_resp = _github_http.get(
+                "https://api.github.com/user",
+                headers=auth_hdr,
+                timeout=3,
+            )
+            user_data = user_resp.json()
+        else:
+            import urllib.request as _ureq
+            _req = _ureq.Request(
+                "https://api.github.com/user",
+                headers={**auth_hdr, "Accept": "application/json", "User-Agent": "YGB-Server"},
+            )
+            with _ureq.urlopen(_req, timeout=3) as _r:
+                user_data = json.loads(_r.read().decode())
+
+        timings["user_fetch"] = _perf_ms(t0)
 
         github_id = str(user_data.get("id", ""))
         if not github_id:
@@ -3814,144 +4105,62 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             return {"error": "invalid_github_profile"}
         github_login = user_data.get("login", "")
         github_email = user_data.get("email", "")
-        github_profile = {
-            "github_id": github_id,
-            "github_login": github_login,
-            "name": user_data.get("name") or github_login or "",
-            "email": github_email or "",
-            "avatar_url": user_data.get("avatar_url", ""),
-            "html_url": user_data.get("html_url", ""),
-            "company": user_data.get("company", ""),
-            "blog": user_data.get("blog", ""),
-            "location": user_data.get("location", ""),
-            "bio": user_data.get("bio", ""),
-            "public_repos": int(user_data.get("public_repos") or 0),
-            "followers": int(user_data.get("followers") or 0),
-            "following": int(user_data.get("following") or 0),
-            "geoip_location": location,
-            "ip_address": ip,
-        }
-        for key, value in list(github_profile.items()):
-            if isinstance(value, str):
-                github_profile[key] = value.strip()[:512]
 
-        # 3. If email not public, fetch from /user/emails
-        if not github_email:
-            emails_req = urllib.request.Request(
-                "https://api.github.com/user/emails",
-                headers={
-                    "Authorization": f"Bearer {access_token}",
-                    "Accept": "application/json",
-                    "User-Agent": "YGB-Server",
-                },
-            )
-            with urllib.request.urlopen(emails_req, timeout=10) as _resp:
-                emails = json.loads(_resp.read().decode())
-            # Pick primary verified email
-            for em in emails:
-                if em.get("primary") and em.get("verified"):
-                    github_email = em["email"]
-                    break
-            if not github_email and emails:
-                github_email = emails[0].get("email", "")
+        # Use public email or stable fallback — background will resolve private email later
+        effective_email = github_email or f"github-{github_id}@users.noreply.local"
 
-        if not github_email:
-            # Stable fallback identifier when account email is unavailable.
-            github_email = f"github-{github_id}@users.noreply.local"
-        github_profile["email"] = github_email
-
-        # 4. Create or resolve local user account
-        user = get_user_by_email(github_email)
+        # 3. DB: lookup/create user → create session → issue JWT
+        t0 = _time.monotonic()
+        user = get_user_by_email(effective_email)
         if not user:
             display_name = github_login or f"github-{github_id}"
-            user = create_user(display_name, github_email, "hunter")
-            log_activity(
-                user["id"],
-                "USER_REGISTERED_GITHUB",
-                f"GitHub account linked: {github_login}",
-                ip_address=ip,
-            )
+            user = create_user(display_name, effective_email, "hunter")
 
-        # 5. Device/session tracking + security alerts
-        dh = compute_device_hash(ua, ip)
-        device = register_device(user["id"], dh, ip, ua, location=location)
         session = create_session(
             user["id"],
             "AUTHENTICATED",
             None,
             ip_address=ip,
             user_agent=ua,
-            device_hash=dh,
+            device_hash=compute_device_hash(ua, ip),
             metadata={
                 "auth_method": "github",
                 "github_login": github_login,
                 "github_id": github_id,
-                "geolocation": location,
             },
         )
-        update_user_auth_profile(
-            user["id"],
-            auth_provider="github",
-            ip_address=ip,
-            geolocation=location,
-            github_profile=github_profile,
-        )
-        log_activity(
-            user["id"],
-            "LOGIN_SUCCESS_GITHUB",
-            f"GitHub login from {ip} ({location})",
-            ip_address=ip,
-            metadata={
-                "github_login": github_login,
-                "github_id": github_id,
-                "github_profile": github_profile,
-            },
-        )
-        try:
-            alert_new_login(user["name"], ip, ua, location)
-            if device.get("is_new"):
-                alert_new_device(user["name"], dh, ip, ua, location)
-            active_count = get_active_device_count(user["id"])
-            if active_count > 1:
-                devices = get_user_devices(user["id"])
-                alert_multiple_devices(user["name"], active_count, devices)
-        except Exception:
-            pass  # alerts are best-effort
+        timings["db_upsert"] = _perf_ms(t0)
 
-        # 6. Issue JWT
+        # 4. Issue JWT
+        t0 = _time.monotonic()
         jwt_token = generate_jwt(
             user_id=user["id"],
             email=user.get("email"),
             session_id=session["id"],
             role=user.get("role", "hunter"),
         )
+        timings["jwt"] = _perf_ms(t0)
+
+        timings["total_fast_path"] = _perf_ms(t_total)
+        logger.info(
+            "oauth_perf fast_path: %s",
+            " ".join(f"{k}={v}ms" for k, v in timings.items()),
+        )
+
+        # Build minimal profile for redirect URL (no GeoIP yet — background fills it)
+        github_profile_minimal = {
+            "github_id": github_id,
+            "github_login": github_login,
+            "name": user_data.get("name") or github_login or "",
+            "avatar_url": user_data.get("avatar_url", ""),
+            "html_url": user_data.get("html_url", ""),
+        }
+
         safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
         safe_token = urllib.parse.quote_plus(jwt_token)
         safe_session = urllib.parse.quote_plus(session["id"])
         safe_profile = urllib.parse.quote_plus(
-            json.dumps(github_profile, separators=(",", ":"), ensure_ascii=False)
-        )
-        # Avoid overly long callback URLs by degrading to a minimal profile payload.
-        if len(safe_profile) > 1800:
-            minimal_profile = {
-                "github_id": github_id,
-                "github_login": github_login,
-                "name": github_profile.get("name", ""),
-                "avatar_url": github_profile.get("avatar_url", ""),
-                "html_url": github_profile.get("html_url", ""),
-                "geoip_location": location,
-                "ip_address": ip,
-            }
-            safe_profile = urllib.parse.quote_plus(
-                json.dumps(minimal_profile, separators=(",", ":"), ensure_ascii=False)
-            )
-
-        logger.info(
-            "GitHub login success user=%s email=%s ip=%s location=%s",
-            github_login,
-            github_email,
-            ip,
-            location,
+            json.dumps(github_profile_minimal, separators=(",", ":"), ensure_ascii=False)
         )
 
         return {
@@ -3963,10 +4172,158 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                 f"&auth=github"
                 f"&profile={safe_profile}"
             ),
+            # Pass context to background task (no secrets — only IDs/metadata)
+            "_bg_ctx": {
+                "user_id": user["id"],
+                "user_name": user.get("name", github_login),
+                "github_id": github_id,
+                "github_login": github_login,
+                "github_email": github_email,
+                "effective_email": effective_email,
+                "access_token": access_token,
+                "user_data": user_data,
+                "is_new_user": user.get("created_at", "") == user.get("last_active", ""),
+            },
         }
 
+    # ------------------------------------------------------------------
+    # BACKGROUND TASK — non-critical, runs after redirect is sent
+    # GeoIP, /user/emails, device registration, profile update, alerts
+    # ------------------------------------------------------------------
+    def _oauth_background_work(bg_ctx: dict):
+        """Best-effort enrichment: runs AFTER the user has already been redirected."""
+        import time as _t
+        t_total = _t.monotonic()
+        timings: Dict[str, int] = {}
+
+        user_id = bg_ctx["user_id"]
+        user_name = bg_ctx["user_name"]
+        github_id = bg_ctx["github_id"]
+        github_login = bg_ctx["github_login"]
+        access_token = bg_ctx["access_token"]
+        user_data = bg_ctx["user_data"]
+        effective_email = bg_ctx["effective_email"]
+        github_email = bg_ctx["github_email"]
+
+        try:
+            # 1. GeoIP (was blocking the entire flow before)
+            t0 = _t.monotonic()
+            location = resolve_ip_geolocation(ip)
+            timings["geoip"] = _perf_ms(t0)
+
+            # 2. Fetch private email if needed
+            t0 = _t.monotonic()
+            if not github_email:
+                try:
+                    if _HAVE_REQUESTS:
+                        emails_resp = _github_http.get(
+                            "https://api.github.com/user/emails",
+                            headers={"Authorization": f"Bearer {access_token}"},
+                            timeout=3,
+                        )
+                        emails = emails_resp.json()
+                    else:
+                        import urllib.request as _ureq
+                        _req = _ureq.Request(
+                            "https://api.github.com/user/emails",
+                            headers={
+                                "Authorization": f"Bearer {access_token}",
+                                "Accept": "application/json",
+                                "User-Agent": "YGB-Server",
+                            },
+                        )
+                        with _ureq.urlopen(_req, timeout=3) as _r:
+                            emails = json.loads(_r.read().decode())
+
+                    for em in emails:
+                        if em.get("primary") and em.get("verified"):
+                            github_email = em["email"]
+                            break
+                    if not github_email and emails:
+                        github_email = emails[0].get("email", "")
+                except Exception:
+                    logger.debug("Background /user/emails fetch failed", exc_info=True)
+            timings["emails_fetch"] = _perf_ms(t0)
+
+            # 3. Build full profile for storage
+            github_profile = {
+                "github_id": github_id,
+                "github_login": github_login,
+                "name": user_data.get("name") or github_login or "",
+                "email": github_email or effective_email,
+                "avatar_url": user_data.get("avatar_url", ""),
+                "html_url": user_data.get("html_url", ""),
+                "company": user_data.get("company", ""),
+                "blog": user_data.get("blog", ""),
+                "location": user_data.get("location", ""),
+                "bio": user_data.get("bio", ""),
+                "public_repos": int(user_data.get("public_repos") or 0),
+                "followers": int(user_data.get("followers") or 0),
+                "following": int(user_data.get("following") or 0),
+                "geoip_location": location,
+                "ip_address": ip,
+            }
+            for key, value in list(github_profile.items()):
+                if isinstance(value, str):
+                    github_profile[key] = value.strip()[:512]
+
+            # 4. Device registration + profile + audit log
+            t0 = _t.monotonic()
+            dh = compute_device_hash(ua, ip)
+            device = register_device(user_id, dh, ip, ua, location=location)
+            update_user_auth_profile(
+                user_id,
+                auth_provider="github",
+                ip_address=ip,
+                geolocation=location,
+                github_profile=github_profile,
+            )
+            if bg_ctx.get("is_new_user"):
+                log_activity(
+                    user_id,
+                    "USER_REGISTERED_GITHUB",
+                    f"GitHub account linked: {github_login}",
+                    ip_address=ip,
+                )
+            log_activity(
+                user_id,
+                "LOGIN_SUCCESS_GITHUB",
+                f"GitHub login from {ip} ({location})",
+                ip_address=ip,
+                metadata={
+                    "github_login": github_login,
+                    "github_id": github_id,
+                },
+            )
+            timings["db_writes"] = _perf_ms(t0)
+
+            # 5. Email alerts (best-effort)
+            t0 = _t.monotonic()
+            try:
+                alert_new_login(user_name, ip, ua, location)
+                if device.get("is_new"):
+                    alert_new_device(user_name, dh, ip, ua, location)
+                active_count = get_active_device_count(user_id)
+                if active_count > 1:
+                    devices = get_user_devices(user_id)
+                    alert_multiple_devices(user_name, active_count, devices)
+            except Exception:
+                pass  # alerts are best-effort
+            timings["alerts"] = _perf_ms(t0)
+
+            timings["total_bg"] = _perf_ms(t_total)
+            logger.info(
+                "oauth_perf background: %s",
+                " ".join(f"{k}={v}ms" for k, v in timings.items()),
+            )
+        except Exception:
+            logger.exception("OAuth background enrichment error (non-fatal)")
+
+    # ------------------------------------------------------------------
+    # Execute: fast path → redirect immediately → background fires after
+    # ------------------------------------------------------------------
     try:
-        result = await asyncio.to_thread(_sync_github_exchange)
+        result = await asyncio.to_thread(_sync_github_fast_path)
     except Exception:
         logger.exception("GitHub OAuth callback error")
         result = {"error": "server_error"}
@@ -3978,6 +4335,11 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         )
         resp.delete_cookie("ygb_oauth_state")
         return resp
+
+    # Fire background enrichment (non-blocking)
+    bg_ctx = result.pop("_bg_ctx", None)
+    if bg_ctx:
+        asyncio.get_event_loop().run_in_executor(None, _oauth_background_work, bg_ctx)
 
     resp = RedirectResponse(url=result["redirect_url"], status_code=302)
     resp.delete_cookie("ygb_oauth_state")

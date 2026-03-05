@@ -11,11 +11,9 @@
  * NO auto-certification. NO authority unlock.
  */
 
-#include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-
 
 namespace field_lifecycle {
 

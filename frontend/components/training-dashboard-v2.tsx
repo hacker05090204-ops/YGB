@@ -24,10 +24,10 @@ interface DashboardV2Frame {
     auto_pending: boolean;
     epoch: number;
     total_epochs: number;
-    samples_per_sec: number;
-    eta_seconds: number;
-    loss: number;
-    accuracy: number;
+    samples_per_sec: number | null;
+    eta_seconds: number | null;
+    loss: number | null;
+    accuracy: number | null;
     // Cluster
     world_size: number;
     mode: string;           // A / Lab
@@ -35,10 +35,11 @@ interface DashboardV2Frame {
     storage_used_gb: number;
     storage_cap_gb: number;
     // GPU
-    gpu_utilization: number;
-    gpu_temp: number;
+    gpu_utilization: number | null;
+    gpu_temp: number | null;
     // Meta
     stalled: boolean;
+    sequence_id: number;
     timestamp: string;
 }
 
@@ -129,11 +130,11 @@ export default function TrainingDashboardV2() {
                         try {
                             const d: DashboardV2Frame = JSON.parse(e.data);
                             setFrame(d);
-                            setSpsHistory(p => [...p.slice(-100), d.samples_per_sec]);
+                            setSpsHistory(p => [...p.slice(-100), d.samples_per_sec ?? 0]);
                             if (timer.current) clearTimeout(timer.current);
                             timer.current = setTimeout(() => {
                                 setFrame(prev => prev ? { ...prev, stalled: true } : null);
-                            }, 10000);
+                            }, 5000);
                         } catch { /* skip */ }
                     },
                     () => ws?.close(),
@@ -197,15 +198,15 @@ export default function TrainingDashboardV2() {
                         {frame.active_field || 'No active field'}
                     </div>
                     <div style={{ fontSize: '10px', color: '#6b7280' }}>
-                        E{frame.epoch}/{frame.total_epochs} · Loss {frame.loss.toFixed(4)}
+                        E{frame.epoch}/{frame.total_epochs} · Loss {frame.loss != null ? frame.loss.toFixed(4) : '—'}
                     </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: '18px', fontWeight: 700, color: '#10b981' }}>
-                        {(frame.accuracy * 100).toFixed(1)}%
+                        {frame.accuracy != null ? `${(frame.accuracy * 100).toFixed(1)}%` : '—'}
                     </div>
                     <div style={{ fontSize: '10px', color: '#6b7280' }}>
-                        ETA {formatETA(frame.eta_seconds)}
+                        ETA {frame.eta_seconds != null ? formatETA(frame.eta_seconds) : '—'}
                     </div>
                 </div>
             </div>
@@ -213,9 +214,9 @@ export default function TrainingDashboardV2() {
             {/* Stats row */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '12px' }}>
                 {[
-                    { l: 'SPS', v: frame.samples_per_sec >= 1000 ? `${(frame.samples_per_sec / 1000).toFixed(1)}K` : `${frame.samples_per_sec.toFixed(0)}`, c: '#00e5ff' },
-                    { l: 'GPU', v: `${(frame.gpu_utilization * 100).toFixed(0)}%`, c: frame.gpu_utilization > 0.85 ? '#ef4444' : '#f59e0b' },
-                    { l: 'Temp', v: `${frame.gpu_temp.toFixed(0)}°C`, c: frame.gpu_temp > 80 ? '#ef4444' : '#9ca3af' },
+                    { l: 'SPS', v: frame.samples_per_sec != null ? (frame.samples_per_sec >= 1000 ? `${(frame.samples_per_sec / 1000).toFixed(1)}K` : `${frame.samples_per_sec.toFixed(0)}`) : '—', c: '#00e5ff' },
+                    { l: 'GPU', v: frame.gpu_utilization != null ? `${(frame.gpu_utilization * 100).toFixed(0)}%` : '—', c: (frame.gpu_utilization ?? 0) > 0.85 ? '#ef4444' : '#f59e0b' },
+                    { l: 'Temp', v: frame.gpu_temp != null ? `${frame.gpu_temp.toFixed(0)}°C` : '—', c: (frame.gpu_temp ?? 0) > 80 ? '#ef4444' : '#9ca3af' },
                 ].map(s => (
                     <div key={s.l} style={{ background: '#1a1f2e', borderRadius: '6px', padding: '6px', textAlign: 'center' }}>
                         <div style={{ fontSize: '15px', fontWeight: 700, color: s.c }}>{s.v}</div>

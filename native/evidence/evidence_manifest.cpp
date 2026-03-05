@@ -5,8 +5,6 @@
  * into a single manifest with integrity verification.
  */
 
-#include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 

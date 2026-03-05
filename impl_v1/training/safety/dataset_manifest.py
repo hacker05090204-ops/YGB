@@ -99,7 +99,11 @@ def validate_manifest(
     try:
         with open(path, 'r') as f:
             data = json.load(f)
-        manifest = DatasetManifest(**data)
+        # Extract only the 6 signed fields (superset manifests have extra keys)
+        required_keys = {'dataset_hash', 'signed_by', 'version',
+                         'total_samples', 'created_at', 'signature_hash'}
+        manifest_data = {k: data[k] for k in required_keys}
+        manifest = DatasetManifest(**manifest_data)
     except Exception as e:
         logger.error(f"[MANIFEST] BLOCKED: invalid manifest format — {e}")
         return False, "invalid_format", None
