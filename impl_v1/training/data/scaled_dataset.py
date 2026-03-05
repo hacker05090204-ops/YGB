@@ -133,7 +133,7 @@ class ScaledDatasetGenerator:
             features = {
                 "type": "edge_case",
                 "difficulty": self.rng.uniform(0.8, 1.0),
-                "noise": self.rng.uniform(0.3, 0.5),
+                "noise": self.rng.uniform(0.05, 0.15),
                 "signal_strength": signal_strength,
                 "response_ratio": response_ratio,
                 "pattern_type": pattern_type,
@@ -147,7 +147,7 @@ class ScaledDatasetGenerator:
             features = {
                 "type": "standard",
                 "difficulty": self.rng.uniform(0.1, 0.7),
-                "noise": self.rng.uniform(0.0, 0.2),
+                "noise": self.rng.uniform(0.0, 0.05),
                 "signal_strength": signal_strength,
                 "response_ratio": response_ratio,
                 "pattern_type": pattern_type,

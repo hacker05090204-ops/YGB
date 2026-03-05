@@ -1,27 +1,27 @@
 {
   "dataset_source": "INGESTION_PIPELINE",
   "ingestion_manifest_hash": "000000007c5d0f850000000013c1f793000000006f9cf81600000000901f0718",
-  "tensor_hash": "3eab0e05b548eb9df751f0472eb09e2c09bc12e8ac0d9a50e0325499e32f4c34",
-  "sample_count": 125999,
+  "tensor_hash": "bd44347a7e3b1702e0eaf929aa58571b2fa9c5bf4080a8236d0de5ee18d2c736",
+  "sample_count": 125993,
   "feature_dim": 256,
   "num_classes": 2,
-  "accepted": 125999,
+  "accepted": 125993,
   "rejected_policy": 0,
-  "rejected_quality": 1,
+  "rejected_quality": 7,
   "strict_real_mode": true,
   "class_histogram": {
     "1": 57296,
-    "0": 68703
+    "0": 68697
   },
   "class_entropy": 0.9941,
   "source_trust_avg": 0.9116,
   "source_trust_min": 0.7,
   "training_mode": "PRODUCTION_REAL",
-  "frozen_at": "2026-03-05T18:21:56.117227",
-  "dataset_hash": "3eab0e05b548eb9df751f0472eb09e2c09bc12e8ac0d9a50e0325499e32f4c34",
+  "frozen_at": "2026-03-05T19:04:28.615104",
+  "dataset_hash": "bd44347a7e3b1702e0eaf929aa58571b2fa9c5bf4080a8236d0de5ee18d2c736",
   "signed_by": "1b7d03627cd17c222be30b483cd6404921e4cd3f91c4f508b10d4e53a3ceb680",
   "version": "1.0",
-  "total_samples": 125999,
-  "created_at": "2026-03-05T18:21:56.117227",
-  "signature_hash": "2fa362ea5139fe8e1648ee10d4304ae8949b045419270da58039ffd270deb2f7"
+  "total_samples": 125993,
+  "created_at": "2026-03-05T19:04:28.615104",
+  "signature_hash": "e54eb40ca287f7f677ac575977638d025e4bddd6859c98238e42b35ee4c110a0"
 }

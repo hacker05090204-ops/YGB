@@ -169,12 +169,12 @@ class SyntheticTrainingDataset(Dataset):
             if i < 64:
                 # Signal-strength features — PRIMARY label signal
                 base = signal
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 128:
                 # Response-ratio features — SECONDARY label signal
                 base = response
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 192:
                 # Diverse derived features — INDEPENDENT combinations
@@ -184,30 +184,30 @@ class SyntheticTrainingDataset(Dataset):
                 if sub_idx < 16:
                     # Polynomial: signal^2 with independent noise
                     base = signal * signal
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 32:
                     # Polynomial: response^2 with independent noise
                     base = response * response
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 40:
                     # Trigonometric: sin(signal * pi)
                     import math
                     base = 0.5 + 0.5 * math.sin(signal * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 48:
                     # Trigonometric: cos(response * pi)
                     import math
                     base = 0.5 + 0.5 * math.cos(response * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 56:
                     # Threshold: binary indicator with noise
-                    threshold = 0.5 + 0.05 * sample_rng.gauss(0, 1)
+                    threshold = 0.5 + 0.02 * sample_rng.gauss(0, 1)
                     base = 0.8 if signal > threshold else 0.2
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 else:
                     # Rank-based: difficulty-weighted signal magnitude
                     base = signal * (1.0 - difficulty * 0.3)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 
                 val = base + noise
             else:
@@ -221,19 +221,19 @@ class SyntheticTrainingDataset(Dataset):
                 if sub_idx < 16:
                     # Endpoint entropy features
                     base = endpoint_entropy
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 elif sub_idx < 32:
                     # Exploit complexity features
                     base = exploit_complexity
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 elif sub_idx < 48:
                     # Impact severity features
                     base = impact_severity_val
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 else:
                     # Fingerprint density features
                     base = fingerprint_density
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 val = base + noise
             
             # Clamp to [0, 1]
@@ -1018,33 +1018,33 @@ class IngestionPipelineDataset(Dataset):
         for i in range(self.feature_dim):
             if i < 64:
                 base = signal
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 128:
                 base = response
-                noise = noise_level * 0.20 * sample_rng.gauss(0, 1)
+                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
                 val = base + noise
             elif i < 192:
                 sub_idx = i - 128
                 if sub_idx < 16:
                     base = signal * signal
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 32:
                     base = response * response
-                    noise = 0.15 * sample_rng.gauss(0, 1)
+                    noise = 0.06 * sample_rng.gauss(0, 1)
                 elif sub_idx < 40:
                     base = 0.5 + 0.5 * math.sin(signal * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 48:
                     base = 0.5 + 0.5 * math.cos(response * math.pi)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 56:
-                    threshold = 0.5 + 0.05 * sample_rng.gauss(0, 1)
+                    threshold = 0.5 + 0.02 * sample_rng.gauss(0, 1)
                     base = 0.8 if signal > threshold else 0.2
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 else:
                     base = signal * (1.0 - difficulty * 0.3)
-                    noise = 0.12 * sample_rng.gauss(0, 1)
+                    noise = 0.05 * sample_rng.gauss(0, 1)
                 val = base + noise
             else:
                 # [192-255] Additional feature groups from raw metadata
@@ -1056,16 +1056,16 @@ class IngestionPipelineDataset(Dataset):
                 
                 if sub_idx < 16:
                     base = endpoint_entropy
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 elif sub_idx < 32:
                     base = exploit_complexity
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 elif sub_idx < 48:
                     base = impact_severity_val
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 else:
                     base = fingerprint_density
-                    noise = 0.10 * sample_rng.gauss(0, 1)
+                    noise = 0.04 * sample_rng.gauss(0, 1)
                 val = base + noise
             vec.append(max(0.0, min(1.0, val)))
 
