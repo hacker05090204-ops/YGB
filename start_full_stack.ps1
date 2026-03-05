@@ -68,7 +68,7 @@ function Stop-PortListener {
 Import-DotEnv (Join-Path $root ".env")
 
 $env:PYTHONPATH = $root
-$env:API_HOST = "127.0.0.1"
+$env:API_HOST = "0.0.0.0"
 $env:API_PORT = "$ApiPort"
 $env:API_RELOAD = "false"
 $env:GITHUB_REDIRECT_URI = "http://${LoopbackHost}:$ApiPort/auth/github/callback"
@@ -80,14 +80,14 @@ Stop-PortListener -Port $ApiPort -ForceKillForeign:$AllowForeignPortKill
 Stop-PortListener -Port $UiPort -ForceKillForeign:$AllowForeignPortKill
 
 $backend = Start-Process -FilePath "python" `
-    -ArgumentList "-m", "uvicorn", "server:app", "--host", "127.0.0.1", "--port", "$ApiPort", "--log-level", "info" `
+    -ArgumentList "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "$ApiPort", "--log-level", "info" `
     -WorkingDirectory (Join-Path $root "api") `
     -WindowStyle Hidden -PassThru
 
 $frontendApiUrl = "http://${LoopbackHost}:$ApiPort"
 $frontendCmdArgs = @(
     "/c",
-    "set NEXT_PUBLIC_YGB_API_URL=$frontendApiUrl&& npm run dev -- -p $UiPort"
+    "set NEXT_PUBLIC_YGB_API_URL=$frontendApiUrl&& npm run dev -- -p $UiPort --hostname 0.0.0.0"
 )
 $frontend = Start-Process -FilePath "cmd.exe" `
     -ArgumentList $frontendCmdArgs `
