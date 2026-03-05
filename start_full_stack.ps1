@@ -67,11 +67,43 @@ function Stop-PortListener {
 
 Import-DotEnv (Join-Path $root ".env")
 
+# ── AUTO-START D: DRIVE NAS SHARE ──
+# Ensure SharedDrive SMB share exists and network is ready for all users
+$shareName = "SharedDrive"
+$shareExists = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
+if (-not $shareExists -and (Test-Path "D:\")) {
+    Write-Host "Creating D: drive share '$shareName'..."
+    Start-Process powershell -Verb RunAs -Wait -ArgumentList @(
+        '-NoProfile', '-Command',
+        "New-SmbShare -Name '$shareName' -Path 'D:\' -FullAccess 'Everyone' -Description 'YGB NAS'; " +
+        "Set-NetConnectionProfile -InterfaceAlias (Get-NetConnectionProfile | Where-Object {`$_.NetworkCategory -eq 'Public'} | Select-Object -First 1 -ExpandProperty InterfaceAlias) -NetworkCategory Private -ErrorAction SilentlyContinue; " +
+        "Set-NetFirewallRule -DisplayGroup 'Network Discovery' -Enabled True -Profile Private,Public -ErrorAction SilentlyContinue; " +
+        "Set-NetFirewallRule -DisplayGroup 'File and Printer Sharing' -Enabled True -Profile Private,Public -ErrorAction SilentlyContinue; " +
+        "New-NetFirewallRule -DisplayName 'YGB Backend 8000' -Direction Inbound -Protocol TCP -LocalPort 8000 -Action Allow -ErrorAction SilentlyContinue; " +
+        "New-NetFirewallRule -DisplayName 'YGB Frontend 3000' -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow -ErrorAction SilentlyContinue"
+    )
+    Write-Host "Share '$shareName' created."
+} elseif ($shareExists) {
+    Write-Host "Share '$shareName' already exists."
+} else {
+    Write-Host "D: drive not found — skipping share creation."
+}
+
+# ── DYNAMIC NETWORK AUTH ──
+# Detect WiFi IP for OAuth redirect (so other devices on the network can use GitHub login)
+$wifiIP = (Get-NetIPAddress -AddressFamily IPv4 |
+    Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '100.*' -and $_.IPAddress -notlike '169.*' -and $_.PrefixOrigin -ne 'WellKnown' } |
+    Select-Object -First 1 -ExpandProperty IPAddress)
+if ($wifiIP) {
+    $env:GITHUB_REDIRECT_URI = "http://${wifiIP}:$ApiPort/auth/github/callback"
+    $env:FRONTEND_URL = "http://${wifiIP}:$UiPort"
+    Write-Host "Network IP: $wifiIP — OAuth redirect: $($env:GITHUB_REDIRECT_URI)"
+}
+
 $env:PYTHONPATH = $root
 $env:API_HOST = "0.0.0.0"
 $env:API_PORT = "$ApiPort"
 $env:API_RELOAD = "false"
-$env:GITHUB_REDIRECT_URI = "http://${LoopbackHost}:$ApiPort/auth/github/callback"
 if (-not $env:ENABLE_G38_AUTO_TRAINING) {
     $env:ENABLE_G38_AUTO_TRAINING = "false"
 }
