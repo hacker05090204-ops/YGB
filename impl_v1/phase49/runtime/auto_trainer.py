@@ -98,12 +98,19 @@ except ImportError:
     TORCH_AVAILABLE = False
     AMP_AVAILABLE = False
 
-# GPU performance + deterministic settings
+# Training profile: deterministic (default) or fast
+_TRAINING_PROFILE = os.environ.get("YGB_TRAINING_PROFILE", "deterministic").lower()
+_FORCE_FRESH = os.environ.get("YGB_FORCE_FRESH_TRAIN", "0") == "1"
+
+# GPU performance settings (profile-dependent)
 if TORCH_AVAILABLE:
-    # DETERMINISTIC: Required for reproducible training
-    # benchmark=False because benchmark and deterministic are contradictory
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
+    if _TRAINING_PROFILE == "fast":
+        torch.backends.cudnn.deterministic = False
+        torch.backends.cudnn.benchmark = True
+        # deterministic algorithms OFF for speed
+    else:
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
     # Enable TF32 tensor core math (RTX 30-series) — ~3x faster matmul
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.allow_tf32 = True
@@ -466,15 +473,33 @@ class AutoTrainer:
                 return False
             
             # Create optimized DataLoader (pin_memory for fast GPU transfer)
-            # num_workers=0 on Windows: worker processes trigger STRICT_REAL_MODE
-            _num_workers = 0 if sys.platform == 'win32' else 4
-            train_loader, holdout_loader, stats = create_training_dataloader(
-                batch_size=1024,
-                num_workers=_num_workers,
-                pin_memory=True,
-                prefetch_factor=2 if _num_workers > 0 else None,
-                seed=42,
-            )
+            # Windows DataLoader: use 2 workers with fallback if fails
+            _num_workers = 2 if sys.platform == 'win32' else 4
+            _dl_persistent = _num_workers > 0
+            _dl_prefetch = 2 if _num_workers > 0 else None
+            
+            try:
+                train_loader, holdout_loader, stats = create_training_dataloader(
+                    batch_size=1024,
+                    num_workers=_num_workers,
+                    pin_memory=True,
+                    prefetch_factor=_dl_prefetch,
+                    seed=42,
+                )
+                logger.info(f"DataLoader: num_workers={_num_workers}, persistent={_dl_persistent}, profile={_TRAINING_PROFILE}")
+            except Exception as e:
+                logger.warning(f"DataLoader with workers={_num_workers} failed: {e}")
+                logger.warning("Retrying with num_workers=0")
+                _num_workers = 0
+                _dl_persistent = False
+                train_loader, holdout_loader, stats = create_training_dataloader(
+                    batch_size=1024,
+                    num_workers=0,
+                    pin_memory=True,
+                    prefetch_factor=None,
+                    seed=42,
+                )
+                logger.info(f"DataLoader: num_workers=0 (fallback), profile={_TRAINING_PROFILE}")
             
             self._gpu_dataloader = train_loader
             self._gpu_holdout_loader = holdout_loader  # Store holdout for validation

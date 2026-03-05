@@ -74,14 +74,28 @@ log.info("  ✅ CUDA + Driver VERIFIED")
 # ═══════════════════════════════════════════════════════════════════════
 log.info("═══ STEP 2: Validate Dataset + Feature Dim ═══")
 
-# Enforce determinism from the start
+# Training profile: deterministic (default) or fast
+TRAINING_PROFILE = os.environ.get("YGB_TRAINING_PROFILE", "deterministic").lower()
+FORCE_FRESH = os.environ.get("YGB_FORCE_FRESH_TRAIN", "0") == "1"
+
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 torch.manual_seed(42)
 torch.cuda.manual_seed_all(42)
 np.random.seed(42)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
-torch.use_deterministic_algorithms(True, warn_only=True)
+
+if TRAINING_PROFILE == "fast":
+    torch.backends.cudnn.deterministic = False
+    torch.backends.cudnn.benchmark = True
+    torch.use_deterministic_algorithms(False)
+    log.info(f"  Training profile: FAST (benchmark=True, deterministic=False)")
+else:
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True, warn_only=True)
+    log.info(f"  Training profile: DETERMINISTIC (benchmark=False, deterministic=True)")
+
+if FORCE_FRESH:
+    log.info("  ⚡ FORCE_FRESH_TRAIN=1 — starting from scratch (no checkpoint resume)")
 
 from impl_v1.training.data.scaled_dataset import DatasetConfig
 from impl_v1.training.data.real_dataset_loader import RealTrainingDataset
@@ -395,10 +409,35 @@ train_ds = TensorDataset(
     torch.tensor(train_f[:shard_samples], dtype=torch.float32),
     torch.tensor(train_l[:shard_samples], dtype=torch.long),
 )
-train_loader = DataLoader(
-    train_ds, batch_size=optimal_batch_3050, shuffle=True,
-    num_workers=0, pin_memory=True, drop_last=False,
-)
+# Windows DataLoader: use 2 workers (was 0) with fallback
+import sys as _sys
+_dl_num_workers = 2 if _sys.platform == 'win32' else 4
+_dl_persistent = _dl_num_workers > 0
+_dl_prefetch = 2 if _dl_num_workers > 0 else None
+
+try:
+    train_loader = DataLoader(
+        train_ds, batch_size=optimal_batch_3050, shuffle=True,
+        num_workers=_dl_num_workers, pin_memory=True, drop_last=False,
+        persistent_workers=_dl_persistent,
+        prefetch_factor=_dl_prefetch,
+    )
+    # Force iteration to test workers
+    _test_iter = iter(train_loader)
+    next(_test_iter)
+    del _test_iter
+    log.info(f"  DataLoader: num_workers={_dl_num_workers}, persistent={_dl_persistent}")
+except Exception as e:
+    log.warning(f"  DataLoader with workers={_dl_num_workers} failed: {e}")
+    log.warning(f"  Retrying with num_workers=0")
+    _dl_num_workers = 0
+    _dl_persistent = False
+    _dl_prefetch = None
+    train_loader = DataLoader(
+        train_ds, batch_size=optimal_batch_3050, shuffle=True,
+        num_workers=0, pin_memory=True, drop_last=False,
+    )
+    log.info(f"  DataLoader: num_workers=0 (fallback)")
 
 log.info(f"  Batch: {optimal_batch_3050}, Grad accum: {GRAD_ACCUM}")
 log.info(f"  Effective batch: {optimal_batch_3050 * GRAD_ACCUM}")
@@ -605,7 +644,12 @@ telemetry = {
         "eta_min": ETA_MIN,
         "encoder_freeze_epochs": ENCODER_FREEZE_EPOCHS,
         "amp_enabled": True,
-        "deterministic": True,
+        "training_profile": TRAINING_PROFILE,
+        "cudnn_benchmark": torch.backends.cudnn.benchmark,
+        "cudnn_deterministic": torch.backends.cudnn.deterministic,
+        "force_fresh_train": FORCE_FRESH,
+        "num_workers": _dl_num_workers,
+        "persistent_workers": _dl_persistent,
     },
     "results": {
         "total_time_sec": round(total_time, 2),
