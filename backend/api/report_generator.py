@@ -480,10 +480,17 @@ async def list_videos(request: Request, user=Depends(require_auth)):
     try:
         cursor = conn.cursor()
         if report_id:
-            cursor.execute(
-                "SELECT * FROM video_recordings WHERE report_id = ? ORDER BY started_at DESC",
-                (report_id,),
-            )
+            # IDOR protection: non-admin can only see their own videos by report_id
+            if user.get("role") == "admin":
+                cursor.execute(
+                    "SELECT * FROM video_recordings WHERE report_id = ? ORDER BY started_at DESC",
+                    (report_id,),
+                )
+            else:
+                cursor.execute(
+                    "SELECT * FROM video_recordings WHERE report_id = ? AND created_by = ? ORDER BY started_at DESC",
+                    (report_id, user_id),
+                )
         elif user.get("role") == "admin":
             cursor.execute(
                 "SELECT * FROM video_recordings ORDER BY started_at DESC LIMIT 100"

@@ -145,14 +145,17 @@ class KeyManager:
                     "KEY_STORAGE_ERROR: YGB_KEY_DIR not set or not a directory "
                     "(strict mode rejects fallback keys)"
                 )
-            # Fallback: env var or default (dev mode only)
-            secret = os.environ.get("YGB_APPROVAL_SECRET", "").encode()
-            if secret:
-                self._keys[self.DEFAULT_KEY_ID] = secret
-            else:
-                self._keys[self.DEFAULT_KEY_ID] = self.DEFAULT_SECRET
+            # Fallback: env var (dev mode only — no hardcoded default)
+            secret_str = os.environ.get("YGB_APPROVAL_SECRET", "")
+            if not secret_str:
+                raise ValueError(
+                    "APPROVAL_SECRET_MISSING: YGB_APPROVAL_SECRET env var is required. "
+                    "Set it to a strong random secret (e.g. python -c \"import secrets; print(secrets.token_hex(32))\"). "
+                    "For production, use YGB_KEY_DIR with key files instead."
+                )
+            self._keys[self.DEFAULT_KEY_ID] = secret_str.encode()
             self._log_audit("KEY_FALLBACK", self.DEFAULT_KEY_ID,
-                            "using env/default — NOT FOR PRODUCTION")
+                            "using env var — NOT FOR PRODUCTION")
 
     @property
     def active_key_id(self) -> str:

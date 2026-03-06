@@ -62,3 +62,8 @@ jwt_token.txt
 *.jwt
 *.token
 login_url.txt
+
+# Secrets (never track)
+.env_secrets.txt
+*.secret
+*.credentials

@@ -237,12 +237,13 @@ async def voice_stream(ws: WebSocket):
       - Server responds with JSON transcription results
       - Client can send JSON control messages: {"type": "stop"}, {"type": "interrupt"}
     """
-    # Authenticate
+    # Authenticate — ws_authenticate returns None on failure but does NOT
+    # close the socket.  We must close explicitly to prevent dangling connections.
+    await ws.accept()
     user = await ws_authenticate(ws)
     if user is None:
-        return  # ws_authenticate closes the connection on failure
-
-    await ws.accept()
+        await ws.close(code=4401, reason="Authentication required")
+        return
     user_id = user.get("sub", "ws_user") if isinstance(user, dict) else "ws_user"
 
     logger.info(f"[VOICE_GW] WebSocket connected: user={user_id}")

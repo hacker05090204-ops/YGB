@@ -67,6 +67,9 @@ function Stop-PortListener {
     }
 }
 
+# ── LOAD .env BEFORE validation or process startup ──
+Import-DotEnv -Path (Join-Path $root ".env")
+
 # ── VALIDATE REQUIRED ENV VARS ──
 $requiredVars = @("JWT_SECRET", "YGB_HMAC_SECRET", "YGB_VIDEO_JWT_SECRET")
 $missing = @()

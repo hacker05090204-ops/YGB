@@ -59,6 +59,25 @@ function isAbortError(error: unknown): boolean {
     return false
 }
 
+/** Get authenticated user ID from session storage. */
+function getAuthUserId(): string {
+    if (typeof window === "undefined") return ""
+    return sessionStorage.getItem("ygb_session_id") || sessionStorage.getItem("ygb_token")?.slice(0, 16) || ""
+}
+
+/** Get authenticated user display name from session profile. */
+function getAuthUserName(): string {
+    if (typeof window === "undefined") return "user"
+    try {
+        const raw = sessionStorage.getItem("ygb_profile")
+        if (raw) {
+            const profile = JSON.parse(raw)
+            return profile.name || profile.github_login || "user"
+        }
+    } catch { /* ignore */ }
+    return "user"
+}
+
 function ControlPageContent() {
     // Dashboard State
     const [dashboardId, setDashboardId] = useState<string | null>(null)
@@ -171,7 +190,7 @@ function ControlPageContent() {
             const response = await protectedFetch(`${API_BASE}/api/dashboard/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: "user-001", user_name: "Researcher" }),
+                body: JSON.stringify({ user_id: getAuthUserId(), user_name: getAuthUserName() }),
                 signal: controller.signal
             })
 
@@ -382,7 +401,7 @@ function ControlPageContent() {
                 body: JSON.stringify({
                     request_id: requestId,
                     approved: true,
-                    approver_id: "user-001",
+                    approver_id: getAuthUserId(),
                     reason
                 })
             })
@@ -411,7 +430,7 @@ function ControlPageContent() {
                 body: JSON.stringify({
                     request_id: requestId,
                     approved: false,
-                    approver_id: "user-001",
+                    approver_id: getAuthUserId(),
                     reason
                 })
             })
@@ -435,7 +454,7 @@ function ControlPageContent() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     transition: "ABORT",
-                    actor_id: "user-001",
+                    actor_id: getAuthUserId(),
                     reason: "User requested stop"
                 })
             })

@@ -20,5 +20,10 @@
             "YGB_HMAC_SECRET": ""
         }
     },
-    "cmake.sourceDirectory": "C:/Users/Unkno/YGB/impl_v1/phase49/native"
+    "cmake.sourceDirectory": "C:/Users/Unkno/YGB/impl_v1/phase49/native",
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }

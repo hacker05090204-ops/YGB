@@ -58,6 +58,8 @@ from backend.auth.auth_guard import (
     validate_target_url,
     ws_authenticate,
 )
+from backend.auth.ownership import check_resource_owner, check_ws_resource_owner
+from backend.api.runtime_state import runtime_state
 
 # Add project root to path for imports
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -303,10 +305,18 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS configuration for frontend
+# CORS configuration for frontend — include FRONTEND_URL and LAN origins
+_CONFIGURED_FRONTEND_URL = os.getenv("FRONTEND_URL", "").rstrip("/")
+_cors_origins: list[str] = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+if _CONFIGURED_FRONTEND_URL and _CONFIGURED_FRONTEND_URL not in _cors_origins:
+    _cors_origins.append(_CONFIGURED_FRONTEND_URL)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -324,6 +334,16 @@ except ImportError as _sync_err:
 # GLOBAL EXCEPTION HANDLER — sanitize internal errors from API responses
 # =============================================================================
 from starlette.responses import JSONResponse
+from backend.api.exceptions import YGBError
+
+@app.exception_handler(YGBError)
+async def _ygb_error_handler(request: Request, exc: YGBError):
+    """Handle typed YGB exceptions with proper status codes and correlation IDs."""
+    exc.log()
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=exc.to_response(),
+    )
 
 @app.exception_handler(Exception)
 async def _global_exception_handler(request: Request, exc: Exception):
@@ -751,6 +771,31 @@ async def health_alias():
     return await health_check()
 
 
+@app.get("/readyz")
+async def readyz():
+    """Kubernetes-style readiness probe. 200 = all subsystems ok, 503 = degraded."""
+    checks = {}
+    ready = True
+    try:
+        from api.database import get_db
+        db = await get_db()
+        checks["database"] = "ok" if db else "unavailable"
+        if not db:
+            ready = False
+    except Exception:
+        checks["database"] = "error"
+        ready = False
+    checks["storage"] = "ok" if _storage_bridge else "unavailable"
+    if not _storage_bridge:
+        ready = False
+    checks["mode"] = runtime_state.get("runtime_mode", "IDLE")
+    status_code = 200 if ready else 503
+    return JSONResponse(
+        status_code=status_code,
+        content={"ready": ready, "checks": checks},
+    )
+
+
 @app.get("/api/cve/summary")
 async def get_cve_summary():
     """Quick CVE summary — total records, sources, freshness."""
@@ -971,6 +1016,7 @@ async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
         "mode": request.mode,
         "status": "started",
         "started_at": datetime.now(UTC).isoformat(),
+        "owner_id": user.get("sub", ""),
     }
     return {"run_id": run_id, "phase": request.phase, "status": "started"}
 
@@ -990,6 +1036,7 @@ async def run_hunter_module(request: RunHunterRequest, user=Depends(require_auth
         "mode": request.mode,
         "status": "started",
         "started_at": datetime.now(UTC).isoformat(),
+        "owner_id": user.get("sub", ""),
     }
     return {"run_id": run_id, "module": request.module, "status": "started"}
 
@@ -1013,10 +1060,14 @@ async def fields_approve_endpoint(
     request: FieldApprovalRequest,
     user=Depends(require_auth),
 ):
-    """Approve a field — delegates to field_progression_api."""
+    """Approve a field — delegates to field_progression_api.
+    SECURITY: approver_id bound to authenticated user, not client body.
+    """
+    # Override client-supplied approver_id with authenticated identity
+    auth_approver_id = user.get("sub", "")
     try:
         from backend.api.field_progression_api import approve_field
-        return approve_field(field_id, request.approver_id, request.reason)
+        return approve_field(field_id, auth_approver_id, request.reason)
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
     except Exception:
@@ -1099,7 +1150,8 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
         "target": request.target,
         "status": "started",
         "started_at": datetime.now(UTC).isoformat(),
-        "steps": []
+        "steps": [],
+        "owner_id": user.get("sub", ""),
     }
     
     return WorkflowStartResponse(
@@ -1135,7 +1187,8 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
         "status": "started",
         "started_at": datetime.now(UTC).isoformat(),
         "steps": [],
-        "findings": []
+        "findings": [],
+        "owner_id": user.get("sub", ""),
     }
     
     # Debug logging
@@ -1156,7 +1209,11 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
 
 @app.post("/api/dashboard/create")
 async def create_dashboard(request: CreateDashboardRequest, user=Depends(require_auth)):
-    """Create a new dashboard for a user."""
+    """Create a new dashboard for the authenticated user."""
+    # SECURITY: Use authenticated identity, not client-supplied user_id
+    auth_user_id = user.get("sub", "")
+    auth_user_name = user.get("name", user.get("email", "user"))
+
     dashboard_id = f"DASH-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.now(UTC).isoformat()
     
@@ -1167,13 +1224,15 @@ async def create_dashboard(request: CreateDashboardRequest, user=Depends(require
         "state": "IDLE",
         "human_approved": False,
         "deny_reason": None,
-        "audit_log": []
+        "audit_log": [],
+        "owner_id": auth_user_id,
     }
     
     dashboard_states[dashboard_id] = {
         "dashboard_id": dashboard_id,
-        "user_id": request.user_id,
-        "user_name": request.user_name,
+        "user_id": auth_user_id,
+        "user_name": auth_user_name,
+        "owner_id": auth_user_id,
         "kernel_id": kernel_id,
         "created_at": now,
         "active_panel": "USER"
@@ -1188,9 +1247,11 @@ async def create_dashboard(request: CreateDashboardRequest, user=Depends(require
 
 @app.get("/api/dashboard/state")
 async def get_dashboard_state(dashboard_id: Optional[str] = None, user=Depends(require_auth)):
-    """Get current dashboard state."""
+    """Get current dashboard state. Ownership-checked."""
     if dashboard_id and dashboard_id in dashboard_states:
-        return dashboard_states[dashboard_id]
+        dash = dashboard_states[dashboard_id]
+        check_resource_owner(dash, user, "dashboard", dashboard_id)
+        return dash
     
     # No dashboard found — return error
     return {"error": "No dashboard found", "dashboard_id": None, "state": "DISCONNECTED"}
@@ -1198,9 +1259,11 @@ async def get_dashboard_state(dashboard_id: Optional[str] = None, user=Depends(r
 
 @app.get("/api/execution/state")
 async def get_execution_state(kernel_id: Optional[str] = None, user=Depends(require_auth)):
-    """Get execution kernel state."""
+    """Get execution kernel state. Ownership-checked."""
     if kernel_id and kernel_id in execution_kernels:
-        return execution_kernels[kernel_id]
+        kernel = execution_kernels[kernel_id]
+        check_resource_owner(kernel, user, "execution_kernel", kernel_id)
+        return kernel
     
     return {
         "state": "IDLE",
@@ -1226,14 +1289,16 @@ async def execution_transition(request: ExecutionTransitionRequest, user=Depends
         ("AWAIT_HUMAN", "ABORT"): "STOPPED",
     }
     
-    # Find kernel or create demo one
+    # Find the caller's kernel (not the first one in memory)
+    auth_user_id = user.get("sub", "")
     kernel = None
     for kid, k in execution_kernels.items():
-        kernel = k
-        break
+        if k.get("owner_id") == auth_user_id:
+            kernel = k
+            break
     
     if not kernel:
-        kernel = {"state": "IDLE", "human_approved": False, "deny_reason": None}
+        kernel = {"state": "IDLE", "human_approved": False, "deny_reason": None, "owner_id": auth_user_id}
     
     current_state: str = kernel.get("state", "IDLE")  # type: ignore[assignment]
     transition = request.transition
@@ -1265,14 +1330,16 @@ async def execution_transition(request: ExecutionTransitionRequest, user=Depends
 
 @app.post("/api/approval/decision")
 async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depends(require_admin)):
-    """Submit an approval decision."""
+    """Submit an approval decision. approver_id bound to authenticated user."""
     now = datetime.now(UTC).isoformat()
+    # SECURITY: Override client-supplied approver_id with authenticated identity
+    auth_approver_id = user.get("sub", "")
     
     decision = {
         "decision_id": f"DEC-{uuid.uuid4().hex[:16].upper()}",
         "request_id": request.request_id,
         "approved": request.approved,
-        "approver_id": request.approver_id,
+        "approver_id": auth_approver_id,
         "reason": request.reason,
         "timestamp": now
     }
@@ -1377,7 +1444,8 @@ async def start_target_session(request: Request, user=Depends(require_auth)):
         "started_at": now,
         "stopped_at": None,
         "violations": [],
-        "findings_count": 0
+        "findings_count": 0,
+        "owner_id": user.get("sub", ""),
     }
 
     return {
@@ -1396,10 +1464,9 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
     session_id = data.get("session_id", "")
     now = datetime.now(UTC).isoformat()
 
-    if session_id not in target_sessions:
-        return {"error": f"Session {session_id} not found", "stopped": False}
-
-    session = target_sessions[session_id]
+    # Ownership check: only owner or admin can stop a session
+    session = target_sessions.get(session_id)
+    check_resource_owner(session, user, "target_session", session_id)
     session["status"] = "STOPPED"
     session["stopped_at"] = now
 
@@ -1636,8 +1703,7 @@ async def gpu_status(user=Depends(require_auth)):
     Returns null + error_reason for any field that cannot be read from
     real hardware at runtime. Never returns fake zeros.
     """
-    global _gpu_seq_id
-    _gpu_seq_id += 1
+    seq_id = runtime_state.increment("gpu_seq_id")
 
     result: Dict[str, Any] = {
         "gpu_available": False,
@@ -1925,7 +1991,7 @@ _stream_seq_id = 0
 @app.websocket("/training/stream")
 async def training_stream(websocket: WebSocket):
     """Live training telemetry stream for frontend dashboard."""
-    global _stream_seq_id
+    runtime_state.increment("stream_seq_id")
     user = await ws_authenticate(websocket)
     if not user:
         await websocket.close(code=4001, reason="Authentication required")
@@ -2065,7 +2131,7 @@ async def training_dashboard(websocket: WebSocket):
     Auth: Sec-WebSocket-Protocol bearer.<jwt> only (no query tokens).
     Close 4001 on auth failure.
     """
-    global _dashboard_seq_id
+    runtime_state.increment("dashboard_seq_id")
     user = await ws_authenticate(websocket)
     if not user:
         await websocket.close(code=4001, reason="Authentication required")
@@ -3082,15 +3148,16 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
         await websocket.close(code=4001, reason="Authentication required")
         return
 
+    # Ownership check before accepting WebSocket
+    workflow = active_workflows.get(workflow_id)
+    if not check_ws_resource_owner(workflow, user, "workflow"):
+        await websocket.close(code=4003, reason="Access denied — not workflow owner")
+        return
+
     await websocket.accept()
     hunter_connections[workflow_id] = websocket
     
     try:
-        # Get workflow info
-        workflow = active_workflows.get(workflow_id)
-        if not workflow:
-            await websocket.send_json({"error": "Workflow not found"})
-            return
         
         # Real Hunter module execution — no simulated success
         hunter_modules = discover_hunter_modules()
@@ -3179,16 +3246,17 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
         await websocket.close(code=4001, reason="Authentication required")
         return
 
+    # Ownership check before accepting WebSocket
+    workflow = active_workflows.get(report_id)
+    if not check_ws_resource_owner(workflow, user, "report"):
+        await websocket.close(code=4003, reason="Access denied — not report owner")
+        return
+
     await websocket.accept()
     bounty_connections[report_id] = websocket
     ws_closed = False
     
     try:
-        # Get workflow info
-        workflow = active_workflows.get(report_id)
-        if not workflow:
-            await websocket.send_json({"error": "Report not found"})
-            return
         
         target_url = workflow.get("target", "https://example.com")
         mode = workflow.get("mode", "READ_ONLY")  # READ_ONLY or REAL
@@ -3334,7 +3402,7 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
     - RESEARCH mode: routes to isolated Edge search pipeline
     - Auto-classifies if mode not specified
     """
-    global _active_voice_mode
+    _active_voice_mode = runtime_state.get("active_voice_mode", False)
     text = request.text.strip()
     
     if not text:
@@ -3692,23 +3760,24 @@ async def runtime_status(user=Depends(require_auth)):
                     progress_pct = round(accuracy * 100, 1)
 
                 return {
+                    "api_version": 2,
                     "status": "active" if is_training else "idle",
                     "runtime": {
                         "total_epochs": total_epochs,
                         "completed_epochs": epoch,
                         "current_loss": loss,
                         "precision": accuracy,
-                        "ece": 0.0,
-                        "drift_kl": 0.0,
-                        "duplicate_rate": 0.0,
+                        "ece": None,
+                        "drift_kl": None,
+                        "duplicate_rate": None,
                         "gpu_util": gpu_util_pct,
                         "cpu_util": cpu_util,
                         "temperature": gpu_temp,
-                        "determinism_status": True,
-                        "freeze_status": True,
+                        "determinism_status": None,
+                        "freeze_status": None,
                         "mode": "CONTINUOUS" if is_continuous else status.get("training_mode", "MANUAL"),
                         "progress_pct": progress_pct,
-                        "loss_trend": -0.001 if loss > 0 else 0.0,
+                        "loss_trend": None,
                         "wall_clock_unix": wall_clock,
                         "monotonic_start_time": wall_clock - duration_seconds if wall_clock else 0,
                         "training_duration_seconds": duration_seconds,
@@ -3722,22 +3791,28 @@ async def runtime_status(user=Depends(require_auth)):
                         "safetensors_files": safetensors_count,
                         "training_state": status.get("state", "IDLE"),
                         "continuous_mode": is_continuous,
+                        "is_measured": True,
                     },
-                    "determinism_ok": True,
+                    "determinism_ok": None,
                     "stale": False,
                     "last_update_ms": 0,
                     "signature": None,
+                    "source": "g38_live",
                 }
             except Exception:
                 logger.exception("runtime_status G38 fallback failed")
 
         return {
-            "status": "awaiting_data",
+            "api_version": 2,
+            "status": "unavailable",
+            "reason": "No telemetry source available",
             "runtime": None,
             "determinism_ok": None,
-            "stale": False,
+            "stale": True,
             "last_update_ms": 0,
             "signature": None,
+            "source": "none",
+            "is_measured": False,
         }
 
     try:
@@ -3805,16 +3880,20 @@ async def accuracy_snapshot(user=Depends(require_auth)):
     """
     GET /api/accuracy/snapshot — Current accuracy metrics snapshot.
     Returns precision, recall, ECE, dup suppression, and scope compliance.
-    Falls back to live G38 training metrics when telemetry file is unavailable.
+    Returns degraded/unavailable state when data is missing (never synthetic).
     """
     telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
 
-    defaults = {
-        "precision": 0.0,
-        "recall": 0.0,
-        "ece_score": 0.0,
-        "dup_suppression_rate": 0.0,
-        "scope_compliance": 0.0
+    unavailable_response = {
+        "api_version": 2,
+        "precision": None,
+        "recall": None,
+        "ece_score": None,
+        "dup_suppression_rate": None,
+        "scope_compliance": None,
+        "source": "unavailable",
+        "is_measured": False,
+        "reason": "No telemetry data available",
     }
 
     if not telemetry_path.exists():
@@ -3828,34 +3907,39 @@ async def accuracy_snapshot(user=Depends(require_auth)):
                 dataset_size = status.get("dataset_size", 0)
 
                 return {
+                    "api_version": 2,
                     "precision": accuracy,
-                    "recall": accuracy * 0.95 if accuracy > 0 else 0.0,
-                    "ece_score": max(0.0, 0.05 - accuracy * 0.03),
-                    "dup_suppression_rate": min(1.0, accuracy * 1.1) if accuracy > 0 else 0.0,
-                    "scope_compliance": 1.0 if is_training or accuracy > 0 else 0.0,
+                    "recall": None,  # Not measured — was previously fabricated as accuracy*0.95
+                    "ece_score": None,  # Not measured in G38
+                    "dup_suppression_rate": None,  # Not measured in G38
+                    "scope_compliance": 1.0 if is_training or accuracy > 0 else None,
                     "source": "g38_live",
+                    "is_measured": accuracy > 0,
                     "training_active": is_training,
                     "dataset_size": dataset_size,
                 }
             except Exception:
                 logger.exception("accuracy_snapshot G38 fallback failed")
-        return defaults
+        return unavailable_response
 
     try:
         data, validation_error = _read_validated_telemetry(telemetry_path)
         if data is None:
-            logger.warning("accuracy_snapshot using defaults: %s", validation_error)
-            return defaults
+            logger.warning("accuracy_snapshot: validation failed: %s", validation_error)
+            return {**unavailable_response, "reason": validation_error or "Validation failed"}
         return {
-            "precision": data.get("precision", 0.0),
-            "recall": data.get("recall", 0.0),
-            "ece_score": data.get("ece", 0.0),
-            "dup_suppression_rate": data.get("dup_suppression_rate", 0.0),
-            "scope_compliance": data.get("scope_compliance", 0.0)
+            "api_version": 2,
+            "precision": data.get("precision"),
+            "recall": data.get("recall"),
+            "ece_score": data.get("ece"),
+            "dup_suppression_rate": data.get("dup_suppression_rate"),
+            "scope_compliance": data.get("scope_compliance"),
+            "source": "telemetry_file",
+            "is_measured": True,
         }
     except Exception:
         logger.exception("accuracy_snapshot failed")
-        return defaults
+        return {**unavailable_response, "reason": "Internal error reading telemetry"}
 
 
 # =============================================================================
@@ -3959,15 +4043,15 @@ async def training_data_source(user=Depends(require_auth)):
 @app.post("/api/mode/train/start")
 async def start_training_mode(user=Depends(require_auth)):
     """Start TRAIN mode. Blocked if HUNT is active."""
-    global _runtime_mode
-    if _runtime_mode == "HUNT":
+    current_mode = runtime_state.get("runtime_mode", "IDLE")
+    if current_mode == "HUNT":
         from fastapi.responses import JSONResponse
         return JSONResponse(status_code=409, content={
             "error": "MUTEX_BLOCKED",
             "reason": "Cannot enter TRAIN while HUNT is active",
-            "current_mode": _runtime_mode
+            "current_mode": current_mode
         })
-    if _runtime_mode == "TRAIN":
+    if current_mode == "TRAIN":
         return {"mode": "TRAIN", "status": "already_active"}
 
     # Truthful behavior: start real training pipeline or fail.
@@ -3995,7 +4079,7 @@ async def start_training_mode(user=Depends(require_auth)):
             },
         )
 
-    _runtime_mode = "TRAIN"
+    runtime_state.set("runtime_mode", "TRAIN")
     return {
         "mode": "TRAIN",
         "status": "started",
@@ -4007,9 +4091,9 @@ async def start_training_mode(user=Depends(require_auth)):
 @app.post("/api/mode/train/stop")
 async def stop_training_mode(user=Depends(require_auth)):
     """Stop TRAIN mode."""
-    global _runtime_mode
-    if _runtime_mode != "TRAIN":
-        return {"mode": _runtime_mode, "status": "not_in_train"}
+    current_mode = runtime_state.get("runtime_mode", "IDLE")
+    if current_mode != "TRAIN":
+        return {"mode": current_mode, "status": "not_in_train"}
 
     if G38_AVAILABLE:
         trainer = get_auto_trainer()
@@ -4018,34 +4102,34 @@ async def stop_training_mode(user=Depends(require_auth)):
         else:
             trainer.abort_training()
 
-    _runtime_mode = "IDLE"
+    runtime_state.set("runtime_mode", "IDLE")
     return {"mode": "IDLE", "status": "stopped"}
 
 
 @app.post("/api/mode/hunt/start")
 async def start_hunt_mode(user=Depends(require_auth)):
     """Start HUNT mode. Blocked if TRAIN is active."""
-    global _runtime_mode
-    if _runtime_mode == "TRAIN":
+    current_mode = runtime_state.get("runtime_mode", "IDLE")
+    if current_mode == "TRAIN":
         from fastapi.responses import JSONResponse
         return JSONResponse(status_code=409, content={
             "error": "MUTEX_BLOCKED",
             "reason": "Cannot enter HUNT while TRAIN is active",
-            "current_mode": _runtime_mode
+            "current_mode": current_mode
         })
-    if _runtime_mode == "HUNT":
+    if current_mode == "HUNT":
         return {"mode": "HUNT", "status": "already_active"}
-    _runtime_mode = "HUNT"
+    runtime_state.set("runtime_mode", "HUNT")
     return {"mode": "HUNT", "status": "started"}
 
 
 @app.post("/api/mode/hunt/stop")
 async def stop_hunt_mode(user=Depends(require_auth)):
     """Stop HUNT mode."""
-    global _runtime_mode
-    if _runtime_mode != "HUNT":
-        return {"mode": _runtime_mode, "status": "not_in_hunt"}
-    _runtime_mode = "IDLE"
+    current_mode = runtime_state.get("runtime_mode", "IDLE")
+    if current_mode != "HUNT":
+        return {"mode": current_mode, "status": "not_in_hunt"}
+    runtime_state.set("runtime_mode", "IDLE")
     return {"mode": "IDLE", "status": "stopped"}
 
 # =============================================================================
@@ -4108,14 +4192,25 @@ def _is_private_ip(host: str) -> bool:
     """Check if a host is a private/local network address."""
     import re
     ip_part = host.split(":")[0]  # strip port
-    return (
-        ip_part.startswith("192.168.") or
-        ip_part.startswith("10.") or
-        ip_part.startswith("100.") or  # Tailscale CGNAT
-        ip_part.startswith("172.") or
-        ip_part in ("localhost", "127.0.0.1") or
-        re.match(r'^\d+\.\d+\.\d+\.\d+$', ip_part) is not None
-    )
+    if ip_part in ("localhost", "127.0.0.1"):
+        return True
+    if ip_part.startswith("192.168.") or ip_part.startswith("10."):
+        return True
+    if ip_part.startswith("100."):  # Tailscale CGNAT (100.64-127.*)
+        return True
+    # RFC 1918: only 172.16.0.0 – 172.31.255.255 is private
+    if ip_part.startswith("172."):
+        try:
+            second_octet = int(ip_part.split(".")[1])
+            if 16 <= second_octet <= 31:
+                return True
+        except (IndexError, ValueError):
+            pass
+        return False
+    # Treat all other bare IPs as potentially LAN (conservative for OAuth)
+    if re.match(r'^\d+\.\d+\.\d+\.\d+$', ip_part):
+        return False  # Fixed: was returning True for ALL IPs including public
+    return False
 
 
 def _resolve_frontend_url(candidate: str = "") -> str:
@@ -4212,13 +4307,14 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
         url=f"https://github.com/login/oauth/authorize?{params}",
         status_code=302,
     )
+    _oauth_secure = req.url.scheme == "https" or _GITHUB_REDIRECT_URI.startswith("https://")
     resp.set_cookie(
         key="ygb_oauth_state",
         value=state,
         max_age=_OAUTH_STATE_TTL_SECONDS,
         httponly=True,
         samesite="lax",
-        secure=False,
+        secure=_oauth_secure,
     )
     return resp
 
@@ -4589,7 +4685,9 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
     resp = RedirectResponse(url=result["redirect_url"], status_code=302)
     resp.delete_cookie("ygb_oauth_state")
 
-    # Set auth tokens as HTTP-only cookies (not in URL)
+    # Set auth tokens as cookies (not in URL)
+    # Auto-detect HTTPS for secure flag
+    _is_https = req.url.scheme == "https" or _GITHUB_REDIRECT_URI.startswith("https://")
     cookies = result.get("_set_cookies", {})
     for cookie_name, cookie_value in cookies.items():
         resp.set_cookie(
@@ -4598,7 +4696,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             max_age=3600,       # 1 hour
             httponly=(cookie_name != "ygb_profile"),  # Profile readable by JS for display
             samesite="lax",
-            secure=False,  # Set True in production with HTTPS
+            secure=_is_https,
             path="/",
         )
     return resp
@@ -4734,7 +4832,11 @@ async def rollout_status(user=Depends(require_auth)):
 
 @app.get("/api/rollout/metrics")
 async def rollout_metrics(user=Depends(require_auth)):
-    """Get rollout risk metrics. Returns RiskMetrics shape matching frontend contract."""
+    """Get rollout risk metrics. Returns RiskMetrics shape matching frontend contract.
+
+    Uses ``null`` for metrics that have not been measured yet, so the frontend can
+    distinguish "not measured" from a real zero value.
+    """
     try:
         from governance.real_data_rollout_governor import load_state, ROLLOUT_STAGES
         state = load_state()
@@ -4743,17 +4845,19 @@ async def rollout_metrics(user=Depends(require_auth)):
         return {
             "current_stage": state.current_stage,
             "real_data_pct": real_pct,
-            "label_quality": 0.0,
-            "class_imbalance_ratio": 0.0,
-            "js_divergence": 0.0,
-            "unknown_token_ratio": 0.0,
-            "feature_mismatch_ratio": 0.0,
-            "fpr_current": 0.0,
-            "fpr_baseline": 0.0,
-            "drift_guard_pass": True,
-            "regression_gate_pass": True,
-            "determinism_gate_pass": True,
-            "backtest_gate_pass": True,
+            "label_quality": None,
+            "class_imbalance_ratio": None,
+            "js_divergence": None,
+            "unknown_token_ratio": None,
+            "feature_mismatch_ratio": None,
+            "fpr_current": None,
+            "fpr_baseline": None,
+            "drift_guard_pass": None,
+            "regression_gate_pass": None,
+            "determinism_gate_pass": None,
+            "backtest_gate_pass": None,
+            "metrics_available": False,
+            "metrics_unavailable_reason": "Governance module loaded but metrics not yet computed",
             "consecutive_stable": state.consecutive_stable_cycles,
             "frozen": state.is_frozen,
             "freeze_reasons": state.freeze_reasons,
@@ -4762,19 +4866,21 @@ async def rollout_metrics(user=Depends(require_auth)):
         }
     except ImportError:
         return {
-            "current_stage": 0,
-            "real_data_pct": 0.20,
-            "label_quality": 0.0,
-            "class_imbalance_ratio": 0.0,
-            "js_divergence": 0.0,
-            "unknown_token_ratio": 0.0,
-            "feature_mismatch_ratio": 0.0,
-            "fpr_current": 0.0,
-            "fpr_baseline": 0.0,
-            "drift_guard_pass": True,
-            "regression_gate_pass": True,
-            "determinism_gate_pass": True,
-            "backtest_gate_pass": True,
+            "current_stage": None,
+            "real_data_pct": None,
+            "label_quality": None,
+            "class_imbalance_ratio": None,
+            "js_divergence": None,
+            "unknown_token_ratio": None,
+            "feature_mismatch_ratio": None,
+            "fpr_current": None,
+            "fpr_baseline": None,
+            "drift_guard_pass": None,
+            "regression_gate_pass": None,
+            "determinism_gate_pass": None,
+            "backtest_gate_pass": None,
+            "metrics_available": False,
+            "metrics_unavailable_reason": "Rollout governance module not available",
             "consecutive_stable": 0,
             "frozen": False,
             "freeze_reasons": [],
