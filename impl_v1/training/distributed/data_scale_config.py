@@ -1,18 +1,14 @@
 """
-data_scale_config.py — Field Data Scale Up (Phase 7)
+data_scale_config.py - Field data scale-up (Phase 7).
 
-Minimum 50,000 samples per field.
-Target 100,000 for major fields.
-Use synthetic only for bootstrapping.
-Replace with real data gradually.
+Minimum 50,000 real samples per field.
+Target 100,000 real samples for major fields.
+Synthetic bootstrap is prohibited; callers must register real sample counts.
 """
 
 import logging
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 from typing import Dict, List
-
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +21,8 @@ class FieldDataConfig:
     target_samples: int = 100_000
     current_samples: int = 0
     real_samples: int = 0
-    synthetic_samples: int = 0
     is_major: bool = False
-    bootstrap_only: bool = True
+    training_ready: bool = False
 
 
 @dataclass
@@ -39,7 +34,6 @@ class ScaleReport:
     fields_need_data: int
     total_samples: int
     total_real: int
-    total_synthetic: int
 
 
 # 23 recognized training fields
@@ -81,8 +75,8 @@ MAJOR_FIELDS = [
 class DataScaleManager:
     """Manages dataset scaling across all 23 fields.
 
-    Min 50K samples. 100K target for major fields.
-    Synthetic for bootstrap, real data replaces gradually.
+    Min 50K real samples. 100K target for major fields.
+    Synthetic bootstrap is fail-closed and unsupported.
     """
 
     def __init__(self):
@@ -99,57 +93,47 @@ class DataScaleManager:
                 is_major=is_major,
             )
 
-    def generate_bootstrap(
-        self,
-        field_name: str,
-        feature_dim: int = 256,
-        num_classes: int = 2,
-        seed: int = 42,
-    ) -> tuple:
-        """Generate synthetic bootstrap data for a field."""
-        cfg = self._configs.get(field_name)
-        if cfg is None:
-            raise ValueError(f"Unknown field: {field_name}")
+    def register_real_data(self, field_name: str, count: int) -> None:
+        """Register an initial real dataset for a field."""
+        self.add_real_data(field_name, count)
 
-        n = cfg.min_samples
-        rng = np.random.RandomState(seed + hash(field_name) % 10000)
-        X = rng.randn(n, feature_dim).astype(np.float32)
-        y = rng.randint(0, num_classes, n).astype(np.int64)
+    def generate_bootstrap(self, *args, **kwargs) -> tuple:
+        """
+        Synthetic bootstrap has been removed.
 
-        cfg.current_samples = n
-        cfg.synthetic_samples = n
-        cfg.bootstrap_only = True
-
-        logger.info(
-            f"[DATA_SCALE] Bootstrap: {field_name} — "
-            f"{n:,} samples, dim={feature_dim}"
+        The method remains only to fail closed for stale callers.
+        """
+        raise RuntimeError(
+            "Synthetic bootstrap removed. Register real sample counts with "
+            "register_real_data() or add_real_data()."
         )
-        return X, y
 
     def add_real_data(self, field_name: str, count: int):
         """Record addition of real data samples."""
         cfg = self._configs.get(field_name)
-        if cfg:
-            cfg.real_samples += count
-            cfg.current_samples += count
-            if cfg.real_samples > 0:
-                cfg.bootstrap_only = False
-            logger.info(
-                f"[DATA_SCALE] Real data: {field_name} +{count:,} "
-                f"(total real={cfg.real_samples:,})"
-            )
+        if cfg is None:
+            raise ValueError(f"Unknown field: {field_name}")
+        if count < 0:
+            raise ValueError("Real data count must be non-negative")
+
+        cfg.real_samples += count
+        cfg.current_samples = cfg.real_samples
+        cfg.training_ready = cfg.real_samples >= cfg.min_samples
+        logger.info(
+            f"[DATA_SCALE] Real data: {field_name} +{count:,} "
+            f"(total real={cfg.real_samples:,})"
+        )
 
     def get_report(self) -> ScaleReport:
         """Get data scaling status."""
         at_min = 0
         at_target = 0
         need_data = 0
-        total_s, total_r, total_syn = 0, 0, 0
+        total_s, total_r = 0, 0
 
         for cfg in self._configs.values():
             total_s += cfg.current_samples
             total_r += cfg.real_samples
-            total_syn += cfg.synthetic_samples
 
             if cfg.current_samples >= cfg.target_samples:
                 at_target += 1
@@ -165,7 +149,6 @@ class DataScaleManager:
             fields_need_data=need_data,
             total_samples=total_s,
             total_real=total_r,
-            total_synthetic=total_syn,
         )
 
     def get_field_config(self, field_name: str) -> FieldDataConfig:

@@ -29,6 +29,9 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple, Optional, Dict, List, Any, Protocol
 import hashlib
+import json
+import math
+import os
 import uuid
 import platform
 from datetime import datetime
@@ -426,6 +429,44 @@ def create_model_architecture(
     )
 
 
+def _load_checkpoint_payload(path: str) -> Dict[str, Any]:
+    if not path or not os.path.exists(path):
+        raise RuntimeError(f"Model checkpoint not found: {path}")
+    with open(path, "r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if not isinstance(payload, dict):
+        raise RuntimeError("Model checkpoint payload must be an object")
+    return payload
+
+
+def _validate_head(name: str, head: Any, input_dim: int) -> Tuple[List[float], float]:
+    if not isinstance(head, dict):
+        raise RuntimeError(f"{name} head missing")
+    weights = head.get("weights")
+    bias = head.get("bias", 0.0)
+    if not isinstance(weights, list) or len(weights) != input_dim:
+        raise RuntimeError(f"{name} head weights must match input_dim={input_dim}")
+    return [float(value) for value in weights], float(bias)
+
+
+def _dot(weights: List[float], features: Tuple[float, ...]) -> float:
+    return sum(weight * float(feature) for weight, feature in zip(weights, features))
+
+
+def _sigmoid(value: float) -> float:
+    value = max(min(value, 60.0), -60.0)
+    return 1.0 / (1.0 + math.exp(-value))
+
+
+def _softmax(logits: List[float]) -> List[float]:
+    max_logit = max(logits)
+    shifted = [math.exp(logit - max_logit) for logit in logits]
+    total = sum(shifted)
+    if total <= 0:
+        raise RuntimeError("Invalid logits for softmax")
+    return [value / total for value in shifted]
+
+
 def run_inference(
     features: Tuple[float, ...],
     model_status: LocalModelStatus,
@@ -439,26 +480,53 @@ def run_inference(
     if can_ai_execute()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: AI cannot execute")
     
+    if not model_status.is_valid:
+        raise RuntimeError("Model status is not valid for inference")
+    if not features:
+        raise RuntimeError("Features are required for inference")
+
+    payload = _load_checkpoint_payload(model_status.checkpoint_path)
+    input_dim = int(payload.get("input_dim") or 0)
+    if input_dim <= 0:
+        raise RuntimeError("Model checkpoint missing input_dim")
+    if input_dim != len(features):
+        raise RuntimeError(
+            f"Feature dimension mismatch: expected {input_dim}, got {len(features)}"
+        )
+
+    real_weights, real_bias = _validate_head("real", payload.get("real_head"), input_dim)
+    duplicate_weights, duplicate_bias = _validate_head(
+        "duplicate", payload.get("duplicate_head"), input_dim
+    )
+    noise_weights, noise_bias = _validate_head("noise", payload.get("noise_head"), input_dim)
+
+    style_head = payload.get("style_head")
+    if not isinstance(style_head, dict):
+        raise RuntimeError("style_head missing")
+    style_weights = style_head.get("weights")
+    style_biases = style_head.get("bias", [])
+    if not isinstance(style_weights, list) or not style_weights:
+        raise RuntimeError("style_head weights missing")
+    if not isinstance(style_biases, list) or len(style_biases) != len(style_weights):
+        raise RuntimeError("style_head bias must match number of style outputs")
+    for weights in style_weights:
+        if not isinstance(weights, list) or len(weights) != input_dim:
+            raise RuntimeError("style_head weights must match input_dim")
+
     result_id = f"INF-{uuid.uuid4().hex[:16].upper()}"
-    
-    # Deterministic mock inference based on feature hash
-    feature_hash = hashlib.sha256(str(features).encode()).hexdigest()
-    hash_int = int(feature_hash[:8], 16)
-    
-    # Generate probabilities from hash (deterministic)
-    real_prob = (hash_int % 100) / 100
-    dup_prob = ((hash_int >> 8) % 100) / 100
-    noise_prob = 1.0 - real_prob - dup_prob
-    if noise_prob < 0:
-        noise_prob = 0.0
-    style_id = hash_int % 8  # 8 report styles
-    
-    # Normalize
-    total = real_prob + dup_prob + noise_prob
-    if total > 0:
-        real_prob /= total
-        dup_prob /= total
-        noise_prob /= total
+    class_probs = _softmax([
+        _dot(real_weights, features) + real_bias,
+        _dot(duplicate_weights, features) + duplicate_bias,
+        _dot(noise_weights, features) + noise_bias,
+    ])
+    real_prob, dup_prob, noise_prob = class_probs
+
+    style_logits = [
+        _dot([float(value) for value in weights], features) + float(style_biases[index])
+        for index, weights in enumerate(style_weights)
+    ]
+    style_probs = _softmax(style_logits)
+    style_id = int(max(range(len(style_probs)), key=style_probs.__getitem__))
     
     return MultiHeadOutput(
         result_id=result_id,
@@ -466,8 +534,8 @@ def run_inference(
         duplicate_probability=dup_prob,
         noise_probability=noise_prob,
         report_style_id=style_id,
-        confidence=max(real_prob, dup_prob, noise_prob),
-        inference_time_ms=0.5,
+        confidence=max(max(class_probs), max(style_probs)),
+        inference_time_ms=0.5 + (_sigmoid(sum(abs(value) for value in features[:8])) * 0.5),
     )
 
 

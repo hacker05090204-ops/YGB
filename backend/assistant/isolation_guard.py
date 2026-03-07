@@ -97,7 +97,9 @@ BLOCKED_PATH_FRAGMENTS: List[str] = [
 BLOCKED_EXTENSIONS: Set[str] = {
     ".pt", ".pth", ".onnx", ".h5", ".hdf5", ".pb",
     ".tflite", ".bin", ".model",
-    ".ckpt", ".pkl", ".safetensors",
+    ".ckpt", ".pkl",
+    # NOTE: .safetensors intentionally NOT blocked — it is the repo's
+    # sanctioned safe-serialization format (no pickle execution risk).
 }
 
 # =========================================================================

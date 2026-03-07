@@ -48,6 +48,8 @@ export function useAuthUser(): AuthUser {
                 // No token — try sessionStorage profile as fallback
                 const raw = sessionStorage.getItem("ygb_profile")
                 if (raw) {
+                    // Cached profile is NOT proof of auth — mark unavailable
+                    // but preserve profile data for display if UI chooses.
                     const profile = JSON.parse(raw)
                     setUser({
                         name: profile.github_login || profile.name || null,
@@ -56,8 +58,8 @@ export function useAuthUser(): AuthUser {
                         githubLogin: profile.github_login || null,
                         role: profile.role || null,
                         authProvider: profile.auth_provider || null,
-                        status: "authenticated",
-                        unavailableReason: null,
+                        status: "unavailable",
+                        unavailableReason: "Cached profile only — no auth token",
                     })
                     return
                 }
@@ -94,6 +96,7 @@ export function useAuthUser(): AuthUser {
             try {
                 const raw = sessionStorage.getItem("ygb_profile")
                 if (raw) {
+                    // Backend unreachable + cached profile ≠ authenticated
                     const profile = JSON.parse(raw)
                     setUser({
                         name: profile.github_login || profile.name || null,
@@ -102,8 +105,8 @@ export function useAuthUser(): AuthUser {
                         githubLogin: profile.github_login || null,
                         role: profile.role || null,
                         authProvider: profile.auth_provider || null,
-                        status: "authenticated",
-                        unavailableReason: null,
+                        status: "unavailable",
+                        unavailableReason: "Backend unreachable — using cached profile",
                     })
                     return
                 }

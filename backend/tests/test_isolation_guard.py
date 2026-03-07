@@ -156,10 +156,10 @@ class TestIsolationGuardExtensions:
         result = self.guard.check_path_read("/data/model.h5")
         assert not result.allowed
 
-    def test_block_safetensors(self):
-        """SafeTensors files are blocked."""
+    def test_allow_safetensors(self):
+        """SafeTensors reads are allowed — safe serialization format (no pickle risk)."""
         result = self.guard.check_path_read("/cache/weights.safetensors")
-        assert not result.allowed
+        assert result.allowed
 
     def test_allow_text_file(self):
         """Text files are allowed."""

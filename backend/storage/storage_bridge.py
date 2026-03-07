@@ -42,6 +42,8 @@ _video_streamer: Optional[VideoStreamer] = None
 # --- In-memory lookup indexes (eliminate full-table scans) ---
 _EMAIL_INDEX: Dict[str, str] = {}       # email → user entity_id
 _EMAIL_INDEX_BUILT = False
+_GITHUB_ID_INDEX: Dict[str, str] = {}
+_GITHUB_ID_INDEX_BUILT = False
 _DEVICE_INDEX: Dict[str, str] = {}      # "user_id|device_hash" → device entity_id
 _DEVICE_INDEX_BUILT = False
 
@@ -52,8 +54,16 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     Call this once at application startup.
     """
     global _engine, _lifecycle, _disk_monitor, _video_streamer
+    global _EMAIL_INDEX, _EMAIL_INDEX_BUILT, _GITHUB_ID_INDEX, _GITHUB_ID_INDEX_BUILT
+    global _DEVICE_INDEX, _DEVICE_INDEX_BUILT
 
     _engine = get_engine(hdd_root)
+    _EMAIL_INDEX = {}
+    _EMAIL_INDEX_BUILT = False
+    _GITHUB_ID_INDEX = {}
+    _GITHUB_ID_INDEX_BUILT = False
+    _DEVICE_INDEX = {}
+    _DEVICE_INDEX_BUILT = False
 
     _lifecycle = LifecycleManager(_engine)
     _lifecycle.start_sweep_thread()
@@ -95,10 +105,14 @@ def create_user(name: str, email: str = None, role: str = "hunter") -> Dict[str,
         "email": email,
         "role": role,
         "password_hash": None,
+        "auth_provider": None,
         "last_login_ip": None,
         "last_geolocation": None,
         "last_auth_provider": None,
         "last_auth_at": None,
+        "github_id": None,
+        "github_login": None,
+        "avatar_url": None,
         "github_profile": {},
         "total_bounties": 0,
         "total_earnings": 0.0,
@@ -122,11 +136,16 @@ def get_user(user_id: str) -> Optional[Dict[str, Any]]:
         return None
 
     latest = entity["latest"]
+    github_profile = latest.get("github_profile", {}) or {}
     return {
         "id": user_id,
         "name": latest.get("name", ""),
         "email": latest.get("email"),
         "role": latest.get("role", "hunter"),
+        "auth_provider": latest.get("auth_provider") or latest.get("last_auth_provider"),
+        "github_id": latest.get("github_id") or github_profile.get("github_id"),
+        "github_login": latest.get("github_login") or github_profile.get("github_login"),
+        "avatar_url": latest.get("avatar_url") or github_profile.get("avatar_url"),
         "total_bounties": latest.get("total_bounties", 0),
         "total_earnings": latest.get("total_earnings", 0.0),
         "created_at": latest.get("created_at", ""),
@@ -441,6 +460,24 @@ def _ensure_email_index():
     _EMAIL_INDEX_BUILT = True
 
 
+def _ensure_github_id_index():
+    """Lazily populate the github_id lookup index."""
+    global _GITHUB_ID_INDEX_BUILT
+    if _GITHUB_ID_INDEX_BUILT:
+        return
+    metas = _engine.list_entities("users", limit=10000)
+    for meta in metas:
+        entity = _engine.read_entity("users", meta["entity_id"])
+        if not entity or not entity.get("latest"):
+            continue
+        latest = entity["latest"]
+        profile = latest.get("github_profile", {}) or {}
+        github_id = latest.get("github_id") or profile.get("github_id")
+        if github_id:
+            _GITHUB_ID_INDEX[str(github_id)] = meta["entity_id"]
+    _GITHUB_ID_INDEX_BUILT = True
+
+
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Find a user by email address (uses cached index after first call)."""
     _ensure_email_index()
@@ -450,18 +487,20 @@ def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     entity = _engine.read_entity("users", entity_id)
     if not entity or not entity.get("latest"):
         return None
-    latest = entity["latest"]
-    return {
-        "id": entity_id,
-        "name": latest.get("name", ""),
-        "email": latest.get("email"),
-        "role": latest.get("role", "hunter"),
-        "password_hash": latest.get("password_hash"),
-        "total_bounties": latest.get("total_bounties", 0),
-        "total_earnings": latest.get("total_earnings", 0.0),
-        "created_at": latest.get("created_at", ""),
-        "last_active": latest.get("last_active", ""),
-    }
+    latest = get_user(entity_id) or {}
+    latest["password_hash"] = entity["latest"].get("password_hash")
+    return latest
+
+
+def get_user_by_github_id(github_id: str) -> Optional[Dict[str, Any]]:
+    """Find a user by stable GitHub account id."""
+    if not github_id:
+        return None
+    _ensure_github_id_index()
+    entity_id = _GITHUB_ID_INDEX.get(str(github_id))
+    if not entity_id:
+        return None
+    return get_user(entity_id)
 
 
 def update_user_password(user_id: str, password_hash: str):
@@ -502,14 +541,24 @@ def update_user_auth_profile(
         else:
             bounded_profile[key] = str(v)[:512]
 
+    github_id = bounded_profile.get("github_id") or latest.get("github_id")
+    github_login = bounded_profile.get("github_login") or latest.get("github_login")
+    avatar_url = bounded_profile.get("avatar_url") or latest.get("avatar_url")
+
     _engine.append_record("users", user_id, {
         **latest,
+        "auth_provider": auth_provider,
         "last_login_ip": ip_address,
         "last_geolocation": geolocation,
         "last_auth_provider": auth_provider,
         "last_auth_at": datetime.now(timezone.utc).isoformat(),
+        "github_id": github_id,
+        "github_login": github_login,
+        "avatar_url": avatar_url,
         "github_profile": bounded_profile,
     })
+    if github_id:
+        _GITHUB_ID_INDEX[str(github_id)] = user_id
 
 
 def get_admin_user_security_view(limit: int = 1000) -> List[Dict[str, Any]]:

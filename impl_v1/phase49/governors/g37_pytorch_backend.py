@@ -22,7 +22,7 @@ import uuid
 import json
 from datetime import datetime
 
-# Try importing PyTorch - graceful fallback if unavailable
+# Try importing PyTorch - fail closed in training/inference paths if unavailable
 try:
     import torch
     import torch.nn as nn
@@ -133,6 +133,12 @@ def _hash_content(content: str) -> str:
 def _now_iso() -> str:
     """Current timestamp."""
     return datetime.utcnow().isoformat() + "Z"
+
+
+def _require_pytorch_runtime(operation: str) -> None:
+    """Fail closed when real PyTorch execution is unavailable."""
+    if not PYTORCH_AVAILABLE or torch is None or nn is None or optim is None:
+        raise RuntimeError(f"PyTorch is required for {operation}")
 
 
 # =============================================================================
@@ -284,17 +290,7 @@ def train_single_epoch(
     if can_train_without_idle()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: Cannot train outside IDLE mode")
     
-    if not PYTORCH_AVAILABLE:
-        # Fallback mock when PyTorch unavailable
-        return EpochMetrics(
-            epoch=epoch,
-            train_loss=max(0.05, 1.0 - (epoch * 0.1)),
-            train_accuracy=min(0.99, 0.7 + (epoch * 0.03)),
-            val_loss=max(0.06, 1.1 - (epoch * 0.1)),
-            val_accuracy=min(0.98, 0.68 + (epoch * 0.03)),
-            learning_rate=0.001,
-            time_seconds=0.1,
-        )
+    _require_pytorch_runtime("train_single_epoch")
     
     import time
     start_time = time.time()
@@ -354,25 +350,11 @@ def train_full(
     
     Returns trained model and metrics history.
     """
+    _require_pytorch_runtime("train_full")
     device = get_torch_device()
     
-    if not PYTORCH_AVAILABLE or device is None:
-        # Return mock metrics when PyTorch unavailable
-        metrics = []
-        for e in range(1, config.epochs + 1):
-            m = EpochMetrics(
-                epoch=e,
-                train_loss=max(0.05, 1.0 - (e * 0.05)),
-                train_accuracy=min(0.99, 0.7 + (e * 0.02)),
-                val_loss=max(0.06, 1.1 - (e * 0.05)),
-                val_accuracy=min(0.98, 0.68 + (e * 0.02)),
-                learning_rate=config.learning_rate,
-                time_seconds=0.01,
-            )
-            metrics.append(m)
-            if m.train_accuracy >= early_stop_accuracy:
-                break
-        return None, tuple(metrics)
+    if device is None:
+        raise RuntimeError("PyTorch device unavailable for train_full")
     
     # Set deterministic seed
     torch.manual_seed(config.seed)
@@ -432,16 +414,7 @@ def load_model_checkpoint(
     path: str,
 ) -> Tuple[Any, ModelCheckpoint]:
     """Load model from checkpoint."""
-    if not PYTORCH_AVAILABLE:
-        return None, ModelCheckpoint(
-            checkpoint_id=_generate_id("CKPT"),
-            epoch=0,
-            train_accuracy=0.0,
-            val_accuracy=0.0,
-            model_hash="",
-            created_at=_now_iso(),
-            path=path,
-        )
+    _require_pytorch_runtime("load_model_checkpoint")
     
     device = get_torch_device()
     model = BugClassifier(config)
@@ -475,17 +448,9 @@ def infer_single(
     if can_infer_without_model()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: Cannot infer without trained model")
     
-    if not PYTORCH_AVAILABLE or model is None:
-        # Mock inference
-        pred = hash(sample.sample_id) % 2
-        conf = 0.8 + (hash(sample.sample_id) % 20) / 100
-        return InferenceResult(
-            result_id=_generate_id("INF"),
-            prediction=pred,
-            confidence=conf,
-            probabilities=(1 - conf, conf) if pred == 1 else (conf, 1 - conf),
-            inference_time_ms=0.1,
-        )
+    _require_pytorch_runtime("infer_single")
+    if model is None:
+        raise RuntimeError("Loaded model required for infer_single")
     
     import time
     start = time.time()

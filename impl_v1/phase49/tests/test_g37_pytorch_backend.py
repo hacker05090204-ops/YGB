@@ -7,6 +7,8 @@ Tests for G37 PyTorch training backend.
 
 import pytest
 
+import impl_v1.phase49.governors.g37_pytorch_backend as backend
+
 from impl_v1.phase49.governors.g37_pytorch_backend import (
     # Enums
     DeviceType,
@@ -101,6 +103,7 @@ class TestTrainingBatch:
 class TestTraining:
     """Tests for training functions."""
     
+    @pytest.mark.skipif(not PYTORCH_AVAILABLE, reason="PyTorch unavailable")
     def test_train_full(self):
         config = create_model_config(
             input_dim=3,
@@ -120,6 +123,7 @@ class TestTraining:
         # Accuracy should improve
         assert metrics[-1].train_accuracy >= metrics[0].train_accuracy
     
+    @pytest.mark.skipif(not PYTORCH_AVAILABLE, reason="PyTorch unavailable")
     def test_early_stopping(self):
         config = create_model_config(
             input_dim=3,
@@ -136,10 +140,23 @@ class TestTraining:
         # Should stop before 100 epochs if accuracy reached
         assert len(metrics) < 100
 
+    def test_train_full_fails_closed_without_pytorch(self, monkeypatch):
+        monkeypatch.setattr(backend, "PYTORCH_AVAILABLE", False)
+        monkeypatch.setattr(backend, "torch", None)
+        monkeypatch.setattr(backend, "nn", None)
+        monkeypatch.setattr(backend, "optim", None)
+
+        config = create_model_config(input_dim=3, output_dim=2, epochs=1)
+        samples = (TrainingSample("S001", (0.1, 0.2, 0.3), 0, "G33"),)
+
+        with pytest.raises(RuntimeError, match="PyTorch is required"):
+            train_full(config, samples)
+
 
 class TestInference:
     """Tests for inference functions."""
     
+    @pytest.mark.skipif(not PYTORCH_AVAILABLE, reason="PyTorch unavailable")
     def test_infer_single(self):
         config = create_model_config(input_dim=3, output_dim=2, epochs=3)
         samples = (TrainingSample("S001", (0.1, 0.2, 0.3), 0, "G33"),)
@@ -151,6 +168,7 @@ class TestInference:
         assert result.prediction in (0, 1)
         assert 0 <= result.confidence <= 1
     
+    @pytest.mark.skipif(not PYTORCH_AVAILABLE, reason="PyTorch unavailable")
     def test_infer_batch(self):
         config = create_model_config(input_dim=3, output_dim=2, epochs=3)
         samples = (
@@ -162,6 +180,12 @@ class TestInference:
         results = infer_batch(model, samples)
         
         assert len(results) == 2
+
+    @pytest.mark.skipif(not PYTORCH_AVAILABLE, reason="PyTorch unavailable")
+    def test_infer_single_fails_closed_without_model(self):
+        sample = TrainingSample("S001", (0.1, 0.2, 0.3), 0, "G33")
+        with pytest.raises(RuntimeError, match="Loaded model required"):
+            infer_single(None, sample)
 
 
 class TestGuards:

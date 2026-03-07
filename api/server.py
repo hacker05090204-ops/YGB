@@ -127,7 +127,7 @@ from backend.alerts.email_alerts import (
 from backend.storage.storage_bridge import (
     register_device, get_user_devices, get_all_active_devices,
     get_active_device_count, get_active_sessions, end_session,
-    get_user_by_email, update_user_password
+    get_user_by_email, get_user_by_github_id, update_user_password
 )
 
 # Import REAL phase runner with actual browser automation
@@ -1355,7 +1355,7 @@ async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depend
 async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require_auth)):
     """Discover potential bug bounty targets from the database."""
     try:
-        targets = await get_all_targets()
+        targets = get_all_targets()
         candidates = []
         for t in targets:
             candidate = {
@@ -1464,8 +1464,16 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
     session_id = data.get("session_id", "")
     now = datetime.now(UTC).isoformat()
 
-    # Ownership check: only owner or admin can stop a session
+    # Guard: nonexistent session → structured error, not bare 404
     session = target_sessions.get(session_id)
+    if session is None:
+        return {
+            "stopped": False,
+            "error": f"Session {session_id!r} not found",
+            "session_id": session_id,
+        }
+
+    # Ownership check: only owner or admin can stop a session
     check_resource_owner(session, user, "target_session", session_id)
     session["status"] = "STOPPED"
     session["stopped_at"] = now
@@ -1480,16 +1488,23 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
 
 @app.get("/target/status")
 async def get_target_status(user=Depends(require_auth)):
-    """Get status of all target sessions."""
-    active = [s for s in target_sessions.values() if s["status"] == "ACTIVE"]
-    stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED"]
+    """Get status of target sessions. Non-admin users see only their own."""
+    is_admin = user.get("role") == "admin"
+    uid = user.get("sub", "")
+
+    if is_admin:
+        active = [s for s in target_sessions.values() if s["status"] == "ACTIVE"]
+        stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED"]
+    else:
+        active = [s for s in target_sessions.values() if s["status"] == "ACTIVE" and s.get("owner_id") == uid]
+        stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED" and s.get("owner_id") == uid]
 
     return {
         "active_sessions": active,
         "stopped_sessions": stopped[-10:],  # Last 10 stopped
         "total_active": len(active),
         "total_stopped": len(stopped),
-        "violations": scope_violations[-20:]  # Last 20 violations
+        "violations": scope_violations[-20:] if is_admin else []
     }
 
 
@@ -1626,7 +1641,7 @@ async def get_g38_events(limit: int = 50, user=Depends(require_auth)):
 
 
 @app.post("/api/g38/abort")
-async def abort_g38_training(user=Depends(require_auth)):
+async def abort_g38_training(user=Depends(require_admin)):
     """Abort current G38 training."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1654,7 +1669,7 @@ async def abort_g38_training(user=Depends(require_auth)):
 
 
 @app.post("/api/g38/start")
-async def start_g38_training(epochs: int = 0, user=Depends(require_auth)):
+async def start_g38_training(epochs: int = 0, user=Depends(require_admin)):
     """Start G38 training in continuous mode (default infinite)."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1781,7 +1796,7 @@ async def training_status(user=Depends(require_auth)):
 
 
 @app.post("/training/start")
-async def training_start(epochs: int = 0, user=Depends(require_auth)):
+async def training_start(epochs: int = 0, user=Depends(require_admin)):
     """Start continuous GPU training (default infinite)."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1813,7 +1828,7 @@ async def training_start(epochs: int = 0, user=Depends(require_auth)):
 
 
 @app.post("/training/stop")
-async def training_stop(user=Depends(require_auth)):
+async def training_stop(user=Depends(require_admin)):
     """Stop training immediately."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1839,7 +1854,7 @@ async def training_stop(user=Depends(require_auth)):
 
 
 @app.post("/training/continuous")
-async def training_continuous(request: Request, user=Depends(require_auth)):
+async def training_continuous(request: Request, user=Depends(require_admin)):
     """Toggle continuous training mode."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1970,7 +1985,7 @@ async def get_g38_latest_report(user=Depends(require_auth)):
 # =============================================================================
 
 @app.post("/training/continuous/stop")
-async def stop_24_7_training(user=Depends(require_auth)):
+async def stop_24_7_training(user=Depends(require_admin)):
     """Stop 24/7 continuous training."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
@@ -1986,7 +2001,7 @@ async def training_progress(user=Depends(require_auth)):
     return metrics.to_dict()
 
 
-_stream_seq_id = 0
+# _stream_seq_id lives in runtime_state ("stream_seq_id"), initialized at import
 
 @app.websocket("/training/stream")
 async def training_stream(websocket: WebSocket):
@@ -2022,7 +2037,7 @@ async def training_stream(websocket: WebSocket):
                 logger.info("Training stream session timeout (%ds)", WS_SESSION_TIMEOUT)
                 await websocket.close(code=1000, reason="Session timeout")
                 break
-            _stream_seq_id += 1
+            seq = runtime_state.increment("stream_seq_id")
             status = trainer.get_status()
             gpu_metrics = mgr.get_gpu_metrics()
 
@@ -2103,7 +2118,7 @@ async def training_stream(websocket: WebSocket):
                 "learning_rate": lr,
                 "eta_seconds": eta_seconds,
                 "stalled": stalled,
-                "sequence_id": _stream_seq_id,
+                "sequence_id": seq,
                 "timestamp": datetime.now(UTC).isoformat(),
             }
             await websocket.send_json(frame)
@@ -2121,7 +2136,7 @@ async def training_stream(websocket: WebSocket):
             pass
 
 
-_dashboard_seq_id = 0
+# _dashboard_seq_id lives in runtime_state ("dashboard_seq_id"), initialized at import
 
 @app.websocket("/training/dashboard")
 async def training_dashboard(websocket: WebSocket):
@@ -2171,7 +2186,7 @@ async def training_dashboard(websocket: WebSocket):
                 logger.info("Dashboard session timeout (%ds)", WS_SESSION_TIMEOUT)
                 await websocket.close(code=1000, reason="Session timeout")
                 break
-            _dashboard_seq_id += 1
+            seq = runtime_state.increment("dashboard_seq_id")
             status = trainer.get_status()
             gpu_metrics = mgr.get_gpu_metrics()
 
@@ -2269,7 +2284,7 @@ async def training_dashboard(websocket: WebSocket):
                 "accuracy": accuracy_val,
                 "stalled": stalled,
                 "mode": mode,
-                "sequence_id": _dashboard_seq_id,
+                "sequence_id": seq,
                 "timestamp": datetime.now(UTC).isoformat(),
             }
             await websocket.send_json(frame)
@@ -2522,10 +2537,12 @@ async def video_token_endpoint(request: Request, user=Depends(require_auth)):
 # =============================================================================
 
 _ALLOW_PASSWORD_LOGIN = os.getenv("ALLOW_PASSWORD_LOGIN", "false").lower() == "true"
-_TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "true").lower() in ("1", "true", "yes", "on")
+# SECURITY: default to NOT trusting proxy headers — set TRUST_PROXY_HEADERS=true
+# and TRUSTED_PROXY_CIDRS explicitly when behind a known reverse proxy.
+_TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "false").lower() in ("1", "true", "yes", "on")
 _TRUSTED_PROXY_CIDRS_RAW = os.getenv(
     "TRUSTED_PROXY_CIDRS",
-    "127.0.0.1/32,::1/128,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16",
+    "127.0.0.1/32,::1/128",
 )
 _ENABLE_G38_AUTO_TRAINING = os.getenv("ENABLE_G38_AUTO_TRAINING", "false").lower() in (
     "1", "true", "yes", "on"
@@ -2982,7 +2999,7 @@ async def storage_tiered_status(user=Depends(require_auth)):
 
 
 @app.post("/api/storage/enforce")
-async def storage_enforce(user=Depends(require_auth)):
+async def storage_enforce(user=Depends(require_admin)):
     """Manually trigger SSD cap enforcement (compress + migrate)."""
     if not TIERED_STORAGE_AVAILABLE:
         return {"available": False, "error": "Tiered storage not loaded"}
@@ -3849,7 +3866,7 @@ async def runtime_status(user=Depends(require_auth)):
                 "temperature": data.get("gpu_temperature", 0.0),
                 "determinism_status": data.get("determinism_status", False),
                 "freeze_status": data.get("freeze_status", False),
-                "mode": _runtime_mode,
+                "mode": runtime_state.get("runtime_mode", "IDLE"),
                 "progress_pct": min(100.0, (data.get("epoch", 0) / max(data.get("total_epochs", 100), 1)) * 100),
                 "loss_trend": data.get("loss_trend", 0.0),
                 # Phase 2: Real-time training visibility
@@ -4041,7 +4058,7 @@ async def training_data_source(user=Depends(require_auth)):
 # =============================================================================
 
 @app.post("/api/mode/train/start")
-async def start_training_mode(user=Depends(require_auth)):
+async def start_training_mode(user=Depends(require_admin)):
     """Start TRAIN mode. Blocked if HUNT is active."""
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode == "HUNT":
@@ -4062,7 +4079,7 @@ async def start_training_mode(user=Depends(require_auth)):
             content={
                 "error": "TRAIN_UNAVAILABLE",
                 "reason": "G38 modules not loaded",
-                "mode": _runtime_mode,
+                "mode": runtime_state.get("runtime_mode", "IDLE"),
             },
         )
 
@@ -4075,7 +4092,7 @@ async def start_training_mode(user=Depends(require_auth)):
                 "error": "TRAIN_START_FAILED",
                 "reason": result.get("reason", "Failed to start training"),
                 "state": result.get("state", "ERROR"),
-                "mode": _runtime_mode,
+                "mode": runtime_state.get("runtime_mode", "IDLE"),
             },
         )
 
@@ -4089,7 +4106,7 @@ async def start_training_mode(user=Depends(require_auth)):
 
 
 @app.post("/api/mode/train/stop")
-async def stop_training_mode(user=Depends(require_auth)):
+async def stop_training_mode(user=Depends(require_admin)):
     """Stop TRAIN mode."""
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode != "TRAIN":
@@ -4107,7 +4124,7 @@ async def stop_training_mode(user=Depends(require_auth)):
 
 
 @app.post("/api/mode/hunt/start")
-async def start_hunt_mode(user=Depends(require_auth)):
+async def start_hunt_mode(user=Depends(require_admin)):
     """Start HUNT mode. Blocked if TRAIN is active."""
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode == "TRAIN":
@@ -4124,7 +4141,7 @@ async def start_hunt_mode(user=Depends(require_auth)):
 
 
 @app.post("/api/mode/hunt/stop")
-async def stop_hunt_mode(user=Depends(require_auth)):
+async def stop_hunt_mode(user=Depends(require_admin)):
     """Stop HUNT mode."""
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode != "HUNT":
@@ -4270,6 +4287,24 @@ def _perf_ms(start: float) -> int:
     return int((_t.monotonic() - start) * 1000)
 
 
+def _resolve_or_create_github_user(
+    github_id: str,
+    github_login: str,
+    effective_email: str,
+) -> tuple[Dict[str, Any], bool]:
+    """Resolve a local user for a GitHub account using stable identity first."""
+    user = get_user_by_github_id(github_id)
+    if user:
+        return user, False
+
+    user = get_user_by_email(effective_email) if effective_email else None
+    if user:
+        return user, False
+
+    display_name = github_login or f"github-{github_id}"
+    return create_user(display_name, effective_email, "hunter"), True
+
+
 @app.get("/auth/github")
 async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     """Redirect to GitHub OAuth authorization page."""
@@ -4281,17 +4316,15 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
 
     import urllib.parse
 
-    # Dynamic callback URL from request Host header
-    # Works from ANY device: WiFi (192.168.x), Tailscale (100.x), localhost
-    request_host = req.headers.get("host", "localhost:8000")
-    dynamic_redirect = f"http://{request_host}/auth/github/callback"
-    logger.info(f"[OAuth] Dynamic callback: {dynamic_redirect}")
+    # SECURITY: Use the configured callback URI — never derive from Host header
+    # (Host header is attacker-controlled and can redirect OAuth codes off-site)
+    logger.info("[OAuth] Using configured callback: %s", _GITHUB_REDIRECT_URI)
 
     # Derive frontend URL from requester's IP
     if frontend_origin:
         frontend_url = _resolve_frontend_url(frontend_origin)
-    elif _is_private_ip(request_host):
-        host_ip = request_host.split(":")[0]
+    elif _is_private_ip(req.headers.get("host", "")):
+        host_ip = req.headers.get("host", "localhost:3000").split(":")[0]
         frontend_url = f"http://{host_ip}:3000"
     else:
         frontend_url = _resolve_frontend_url("")
@@ -4299,7 +4332,7 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     state = _build_oauth_state(frontend_url)
     params = urllib.parse.urlencode({
         "client_id": _GITHUB_CLIENT_ID,
-        "redirect_uri": dynamic_redirect,
+        "redirect_uri": _GITHUB_REDIRECT_URI,
         "scope": "user:email",
         "state": state,
     })
@@ -4343,8 +4376,6 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
     expected_state = req.cookies.get("ygb_oauth_state", "")
     cookie_ok = bool(state and expected_state and state == expected_state)
-    # Accept HMAC-signed state even without cookie match (network IP / cross-device)
-    # Cookie may not round-trip across different IPs/ports (SameSite restrictions)
     if not parsed_ok:
         logger.warning("GitHub OAuth state HMAC validation failed")
         resp = RedirectResponse(
@@ -4354,7 +4385,13 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         resp.delete_cookie("ygb_oauth_state")
         return resp
     if not cookie_ok:
-        logger.info("GitHub OAuth state cookie missing (cross-network login) — HMAC valid, proceeding")
+        logger.warning("GitHub OAuth state cookie missing or mismatched — rejecting")
+        resp = RedirectResponse(
+            url=f"{frontend_url}/login?error=state_mismatch",
+            status_code=302,
+        )
+        resp.delete_cookie("ygb_oauth_state")
+        return resp
 
     if not _GITHUB_CLIENT_ID or not _GITHUB_CLIENT_SECRET:
         raise HTTPException(
@@ -4379,14 +4416,13 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
         # 1. Exchange code -> access token  (uses connection-pooled session)
         t0 = _time.monotonic()
-        # Use Host-header-derived redirect_uri (must match the one sent in /auth/github)
-        request_host = req.headers.get("host", "localhost:8000")
-        dynamic_redirect = f"http://{request_host}/auth/github/callback"
+        # Use the same configured redirect_uri that was sent in /auth/github
+        callback_redirect = _GITHUB_REDIRECT_URI
         token_payload = {
             "client_id": _GITHUB_CLIENT_ID,
             "client_secret": _GITHUB_CLIENT_SECRET,
             "code": code,
-            "redirect_uri": dynamic_redirect,
+            "redirect_uri": callback_redirect,
         }
 
         if _HAVE_REQUESTS:
@@ -4444,13 +4480,21 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
         # Use public email or stable fallback — background will resolve private email later
         effective_email = github_email or f"github-{github_id}@users.noreply.local"
+        github_profile_minimal = {
+            "github_id": github_id,
+            "github_login": github_login,
+            "name": user_data.get("name") or github_login or "",
+            "avatar_url": user_data.get("avatar_url", ""),
+            "html_url": user_data.get("html_url", ""),
+        }
 
         # 3. DB: lookup/create user → create session → issue JWT
         t0 = _time.monotonic()
-        user = get_user_by_email(effective_email)
-        if not user:
-            display_name = github_login or f"github-{github_id}"
-            user = create_user(display_name, effective_email, "hunter")
+        user, is_new_user = _resolve_or_create_github_user(
+            github_id=github_id,
+            github_login=github_login,
+            effective_email=effective_email,
+        )
 
         session = create_session(
             user["id"],
@@ -4464,6 +4508,13 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                 "github_login": github_login,
                 "github_id": github_id,
             },
+        )
+        update_user_auth_profile(
+            user["id"],
+            auth_provider="github",
+            ip_address=ip,
+            geolocation=None,
+            github_profile=github_profile_minimal,
         )
         timings["db_upsert"] = _perf_ms(t0)
 
@@ -4484,14 +4535,6 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         )
 
         # Build minimal profile for redirect URL (no GeoIP yet — background fills it)
-        github_profile_minimal = {
-            "github_id": github_id,
-            "github_login": github_login,
-            "name": user_data.get("name") or github_login or "",
-            "avatar_url": user_data.get("avatar_url", ""),
-            "html_url": user_data.get("html_url", ""),
-        }
-
         safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
         safe_profile = urllib.parse.quote_plus(
             json.dumps(github_profile_minimal, separators=(",", ":"), ensure_ascii=False)
@@ -4523,7 +4566,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                 "effective_email": effective_email,
                 "access_token": access_token,
                 "user_data": user_data,
-                "is_new_user": user.get("created_at", "") == user.get("last_active", ""),
+                "is_new_user": is_new_user,
             },
         }
 
@@ -4694,7 +4737,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             key=cookie_name,
             value=cookie_value,
             max_age=3600,       # 1 hour
-            httponly=(cookie_name != "ygb_profile"),  # Profile readable by JS for display
+            httponly=(cookie_name not in ("ygb_profile", "ygb_token")),  # Token + profile readable by JS; session_id stays HttpOnly
             samesite="lax",
             secure=_is_https,
             path="/",

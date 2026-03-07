@@ -230,7 +230,7 @@ class AutoTrainer:
         self._last_epoch_samples = 0  # Samples processed in current epoch
         
         # === GOVERNANCE INTEGRATION ===
-        self._curriculum = None  # HumanSimulatedCurriculum instance
+        self._curriculum = None  # RealDataCurriculum instance
         self._promotion = None   # GovernedFieldPromotion instance
         self._source_id = None   # Registered data source ID
         
@@ -536,9 +536,9 @@ class AutoTrainer:
             
             # === GOVERNANCE: Initialize curriculum + promotion ===
             try:
-                from impl_v1.training.data.human_simulated_curriculum import HumanSimulatedCurriculum
+                from impl_v1.training.data.real_data_curriculum import RealDataCurriculum
                 from impl_v1.training.data.governed_field_promotion import GovernedFieldPromotion
-                self._curriculum = HumanSimulatedCurriculum()
+                self._curriculum = RealDataCurriculum()
                 self._promotion = GovernedFieldPromotion()
                 logger.info(f"Curriculum initialized: {self._curriculum.get_stage_name()}")
             except Exception as e:

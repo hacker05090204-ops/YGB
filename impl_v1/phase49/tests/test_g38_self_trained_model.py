@@ -13,6 +13,7 @@ Tests cover:
 - Cross-platform parity
 """
 
+import json
 import pytest
 from unittest.mock import patch, MagicMock
 
@@ -62,6 +63,35 @@ from impl_v1.phase49.governors.g38_self_trained_model import (
     ALL_GUARDS,
     verify_all_guards,
 )
+
+
+def _write_checkpoint(tmp_path, input_dim=100):
+    checkpoint = {
+        "input_dim": input_dim,
+        "real_head": {
+            "weights": [0.12] * input_dim,
+            "bias": 0.1,
+        },
+        "duplicate_head": {
+            "weights": [-0.04] * input_dim,
+            "bias": -0.2,
+        },
+        "noise_head": {
+            "weights": [0.02] * input_dim,
+            "bias": -0.1,
+        },
+        "style_head": {
+            "weights": [
+                [0.05] * input_dim,
+                [-0.03] * input_dim,
+                [0.01] * input_dim,
+            ],
+            "bias": [0.0, 0.1, -0.1],
+        },
+    }
+    checkpoint_path = tmp_path / "g38_checkpoint.json"
+    checkpoint_path.write_text(json.dumps(checkpoint), encoding="utf-8")
+    return str(checkpoint_path)
 
 
 # =============================================================================
@@ -338,10 +368,10 @@ class TestModelArchitecture:
 class TestInference:
     """Tests for model inference."""
     
-    def test_run_inference_returns_multi_head_output(self):
+    def test_run_inference_returns_multi_head_output(self, tmp_path):
         model_status = LocalModelStatus(
             status_id="TST-001",
-            checkpoint_path="/tmp/model.pt",
+            checkpoint_path=_write_checkpoint(tmp_path),
             epoch=10,
             train_accuracy=0.95,
             val_accuracy=0.93,
@@ -354,10 +384,10 @@ class TestInference:
         result = run_inference(features, model_status)
         assert isinstance(result, MultiHeadOutput)
     
-    def test_inference_has_all_outputs(self):
+    def test_inference_has_all_outputs(self, tmp_path):
         model_status = LocalModelStatus(
             status_id="TST-001",
-            checkpoint_path="/tmp/model.pt",
+            checkpoint_path=_write_checkpoint(tmp_path),
             epoch=10,
             train_accuracy=0.95,
             val_accuracy=0.93,
@@ -373,10 +403,10 @@ class TestInference:
         assert hasattr(result, "noise_probability")
         assert hasattr(result, "report_style_id")
     
-    def test_inference_is_deterministic(self):
+    def test_inference_is_deterministic(self, tmp_path):
         model_status = LocalModelStatus(
             status_id="TST-001",
-            checkpoint_path="/tmp/model.pt",
+            checkpoint_path=_write_checkpoint(tmp_path),
             epoch=10,
             train_accuracy=0.95,
             val_accuracy=0.93,
@@ -392,6 +422,22 @@ class TestInference:
         assert result1.duplicate_probability == result2.duplicate_probability
         assert result1.noise_probability == result2.noise_probability
         assert result1.report_style_id == result2.report_style_id
+
+    def test_inference_rejects_missing_checkpoint(self):
+        model_status = LocalModelStatus(
+            status_id="TST-001",
+            checkpoint_path="C:/missing/model.json",
+            epoch=10,
+            train_accuracy=0.95,
+            val_accuracy=0.93,
+            is_valid=True,
+            integrity_hash="abc123",
+            created_at="2026-01-01T00:00:00Z",
+            last_trained_at="2026-01-01T00:00:00Z",
+        )
+        features = tuple([0.5] * 100)
+        with pytest.raises(RuntimeError, match="Model checkpoint not found"):
+            run_inference(features, model_status)
 
 
 # =============================================================================

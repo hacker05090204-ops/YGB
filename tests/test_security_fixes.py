@@ -429,5 +429,195 @@ class TestFrontendMockDataRemoval(unittest.TestCase):
         self.assertIn("getAuthUserName", self.control_src)
 
 
+# ════════════════════════════════════════════════════════════════════════
+# Regression: OAuth callback rejects missing / mismatched cookie state
+# ════════════════════════════════════════════════════════════════════════
+
+class TestOAuthCookieBinding(unittest.TestCase):
+    """Verify OAuth callback fails closed when cookie state is absent or wrong."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.server_src = (PROJECT_ROOT / "api" / "server.py").read_text(
+            encoding="utf-8")
+
+    def _get_callback_src(self):
+        idx = self.server_src.find("async def github_auth_callback")
+        self.assertGreater(idx, 0, "github_auth_callback not found")
+        return self.server_src[idx:idx + 2500]
+
+    def test_callback_rejects_missing_cookie(self):
+        """When ygb_oauth_state cookie is missing, callback must redirect with error."""
+        cb = self._get_callback_src()
+        # The old bypass logged info and fell through; now it must reject
+        self.assertNotIn(
+            'logger.info("GitHub OAuth state cookie missing (cross-network login)',
+            cb,
+            "Cross-network bypass must be removed — callback must fail closed on missing cookie",
+        )
+        # Must contain a rejection path for cookie mismatch
+        self.assertIn(
+            "cookie missing or mismatched",
+            cb,
+            "Missing-cookie path must log a warning about rejection",
+        )
+
+    def test_callback_rejects_mismatched_cookie(self):
+        """Mismatched cookie vs URL state must produce a redirect error."""
+        cb = self._get_callback_src()
+        # After `if not cookie_ok:` the code must return a redirect, not fall through
+        idx = cb.find("if not cookie_ok:")
+        self.assertGreater(idx, 0)
+        after = cb[idx:idx + 400]
+        self.assertIn("RedirectResponse", after,
+                       "Mismatched cookie must produce a redirect response")
+        self.assertIn("state_mismatch", after,
+                       "Mismatched cookie must redirect with state_mismatch error")
+        self.assertIn("delete_cookie", after,
+                       "Mismatched-cookie path must delete the OAuth state cookie")
+
+    def test_cookie_deleted_on_all_code_paths(self):
+        """ygb_oauth_state cookie must be deleted on success AND failure paths."""
+        cb = self._get_callback_src()
+        # Count delete_cookie("ygb_oauth_state") — should appear multiple times
+        count = cb.count('delete_cookie("ygb_oauth_state")')
+        self.assertGreaterEqual(count, 3,
+                                 f"Expected >=3 delete_cookie calls in callback, found {count}")
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Regression: /target/status returns only caller-owned sessions for non-admin
+# ════════════════════════════════════════════════════════════════════════
+
+class TestTargetStatusPrivacy(unittest.TestCase):
+    """Verify /target/status filters by ownership for non-admin users."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.server_src = (PROJECT_ROOT / "api" / "server.py").read_text(
+            encoding="utf-8")
+
+    def _get_target_status_src(self):
+        idx = self.server_src.find("async def get_target_status")
+        self.assertGreater(idx, 0)
+        return self.server_src[idx:idx + 1200]
+
+    def test_nonadmin_only_sees_own_sessions(self):
+        """Non-admin code path must filter by owner_id."""
+        fn = self._get_target_status_src()
+        self.assertIn('owner_id', fn,
+                       "Target status must filter sessions by owner_id")
+        self.assertIn('is_admin', fn,
+                       "Target status must check admin role before filtering")
+
+    def test_nonadmin_cannot_see_violations(self):
+        """Non-admin must receive empty violations list."""
+        fn = self._get_target_status_src()
+        # Must have conditional violations: admin gets list, others get []
+        self.assertIn("if is_admin else []", fn,
+                       "Violations must be empty for non-admin users")
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Regression: Non-admin cannot start/stop training or switch runtime mode
+# ════════════════════════════════════════════════════════════════════════
+
+class TestAdminOnlyControlEndpoints(unittest.TestCase):
+    """Verify training and mode control endpoints require admin auth."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.server_src = (PROJECT_ROOT / "api" / "server.py").read_text(
+            encoding="utf-8")
+
+    def test_training_endpoints_require_admin(self):
+        """All training control endpoints must use require_admin."""
+        admin_endpoints = [
+            ("training_start", "/training/start"),
+            ("training_stop", "/training/stop"),
+            ("training_continuous", "/training/continuous"),
+            ("stop_24_7_training", "/training/continuous/stop"),
+        ]
+        for func_name, path in admin_endpoints:
+            idx = self.server_src.find(f"async def {func_name}")
+            self.assertGreater(idx, 0, f"{func_name} not found")
+            # Check the decorator area (200 chars before function def)
+            area = self.server_src[max(0, idx - 200):idx + 200]
+            self.assertIn("require_admin", area,
+                           f"{path} ({func_name}) must use require_admin, not require_auth")
+
+    def test_mode_endpoints_require_admin(self):
+        """All mode control endpoints must use require_admin."""
+        mode_endpoints = [
+            ("start_training_mode", "/api/mode/train/start"),
+            ("stop_training_mode", "/api/mode/train/stop"),
+            ("start_hunt_mode", "/api/mode/hunt/start"),
+            ("stop_hunt_mode", "/api/mode/hunt/stop"),
+        ]
+        for func_name, path in mode_endpoints:
+            idx = self.server_src.find(f"async def {func_name}")
+            self.assertGreater(idx, 0, f"{func_name} not found")
+            area = self.server_src[max(0, idx - 200):idx + 200]
+            self.assertIn("require_admin", area,
+                           f"{path} ({func_name}) must use require_admin, not require_auth")
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Regression: /api/targets/discover calls get_all_targets synchronously
+# ════════════════════════════════════════════════════════════════════════
+
+class TestTargetDiscoverFix(unittest.TestCase):
+    """Verify discover endpoint calls get_all_targets without await."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.server_src = (PROJECT_ROOT / "api" / "server.py").read_text(
+            encoding="utf-8")
+
+    def test_no_await_on_sync_call(self):
+        """get_all_targets() must NOT be awaited since it is synchronous."""
+        idx = self.server_src.find("async def discover_targets")
+        self.assertGreater(idx, 0)
+        fn = self.server_src[idx:idx + 600]
+        self.assertNotIn("await get_all_targets", fn,
+                          "get_all_targets is sync — must not be awaited")
+        self.assertIn("get_all_targets()", fn,
+                       "discover_targets must call get_all_targets()")
+
+
+# ════════════════════════════════════════════════════════════════════════
+# Regression: /runtime/status uses runtime_state, not stale _runtime_mode
+# ════════════════════════════════════════════════════════════════════════
+
+class TestRuntimeModeConsistency(unittest.TestCase):
+    """Verify runtime_status reports mode from runtime_state, not _runtime_mode."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.server_src = (PROJECT_ROOT / "api" / "server.py").read_text(
+            encoding="utf-8")
+
+    def test_no_stale_runtime_mode_in_status(self):
+        """The telemetry-file branch of runtime_status must use runtime_state."""
+        idx = self.server_src.find("async def runtime_status")
+        self.assertGreater(idx, 0)
+        fn = self.server_src[idx:idx + 5000]
+        # The telemetry-file return block must NOT contain _runtime_mode
+        # It should use runtime_state.get("runtime_mode", ...) instead
+        self.assertNotIn('"mode": _runtime_mode', fn,
+                          "runtime_status must not use stale _runtime_mode variable")
+
+    def test_mode_control_uses_runtime_state(self):
+        """Mode control error paths must also use runtime_state, not _runtime_mode."""
+        for func in ["start_training_mode", "stop_training_mode",
+                      "start_hunt_mode", "stop_hunt_mode"]:
+            idx = self.server_src.find(f"async def {func}")
+            self.assertGreater(idx, 0, f"{func} not found")
+            fn = self.server_src[idx:idx + 1000]
+            # Check that _runtime_mode is NOT used as a value
+            self.assertNotIn('"mode": _runtime_mode', fn,
+                              f"{func} must not reference stale _runtime_mode")
+
+
 if __name__ == "__main__":
     unittest.main()

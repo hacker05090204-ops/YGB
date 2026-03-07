@@ -188,12 +188,13 @@ class TestDataScale:
         mgr = DataScaleManager()
         assert mgr.field_count == 23
 
-    def test_bootstrap(self):
+    def test_register_real_data(self):
         from impl_v1.training.distributed.data_scale_config import DataScaleManager
         mgr = DataScaleManager()
-        X, y = mgr.generate_bootstrap("vulnerability_detection")
-        assert X.shape[0] == 50_000
-        assert y.shape[0] == 50_000
+        mgr.register_real_data("vulnerability_detection", 50_000)
+        cfg = mgr.get_field_config("vulnerability_detection")
+        assert cfg.real_samples == 50_000
+        assert cfg.training_ready is True
 
     def test_major_target(self):
         from impl_v1.training.distributed.data_scale_config import DataScaleManager
@@ -212,16 +213,16 @@ class TestDataScale:
     def test_add_real_data(self):
         from impl_v1.training.distributed.data_scale_config import DataScaleManager
         mgr = DataScaleManager()
-        mgr.generate_bootstrap("anomaly_detection")
         mgr.add_real_data("anomaly_detection", 10_000)
         cfg = mgr.get_field_config("anomaly_detection")
         assert cfg.real_samples == 10_000
-        assert cfg.bootstrap_only is False
+        assert cfg.current_samples == 10_000
+        assert cfg.training_ready is False
 
     def test_report(self):
         from impl_v1.training.distributed.data_scale_config import DataScaleManager
         mgr = DataScaleManager()
-        mgr.generate_bootstrap("vulnerability_detection")
+        mgr.register_real_data("vulnerability_detection", 50_000)
         report = mgr.get_report()
         assert report.total_fields == 23
         assert report.fields_at_minimum >= 1

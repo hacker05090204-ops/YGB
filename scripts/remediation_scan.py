@@ -26,7 +26,7 @@ PATTERNS = {
     'fixme': re.compile(r'\bFIXME\b'),
 }
 
-EXCLUDED_DIRS = {'.git', 'node_modules', '__pycache__', '.next', '.gemini', 'dist', 'build'}
+EXCLUDED_DIRS = {'.git', 'node_modules', '__pycache__', '.next', '.gemini', 'dist', 'build', '.venv', 'venv'}
 SCAN_EXTENSIONS = {'.py', '.ts', '.tsx', '.js', '.jsx', '.cpp', '.h', '.c', '.css',
                    '.json', '.env', '.yml', '.yaml', '.toml', '.cfg'}
 

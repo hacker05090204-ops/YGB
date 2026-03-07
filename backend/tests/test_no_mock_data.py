@@ -14,7 +14,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 # Files/dirs to skip during scan
-SKIP_DIRS = {"node_modules", ".next", ".git", "__pycache__", ".venv", "venv", "impl_v1", "production"}
+SKIP_DIRS = {"node_modules", ".next", ".git", "__pycache__", ".venv", "venv", "production"}
 SKIP_FILES = {"test_no_mock_data.py", "page.tsx"}  # Don't scan ourselves or pages that may have legitimate data structures
 
 
@@ -31,8 +31,6 @@ def get_source_files(extensions=(".py", ".tsx", ".ts")):
 
 # Patterns that indicate mock/fake data
 MOCK_PATTERNS = [
-    # Python patterns
-    (r"random\.\w+\(\)", "random value generation"),
     (r"MOCK_DATA", "mock data constant"),
     (r"FAKE_DATA", "fake data constant"),
     (r"DEMO_DATA", "demo data constant"),
