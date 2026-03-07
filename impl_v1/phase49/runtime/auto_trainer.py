@@ -234,6 +234,12 @@ class AutoTrainer:
         self._promotion = None   # GovernedFieldPromotion instance
         self._source_id = None   # Registered data source ID
         
+        # === ATTRIBUTES SET DYNAMICALLY (declared here for type-checker) ===
+        self._checkpoint_path: Optional[str] = None
+        self._gpu_scheduler = None  # LR scheduler (ReduceLROnPlateau)
+        self._scaler = None  # AMP GradScaler
+        self._training_mode_label: str = "MANUAL"
+        
         # === MODE_A EARLY STOPPING ===
         self._best_accuracy = 0.0
         self._no_improvement_count = 0
