@@ -3,9 +3,10 @@
 import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useAuthUser } from "@/hooks/use-auth-user"
+import { authFetch } from "@/lib/ygb-api"
 import { cn } from "@/lib/utils"
 import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck, Clock, RefreshCw } from "lucide-react"
-import { buildAuthHeaders } from "@/lib/auth-token"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -35,14 +36,6 @@ import FieldMasteryDashboard from "@/components/field-mastery-dashboard"
 // API Base URL
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
-/** Fetch wrapper that injects auth headers for protected endpoints. */
-async function protectedFetch(url: string, options: RequestInit = {}): Promise<Response> {
-    const headers = buildAuthHeaders(
-        options.headers as Record<string, string> || {}
-    )
-    return fetch(url, { ...options, headers })
-}
-
 function isAbortError(error: unknown): boolean {
     if (error instanceof DOMException) {
         return error.name === "AbortError"
@@ -59,26 +52,11 @@ function isAbortError(error: unknown): boolean {
     return false
 }
 
-/** Get authenticated user ID from session storage. */
-function getAuthUserId(): string {
-    if (typeof window === "undefined") return ""
-    return sessionStorage.getItem("ygb_session_id") || sessionStorage.getItem("ygb_token")?.slice(0, 16) || ""
-}
-
-/** Get authenticated user display name from session profile. */
-function getAuthUserName(): string {
-    if (typeof window === "undefined") return "user"
-    try {
-        const raw = sessionStorage.getItem("ygb_profile")
-        if (raw) {
-            const profile = JSON.parse(raw)
-            return profile.name || profile.github_login || "user"
-        }
-    } catch { /* ignore */ }
-    return "user"
-}
-
 function ControlPageContent() {
+    const authUser = useAuthUser()
+    const authUserId = authUser.userId || ""
+    const authUserName = authUser.name || authUser.githubLogin || "user"
+
     // Dashboard State
     const [dashboardId, setDashboardId] = useState<string | null>(null)
     const [isConnected, setIsConnected] = useState(false)
@@ -182,15 +160,19 @@ function ControlPageContent() {
 
     // Initialize dashboard with timeout
     const initDashboard = useCallback(async () => {
+        if (authUser.status !== "authenticated" || !authUserId) {
+            return
+        }
+
         setIsLoading(true)
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort("dashboard_init_timeout"), 5000)
 
         try {
-            const response = await protectedFetch(`${API_BASE}/api/dashboard/create`, {
+            const response = await authFetch(`${API_BASE}/api/dashboard/create`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: getAuthUserId(), user_name: getAuthUserName() }),
+                body: JSON.stringify({ user_id: authUserId, user_name: authUserName }),
                 signal: controller.signal
             })
 
@@ -213,20 +195,23 @@ function ControlPageContent() {
             clearTimeout(timeout)
             setIsLoading(false)
         }
-    }, [])
+    }, [authUser.status, authUserId, authUserName])
 
     useEffect(() => {
-        initDashboard()
-    }, [initDashboard])
+        if (authUser.status === "authenticated" && authUserId) {
+            void initDashboard()
+        }
+    }, [authUser.status, authUserId, initDashboard])
 
     // Recover from transient startup/API blips automatically once backend is healthy.
     useEffect(() => {
+        if (authUser.status !== "authenticated" || !authUserId) return
         if (!isConnected) return
         if (dashboardId === "AUTH_REQUIRED") return
         if (!dashboardId || dashboardId === "UNAVAILABLE") {
-            initDashboard()
+            void initDashboard()
         }
-    }, [isConnected, dashboardId, initDashboard])
+    }, [authUser.status, authUserId, isConnected, dashboardId, initDashboard])
 
     useEffect(() => {
         checkServerHealth()
@@ -247,7 +232,7 @@ function ControlPageContent() {
             const timeout = setTimeout(() => controller.abort("accuracy_timeout"), 2500)
 
             try {
-                const res = await protectedFetch(`${API_BASE}/api/accuracy/snapshot`, {
+                const res = await authFetch(`${API_BASE}/api/accuracy/snapshot`, {
                     signal: controller.signal
                 })
                 if (res.ok) {
@@ -281,7 +266,7 @@ function ControlPageContent() {
             const timeout = setTimeout(() => controller.abort("runtime_status_timeout"), 2500)
 
             try {
-                const res = await protectedFetch(`${API_BASE}/runtime/status`, {
+                const res = await authFetch(`${API_BASE}/runtime/status`, {
                     signal: controller.signal
                 })
                 if (res.ok) {
@@ -342,7 +327,7 @@ function ControlPageContent() {
     const handleStartTraining = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await protectedFetch(`${API_BASE}/api/g38/start?epochs=0`, { method: "POST" })
+            const res = await authFetch(`${API_BASE}/api/g38/start?epochs=0`, { method: "POST" })
             if (res.ok) setRuntimeMode("TRAIN")
         } catch (e) { console.error("Start training failed:", e) }
         finally { setModeLoading(false) }
@@ -351,7 +336,7 @@ function ControlPageContent() {
     const handleStopTraining = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await protectedFetch(`${API_BASE}/api/g38/abort`, { method: "POST" })
+            const res = await authFetch(`${API_BASE}/api/g38/abort`, { method: "POST" })
             if (res.ok) setRuntimeMode("IDLE")
         } catch (e) { console.error("Stop training failed:", e) }
         finally { setModeLoading(false) }
@@ -360,7 +345,7 @@ function ControlPageContent() {
     const handleStartHunting = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await protectedFetch(`${API_BASE}/api/mode/hunt/start`, { method: "POST" })
+            const res = await authFetch(`${API_BASE}/api/mode/hunt/start`, { method: "POST" })
             if (res.ok) setRuntimeMode("HUNT")
         } catch (e) { console.error("Start hunting failed:", e) }
         finally { setModeLoading(false) }
@@ -369,7 +354,7 @@ function ControlPageContent() {
     const handleStopHunting = useCallback(async () => {
         setModeLoading(true)
         try {
-            const res = await protectedFetch(`${API_BASE}/api/mode/hunt/stop`, { method: "POST" })
+            const res = await authFetch(`${API_BASE}/api/mode/hunt/stop`, { method: "POST" })
             if (res.ok) setRuntimeMode("IDLE")
         } catch (e) { console.error("Stop hunting failed:", e) }
         finally { setModeLoading(false) }
@@ -380,7 +365,7 @@ function ControlPageContent() {
         setAutonomyMode(mode)
 
         try {
-            await protectedFetch(`${API_BASE}/api/autonomy/session`, {
+            await authFetch(`${API_BASE}/api/autonomy/session`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ mode, duration_hours: hours || 0 })
@@ -395,13 +380,13 @@ function ControlPageContent() {
         setApprovalLoading(true)
 
         try {
-            const response = await protectedFetch(`${API_BASE}/api/approval/decision`, {
+            const response = await authFetch(`${API_BASE}/api/approval/decision`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     request_id: requestId,
                     approved: true,
-                    approver_id: getAuthUserId(),
+                    approver_id: authUserId,
                     reason
                 })
             })
@@ -418,19 +403,19 @@ function ControlPageContent() {
         } finally {
             setApprovalLoading(false)
         }
-    }, [])
+    }, [authUserId])
 
     const handleReject = useCallback(async (requestId: string, reason?: string) => {
         setApprovalLoading(true)
 
         try {
-            const response = await protectedFetch(`${API_BASE}/api/approval/decision`, {
+            const response = await authFetch(`${API_BASE}/api/approval/decision`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     request_id: requestId,
                     approved: false,
-                    approver_id: getAuthUserId(),
+                    approver_id: authUserId,
                     reason
                 })
             })
@@ -445,16 +430,16 @@ function ControlPageContent() {
         } finally {
             setApprovalLoading(false)
         }
-    }, [])
+    }, [authUserId])
 
     const handleStop = useCallback(async () => {
         try {
-            await protectedFetch(`${API_BASE}/api/execution/transition`, {
+            await authFetch(`${API_BASE}/api/execution/transition`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     transition: "ABORT",
-                    actor_id: getAuthUserId(),
+                    actor_id: authUserId,
                     reason: "User requested stop"
                 })
             })
@@ -466,14 +451,14 @@ function ControlPageContent() {
             console.error("Stop failed:", error)
             setExecutionState("STOPPED")
         }
-    }, [])
+    }, [authUserId])
 
     // Target Discovery Handler
     const handleDiscoverTargets = useCallback(async () => {
         setIsDiscovering(true)
 
         try {
-            const response = await protectedFetch(`${API_BASE}/api/targets/discover`, {
+            const response = await authFetch(`${API_BASE}/api/targets/discover`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ min_payout: "LOW", max_density: "MEDIUM", public_only: true })
@@ -531,7 +516,7 @@ function ControlPageContent() {
         setVoiceProcessing(true)
 
         try {
-            const response = await protectedFetch(`${API_BASE}/api/voice/parse`, {
+            const response = await authFetch(`${API_BASE}/api/voice/parse`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text, mode: voiceMode })

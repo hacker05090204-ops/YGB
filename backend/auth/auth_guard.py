@@ -16,6 +16,8 @@ import time
 import hashlib
 import hmac
 import secrets
+from http.cookies import SimpleCookie
+from urllib.parse import urlparse
 from typing import Optional, Dict, Set
 from pathlib import Path
 from functools import wraps
@@ -27,7 +29,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from backend.auth.auth import verify_jwt
+from backend.auth.auth import verify_jwt, verify_csrf_token
 
 # =============================================================================
 # TOKEN REVOCATION STORE (pluggable — see revocation_store.py)
@@ -42,6 +44,91 @@ from backend.auth.revocation_store import (
 
 # Bearer token scheme
 _bearer_scheme = HTTPBearer(auto_error=False)
+AUTH_COOKIE_NAME = "ygb_auth"
+LEGACY_AUTH_COOKIE_NAME = "ygb_token"
+CSRF_COOKIE_NAME = "ygb_csrf"
+CSRF_HEADER_NAME = "x-csrf-token"
+_SAFE_HTTP_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "TRACE"})
+
+
+def _allowed_origins() -> Set[str]:
+    origins = {
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    }
+    frontend = os.getenv("FRONTEND_URL", "").rstrip("/")
+    if frontend:
+        origins.add(frontend)
+    extra = os.getenv("YGB_ALLOWED_ORIGINS", "")
+    for value in extra.split(","):
+        value = value.strip().rstrip("/")
+        if value:
+            origins.add(value)
+    return origins
+
+
+def _extract_cookie_token(request: Request) -> Optional[str]:
+    return request.cookies.get(AUTH_COOKIE_NAME) or request.cookies.get(LEGACY_AUTH_COOKIE_NAME)
+
+
+def _normalize_origin(origin: str) -> str:
+    parsed = urlparse(origin)
+    if not parsed.scheme or not parsed.netloc:
+        return ""
+    return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+
+
+def _enforce_cookie_csrf(request: Request) -> None:
+    if request.method.upper() in _SAFE_HTTP_METHODS:
+        return
+
+    origin = request.headers.get("origin")
+    if not origin:
+        referer = request.headers.get("referer", "")
+        origin = _normalize_origin(referer)
+    normalized_origin = _normalize_origin(origin or "")
+    if not normalized_origin or normalized_origin not in _allowed_origins():
+        raise HTTPException(
+            status_code=403,
+            detail={"error": "CSRF_BLOCKED", "detail": "Request origin not allowed"},
+        )
+
+    csrf_cookie = request.cookies.get(CSRF_COOKIE_NAME, "")
+    csrf_header = request.headers.get(CSRF_HEADER_NAME, "")
+    if not csrf_cookie or not csrf_header or not verify_csrf_token(csrf_header, csrf_cookie):
+        raise HTTPException(
+            status_code=403,
+            detail={"error": "CSRF_BLOCKED", "detail": "Missing or invalid CSRF token"},
+        )
+
+
+def _verify_token_or_401(token: str) -> Dict:
+    if is_token_revoked(token):
+        raise HTTPException(
+            status_code=401,
+            detail={"error": "AUTH_REQUIRED", "detail": "Token has been revoked"},
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    payload = verify_jwt(token)
+    if payload is None:
+        raise HTTPException(
+            status_code=401,
+            detail={"error": "AUTH_REQUIRED", "detail": "Invalid or expired token"},
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    session_id = payload.get("session_id")
+    if session_id and is_session_revoked(session_id):
+        raise HTTPException(
+            status_code=401,
+            detail={"error": "AUTH_REQUIRED", "detail": "Session has been invalidated"},
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return payload
 
 
 # =============================================================================
@@ -69,13 +156,24 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
         )
         return None
 
-    # ONLY: Sec-WebSocket-Protocol header
-    protocols = websocket.headers.get("sec-websocket-protocol", "")
-    for proto in protocols.split(","):
-        proto = proto.strip()
-        if proto.startswith("bearer."):
-            token = proto[7:]
-            break
+    cookie_header = websocket.headers.get("cookie", "")
+    if cookie_header:
+        try:
+            cookies = SimpleCookie()
+            cookies.load(cookie_header)
+            morsel = cookies.get(AUTH_COOKIE_NAME) or cookies.get(LEGACY_AUTH_COOKIE_NAME)
+            if morsel is not None:
+                token = morsel.value
+        except Exception:
+            token = None
+
+    if not token:
+        protocols = websocket.headers.get("sec-websocket-protocol", "")
+        for proto in protocols.split(","):
+            proto = proto.strip()
+            if proto.startswith("bearer."):
+                token = proto[7:]
+                break
 
     if not token:
         return None
@@ -123,40 +221,26 @@ async def require_auth(
     Returns decoded JWT payload on success.
     Raises HTTPException(401) on failure.
     """
-    if not credentials:
+    token = None
+    via_cookie = False
+
+    if credentials:
+        token = credentials.credentials
+    else:
+        token = _extract_cookie_token(request)
+        via_cookie = bool(token)
+
+    if not token:
         raise HTTPException(
             status_code=401,
             detail={"error": "AUTH_REQUIRED", "detail": "Authentication required"},
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    token = credentials.credentials
+    if via_cookie:
+        _enforce_cookie_csrf(request)
 
-    # Check token revocation
-    if is_token_revoked(token):
-        raise HTTPException(
-            status_code=401,
-            detail={"error": "AUTH_REQUIRED", "detail": "Token has been revoked"},
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Verify JWT
-    payload = verify_jwt(token)
-    if payload is None:
-        raise HTTPException(
-            status_code=401,
-            detail={"error": "AUTH_REQUIRED", "detail": "Invalid or expired token"},
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    # Check session revocation if session_id is in payload
-    session_id = payload.get("session_id")
-    if session_id and is_session_revoked(session_id):
-        raise HTTPException(
-            status_code=401,
-            detail={"error": "AUTH_REQUIRED", "detail": "Session has been invalidated"},
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    payload = _verify_token_or_401(token)
 
     # Role is required by admin guards, but older JWTs may not contain it.
     # Hydrate role from storage as a compatibility path.
@@ -173,7 +257,7 @@ async def require_auth(
                 # regular auth if role lookup backend is unavailable.
                 pass
 
-    return payload
+    return {**payload, "_auth_via": "cookie" if via_cookie else "bearer"}
 
 
 async def require_admin(

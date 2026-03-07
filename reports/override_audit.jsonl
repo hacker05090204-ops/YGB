@@ -42,3 +42,11 @@
 {"timestamp": "2026-02-24T14:16:25.318130", "action": "first_approval", "details": {"request_id": "OVERRIDE_20260224141625", "approver": "user2"}}
 {"timestamp": "2026-02-24T14:16:25.319144", "action": "override_approved", "details": {"request_id": "OVERRIDE_20260224141625", "first_approver": "user2", "second_approver": "user3", "gpg_verified": false}}
 {"timestamp": "2026-02-24T14:16:25.320654", "action": "request_created", "details": {"request_id": "OVERRIDE_20260224141625", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-03-07T19:55:59.779560", "action": "request_created", "details": {"request_id": "OVERRIDE_20260307195559", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-03-07T19:55:59.780071", "action": "first_approval", "details": {"request_id": "OVERRIDE_20260307195559", "approver": "user2"}}
+{"timestamp": "2026-03-07T19:55:59.781075", "action": "override_approved", "details": {"request_id": "OVERRIDE_20260307195559", "first_approver": "user2", "second_approver": "user3", "gpg_verified": false}}
+{"timestamp": "2026-03-07T19:55:59.789083", "action": "request_created", "details": {"request_id": "OVERRIDE_20260307195559", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-03-07T19:58:13.696044", "action": "request_created", "details": {"request_id": "OVERRIDE_20260307195813", "reason": "Test", "requested_by": "user1"}}
+{"timestamp": "2026-03-07T19:58:13.697043", "action": "first_approval", "details": {"request_id": "OVERRIDE_20260307195813", "approver": "user2"}}
+{"timestamp": "2026-03-07T19:58:13.698042", "action": "override_approved", "details": {"request_id": "OVERRIDE_20260307195813", "first_approver": "user2", "second_approver": "user3", "gpg_verified": false}}
+{"timestamp": "2026-03-07T19:58:13.707339", "action": "request_created", "details": {"request_id": "OVERRIDE_20260307195813", "reason": "Test", "requested_by": "user1"}}

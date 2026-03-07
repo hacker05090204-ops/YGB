@@ -141,10 +141,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       isActive={isActive}
                       className="h-10 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:shadow-[0_0_20px_rgba(168,85,247,0.15)] hover:bg-white/5 transition-all duration-200"
                     >
-                      <a href={item.url} className="flex items-center gap-3">
+                      <Link href={item.url} className="flex items-center gap-3">
                         <item.icon className="size-5" />
                         <span className="font-medium text-base">{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 )
@@ -159,10 +159,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {data.navSecondary.map((item) => (
                 <SidebarMenuItem key={item.title} className="sidebar-item">
                   <SidebarMenuButton asChild tooltip={item.title} className="h-10 hover:bg-white/5 text-muted-foreground hover:text-foreground">
-                    <a href={item.url} className="flex items-center gap-3">
+                    <Link href={item.url} className="flex items-center gap-3">
                       <item.icon className="size-5" />
                       <span className="font-medium">{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

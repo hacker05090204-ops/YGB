@@ -3,7 +3,7 @@
  * TypeScript client for communicating with the YGB FastAPI backend
  */
 
-import { buildAuthHeaders } from "./auth-token";
+import { credentialedFetch } from "./auth-token";
 
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
 
@@ -13,11 +13,7 @@ const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
  * Enforces cache: "no-store" for critical freshness — no stale caching.
  */
 export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  const headers = buildAuthHeaders(
-    options.headers as Record<string, string> || {}
-  );
-
-  return fetch(url, { ...options, headers, cache: "no-store" });
+  return credentialedFetch(url, options);
 }
 
 // ============== TYPES ==============

@@ -9,7 +9,6 @@ import {
     Activity,
     Zap,
     Clock,
-    Power,
     RefreshCw,
     LogOut,
     Settings,
@@ -21,10 +20,16 @@ import {
     Pause,
     ChevronDown,
     CheckCircle,
-    AlertTriangle,
     XCircle,
     ArrowLeft,
 } from "lucide-react"
+
+import {
+    credentialedFetch,
+    notifyAuthStateChanged,
+    purgeLegacyAuthStorage,
+} from "@/lib/auth-token"
+import { authFetch } from "@/lib/ygb-api"
 
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
@@ -51,14 +56,6 @@ interface TrainingStatus {
     wall_clock_unix: number
     training_duration_seconds: number
     gpu_mem_allocated_mb: number
-}
-
-interface AuditEntry {
-    timestamp: number
-    action: string
-    user_id: string
-    ip: string
-    details: string
 }
 
 export default function AdminPanel() {
@@ -104,24 +101,14 @@ export default function AdminPanel() {
     const [showIntervalDropdown, setShowIntervalDropdown] = useState(false)
     const intervalOptions = [3, 6, 10, 30, 60]
 
-    // Audit log
-    const [auditLog, setAuditLog] = useState<AuditEntry[]>([])
-
     // Live refresh
     const [autoRefresh, setAutoRefresh] = useState(true)
     const [lastRefresh, setLastRefresh] = useState(0)
 
     // Auth check
     useEffect(() => {
-        const token = localStorage.getItem("ygb_session")
-        if (!token) {
-            router.push("/admin")
-            return
-        }
-
-        fetch(`${API_BASE}/admin/verify`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
+        purgeLegacyAuthStorage()
+        credentialedFetch(`${API_BASE}/admin/verify`)
             .then((r) => r.json())
             .then((data) => {
                 if (data.status === "ok") {
@@ -129,7 +116,6 @@ export default function AdminPanel() {
                     setUserRole(data.role)
                     setUserId(data.user_id)
                 } else {
-                    localStorage.removeItem("ygb_session")
                     router.push("/admin")
                 }
             })
@@ -140,15 +126,10 @@ export default function AdminPanel() {
 
     // Fetch status
     const fetchStatus = useCallback(async () => {
-        const token = localStorage.getItem("ygb_session")
-        if (!token) return
-
         try {
-            const headers = { Authorization: `Bearer ${token}` }
-
             const [gpuRes, trainRes] = await Promise.allSettled([
-                fetch(`${API_BASE}/gpu/status`, { headers }).then((r) => r.json()),
-                fetch(`${API_BASE}/training/status`, { headers }).then((r) => r.json()),
+                authFetch(`${API_BASE}/gpu/status`).then((r) => r.json()),
+                authFetch(`${API_BASE}/training/status`).then((r) => r.json()),
             ])
 
             if (gpuRes.status === "fulfilled" && gpuRes.value) {
@@ -169,7 +150,9 @@ export default function AdminPanel() {
     // Auto refresh polling
     useEffect(() => {
         if (!authenticated || !autoRefresh) return
-        fetchStatus()
+        queueMicrotask(() => {
+            void fetchStatus()
+        })
         const timer = window.setInterval(fetchStatus, (interval || 3) * 1000)
         return () => window.clearInterval(timer)
     }, [authenticated, autoRefresh, interval, fetchStatus])
@@ -197,61 +180,54 @@ export default function AdminPanel() {
 
     // Toggle training
     const toggleTraining = async () => {
-        const token = localStorage.getItem("ygb_session")
-        if (!token) return
         try {
-            await fetch(`${API_BASE}/training/${training.is_training ? "stop" : "start"}`, {
+            await authFetch(`${API_BASE}/training/${training.is_training ? "stop" : "start"}`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
             })
-            fetchStatus()
+            await fetchStatus()
         } catch { }
     }
 
     // Toggle 24/7 mode
     const toggle247 = async () => {
-        const token = localStorage.getItem("ygb_session")
-        if (!token) return
         try {
-            await fetch(`${API_BASE}/training/continuous`, {
+            await authFetch(`${API_BASE}/training/continuous`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ enabled: !continuousMode }),
             })
             setContinuousMode(!continuousMode)
-            fetchStatus()
+            await fetchStatus()
         } catch { }
     }
 
     // Set interval
     const setTrainingInterval = async (sec: number) => {
-        const token = localStorage.getItem("ygb_session")
-        if (!token) return
         try {
-            await fetch(`${API_BASE}/training/interval`, {
+            await authFetch(`${API_BASE}/training/interval`, {
                 method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ interval_sec: sec }),
             })
             setInterval_(sec)
             setShowIntervalDropdown(false)
-            fetchStatus()
+            await fetchStatus()
         } catch { }
     }
 
     // Logout
-    const handleLogout = () => {
-        localStorage.removeItem("ygb_session")
-        localStorage.removeItem("ygb_jwt")
+    const handleLogout = async () => {
+        try {
+            await credentialedFetch(`${API_BASE}/admin/logout`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            })
+        } catch {
+            // Best-effort logout.
+        }
+        purgeLegacyAuthStorage()
+        notifyAuthStateChanged()
         router.push("/admin")
     }
 

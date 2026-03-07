@@ -178,16 +178,13 @@ def classify_path(filepath):
     if 'impl_v1' in parts:
         if any(p in ('ci', 'monitoring', 'validation') for p in parts):
             return 'CI_TOOLING'
-        # Governors: only classify as CI_TOOLING if NOT imported by runtime
+        # Governors are runtime policy modules by default. Only an explicit
+        # test-only marker should downgrade them to tooling.
         if 'governors' in parts:
-            # Known runtime-imported governors should be PRODUCTION
-            _RUNTIME_GOVERNORS = {
-                'g35_ai_accelerator.py', 'g38_auto_training.py',
-                'g21_auto_update.py',
-            }
-            if parts[-1] in _RUNTIME_GOVERNORS:
-                return 'PRODUCTION'
-            return 'CI_TOOLING'
+            _TEST_ONLY_GOVERNORS = set()
+            if parts[-1] in _TEST_ONLY_GOVERNORS:
+                return 'CI_TOOLING'
+            return 'PRODUCTION'
         # Phase governance/freeze Python files
         if any(p.startswith('phase') for p in parts):
             if parts[-1].startswith(('quality_gate', 'freeze_condition')):

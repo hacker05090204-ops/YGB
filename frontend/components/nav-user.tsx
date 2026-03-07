@@ -8,8 +8,13 @@ import {
   User,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { buildAuthHeaders } from "@/lib/auth-token"
 import { toast } from "sonner"
+
+import {
+  credentialedFetch,
+  notifyAuthStateChanged,
+  purgeLegacyAuthStorage,
+} from "@/lib/auth-token"
 
 import {
   Avatar,
@@ -48,26 +53,15 @@ export function NavUser({
 
   const handleLogout = async () => {
     try {
-      await fetch(`${API_BASE}/auth/logout`, {
+      await credentialedFetch(`${API_BASE}/auth/logout`, {
         method: "POST",
-        headers: buildAuthHeaders({ "Content-Type": "application/json" }),
+        headers: { "Content-Type": "application/json" },
       })
     } catch {
-      // Ignore network failures and still clear local auth state.
+      // Ignore network failures and still clear legacy local auth state.
     } finally {
-      const keys = [
-        "ygb_token",
-        "ygb_jwt",
-        "ygb_session",
-        "ygb_session_id",
-        "ygb_auth_method",
-        "ygb_profile",
-        "ygb_network",
-      ]
-      for (const key of keys) {
-        sessionStorage.removeItem(key)
-        localStorage.removeItem(key)
-      }
+      purgeLegacyAuthStorage()
+      notifyAuthStateChanged()
       router.push("/login")
       router.refresh()
     }

@@ -131,6 +131,70 @@ def restore_rng_states(states: Dict[str, Any]) -> None:
             torch.cuda.set_rng_state_all(states["torch_cuda"])
 
 
+def _serialize_rng_states(states: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert RNG states into a safe checkpoint payload."""
+    serialized: Dict[str, Any] = {
+        "seed": states.get("seed"),
+    }
+
+    python_state = states.get("python_random")
+    if python_state:
+        serialized["python_random"] = {
+            "version": python_state[0],
+            "internal_state": list(python_state[1]),
+            "gauss_next": python_state[2],
+        }
+
+    if NUMPY_AVAILABLE and "numpy_random" in states:
+        numpy_state = states["numpy_random"]
+        serialized["numpy_random"] = {
+            "bit_generator": numpy_state[0],
+            "state": numpy_state[1].tolist(),
+            "pos": int(numpy_state[2]),
+            "has_gauss": int(numpy_state[3]),
+            "cached_gaussian": float(numpy_state[4]),
+        }
+
+    if "torch_cpu" in states:
+        serialized["torch_cpu"] = states["torch_cpu"]
+    if "torch_cuda" in states:
+        serialized["torch_cuda"] = states["torch_cuda"]
+
+    return serialized
+
+
+def _deserialize_rng_states(states: Dict[str, Any]) -> Dict[str, Any]:
+    """Restore serialized RNG state payload into runtime objects."""
+    restored: Dict[str, Any] = {
+        "seed": states.get("seed"),
+    }
+
+    python_state = states.get("python_random")
+    if python_state:
+        restored["python_random"] = (
+            python_state["version"],
+            tuple(python_state["internal_state"]),
+            python_state["gauss_next"],
+        )
+
+    if NUMPY_AVAILABLE and "numpy_random" in states:
+        numpy_state = states["numpy_random"]
+        restored["numpy_random"] = (
+            numpy_state["bit_generator"],
+            np.array(numpy_state["state"], dtype=np.uint32),
+            int(numpy_state["pos"]),
+            int(numpy_state["has_gauss"]),
+            float(numpy_state["cached_gaussian"]),
+        )
+
+    if "torch_cpu" in states:
+        restored["torch_cpu"] = states["torch_cpu"]
+    if "torch_cuda" in states:
+        restored["torch_cuda"] = states["torch_cuda"]
+
+    return restored
+
+
 # =============================================================================
 # CHECKPOINTING WITH RNG
 # =============================================================================
@@ -159,6 +223,9 @@ def save_checkpoint_with_rng(
     Returns:
         Checkpoint hash for determinism verification
     """
+    if not TORCH_AVAILABLE:
+        raise RuntimeError("PyTorch is required for deterministic checkpoints")
+
     rng_states = get_rng_states()
     
     # Compute determinism hash
@@ -168,19 +235,13 @@ def save_checkpoint_with_rng(
     checkpoint = {
         "model_state": model_state,
         "optimizer_state": optimizer_state,
-        "rng_states": rng_states,
+        "rng_states": _serialize_rng_states(rng_states),
         "epoch": epoch,
         "loss": loss,
         "hash": checkpoint_hash,
     }
     
-    if TORCH_AVAILABLE:
-        torch.save(checkpoint, filepath)
-    else:
-        # Fallback for non-torch environments
-        import pickle
-        with open(filepath, "wb") as f:
-            pickle.dump(checkpoint, f)
+    torch.save(checkpoint, filepath)
     
     return checkpoint_hash
 
@@ -192,20 +253,19 @@ def load_checkpoint_with_rng(filepath: Path) -> DeterministicCheckpoint:
     Returns:
         DeterministicCheckpoint with all states
     """
-    if TORCH_AVAILABLE:
-        checkpoint = torch.load(filepath, weights_only=False)
-    else:
-        import pickle
-        with open(filepath, "rb") as f:
-            checkpoint = pickle.load(f)
+    if not TORCH_AVAILABLE:
+        raise RuntimeError("PyTorch is required for deterministic checkpoints")
+
+    checkpoint = torch.load(filepath, map_location="cpu", weights_only=True)
+    rng_states = _deserialize_rng_states(checkpoint["rng_states"])
     
     # Restore RNG states
-    restore_rng_states(checkpoint["rng_states"])
+    restore_rng_states(rng_states)
     
     return DeterministicCheckpoint(
         model_state=checkpoint["model_state"],
         optimizer_state=checkpoint["optimizer_state"],
-        rng_states=checkpoint["rng_states"],
+        rng_states=rng_states,
         epoch=checkpoint["epoch"],
         loss=checkpoint["loss"],
         hash=checkpoint["hash"],

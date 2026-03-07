@@ -107,6 +107,21 @@ class TestWsAuthenticateUnit(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result["sub"], "ws-test-user")
 
+    def test_accepts_cookie_auth(self):
+        """ws_authenticate accepts HttpOnly auth cookie for browser WS clients."""
+        from backend.auth.auth_guard import ws_authenticate
+        from backend.auth.revocation_store import reset_store
+
+        reset_store()
+        token = _valid_token()
+        mock_ws = MagicMock()
+        mock_ws.query_params = {}
+        mock_ws.headers = {"cookie": f"ygb_auth={token}"}
+
+        result = _run(ws_authenticate(mock_ws))
+        self.assertIsNotNone(result)
+        self.assertEqual(result["sub"], "ws-test-user")
+
     def test_rejects_query_param_token(self):
         """ws_authenticate rejects valid token passed via query param."""
         from backend.auth.auth_guard import ws_authenticate

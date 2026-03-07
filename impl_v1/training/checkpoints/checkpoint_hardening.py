@@ -187,7 +187,7 @@ class HardenedCheckpointManager:
         if str(checkpoint_path).endswith('.safetensors'):
             state = st_load_file(str(checkpoint_path), device='cpu')
         else:
-            state = torch.load(checkpoint_path, weights_only=False)
+            state = torch.load(checkpoint_path, map_location='cpu', weights_only=True)
         
         if "model_state_dict" in state:
             model.load_state_dict(state["model_state_dict"])

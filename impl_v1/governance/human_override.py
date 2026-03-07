@@ -13,7 +13,7 @@ No single human can unlock.
 
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import json
 import hashlib
@@ -47,6 +47,8 @@ class EmergencyOverrideManager:
     
     OVERRIDE_FILE = Path("impl_v1/governance/EMERGENCY_OVERRIDE.json")
     AUDIT_LOG = Path("reports/override_audit.jsonl")
+    MISUSE_WINDOW = timedelta(days=1)
+    MISUSE_THRESHOLD = 5
     
     def __init__(self):
         self.current_request: Optional[OverrideRequest] = None
@@ -216,17 +218,27 @@ class EmergencyOverrideManager:
             return False, []
         
         recent_overrides = 0
+        cutoff = datetime.now() - self.MISUSE_WINDOW
         
         with open(self.AUDIT_LOG, "r") as f:
             for line in f:
                 try:
                     entry = json.loads(line)
-                    if entry["action"] == "override_approved":
+                    if entry.get("action") != "override_approved":
+                        continue
+                    timestamp = entry.get("timestamp")
+                    if not timestamp:
+                        continue
+                    approved_at = datetime.fromisoformat(timestamp)
+                    if approved_at >= cutoff:
                         recent_overrides += 1
                 except Exception:
                     pass
         
-        if recent_overrides > 5:
-            issues.append(f"High override frequency: {recent_overrides} total")
+        if recent_overrides > self.MISUSE_THRESHOLD:
+            issues.append(
+                f"High override frequency: {recent_overrides} approvals in the last "
+                f"{int(self.MISUSE_WINDOW.total_seconds() // 3600)}h"
+            )
         
         return len(issues) > 0, issues

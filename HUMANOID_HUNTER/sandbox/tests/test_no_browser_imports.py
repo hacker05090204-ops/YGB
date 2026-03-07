@@ -7,6 +7,7 @@ Tests:
 - No phase22+ imports
 """
 import pytest
+from pathlib import Path
 
 
 class TestNoForbiddenImports:
@@ -42,14 +43,10 @@ class TestNoForbiddenImports:
 
     def test_no_phase22_import(self):
         """No phase22+ imports."""
-        import os
-        module_dir = os.path.dirname(__file__).replace('/tests', '')
-        for filename in os.listdir(module_dir):
-            if filename.endswith('.py'):
-                filepath = os.path.join(module_dir, filename)
-                with open(filepath, 'r') as f:
-                    content = f.read()
-                    assert 'phase22' not in content
+        module_dir = Path(__file__).resolve().parents[1]
+        for filepath in module_dir.glob("*.py"):
+            content = filepath.read_text()
+            assert 'phase22' not in content
 
 
 class TestEnumCounts:

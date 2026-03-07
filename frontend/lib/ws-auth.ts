@@ -1,52 +1,26 @@
 /**
  * WebSocket Auth Factory
  *
- * Centralized WebSocket connection using Sec-WebSocket-Protocol bearer auth.
- * Query-string tokens are NOT used (security risk — leaks in logs/referrer).
+ * Browser auth relies on HttpOnly cookies sent during the WebSocket handshake.
+ * Query-string tokens are never used.
  */
 
-import { getAuthToken } from "./auth-token";
+const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000"
 
-const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
-
-/**
- * Get the current auth token using unified lookup.
- */
-function getToken(): string | null {
-    return getAuthToken();
-}
-
-/**
- * Create an authenticated WebSocket connection.
- *
- * @param path - WS path (e.g. "/ws/hunting")
- * @param onMessage - Message handler
- * @param onError - Error handler
- * @param onClose - Close handler
- * @returns WebSocket instance or null if no token
- */
 export function createAuthWebSocket(
-    path: string,
-    onMessage?: (event: MessageEvent) => void,
-    onError?: (event: Event) => void,
-    onClose?: (event: CloseEvent) => void
-): WebSocket | null {
-    const token = getToken();
-    if (!token) {
-        console.warn("[WS] No auth token — cannot open WebSocket");
-        return null;
-    }
+  path: string,
+  onMessage?: (event: MessageEvent) => void,
+  onError?: (event: Event) => void,
+  onClose?: (event: CloseEvent) => void
+): WebSocket {
+  const url = `${WS_BASE}${path}`
+  const ws = new WebSocket(url)
 
-    const url = `${WS_BASE}${path}`;
+  if (onMessage) ws.onmessage = onMessage
+  if (onError) ws.onerror = onError
+  if (onClose) ws.onclose = onClose
 
-    // Use Sec-WebSocket-Protocol for auth (NOT query string)
-    const ws = new WebSocket(url, [`bearer.${token}`]);
-
-    if (onMessage) ws.onmessage = onMessage;
-    if (onError) ws.onerror = onError;
-    if (onClose) ws.onclose = onClose;
-
-    return ws;
+  return ws
 }
 
-export { WS_BASE };
+export { WS_BASE }

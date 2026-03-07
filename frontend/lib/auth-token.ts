@@ -1,65 +1,84 @@
 /**
- * Auth Token Utilities — Centralized token retrieval and header building.
+ * Browser auth helpers for HttpOnly-cookie sessions.
  *
- * Checks multiple storage keys in priority order so that any auth flow
- * (session-based, JWT-based, or legacy) is covered without each caller
- * needing to know the storage layout.
+ * Live auth tokens are never read from browser storage.
  */
 
-const TOKEN_KEYS = ["ygb_token", "ygb_jwt", "ygb_session"] as const;
+export const AUTH_STATE_EVENT = "ygb-auth-changed"
 
-/**
- * Retrieve the current auth token from browser storage.
- *
- * Priority: sessionStorage first (per-tab isolation), then localStorage.
- * Checks keys: ygb_token, ygb_jwt, ygb_session.
- *
- * @returns The token string, or null if not authenticated.
- */
-export function getAuthToken(): string | null {
-    if (typeof window === "undefined") return null;
+const CSRF_COOKIE_NAME = "ygb_csrf"
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS", "TRACE"])
 
-    // Check sessionStorage first (per-tab, higher priority)
-    for (const key of TOKEN_KEYS) {
-        const val = sessionStorage.getItem(key);
-        if (val) return val;
-    }
+const LEGACY_STORAGE_KEYS = [
+  "ygb_token",
+  "ygb_jwt",
+  "ygb_session",
+  "ygb_session_id",
+  "ygb_auth_method",
+  "ygb_profile",
+  "ygb_network",
+] as const
 
-    // Fallback to localStorage (persistent across tabs)
-    for (const key of TOKEN_KEYS) {
-        const val = localStorage.getItem(key);
-        if (val) return val;
-    }
-
-    return null;
+function hasWindow(): boolean {
+  return typeof window !== "undefined"
 }
 
-/**
- * Build a Headers object that includes Authorization when a token is available.
- *
- * @param existing - Optional existing headers (Record or Headers) to merge.
- * @returns A new Headers object with Authorization set if token exists.
- */
-export function buildAuthHeaders(
-    existing?: Record<string, string> | HeadersInit
-): Record<string, string> {
-    const headers: Record<string, string> = {};
+export function getCookieValue(name: string): string | null {
+  if (typeof document === "undefined") {
+    return null
+  }
 
-    // Merge existing headers
-    if (existing) {
-        if (existing instanceof Headers) {
-            existing.forEach((value, key) => {
-                headers[key] = value;
-            });
-        } else if (typeof existing === "object" && !Array.isArray(existing)) {
-            Object.assign(headers, existing);
-        }
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const match = document.cookie.match(new RegExp(`(?:^|; )${escaped}=([^;]*)`))
+  return match ? decodeURIComponent(match[1]) : null
+}
+
+export function getCsrfToken(): string | null {
+  return getCookieValue(CSRF_COOKIE_NAME)
+}
+
+export function purgeLegacyAuthStorage(): void {
+  if (!hasWindow()) {
+    return
+  }
+
+  for (const key of LEGACY_STORAGE_KEYS) {
+    window.sessionStorage.removeItem(key)
+    window.localStorage.removeItem(key)
+  }
+}
+
+export function notifyAuthStateChanged(): void {
+  if (!hasWindow()) {
+    return
+  }
+
+  window.dispatchEvent(new Event(AUTH_STATE_EVENT))
+}
+
+export function withCredentialedAuth(options: RequestInit = {}): RequestInit {
+  const headers = new Headers(options.headers)
+  const method = (options.method ?? "GET").toUpperCase()
+
+  if (!SAFE_METHODS.has(method)) {
+    const csrfToken = getCsrfToken()
+    if (csrfToken && !headers.has("X-CSRF-Token")) {
+      headers.set("X-CSRF-Token", csrfToken)
     }
+  }
 
-    const token = getAuthToken();
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
+  return {
+    ...options,
+    method,
+    headers,
+    credentials: "include",
+    cache: options.cache ?? "no-store",
+  }
+}
 
-    return headers;
+export async function credentialedFetch(
+  input: RequestInfo | URL,
+  options: RequestInit = {}
+): Promise<Response> {
+  return fetch(input, withCredentialedAuth(options))
 }

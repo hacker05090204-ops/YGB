@@ -1,12 +1,12 @@
 {
-  "auto_mode_safe": false,
-  "reason": "FAILED: governance_valid",
+  "auto_mode_safe": true,
+  "reason": "ALL ENTERPRISE CHECKS PASSED",
   "checks": {
     "inference_isolated": true,
     "training_isolated": true,
     "no_shared_memory": true,
     "sandbox_enforced": true,
-    "governance_valid": false
+    "governance_valid": true
   },
-  "timestamp": "2026-02-17T08:03:32.703667"
+  "timestamp": "2026-03-07T19:58:13.678962"
 }

@@ -8,6 +8,10 @@ Tests for operational governance.
 import unittest
 from pathlib import Path
 import sys
+import json
+from datetime import datetime, timedelta
+from tempfile import TemporaryDirectory
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
@@ -133,6 +137,52 @@ class TestHumanOverride(unittest.TestCase):
         
         success, msg = manager.approve("user1")
         self.assertFalse(success)
+
+    def test_misuse_ignores_old_override_history(self):
+        """Old approvals outside the misuse window should not block governance."""
+        with TemporaryDirectory() as tmp:
+            override_file = Path(tmp) / "override.json"
+            audit_log = Path(tmp) / "override_audit.jsonl"
+            stale_ts = (
+                datetime.now() - EmergencyOverrideManager.MISUSE_WINDOW - timedelta(minutes=1)
+            ).isoformat()
+            with open(audit_log, "w") as f:
+                for _ in range(EmergencyOverrideManager.MISUSE_THRESHOLD + 2):
+                    f.write(json.dumps({
+                        "timestamp": stale_ts,
+                        "action": "override_approved",
+                        "details": {},
+                    }) + "\n")
+
+            with patch.object(EmergencyOverrideManager, "OVERRIDE_FILE", override_file), \
+                 patch.object(EmergencyOverrideManager, "AUDIT_LOG", audit_log):
+                manager = EmergencyOverrideManager()
+                misuse, issues = manager.check_for_misuse()
+
+            self.assertFalse(misuse)
+            self.assertEqual(issues, [])
+
+    def test_misuse_blocks_recent_override_spike(self):
+        """Recent approvals above threshold should still trigger misuse detection."""
+        with TemporaryDirectory() as tmp:
+            override_file = Path(tmp) / "override.json"
+            audit_log = Path(tmp) / "override_audit.jsonl"
+            fresh_ts = datetime.now().isoformat()
+            with open(audit_log, "w") as f:
+                for _ in range(EmergencyOverrideManager.MISUSE_THRESHOLD + 1):
+                    f.write(json.dumps({
+                        "timestamp": fresh_ts,
+                        "action": "override_approved",
+                        "details": {},
+                    }) + "\n")
+
+            with patch.object(EmergencyOverrideManager, "OVERRIDE_FILE", override_file), \
+                 patch.object(EmergencyOverrideManager, "AUDIT_LOG", audit_log):
+                manager = EmergencyOverrideManager()
+                misuse, issues = manager.check_for_misuse()
+
+            self.assertTrue(misuse)
+            self.assertTrue(issues)
 
 
 if __name__ == "__main__":

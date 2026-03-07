@@ -1,33 +1,49 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-/**
- * AuthGuard — wraps protected pages.
- * Redirects to /login if no valid token is found in sessionStorage.
- * Shows nothing (blank) during the check to prevent flash of protected content.
- */
+import { useAuthUser } from "@/hooks/use-auth-user"
+
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-    const router = useRouter()
-    const [authorized, setAuthorized] = useState(false)
+  const router = useRouter()
+  const authUser = useAuthUser()
 
-    useEffect(() => {
-        const token = sessionStorage.getItem("ygb_token")
-        if (!token) {
-            router.replace("/login")
-            return
-        }
-        setAuthorized(true)
-    }, [router])
+  useEffect(() => {
+    if (
+      authUser.status === "unavailable" &&
+      authUser.unavailableReason === "Authentication required"
+    ) {
+      router.replace("/login")
+    }
+  }, [authUser.status, authUser.unavailableReason, router])
 
-    if (!authorized) {
-        return (
-            <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-                <div className="text-gray-600 text-sm animate-pulse">Checking authentication...</div>
-            </div>
-        )
+  if (authUser.status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+        <div className="text-gray-600 text-sm animate-pulse">
+          Checking authentication...
+        </div>
+      </div>
+    )
+  }
+
+  if (authUser.status !== "authenticated") {
+    if (authUser.unavailableReason === "Authentication required") {
+      return null
     }
 
-    return <>{children}</>
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center px-6">
+        <div className="text-center">
+          <p className="text-sm text-gray-300">Session verification unavailable</p>
+          <p className="mt-2 text-xs text-gray-500">
+            {authUser.unavailableReason || "Backend unreachable"}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return <>{children}</>
 }

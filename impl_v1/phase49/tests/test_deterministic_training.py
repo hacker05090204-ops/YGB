@@ -12,6 +12,7 @@ import unittest
 import random
 import sys
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch, MagicMock
 
 # Add to path
@@ -21,9 +22,12 @@ from impl_v1.phase49.training.deterministic_training import (
     set_deterministic_mode,
     get_rng_states,
     restore_rng_states,
+    save_checkpoint_with_rng,
+    load_checkpoint_with_rng,
     verify_replay_determinism,
     compute_loss_hash,
     DEFAULT_SEED,
+    TORCH_AVAILABLE,
 )
 
 
@@ -82,6 +86,31 @@ class TestRNGCheckpointing(unittest.TestCase):
         actual = [random.random() for _ in range(5)]
         
         self.assertEqual(expected, actual)
+
+    @unittest.skipUnless(TORCH_AVAILABLE, "PyTorch required")
+    def test_checkpoint_round_trip_uses_safe_payload(self):
+        """Checkpoint save/load round-trip restores tensors and RNG state."""
+        import torch
+
+        set_deterministic_mode(seed=42)
+
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "deterministic.ckpt"
+            model_state = {"weight": torch.ones(2)}
+            optimizer_state = {"param_groups": [{"lr": 0.1}], "state": {}}
+
+            save_checkpoint_with_rng(
+                model_state=model_state,
+                optimizer_state=optimizer_state,
+                epoch=3,
+                loss=0.125,
+                filepath=path,
+            )
+            checkpoint = load_checkpoint_with_rng(path)
+
+        self.assertTrue(torch.equal(checkpoint.model_state["weight"], model_state["weight"]))
+        self.assertEqual(checkpoint.epoch, 3)
+        self.assertIn("python_random", checkpoint.rng_states)
 
 
 class TestReplayDeterminism(unittest.TestCase):

@@ -505,6 +505,14 @@ class AutoTrainer:
             self._gpu_holdout_loader = holdout_loader  # Store holdout for validation
             self._gpu_dataset_stats = stats
 
+            dataset_source = str(stats.get("dataset_source", "") or "").upper()
+            if dataset_source != "INGESTION_PIPELINE":
+                logger.error(
+                    "Refusing to initialize training with non-real dataset source: %s",
+                    dataset_source or "<missing>",
+                )
+                return False
+
             if self._abort_flag.is_set():
                 logger.info("GPU initialization aborted after DataLoader creation")
                 return False

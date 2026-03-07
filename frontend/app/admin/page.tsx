@@ -4,6 +4,12 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Shield, Lock, AlertTriangle, Eye, EyeOff } from "lucide-react"
 
+import {
+    credentialedFetch,
+    notifyAuthStateChanged,
+    purgeLegacyAuthStorage,
+} from "@/lib/auth-token"
+
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 export default function AdminLogin() {
@@ -15,22 +21,21 @@ export default function AdminLogin() {
     const [loading, setLoading] = useState(false)
     const [showCode, setShowCode] = useState(false)
     const [showVaultPass, setShowVaultPass] = useState(false)
-    const [attemptsLeft, setAttemptsLeft] = useState(5)
+    const attemptsLeft = 5
     const [lockedUntil, setLockedUntil] = useState<number | null>(null)
 
     // Check existing session
     useEffect(() => {
-        const token = localStorage.getItem("ygb_session")
-        if (token) {
-            fetch(`${API_BASE}/admin/verify`, {
-                headers: { Authorization: `Bearer ${token}` },
+        purgeLegacyAuthStorage()
+        credentialedFetch(`${API_BASE}/admin/verify`)
+            .then(async (r) => {
+                if (!r.ok) return null
+                return r.json()
             })
-                .then((r) => r.json())
-                .then((data) => {
-                    if (data.status === "ok") router.push("/admin/panel")
-                })
-                .catch(() => { })
-        }
+            .then((data) => {
+                if (data?.status === "ok") router.push("/admin/panel")
+            })
+            .catch(() => { })
     }, [router])
 
     // Lockout countdown
@@ -54,30 +59,21 @@ export default function AdminLogin() {
         setError("")
 
         try {
-            const res = await fetch(`${API_BASE}/admin/login`, {
+            const res = await credentialedFetch(`${API_BASE}/admin/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, totp_code: totpCode }),
-                credentials: "include",
             })
 
             const data = await res.json()
 
             if (data.status === "ok") {
-                localStorage.setItem("ygb_session", data.session_token)
-                if (data.jwt_token) {
-                    localStorage.setItem("ygb_jwt", data.jwt_token)
-                }
-
                 // Unlock vault with password (server-side key derivation)
                 if (vaultPassword) {
                     try {
-                        await fetch(`${API_BASE}/admin/vault-unlock`, {
+                        await credentialedFetch(`${API_BASE}/admin/vault-unlock`, {
                             method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${data.session_token}`,
-                            },
+                            headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ vault_password: vaultPassword }),
                         })
                     } catch {
@@ -87,13 +83,14 @@ export default function AdminLogin() {
 
                 // Clear vault password from memory immediately
                 setVaultPassword("")
+                notifyAuthStateChanged()
                 router.push("/admin/panel")
-            } else if (data.status === "locked_out") {
-                setLockedUntil(Date.now() / 1000 + 1800)
-                setError(data.message)
             } else {
-                setError(data.message || "Authentication failed")
-                if (data.remaining !== undefined) setAttemptsLeft(data.remaining)
+                const detail = data.detail || "Authentication failed"
+                if (typeof detail === "string" && detail.toLowerCase().includes("locked")) {
+                    setLockedUntil(Date.now() / 1000 + 1800)
+                }
+                setError(detail)
             }
         } catch {
             setError("Connection failed. Check server status.")

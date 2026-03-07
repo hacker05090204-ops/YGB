@@ -57,6 +57,9 @@ from backend.auth.auth_guard import (
     preflight_check_secrets,
     validate_target_url,
     ws_authenticate,
+    AUTH_COOKIE_NAME,
+    LEGACY_AUTH_COOKIE_NAME,
+    CSRF_COOKIE_NAME,
 )
 from backend.auth.ownership import check_resource_owner, check_ws_resource_owner
 from backend.api.runtime_state import runtime_state
@@ -116,7 +119,7 @@ from backend.training.state_manager import get_training_state_manager
 # Import auth and alerts
 from backend.auth.auth import (
     hash_password, verify_password, generate_jwt, verify_jwt,
-    compute_device_hash, get_rate_limiter, generate_csrf_token,
+    compute_device_hash, get_rate_limiter, generate_csrf_token, verify_csrf_token,
     needs_rehash,
 )
 from backend.auth.geoip import resolve_ip_geolocation
@@ -2537,6 +2540,138 @@ async def video_token_endpoint(request: Request, user=Depends(require_auth)):
 # =============================================================================
 
 _ALLOW_PASSWORD_LOGIN = os.getenv("ALLOW_PASSWORD_LOGIN", "false").lower() == "true"
+_AUTH_COOKIE_MAX_AGE_SECONDS = int(os.getenv("AUTH_COOKIE_MAX_AGE_SECONDS", "3600"))
+_ADMIN_SESSION_COOKIE_NAME = "ygb_admin_session"
+_SAFE_HTTP_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "TRACE"})
+
+
+def _is_secure_request(req: Request) -> bool:
+    return req.url.scheme == "https" or _FRONTEND_URL.startswith("https://")
+
+
+def _set_auth_cookies(resp: Response, req: Request, token: str) -> None:
+    secure = _is_secure_request(req)
+    csrf_token = generate_csrf_token()
+    resp.set_cookie(
+        key=AUTH_COOKIE_NAME,
+        value=token,
+        max_age=_AUTH_COOKIE_MAX_AGE_SECONDS,
+        httponly=True,
+        samesite="lax",
+        secure=secure,
+        path="/",
+    )
+    resp.set_cookie(
+        key=CSRF_COOKIE_NAME,
+        value=csrf_token,
+        max_age=_AUTH_COOKIE_MAX_AGE_SECONDS,
+        httponly=False,
+        samesite="lax",
+        secure=secure,
+        path="/",
+    )
+    # Clear legacy browser-readable auth cookies as part of the migration.
+    resp.delete_cookie(LEGACY_AUTH_COOKIE_NAME, path="/")
+    resp.delete_cookie("ygb_session_id", path="/")
+    resp.delete_cookie("ygb_profile", path="/")
+
+
+def _clear_auth_cookies(resp: Response, req: Request) -> None:
+    secure = _is_secure_request(req)
+    for cookie_name in (
+        AUTH_COOKIE_NAME,
+        CSRF_COOKIE_NAME,
+        LEGACY_AUTH_COOKIE_NAME,
+        "ygb_session_id",
+        "ygb_profile",
+    ):
+        resp.delete_cookie(
+            cookie_name,
+            path="/",
+            secure=secure,
+            samesite="lax",
+        )
+
+
+def _allowed_cookie_origins() -> set[str]:
+    origins = {
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    }
+    if _FRONTEND_URL:
+        origins.add(_FRONTEND_URL.rstrip("/"))
+    for value in os.getenv("YGB_ALLOWED_ORIGINS", "").split(","):
+        value = value.strip().rstrip("/")
+        if value:
+            origins.add(value)
+    return origins
+
+
+def _normalize_origin(origin: str) -> str:
+    if not origin:
+        return ""
+
+    from urllib.parse import urlparse
+
+    parsed = urlparse(origin)
+    if not parsed.scheme or not parsed.netloc:
+        return ""
+    return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+
+
+def _enforce_cookie_csrf(req: Request) -> None:
+    if req.method.upper() in _SAFE_HTTP_METHODS:
+        return
+
+    origin = req.headers.get("origin") or _normalize_origin(req.headers.get("referer", ""))
+    normalized_origin = _normalize_origin(origin)
+    if not normalized_origin or normalized_origin not in _allowed_cookie_origins():
+        raise HTTPException(status_code=403, detail="Request origin not allowed")
+
+    csrf_cookie = req.cookies.get(CSRF_COOKIE_NAME, "")
+    csrf_header = req.headers.get("x-csrf-token", "")
+    if not csrf_cookie or not csrf_header or not verify_csrf_token(csrf_header, csrf_cookie):
+        raise HTTPException(status_code=403, detail="Missing or invalid CSRF token")
+
+
+def _set_admin_auth_cookies(resp: Response, req: Request, session_token: str, auth_token: str) -> None:
+    secure = _is_secure_request(req)
+    _set_auth_cookies(resp, req, auth_token)
+    resp.set_cookie(
+        key=_ADMIN_SESSION_COOKIE_NAME,
+        value=session_token,
+        max_age=_AUTH_COOKIE_MAX_AGE_SECONDS,
+        httponly=True,
+        samesite="lax",
+        secure=secure,
+        path="/",
+    )
+
+
+def _clear_admin_auth_cookies(resp: Response, req: Request) -> None:
+    secure = _is_secure_request(req)
+    _clear_auth_cookies(resp, req)
+    resp.delete_cookie(
+        _ADMIN_SESSION_COOKIE_NAME,
+        path="/",
+        secure=secure,
+        samesite="lax",
+    )
+
+
+def _extract_admin_session_token(req: Request) -> tuple[Optional[str], bool]:
+    auth_header = req.headers.get("authorization", "")
+    if auth_header.startswith("Bearer "):
+        return auth_header[7:], False
+
+    cookie_token = req.cookies.get(_ADMIN_SESSION_COOKIE_NAME)
+    if cookie_token:
+        return cookie_token, True
+
+    return None, False
+
 # SECURITY: default to NOT trusting proxy headers — set TRUST_PROXY_HEADERS=true
 # and TRUSTED_PROXY_CIDRS explicitly when behind a known reverse proxy.
 _TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "false").lower() in ("1", "true", "yes", "on")
@@ -2679,7 +2814,7 @@ class RegisterRequest(BaseModel):
 
 
 @app.post("/auth/register")
-async def register_user(request: RegisterRequest, req: Request):
+async def register_user(request: RegisterRequest, req: Request, response: Response):
     """Register a new user with hashed password."""
     ip = _extract_client_ip(req)
     ua = req.headers.get("user-agent", "unknown")
@@ -2728,10 +2863,10 @@ async def register_user(request: RegisterRequest, req: Request):
             status_code=400,
             detail={"error": "EMAIL_EXISTS", "detail": "Email already registered"},
         )
+    _set_auth_cookies(response, req, result["token"])
     return {
         "success": True,
         "user": {"id": result["user"]["id"], "name": result["user"]["name"], "email": result["user"]["email"], "role": "hunter"},
-        "token": result["token"],
         "session_id": result["session_id"],
         "device": result["device"],
         "network": result["network"],
@@ -2740,7 +2875,7 @@ async def register_user(request: RegisterRequest, req: Request):
 
 
 @app.post("/auth/login")
-async def login(request: LoginRequest, req: Request):
+async def login(request: LoginRequest, req: Request, response: Response):
     """Login with email/password. Captures IP, UA, device hash. Sends alerts."""
     if not _ALLOW_PASSWORD_LOGIN:
         raise HTTPException(
@@ -2837,18 +2972,30 @@ async def login(request: LoginRequest, req: Request):
     result = await asyncio.to_thread(_sync_login)
     if "error" in result:
         raise HTTPException(status_code=result["error"], detail=result["detail"])
-    return result
+    _set_auth_cookies(response, req, result["token"])
+    return {
+        "success": result["success"],
+        "user": result["user"],
+        "session_id": result["session_id"],
+        "device": result["device"],
+        "network": result["network"],
+        "auth_method": result["auth_method"],
+    }
 
 
 @app.post("/auth/logout")
-async def logout(req: Request, user=Depends(require_auth)):
+async def logout(req: Request, response: Response, user=Depends(require_auth)):
     """End current session. Revokes token and invalidates session."""
     ip = _extract_client_ip(req)
 
-    # Extract and revoke the Bearer token
     auth_header = req.headers.get("authorization", "")
+    cookie_token = req.cookies.get(AUTH_COOKIE_NAME) or req.cookies.get(LEGACY_AUTH_COOKIE_NAME)
+    token = None
     if auth_header.startswith("Bearer "):
         token = auth_header[7:]
+    elif cookie_token:
+        token = cookie_token
+    if token:
         revoke_token(token)
 
     # Revoke session if present in user payload
@@ -2861,7 +3008,8 @@ async def logout(req: Request, user=Depends(require_auth)):
             pass  # Best effort
 
     user_id = user.get("sub")
-    log_activity(user_id, "LOGOUT", f"Logout from {ip} — token+session revoked", ip_address=ip)
+    log_activity(user_id, "LOGOUT", f"Logout from {ip}", ip_address=ip)
+    _clear_auth_cookies(response, req)
     return {"success": True, "message": "Logged out — token and session revoked"}
 
 
@@ -2960,11 +3108,9 @@ async def admin_auth_intel(req: Request, limit: int = 200):
       - github id/login/profile details
       - last login IP + geolocation
     """
-    auth_header = req.headers.get("authorization", "")
-    if not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Bearer token required")
-
-    token = auth_header[7:]
+    token, _ = _extract_admin_session_token(req)
+    if not token:
+        raise HTTPException(status_code=401, detail="Admin authentication required")
     try:
         from backend.api.admin_auth import require_auth as admin_require_auth, ROLE_ADMIN
         admin_result = admin_require_auth(jwt_token=token, required_role=ROLE_ADMIN)
@@ -4536,26 +4682,14 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
         # Build minimal profile for redirect URL (no GeoIP yet — background fills it)
         safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
-        safe_profile = urllib.parse.quote_plus(
-            json.dumps(github_profile_minimal, separators=(",", ":"), ensure_ascii=False)
-        )
-
-        # ── Security: token + session_id go in cookies, NOT URL params ──
-        # URL params leak via browser history, referrer headers, and server logs.
-        # Only non-sensitive display data (username, auth method) goes in URL.
+        # Security: auth stays in cookies, not URL params.
         return {
             "redirect_url": (
                 f"{frontend_url}/login"
                 f"?user={safe_user}"
                 f"&auth=github"
             ),
-            "_set_cookies": {
-                "ygb_token": jwt_token,
-                "ygb_session_id": session["id"],
-                "ygb_profile": json.dumps(
-                    github_profile_minimal, separators=(",", ":"), ensure_ascii=False
-                ),
-            },
+            "_auth_token": jwt_token,
             # Pass context to background task (no secrets — only IDs/metadata)
             "_bg_ctx": {
                 "user_id": user["id"],
@@ -4728,20 +4862,9 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
     resp = RedirectResponse(url=result["redirect_url"], status_code=302)
     resp.delete_cookie("ygb_oauth_state")
 
-    # Set auth tokens as cookies (not in URL)
-    # Auto-detect HTTPS for secure flag
-    _is_https = req.url.scheme == "https" or _GITHUB_REDIRECT_URI.startswith("https://")
-    cookies = result.get("_set_cookies", {})
-    for cookie_name, cookie_value in cookies.items():
-        resp.set_cookie(
-            key=cookie_name,
-            value=cookie_value,
-            max_age=3600,       # 1 hour
-            httponly=(cookie_name not in ("ygb_profile", "ygb_token")),  # Token + profile readable by JS; session_id stays HttpOnly
-            samesite="lax",
-            secure=_is_https,
-            path="/",
-        )
+    auth_token = result.get("_auth_token")
+    if auth_token:
+        _set_auth_cookies(resp, req, auth_token)
     return resp
 
 
@@ -4755,7 +4878,7 @@ class AdminLoginRequest(BaseModel):
 
 
 @app.post("/admin/login")
-async def admin_login(request: AdminLoginRequest, req: Request):
+async def admin_login(request: AdminLoginRequest, req: Request, response: Response):
     """Admin login — entry point for admin auth. No Depends(require_auth)."""
     try:
         from backend.api.admin_auth import login as admin_auth_login
@@ -4764,30 +4887,39 @@ async def admin_login(request: AdminLoginRequest, req: Request):
             totp_code=request.totp_code,
             ip=_extract_client_ip(req),
         )
-        if result.get("status") == "ok":
-            return result
-        else:
+        if result.get("status") != "ok":
             raise HTTPException(
                 status_code=401,
                 detail=result.get("message", "Login failed"),
             )
+
+        browser_token = generate_jwt(
+            user_id=result["user_id"],
+            email=request.email,
+            session_id=f"admin:{result['session_token']}",
+            role=result.get("role", "admin").lower(),
+        )
+        _set_admin_auth_cookies(response, req, result["session_token"], browser_token)
+        return {
+            "status": "ok",
+            "user_id": result["user_id"],
+            "role": result.get("role"),
+        }
     except HTTPException:
         raise
     except ImportError:
         raise HTTPException(status_code=501, detail="Admin auth module not available")
-    except Exception as e:
+    except Exception:
         logger.exception("Admin login error")
         raise HTTPException(status_code=500, detail="Internal error during login")
 
 
 @app.get("/admin/verify")
 async def admin_verify(req: Request):
-    """Verify an admin token. Returns user info or 401."""
-    auth_header = req.headers.get("authorization", "")
-    if not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Bearer token required")
-
-    token = auth_header[7:]
+    """Verify an admin session. Returns user info or 401."""
+    token, _ = _extract_admin_session_token(req)
+    if not token:
+        raise HTTPException(status_code=401, detail="Admin authentication required")
 
     try:
         from backend.api.admin_auth import require_auth as admin_require_auth
@@ -4816,12 +4948,12 @@ class VaultUnlockRequest(BaseModel):
 
 @app.post("/admin/vault-unlock")
 async def admin_vault_unlock(request: VaultUnlockRequest, req: Request):
-    """Unlock the vault. Requires Bearer token for auth."""
-    auth_header = req.headers.get("authorization", "")
-    if not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Bearer token required")
-
-    token = auth_header[7:]
+    """Unlock the vault. Requires an authenticated admin session."""
+    token, via_cookie = _extract_admin_session_token(req)
+    if not token:
+        raise HTTPException(status_code=401, detail="Admin authentication required")
+    if via_cookie:
+        _enforce_cookie_csrf(req)
 
     try:
         from backend.api.vault_session import vault_unlock
@@ -4843,6 +4975,31 @@ async def admin_vault_unlock(request: VaultUnlockRequest, req: Request):
     except Exception:
         logger.exception("Vault unlock error")
         raise HTTPException(status_code=500, detail="Vault unlock failed")
+
+
+@app.post("/admin/logout")
+async def admin_logout(req: Request, response: Response):
+    """Terminate admin session cookies and revoke browser auth."""
+    admin_session_token, _ = _extract_admin_session_token(req)
+    browser_token = req.cookies.get(AUTH_COOKIE_NAME)
+
+    try:
+        if browser_token:
+            revoke_token(browser_token)
+            payload = verify_jwt(browser_token)
+            if payload and payload.get("session_id"):
+                revoke_session(payload["session_id"])
+        if admin_session_token:
+            from backend.api.admin_auth import logout as admin_auth_logout
+            admin_auth_logout(admin_session_token)
+    except ImportError:
+        raise HTTPException(status_code=501, detail="Admin auth module not available")
+    except Exception:
+        logger.exception("Admin logout error")
+        raise HTTPException(status_code=500, detail="Admin logout failed")
+
+    _clear_admin_auth_cookies(response, req)
+    return {"status": "ok"}
 
 
 # =============================================================================

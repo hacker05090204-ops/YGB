@@ -1,267 +1,325 @@
 "use client"
 
-import { useEffect, useState, Suspense } from "react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { Suspense, useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+
+import {
+  credentialedFetch,
+  notifyAuthStateChanged,
+  purgeLegacyAuthStorage,
+} from "@/lib/auth-token"
 
 const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 function LoginContent() {
-    const searchParams = useSearchParams()
-    const router = useRouter()
-    const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
-    const [message, setMessage] = useState("")
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
+  const [message, setMessage] = useState("")
 
-    useEffect(() => {
-        // Helper to read cookies by name
-        const getCookie = (name: string): string | null => {
-            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
-            return match ? decodeURIComponent(match[2]) : null
+  useEffect(() => {
+    let cancelled = false
+    let redirectTimer: ReturnType<typeof setTimeout> | undefined
+
+    const error = searchParams.get("error")
+    const authMethod = searchParams.get("auth")
+    const fallbackUser = searchParams.get("user")
+
+    purgeLegacyAuthStorage()
+
+    if (error) {
+      const errorMessages: Record<string, string> = {
+        no_code: "GitHub did not return an authorization code",
+        token_exchange_failed: "Failed to exchange code for token",
+        server_error: "Server error during authentication",
+        access_denied: "Access denied by GitHub",
+        state_mismatch: "OAuth state mismatch detected; please retry login",
+        invalid_github_profile: "GitHub profile data was incomplete",
+      }
+      queueMicrotask(() => {
+        if (cancelled) {
+          return
         }
-
-        // Token now comes via HTTP-only cookie, not URL params (security fix)
-        // Check both cookie and URL param for backward compatibility
-        const token = getCookie("ygb_token") || searchParams.get("token")
-        const error = searchParams.get("error")
-        const user = searchParams.get("user")
-        const sessionId = getCookie("ygb_session_id") || searchParams.get("session_id")
-        const authMethod = searchParams.get("auth")
-        const encodedProfile = getCookie("ygb_profile") || searchParams.get("profile")
-
-        if (token) {
-            // Store token and redirect to control page
-            sessionStorage.setItem("ygb_token", token)
-            if (sessionId) {
-                sessionStorage.setItem("ygb_session_id", sessionId)
-            }
-            if (authMethod) {
-                sessionStorage.setItem("ygb_auth_method", authMethod)
-            }
-            if (encodedProfile) {
-                try {
-                    const profile = JSON.parse(encodedProfile)
-                    sessionStorage.setItem("ygb_profile", JSON.stringify(profile))
-                    sessionStorage.setItem("ygb_network", JSON.stringify({
-                        ip: profile.ip_address || null,
-                        geolocation: profile.geoip_location || null,
-                    }))
-                } catch {
-                    // Ignore malformed profile payloads; token login still succeeds.
-                }
-            }
-
-            // Clear auth cookies after reading (one-time use)
-            document.cookie = "ygb_token=; max-age=0; path=/"
-            document.cookie = "ygb_session_id=; max-age=0; path=/"
-            document.cookie = "ygb_profile=; max-age=0; path=/"
-
-            setStatus("success")
-            setMessage(`Welcome, ${user || "user"}!`)
-
-            // Redirect after brief display
-            const timer = setTimeout(() => router.push("/control"), 1500)
-            return () => clearTimeout(timer)
-        } else if (error) {
-            setStatus("error")
-            const errorMessages: Record<string, string> = {
-                no_code: "GitHub did not return an authorization code",
-                token_exchange_failed: "Failed to exchange code for token",
-                server_error: "Server error during authentication",
-                access_denied: "Access denied by GitHub",
-                state_mismatch: "OAuth state mismatch detected; please retry login",
-                invalid_github_profile: "GitHub profile data was incomplete",
-            }
-            setMessage(errorMessages[error] || `Authentication error: ${error}`)
-        }
-    }, [searchParams, router])
-
-    const handleGitHubLogin = () => {
-        const origin = encodeURIComponent(window.location.origin)
-        window.location.href = `${API_BASE}/auth/github?frontend_origin=${origin}`
+        setStatus("error")
+        setMessage(errorMessages[error] || `Authentication error: ${error}`)
+      })
+      return () => {
+        if (redirectTimer) clearTimeout(redirectTimer)
+      }
     }
 
-    return (
-        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
-            {/* Ambient glow */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-blue-500/5 blur-[120px]" />
-                <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full bg-purple-500/5 blur-[100px]" />
-            </div>
+    const verifySession = async () => {
+      try {
+        const res = await credentialedFetch(`${API_BASE}/auth/me`)
+        if (!res.ok) {
+          if (authMethod === "github" && !cancelled) {
+            setStatus("error")
+            setMessage("GitHub sign-in did not create a valid session")
+          }
+          return
+        }
 
-            <div className="relative w-full max-w-md">
-                {/* Logo / Branding */}
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 mb-4 shadow-lg shadow-blue-500/20">
-                        <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg>
-                    </div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight">YGB Control</h1>
-                    <p className="text-sm text-gray-500 mt-1">Phase-49 Security Operations</p>
-                </div>
+        const data = await res.json()
+        if (cancelled) {
+          return
+        }
 
-                {/* Card */}
-                <div className="bg-[#12121a] border border-gray-800/60 rounded-2xl p-8 shadow-2xl shadow-black/40 backdrop-blur-sm">
-                    {status === "success" ? (
-                        <div className="text-center py-4">
-                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
-                                <svg className="w-6 h-6 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                            </div>
-                            <h2 className="text-lg font-semibold text-white mb-1">{message}</h2>
-                            <p className="text-sm text-gray-400">Redirecting to control panel...</p>
-                            <div className="mt-4 h-1 bg-gray-800 rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full animate-[progress_1.5s_ease-in-out]" style={{ width: "100%" }} />
-                            </div>
-                        </div>
-                    ) : status === "error" ? (
-                        <div className="text-center py-4">
-                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 mb-4">
-                                <svg className="w-6 h-6 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="12" r="10" />
-                                    <line x1="15" y1="9" x2="9" y2="15" />
-                                    <line x1="9" y1="9" x2="15" y2="15" />
-                                </svg>
-                            </div>
-                            <h2 className="text-lg font-semibold text-white mb-1">Authentication Failed</h2>
-                            <p className="text-sm text-red-400/80 mb-6">{message}</p>
-                            <button
-                                onClick={handleGitHubLogin}
-                                className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
-                            >
-                                Try Again
-                            </button>
-                        </div>
-                    ) : (
-                        <div>
-                            <h2 className="text-lg font-semibold text-white mb-1 text-center">Sign in to continue</h2>
-                            <p className="text-sm text-gray-500 mb-6 text-center">Choose your authentication method</p>
+        notifyAuthStateChanged()
+        setStatus("success")
+        setMessage(
+          `Welcome, ${data.github_login || data.name || fallbackUser || "user"}!`
+        )
+        redirectTimer = setTimeout(() => router.push("/control"), 1500)
+      } catch {
+        if (authMethod === "github" && !cancelled) {
+          setStatus("error")
+          setMessage("Network error - could not verify the new session")
+        }
+      }
+    }
 
-                            {/* Email/Password Login Form */}
-                            <form
-                                id="login-form"
-                                onSubmit={async (e) => {
-                                    e.preventDefault()
-                                    const formData = new FormData(e.currentTarget)
-                                    const email = formData.get("email") as string
-                                    const password = formData.get("password") as string
-                                    if (!email || !password) {
-                                        setStatus("error")
-                                        setMessage("Please enter both email and password")
-                                        return
-                                    }
-                                    try {
-                                        const res = await fetch(`${API_BASE}/auth/login`, {
-                                            method: "POST",
-                                            headers: { "Content-Type": "application/json" },
-                                            body: JSON.stringify({ email, password }),
-                                        })
-                                        const data = await res.json()
-                                        if (!res.ok) {
-                                            setStatus("error")
-                                            setMessage(data.detail?.detail || data.detail || "Login failed")
-                                            return
-                                        }
-                                        sessionStorage.setItem("ygb_token", data.token)
-                                        if (data.session_id) sessionStorage.setItem("ygb_session_id", data.session_id)
-                                        if (data.auth_method) sessionStorage.setItem("ygb_auth_method", data.auth_method)
-                                        if (data.network) sessionStorage.setItem("ygb_network", JSON.stringify(data.network))
-                                        setStatus("success")
-                                        setMessage(`Welcome, ${data.user?.name || email}!`)
-                                        setTimeout(() => router.push("/control"), 1500)
-                                    } catch {
-                                        setStatus("error")
-                                        setMessage("Network error — is the backend running?")
-                                    }
-                                }}
-                                className="space-y-4"
-                            >
-                                <div>
-                                    <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5">Email</label>
-                                    <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        autoComplete="email"
-                                        placeholder="you@example.com"
-                                        className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="password" className="block text-xs font-medium text-gray-400 mb-1.5">Password</label>
-                                    <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
-                                        autoComplete="current-password"
-                                        placeholder="••••••••"
-                                        className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
-                                    />
-                                </div>
-                                <button
-                                    type="submit"
-                                    id="password-login-button"
-                                    className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
-                                >
-                                    Sign In
-                                </button>
-                            </form>
+    void verifySession()
 
-                            {/* Divider */}
-                            <div className="flex items-center gap-3 my-6">
-                                <div className="flex-1 h-px bg-gray-800/60" />
-                                <span className="text-xs text-gray-600 uppercase tracking-wider">or</span>
-                                <div className="flex-1 h-px bg-gray-800/60" />
-                            </div>
+    return () => {
+      cancelled = true
+      if (redirectTimer) clearTimeout(redirectTimer)
+    }
+  }, [router, searchParams])
 
-                            {/* GitHub OAuth */}
-                            <button
-                                onClick={handleGitHubLogin}
-                                id="github-login-button"
-                                className="group w-full py-3.5 px-4 bg-[#1a1a2e] hover:bg-[#22223a] border border-gray-700/60 hover:border-gray-600 text-white rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer hover:shadow-lg hover:shadow-purple-500/5"
-                            >
-                                {/* GitHub Logo */}
-                                <svg className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                                </svg>
-                                Continue with GitHub
-                            </button>
+  const handleGitHubLogin = () => {
+    const origin = encodeURIComponent(window.location.origin)
+    window.location.href = `${API_BASE}/auth/github?frontend_origin=${origin}`
+  }
 
-                            <div className="mt-6 pt-6 border-t border-gray-800/60">
-                                <p className="text-xs text-gray-600 text-center leading-relaxed">
-                                    By signing in, you agree to the terms of use.
-                                    <br />
-                                    Only authorized personnel may access this system.
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </div>
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-blue-500/5 blur-[120px]" />
+        <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] rounded-full bg-purple-500/5 blur-[100px]" />
+      </div>
 
-                {/* Footer */}
-                <p className="text-center text-xs text-gray-700 mt-6">
-                    YGB Security Operations Platform
-                </p>
-            </div>
-
-            <style jsx>{`
-                @keyframes progress {
-                    from { width: 0%; }
-                    to { width: 100%; }
-                }
-            `}</style>
+      <div className="relative w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 mb-4 shadow-lg shadow-blue-500/20">
+            <svg
+              className="w-8 h-8 text-white"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">YGB Control</h1>
+          <p className="text-sm text-gray-500 mt-1">Phase-49 Security Operations</p>
         </div>
-    )
+
+        <div className="bg-[#12121a] border border-gray-800/60 rounded-2xl p-8 shadow-2xl shadow-black/40 backdrop-blur-sm">
+          {status === "success" ? (
+            <div className="text-center py-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4">
+                <svg
+                  className="w-6 h-6 text-emerald-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-white mb-1">{message}</h2>
+              <p className="text-sm text-gray-400">Redirecting to control panel...</p>
+              <div className="mt-4 h-1 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full animate-[progress_1.5s_ease-in-out]"
+                  style={{ width: "100%" }}
+                />
+              </div>
+            </div>
+          ) : status === "error" ? (
+            <div className="text-center py-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 mb-4">
+                <svg
+                  className="w-6 h-6 text-red-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="15" y1="9" x2="9" y2="15" />
+                  <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-semibold text-white mb-1">
+                Authentication Failed
+              </h2>
+              <p className="text-sm text-red-400/80 mb-6">{message}</p>
+              <button
+                onClick={handleGitHubLogin}
+                className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-1 text-center">
+                Sign in to continue
+              </h2>
+              <p className="text-sm text-gray-500 mb-6 text-center">
+                Choose your authentication method
+              </p>
+
+              <form
+                id="login-form"
+                onSubmit={async (e) => {
+                  e.preventDefault()
+                  const formData = new FormData(e.currentTarget)
+                  const email = String(formData.get("email") || "")
+                  const password = String(formData.get("password") || "")
+
+                  if (!email || !password) {
+                    setStatus("error")
+                    setMessage("Please enter both email and password")
+                    return
+                  }
+
+                  try {
+                    const res = await credentialedFetch(`${API_BASE}/auth/login`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email, password }),
+                    })
+                    const data = await res.json()
+
+                    if (!res.ok) {
+                      setStatus("error")
+                      setMessage(data.detail?.detail || data.detail || "Login failed")
+                      return
+                    }
+
+                    notifyAuthStateChanged()
+                    setStatus("success")
+                    setMessage(`Welcome, ${data.user?.name || email}!`)
+                    setTimeout(() => router.push("/control"), 1500)
+                  } catch {
+                    setStatus("error")
+                    setMessage("Network error - is the backend running?")
+                  }
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-xs font-medium text-gray-400 mb-1.5"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="password"
+                    className="block text-xs font-medium text-gray-400 mb-1.5"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    placeholder="••••••••"
+                    className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  id="password-login-button"
+                  className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+                >
+                  Sign In
+                </button>
+              </form>
+
+              <div className="flex items-center gap-3 my-6">
+                <div className="flex-1 h-px bg-gray-800/60" />
+                <span className="text-xs text-gray-600 uppercase tracking-wider">or</span>
+                <div className="flex-1 h-px bg-gray-800/60" />
+              </div>
+
+              <button
+                onClick={handleGitHubLogin}
+                id="github-login-button"
+                className="group w-full py-3.5 px-4 bg-[#1a1a2e] hover:bg-[#22223a] border border-gray-700/60 hover:border-gray-600 text-white rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer hover:shadow-lg hover:shadow-purple-500/5"
+              >
+                <svg
+                  className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                </svg>
+                Continue with GitHub
+              </button>
+
+              <div className="mt-6 pt-6 border-t border-gray-800/60">
+                <p className="text-xs text-gray-600 text-center leading-relaxed">
+                  By signing in, you agree to the terms of use.
+                  <br />
+                  Only authorized personnel may access this system.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <p className="text-center text-xs text-gray-700 mt-6">
+          YGB Security Operations Platform
+        </p>
+      </div>
+
+      <style jsx>{`
+        @keyframes progress {
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
+        }
+      `}</style>
+    </div>
+  )
 }
 
 export default function LoginPage() {
-    return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-                <div className="text-gray-500 text-sm">Loading...</div>
-            </div>
-        }>
-            <LoginContent />
-        </Suspense>
-    )
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+          <div className="text-gray-500 text-sm">Loading...</div>
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  )
 }

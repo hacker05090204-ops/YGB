@@ -1,243 +1,174 @@
-/**
- * Tests for hooks/use-auth-user.ts — Auth user profile behavior
- *
- * Tests the ACTUAL hook behavior:
- * - Server-validated auth sets status = "authenticated"
- * - Cached profile WITHOUT token → status = "unavailable" (NOT authenticated)
- * - No profile at all → status = "unavailable"
- * - Backend unreachable with cached profile → status = "unavailable"
- * - Malformed sessionStorage data → graceful fallback
- * - getUserProfile API contract
- */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
-// ---- Auth trust boundary contract tests ----
-
-describe('useAuthUser auth trust boundary', () => {
-    /**
-     * These tests verify the REAL contract of use-auth-user.ts:
-     * Only server-validated sessions produce status="authenticated".
-     * Cached profile data alone does NOT count as authenticated.
-     *
-     * We simulate the hook logic directly since full React hook
-     * rendering needs a test renderer. The assertions match what the
-     * hook MUST produce under each condition.
-     */
-
-    function simulateHookBehavior(opts: {
-        token: string | null;
-        cachedProfile: string | null;
-        serverReachable: boolean;
-        serverResponse?: Record<string, unknown>;
-    }) {
-        // Mirror the logic in use-auth-user.ts
-
-        // Phase 1: no token
-        if (!opts.token) {
-            if (opts.cachedProfile) {
-                try {
-                    const profile = JSON.parse(opts.cachedProfile)
-                    return {
-                        name: profile.github_login || profile.name || null,
-                        email: profile.email || null,
-                        avatar: profile.avatar_url || null,
-                        githubLogin: profile.github_login || null,
-                        role: profile.role || null,
-                        status: "unavailable" as const,
-                        unavailableReason: "Cached profile only — no auth token",
-                    }
-                } catch {
-                    return {
-                        name: null, email: null, avatar: null,
-                        githubLogin: null, role: null,
-                        status: "unavailable" as const,
-                        unavailableReason: "No auth token found",
-                    }
-                }
-            }
-            return {
-                name: null, email: null, avatar: null,
-                githubLogin: null, role: null,
-                status: "unavailable" as const,
-                unavailableReason: "No auth token found",
-            }
-        }
-
-        // Phase 2: token exists → try server
-        if (!opts.serverReachable) {
-            if (opts.cachedProfile) {
-                try {
-                    const profile = JSON.parse(opts.cachedProfile)
-                    return {
-                        name: profile.github_login || profile.name || null,
-                        email: profile.email || null,
-                        avatar: profile.avatar_url || null,
-                        githubLogin: profile.github_login || null,
-                        role: profile.role || null,
-                        status: "unavailable" as const,
-                        unavailableReason: "Backend unreachable — using cached profile",
-                    }
-                } catch {
-                    return {
-                        name: null, email: null, avatar: null,
-                        githubLogin: null, role: null,
-                        status: "error" as const,
-                        unavailableReason: "Backend unreachable",
-                    }
-                }
-            }
-            return {
-                name: null, email: null, avatar: null,
-                githubLogin: null, role: null,
-                status: "error" as const,
-                unavailableReason: "Backend unreachable",
-            }
-        }
-
-        // Phase 3: token exists AND server reachable + responded
-        const data = opts.serverResponse || {}
-        return {
-            name: (data.github_login || data.name || null) as string | null,
-            email: (data.email || null) as string | null,
-            avatar: (data.avatar_url || null) as string | null,
-            githubLogin: (data.github_login || null) as string | null,
-            role: (data.role || null) as string | null,
-            status: "authenticated" as const,
-            unavailableReason: null,
-        }
+describe("cookie auth contract", () => {
+  function simulateHookBehavior(opts: {
+    responseStatus: number
+    serverReachable: boolean
+    serverResponse?: Record<string, unknown>
+  }) {
+    if (!opts.serverReachable) {
+      return {
+        userId: null,
+        sessionId: null,
+        name: null,
+        email: null,
+        avatar: null,
+        githubLogin: null,
+        role: null,
+        authProvider: null,
+        status: "unavailable" as const,
+        unavailableReason: "Backend unreachable",
+      }
     }
 
-    it('server-validated session → "authenticated"', () => {
-        const result = simulateHookBehavior({
-            token: "real-jwt-token",
-            cachedProfile: null,
-            serverReachable: true,
-            serverResponse: {
-                github_login: "octocat",
-                name: "The Octocat",
-                email: "octocat@github.com",
-                avatar_url: "https://avatars.githubusercontent.com/u/1",
-                role: "hunter",
-            },
-        })
-        expect(result.status).toBe("authenticated")
-        expect(result.name).toBe("octocat")
-        expect(result.role).toBe("hunter")
-        expect(result.unavailableReason).toBeNull()
+    if ([401, 403, 404].includes(opts.responseStatus)) {
+      return {
+        userId: null,
+        sessionId: null,
+        name: null,
+        email: null,
+        avatar: null,
+        githubLogin: null,
+        role: null,
+        authProvider: null,
+        status: "unavailable" as const,
+        unavailableReason: "Authentication required",
+      }
+    }
+
+    const data = opts.serverResponse || {}
+    return {
+      userId: (data.user_id || null) as string | null,
+      sessionId: (data.session_id || null) as string | null,
+      name: (data.github_login || data.name || null) as string | null,
+      email: (data.email || null) as string | null,
+      avatar: (data.avatar_url || null) as string | null,
+      githubLogin: (data.github_login || null) as string | null,
+      role: (data.role || null) as string | null,
+      authProvider: (data.auth_provider || null) as string | null,
+      status: "authenticated" as const,
+      unavailableReason: null,
+    }
+  }
+
+  it("server-validated cookie session -> authenticated", () => {
+    const result = simulateHookBehavior({
+      responseStatus: 200,
+      serverReachable: true,
+      serverResponse: {
+        user_id: "user-1",
+        session_id: "sess-1",
+        github_login: "octocat",
+        name: "The Octocat",
+        email: "octocat@github.com",
+        avatar_url: "https://avatars.githubusercontent.com/u/1",
+        role: "hunter",
+        auth_provider: "github",
+      },
     })
 
-    it('cached profile WITHOUT token → "unavailable" (NOT authenticated)', () => {
-        const result = simulateHookBehavior({
-            token: null,
-            cachedProfile: JSON.stringify({
-                github_login: "octocat",
-                email: "octocat@github.com",
-            }),
-            serverReachable: true,
-        })
-        expect(result.status).toBe("unavailable")
-        expect(result.unavailableReason).toContain("no auth token")
-        // Profile data preserved for UI display
-        expect(result.name).toBe("octocat")
+    expect(result.status).toBe("authenticated")
+    expect(result.userId).toBe("user-1")
+    expect(result.sessionId).toBe("sess-1")
+    expect(result.name).toBe("octocat")
+    expect(result.role).toBe("hunter")
+  })
+
+  it("401 from /auth/me -> unavailable, not authenticated", () => {
+    const result = simulateHookBehavior({
+      responseStatus: 401,
+      serverReachable: true,
     })
 
-    it('no token, no cached profile → "unavailable"', () => {
-        const result = simulateHookBehavior({
-            token: null,
-            cachedProfile: null,
-            serverReachable: true,
-        })
-        expect(result.status).toBe("unavailable")
-        expect(result.name).toBeNull()
+    expect(result.status).toBe("unavailable")
+    expect(result.unavailableReason).toBe("Authentication required")
+    expect(result.name).toBeNull()
+  })
+
+  it("404 from /auth/me -> unavailable, not authenticated", () => {
+    const result = simulateHookBehavior({
+      responseStatus: 404,
+      serverReachable: true,
     })
 
-    it('token exists but backend unreachable + cached profile → "unavailable"', () => {
-        const result = simulateHookBehavior({
-            token: "real-jwt",
-            cachedProfile: JSON.stringify({
-                github_login: "octocat",
-                email: "octocat@github.com",
-            }),
-            serverReachable: false,
-        })
-        expect(result.status).toBe("unavailable")
-        expect(result.unavailableReason).toContain("Backend unreachable")
-        // Cached data available but NOT treated as auth proof
-        expect(result.name).toBe("octocat")
+    expect(result.status).toBe("unavailable")
+    expect(result.unavailableReason).toBe("Authentication required")
+  })
+
+  it("backend unreachable -> unavailable", () => {
+    const result = simulateHookBehavior({
+      responseStatus: 0,
+      serverReachable: false,
     })
 
-    it('token exists, backend unreachable, no cache → "error"', () => {
-        const result = simulateHookBehavior({
-            token: "real-jwt",
-            cachedProfile: null,
-            serverReachable: false,
-        })
-        expect(result.status).toBe("error")
-    })
-
-    it('malformed JSON in sessionStorage → graceful fallback', () => {
-        const result = simulateHookBehavior({
-            token: null,
-            cachedProfile: "not-valid-json{{{",
-            serverReachable: true,
-        })
-        expect(result.status).toBe("unavailable")
-        expect(result.name).toBeNull()
-    })
-
-    it('empty profile object → correct null defaults', () => {
-        const result = simulateHookBehavior({
-            token: null,
-            cachedProfile: JSON.stringify({}),
-            serverReachable: true,
-        })
-        expect(result.status).toBe("unavailable")
-        expect(result.name).toBeNull()
-        expect(result.email).toBeNull()
-        expect(result.avatar).toBeNull()
-    })
+    expect(result.status).toBe("unavailable")
+    expect(result.unavailableReason).toContain("Backend unreachable")
+  })
 })
 
+describe("api helpers", () => {
+  const mockFetch = vi.fn()
 
-// ---- getUserProfile API contract tests ----
+  beforeEach(async () => {
+    mockFetch.mockReset()
+    vi.stubGlobal("fetch", mockFetch)
+    vi.stubGlobal("document", { cookie: "ygb_csrf=csrf-123" })
+    vi.stubEnv("NEXT_PUBLIC_YGB_API_URL", "http://test-api:9000")
+    vi.resetModules()
+  })
 
-describe('getUserProfile', () => {
-    const mockFetch = vi.fn()
-    vi.stubGlobal('fetch', mockFetch)
-    vi.stubEnv('NEXT_PUBLIC_YGB_API_URL', 'http://test-api:9000')
+  it("authFetch sends cookies and csrf for unsafe methods", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ ok: true }),
+    } as Response)
 
-    let api: typeof import('../lib/ygb-api')
-
-    beforeEach(async () => {
-        mockFetch.mockReset()
-        api = await import('../lib/ygb-api')
+    const auth = await import("../lib/auth-token")
+    await auth.credentialedFetch("http://test-api:9000/protected", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{}",
     })
 
-    it('returns user profile on success', async () => {
-        const data = {
-            id: "user-1",
-            name: "octocat",
-            email: "octocat@github.com",
-            role: "hunter",
-            github_login: "octocat",
-            avatar_url: "https://avatars.githubusercontent.com/u/1",
-            auth_provider: "github",
-        }
-        mockFetch.mockResolvedValueOnce({
-            ok: true,
-            json: () => Promise.resolve(data),
-        } as Response)
-        const result = await api.getUserProfile()
-        expect(result).toEqual(data)
-        expect(result.github_login).toBe("octocat")
-    })
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+    const [, options] = mockFetch.mock.calls[0]
+    expect(options.credentials).toBe("include")
+    expect(options.cache).toBe("no-store")
+    expect(new Headers(options.headers).get("X-CSRF-Token")).toBe("csrf-123")
+  })
 
-    it('throws on non-ok', async () => {
-        mockFetch.mockResolvedValueOnce({
-            ok: false,
-            status: 401,
-            json: () => Promise.resolve({ detail: 'Unauthorized' }),
-        } as unknown as Response)
-        await expect(api.getUserProfile()).rejects.toThrow('Failed to fetch user profile')
-    })
+  it("getUserProfile uses cookie auth and returns the payload", async () => {
+    const data = {
+      id: "user-1",
+      name: "octocat",
+      email: "octocat@github.com",
+      role: "hunter",
+      github_login: "octocat",
+      avatar_url: "https://avatars.githubusercontent.com/u/1",
+      auth_provider: "github",
+    }
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(data),
+    } as Response)
+
+    const api = await import("../lib/ygb-api")
+    const result = await api.getUserProfile()
+
+    expect(result).toEqual(data)
+    const [, options] = mockFetch.mock.calls[0]
+    expect(options.credentials).toBe("include")
+    expect(options.cache).toBe("no-store")
+  })
+
+  it("getUserProfile throws on non-ok", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: () => Promise.resolve({ detail: "Unauthorized" }),
+    } as Response)
+
+    const api = await import("../lib/ygb-api")
+    await expect(api.getUserProfile()).rejects.toThrow("Failed to fetch user profile")
+  })
 })

@@ -130,7 +130,7 @@ def _export_to_onnx(model_path: Path, onnx_path: Path) -> bool:
                 return False
         else:
             # Try loading as regular PyTorch checkpoint
-            model = torch.load(str(model_path), map_location="cpu")
+            model = torch.load(str(model_path), map_location="cpu", weights_only=True)
             if hasattr(model, "eval"):
                 model.eval()
             logger.info("Model loaded, exporting to ONNX...")

@@ -419,7 +419,7 @@ def load_model_checkpoint(
     device = get_torch_device()
     model = BugClassifier(config)
     
-    checkpoint = torch.load(path, map_location=device)
+    checkpoint = torch.load(path, map_location=device, weights_only=True)
     model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     model.eval()
