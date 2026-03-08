@@ -1,4 +1,4 @@
-param(
+﻿param(
     [int]$ApiPort = 8000,
     [int]$UiPort = 3000,
     [switch]$AllowForeignPortKill,
@@ -67,10 +67,10 @@ function Stop-PortListener {
     }
 }
 
-# ── LOAD .env BEFORE validation or process startup ──
+# -- LOAD .env BEFORE validation or process startup --
 Import-DotEnv -Path (Join-Path $root ".env")
 
-# ── VALIDATE REQUIRED ENV VARS ──
+# -- VALIDATE REQUIRED ENV VARS --
 $requiredVars = @("JWT_SECRET", "YGB_HMAC_SECRET", "YGB_VIDEO_JWT_SECRET")
 $missing = @()
 foreach ($v in $requiredVars) {
@@ -81,10 +81,10 @@ foreach ($v in $requiredVars) {
 if ($missing.Count -gt 0) {
     Write-Warning "MISSING required env vars: $($missing -join ', ')"
     Write-Warning "Copy .env.example to .env and fill in values. See docs/ENV_SETUP.md"
-    # Don't exit — server will still start but will warn on preflight
+    # Don't exit -- server will still start but will warn on preflight
 }
 
-# ── SMB SHARE (opt-in only with -LanShare) ──
+# -- SMB SHARE (opt-in only with -LanShare) --
 if ($LanShare) {
     $shareName = "SharedDrive"
     $shareExists = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
@@ -105,7 +105,7 @@ if ($LanShare) {
     Write-Host "LAN share disabled (use -LanShare to enable)."
 }
 
-# ── DYNAMIC NETWORK AUTH ──
+# -- DYNAMIC NETWORK AUTH --
 # Detect the REAL network IP (interface with a default gateway = connected to router)
 $defaultRoute = Get-NetRoute -DestinationPrefix '0.0.0.0/0' -ErrorAction SilentlyContinue |
     Sort-Object RouteMetric | Select-Object -First 1
@@ -116,8 +116,8 @@ if ($defaultRoute) {
     $wifiIP = $null
 }
 if ($wifiIP) {
-    $env:GITHUB_REDIRECT_URI = "http://${wifiIP}:$ApiPort/auth/github/callback"
-    $env:FRONTEND_URL = "http://${wifiIP}:$UiPort"
+    $env:GITHUB_REDIRECT_URI = "http://" + $wifiIP + ":$ApiPort/auth/github/callback"
+    $env:FRONTEND_URL = "http://" + $wifiIP + ":$UiPort"
     Write-Host "Network IP: $wifiIP - OAuth redirect: $($env:GITHUB_REDIRECT_URI)"
 } else {
     Write-Host "WARNING: Could not detect network IP - using localhost"
@@ -127,7 +127,7 @@ $env:PYTHONPATH = $root
 # Default to localhost binding (secure). Use -BindAllInterfaces for LAN access.
 if ($BindAllInterfaces) {
     $env:API_HOST = "0.0.0.0"
-    Write-Host "WARNING: Binding to all interfaces (0.0.0.0) — server exposed to LAN"
+    Write-Host "WARNING: Binding to all interfaces (0.0.0.0) -- server exposed to LAN"
 } else {
     $env:API_HOST = "127.0.0.1"
 }
@@ -146,7 +146,7 @@ $backend = Start-Process -FilePath "python" `
     -WorkingDirectory (Join-Path $root "api") `
     -WindowStyle Hidden -PassThru
 
-# ── Start Sync Engine (background daemon) ──
+# -- Start Sync Engine (background daemon) --
 $syncEngine = Start-Process -FilePath "python" `
     -ArgumentList "-m", "backend.sync.sync_engine", "--watch" `
     -WorkingDirectory $root `
@@ -155,20 +155,17 @@ Write-Host "Sync Engine PID: $($syncEngine.Id)"
 
 # Use network IP for API URL when binding all interfaces
 if ($BindAllInterfaces -and $wifiIP) {
-    $frontendApiUrl = "http://${wifiIP}:$ApiPort"
+    $frontendApiUrl = "http://" + $wifiIP + ":$ApiPort"
 } else {
-    $frontendApiUrl = "http://${LoopbackHost}:$ApiPort"
+    $frontendApiUrl = "http://" + $LoopbackHost + ":$ApiPort"
 }
 Write-Host "Frontend API URL: $frontendApiUrl"
 
 # Frontend hostname: only bind 0.0.0.0 if explicitly opted in
 $frontendHostname = if ($BindAllInterfaces) { "0.0.0.0" } else { "localhost" }
-$frontendCmdArgs = @(
-    "/c",
-    "set NEXT_PUBLIC_YGB_API_URL=$frontendApiUrl&& npm run dev -- -p $UiPort --hostname $frontendHostname"
-)
+$frontendCmd = 'set NEXT_PUBLIC_YGB_API_URL=' + $frontendApiUrl + '& npm run dev -- -p ' + $UiPort + ' --hostname ' + $frontendHostname
 $frontend = Start-Process -FilePath "cmd.exe" `
-    -ArgumentList $frontendCmdArgs `
+    -ArgumentList "/c", $frontendCmd `
     -WorkingDirectory (Join-Path $root "frontend") `
     -WindowStyle Hidden -PassThru
 
@@ -179,14 +176,14 @@ $uiStatus = "unreachable"
 
 for ($i = 0; $i -lt 30; $i++) {
     try {
-        $apiStatus = (Invoke-WebRequest -UseBasicParsing "http://${LoopbackHost}:$ApiPort/health" -TimeoutSec 1).StatusCode
+        $apiStatus = (Invoke-WebRequest -UseBasicParsing ("http://" + $LoopbackHost + ":$ApiPort/health") -TimeoutSec 1).StatusCode
     } catch {}
     try {
-        $uiStatus = (Invoke-WebRequest -UseBasicParsing "http://${LoopbackHost}:$UiPort/control" -TimeoutSec 1).StatusCode
+        $uiStatus = (Invoke-WebRequest -UseBasicParsing ("http://" + $LoopbackHost + ":$UiPort/control") -TimeoutSec 1).StatusCode
     } catch {}
     if ($apiStatus -eq 200 -and $uiStatus -eq 200) { break }
     Start-Sleep -Seconds 1
 }
 
-Write-Host "Backend PID: $($backend.Id)  URL: http://${LoopbackHost}:$ApiPort  /health=$apiStatus"
-Write-Host "Frontend PID: $($frontend.Id) URL: http://${LoopbackHost}:$UiPort/control  status=$uiStatus"
+Write-Host ("Backend PID: " + $backend.Id + "  URL: http://" + $LoopbackHost + ":$ApiPort  /health=$apiStatus")
+Write-Host ("Frontend PID: " + $frontend.Id + " URL: http://" + $LoopbackHost + ":$UiPort/control  status=$uiStatus")

@@ -334,6 +334,24 @@ def _save_runtime_status(runtime: dict) -> None:
     os.replace(tmp, RUNTIME_STATE_PATH)
 
 
+def _signed_approval_status(field_id: int) -> dict:
+    """Resolve approval from the signed ledger only. Fail closed."""
+    ledger = ApprovalLedger(APPROVAL_LEDGER_PATH)
+    try:
+        ledger.load()
+        chain_valid = ledger.verify_chain()
+        has_approval = chain_valid and ledger.has_approval(field_id)
+    except Exception as exc:
+        logger.warning(f"Failed to load approval ledger: {exc}")
+        chain_valid = False
+        has_approval = False
+
+    return {
+        "has_signed_approval": has_approval,
+        "chain_valid": chain_valid,
+    }
+
+
 def _advance_to_next_field(state: dict) -> Optional[dict]:
     """Activate the next field after the current one is frozen."""
     active_id = state.get("active_field_id", 0)
@@ -391,6 +409,9 @@ def sync_active_field_training(
 
     field = state["fields"][active_id]
     now = datetime.now(timezone.utc)
+    approval_status = _signed_approval_status(field["id"])
+    has_signed_approval = approval_status["has_signed_approval"]
+    field["human_approved"] = has_signed_approval
 
     first_trained_at = field.get("first_trained_at")
     if not first_trained_at:
@@ -449,7 +470,7 @@ def sync_active_field_training(
         field["frozen"] = False
     elif promotion_ready:
         field["state"] = "CERTIFICATION_PENDING"
-        if field.get("human_approved", False):
+        if has_signed_approval:
             field["certified"] = True
             field["state"] = "CERTIFIED"
             if freeze_result.freeze_allowed:
@@ -661,6 +682,22 @@ def start_training() -> dict:
     field = state["fields"][active_id]
 
     if field.get("frozen", False) and field.get("certified", False):
+        approval_status = _signed_approval_status(active_id)
+        if not approval_status["chain_valid"]:
+            return {
+                "status": "blocked",
+                "gate": "LEDGER_INTEGRITY",
+                "message": "LEDGER_TAMPERED: approval chain verification failed",
+            }
+        if not approval_status["has_signed_approval"]:
+            return {
+                "status": "blocked",
+                "gate": "HUMAN_APPROVAL",
+                "message": (
+                    f"APPROVAL_MISSING: field '{field['name']}' is not backed "
+                    "by a signed approval token"
+                ),
+            }
         next_field = _advance_to_next_field(state)
         if next_field is None:
             state["last_updated"] = datetime.now(timezone.utc).isoformat()
