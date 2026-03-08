@@ -30,9 +30,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
 import { getApiBase } from "@/lib/ygb-api"
-
+import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -51,7 +50,7 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter()
-  const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
+
 
   const handleLogout = async () => {
     try {

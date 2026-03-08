@@ -1,6 +1,6 @@
 {
-  "total_samples": 298974,
-  "verified_samples": 298974,
+  "total_samples": 302510,
+  "verified_samples": 302510,
   "per_field_counts": {
     "endpoint": 3536,
     "parameters": 3536,
@@ -14,17 +14,17 @@
     "CISA KEV Catalog": 1536
   },
   "strict_real_mode": true,
-  "updated_at": "2026-03-08T06:38:01.508151+00:00",
+  "updated_at": "2026-03-08T07:50:30.394733+00:00",
   "ingestion_manifest_hash": "5e4eb61cb6c4a063",
   "worker_stats": {
     "total_ingested": 3536,
     "total_dropped": 0,
     "total_deduped": 0
   },
-  "sample_count": 298974,
+  "sample_count": 302510,
   "dataset_hash": "5e4eb61cb6c4a063",
   "signed_by": "1b7d03627cd17c222be30b483cd6404921e4cd3f91c4f508b10d4e53a3ceb680",
   "version": "1.0",
-  "created_at": "2026-03-08T06:38:01.508151+00:00",
+  "created_at": "2026-03-08T07:50:30.394733+00:00",
   "signature_hash": "c75cf6a2d31130e6efc3364516c3956727723c84f66b28dde3be5d8c69d2b7c6"
 }
