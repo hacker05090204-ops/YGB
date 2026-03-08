@@ -34,22 +34,18 @@ _GB = 1024 ** 3
 _MB = 1024 ** 2
 
 SSD_ROOT = Path(os.environ.get("YGB_SSD_ROOT", "C:/ygb_data"))
-HDD_ROOT = Path(os.environ.get("YGB_HDD_ROOT", "D:/ygb_hdd"))
-HDD_BACKUP = Path(os.environ.get("DATABASE_BACKUP_PATH", "D:/ygb_data/ygb.db")).parent
+PRIMARY_HDD_ROOT = Path(os.environ.get("YGB_HDD_ROOT", "D:/ygb_hdd"))
+FALLBACK_HDD_ROOT = Path(
+    os.environ.get("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback")
+)
 
 SSD_CAP_BYTES = int(float(os.environ.get("YGB_SSD_CAP_GB", "110")) * _GB)
 
-# Sub-directories — training artefacts on SSD, everything else on HDD.
+# Sub-directories — training artefacts on SSD, everything else on HDD/NAS.
 SSD_TRAINING_DIR   = SSD_ROOT / "training"
 SSD_CHECKPOINTS    = SSD_ROOT / "checkpoints"
 SSD_DATASETS       = SSD_ROOT / "datasets"
 SSD_DB             = SSD_ROOT / "ygb.db"
-
-HDD_VIDEOS         = HDD_ROOT / "videos"
-HDD_LOGS           = HDD_ROOT / "logs"
-HDD_USER_DATA      = HDD_ROOT / "user_data"
-HDD_SESSIONS       = HDD_ROOT / "sessions"
-HDD_OVERFLOW       = HDD_ROOT / "ssd_overflow"
 
 # Files older than this and bigger than MIN_COMPRESS_SIZE are eligible for
 # compression / migration when the SSD cap is hit.
@@ -71,6 +67,13 @@ class StorageReport:
     compressed_count: int = 0
     migrated_count: int = 0
     migrated_bytes: int = 0
+    primary_hdd_root: str = str(PRIMARY_HDD_ROOT)
+    fallback_hdd_root: str = str(FALLBACK_HDD_ROOT)
+    active_hdd_root: str = ""
+    primary_available: bool = False
+    fallback_available: bool = False
+    fallback_active: bool = False
+    topology_reason: str = ""
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
 
     def to_dict(self) -> dict:
@@ -83,6 +86,13 @@ class StorageReport:
             "compressed_count": self.compressed_count,
             "migrated_count": self.migrated_count,
             "migrated_gb": round(self.migrated_bytes / _GB, 2),
+            "primary_hdd_root": self.primary_hdd_root,
+            "fallback_hdd_root": self.fallback_hdd_root,
+            "active_hdd_root": self.active_hdd_root,
+            "primary_available": self.primary_available,
+            "fallback_available": self.fallback_available,
+            "fallback_active": self.fallback_active,
+            "topology_reason": self.topology_reason,
             "timestamp": self.timestamp,
         }
 
@@ -107,8 +117,92 @@ def _ssd_usage() -> int:
     return _dir_size(SSD_ROOT)
 
 
+def _path_is_usable(path: Path) -> tuple[bool, str]:
+    """Check whether a root is currently writable enough for active storage."""
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        probe = path / ".ygb_probe.tmp"
+        with open(probe, "wb") as f:
+            f.write(b"ok")
+        probe.unlink(missing_ok=True)
+        return True, "ok"
+    except Exception as exc:
+        return False, type(exc).__name__
+
+
+def resolve_hdd_root() -> tuple[Path, dict]:
+    """
+    Resolve the active HDD/NAS root.
+
+    Primary policy:
+      1. Use configured D:-backed NAS root when available.
+      2. Fall back to configured C:-backed local root when NAS is unavailable.
+    """
+    primary_ok, primary_reason = _path_is_usable(PRIMARY_HDD_ROOT)
+    fallback_ok, fallback_reason = _path_is_usable(FALLBACK_HDD_ROOT)
+
+    if primary_ok:
+        return PRIMARY_HDD_ROOT, {
+            "primary_root": str(PRIMARY_HDD_ROOT),
+            "fallback_root": str(FALLBACK_HDD_ROOT),
+            "active_root": str(PRIMARY_HDD_ROOT),
+            "primary_available": True,
+            "fallback_available": fallback_ok,
+            "fallback_active": False,
+            "mode": "PRIMARY",
+            "reason": "Primary NAS root active",
+        }
+
+    if fallback_ok:
+        return FALLBACK_HDD_ROOT, {
+            "primary_root": str(PRIMARY_HDD_ROOT),
+            "fallback_root": str(FALLBACK_HDD_ROOT),
+            "active_root": str(FALLBACK_HDD_ROOT),
+            "primary_available": False,
+            "fallback_available": True,
+            "fallback_active": True,
+            "mode": "FALLBACK",
+            "reason": f"Primary root unavailable ({primary_reason}) — using local fallback",
+        }
+
+    return PRIMARY_HDD_ROOT, {
+        "primary_root": str(PRIMARY_HDD_ROOT),
+        "fallback_root": str(FALLBACK_HDD_ROOT),
+        "active_root": str(PRIMARY_HDD_ROOT),
+        "primary_available": False,
+        "fallback_available": False,
+        "fallback_active": False,
+        "mode": "UNAVAILABLE",
+        "reason": (
+            f"Primary unavailable ({primary_reason}); "
+            f"fallback unavailable ({fallback_reason})"
+        ),
+    }
+
+
+def get_storage_topology() -> dict:
+    """Expose the resolved storage topology for API/runtime truth endpoints."""
+    _, topology = resolve_hdd_root()
+    return topology
+
+
+def _active_hdd_root() -> Path:
+    return resolve_hdd_root()[0]
+
+
+def _active_hdd_dir(*parts: str) -> Path:
+    return _active_hdd_root().joinpath(*parts)
+
+
+def _backup_root() -> Path:
+    override = os.environ.get("DATABASE_BACKUP_PATH", "").strip()
+    if override:
+        return Path(override).expanduser().parent
+    return _active_hdd_root() / "backups"
+
+
 def _hdd_usage() -> int:
-    return _dir_size(HDD_ROOT)
+    return _dir_size(_active_hdd_root())
 
 
 def _cold_files(root: Path) -> list[Path]:
@@ -177,7 +271,7 @@ def migrate_to_hdd(src: Path) -> Optional[Path]:
         rel = src.relative_to(SSD_ROOT)
     except ValueError:
         rel = Path(src.name)
-    dst = HDD_OVERFLOW / rel
+    dst = _active_hdd_dir("ssd_overflow") / rel
     dst.parent.mkdir(parents=True, exist_ok=True)
     try:
         shutil.move(str(src), str(dst))
@@ -200,6 +294,14 @@ def enforce_ssd_cap() -> StorageReport:
     Returns a StorageReport.
     """
     report = StorageReport()
+    topology = get_storage_topology()
+    report.primary_hdd_root = topology["primary_root"]
+    report.fallback_hdd_root = topology["fallback_root"]
+    report.active_hdd_root = topology["active_root"]
+    report.primary_available = topology["primary_available"]
+    report.fallback_available = topology["fallback_available"]
+    report.fallback_active = topology["fallback_active"]
+    report.topology_reason = topology["reason"]
     used = _ssd_usage()
     report.ssd_used_bytes = used
     report.ssd_cap_bytes = SSD_CAP_BYTES
@@ -275,14 +377,14 @@ def resolve_path(category: str, filename: str = "") -> Path:
         "training":   SSD_TRAINING_DIR,
         "checkpoint": SSD_CHECKPOINTS,
         "dataset":    SSD_DATASETS,
-        "video":      HDD_VIDEOS,
-        "log":        HDD_LOGS,
-        "user_data":  HDD_USER_DATA,
-        "session":    HDD_SESSIONS,
-        "upload":     HDD_USER_DATA / "uploads",
-        "backup":     HDD_BACKUP,
+        "video":      _active_hdd_dir("videos"),
+        "log":        _active_hdd_dir("logs"),
+        "user_data":  _active_hdd_dir("user_data"),
+        "session":    _active_hdd_dir("sessions"),
+        "upload":     _active_hdd_dir("user_data", "uploads"),
+        "backup":     _backup_root(),
     }
-    base = _mapping.get(category, HDD_ROOT / category)
+    base = _mapping.get(category, _active_hdd_dir(category))
     base.mkdir(parents=True, exist_ok=True)
     return base / filename if filename else base
 
@@ -290,6 +392,14 @@ def resolve_path(category: str, filename: str = "") -> Path:
 def get_storage_report() -> dict:
     """Quick snapshot of SSD/HDD usage for the API."""
     r = StorageReport()
+    topology = get_storage_topology()
+    r.primary_hdd_root = topology["primary_root"]
+    r.fallback_hdd_root = topology["fallback_root"]
+    r.active_hdd_root = topology["active_root"]
+    r.primary_available = topology["primary_available"]
+    r.fallback_available = topology["fallback_available"]
+    r.fallback_active = topology["fallback_active"]
+    r.topology_reason = topology["reason"]
     r.ssd_used_bytes = _ssd_usage()
     r.ssd_free_bytes = max(0, SSD_CAP_BYTES - r.ssd_used_bytes)
     r.ssd_usage_pct = (r.ssd_used_bytes / SSD_CAP_BYTES * 100) if SSD_CAP_BYTES > 0 else 0.0
@@ -302,11 +412,27 @@ def get_storage_report() -> dict:
 # ---------------------------------------------------------------------------
 
 def _init_dirs():
+    hdd_root, topology = resolve_hdd_root()
+    hdd_dirs = [
+        hdd_root / "videos",
+        hdd_root / "logs",
+        hdd_root / "user_data",
+        hdd_root / "sessions",
+        hdd_root / "ssd_overflow",
+    ]
+    if topology["fallback_active"]:
+        logger.warning(
+            "Primary HDD root unavailable; using fallback root at %s",
+            hdd_root,
+        )
     for d in [
         SSD_TRAINING_DIR, SSD_CHECKPOINTS, SSD_DATASETS,
-        HDD_VIDEOS, HDD_LOGS, HDD_USER_DATA, HDD_SESSIONS, HDD_OVERFLOW,
+        *hdd_dirs,
     ]:
-        d.mkdir(parents=True, exist_ok=True)
+        try:
+            d.mkdir(parents=True, exist_ok=True)
+        except Exception as exc:
+            logger.warning("Storage directory init skipped for %s: %s", d, exc)
 
 
 _init_dirs()

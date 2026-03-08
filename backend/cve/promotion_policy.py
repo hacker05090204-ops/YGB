@@ -33,6 +33,8 @@ TRUSTED_SOURCES = frozenset([
     "CVEProject/cvelistV5",
     "NVD API v2",
     "CISA KEV Catalog",
+    "Vulners",
+    "VulDB",
 ])
 
 MIN_CORROBORATING_SOURCES = 2

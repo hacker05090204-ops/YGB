@@ -28,15 +28,24 @@ def test_local_bootstrap_creates_expected_files(tmp_path, monkeypatch):
     monkeypatch.setattr(artifacts, "WG_KEY_STATE_PATH", str(config_dir / "wg_key_state.json"))
     monkeypatch.setattr(artifacts, "PAIRING_LOG_PATH", str(reports_dir / "pairing_log.json"))
     monkeypatch.setattr(artifacts, "CLUSTER_HEALTH_PATH", str(reports_dir / "cluster_health.json"))
+    monkeypatch.setattr(artifacts, "TRAINING_GATE_PATH", str(reports_dir / "training_gate.json"))
+    monkeypatch.setattr(artifacts, "TRAINING_TELEMETRY_PATH", str(reports_dir / "training_telemetry.json"))
+    monkeypatch.setattr(artifacts, "RUNTIME_STATE_PATH", str(reports_dir / "runtime_state.json"))
+    monkeypatch.setattr(artifacts, "FIELD_RUNTIME_STATUS_PATH", str(data_dir / "runtime_status.json"))
+    monkeypatch.setenv("YGB_HMAC_SECRET", "ab" * 32)
 
-    result = artifacts.ensure_local_mode_a_bootstrap()
+    result = artifacts.bootstrap_runtime_artifacts(force_refresh=True)
 
-    assert result["mode"] == "single_node_local"
+    assert result["bootstrap"]["mode"] == "single_node_local"
     assert (config_dir / "device_identity.json").exists()
     assert (config_dir / "cluster_role.json").exists()
     assert (config_dir / "devices.json").exists()
     assert (reports_dir / "pairing_log.json").exists()
     assert (reports_dir / "cluster_health.json").exists()
+    assert (reports_dir / "training_gate.json").exists()
+    assert (reports_dir / "training_telemetry.json").exists()
+    assert (reports_dir / "runtime_state.json").exists()
+    assert (data_dir / "runtime_status.json").exists()
 
 
 def test_training_telemetry_validates(tmp_path, monkeypatch):
@@ -46,6 +55,7 @@ def test_training_telemetry_validates(tmp_path, monkeypatch):
     monkeypatch.setattr(artifacts, "TRAINING_TELEMETRY_PATH", str(telemetry_path))
     monkeypatch.setattr(runtime_api, "TELEMETRY_PATH", str(telemetry_path))
     monkeypatch.setattr(runtime_api, "LAST_SEEN_PATH", str(last_seen_path))
+    monkeypatch.setenv("YGB_HMAC_SECRET", "cd" * 32)
 
     if telemetry_path.exists():
         telemetry_path.unlink()

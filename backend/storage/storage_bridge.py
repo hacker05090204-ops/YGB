@@ -29,6 +29,12 @@ from native.hdd_engine.video_streamer import VideoStreamer
 
 logger = logging.getLogger("storage_bridge")
 
+try:
+    from backend.storage.tiered_storage import get_storage_topology, resolve_hdd_root
+except Exception:  # pragma: no cover - tiered storage is optional here
+    get_storage_topology = None
+    resolve_hdd_root = None
+
 
 # =============================================================================
 # SINGLETON INSTANCES
@@ -46,6 +52,8 @@ _GITHUB_ID_INDEX: Dict[str, str] = {}
 _GITHUB_ID_INDEX_BUILT = False
 _DEVICE_INDEX: Dict[str, str] = {}      # "user_id|device_hash" → device entity_id
 _DEVICE_INDEX_BUILT = False
+_storage_active_root: Optional[str] = None
+_storage_mode: str = "UNRESOLVED"
 
 
 def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
@@ -56,14 +64,37 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     global _engine, _lifecycle, _disk_monitor, _video_streamer
     global _EMAIL_INDEX, _EMAIL_INDEX_BUILT, _GITHUB_ID_INDEX, _GITHUB_ID_INDEX_BUILT
     global _DEVICE_INDEX, _DEVICE_INDEX_BUILT
+    global _storage_active_root, _storage_mode
 
-    _engine = get_engine(hdd_root)
+    topology = {
+        "primary_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"))),
+        "fallback_root": str(Path(os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"))),
+        "active_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"))),
+        "primary_available": True,
+        "fallback_available": False,
+        "fallback_active": False,
+        "mode": "EXPLICIT" if hdd_root else "PRIMARY",
+        "reason": "Tiered storage topology unavailable",
+    }
+    resolved_root = hdd_root
+    if resolved_root is None and resolve_hdd_root and get_storage_topology:
+        try:
+            resolved_path, topology = resolve_hdd_root()
+            resolved_root = str(resolved_path)
+        except Exception as exc:
+            logger.warning("Storage topology resolution failed: %s", exc)
+    if resolved_root is None:
+        resolved_root = os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd")
+
+    _engine = get_engine(resolved_root)
     _EMAIL_INDEX = {}
     _EMAIL_INDEX_BUILT = False
     _GITHUB_ID_INDEX = {}
     _GITHUB_ID_INDEX_BUILT = False
     _DEVICE_INDEX = {}
     _DEVICE_INDEX_BUILT = False
+    _storage_active_root = str(_engine.root)
+    _storage_mode = topology.get("mode", "PRIMARY")
 
     _lifecycle = LifecycleManager(_engine)
     _lifecycle.start_sweep_thread()
@@ -74,10 +105,19 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     _video_streamer = VideoStreamer(str(_engine.root))
 
     logger.info(f"Storage bridge initialized at: {_engine.root}")
+    if topology.get("fallback_active"):
+        logger.warning(
+            "Primary HDD/NAS root unavailable; storage bridge running on fallback root %s",
+            _engine.root,
+        )
 
     return {
         "status": "initialized",
         "hdd_root": str(_engine.root),
+        "storage_mode": _storage_mode,
+        "primary_hdd_root": topology.get("primary_root"),
+        "fallback_hdd_root": topology.get("fallback_root"),
+        "fallback_active": topology.get("fallback_active", False),
         "subsystems": ["engine", "lifecycle", "disk_monitor", "video_streamer"],
     }
 
@@ -804,6 +844,22 @@ def get_storage_health() -> Dict[str, Any]:
     """
     checked_at = datetime.now(timezone.utc).isoformat()
     reasons = []
+    topology = {
+        "primary_root": os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        "fallback_root": os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"),
+        "active_root": _storage_active_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        "primary_available": None,
+        "fallback_available": None,
+        "fallback_active": False,
+        "mode": _storage_mode,
+        "reason": None,
+    }
+    if get_storage_topology:
+        try:
+            topology = get_storage_topology()
+        except Exception as e:
+            logger.error("Storage topology check failed: %s", e)
+            reasons.append(f"Storage topology error: {type(e).__name__}")
 
     # Check engine
     storage_active = False
@@ -835,9 +891,14 @@ def get_storage_health() -> Dict[str, Any]:
     if not disk_monitor_ok:
         reasons.append("Disk monitor not initialized")
 
+    if topology.get("fallback_active"):
+        reasons.append("Primary HDD/NAS root unavailable — running on local fallback")
+
     reason = "; ".join(reasons) if reasons else None
     overall_status = "ACTIVE" if (storage_active and db_active and lifecycle_ok) else "INACTIVE"
     if storage_active and not lifecycle_ok:
+        overall_status = "DEGRADED"
+    elif storage_active and topology.get("fallback_active"):
         overall_status = "DEGRADED"
 
     return {
@@ -846,6 +907,14 @@ def get_storage_health() -> Dict[str, Any]:
         "db_active": db_active,
         "lifecycle_ok": lifecycle_ok,
         "disk_monitor_ok": disk_monitor_ok,
+        "storage_root": str(getattr(_engine, "root", topology.get("active_root"))) if _engine else topology.get("active_root"),
+        "storage_mode": topology.get("mode", _storage_mode),
+        "primary_hdd_root": topology.get("primary_root"),
+        "fallback_hdd_root": topology.get("fallback_root"),
+        "primary_available": topology.get("primary_available"),
+        "fallback_available": topology.get("fallback_available"),
+        "fallback_active": topology.get("fallback_active", False),
+        "topology_reason": topology.get("reason"),
         "reason": reason,
         "checked_at": checked_at,
     }

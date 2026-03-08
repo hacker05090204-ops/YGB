@@ -1,0 +1,11 @@
+{
+  "bootstrapped_at": "2026-03-08T08:31:56.826701+00:00",
+  "device_id": "a74657ac26cb06b577c08015e48e4076a64c485662eceafbdf146a3268566026",
+  "hostname": "UNKNOWN-HUNTER",
+  "mac_address": "94bb43eb3384",
+  "machine": "AMD64",
+  "mode": "single_node_local",
+  "platform": "Windows",
+  "platform_release": "10",
+  "processor": "AMD64 Family 25 Model 68 Stepping 1, AuthenticAMD"
+}

@@ -172,3 +172,38 @@ def test_auth_me_returns_github_fields_from_storage(monkeypatch):
     assert payload["github_login"] == "octocat"
     assert payload["avatar_url"] == "https://avatars.githubusercontent.com/u/1"
     assert response.headers["Cache-Control"] == "no-store"
+
+
+def test_oauth_runtime_config_reports_missing_fields(monkeypatch):
+    monkeypatch.delenv("GITHUB_CLIENT_ID", raising=False)
+    monkeypatch.delenv("GITHUB_CLIENT_SECRET", raising=False)
+    monkeypatch.setenv(
+        "GITHUB_REDIRECT_URI",
+        "http://192.168.1.10:8000/auth/github/callback",
+    )
+    monkeypatch.setenv("FRONTEND_URL", "http://192.168.1.10:3000")
+
+    detail = server_mod._oauth_not_configured_detail()
+
+    assert detail["error"] == "GITHUB_OAUTH_NOT_CONFIGURED"
+    assert "GITHUB_CLIENT_ID" in detail["missing"]
+    assert "GITHUB_CLIENT_SECRET" in detail["missing"]
+    assert detail["redirect_uri"] == "http://192.168.1.10:8000/auth/github/callback"
+
+
+def test_auth_provider_status_uses_shared_server_side_oauth(monkeypatch):
+    monkeypatch.setenv("GITHUB_CLIENT_ID", "github-client-id")
+    monkeypatch.setenv("GITHUB_CLIENT_SECRET", "github-client-secret")
+    monkeypatch.setenv(
+        "GITHUB_REDIRECT_URI",
+        "http://192.168.1.10:8000/auth/github/callback",
+    )
+    monkeypatch.setenv("FRONTEND_URL", "http://192.168.1.10:3000")
+
+    payload = asyncio.run(server_mod.auth_provider_status())
+
+    assert payload["password"]["enabled"] in {True, False}
+    assert payload["github"]["enabled"] is True
+    assert payload["github"]["missing"] == []
+    assert payload["github"]["redirect_uri"] == "http://192.168.1.10:8000/auth/github/callback"
+    assert payload["github"]["frontend_url"] == "http://192.168.1.10:3000"

@@ -42,6 +42,9 @@ from impl_v1.governance.evolution_test import (
 from impl_v1.governance.human_override import (
     EmergencyOverrideManager,
 )
+from impl_v1.governance.governance_controller import (
+    OperationalGovernanceController,
+)
 
 
 class TestHumanFactorSafety(unittest.TestCase):
@@ -124,11 +127,23 @@ class TestHumanOverride(unittest.TestCase):
         success, msg = manager.approve("user2")
         self.assertTrue(success)
         self.assertIn("Awaiting second", msg)
-        
+
         # Second approval
-        success, msg = manager.approve("user3")
+        success, msg = manager.approve("user3", gpg_signature="signed-approval")
         self.assertTrue(success)
         self.assertIn("APPROVED", msg)
+
+    def test_second_approval_requires_signature(self):
+        """Unsigned second approvals must be rejected."""
+        manager = EmergencyOverrideManager()
+        manager.create_request("Test", "user1")
+
+        success, _ = manager.approve("user2")
+        self.assertTrue(success)
+
+        success, msg = manager.approve("user3")
+        self.assertFalse(success)
+        self.assertIn("GPG signature", msg)
     
     def test_self_approval_blocked(self):
         """Cannot approve own request."""
@@ -183,6 +198,23 @@ class TestHumanOverride(unittest.TestCase):
 
             self.assertTrue(misuse)
             self.assertTrue(issues)
+
+    def test_governance_blocks_pending_override_lane(self):
+        """Governance must not report auto-mode safe with a pending override."""
+        with TemporaryDirectory() as tmp:
+            override_file = Path(tmp) / "override.json"
+            audit_log = Path(tmp) / "override_audit.jsonl"
+            state_file = Path(tmp) / "governance_state.json"
+
+            with patch.object(EmergencyOverrideManager, "OVERRIDE_FILE", override_file), \
+                 patch.object(EmergencyOverrideManager, "AUDIT_LOG", audit_log), \
+                 patch.object(OperationalGovernanceController, "STATE_FILE", state_file):
+                controller = OperationalGovernanceController()
+                controller.override_manager.create_request("Test", "user1")
+                status = controller.check_governance()
+
+            self.assertFalse(status.auto_mode_safe)
+            self.assertFalse(status.checks["override_lane_clear"])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,12 @@
+{
+  "device_id": "a74657ac26cb06b577c08015e48e4076a64c485662eceafbdf146a3268566026",
+  "hostname": "UNKNOWN-HUNTER",
+  "quorum_required": 1,
+  "roles": [
+    "AUTHORITY",
+    "STORAGE",
+    "WORKER"
+  ],
+  "topology": "single_node_local",
+  "updated_at": "2026-03-08T08:31:56.826701+00:00"
+}

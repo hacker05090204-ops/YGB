@@ -13,6 +13,7 @@ Rate-limited per user/device.
 Full audit logging.
 """
 
+import asyncio
 import json
 import logging
 import uuid
@@ -22,7 +23,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-from backend.auth.auth_guard import require_auth, ws_authenticate
+from backend.auth.auth_guard import require_admin, require_auth, ws_authenticate
 
 logger = logging.getLogger(__name__)
 
@@ -58,6 +59,21 @@ class RespondRequest(BaseModel):
     """Generate TTS response."""
     text: str
     response_type: str = "SUCCESS"
+
+
+class STTSampleRequest(BaseModel):
+    """Browser-captured WAV sample paired with transcript for local STT training."""
+    audio_wav_b64: str
+    transcript: str
+    device_id: str = "browser"
+    language: str = "en-US"
+    provider: str = "BROWSER_WEBSPEECH"
+
+
+class STTTrainRequest(BaseModel):
+    """Admin-triggered local STT training request."""
+    epochs: int = 3
+    batch_size: int = 4
 
 
 # =============================================================================
@@ -252,6 +268,65 @@ async def tts_respond(req: RespondRequest, user=Depends(require_auth)):
         "latency_ms": result.latency_ms,
         "audio_url": result.audio_url,
     }
+
+
+@voice_gw_router.post("/api/voice/stt/sample")
+async def upload_stt_sample(req: STTSampleRequest, user=Depends(require_auth)):
+    """Store a real browser-captured STT sample for offline training."""
+    import base64
+
+    user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
+    try:
+        audio_bytes = base64.b64decode(req.audio_wav_b64)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid base64 WAV payload")
+
+    from backend.training.stt_dataset_collector import save_sample
+
+    result = save_sample(
+        audio_bytes=audio_bytes,
+        transcript=req.transcript,
+        user_id=user_id,
+        device_id=req.device_id,
+        language=req.language,
+        provider=req.provider,
+    )
+    audit = _get_audit()
+    audit.log(
+        user_id=user_id,
+        device_id=req.device_id,
+        transcript=req.transcript[:120],
+        intent="STT_SAMPLE_UPLOAD",
+        action="DATASET_APPEND",
+        policy="ALLOWED",
+        result="ACCEPTED" if result.get("accepted") else "REJECTED",
+    )
+    return result
+
+
+@voice_gw_router.get("/api/voice/stt/status")
+async def stt_dataset_status(user=Depends(require_auth)):
+    """Truthful offline STT readiness, quality, and model status."""
+    from backend.training.stt_dataset_collector import get_dataset_status
+    from impl_v1.training.voice.stt_model import get_local_stt_service
+
+    return {
+        "dataset": get_dataset_status(),
+        "model": get_local_stt_service().get_status(),
+    }
+
+
+@voice_gw_router.post("/api/voice/stt/train")
+async def train_local_stt(req: STTTrainRequest, user=Depends(require_admin)):
+    """Admin-only local STT training trigger."""
+    from backend.training.stt_dataset_collector import train_local_stt_model
+
+    result = await asyncio.to_thread(
+        train_local_stt_model,
+        epochs=max(1, min(req.epochs, 20)),
+        batch_size=max(1, min(req.batch_size, 16)),
+    )
+    return result
 
 
 # =============================================================================

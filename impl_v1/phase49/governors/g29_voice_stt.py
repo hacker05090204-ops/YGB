@@ -436,5 +436,4 @@ def is_voice_supported() -> bool:
             or capabilities.get("local_capture_available")
         )
     except Exception:
-        # Browser relay is the minimum supported fallback.
-        return True
+        return False

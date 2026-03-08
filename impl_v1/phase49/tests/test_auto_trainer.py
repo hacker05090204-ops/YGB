@@ -333,6 +333,111 @@ class TestStatus:
         assert status["last_event"] == "TEST_EVENT"
 
 
+class _DatasetLeaf:
+    def __init__(self, features, labels):
+        self._features_tensor = features
+        self._labels_tensor = labels
+
+
+class _DatasetSubset:
+    def __init__(self, dataset, indices):
+        self.dataset = dataset
+        self.indices = indices
+
+
+class _LoaderStub:
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+
+class TestGovernanceWiring:
+    """Tests for governance gates wired into the trainer."""
+
+    def test_extract_governance_dataset_arrays_from_subset(self):
+        torch = pytest.importorskip("torch")
+        trainer = AutoTrainer()
+        base = _DatasetLeaf(
+            torch.tensor([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]),
+            torch.tensor([0, 1, 0]),
+        )
+        subset = _DatasetSubset(base, [2, 0])
+
+        features, labels = trainer._extract_governance_dataset_arrays(subset)
+
+        assert features.tolist() == [[5.0, 6.0], [1.0, 2.0]]
+        assert labels.tolist() == [0, 0]
+
+    def test_run_governance_pre_training_gate_blocks_failed_result(self, monkeypatch):
+        torch = pytest.importorskip("torch")
+        trainer = AutoTrainer()
+        trainer._gpu_dataloader = _LoaderStub(
+            _DatasetLeaf(
+                torch.tensor([[1.0, 2.0], [3.0, 4.0]]),
+                torch.tensor([0, 1]),
+            )
+        )
+        trainer._source_id = "SRC-123"
+
+        calls = {}
+
+        def _fake_gate(features, labels, n_classes, source_id):
+            calls["shape"] = features.shape
+            calls["labels"] = labels.tolist()
+            calls["n_classes"] = n_classes
+            calls["source_id"] = source_id
+            from impl_v1.training.data.governance_pipeline import PreTrainingResult
+            return PreTrainingResult(
+                passed=False,
+                checks_run=1,
+                checks_failed=1,
+                failures=["synthetic failure"],
+            )
+
+        monkeypatch.setattr(
+            "impl_v1.training.data.governance_pipeline.pre_training_gate",
+            _fake_gate,
+        )
+
+        result = trainer._run_governance_pre_training_gate()
+
+        assert result is False
+        assert calls["shape"] == (2, 2)
+        assert calls["labels"] == [0, 1]
+        assert calls["n_classes"] == 2
+        assert calls["source_id"] == "SRC-123"
+        assert trainer._governance_dataset_hash
+        blocked_events = [e for e in trainer.events if e.event_type == "GUARD_BLOCKED"]
+        assert len(blocked_events) == 1
+
+    def test_run_governance_post_epoch_audit_uses_dataset_hash(self, monkeypatch):
+        trainer = AutoTrainer()
+        trainer._governance_dataset_hash = "abc123"
+        observed = {}
+
+        def _fake_audit(**kwargs):
+            observed.update(kwargs)
+            from impl_v1.training.data.governance_pipeline import PostEpochResult
+            return PostEpochResult(epoch=kwargs["epoch"])
+
+        monkeypatch.setattr(
+            "impl_v1.training.data.governance_pipeline.post_epoch_audit",
+            _fake_audit,
+        )
+
+        trainer._run_governance_post_epoch_audit(
+            epoch=7,
+            accuracy=0.8,
+            holdout_accuracy=0.8,
+            loss=0.2,
+            train_accuracy=0.82,
+            total_samples=128,
+        )
+
+        assert observed["epoch"] == 7
+        assert observed["dataset_hash"] == "abc123"
+        assert observed["total_samples"] == 128
+
+
 # =============================================================================
 # SINGLETON TESTS
 # =============================================================================

@@ -29,6 +29,12 @@ import torch.nn.functional as F
 
 logger = logging.getLogger(__name__)
 
+try:
+    from backend.storage.tiered_storage import get_storage_topology, resolve_path
+except Exception:  # pragma: no cover - optional during isolated import/tests
+    get_storage_topology = None
+    resolve_path = None
+
 # Paths
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 _CHECKPOINT_DIR = _PROJECT_ROOT / "checkpoints" / "stt"
@@ -388,27 +394,135 @@ class LocalSTTService:
         self._model_loaded = False
         self._total_transcriptions = 0
         self._total_errors = 0
+        self._loaded_checkpoint_path: Optional[str] = None
+        self._parameter_count: int = 0
 
         # Try to load checkpoint
         self._load_model()
 
+    def _candidate_checkpoint_dirs(self) -> List[Path]:
+        candidates: List[Path] = [_CHECKPOINT_DIR]
+
+        env_dir = os.environ.get("YGB_STT_CHECKPOINT_DIR", "").strip()
+        if env_dir:
+            candidates.append(Path(env_dir).expanduser())
+
+        if resolve_path:
+            try:
+                candidates.append(resolve_path("checkpoint") / "stt")
+            except Exception:
+                pass
+
+        if get_storage_topology:
+            try:
+                topology = get_storage_topology()
+                active_root = topology.get("active_root", "")
+                fallback_root = topology.get("fallback_root", "")
+                if active_root:
+                    candidates.append(Path(active_root) / "stt" / "checkpoints")
+                if fallback_root:
+                    candidates.append(Path(fallback_root) / "stt" / "checkpoints")
+            except Exception:
+                pass
+
+        deduped: List[Path] = []
+        seen = set()
+        for candidate in candidates:
+            key = str(candidate)
+            if key not in seen:
+                deduped.append(candidate)
+                seen.add(key)
+        return deduped
+
+    def _candidate_manifest_paths(self) -> List[Path]:
+        candidates: List[Path] = []
+
+        env_manifest = os.environ.get("YGB_STT_MANIFEST", "").strip()
+        if env_manifest:
+            candidates.append(Path(env_manifest).expanduser())
+
+        candidates.extend([
+            _PROJECT_ROOT / "data" / "stt_manifest.jsonl",
+            _PROJECT_ROOT / "data" / "stt" / "stt_manifest.jsonl",
+        ])
+
+        if resolve_path:
+            try:
+                dataset_root = resolve_path("dataset")
+                candidates.extend([
+                    dataset_root / "stt_manifest.jsonl",
+                    dataset_root / "stt" / "stt_manifest.jsonl",
+                ])
+            except Exception:
+                pass
+
+        if get_storage_topology:
+            try:
+                topology = get_storage_topology()
+                for root_key in ("active_root", "fallback_root", "primary_root"):
+                    raw_root = topology.get(root_key, "")
+                    if raw_root:
+                        root = Path(raw_root)
+                        candidates.extend([
+                            root / "stt" / "stt_manifest.jsonl",
+                            root / "datasets" / "stt_manifest.jsonl",
+                        ])
+            except Exception:
+                pass
+
+        deduped: List[Path] = []
+        seen = set()
+        for candidate in candidates:
+            key = str(candidate)
+            if key not in seen:
+                deduped.append(candidate)
+                seen.add(key)
+        return deduped
+
+    def _candidate_checkpoint_paths(self) -> List[Path]:
+        candidates: List[Path] = []
+
+        env_path = os.environ.get("YGB_STT_CHECKPOINT", "").strip()
+        if env_path:
+            candidates.append(Path(env_path).expanduser())
+
+        for directory in self._candidate_checkpoint_dirs():
+            candidates.append(directory / "conformer_ctc_latest.pt")
+            if directory.exists():
+                candidates.extend(sorted(directory.glob("conformer_ctc*.pt")))
+        return [candidate for candidate in candidates if candidate]
+
     def _load_model(self):
         """Load model from checkpoint or initialize untrained."""
-        checkpoint_path = _CHECKPOINT_DIR / "conformer_ctc_latest.pt"
-
         try:
             self._model = ConformerCTCModel()
+            self._parameter_count = sum(
+                p.numel() for p in self._model.parameters()
+            )
+            self._model_loaded = False
 
-            if checkpoint_path.exists():
-                state = torch.load(str(checkpoint_path), map_location="cpu",
-                                   weights_only=True)
-                self._model.load_state_dict(state["model_state_dict"])
-                self._model_loaded = True
-                logger.info(f"[STT] Loaded checkpoint: {checkpoint_path}")
-            else:
-                self._model_loaded = False
+            for checkpoint_path in self._candidate_checkpoint_paths():
+                if not checkpoint_path.exists():
+                    continue
+
+                try:
+                    state = torch.load(str(checkpoint_path), map_location="cpu",
+                                       weights_only=True)
+                    self._model.load_state_dict(state["model_state_dict"])
+                    self._model_loaded = True
+                    self._loaded_checkpoint_path = str(checkpoint_path)
+                    logger.info(f"[STT] Loaded checkpoint: {checkpoint_path}")
+                    break
+                except Exception as checkpoint_error:
+                    logger.warning(
+                        "[STT] Failed to load checkpoint %s: %s",
+                        checkpoint_path,
+                        checkpoint_error,
+                    )
+
+            if not self._model_loaded:
                 logger.warning(
-                    "[STT] No checkpoint found — model is UNTRAINED. "
+                    "[STT] No compatible checkpoint found — model is UNTRAINED. "
                     "STT will report DEGRADED until trained."
                 )
 
@@ -487,17 +601,37 @@ class LocalSTTService:
 
     def get_status(self) -> Dict:
         """Get service status — truthful, never shows ACTIVE when degraded."""
+        manifest_candidates = [str(path) for path in self._candidate_manifest_paths()]
+        checkpoint_candidates = [str(path) for path in self._candidate_checkpoint_paths()]
+        manifest_found = next(
+            (str(path) for path in self._candidate_manifest_paths() if path.exists()),
+            None,
+        )
+        dataset_status = None
+        try:
+            from backend.training.stt_dataset_collector import get_dataset_status
+
+            dataset_status = get_dataset_status()
+        except Exception:
+            dataset_status = None
         return {
             "provider": "LOCAL_CONFORMER_CTC",
             "status": "AVAILABLE" if self._model_loaded else "DEGRADED",
             "model_loaded": self._model_loaded,
             "device": self._device,
+            "parameter_count": self._parameter_count,
+            "parameter_millions": round(self._parameter_count / 1_000_000, 4),
             "total_transcriptions": self._total_transcriptions,
             "total_errors": self._total_errors,
             "checkpoint_dir": str(_CHECKPOINT_DIR),
+            "loaded_checkpoint": self._loaded_checkpoint_path,
+            "candidate_checkpoints": checkpoint_candidates[:10],
+            "candidate_manifests": manifest_candidates[:10],
+            "training_manifest_found": manifest_found,
+            "dataset_status": dataset_status,
             "reason": None if self._model_loaded else (
-                "Model untrained — no checkpoint at "
-                f"{_CHECKPOINT_DIR / 'conformer_ctc_latest.pt'}"
+                "Model untrained — no compatible checkpoint found in "
+                f"{_CHECKPOINT_DIR}"
             ),
         }
 

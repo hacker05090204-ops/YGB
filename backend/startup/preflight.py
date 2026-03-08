@@ -240,10 +240,12 @@ def check_boot_summary() -> CheckResult:
     gh_id = os.environ.get("GITHUB_CLIENT_ID", "")
     gh_secret = os.environ.get("GITHUB_CLIENT_SECRET", "")
     gh_redirect = os.environ.get("GITHUB_REDIRECT_URI", "")
-    if gh_id and gh_secret:
+    if gh_id and gh_secret and gh_redirect:
         features["github_oauth"] = "ENABLED"
     elif profile == "CONNECTED":
-        features["github_oauth"] = "BLOCKED (GITHUB_CLIENT_ID/SECRET required)"
+        features["github_oauth"] = (
+            "BLOCKED (GITHUB_CLIENT_ID/SECRET required in .env or .env.connected)"
+        )
     else:
         features["github_oauth"] = "DISABLED (privacy mode)"
 

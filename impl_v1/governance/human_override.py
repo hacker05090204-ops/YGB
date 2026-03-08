@@ -156,8 +156,11 @@ class EmergencyOverrideManager:
             })
             
             return True, "First approval recorded. Awaiting second approval."
-        
+
         # Second approval
+        if not gpg_signature or not str(gpg_signature).strip():
+            return False, "Second approval requires a GPG signature"
+
         self.current_request.second_approver = approver
         self.current_request.second_approval_at = datetime.now().isoformat()
         self.current_request.gpg_signature = gpg_signature
@@ -196,8 +199,19 @@ class EmergencyOverrideManager:
         
         if self.current_request.status == "approved":
             return True, "Override active (dual approval)"
-        
+
         return False, f"Override status: {self.current_request.status}"
+
+    def governance_clearance(self) -> Tuple[bool, str]:
+        """Return whether the override lane is clear for normal auto-mode."""
+        if not self.current_request:
+            return True, "No override request"
+
+        status = (self.current_request.status or "").strip().lower()
+        if status in {"pending", "approved"}:
+            return False, f"Override lane not clear: {self.current_request.status}"
+
+        return True, f"Override status: {self.current_request.status}"
     
     def clear_override(self) -> None:
         """Clear current override (return to normal)."""

@@ -262,9 +262,27 @@ class TestConstants:
         """Supported wake words defined."""
         assert len(SUPPORTED_WAKE_WORDS) > 0
     
-    def test_is_voice_supported(self):
-        """Voice support check."""
+    def test_is_voice_supported_with_runtime_probe(self, monkeypatch):
+        """Voice support reflects real runtime capability probes."""
+        monkeypatch.setattr(
+            "backend.assistant.voice_runtime.probe_microphone_capabilities",
+            lambda: {
+                "browser_relay_available": True,
+                "local_capture_available": False,
+            },
+        )
         assert is_voice_supported() is True
+
+    def test_is_voice_supported_fails_closed_on_probe_error(self, monkeypatch):
+        """Voice support should fail closed when probing errors."""
+        def _boom():
+            raise RuntimeError("probe failed")
+
+        monkeypatch.setattr(
+            "backend.assistant.voice_runtime.probe_microphone_capabilities",
+            _boom,
+        )
+        assert is_voice_supported() is False
 
 
 class TestDataclasses:

@@ -99,6 +99,7 @@ class CVERecord:
     canonical_version: int
     merged_at: str
     content_hash: str = ""
+    severity_source: str = ""
     promotion_status: str = "RESEARCH_PENDING"
     block_reason: str = ""
     merge_conflicts: List[str] = field(default_factory=list)
@@ -199,6 +200,7 @@ _SOURCE_CONFIGS = {
         "confidence": 0.98,
         "priority": 1,
         "is_canonical": True,
+        "severity_rank": 3,
     },
     "cveproject": {
         "name": "CVEProject/cvelistV5",
@@ -208,6 +210,7 @@ _SOURCE_CONFIGS = {
         "confidence": 0.95,
         "priority": 2,
         "is_canonical": True,
+        "severity_rank": 2,
     },
     "nvd": {
         "name": "NVD API v2",
@@ -218,6 +221,7 @@ _SOURCE_CONFIGS = {
         "confidence": 0.90,
         "priority": 3,
         "is_canonical": False,
+        "severity_rank": 0,
     },
     "cisa_kev": {
         "name": "CISA KEV Catalog",
@@ -227,6 +231,7 @@ _SOURCE_CONFIGS = {
         "confidence": 1.0,
         "priority": 4,
         "is_canonical": False,
+        "severity_rank": 4,
     },
     "vulners": {
         "name": "Vulners",
@@ -237,6 +242,7 @@ _SOURCE_CONFIGS = {
         "confidence": 0.80,
         "priority": 5,
         "is_canonical": False,
+        "severity_rank": 1,
     },
     "vuldb": {
         "name": "VulDB",
@@ -247,7 +253,11 @@ _SOURCE_CONFIGS = {
         "confidence": 0.75,
         "priority": 6,
         "is_canonical": False,
+        "severity_rank": 2,
     },
+}
+_SOURCE_NAME_TO_ID = {
+    cfg["name"]: source_id for source_id, cfg in _SOURCE_CONFIGS.items()
 }
 
 
@@ -351,6 +361,11 @@ class CVEPipeline:
 
         return {
             "status": overall,
+            "fetch_strategy": "HOST_HTTP_PLUS_EDGE_CORROBORATION",
+            "severity_authority": "NVD-first with Vulners/VulDB enrichment",
+            "scheduler_interval_target_seconds": int(
+                os.environ.get("CVE_INGEST_INTERVAL_SECONDS", "300")
+            ),
             "sources_total": total,
             "sources_connected": connected,
             "sources_configured": configured,
@@ -395,6 +410,11 @@ class CVEPipeline:
             parser_version=PARSER_VERSION,
         )
 
+    def _severity_rank(self, source_name: str) -> int:
+        source_id = _SOURCE_NAME_TO_ID.get(source_name, "")
+        cfg = _SOURCE_CONFIGS.get(source_id, {})
+        return int(cfg.get("severity_rank", 99))
+
     # ─── Deterministic Merge ─────────────────────────────────────────
 
     def ingest_record(
@@ -435,7 +455,22 @@ class CVEPipeline:
                 "CRITICAL": 4, "HIGH": 3, "MEDIUM": 2,
                 "LOW": 1, "UNKNOWN": 0,
             }
-            if sev_order.get(severity, 0) > sev_order.get(existing.severity, 0):
+            existing_rank = self._severity_rank(
+                existing.severity_source or existing.provenance[-1].source
+            )
+            incoming_rank = self._severity_rank(provenance.source)
+            replace_severity = False
+            if severity and severity.upper() != "UNKNOWN":
+                if existing.severity in ("", "UNKNOWN"):
+                    replace_severity = True
+                elif incoming_rank < existing_rank:
+                    replace_severity = True
+                elif (
+                    incoming_rank == existing_rank
+                    and sev_order.get(severity, 0) > sev_order.get(existing.severity, 0)
+                ):
+                    replace_severity = True
+            if replace_severity:
                 if existing.severity != severity:
                     conflicts.append(
                         f"severity: {existing.severity} → {severity} "
@@ -443,9 +478,11 @@ class CVEPipeline:
                     )
                 merged_severity = severity
                 merged_cvss = cvss_score or existing.cvss_score
+                merged_severity_source = provenance.source
             else:
                 merged_severity = existing.severity
                 merged_cvss = existing.cvss_score or cvss_score
+                merged_severity_source = existing.severity_source
 
             # CVSS score conflict
             if (cvss_score and existing.cvss_score and
@@ -470,6 +507,7 @@ class CVEPipeline:
                 canonical_version=existing.canonical_version + 1,
                 merged_at=datetime.now(timezone.utc).isoformat(),
                 content_hash=content_hash,
+                severity_source=merged_severity_source,
                 promotion_status=existing.promotion_status,
                 block_reason=existing.block_reason,
                 merge_conflicts=existing.merge_conflicts + conflicts,
@@ -498,6 +536,7 @@ class CVEPipeline:
                 canonical_version=1,
                 merged_at=datetime.now(timezone.utc).isoformat(),
                 content_hash=content_hash,
+                severity_source=provenance.source,
                 promotion_status="RESEARCH_PENDING",
             )
             self._records[cve_id] = record
@@ -603,6 +642,7 @@ class CVEPipeline:
                 "title": r.title,
                 "description": r.description[:200],
                 "severity": r.severity,
+                "severity_source": r.severity_source,
                 "cvss_score": r.cvss_score,
                 "is_exploited": r.is_exploited,
                 "sources": [p.source for p in r.provenance],
@@ -614,6 +654,59 @@ class CVEPipeline:
             }
             for r in records
         ]
+
+    def search(self, query: str) -> List[Dict[str, Any]]:
+        """Search ingested CVE records by ID, text, product, or source."""
+        needle = (query or "").strip().lower()
+        if len(needle) < 3:
+            return []
+
+        ranked: List[Tuple[int, Dict[str, Any]]] = []
+        for record in self._records.values():
+            score = 0
+            cve_id_lower = record.cve_id.lower()
+            title_lower = record.title.lower()
+            desc_lower = record.description.lower()
+            source_blob = " ".join(p.source.lower() for p in record.provenance)
+            products_blob = " ".join(p.lower() for p in record.affected_products)
+            refs_blob = " ".join(r.lower() for r in record.references)
+
+            if needle == cve_id_lower:
+                score += 20
+            elif needle in cve_id_lower:
+                score += 12
+            if needle in title_lower:
+                score += 8
+            if needle in desc_lower:
+                score += 6
+            if needle in products_blob:
+                score += 4
+            if needle in source_blob:
+                score += 3
+            if needle in refs_blob:
+                score += 2
+            if needle == record.severity.lower():
+                score += 5
+
+            if score:
+                ranked.append((
+                    score,
+                    {
+                        "cve_id": record.cve_id,
+                        "title": record.title,
+                        "description": record.description[:300],
+                        "severity": record.severity,
+                        "severity_source": record.severity_source,
+                        "cvss_score": record.cvss_score,
+                        "is_exploited": record.is_exploited,
+                        "sources": [p.source for p in record.provenance],
+                        "promotion_status": record.promotion_status,
+                        "merged_at": record.merged_at,
+                    },
+                ))
+
+        ranked.sort(key=lambda item: (-item[0], item[1]["cve_id"]))
+        return [payload for _, payload in ranked]
 
     def get_record(self, cve_id: str) -> Optional[CVERecord]:
         return self._records.get(cve_id)

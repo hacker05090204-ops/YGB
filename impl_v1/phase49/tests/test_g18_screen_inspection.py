@@ -154,6 +154,7 @@ class TestPerformInspection:
         authorize_inspection(request.request_id)
         result = perform_inspection(request.request_id)
         assert isinstance(result, InspectionResult)
+        assert result.status == InspectionStatus.DENIED
     
     def test_result_has_voice_explanation_en(self):
         request = create_inspection_request("dev", "user", True, True)
@@ -183,6 +184,12 @@ class TestPerformInspection:
         perform_inspection(request.request_id)
         result = get_inspection_result(request.request_id)
         assert result is not None
+
+    def test_native_unavailable_marks_request_denied(self):
+        request = create_inspection_request("dev", "user", True, True)
+        authorize_inspection(request.request_id)
+        result = perform_inspection(request.request_id)
+        assert result.status == InspectionStatus.DENIED
 
 
 class TestCanInspectionInteract:

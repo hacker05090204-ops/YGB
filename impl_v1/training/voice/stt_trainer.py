@@ -31,6 +31,47 @@ from impl_v1.training.voice.stt_model import (
 logger = logging.getLogger(__name__)
 
 
+def _discover_manifest_path(explicit_path: str) -> str:
+    candidate = Path(explicit_path)
+    if explicit_path and candidate.exists():
+        return explicit_path
+
+    env_manifest = os.environ.get("YGB_STT_MANIFEST", "").strip()
+    if env_manifest and Path(env_manifest).exists():
+        return env_manifest
+
+    candidates = [
+        Path("data/stt_manifest.jsonl"),
+        Path("data/stt/stt_manifest.jsonl"),
+    ]
+
+    try:
+        from backend.storage.tiered_storage import get_storage_topology, resolve_path
+
+        dataset_root = resolve_path("dataset")
+        candidates.extend([
+            dataset_root / "stt_manifest.jsonl",
+            dataset_root / "stt" / "stt_manifest.jsonl",
+        ])
+        topology = get_storage_topology()
+        for root_key in ("active_root", "fallback_root", "primary_root"):
+            root = topology.get(root_key, "")
+            if root:
+                candidates.extend([
+                    Path(root) / "stt" / "stt_manifest.jsonl",
+                    Path(root) / "datasets" / "stt_manifest.jsonl",
+                ])
+    except Exception:
+        pass
+
+    for path in candidates:
+        if path.exists():
+            logger.info("[STT_TRAIN] Using discovered manifest: %s", path)
+            return str(path)
+
+    return explicit_path
+
+
 # =============================================================================
 # SPEECH DATASET
 # =============================================================================
@@ -78,15 +119,31 @@ class SpeechDataset(Dataset):
         # Load audio
         audio_path = sample["audio"]
         try:
-            if audio_path.endswith(".wav"):
-                import wave
-                with wave.open(audio_path, "rb") as wf:
-                    audio_data = wf.readframes(wf.getnframes())
-                    audio_np = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32)
+            audio_np = None
+            try:
+                import torchaudio
+
+                waveform, sample_rate = torchaudio.load(audio_path)
+                if waveform.dim() > 1 and waveform.size(0) > 1:
+                    waveform = waveform.mean(dim=0, keepdim=True)
+                if sample_rate != 16000:
+                    waveform = torchaudio.functional.resample(
+                        waveform, sample_rate, 16000
+                    )
+                audio_np = waveform.squeeze(0).cpu().numpy().astype(np.float32)
+            except Exception:
+                audio_np = None
+
+            if audio_np is None:
+                if audio_path.endswith(".wav"):
+                    import wave
+                    with wave.open(audio_path, "rb") as wf:
+                        audio_data = wf.readframes(wf.getnframes())
+                        audio_np = np.frombuffer(audio_data, dtype=np.int16).astype(np.float32)
+                        audio_np /= 32768.0
+                else:
+                    audio_np = np.fromfile(audio_path, dtype=np.int16).astype(np.float32)
                     audio_np /= 32768.0
-            else:
-                audio_np = np.fromfile(audio_path, dtype=np.int16).astype(np.float32)
-                audio_np /= 32768.0
         except Exception:
             audio_np = np.zeros(self.max_audio_len, dtype=np.float32)
 
@@ -372,9 +429,14 @@ def main():
     if args.resume:
         trainer.load_checkpoint()
 
-    train_ds = SpeechDataset(args.manifest)
+    manifest_path = _discover_manifest_path(args.manifest)
+    train_ds = SpeechDataset(manifest_path)
     if len(train_ds) == 0:
-        logger.error("[STT_TRAIN] No training data. Create a manifest file first.")
+        logger.error(
+            "[STT_TRAIN] No training data. Create a real manifest file first. "
+            "Checked: %s",
+            manifest_path,
+        )
         return
 
     train_loader = DataLoader(train_ds, batch_size=args.batch_size,

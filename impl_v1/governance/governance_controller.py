@@ -65,11 +65,15 @@ class OperationalGovernanceController:
         # 3. No override misuse
         has_misuse, issues = self.override_manager.check_for_misuse()
         checks["no_override_misuse"] = not has_misuse
-        
-        # 4. Incident automation ready
+
+        # 4. Override lane must be clear (no pending/active emergency override)
+        override_clear, override_reason = self.override_manager.governance_clearance()
+        checks["override_lane_clear"] = override_clear
+
+        # 5. Incident automation ready
         checks["incident_automation"] = True  # Always ready
-        
-        # 5. Governance active
+
+        # 6. Governance active
         checks["governance_active"] = True
         
         all_passed = all(checks.values())
@@ -79,6 +83,8 @@ class OperationalGovernanceController:
         else:
             failed = [k for k, v in checks.items() if not v]
             reason = f"FAILED: {', '.join(failed)}"
+            if not override_clear:
+                reason = f"{reason} ({override_reason})"
         
         status = GovernanceStatus(
             auto_mode_safe=all_passed,

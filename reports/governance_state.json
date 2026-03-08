@@ -5,8 +5,9 @@
     "registry_valid": true,
     "model_not_expired": true,
     "no_override_misuse": true,
+    "override_lane_clear": true,
     "incident_automation": true,
     "governance_active": true
   },
-  "timestamp": "2026-03-07T19:58:13.677378"
+  "timestamp": "2026-03-08T14:01:56.864812"
 }

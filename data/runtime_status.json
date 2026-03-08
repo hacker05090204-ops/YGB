@@ -1,0 +1,15 @@
+{
+  "containment_active": false,
+  "containment_reason": null,
+  "data_freshness": "idle",
+  "determinism_pass": true,
+  "drift_alert": false,
+  "freeze_reason": null,
+  "freeze_valid": true,
+  "gpu_utilization": 33.0,
+  "merge_status": null,
+  "precision_breach": false,
+  "training_velocity_batches_sec": null,
+  "training_velocity_samples_hr": null,
+  "updated_at": "2026-03-08T08:35:17.270501+00:00"
+}

@@ -209,10 +209,58 @@ class TestCVEPipeline:
         """Pipeline status should return structured summary."""
         status = self.pipeline.get_pipeline_status()
         assert "status" in status
+        assert status["fetch_strategy"] == "HOST_HTTP_PLUS_EDGE_CORROBORATION"
+        assert status["severity_authority"] == "NVD-first with Vulners/VulDB enrichment"
         assert "sources_total" in status
         assert "total_records" in status
         assert "slo" in status
         assert "sources" in status
+
+    def test_search_matches_id_and_keywords(self):
+        """Search should match CVE IDs and product keywords."""
+        self.pipeline.ingest_record(
+            cve_id="CVE-2024-1234",
+            title="OpenSSL issue",
+            description="TLS parsing bug in OpenSSL server path",
+            severity="HIGH",
+            cvss_score=7.5,
+            affected_products=["openssl"],
+            references=[],
+            is_exploited=False,
+            source_id="nvd",
+        )
+        results = self.pipeline.search("openssl")
+        assert len(results) == 1
+        assert results[0]["cve_id"] == "CVE-2024-1234"
+        assert results[0]["severity_source"] == "NVD API v2"
+
+    def test_nvd_severity_is_authoritative(self):
+        """NVD severity should override weaker source severity when they differ."""
+        self.pipeline.ingest_record(
+            cve_id="CVE-2024-5555",
+            title="Canonical record",
+            description="Canonical description",
+            severity="CRITICAL",
+            cvss_score=9.8,
+            affected_products=[],
+            references=[],
+            is_exploited=False,
+            source_id="cve_services",
+        )
+        record, result = self.pipeline.ingest_record(
+            cve_id="CVE-2024-5555",
+            title="NVD record",
+            description="NVD normalized description",
+            severity="HIGH",
+            cvss_score=8.1,
+            affected_products=[],
+            references=[],
+            is_exploited=False,
+            source_id="nvd",
+        )
+        assert result.name == "UPDATED"
+        assert record.severity == "HIGH"
+        assert record.severity_source == "NVD API v2"
 
     def test_merge_conflict_logging(self):
         """Merge conflicts should be logged."""
@@ -469,6 +517,8 @@ class TestHeadlessResearch:
         """Domain whitelist should work correctly."""
         assert self.engine.is_url_allowed("https://nvd.nist.gov/vuln/detail/CVE-2024-1234")
         assert self.engine.is_url_allowed("https://cve.org/CVERecord?id=CVE-2024-1234")
+        assert self.engine.is_url_allowed("https://vulners.com/cve/CVE-2024-1234")
+        assert self.engine.is_url_allowed("https://vuldb.com/?id.12345")
         assert not self.engine.is_url_allowed("https://evil.com/steal")
         assert not self.engine.is_url_allowed("http://nvd.nist.gov")  # HTTP blocked
         assert not self.engine.is_url_allowed("https://nvd.nist.gov/login")

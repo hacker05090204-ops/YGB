@@ -37,6 +37,7 @@ import time
 import logging
 import uuid
 import hashlib
+import numpy as np
 from datetime import datetime, timezone
 from dataclasses import dataclass
 from typing import Optional, Callable, List, Tuple
@@ -48,6 +49,7 @@ from backend.training.runtime_artifacts import (
     write_field_runtime_status,
     write_training_gate,
     write_training_telemetry,
+    write_runtime_state_snapshot,
 )
 
 # Import idle detection
@@ -228,6 +230,7 @@ class AutoTrainer:
         self._gpu_dataloader = None  # Real data DataLoader
         self._gpu_holdout_loader = None  # Holdout validation DataLoader
         self._gpu_dataset_stats = None  # Dataset statistics
+        self._governance_dataset_hash = ""
         self._last_loss = 0.0  # Last training loss
         self._last_accuracy = 0.0  # Last training accuracy
         self._last_holdout_accuracy = 0.0  # Last holdout (real) accuracy
@@ -347,6 +350,104 @@ class AutoTrainer:
         except Exception:
             return False
 
+    def _extract_governance_dataset_arrays(self, dataset) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        """Extract feature and label arrays from the active dataset, including Subset wrappers."""
+        if dataset is None:
+            return None, None
+
+        subset_indices = getattr(dataset, "indices", None)
+        underlying_dataset = getattr(dataset, "dataset", None)
+        if subset_indices is not None and underlying_dataset is not None:
+            base_features, base_labels = self._extract_governance_dataset_arrays(underlying_dataset)
+            if base_features is None or base_labels is None:
+                return None, None
+            index_array = np.asarray(list(subset_indices), dtype=np.int64)
+            return base_features[index_array], base_labels[index_array]
+
+        features_tensor = getattr(dataset, "_features_tensor", None)
+        labels_tensor = getattr(dataset, "_labels_tensor", None)
+        if features_tensor is None or labels_tensor is None:
+            return None, None
+
+        return (
+            features_tensor.detach().cpu().numpy(),
+            labels_tensor.detach().cpu().numpy(),
+        )
+
+    def _hash_governance_dataset(self, features: np.ndarray, labels: np.ndarray) -> str:
+        """Compute a stable hash of the governed training dataset."""
+        digest = hashlib.sha256()
+        digest.update(np.ascontiguousarray(features).tobytes())
+        digest.update(np.ascontiguousarray(labels).tobytes())
+        return digest.hexdigest()
+
+    def _run_governance_pre_training_gate(self) -> bool:
+        """Run the pre-training governance gate against the real DataLoader dataset."""
+        if self._gpu_dataloader is None:
+            logger.error("Governance pre-training gate failed: DataLoader not initialized")
+            return False
+
+        features, labels = self._extract_governance_dataset_arrays(self._gpu_dataloader.dataset)
+        if features is None or labels is None or features.size == 0 or labels.size == 0:
+            logger.error("Governance pre-training gate failed: dataset tensors unavailable")
+            return False
+
+        from impl_v1.training.data.governance_pipeline import pre_training_gate
+
+        n_classes = max(1, int(np.unique(labels).size))
+        source_id = self._source_id or "ingestion_pipeline"
+        result = pre_training_gate(
+            features,
+            labels,
+            n_classes=n_classes,
+            source_id=source_id,
+        )
+        self._governance_dataset_hash = self._hash_governance_dataset(features, labels)
+
+        if not result.passed:
+            failure_summary = "; ".join(result.failures[:3]) if result.failures else "unknown governance failure"
+            logger.error(f"Governance pre-training gate blocked training: {failure_summary}")
+            self._emit_event(
+                "GUARD_BLOCKED",
+                f"Governance pre-training gate failed: {failure_summary}",
+                epoch=self._epoch,
+                gpu_used=True,
+            )
+            return False
+
+        logger.info(
+            "Governance pre-training gate passed: %s/%s checks in %.0fms",
+            result.checks_passed,
+            result.checks_run,
+            result.duration_ms,
+        )
+        return True
+
+    def _run_governance_post_epoch_audit(
+        self,
+        *,
+        epoch: int,
+        accuracy: float,
+        holdout_accuracy: float,
+        loss: float,
+        train_accuracy: float,
+        total_samples: int,
+    ) -> None:
+        """Run the post-epoch governance audit on the real epoch outputs."""
+        from impl_v1.training.data.governance_pipeline import post_epoch_audit
+
+        result = post_epoch_audit(
+            epoch=epoch,
+            accuracy=accuracy,
+            holdout_accuracy=holdout_accuracy,
+            loss=loss,
+            train_accuracy=train_accuracy,
+            total_samples=total_samples,
+            dataset_hash=self._governance_dataset_hash,
+        )
+        for warning in result.warnings:
+            logger.warning(f"[GOVERNANCE] {warning}")
+
     def _persist_runtime_artifacts(
         self,
         *,
@@ -396,6 +497,41 @@ class AutoTrainer:
                     self._gpu_dataset_stats["train"]["total"]
                     if self._gpu_dataset_stats else None
                 ),
+            )
+            current_epoch = self._session_epoch if self._session_epoch > 0 else self._epoch
+            runtime_total_epochs = total_epochs if total_epochs > 0 else max(current_epoch, 0)
+            progress_pct = 0.0
+            if runtime_total_epochs > 0 and current_epoch > 0:
+                progress_pct = min((current_epoch / runtime_total_epochs) * 100.0, 100.0)
+            if self._last_loss > 0 and self._best_accuracy > 0 and self._last_accuracy >= self._best_accuracy:
+                loss_trend = "improving"
+            elif self._last_loss > 0:
+                loss_trend = "active"
+            else:
+                loss_trend = "idle"
+
+            write_runtime_state_snapshot(
+                mode=self._state.value,
+                total_epochs=runtime_total_epochs,
+                completed_epochs=current_epoch,
+                current_loss=float(self._last_loss),
+                best_loss=float(self._last_loss if self._best_accuracy <= 0 else self._last_loss),
+                precision=float(self._last_accuracy),
+                ece=0.0,
+                drift_kl=0.0,
+                duplicate_rate=0.0,
+                gpu_util=host_metrics.get("gpu_util"),
+                cpu_util=host_metrics.get("cpu_util"),
+                temperature=host_metrics.get("gpu_temperature"),
+                determinism_status=determinism_status,
+                freeze_status=promotion_frozen,
+                progress_pct=progress_pct,
+                loss_trend=loss_trend,
+                training_start_ms=(
+                    int(self._session_start_timestamp.timestamp() * 1000)
+                    if self._session_start_timestamp else 0
+                ),
+                total_errors=0,
             )
             write_field_runtime_status(
                 containment_active=promotion_frozen,
@@ -690,6 +826,9 @@ class AutoTrainer:
                 logger.info(f"Data source registered: {self._source_id}")
             except Exception as e:
                 logger.warning(f"Data source registry: {e}")
+
+            if not self._run_governance_pre_training_gate():
+                return False
             
             # === GOVERNANCE: Initialize curriculum + promotion ===
             try:
@@ -950,6 +1089,18 @@ class AutoTrainer:
                     logger.warning(f"Promotion eval: {e}")
             
             # Save checkpoint async (background thread — doesn't block GPU training)
+            try:
+                self._run_governance_post_epoch_audit(
+                    epoch=self._epoch,
+                    accuracy=accuracy,
+                    holdout_accuracy=holdout_accuracy,
+                    loss=avg_loss,
+                    train_accuracy=train_accuracy,
+                    total_samples=total_samples,
+                )
+            except Exception as e:
+                logger.warning(f"Post-epoch governance audit failed: {e}")
+
             if hasattr(self, '_checkpoint_path') and self._checkpoint_path:
                 try:
                     # Copy state dicts to CPU before submitting to background thread

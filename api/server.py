@@ -10,11 +10,31 @@ IT CANNOT EXECUTE BROWSER ACTIONS OR BYPASS GOVERNANCE.
 
 import os
 
-# Load .env FIRST — before any other imports read env vars
 from pathlib import Path as _Path
-_env_file = _Path(__file__).resolve().parent.parent / ".env"
-if _env_file.exists():
-    with open(_env_file) as _f:
+
+
+def _is_placeholder_env_value(key: str, value: str) -> bool:
+    upper = value.strip().upper()
+    if not upper:
+        return False
+    if upper.startswith("CHANGE_ME"):
+        return True
+    if key == "GITHUB_CLIENT_ID" and upper.startswith("CONNECTED_GITHUB_CLIENT_ID"):
+        return True
+    if key == "GITHUB_CLIENT_SECRET" and upper.startswith("CHANGE_ME_PROVIDE_REAL"):
+        return True
+    return False
+
+
+def _load_env_file(
+    path: _Path,
+    *,
+    allow_placeholders: bool = False,
+    allowed_keys: set[str] | None = None,
+) -> None:
+    if not path.exists():
+        return
+    with open(path) as _f:
         for _line in _f:
             _line = _line.strip()
             if not _line or _line.startswith("#"):
@@ -24,9 +44,66 @@ if _env_file.exists():
                 continue
             _key = _line[:_eq].strip()
             _val = _line[_eq + 1:].strip()
+            if allowed_keys is not None and _key not in allowed_keys:
+                continue
+            if not allow_placeholders and _is_placeholder_env_value(_key, _val):
+                continue
             # Don't override existing env vars (command-line takes precedence)
             if _key not in os.environ:
                 os.environ[_key] = _val
+
+
+def _shared_oauth_candidate_files() -> list[_Path]:
+    candidates: list[_Path] = []
+    explicit = os.getenv("YGB_SHARED_OAUTH_FILE", "").strip()
+    if explicit:
+        candidates.append(_Path(explicit).expanduser())
+
+    for root in (
+        os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"),
+    ):
+        if not root:
+            continue
+        base = _Path(root)
+        candidates.extend(
+            [
+                base / "secrets" / "github_oauth.env",
+                base / "config" / "github_oauth.env",
+            ]
+        )
+
+    deduped: list[_Path] = []
+    seen = set()
+    for candidate in candidates:
+        key = str(candidate)
+        if key not in seen:
+            deduped.append(candidate)
+            seen.add(key)
+    return deduped
+
+
+def _load_shared_github_oauth_env() -> None:
+    needed = {
+        "GITHUB_CLIENT_ID",
+        "GITHUB_CLIENT_SECRET",
+        "GITHUB_REDIRECT_URI",
+        "FRONTEND_URL",
+        "YGB_ALLOWED_ORIGINS",
+    }
+    if os.getenv("GITHUB_CLIENT_ID") and os.getenv("GITHUB_CLIENT_SECRET"):
+        return
+    for candidate in _shared_oauth_candidate_files():
+        _load_env_file(candidate, allow_placeholders=False, allowed_keys=needed)
+        if os.getenv("GITHUB_CLIENT_ID") and os.getenv("GITHUB_CLIENT_SECRET"):
+            break
+
+
+# Load env files FIRST — before any other imports read env vars.
+_ENV_ROOT = _Path(__file__).resolve().parent.parent
+_load_env_file(_ENV_ROOT / ".env", allow_placeholders=False)
+_load_env_file(_ENV_ROOT / ".env.connected", allow_placeholders=False)
+_load_shared_github_oauth_env()
 
 import sys
 import uuid
@@ -71,7 +148,8 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # Ensure HDD storage root points to the dedicated YGB_DATA partition (D:\)
 import platform as _plat
 if _plat.system() == "Windows":
-    os.environ["YGB_HDD_ROOT"] = "D:/ygb_hdd"
+    os.environ.setdefault("YGB_HDD_ROOT", "D:/ygb_hdd")
+    os.environ.setdefault("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback")
 
 # Import HDD storage bridge (replaces SQLite database module)
 from backend.storage.storage_bridge import (
@@ -115,6 +193,7 @@ except ImportError:
 
 # Import training state manager
 from backend.training.state_manager import get_training_state_manager
+from backend.training.runtime_artifacts import bootstrap_runtime_artifacts
 
 # Import auth and alerts
 from backend.auth.auth import (
@@ -237,6 +316,12 @@ async def lifespan(app):
     except Exception as e:
         print(f"[!] HDD Storage Engine init failed: {e}")
 
+    try:
+        bootstrap_runtime_artifacts()
+        logger.info("[BOOT] Runtime artifacts bootstrapped")
+    except Exception as e:
+        logger.warning("[BOOT] Runtime artifact bootstrap degraded: %s", e)
+
     # Start CVE scheduler (async — must be awaited)
     try:
         from backend.cve.cve_scheduler import get_scheduler
@@ -310,6 +395,14 @@ app = FastAPI(
 
 # CORS configuration for frontend — include FRONTEND_URL and LAN origins
 _CONFIGURED_FRONTEND_URL = os.getenv("FRONTEND_URL", "").rstrip("/")
+_PRIVATE_FRONTEND_ORIGIN_REGEX = (
+    r"^https?://(?:(?:localhost|127\.0\.0\.1)"
+    r"|(?:10(?:\.\d{1,3}){3})"
+    r"|(?:192\.168(?:\.\d{1,3}){2})"
+    r"|(?:172\.(?:1[6-9]|2\d|3[01])(?:\.\d{1,3}){2})"
+    r"|(?:100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])(?:\.\d{1,3}){2}))"
+    r":(?:3000|8000)$"
+)
 _cors_origins: list[str] = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
@@ -320,6 +413,7 @@ if _CONFIGURED_FRONTEND_URL and _CONFIGURED_FRONTEND_URL not in _cors_origins:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
+    allow_origin_regex=_PRIVATE_FRONTEND_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -827,13 +921,24 @@ async def search_cves(q: str = "", user=Depends(require_auth)):
         return {"results": [], "query": q, "reason": "Query must be at least 3 characters"}
     try:
         from backend.cve.cve_pipeline import get_pipeline
+
         pipeline = get_pipeline()
         results = pipeline.search(q)
-        return {"results": results[:50], "query": q, "total": len(results)}
+        research = None
+        if not results:
+            from backend.assistant.voice_runtime import run_research_analysis
+
+            research = run_research_analysis(
+                f"{q} CVE severity NVD Vulners VulDB latest advisory"
+            )
+        return {
+            "results": results[:50],
+            "query": q,
+            "total": len(results),
+            "research_corroboration": research,
+        }
     except ImportError:
         return {"results": [], "query": q, "reason": "CVE pipeline not available"}
-    except AttributeError:
-        return {"results": [], "query": q, "reason": "Search not implemented in pipeline"}
     except Exception:
         logger.exception("search_cves failed")
         return {"results": [], "query": q, "reason": "Internal error"}
@@ -2546,7 +2651,8 @@ _SAFE_HTTP_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "TRACE"})
 
 
 def _is_secure_request(req: Request) -> bool:
-    return req.url.scheme == "https" or _FRONTEND_URL.startswith("https://")
+    frontend_url = _env_oauth_value("FRONTEND_URL", "http://localhost:3000")
+    return req.url.scheme == "https" or frontend_url.startswith("https://")
 
 
 def _set_auth_cookies(resp: Response, req: Request, token: str) -> None:
@@ -2576,6 +2682,11 @@ def _set_auth_cookies(resp: Response, req: Request, token: str) -> None:
     resp.delete_cookie("ygb_profile", path="/")
 
 
+def _set_cookies(resp: Response, req: Request, token: str) -> None:
+    """Backward-compatible auth cookie helper name used by security tests."""
+    _set_auth_cookies(resp, req, token)
+
+
 def _clear_auth_cookies(resp: Response, req: Request) -> None:
     secure = _is_secure_request(req)
     for cookie_name in (
@@ -2594,19 +2705,39 @@ def _clear_auth_cookies(resp: Response, req: Request) -> None:
 
 
 def _allowed_cookie_origins() -> set[str]:
+    frontend_url = _env_oauth_value("FRONTEND_URL", "http://localhost:3000")
     origins = {
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
     }
-    if _FRONTEND_URL:
-        origins.add(_FRONTEND_URL.rstrip("/"))
+    if frontend_url:
+        origins.add(frontend_url.rstrip("/"))
     for value in os.getenv("YGB_ALLOWED_ORIGINS", "").split(","):
         value = value.strip().rstrip("/")
         if value:
             origins.add(value)
     return origins
+
+
+@app.get("/api/auth/providers")
+async def auth_provider_status():
+    """Public auth-provider status for the login page."""
+    cfg = _get_github_oauth_config()
+    return {
+        "password": {
+            "enabled": _ALLOW_PASSWORD_LOGIN,
+        },
+        "github": {
+            "enabled": not cfg["missing"],
+            "missing": cfg["missing"],
+            "redirect_uri": cfg["redirect_uri"],
+            "frontend_url": cfg["frontend_url"],
+            "shared_candidates": [str(path) for path in _shared_oauth_candidate_files()],
+        },
+        "checked_at": datetime.now(UTC).isoformat(),
+    }
 
 
 def _normalize_origin(origin: str) -> str:
@@ -2621,13 +2752,39 @@ def _normalize_origin(origin: str) -> str:
     return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
 
 
+def _is_allowed_private_origin(origin: str, *, allowed_ports: set[int]) -> bool:
+    normalized = _normalize_origin(origin)
+    if not normalized:
+        return False
+
+    try:
+        from urllib.parse import urlparse
+
+        parsed = urlparse(normalized)
+        host = parsed.hostname or ""
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        return (
+            parsed.scheme in {"http", "https"}
+            and port in allowed_ports
+            and _is_private_ip(host)
+        )
+    except Exception:
+        return False
+
+
 def _enforce_cookie_csrf(req: Request) -> None:
     if req.method.upper() in _SAFE_HTTP_METHODS:
         return
 
     origin = req.headers.get("origin") or _normalize_origin(req.headers.get("referer", ""))
     normalized_origin = _normalize_origin(origin)
-    if not normalized_origin or normalized_origin not in _allowed_cookie_origins():
+    if (
+        not normalized_origin
+        or (
+            normalized_origin not in _allowed_cookie_origins()
+            and not _is_allowed_private_origin(normalized_origin, allowed_ports={3000, 8000})
+        )
+    ):
         raise HTTPException(status_code=403, detail="Request origin not allowed")
 
     csrf_cookie = req.cookies.get(CSRF_COOKIE_NAME, "")
@@ -4330,15 +4487,57 @@ async def stop_hunt_mode(user=Depends(require_admin)):
 # GITHUB OAUTH LOGIN
 # =============================================================================
 
-_GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "")
-_GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
-_FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-_GITHUB_REDIRECT_URI = os.getenv(
-    "GITHUB_REDIRECT_URI",
-    "http://localhost:8000/auth/github/callback",
-)
-_OAUTH_STATE_TTL_SECONDS = int(os.getenv("OAUTH_STATE_TTL_SECONDS", "600"))
-_OAUTH_STATE_SECRET = os.getenv("YGB_HMAC_SECRET", "") or os.getenv("JWT_SECRET", "")
+def _env_oauth_value(key: str, default: str = "") -> str:
+    raw = os.getenv(key, default).strip()
+    if raw and _is_placeholder_env_value(key, raw):
+        return default
+    return raw
+
+
+def _get_oauth_state_ttl_seconds() -> int:
+    try:
+        return max(60, int(os.getenv("OAUTH_STATE_TTL_SECONDS", "600")))
+    except Exception:
+        return 600
+
+
+def _get_oauth_state_secret() -> str:
+    return os.getenv("YGB_HMAC_SECRET", "") or os.getenv("JWT_SECRET", "")
+
+
+def _get_github_oauth_config() -> Dict[str, Any]:
+    client_id = _env_oauth_value("GITHUB_CLIENT_ID", "")
+    client_secret = _env_oauth_value("GITHUB_CLIENT_SECRET", "")
+    frontend_url = _env_oauth_value("FRONTEND_URL", "http://localhost:3000")
+    redirect_uri = _env_oauth_value(
+        "GITHUB_REDIRECT_URI",
+        "http://localhost:8000/auth/github/callback",
+    )
+    missing = []
+    if not client_id:
+        missing.append("GITHUB_CLIENT_ID")
+    if not client_secret:
+        missing.append("GITHUB_CLIENT_SECRET")
+    return {
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "frontend_url": frontend_url.rstrip("/"),
+        "redirect_uri": redirect_uri,
+        "missing": missing,
+    }
+
+
+def _oauth_not_configured_detail() -> Dict[str, Any]:
+    cfg = _get_github_oauth_config()
+    return {
+        "error": "GITHUB_OAUTH_NOT_CONFIGURED",
+        "detail": "GitHub OAuth is not fully configured",
+        "missing": cfg["missing"],
+        "redirect_uri": cfg["redirect_uri"],
+        "frontend_url": cfg["frontend_url"],
+        "checked_files": [".env", ".env.connected"],
+        "shared_candidates": [str(path) for path in _shared_oauth_candidate_files()],
+    }
 
 # --- HTTP session pool for GitHub API (connection reuse / keep-alive) ---
 try:
@@ -4364,21 +4563,27 @@ def _b64url_decode(raw: str) -> str:
 
 
 def _oauth_state_sign(payload: str) -> str:
-    if not _OAUTH_STATE_SECRET:
+    secret = _get_oauth_state_secret()
+    if not secret:
         return ""
     return hmac.new(
-        _OAUTH_STATE_SECRET.encode("utf-8"),
+        secret.encode("utf-8"),
         payload.encode("utf-8"),
         hashlib.sha256,
     ).hexdigest()
 
 
 def _allowed_frontend_urls() -> set[str]:
+    cfg = _get_github_oauth_config()
     urls = {
-        _FRONTEND_URL.rstrip("/"),
+        cfg["frontend_url"],
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     }
+    for value in os.getenv("YGB_ALLOWED_ORIGINS", "").split(","):
+        value = value.strip().rstrip("/")
+        if value:
+            urls.add(value)
     return urls
 
 
@@ -4409,22 +4614,15 @@ def _is_private_ip(host: str) -> bool:
 
 def _resolve_frontend_url(candidate: str = "") -> str:
     """Resolve frontend URL — accept any private-network-based URL on port 3000."""
+    cfg = _get_github_oauth_config()
     val = (candidate or "").strip().rstrip("/")
     if not val:
-        return _FRONTEND_URL.rstrip("/")
+        return cfg["frontend_url"]
     if val in _allowed_frontend_urls():
         return val
-    # Accept any private/local IP on the expected frontend port
-    try:
-        from urllib.parse import urlparse
-        parsed = urlparse(val)
-        host = parsed.hostname or ""
-        port = parsed.port or 80
-        if port == 3000 and _is_private_ip(host):
-            return val
-    except Exception:
-        pass
-    return _FRONTEND_URL.rstrip("/")
+    if _is_allowed_private_origin(val, allowed_ports={3000}):
+        return val
+    return cfg["frontend_url"]
 
 
 def _build_oauth_state(frontend_url: str) -> str:
@@ -4449,7 +4647,7 @@ def _parse_oauth_state(state: str) -> tuple[bool, Optional[str]]:
 
         ts = int(parts[1])
         now = int(datetime.now(UTC).timestamp())
-        if now - ts > _OAUTH_STATE_TTL_SECONDS:
+        if now - ts > _get_oauth_state_ttl_seconds():
             return False, None
 
         frontend_url = _resolve_frontend_url(_b64url_decode(parts[3]))
@@ -4485,17 +4683,18 @@ def _resolve_or_create_github_user(
 @app.get("/auth/github")
 async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     """Redirect to GitHub OAuth authorization page."""
-    if not _GITHUB_CLIENT_ID:
+    cfg = _get_github_oauth_config()
+    if not cfg["client_id"]:
         raise HTTPException(
             status_code=501,
-            detail="GitHub OAuth not configured - set GITHUB_CLIENT_ID env var",
+            detail=_oauth_not_configured_detail(),
         )
 
     import urllib.parse
 
     # SECURITY: Use the configured callback URI — never derive from Host header
     # (Host header is attacker-controlled and can redirect OAuth codes off-site)
-    logger.info("[OAuth] Using configured callback: %s", _GITHUB_REDIRECT_URI)
+    logger.info("[OAuth] Using configured callback: %s", cfg["redirect_uri"])
 
     # Derive frontend URL from requester's IP
     if frontend_origin:
@@ -4508,8 +4707,8 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
 
     state = _build_oauth_state(frontend_url)
     params = urllib.parse.urlencode({
-        "client_id": _GITHUB_CLIENT_ID,
-        "redirect_uri": _GITHUB_REDIRECT_URI,
+        "client_id": cfg["client_id"],
+        "redirect_uri": cfg["redirect_uri"],
         "scope": "user:email",
         "state": state,
     })
@@ -4517,11 +4716,11 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
         url=f"https://github.com/login/oauth/authorize?{params}",
         status_code=302,
     )
-    _oauth_secure = req.url.scheme == "https" or _GITHUB_REDIRECT_URI.startswith("https://")
+    _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith("https://")
     resp.set_cookie(
         key="ygb_oauth_state",
         value=state,
-        max_age=_OAUTH_STATE_TTL_SECONDS,
+        max_age=_get_oauth_state_ttl_seconds(),
         httponly=True,
         samesite="lax",
         secure=_oauth_secure,
@@ -4532,8 +4731,9 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
 @app.get("/auth/github/callback")
 async def github_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
     """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
+    cfg = _get_github_oauth_config()
     parsed_ok, parsed_frontend = _parse_oauth_state(state) if state else (False, None)
-    frontend_url = parsed_frontend or _FRONTEND_URL
+    frontend_url = parsed_frontend or cfg["frontend_url"]
 
     if error:
         resp = RedirectResponse(
@@ -4570,10 +4770,10 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         resp.delete_cookie("ygb_oauth_state")
         return resp
 
-    if not _GITHUB_CLIENT_ID or not _GITHUB_CLIENT_SECRET:
+    if not cfg["client_id"] or not cfg["client_secret"]:
         raise HTTPException(
             status_code=501,
-            detail="GitHub OAuth not configured",
+            detail=_oauth_not_configured_detail(),
         )
 
     import urllib.parse
@@ -4594,10 +4794,10 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         # 1. Exchange code -> access token  (uses connection-pooled session)
         t0 = _time.monotonic()
         # Use the same configured redirect_uri that was sent in /auth/github
-        callback_redirect = _GITHUB_REDIRECT_URI
+        callback_redirect = cfg["redirect_uri"]
         token_payload = {
-            "client_id": _GITHUB_CLIENT_ID,
-            "client_secret": _GITHUB_CLIENT_SECRET,
+            "client_id": cfg["client_id"],
+            "client_secret": cfg["client_secret"],
             "code": code,
             "redirect_uri": callback_redirect,
         }

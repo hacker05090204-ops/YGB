@@ -88,18 +88,54 @@ if ($missing.Count -gt 0) {
 if ($LanShare) {
     $shareName = "SharedDrive"
     $shareExists = Get-SmbShare -Name $shareName -ErrorAction SilentlyContinue
-    if (-not $shareExists -and (Test-Path "D:\")) {
-        Write-Host "Creating D: drive share '$shareName' (LAN share enabled)..."
-        Start-Process powershell -Verb RunAs -Wait -ArgumentList @(
-            '-NoProfile', '-Command',
-            "New-SmbShare -Name '$shareName' -Path 'D:\' -ReadAccess '$env:USERNAME' -Description 'YGB NAS'; " +
-            "Set-NetConnectionProfile -InterfaceAlias (Get-NetConnectionProfile | Where-Object {`$_.NetworkCategory -eq 'Public'} | Select-Object -First 1 -ExpandProperty InterfaceAlias) -NetworkCategory Private -ErrorAction SilentlyContinue"
-        )
-        Write-Host "Share '$shareName' created with user-level access."
-    } elseif ($shareExists) {
-        Write-Host "Share '$shareName' already exists."
-    } else {
+    if (-not (Test-Path "D:\")) {
         Write-Host "D: drive not found - skipping share creation."
+    } else {
+        $needsRepair = $false
+        if ($shareExists) {
+            $shareAccess = @(Get-SmbShareAccess -Name $shareName -ErrorAction SilentlyContinue)
+            foreach ($entry in $shareAccess) {
+                if (
+                    $entry.AccountName -eq "Everyone" -or
+                    $entry.AccountName -eq "ANONYMOUS LOGON" -or
+                    $entry.AccountName -like "*Guests*" -or
+                    $entry.AccessRight -in @("Full", "Change")
+                ) {
+                    $needsRepair = $true
+                    break
+                }
+            }
+
+            if (-not ($shareAccess | Where-Object {
+                $_.AccountName -like "*$env:USERNAME" -and $_.AccessRight -eq "Read"
+            })) {
+                $needsRepair = $true
+            }
+        }
+
+        if (-not $shareExists) {
+            Write-Host "Creating D: drive share '$shareName' (LAN share enabled)..."
+        } elseif ($needsRepair) {
+            Write-Host "Repairing existing share '$shareName' to remove broad access..."
+        } else {
+            Write-Host "Share '$shareName' already exists with safe user-level access."
+        }
+
+        if ((-not $shareExists) -or $needsRepair) {
+            Start-Process powershell -Verb RunAs -Wait -ArgumentList @(
+                '-NoProfile', '-Command',
+                "if (-not (Get-SmbShare -Name '$shareName' -ErrorAction SilentlyContinue)) { " +
+                "New-SmbShare -Name '$shareName' -Path 'D:\' -ReadAccess '$env:USERNAME' -FolderEnumerationMode AccessBased -Description 'YGB NAS'; " +
+                "} " +
+                "Revoke-SmbShareAccess -Name '$shareName' -AccountName 'Everyone' -Force -ErrorAction SilentlyContinue; " +
+                "Revoke-SmbShareAccess -Name '$shareName' -AccountName 'ANONYMOUS LOGON' -Force -ErrorAction SilentlyContinue; " +
+                "Revoke-SmbShareAccess -Name '$shareName' -AccountName 'Guests' -Force -ErrorAction SilentlyContinue; " +
+                "Revoke-SmbShareAccess -Name '$shareName' -AccountName '$env:USERNAME' -Force -ErrorAction SilentlyContinue; " +
+                "Grant-SmbShareAccess -Name '$shareName' -AccountName '$env:USERNAME' -AccessRight Read -Force; " +
+                "Set-NetConnectionProfile -InterfaceAlias (Get-NetConnectionProfile | Where-Object {`$_.NetworkCategory -eq 'Public'} | Select-Object -First 1 -ExpandProperty InterfaceAlias) -NetworkCategory Private -ErrorAction SilentlyContinue"
+            )
+            Write-Host "Share '$shareName' is now limited to read-only access for $env:USERNAME."
+        }
     }
 } else {
     Write-Host "LAN share disabled (use -LanShare to enable)."

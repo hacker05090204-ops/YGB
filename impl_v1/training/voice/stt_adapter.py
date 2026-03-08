@@ -448,6 +448,11 @@ def get_stt_status() -> dict:
     local_model_loaded = bool(
         getattr(getattr(local_adapter, "_service", None), "_model_loaded", False)
     )
+    local_service_status = (
+        getattr(local_adapter, "_service", None).get_status()
+        if getattr(local_adapter, "_service", None) is not None
+        else {}
+    )
 
     return {
         "stt_status": "STT_READY" if local_status == "CLOSED" else "DEGRADED",
@@ -456,6 +461,7 @@ def get_stt_status() -> dict:
         "external_deps": [],  # No external deps in production
         "local_provider_status": local_status,
         "local_model_loaded": local_model_loaded,
+        "local_service": local_service_status,
         "browser_relay_available": browser_available,
         "provider_count": len(_chain._adapters),
         "provider_status": health.provider_status,

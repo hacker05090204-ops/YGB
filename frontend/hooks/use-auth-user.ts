@@ -3,12 +3,11 @@
 import { useCallback, useEffect, useState } from "react"
 
 import {
-import { getApiBase } from "@/lib/ygb-api"
-
   AUTH_STATE_EVENT,
   credentialedFetch,
   purgeLegacyAuthStorage,
 } from "@/lib/auth-token"
+import { getApiBase } from "@/lib/ygb-api"
 
 export interface AuthUser {
   userId: string | null

@@ -50,10 +50,18 @@ function isAbortError(error: unknown): boolean {
     return false
 }
 
+function getAuthUserId(authUser: ReturnType<typeof useAuthUser>): string {
+    return authUser.userId || ""
+}
+
+function getAuthUserName(authUser: ReturnType<typeof useAuthUser>): string {
+    return authUser.name || authUser.githubLogin || "user"
+}
+
 function ControlPageContent() {
     const authUser = useAuthUser()
-    const authUserId = authUser.userId || ""
-    const authUserName = authUser.name || authUser.githubLogin || "user"
+    const authUserId = getAuthUserId(authUser)
+    const authUserName = getAuthUserName(authUser)
 
     // Dashboard State
     const [dashboardId, setDashboardId] = useState<string | null>(null)

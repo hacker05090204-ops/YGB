@@ -1,0 +1,19 @@
+{
+  "devices": [
+    {
+      "device_id": "a74657ac26cb06b577c08015e48e4076a64c485662eceafbdf146a3268566026",
+      "hostname": "UNKNOWN-HUNTER",
+      "ip_address": "192.168.31.121",
+      "roles": [
+        "AUTHORITY",
+        "STORAGE",
+        "WORKER"
+      ],
+      "status": "online",
+      "trusted": true
+    }
+  ],
+  "mode": "single_node_local",
+  "schema_version": 1,
+  "updated_at": "2026-03-08T08:31:56.826701+00:00"
+}

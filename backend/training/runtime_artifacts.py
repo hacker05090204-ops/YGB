@@ -40,6 +40,7 @@ PAIRING_LOG_PATH = os.path.join(REPORTS_DIR, "pairing_log.json")
 CLUSTER_HEALTH_PATH = os.path.join(REPORTS_DIR, "cluster_health.json")
 TRAINING_GATE_PATH = os.path.join(REPORTS_DIR, "training_gate.json")
 TRAINING_TELEMETRY_PATH = os.path.join(REPORTS_DIR, "training_telemetry.json")
+RUNTIME_STATE_PATH = os.path.join(REPORTS_DIR, "runtime_state.json")
 FIELD_RUNTIME_STATUS_PATH = os.path.join(DATA_DIR, "runtime_status.json")
 
 
@@ -72,6 +73,10 @@ def _ensure_json(path: str, payload: Dict[str, Any], *, overwrite: bool) -> Dict
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _now_ms() -> int:
+    return int(time.time() * 1000)
 
 
 def _detect_local_ip() -> Optional[str]:
@@ -220,6 +225,19 @@ def probe_host_metrics() -> Dict[str, Optional[float]]:
     }
 
 
+def probe_determinism_configuration() -> bool:
+    """
+    Detect whether the runtime is configured for deterministic training mode.
+
+    This is a configuration/status probe, not a claim that a full deterministic
+    training proof has already been completed.
+    """
+    profile = os.environ.get("YGB_TRAINING_PROFILE", "deterministic").strip().lower()
+    if profile == "fast":
+        return False
+    return os.environ.get("YGB_DETERMINISTIC_MODE", "true").strip().lower() != "false"
+
+
 def write_training_gate(
     *,
     determinism_status: bool,
@@ -310,6 +328,55 @@ def write_training_telemetry(
     return payload
 
 
+def write_runtime_state_snapshot(
+    *,
+    mode: str,
+    total_epochs: int,
+    completed_epochs: int,
+    current_loss: float,
+    best_loss: float,
+    precision: float,
+    ece: float,
+    drift_kl: float,
+    duplicate_rate: float,
+    gpu_util: Optional[float],
+    cpu_util: Optional[float],
+    temperature: Optional[float],
+    determinism_status: bool,
+    freeze_status: bool,
+    progress_pct: float,
+    loss_trend: str,
+    training_start_ms: int,
+    total_errors: int,
+) -> Dict[str, Any]:
+    payload = {
+        "version": 1,
+        "mode": str(mode or "IDLE").upper(),
+        "total_epochs": int(total_epochs),
+        "completed_epochs": int(completed_epochs),
+        "current_loss": round(float(current_loss), 8),
+        "best_loss": round(float(best_loss), 8),
+        "precision": round(float(precision), 8),
+        "rolling_precision": round(float(precision), 8),
+        "ece": round(float(ece), 8),
+        "kl_baseline_ema": round(float(drift_kl), 8),
+        "drift_kl": round(float(drift_kl), 8),
+        "duplicate_rate": round(float(duplicate_rate), 8),
+        "gpu_util": round(float(gpu_util), 4) if gpu_util is not None else 0.0,
+        "cpu_util": round(float(cpu_util), 4) if cpu_util is not None else 0.0,
+        "temperature": round(float(temperature), 4) if temperature is not None else 0.0,
+        "determinism_status": bool(determinism_status),
+        "freeze_status": bool(freeze_status),
+        "progress_pct": round(float(progress_pct), 4),
+        "loss_trend": str(loss_trend or "idle"),
+        "last_update_ms": _now_ms(),
+        "training_start_ms": int(training_start_ms),
+        "total_errors": int(total_errors),
+    }
+    _atomic_write_json(RUNTIME_STATE_PATH, payload)
+    return payload
+
+
 def write_field_runtime_status(
     *,
     containment_active: bool,
@@ -342,3 +409,91 @@ def write_field_runtime_status(
     }
     _atomic_write_json(FIELD_RUNTIME_STATUS_PATH, payload)
     return payload
+
+
+def bootstrap_runtime_artifacts(*, force_refresh: bool = False) -> Dict[str, Any]:
+    """
+    Materialize truthful local runtime artifacts for idle/server-startup mode.
+
+    This creates a real single-node bootstrap plus an idle runtime baseline so
+    health/status APIs do not start with missing files.
+    """
+    host_metrics = probe_host_metrics()
+    determinism_status = probe_determinism_configuration()
+
+    bootstrap = ensure_local_mode_a_bootstrap()
+    gate = _read_json(TRAINING_GATE_PATH)
+    if gate is None or force_refresh:
+        gate = write_training_gate(
+            determinism_status=determinism_status,
+            freeze_status=False,
+            gpu_temperature=host_metrics.get("gpu_temperature"),
+        )
+
+    runtime_state = _read_json(RUNTIME_STATE_PATH)
+    if runtime_state is None or force_refresh:
+        runtime_state = write_runtime_state_snapshot(
+            mode="IDLE",
+            total_epochs=0,
+            completed_epochs=0,
+            current_loss=0.0,
+            best_loss=0.0,
+            precision=0.0,
+            ece=0.0,
+            drift_kl=0.0,
+            duplicate_rate=0.0,
+            gpu_util=host_metrics.get("gpu_util"),
+            cpu_util=host_metrics.get("cpu_util"),
+            temperature=host_metrics.get("gpu_temperature"),
+            determinism_status=determinism_status,
+            freeze_status=False,
+            progress_pct=0.0,
+            loss_trend="idle",
+            training_start_ms=0,
+            total_errors=0,
+        )
+
+    field_runtime = _read_json(FIELD_RUNTIME_STATUS_PATH)
+    if field_runtime is None or force_refresh:
+        field_runtime = write_field_runtime_status(
+            containment_active=False,
+            containment_reason=None,
+            precision_breach=False,
+            drift_alert=False,
+            freeze_valid=True,
+            freeze_reason=None,
+            training_velocity_samples_hr=None,
+            training_velocity_batches_sec=None,
+            gpu_utilization=host_metrics.get("gpu_util"),
+            determinism_pass=determinism_status,
+            data_freshness="idle",
+            merge_status=None,
+        )
+
+    telemetry = _read_json(TRAINING_TELEMETRY_PATH)
+    if telemetry is None or force_refresh:
+        telemetry = write_training_telemetry(
+            epoch=0,
+            batch_size=0,
+            loss=0.0,
+            precision=0.0,
+            total_epochs=0,
+            training_duration_seconds=0.0,
+            samples_per_second=0.0,
+            determinism_status=determinism_status,
+            freeze_status=False,
+            gpu_temperature=host_metrics.get("gpu_temperature"),
+            cpu_util=host_metrics.get("cpu_util"),
+            gpu_util=host_metrics.get("gpu_util"),
+            wall_clock_unix=int(time.time()),
+            monotonic_start_time=int(time.monotonic()),
+            dataset_size=0,
+        )
+
+    return {
+        "bootstrap": bootstrap,
+        "training_gate": gate,
+        "runtime_state": runtime_state,
+        "training_telemetry": telemetry,
+        "field_runtime_status": field_runtime,
+    }

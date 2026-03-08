@@ -25,9 +25,12 @@ EXTRACTION_VERSION = "1.0.0"
 ALLOWED_DOMAINS = frozenset([
     "nvd.nist.gov", "services.nvd.nist.gov",
     "cve.org", "www.cve.org", "cveawg.mitre.org",
+    "cisa.gov", "www.cisa.gov",
     "owasp.org", "www.owasp.org", "cheatsheetseries.owasp.org",
     "cwe.mitre.org", "capec.mitre.org",
     "www.cvedetails.com", "cvedetails.com",
+    "vulners.com", "www.vulners.com",
+    "vuldb.com", "www.vuldb.com",
     "portswigger.net", "www.portswigger.net",
     "blog.cloudflare.com", "security.googleblog.com",
     "msrc.microsoft.com",

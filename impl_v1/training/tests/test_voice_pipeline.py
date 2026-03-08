@@ -96,6 +96,8 @@ class TestSTTAdapterChain:
         status = get_stt_status()
         assert "active_provider" in status
         assert "provider_status" in status
+        assert "local_service" in status
+        assert "candidate_checkpoints" in status["local_service"] or status["local_service"] == {}
 
     def test_active_provider_falls_back(self):
         """When primary circuits are all open, active_provider still returns something."""

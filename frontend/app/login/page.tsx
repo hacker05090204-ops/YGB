@@ -10,11 +10,53 @@ import {
 } from "@/lib/auth-token"
 import { getApiBase } from "@/lib/ygb-api"
 
+interface AuthProviderSnapshot {
+  password: {
+    enabled: boolean
+  }
+  github: {
+    enabled: boolean
+    missing: string[]
+    redirect_uri: string | null
+    frontend_url: string | null
+    shared_candidates: string[]
+  }
+  checked_at: string
+}
+
 function LoginContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
   const [message, setMessage] = useState("")
+  const [authProviders, setAuthProviders] = useState<AuthProviderSnapshot | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadAuthProviders = async () => {
+      try {
+        const res = await credentialedFetch(`${getApiBase()}/api/auth/providers`)
+        if (!res.ok) {
+          return
+        }
+        const data = (await res.json()) as AuthProviderSnapshot
+        if (!cancelled) {
+          setAuthProviders(data)
+        }
+      } catch {
+        if (!cancelled) {
+          setAuthProviders(null)
+        }
+      }
+    }
+
+    void loadAuthProviders()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -43,7 +85,9 @@ function LoginContent() {
         setMessage(errorMessages[error] || `Authentication error: ${error}`)
       })
       return () => {
-        if (redirectTimer) clearTimeout(redirectTimer)
+        if (redirectTimer) {
+          clearTimeout(redirectTimer)
+        }
       }
     }
 
@@ -81,14 +125,30 @@ function LoginContent() {
 
     return () => {
       cancelled = true
-      if (redirectTimer) clearTimeout(redirectTimer)
+      if (redirectTimer) {
+        clearTimeout(redirectTimer)
+      }
     }
   }, [router, searchParams])
 
   const handleGitHubLogin = () => {
+    if (authProviders && !authProviders.github.enabled) {
+      const missing = authProviders.github.missing.join(", ")
+      setStatus("error")
+      setMessage(
+        missing
+          ? `GitHub sign-in is not ready on this server yet. Missing: ${missing}`
+          : "GitHub sign-in is not ready on this server yet."
+      )
+      return
+    }
     const origin = encodeURIComponent(window.location.origin)
     window.location.href = `${getApiBase()}/auth/github?frontend_origin=${origin}`
   }
+
+  const passwordEnabled = authProviders?.password.enabled ?? true
+  const githubEnabled = authProviders?.github.enabled ?? true
+  const githubMissing = authProviders?.github.missing ?? []
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
@@ -164,7 +224,8 @@ function LoginContent() {
               <p className="text-sm text-red-400/80 mb-6">{message}</p>
               <button
                 onClick={handleGitHubLogin}
-                className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer"
+                disabled={!githubEnabled}
+                className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Try Again
               </button>
@@ -178,85 +239,91 @@ function LoginContent() {
                 Choose your authentication method
               </p>
 
-              <form
-                id="login-form"
-                onSubmit={async (e) => {
-                  e.preventDefault()
-                  const formData = new FormData(e.currentTarget)
-                  const email = String(formData.get("email") || "")
-                  const password = String(formData.get("password") || "")
+              {passwordEnabled ? (
+                <form
+                  id="login-form"
+                  onSubmit={async (e) => {
+                    e.preventDefault()
+                    const formData = new FormData(e.currentTarget)
+                    const email = String(formData.get("email") || "")
+                    const password = String(formData.get("password") || "")
 
-                  if (!email || !password) {
-                    setStatus("error")
-                    setMessage("Please enter both email and password")
-                    return
-                  }
-
-                  try {
-                    const res = await credentialedFetch(`${getApiBase()}/auth/login`, {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ email, password }),
-                    })
-                    const data = await res.json()
-
-                    if (!res.ok) {
+                    if (!email || !password) {
                       setStatus("error")
-                      setMessage(data.detail?.detail || data.detail || "Login failed")
+                      setMessage("Please enter both email and password")
                       return
                     }
 
-                    notifyAuthStateChanged()
-                    setStatus("success")
-                    setMessage(`Welcome, ${data.user?.name || email}!`)
-                    setTimeout(() => router.push("/control"), 1500)
-                  } catch {
-                    setStatus("error")
-                    setMessage("Network error - is the backend running?")
-                  }
-                }}
-                className="space-y-4"
-              >
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-xs font-medium text-gray-400 mb-1.5"
-                  >
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-xs font-medium text-gray-400 mb-1.5"
-                  >
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  id="password-login-button"
-                  className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+                    try {
+                      const res = await credentialedFetch(`${getApiBase()}/auth/login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password }),
+                      })
+                      const data = await res.json()
+
+                      if (!res.ok) {
+                        setStatus("error")
+                        setMessage(data.detail?.detail || data.detail || "Login failed")
+                        return
+                      }
+
+                      notifyAuthStateChanged()
+                      setStatus("success")
+                      setMessage(`Welcome, ${data.user?.name || email}!`)
+                      setTimeout(() => router.push("/control"), 1500)
+                    } catch {
+                      setStatus("error")
+                      setMessage("Network error - is the backend running?")
+                    }
+                  }}
+                  className="space-y-4"
                 >
-                  Sign In
-                </button>
-              </form>
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-xs font-medium text-gray-400 mb-1.5"
+                    >
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      placeholder="you@example.com"
+                      className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className="block text-xs font-medium text-gray-400 mb-1.5"
+                    >
+                      Password
+                    </label>
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      placeholder="********"
+                      className="w-full px-4 py-3 bg-[#0e0e18] border border-gray-700/60 rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-all"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    id="password-login-button"
+                    className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+                  >
+                    Sign In
+                  </button>
+                </form>
+              ) : (
+                <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                  Password login is disabled on this server. Use a configured external provider.
+                </div>
+              )}
 
               <div className="flex items-center gap-3 my-6">
                 <div className="flex-1 h-px bg-gray-800/60" />
@@ -267,7 +334,8 @@ function LoginContent() {
               <button
                 onClick={handleGitHubLogin}
                 id="github-login-button"
-                className="group w-full py-3.5 px-4 bg-[#1a1a2e] hover:bg-[#22223a] border border-gray-700/60 hover:border-gray-600 text-white rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer hover:shadow-lg hover:shadow-purple-500/5"
+                disabled={!githubEnabled}
+                className="group w-full py-3.5 px-4 bg-[#1a1a2e] hover:bg-[#22223a] border border-gray-700/60 hover:border-gray-600 text-white rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer hover:shadow-lg hover:shadow-purple-500/5 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <svg
                   className="w-5 h-5 text-gray-300 group-hover:text-white transition-colors"
@@ -278,6 +346,12 @@ function LoginContent() {
                 </svg>
                 Continue with GitHub
               </button>
+              {!githubEnabled && githubMissing.length > 0 && (
+                <p className="mt-3 text-xs text-amber-300 text-center">
+                  GitHub sign-in is waiting on server-side OAuth config:{" "}
+                  {githubMissing.join(", ")}
+                </p>
+              )}
 
               <div className="mt-6 pt-6 border-t border-gray-800/60">
                 <p className="text-xs text-gray-600 text-center leading-relaxed">
