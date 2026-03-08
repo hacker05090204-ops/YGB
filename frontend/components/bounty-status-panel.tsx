@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { authFetch } from '@/lib/ygb-api';
+import { authFetch , getApiBase } from '@/lib/ygb-api';
 import { createAuthWebSocket } from '@/lib/ws-auth';
 
 /**
@@ -133,7 +133,7 @@ export default function BountyStatusPanel() {
         const fetchDataSource = async () => {
             try {
                 const res = await authFetch(
-                    (process.env.NEXT_PUBLIC_YGB_API_URL || 'http://localhost:8000') + '/api/training/data-source'
+                    getApiBase() + '/api/training/data-source'
                 );
                 if (res.ok) setDataSource(await res.json());
             } catch { /* backend offline */ }

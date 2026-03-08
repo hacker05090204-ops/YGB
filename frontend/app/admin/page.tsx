@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation"
 import { Shield, Lock, AlertTriangle, Eye, EyeOff } from "lucide-react"
 
 import {
+import { getApiBase } from "@/lib/ygb-api"
+
     credentialedFetch,
     notifyAuthStateChanged,
     purgeLegacyAuthStorage,
 } from "@/lib/auth-token"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 export default function AdminLogin() {
     const router = useRouter()
@@ -27,7 +27,7 @@ export default function AdminLogin() {
     // Check existing session
     useEffect(() => {
         purgeLegacyAuthStorage()
-        credentialedFetch(`${API_BASE}/admin/verify`)
+        credentialedFetch(`${getApiBase()}/admin/verify`)
             .then(async (r) => {
                 if (!r.ok) return null
                 return r.json()
@@ -59,7 +59,7 @@ export default function AdminLogin() {
         setError("")
 
         try {
-            const res = await credentialedFetch(`${API_BASE}/admin/login`, {
+            const res = await credentialedFetch(`${getApiBase()}/admin/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, totp_code: totpCode }),
@@ -71,7 +71,7 @@ export default function AdminLogin() {
                 // Unlock vault with password (server-side key derivation)
                 if (vaultPassword) {
                     try {
-                        await credentialedFetch(`${API_BASE}/admin/vault-unlock`, {
+                        await credentialedFetch(`${getApiBase()}/admin/vault-unlock`, {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({ vault_password: vaultPassword }),

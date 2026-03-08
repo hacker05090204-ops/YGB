@@ -14,14 +14,18 @@ Rules:
 """
 
 import hashlib
+import json
 import logging
 import os
 import subprocess
 import uuid
+from pathlib import Path
 from dataclasses import dataclass
 from datetime import datetime, UTC
 from enum import Enum
 from typing import Optional, Dict
+
+from impl_v1.phase49.runtime.secure_subprocess import safe_popen
 
 logger = logging.getLogger(__name__)
 
@@ -68,16 +72,10 @@ class StatusQueryExecutor:
         output = ""
 
         try:
-            if query_type in ("QUERY_STATUS", "STATUS_QUERY"):
-                output = "System operational. API online."
-            elif query_type in ("QUERY_GPU", "LIST_DEVICES"):
-                output = "GPU status: check /gpu/status endpoint for real metrics."
-            elif query_type in ("QUERY_TRAINING", "TRAINING_STATUS"):
-                output = "Training status: check /training/status endpoint."
-            elif query_type == "QUERY_PROGRESS":
-                output = "Progress: check dashboard for real-time metrics."
-            else:
-                output = f"Status query completed for: {query_type}"
+            from backend.assistant.voice_runtime import collect_status_snapshot
+
+            payload = collect_status_snapshot(query_type)
+            output = json.dumps(payload, indent=2, sort_keys=True, default=str)
 
             elapsed = (time.time() - start) * 1000
             return ExecutorResult(
@@ -112,6 +110,9 @@ ALLOWED_APPS = {
     "notepad.exe": "notepad.exe",
     "code": "code",
     "code.exe": "code",
+    "edge": "msedge.exe",
+    "msedge": "msedge.exe",
+    "msedge.exe": "msedge.exe",
     "chrome": "chrome",
     "chrome.exe": "chrome",
     "firefox": "firefox",
@@ -132,8 +133,14 @@ ALLOWED_APPS = {
 class AppRunnerExecutor:
     """Launch, focus, or close allowlisted applications only."""
 
-    def execute(self, intent_id: str, action: str,
-                app_name: str) -> ExecutorResult:
+    def execute(
+        self,
+        intent_id: str,
+        action: str,
+        app_name: str,
+        *,
+        launch_command: Optional[list[str]] = None,
+    ) -> ExecutorResult:
         import time
         start = time.time()
         app_lower = app_name.lower().strip()
@@ -149,15 +156,32 @@ class AppRunnerExecutor:
                 timestamp=datetime.now(UTC).isoformat(),
             )
 
-        exe = ALLOWED_APPS[app_lower]
+        command = list(launch_command or [])
+        if not command:
+            try:
+                from backend.governance.host_action_governor import HostActionGovernor
+
+                resolved = HostActionGovernor.resolve_app_command(app_lower)
+            except Exception:
+                resolved = None
+            if not resolved:
+                return ExecutorResult(
+                    result_id=f"EXR-{uuid.uuid4().hex[:12].upper()}",
+                    intent_id=intent_id,
+                    executor="AppRunnerExecutor",
+                    status=ExecStatus.BLOCKED,
+                    output=f"BLOCKED: no trusted launch command for '{app_name}'",
+                    audit_hash=_make_audit_hash(intent_id, "AppRunner", "BLOCKED"),
+                    timestamp=datetime.now(UTC).isoformat(),
+                )
+            command = resolved
+        exe = Path(command[0]).name
         try:
             if action in ("launch", "open"):
-                # Non-blocking launch
-                subprocess.Popen(
-                    [exe],
+                safe_popen(
+                    command,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
-                    creationflags=getattr(subprocess, 'DETACHED_PROCESS', 0),
                 )
                 output = f"Launched {exe}"
             elif action == "close":
@@ -189,6 +213,89 @@ class AppRunnerExecutor:
                 status=ExecStatus.FAILED,
                 output=f"FAILED: {str(e)}",
                 audit_hash=_make_audit_hash(intent_id, "AppRunner", str(e)),
+                timestamp=datetime.now(UTC).isoformat(),
+            )
+
+
+# =============================================================================
+# APPROVED TASK EXECUTOR
+# =============================================================================
+
+class ApprovedTaskExecutor:
+    """Launch allowlisted project tasks through the hardened subprocess wrapper."""
+
+    def execute(
+        self,
+        intent_id: str,
+        task_name: str,
+        *,
+        command: Optional[list[str]] = None,
+        workdir: Optional[str] = None,
+    ) -> ExecutorResult:
+        import time
+        start = time.time()
+
+        task_lower = task_name.lower().strip()
+        if not task_lower:
+            return ExecutorResult(
+                result_id=f"EXR-{uuid.uuid4().hex[:12].upper()}",
+                intent_id=intent_id,
+                executor="ApprovedTaskExecutor",
+                status=ExecStatus.BLOCKED,
+                output="BLOCKED: task name required",
+                audit_hash=_make_audit_hash(intent_id, "ApprovedTask", "BLOCKED"),
+                timestamp=datetime.now(UTC).isoformat(),
+            )
+
+        task_command = list(command or [])
+        task_workdir = workdir
+        if not task_command:
+            try:
+                from backend.governance.host_action_governor import HostActionGovernor
+
+                task_meta = HostActionGovernor.resolve_task_command(task_lower)
+            except Exception:
+                task_meta = None
+            if not task_meta:
+                return ExecutorResult(
+                    result_id=f"EXR-{uuid.uuid4().hex[:12].upper()}",
+                    intent_id=intent_id,
+                    executor="ApprovedTaskExecutor",
+                    status=ExecStatus.BLOCKED,
+                    output=f"BLOCKED: task '{task_name}' not approved",
+                    audit_hash=_make_audit_hash(intent_id, "ApprovedTask", "BLOCKED"),
+                    timestamp=datetime.now(UTC).isoformat(),
+                )
+            task_command = list(task_meta["command"])
+            task_workdir = str(task_meta.get("cwd") or "")
+
+        try:
+            safe_popen(
+                task_command,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                cwd=task_workdir or None,
+            )
+            output = f"Launched task {task_lower}"
+            elapsed = (time.time() - start) * 1000
+            return ExecutorResult(
+                result_id=f"EXR-{uuid.uuid4().hex[:12].upper()}",
+                intent_id=intent_id,
+                executor="ApprovedTaskExecutor",
+                status=ExecStatus.SUCCESS,
+                output=output,
+                audit_hash=_make_audit_hash(intent_id, "ApprovedTask", output),
+                timestamp=datetime.now(UTC).isoformat(),
+                execution_ms=elapsed,
+            )
+        except Exception as e:
+            return ExecutorResult(
+                result_id=f"EXR-{uuid.uuid4().hex[:12].upper()}",
+                intent_id=intent_id,
+                executor="ApprovedTaskExecutor",
+                status=ExecStatus.FAILED,
+                output=f"FAILED: {str(e)}",
+                audit_hash=_make_audit_hash(intent_id, "ApprovedTask", str(e)),
                 timestamp=datetime.now(UTC).isoformat(),
             )
 
@@ -252,13 +359,19 @@ ALLOWED_BROWSE_DOMAINS = {
 class BrowserExecutor:
     """Controlled URL navigation — allowlisted domains only."""
 
-    def execute(self, intent_id: str, url: str) -> ExecutorResult:
+    def execute(
+        self,
+        intent_id: str,
+        url: str,
+        *,
+        launch_command: Optional[list[str]] = None,
+    ) -> ExecutorResult:
         from urllib.parse import urlparse
         import time
         start = time.time()
 
         domain = urlparse(url).netloc.lower()
-        if domain not in ALLOWED_BROWSE_DOMAINS:
+        if launch_command is None and domain not in ALLOWED_BROWSE_DOMAINS:
             return ExecutorResult(
                 result_id=f"EXR-{uuid.uuid4().hex[:12].upper()}",
                 intent_id=intent_id,
@@ -270,8 +383,22 @@ class BrowserExecutor:
             )
 
         try:
-            import webbrowser
-            webbrowser.open(url, new=2)
+            command = list(launch_command or [])
+            if not command:
+                try:
+                    from backend.governance.host_action_governor import HostActionGovernor
+
+                    resolved = HostActionGovernor.resolve_app_command("msedge")
+                except Exception:
+                    resolved = None
+                if not resolved:
+                    raise ValueError("Trusted browser command not available")
+                command = resolved + [url]
+            safe_popen(
+                command,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
             elapsed = (time.time() - start) * 1000
             return ExecutorResult(
                 result_id=f"EXR-{uuid.uuid4().hex[:12].upper()}",

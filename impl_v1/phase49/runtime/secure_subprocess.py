@@ -268,6 +268,7 @@ def safe_popen(
     *,
     stdout=subprocess.DEVNULL,
     stderr=subprocess.DEVNULL,
+    cwd: Optional[str] = None,
 ) -> subprocess.Popen:
     """
     Launch a long-running process securely.
@@ -296,6 +297,7 @@ def safe_popen(
         stderr=stderr,
         shell=False,
         env=clean_env,
+        cwd=cwd,
     )
 
 

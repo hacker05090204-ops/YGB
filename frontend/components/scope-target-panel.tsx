@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import { cn } from "@/lib/utils"
 import {
     Target,
@@ -16,8 +16,6 @@ import {
     Clock,
     Activity
 } from "lucide-react"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface ScopeViolation {
     rule: string
@@ -59,7 +57,7 @@ export function ScopeTargetPanel({ className }: ScopeTargetPanelProps) {
     // Poll target status every 2s
     const fetchStatus = useCallback(async () => {
         try {
-            const res = await authFetch(`${API_BASE}/target/status`)
+            const res = await authFetch(`${getApiBase()}/target/status`)
             if (res.ok) {
                 const data = await res.json()
                 setActiveSessions(data.active_sessions || [])
@@ -98,7 +96,7 @@ export function ScopeTargetPanel({ className }: ScopeTargetPanelProps) {
                 }
             }
 
-            const res = await authFetch(`${API_BASE}/scope/validate`, {
+            const res = await authFetch(`${getApiBase()}/scope/validate`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ target_url: targetUrl, scope_definition: scopeDef })
@@ -135,7 +133,7 @@ export function ScopeTargetPanel({ className }: ScopeTargetPanelProps) {
                 try { scopeDef = JSON.parse(scopeJson) } catch { /* ignore */ }
             }
 
-            const res = await authFetch(`${API_BASE}/target/start`, {
+            const res = await authFetch(`${getApiBase()}/target/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -162,7 +160,7 @@ export function ScopeTargetPanel({ className }: ScopeTargetPanelProps) {
     const handleStopSession = async (sessionId: string) => {
         setIsStopping(true)
         try {
-            await authFetch(`${API_BASE}/target/stop`, {
+            await authFetch(`${getApiBase()}/target/stop`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ session_id: sessionId })

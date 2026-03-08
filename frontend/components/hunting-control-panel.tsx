@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import { cn } from "@/lib/utils"
 import {
     Target,
@@ -25,8 +25,6 @@ import {
     ChevronDown,
     ChevronUp,
 } from "lucide-react"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 // =========================================================================
 // TYPES
@@ -129,7 +127,7 @@ export function HuntingControlPanel({ className }: HuntingControlPanelProps) {
     const fetchTargets = useCallback(async () => {
         setLoading(true)
         try {
-            const res = await authFetch(`${API_BASE}/api/hunting/targets`)
+            const res = await authFetch(`${getApiBase()}/api/hunting/targets`)
             if (res.ok) {
                 const data = await res.json()
                 setTargets(data.targets || [])
@@ -143,7 +141,7 @@ export function HuntingControlPanel({ className }: HuntingControlPanelProps) {
 
     const fetchAutoModeState = useCallback(async () => {
         try {
-            const res = await authFetch(`${API_BASE}/api/hunting/auto-mode`)
+            const res = await authFetch(`${getApiBase()}/api/hunting/auto-mode`)
             if (res.ok) {
                 const data = await res.json()
                 setAutoMode(data)

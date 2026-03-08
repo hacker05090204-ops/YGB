@@ -427,5 +427,14 @@ def create_voice_engine(
 
 def is_voice_supported() -> bool:
     """Check if voice input is supported."""
-    # In production: check for microphone availability
-    return True
+    try:
+        from backend.assistant.voice_runtime import probe_microphone_capabilities
+
+        capabilities = probe_microphone_capabilities()
+        return bool(
+            capabilities.get("browser_relay_available")
+            or capabilities.get("local_capture_available")
+        )
+    except Exception:
+        # Browser relay is the minimum supported fallback.
+        return True

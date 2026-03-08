@@ -5,18 +5,27 @@
 
 import { credentialedFetch } from "./auth-token";
 
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
+const _ENV_API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
+const _API_PORT = "8000";
 
 /**
- * Centralized fetch wrapper that includes Authorization header.
- * Uses unified token lookup from auth-token.ts.
- * Enforces cache: "no-store" for critical freshness — no stale caching.
+ * Derive API base URL at runtime from the browser's current hostname.
+ * This ensures cookies set by the backend at IP:8000 are sent back to the
+ * same IP:8000 — not to "localhost:8000" which is a different cookie domain.
+ * Falls back to NEXT_PUBLIC_YGB_API_URL for SSR/tests.
+ */
+export function getApiBase(): string {
+  if (typeof window === "undefined") return _ENV_API_BASE;
+  const { protocol, hostname } = window.location;
+  return `${protocol}//${hostname}:${_API_PORT}`;
+}
+
+/**
+ * Centralized fetch wrapper that includes auth credentials (HttpOnly cookies).
  */
 export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
   return credentialedFetch(url, options);
 }
-
-// ============== TYPES ==============
 
 export interface PhaseInfo {
   name: string;
@@ -52,19 +61,19 @@ export interface HealthCheck {
 // ============== API FUNCTIONS ==============
 
 export async function getPhases(): Promise<PhaseInfo[]> {
-  const res = await authFetch(`${API_BASE}/api/phases`);
+  const res = await authFetch(`${getApiBase()}/api/phases`);
   if (!res.ok) throw new Error("Failed to fetch phases");
   return res.json();
 }
 
 export async function getHunterModules(): Promise<HunterModuleInfo[]> {
-  const res = await authFetch(`${API_BASE}/api/hunter-modules`);
+  const res = await authFetch(`${getApiBase()}/api/hunter-modules`);
   if (!res.ok) throw new Error("Failed to fetch hunter modules");
   return res.json();
 }
 
 export async function runPhase(phase: string): Promise<ExecutionResult> {
-  const res = await authFetch(`${API_BASE}/api/run-phase`, {
+  const res = await authFetch(`${getApiBase()}/api/run-phase`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ phase }),
@@ -77,7 +86,7 @@ export async function runPhase(phase: string): Promise<ExecutionResult> {
 }
 
 export async function runHunterModule(module: string): Promise<ExecutionResult> {
-  const res = await authFetch(`${API_BASE}/api/run-hunter`, {
+  const res = await authFetch(`${getApiBase()}/api/run-hunter`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ module }),
@@ -90,7 +99,7 @@ export async function runHunterModule(module: string): Promise<ExecutionResult> 
 }
 
 export async function checkHealth(): Promise<HealthCheck> {
-  const res = await authFetch(`${API_BASE}/api/health`);
+  const res = await authFetch(`${getApiBase()}/api/health`);
   if (!res.ok) throw new Error("API server not available");
   return res.json();
 }
@@ -150,27 +159,27 @@ export interface LifecycleStatus {
 }
 
 export async function getStorageStats(): Promise<StorageStats> {
-  const res = await authFetch(`${API_BASE}/api/storage/stats`);
+  const res = await authFetch(`${getApiBase()}/api/storage/stats`);
   if (!res.ok) throw new Error("Failed to fetch storage stats");
   return res.json();
 }
 
 export async function getDiskStatus(): Promise<DiskStatus> {
-  const res = await authFetch(`${API_BASE}/api/storage/disk`);
+  const res = await authFetch(`${getApiBase()}/api/storage/disk`);
   if (!res.ok) throw new Error("Failed to fetch disk status");
   return res.json();
 }
 
 export async function getLifecycleStatus(): Promise<LifecycleStatus> {
-  const res = await authFetch(`${API_BASE}/api/storage/lifecycle`);
+  const res = await authFetch(`${getApiBase()}/api/storage/lifecycle`);
   if (!res.ok) throw new Error("Failed to fetch lifecycle status");
   return res.json();
 }
 
 export async function getDeletePreview(entityType?: string) {
   const url = entityType
-    ? `${API_BASE}/api/storage/delete-preview?entity_type=${entityType}`
-    : `${API_BASE}/api/storage/delete-preview`;
+    ? `${getApiBase()}/api/storage/delete-preview?entity_type=${entityType}`
+    : `${getApiBase()}/api/storage/delete-preview`;
   const res = await authFetch(url);
   if (!res.ok) throw new Error("Failed to fetch delete preview");
   return res.json();
@@ -178,8 +187,8 @@ export async function getDeletePreview(entityType?: string) {
 
 export async function getVideoList(userId?: string) {
   const url = userId
-    ? `${API_BASE}/api/video/list?user_id=${userId}`
-    : `${API_BASE}/api/video/list`;
+    ? `${getApiBase()}/api/video/list?user_id=${userId}`
+    : `${getApiBase()}/api/video/list`;
   const res = await authFetch(url);
   if (!res.ok) throw new Error("Failed to fetch video list");
   return res.json();
@@ -248,31 +257,31 @@ export interface RolloutMetrics {
 }
 
 export async function getDatasetReadiness(): Promise<DatasetReadiness> {
-  const res = await authFetch(`${API_BASE}/api/readiness`);
+  const res = await authFetch(`${getApiBase()}/api/readiness`);
   if (!res.ok) throw new Error("Failed to fetch dataset readiness");
   return res.json();
 }
 
 export async function getIntegrationStatus(): Promise<IntegrationStatusResponse> {
-  const res = await authFetch(`${API_BASE}/api/integration/status`);
+  const res = await authFetch(`${getApiBase()}/api/integration/status`);
   if (!res.ok) throw new Error("Failed to fetch integration status");
   return res.json();
 }
 
 export async function getCVEPipelineStatus(): Promise<CVEPipelineStatus> {
-  const res = await authFetch(`${API_BASE}/api/cve/status`);
+  const res = await authFetch(`${getApiBase()}/api/cve/status`);
   if (!res.ok) throw new Error("Failed to fetch CVE pipeline status");
   return res.json();
 }
 
 export async function getBackupStatus(): Promise<BackupStatus> {
-  const res = await authFetch(`${API_BASE}/api/backup/status`);
+  const res = await authFetch(`${getApiBase()}/api/backup/status`);
   if (!res.ok) throw new Error("Failed to fetch backup status");
   return res.json();
 }
 
 export async function getRolloutMetrics(): Promise<RolloutMetrics> {
-  const res = await authFetch(`${API_BASE}/api/rollout/metrics`);
+  const res = await authFetch(`${getApiBase()}/api/rollout/metrics`);
   if (!res.ok) throw new Error("Failed to fetch rollout metrics");
   return res.json();
 }
@@ -290,7 +299,7 @@ export interface UserProfile {
 }
 
 export async function getUserProfile(): Promise<UserProfile> {
-  const res = await authFetch(`${API_BASE}/api/user/profile`);
+  const res = await authFetch(`${getApiBase()}/api/user/profile`);
   if (!res.ok) throw new Error("Failed to fetch user profile");
   return res.json();
 }

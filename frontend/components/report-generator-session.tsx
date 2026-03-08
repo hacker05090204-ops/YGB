@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 
 interface ReportItem {
     filename: string
@@ -28,8 +28,6 @@ interface RuntimeSnapshot {
     stale?: boolean
     determinism_ok?: boolean
 }
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 function safeIso(iso: string): string {
     try {
@@ -60,8 +58,8 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
     const refresh = React.useCallback(async () => {
         try {
             const [reportsRes, videosRes] = await Promise.all([
-                authFetch(`${API_BASE}/api/reports`),
-                authFetch(`${API_BASE}/api/reports/videos`),
+                authFetch(`${getApiBase()}/api/reports`),
+                authFetch(`${getApiBase()}/api/reports/videos`),
             ])
 
             if (reportsRes.ok) {
@@ -102,7 +100,7 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
 
     const startRecording = React.useCallback(async () => {
         try {
-            const res = await authFetch(`${API_BASE}/api/reports/videos/start`, {
+            const res = await authFetch(`${getApiBase()}/api/reports/videos/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ report_id: null, metadata: { source: "control_panel" } }),
@@ -124,7 +122,7 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
     const stopRecording = React.useCallback(async () => {
         if (!recordingId) return
         try {
-            await authFetch(`${API_BASE}/api/reports/videos/${recordingId}/stop`, {
+            await authFetch(`${getApiBase()}/api/reports/videos/${recordingId}/stop`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -148,7 +146,7 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
         try {
             let reportContent: string | null = null
             if (selectedReport) {
-                const reportRes = await authFetch(`${API_BASE}/api/reports/${encodeURIComponent(selectedReport)}/content`)
+                const reportRes = await authFetch(`${getApiBase()}/api/reports/${encodeURIComponent(selectedReport)}/content`)
                 if (reportRes.ok) {
                     reportContent = await reportRes.text()
                 }
@@ -162,7 +160,7 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
                 ) || null
 
                 if (selectedVideoMeta) {
-                    const tokenRes = await authFetch(`${API_BASE}/api/video/token`, {
+                    const tokenRes = await authFetch(`${getApiBase()}/api/video/token`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
@@ -182,8 +180,8 @@ export function ReportGeneratorSession({ className = "", refreshInterval = 8000 
             let accuracy: Record<string, unknown> | null = null
             if (includeTrainingSnapshot) {
                 const [runtimeRes, accuracyRes] = await Promise.all([
-                    authFetch(`${API_BASE}/runtime/status`),
-                    authFetch(`${API_BASE}/api/accuracy/snapshot`),
+                    authFetch(`${getApiBase()}/runtime/status`),
+                    authFetch(`${getApiBase()}/api/accuracy/snapshot`),
                 ])
 
                 if (runtimeRes.ok) {

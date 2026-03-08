@@ -44,6 +44,7 @@ ALLOWED_APPS: Set[str] = {
     "code", "code.exe",               # VS Code
     "chrome", "chrome.exe",
     "firefox", "firefox.exe",
+    "edge", "msedge", "msedge.exe",
     "powershell", "pwsh",
     "cmd",
     "explorer", "explorer.exe",
@@ -89,6 +90,13 @@ INJECTION_PATTERNS = [
     r"<script",                # XSS
 ]
 
+HOST_GOVERNED_COMMANDS = {
+    "LAUNCH_APP",
+    "OPEN_APP",
+    "OPEN_URL",
+    "RUN_APPROVED_TASK",
+}
+
 
 # =============================================================================
 # POLICY ENGINE
@@ -118,6 +126,42 @@ class VoicePolicyEngine:
                     verdict=PolicyVerdict.DENIED,
                     reason=f"Command injection pattern detected: {pattern}",
                     policy_name="INJECTION_GUARD",
+                    evaluated_at=now,
+                )
+
+        # 2. Special host-action governance
+        if command_type in HOST_GOVERNED_COMMANDS:
+            session_id = args.get("host_session_id", "").strip()
+            if not session_id:
+                return PolicyDecision(
+                    verdict=PolicyVerdict.REQUIRES_OVERRIDE,
+                    reason="Host action requires a signed host governance session",
+                    policy_name="HOST_ACTION_GOVERNANCE",
+                    evaluated_at=now,
+                )
+            try:
+                from backend.governance.host_action_governor import HostActionGovernor
+
+                decision = HostActionGovernor().validate_request(
+                    session_id,
+                    command_type,
+                    args,
+                )
+            except Exception as exc:
+                self._denied_count += 1
+                return PolicyDecision(
+                    verdict=PolicyVerdict.DENIED,
+                    reason=f"Host governance unavailable: {type(exc).__name__}",
+                    policy_name="HOST_ACTION_GOVERNANCE",
+                    evaluated_at=now,
+                )
+
+            if not decision["allowed"]:
+                self._denied_count += 1
+                return PolicyDecision(
+                    verdict=PolicyVerdict.DENIED,
+                    reason=decision["reason"],
+                    policy_name="HOST_ACTION_GOVERNANCE",
                     evaluated_at=now,
                 )
 

@@ -29,9 +29,7 @@ import {
     notifyAuthStateChanged,
     purgeLegacyAuthStorage,
 } from "@/lib/auth-token"
-import { authFetch } from "@/lib/ygb-api"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 
 interface GpuStatus {
     available: boolean
@@ -108,7 +106,7 @@ export default function AdminPanel() {
     // Auth check
     useEffect(() => {
         purgeLegacyAuthStorage()
-        credentialedFetch(`${API_BASE}/admin/verify`)
+        credentialedFetch(`${getApiBase()}/admin/verify`)
             .then((r) => r.json())
             .then((data) => {
                 if (data.status === "ok") {
@@ -128,8 +126,8 @@ export default function AdminPanel() {
     const fetchStatus = useCallback(async () => {
         try {
             const [gpuRes, trainRes] = await Promise.allSettled([
-                authFetch(`${API_BASE}/gpu/status`).then((r) => r.json()),
-                authFetch(`${API_BASE}/training/status`).then((r) => r.json()),
+                authFetch(`${getApiBase()}/gpu/status`).then((r) => r.json()),
+                authFetch(`${getApiBase()}/training/status`).then((r) => r.json()),
             ])
 
             if (gpuRes.status === "fulfilled" && gpuRes.value) {
@@ -181,7 +179,7 @@ export default function AdminPanel() {
     // Toggle training
     const toggleTraining = async () => {
         try {
-            await authFetch(`${API_BASE}/training/${training.is_training ? "stop" : "start"}`, {
+            await authFetch(`${getApiBase()}/training/${training.is_training ? "stop" : "start"}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             })
@@ -192,7 +190,7 @@ export default function AdminPanel() {
     // Toggle 24/7 mode
     const toggle247 = async () => {
         try {
-            await authFetch(`${API_BASE}/training/continuous`, {
+            await authFetch(`${getApiBase()}/training/continuous`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ enabled: !continuousMode }),
@@ -205,7 +203,7 @@ export default function AdminPanel() {
     // Set interval
     const setTrainingInterval = async (sec: number) => {
         try {
-            await authFetch(`${API_BASE}/training/interval`, {
+            await authFetch(`${getApiBase()}/training/interval`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ interval_sec: sec }),
@@ -219,7 +217,7 @@ export default function AdminPanel() {
     // Logout
     const handleLogout = async () => {
         try {
-            await credentialedFetch(`${API_BASE}/admin/logout`, {
+            await credentialedFetch(`${getApiBase()}/admin/logout`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             })

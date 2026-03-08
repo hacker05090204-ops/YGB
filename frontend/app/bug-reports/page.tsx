@@ -3,7 +3,7 @@
 import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect, useRef } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
 import { Bug, Filter, Plus, AlertCircle, CheckCircle, XCircle, RefreshCw } from "lucide-react"
@@ -18,8 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface BugReport {
     id: string
@@ -37,7 +35,7 @@ function BugReportsPageContent() {
 
     const fetchBugs = async () => {
         try {
-            const res = await authFetch(`${API_BASE}/api/db/bounties`)
+            const res = await authFetch(`${getApiBase()}/api/db/bounties`)
             if (res.ok) {
                 const data = await res.json()
                 const mapped = (data.bounties || []).map((b: any) => ({
@@ -59,7 +57,7 @@ function BugReportsPageContent() {
     useEffect(() => {
         async function checkHealth() {
             try {
-                const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+                const res = await fetch(`${getApiBase()}/api/health`, { cache: "no-store" })
                 setApiStatus(res.ok ? "online" : "offline")
             } catch {
                 setApiStatus("offline")

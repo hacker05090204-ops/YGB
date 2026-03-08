@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import {
     HardDrive,
     Database,
@@ -18,8 +18,6 @@ import {
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface DiskStats {
     total_bytes: number
@@ -91,8 +89,8 @@ export function StorageMonitor() {
         setLoading(true)
         try {
             const [diskRes, statsRes] = await Promise.all([
-                authFetch(`${API_BASE}/api/storage/disk`),
-                authFetch(`${API_BASE}/api/storage/stats`),
+                authFetch(`${getApiBase()}/api/storage/disk`),
+                authFetch(`${getApiBase()}/api/storage/stats`),
             ])
 
             if (diskRes.ok) {

@@ -3,7 +3,7 @@
 import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect, useRef } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
 import { FolderOpen, Calendar, Clock, Plus, RefreshCw, AlertCircle } from "lucide-react"
@@ -18,8 +18,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface Project {
     id: string
@@ -37,7 +35,7 @@ function ProjectsPageContent() {
 
     const fetchProjects = async () => {
         try {
-            const res = await authFetch(`${API_BASE}/api/db/targets`)
+            const res = await authFetch(`${getApiBase()}/api/db/targets`)
             if (res.ok) {
                 const data = await res.json()
                 const targets = data.targets || []
@@ -60,7 +58,7 @@ function ProjectsPageContent() {
     useEffect(() => {
         async function checkHealth() {
             try {
-                const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+                const res = await fetch(`${getApiBase()}/api/health`, { cache: "no-store" })
                 setApiStatus(res.ok ? "online" : "offline")
             } catch {
                 setApiStatus("offline")

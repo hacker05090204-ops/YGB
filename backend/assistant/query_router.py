@@ -122,6 +122,8 @@ RESEARCH_KEYWORD_WEIGHTS: Dict[str, float] = {
     "history of": 1.5, "origin of": 1.5,
     "difference between": 2.0,
     "translate": 1.0, "calculate": 1.0, "convert": 1.0,
+    "latest": 1.5, "news": 1.5, "headline": 1.5, "headlines": 1.5,
+    "current events": 1.5, "breaking": 1.0, "today": 1.0,
     # Informational — medium weight
     "science": 1.0, "physics": 1.0, "chemistry": 1.0, "biology": 1.0,
     "mathematics": 1.0, "math": 1.0, "geography": 1.0, "literature": 1.0,

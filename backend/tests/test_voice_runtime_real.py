@@ -1,0 +1,275 @@
+import types
+from pathlib import Path
+
+from backend.assistant import voice_runtime as vr
+from backend.assistant.query_router import ResearchResult, ResearchStatus, VoiceMode
+from impl_v1.training.voice.voice_executors import ExecStatus
+
+
+class _FakeIntent:
+    def __init__(self, command_type="QUERY_STATUS", route_mode="SECURITY", error=None):
+        self.intent_id = "INT-1"
+        self.command_type = command_type
+        self.args = {}
+        self.transcript_text = "status"
+        self.route_mode = route_mode
+        self.requires_confirmation = False
+        self.confirmed = False
+        self.executed = False
+        self.error = error
+        self.result = None
+        self.idempotency_key = "idem-1"
+
+
+class _FakeOrchestrator:
+    def __init__(self, intent):
+        self.intent = intent
+        self.executed_result = None
+        self.failed_reason = None
+
+    def get_intent(self, intent_id):
+        return self.intent if intent_id == self.intent.intent_id else None
+
+    def confirm_intent(self, intent_id, confirmer_id):
+        if intent_id != self.intent.intent_id:
+            return False
+        self.intent.confirmed = True
+        return True
+
+    def is_ready_to_execute(self, intent_id):
+        return not self.intent.error
+
+    def mark_executed(self, intent_id, result):
+        self.intent.executed = True
+        self.executed_result = result
+
+    def mark_failed(self, intent_id, error):
+        self.failed_reason = error
+        self.intent.error = error
+
+
+class _FakePolicy:
+    class _Verdict:
+        def __init__(self, value):
+            self.value = value
+
+    def __init__(self, value="ALLOWED", reason="ok"):
+        self.value = value
+        self.reason = reason
+
+    def evaluate(self, command_type, args):
+        return types.SimpleNamespace(
+            verdict=self._Verdict(self.value),
+            reason=self.reason,
+        )
+
+
+class _FakeAudit:
+    def __init__(self):
+        self.entries = []
+
+    def log(self, **kwargs):
+        self.entries.append(kwargs)
+
+
+def test_execute_orchestrated_intent_runs_real_dispatch(monkeypatch):
+    intent = _FakeIntent(command_type="QUERY_STATUS")
+    orch = _FakeOrchestrator(intent)
+    audit = _FakeAudit()
+
+    monkeypatch.setattr(
+        vr,
+        "dispatch_supported_command",
+        lambda command_type, args, transcript_text: {
+            "status": "ok",
+            "output": "runtime-ok",
+            "data": {"query_type": command_type},
+        },
+    )
+
+    result = vr.execute_orchestrated_intent(
+        orch,
+        "INT-1",
+        None,
+        policy=_FakePolicy(),
+        audit=audit,
+        user_id="user-1",
+        device_id="dev-1",
+    )
+
+    assert result["status"] == "ok"
+    assert result["executed"] is True
+    assert orch.executed_result == "runtime-ok"
+    assert audit.entries[-1]["action"] == "EXECUTED"
+
+
+def test_execute_orchestrated_intent_blocks_policy():
+    intent = _FakeIntent(command_type="QUERY_STATUS")
+    orch = _FakeOrchestrator(intent)
+    audit = _FakeAudit()
+
+    result = vr.execute_orchestrated_intent(
+        orch,
+        "INT-1",
+        None,
+        policy=_FakePolicy(value="DENIED", reason="Policy blocked"),
+        audit=audit,
+        user_id="user-1",
+        device_id="dev-1",
+    )
+
+    assert result["status"] == "blocked"
+    assert result["gate"] == "POLICY"
+    assert orch.failed_reason == "Policy blocked"
+    assert audit.entries[-1]["action"] == "BLOCKED"
+
+
+def test_build_voice_pipeline_status_truthful(monkeypatch):
+    monkeypatch.setattr(
+        "impl_v1.training.voice.stt_adapter.get_stt_status",
+        lambda: {
+            "stt_status": "DEGRADED",
+            "browser_relay_available": True,
+            "local_only": True,
+        },
+    )
+
+    class _FakeTTS:
+        def get_stats(self):
+            return {
+                "status": "IDLE",
+                "active_provider": "API_PROXY",
+                "privacy_mode": False,
+                "total_spoken": 0,
+                "total_interrupted": 0,
+                "total_errors": 0,
+                "provider_health": {"reachable": False, "reason": "proxy_down"},
+            }
+
+    monkeypatch.setattr("impl_v1.training.voice.tts_streaming.TTSEngine", _FakeTTS)
+    monkeypatch.setattr(
+        "impl_v1.training.voice.voice_metrics.get_voice_health",
+        lambda: {"total_commands": 1, "success_rate": 0.0, "slo_met": False},
+    )
+
+    vr.runtime_state.set("active_voice_mode", "RESEARCH")
+    status = vr.build_voice_pipeline_status()
+
+    assert status["pipeline_status"] == "DEGRADED"
+    assert status["mode"] == "RESEARCH"
+    assert status["microphone"]["browser_relay_available"] is True
+
+
+def test_run_research_analysis_includes_verification(monkeypatch):
+    def _fake_search(self, query):
+        return ResearchResult(
+            query=query,
+            status=ResearchStatus.SUCCESS,
+            title="Latest News",
+            summary="Important update from two sources.",
+            source="bing.com",
+            key_terms=("latest", "news"),
+            word_count=5,
+            elapsed_ms=12.0,
+            mode=VoiceMode.RESEARCH,
+            timestamp="2026-03-08T00:00:00+00:00",
+        )
+
+    def _fake_fetch(self, query):
+        html = """
+        <a href="https://nvd.nist.gov/vuln/detail/CVE-2024-0001">nvd</a>
+        <a href="https://owasp.org/www-project-top-ten/">owasp</a>
+        """
+        return html, "bing.com"
+
+    monkeypatch.setattr(vr.ResearchSearchPipeline, "search", _fake_search)
+    monkeypatch.setattr(vr.ResearchSearchPipeline, "_fetch_search_html", _fake_fetch)
+
+    result = vr.run_research_analysis("what's latest security news")
+
+    assert result["status"] == "ok"
+    assert result["research"]["summary"] == "Important update from two sources."
+    assert result["verification"]["confidence"] in {"LIKELY", "UNVERIFIED"}
+    assert len(result["verification"]["sources"]) >= 2
+
+
+def test_dispatch_supported_command_runs_host_action(monkeypatch):
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "voice-runtime-secret")
+    monkeypatch.setattr(
+        "backend.governance.host_action_governor.HostActionGovernor.validate_request",
+        lambda self, session_id, action, args: {
+            "allowed": True,
+            "canonical_app": "notepad",
+            "command": [r"C:\Windows\System32\notepad.exe"],
+        },
+    )
+    monkeypatch.setattr(
+        "impl_v1.training.voice.voice_executors.AppRunnerExecutor.execute",
+        lambda self, intent_id, action, app_name, launch_command=None: types.SimpleNamespace(
+            status=ExecStatus.SUCCESS,
+            output="Launched notepad",
+            executor="AppRunnerExecutor",
+            audit_hash="audit-hash",
+            execution_ms=4.2,
+        ),
+    )
+
+    result = vr.dispatch_supported_command(
+        "LAUNCH_APP",
+        {
+            "app": "notepad",
+            "host_session_id": "HAG-1",
+            "_intent_id": "INT-HOST",
+        },
+        "open notepad",
+    )
+
+    assert result["status"] == "ok"
+    assert result["output"] == "Launched notepad"
+    assert result["executor"] == "AppRunnerExecutor"
+
+
+def test_set_objective_blocks_second_until_complete(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        "backend.assistant.task_focus.FOCUS_STATE_PATH",
+        Path(tmp_path / "focus.json"),
+    )
+
+    first = vr.dispatch_supported_command(
+        "SET_OBJECTIVE",
+        {"title": "Finish project A", "requested_by": "user-1"},
+        "focus on finish project A",
+    )
+    second = vr.dispatch_supported_command(
+        "SET_OBJECTIVE",
+        {"title": "Start project B", "requested_by": "user-1"},
+        "focus on start project B",
+    )
+
+    assert first["status"] == "ok"
+    assert second["status"] == "blocked"
+    assert "ACTIVE_OBJECTIVE_IN_PROGRESS" in second["message"]
+
+
+def test_record_objective_progress_appends_grounded_step(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        "backend.assistant.task_focus.FOCUS_STATE_PATH",
+        Path(tmp_path / "focus.json"),
+    )
+
+    vr.dispatch_supported_command(
+        "SET_OBJECTIVE",
+        {"title": "Inspect runtime", "requested_by": "user-1"},
+        "focus on inspect runtime",
+    )
+
+    intent = types.SimpleNamespace(command_type="QUERY_STATUS", route_mode="SECURITY")
+    vr.record_objective_progress(
+        intent,
+        {"status": "ok", "output": "Runtime collected successfully"},
+    )
+
+    from backend.assistant.task_focus import TaskFocusManager
+
+    snapshot = TaskFocusManager(state_path=tmp_path / "focus.json").status_snapshot()
+    assert snapshot["active_objective"]["steps"][-1]["summary"] == "Runtime collected successfully"

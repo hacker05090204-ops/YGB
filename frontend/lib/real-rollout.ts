@@ -5,7 +5,7 @@
  * plus fetch helpers and utility functions for the dashboard.
  */
 
-import { authFetch } from "@/lib/ygb-api";
+import { authFetch , getApiBase } from "@/lib/ygb-api";
 // ============== TYPES ==============
 
 export type RolloutStageName = "STAGE_0" | "STAGE_1" | "STAGE_2" | "STAGE_3";
@@ -144,13 +144,11 @@ export function deserializeStatus(json: string): RolloutStatus {
 
 // ============== API HELPERS ==============
 
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
-
 /**
  * Fetch current rollout status from API.
  */
 export async function fetchRolloutStatus(): Promise<RolloutStatus> {
-    const res = await authFetch(`${API_BASE}/api/rollout/status`);
+    const res = await authFetch(`${getApiBase()}/api/rollout/status`);
     if (!res.ok) throw new Error("Failed to fetch rollout status");
     return res.json();
 }
@@ -159,7 +157,7 @@ export async function fetchRolloutStatus(): Promise<RolloutStatus> {
  * Fetch latest risk metrics from API.
  */
 export async function fetchRiskMetrics(): Promise<RiskMetrics> {
-    const res = await authFetch(`${API_BASE}/api/rollout/metrics`);
+    const res = await authFetch(`${getApiBase()}/api/rollout/metrics`);
     if (!res.ok) throw new Error("Failed to fetch risk metrics");
     return res.json();
 }

@@ -3,7 +3,7 @@
 import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect, useRef } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
 import { ShieldAlert, CheckCircle, AlertTriangle, XCircle, Search, Play, FileText, RefreshCw, AlertCircle } from "lucide-react"
@@ -16,8 +16,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface SecurityData {
     critical: number
@@ -50,7 +48,7 @@ function SecurityPageContent() {
 
     const fetchSecurityData = async () => {
         try {
-            const res = await authFetch(`${API_BASE}/api/db/bounties`)
+            const res = await authFetch(`${getApiBase()}/api/db/bounties`)
             if (res.ok) {
                 const data = await res.json()
                 const bounties = data.bounties || []
@@ -91,7 +89,7 @@ function SecurityPageContent() {
     useEffect(() => {
         async function checkHealth() {
             try {
-                const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+                const res = await fetch(`${getApiBase()}/api/health`, { cache: "no-store" })
                 setApiStatus(res.ok ? "online" : "offline")
             } catch {
                 setApiStatus("offline")

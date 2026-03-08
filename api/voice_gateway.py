@@ -45,12 +45,13 @@ class IntentRequest(BaseModel):
     text: str
     device_id: str = "browser"
     confidence: float = 0.8
+    host_session_id: Optional[str] = None
 
 
 class ExecuteRequest(BaseModel):
     """Execute a confirmed intent."""
     intent_id: str
-    confirmer_id: str
+    confirmer_id: Optional[str] = None
 
 
 class RespondRequest(BaseModel):
@@ -165,10 +166,19 @@ async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
         raise HTTPException(status_code=429, detail=reason)
 
     orch = _get_orchestrator()
+    from backend.api.runtime_state import runtime_state
+    host_session_id = req.host_session_id or runtime_state.get("active_host_action_session")
+    if host_session_id:
+        runtime_state.set("active_host_action_session", host_session_id)
     intent = orch.process_transcript(
         text=req.text, user_id=user_id,
         device_id=req.device_id, confidence=req.confidence,
+        context_args=(
+            {"host_session_id": host_session_id}
+            if host_session_id else None
+        ),
     )
+    runtime_state.set("active_voice_mode", intent.route_mode)
 
     # Policy check
     policy = _get_policy()
@@ -180,28 +190,49 @@ async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
         user_id=user_id, device_id=req.device_id,
         transcript=req.text, intent=intent.command_type,
         action="PENDING", policy=decision.verdict.value,
-        result="AWAITING" if intent.requires_confirmation else "QUEUED",
+        result=(
+            "BLOCKED" if intent.error
+            else "AWAITING" if intent.requires_confirmation
+            else "QUEUED"
+        ),
     )
 
     return {
         "intent_id": intent.intent_id,
         "command_type": intent.command_type,
+        "mode": intent.route_mode,
         "risk_level": intent.risk_level.value,
         "requires_confirmation": intent.requires_confirmation,
         "confidence": intent.confidence,
         "policy_verdict": decision.verdict.value,
         "policy_reason": decision.reason,
+        "args": intent.args,
+        "ready_to_execute": orch.is_ready_to_execute(intent.intent_id),
+        "error": intent.error,
     }
 
 
 @voice_gw_router.post("/api/voice/execute")
 async def execute_intent(req: ExecuteRequest, user=Depends(require_auth)):
     """Execute a confirmed intent. Auth required."""
+    user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
     orch = _get_orchestrator()
-    success = orch.confirm_intent(req.intent_id, req.confirmer_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Intent not found or not confirmable")
-    return {"executed": True, "intent_id": req.intent_id}
+    from backend.assistant.voice_runtime import execute_orchestrated_intent
+
+    result = execute_orchestrated_intent(
+        orch,
+        req.intent_id,
+        req.confirmer_id,
+        policy=_get_policy(),
+        audit=_get_audit(),
+        user_id=user_id,
+        device_id="browser",
+    )
+    if result.get("status") == "error":
+        raise HTTPException(status_code=404, detail=result.get("message", "Intent not found"))
+    if result.get("status") == "blocked":
+        raise HTTPException(status_code=409, detail=result)
+    return result
 
 
 @voice_gw_router.post("/api/voice/respond")
@@ -219,6 +250,7 @@ async def tts_respond(req: RespondRequest, user=Depends(require_auth)):
         "status": result.status.value,
         "provider": result.provider.value,
         "latency_ms": result.latency_ms,
+        "audio_url": result.audio_url,
     }
 
 

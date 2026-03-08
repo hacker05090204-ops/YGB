@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react"
 
 import {
+import { getApiBase } from "@/lib/ygb-api"
+
   AUTH_STATE_EVENT,
   credentialedFetch,
   purgeLegacyAuthStorage,
@@ -20,8 +22,6 @@ export interface AuthUser {
   status: "loading" | "authenticated" | "unavailable"
   unavailableReason: string | null
 }
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 const EMPTY_AUTH_USER: AuthUser = {
   userId: null,
@@ -41,7 +41,7 @@ export function useAuthUser(): AuthUser {
 
   const fetchUser = useCallback(async () => {
     try {
-      const res = await credentialedFetch(`${API_BASE}/auth/me`)
+      const res = await credentialedFetch(`${getApiBase()}/auth/me`)
 
       if (res.status === 401 || res.status === 403 || res.status === 404) {
         setUser({

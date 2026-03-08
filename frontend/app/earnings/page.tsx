@@ -3,7 +3,7 @@
 import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect, useRef } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
 import { DollarSign, TrendingUp, CheckCircle, CreditCard, ArrowUpRight, RefreshCw, AlertCircle } from "lucide-react"
@@ -16,8 +16,6 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface Bounty {
     id: string
@@ -47,7 +45,7 @@ function EarningsPageContent() {
 
     const fetchData = async () => {
         try {
-            const res = await authFetch(`${API_BASE}/api/db/bounties`)
+            const res = await authFetch(`${getApiBase()}/api/db/bounties`)
             if (res.ok) {
                 const data = await res.json()
                 setBounties(data.bounties || [])
@@ -61,7 +59,7 @@ function EarningsPageContent() {
     useEffect(() => {
         async function checkHealth() {
             try {
-                const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+                const res = await fetch(`${getApiBase()}/api/health`, { cache: "no-store" })
                 setApiStatus(res.ok ? "online" : "offline")
             } catch {
                 setApiStatus("offline")

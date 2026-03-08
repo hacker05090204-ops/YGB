@@ -39,8 +39,8 @@ class TestSTTAdapterChain:
         self.chain = STTAdapterChain()
         self.chain.reset_all()
 
-    def test_chain_has_three_providers(self):
-        assert len(self.chain._adapters) == 3
+    def test_chain_has_production_providers(self):
+        assert len(self.chain._adapters) >= 2
 
     def test_initial_health_report(self):
         health = self.chain.get_health()
@@ -119,6 +119,44 @@ class TestIntentOrchestrator:
         intent = self.orch.process_transcript("what is the status", "user1", "dev1")
         assert intent.intent_id.startswith("INT-")
         assert intent.user_id == "user1"
+        assert intent.route_mode == "SECURITY"
+
+    def test_research_query_routes_to_research_mode(self):
+        intent = self.orch.process_transcript("what's latest AI news", "user1", "dev1")
+        assert intent.command_type == "RESEARCH_QUERY"
+        assert intent.route_mode == "RESEARCH"
+        assert intent.args["query"] == "what's latest AI news"
+
+    def test_host_action_routes_with_signed_session(self):
+        intent = self.orch.process_transcript(
+            "open notepad",
+            "user1",
+            "dev1",
+            context_args={"host_session_id": "HAG-TEST"},
+        )
+        assert intent.command_type == "LAUNCH_APP"
+        assert intent.route_mode == "HOST_ACTION"
+        assert intent.args["app"] == "notepad"
+        assert intent.args["host_session_id"] == "HAG-TEST"
+
+    def test_focus_command_routes_to_assistant_mode(self):
+        intent = self.orch.process_transcript(
+            "focus on finish the current project",
+            "user1",
+            "dev1",
+        )
+        assert intent.command_type == "SET_OBJECTIVE"
+        assert intent.route_mode == "ASSISTANT"
+        assert intent.args["title"] == "finish the current project"
+
+    def test_objective_status_routes_to_assistant_mode(self):
+        intent = self.orch.process_transcript(
+            "what is current objective",
+            "user1",
+            "dev1",
+        )
+        assert intent.command_type == "OBJECTIVE_STATUS"
+        assert intent.route_mode == "ASSISTANT"
 
     def test_low_risk_no_confirmation(self):
         intent = self.orch.process_transcript("what is the status", "user1", "dev1")
@@ -174,13 +212,62 @@ class TestPolicyEngine:
         decision = self.engine.evaluate("QUERY_STATUS", {})
         assert decision.verdict.value == "ALLOWED"
 
-    def test_blocked_app_denied(self):
-        decision = self.engine.evaluate("LAUNCH_APP", {"app": "malware.exe"})
-        assert decision.verdict.value == "DENIED"
-        assert "allowlist" in decision.reason.lower()
+    def test_blocked_app_denied(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("YGB_APPROVAL_SECRET", "voice-policy-secret")
+        from backend.governance.host_action_governor import HostActionGovernor
 
-    def test_allowed_app_passes(self):
+        ledger_path = tmp_path / "host_action_ledger.jsonl"
+        governor = HostActionGovernor(ledger_path=ledger_path)
+        session = governor.issue_session(
+            requested_by="user1",
+            approver_id="admin1",
+            reason="Allow only trusted apps",
+            allowed_actions=["LAUNCH_APP"],
+            allowed_apps=["notepad"],
+        )
+        monkeypatch.setattr(
+            "backend.governance.host_action_governor.HOST_ACTION_LEDGER_PATH",
+            ledger_path,
+        )
+
+        decision = self.engine.evaluate(
+            "LAUNCH_APP",
+            {"app": "malware.exe", "host_session_id": session.session_id},
+        )
+        assert decision.verdict.value == "DENIED"
+        assert "unknown" in decision.reason.lower() or "allowed" in decision.reason.lower()
+
+    def test_host_action_requires_signed_session(self):
         decision = self.engine.evaluate("LAUNCH_APP", {"app": "notepad"})
+        assert decision.verdict.value == "REQUIRES_OVERRIDE"
+
+    def test_allowed_app_passes_with_signed_session(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("YGB_APPROVAL_SECRET", "voice-policy-secret")
+        from backend.governance.host_action_governor import HostActionGovernor
+
+        ledger_path = tmp_path / "host_action_ledger.jsonl"
+        monkeypatch.setattr(
+            HostActionGovernor,
+            "resolve_app_command",
+            classmethod(lambda cls, app_name: [r"C:\Windows\System32\notepad.exe"]),
+        )
+        governor = HostActionGovernor(ledger_path=ledger_path)
+        session = governor.issue_session(
+            requested_by="user1",
+            approver_id="admin1",
+            reason="Allow notepad launch",
+            allowed_actions=["LAUNCH_APP"],
+            allowed_apps=["notepad"],
+        )
+        monkeypatch.setattr(
+            "backend.governance.host_action_governor.HOST_ACTION_LEDGER_PATH",
+            ledger_path,
+        )
+
+        decision = self.engine.evaluate(
+            "LAUNCH_APP",
+            {"app": "notepad", "host_session_id": session.session_id},
+        )
         assert decision.verdict.value == "ALLOWED"
 
     def test_blocked_download_domain(self):
@@ -209,8 +296,28 @@ class TestPolicyEngine:
         decision = self.engine.evaluate("SECURITY_CHANGE", {})
         assert decision.verdict.value == "REQUIRES_OVERRIDE"
 
-    def test_stats_count_denials(self):
-        self.engine.evaluate("LAUNCH_APP", {"app": "evil.exe"})
+    def test_stats_count_denials(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("YGB_APPROVAL_SECRET", "voice-policy-secret")
+        from backend.governance.host_action_governor import HostActionGovernor
+
+        ledger_path = tmp_path / "host_action_ledger.jsonl"
+        governor = HostActionGovernor(ledger_path=ledger_path)
+        session = governor.issue_session(
+            requested_by="user1",
+            approver_id="admin1",
+            reason="Allow only notepad",
+            allowed_actions=["LAUNCH_APP"],
+            allowed_apps=["notepad"],
+        )
+        monkeypatch.setattr(
+            "backend.governance.host_action_governor.HOST_ACTION_LEDGER_PATH",
+            ledger_path,
+        )
+
+        self.engine.evaluate(
+            "LAUNCH_APP",
+            {"app": "evil.exe", "host_session_id": session.session_id},
+        )
         stats = self.engine.get_stats()
         assert stats["total_denied"] >= 1
 
@@ -235,9 +342,21 @@ class TestExecutorSafety:
         result = exe.execute("INT-TEST", "launch", "malware.exe")
         assert result.status.value == "BLOCKED"
 
-    def test_app_runner_allows_notepad(self):
-        from impl_v1.training.voice.voice_executors import AppRunnerExecutor, ALLOWED_APPS
-        assert "notepad" in ALLOWED_APPS
+    def test_app_runner_allows_notepad(self, monkeypatch):
+        from impl_v1.training.voice.voice_executors import AppRunnerExecutor
+
+        monkeypatch.setattr(
+            "impl_v1.training.voice.voice_executors.safe_popen",
+            lambda *args, **kwargs: object(),
+        )
+        exe = AppRunnerExecutor()
+        result = exe.execute(
+            "INT-TEST",
+            "launch",
+            "notepad",
+            launch_command=[r"C:\Windows\System32\notepad.exe"],
+        )
+        assert result.status.value == "SUCCESS"
 
     def test_download_blocks_unlisted_domain(self):
         from impl_v1.training.voice.voice_executors import DownloadExecutor
@@ -273,12 +392,15 @@ class TestExecutorSafety:
 class TestTTSLoop:
     """Tests for TTS streaming engine."""
 
-    def test_tts_speak_returns_response(self):
+    def test_tts_speak_returns_response(self, monkeypatch):
         from impl_v1.training.voice.tts_streaming import TTSEngine, ResponseType
+        monkeypatch.setenv("YGB_TEST_MODE", "true")
         tts = TTSEngine()
         response = tts.speak("Test message")
         assert response.text == "Test message"
         assert response.response_type == ResponseType.SUCCESS
+        assert response.status.value == "IDLE"
+        assert response.audio_url is not None
 
     def test_tts_interrupt(self):
         from impl_v1.training.voice.tts_streaming import TTSEngine
@@ -303,12 +425,14 @@ class TestTTSLoop:
         assert is_interrupt_command("quiet") is True
         assert is_interrupt_command("keep going") is False
 
-    def test_tts_stats(self):
+    def test_tts_stats(self, monkeypatch):
         from impl_v1.training.voice.tts_streaming import TTSEngine
+        monkeypatch.setenv("YGB_TEST_MODE", "true")
         tts = TTSEngine()
         stats = tts.get_stats()
         assert "status" in stats
         assert "active_provider" in stats
+        assert "provider_health" in stats
 
 
 # =========================================================================

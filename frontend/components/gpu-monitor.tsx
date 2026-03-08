@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 
 interface GPUStatus {
     gpu_available: boolean
@@ -25,7 +25,7 @@ export function GpuMonitor({ className = "", refreshInterval = 5000 }) {
 
     const fetchStatus = React.useCallback(async () => {
         try {
-            const res = await authFetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/gpu/status")
+            const res = await authFetch(getApiBase() + "/gpu/status")
             if (!res.ok) throw new Error("Backend unavailable")
             const data = await res.json()
             setStatus(data)

@@ -4,7 +4,7 @@ import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { createAuthWebSocket } from "@/lib/ws-auth"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import {
     Play,
     Square,
@@ -32,8 +32,6 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface PhaseUpdate {
     type: string
@@ -87,7 +85,7 @@ function RunnerPageContent() {
     useEffect(() => {
         async function checkApi() {
             try {
-                const res = await fetch(`${API_BASE}/health`, { cache: "no-store" })
+                const res = await fetch(`${getApiBase()}/health`, { cache: "no-store" })
                 if (res.ok) {
                     setApiStatus("online")
                 } else {
@@ -127,7 +125,7 @@ function RunnerPageContent() {
 
         try {
             // Start workflow via REST API
-            const startRes = await authFetch(`${API_BASE}/api/workflow/bounty/start`, {
+            const startRes = await authFetch(`${getApiBase()}/api/workflow/bounty/start`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

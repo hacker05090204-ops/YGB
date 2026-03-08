@@ -54,6 +54,7 @@ class TTSResponse:
     status: TTSStatus
     latency_ms: float
     timestamp: str
+    audio_url: Optional[str] = None
 
 
 # =============================================================================
@@ -118,18 +119,98 @@ class TTSEngine:
             return TTSProvider.LOCAL_PYTTSX3
         return TTSProvider.API_PROXY
 
+    def probe_provider(self) -> Dict:
+        """Probe the active provider truthfully."""
+        if self._privacy_mode:
+            try:
+                import pyttsx3  # type: ignore
+
+                return {
+                    "provider": TTSProvider.LOCAL_PYTTSX3.value,
+                    "reachable": True,
+                    "reason": "pyttsx3 available",
+                }
+            except ImportError:
+                return {
+                    "provider": TTSProvider.LOCAL_PYTTSX3.value,
+                    "reachable": False,
+                    "reason": "pyttsx3 not installed",
+                }
+            except Exception as exc:
+                return {
+                    "provider": TTSProvider.LOCAL_PYTTSX3.value,
+                    "reachable": False,
+                    "reason": f"local_tts_probe_failed:{type(exc).__name__}",
+                }
+
+        try:
+            from impl_v1.phase49.governors.g04_voice_proxy import (
+                VoiceOutputType,
+                build_tts_url,
+                create_voice_request,
+            )
+            import os
+            import urllib.request
+
+            request = create_voice_request(
+                text="voice proxy health",
+                output_type=VoiceOutputType.PROGRESS,
+                language="en",
+                priority=1,
+            )
+            probe_url = build_tts_url(request)
+            if os.environ.get("YGB_TEST_MODE", "").lower() == "true":
+                return {
+                    "provider": TTSProvider.API_PROXY.value,
+                    "reachable": True,
+                    "reason": "test_mode",
+                    "audio_url": probe_url,
+                }
+
+            req = urllib.request.Request(probe_url, method="GET")
+            req.add_header("User-Agent", "YGB-VoiceHealth/1.0")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                reachable = resp.status == 200
+            return {
+                "provider": TTSProvider.API_PROXY.value,
+                "reachable": reachable,
+                "reason": "HTTP_200" if reachable else f"HTTP_{resp.status}",
+                "audio_url": probe_url,
+            }
+        except Exception as exc:
+            return {
+                "provider": TTSProvider.API_PROXY.value,
+                "reachable": False,
+                "reason": f"proxy_probe_failed:{type(exc).__name__}",
+            }
+
     def speak(self, text: str, response_type: ResponseType = ResponseType.SUCCESS
               ) -> TTSResponse:
         """Speak text via TTS. Returns response with status."""
         start = time.time()
         self._status = TTSStatus.SPEAKING
         provider = self.active_provider
+        audio_url = None
 
         try:
             if self._privacy_mode:
-                result = self._speak_local(text)
+                delivered = self._speak_local(text)
             else:
-                result = self._speak_api(text)
+                delivered, audio_url = self._speak_api(text, response_type)
+
+            if not delivered:
+                self._total_errors += 1
+                self._status = TTSStatus.ERROR
+                return TTSResponse(
+                    response_id=f"TTS-{uuid.uuid4().hex[:12].upper()}",
+                    text=text,
+                    response_type=response_type,
+                    provider=provider,
+                    status=TTSStatus.ERROR,
+                    latency_ms=(time.time() - start) * 1000,
+                    timestamp=datetime.now(UTC).isoformat(),
+                    audio_url=audio_url,
+                )
 
             elapsed = (time.time() - start) * 1000
             self._total_spoken += 1
@@ -143,6 +224,7 @@ class TTSEngine:
                 status=TTSStatus.IDLE,
                 latency_ms=elapsed,
                 timestamp=datetime.now(UTC).isoformat(),
+                audio_url=audio_url,
             )
         except Exception as e:
             self._total_errors += 1
@@ -156,6 +238,7 @@ class TTSEngine:
                 status=TTSStatus.ERROR,
                 latency_ms=(time.time() - start) * 1000,
                 timestamp=datetime.now(UTC).isoformat(),
+                audio_url=audio_url,
             )
 
     def interrupt(self) -> bool:
@@ -166,13 +249,35 @@ class TTSEngine:
             return True
         return False
 
-    def _speak_api(self, text: str) -> bool:
-        """Speak via external TTS API."""
-        # PRODUCTION: HTTP request to TTS_API_URL
-        # Return True on success
-        # For now: truthfully mark as attempted
-        logger.info(f"[TTS] API speak request: {text[:50]}...")
-        return True
+    def _speak_api(self, text: str, response_type: ResponseType) -> tuple[bool, Optional[str]]:
+        """Speak via the real TTS proxy governor."""
+        from impl_v1.phase49.governors.g04_voice_proxy import (
+            VoiceOutputType,
+            create_voice_request,
+            process_voice_request,
+        )
+
+        output_type = {
+            ResponseType.SUCCESS: VoiceOutputType.EXPLANATION,
+            ResponseType.BLOCKED: VoiceOutputType.ALERT,
+            ResponseType.RETRY_IN_PROGRESS: VoiceOutputType.PROGRESS,
+            ResponseType.FAILURE: VoiceOutputType.ALERT,
+        }.get(response_type, VoiceOutputType.EXPLANATION)
+
+        result = process_voice_request(
+            create_voice_request(
+                text=text,
+                output_type=output_type,
+                language="en",
+                priority=5,
+            )
+        )
+        if result.status.value == "DELIVERED":
+            logger.info(f"[TTS] Proxy delivered audio for: {text[:50]}...")
+            return True, result.audio_url
+
+        logger.warning("[TTS] Proxy delivery failed: %s", result.error_message or result.status.value)
+        return False, result.audio_url
 
     def _speak_local(self, text: str) -> bool:
         """Speak via local pyttsx3 (privacy mode)."""
@@ -197,4 +302,5 @@ class TTSEngine:
             "total_spoken": self._total_spoken,
             "total_interrupted": self._total_interrupted,
             "total_errors": self._total_errors,
+            "provider_health": self.probe_provider(),
         }

@@ -31,6 +31,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
+import { getApiBase } from "@/lib/ygb-api"
+
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -53,7 +55,7 @@ export function NavUser({
 
   const handleLogout = async () => {
     try {
-      await credentialedFetch(`${API_BASE}/auth/logout`, {
+      await credentialedFetch(`${getApiBase()}/auth/logout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       })

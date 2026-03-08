@@ -8,8 +8,7 @@ import {
   notifyAuthStateChanged,
   purgeLegacyAuthStorage,
 } from "@/lib/auth-token"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
+import { getApiBase } from "@/lib/ygb-api"
 
 function LoginContent() {
   const searchParams = useSearchParams()
@@ -50,7 +49,7 @@ function LoginContent() {
 
     const verifySession = async () => {
       try {
-        const res = await credentialedFetch(`${API_BASE}/auth/me`)
+        const res = await credentialedFetch(`${getApiBase()}/auth/me`)
         if (!res.ok) {
           if (authMethod === "github" && !cancelled) {
             setStatus("error")
@@ -88,7 +87,7 @@ function LoginContent() {
 
   const handleGitHubLogin = () => {
     const origin = encodeURIComponent(window.location.origin)
-    window.location.href = `${API_BASE}/auth/github?frontend_origin=${origin}`
+    window.location.href = `${getApiBase()}/auth/github?frontend_origin=${origin}`
   }
 
   return (
@@ -194,7 +193,7 @@ function LoginContent() {
                   }
 
                   try {
-                    const res = await credentialedFetch(`${API_BASE}/auth/login`, {
+                    const res = await credentialedFetch(`${getApiBase()}/auth/login`, {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ email, password }),

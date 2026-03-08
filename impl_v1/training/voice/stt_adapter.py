@@ -441,12 +441,23 @@ def get_stt_status() -> dict:
     health = _chain.get_health()
     local_adapter = _chain._adapters[0] if _chain._adapters else None
     local_status = local_adapter.get_status() if local_adapter else "BLOCKED"
+    browser_available = any(
+        adapter.provider == STTProvider.BROWSER_WEBSPEECH
+        for adapter in _chain._adapters
+    )
+    local_model_loaded = bool(
+        getattr(getattr(local_adapter, "_service", None), "_model_loaded", False)
+    )
 
     return {
         "stt_status": "STT_READY" if local_status == "CLOSED" else "DEGRADED",
         "active_provider": health.active_provider.value,
         "local_only": not _chain._test_mode,
         "external_deps": [],  # No external deps in production
+        "local_provider_status": local_status,
+        "local_model_loaded": local_model_loaded,
+        "browser_relay_available": browser_available,
+        "provider_count": len(_chain._adapters),
         "provider_status": health.provider_status,
         "total_transcriptions": health.total_transcriptions,
         "avg_confidence": health.avg_confidence,

@@ -14,7 +14,7 @@ All routes require JWT auth.
 
 import logging
 from datetime import datetime, UTC
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
@@ -34,10 +34,21 @@ class VoiceCommandRequest(BaseModel):
     text: str
     device_id: str = "browser"
     confidence: float = 0.8
+    host_session_id: Optional[str] = None
 
 
 class VoiceConfirmRequest(BaseModel):
     confirmer_id: str
+
+
+class HostSessionRequest(BaseModel):
+    approver_id: str
+    reason: str
+    allowed_actions: List[str]
+    allowed_apps: List[str] = []
+    allowed_tasks: List[str] = []
+    allowed_roots: List[str] = []
+    expiration_window_s: int = 3600
 
 
 # =============================================================================
@@ -94,12 +105,21 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
 
         # Process through orchestrator
         orch = _get_orchestrator()
+        from backend.api.runtime_state import runtime_state
+        host_session_id = req.host_session_id or runtime_state.get("active_host_action_session")
+        if host_session_id:
+            runtime_state.set("active_host_action_session", host_session_id)
         intent = orch.process_transcript(
             text=req.text,
             user_id=user_id,
             device_id=req.device_id,
             confidence=req.confidence,
+            context_args=(
+                {"host_session_id": host_session_id}
+                if host_session_id else None
+            ),
         )
+        runtime_state.set("active_voice_mode", intent.route_mode)
 
         # Policy check
         policy = _get_policy()
@@ -114,17 +134,24 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
             intent=intent.command_type,
             action="PENDING",
             policy=decision.verdict.value,
-            result="AWAITING" if intent.requires_confirmation else "QUEUED",
+            result=(
+                "BLOCKED" if intent.error
+                else "AWAITING" if intent.requires_confirmation
+                else "QUEUED"
+            ),
         )
 
         return {
             "intent_id": intent.intent_id,
             "command_type": intent.command_type,
+            "mode": intent.route_mode,
             "risk_level": intent.risk_level.value,
             "requires_confirmation": intent.requires_confirmation,
             "confidence": intent.confidence,
             "policy_verdict": decision.verdict.value,
             "policy_reason": decision.reason,
+            "args": intent.args,
+            "ready_to_execute": orch.is_ready_to_execute(intent.intent_id),
             "error": intent.error,
             "timestamp": intent.timestamp,
         }
@@ -146,38 +173,52 @@ async def confirm_voice_intent(intent_id: str, req: VoiceConfirmRequest,
     return {"confirmed": True, "intent_id": intent_id}
 
 
+@voice_router.post("/api/voice/host-session")
+async def create_host_action_session(req: HostSessionRequest, user=Depends(require_auth)):
+    """Create a signed bounded host-action session."""
+    user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
+    try:
+        from backend.api.runtime_state import runtime_state
+        from backend.governance.host_action_governor import HostActionGovernor
+
+        governor = HostActionGovernor()
+        session = governor.issue_session(
+            requested_by=user_id,
+            approver_id=req.approver_id,
+            reason=req.reason,
+            allowed_actions=req.allowed_actions,
+            allowed_apps=req.allowed_apps,
+            allowed_tasks=req.allowed_tasks,
+            allowed_roots=req.allowed_roots,
+            expiration_window_s=req.expiration_window_s,
+        )
+        runtime_state.set("active_host_action_session", session.session_id)
+        return governor.describe_session(session.session_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception:
+        logger.exception("Host session creation failed")
+        raise HTTPException(status_code=500, detail="Host governance unavailable")
+
+
+@voice_router.get("/api/voice/host-session/{session_id}")
+async def host_action_session_status(session_id: str, user=Depends(require_auth)):
+    """Return current state for a signed host-action session."""
+    from backend.governance.host_action_governor import HostActionGovernor
+
+    governor = HostActionGovernor()
+    status = governor.describe_session(session_id)
+    if status["status"] == "missing":
+        raise HTTPException(status_code=404, detail="Session not found")
+    return status
+
+
 @voice_router.get("/api/voice/status")
 async def voice_pipeline_status():
     """Get voice pipeline health status — truthful reporting."""
-    from impl_v1.training.voice.stt_adapter import get_stt_status
-    from impl_v1.training.voice.tts_streaming import TTSEngine
-    from impl_v1.training.voice.voice_metrics import get_voice_health
+    from backend.assistant.voice_runtime import build_voice_pipeline_status
 
-    stt = get_stt_status()
-    tts = TTSEngine()
-    tts_stats = tts.get_stats()
-    metrics = get_voice_health()
-
-    # Determine overall TTS status
-    tts_status = "TTS_READY" if tts_stats.get("status") != "ERROR" else "DEGRADED"
-
-    return {
-        "pipeline_status": "ONLINE",
-        "stt_status": stt.get("stt_status", "DEGRADED"),
-        "tts_status": tts_status,
-        "local_only": stt.get("local_only", True),
-        "external_deps": [],
-        "no_whisper_dependency": True,
-        "no_google_stt_dependency": True,
-        "stt": stt,
-        "tts": tts_stats,
-        "metrics_summary": {
-            "total_commands": metrics["total_commands"],
-            "success_rate": metrics["success_rate"],
-            "slo_met": metrics["slo_met"],
-        },
-        "timestamp": datetime.now(UTC).isoformat(),
-    }
+    return build_voice_pipeline_status()
 
 
 @voice_router.get("/api/voice/metrics")

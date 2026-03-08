@@ -3,7 +3,7 @@
 import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect, useCallback } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import Link from "next/link"
 import {
     ArrowLeft,
@@ -27,8 +27,6 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 // =========================================================================
 // TYPES
@@ -178,7 +176,7 @@ function FieldProgressionDashboardContent() {
 
     const fetchData = useCallback(async () => {
         try {
-            const res = await authFetch(`${API_BASE}/fields/state`)
+            const res = await authFetch(`${getApiBase()}/fields/state`)
             if (!res.ok) throw new Error(`HTTP ${res.status}`)
             const json = await res.json()
             setData(json)
@@ -200,7 +198,7 @@ function FieldProgressionDashboardContent() {
     const handleTrain = async () => {
         setActionStatus("Starting training...")
         try {
-            const res = await authFetch(`${API_BASE}/training/start`, { method: "POST" })
+            const res = await authFetch(`${getApiBase()}/training/start`, { method: "POST" })
             const json = await res.json()
             setActionStatus(json.message || json.status)
             fetchData()
@@ -212,7 +210,7 @@ function FieldProgressionDashboardContent() {
     const handleHunt = async () => {
         setActionStatus("Checking hunt gates...")
         try {
-            const res = await authFetch(`${API_BASE}/hunt/start`, { method: "POST" })
+            const res = await authFetch(`${getApiBase()}/hunt/start`, { method: "POST" })
             const json = await res.json()
             setActionStatus(json.message || json.status)
             fetchData()
@@ -224,7 +222,7 @@ function FieldProgressionDashboardContent() {
     const handleApprove = async (fieldId: number) => {
         setActionStatus(`Approving field ${fieldId}...`)
         try {
-            const res = await authFetch(`${API_BASE}/fields/approve/${fieldId}`, {
+            const res = await authFetch(`${getApiBase()}/fields/approve/${fieldId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

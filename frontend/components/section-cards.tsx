@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -13,8 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface AdminStats {
   total_users: number
@@ -30,7 +28,7 @@ export function SectionCards() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await authFetch(`${API_BASE}/api/db/admin/stats`)
+        const res = await authFetch(`${getApiBase()}/api/db/admin/stats`)
         if (res.ok) {
           const data = await res.json()
           setStats(data.stats || null)

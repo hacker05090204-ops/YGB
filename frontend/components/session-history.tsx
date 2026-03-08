@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 
 interface Session {
     id: string
@@ -20,7 +20,7 @@ export function SessionHistory({ className = "", refreshInterval = 5000 }) {
 
     const fetchSessions = React.useCallback(async () => {
         try {
-            const res = await authFetch((process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000") + "/admin/active-sessions")
+            const res = await authFetch(getApiBase() + "/admin/active-sessions")
             if (!res.ok) throw new Error("Backend unavailable")
             const data = await res.json()
             setSessions(data.sessions || [])

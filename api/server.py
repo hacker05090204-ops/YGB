@@ -3554,6 +3554,7 @@ _active_voice_mode = "SECURITY"
 class VoiceParseRequest(BaseModel):
     text: str
     mode: Optional[str] = None  # "SECURITY" or "RESEARCH", auto-detect if None
+    host_session_id: Optional[str] = None
 
 
 @app.post("/api/voice/parse")
@@ -3565,7 +3566,7 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
     - RESEARCH mode: routes to isolated Edge search pipeline
     - Auto-classifies if mode not specified
     """
-    _active_voice_mode = runtime_state.get("active_voice_mode", False)
+    _active_voice_mode = runtime_state.get("active_voice_mode", "SECURITY")
     text = request.text.strip()
     
     if not text:
@@ -3584,6 +3585,7 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
     # Determine mode
     mode = request.mode
     route_decision = None
+    host_session_id = request.host_session_id or runtime_state.get("active_host_action_session")
     
     if RESEARCH_AVAILABLE and mode is None:
         # Auto-classify
@@ -3593,8 +3595,41 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
     elif mode is None:
         mode = "SECURITY"
     
-    _active_voice_mode = mode
-    
+    runtime_state.set("active_voice_mode", mode)
+
+    if host_session_id:
+        try:
+            from impl_v1.training.voice.voice_intent_orchestrator import VoiceIntentOrchestrator
+
+            orch = VoiceIntentOrchestrator()
+            user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
+            host_intent = orch.process_transcript(
+                text=text,
+                user_id=user_id,
+                device_id="browser",
+                confidence=0.8,
+                context_args={"host_session_id": host_session_id},
+            )
+            if host_intent.command_type in {"LAUNCH_APP", "OPEN_APP", "OPEN_URL", "RUN_APPROVED_TASK"}:
+                runtime_state.set("active_voice_mode", host_intent.route_mode)
+                runtime_state.set("active_host_action_session", host_session_id)
+                return {
+                    "intent_id": host_intent.intent_id,
+                    "intent_type": host_intent.command_type,
+                    "raw_text": text,
+                    "extracted_value": host_intent.args.get("app")
+                    or host_intent.args.get("url")
+                    or host_intent.args.get("task"),
+                    "confidence": host_intent.confidence,
+                    "status": "PARSED" if not host_intent.error else "BLOCKED",
+                    "block_reason": host_intent.error,
+                    "active_mode": host_intent.route_mode,
+                    "args": host_intent.args,
+                    "timestamp": host_intent.timestamp,
+                }
+        except Exception:
+            logger.exception("Host-action parse failed")
+
     # ===== RESEARCH MODE =====
     if mode == "RESEARCH" and RESEARCH_AVAILABLE:
         # Run isolation pre-check
@@ -3614,41 +3649,37 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
                 "timestamp": datetime.now(UTC).isoformat(),
             }
         
-        # Execute research search
-        pipeline = ResearchSearchPipeline()
-        result = pipeline.search(text)
-        
-        # Audit log
-        guard.log_research_query(
-            query=text,
-            result_status=result.status.value,
-            checks_passed=5,
-            checks_failed=0,
-            violations=[],
-        )
-        
+        from backend.assistant.voice_runtime import run_research_analysis
+        analysis = run_research_analysis(text)
+        research = analysis.get("research", {})
+        verification = analysis.get("verification", {})
+        audit = analysis.get("audit", {})
+
         return {
             "intent_id": f"VOC-RESEARCH",
             "intent_type": "RESEARCH_QUERY",
             "raw_text": text,
-            "extracted_value": result.summary,
-            "confidence": 0.9 if result.status == ResearchStatus.SUCCESS else 0.3,
-            "status": "PARSED" if result.status == ResearchStatus.SUCCESS else "INVALID",
-            "block_reason": None if result.status == ResearchStatus.SUCCESS else result.summary,
+            "extracted_value": research.get("summary"),
+            "confidence": 0.9 if research.get("status") == ResearchStatus.SUCCESS.value else 0.3,
+            "status": "PARSED" if research.get("status") == ResearchStatus.SUCCESS.value else "INVALID",
+            "block_reason": None if research.get("status") == ResearchStatus.SUCCESS.value else research.get("summary"),
             "active_mode": "RESEARCH",
             "research_result": {
-                "title": result.title,
-                "summary": result.summary,
-                "source": result.source,
-                "key_terms": list(result.key_terms),
-                "word_count": result.word_count,
-                "elapsed_ms": result.elapsed_ms,
+                "title": research.get("title"),
+                "summary": research.get("summary"),
+                "source": research.get("source"),
+                "search_backend": research.get("search_backend"),
+                "key_terms": research.get("key_terms", []),
+                "word_count": research.get("word_count", 0),
+                "elapsed_ms": research.get("elapsed_ms", 0),
             },
+            "verification": verification,
+            "audit": audit,
             "route_decision": {
                 "confidence": route_decision.confidence if route_decision else 1.0,
                 "reason": route_decision.reason if route_decision else "Manual mode selection",
             } if route_decision or mode == "RESEARCH" else None,
-            "timestamp": result.timestamp,
+            "timestamp": analysis.get("audit", {}).get("timestamp", datetime.now(UTC).isoformat()),
         }
     
     # ===== SECURITY MODE (default) =====
@@ -3684,7 +3715,7 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
 async def voice_mode(user=Depends(require_auth)):
     """Return current active voice mode."""
     return {
-        "mode": _active_voice_mode,
+        "mode": runtime_state.get("active_voice_mode", "SECURITY"),
         "research_available": RESEARCH_AVAILABLE,
     }
 

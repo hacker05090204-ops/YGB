@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import { cn } from "@/lib/utils"
 import {
     Activity,
@@ -17,8 +17,6 @@ import {
     Square,
     BarChart3
 } from "lucide-react"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface G38Status {
     available: boolean
@@ -88,8 +86,8 @@ export function TrainingProgress({
     const fetchStatus = useCallback(async () => {
         try {
             const [statusRes, eventsRes] = await Promise.all([
-                authFetch(`${API_BASE}/api/g38/status`),
-                authFetch(`${API_BASE}/api/g38/events?limit=5`)
+                authFetch(`${getApiBase()}/api/g38/status`),
+                authFetch(`${getApiBase()}/api/g38/events?limit=5`)
             ])
 
             if (statusRes.ok) {
@@ -114,7 +112,7 @@ export function TrainingProgress({
     const startTraining = useCallback(async () => {
         setIsStarting(true)
         try {
-            const res = await authFetch(`${API_BASE}/api/g38/start?epochs=${selectedEpochs}`, {
+            const res = await authFetch(`${getApiBase()}/api/g38/start?epochs=${selectedEpochs}`, {
                 method: 'POST'
             })
             if (res.ok) {
@@ -130,7 +128,7 @@ export function TrainingProgress({
     const stopTraining = useCallback(async () => {
         setIsStopping(true)
         try {
-            const res = await authFetch(`${API_BASE}/api/g38/abort`, {
+            const res = await authFetch(`${getApiBase()}/api/g38/abort`, {
                 method: 'POST'
             })
             if (res.ok) {

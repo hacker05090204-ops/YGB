@@ -3,7 +3,7 @@
 import { AuthGuard } from "@/components/auth-guard"
 
 import { useState, useEffect } from "react"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch , getApiBase } from "@/lib/ygb-api"
 import Link from "next/link"
 import {
     ArrowLeft,
@@ -67,8 +67,6 @@ interface G38Status {
     }
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
-
 function TrainingDashboardContent() {
     const [status, setStatus] = useState<G38Status | null>(null)
     const [events, setEvents] = useState<TrainingEvent[]>([])
@@ -81,8 +79,8 @@ function TrainingDashboardContent() {
     const fetchData = async () => {
         try {
             const [statusRes, eventsRes] = await Promise.all([
-                authFetch(`${API_BASE}/api/g38/status`),
-                authFetch(`${API_BASE}/api/g38/events?limit=100`)
+                authFetch(`${getApiBase()}/api/g38/status`),
+                authFetch(`${getApiBase()}/api/g38/events?limit=100`)
             ])
 
             if (statusRes.ok) {
@@ -118,7 +116,7 @@ function TrainingDashboardContent() {
     const startTraining = async (epochs: number) => {
         setStartingTraining(true)
         try {
-            await authFetch(`${API_BASE}/api/g38/start?epochs=${epochs}`, { method: "POST" })
+            await authFetch(`${getApiBase()}/api/g38/start?epochs=${epochs}`, { method: "POST" })
             await fetchData()
         } catch (error) {
             console.error("Failed to start training:", error)
