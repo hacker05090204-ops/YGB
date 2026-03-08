@@ -38,6 +38,7 @@ _calculate_progress = _mod._calculate_progress
 get_fields_state = _mod.get_fields_state
 get_active_progress = _mod.get_active_progress
 start_training = _mod.start_training
+sync_active_field_training = _mod.sync_active_field_training
 
 
 # ==================================================================
@@ -269,3 +270,91 @@ class TestTrainingStart:
         if result["status"] == "ok":
             assert "field_id" in result
             assert "field_name" in result
+
+
+class TestFieldSync:
+    """Verify real training metrics update field lifecycle state."""
+
+    def test_sync_sets_certification_pending_without_human_approval(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = os.path.join(tmp, "field_state.json")
+            runtime_path = os.path.join(tmp, "runtime_status.json")
+            orig_state = _mod.FIELD_STATE_PATH
+            orig_runtime = _mod.RUNTIME_STATE_PATH
+            _mod.FIELD_STATE_PATH = state_path
+            _mod.RUNTIME_STATE_PATH = runtime_path
+            try:
+                state = _default_state()
+                _save_field_state(state)
+                result = sync_active_field_training(
+                    precision=0.98,
+                    fpr=0.02,
+                    stability_cycles=5,
+                    promotion_ready=True,
+                    determinism_passed=True,
+                    drift_passed=True,
+                    regression_passed=True,
+                )
+                loaded = _load_field_state()
+                field = loaded["fields"][0]
+                assert result["status"] == "ok"
+                assert field["state"] == "CERTIFICATION_PENDING"
+                assert field["certified"] is False
+                assert field["frozen"] is False
+                assert os.path.exists(runtime_path)
+            finally:
+                _mod.FIELD_STATE_PATH = orig_state
+                _mod.RUNTIME_STATE_PATH = orig_runtime
+
+    def test_sync_freezes_human_approved_field(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = os.path.join(tmp, "field_state.json")
+            runtime_path = os.path.join(tmp, "runtime_status.json")
+            orig_state = _mod.FIELD_STATE_PATH
+            orig_runtime = _mod.RUNTIME_STATE_PATH
+            _mod.FIELD_STATE_PATH = state_path
+            _mod.RUNTIME_STATE_PATH = runtime_path
+            try:
+                state = _default_state()
+                state["fields"][0]["human_approved"] = True
+                _save_field_state(state)
+                result = sync_active_field_training(
+                    precision=0.985,
+                    fpr=0.01,
+                    stability_cycles=6,
+                    promotion_ready=True,
+                    determinism_passed=True,
+                    drift_passed=True,
+                    regression_passed=True,
+                )
+                loaded = _load_field_state()
+                field = loaded["fields"][0]
+                assert result["status"] == "ok"
+                assert field["state"] == "FROZEN"
+                assert field["certified"] is True
+                assert field["frozen"] is True
+                assert loaded["certified_count"] == 1
+            finally:
+                _mod.FIELD_STATE_PATH = orig_state
+                _mod.RUNTIME_STATE_PATH = orig_runtime
+
+    def test_start_training_advances_after_frozen_field(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            state_path = os.path.join(tmp, "field_state.json")
+            orig_state = _mod.FIELD_STATE_PATH
+            _mod.FIELD_STATE_PATH = state_path
+            try:
+                state = _default_state()
+                state["fields"][0]["state"] = "FROZEN"
+                state["fields"][0]["certified"] = True
+                state["fields"][0]["frozen"] = True
+                _save_field_state(state)
+                result = start_training()
+                loaded = _load_field_state()
+                assert result["status"] == "ok"
+                assert result["field_id"] == 1
+                assert loaded["active_field_id"] == 1
+                assert loaded["fields"][1]["active"] is True
+                assert loaded["fields"][1]["state"] == "TRAINING"
+            finally:
+                _mod.FIELD_STATE_PATH = orig_state

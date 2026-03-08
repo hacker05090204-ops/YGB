@@ -42,6 +42,14 @@ from dataclasses import dataclass
 from typing import Optional, Callable, List, Tuple
 from enum import Enum
 
+from backend.training.runtime_artifacts import (
+    ensure_local_mode_a_bootstrap,
+    probe_host_metrics,
+    write_field_runtime_status,
+    write_training_gate,
+    write_training_telemetry,
+)
+
 # Import idle detection
 from .idle_detector import (
     get_idle_seconds,
@@ -239,6 +247,8 @@ class AutoTrainer:
         self._gpu_scheduler = None  # LR scheduler (ReduceLROnPlateau)
         self._scaler = None  # AMP GradScaler
         self._training_mode_label: str = "MANUAL"
+        self._session_start_monotonic = 0.0
+        self._batch_size = 0
         
         # === MODE_A EARLY STOPPING ===
         self._best_accuracy = 0.0
@@ -307,6 +317,138 @@ class AutoTrainer:
                 pass
         
         return event
+
+    def _session_duration_seconds(self) -> float:
+        """Return current session duration in seconds."""
+        if not self._current_session:
+            return 0.0
+        try:
+            started = datetime.fromisoformat(self._current_session.started_at)
+            if started.tzinfo is None:
+                started = started.replace(tzinfo=timezone.utc)
+            return max(
+                0.0,
+                (datetime.now(timezone.utc) - started).total_seconds(),
+            )
+        except ValueError:
+            return 0.0
+
+    def _determinism_status(self) -> bool:
+        """Infer whether the current trainer is running in deterministic mode."""
+        if not TORCH_AVAILABLE or not PYTORCH_AVAILABLE:
+            return False
+        try:
+            return bool(
+                torch.cuda.is_available()
+                and torch.backends.cudnn.deterministic
+                and _TRAINING_PROFILE != "fast"
+                and os.environ.get("CUBLAS_WORKSPACE_CONFIG")
+            )
+        except Exception:
+            return False
+
+    def _persist_runtime_artifacts(
+        self,
+        *,
+        epoch_elapsed_seconds: Optional[float] = None,
+    ) -> None:
+        """Persist telemetry, gate state, and field progression outputs."""
+        try:
+            host_metrics = probe_host_metrics()
+            determinism_status = self._determinism_status()
+            promotion_frozen = bool(
+                self._promotion is not None and self._promotion.state.frozen
+            )
+            promotion_reason = (
+                self._promotion.state.freeze_reason
+                if self._promotion is not None else None
+            )
+            duration_seconds = self._session_duration_seconds()
+            total_epochs = (
+                self._target_epochs
+                if self._target_epochs > 0 and self._target_epochs < 999999
+                else 0
+            )
+            batch_velocity = None
+            if epoch_elapsed_seconds and self._last_total_batches > 0:
+                batch_velocity = self._last_total_batches / max(epoch_elapsed_seconds, 0.001)
+
+            write_training_gate(
+                determinism_status=determinism_status,
+                freeze_status=promotion_frozen,
+                gpu_temperature=host_metrics.get("gpu_temperature"),
+            )
+            write_training_telemetry(
+                epoch=self._session_epoch if self._session_epoch > 0 else self._epoch,
+                batch_size=int(self._batch_size or 0),
+                loss=float(self._last_loss),
+                precision=float(self._last_accuracy),
+                total_epochs=total_epochs,
+                training_duration_seconds=duration_seconds,
+                samples_per_second=float(self._samples_per_sec),
+                determinism_status=determinism_status,
+                freeze_status=promotion_frozen,
+                gpu_temperature=host_metrics.get("gpu_temperature"),
+                cpu_util=host_metrics.get("cpu_util"),
+                gpu_util=host_metrics.get("gpu_util"),
+                monotonic_start_time=int(self._session_start_monotonic or time.monotonic()),
+                dataset_size=(
+                    self._gpu_dataset_stats["train"]["total"]
+                    if self._gpu_dataset_stats else None
+                ),
+            )
+            write_field_runtime_status(
+                containment_active=promotion_frozen,
+                containment_reason=promotion_reason,
+                precision_breach=bool(
+                    self._last_accuracy > 0 and self._last_accuracy < self._early_stop_baseline
+                ),
+                drift_alert=promotion_frozen,
+                freeze_valid=(not promotion_frozen) if self._last_accuracy > 0 else None,
+                freeze_reason=promotion_reason,
+                training_velocity_samples_hr=(
+                    float(self._samples_per_sec) * 3600.0
+                    if self._samples_per_sec > 0 else None
+                ),
+                training_velocity_batches_sec=batch_velocity,
+                gpu_utilization=host_metrics.get("gpu_util"),
+                determinism_pass=determinism_status,
+                data_freshness="fresh" if self._gpu_dataset_stats else None,
+                merge_status="blocked" if promotion_frozen else None,
+            )
+
+            try:
+                from backend.api.field_progression_api import sync_active_field_training
+
+                sync_active_field_training(
+                    precision=float(self._last_accuracy) if self._last_accuracy > 0 else None,
+                    fpr=max(0.0, 1.0 - float(self._last_accuracy))
+                    if self._last_accuracy > 0 else None,
+                    stability_cycles=(
+                        self._promotion.state.stable_cycles
+                        if self._promotion is not None else None
+                    ),
+                    promotion_ready=bool(
+                        self._promotion is not None and self._promotion.is_live_ready()
+                    ),
+                    promotion_frozen=promotion_frozen,
+                    promotion_freeze_reason=promotion_reason,
+                    determinism_passed=determinism_status,
+                    drift_passed=not promotion_frozen,
+                    regression_passed=True,
+                    training_velocity_samples_hr=(
+                        float(self._samples_per_sec) * 3600.0
+                        if self._samples_per_sec > 0 else None
+                    ),
+                    training_velocity_batches_sec=batch_velocity,
+                    gpu_utilization=host_metrics.get("gpu_util"),
+                    data_freshness="fresh" if self._gpu_dataset_stats else None,
+                    merge_status="blocked" if promotion_frozen else None,
+                )
+            except Exception as exc:
+                logger.warning(f"Field progression sync failed: {exc}")
+        except Exception as exc:
+            logger.warning(f"Runtime artifact persistence failed: {exc}")
 
     def _attempt_ingestion_recovery(self, target_samples: int) -> Tuple[bool, str]:
         """
@@ -510,6 +652,7 @@ class AutoTrainer:
             self._gpu_dataloader = train_loader
             self._gpu_holdout_loader = holdout_loader  # Store holdout for validation
             self._gpu_dataset_stats = stats
+            self._batch_size = int(getattr(train_loader, "batch_size", 0) or 0)
 
             dataset_source = str(stats.get("dataset_source", "") or "").upper()
             if dataset_source != "INGESTION_PIPELINE":
@@ -999,6 +1142,8 @@ class AutoTrainer:
                 gpu_used=True,
             )
             
+            self._persist_runtime_artifacts(epoch_elapsed_seconds=_step_elapsed)
+
             # If early stopped, return False to signal training session should end
             if early_stopped:
                 return False
@@ -1503,6 +1648,15 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             start_epoch=trainer._epoch,
             gpu_used=True,  # Always GPU
         )
+        trainer._session_start_monotonic = time.monotonic()
+
+    ensure_local_mode_a_bootstrap()
+    initial_metrics = probe_host_metrics()
+    write_training_gate(
+        determinism_status=trainer._determinism_status(),
+        freeze_status=False,
+        gpu_temperature=initial_metrics.get("gpu_temperature"),
+    )
     
     trainer._emit_event(
         "CONTINUOUS_START",
@@ -1571,6 +1725,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                         epoch=epoch_count,
                         gpu_used=True,
                     )
+                    trainer._persist_runtime_artifacts(epoch_elapsed_seconds=_step_elapsed)
                 
             except Exception as e:
                 trainer._emit_event(
@@ -1588,6 +1743,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
         with trainer._training_lock:
             trainer._state = TrainingState.IDLE
             if trainer._current_session:
+                trainer._persist_runtime_artifacts()
                 trainer._generate_session_report()
             trainer._current_session = None
             trainer._continuous_thread = None

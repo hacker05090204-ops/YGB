@@ -165,9 +165,10 @@ class TrainingStateManager:
         except Exception as e:
             import logging
             logging.getLogger(__name__).exception("Failed to get trainer status")
+            error_status = str(e).strip() or "trainer_error"
             return TrainingMetrics(
                 status="error",
-                automode_status="trainer_error",
+                automode_status=error_status,
             )
 
         is_training = trainer_status.get("is_training", False)

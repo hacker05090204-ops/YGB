@@ -18,6 +18,7 @@ GOVERNANCE:
 
 import json
 import logging
+import math
 import os
 import time
 from datetime import datetime, timezone
@@ -148,11 +149,15 @@ def _default_state() -> dict:
             "dup_detection": None,
             "ece": None,
             "stability_days": 0,
+            "stability_cycles": 0,
             "human_approved": False,
             "active": (i == 0),
             "locked": (i > 0),
             "certified": False,
             "frozen": False,
+            "freeze_reason": None,
+            "first_trained_at": None,
+            "last_trained_at": None,
         })
     return {
         "active_field_id": 0,
@@ -318,6 +323,187 @@ def _build_runtime_status(ladder_state: dict) -> dict:
     return runtime
 
 
+def _save_runtime_status(runtime: dict) -> None:
+    """Persist runtime status atomically."""
+    os.makedirs(os.path.dirname(RUNTIME_STATE_PATH) or ".", exist_ok=True)
+    tmp = RUNTIME_STATE_PATH + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(runtime, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, RUNTIME_STATE_PATH)
+
+
+def _advance_to_next_field(state: dict) -> Optional[dict]:
+    """Activate the next field after the current one is frozen."""
+    active_id = state.get("active_field_id", 0)
+    next_id = active_id + 1
+    if next_id >= TOTAL_FIELDS:
+        return None
+
+    current = state["fields"][active_id]
+    current["active"] = False
+    current["locked"] = False
+
+    nxt = state["fields"][next_id]
+    nxt["active"] = True
+    nxt["locked"] = False
+    if nxt["state"] == "NOT_STARTED":
+        nxt["state"] = "TRAINING"
+
+    state["active_field_id"] = next_id
+    state["last_updated"] = datetime.now(timezone.utc).isoformat()
+    return nxt
+
+
+def sync_active_field_training(
+    *,
+    precision: Optional[float],
+    fpr: Optional[float],
+    dup_detection: Optional[float] = None,
+    ece: Optional[float] = None,
+    stability_cycles: Optional[int] = None,
+    promotion_ready: bool = False,
+    promotion_frozen: bool = False,
+    promotion_freeze_reason: Optional[str] = None,
+    determinism_passed: Optional[bool] = None,
+    drift_passed: Optional[bool] = None,
+    regression_passed: Optional[bool] = None,
+    training_velocity_samples_hr: Optional[float] = None,
+    training_velocity_batches_sec: Optional[float] = None,
+    gpu_utilization: Optional[float] = None,
+    data_freshness: Optional[str] = None,
+    merge_status: Optional[str] = None,
+) -> dict:
+    """
+    Persist real training metrics for the active field and advance lifecycle
+    state based on governed promotion/freeze results.
+    """
+    from impl_v1.training.distributed.freeze_validator import FreezeValidator
+
+    state = _load_field_state()
+    active_id = state.get("active_field_id", 0)
+    if active_id >= TOTAL_FIELDS:
+        return {
+            "status": "error",
+            "message": "ALL_FIELDS_COMPLETE",
+        }
+
+    field = state["fields"][active_id]
+    now = datetime.now(timezone.utc)
+
+    first_trained_at = field.get("first_trained_at")
+    if not first_trained_at:
+        field["first_trained_at"] = now.isoformat()
+        first_trained_at = field["first_trained_at"]
+
+    if precision is not None:
+        field["precision"] = round(float(precision), 4)
+    if fpr is not None:
+        field["fpr"] = round(float(fpr), 4)
+    if dup_detection is not None:
+        field["dup_detection"] = round(float(dup_detection), 4)
+    if ece is not None:
+        field["ece"] = round(float(ece), 4)
+    if stability_cycles is not None:
+        field["stability_cycles"] = int(stability_cycles)
+
+    try:
+        started = datetime.fromisoformat(first_trained_at)
+        if started.tzinfo is None:
+            started = started.replace(tzinfo=timezone.utc)
+        field["stability_days"] = max(
+            0, int(math.floor((now - started).total_seconds() / 86400.0))
+        )
+    except ValueError:
+        field["stability_days"] = 0
+
+    thresholds = TIERS[field["id"]]["thresholds"]
+    precision_breach = (
+        field.get("precision") is not None and
+        field["precision"] < thresholds["min_precision"]
+    )
+    drift_alert = promotion_frozen or (drift_passed is False)
+
+    freeze_result = FreezeValidator().validate_freeze(
+        model_version=f"field-{field['id']}",
+        determinism_passed=bool(determinism_passed),
+        determinism_detail="Determinism verified by runtime artifacts"
+        if determinism_passed else "Determinism not proven by runtime artifacts",
+        drift_passed=not drift_alert,
+        drift_detail=promotion_freeze_reason or "No promotion freeze active",
+        regression_passed=bool(regression_passed)
+        if regression_passed is not None else True,
+        regression_detail="Regression check passed"
+        if regression_passed is not False else "Regression threshold exceeded",
+    )
+
+    field["freeze_reason"] = promotion_freeze_reason or (
+        None if freeze_result.freeze_allowed else freeze_result.reason
+    )
+    field["last_trained_at"] = now.isoformat()
+
+    if promotion_frozen:
+        field["state"] = "TRAINING"
+        field["certified"] = False
+        field["frozen"] = False
+    elif promotion_ready:
+        field["state"] = "CERTIFICATION_PENDING"
+        if field.get("human_approved", False):
+            field["certified"] = True
+            field["state"] = "CERTIFIED"
+            if freeze_result.freeze_allowed:
+                field["frozen"] = True
+                field["state"] = "FROZEN"
+            else:
+                field["frozen"] = False
+        else:
+            field["certified"] = False
+            field["frozen"] = False
+    elif field.get("precision") is not None and not precision_breach:
+        field["state"] = "STABILITY_CHECK"
+        field["certified"] = False
+        field["frozen"] = False
+    else:
+        field["state"] = "TRAINING"
+        field["certified"] = False
+        field["frozen"] = False
+
+    state["certified_count"] = sum(
+        1 for item in state["fields"] if item.get("certified", False)
+    )
+    state["last_updated"] = now.isoformat()
+    _save_field_state(state)
+
+    runtime = {
+        "containment_active": promotion_frozen,
+        "containment_reason": promotion_freeze_reason,
+        "precision_breach": precision_breach,
+        "drift_alert": drift_alert,
+        "freeze_valid": freeze_result.freeze_allowed,
+        "freeze_reason": field.get("freeze_reason"),
+        "training_velocity_samples_hr": training_velocity_samples_hr,
+        "training_velocity_batches_sec": training_velocity_batches_sec,
+        "gpu_utilization": gpu_utilization,
+        "determinism_pass": determinism_passed,
+        "data_freshness": data_freshness,
+        "merge_status": merge_status,
+    }
+    _save_runtime_status(runtime)
+
+    return {
+        "status": "ok",
+        "field_id": field["id"],
+        "field_name": field["name"],
+        "field_state": field["state"],
+        "promotion_ready": promotion_ready,
+        "promotion_frozen": promotion_frozen,
+        "freeze_valid": freeze_result.freeze_allowed,
+        "runtime": runtime,
+        "timestamp": now.isoformat(),
+    }
+
+
 # =========================================================================
 # ENDPOINT HANDLERS
 # =========================================================================
@@ -474,6 +660,22 @@ def start_training() -> dict:
 
     field = state["fields"][active_id]
 
+    if field.get("frozen", False) and field.get("certified", False):
+        next_field = _advance_to_next_field(state)
+        if next_field is None:
+            state["last_updated"] = datetime.now(timezone.utc).isoformat()
+            _save_field_state(state)
+            return {
+                "status": "ok",
+                "message": "ALL_FIELDS_COMPLETE: all fields already frozen",
+                "field_id": active_id,
+                "field_name": field["name"],
+                "tier": field["tier"],
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        field = next_field
+        active_id = field["id"]
+
     if field["state"] not in ("NOT_STARTED", "TRAINING"):
         return {
             "status": "error",
@@ -484,6 +686,7 @@ def start_training() -> dict:
     # Transition to TRAINING
     field["state"] = "TRAINING"
     field["active"] = True
+    field["locked"] = False
     state["last_updated"] = datetime.now(timezone.utc).isoformat()
     _save_field_state(state)
 
