@@ -5,19 +5,105 @@
 
 import { credentialedFetch } from "./auth-token";
 
-const _ENV_API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000";
+const _ENV_API_BASE = (process.env.NEXT_PUBLIC_YGB_API_URL || "").trim().replace(/\/+$/, "");
+const _DEFAULT_API_BASE = "http://localhost:8000";
 const _API_PORT = "8000";
+const _API_BASE_OVERRIDE_KEY = "ygb_api_base_override";
+
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1";
+}
+
+function normalizeApiBase(raw: string | null | undefined): string {
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    return url.origin.replace(/\/+$/, "");
+  } catch {
+    return "";
+  }
+}
+
+function isPrivateOrigin(origin: string): boolean {
+  try {
+    const url = new URL(origin);
+    const host = url.hostname;
+    if (host === "localhost" || host === "127.0.0.1") return true;
+    if (host.startsWith("192.168.") || host.startsWith("10.")) return true;
+    if (host.startsWith("100.")) return true; // Tailscale CGNAT
+    if (host.startsWith("172.")) {
+      const second = parseInt(host.split(".")[1], 10);
+      if (second >= 16 && second <= 31) return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function readBrowserApiBaseOverride(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  const fromQuery = normalizeApiBase(
+    new URLSearchParams(window.location.search).get("api_base")
+  );
+  // GOVERNANCE: Only accept private/LAN IPs — never allow external redirects
+  if (fromQuery && isPrivateOrigin(fromQuery)) {
+    try {
+      window.localStorage.setItem(_API_BASE_OVERRIDE_KEY, fromQuery);
+    } catch {
+      // Ignore storage failures and still use the query value.
+    }
+    return fromQuery;
+  }
+
+  try {
+    const stored = normalizeApiBase(window.localStorage.getItem(_API_BASE_OVERRIDE_KEY));
+    if (stored && isPrivateOrigin(stored)) return stored;
+    // Clear any stored non-private override (stale or malicious)
+    if (stored) window.localStorage.removeItem(_API_BASE_OVERRIDE_KEY);
+    return "";
+  } catch {
+    return "";
+  }
+}
 
 /**
  * Derive API base URL at runtime from the browser's current hostname.
  * This ensures cookies set by the backend at IP:8000 are sent back to the
  * same IP:8000 — not to "localhost:8000" which is a different cookie domain.
- * Falls back to NEXT_PUBLIC_YGB_API_URL for SSR/tests.
+ * If the frontend runs on localhost from another device, allow an explicit
+ * backend override via query string, localStorage, or env.
  */
 export function getApiBase(): string {
-  if (typeof window === "undefined") return _ENV_API_BASE;
+  if (typeof window === "undefined") return _ENV_API_BASE || _DEFAULT_API_BASE;
+
   const { protocol, hostname } = window.location;
-  return `${protocol}//${hostname}:${_API_PORT}`;
+  const derived = `${protocol}//${hostname}:${_API_PORT}`;
+  if (!isLoopbackHost(hostname)) {
+    return derived;
+  }
+
+  const override = readBrowserApiBaseOverride();
+  if (override) {
+    return override;
+  }
+
+  if (_ENV_API_BASE) {
+    try {
+      const envHost = new URL(_ENV_API_BASE).hostname;
+      if (!isLoopbackHost(envHost)) {
+        return _ENV_API_BASE;
+      }
+    } catch {
+      return _ENV_API_BASE;
+    }
+    return _ENV_API_BASE;
+  }
+
+  return derived;
 }
 
 /**

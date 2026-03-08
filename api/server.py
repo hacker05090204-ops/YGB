@@ -193,7 +193,10 @@ except ImportError:
 
 # Import training state manager
 from backend.training.state_manager import get_training_state_manager
-from backend.training.runtime_artifacts import bootstrap_runtime_artifacts
+from backend.training.runtime_artifacts import (
+    bootstrap_runtime_artifacts,
+    repair_runtime_artifacts_if_needed,
+)
 
 # Import auth and alerts
 from backend.auth.auth import (
@@ -4026,14 +4029,34 @@ async def runtime_status(user=Depends(require_auth)):
     Falls back to live G38 auto_trainer metrics if no telemetry file exists.
     """
     telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
+    live_status = None
+    training_active = False
+
+    if G38_AVAILABLE:
+        try:
+            trainer = get_auto_trainer()
+            live_status = trainer.get_status()
+            training_active = bool(live_status.get("is_training", False))
+        except Exception:
+            logger.exception("runtime_status live trainer probe failed")
+            live_status = None
+
+    repair_status = {"repaired": False, "issues": []}
+    try:
+        repair_status = repair_runtime_artifacts_if_needed(
+            training_active=training_active
+        )
+    except Exception:
+        logger.exception("runtime_status auto-repair failed")
+        repair_status = {"repaired": False, "issues": ["auto_repair_failed"]}
 
     # --- Fallback: G38 auto_trainer live metrics when no telemetry file ---
     if not telemetry_path.exists():
-        if G38_AVAILABLE:
+        if live_status is not None:
             try:
                 trainer = get_auto_trainer()
-                status = trainer.get_status()
-                is_training = status.get("is_training", False)
+                status = live_status
+                is_training = bool(status.get("is_training", False))
                 epoch = status.get("epoch", 0)
                 total_epochs = status.get("total_epochs", 0)
                 loss = float(status.get("last_loss", 0.0) or 0.0)
@@ -4149,6 +4172,8 @@ async def runtime_status(user=Depends(require_auth)):
                     "last_update_ms": 0,
                     "signature": None,
                     "source": "g38_live",
+                    "auto_repaired": repair_status.get("repaired", False),
+                    "repair_issues": repair_status.get("issues", []),
                 }
             except Exception:
                 logger.exception("runtime_status G38 fallback failed")
@@ -4164,6 +4189,8 @@ async def runtime_status(user=Depends(require_auth)):
             "signature": None,
             "source": "none",
             "is_measured": False,
+            "auto_repaired": repair_status.get("repaired", False),
+            "repair_issues": repair_status.get("issues", []),
         }
 
     try:
@@ -4177,16 +4204,32 @@ async def runtime_status(user=Depends(require_auth)):
                 "stale": True,
                 "last_update_ms": 0,
                 "signature": None,
+                "source": "telemetry_file",
+                "auto_repaired": repair_status.get("repaired", False),
+                "repair_issues": repair_status.get("issues", []),
             }
 
         # Check staleness (>60s since file mod time)
         import time as _time
         mod_time = telemetry_path.stat().st_mtime
         age_ms = int((_time.time() - mod_time) * 1000)
-        is_stale = age_ms > 60000
+        is_stale = training_active and age_ms > 60000
+        runtime_mode = "IDLE"
+        training_state = "IDLE"
+        samples_per_second = data.get("samples_per_second", 0.0)
+        dataset_size = data.get("dataset_size", 0)
+        checkpoints_saved = 0
+        safetensors_files = 0
+        if live_status is not None:
+            runtime_mode = str(live_status.get("training_mode", "IDLE") or "IDLE")
+            training_state = str(live_status.get("state", "IDLE") or "IDLE")
+            samples_per_second = live_status.get("samples_per_sec", samples_per_second)
+            dataset_size = live_status.get("dataset_size", dataset_size)
+            checkpoints_saved = int(live_status.get("events_count", 0) or 0)
+        status_value = "active" if training_active else "idle"
 
         return {
-            "status": "active",
+            "status": status_value,
             "runtime": {
                 "total_epochs": data.get("total_epochs", 100),
                 "completed_epochs": data.get("epoch", 0),
@@ -4200,18 +4243,30 @@ async def runtime_status(user=Depends(require_auth)):
                 "temperature": data.get("gpu_temperature", 0.0),
                 "determinism_status": data.get("determinism_status", False),
                 "freeze_status": data.get("freeze_status", False),
-                "mode": runtime_state.get("runtime_mode", "IDLE"),
+                "mode": runtime_mode,
                 "progress_pct": min(100.0, (data.get("epoch", 0) / max(data.get("total_epochs", 100), 1)) * 100),
                 "loss_trend": data.get("loss_trend", 0.0),
                 # Phase 2: Real-time training visibility
                 "wall_clock_unix": data.get("wall_clock_unix", 0),
                 "monotonic_start_time": data.get("monotonic_start_time", 0),
                 "training_duration_seconds": data.get("training_duration_seconds", 0.0),
+                "training_state": training_state,
+                "samples_per_sec": samples_per_second,
+                "dataset_size": dataset_size,
+                "checkpoints_saved": checkpoints_saved,
+                "safetensors_files": safetensors_files,
             },
             "determinism_ok": data.get("determinism_status", False),
             "stale": is_stale,
             "last_update_ms": age_ms,
-            "signature": data.get("hmac", None)
+            "signature": data.get("hmac", None),
+            "source": (
+                "telemetry_file_self_healed"
+                if repair_status.get("repaired")
+                else "telemetry_file"
+            ),
+            "auto_repaired": repair_status.get("repaired", False),
+            "repair_issues": repair_status.get("issues", []),
         }
     except Exception:
         logger.exception("runtime_status failed")
@@ -4223,6 +4278,9 @@ async def runtime_status(user=Depends(require_auth)):
             "stale": True,
             "last_update_ms": 0,
             "signature": None,
+            "source": "telemetry_file",
+            "auto_repaired": repair_status.get("repaired", False),
+            "repair_issues": repair_status.get("issues", []),
         }
 
 

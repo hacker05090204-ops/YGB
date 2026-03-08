@@ -123,6 +123,9 @@ function ControlPageContent() {
         stale?: boolean;
         last_update_ms?: number;
         signature?: string;
+        source?: string;
+        auto_repaired?: boolean;
+        repair_issues?: string[];
     } | null>(null)
 
     // Phase 2: Real-time clock and stall detection
@@ -778,7 +781,13 @@ function ControlPageContent() {
                                     </div>
                                     <div>
                                         <h2 className="text-sm font-bold">Runtime Telemetry</h2>
-                                        <p className="text-xs text-muted-foreground">C++ Authoritative Source</p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {runtimeStatus?.source === "g38_live"
+                                                ? "Live trainer fallback"
+                                                : runtimeStatus?.source === "telemetry_file_self_healed"
+                                                    ? "Auto-repaired idle baseline"
+                                                    : "Validated telemetry source"}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -792,6 +801,11 @@ function ControlPageContent() {
                                         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium animate-pulse">
                                             <AlertTriangle className="w-3 h-3" />
                                             STALE DATA
+                                        </div>
+                                    )}
+                                    {runtimeStatus?.auto_repaired && !runtimeStatus?.stale && (
+                                        <div className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-medium">
+                                            AUTO-FIXED
                                         </div>
                                     )}
                                     {runtimeStatus?.status === "awaiting_data" && (

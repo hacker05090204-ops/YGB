@@ -34,6 +34,57 @@ function mockError(status: number, detail?: string) {
 
 beforeEach(() => {
     mockFetch.mockReset()
+    delete (globalThis as { window?: unknown }).window
+})
+
+afterEach(() => {
+    delete (globalThis as { window?: unknown }).window
+})
+
+function installWindow(url: string, persistedApiBase: string | null = null) {
+    const parsed = new URL(url)
+    let storedApiBase = persistedApiBase
+
+    ;(globalThis as { window?: unknown }).window = {
+        location: {
+            protocol: parsed.protocol,
+            hostname: parsed.hostname,
+            search: parsed.search,
+        },
+        localStorage: {
+            getItem: (key: string) => key === 'ygb_api_base_override' ? storedApiBase : null,
+            setItem: (key: string, value: string) => {
+                if (key === 'ygb_api_base_override') {
+                    storedApiBase = value
+                }
+            },
+        },
+    }
+
+    return () => storedApiBase
+}
+
+describe('getApiBase', () => {
+    it('uses the browser hostname when the frontend is served from a remote host', () => {
+        installWindow('http://192.168.31.121:3000/control')
+
+        expect(api.getApiBase()).toBe('http://192.168.31.121:8000')
+    })
+
+    it('uses a persisted override when running on localhost', () => {
+        installWindow('http://localhost:3000/login', 'http://192.168.31.121:8000')
+
+        expect(api.getApiBase()).toBe('http://192.168.31.121:8000')
+    })
+
+    it('captures an api_base query override and persists it', () => {
+        const readStored = installWindow(
+            'http://localhost:3000/login?api_base=http%3A%2F%2F192.168.31.121%3A8000'
+        )
+
+        expect(api.getApiBase()).toBe('http://192.168.31.121:8000')
+        expect(readStored()).toBe('http://192.168.31.121:8000')
+    })
 })
 
 // ---- GET endpoints ----

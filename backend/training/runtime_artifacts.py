@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from backend.api.runtime_api import (
+    REQUIRED_FIELDS,
     EXPECTED_HMAC_VERSION,
     EXPECTED_SCHEMA_VERSION,
     compute_payload_crc,
@@ -42,6 +43,9 @@ TRAINING_GATE_PATH = os.path.join(REPORTS_DIR, "training_gate.json")
 TRAINING_TELEMETRY_PATH = os.path.join(REPORTS_DIR, "training_telemetry.json")
 RUNTIME_STATE_PATH = os.path.join(REPORTS_DIR, "runtime_state.json")
 FIELD_RUNTIME_STATUS_PATH = os.path.join(DATA_DIR, "runtime_status.json")
+IDLE_ARTIFACT_MAX_AGE_SECONDS = int(
+    os.environ.get("YGB_IDLE_ARTIFACT_MAX_AGE_SECONDS", "90")
+)
 
 
 def _atomic_write_json(path: str, payload: Dict[str, Any]) -> None:
@@ -77,6 +81,49 @@ def _utc_now() -> str:
 
 def _now_ms() -> int:
     return int(time.time() * 1000)
+
+
+def _file_age_seconds(path: str) -> Optional[float]:
+    try:
+        return max(0.0, time.time() - os.path.getmtime(path))
+    except OSError:
+        return None
+
+
+def _runtime_state_is_valid(payload: Optional[Dict[str, Any]]) -> bool:
+    if not isinstance(payload, dict):
+        return False
+    return all(field in payload for field in REQUIRED_FIELDS)
+
+
+def _telemetry_payload_is_valid(payload: Optional[Dict[str, Any]]) -> bool:
+    if not isinstance(payload, dict):
+        return False
+
+    required_fields = {
+        "schema_version",
+        "determinism_status",
+        "freeze_status",
+        "crc32",
+        "hmac",
+        "hmac_version",
+        "monotonic_timestamp",
+        "wall_clock_unix",
+    }
+    if any(field not in payload for field in required_fields):
+        return False
+    if payload.get("schema_version") != EXPECTED_SCHEMA_VERSION:
+        return False
+    if payload.get("hmac_version") != EXPECTED_HMAC_VERSION:
+        return False
+
+    try:
+        return (
+            int(payload.get("crc32")) == compute_payload_crc(payload)
+            and str(payload.get("hmac", "")) == compute_payload_hmac(payload)
+        )
+    except Exception:
+        return False
 
 
 def _detect_local_ip() -> Optional[str]:
@@ -409,6 +456,60 @@ def write_field_runtime_status(
     }
     _atomic_write_json(FIELD_RUNTIME_STATUS_PATH, payload)
     return payload
+
+
+def repair_runtime_artifacts_if_needed(
+    *,
+    training_active: bool,
+    idle_max_age_seconds: Optional[int] = None,
+) -> Dict[str, Any]:
+    """
+    Repair missing/corrupt/stale idle artifacts automatically.
+
+    This only rewrites artifacts when training is NOT active, so it does not
+    override live telemetry produced by an active training session.
+    """
+    max_age_seconds = int(idle_max_age_seconds or IDLE_ARTIFACT_MAX_AGE_SECONDS)
+    issues: list[str] = []
+
+    training_gate = _read_json(TRAINING_GATE_PATH)
+    if training_gate is None:
+        issues.append("training_gate_missing")
+
+    runtime_state = _read_json(RUNTIME_STATE_PATH)
+    if not _runtime_state_is_valid(runtime_state):
+        issues.append("runtime_state_invalid")
+    elif not training_active:
+        age = _file_age_seconds(RUNTIME_STATE_PATH)
+        if age is not None and age > max_age_seconds:
+            issues.append("runtime_state_idle_stale")
+
+    field_runtime = _read_json(FIELD_RUNTIME_STATUS_PATH)
+    if field_runtime is None:
+        issues.append("field_runtime_missing")
+
+    telemetry = _read_json(TRAINING_TELEMETRY_PATH)
+    if not _telemetry_payload_is_valid(telemetry):
+        issues.append("training_telemetry_invalid")
+    elif not training_active:
+        age = _file_age_seconds(TRAINING_TELEMETRY_PATH)
+        if age is not None and age > max_age_seconds:
+            issues.append("training_telemetry_idle_stale")
+
+    if training_active or not issues:
+        return {
+            "repaired": False,
+            "issues": issues,
+            "training_active": training_active,
+        }
+
+    artifacts = bootstrap_runtime_artifacts(force_refresh=True)
+    return {
+        "repaired": True,
+        "issues": issues,
+        "training_active": training_active,
+        "artifacts": artifacts,
+    }
 
 
 def bootstrap_runtime_artifacts(*, force_refresh: bool = False) -> Dict[str, Any]:
