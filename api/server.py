@@ -23,6 +23,10 @@ def _is_placeholder_env_value(key: str, value: str) -> bool:
         return True
     if key == "GITHUB_CLIENT_SECRET" and upper.startswith("CHANGE_ME_PROVIDE_REAL"):
         return True
+    if key == "GOOGLE_CLIENT_ID" and upper.startswith("CONNECTED_GOOGLE_CLIENT_ID"):
+        return True
+    if key == "GOOGLE_CLIENT_SECRET" and upper.startswith("CHANGE_ME_PROVIDE_REAL"):
+        return True
     return False
 
 
@@ -53,11 +57,29 @@ def _load_env_file(
                 os.environ[_key] = _val
 
 
-def _shared_oauth_candidate_files() -> list[_Path]:
+def _oauth_provider_env_keys(provider: str) -> dict[str, str]:
+    normalized = (provider or "github").strip().lower()
+    if normalized == "google":
+        return {
+            "client_id": "GOOGLE_CLIENT_ID",
+            "client_secret": "GOOGLE_CLIENT_SECRET",
+            "redirect_uri": "GOOGLE_REDIRECT_URI",
+        }
+    return {
+        "client_id": "GITHUB_CLIENT_ID",
+        "client_secret": "GITHUB_CLIENT_SECRET",
+        "redirect_uri": "GITHUB_REDIRECT_URI",
+    }
+
+
+def _shared_oauth_candidate_files(provider: str = "github") -> list[_Path]:
     candidates: list[_Path] = []
     explicit = os.getenv("YGB_SHARED_OAUTH_FILE", "").strip()
     if explicit:
         candidates.append(_Path(explicit).expanduser())
+
+    normalized = (provider or "github").strip().lower()
+    filenames = [f"{normalized}_oauth.env", "oauth.env"]
 
     for root in (
         os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
@@ -66,12 +88,13 @@ def _shared_oauth_candidate_files() -> list[_Path]:
         if not root:
             continue
         base = _Path(root)
-        candidates.extend(
-            [
-                base / "secrets" / "github_oauth.env",
-                base / "config" / "github_oauth.env",
-            ]
-        )
+        for filename in filenames:
+            candidates.extend(
+                [
+                    base / "secrets" / filename,
+                    base / "config" / filename,
+                ]
+            )
 
     deduped: list[_Path] = []
     seen = set()
@@ -83,19 +106,20 @@ def _shared_oauth_candidate_files() -> list[_Path]:
     return deduped
 
 
-def _load_shared_github_oauth_env() -> None:
+def _load_shared_oauth_env(provider: str) -> None:
+    keys = _oauth_provider_env_keys(provider)
     needed = {
-        "GITHUB_CLIENT_ID",
-        "GITHUB_CLIENT_SECRET",
-        "GITHUB_REDIRECT_URI",
+        keys["client_id"],
+        keys["client_secret"],
+        keys["redirect_uri"],
         "FRONTEND_URL",
         "YGB_ALLOWED_ORIGINS",
     }
-    if os.getenv("GITHUB_CLIENT_ID") and os.getenv("GITHUB_CLIENT_SECRET"):
+    if os.getenv(keys["client_id"]) and os.getenv(keys["client_secret"]):
         return
-    for candidate in _shared_oauth_candidate_files():
+    for candidate in _shared_oauth_candidate_files(provider):
         _load_env_file(candidate, allow_placeholders=False, allowed_keys=needed)
-        if os.getenv("GITHUB_CLIENT_ID") and os.getenv("GITHUB_CLIENT_SECRET"):
+        if os.getenv(keys["client_id"]) and os.getenv(keys["client_secret"]):
             break
 
 
@@ -103,7 +127,8 @@ def _load_shared_github_oauth_env() -> None:
 _ENV_ROOT = _Path(__file__).resolve().parent.parent
 _load_env_file(_ENV_ROOT / ".env", allow_placeholders=False)
 _load_env_file(_ENV_ROOT / ".env.connected", allow_placeholders=False)
-_load_shared_github_oauth_env()
+_load_shared_oauth_env("github")
+_load_shared_oauth_env("google")
 
 import sys
 import uuid
@@ -212,7 +237,7 @@ from backend.alerts.email_alerts import (
 from backend.storage.storage_bridge import (
     register_device, get_user_devices, get_all_active_devices,
     get_active_device_count, get_active_sessions, end_session,
-    get_user_by_email, get_user_by_github_id, update_user_password
+    get_user_by_email, get_user_by_github_id, get_user_by_google_sub, update_user_password
 )
 
 # Import REAL phase runner with actual browser automation
@@ -2727,17 +2752,25 @@ def _allowed_cookie_origins() -> set[str]:
 @app.get("/api/auth/providers")
 async def auth_provider_status():
     """Public auth-provider status for the login page."""
-    cfg = _get_github_oauth_config()
+    github_cfg = _get_github_oauth_config()
+    google_cfg = _get_google_oauth_config()
     return {
         "password": {
             "enabled": _ALLOW_PASSWORD_LOGIN,
         },
         "github": {
-            "enabled": not cfg["missing"],
-            "missing": cfg["missing"],
-            "redirect_uri": cfg["redirect_uri"],
-            "frontend_url": cfg["frontend_url"],
-            "shared_candidates": [str(path) for path in _shared_oauth_candidate_files()],
+            "enabled": not github_cfg["missing"],
+            "missing": github_cfg["missing"],
+            "redirect_uri": github_cfg["redirect_uri"],
+            "frontend_url": github_cfg["frontend_url"],
+            "shared_candidates": [str(path) for path in _shared_oauth_candidate_files("github")],
+        },
+        "google": {
+            "enabled": not google_cfg["missing"],
+            "missing": google_cfg["missing"],
+            "redirect_uri": google_cfg["redirect_uri"],
+            "frontend_url": google_cfg["frontend_url"],
+            "shared_candidates": [str(path) for path in _shared_oauth_candidate_files("google")],
         },
         "checked_at": datetime.now(UTC).isoformat(),
     }
@@ -3042,7 +3075,7 @@ async def login(request: LoginRequest, req: Request, response: Response):
             status_code=403,
             detail={
                 "error": "GITHUB_AUTH_REQUIRED",
-                "detail": "Password login is disabled. Use /auth/github for authentication.",
+                "detail": "Password login is disabled. Use /auth/github or /auth/google for authentication.",
             },
         )
 
@@ -3248,6 +3281,8 @@ async def auth_me(user=Depends(require_auth)):
         "email": record.get("email"),
         "role": record.get("role", "hunter"),
         "github_login": record.get("github_login"),
+        "google_email": record.get("google_email"),
+        "google_picture": record.get("google_picture"),
         "avatar_url": record.get("avatar_url"),
         "auth_provider": record.get("auth_provider", "email"),
         "session_id": user.get("session_id"),
@@ -4563,7 +4598,35 @@ def _get_oauth_state_secret() -> str:
     return os.getenv("YGB_HMAC_SECRET", "") or os.getenv("JWT_SECRET", "")
 
 
+def _refresh_oauth_env(provider: str) -> None:
+    keys = _oauth_provider_env_keys(provider)
+    if _env_oauth_value(keys["client_id"], "") and _env_oauth_value(keys["client_secret"], ""):
+        return
+    allowed_keys = {
+        keys["client_id"],
+        keys["client_secret"],
+        keys["redirect_uri"],
+        "FRONTEND_URL",
+        "YGB_ALLOWED_ORIGINS",
+    }
+    _load_env_file(_ENV_ROOT / ".env", allow_placeholders=False, allowed_keys=allowed_keys)
+    _load_env_file(_ENV_ROOT / ".env.connected", allow_placeholders=False, allowed_keys=allowed_keys)
+    _load_shared_oauth_env(provider)
+
+
+def _oauth_provider_label(provider: str) -> str:
+    return "Google" if (provider or "").strip().lower() == "google" else "GitHub"
+
+
+def _oauth_state_cookie_name(provider: str) -> str:
+    normalized = (provider or "github").strip().lower()
+    if normalized == "github":
+        return "ygb_oauth_state"
+    return f"ygb_oauth_state_{normalized}"
+
+
 def _get_github_oauth_config() -> Dict[str, Any]:
+    _refresh_oauth_env("github")
     client_id = _env_oauth_value("GITHUB_CLIENT_ID", "")
     client_secret = _env_oauth_value("GITHUB_CLIENT_SECRET", "")
     frontend_url = _env_oauth_value("FRONTEND_URL", "http://localhost:3000")
@@ -4585,19 +4648,44 @@ def _get_github_oauth_config() -> Dict[str, Any]:
     }
 
 
-def _oauth_not_configured_detail() -> Dict[str, Any]:
-    cfg = _get_github_oauth_config()
+def _get_google_oauth_config() -> Dict[str, Any]:
+    _refresh_oauth_env("google")
+    client_id = _env_oauth_value("GOOGLE_CLIENT_ID", "")
+    client_secret = _env_oauth_value("GOOGLE_CLIENT_SECRET", "")
+    frontend_url = _env_oauth_value("FRONTEND_URL", "http://localhost:3000")
+    redirect_uri = _env_oauth_value(
+        "GOOGLE_REDIRECT_URI",
+        "http://localhost:8000/auth/google/callback",
+    )
+    missing = []
+    if not client_id:
+        missing.append("GOOGLE_CLIENT_ID")
+    if not client_secret:
+        missing.append("GOOGLE_CLIENT_SECRET")
     return {
-        "error": "GITHUB_OAUTH_NOT_CONFIGURED",
-        "detail": "GitHub OAuth is not fully configured",
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "frontend_url": frontend_url.rstrip("/"),
+        "redirect_uri": redirect_uri,
+        "missing": missing,
+    }
+
+
+def _oauth_not_configured_detail(provider: str = "github") -> Dict[str, Any]:
+    normalized = (provider or "github").strip().lower()
+    cfg = _get_google_oauth_config() if normalized == "google" else _get_github_oauth_config()
+    label = _oauth_provider_label(normalized)
+    return {
+        "error": f"{normalized.upper()}_OAUTH_NOT_CONFIGURED",
+        "detail": f"{label} OAuth is not fully configured",
         "missing": cfg["missing"],
         "redirect_uri": cfg["redirect_uri"],
         "frontend_url": cfg["frontend_url"],
         "checked_files": [".env", ".env.connected"],
-        "shared_candidates": [str(path) for path in _shared_oauth_candidate_files()],
+        "shared_candidates": [str(path) for path in _shared_oauth_candidate_files(normalized)],
     }
 
-# --- HTTP session pool for GitHub API (connection reuse / keep-alive) ---
+# --- HTTP session pool for OAuth provider APIs (connection reuse / keep-alive) ---
 try:
     import requests as _http_lib
     _github_http = _http_lib.Session()
@@ -4605,10 +4693,12 @@ try:
         "Accept": "application/json",
         "User-Agent": "YGB-Server",
     })
+    _oauth_http = _github_http
     _HAVE_REQUESTS = True
 except ImportError:
     _HAVE_REQUESTS = False
     _github_http = None
+    _oauth_http = None
 
 
 def _b64url_encode(raw: str) -> str:
@@ -4738,6 +4828,24 @@ def _resolve_or_create_github_user(
     return create_user(display_name, effective_email, "hunter"), True
 
 
+def _resolve_or_create_google_user(
+    google_sub: str,
+    effective_email: str,
+    display_name: str,
+) -> tuple[Dict[str, Any], bool]:
+    """Resolve a local user for a Google account using stable identity first."""
+    user = get_user_by_google_sub(google_sub)
+    if user:
+        return user, False
+
+    user = get_user_by_email(effective_email) if effective_email else None
+    if user:
+        return user, False
+
+    safe_name = (display_name or "").strip() or f"google-{google_sub}"
+    return create_user(safe_name, effective_email, "hunter"), True
+
+
 @app.get("/auth/github")
 async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     """Redirect to GitHub OAuth authorization page."""
@@ -4776,7 +4884,7 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     )
     _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith("https://")
     resp.set_cookie(
-        key="ygb_oauth_state",
+        key=_oauth_state_cookie_name("github"),
         value=state,
         max_age=_get_oauth_state_ttl_seconds(),
         httponly=True,
@@ -4790,42 +4898,43 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
 async def github_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
     """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
     cfg = _get_github_oauth_config()
+    state_cookie = _oauth_state_cookie_name("github")
     parsed_ok, parsed_frontend = _parse_oauth_state(state) if state else (False, None)
     frontend_url = parsed_frontend or cfg["frontend_url"]
 
     if error:
         resp = RedirectResponse(
-            url=f"{frontend_url}/login?error={error}",
+            url=f"{frontend_url}/login?error={error}&auth=github",
             status_code=302,
         )
-        resp.delete_cookie("ygb_oauth_state")
+        resp.delete_cookie(state_cookie)
         return resp
 
     if not code:
         resp = RedirectResponse(
-            url=f"{frontend_url}/login?error=no_code",
+            url=f"{frontend_url}/login?error=no_code&auth=github",
             status_code=302,
         )
-        resp.delete_cookie("ygb_oauth_state")
+        resp.delete_cookie(state_cookie)
         return resp
 
-    expected_state = req.cookies.get("ygb_oauth_state", "")
+    expected_state = req.cookies.get(state_cookie, "")
     cookie_ok = bool(state and expected_state and state == expected_state)
     if not parsed_ok:
         logger.warning("GitHub OAuth state HMAC validation failed")
         resp = RedirectResponse(
-            url=f"{frontend_url}/login?error=state_mismatch",
+            url=f"{frontend_url}/login?error=state_mismatch&auth=github",
             status_code=302,
         )
-        resp.delete_cookie("ygb_oauth_state")
+        resp.delete_cookie(state_cookie)
         return resp
     if not cookie_ok:
         logger.warning("GitHub OAuth state cookie missing or mismatched — rejecting")
         resp = RedirectResponse(
-            url=f"{frontend_url}/login?error=state_mismatch",
+            url=f"{frontend_url}/login?error=state_mismatch&auth=github",
             status_code=302,
         )
-        resp.delete_cookie("ygb_oauth_state")
+        resp.delete_cookie(state_cookie)
         return resp
 
     if not cfg["client_id"] or not cfg["client_secret"]:
@@ -5137,10 +5246,10 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
     if "error" in result:
         resp = RedirectResponse(
-            url=f"{frontend_url}/login?error={result['error']}",
+            url=f"{frontend_url}/login?error={result['error']}&auth=github",
             status_code=302,
         )
-        resp.delete_cookie("ygb_oauth_state")
+        resp.delete_cookie(state_cookie)
         return resp
 
     # Fire background enrichment (non-blocking)
@@ -5149,7 +5258,290 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         asyncio.get_event_loop().run_in_executor(None, _oauth_background_work, bg_ctx)
 
     resp = RedirectResponse(url=result["redirect_url"], status_code=302)
-    resp.delete_cookie("ygb_oauth_state")
+    resp.delete_cookie(state_cookie)
+
+    auth_token = result.get("_auth_token")
+    if auth_token:
+        _set_auth_cookies(resp, req, auth_token)
+    return resp
+
+
+# =============================================================================
+# GOOGLE OAUTH LOGIN
+# =============================================================================
+
+@app.get("/auth/google")
+async def google_auth_redirect(req: Request, frontend_origin: str = ""):
+    """Redirect to Google OAuth authorization page."""
+    cfg = _get_google_oauth_config()
+    if not cfg["client_id"]:
+        raise HTTPException(
+            status_code=501,
+            detail=_oauth_not_configured_detail("google"),
+        )
+
+    import urllib.parse
+
+    logger.info("[OAuth] Using configured Google callback: %s", cfg["redirect_uri"])
+
+    if frontend_origin:
+        frontend_url = _resolve_frontend_url(frontend_origin)
+    elif _is_private_ip(req.headers.get("host", "")):
+        host_ip = req.headers.get("host", "localhost:3000").split(":")[0]
+        frontend_url = f"http://{host_ip}:3000"
+    else:
+        frontend_url = _resolve_frontend_url("")
+
+    state = _build_oauth_state(frontend_url)
+    params = urllib.parse.urlencode({
+        "client_id": cfg["client_id"],
+        "redirect_uri": cfg["redirect_uri"],
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+        "access_type": "online",
+        "prompt": "select_account",
+        "include_granted_scopes": "true",
+    })
+    resp = RedirectResponse(
+        url=f"https://accounts.google.com/o/oauth2/v2/auth?{params}",
+        status_code=302,
+    )
+    _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith("https://")
+    resp.set_cookie(
+        key=_oauth_state_cookie_name("google"),
+        value=state,
+        max_age=_get_oauth_state_ttl_seconds(),
+        httponly=True,
+        samesite="lax",
+        secure=_oauth_secure,
+    )
+    return resp
+
+
+@app.get("/auth/google/callback")
+async def google_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
+    """Handle Google OAuth callback and establish a local session."""
+    cfg = _get_google_oauth_config()
+    state_cookie = _oauth_state_cookie_name("google")
+    parsed_ok, parsed_frontend = _parse_oauth_state(state) if state else (False, None)
+    frontend_url = parsed_frontend or cfg["frontend_url"]
+
+    if error:
+        resp = RedirectResponse(
+            url=f"{frontend_url}/login?error={error}&auth=google",
+            status_code=302,
+        )
+        resp.delete_cookie(state_cookie)
+        return resp
+
+    if not code:
+        resp = RedirectResponse(
+            url=f"{frontend_url}/login?error=no_code&auth=google",
+            status_code=302,
+        )
+        resp.delete_cookie(state_cookie)
+        return resp
+
+    expected_state = req.cookies.get(state_cookie, "")
+    cookie_ok = bool(state and expected_state and state == expected_state)
+    if not parsed_ok:
+        logger.warning("Google OAuth state HMAC validation failed")
+        resp = RedirectResponse(
+            url=f"{frontend_url}/login?error=state_mismatch&auth=google",
+            status_code=302,
+        )
+        resp.delete_cookie(state_cookie)
+        return resp
+    if not cookie_ok:
+        logger.warning("Google OAuth state cookie missing or mismatched; rejecting")
+        resp = RedirectResponse(
+            url=f"{frontend_url}/login?error=state_mismatch&auth=google",
+            status_code=302,
+        )
+        resp.delete_cookie(state_cookie)
+        return resp
+
+    if not cfg["client_id"] or not cfg["client_secret"]:
+        raise HTTPException(
+            status_code=501,
+            detail=_oauth_not_configured_detail("google"),
+        )
+
+    import urllib.parse
+
+    ip = _extract_client_ip(req)
+    ua = req.headers.get("user-agent", "unknown")
+
+    def _sync_google_login():
+        location = resolve_ip_geolocation(ip)
+        token_payload = {
+            "client_id": cfg["client_id"],
+            "client_secret": cfg["client_secret"],
+            "code": code,
+            "grant_type": "authorization_code",
+            "redirect_uri": cfg["redirect_uri"],
+        }
+
+        if _HAVE_REQUESTS:
+            token_resp_raw = _oauth_http.post(
+                "https://oauth2.googleapis.com/token",
+                data=token_payload,
+                timeout=5,
+            )
+            token_resp = token_resp_raw.json()
+        else:
+            import urllib.request as _ureq
+            _data = urllib.parse.urlencode(token_payload).encode()
+            _req = _ureq.Request(
+                "https://oauth2.googleapis.com/token",
+                data=_data,
+                headers={"Accept": "application/json"},
+            )
+            with _ureq.urlopen(_req, timeout=5) as _r:
+                token_resp = json.loads(_r.read().decode())
+
+        access_token = token_resp.get("access_token")
+        if not access_token:
+            logger.error("Google token exchange failed: %s", token_resp)
+            return {"error": "token_exchange_failed"}
+
+        auth_hdr = {"Authorization": f"Bearer {access_token}"}
+        if _HAVE_REQUESTS:
+            user_resp = _oauth_http.get(
+                "https://openidconnect.googleapis.com/v1/userinfo",
+                headers=auth_hdr,
+                timeout=5,
+            )
+            user_data = user_resp.json()
+        else:
+            import urllib.request as _ureq
+            _req = _ureq.Request(
+                "https://openidconnect.googleapis.com/v1/userinfo",
+                headers={**auth_hdr, "Accept": "application/json", "User-Agent": "YGB-Server"},
+            )
+            with _ureq.urlopen(_req, timeout=5) as _r:
+                user_data = json.loads(_r.read().decode())
+
+        google_sub = str(user_data.get("sub", "")).strip()
+        if not google_sub:
+            logger.error("Google user payload missing sub: %s", user_data)
+            return {"error": "invalid_google_profile"}
+
+        google_email = str(user_data.get("email", "")).strip()
+        email_verified = bool(user_data.get("email_verified"))
+        effective_email = google_email if (google_email and email_verified) else f"google-{google_sub}@users.noreply.local"
+        display_name = (
+            str(user_data.get("name", "")).strip()
+            or (google_email.split("@", 1)[0] if google_email else "")
+            or f"google-{google_sub}"
+        )
+        google_profile = {
+            "google_sub": google_sub,
+            "google_email": google_email,
+            "email_verified": email_verified,
+            "name": user_data.get("name") or display_name,
+            "given_name": user_data.get("given_name", ""),
+            "family_name": user_data.get("family_name", ""),
+            "google_picture": user_data.get("picture", ""),
+            "picture": user_data.get("picture", ""),
+            "locale": user_data.get("locale", ""),
+            "hd": user_data.get("hd", ""),
+            "ip_address": ip,
+            "geoip_location": location,
+        }
+        for key, value in list(google_profile.items()):
+            if isinstance(value, str):
+                google_profile[key] = value.strip()[:512]
+
+        user, is_new_user = _resolve_or_create_google_user(
+            google_sub=google_sub,
+            effective_email=effective_email,
+            display_name=display_name,
+        )
+
+        dh = compute_device_hash(ua, ip)
+        device = register_device(user["id"], dh, ip, ua, location=location)
+        session = create_session(
+            user["id"],
+            "AUTHENTICATED",
+            None,
+            ip_address=ip,
+            user_agent=ua,
+            device_hash=dh,
+            metadata={
+                "auth_method": "google",
+                "google_sub": google_sub,
+                "google_email": google_email or effective_email,
+                "geolocation": location,
+            },
+        )
+        update_user_auth_profile(
+            user["id"],
+            auth_provider="google",
+            ip_address=ip,
+            geolocation=location,
+            google_profile=google_profile,
+        )
+
+        user_name = user.get("name", display_name)
+        if is_new_user:
+            log_activity(
+                user["id"],
+                "USER_REGISTERED_GOOGLE",
+                f"Google account linked: {google_email or google_sub}",
+                ip_address=ip,
+            )
+        log_activity(
+            user["id"],
+            "LOGIN_SUCCESS_GOOGLE",
+            f"Google login from {ip} ({location})",
+            ip_address=ip,
+            metadata={
+                "google_sub": google_sub,
+                "google_email": google_email or effective_email,
+            },
+        )
+
+        try:
+            alert_new_login(user_name, ip, ua, location)
+            if device.get("is_new"):
+                alert_new_device(user_name, dh, ip, ua, location)
+            active_count = get_active_device_count(user["id"])
+            if active_count > 1:
+                devices = get_user_devices(user["id"])
+                alert_multiple_devices(user_name, active_count, devices)
+        except Exception:
+            pass
+
+        jwt_token = generate_jwt(
+            user_id=user["id"],
+            email=user.get("email"),
+            session_id=session["id"],
+            role=user.get("role", "hunter"),
+        )
+        safe_user = urllib.parse.quote_plus(user_name or "user")
+        return {
+            "redirect_url": f"{frontend_url}/login?user={safe_user}&auth=google",
+            "_auth_token": jwt_token,
+        }
+
+    try:
+        result = await asyncio.to_thread(_sync_google_login)
+    except Exception:
+        logger.exception("Google OAuth callback error")
+        result = {"error": "server_error"}
+
+    if "error" in result:
+        resp = RedirectResponse(
+            url=f"{frontend_url}/login?error={result['error']}&auth=google",
+            status_code=302,
+        )
+        resp.delete_cookie(state_cookie)
+        return resp
+
+    resp = RedirectResponse(url=result["redirect_url"], status_code=302)
+    resp.delete_cookie(state_cookie)
 
     auth_token = result.get("_auth_token")
     if auth_token:

@@ -21,6 +21,13 @@ interface AuthProviderSnapshot {
     frontend_url: string | null
     shared_candidates: string[]
   }
+  google: {
+    enabled: boolean
+    missing: string[]
+    redirect_uri: string | null
+    frontend_url: string | null
+    shared_candidates: string[]
+  }
   checked_at: string
 }
 
@@ -64,18 +71,21 @@ function LoginContent() {
 
     const error = searchParams.get("error")
     const authMethod = searchParams.get("auth")
+    const providerLabel = authMethod === "google" ? "Google" : "GitHub"
+    const usedExternalProvider = authMethod === "github" || authMethod === "google"
     const fallbackUser = searchParams.get("user")
 
     purgeLegacyAuthStorage()
 
     if (error) {
       const errorMessages: Record<string, string> = {
-        no_code: "GitHub did not return an authorization code",
+        no_code: `${providerLabel} did not return an authorization code`,
         token_exchange_failed: "Failed to exchange code for token",
         server_error: "Server error during authentication",
-        access_denied: "Access denied by GitHub",
+        access_denied: `Access denied by ${providerLabel}`,
         state_mismatch: "OAuth state mismatch detected; please retry login",
         invalid_github_profile: "GitHub profile data was incomplete",
+        invalid_google_profile: "Google profile data was incomplete",
       }
       queueMicrotask(() => {
         if (cancelled) {
@@ -95,9 +105,9 @@ function LoginContent() {
       try {
         const res = await credentialedFetch(`${getApiBase()}/auth/me`)
         if (!res.ok) {
-          if (authMethod === "github" && !cancelled) {
+          if (usedExternalProvider && !cancelled) {
             setStatus("error")
-            setMessage("GitHub sign-in did not create a valid session")
+            setMessage(`${providerLabel} sign-in did not create a valid session`)
           }
           return
         }
@@ -114,7 +124,7 @@ function LoginContent() {
         )
         redirectTimer = setTimeout(() => router.push("/control"), 1500)
       } catch {
-        if (authMethod === "github" && !cancelled) {
+        if (usedExternalProvider && !cancelled) {
           setStatus("error")
           setMessage("Network error - could not verify the new session")
         }
@@ -146,9 +156,27 @@ function LoginContent() {
     window.location.href = `${getApiBase()}/auth/github?frontend_origin=${origin}`
   }
 
+  const handleGoogleLogin = () => {
+    if (authProviders && !authProviders.google.enabled) {
+      const missing = authProviders.google.missing.join(", ")
+      setStatus("error")
+      setMessage(
+        missing
+          ? `Google sign-in is not ready on this server yet. Missing: ${missing}`
+          : "Google sign-in is not ready on this server yet."
+      )
+      return
+    }
+    const origin = encodeURIComponent(window.location.origin)
+    window.location.href = `${getApiBase()}/auth/google?frontend_origin=${origin}`
+  }
+
   const passwordEnabled = authProviders?.password.enabled ?? true
   const githubEnabled = authProviders?.github.enabled ?? true
   const githubMissing = authProviders?.github.missing ?? []
+  const googleEnabled = authProviders?.google.enabled ?? true
+  const googleMissing = authProviders?.google.missing ?? []
+  const retryAuthMethod = searchParams.get("auth") === "google" ? "google" : "github"
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center p-4">
@@ -223,11 +251,11 @@ function LoginContent() {
               </h2>
               <p className="text-sm text-red-400/80 mb-6">{message}</p>
               <button
-                onClick={handleGitHubLogin}
-                disabled={!githubEnabled}
+                onClick={retryAuthMethod === "google" ? handleGoogleLogin : handleGitHubLogin}
+                disabled={retryAuthMethod === "google" ? !googleEnabled : !githubEnabled}
                 className="w-full py-3 px-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Try Again
+                {retryAuthMethod === "google" ? "Retry Google Sign-In" : "Retry GitHub Sign-In"}
               </button>
             </div>
           ) : (
@@ -350,6 +378,31 @@ function LoginContent() {
                 <p className="mt-3 text-xs text-amber-300 text-center">
                   GitHub sign-in is waiting on server-side OAuth config:{" "}
                   {githubMissing.join(", ")}
+                </p>
+              )}
+
+              <button
+                onClick={handleGoogleLogin}
+                id="google-login-button"
+                disabled={!googleEnabled}
+                className="group mt-3 w-full py-3.5 px-4 bg-[#1c231f] hover:bg-[#243026] border border-emerald-900/40 hover:border-emerald-700/50 text-white rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-3 cursor-pointer hover:shadow-lg hover:shadow-emerald-500/5 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <svg
+                  className="w-5 h-5"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path fill="#EA4335" d="M12 10.2v3.9h5.5c-.2 1.3-1.5 3.9-5.5 3.9-3.3 0-6-2.8-6-6.2s2.7-6.2 6-6.2c1.9 0 3.2.8 3.9 1.5l2.7-2.7C16.9 2.7 14.7 1.8 12 1.8 6.5 1.8 2 6.4 2 12s4.5 10.2 10 10.2c5.8 0 9.6-4.1 9.6-9.8 0-.7-.1-1.3-.2-1.9H12z" />
+                  <path fill="#34A853" d="M2 7.8l3.2 2.3C6 7.6 8.7 5.8 12 5.8c1.9 0 3.2.8 3.9 1.5l2.7-2.7C16.9 2.7 14.7 1.8 12 1.8 8.1 1.8 4.8 4 2.9 7.1L2 7.8z" />
+                  <path fill="#FBBC05" d="M12 22.2c2.6 0 4.8-.9 6.4-2.4l-3-2.5c-.8.6-1.9 1-3.4 1-3.9 0-5.3-2.6-5.5-3.9l-3.1 2.4C5.2 20 8.3 22.2 12 22.2z" />
+                  <path fill="#4285F4" d="M21.6 12.4c0-.7-.1-1.3-.2-1.9H12v3.9h5.5c-.3 1.5-1.2 2.7-2.5 3.6l3 2.5c1.8-1.7 3.6-4.8 3.6-8.1z" />
+                </svg>
+                Continue with Google
+              </button>
+              {!googleEnabled && googleMissing.length > 0 && (
+                <p className="mt-3 text-xs text-amber-300 text-center">
+                  Google sign-in is waiting on server-side OAuth config:{" "}
+                  {googleMissing.join(", ")}
                 </p>
               )}
 

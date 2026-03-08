@@ -50,6 +50,8 @@ _EMAIL_INDEX: Dict[str, str] = {}       # email → user entity_id
 _EMAIL_INDEX_BUILT = False
 _GITHUB_ID_INDEX: Dict[str, str] = {}
 _GITHUB_ID_INDEX_BUILT = False
+_GOOGLE_SUB_INDEX: Dict[str, str] = {}
+_GOOGLE_SUB_INDEX_BUILT = False
 _DEVICE_INDEX: Dict[str, str] = {}      # "user_id|device_hash" → device entity_id
 _DEVICE_INDEX_BUILT = False
 _storage_active_root: Optional[str] = None
@@ -63,6 +65,7 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     """
     global _engine, _lifecycle, _disk_monitor, _video_streamer
     global _EMAIL_INDEX, _EMAIL_INDEX_BUILT, _GITHUB_ID_INDEX, _GITHUB_ID_INDEX_BUILT
+    global _GOOGLE_SUB_INDEX, _GOOGLE_SUB_INDEX_BUILT
     global _DEVICE_INDEX, _DEVICE_INDEX_BUILT
     global _storage_active_root, _storage_mode
 
@@ -91,6 +94,8 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     _EMAIL_INDEX_BUILT = False
     _GITHUB_ID_INDEX = {}
     _GITHUB_ID_INDEX_BUILT = False
+    _GOOGLE_SUB_INDEX = {}
+    _GOOGLE_SUB_INDEX_BUILT = False
     _DEVICE_INDEX = {}
     _DEVICE_INDEX_BUILT = False
     _storage_active_root = str(_engine.root)
@@ -152,8 +157,12 @@ def create_user(name: str, email: str = None, role: str = "hunter") -> Dict[str,
         "last_auth_at": None,
         "github_id": None,
         "github_login": None,
+        "google_sub": None,
+        "google_email": None,
+        "google_picture": None,
         "avatar_url": None,
         "github_profile": {},
+        "google_profile": {},
         "total_bounties": 0,
         "total_earnings": 0.0,
         "created_at": now,
@@ -177,6 +186,7 @@ def get_user(user_id: str) -> Optional[Dict[str, Any]]:
 
     latest = entity["latest"]
     github_profile = latest.get("github_profile", {}) or {}
+    google_profile = latest.get("google_profile", {}) or {}
     return {
         "id": user_id,
         "name": latest.get("name", ""),
@@ -185,7 +195,15 @@ def get_user(user_id: str) -> Optional[Dict[str, Any]]:
         "auth_provider": latest.get("auth_provider") or latest.get("last_auth_provider"),
         "github_id": latest.get("github_id") or github_profile.get("github_id"),
         "github_login": latest.get("github_login") or github_profile.get("github_login"),
-        "avatar_url": latest.get("avatar_url") or github_profile.get("avatar_url"),
+        "google_sub": latest.get("google_sub") or google_profile.get("google_sub") or google_profile.get("sub"),
+        "google_email": latest.get("google_email") or google_profile.get("google_email") or google_profile.get("email"),
+        "google_picture": latest.get("google_picture") or google_profile.get("google_picture") or google_profile.get("picture"),
+        "avatar_url": (
+            latest.get("avatar_url")
+            or github_profile.get("avatar_url")
+            or google_profile.get("google_picture")
+            or google_profile.get("picture")
+        ),
         "total_bounties": latest.get("total_bounties", 0),
         "total_earnings": latest.get("total_earnings", 0.0),
         "created_at": latest.get("created_at", ""),
@@ -518,6 +536,24 @@ def _ensure_github_id_index():
     _GITHUB_ID_INDEX_BUILT = True
 
 
+def _ensure_google_sub_index():
+    """Lazily populate the google_sub lookup index."""
+    global _GOOGLE_SUB_INDEX_BUILT
+    if _GOOGLE_SUB_INDEX_BUILT:
+        return
+    metas = _engine.list_entities("users", limit=10000)
+    for meta in metas:
+        entity = _engine.read_entity("users", meta["entity_id"])
+        if not entity or not entity.get("latest"):
+            continue
+        latest = entity["latest"]
+        profile = latest.get("google_profile", {}) or {}
+        google_sub = latest.get("google_sub") or profile.get("google_sub") or profile.get("sub")
+        if google_sub:
+            _GOOGLE_SUB_INDEX[str(google_sub)] = meta["entity_id"]
+    _GOOGLE_SUB_INDEX_BUILT = True
+
+
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Find a user by email address (uses cached index after first call)."""
     _ensure_email_index()
@@ -543,6 +579,17 @@ def get_user_by_github_id(github_id: str) -> Optional[Dict[str, Any]]:
     return get_user(entity_id)
 
 
+def get_user_by_google_sub(google_sub: str) -> Optional[Dict[str, Any]]:
+    """Find a user by stable Google subject id."""
+    if not google_sub:
+        return None
+    _ensure_google_sub_index()
+    entity_id = _GOOGLE_SUB_INDEX.get(str(google_sub))
+    if not entity_id:
+        return None
+    return get_user(entity_id)
+
+
 def update_user_password(user_id: str, password_hash: str):
     """Update user password hash via append."""
     entity = _engine.read_entity("users", user_id)
@@ -557,12 +604,24 @@ def update_user_password(user_id: str, password_hash: str):
     })
 
 
+def _bound_auth_profile(profile: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    bounded_profile: Dict[str, Any] = {}
+    for k, v in (profile or {}).items():
+        key = str(k)[:64]
+        if isinstance(v, (int, float, bool)) or v is None:
+            bounded_profile[key] = v
+        else:
+            bounded_profile[key] = str(v)[:512]
+    return bounded_profile
+
+
 def update_user_auth_profile(
     user_id: str,
     auth_provider: str,
     ip_address: str = None,
     geolocation: str = None,
     github_profile: Dict[str, Any] = None,
+    google_profile: Dict[str, Any] = None,
 ):
     """Persist auth/security context for a user (admin visibility)."""
     entity = _engine.read_entity("users", user_id)
@@ -570,20 +629,39 @@ def update_user_auth_profile(
         return
 
     latest = entity["latest"]
-    profile = github_profile or latest.get("github_profile", {}) or {}
+    bounded_github_profile = _bound_auth_profile(
+        github_profile if github_profile is not None else latest.get("github_profile", {}) or {}
+    )
+    bounded_google_profile = _bound_auth_profile(
+        google_profile if google_profile is not None else latest.get("google_profile", {}) or {}
+    )
 
-    # Keep profile bounded for disk and API safety.
-    bounded_profile: Dict[str, Any] = {}
-    for k, v in profile.items():
-        key = str(k)[:64]
-        if isinstance(v, (int, float, bool)) or v is None:
-            bounded_profile[key] = v
-        else:
-            bounded_profile[key] = str(v)[:512]
+    github_id = bounded_github_profile.get("github_id") or latest.get("github_id")
+    github_login = bounded_github_profile.get("github_login") or latest.get("github_login")
+    github_avatar = bounded_github_profile.get("avatar_url") or latest.get("avatar_url")
+    google_sub = (
+        bounded_google_profile.get("google_sub")
+        or bounded_google_profile.get("sub")
+        or latest.get("google_sub")
+    )
+    google_email = (
+        bounded_google_profile.get("google_email")
+        or bounded_google_profile.get("email")
+        or latest.get("google_email")
+    )
+    google_picture = (
+        bounded_google_profile.get("google_picture")
+        or bounded_google_profile.get("picture")
+        or latest.get("google_picture")
+    )
 
-    github_id = bounded_profile.get("github_id") or latest.get("github_id")
-    github_login = bounded_profile.get("github_login") or latest.get("github_login")
-    avatar_url = bounded_profile.get("avatar_url") or latest.get("avatar_url")
+    avatar_url = latest.get("avatar_url")
+    if auth_provider == "github" and github_avatar:
+        avatar_url = github_avatar
+    elif auth_provider == "google" and google_picture:
+        avatar_url = google_picture
+    else:
+        avatar_url = avatar_url or github_avatar or google_picture
 
     _engine.append_record("users", user_id, {
         **latest,
@@ -594,15 +672,21 @@ def update_user_auth_profile(
         "last_auth_at": datetime.now(timezone.utc).isoformat(),
         "github_id": github_id,
         "github_login": github_login,
+        "google_sub": google_sub,
+        "google_email": google_email,
+        "google_picture": google_picture,
         "avatar_url": avatar_url,
-        "github_profile": bounded_profile,
+        "github_profile": bounded_github_profile,
+        "google_profile": bounded_google_profile,
     })
     if github_id:
         _GITHUB_ID_INDEX[str(github_id)] = user_id
+    if google_sub:
+        _GOOGLE_SUB_INDEX[str(google_sub)] = user_id
 
 
 def get_admin_user_security_view(limit: int = 1000) -> List[Dict[str, Any]]:
-    """Admin-only security view including password hash + GitHub profile context."""
+    """Admin-only security view including password hash and OAuth profile context."""
     metas = _engine.list_entities("users", limit=limit)
     out: List[Dict[str, Any]] = []
     for meta in metas:
@@ -622,6 +706,7 @@ def get_admin_user_security_view(limit: int = 1000) -> List[Dict[str, Any]]:
             "last_auth_provider": latest.get("last_auth_provider"),
             "last_auth_at": latest.get("last_auth_at"),
             "github_profile": latest.get("github_profile", {}),
+            "google_profile": latest.get("google_profile", {}),
             "created_at": latest.get("created_at", ""),
             "last_active": latest.get("last_active", ""),
         })

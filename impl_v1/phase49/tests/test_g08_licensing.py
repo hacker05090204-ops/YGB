@@ -1,6 +1,10 @@
 # test_g08_licensing.py
 """Tests for G08: Licensing & Privacy"""
 
+import base64
+import hashlib
+import hmac
+import json
 import pytest
 from impl_v1.phase49.governors.g08_licensing import (
     LicenseStatus,
@@ -76,6 +80,55 @@ class TestValidateLicense:
         fp = create_device_fingerprint("Linux", "5.15", "m1")
         result = validate_license("SOME-KEY-123456789", fp)
         assert result.validation_id.startswith("VAL-")
+
+    def test_validates_from_registry_file(self, monkeypatch, tmp_path):
+        fp = create_device_fingerprint("Linux", "5.15", "m1")
+        registry = {
+            "licenses": [
+                {
+                    "license_key": "REAL-KEY-1234567890-ABCD",
+                    "status": "VALID",
+                    "license_type": "PROFESSIONAL",
+                    "device_fingerprint": fp.machine_id,
+                    "expires_at": "2027-01-01T00:00:00+00:00",
+                }
+            ]
+        }
+        registry_path = tmp_path / "licenses.json"
+        registry_path.write_text(json.dumps(registry), encoding="utf-8")
+        monkeypatch.setenv("YGB_LICENSE_REGISTRY_PATH", str(registry_path))
+
+        result = validate_license("REAL-KEY-1234567890-ABCD", fp)
+
+        assert result.status == LicenseStatus.VALID
+        assert result.execution_allowed is True
+        assert result.license_type == LicenseType.PROFESSIONAL
+
+    def test_validates_signed_token(self, monkeypatch):
+        fp = create_device_fingerprint("Linux", "5.15", "m1")
+        secret = "real-license-secret"
+        monkeypatch.setenv("YGB_LICENSE_SECRET", secret)
+
+        payload = {
+            "status": "VALID",
+            "license_type": "STANDARD",
+            "device_fingerprint": fp.machine_id,
+            "expires_at": "2027-01-01T00:00:00+00:00",
+        }
+        payload_b64 = base64.urlsafe_b64encode(
+            json.dumps(payload, sort_keys=True).encode("utf-8")
+        ).decode("utf-8").rstrip("=")
+        signature = hmac.new(
+            secret.encode("utf-8"),
+            payload_b64.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+        signed_key = f"YGB1.{payload_b64}.{signature}"
+
+        result = validate_license(signed_key, fp)
+
+        assert result.status == LicenseStatus.VALID
+        assert result.execution_allowed is True
 
 
 class TestPrivacyConfig:

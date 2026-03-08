@@ -13,24 +13,33 @@ NOT used for:
 - Direct action triggering
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import Dict, Iterable, List, Optional
 import uuid
 from datetime import datetime, UTC
+
+try:
+    from backend.cve import get_pipeline as _get_cve_pipeline
+except Exception:  # pragma: no cover - backend import may be unavailable in thin envs
+    _get_cve_pipeline = None
 
 
 class CVESeverity(Enum):
     """CLOSED ENUM - 5 severities (CVSS v3)"""
+
     CRITICAL = "CRITICAL"  # 9.0-10.0
-    HIGH = "HIGH"          # 7.0-8.9
-    MEDIUM = "MEDIUM"      # 4.0-6.9
-    LOW = "LOW"            # 0.1-3.9
-    NONE = "NONE"          # 0.0
+    HIGH = "HIGH"  # 7.0-8.9
+    MEDIUM = "MEDIUM"  # 4.0-6.9
+    LOW = "LOW"  # 0.1-3.9
+    NONE = "NONE"  # 0.0
 
 
 class CVEStatus(Enum):
     """CLOSED ENUM - 4 statuses"""
+
     PUBLISHED = "PUBLISHED"
     MODIFIED = "MODIFIED"
     REJECTED = "REJECTED"
@@ -40,13 +49,14 @@ class CVEStatus(Enum):
 @dataclass(frozen=True)
 class CVERecord:
     """Immutable CVE record."""
+
     cve_id: str
     description: str
     severity: CVESeverity
     cvss_score: float
     status: CVEStatus
-    affected_products: tuple  # Tuple of product strings
-    references: tuple         # Tuple of reference URLs
+    affected_products: tuple
+    references: tuple
     published_date: str
     last_modified: str
 
@@ -54,35 +64,43 @@ class CVERecord:
 @dataclass(frozen=True)
 class CVEQueryResult:
     """Result of CVE query."""
+
     query_id: str
     query_term: str
-    records: tuple  # Tuple[CVERecord, ...]
+    records: tuple
     total_count: int
     timestamp: str
     cached: bool
 
 
-# Local cache (in-memory for governance layer)
 _cve_cache: Dict[str, CVERecord] = {}
+
+
+def _now_iso() -> str:
+    return datetime.now(UTC).isoformat()
 
 
 def clear_cache():
     """Clear CVE cache (for testing)."""
+
     _cve_cache.clear()
 
 
 def cache_record(record: CVERecord):
     """Add record to cache."""
+
     _cve_cache[record.cve_id] = record
 
 
 def get_cached(cve_id: str) -> Optional[CVERecord]:
     """Get record from cache."""
+
     return _cve_cache.get(cve_id)
 
 
 def score_to_severity(score: float) -> CVESeverity:
     """Convert CVSS score to severity."""
+
     if score >= 9.0:
         return CVESeverity.CRITICAL
     if score >= 7.0:
@@ -102,9 +120,9 @@ def create_cve_record(
     references: Optional[List[str]] = None,
     status: CVEStatus = CVEStatus.PUBLISHED,
 ) -> CVERecord:
-    """Create a CVE record."""
-    now = datetime.now(UTC).isoformat()
-    
+    """Create and locally cache a CVE record."""
+
+    now = _now_iso()
     record = CVERecord(
         cve_id=cve_id,
         description=description,
@@ -116,11 +134,131 @@ def create_cve_record(
         published_date=now,
         last_modified=now,
     )
-    
-    # Cache it
     cache_record(record)
-    
     return record
+
+
+def _iter_local_matches(search_term: str, min_score: float) -> Iterable[CVERecord]:
+    needle = (search_term or "").strip().lower()
+    for record in _cve_cache.values():
+        if record.cvss_score < min_score:
+            continue
+        if not needle:
+            yield record
+            continue
+        if needle in record.description.lower():
+            yield record
+            continue
+        if needle in record.cve_id.lower():
+            yield record
+            continue
+        if any(needle in product.lower() for product in record.affected_products):
+            yield record
+
+
+def _pipeline_record_to_cve(record: object) -> Optional[CVERecord]:
+    if record is None:
+        return None
+
+    cve_id = str(getattr(record, "cve_id", "") or "").strip()
+    if not cve_id:
+        return None
+
+    cvss_score = float(getattr(record, "cvss_score", 0.0) or 0.0)
+    merged_at = str(getattr(record, "merged_at", "") or _now_iso())
+
+    return CVERecord(
+        cve_id=cve_id,
+        description=str(getattr(record, "description", "") or ""),
+        severity=score_to_severity(cvss_score),
+        cvss_score=cvss_score,
+        status=CVEStatus.MODIFIED if getattr(record, "canonical_version", 1) > 1 else CVEStatus.PUBLISHED,
+        affected_products=tuple(getattr(record, "affected_products", []) or ()),
+        references=tuple(getattr(record, "references", []) or ()),
+        published_date=merged_at,
+        last_modified=merged_at,
+    )
+
+
+def _query_pipeline(search_term: str, min_score: float) -> List[CVERecord]:
+    if _get_cve_pipeline is None:
+        return []
+
+    try:
+        pipeline = _get_cve_pipeline()
+    except Exception:
+        return []
+
+    if pipeline is None:
+        return []
+
+    cve_ids: List[str] = []
+    needle = (search_term or "").strip()
+    if needle:
+        cve_ids = [entry.get("cve_id", "") for entry in pipeline.search(needle)]
+    else:
+        cve_ids = [entry.get("cve_id", "") for entry in pipeline.get_records()]
+
+    records: List[CVERecord] = []
+    seen = set()
+    for cve_id in cve_ids:
+        if not cve_id or cve_id in seen:
+            continue
+        seen.add(cve_id)
+        record = _pipeline_record_to_cve(pipeline.get_record(cve_id))
+        if record is None or record.cvss_score < min_score:
+            continue
+        records.append(record)
+    return records
+
+
+def _query_passive_live(search_term: str, min_score: float) -> List[CVERecord]:
+    needle = (search_term or "").strip()
+    if len(needle) < 3:
+        return []
+
+    try:
+        from .g15_cve_api import APIStatus, fetch_cves_passive
+    except Exception:
+        return []
+
+    try:
+        result = fetch_cves_passive(needle)
+    except Exception:
+        return []
+
+    if result.status not in (APIStatus.CONNECTED, APIStatus.DEGRADED):
+        return []
+
+    records: List[CVERecord] = []
+    for record in result.records:
+        if record.cvss_score < min_score:
+            continue
+        records.append(record)
+    return records
+
+
+def _sort_records(records: Iterable[CVERecord], search_term: str) -> List[CVERecord]:
+    needle = (search_term or "").strip().lower()
+    unique: Dict[str, CVERecord] = {}
+    for record in records:
+        existing = unique.get(record.cve_id)
+        if existing is None or record.cvss_score > existing.cvss_score:
+            unique[record.cve_id] = record
+
+    def rank(record: CVERecord) -> tuple:
+        exact = 1 if needle and record.cve_id.lower() == needle else 0
+        cve_match = 1 if needle and needle in record.cve_id.lower() else 0
+        text_match = 1 if needle and needle in record.description.lower() else 0
+        return (
+            -exact,
+            -cve_match,
+            -text_match,
+            -record.cvss_score,
+            record.cve_id,
+        )
+
+    return sorted(unique.values(), key=rank)
 
 
 def query_cves(
@@ -130,37 +268,46 @@ def query_cves(
 ) -> CVEQueryResult:
     """
     Query CVE records.
-    
-    NOTE: This is a mock implementation for governance testing.
-    Real implementation would query NVD API.
+
+    Resolution order:
+    1. Local authoritative cache, when present.
+    2. Canonical runtime CVE pipeline.
+    3. Passive live NVD lookup via g15, if configured.
     """
-    matching = []
-    
-    for cve_id, record in _cve_cache.items():
-        if record.cvss_score < min_score:
-            continue
-        
-        # Simple text search
-        if search_term.lower() in record.description.lower():
-            matching.append(record)
-        elif search_term.upper() in cve_id.upper():
-            matching.append(record)
-        elif any(search_term.lower() in p.lower() for p in record.affected_products):
-            matching.append(record)
-    
-    # Sort by score descending
-    matching.sort(key=lambda r: r.cvss_score, reverse=True)
-    
-    # Limit results
-    matching = matching[:max_results]
-    
+
+    local_records = list(_iter_local_matches(search_term, min_score))
+    if _cve_cache:
+        records = _sort_records(local_records, search_term)[:max_results]
+        return CVEQueryResult(
+            query_id=f"QRY-{uuid.uuid4().hex[:16].upper()}",
+            query_term=search_term,
+            records=tuple(records),
+            total_count=len(records),
+            timestamp=_now_iso(),
+            cached=True,
+        )
+
+    pipeline_records = _query_pipeline(search_term, min_score)
+    if pipeline_records:
+        records = _sort_records(pipeline_records, search_term)[:max_results]
+        return CVEQueryResult(
+            query_id=f"QRY-{uuid.uuid4().hex[:16].upper()}",
+            query_term=search_term,
+            records=tuple(records),
+            total_count=len(records),
+            timestamp=_now_iso(),
+            cached=False,
+        )
+
+    live_records = _query_passive_live(search_term, min_score)
+    records = _sort_records(live_records, search_term)[:max_results]
     return CVEQueryResult(
         query_id=f"QRY-{uuid.uuid4().hex[:16].upper()}",
         query_term=search_term,
-        records=tuple(matching),
-        total_count=len(matching),
-        timestamp=datetime.now(UTC).isoformat(),
-        cached=True,
+        records=tuple(records),
+        total_count=len(records),
+        timestamp=_now_iso(),
+        cached=False,
     )
 
 
@@ -168,37 +315,26 @@ def correlate_target(
     target_name: str,
     products: List[str],
 ) -> CVEQueryResult:
-    """
-    Correlate target with CVE database.
-    
-    Returns relevant CVEs for the target.
-    """
-    all_matches = []
-    
+    """Correlate a target against local/runtime CVE intelligence."""
+
+    all_matches: List[CVERecord] = []
+    cached = True
+
     for product in products:
         result = query_cves(product)
+        cached = cached and result.cached
         all_matches.extend(result.records)
-    
-    # Also search target name
+
     name_result = query_cves(target_name)
+    cached = cached and name_result.cached
     all_matches.extend(name_result.records)
-    
-    # Dedupe
-    seen = set()
-    unique = []
-    for record in all_matches:
-        if record.cve_id not in seen:
-            seen.add(record.cve_id)
-            unique.append(record)
-    
-    # Sort by severity
-    unique.sort(key=lambda r: r.cvss_score, reverse=True)
-    
+
+    records = _sort_records(all_matches, target_name)[:50]
     return CVEQueryResult(
         query_id=f"COR-{uuid.uuid4().hex[:16].upper()}",
         query_term=f"target:{target_name}",
-        records=tuple(unique[:50]),
-        total_count=len(unique),
-        timestamp=datetime.now(UTC).isoformat(),
-        cached=True,
+        records=tuple(records),
+        total_count=len(records),
+        timestamp=_now_iso(),
+        cached=cached,
     )

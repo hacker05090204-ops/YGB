@@ -2,6 +2,7 @@
 """Tests for G07: CVE Intelligence"""
 
 import pytest
+import backend.cve.cve_pipeline as pipeline_mod
 from impl_v1.phase49.governors.g07_cve_intelligence import (
     CVESeverity,
     CVEStatus,
@@ -139,6 +140,28 @@ class TestQueryCVEs:
     def test_result_is_cached_flag(self):
         result = query_cves("test")
         assert result.cached is True
+
+    def test_uses_runtime_pipeline_when_local_cache_empty(self):
+        clear_cache()
+        pipeline_mod._pipeline = None
+        pipeline = pipeline_mod.get_pipeline()
+        pipeline.ingest_record(
+            cve_id="CVE-2026-1234",
+            title="Runtime pipeline issue",
+            description="Runtime pipeline vulnerability in edge worker",
+            severity="HIGH",
+            cvss_score=8.2,
+            affected_products=["edge-worker"],
+            references=["https://example.test/advisory"],
+            is_exploited=False,
+            source_id="nvd",
+        )
+
+        result = query_cves("edge-worker")
+
+        assert result.total_count == 1
+        assert result.cached is False
+        assert result.records[0].cve_id == "CVE-2026-1234"
 
 
 class TestCorrelateTarget:

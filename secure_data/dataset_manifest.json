@@ -17,11 +17,11 @@
   "source_trust_avg": 0.9116,
   "source_trust_min": 0.7,
   "training_mode": "PRODUCTION_REAL",
-  "frozen_at": "2026-03-08T22:28:34.212495",
+  "frozen_at": "2026-03-08T23:55:53.510557",
   "dataset_hash": "db36590b1dca8cb1321875bbeda7f5b85bf45c36c741f5254e827db0e90d98bb",
   "signed_by": "1b7d03627cd17c222be30b483cd6404921e4cd3f91c4f508b10d4e53a3ceb680",
   "version": "1.0",
   "total_samples": 125993,
-  "created_at": "2026-03-08T22:28:34.212495",
+  "created_at": "2026-03-08T23:55:53.510557",
   "signature_hash": "52d22999556602d08e3f07c28e1a3589da4b176244f748a15dbced31aa1a0328"
 }

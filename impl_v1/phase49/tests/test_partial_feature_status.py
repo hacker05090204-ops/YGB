@@ -132,18 +132,17 @@ class TestGmailAlertsTruthfulness:
 
 
 class TestScreenInspectionTruthfulness:
-    """Screen inspection must report stub mode explicitly."""
+    """Screen inspection must report actual availability, never fake findings."""
 
-    def test_stub_mode_indicator(self):
-        """get_inspection_mode_info must indicate stub mode."""
-        from impl_v1.phase49.governors.g18_screen_inspection import (
-            get_inspection_mode_info, NATIVE_CAPTURE_AVAILABLE,
-        )
+    def test_mode_indicator_is_truthful(self):
+        """Mode info must reflect local availability or explicit unavailability."""
+        from impl_v1.phase49.governors.g18_screen_inspection import get_inspection_mode_info
+
         info = get_inspection_mode_info()
-        assert info["is_stub"] is True, "Should be in stub mode without native driver"
-        assert info["native_capture_available"] is False
-        assert info["mode"] == "STUB_READ_ONLY"
-        assert "stub" in info["description"].lower()
+        assert info["is_stub"] is False
+        assert info["mode"] in {"LOCAL_READ_ONLY", "UNAVAILABLE_READ_ONLY"}
+        assert isinstance(info["native_capture_available"], bool)
+        assert "stub" not in info["description"].lower()
 
     def test_can_inspection_interact_always_false(self):
         """can_inspection_interact must ALWAYS return False."""
