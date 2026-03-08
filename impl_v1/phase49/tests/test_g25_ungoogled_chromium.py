@@ -165,9 +165,15 @@ class TestVersionCheck:
             f.write(b"mock binary")
             f.flush()
             f.close()  # Close before access on Windows
-            
-            result = _get_version(f.name)
-            # Mock returns "125.0.0.0" for existing files
+
+            with patch("subprocess.run") as mock_run:
+                mock_run.return_value = MagicMock(
+                    returncode=0,
+                    stdout="ungoogled-chromium 125.0.0.0",
+                    stderr="",
+                )
+                result = _get_version(f.name)
+
             assert result == "125.0.0.0"
         finally:
             if os.path.exists(f.name):
@@ -249,34 +255,44 @@ class TestDetection:
             f.close()  # Close before access on Windows
             
             with patch("shutil.which") as mock_which:
-                mock_which.return_value = f.name
-                
-                result = detect_ungoogled_chromium()
-                
-                # Mock version returns 125.0.0.0 which is >= 120.0.0.0
-                assert result.status == BrowserVerificationStatus.VERIFIED
-                assert result.can_launch is True
-                assert result.binary is not None
-                assert result.binary.verified is True
+                with patch("subprocess.run") as mock_run:
+                    mock_run.return_value = MagicMock(
+                        returncode=0,
+                        stdout="ungoogled-chromium 125.0.0.0",
+                        stderr="",
+                    )
+                    mock_which.return_value = f.name
+
+                    result = detect_ungoogled_chromium()
+
+                    assert result.status == BrowserVerificationStatus.VERIFIED
+                    assert result.can_launch is True
+                    assert result.binary is not None
+                    assert result.binary.verified is True
         finally:
             if os.path.exists(f.name):
                 os.unlink(f.name)
     
     def test_detect_version_not_available(self):
-        """Detect with version detection returning None (non-existent path)."""
-        with patch("shutil.which") as mock_which:
-            with patch.object(Path, "exists") as mock_exists:
-                with patch.object(Path, "is_file") as mock_is_file:
-                    mock_which.return_value = None
-                    mock_exists.return_value = True
-                    mock_is_file.return_value = True
-                    
-                    # This will find a trusted path, but version check will work
-                    # because we mock Path.exists
+        """Detection fails closed when version probing is unavailable."""
+        f = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            f.write(b"mock ungoogled chromium binary")
+            f.flush()
+            f.close()
+
+            with patch("shutil.which") as mock_which:
+                with patch("subprocess.run", side_effect=OSError("not executable")):
+                    mock_which.return_value = f.name
+
                     result = detect_ungoogled_chromium()
-                    
-                    # The detected binary should be verified (returns mock version)
-                    assert result is not None
+
+                    assert result.status == BrowserVerificationStatus.BLOCKED
+                    assert result.can_launch is False
+                    assert "Version probe failed" in result.error_message
+        finally:
+            if os.path.exists(f.name):
+                os.unlink(f.name)
 
 
 class TestVerifyAndAuthorize:
@@ -291,12 +307,18 @@ class TestVerifyAndAuthorize:
             f.close()  # Close before access on Windows
             
             with patch("shutil.which") as mock_which:
-                mock_which.return_value = f.name
-                
-                can_launch, result = verify_and_authorize_launch()
-                
-                assert can_launch is True
-                assert result.status == BrowserVerificationStatus.VERIFIED
+                with patch("subprocess.run") as mock_run:
+                    mock_run.return_value = MagicMock(
+                        returncode=0,
+                        stdout="ungoogled-chromium 125.0.0.0",
+                        stderr="",
+                    )
+                    mock_which.return_value = f.name
+
+                    can_launch, result = verify_and_authorize_launch()
+
+                    assert can_launch is True
+                    assert result.status == BrowserVerificationStatus.VERIFIED
         finally:
             if os.path.exists(f.name):
                 os.unlink(f.name)
@@ -367,11 +389,17 @@ class TestEnforcement:
             f.close()  # Close before access on Windows
             
             with patch("shutil.which") as mock_which:
-                mock_which.return_value = f.name
-                
-                result = enforce_ungoogled_chromium()
-                
-                assert result.can_launch is True
+                with patch("subprocess.run") as mock_run:
+                    mock_run.return_value = MagicMock(
+                        returncode=0,
+                        stdout="ungoogled-chromium 125.0.0.0",
+                        stderr="",
+                    )
+                    mock_which.return_value = f.name
+
+                    result = enforce_ungoogled_chromium()
+
+                    assert result.can_launch is True
         finally:
             if os.path.exists(f.name):
                 os.unlink(f.name)

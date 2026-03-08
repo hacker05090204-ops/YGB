@@ -12,8 +12,10 @@ Privacy-first, fingerprint-reduced browser REQUIRED.
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple
-import shutil
 import hashlib
+import re
+import shutil
+import subprocess
 from pathlib import Path
 from datetime import datetime, UTC
 
@@ -109,6 +111,7 @@ TRUSTED_BINARY_PATHS: Tuple[str, ...] = (
 
 # Minimum version required
 MINIMUM_VERSION = "120.0.0.0"
+_VERSION_PATTERN = re.compile(r"(\d+(?:\.\d+){0,3})")
 
 
 # =============================================================================
@@ -136,17 +139,34 @@ def _check_trusted_paths() -> Optional[str]:
 def _get_version(binary_path: str) -> Optional[str]:
     """
     Extract version from browser binary.
-    
-    NOTE: Real implementation deferred to C++ backend.
-    Python layer provides mock for testing.
+
+    This probes the actual browser binary with ``--version`` and parses the
+    returned version string. If the binary cannot be executed or does not
+    expose a version number, the result is unavailable and launch is blocked.
     """
-    # Mock version detection - real version comes from C++ binary execution
-    # This prevents forbidden subprocess import while allowing testing
     path = Path(binary_path)
-    if path.exists():
-        # Return mock version for testing; C++ integration will provide real version
-        return "125.0.0.0"
-    return None
+    if not path.exists() or not path.is_file():
+        return None
+
+    try:
+        result = subprocess.run(
+            [str(path), "--version"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+    if result.returncode != 0:
+        return None
+
+    raw = " ".join(
+        part.strip() for part in (result.stdout, result.stderr) if part and part.strip()
+    )
+    match = _VERSION_PATTERN.search(raw)
+    return match.group(1) if match else None
 
 
 def _compute_checksum(binary_path: str) -> Optional[str]:
@@ -213,6 +233,22 @@ def detect_ungoogled_chromium() -> BrowserVerificationResult:
     
     # Step 3: Compute checksum
     checksum = _compute_checksum(binary_path)
+
+    if not version:
+        binary = BrowserBinary(
+            path=binary_path,
+            name="ungoogled-chromium",
+            version=None,
+            checksum=checksum,
+            verified=False,
+        )
+        return BrowserVerificationResult(
+            status=BrowserVerificationStatus.BLOCKED,
+            binary=binary,
+            error_message="Version probe failed for Ungoogled Chromium binary",
+            timestamp=timestamp,
+            can_launch=False,
+        )
     
     # Step 4: Verify version
     if version and not _is_version_acceptable(version):  # pragma: no cover - version mismatch

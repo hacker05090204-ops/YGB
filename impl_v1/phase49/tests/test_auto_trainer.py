@@ -437,6 +437,56 @@ class TestGovernanceWiring:
         assert observed["dataset_hash"] == "abc123"
         assert observed["total_samples"] == 128
 
+    def test_build_training_dataloaders_falls_back_after_probe_failure(self, monkeypatch):
+        torch = pytest.importorskip("torch")
+        trainer = AutoTrainer()
+        calls = []
+
+        class _Loader:
+            def __init__(self, num_workers):
+                self.batch_size = 1024
+                self.dataset = object()
+                self._num_workers = num_workers
+
+            def __iter__(self):
+                if self._num_workers > 0:
+                    raise OSError("Can't pickle local object 'CDLL.__init__.<locals>._FuncPtr'")
+                yield (
+                    torch.zeros((2, 256), dtype=torch.float32),
+                    torch.zeros(2, dtype=torch.long),
+                )
+
+        def _fake_create_training_dataloader(*, batch_size, num_workers, pin_memory, prefetch_factor, seed):
+            calls.append(num_workers)
+            loader = _Loader(num_workers)
+            return loader, loader, {
+                "dataset_source": "INGESTION_PIPELINE",
+                "train": {"total": 2},
+                "batch_size": batch_size,
+                "num_workers": num_workers,
+                "pin_memory": pin_memory,
+            }
+
+        monkeypatch.setattr(
+            "impl_v1.training.data.real_dataset_loader.create_training_dataloader",
+            _fake_create_training_dataloader,
+        )
+        monkeypatch.setattr(
+            "impl_v1.phase49.runtime.auto_trainer.sys.platform",
+            "win32",
+            raising=False,
+        )
+
+        train_loader, holdout_loader, stats, first_batch = trainer._build_training_dataloaders(
+            batch_size=1024,
+            seed=42,
+        )
+
+        assert calls == [2, 0]
+        assert stats["num_workers"] == 0
+        assert first_batch[0].shape == (2, 256)
+        assert train_loader is holdout_loader
+
 
 # =============================================================================
 # SINGLETON TESTS

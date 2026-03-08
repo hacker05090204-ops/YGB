@@ -13,6 +13,9 @@ Validates:
 import pytest
 import sys
 import os
+import hashlib
+
+import numpy as np
 
 # Add parent path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
@@ -128,6 +131,154 @@ class TestRealDatasetPipeline:
         assert "difficulty" in clean
         assert "severity" not in clean
         assert "accepted" not in clean
+
+    def test_ingestion_encoder_uses_parameters_content(self):
+        """Changing parameters should change the encoded representation."""
+        from impl_v1.training.data.real_dataset_loader import IngestionPipelineDataset
+
+        dataset = IngestionPipelineDataset.__new__(IngestionPipelineDataset)
+        dataset.feature_dim = 256
+        features = {
+            "signal_strength": 0.82,
+            "response_ratio": 0.61,
+            "difficulty": 0.18,
+            "noise": 0.05,
+            "endpoint_entropy": 0.74,
+            "exploit_complexity": 0.69,
+            "impact_severity": 0.87,
+            "fingerprint_density": 0.63,
+            "parameter_ratio": 0.44,
+            "parameters_entropy": 0.58,
+        }
+
+        vec_a = dataset._encode_features(
+            features,
+            endpoint="/api/v1/users/42",
+            parameters="id=42&sort=asc",
+            exploit_vector="UNION SELECT 1,2,3",
+            impact="CVSS:8.1|Sensitive data exposure",
+            source_tag="nvd",
+            fingerprint="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        )
+        vec_b = dataset._encode_features(
+            features,
+            endpoint="/api/v1/users/42",
+            parameters="account=42&filter=active&expand=profile",
+            exploit_vector="UNION SELECT 1,2,3",
+            impact="CVSS:8.1|Sensitive data exposure",
+            source_tag="nvd",
+            fingerprint="0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+        )
+
+        assert len(vec_a) == 256
+        assert len(vec_b) == 256
+        assert vec_a != vec_b
+        assert vec_a[32:64] != vec_b[32:64]
+
+    def test_ingestion_encoder_entropy_profile(self):
+        """Encoded real-ingestion features should clear the native entropy floor."""
+        from impl_v1.training.data.real_dataset_loader import IngestionPipelineDataset
+
+        dataset = IngestionPipelineDataset.__new__(IngestionPipelineDataset)
+        dataset.feature_dim = 256
+
+        rows = []
+        for i in range(256):
+            signal = ((i * 7) % 100) / 100.0
+            response = ((i * 11) % 100) / 100.0
+            difficulty = 1.0 - min(signal * 0.7 + 0.1, 1.0)
+            impact_severity = min(0.2 + ((i * 13) % 80) / 100.0, 1.0)
+            fingerprint_density = 0.25 + ((i * 5) % 70) / 100.0
+            parameters = f"id={i}&page={i % 9}&sort={(i * 3) % 7}&token={i:04x}"
+            impact = f"CVSS:{3.0 + (i % 7):.1f}|impact-{i % 19}|scope-{i % 5}"
+            row = dataset._encode_features(
+                {
+                    "signal_strength": signal,
+                    "response_ratio": response,
+                    "difficulty": difficulty,
+                    "noise": 0.05,
+                    "endpoint_entropy": 0.35 + ((i * 9) % 50) / 100.0,
+                    "exploit_complexity": 0.30 + ((i * 4) % 60) / 100.0,
+                    "impact_severity": impact_severity,
+                    "fingerprint_density": fingerprint_density,
+                    "parameter_ratio": min(len(parameters) / 96.0, 1.0),
+                    "parameters_entropy": 0.25 + ((i * 6) % 60) / 100.0,
+                },
+                endpoint=f"/api/v{i % 4}/users/{i % 37}/items/{(i * 5) % 91}",
+                parameters=parameters,
+                exploit_vector=f"payload-{i % 17}-step-{(i * i) % 97}-probe",
+                impact=impact,
+                source_tag=f"source_{i % 23}",
+                fingerprint=hashlib.sha256(f"sample-{i}".encode()).hexdigest(),
+            )
+            rows.append(row)
+
+        features = np.asarray(rows, dtype=np.float64)
+
+        def _entropy(col: np.ndarray, bins: int = 64) -> float:
+            vmin = float(col.min())
+            vmax = float(col.max())
+            rng = vmax - vmin
+            if rng < 1e-12:
+                return 0.0
+            hist = np.zeros(bins, dtype=np.int64)
+            scaled = ((col - vmin) / rng * (bins - 1)).astype(np.int64)
+            scaled = np.clip(scaled, 0, bins - 1)
+            for bucket in scaled:
+                hist[bucket] += 1
+            probs = hist[hist > 0] / col.size
+            return float(-(probs * np.log2(probs)).sum())
+
+        entropies = np.asarray([_entropy(features[:, idx]) for idx in range(features.shape[1])])
+        low_entropy_count = int((entropies < 1.5).sum())
+
+        assert entropies.min() > 1.5
+        assert low_entropy_count < (features.shape[1] // 4)
+
+    def test_persisted_samples_forward_parameters(self, monkeypatch):
+        """Persisted samples must carry parameters into the real encoder path."""
+        from impl_v1.training.data.real_dataset_loader import IngestionPipelineDataset
+
+        dataset = IngestionPipelineDataset.__new__(IngestionPipelineDataset)
+        captured = []
+
+        def _fake_process_one_sample(
+            endpoint, parameters, exploit_vector, impact, source_tag,
+            fingerprint, reliability_val, policy, scorer,
+        ):
+            captured.append(
+                {
+                    "endpoint": endpoint,
+                    "parameters": parameters,
+                    "source_tag": source_tag,
+                    "reliability": reliability_val,
+                }
+            )
+            return "accepted"
+
+        monkeypatch.setattr(dataset, "_process_one_sample", _fake_process_one_sample)
+
+        accepted, rejected_policy, rejected_quality = dataset._process_persisted_samples(
+            [
+                {
+                    "endpoint": "/api/users/7",
+                    "parameters": "id=7&role=user",
+                    "exploit_vector": "probe-vector",
+                    "impact": "CVSS:7.3|impact",
+                    "source_tag": "nvd",
+                    "fingerprint": "abc123",
+                    "reliability": 0.91,
+                }
+            ],
+            policy=object(),
+            scorer=object(),
+            min_samples=1,
+        )
+
+        assert accepted == 1
+        assert rejected_policy == 0
+        assert rejected_quality == 0
+        assert captured[0]["parameters"] == "id=7&role=user"
 
 
 if __name__ == "__main__":

@@ -14,11 +14,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": true,
       "locked": false,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 1,
@@ -31,11 +35,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 2,
@@ -48,11 +56,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 3,
@@ -65,11 +77,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 4,
@@ -82,11 +98,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 5,
@@ -99,11 +119,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 6,
@@ -116,11 +140,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 7,
@@ -133,11 +161,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 8,
@@ -150,11 +182,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 9,
@@ -167,11 +203,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 10,
@@ -184,11 +224,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 11,
@@ -201,11 +245,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 12,
@@ -218,11 +266,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 13,
@@ -235,11 +287,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 14,
@@ -252,11 +308,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 15,
@@ -269,11 +329,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 16,
@@ -286,11 +350,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 17,
@@ -303,11 +371,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 18,
@@ -320,11 +392,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 19,
@@ -337,11 +413,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 20,
@@ -354,11 +434,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 21,
@@ -371,11 +455,15 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     },
     {
       "id": 22,
@@ -388,12 +476,16 @@
       "dup_detection": null,
       "ece": null,
       "stability_days": 0,
+      "stability_cycles": 0,
       "human_approved": false,
       "active": false,
       "locked": true,
       "certified": false,
-      "frozen": false
+      "frozen": false,
+      "freeze_reason": null,
+      "first_trained_at": null,
+      "last_trained_at": null
     }
   ],
-  "last_updated": "2026-03-08T05:58:49.032392+00:00"
+  "last_updated": "2026-03-08T16:30:48.326948+00:00"
 }

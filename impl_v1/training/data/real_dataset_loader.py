@@ -775,8 +775,15 @@ class IngestionPipelineDataset(Dataset):
                 fingerprint = fp.value.decode("utf-8", errors="replace")
 
                 ok = self._process_one_sample(
-                    endpoint, exploit_vector, impact, source_tag,
-                    fingerprint, reliability.value, policy, scorer
+                    endpoint,
+                    parameters,
+                    exploit_vector,
+                    impact,
+                    source_tag,
+                    fingerprint,
+                    reliability.value,
+                    policy,
+                    scorer,
                 )
                 if ok == "accepted":
                     accepted += 1
@@ -811,9 +818,136 @@ class IngestionPipelineDataset(Dataset):
         # Write manifest
         self._write_manifest(accepted, rejected_policy, rejected_quality)
 
+    @staticmethod
+    def _stable_unit_value(payload: str) -> float:
+        """Map arbitrary content to a deterministic unit-range value."""
+        if not payload:
+            return 0.0
+        digest = hashlib.sha256(payload.encode("utf-8", errors="ignore")).digest()
+        return int.from_bytes(digest[:8], "big") / float((1 << 64) - 1)
+
+    @staticmethod
+    def _char_entropy(text: str) -> float:
+        """Normalized Shannon entropy over characters."""
+        if not text:
+            return 0.0
+        from collections import Counter
+
+        counts = Counter(text)
+        total = len(text)
+        entropy = 0.0
+        for count in counts.values():
+            p = count / total
+            if p > 0:
+                entropy -= p * math.log2(p)
+        return min(entropy / 6.0, 1.0)
+
+    @classmethod
+    def _text_stats(cls, text: str, *, fingerprint_mode: bool = False) -> List[float]:
+        """Extract deterministic normalized stats from raw text."""
+        normalized = text or ""
+        length = len(normalized)
+        if length == 0:
+            return [0.0] * 8
+
+        unique_ratio = min(len(set(normalized)) / length, 1.0)
+        digit_ratio = sum(ch.isdigit() for ch in normalized) / length
+        alpha_ratio = sum(ch.isalpha() for ch in normalized) / length
+        upper_ratio = sum(ch.isupper() for ch in normalized) / length
+        symbol_ratio = sum(not ch.isalnum() for ch in normalized) / length
+        slash_ratio = normalized.count("/") / max(length, 1)
+        token_count = len(
+            [token for token in normalized.replace("/", " ").replace("&", " ").split() if token]
+        )
+        token_ratio = min(token_count / 16.0, 1.0)
+        entropy = cls._char_entropy(normalized)
+
+        if fingerprint_mode:
+            hex_ratio = sum(ch.lower() in "0123456789abcdef" for ch in normalized) / length
+            symbol_ratio = hex_ratio
+
+        return [
+            min(length / 128.0, 1.0),
+            unique_ratio,
+            digit_ratio,
+            alpha_ratio,
+            upper_ratio,
+            min(symbol_ratio, 1.0),
+            min(slash_ratio, 1.0),
+            min((token_ratio + entropy) / 2.0, 1.0),
+        ]
+
+    @classmethod
+    def _build_text_block(
+        cls,
+        text: str,
+        *,
+        salt: str,
+        scalar_a: float,
+        scalar_b: float,
+        size: int = 32,
+        fingerprint_mode: bool = False,
+    ) -> List[float]:
+        """Build a dense deterministic projection block from raw text."""
+        normalized = (text or "").strip().lower()
+        stats = cls._text_stats(normalized, fingerprint_mode=fingerprint_mode)
+        reversed_text = normalized[::-1]
+        if not normalized:
+            return [min(max((0.55 * scalar_a) + (0.45 * scalar_b), 0.0), 1.0)] * size
+
+        vec = []
+        for i in range(size):
+            stat_a = stats[i % len(stats)]
+            stat_b = stats[(i * 3 + 1) % len(stats)]
+            hash_a = cls._stable_unit_value(f"{salt}|a|{i}|{normalized}")
+            hash_b = cls._stable_unit_value(f"{salt}|b|{i}|{reversed_text}")
+            hash_c = cls._stable_unit_value(
+                f"{salt}|c|{i}|{len(normalized)}|{stat_a:.6f}|{stat_b:.6f}"
+            )
+            val = (
+                0.38 * hash_a
+                + 0.16 * hash_b
+                + 0.12 * hash_c
+                + 0.14 * stat_a
+                + 0.08 * stat_b
+                + 0.07 * scalar_a
+                + 0.05 * scalar_b
+            )
+            vec.append(min(max(val, 0.0), 1.0))
+        return vec
+
+    @classmethod
+    def _build_numeric_block(cls, metrics: List[float], size: int = 64) -> List[float]:
+        """Build interaction features from normalized numeric metrics."""
+        if not metrics:
+            return [0.0] * size
+
+        clean = [min(max(float(v), 0.0), 1.0) for v in metrics]
+        vec = []
+        for i in range(size):
+            a = clean[i % len(clean)]
+            b = clean[(i * 3 + 1) % len(clean)]
+            c = clean[(i * 5 + 2) % len(clean)]
+            trig = 0.5 + 0.5 * math.sin((a * math.pi * (i + 1)) + (b * 2.17) + (c * 1.13))
+            mixed = (a * b + b * c + c * a) / 3.0
+            hashed = cls._stable_unit_value(
+                f"numeric|{i}|{a:.6f}|{b:.6f}|{c:.6f}|{sum(clean):.6f}"
+            )
+            val = (0.42 * trig) + (0.28 * mixed) + (0.18 * hashed) + (0.12 * ((a + b + c) / 3.0))
+            vec.append(min(max(val, 0.0), 1.0))
+        return vec
+
     def _process_one_sample(
-        self, endpoint, exploit_vector, impact, source_tag,
-        fingerprint, reliability_val, policy, scorer,
+        self,
+        endpoint,
+        parameters,
+        exploit_vector,
+        impact,
+        source_tag,
+        fingerprint,
+        reliability_val,
+        policy,
+        scorer,
     ) -> str:
         """Process a single sample through policy + quality checks.
 
@@ -853,6 +987,10 @@ class IngestionPipelineDataset(Dataset):
         exploit_cmplx = 0.5
         if exploit_vector:
             exploit_cmplx = min(len(set(exploit_vector)) / max(len(exploit_vector), 1), 1.0)
+
+        # Parameters richness: token density + character entropy
+        params_ratio = min(len(parameters) / 96.0, 1.0) if parameters else 0.0
+        params_entropy = self._char_entropy(parameters)
         
         # Impact severity: keyword + CVSS-based scoring
         impact_sev = 0.5
@@ -891,10 +1029,20 @@ class IngestionPipelineDataset(Dataset):
             "exploit_complexity": exploit_cmplx,
             "impact_severity": impact_sev,
             "fingerprint_density": fp_density,
+            "parameter_ratio": params_ratio,
+            "parameters_entropy": params_entropy,
         }
 
         clean_features = strip_forbidden_fields(features_dict)
-        feature_vec = self._encode_features(clean_features)
+        feature_vec = self._encode_features(
+            clean_features,
+            endpoint=endpoint,
+            parameters=parameters,
+            exploit_vector=exploit_vector,
+            impact=impact,
+            source_tag=source_tag,
+            fingerprint=fingerprint,
+        )
 
         # Quality score
         import numpy as np
@@ -921,6 +1069,7 @@ class IngestionPipelineDataset(Dataset):
         self._labels.append(label)
         self._raw_samples.append({
             "endpoint": endpoint,
+            "parameters": parameters,
             "exploit_vector": exploit_vector,
             "impact": impact,
             "source_tag": source_tag,
@@ -987,6 +1136,7 @@ class IngestionPipelineDataset(Dataset):
 
             ok = self._process_one_sample(
                 endpoint=sample.get("endpoint", ""),
+                parameters=sample.get("parameters", ""),
                 exploit_vector=sample.get("exploit_vector", ""),
                 impact=sample.get("impact", ""),
                 source_tag=sample.get("source_tag", ""),
@@ -1004,71 +1154,117 @@ class IngestionPipelineDataset(Dataset):
 
         return accepted, rejected_policy, rejected_quality
 
-    def _encode_features(self, features: dict) -> List[float]:
-        """Encode feature dict to fixed-size vector (same logic as synthetic)."""
-        vec = []
+    def _encode_features(
+        self,
+        features: dict,
+        *,
+        endpoint: str = "",
+        parameters: str = "",
+        exploit_vector: str = "",
+        impact: str = "",
+        source_tag: str = "",
+        fingerprint: str = "",
+    ) -> List[float]:
+        """Encode raw ingestion content to a dense deterministic 256-dim vector."""
         signal = features.get("signal_strength", 0.5)
         response = features.get("response_ratio", 0.5)
         difficulty = features.get("difficulty", 0.5)
         noise_level = features.get("noise", 0.1)
+        endpoint_entropy = features.get("endpoint_entropy", 0.5)
+        exploit_complexity = features.get("exploit_complexity", 0.5)
+        impact_severity_val = features.get("impact_severity", 0.5)
+        fingerprint_density = features.get("fingerprint_density", 0.5)
+        parameter_ratio = features.get("parameter_ratio", min(len(parameters) / 96.0, 1.0))
+        parameters_entropy = features.get("parameters_entropy", self._char_entropy(parameters))
+        source_hash = self._stable_unit_value(f"source|{source_tag.lower()}")
 
-        sample_seed = int((signal * 10000 + response * 1000 + difficulty * 100) * 100)
-        sample_rng = random.Random(sample_seed)
+        endpoint_block = self._build_text_block(
+            endpoint,
+            salt="endpoint",
+            scalar_a=signal,
+            scalar_b=endpoint_entropy,
+            size=32,
+        )
+        parameters_block = self._build_text_block(
+            parameters,
+            salt="parameters",
+            scalar_a=parameter_ratio,
+            scalar_b=parameters_entropy,
+            size=32,
+        )
+        exploit_block = self._build_text_block(
+            exploit_vector,
+            salt="exploit",
+            scalar_a=response,
+            scalar_b=exploit_complexity,
+            size=32,
+        )
+        impact_block = self._build_text_block(
+            impact,
+            salt="impact",
+            scalar_a=impact_severity_val,
+            scalar_b=signal,
+            size=32,
+        )
+        fingerprint_block = self._build_text_block(
+            f"{fingerprint}|{source_tag}",
+            salt="fingerprint",
+            scalar_a=fingerprint_density,
+            scalar_b=source_hash,
+            size=32,
+            fingerprint_mode=True,
+        )
+        numeric_block = self._build_numeric_block(
+            [
+                signal,
+                response,
+                difficulty,
+                noise_level,
+                endpoint_entropy,
+                exploit_complexity,
+                impact_severity_val,
+                fingerprint_density,
+                parameter_ratio,
+                parameters_entropy,
+                source_hash,
+            ],
+            size=64,
+        )
+        combined_block = self._build_text_block(
+            "|".join(
+                part for part in (
+                    endpoint,
+                    parameters,
+                    exploit_vector,
+                    impact,
+                    source_tag,
+                    fingerprint,
+                ) if part
+            ),
+            salt="combined",
+            scalar_a=(signal + impact_severity_val) / 2.0,
+            scalar_b=(exploit_complexity + parameter_ratio) / 2.0,
+            size=32,
+        )
 
-        for i in range(self.feature_dim):
-            if i < 64:
-                base = signal
-                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
-                val = base + noise
-            elif i < 128:
-                base = response
-                noise = noise_level * 0.08 * sample_rng.gauss(0, 1)
-                val = base + noise
-            elif i < 192:
-                sub_idx = i - 128
-                if sub_idx < 16:
-                    base = signal * signal
-                    noise = 0.06 * sample_rng.gauss(0, 1)
-                elif sub_idx < 32:
-                    base = response * response
-                    noise = 0.06 * sample_rng.gauss(0, 1)
-                elif sub_idx < 40:
-                    base = 0.5 + 0.5 * math.sin(signal * math.pi)
-                    noise = 0.05 * sample_rng.gauss(0, 1)
-                elif sub_idx < 48:
-                    base = 0.5 + 0.5 * math.cos(response * math.pi)
-                    noise = 0.05 * sample_rng.gauss(0, 1)
-                elif sub_idx < 56:
-                    threshold = 0.5 + 0.02 * sample_rng.gauss(0, 1)
-                    base = 0.8 if signal > threshold else 0.2
-                    noise = 0.04 * sample_rng.gauss(0, 1)
-                else:
-                    base = signal * (1.0 - difficulty * 0.3)
-                    noise = 0.05 * sample_rng.gauss(0, 1)
-                val = base + noise
-            else:
-                # [192-255] Additional feature groups from raw metadata
-                sub_idx = i - 192  # 0-63
-                endpoint_entropy = features.get("endpoint_entropy", 0.5)
-                exploit_complexity = features.get("exploit_complexity", 0.5)
-                impact_severity_val = features.get("impact_severity", 0.5)
-                fingerprint_density = features.get("fingerprint_density", 0.5)
-                
-                if sub_idx < 16:
-                    base = endpoint_entropy
-                    noise = 0.04 * sample_rng.gauss(0, 1)
-                elif sub_idx < 32:
-                    base = exploit_complexity
-                    noise = 0.04 * sample_rng.gauss(0, 1)
-                elif sub_idx < 48:
-                    base = impact_severity_val
-                    noise = 0.04 * sample_rng.gauss(0, 1)
-                else:
-                    base = fingerprint_density
-                    noise = 0.04 * sample_rng.gauss(0, 1)
-                val = base + noise
-            vec.append(max(0.0, min(1.0, val)))
+        vec = (
+            endpoint_block
+            + parameters_block
+            + exploit_block
+            + impact_block
+            + fingerprint_block
+            + numeric_block
+            + combined_block
+        )
+        if len(vec) >= self.feature_dim:
+            return vec[:self.feature_dim]
 
+        while len(vec) < self.feature_dim:
+            idx = len(vec)
+            filler = self._stable_unit_value(
+                f"pad|{idx}|{signal:.6f}|{response:.6f}|{impact_severity_val:.6f}|{source_tag}"
+            )
+            vec.append(filler)
         return vec
 
     def _compute_manifest_hash(self) -> str:

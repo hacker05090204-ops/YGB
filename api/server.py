@@ -5303,16 +5303,18 @@ async def rollout_status(user=Depends(require_auth)):
         return get_current_status()
     except ImportError:
         return {
-            "stage": 0,
-            "stage_label": "STAGE_0",
-            "real_data_pct": 0.20,
-            "consecutive_stable": 0,
-            "frozen": False,
+            "stage": None,
+            "stage_label": None,
+            "real_data_pct": None,
+            "consecutive_stable": None,
+            "frozen": None,
             "freeze_reasons": [],
-            "total_cycles": 0,
+            "total_cycles": None,
             "last_cycle_id": None,
             "last_updated": None,
             "promotion_history": [],
+            "status_available": False,
+            "status_unavailable_reason": "Rollout governance module not available",
         }
     except Exception:
         logger.exception("Rollout status error")
@@ -5370,10 +5372,10 @@ async def rollout_metrics(user=Depends(require_auth)):
             "backtest_gate_pass": None,
             "metrics_available": False,
             "metrics_unavailable_reason": "Rollout governance module not available",
-            "consecutive_stable": 0,
-            "frozen": False,
+            "consecutive_stable": None,
+            "frozen": None,
             "freeze_reasons": [],
-            "total_cycles": 0,
+            "total_cycles": None,
             "last_updated": None,
         }
     except Exception:

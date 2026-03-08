@@ -251,6 +251,7 @@ class AutoTrainer:
         self._scaler = None  # AMP GradScaler
         self._training_mode_label: str = "MANUAL"
         self._session_start_monotonic = 0.0
+        self._session_start_timestamp = None
         self._batch_size = 0
         
         # === MODE_A EARLY STOPPING ===
@@ -654,6 +655,55 @@ class AutoTrainer:
         )
         logger.info("Auto-ingestion recovery completed")
         return True, "Bridge persistence regenerated"
+
+    def _build_training_dataloaders(
+        self,
+        *,
+        batch_size: int,
+        seed: int,
+    ):
+        """
+        Build DataLoaders and validate that worker startup survives first use.
+
+        On Windows, a DataLoader can be constructed successfully and still fail
+        on the first iterator pull due to multiprocessing/pickling problems.
+        Treat that as a real loader failure and fall back to ``num_workers=0``.
+        """
+        from impl_v1.training.data.real_dataset_loader import create_training_dataloader
+
+        requested_workers = 2 if sys.platform == "win32" else 4
+
+        def _create(num_workers: int):
+            prefetch = 2 if num_workers > 0 else None
+            persistent = num_workers > 0
+            train_loader, holdout_loader, stats = create_training_dataloader(
+                batch_size=batch_size,
+                num_workers=num_workers,
+                pin_memory=True,
+                prefetch_factor=prefetch,
+                seed=seed,
+            )
+            first_batch = next(iter(train_loader))
+            logger.info(
+                "DataLoader: num_workers=%s, persistent=%s, profile=%s",
+                num_workers,
+                persistent,
+                _TRAINING_PROFILE,
+            )
+            return train_loader, holdout_loader, stats, first_batch
+
+        try:
+            return _create(requested_workers)
+        except Exception as e:
+            logger.warning(
+                "DataLoader with workers=%s failed during startup/probe: %s",
+                requested_workers,
+                e,
+            )
+            if requested_workers == 0:
+                raise
+            logger.warning("Retrying with num_workers=0")
+            return _create(0)
     
     def _init_gpu_resources(self) -> bool:
         """
@@ -709,7 +759,6 @@ class AutoTrainer:
             
             # === REAL DATA PIPELINE (NO SYNTHETIC DATA) ===
             from impl_v1.training.data.real_dataset_loader import (
-                create_training_dataloader,
                 get_per_field_report,
                 validate_dataset_integrity,
                 YGB_MIN_REAL_SAMPLES,
@@ -756,34 +805,10 @@ class AutoTrainer:
                 logger.info("GPU initialization aborted before DataLoader creation")
                 return False
             
-            # Create optimized DataLoader (pin_memory for fast GPU transfer)
-            # Windows DataLoader: use 2 workers with fallback if fails
-            _num_workers = 2 if sys.platform == 'win32' else 4
-            _dl_persistent = _num_workers > 0
-            _dl_prefetch = 2 if _num_workers > 0 else None
-            
-            try:
-                train_loader, holdout_loader, stats = create_training_dataloader(
-                    batch_size=1024,
-                    num_workers=_num_workers,
-                    pin_memory=True,
-                    prefetch_factor=_dl_prefetch,
-                    seed=42,
-                )
-                logger.info(f"DataLoader: num_workers={_num_workers}, persistent={_dl_persistent}, profile={_TRAINING_PROFILE}")
-            except Exception as e:
-                logger.warning(f"DataLoader with workers={_num_workers} failed: {e}")
-                logger.warning("Retrying with num_workers=0")
-                _num_workers = 0
-                _dl_persistent = False
-                train_loader, holdout_loader, stats = create_training_dataloader(
-                    batch_size=1024,
-                    num_workers=0,
-                    pin_memory=True,
-                    prefetch_factor=None,
-                    seed=42,
-                )
-                logger.info(f"DataLoader: num_workers=0 (fallback), profile={_TRAINING_PROFILE}")
+            train_loader, holdout_loader, stats, first_batch = self._build_training_dataloaders(
+                batch_size=1024,
+                seed=42,
+            )
             
             self._gpu_dataloader = train_loader
             self._gpu_holdout_loader = holdout_loader  # Store holdout for validation
@@ -803,7 +828,6 @@ class AutoTrainer:
                 return False
             
             # Pre-load first batch to GPU for fast access
-            first_batch = next(iter(train_loader))
             self._gpu_features = first_batch[0].to(self._gpu_device)
             self._gpu_labels = first_batch[1].to(self._gpu_device)
             
@@ -1367,8 +1391,10 @@ class AutoTrainer:
             # Start training session
             with self._training_lock:
                 self._state = TrainingState.TRAINING
+                self._session_start_timestamp = datetime.now(timezone.utc)
+                self._session_start_monotonic = time.monotonic()
                 self._current_session = TrainingSession(
-                    started_at=datetime.now(timezone.utc).isoformat(),
+                    started_at=self._session_start_timestamp.isoformat(),
                     start_epoch=self._epoch,
                     gpu_used=conditions.gpu_available,
                 )
@@ -1382,6 +1408,8 @@ class AutoTrainer:
             with self._training_lock:
                 self._state = TrainingState.IDLE
                 self._current_session = None
+                self._session_start_timestamp = None
+                self._session_start_monotonic = 0.0
             
             return success
             
@@ -1556,8 +1584,10 @@ class AutoTrainer:
             self._target_epochs = epochs
             self._session_epoch = 0
             # Track session for report generation
+            self._session_start_timestamp = datetime.now(timezone.utc)
+            self._session_start_monotonic = time.monotonic()
             self._current_session = TrainingSession(
-                started_at=datetime.now(timezone.utc).isoformat(),
+                started_at=self._session_start_timestamp.isoformat(),
                 start_epoch=self._epoch,
                 gpu_used=True,  # Always GPU
             )
@@ -1630,6 +1660,8 @@ class AutoTrainer:
                 self._target_epochs = 0
                 self._session_epoch = 0
                 self._current_session = None
+                self._session_start_timestamp = None
+                self._session_start_monotonic = 0.0
             
             self._emit_event(
                 "TRAINING_STOPPED",
@@ -1794,8 +1826,9 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
         trainer._continuous_thread = None
         trainer._target_epochs = target_epochs if target_epochs > 0 else 999999
         trainer._session_epoch = 0
+        trainer._session_start_timestamp = datetime.now(timezone.utc)
         trainer._current_session = TrainingSession(
-            started_at=datetime.now(timezone.utc).isoformat(),
+            started_at=trainer._session_start_timestamp.isoformat(),
             start_epoch=trainer._epoch,
             gpu_used=True,  # Always GPU
         )
@@ -1897,6 +1930,8 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                 trainer._persist_runtime_artifacts()
                 trainer._generate_session_report()
             trainer._current_session = None
+            trainer._session_start_timestamp = None
+            trainer._session_start_monotonic = 0.0
             trainer._continuous_thread = None
         
         trainer._emit_event(
@@ -1952,6 +1987,8 @@ def stop_continuous_training(wait_timeout_seconds: float = 5.0) -> dict:
             if trainer._current_session:
                 trainer._generate_session_report()
             trainer._current_session = None
+            trainer._session_start_timestamp = None
+            trainer._session_start_monotonic = 0.0
 
     return {
         "stopped": not thread_alive,

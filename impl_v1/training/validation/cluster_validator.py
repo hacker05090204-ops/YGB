@@ -17,9 +17,11 @@ import logging
 import os
 import time
 from dataclasses import dataclass, asdict
-from typing import List, Tuple
+from pathlib import Path
+from typing import List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 @dataclass
@@ -168,14 +170,26 @@ def _validate_overfit() -> ValidationStep:
     """Step 5: Overfit guard check."""
     start = time.perf_counter()
     try:
-        from impl_v1.training.safety.overfit_guard import OverfitGuard
-        guard = OverfitGuard(threshold=0.15)
-        # Quick validation with mock values
-        guard.check_epoch(0, train_loss=0.5, val_loss=0.48)
-        guard.check_epoch(1, train_loss=0.4, val_loss=0.39)
-        guard.check_epoch(2, train_loss=0.35, val_loss=0.34)
-        details = f"max_gap={guard.status.max_gap_seen:.4f}, warning={guard.overfit_warning}"
-        passed = not guard.overfit_warning
+        from impl_v1.training.safety.overfit_guard import DEFAULT_GAP_THRESHOLD
+
+        gap_report = _load_latest_generalization_report()
+        if gap_report is None:
+            passed = False
+            details = "No real training generalization report available"
+        else:
+            max_gap = gap_report["max_gap"]
+            latest_gap = gap_report["latest_gap"]
+            recent_max_gap = gap_report["recent_max_gap"]
+            passed = (
+                recent_max_gap <= DEFAULT_GAP_THRESHOLD
+                and latest_gap <= DEFAULT_GAP_THRESHOLD
+            )
+            details = (
+                f"source={gap_report['source']}, epochs={gap_report['epoch_count']}, "
+                f"latest_gap={latest_gap:.4f}, recent_max_gap={recent_max_gap:.4f}, "
+                f"historical_max_gap={max_gap:.4f}, "
+                f"threshold={DEFAULT_GAP_THRESHOLD:.4f}"
+            )
     except Exception as e:
         passed = False
         details = f"Error: {e}"
@@ -184,6 +198,73 @@ def _validate_overfit() -> ValidationStep:
         name="Overfit guard", passed=passed,
         duration_sec=time.perf_counter() - start, details=details,
     )
+
+
+def _candidate_training_reports() -> List[Path]:
+    reports_dir = PROJECT_ROOT / "reports"
+    candidates = [
+        reports_dir / "training_session_result.json",
+        reports_dir / "speed_telemetry.json",
+    ]
+    g38_dir = reports_dir / "g38_training"
+    if g38_dir.exists():
+        candidates.extend(sorted(g38_dir.glob("*.json")))
+    return [path for path in candidates if path.exists() and path.is_file()]
+
+
+def _extract_accuracy_gap_records(payload: dict, source: str) -> List[Tuple[int, float, float, str]]:
+    records: List[Tuple[int, float, float, str]] = []
+
+    def _add_record(entry: dict, eval_key: str) -> None:
+        train_acc = entry.get("train_acc")
+        eval_acc = entry.get(eval_key)
+        epoch = entry.get("epoch")
+        if train_acc is None or eval_acc is None or epoch is None:
+            return
+        records.append((int(epoch), float(train_acc), float(eval_acc), source))
+
+    for entry in payload.get("epoch_reports", []):
+        if isinstance(entry, dict):
+            _add_record(entry, "test_acc")
+
+    for entry in payload.get("all_metrics", []):
+        if isinstance(entry, dict):
+            eval_key = "test_acc" if "test_acc" in entry else "val_accuracy"
+            _add_record(entry, eval_key)
+
+    return records
+
+
+def _load_latest_generalization_report() -> Optional[dict]:
+    newest_report: Optional[dict] = None
+    newest_mtime = -1.0
+
+    for path in _candidate_training_reports():
+        try:
+            with open(path, "r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+            continue
+
+        records = _extract_accuracy_gap_records(payload, path.name)
+        if not records:
+            continue
+
+        mtime = path.stat().st_mtime
+        if mtime <= newest_mtime:
+            continue
+
+        gaps = [max(0.0, train_acc - eval_acc) for _, train_acc, eval_acc, _ in records]
+        newest_report = {
+            "source": path.name,
+            "epoch_count": len(records),
+            "latest_gap": gaps[-1],
+            "recent_max_gap": max(gaps[-5:]),
+            "max_gap": max(gaps),
+        }
+        newest_mtime = mtime
+
+    return newest_report
 
 
 def _validate_cache_integrity() -> ValidationStep:

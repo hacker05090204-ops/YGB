@@ -123,23 +123,20 @@ static bool generate_keypair(WgKeypair &kp, uint32_t version) {
     return false;
   }
 
-  // KEY DERIVATION: CSPRNG-seeded deterministic transform.
-  // NOTE: Real WireGuard uses Curve25519 scalar multiplication.
-  // This uses a bitwise complement as a deterministic placeholder.
-  // The private key is CSPRNG-generated (secure), but the public key
-  // derivation is NOT Curve25519. When integrating a real Curve25519
-  // library (e.g., libsodium crypto_scalarmult_base), replace this block.
-  // FAIL-CLOSED: Do not deploy without real Curve25519 if peers require it.
-  for (int i = 0; i < WG_KEY_SIZE; ++i) {
-    kp.public_key[i] = ~kp.private_key[i];
-  }
-
-  bytes_to_hex(kp.private_key, WG_KEY_SIZE, kp.private_hex);
-  bytes_to_hex(kp.public_key, WG_KEY_SIZE, kp.public_hex);
-  kp.generated_at = static_cast<uint64_t>(std::time(nullptr));
+  // FAIL-CLOSED: public-key derivation requires a real Curve25519 backend.
+  // Refuse rotation rather than writing non-WireGuard-compatible keys.
+  std::memset(kp.private_key, 0, sizeof(kp.private_key));
+  std::memset(kp.public_key, 0, sizeof(kp.public_key));
+  std::memset(kp.private_hex, 0, sizeof(kp.private_hex));
+  std::memset(kp.public_hex, 0, sizeof(kp.public_hex));
+  kp.generated_at = 0;
   kp.version = version;
-  kp.valid = true;
-  return true;
+  kp.valid = false;
+  std::fprintf(
+      stderr,
+      "WG_ROTATION: Curve25519 public-key derivation unavailable; "
+      "refusing placeholder keypair generation\n");
+  return false;
 }
 
 // =========================================================================
