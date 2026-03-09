@@ -25,6 +25,11 @@ npm install
 powershell -ExecutionPolicy Bypass -File .\start_full_stack.ps1
 ```
 
+**Private client mode (join the hosted Tailscale server and open it):**
+```bash
+powershell -ExecutionPolicy Bypass -File .\start_private_client.ps1
+```
+
 **Terminal 1 - Backend API:**
 ```bash
 cd api

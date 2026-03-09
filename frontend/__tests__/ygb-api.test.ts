@@ -65,10 +65,10 @@ function installWindow(url: string, persistedApiBase: string | null = null) {
 }
 
 describe('getApiBase', () => {
-    it('uses the browser hostname when the frontend is served from a remote host', () => {
+    it('prefers the explicit env override when configured', () => {
         installWindow('http://192.168.31.121:3000/control')
 
-        expect(api.getApiBase()).toBe('http://192.168.31.121:8000')
+        expect(api.getApiBase()).toBe('http://test-api:9000')
     })
 
     it('uses a persisted override when running on localhost', () => {
@@ -84,6 +84,15 @@ describe('getApiBase', () => {
 
         expect(api.getApiBase()).toBe('http://192.168.31.121:8000')
         expect(readStored()).toBe('http://192.168.31.121:8000')
+    })
+
+    it('accepts a ts.net api override as a private Tailscale origin', () => {
+        const readStored = installWindow(
+            'http://localhost:3000/login?api_base=https%3A%2F%2Fygb-nas.tailc0975a.ts.net%3A8443'
+        )
+
+        expect(api.getApiBase()).toBe('https://ygb-nas.tailc0975a.ts.net:8443')
+        expect(readStored()).toBe('https://ygb-nas.tailc0975a.ts.net:8443')
     })
 })
 

@@ -29,6 +29,7 @@ function isPrivateOrigin(origin: string): boolean {
     const url = new URL(origin);
     const host = url.hostname;
     if (host === "localhost" || host === "127.0.0.1") return true;
+    if (host.endsWith(".ts.net")) return true;
     if (host.startsWith("192.168.") || host.startsWith("10.")) return true;
     if (host.startsWith("100.")) return true; // Tailscale CGNAT
     if (host.startsWith("172.")) {
@@ -80,27 +81,19 @@ function readBrowserApiBaseOverride(): string {
 export function getApiBase(): string {
   if (typeof window === "undefined") return _ENV_API_BASE || _DEFAULT_API_BASE;
 
-  const { protocol, hostname } = window.location;
-  const derived = `${protocol}//${hostname}:${_API_PORT}`;
-  if (!isLoopbackHost(hostname)) {
-    return derived;
-  }
-
   const override = readBrowserApiBaseOverride();
   if (override) {
     return override;
   }
 
   if (_ENV_API_BASE) {
-    try {
-      const envHost = new URL(_ENV_API_BASE).hostname;
-      if (!isLoopbackHost(envHost)) {
-        return _ENV_API_BASE;
-      }
-    } catch {
-      return _ENV_API_BASE;
-    }
     return _ENV_API_BASE;
+  }
+
+  const { protocol, hostname } = window.location;
+  const derived = `${protocol}//${hostname}:${_API_PORT}`;
+  if (!isLoopbackHost(hostname)) {
+    return derived;
   }
 
   return derived;

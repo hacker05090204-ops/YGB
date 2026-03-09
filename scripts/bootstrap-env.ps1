@@ -67,6 +67,7 @@ Write-Host "     Get from: https://github.com/settings/developers"
 Write-Host "  2. Set callback URL in GitHub App to:"
 Write-Host "     http://localhost:8000/auth/github/callback" -ForegroundColor Cyan
 Write-Host "  3. Run: .\start_full_stack.ps1"
+Write-Host "     Or join the hosted private server: .\start_private_client.ps1"
 Write-Host ""
 Write-Host "For LAN access: .\start_full_stack.ps1 -BindAllInterfaces"
 Write-Host "See docs/ENV_SETUP.md for full documentation."

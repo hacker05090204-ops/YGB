@@ -11,10 +11,11 @@
 venv/
 env/
 .env
-.env.connected
-.env.privacy
-.env.voice_connected
-.env.voice_privacy
+.env.*
+!.env.example
+frontend/.env.local
+frontend/.env*.local
+config/wg_key_state.json
 
 # Model artifacts — NEVER push to git
 *.pt
@@ -62,6 +63,7 @@ jwt_token.txt
 *.jwt
 *.token
 login_url.txt
+*.authkey
 
 # Secrets (never track)
 .env_secrets.txt

@@ -18,6 +18,43 @@ notepad .env
 .\start_full_stack.ps1
 ```
 
+## Tailscale Private Mode (Recommended)
+
+Use this when one machine hosts YGB and other machines should join the same private tailnet and use the hosted app.
+
+Host machine `.env`:
+
+```ini
+FRONTEND_URL=https://ygb-nas.tail7521c4.ts.net
+GITHUB_REDIRECT_URI=https://ygb-nas.tail7521c4.ts.net:8443/auth/github/callback
+GOOGLE_REDIRECT_URI=https://ygb-nas.tail7521c4.ts.net:8443/auth/google/callback
+YGB_TAILSCALE_AUTO_CONNECT=true
+YGB_TAILSCALE_OWNER_ACCOUNT=hacker05090204@gmail.com
+YGB_TAILSCALE_HOSTNAME=ygb-nas
+YGB_TAILSCALE_AUTO_SERVE=true
+```
+
+Client machine `.env`:
+
+```ini
+YGB_TAILSCALE_AUTO_CONNECT=true
+YGB_TAILSCALE_OWNER_ACCOUNT=hacker05090204@gmail.com
+YGB_REMOTE_ONLY=true
+YGB_REMOTE_FRONTEND_URL=https://ygb-nas.tail7521c4.ts.net
+```
+
+Then run the same command on either machine:
+
+```powershell
+.\start_full_stack.ps1
+```
+
+What happens:
+- host: starts local API/UI and reapplies `tailscale serve`
+- client: joins the tailnet first, then opens the hosted YGB frontend instead of starting a fake local stack
+
+For unattended join on a client machine, add a Tailscale auth key in a local-only file and point `YGB_TAILSCALE_AUTH_KEY` at it using `file:C:/path/to/ygb.authkey`. Do not commit that key.
+
 ## Why One Laptop Works and Another Fails
 
 **Root cause:** The `.env` file containing `GITHUB_CLIENT_ID` and other secrets is in `.gitignore` (correctly — secrets should never be committed). When you clone the repo on a new laptop, the `.env` file doesn't exist.
@@ -55,6 +92,10 @@ The callback URL will auto-detect your network IP. Make sure to add it in your G
 - `http://localhost:8000/auth/github/callback`
 - `http://192.168.x.x:8000/auth/github/callback`
 
+For Tailscale private access, prefer the private HTTPS callback instead:
+- `https://ygb-nas.tail7521c4.ts.net:8443/auth/github/callback`
+- `https://ygb-nas.tail7521c4.ts.net:8443/auth/google/callback`
+
 ## Sync Engine
 
 The sync engine starts automatically with the full stack. Configure peer nodes in `.env`:
@@ -88,3 +129,4 @@ Run before starting the server to check all vars are set:
 | `CORS error on login` | Ensure `FRONTEND_URL` matches your browser URL |
 | `Callback URL mismatch` | Add your URL to GitHub OAuth App settings |
 | `Access denied from other device` | Use `.\start_full_stack.ps1 -BindAllInterfaces` |
+| `Tailscale login pending browser approval` | Approve the printed `login.tailscale.com` URL once or add `YGB_TAILSCALE_AUTH_KEY` for unattended join |

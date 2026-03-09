@@ -1,27 +1,30 @@
 {
-  "dataset_source": "INGESTION_PIPELINE",
-  "ingestion_manifest_hash": "000000007c5d0f850000000013c1f793000000006f9cf81600000000901f0718",
-  "tensor_hash": "db36590b1dca8cb1321875bbeda7f5b85bf45c36c741f5254e827db0e90d98bb",
-  "sample_count": 125993,
-  "feature_dim": 256,
-  "num_classes": 2,
-  "accepted": 125993,
-  "rejected_policy": 0,
-  "rejected_quality": 7,
-  "strict_real_mode": true,
-  "class_histogram": {
-    "1": 57296,
-    "0": 68697
+  "total_samples": 309585,
+  "verified_samples": 309585,
+  "per_field_counts": {
+    "endpoint": 3539,
+    "parameters": 3539,
+    "exploit_vector": 3539,
+    "impact": 3539,
+    "source_tag": 3539,
+    "reliability": 3539
   },
-  "class_entropy": 0.9941,
-  "source_trust_avg": 0.9116,
-  "source_trust_min": 0.7,
-  "training_mode": "PRODUCTION_REAL",
-  "frozen_at": "2026-03-08T23:55:53.510557",
-  "dataset_hash": "db36590b1dca8cb1321875bbeda7f5b85bf45c36c741f5254e827db0e90d98bb",
+  "source_mix": {
+    "NVD API v2": 2000,
+    "CISA KEV Catalog": 1539
+  },
+  "strict_real_mode": true,
+  "updated_at": "2026-03-09T20:28:42.118915+00:00",
+  "ingestion_manifest_hash": "53bab1a1931af605",
+  "worker_stats": {
+    "total_ingested": 3539,
+    "total_dropped": 0,
+    "total_deduped": 1209312
+  },
+  "sample_count": 309585,
+  "dataset_hash": "53bab1a1931af605",
   "signed_by": "1b7d03627cd17c222be30b483cd6404921e4cd3f91c4f508b10d4e53a3ceb680",
   "version": "1.0",
-  "total_samples": 125993,
-  "created_at": "2026-03-08T23:55:53.510557",
-  "signature_hash": "52d22999556602d08e3f07c28e1a3589da4b176244f748a15dbced31aa1a0328"
+  "created_at": "2026-03-09T20:28:42.118915+00:00",
+  "signature_hash": "54cdc63b0797df0d60c322d515e859de0a743aab8a49e29e5f90ac2384b18839"
 }

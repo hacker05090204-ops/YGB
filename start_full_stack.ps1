@@ -1,9 +1,10 @@
-﻿param(
+param(
     [int]$ApiPort = 8000,
     [int]$UiPort = 3000,
     [switch]$AllowForeignPortKill,
     [switch]$LanShare,
-    [switch]$BindAllInterfaces
+    [switch]$BindAllInterfaces,
+    [switch]$RemoteOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,6 +23,64 @@ function Import-DotEnv {
         $value = $line.Substring($idx + 1)
         Set-Item -Path ("Env:" + $key) -Value $value
     }
+}
+
+function Get-BoolEnv {
+    param(
+        [string]$Name,
+        [bool]$Default = $false
+    )
+
+    $item = Get-Item -Path ("Env:" + $Name) -ErrorAction SilentlyContinue
+    $raw = ""
+    if ($item) {
+        $raw = [string]$item.Value
+    }
+    if ([string]::IsNullOrWhiteSpace($raw)) {
+        return $Default
+    }
+
+    switch -Regex ($raw.Trim().ToLowerInvariant()) {
+        "^(1|true|yes|on)$" { return $true }
+        "^(0|false|no|off)$" { return $false }
+        default { return $Default }
+    }
+}
+
+function Get-UriOrNull {
+    param([string]$Value)
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return $null
+    }
+
+    try {
+        return [uri]$Value.Trim()
+    } catch {
+        return $null
+    }
+}
+
+function Test-IsLoopbackUrl {
+    param([string]$Value)
+
+    $uri = Get-UriOrNull -Value $Value
+    if ($null -eq $uri) {
+        return $true
+    }
+
+    return $uri.Host -in @("localhost", "127.0.0.1", "::1")
+}
+
+function Test-IsTsNetUrl {
+    param([string]$Value)
+
+    $uri = Get-UriOrNull -Value $Value
+    if ($null -eq $uri) {
+        return $false
+    }
+
+    return $uri.Host.ToLowerInvariant().EndsWith(".ts.net")
 }
 
 function Get-CommandLineForPid {
@@ -69,6 +128,61 @@ function Stop-PortListener {
 
 # -- LOAD .env BEFORE validation or process startup --
 Import-DotEnv -Path (Join-Path $root ".env")
+Import-DotEnv -Path (Join-Path $root "frontend\.env.local")
+
+$tailscaleAutoConnect = Get-BoolEnv -Name "YGB_TAILSCALE_AUTO_CONNECT"
+$tailscaleAutoServe = Get-BoolEnv -Name "YGB_TAILSCALE_AUTO_SERVE"
+$tailscaleOpenBrowser = Get-BoolEnv -Name "YGB_TAILSCALE_OPEN_BROWSER" -Default $true
+$remoteOnlyMode = $RemoteOnly -or (Get-BoolEnv -Name "YGB_REMOTE_ONLY")
+$expectedTailnet = ([string]$env:YGB_TAILSCALE_OWNER_ACCOUNT).Trim()
+$tailscaleHostname = ([string]$env:YGB_TAILSCALE_HOSTNAME).Trim()
+$tailscaleAuthKey = ([string]$env:YGB_TAILSCALE_AUTH_KEY).Trim()
+$configuredFrontendUrl = ([string]$env:FRONTEND_URL).Trim()
+$remoteFrontendUrl = ([string]$env:YGB_REMOTE_FRONTEND_URL).Trim()
+if (-not $remoteFrontendUrl) {
+    $remoteFrontendUrl = $configuredFrontendUrl
+}
+
+$shouldUseTailscale = (
+    $tailscaleAutoConnect -or
+    $tailscaleAutoServe -or
+    $remoteOnlyMode -or
+    (Test-IsTsNetUrl -Value $configuredFrontendUrl) -or
+    (Test-IsTsNetUrl -Value $remoteFrontendUrl)
+)
+
+if ($shouldUseTailscale) {
+    $ensureTailnetScript = Join-Path $root "scripts\ensure-tailscale-tailnet.ps1"
+    if (-not (Test-Path $ensureTailnetScript)) {
+        throw "Missing Tailscale helper script: $ensureTailnetScript"
+    }
+
+    $ensureTailnetArgs = @()
+    if ($expectedTailnet) {
+        $ensureTailnetArgs += @("-ExpectedAccount", $expectedTailnet)
+    }
+    if ($tailscaleHostname) {
+        $ensureTailnetArgs += @("-Hostname", $tailscaleHostname)
+    }
+    if ($tailscaleAuthKey) {
+        $ensureTailnetArgs += @("-AuthKey", $tailscaleAuthKey)
+    }
+    if ($tailscaleOpenBrowser) {
+        $ensureTailnetArgs += "-OpenBrowser"
+    }
+
+    & $ensureTailnetScript @ensureTailnetArgs
+}
+
+if ($remoteOnlyMode) {
+    if (-not $remoteFrontendUrl) {
+        throw "Remote-only mode requires YGB_REMOTE_FRONTEND_URL or FRONTEND_URL."
+    }
+
+    Write-Host "Opening hosted YGB frontend at $remoteFrontendUrl"
+    Start-Process $remoteFrontendUrl | Out-Null
+    exit 0
+}
 
 # -- VALIDATE REQUIRED ENV VARS --
 $requiredVars = @("JWT_SECRET", "YGB_HMAC_SECRET", "YGB_VIDEO_JWT_SECRET")
@@ -151,12 +265,29 @@ if ($defaultRoute) {
 } else {
     $wifiIP = $null
 }
-if ($wifiIP) {
-    $env:GITHUB_REDIRECT_URI = "http://" + $wifiIP + ":$ApiPort/auth/github/callback"
-    $env:FRONTEND_URL = "http://" + $wifiIP + ":$UiPort"
+
+if (Test-IsTsNetUrl -Value $configuredFrontendUrl) {
+    Write-Host "Using configured private frontend URL: $configuredFrontendUrl"
+} elseif ($BindAllInterfaces -and $wifiIP) {
+    if ((-not $configuredFrontendUrl) -or (Test-IsLoopbackUrl -Value $configuredFrontendUrl)) {
+        $env:FRONTEND_URL = "http://" + $wifiIP + ":$UiPort"
+    }
+    if ((-not $env:GITHUB_REDIRECT_URI) -or (Test-IsLoopbackUrl -Value $env:GITHUB_REDIRECT_URI)) {
+        $env:GITHUB_REDIRECT_URI = "http://" + $wifiIP + ":$ApiPort/auth/github/callback"
+    }
+    if ((-not $env:GOOGLE_REDIRECT_URI) -or (Test-IsLoopbackUrl -Value $env:GOOGLE_REDIRECT_URI)) {
+        $env:GOOGLE_REDIRECT_URI = "http://" + $wifiIP + ":$ApiPort/auth/google/callback"
+    }
     Write-Host "Network IP: $wifiIP - OAuth redirect: $($env:GITHUB_REDIRECT_URI)"
+} elseif ($configuredFrontendUrl) {
+    Write-Host "Using configured frontend URL: $configuredFrontendUrl"
 } else {
-    Write-Host "WARNING: Could not detect network IP - using localhost"
+    $env:FRONTEND_URL = "http://" + $LoopbackHost + ":$UiPort"
+    if ($wifiIP) {
+        Write-Host "Detected network IP $wifiIP but keeping localhost startup URLs."
+    } else {
+        Write-Host "WARNING: Could not detect network IP - using localhost"
+    }
 }
 
 $env:PYTHONPATH = $root
@@ -189,17 +320,39 @@ $syncEngine = Start-Process -FilePath "python" `
     -WindowStyle Hidden -PassThru
 Write-Host "Sync Engine PID: $($syncEngine.Id)"
 
-# Use network IP for API URL when binding all interfaces
-if ($BindAllInterfaces -and $wifiIP) {
+$configuredFrontendApiUrl = ([string]$env:NEXT_PUBLIC_YGB_API_URL).Trim()
+$configuredFrontendWsUrl = ([string]$env:NEXT_PUBLIC_WS_URL).Trim()
+$tsNetFrontendUri = Get-UriOrNull -Value ([string]$env:FRONTEND_URL)
+if ($configuredFrontendApiUrl) {
+    $frontendApiUrl = $configuredFrontendApiUrl
+} elseif ($tsNetFrontendUri -and $tsNetFrontendUri.Host.ToLowerInvariant().EndsWith(".ts.net")) {
+    $frontendApiUrl = "https://" + $tsNetFrontendUri.Host + ":8443"
+} elseif ($BindAllInterfaces -and $wifiIP) {
     $frontendApiUrl = "http://" + $wifiIP + ":$ApiPort"
 } else {
     $frontendApiUrl = "http://" + $LoopbackHost + ":$ApiPort"
 }
+
+if ($configuredFrontendWsUrl) {
+    $frontendWsUrl = $configuredFrontendWsUrl
+} elseif ($tsNetFrontendUri -and $tsNetFrontendUri.Host.ToLowerInvariant().EndsWith(".ts.net")) {
+    $frontendWsUrl = "wss://" + $tsNetFrontendUri.Host + ":8443"
+} elseif ($BindAllInterfaces -and $wifiIP) {
+    $frontendWsUrl = "ws://" + $wifiIP + ":$ApiPort"
+} else {
+    $frontendWsUrl = "ws://" + $LoopbackHost + ":$ApiPort"
+}
+
 Write-Host "Frontend API URL: $frontendApiUrl"
+Write-Host "Frontend WS URL: $frontendWsUrl"
 
 # Frontend hostname: only bind 0.0.0.0 if explicitly opted in
 $frontendHostname = if ($BindAllInterfaces) { "0.0.0.0" } else { "localhost" }
-$frontendCmd = 'set NEXT_PUBLIC_YGB_API_URL=' + $frontendApiUrl + '& npm run dev -- -p ' + $UiPort + ' --hostname ' + $frontendHostname
+$frontendCmd = (
+    'set NEXT_PUBLIC_YGB_API_URL=' + $frontendApiUrl +
+    '&& set NEXT_PUBLIC_WS_URL=' + $frontendWsUrl +
+    '&& npm run dev -- -p ' + $UiPort + ' --hostname ' + $frontendHostname
+)
 $frontend = Start-Process -FilePath "cmd.exe" `
     -ArgumentList "/c", $frontendCmd `
     -WorkingDirectory (Join-Path $root "frontend") `
@@ -219,6 +372,19 @@ for ($i = 0; $i -lt 30; $i++) {
     } catch {}
     if ($apiStatus -eq 200 -and $uiStatus -eq 200) { break }
     Start-Sleep -Seconds 1
+}
+
+if ($tailscaleAutoServe -or (Test-IsTsNetUrl -Value ([string]$env:FRONTEND_URL))) {
+    $serveScript = Join-Path $root "scripts\tailscale-serve-ygb.ps1"
+    if (Test-Path $serveScript) {
+        try {
+            & $serveScript -FrontendUrl ([string]$env:FRONTEND_URL)
+        } catch {
+            Write-Warning "Tailscale Serve apply failed: $($_.Exception.Message)"
+        }
+    } else {
+        Write-Warning "Tailscale Serve script not found at $serveScript"
+    }
 }
 
 Write-Host ("Backend PID: " + $backend.Id + "  URL: http://" + $LoopbackHost + ":$ApiPort  /health=$apiStatus")
