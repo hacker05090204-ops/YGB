@@ -11,17 +11,17 @@ import {
 import { getApiBase } from "@/lib/ygb-api"
 
 interface AuthProviderSnapshot {
-  password: {
+  password?: {
     enabled: boolean
   }
-  github: {
+  github?: {
     enabled: boolean
     missing: string[]
     redirect_uri: string | null
     frontend_url: string | null
     shared_candidates: string[]
   }
-  google: {
+  google?: {
     enabled: boolean
     missing: string[]
     redirect_uri: string | null
@@ -142,8 +142,9 @@ function LoginContent() {
   }, [router, searchParams])
 
   const handleGitHubLogin = () => {
-    if (authProviders && !authProviders.github.enabled) {
-      const missing = authProviders.github.missing.join(", ")
+    const githubProvider = authProviders?.github
+    if (authProviders && !githubProvider?.enabled) {
+      const missing = (githubProvider?.missing ?? ["GITHUB_PROVIDER_STATUS_UNAVAILABLE"]).join(", ")
       setStatus("error")
       setMessage(
         missing
@@ -157,8 +158,9 @@ function LoginContent() {
   }
 
   const handleGoogleLogin = () => {
-    if (authProviders && !authProviders.google.enabled) {
-      const missing = authProviders.google.missing.join(", ")
+    const googleProvider = authProviders?.google
+    if (authProviders && !googleProvider?.enabled) {
+      const missing = (googleProvider?.missing ?? ["GOOGLE_PROVIDER_STATUS_UNAVAILABLE"]).join(", ")
       setStatus("error")
       setMessage(
         missing
@@ -171,11 +173,11 @@ function LoginContent() {
     window.location.href = `${getApiBase()}/auth/google?frontend_origin=${origin}`
   }
 
-  const passwordEnabled = authProviders?.password.enabled ?? true
-  const githubEnabled = authProviders?.github.enabled ?? true
-  const githubMissing = authProviders?.github.missing ?? []
-  const googleEnabled = authProviders?.google.enabled ?? true
-  const googleMissing = authProviders?.google.missing ?? []
+  const passwordEnabled = authProviders?.password?.enabled ?? true
+  const githubEnabled = authProviders ? (authProviders.github?.enabled ?? false) : true
+  const githubMissing = authProviders?.github?.missing ?? []
+  const googleEnabled = authProviders ? (authProviders.google?.enabled ?? false) : true
+  const googleMissing = authProviders?.google?.missing ?? []
   const retryAuthMethod = searchParams.get("auth") === "google" ? "google" : "github"
 
   return (

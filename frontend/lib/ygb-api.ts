@@ -60,6 +60,14 @@ function readBrowserApiBaseOverride(): string {
     return fromQuery;
   }
 
+  return "";
+}
+
+function readStoredBrowserApiBaseOverride(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
   try {
     const stored = normalizeApiBase(window.localStorage.getItem(_API_BASE_OVERRIDE_KEY));
     if (stored && isPrivateOrigin(stored)) return stored;
@@ -81,13 +89,18 @@ function readBrowserApiBaseOverride(): string {
 export function getApiBase(): string {
   if (typeof window === "undefined") return _ENV_API_BASE || _DEFAULT_API_BASE;
 
-  const override = readBrowserApiBaseOverride();
-  if (override) {
-    return override;
+  const queryOverride = readBrowserApiBaseOverride();
+  if (queryOverride) {
+    return queryOverride;
   }
 
   if (_ENV_API_BASE) {
     return _ENV_API_BASE;
+  }
+
+  const storedOverride = readStoredBrowserApiBaseOverride();
+  if (storedOverride) {
+    return storedOverride;
   }
 
   const { protocol, hostname } = window.location;

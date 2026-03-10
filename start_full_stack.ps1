@@ -157,21 +157,21 @@ if ($shouldUseTailscale) {
         throw "Missing Tailscale helper script: $ensureTailnetScript"
     }
 
-    $ensureTailnetArgs = @()
+    $ensureTailnetParams = @{}
     if ($expectedTailnet) {
-        $ensureTailnetArgs += @("-ExpectedAccount", $expectedTailnet)
+        $ensureTailnetParams["ExpectedAccount"] = $expectedTailnet
     }
     if ($tailscaleHostname) {
-        $ensureTailnetArgs += @("-Hostname", $tailscaleHostname)
+        $ensureTailnetParams["Hostname"] = $tailscaleHostname
     }
     if ($tailscaleAuthKey) {
-        $ensureTailnetArgs += @("-AuthKey", $tailscaleAuthKey)
+        $ensureTailnetParams["AuthKey"] = $tailscaleAuthKey
     }
     if ($tailscaleOpenBrowser) {
-        $ensureTailnetArgs += "-OpenBrowser"
+        $ensureTailnetParams["OpenBrowser"] = $true
     }
 
-    & $ensureTailnetScript @ensureTailnetArgs
+    & $ensureTailnetScript @ensureTailnetParams
 }
 
 if ($remoteOnlyMode) {
@@ -346,8 +346,8 @@ if ($configuredFrontendWsUrl) {
 Write-Host "Frontend API URL: $frontendApiUrl"
 Write-Host "Frontend WS URL: $frontendWsUrl"
 
-# Frontend hostname: only bind 0.0.0.0 if explicitly opted in
-$frontendHostname = if ($BindAllInterfaces) { "0.0.0.0" } else { "localhost" }
+# Frontend hostname: bind IPv4 loopback by default so Tailscale Serve can proxy to 127.0.0.1 reliably.
+$frontendHostname = if ($BindAllInterfaces) { "0.0.0.0" } else { "127.0.0.1" }
 $frontendCmd = (
     'set NEXT_PUBLIC_YGB_API_URL=' + $frontendApiUrl +
     '&& set NEXT_PUBLIC_WS_URL=' + $frontendWsUrl +

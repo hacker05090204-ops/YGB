@@ -2750,10 +2750,12 @@ def _allowed_cookie_origins() -> set[str]:
 
 
 @app.get("/api/auth/providers")
-async def auth_provider_status():
+async def auth_provider_status(response: Response = None):
     """Public auth-provider status for the login page."""
     github_cfg = _get_github_oauth_config()
     google_cfg = _get_google_oauth_config()
+    if response is not None:
+        response.headers["Cache-Control"] = "no-store"
     return {
         "password": {
             "enabled": _ALLOW_PASSWORD_LOGIN,

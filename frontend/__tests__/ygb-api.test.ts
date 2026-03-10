@@ -65,19 +65,33 @@ function installWindow(url: string, persistedApiBase: string | null = null) {
 }
 
 describe('getApiBase', () => {
+    beforeEach(() => {
+        vi.stubEnv('NEXT_PUBLIC_YGB_API_URL', 'http://test-api:9000')
+    })
+
     it('prefers the explicit env override when configured', () => {
         installWindow('http://192.168.31.121:3000/control')
 
         expect(api.getApiBase()).toBe('http://test-api:9000')
     })
 
-    it('uses a persisted override when running on localhost', () => {
+    it('keeps the explicit env override over a stale stored browser override', () => {
         installWindow('http://localhost:3000/login', 'http://192.168.31.121:8000')
 
-        expect(api.getApiBase()).toBe('http://192.168.31.121:8000')
+        expect(api.getApiBase()).toBe('http://test-api:9000')
+    })
+
+    it('uses a persisted override when running on localhost', async () => {
+        vi.stubEnv('NEXT_PUBLIC_YGB_API_URL', '')
+        vi.resetModules()
+        const freshApi = await import('../lib/ygb-api')
+        installWindow('http://localhost:3000/login', 'http://192.168.31.121:8000')
+
+        expect(freshApi.getApiBase()).toBe('http://192.168.31.121:8000')
     })
 
     it('captures an api_base query override and persists it', () => {
+        vi.stubEnv('NEXT_PUBLIC_YGB_API_URL', '')
         const readStored = installWindow(
             'http://localhost:3000/login?api_base=http%3A%2F%2F192.168.31.121%3A8000'
         )
@@ -87,6 +101,7 @@ describe('getApiBase', () => {
     })
 
     it('accepts a ts.net api override as a private Tailscale origin', () => {
+        vi.stubEnv('NEXT_PUBLIC_YGB_API_URL', '')
         const readStored = installWindow(
             'http://localhost:3000/login?api_base=https%3A%2F%2Fygb-nas.tailc0975a.ts.net%3A8443'
         )
