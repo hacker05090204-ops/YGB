@@ -330,6 +330,9 @@ def write_training_telemetry(
     batch_size: int,
     loss: float,
     precision: float,
+    recall: float = 0.0,
+    kl_divergence: float = 0.0,
+    ece: float = 0.0,
     total_epochs: int,
     training_duration_seconds: float,
     samples_per_second: float,
@@ -349,6 +352,9 @@ def write_training_telemetry(
         "determinism_status": bool(determinism_status),
         "freeze_status": bool(freeze_status),
         "precision": round(float(precision), 8),
+        "recall": round(float(recall), 8),
+        "kl_divergence": round(float(kl_divergence), 8),
+        "ece": round(float(ece), 8),
         "loss": round(float(loss), 8),
         "gpu_temperature": round(float(gpu_temperature), 8)
         if gpu_temperature is not None

@@ -13,6 +13,7 @@ import os
 import pytest
 from pathlib import Path
 from unittest.mock import patch, MagicMock
+import tempfile
 
 # Add project root
 PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
@@ -149,6 +150,20 @@ class TestTrainingStateManager:
         result = mgr.get_training_progress()
         assert result.status == "error"
         assert "GPU detached" in result.automode_status
+
+    def test_checkpoint_count_includes_safetensors(self):
+        mgr = TrainingStateManager()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            reports_dir = root / "reports" / "g38_training"
+            ckpt_dir = root / "training" / "checkpoints"
+            reports_dir.mkdir(parents=True)
+            ckpt_dir.mkdir(parents=True)
+            (reports_dir / "epoch_1.safetensors").write_text("x", encoding="utf-8")
+            (ckpt_dir / "epoch_2.safetensors").write_text("x", encoding="utf-8")
+
+            with patch("backend.training.state_manager.PROJECT_ROOT", root):
+                assert mgr.get_checkpoint_count() == 2
 
     def test_no_mock_keywords_in_source(self):
         """Source code must NOT contain mock fallback patterns."""

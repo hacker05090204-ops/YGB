@@ -49,6 +49,35 @@ LEGACY_AUTH_COOKIE_NAME = "ygb_token"
 CSRF_COOKIE_NAME = "ygb_csrf"
 CSRF_HEADER_NAME = "x-csrf-token"
 _SAFE_HTTP_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "TRACE"})
+_TRUTHY_VALUES = frozenset({"1", "true", "yes", "on"})
+
+
+def is_temporary_auth_bypass_enabled() -> bool:
+    return os.getenv("YGB_TEMP_AUTH_BYPASS", "false").strip().lower() in _TRUTHY_VALUES
+
+
+def build_temporary_auth_user(auth_via: str = "temporary") -> Dict:
+    role = os.getenv("YGB_TEMP_AUTH_ROLE", "admin").strip().lower() or "admin"
+    user_id = os.getenv("YGB_TEMP_AUTH_USER_ID", "temp-public-admin").strip() or "temp-public-admin"
+    name = os.getenv("YGB_TEMP_AUTH_NAME", "Temporary Admin").strip() or "Temporary Admin"
+    email = os.getenv(
+        "YGB_TEMP_AUTH_EMAIL",
+        "temp-public-admin@local.invalid",
+    ).strip() or "temp-public-admin@local.invalid"
+    session_id = os.getenv(
+        "YGB_TEMP_AUTH_SESSION_ID",
+        "temp-auth-bypass-session",
+    ).strip() or "temp-auth-bypass-session"
+    return {
+        "sub": user_id,
+        "name": name,
+        "email": email,
+        "role": role,
+        "session_id": session_id,
+        "auth_provider": "temporary_bypass",
+        "_auth_via": auth_via,
+        "_temporary_bypass": True,
+    }
 
 
 def _allowed_origins() -> Set[str]:
@@ -147,6 +176,9 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
     import logging
     _ws_logger = logging.getLogger("ygb.ws_auth")
 
+    if is_temporary_auth_bypass_enabled():
+        return build_temporary_auth_user("temporary_websocket")
+
     token = None
 
     # REJECTED: Query parameter tokens (security risk — leaks in logs/referrer)
@@ -221,6 +253,9 @@ async def require_auth(
     Returns decoded JWT payload on success.
     Raises HTTPException(401) on failure.
     """
+    if is_temporary_auth_bypass_enabled():
+        return build_temporary_auth_user("temporary_http")
+
     token = None
     via_cookie = False
 

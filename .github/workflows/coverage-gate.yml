@@ -345,3 +345,140 @@ jobs:
                       print(l, end='')
           sys.exit(1)
           PYEOF
+
+  # =====================================================================
+  # SECURITY REGRESSION GATE — block merges with security anti-patterns
+  # =====================================================================
+  security-regression:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
+      YGB_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install numpy
+          pip install pytest pytest-asyncio
+          pip install pycryptodome bcrypt
+          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
+
+      - name: Run security regression scanner
+        run: python scripts/security_regression_scan.py
+
+      - name: Run security regression tests
+        run: pytest backend/tests/test_security_regression_guards.py -v --tb=short
+
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-regression-report
+          path: reports/security_regression_report.json
+
+  # =====================================================================
+  # RELIABILITY GATE — readiness latency, timeout rate, completeness
+  # =====================================================================
+  reliability-gate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
+      YGB_ENV: test
+      GATE_READINESS_LATENCY_MS: "5000"
+      GATE_TIMEOUT_RATE: "0.05"
+      GATE_COMPLETENESS: "0.95"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install numpy
+          pip install pytest pytest-asyncio
+          pip install pycryptodome bcrypt
+          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
+
+      - name: Run reliability tests
+        run: pytest backend/tests/test_reliability.py backend/tests/test_observability.py backend/tests/test_api_v2_contract.py backend/tests/test_wiring_audit.py -v --tb=short
+
+      - name: Run reliability gate
+        run: python scripts/reliability_gate.py
+
+      - name: Upload reliability report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reliability-gate-report
+          path: reports/reliability_gate_report.json
+
+  # =====================================================================
+  # TRAINING & INFERENCE GATE — block deploys if AI pipeline is broken
+  # =====================================================================
+  training-inference-gate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
+      YGB_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install numpy
+          pip install pytest pytest-asyncio
+          pip install pycryptodome bcrypt
+          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
+
+      - name: Training pipeline import validation
+        run: |
+          python -c "
+          from backend.training.state_manager import get_training_state_manager
+          mgr = get_training_state_manager()
+          progress = mgr.get_training_progress()
+          assert progress.status in ('idle', 'running', 'error', 'completed'), f'Bad status: {progress.status}'
+          print(f'Training state OK: {progress.status}')
+          "
+
+      - name: Safetensors I/O validation
+        run: |
+          python -c "
+          import tempfile, os
+          from training.safetensors_io import save_safetensors, load_safetensors
+          import numpy as np
+          data = {'weights': np.random.randn(4, 4).astype(np.float32)}
+          with tempfile.NamedTemporaryFile(suffix='.safetensors', delete=False) as f:
+              path = f.name
+          try:
+              save_safetensors(data, path)
+              loaded = load_safetensors(path)
+              assert 'weights' in loaded, 'Missing weights after roundtrip'
+              assert loaded['weights'].shape == (4, 4), f'Wrong shape: {loaded[\"weights\"].shape}'
+              print('Safetensors roundtrip OK')
+          finally:
+              os.unlink(path)
+          "
+
+      - name: Run training and system status tests
+        run: |
+          pytest backend/tests/test_system_status.py -v --tb=short
+          pytest backend/tests/test_e2e_audit.py::TestTrainingStateManagerNoMocks -v --tb=short
+
+

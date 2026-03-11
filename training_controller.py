@@ -522,6 +522,15 @@ def phase3_training_execution(
             drift_aborted = True
             break
 
+    # Emit training latency to observability metrics (best-effort)
+    _total_training_ms = round((time.perf_counter() - t0) * 1000, 2)
+    try:
+        from backend.observability.metrics import metrics_registry
+        metrics_registry.record("training_latency_ms", _total_training_ms)
+        metrics_registry.set_gauge("model_accuracy", best_acc)
+    except Exception:
+        pass
+
     # Final weight hash
     final_hash = hashlib.sha256()
     for p in model.parameters():

@@ -16,6 +16,7 @@ Full audit logging.
 import asyncio
 import json
 import logging
+import time as _time
 import uuid
 from datetime import datetime, UTC
 from typing import Optional
@@ -129,6 +130,7 @@ async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
     """One-shot audio transcription. Auth required."""
     import base64
 
+    _t0 = _time.monotonic()
     user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
 
     # Rate limit
@@ -144,6 +146,14 @@ async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
 
     chain = _get_stt_chain()
     result = chain.transcribe(audio_bytes)
+
+    # Emit voice inference latency metric
+    _voice_latency = round((_time.monotonic() - _t0) * 1000, 2)
+    try:
+        from backend.observability.metrics import metrics_registry
+        metrics_registry.record("voice_inference_latency_ms", _voice_latency)
+    except Exception:
+        pass
 
     audit = _get_audit()
     audit.log(
@@ -173,6 +183,7 @@ async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
 @voice_gw_router.post("/api/voice/intent")
 async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
     """Parse text into structured intent. Auth required."""
+    _t0 = _time.monotonic()
     user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
 
     # Rate limit
@@ -199,6 +210,14 @@ async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
     # Policy check
     policy = _get_policy()
     decision = policy.evaluate(intent.command_type, intent.args)
+
+    # Emit voice inference latency metric
+    _voice_latency = round((_time.monotonic() - _t0) * 1000, 2)
+    try:
+        from backend.observability.metrics import metrics_registry
+        metrics_registry.record("voice_inference_latency_ms", _voice_latency)
+    except Exception:
+        pass
 
     # Audit
     audit = _get_audit()

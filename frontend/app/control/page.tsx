@@ -133,9 +133,15 @@ function ControlPageContent() {
     const lastTelemetryTs = useRef<number>(0)
     const [isStalled, setIsStalled] = useState(false)
     const healthFailureCount = useRef(0)
+    const healthCheckInFlight = useRef(false)
 
     // Connectivity comes from unprotected health checks, not dashboard creation.
     const checkServerHealth = useCallback(async () => {
+        if (healthCheckInFlight.current) {
+            return
+        }
+
+        healthCheckInFlight.current = true
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort("health_timeout"), 5000)
 
@@ -150,7 +156,7 @@ function ControlPageContent() {
                 setIsConnected(true)
             } else {
                 healthFailureCount.current += 1
-                if (healthFailureCount.current >= 2) {
+                if (healthFailureCount.current >= 3) {
                     setIsConnected(false)
                 }
             }
@@ -159,11 +165,12 @@ function ControlPageContent() {
                 console.warn("Health check failed:", error)
             }
             healthFailureCount.current += 1
-            if (healthFailureCount.current >= 2) {
+            if (healthFailureCount.current >= 3) {
                 setIsConnected(false)
             }
         } finally {
             clearTimeout(timeout)
+            healthCheckInFlight.current = false
         }
     }, [])
 
@@ -224,7 +231,7 @@ function ControlPageContent() {
 
     useEffect(() => {
         checkServerHealth()
-        const interval = setInterval(checkServerHealth, 3000)
+        const interval = setInterval(checkServerHealth, 10000)
         return () => clearInterval(interval)
     }, [checkServerHealth])
 

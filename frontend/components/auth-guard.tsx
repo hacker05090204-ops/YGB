@@ -1,22 +1,28 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
+import { buildLoginRedirectTarget } from "@/lib/post-login-redirect"
 import { useAuthUser } from "@/hooks/use-auth-user"
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const authUser = useAuthUser()
+  const search = searchParams?.toString() ?? ""
 
   useEffect(() => {
     if (
       authUser.status === "unavailable" &&
       authUser.unavailableReason === "Authentication required"
     ) {
-      router.replace("/login")
+      router.replace(
+        buildLoginRedirectTarget(pathname || "/", search ? `?${search}` : "")
+      )
     }
-  }, [authUser.status, authUser.unavailableReason, router])
+  }, [authUser.status, authUser.unavailableReason, pathname, router, search])
 
   if (authUser.status === "loading") {
     return (

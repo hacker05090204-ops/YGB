@@ -18,7 +18,7 @@ FORBIDDEN FIELDS (hard blocked):
 
 import torch
 from torch.utils.data import Dataset, DataLoader
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict, Any
 import random
 from dataclasses import dataclass
 
@@ -314,26 +314,41 @@ class _LegacySampleCollection:
         self._dataset = dataset
 
     def __len__(self) -> int:
-        return len(self._dataset._raw_samples)
+        if self._dataset._raw_samples:
+            return len(self._dataset._raw_samples)
+        labels_tensor = getattr(self._dataset, "_labels_tensor", None)
+        if labels_tensor is not None:
+            return int(labels_tensor.shape[0])
+        return 0
 
     def __iter__(self):
         for idx in range(len(self)):
             yield self[idx]
 
     def __getitem__(self, idx: int) -> _LegacyCompatSample:
-        raw = self._dataset._raw_samples[idx]
-        sample_id = (
-            raw.get("fingerprint")
-            or hashlib.sha256(raw.get("endpoint", "").encode()).hexdigest()[:16]
-        )
-        reliability = float(raw.get("reliability", 0.7))
-        exploit_vector = raw.get("exploit_vector", "")
-        features = strip_forbidden_fields({
-            "signal_strength": min(reliability, 1.0),
-            "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
-            "difficulty": 1.0 - min(reliability, 1.0),
-            "noise": 0.05,
-        })
+        if self._dataset._raw_samples:
+            raw = self._dataset._raw_samples[idx]
+            sample_id = (
+                raw.get("fingerprint")
+                or hashlib.sha256(raw.get("endpoint", "").encode()).hexdigest()[:16]
+            )
+            reliability = float(raw.get("reliability", 0.7))
+            exploit_vector = raw.get("exploit_vector", "")
+            features = strip_forbidden_fields({
+                "signal_strength": min(reliability, 1.0),
+                "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
+                "difficulty": 1.0 - min(reliability, 1.0),
+                "noise": 0.05,
+            })
+        else:
+            label = int(self._dataset._labels_tensor[idx].item())
+            sample_id = f"cached-{idx:08d}"
+            features = strip_forbidden_fields({
+                "signal_strength": 0.9 if label == 1 else 0.5,
+                "response_ratio": 0.5,
+                "difficulty": 0.1 if label == 1 else 0.5,
+                "noise": 0.05,
+            })
         return _LegacyCompatSample(id=sample_id, features=features)
 
 
@@ -586,7 +601,17 @@ import json
 import os
 import logging
 import math
+import tempfile
 from pathlib import Path
+from datetime import datetime, timezone
+
+try:
+    from safetensors.torch import load_file as load_safetensors_file, save_file as save_safetensors_file
+    SAFETENSORS_AVAILABLE = True
+except ImportError:
+    load_safetensors_file = None
+    save_safetensors_file = None
+    SAFETENSORS_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -594,6 +619,7 @@ logger = logging.getLogger(__name__)
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 _BRIDGE_DIR = _PROJECT_ROOT / "native" / "distributed"
 _SECURE_DATA = _PROJECT_ROOT / "secure_data"
+_INGESTION_TENSOR_CACHE_SCHEMA_VERSION = 1
 
 # Bridge library name
 _BRIDGE_LIB = (
@@ -689,6 +715,11 @@ class IngestionPipelineDataset(Dataset):
         # Use the HIGHER of persisted vs DLL (persisted is authoritative)
         verified_count = max(dll_verified, persisted_verified)
         self._use_persisted_samples = dll_verified == 0 and persisted_verified > 0
+        self._verified_count = verified_count
+        self._raw_samples = []
+        self._features = []
+        self._labels = []
+        self._tensor_cache_metadata: Dict[str, Any] = {}
 
         logger.info(
             f"[INGESTION] DLL verified={dll_verified}, "
@@ -711,6 +742,18 @@ class IngestionPipelineDataset(Dataset):
                 f"Field frozen. No synthetic fallback."
             )
 
+        self._manifest_hash = self._compute_manifest_hash()
+
+        if self._load_tensor_cache(verified_count):
+            logger.info(
+                "[INGESTION] Tensor cache hit: %s (%s samples)",
+                self._manifest_hash[:16],
+                self._features_tensor.shape[0],
+            )
+            self.samples = _LegacySampleCollection(self)
+            self._ensure_manifest_from_cache()
+            return
+
         # Import policy + quality scorer
         from impl_v1.training.distributed.ingestion_policy import (
             IngestionPolicy, IngestionCandidate,
@@ -723,9 +766,6 @@ class IngestionPipelineDataset(Dataset):
         scorer = DataQualityScorer()
 
         # Fetch and filter samples
-        self._raw_samples = []
-        self._features = []
-        self._labels = []
         accepted = 0
         rejected_policy = 0
         rejected_quality = 0
@@ -811,12 +851,19 @@ class IngestionPipelineDataset(Dataset):
         self._labels_tensor = torch.tensor(self._labels, dtype=torch.long)
         # Legacy compatibility for callers/tests that iterate dataset.samples.
         self.samples = _LegacySampleCollection(self)
-
-        # Generate manifest hash
-        self._manifest_hash = self._compute_manifest_hash()
-
-        # Write manifest
-        self._write_manifest(accepted, rejected_policy, rejected_quality)
+        self._tensor_cache_metadata = self._build_tensor_cache_metadata(
+            accepted=accepted,
+            rejected_policy=rejected_policy,
+            rejected_quality=rejected_quality,
+            verified_count=verified_count,
+        )
+        self._write_manifest(
+            accepted,
+            rejected_policy,
+            rejected_quality,
+            cache_metadata=self._tensor_cache_metadata,
+        )
+        self._save_tensor_cache(self._tensor_cache_metadata)
 
     @staticmethod
     def _stable_unit_value(payload: str) -> float:
@@ -1267,30 +1314,254 @@ class IngestionPipelineDataset(Dataset):
             vec.append(filler)
         return vec
 
+    @staticmethod
+    def _atomic_write_json(path: Path, payload: Dict[str, Any]) -> None:
+        target = Path(path)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp_path = tempfile.mkstemp(
+            dir=str(target.parent),
+            prefix=target.name + ".",
+            suffix=".tmp",
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(payload, handle, indent=2)
+                handle.write("\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(tmp_path, target)
+        except Exception:
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+            raise
+
+    @staticmethod
+    def _tensor_cache_dir() -> Path:
+        return _SECURE_DATA / "tensor_cache"
+
+    def _tensor_cache_key(self, verified_count: int) -> str:
+        digest = hashlib.sha256()
+        digest.update(str(_INGESTION_TENSOR_CACHE_SCHEMA_VERSION).encode("utf-8"))
+        digest.update(str(self._manifest_hash).encode("utf-8"))
+        digest.update(str(verified_count).encode("utf-8"))
+        digest.update(str(self.feature_dim).encode("utf-8"))
+        digest.update(str(self.seed).encode("utf-8"))
+        digest.update(str(bool(STRICT_REAL_MODE)).encode("utf-8"))
+        return digest.hexdigest()
+
+    def _tensor_cache_paths(self, verified_count: int) -> Tuple[Path, Path]:
+        cache_base = self._tensor_cache_dir() / f"ingestion_{self._tensor_cache_key(verified_count)}"
+        return cache_base.with_suffix(".safetensors"), cache_base.with_suffix(".json")
+
+    @staticmethod
+    def _tensor_hash_for_tensors(features_tensor: torch.Tensor, labels_tensor: torch.Tensor) -> str:
+        digest = hashlib.sha256()
+        digest.update(features_tensor.detach().cpu().contiguous().numpy().tobytes())
+        digest.update(labels_tensor.detach().cpu().contiguous().numpy().tobytes())
+        return digest.hexdigest()
+
+    def _compute_tensor_hash(self) -> str:
+        return self._tensor_hash_for_tensors(self._features_tensor, self._labels_tensor)
+
+    def _build_tensor_cache_metadata(
+        self,
+        *,
+        accepted: int,
+        rejected_policy: int,
+        rejected_quality: int,
+        verified_count: int,
+    ) -> Dict[str, Any]:
+        if self._labels:
+            labels = [int(lbl) for lbl in self._labels]
+        else:
+            labels = [int(lbl) for lbl in self._labels_tensor.detach().cpu().tolist()]
+
+        class_histogram: Dict[str, int] = {}
+        for label in labels:
+            key = str(int(label))
+            class_histogram[key] = class_histogram.get(key, 0) + 1
+
+        trust_scores = [float(sample.get("reliability", 0.0)) for sample in self._raw_samples]
+        return {
+            "schema_version": _INGESTION_TENSOR_CACHE_SCHEMA_VERSION,
+            "cache_kind": "ingestion_tensor_cache",
+            "format": "safetensors",
+            "dataset_source": self.dataset_source,
+            "ingestion_manifest_hash": self._manifest_hash,
+            "feature_dim": int(self.feature_dim),
+            "seed": int(self.seed),
+            "strict_real_mode": bool(STRICT_REAL_MODE),
+            "verified_count": int(verified_count),
+            "sample_count": int(self._features_tensor.shape[0]),
+            "num_classes": len(class_histogram),
+            "accepted": int(accepted),
+            "rejected_policy": int(rejected_policy),
+            "rejected_quality": int(rejected_quality),
+            "class_histogram": class_histogram,
+            "source_trust_avg": round(sum(trust_scores) / len(trust_scores), 4) if trust_scores else 0.0,
+            "source_trust_min": round(min(trust_scores), 4) if trust_scores else 0.0,
+            "tensor_hash": self._compute_tensor_hash(),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+    def _load_tensor_cache(self, verified_count: int) -> bool:
+        if not SAFETENSORS_AVAILABLE or load_safetensors_file is None:
+            return False
+
+        weights_path, meta_path = self._tensor_cache_paths(verified_count)
+        if not weights_path.exists() or not meta_path.exists():
+            return False
+
+        try:
+            with open(meta_path, "r", encoding="utf-8") as handle:
+                metadata = json.load(handle)
+        except (OSError, json.JSONDecodeError):
+            return False
+
+        if not isinstance(metadata, dict):
+            return False
+        if metadata.get("schema_version") != _INGESTION_TENSOR_CACHE_SCHEMA_VERSION:
+            return False
+        if metadata.get("cache_kind") != "ingestion_tensor_cache":
+            return False
+        if metadata.get("ingestion_manifest_hash") != self._manifest_hash:
+            return False
+        if int(metadata.get("verified_count", 0) or 0) != int(verified_count):
+            return False
+        if int(metadata.get("feature_dim", 0) or 0) != int(self.feature_dim):
+            return False
+        if int(metadata.get("seed", -1) or -1) != int(self.seed):
+            return False
+        if bool(metadata.get("strict_real_mode", False)) != bool(STRICT_REAL_MODE):
+            return False
+
+        try:
+            tensors = load_safetensors_file(str(weights_path))
+        except Exception:
+            return False
+
+        features_tensor = tensors.get("features")
+        labels_tensor = tensors.get("labels")
+        if features_tensor is None or labels_tensor is None:
+            return False
+        if features_tensor.ndim != 2 or labels_tensor.ndim != 1:
+            return False
+        if features_tensor.shape[1] != self.feature_dim:
+            return False
+        if features_tensor.shape[0] != labels_tensor.shape[0]:
+            return False
+        if features_tensor.shape[0] < self.min_samples:
+            return False
+
+        expected_samples = int(metadata.get("sample_count", 0) or 0)
+        if expected_samples and int(features_tensor.shape[0]) != expected_samples:
+            return False
+
+        expected_hash = str(metadata.get("tensor_hash", "") or "")
+        if expected_hash:
+            actual_hash = self._tensor_hash_for_tensors(features_tensor, labels_tensor)
+            if actual_hash != expected_hash:
+                return False
+
+        self._features_tensor = features_tensor.to(dtype=torch.float32)
+        self._labels_tensor = labels_tensor.to(dtype=torch.long)
+        self._labels = [int(lbl) for lbl in self._labels_tensor.detach().cpu().tolist()]
+        self._raw_samples = []
+        self._features = []
+        self._tensor_cache_metadata = metadata
+        return True
+
+    def _save_tensor_cache(self, metadata: Dict[str, Any]) -> None:
+        if not SAFETENSORS_AVAILABLE or save_safetensors_file is None:
+            return
+
+        verified_count = int(metadata.get("verified_count", self._verified_count) or self._verified_count)
+        weights_path, meta_path = self._tensor_cache_paths(verified_count)
+        weights_path.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp_weights = tempfile.mkstemp(
+            dir=str(weights_path.parent),
+            prefix=weights_path.name + ".",
+            suffix=".tmp",
+        )
+        os.close(fd)
+        try:
+            save_safetensors_file(
+                {
+                    "features": self._features_tensor.detach().cpu(),
+                    "labels": self._labels_tensor.detach().cpu(),
+                },
+                tmp_weights,
+            )
+            os.replace(tmp_weights, weights_path)
+            self._atomic_write_json(meta_path, metadata)
+        except Exception as exc:
+            try:
+                os.remove(tmp_weights)
+            except OSError:
+                pass
+            logger.warning("[INGESTION] Tensor cache save skipped: %s", exc)
+
+    def _manifest_matches_cache(self, metadata: Dict[str, Any]) -> bool:
+        manifest_path = _SECURE_DATA / "dataset_manifest.json"
+        if not manifest_path.exists():
+            return False
+        try:
+            with open(manifest_path, "r", encoding="utf-8") as handle:
+                manifest = json.load(handle)
+        except (OSError, json.JSONDecodeError):
+            return False
+        if not isinstance(manifest, dict):
+            return False
+        manifest_samples = int(manifest.get("sample_count", manifest.get("total_samples", 0)) or 0)
+        return (
+            str(manifest.get("dataset_source", "") or "").upper() == self.dataset_source
+            and str(manifest.get("ingestion_manifest_hash", "") or "") == str(metadata.get("ingestion_manifest_hash", "") or "")
+            and str(manifest.get("tensor_hash", "") or "") == str(metadata.get("tensor_hash", "") or "")
+            and manifest_samples == int(metadata.get("sample_count", 0) or 0)
+        )
+
+    def _ensure_manifest_from_cache(self) -> None:
+        metadata = self._tensor_cache_metadata or {}
+        if not metadata or self._manifest_matches_cache(metadata):
+            return
+        self._write_manifest(
+            int(metadata.get("accepted", metadata.get("sample_count", 0)) or 0),
+            int(metadata.get("rejected_policy", 0) or 0),
+            int(metadata.get("rejected_quality", 0) or 0),
+            cache_metadata=metadata,
+        )
+
     def _compute_manifest_hash(self) -> str:
         """Get manifest hash from the bridge (C++ side)."""
         hash_buf = ctypes.create_string_buffer(65)
         self._lib.bridge_get_dataset_manifest_hash(hash_buf, 65)
         return hash_buf.value.decode("utf-8", errors="replace")
 
-    def _write_manifest(self, accepted, rejected_policy, rejected_quality):
+    def _write_manifest(self, accepted, rejected_policy, rejected_quality, cache_metadata: Optional[Dict[str, Any]] = None):
         """Write dataset_manifest.json to secure_data/ with hardened quality metrics."""
         _SECURE_DATA.mkdir(parents=True, exist_ok=True)
         manifest_path = _SECURE_DATA / "dataset_manifest.json"
 
-        # Hash the tensors too
-        h = hashlib.sha256()
-        h.update(self._features_tensor.numpy().tobytes())
-        h.update(self._labels_tensor.numpy().tobytes())
-        tensor_hash = h.hexdigest()
+        metadata = dict(cache_metadata or {})
+        tensor_hash = str(metadata.get("tensor_hash", "") or self._compute_tensor_hash())
 
-        # Class histogram
-        class_histogram = {}
-        for lbl in self._labels:
-            class_histogram[lbl] = class_histogram.get(lbl, 0) + 1
+        class_histogram: Dict[int, int] = {}
+        if metadata.get("class_histogram"):
+            for key, value in (metadata.get("class_histogram") or {}).items():
+                class_histogram[int(key)] = int(value)
+        elif self._labels:
+            for lbl in self._labels:
+                label = int(lbl)
+                class_histogram[label] = class_histogram.get(label, 0) + 1
+        else:
+            unique_labels, counts = torch.unique(self._labels_tensor.detach().cpu(), return_counts=True)
+            for label, count in zip(unique_labels.tolist(), counts.tolist()):
+                class_histogram[int(label)] = int(count)
 
         # Class entropy (Shannon)
-        total = len(self._labels)
+        total = int(metadata.get("sample_count", self._labels_tensor.shape[0]) or self._labels_tensor.shape[0])
         class_entropy = 0.0
         if total > 0:
             for count in class_histogram.values():
@@ -1299,40 +1570,46 @@ class IngestionPipelineDataset(Dataset):
                     class_entropy -= p * math.log2(p)
 
         # Source trust summary
-        trust_scores = [s.get("reliability", 0.0) for s in self._raw_samples]
-        avg_trust = sum(trust_scores) / len(trust_scores) if trust_scores else 0.0
+        if self._raw_samples:
+            trust_scores = [float(s.get("reliability", 0.0)) for s in self._raw_samples]
+            avg_trust = sum(trust_scores) / len(trust_scores) if trust_scores else 0.0
+            min_trust = min(trust_scores) if trust_scores else 0.0
+        else:
+            avg_trust = float(metadata.get("source_trust_avg", 0.0) or 0.0)
+            min_trust = float(metadata.get("source_trust_min", 0.0) or 0.0)
 
         manifest = {
             "dataset_source": "INGESTION_PIPELINE",
             "ingestion_manifest_hash": self._manifest_hash,
             "tensor_hash": tensor_hash,
-            "sample_count": len(self._features),
+            "sample_count": total,
             "feature_dim": self.feature_dim,
-            "num_classes": len(set(self._labels)),
-            "accepted": accepted,
-            "rejected_policy": rejected_policy,
-            "rejected_quality": rejected_quality,
+            "num_classes": int(metadata["num_classes"]) if "num_classes" in metadata else len(class_histogram),
+            "accepted": int(metadata["accepted"]) if "accepted" in metadata else int(accepted),
+            "rejected_policy": int(metadata["rejected_policy"]) if "rejected_policy" in metadata else int(rejected_policy),
+            "rejected_quality": int(metadata["rejected_quality"]) if "rejected_quality" in metadata else int(rejected_quality),
             "strict_real_mode": STRICT_REAL_MODE,
             "class_histogram": class_histogram,
             "class_entropy": round(class_entropy, 4),
             "source_trust_avg": round(avg_trust, 4),
-            "source_trust_min": round(min(trust_scores), 4) if trust_scores else 0.0,
+            "source_trust_min": round(min_trust, 4),
             "training_mode": "PRODUCTION_REAL" if STRICT_REAL_MODE else "LAB_COMPLEX",
-            "frozen_at": __import__("datetime").datetime.now().isoformat(),
+            "frozen_at": datetime.now(timezone.utc).isoformat(),
         }
 
         # Canonicalize: add signed fields for DatasetManifest compatibility
         from impl_v1.training.safety.manifest_builder import canonicalize_manifest
         canonicalize_manifest(manifest)
 
-        with open(manifest_path, "w") as f:
-            json.dump(manifest, f, indent=2)
+        self._atomic_write_json(manifest_path, manifest)
 
         logger.info(f"[INGESTION] Manifest written: {manifest_path}")
         logger.info(f"[INGESTION] Ingestion hash: {self._manifest_hash[:32]}...")
         logger.info(f"[INGESTION] Tensor hash: {tensor_hash[:32]}...")
 
     def __len__(self) -> int:
+        if getattr(self, "_features_tensor", None) is not None:
+            return int(self._features_tensor.shape[0])
         return len(self._features)
 
     def __getitem__(self, idx: int):
@@ -1340,11 +1617,16 @@ class IngestionPipelineDataset(Dataset):
 
     def get_statistics(self) -> dict:
         """Get dataset statistics."""
-        n_positive = sum(1 for l in self._labels if l == 1)
+        if self._labels:
+            total = len(self._labels)
+            n_positive = sum(1 for l in self._labels if int(l) == 1)
+        else:
+            total = int(self._labels_tensor.shape[0])
+            n_positive = int((self._labels_tensor == 1).sum().item())
         return {
-            "total": len(self._features),
+            "total": total,
             "positive": n_positive,
-            "negative": len(self._features) - n_positive,
+            "negative": total - n_positive,
             "feature_dim": self.feature_dim,
             "dataset_source": self.dataset_source,
             "manifest_hash": self._manifest_hash,

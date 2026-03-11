@@ -142,6 +142,8 @@ class TrainingStateManager:
         count = 0
         for d in checkpoint_dirs:
             if d.exists():
+                count += len(list(d.glob("*.safetensors")))
+                count += len(list(d.glob("*.safetensor")))
                 count += len(list(d.glob("*.pt"))) + len(list(d.glob("*.pth")))
                 count += len(list(d.glob("checkpoint_*")))
         return count if count > 0 else None
@@ -219,6 +221,20 @@ class TrainingStateManager:
             last_accuracy=accuracy_val,
             training_mode=trainer_status.get("training_mode"),
         )
+
+    def emit_training_metrics(self, metrics: "TrainingMetrics") -> None:
+        """Emit training domain metrics to the observability registry."""
+        try:
+            from backend.observability.metrics import metrics_registry
+            if metrics.elapsed_seconds is not None:
+                metrics_registry.record(
+                    "training_latency_ms",
+                    round(metrics.elapsed_seconds * 1000, 2),
+                )
+            if metrics.last_accuracy is not None:
+                metrics_registry.set_gauge("model_accuracy", metrics.last_accuracy)
+        except Exception:
+            pass
 
 
 # Singleton instance

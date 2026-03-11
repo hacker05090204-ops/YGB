@@ -229,6 +229,23 @@ class TestDashboardFrameShape(unittest.TestCase):
         self.assertIsNotNone(result)
         self.assertEqual(result["sub"], "ws-test-user")
 
+    def test_temporary_bypass_returns_synthetic_user(self):
+        """ws_authenticate allows the temporary public bypass without a token."""
+        from backend.auth.auth_guard import ws_authenticate
+
+        os.environ["YGB_TEMP_AUTH_BYPASS"] = "true"
+        try:
+            mock_ws = MagicMock()
+            mock_ws.query_params = {}
+            mock_ws.headers = {}
+
+            result = _run(ws_authenticate(mock_ws))
+            self.assertIsNotNone(result)
+            self.assertEqual(result["sub"], "temp-public-admin")
+            self.assertTrue(result["_temporary_bypass"])
+        finally:
+            os.environ.pop("YGB_TEMP_AUTH_BYPASS", None)
+
 
 if __name__ == "__main__":
     unittest.main()

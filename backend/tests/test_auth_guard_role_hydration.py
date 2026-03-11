@@ -111,3 +111,14 @@ async def test_require_admin_blocks_non_admin():
     with pytest.raises(HTTPException) as exc:
         await auth_guard.require_admin({"role": "hunter"})
     assert exc.value.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_require_auth_allows_temporary_bypass(monkeypatch):
+    monkeypatch.setenv("YGB_TEMP_AUTH_BYPASS", "true")
+
+    payload = await auth_guard.require_auth(_request(), None)
+
+    assert payload["sub"] == "temp-public-admin"
+    assert payload["role"] == "admin"
+    assert payload["_temporary_bypass"] is True

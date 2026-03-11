@@ -13,6 +13,7 @@ All routes require JWT auth.
 """
 
 import logging
+import time as _time
 from datetime import datetime, UTC
 from typing import List, Optional
 
@@ -94,6 +95,7 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
     Auth required. Rate-limited.
     """
     try:
+        _t0 = _time.monotonic()
         # Extract user_id from JWT payload
         user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
 
@@ -140,6 +142,14 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
                 else "QUEUED"
             ),
         )
+
+        # Emit voice inference latency metric
+        _voice_latency = round((_time.monotonic() - _t0) * 1000, 2)
+        try:
+            from backend.observability.metrics import metrics_registry
+            metrics_registry.record("voice_inference_latency_ms", _voice_latency)
+        except Exception:
+            pass
 
         return {
             "intent_id": intent.intent_id,

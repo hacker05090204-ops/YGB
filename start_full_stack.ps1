@@ -9,7 +9,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
-$LoopbackHost = "localhost"
+$LoopbackHost = "127.0.0.1"
 
 function Import-DotEnv {
     param([string]$Path)
@@ -195,7 +195,7 @@ foreach ($v in $requiredVars) {
 if ($missing.Count -gt 0) {
     Write-Warning "MISSING required env vars: $($missing -join ', ')"
     Write-Warning "Copy .env.example to .env and fill in values. See docs/ENV_SETUP.md"
-    # Don't exit -- server will still start but will warn on preflight
+    throw "Missing required environment variables: $($missing -join ', '). Backend startup aborted before launch."
 }
 
 # -- SMB SHARE (opt-in only with -LanShare) --
@@ -307,16 +307,27 @@ if (-not $env:ENABLE_G38_AUTO_TRAINING) {
 Stop-PortListener -Port $ApiPort -ForceKillForeign:$AllowForeignPortKill
 Stop-PortListener -Port $UiPort -ForceKillForeign:$AllowForeignPortKill
 
+$reportsDir = Join-Path $root "reports"
+New-Item -ItemType Directory -Path $reportsDir -Force | Out-Null
+$backendStdoutLog = Join-Path $reportsDir "backend_api.out.log"
+$backendStderrLog = Join-Path $reportsDir "backend_api.err.log"
+$syncStdoutLog = Join-Path $reportsDir "sync_engine.out.log"
+$syncStderrLog = Join-Path $reportsDir "sync_engine.err.log"
+
 $bindHost = $env:API_HOST
 $backend = Start-Process -FilePath "python" `
     -ArgumentList "-m", "uvicorn", "server:app", "--host", $bindHost, "--port", "$ApiPort", "--log-level", "info" `
     -WorkingDirectory (Join-Path $root "api") `
+    -RedirectStandardOutput $backendStdoutLog `
+    -RedirectStandardError $backendStderrLog `
     -WindowStyle Hidden -PassThru
 
 # -- Start Sync Engine (background daemon) --
 $syncEngine = Start-Process -FilePath "python" `
     -ArgumentList "-m", "backend.sync.sync_engine", "--watch" `
     -WorkingDirectory $root `
+    -RedirectStandardOutput $syncStdoutLog `
+    -RedirectStandardError $syncStderrLog `
     -WindowStyle Hidden -PassThru
 Write-Host "Sync Engine PID: $($syncEngine.Id)"
 
@@ -372,6 +383,16 @@ for ($i = 0; $i -lt 30; $i++) {
     } catch {}
     if ($apiStatus -eq 200 -and $uiStatus -eq 200) { break }
     Start-Sleep -Seconds 1
+}
+
+if ($apiStatus -ne 200) {
+    Write-Warning "Backend failed to become healthy. See logs:"
+    Write-Warning "  stdout: $backendStdoutLog"
+    Write-Warning "  stderr: $backendStderrLog"
+    Stop-Process -Id $backend.Id -Force -ErrorAction SilentlyContinue
+    Stop-Process -Id $syncEngine.Id -Force -ErrorAction SilentlyContinue
+    Stop-Process -Id $frontend.Id -Force -ErrorAction SilentlyContinue
+    throw "Backend failed to start. Review $backendStderrLog"
 }
 
 if ($tailscaleAutoServe -or (Test-IsTsNetUrl -Value ([string]$env:FRONTEND_URL))) {

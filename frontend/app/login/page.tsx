@@ -9,6 +9,12 @@ import {
   purgeLegacyAuthStorage,
 } from "@/lib/auth-token"
 import { getApiBase } from "@/lib/ygb-api"
+import {
+  clearPostLoginRedirect,
+  consumePostLoginRedirect,
+  normalizePostLoginRedirect,
+  persistPostLoginRedirect,
+} from "@/lib/post-login-redirect"
 
 interface AuthProviderSnapshot {
   password?: {
@@ -37,6 +43,9 @@ function LoginContent() {
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
   const [message, setMessage] = useState("")
   const [authProviders, setAuthProviders] = useState<AuthProviderSnapshot | null>(null)
+  const nextTarget = normalizePostLoginRedirect(searchParams.get("next"))
+  const authMethod = searchParams.get("auth")
+  const hasAuthError = Boolean(searchParams.get("error"))
 
   useEffect(() => {
     let cancelled = false
@@ -66,11 +75,21 @@ function LoginContent() {
   }, [])
 
   useEffect(() => {
+    if (nextTarget) {
+      persistPostLoginRedirect(nextTarget)
+      return
+    }
+
+    if (!authMethod && !hasAuthError) {
+      clearPostLoginRedirect()
+    }
+  }, [authMethod, hasAuthError, nextTarget])
+
+  useEffect(() => {
     let cancelled = false
     let redirectTimer: ReturnType<typeof setTimeout> | undefined
 
     const error = searchParams.get("error")
-    const authMethod = searchParams.get("auth")
     const providerLabel = authMethod === "google" ? "Google" : "GitHub"
     const usedExternalProvider = authMethod === "github" || authMethod === "google"
     const fallbackUser = searchParams.get("user")
@@ -122,7 +141,8 @@ function LoginContent() {
         setMessage(
           `Welcome, ${data.github_login || data.name || fallbackUser || "user"}!`
         )
-        redirectTimer = setTimeout(() => router.push("/control"), 1500)
+        const redirectTarget = consumePostLoginRedirect(nextTarget)
+        redirectTimer = setTimeout(() => router.push(redirectTarget), 1500)
       } catch {
         if (usedExternalProvider && !cancelled) {
           setStatus("error")
@@ -139,7 +159,7 @@ function LoginContent() {
         clearTimeout(redirectTimer)
       }
     }
-  }, [router, searchParams])
+  }, [authMethod, nextTarget, router, searchParams])
 
   const handleGitHubLogin = () => {
     const githubProvider = authProviders?.github
@@ -153,6 +173,7 @@ function LoginContent() {
       )
       return
     }
+    persistPostLoginRedirect(nextTarget)
     const origin = encodeURIComponent(window.location.origin)
     window.location.href = `${getApiBase()}/auth/github?frontend_origin=${origin}`
   }
@@ -169,6 +190,7 @@ function LoginContent() {
       )
       return
     }
+    persistPostLoginRedirect(nextTarget)
     const origin = encodeURIComponent(window.location.origin)
     window.location.href = `${getApiBase()}/auth/google?frontend_origin=${origin}`
   }
@@ -223,7 +245,7 @@ function LoginContent() {
                 </svg>
               </div>
               <h2 className="text-lg font-semibold text-white mb-1">{message}</h2>
-              <p className="text-sm text-gray-400">Redirecting to control panel...</p>
+              <p className="text-sm text-gray-400">Redirecting...</p>
               <div className="mt-4 h-1 bg-gray-800 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full animate-[progress_1.5s_ease-in-out]"
@@ -301,7 +323,8 @@ function LoginContent() {
                       notifyAuthStateChanged()
                       setStatus("success")
                       setMessage(`Welcome, ${data.user?.name || email}!`)
-                      setTimeout(() => router.push("/control"), 1500)
+                      const redirectTarget = consumePostLoginRedirect(nextTarget)
+                      setTimeout(() => router.push(redirectTarget), 1500)
                     } catch {
                       setStatus("error")
                       setMessage("Network error - is the backend running?")

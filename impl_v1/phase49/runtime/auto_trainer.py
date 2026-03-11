@@ -37,10 +37,12 @@ import time
 import logging
 import uuid
 import hashlib
+import json
+import tempfile
 import numpy as np
 from datetime import datetime, timezone
 from dataclasses import dataclass
-from typing import Optional, Callable, List, Tuple
+from typing import Optional, Callable, List, Tuple, Dict, Any
 from enum import Enum
 
 from backend.training.runtime_artifacts import (
@@ -58,6 +60,7 @@ from .idle_detector import (
     is_power_connected,
     is_scan_active,
 )
+from .telegram_notifier import build_training_telegram_notifier_from_env
 
 # Import guards and conditions from G38
 from impl_v1.phase49.governors.g38_self_trained_model import (
@@ -107,6 +110,14 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
     AMP_AVAILABLE = False
+
+try:
+    from safetensors.torch import load_file as load_safetensors_file, save_file as save_safetensors_file
+    SAFETENSORS_AVAILABLE = True
+except ImportError:
+    SAFETENSORS_AVAILABLE = False
+    load_safetensors_file = None
+    save_safetensors_file = None
 
 # Training profile: deterministic (default) or fast
 _TRAINING_PROFILE = os.environ.get("YGB_TRAINING_PROFILE", "deterministic").lower()
@@ -247,18 +258,28 @@ class AutoTrainer:
         
         # === ATTRIBUTES SET DYNAMICALLY (declared here for type-checker) ===
         self._checkpoint_path: Optional[str] = None
+        self._checkpoint_meta_path: Optional[str] = None
         self._gpu_scheduler = None  # LR scheduler (ReduceLROnPlateau)
         self._scaler = None  # AMP GradScaler
         self._training_mode_label: str = "MANUAL"
         self._session_start_monotonic = 0.0
         self._session_start_timestamp = None
         self._batch_size = 0
+        self._last_error = ""
+        self._telegram_notifier = build_training_telegram_notifier_from_env()
+        self._worker_status_path = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), "..", "..", "..", "reports", "g38_training_worker.status.json"
+        ))
+        self._dataset_manifest_path = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), "..", "..", "..", "secure_data", "dataset_manifest.json"
+        ))
         
         # === MODE_A EARLY STOPPING ===
         self._best_accuracy = 0.0
         self._no_improvement_count = 0
         self._early_stop_patience = 5  # Stop after 5 epochs without improvement
         self._early_stop_baseline = 0.80  # Min accuracy before early stop allowed
+        self._write_worker_status()
     
     @property
     def state(self) -> TrainingState:
@@ -278,6 +299,111 @@ class AutoTrainer:
     def set_event_callback(self, callback: Callable[[TrainingEvent], None]) -> None:
         """Set callback for training events (for dashboard)."""
         self._on_event_callback = callback
+
+    @staticmethod
+    def _atomic_write_json(path: str, payload: Dict[str, Any]) -> None:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        fd, tmp_path = tempfile.mkstemp(
+            dir=os.path.dirname(path),
+            prefix=os.path.basename(path) + ".",
+            suffix=".tmp",
+        )
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(payload, handle, indent=2)
+                handle.write("\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(tmp_path, path)
+        except Exception:
+            try:
+                os.remove(tmp_path)
+            except OSError:
+                pass
+            raise
+
+    @staticmethod
+    def _checkpoint_paths_for(base_dir: str) -> tuple[str, str, str]:
+        base = os.path.join(base_dir, "g38_model_checkpoint")
+        return (
+            base + ".safetensors",
+            base + ".json",
+            base + ".pt",
+        )
+
+    @staticmethod
+    def _build_checkpoint_metadata(
+        *,
+        epoch: int,
+        accuracy: float,
+        holdout_accuracy: float,
+        loss: float,
+        real_samples_processed: int,
+    ) -> Dict[str, Any]:
+        return {
+            "schema_version": 1,
+            "format": "safetensors",
+            "epoch": int(epoch),
+            "accuracy": float(accuracy),
+            "holdout_accuracy": float(holdout_accuracy),
+            "loss": float(loss),
+            "real_samples_processed": int(real_samples_processed),
+            "saved_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+    @classmethod
+    def _save_checkpoint_bundle(
+        cls,
+        checkpoint_path: str,
+        checkpoint_meta_path: str,
+        model_state: Dict[str, "torch.Tensor"],
+        metadata: Dict[str, Any],
+    ) -> None:
+        if not SAFETENSORS_AVAILABLE or save_safetensors_file is None:
+            raise RuntimeError("safetensors package not available")
+
+        os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
+        fd, tmp_weights = tempfile.mkstemp(
+            dir=os.path.dirname(checkpoint_path),
+            prefix=os.path.basename(checkpoint_path) + ".",
+            suffix=".tmp",
+        )
+        os.close(fd)
+        try:
+            save_safetensors_file(model_state, tmp_weights)
+            os.replace(tmp_weights, checkpoint_path)
+        except Exception:
+            try:
+                os.remove(tmp_weights)
+            except OSError:
+                pass
+            raise
+
+        cls._atomic_write_json(checkpoint_meta_path, metadata)
+
+    def _load_checkpoint_metadata(self, checkpoint_meta_path: str) -> Dict[str, Any]:
+        try:
+            with open(checkpoint_meta_path, "r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+            if isinstance(payload, dict):
+                return payload
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            pass
+        return {}
+
+    def _write_worker_status(self) -> None:
+        try:
+            payload = self.get_status()
+            self._atomic_write_json(self._worker_status_path, payload)
+        except Exception as exc:
+            logger.debug("Worker status write skipped: %s", exc)
+
+    @staticmethod
+    def _archive_legacy_checkpoint(legacy_checkpoint_path: str) -> None:
+        if not legacy_checkpoint_path or not os.path.exists(legacy_checkpoint_path):
+            return
+        archived_path = legacy_checkpoint_path + ".legacy"
+        os.replace(legacy_checkpoint_path, archived_path)
     
     def _emit_event(
         self,
@@ -299,6 +425,8 @@ class AutoTrainer:
         )
         
         self._events.append(event)
+        if event_type == "ERROR":
+            self._last_error = details
         
         # Log to console
         log_msg = f"[{event_type}] {details}"
@@ -319,6 +447,17 @@ class AutoTrainer:
                 self._on_event_callback(event)
             except Exception:
                 pass
+
+        if self._telegram_notifier is not None:
+            try:
+                self._telegram_notifier.notify(event, self.get_status())
+            except Exception:
+                pass
+
+        try:
+            self._write_worker_status()
+        except Exception:
+            pass
         
         return event
 
@@ -336,6 +475,45 @@ class AutoTrainer:
             )
         except ValueError:
             return 0.0
+
+    def _fast_validate_dataset_manifest(self, min_samples: int) -> Tuple[bool, str]:
+        """Use the signed dataset manifest as the fast-path readiness check."""
+        try:
+            with open(self._dataset_manifest_path, "r", encoding="utf-8") as handle:
+                manifest = json.load(handle)
+        except (FileNotFoundError, json.JSONDecodeError, OSError) as exc:
+            return False, f"manifest_unavailable: {type(exc).__name__}"
+
+        if not isinstance(manifest, dict):
+            return False, "manifest_invalid: not a JSON object"
+
+        dataset_source = str(manifest.get("dataset_source", "") or "").upper()
+        strict_real = bool(manifest.get("strict_real_mode", False))
+        training_mode = str(manifest.get("training_mode", "") or "").upper()
+        sample_count = int(manifest.get("sample_count", manifest.get("total_samples", 0)) or 0)
+        class_histogram = manifest.get("class_histogram", {}) or {}
+        positive = int(class_histogram.get("1", class_histogram.get(1, 0)) or 0)
+        total = max(sample_count, int(manifest.get("total_samples", sample_count) or sample_count))
+        positive_ratio = (positive / total) if total > 0 else 0.0
+        signed = bool(manifest.get("signature_hash")) and bool(manifest.get("signed_by"))
+
+        if not strict_real:
+            return False, "manifest_invalid: strict_real_mode is not enabled"
+        if dataset_source != "INGESTION_PIPELINE":
+            return False, f"manifest_invalid: dataset_source={dataset_source or '<missing>'}"
+        if training_mode and training_mode != "PRODUCTION_REAL":
+            return False, f"manifest_invalid: training_mode={training_mode}"
+        if not signed:
+            return False, "manifest_invalid: signature fields missing"
+        if total < min_samples:
+            return False, f"manifest_invalid: sample_count={total} below threshold={min_samples}"
+        if not (0.40 <= positive_ratio <= 0.60):
+            return False, f"manifest_invalid: class balance {positive_ratio:.2%}"
+
+        return True, (
+            f"Dataset valid (MANIFEST_FAST_PATH): {total} samples, "
+            f"{positive_ratio:.2%} positive, source={dataset_source}"
+        )
 
     def _determinism_status(self) -> bool:
         """Infer whether the current trainer is running in deterministic mode."""
@@ -671,7 +849,15 @@ class AutoTrainer:
         """
         from impl_v1.training.data.real_dataset_loader import create_training_dataloader
 
-        requested_workers = 2 if sys.platform == "win32" else 4
+        env_workers = os.environ.get("YGB_TRAIN_DATALOADER_WORKERS", "").strip()
+        if env_workers:
+            requested_workers = max(0, int(env_workers))
+        elif sys.platform == "win32":
+            # Windows worker spawn has repeatedly hit DLL pickling failures and
+            # multi-minute startup stalls in the ingestion dataset path.
+            requested_workers = 0
+        else:
+            requested_workers = 4
 
         def _create(num_workers: int):
             prefetch = 2 if num_workers > 0 else None
@@ -764,8 +950,12 @@ class AutoTrainer:
                 YGB_MIN_REAL_SAMPLES,
             )
             
-            # Validate dataset before use
-            valid, msg = validate_dataset_integrity()
+            # Validate dataset before use. Fast-path via the signed manifest, then
+            # fall back to the full ingestion integrity scan if the manifest is
+            # missing or insufficient.
+            valid, msg = self._fast_validate_dataset_manifest(YGB_MIN_REAL_SAMPLES)
+            if not valid:
+                valid, msg = validate_dataset_integrity()
             if not valid:
                 logger.error(f"Dataset validation failed: {msg}")
 
@@ -867,34 +1057,94 @@ class AutoTrainer:
             # === TRY TO LOAD EXISTING CHECKPOINT ===
             try:
                 hdd_root = os.environ.get('YGB_HDD_ROOT', 'D:/ygb_hdd')
-                self._checkpoint_path = os.path.join(
-                    hdd_root, 'training', 'g38_model_checkpoint.pt'
-                )
+                checkpoint_dir = os.path.join(hdd_root, 'training')
+                (
+                    self._checkpoint_path,
+                    self._checkpoint_meta_path,
+                    legacy_checkpoint_path,
+                ) = self._checkpoint_paths_for(checkpoint_dir)
                 os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
             except OSError:
                 # HDD path not available (e.g. D: drive missing), use local fallback
-                self._checkpoint_path = os.path.join(
-                    os.path.dirname(__file__), '..', '..', '..', 'data', 'g38_checkpoint.pt'
-                )
+                checkpoint_dir = os.path.abspath(os.path.join(
+                    os.path.dirname(__file__), '..', '..', '..', 'data'
+                ))
+                (
+                    self._checkpoint_path,
+                    self._checkpoint_meta_path,
+                    legacy_checkpoint_path,
+                ) = self._checkpoint_paths_for(checkpoint_dir)
                 os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
                 logger.warning(f"HDD path unavailable, using local checkpoint: {self._checkpoint_path}")
             
             if os.path.exists(self._checkpoint_path):
                 try:
-                    ckpt = torch.load(self._checkpoint_path, map_location=self._gpu_device, weights_only=True)
-                    self._gpu_model.load_state_dict(ckpt['model_state'])
-                    self._gpu_optimizer.load_state_dict(ckpt['optimizer_state'])
-                    if 'scheduler_state' in ckpt:
-                        self._gpu_scheduler.load_state_dict(ckpt['scheduler_state'])
-                    self._epoch = ckpt.get('epoch', 0)
-                    self._last_accuracy = ckpt.get('accuracy', 0.0)
-                    self._last_loss = ckpt.get('loss', 0.0)
+                    if not SAFETENSORS_AVAILABLE or load_safetensors_file is None:
+                        raise RuntimeError("safetensors package not available")
+                    model_state = load_safetensors_file(self._checkpoint_path, device='cpu')
+                    self._gpu_model.load_state_dict(model_state)
+                    ckpt_meta = self._load_checkpoint_metadata(self._checkpoint_meta_path or "")
+                    self._epoch = int(ckpt_meta.get('epoch', 0) or 0)
+                    self._last_accuracy = float(ckpt_meta.get('accuracy', 0.0) or 0.0)
+                    self._last_holdout_accuracy = float(ckpt_meta.get('holdout_accuracy', self._last_accuracy) or self._last_accuracy)
+                    self._last_loss = float(ckpt_meta.get('loss', 0.0) or 0.0)
+                    self._real_samples_processed = int(
+                        ckpt_meta.get('real_samples_processed', self._real_samples_processed) or 0
+                    )
+                    if os.path.exists(legacy_checkpoint_path):
+                        self._archive_legacy_checkpoint(legacy_checkpoint_path)
                     logger.info(
-                        f"Loaded checkpoint: epoch={self._epoch}, "
+                        f"Loaded safetensors checkpoint: epoch={self._epoch}, "
                         f"accuracy={self._last_accuracy:.2%}, loss={self._last_loss:.4f}"
                     )
                 except Exception as e:
                     logger.warning(f"Could not load checkpoint, starting fresh: {e}")
+            elif os.path.exists(legacy_checkpoint_path):
+                try:
+                    ckpt = torch.load(legacy_checkpoint_path, map_location=self._gpu_device, weights_only=True)
+                    model_state = ckpt.get('model_state') or ckpt.get('model_state_dict') or ckpt
+                    self._gpu_model.load_state_dict(model_state)
+                    if isinstance(ckpt, dict) and 'optimizer_state' in ckpt:
+                        self._gpu_optimizer.load_state_dict(ckpt['optimizer_state'])
+                    if isinstance(ckpt, dict) and 'scheduler_state' in ckpt:
+                        self._gpu_scheduler.load_state_dict(ckpt['scheduler_state'])
+                    self._epoch = int(ckpt.get('epoch', 0) or 0) if isinstance(ckpt, dict) else 0
+                    self._last_accuracy = float(ckpt.get('accuracy', 0.0) or 0.0) if isinstance(ckpt, dict) else 0.0
+                    self._last_holdout_accuracy = float(
+                        ckpt.get('holdout_accuracy', self._last_accuracy) or self._last_accuracy
+                    ) if isinstance(ckpt, dict) else self._last_accuracy
+                    self._last_loss = float(ckpt.get('loss', 0.0) or 0.0) if isinstance(ckpt, dict) else 0.0
+                    self._real_samples_processed = int(
+                        ckpt.get('real_samples_processed', self._real_samples_processed) or 0
+                    ) if isinstance(ckpt, dict) else self._real_samples_processed
+                    logger.info(
+                        "Loaded legacy checkpoint for migration: epoch=%s, accuracy=%.2f%%, loss=%.4f",
+                        self._epoch,
+                        self._last_accuracy * 100.0,
+                        self._last_loss,
+                    )
+                    if SAFETENSORS_AVAILABLE and self._checkpoint_meta_path:
+                        migrated_state = {
+                            key: value.detach().cpu().clone().contiguous()
+                            for key, value in self._gpu_model.state_dict().items()
+                        }
+                        migrated_meta = self._build_checkpoint_metadata(
+                            epoch=self._epoch,
+                            accuracy=self._last_accuracy,
+                            holdout_accuracy=self._last_holdout_accuracy,
+                            loss=self._last_loss,
+                            real_samples_processed=self._real_samples_processed,
+                        )
+                        self._save_checkpoint_bundle(
+                            self._checkpoint_path,
+                            self._checkpoint_meta_path,
+                            migrated_state,
+                            migrated_meta,
+                        )
+                        self._archive_legacy_checkpoint(legacy_checkpoint_path)
+                        logger.info("Migrated legacy checkpoint to safetensors: %s", self._checkpoint_path)
+                except Exception as e:
+                    logger.warning(f"Could not load legacy checkpoint, starting fresh: {e}")
             
             # NOTE: torch.compile skipped — model is too small to benefit,
             # and torch._dynamo can silently corrupt outputs on Windows.
@@ -911,6 +1161,7 @@ class AutoTrainer:
             return True
             
         except Exception as e:
+            self._last_error = str(e).strip()
             logger.error(f"Failed to initialize GPU resources: {e}")
             return False
     
@@ -1127,18 +1378,26 @@ class AutoTrainer:
 
             if hasattr(self, '_checkpoint_path') and self._checkpoint_path:
                 try:
-                    # Copy state dicts to CPU before submitting to background thread
-                    ckpt_data = {
-                        'model_state': {k: v.cpu().clone() for k, v in self._gpu_model.state_dict().items()},
-                        'optimizer_state': self._gpu_optimizer.state_dict(),
-                        'scheduler_state': self._gpu_scheduler.state_dict() if hasattr(self, '_gpu_scheduler') else None,
-                        'epoch': self._epoch,
-                        'accuracy': accuracy,
-                        'holdout_accuracy': holdout_accuracy,
-                        'loss': avg_loss,
-                        'real_samples_processed': self._real_samples_processed,
+                    if not SAFETENSORS_AVAILABLE or not self._checkpoint_meta_path:
+                        raise RuntimeError("safetensors checkpoint support unavailable")
+                    model_state = {
+                        key: value.detach().cpu().clone().contiguous()
+                        for key, value in self._gpu_model.state_dict().items()
                     }
-                    _checkpoint_executor.submit(torch.save, ckpt_data, self._checkpoint_path)
+                    checkpoint_meta = self._build_checkpoint_metadata(
+                        epoch=self._epoch,
+                        accuracy=accuracy,
+                        holdout_accuracy=holdout_accuracy,
+                        loss=avg_loss,
+                        real_samples_processed=self._real_samples_processed,
+                    )
+                    _checkpoint_executor.submit(
+                        self._save_checkpoint_bundle,
+                        self._checkpoint_path,
+                        self._checkpoint_meta_path,
+                        model_state,
+                        checkpoint_meta,
+                    )
                 except Exception as e:
                     logger.warning(f"Checkpoint save failed: {e}")
             
@@ -1155,6 +1414,7 @@ class AutoTrainer:
             return True, accuracy, avg_loss
             
         except Exception as e:
+            self._last_error = str(e).strip()
             import traceback
             err_tb = traceback.format_exc()
             logger.error(f"GPU training step failed: {e}\n{err_tb}")
@@ -1506,6 +1766,7 @@ class AutoTrainer:
         
         loop = asyncio.get_event_loop()
         self._task = loop.create_task(self.run_scheduler())
+        self._write_worker_status()
     
     def stop(self) -> None:
         """Stop the background scheduler."""
@@ -1515,6 +1776,7 @@ class AutoTrainer:
         if self._task is not None:
             self._task.cancel()
             self._task = None
+        self._write_worker_status()
     
     def abort_training(self) -> dict:
         """Abort training immediately. Returns status."""
@@ -1561,6 +1823,12 @@ class AutoTrainer:
                 "reason": "PyTorch not installed - cannot train on GPU",
                 "state": "ERROR",
             }
+        if not SAFETENSORS_AVAILABLE:
+            return {
+                "started": False,
+                "reason": "safetensors not installed - required checkpoint format unavailable",
+                "state": "ERROR",
+            }
         
         device_info = detect_compute_device()
         if device_info.device_type != DeviceType.CUDA:
@@ -1578,6 +1846,7 @@ class AutoTrainer:
                     "state": self._state.value,
                 }
             
+            self._last_error = ""
             self._state = TrainingState.TRAINING
             self._abort_flag.clear()
             # Set REAL target for progress tracking
@@ -1601,6 +1870,7 @@ class AutoTrainer:
         try:
             # Initialize GPU resources ONCE (data stays on GPU)
             if not self._init_gpu_resources():
+                self._last_error = self._last_error or "Failed to initialize GPU resources"
                 self._state = TrainingState.ERROR
                 return {
                     "started": False,
@@ -1662,6 +1932,7 @@ class AutoTrainer:
                 self._current_session = None
                 self._session_start_timestamp = None
                 self._session_start_monotonic = 0.0
+            self._write_worker_status()
             
             self._emit_event(
                 "TRAINING_STOPPED",
@@ -1680,6 +1951,7 @@ class AutoTrainer:
             }
             
         except Exception as e:
+            self._last_error = str(e).strip()
             self._state = TrainingState.ERROR
             self._emit_event("ERROR", f"GPU training failed: {str(e)}", gpu_used=True)
             return {
@@ -1746,6 +2018,7 @@ class AutoTrainer:
             "dataset_size": self._gpu_dataset_stats["train"]["total"] if self._gpu_dataset_stats else 0,
             "training_mode": "CONTINUOUS" if is_continuous else getattr(self, '_training_mode_label', 'MANUAL'),
             "continuous_mode": is_continuous,
+            "last_error": self._last_error or None,
         }
 
 
@@ -1800,6 +2073,12 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             "reason": "PyTorch not installed - cannot train on GPU",
             "state": "ERROR",
         }
+    if not SAFETENSORS_AVAILABLE:
+        return {
+            "started": False,
+            "reason": "safetensors not installed - required checkpoint format unavailable",
+            "state": "ERROR",
+        }
     
     device_info = detect_compute_device()
     if device_info.device_type != DeviceType.CUDA:
@@ -1819,6 +2098,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                 "state": trainer._state.value,
             }
         
+        trainer._last_error = ""
         trainer._continuous_mode = True
         trainer._continuous_target = target_epochs
         trainer._state = TrainingState.TRAINING
@@ -1933,6 +2213,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             trainer._session_start_timestamp = None
             trainer._session_start_monotonic = 0.0
             trainer._continuous_thread = None
+        trainer._write_worker_status()
         
         trainer._emit_event(
             "CONTINUOUS_STOP",
@@ -1966,6 +2247,7 @@ def stop_continuous_training(wait_timeout_seconds: float = 5.0) -> dict:
     with trainer._training_lock:
         if trainer._state == TrainingState.TRAINING:
             trainer._state = TrainingState.ABORTING
+    trainer._write_worker_status()
 
     trainer._emit_event(
         "CONTINUOUS_STOP_REQUESTED",
@@ -1989,6 +2271,7 @@ def stop_continuous_training(wait_timeout_seconds: float = 5.0) -> dict:
             trainer._current_session = None
             trainer._session_start_timestamp = None
             trainer._session_start_monotonic = 0.0
+        trainer._write_worker_status()
 
     return {
         "stopped": not thread_alive,

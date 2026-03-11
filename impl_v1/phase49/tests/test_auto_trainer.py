@@ -13,6 +13,8 @@ Tests cover:
 import pytest
 import asyncio
 import time
+import json
+import tempfile
 from unittest.mock import patch, MagicMock, AsyncMock
 
 from impl_v1.phase49.runtime.auto_trainer import (
@@ -263,7 +265,27 @@ class TestEventEmission:
         # Should not raise - error is caught
         event = trainer._emit_event("TEST_EVENT", "Test details")
         assert event is not None
-    
+
+    @patch("impl_v1.phase49.runtime.auto_trainer.build_training_telegram_notifier_from_env")
+    def test_emit_event_notifies_telegram(self, mock_builder):
+        class _Notifier:
+            def __init__(self):
+                self.calls = []
+
+            def notify(self, event, status):
+                self.calls.append((event, status))
+
+        notifier = _Notifier()
+        mock_builder.return_value = notifier
+
+        trainer = AutoTrainer()
+        trainer._emit_event("CHECKPOINT_SAVED", "Saved safetensors checkpoint", epoch=7)
+
+        assert len(notifier.calls) == 1
+        event, status = notifier.calls[0]
+        assert event.event_type == "CHECKPOINT_SAVED"
+        assert status["last_event"] == "CHECKPOINT_SAVED"
+
     def test_event_types_log_correctly(self):
         """Test various event types are logged at appropriate levels."""
         trainer = AutoTrainer()
@@ -331,6 +353,39 @@ class TestStatus:
         
         status = trainer.get_status()
         assert status["last_event"] == "TEST_EVENT"
+
+    def test_checkpoint_paths_use_safetensors(self):
+        weights_path, meta_path, legacy_path = AutoTrainer._checkpoint_paths_for("D:/ygb_hdd/training")
+
+        assert weights_path.endswith(".safetensors")
+        assert meta_path.endswith(".json")
+        assert legacy_path.endswith(".pt")
+
+    def test_fast_validate_dataset_manifest_accepts_signed_real_manifest(self):
+        trainer = AutoTrainer()
+        manifest = {
+            "dataset_source": "INGESTION_PIPELINE",
+            "strict_real_mode": True,
+            "training_mode": "PRODUCTION_REAL",
+            "sample_count": 125993,
+            "class_histogram": {"1": 57296, "0": 68697},
+            "signed_by": "signer",
+            "signature_hash": "sig",
+        }
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(manifest, handle)
+            path = handle.name
+
+        try:
+            trainer._dataset_manifest_path = path
+            ok, msg = trainer._fast_validate_dataset_manifest(125000)
+        finally:
+            import os
+            os.remove(path)
+
+        assert ok is True
+        assert "MANIFEST_FAST_PATH" in msg
 
 
 class _DatasetLeaf:

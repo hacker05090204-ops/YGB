@@ -52,6 +52,8 @@ _GITHUB_ID_INDEX: Dict[str, str] = {}
 _GITHUB_ID_INDEX_BUILT = False
 _GOOGLE_SUB_INDEX: Dict[str, str] = {}
 _GOOGLE_SUB_INDEX_BUILT = False
+_PHONE_INDEX: Dict[str, str] = {}
+_PHONE_INDEX_BUILT = False
 _DEVICE_INDEX: Dict[str, str] = {}      # "user_id|device_hash" → device entity_id
 _DEVICE_INDEX_BUILT = False
 _storage_active_root: Optional[str] = None
@@ -65,7 +67,7 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     """
     global _engine, _lifecycle, _disk_monitor, _video_streamer
     global _EMAIL_INDEX, _EMAIL_INDEX_BUILT, _GITHUB_ID_INDEX, _GITHUB_ID_INDEX_BUILT
-    global _GOOGLE_SUB_INDEX, _GOOGLE_SUB_INDEX_BUILT
+    global _GOOGLE_SUB_INDEX, _GOOGLE_SUB_INDEX_BUILT, _PHONE_INDEX, _PHONE_INDEX_BUILT
     global _DEVICE_INDEX, _DEVICE_INDEX_BUILT
     global _storage_active_root, _storage_mode
 
@@ -96,6 +98,8 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     _GITHUB_ID_INDEX_BUILT = False
     _GOOGLE_SUB_INDEX = {}
     _GOOGLE_SUB_INDEX_BUILT = False
+    _PHONE_INDEX = {}
+    _PHONE_INDEX_BUILT = False
     _DEVICE_INDEX = {}
     _DEVICE_INDEX_BUILT = False
     _storage_active_root = str(_engine.root)
@@ -160,6 +164,8 @@ def create_user(name: str, email: str = None, role: str = "hunter") -> Dict[str,
         "google_sub": None,
         "google_email": None,
         "google_picture": None,
+        "phone_number": None,
+        "phone_verified_at": None,
         "avatar_url": None,
         "github_profile": {},
         "google_profile": {},
@@ -198,6 +204,8 @@ def get_user(user_id: str) -> Optional[Dict[str, Any]]:
         "google_sub": latest.get("google_sub") or google_profile.get("google_sub") or google_profile.get("sub"),
         "google_email": latest.get("google_email") or google_profile.get("google_email") or google_profile.get("email"),
         "google_picture": latest.get("google_picture") or google_profile.get("google_picture") or google_profile.get("picture"),
+        "phone_number": latest.get("phone_number"),
+        "phone_verified_at": latest.get("phone_verified_at"),
         "avatar_url": (
             latest.get("avatar_url")
             or github_profile.get("avatar_url")
@@ -554,6 +562,23 @@ def _ensure_google_sub_index():
     _GOOGLE_SUB_INDEX_BUILT = True
 
 
+def _ensure_phone_index():
+    """Lazily populate the phone number lookup index."""
+    global _PHONE_INDEX_BUILT
+    if _PHONE_INDEX_BUILT:
+        return
+    metas = _engine.list_entities("users", limit=10000)
+    for meta in metas:
+        entity = _engine.read_entity("users", meta["entity_id"])
+        if not entity or not entity.get("latest"):
+            continue
+        latest = entity["latest"]
+        phone_number = latest.get("phone_number")
+        if phone_number:
+            _PHONE_INDEX[str(phone_number)] = meta["entity_id"]
+    _PHONE_INDEX_BUILT = True
+
+
 def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Find a user by email address (uses cached index after first call)."""
     _ensure_email_index()
@@ -585,6 +610,17 @@ def get_user_by_google_sub(google_sub: str) -> Optional[Dict[str, Any]]:
         return None
     _ensure_google_sub_index()
     entity_id = _GOOGLE_SUB_INDEX.get(str(google_sub))
+    if not entity_id:
+        return None
+    return get_user(entity_id)
+
+
+def get_user_by_phone(phone_number: str) -> Optional[Dict[str, Any]]:
+    """Find a user by verified phone number."""
+    if not phone_number:
+        return None
+    _ensure_phone_index()
+    entity_id = _PHONE_INDEX.get(str(phone_number))
     if not entity_id:
         return None
     return get_user(entity_id)
@@ -622,6 +658,7 @@ def update_user_auth_profile(
     geolocation: str = None,
     github_profile: Dict[str, Any] = None,
     google_profile: Dict[str, Any] = None,
+    phone_number: str = None,
 ):
     """Persist auth/security context for a user (admin visibility)."""
     entity = _engine.read_entity("users", user_id)
@@ -654,6 +691,10 @@ def update_user_auth_profile(
         or bounded_google_profile.get("picture")
         or latest.get("google_picture")
     )
+    resolved_phone_number = phone_number or latest.get("phone_number")
+    phone_verified_at = latest.get("phone_verified_at")
+    if auth_provider == "phone" and resolved_phone_number:
+        phone_verified_at = datetime.now(timezone.utc).isoformat()
 
     avatar_url = latest.get("avatar_url")
     if auth_provider == "github" and github_avatar:
@@ -675,6 +716,8 @@ def update_user_auth_profile(
         "google_sub": google_sub,
         "google_email": google_email,
         "google_picture": google_picture,
+        "phone_number": resolved_phone_number,
+        "phone_verified_at": phone_verified_at,
         "avatar_url": avatar_url,
         "github_profile": bounded_github_profile,
         "google_profile": bounded_google_profile,
@@ -683,6 +726,8 @@ def update_user_auth_profile(
         _GITHUB_ID_INDEX[str(github_id)] = user_id
     if google_sub:
         _GOOGLE_SUB_INDEX[str(google_sub)] = user_id
+    if resolved_phone_number:
+        _PHONE_INDEX[str(resolved_phone_number)] = user_id
 
 
 def get_admin_user_security_view(limit: int = 1000) -> List[Dict[str, Any]]:
@@ -705,6 +750,8 @@ def get_admin_user_security_view(limit: int = 1000) -> List[Dict[str, Any]]:
             "last_geolocation": latest.get("last_geolocation"),
             "last_auth_provider": latest.get("last_auth_provider"),
             "last_auth_at": latest.get("last_auth_at"),
+            "phone_number": latest.get("phone_number"),
+            "phone_verified_at": latest.get("phone_verified_at"),
             "github_profile": latest.get("github_profile", {}),
             "google_profile": latest.get("google_profile", {}),
             "created_at": latest.get("created_at", ""),

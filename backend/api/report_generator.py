@@ -141,6 +141,7 @@ def _now_iso() -> str:
 async def create_report(request: Request, user=Depends(require_auth)):
     """Create a new report."""
     _ensure_tables()
+    _t0 = time.monotonic()
     body = await request.json()
     user_id = user.get("sub", "")
 
@@ -190,6 +191,14 @@ async def create_report(request: Request, user=Depends(require_auth)):
         })
     finally:
         conn.close()
+
+    # Emit report generation latency metric
+    _rpt_latency = round((time.monotonic() - _t0) * 1000, 2)
+    try:
+        from backend.observability.metrics import metrics_registry
+        metrics_registry.record("report_generation_latency_ms", _rpt_latency)
+    except Exception:
+        pass
 
     _log_activity(user_id, "REPORT_CREATED", f"Report '{title}' created ({report_id})")
     logger.info("Report created: %s by %s", report_id, user_id)

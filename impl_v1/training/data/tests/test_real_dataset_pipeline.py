@@ -14,6 +14,7 @@ import pytest
 import sys
 import os
 import hashlib
+import json
 
 import numpy as np
 
@@ -279,6 +280,58 @@ class TestRealDatasetPipeline:
         assert rejected_policy == 0
         assert rejected_quality == 0
         assert captured[0]["parameters"] == "id=7&role=user"
+
+    def test_ingestion_tensor_cache_round_trip(self, monkeypatch, tmp_path):
+        """Encoded ingestion tensors should persist and reload from safetensors cache."""
+        torch = pytest.importorskip("torch")
+        pytest.importorskip("safetensors")
+        import impl_v1.training.data.real_dataset_loader as rdl
+
+        secure_data = tmp_path / "secure_data"
+        monkeypatch.setattr(rdl, "_SECURE_DATA", secure_data)
+
+        dataset = rdl.IngestionPipelineDataset.__new__(rdl.IngestionPipelineDataset)
+        dataset.feature_dim = 4
+        dataset.min_samples = 2
+        dataset.seed = 42
+        dataset._verified_count = 2
+        dataset._manifest_hash = "manifest-cache-key"
+        dataset._raw_samples = [{"reliability": 0.91}, {"reliability": 0.72}]
+        dataset._features = []
+        dataset._labels = [1, 0]
+        dataset._features_tensor = torch.tensor(
+            [[0.1, 0.2, 0.3, 0.4], [0.5, 0.6, 0.7, 0.8]],
+            dtype=torch.float32,
+        )
+        dataset._labels_tensor = torch.tensor([1, 0], dtype=torch.long)
+
+        metadata = dataset._build_tensor_cache_metadata(
+            accepted=2,
+            rejected_policy=0,
+            rejected_quality=0,
+            verified_count=2,
+        )
+        dataset._save_tensor_cache(metadata)
+
+        reloaded = rdl.IngestionPipelineDataset.__new__(rdl.IngestionPipelineDataset)
+        reloaded.feature_dim = 4
+        reloaded.min_samples = 2
+        reloaded.seed = 42
+        reloaded._verified_count = 2
+        reloaded._manifest_hash = "manifest-cache-key"
+        reloaded._raw_samples = []
+        reloaded._features = []
+        reloaded._labels = []
+        reloaded._tensor_cache_metadata = {}
+
+        assert reloaded._load_tensor_cache(2) is True
+        assert torch.equal(reloaded._features_tensor, dataset._features_tensor)
+        assert torch.equal(reloaded._labels_tensor, dataset._labels_tensor)
+
+        reloaded._ensure_manifest_from_cache()
+        manifest = json.loads((secure_data / "dataset_manifest.json").read_text(encoding="utf-8"))
+        assert manifest["tensor_hash"] == metadata["tensor_hash"]
+        assert manifest["sample_count"] == 2
 
 
 if __name__ == "__main__":

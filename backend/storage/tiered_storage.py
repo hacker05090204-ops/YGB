@@ -22,7 +22,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 logger = logging.getLogger("tiered_storage")
 
@@ -51,6 +51,16 @@ SSD_DB             = SSD_ROOT / "ygb.db"
 # compression / migration when the SSD cap is hit.
 COLD_AGE = timedelta(hours=24)
 MIN_COMPRESS_SIZE = 512 * _MB  # 0.5 GB
+STORAGE_TOPOLOGY_CACHE_SECONDS = max(
+    1.0,
+    float(os.environ.get("YGB_STORAGE_TOPOLOGY_CACHE_SECONDS", "15")),
+)
+
+_storage_topology_cache_lock = threading.Lock()
+_storage_topology_cache: dict[str, Any] = {
+    "checked_at": 0.0,
+    "value": None,
+}
 
 
 # ---------------------------------------------------------------------------
@@ -180,10 +190,29 @@ def resolve_hdd_root() -> tuple[Path, dict]:
     }
 
 
-def get_storage_topology() -> dict:
-    """Expose the resolved storage topology for API/runtime truth endpoints."""
+def get_storage_topology(*, force_refresh: bool = False) -> dict:
+    """
+    Expose the resolved storage topology for API/runtime truth endpoints.
+
+    The underlying probe writes a small file to the active HDD root to confirm
+    writability. Caching prevents `/health` polling from repeatedly waking or
+    stalling the storage device every few seconds.
+    """
+    now = time.monotonic()
+    if not force_refresh:
+        with _storage_topology_cache_lock:
+            cached = _storage_topology_cache["value"]
+            cached_at = float(_storage_topology_cache["checked_at"] or 0.0)
+            if isinstance(cached, dict) and (now - cached_at) < STORAGE_TOPOLOGY_CACHE_SECONDS:
+                return dict(cached)
+
     _, topology = resolve_hdd_root()
-    return topology
+
+    with _storage_topology_cache_lock:
+        _storage_topology_cache["checked_at"] = now
+        _storage_topology_cache["value"] = dict(topology)
+
+    return dict(topology)
 
 
 def _active_hdd_root() -> Path:
