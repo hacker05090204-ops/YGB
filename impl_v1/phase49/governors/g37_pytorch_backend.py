@@ -88,8 +88,8 @@ class EpochMetrics:
     epoch: int
     train_loss: float
     train_accuracy: float
-    val_loss: float
-    val_accuracy: float
+    val_loss: Optional[float] = None
+    val_accuracy: Optional[float] = None
     learning_rate: float
     time_seconds: float
 
@@ -100,7 +100,7 @@ class ModelCheckpoint:
     checkpoint_id: str
     epoch: int
     train_accuracy: float
-    val_accuracy: float
+    val_accuracy: Optional[float] = None
     model_hash: str
     created_at: str
     path: str
@@ -332,8 +332,8 @@ def train_single_epoch(
         epoch=epoch,
         train_loss=total_loss,
         train_accuracy=correct / total if total > 0 else 0.0,
-        val_loss=total_loss * 1.1,  # Proxy
-        val_accuracy=(correct / total) * 0.95 if total > 0 else 0.0,
+        val_loss=None,  # Real holdout validation is done in auto_trainer.py
+        val_accuracy=None,  # Real holdout accuracy is done in auto_trainer.py
         learning_rate=optimizer.param_groups[0]['lr'],
         time_seconds=elapsed,
     )
@@ -428,7 +428,7 @@ def load_model_checkpoint(
         checkpoint_id=_generate_id("CKPT"),
         epoch=checkpoint['epoch'],
         train_accuracy=checkpoint['accuracy'],
-        val_accuracy=checkpoint['accuracy'] * 0.95,
+        val_accuracy=checkpoint.get('holdout_accuracy'),  # Real holdout, not fabricated
         model_hash=_hash_content(f"{config.seed}:{checkpoint['epoch']}"),
         created_at=_now_iso(),
         path=path,
