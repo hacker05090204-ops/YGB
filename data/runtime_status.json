@@ -6,10 +6,10 @@
   "drift_alert": false,
   "freeze_reason": "",
   "freeze_valid": true,
-  "gpu_utilization": 35.0,
+  "gpu_utilization": 69.0,
   "merge_status": null,
-  "precision_breach": false,
-  "training_velocity_batches_sec": 80.14402609986139,
-  "training_velocity_samples_hr": 297404863.57345366,
-  "updated_at": "2026-03-12T18:57:30.433787+00:00"
+  "precision_breach": true,
+  "training_velocity_batches_sec": 55.92475212711221,
+  "training_velocity_samples_hr": 207530044.17345816,
+  "updated_at": "2026-03-12T19:10:28.781186+00:00"
 }
