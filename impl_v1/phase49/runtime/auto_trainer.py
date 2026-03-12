@@ -922,7 +922,7 @@ class AutoTrainer:
                 input_dim=256,
                 output_dim=2,
                 hidden_dims=(512, 256, 128),
-                dropout=0.3,
+                dropout=0.4,
                 learning_rate=0.001,
                 batch_size=1024,
                 epochs=1,
@@ -934,13 +934,13 @@ class AutoTrainer:
             self._gpu_model = self._gpu_model.to(self._gpu_device)
             
             # Create optimizer and criterion (PERSISTENT)
-            self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate)
+            self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate, weight_decay=1e-4)
             self._gpu_criterion = nn.CrossEntropyLoss()
             
-            # LR scheduler — reduce LR when loss plateaus
-            self._gpu_scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-                self._gpu_optimizer, mode='min', factor=0.5, patience=10,
-                min_lr=1e-6, verbose=False,
+            # LR scheduler — cosine annealing with warm restarts (24/7 mode)
+            # T_0=50: full cosine cycle every 50 epochs, T_mult=1: same length each restart
+            self._gpu_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+                self._gpu_optimizer, T_0=50, T_mult=1, eta_min=1e-6,
             )
             
             # === REAL DATA PIPELINE (NO SYNTHETIC DATA) ===
@@ -1322,10 +1322,10 @@ class AutoTrainer:
             # Use holdout accuracy as the real accuracy metric
             accuracy = holdout_accuracy
             
-            # Step LR scheduler based on loss
+            # Step LR scheduler (cosine annealing — no loss arg needed)
             current_lr = self._gpu_optimizer.param_groups[0]['lr']
             if hasattr(self, '_gpu_scheduler') and self._gpu_scheduler is not None:
-                self._gpu_scheduler.step(avg_loss)
+                self._gpu_scheduler.step()
                 current_lr = self._gpu_optimizer.param_groups[0]['lr']
             
             # === CURRICULUM STAGE UPDATE ===
