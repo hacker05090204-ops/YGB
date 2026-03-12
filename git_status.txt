@@ -1,0 +1,54 @@
+﻿ M .env.example
+ M .github/workflows/coverage-gate.yml
+ M api/reports/g38_training/learned_features.json
+ M api/reports/g38_training/not_learned_yet.txt
+ M api/reports/g38_training/training_summary.txt
+ M api/server.py
+ M api/voice_gateway.py
+ M api/voice_routes.py
+ M backend/api/admin_auth.py
+ M backend/api/report_generator.py
+ M backend/auth/auth_guard.py
+ M backend/storage/storage_bridge.py
+ M backend/storage/tiered_storage.py
+ M backend/tests/test_auth_guard_role_hydration.py
+ M backend/tests/test_websocket_auth.py
+ M backend/training/runtime_artifacts.py
+ M backend/training/state_manager.py
+ M backend/training/tests/test_training_progress_endpoint.py
+ M data/runtime_status.json
+ M frontend/app/control/page.tsx
+ M frontend/app/login/page.tsx
+ M frontend/components/auth-guard.tsx
+ M impl_v1/phase49/runtime/auto_trainer.py
+ M impl_v1/phase49/tests/test_auto_trainer.py
+ M impl_v1/training/data/real_dataset_loader.py
+ M impl_v1/training/data/tests/test_real_dataset_pipeline.py
+ M secure_data/dataset_manifest.json
+ M start_full_stack.ps1
+ M training_controller.py
+?? FULL_AUDIT_REPORT.md
+?? backend/api/api_v2_contract.py
+?? backend/api/system_status.py
+?? backend/observability/metrics.py
+?? backend/reliability/
+?? backend/tests/test_api_v2_contract.py
+?? backend/tests/test_e2e_audit.py
+?? backend/tests/test_observability.py
+?? backend/tests/test_reliability.py
+?? backend/tests/test_security_regression_guards.py
+?? backend/tests/test_system_status.py
+?? backend/tests/test_wiring_audit.py
+?? frontend/__tests__/null-safe-contract.test.ts
+?? frontend/__tests__/post-login-redirect.test.ts
+?? frontend/hooks/use-backend-status.ts
+?? frontend/lib/post-login-redirect.ts
+?? git_status.txt
+?? impl_v1/phase49/runtime/telegram_notifier.py
+?? impl_v1/phase49/tests/test_telegram_notifier.py
+?? scripts/reliability_gate.py
+?? scripts/security_regression_scan.py
+?? test_broader_output.txt
+?? test_status_output.txt
+?? test_wiring_output.txt
+?? test_wiring_result.log

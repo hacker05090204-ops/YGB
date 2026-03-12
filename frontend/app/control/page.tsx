@@ -890,64 +890,64 @@ function ControlPageContent() {
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Epochs</p>
                                         <p className="text-lg font-bold text-violet-400">
-                                            {runtimeStatus.runtime.completed_epochs}/{runtimeStatus.runtime.total_epochs}
+                                            {runtimeStatus.runtime.completed_epochs ?? 0}/{runtimeStatus.runtime.total_epochs ?? 0}
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Progress</p>
                                         <p className="text-lg font-bold text-blue-400">
-                                            {runtimeStatus.runtime.progress_pct.toFixed(1)}%
+                                            {(runtimeStatus.runtime.progress_pct ?? 0).toFixed(1)}%
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Loss</p>
                                         <p className="text-lg font-bold text-amber-400">
-                                            {runtimeStatus.runtime.current_loss.toFixed(4)}
-                                            <span className={cn("text-xs ml-1", runtimeStatus.runtime.loss_trend < 0 ? "text-emerald-400" : "text-red-400")}>
-                                                {runtimeStatus.runtime.loss_trend < 0 ? "↓" : "↑"}
+                                            {(runtimeStatus.runtime.current_loss ?? 0).toFixed(4)}
+                                            <span className={cn("text-xs ml-1", (runtimeStatus.runtime.loss_trend ?? 0) < 0 ? "text-emerald-400" : "text-red-400")}>
+                                                {(runtimeStatus.runtime.loss_trend ?? 0) < 0 ? "↓" : "↑"}
                                             </span>
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Precision</p>
                                         <p className="text-lg font-bold text-emerald-400">
-                                            {(runtimeStatus.runtime.precision * 100).toFixed(1)}%
+                                            {((runtimeStatus.runtime.precision ?? 0) * 100).toFixed(1)}%
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">ECE</p>
                                         <p className="text-lg font-bold text-cyan-400">
-                                            {runtimeStatus.runtime.ece.toFixed(4)}
+                                            {(runtimeStatus.runtime.ece ?? 0).toFixed(4)}
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Drift KL</p>
                                         <p className="text-lg font-bold text-purple-400">
-                                            {runtimeStatus.runtime.drift_kl.toFixed(4)}
+                                            {(runtimeStatus.runtime.drift_kl ?? 0).toFixed(4)}
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">GPU Util</p>
                                         <p className="text-lg font-bold text-orange-400">
-                                            {runtimeStatus.runtime.gpu_util.toFixed(0)}%
+                                            {(runtimeStatus.runtime.gpu_util ?? 0).toFixed(0)}%
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">CPU Util</p>
                                         <p className="text-lg font-bold text-sky-400">
-                                            {runtimeStatus.runtime.cpu_util.toFixed(0)}%
+                                            {(runtimeStatus.runtime.cpu_util ?? 0).toFixed(0)}%
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Temp</p>
-                                        <p className={cn("text-lg font-bold", runtimeStatus.runtime.temperature > 85 ? "text-red-400" : "text-emerald-400")}>
-                                            {runtimeStatus.runtime.temperature.toFixed(0)}°C
+                                        <p className={cn("text-lg font-bold", (runtimeStatus.runtime.temperature ?? 0) > 85 ? "text-red-400" : "text-emerald-400")}>
+                                            {(runtimeStatus.runtime.temperature ?? 0).toFixed(0)}°C
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dup Rate</p>
                                         <p className="text-lg font-bold text-pink-400">
-                                            {(runtimeStatus.runtime.duplicate_rate * 100).toFixed(1)}%
+                                            {((runtimeStatus.runtime.duplicate_rate ?? 0) * 100).toFixed(1)}%
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
@@ -968,19 +968,19 @@ function ControlPageContent() {
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Epochs Done</p>
                                         <p className="text-lg font-bold text-violet-400">
-                                            {runtimeStatus.runtime.completed_epochs}
+                                            {runtimeStatus.runtime.completed_epochs ?? 0}
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Last Accuracy</p>
                                         <p className="text-lg font-bold text-emerald-400">
-                                            {(runtimeStatus.runtime.precision * 100).toFixed(1)}%
+                                            {((runtimeStatus.runtime.precision ?? 0) * 100).toFixed(1)}%
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
                                         <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Last Loss</p>
                                         <p className="text-lg font-bold text-amber-400">
-                                            {runtimeStatus.runtime.current_loss.toFixed(6)}
+                                            {(runtimeStatus.runtime.current_loss ?? 0).toFixed(6)}
                                         </p>
                                     </div>
                                     <div className="p-3 rounded-xl bg-background/50 border border-border/30">
