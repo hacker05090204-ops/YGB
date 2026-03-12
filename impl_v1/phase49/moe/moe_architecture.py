@@ -957,7 +957,7 @@ def run_smoke_test() -> Dict[str, Any]:
     print(f"   Expert budget: {budget}/{config.n_experts}")
 
     print("\n" + "=" * 70)
-    print("✅ All smoke tests passed!")
+    print("[OK] All smoke tests passed!")
     print("=" * 70)
 
     return {
