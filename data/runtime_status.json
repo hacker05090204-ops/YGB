@@ -1,15 +1,15 @@
 {
   "containment_active": false,
-  "containment_reason": "",
-  "data_freshness": "fresh",
+  "containment_reason": null,
+  "data_freshness": "idle",
   "determinism_pass": true,
   "drift_alert": false,
-  "freeze_reason": "",
+  "freeze_reason": null,
   "freeze_valid": true,
-  "gpu_utilization": null,
+  "gpu_utilization": 24.0,
   "merge_status": null,
   "precision_breach": false,
-  "training_velocity_batches_sec": 55.55765159437953,
-  "training_velocity_samples_hr": 206178687.651046,
-  "updated_at": "2026-03-12T10:17:45.171229+00:00"
+  "training_velocity_batches_sec": null,
+  "training_velocity_samples_hr": null,
+  "updated_at": "2026-03-12T12:43:27.352712+00:00"
 }

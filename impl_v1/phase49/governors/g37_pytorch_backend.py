@@ -88,10 +88,10 @@ class EpochMetrics:
     epoch: int
     train_loss: float
     train_accuracy: float
-    val_loss: Optional[float] = None
-    val_accuracy: Optional[float] = None
     learning_rate: float
     time_seconds: float
+    val_loss: Optional[float] = None
+    val_accuracy: Optional[float] = None
 
 
 @dataclass(frozen=True)
@@ -100,10 +100,10 @@ class ModelCheckpoint:
     checkpoint_id: str
     epoch: int
     train_accuracy: float
-    val_accuracy: Optional[float] = None
     model_hash: str
     created_at: str
     path: str
+    val_accuracy: Optional[float] = None
 
 
 @dataclass(frozen=True)
