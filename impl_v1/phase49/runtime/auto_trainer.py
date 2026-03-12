@@ -1391,13 +1391,22 @@ class AutoTrainer:
                         loss=avg_loss,
                         real_samples_processed=self._real_samples_processed,
                     )
-                    _checkpoint_executor.submit(
+                    future = _checkpoint_executor.submit(
                         self._save_checkpoint_bundle,
                         self._checkpoint_path,
                         self._checkpoint_meta_path,
                         model_state,
                         checkpoint_meta,
                     )
+                    def _on_checkpoint_done(f, path=self._checkpoint_path):
+                        exc = f.exception()
+                        if exc:
+                            logger.error(f"Async checkpoint save FAILED for {path}: {exc}")
+                        else:
+                            logger.info(f"Checkpoint saved: {path}")
+                            if self._current_session:
+                                self._current_session.checkpoints_saved += 1
+                    future.add_done_callback(_on_checkpoint_done)
                 except Exception as e:
                     logger.warning(f"Checkpoint save failed: {e}")
             
