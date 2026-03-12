@@ -391,7 +391,16 @@ async def lifespan(app):
 
     # Start G38 auto-training scheduler only when explicitly enabled.
     if G38_AVAILABLE and _ENABLE_G38_AUTO_TRAINING:
-        start_auto_training()
+        start_auto_training()  # Starts background monitor
+        # Enable 24/7 continuous training (infinite epochs)
+        try:
+            result = start_continuous_training(0)
+            if result.get("started"):
+                print("[*] G38 24/7 continuous training STARTED")
+            else:
+                print(f"[*] G38 continuous training deferred: {result.get('reason', 'unknown')}")
+        except Exception as e:
+            logger.warning(f"[BOOT] G38 continuous training start failed: {e}")
         g38_started = True
         print("[*] G38 auto-training started")
 
