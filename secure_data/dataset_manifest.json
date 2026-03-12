@@ -1,30 +1,30 @@
 {
-  "total_samples": 334358,
-  "verified_samples": 334358,
+  "total_samples": 341438,
+  "verified_samples": 341438,
   "per_field_counts": {
-    "endpoint": 3539,
-    "parameters": 3539,
-    "exploit_vector": 3539,
-    "impact": 3539,
-    "source_tag": 3539,
-    "reliability": 3539
+    "endpoint": 3540,
+    "parameters": 3540,
+    "exploit_vector": 3540,
+    "impact": 3540,
+    "source_tag": 3540,
+    "reliability": 3540
   },
   "source_mix": {
     "NVD API v2": 2000,
-    "CISA KEV Catalog": 1539
+    "CISA KEV Catalog": 1540
   },
   "strict_real_mode": true,
-  "updated_at": "2026-03-11T02:53:28.927750+00:00",
-  "ingestion_manifest_hash": "e9402e71b0c87e57",
+  "updated_at": "2026-03-12T04:45:09.524430+00:00",
+  "ingestion_manifest_hash": "bc3cfb56c0a0a327",
   "worker_stats": {
-    "total_ingested": 3539,
+    "total_ingested": 3540,
     "total_dropped": 0,
     "total_deduped": 0
   },
-  "sample_count": 334358,
-  "dataset_hash": "e9402e71b0c87e57",
+  "sample_count": 341438,
+  "dataset_hash": "bc3cfb56c0a0a327",
   "signed_by": "1b7d03627cd17c222be30b483cd6404921e4cd3f91c4f508b10d4e53a3ceb680",
   "version": "1.0",
-  "created_at": "2026-03-11T02:53:28.927750+00:00",
-  "signature_hash": "2b2fbdb88bcb9a4696d7d5f0ee919226974801321410172473bb5bc639828964"
+  "created_at": "2026-03-12T04:45:09.524430+00:00",
+  "signature_hash": "61ebca06a7f0d0a2f7bfdfa9e1090f7b27ebf25a1d4b71b57e6819c8f262dff1"
 }
