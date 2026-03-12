@@ -450,7 +450,6 @@ class TrainingResult:
     loss_final: float
     accuracy_estimate: float
     gpu_time_seconds: float
-    is_mock: bool  # True = mock, False = real C++ GPU
 
 
 def _create_training_config(
@@ -530,36 +529,20 @@ def prepare_training_batch(
         batch_hash=batch_hash,
     )
 
-
 def simulate_gpu_training(
     batch: TrainingBatch,
     config: GPUTrainingConfig,
     mode: TrainingMode,
 ) -> TrainingResult:
     """
-    GPU training stub — BLOCKED in production.
+    BLOCKED — real training uses g37_pytorch_backend.py.
 
-    Real training runs through g37_pytorch_backend.py or the C++ GPU kernel.
-    This function exists only for interface compatibility and MUST NOT
-    return fabricated results in strict mode.
+    This stub exists only for interface compatibility. It always
+    raises RuntimeError in production to prevent accidental use.
     """
-    import os
-    if os.environ.get("YGB_ALLOW_MOCK_TRAINING") != "1":
-        raise RuntimeError(
-            "BLOCKED: simulate_gpu_training() is a mock stub. "
-            "Real training must use g37_pytorch_backend or C++ GPU kernel. "
-            "Set YGB_ALLOW_MOCK_TRAINING=1 to override for testing only."
-        )
-
-    # TEST-ONLY fallback — never reached in production
-    return TrainingResult(
-        result_id=_generate_id("TRR"),
-        mode=mode,
-        epochs_completed=0,
-        loss_final=float('inf'),
-        accuracy_estimate=0.0,
-        gpu_time_seconds=0.0,
-        is_mock=True,
+    raise RuntimeError(
+        "BLOCKED: simulate_gpu_training() is retired. "
+        "Real training runs through g37_pytorch_backend or the C++ GPU kernel."
     )
 
 

@@ -1550,24 +1550,30 @@ class AutoTrainer:
             ds_total = self._gpu_dataset_stats.get('train', {}).get('total', 0) if self._gpu_dataset_stats else 0
             self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
             
-            # === MODE_A EARLY STOPPING CHECK ===
+            # === MODE_A EARLY STOPPING → AUTO-RESTART (24/7) ===
             if accuracy > self._best_accuracy:
                 self._best_accuracy = accuracy
                 self._no_improvement_count = 0
             else:
                 self._no_improvement_count += 1
             
-            early_stopped = False
             if (self._best_accuracy >= self._early_stop_baseline
                     and self._no_improvement_count >= self._early_stop_patience):
-                early_stopped = True
                 self._emit_event(
-                    "EARLY_STOP",
-                    f"MODE_A early stop: accuracy={self._best_accuracy:.2%} "
+                    "MODE_A_CYCLE_COMPLETE",
+                    f"MODE_A cycle complete: accuracy={self._best_accuracy:.2%} "
                     f"(>={self._early_stop_baseline:.0%}), no improvement for "
-                    f"{self._no_improvement_count} epochs. Certification in MODE_C.",
+                    f"{self._no_improvement_count} epochs. "
+                    f"Resetting counters for new cycle.",
                     epoch=self._epoch,
                     gpu_used=True,
+                )
+                # Reset counters — training continues in 24/7 mode
+                self._best_accuracy = 0.0
+                self._no_improvement_count = 0
+                logger.info(
+                    "[MODE_A] Cycle complete — resetting early stop counters "
+                    "for new learning cycle (24/7 continuous mode)"
                 )
             
             # Save checkpoint
@@ -1587,10 +1593,6 @@ class AutoTrainer:
             )
             
             self._persist_runtime_artifacts(epoch_elapsed_seconds=_step_elapsed)
-
-            # If early stopped, return False to signal training session should end
-            if early_stopped:
-                return False
             
             return True
             
