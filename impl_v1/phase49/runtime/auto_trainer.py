@@ -922,7 +922,7 @@ class AutoTrainer:
                 input_dim=256,
                 output_dim=2,
                 hidden_dims=(512, 256, 128),
-                dropout=0.4,
+                dropout=0.3,
                 learning_rate=0.001,
                 batch_size=1024,
                 epochs=1,
@@ -934,7 +934,7 @@ class AutoTrainer:
             self._gpu_model = self._gpu_model.to(self._gpu_device)
             
             # Create optimizer and criterion (PERSISTENT)
-            self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate, weight_decay=1e-4)
+            self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate, weight_decay=1e-5)
             self._gpu_criterion = nn.CrossEntropyLoss()
             
             # LR scheduler — cosine annealing with warm restarts (24/7 mode)
