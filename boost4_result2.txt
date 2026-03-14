@@ -1,0 +1,11 @@
+﻿..........................F..............................                [100%]
+================================== FAILURES ===================================
+____________ TestAdminAuthLogin.test_login_bad_totp_until_lockout _____________
+backend\tests\test_coverage_boost4.py:258: in test_login_bad_totp_until_lockout
+    self.assertEqual(result['status'], 'locked_out')
+E   AssertionError: 'denied' != 'locked_out'
+E   - denied
+E   + locked_out
+=========================== short test summary info ===========================
+FAILED backend/tests/test_coverage_boost4.py::TestAdminAuthLogin::test_login_bad_totp_until_lockout
+1 failed, 56 passed in 0.75s

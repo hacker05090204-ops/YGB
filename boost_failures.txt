@@ -1,0 +1,33 @@
+﻿........................................................................ [ 63%]
+............................FFFFF....F...                                [100%]
+================================== FAILURES ===================================
+E   AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'metrics_registry'
+C:\Program Files\Python311\Lib\unittest\mock.py:1419: AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'metrics_registry'
+E   AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'run_all_checks'
+C:\Program Files\Python311\Lib\unittest\mock.py:1419: AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'run_all_checks'
+E   AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'get_storage_health'
+C:\Program Files\Python311\Lib\unittest\mock.py:1419: AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'get_storage_health'
+E   AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'get_training_state_manager'
+C:\Program Files\Python311\Lib\unittest\mock.py:1419: AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'get_training_state_manager'
+E   AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'build_voice_pipeline_status'
+C:\Program Files\Python311\Lib\unittest\mock.py:1419: AttributeError: <module 'backend.api.system_status' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\system_status.py'> does not have the attribute 'build_voice_pipeline_status'
+E   AssertionError: <sqlite3.Connection object at 0x0000014CE5860220> is not None
+C:\Program Files\Python311\Lib\unittest\case.py:703: AssertionError: <sqlite3.Connection object at 0x0000014CE5860220> is not None
+============================== warnings summary ===============================
+backend/tests/test_coverage_boost.py::TestAuthServerHelpers::test_load_json_file_missing
+  C:\Users\Unkno\YGB\backend\tests\test_coverage_boost.py:39: DeprecationWarning: auth_server.py is deprecated and unmounted. Use backend/auth/auth.py and auth_guard.py instead.
+    from backend.api.auth_server import load_json
+
+backend/tests/test_coverage_boost.py::TestReportGeneratorDB::test_ensure_tables_already_created
+  C:\Users\Unkno\YGB\backend\auth\auth_guard.py:32: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
+    from backend.auth.auth import verify_jwt, verify_csrf_token
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend/tests/test_coverage_boost.py::TestSystemStatus::test_get_metrics_snapshot
+FAILED backend/tests/test_coverage_boost.py::TestSystemStatus::test_get_readiness
+FAILED backend/tests/test_coverage_boost.py::TestSystemStatus::test_get_storage_health
+FAILED backend/tests/test_coverage_boost.py::TestSystemStatus::test_get_training_state
+FAILED backend/tests/test_coverage_boost.py::TestSystemStatus::test_get_voice_status
+FAILED backend/tests/test_coverage_boost.py::TestReportGeneratorDB::test_get_db_connection_failure
+6 failed, 107 passed, 2 warnings in 5.35s

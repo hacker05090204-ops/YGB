@@ -1,0 +1,12 @@
+TOTAL: 84.6% (3842/4542)
+Lines to 85%: 18
+   28%  miss=174  backend\api\report_generator.py
+   77%  miss= 73  backend\api\field_progression_api.py
+   82%  miss= 52  backend\api\admin_auth.py
+   81%  miss= 46  backend\api\auth_server.py
+   79%  miss= 44  backend\auth\auth_guard.py
+   69%  miss= 44  backend\auth\revocation_store.py
+   86%  miss= 38  backend\governance\host_action_governor.py
+   77%  miss= 37  backend\approval\report_orchestrator.py
+   85%  miss= 31  backend\api\runtime_api.py
+   84%  miss= 25  backend\governance\device_authority.py

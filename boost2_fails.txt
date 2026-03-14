@@ -1,0 +1,27 @@
+..............................F.F..............................          [100%]
+================================== FAILURES ===================================
+______________ TestRuntimeApiHelpers.test_load_hmac_key_from_env ______________
+backend\tests\test_coverage_boost2.py:338: in test_load_hmac_key_from_env
+    self.assertEqual(key, b"abcdef")  # treated as UTF-8 since not valid hex
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: b'\xab\xcd\xef' != b'abcdef'
+___________ TestRuntimeApiHelpers.test_load_hmac_key_no_env_no_file ___________
+backend\tests\test_coverage_boost2.py:349: in test_load_hmac_key_no_env_no_file
+    with self.assertRaises(RuntimeError):
+E   AssertionError: RuntimeError not raised
+============================== warnings summary ===============================
+backend/tests/test_coverage_boost2.py::TestReportGeneratorHelpers2::test_ensure_tables_db_error
+  C:\Users\Unkno\YGB\backend\auth\auth_guard.py:32: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
+    from backend.auth.auth import verify_jwt, verify_csrf_token
+
+backend/tests/test_coverage_boost2.py::TestAuthServerLoginEndpoint::test_login_bad_password
+  C:\Users\Unkno\YGB\backend\tests\test_coverage_boost2.py:584: DeprecationWarning: auth_server.py is deprecated and unmounted. Use backend/auth/auth.py and auth_guard.py instead.
+    from backend.api.auth_server import login, LoginRequest
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend/tests/test_coverage_boost2.py::TestRuntimeApiHelpers::test_load_hmac_key_from_env
+FAILED backend/tests/test_coverage_boost2.py::TestRuntimeApiHelpers::test_load_hmac_key_no_env_no_file
+2 failed, 61 passed, 2 warnings in 2.75s
+
+---

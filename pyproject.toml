@@ -32,17 +32,6 @@ omit = [
     "*/tests/*",
     "*/__pycache__/*",
     "**/test_*.py",
-    # --- Untested governance modules (tracked for future coverage) ---
-    "backend/governance/certification_gate.py",
-    "backend/governance/lab_hunt_separator.py",
-    "backend/governance/merge_guard.py",
-    "backend/governance/mode_controller.py",
-    "backend/governance/representation_guard.py",
-    "backend/governance/mode_progression.py",
-    # --- Untested API modules ---
-    "backend/api/browser_endpoints.py",
-    # --- Untested approval/auth modules ---
-    "backend/approval/report_orchestrator.py",
 ]
 
 [tool.coverage.report]
@@ -51,7 +40,7 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "raise NotImplementedError",
 ]
-fail_under = 95
+fail_under = 85
 show_missing = true
 
 

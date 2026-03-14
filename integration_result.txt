@@ -1,0 +1,25 @@
+﻿...........................F..F....                                      [100%]
+================================== FAILURES ===================================
+_________ TestRuntimeApiRealCrypto.test_validate_telemetry_real_file __________
+backend\tests\test_integration_real_data.py:741: in test_validate_telemetry_real_file
+    with patch('backend.api.runtime_api.TELEMETRY_FILE', telemetry_path):
+C:\Program Files\Python311\Lib\unittest\mock.py:1446: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+C:\Program Files\Python311\Lib\unittest\mock.py:1419: in get_original
+    raise AttributeError(
+E   AttributeError: <module 'backend.api.runtime_api' from 'C:\\Users\\Unkno\\YGB\\backend\\api\\runtime_api.py'> does not have the attribute 'TELEMETRY_FILE'
+_________ TestFieldProgressionRealFiles.test_field_advancement_chain __________
+backend\tests\test_integration_real_data.py:811: in test_field_advancement_chain
+    self.assertTrue(f["active"])
+E   AssertionError: False is not true
+============================== warnings summary ===============================
+backend/tests/test_integration_real_data.py::TestReportGeneratorRealDB::test_create_report_real_db
+  C:\Users\Unkno\YGB\backend\auth\auth_guard.py:32: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
+    from backend.auth.auth import verify_jwt, verify_csrf_token
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend/tests/test_integration_real_data.py::TestRuntimeApiRealCrypto::test_validate_telemetry_real_file
+FAILED backend/tests/test_integration_real_data.py::TestFieldProgressionRealFiles::test_field_advancement_chain
+2 failed, 33 passed, 1 warning in 5.05s

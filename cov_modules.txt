@@ -1,0 +1,111 @@
+﻿..............................FFFFF..................................... [  4%]
+........................................................................ [  9%]
+........................................................................ [ 14%]
+........................................................................ [ 19%]
+........................................................................ [ 24%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 39%]
+........................................................................ [ 43%]
+........................................................................ [ 48%]
+........................................................................ [ 53%]
+......................................ss.s.............................. [ 58%]
+........................................................................ [ 63%]
+..............................F......................................... [ 68%]
+................F...................................................F... [ 73%]
+......................................................F................. [ 78%]
+....................................................F................... [ 83%]
+........................................................................ [ 87%]
+.............................................................FFFFFFFFF.. [ 92%]
+.....................FFF..............FFFFF............................. [ 97%]
+....................F............
+ERROR: Coverage failure: total of 73 is less than fail-under=85
+                                                                         [100%]
+============================== warnings summary ===============================
+backend\auth\auth_guard.py:32
+  C:\Users\Unkno\YGB\backend\auth\auth_guard.py:32: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
+    from backend.auth.auth import verify_jwt, verify_csrf_token
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.11.9-final-0 _______________
+
+Name                                            Stmts   Miss  Cover   Missing
+-----------------------------------------------------------------------------
+backend\api\__init__.py                             0      0   100%
+backend\api\admin_auth.py                         290    243    16%   60, 69-75, 85-100, 113-118, 123-125, 130-139, 144-167, 172-175, 184-201, 206-232, 237-239, 253-258, 263-285, 290-322, 331-338, 343-370, 375-381, 391-397, 402-404, 409-432, 443-444, 457-513, 524-530, 545-586, 595-622
+backend\api\api_v2_contract.py                     52      4    92%   104-106, 182
+backend\api\auth_server.py                        246    246     0%   17-482
+backend\api\browser_endpoints.py                   64     17    73%   50, 174-193
+backend\api\db_safety.py                           26      2    92%   34-35
+backend\api\exceptions.py                          38      1    97%   51
+backend\api\fido2_auth.py                         115    115     0%   13-290
+backend\api\field_progression_api.py              323     62    81%   130-131, 311-312, 344-347, 360, 405, 426, 428, 435, 439-440, 468-470, 480, 484-491, 637, 668, 677, 687, 703-705, 717, 753, 763, 776-802, 823-848
+backend\api\report_generator.py                   243    182    25%   47-49, 73, 77-78, 118-119, 143-206, 212-239, 245-288, 298-344, 359-410, 416-466, 481-520
+backend\api\runtime_api.py                        213     56    74%   74-81, 147-159, 170, 185, 243-245, 344-345, 354-355, 361-363, 429, 459-461, 477, 493-501, 510-536
+backend\api\runtime_state.py                       34      0   100%
+backend\api\system_status.py                       48     18    62%   59-61, 80-82, 92-112
+backend\api\training_progress.py                   50      7    86%   88-89, 113-118
+backend\api\vault_session.py                       44     12    73%   43-44, 93-119
+backend\approval\__init__.py                        0      0   100%
+backend\approval\report_orchestrator.py           160     37    77%   132-135, 143, 156-158, 207-259
+backend\auth\__init__.py                            0      0   100%
+backend\auth\auth.py                              143     22    85%   67-71, 82-86, 106, 112-113, 117-128, 134
+backend\auth\auth_guard.py                        212     52    75%   113-130, 199-200, 220, 259-295, 315, 383, 385, 433-435, 465, 470-477
+backend\auth\geoip.py                              69      8    88%   61-66, 69, 108
+backend\auth\ownership.py                          23      0   100%
+backend\auth\revocation_store.py                  141     44    69%   87-88, 116-130, 133, 136, 139-145, 148-151, 154-157, 161-164, 168-171, 175-177, 194-195, 220-221
+backend\governance\__init__.py                      0      0   100%
+backend\governance\approval_ledger.py             238     11    95%   75-82, 110-114, 353
+backend\governance\audit_archive.py                72      4    94%   61-62, 77-78
+backend\governance\authority_lock.py               24      0   100%
+backend\governance\auto_mode_controller.py         91      0   100%
+backend\governance\automation_enforcer.py          89      0   100%
+backend\governance\certification_gate.py           57      0   100%
+backend\governance\clock_guard.py                  61      0   100%
+backend\governance\device_authority.py            156     25    84%   57-58, 82-83, 96, 109, 223-224, 241-242, 277-284, 293-305, 320, 328-329
+backend\governance\governance_policy_check.py      36      0   100%
+backend\governance\host_action_governor.py        267     38    86%   115-116, 216-224, 230, 234, 236, 238, 275, 368, 371, 377, 414, 423, 429, 488, 500, 531, 551-568, 579, 584, 590, 613
+backend\governance\incident_reconciler.py          87      3    97%   152, 173-174
+backend\governance\lab_hunt_separator.py           29      0   100%
+backend\governance\merge_guard.py                  30      0   100%
+backend\governance\mode_controller.py              65      2    97%   98-99
+backend\governance\mode_progression.py            144      2    99%   204-205
+backend\governance\report_draft_assistant.py       39      1    97%   51
+backend\governance\report_similarity.py            61      2    97%   126-127
+backend\governance\representation_guard.py        111      4    96%   207-211
+backend\integrity\__init__.py                       0      0   100%
+backend\integrity\integrity_bridge.py             351      2    99%   422-423
+-----------------------------------------------------------------------------
+TOTAL                                            4542   1222    73%
+FAIL Required test coverage of 85.0% not reached. Total coverage: 73.10%
+=========================== short test summary info ===========================
+FAILED backend/tests/test_auth_guard_role_hydration.py::test_require_auth_hydrates_role_from_storage
+FAILED backend/tests/test_auth_guard_role_hydration.py::test_require_auth_still_succeeds_when_role_lookup_fails
+FAILED backend/tests/test_auth_guard_role_hydration.py::test_require_auth_accepts_cookie_auth_on_safe_methods
+FAILED backend/tests/test_auth_guard_role_hydration.py::test_require_auth_rejects_cookie_auth_without_csrf
+FAILED backend/tests/test_auth_guard_role_hydration.py::test_require_auth_accepts_cookie_auth_with_valid_csrf
+FAILED backend/tests/test_p0_security.py::TestLogout::test_logout_endpoint_has_revocation
+FAILED backend/tests/test_production_readiness.py::TestGovernorClassification::test_non_runtime_governor_is_ci_tooling
+FAILED backend/tests/test_production_simulations.py::TestFrontendStateMismatch::test_no_runtime_file_returns_safe_defaults
+FAILED backend/tests/test_realtime_telemetry.py::TestAuthFetchCacheControl::test_auth_fetch_no_store
+FAILED backend/tests/test_runtime_api.py::TestGetRuntimeStatus::test_missing_file_returns_awaiting
+FAILED backend/tests/test_websocket_auth.py::TestWsAuthenticateUnit::test_accepts_cookie_auth
+FAILED backend/tests/test_websocket_auth.py::TestWsAuthenticateUnit::test_extracts_from_protocol_header
+FAILED backend/tests/test_websocket_auth.py::TestWsAuthenticateUnit::test_rejects_query_param_token
+FAILED backend/tests/test_websocket_auth.py::TestWsAuthenticateUnit::test_rejects_revoked_token
+FAILED backend/tests/test_websocket_auth.py::TestWsAuthenticateUnit::test_returns_none_invalid_token
+FAILED backend/tests/test_websocket_auth.py::TestWsAuthenticateUnit::test_returns_none_no_token
+FAILED backend/tests/test_websocket_auth.py::TestWsAuthenticateUnit::test_returns_payload_valid_token
+FAILED backend/tests/test_websocket_auth.py::TestDashboardFrameShape::test_auth_acceptance_for_dashboard
+FAILED backend/tests/test_websocket_auth.py::TestDashboardFrameShape::test_auth_rejection_returns_none
+FAILED tests/test_risk_fixes.py::TestOAuthCookieFlags::test_ygb_token_not_httponly_in_source
+FAILED tests/test_risk_fixes.py::TestOAuthRedirectURI::test_callback_also_uses_configured_redirect
+FAILED tests/test_risk_fixes.py::TestOAuthRedirectURI::test_configured_redirect_used
+FAILED tests/test_safetensors_migration.py::TestSafetensorsIO::test_save_load_roundtrip
+FAILED tests/test_safetensors_migration.py::TestSafetensorsIO::test_fp16_conversion
+FAILED tests/test_safetensors_migration.py::TestSafetensorsIO::test_checksum_verification
+FAILED tests/test_safetensors_migration.py::TestSafetensorsIO::test_atomic_write_no_partial_file
+FAILED tests/test_safetensors_migration.py::TestSafetensorsIO::test_file_not_found_raises
+FAILED tests/test_security_fixes.py::TestOAuthCookieBinding::test_cookie_deleted_on_all_code_paths
+28 failed, 1442 passed, 3 skipped, 1 warning in 40.33s

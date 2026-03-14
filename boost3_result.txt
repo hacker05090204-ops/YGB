@@ -1,0 +1,9 @@
+﻿........................................................................ [ 97%]
+..                                                                       [100%]
+============================== warnings summary ===============================
+backend/tests/test_coverage_boost3.py::TestAuthPasswordHashing::test_hash_password_returns_versioned
+  C:\Users\Unkno\YGB\backend\tests\test_coverage_boost3.py:27: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
+    from backend.auth.auth import hash_password
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+74 passed, 1 warning in 2.92s
