@@ -9,7 +9,7 @@
   "gpu_utilization": 28.0,
   "merge_status": null,
   "precision_breach": true,
-  "training_velocity_batches_sec": 23.139252293733858,
-  "training_velocity_samples_hr": 85866988.5517711,
-  "updated_at": "2026-03-13T21:01:36.403859+00:00"
+  "training_velocity_batches_sec": 36.86109172365186,
+  "training_velocity_samples_hr": 136787088.05546522,
+  "updated_at": "2026-03-14T17:55:50.928281+00:00"
 }

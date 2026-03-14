@@ -1,8 +1,0 @@
-﻿...................................                                      [100%]
-============================== warnings summary ===============================
-backend/tests/test_integration_real_data.py::TestReportGeneratorRealDB::test_create_report_real_db
-  C:\Users\Unkno\YGB\backend\auth\auth_guard.py:32: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
-    from backend.auth.auth import verify_jwt, verify_csrf_token
-
--- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-35 passed, 1 warning in 4.13s

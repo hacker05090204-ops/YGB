@@ -1,6 +1,0 @@
-﻿
-[FAIL] 20 violation(s) found:
-    "", "changeme", "secret", 
-"password", "jwt_secret",
-
-
