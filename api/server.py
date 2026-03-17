@@ -425,7 +425,7 @@ async def lifespan(app):
         logger.info("[SHUTDOWN] CVE scheduler stopped")
         print("CVE scheduler stopped")
     except Exception:
-        pass
+        logger.warning("[SHUTDOWN] CVE scheduler stop failed", exc_info=True)
 
     # Stop G38 auto-training
     if G38_AVAILABLE and g38_started:
@@ -1407,6 +1407,10 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
         "owner_id": user.get("sub", ""),
     }
     
+    # Signal scan active so auto-training yields
+    if G38_AVAILABLE:
+        set_scan_active(True)
+    
     return WorkflowStartResponse(
         workflow_id=workflow_id,
         status="started"
@@ -1444,10 +1448,11 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
         "owner_id": user.get("sub", ""),
     }
     
-    # Debug logging
-    print(f"🎯 NEW WORKFLOW: {report_id}")
-    print(f"   Target: {target}")
-    print(f"   Mode: {request.mode}")
+    # Signal scan active so auto-training yields
+    if G38_AVAILABLE:
+        set_scan_active(True)
+    
+    logger.info("NEW WORKFLOW: %s target=%s mode=%s", report_id, target, request.mode)
     
     return WorkflowStartResponse(
         workflow_id=report_id,
@@ -1608,7 +1613,7 @@ async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depend
 async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require_auth)):
     """Discover potential bug bounty targets from the database."""
     try:
-        targets = get_all_targets()
+        targets = get_all_targets() or []  # Defense-in-depth: guard against None
         candidates = []
         for t in targets:
             candidate = {
@@ -1701,6 +1706,10 @@ async def start_target_session(request: Request, user=Depends(require_auth)):
         "owner_id": user.get("sub", ""),
     }
 
+    # Signal scan active so auto-training yields
+    if G38_AVAILABLE:
+        set_scan_active(True)
+
     return {
         "started": True,
         "session_id": session_id,
@@ -1731,11 +1740,30 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
     session["status"] = "STOPPED"
     session["stopped_at"] = now
 
+    # Clear scan-active flag if no other sessions remain active
+    if G38_AVAILABLE:
+        still_active = any(
+            s["status"] == "ACTIVE" for s in target_sessions.values()
+        )
+        if not still_active:
+            set_scan_active(False)
+
+    # Compute real duration from timestamps
+    duration = 0
+    started_at = session.get("started_at")
+    if started_at:
+        try:
+            start_dt = datetime.fromisoformat(started_at)
+            stop_dt = datetime.fromisoformat(now)
+            duration = int((stop_dt - start_dt).total_seconds())
+        except (ValueError, TypeError):
+            pass
+
     return {
         "stopped": True,
         "session_id": session_id,
         "stopped_at": now,
-        "duration_seconds": 0  # Would compute real duration in production
+        "duration_seconds": duration
     }
 
 
@@ -5799,7 +5827,7 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
                 devices = get_user_devices(user["id"])
                 alert_multiple_devices(user_name, active_count, devices)
         except Exception:
-            pass
+            logger.warning("Device tracking/alerting failed for user %s", user.get("name"), exc_info=True)
 
         jwt_token = generate_jwt(
             user_id=user["id"],

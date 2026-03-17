@@ -156,9 +156,11 @@ def can_task_bypass_isolation() -> bool:
 
 def detect_gpu_availability() -> bool:
     """Detect if GPU is available for acceleration."""
-    # In production: check for CUDA, OpenCL, etc.
-    # Mock: return False (CPU fallback)
-    return False
+    try:
+        import torch
+        return torch.cuda.is_available()
+    except ImportError:
+        return False  # PyTorch not installed — CPU fallback
 
 
 def get_execution_backend() -> ExecutionBackend:
@@ -296,7 +298,7 @@ class ParallelTaskEngine:
         started_at = datetime.now(UTC)
         
         try:
-            # Mock task execution (READ-ONLY)
+            # Stub task execution (READ-ONLY) — real C++ backend pending
             result_data = self._run_task_logic(task)
             
             completed_at = datetime.now(UTC)
@@ -328,7 +330,7 @@ class ParallelTaskEngine:
             )
     
     def _run_task_logic(self, task: TaskSpec) -> Dict[str, Any]:
-        """Run task-specific logic (mock implementation)."""
+        """Run task-specific logic (stub — real execution deferred to C++ backend)."""
         # All operations are READ-ONLY
         if task.task_type == TaskType.DISCOVERY:
             return {

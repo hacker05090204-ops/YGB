@@ -15,7 +15,7 @@ from typing import List, Optional, Dict
 import uuid
 import hashlib
 import secrets
-from datetime import datetime, UTC
+from datetime import datetime, UTC, timedelta
 
 
 class DeviceTrustLevel(Enum):
@@ -128,7 +128,7 @@ def register_device(
             challenge_id=f"CHL-{uuid.uuid4().hex[:16].upper()}",
             device_id=device_id,
             password_hash=hash_password(password),
-            expires_at="2026-02-01T00:00:00Z",  # Mock expiry
+            expires_at=(datetime.now(UTC) + timedelta(hours=24)).isoformat(),
             status=VerificationStatus.PENDING,
             attempts=0,
             max_attempts=MAX_VERIFICATION_ATTEMPTS,

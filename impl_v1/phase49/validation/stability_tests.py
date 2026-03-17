@@ -154,7 +154,7 @@ class PerformanceBaseline:
     memory_per_scan_mb: float
     cpu_usage_percent: float
     gpu_usage_percent: float
-    report_generation_ms: float
+    report_generation_ms: Optional[float]
     timestamp: str
 
 
@@ -165,8 +165,8 @@ def measure_scan_performance(iterations: int = 10) -> Dict[str, float]:
     
     for _ in range(iterations):
         start = time.time()
-        # Simulate scan operation
-        time.sleep(0.01)  # Mock scan
+        # Placeholder scan timing — real scan function plugged in by caller
+        time.sleep(0.01)
         times.append((time.time() - start) * 1000)
     
     memory_after = get_memory_usage_mb()
@@ -187,8 +187,8 @@ def create_performance_baseline() -> PerformanceBaseline:
         scan_time_ms=scan_metrics["avg_scan_time_ms"],
         memory_per_scan_mb=scan_metrics["memory_per_scan_mb"],
         cpu_usage_percent=get_cpu_percent(),
-        gpu_usage_percent=0.0,  # Would measure actual GPU
-        report_generation_ms=50.0,  # Mock value
+        gpu_usage_percent=0.0,  # Requires real GPU query (nvidia-smi)
+        report_generation_ms=None,  # Measured when report generator is available
         timestamp=datetime.now().isoformat(),
     )
 
@@ -209,15 +209,16 @@ class GeneralizationResult:
 
 
 def test_generalization() -> GeneralizationResult:
-    """Test model generalization on unseen patterns."""
-    # These would be actual model evaluations
-    # Using mock values for framework demonstration
-    
+    """Test model generalization on unseen patterns.
+
+    Returns placeholder zeros when no real model is loaded.
+    Real model evaluation must be plugged in by the caller.
+    """
     return GeneralizationResult(
-        unseen_patterns_accuracy=0.92,
-        modified_payloads_accuracy=0.88,
-        obfuscated_accuracy=0.85,
-        unusual_encodings_accuracy=0.90,
-        robustness_score=0.89,
-        calibration_shift=0.03,
+        unseen_patterns_accuracy=0.0,
+        modified_payloads_accuracy=0.0,
+        obfuscated_accuracy=0.0,
+        unusual_encodings_accuracy=0.0,
+        robustness_score=0.0,
+        calibration_shift=0.0,
     )

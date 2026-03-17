@@ -60,13 +60,14 @@ class TestGpuDetection:
     """Test GPU detection."""
     
     def test_detect_gpu_availability(self):
-        """Detect GPU (mock returns False)."""
-        assert detect_gpu_availability() is False
+        """Detect GPU returns a bool (real CUDA detection)."""
+        result = detect_gpu_availability()
+        assert isinstance(result, bool)
     
     def test_get_execution_backend(self):
-        """Get backend (falls back to CPU)."""
+        """Get backend based on real GPU availability."""
         backend = get_execution_backend()
-        assert backend == ExecutionBackend.CPU
+        assert backend in (ExecutionBackend.CPU, ExecutionBackend.GPU)
 
 
 class TestTaskBuilders:
@@ -122,7 +123,7 @@ class TestParallelEngine:
         """Create parallel engine."""
         engine = create_parallel_engine()
         assert engine.max_workers == 4
-        assert engine.backend == ExecutionBackend.CPU
+        assert engine.backend in (ExecutionBackend.CPU, ExecutionBackend.GPU)
     
     def test_create_engine_custom_workers(self):
         """Create engine with custom workers."""

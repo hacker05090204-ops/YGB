@@ -32,6 +32,8 @@ import hashlib
 import json
 import math
 import os
+import subprocess
+import time
 import uuid
 import platform
 from datetime import datetime
@@ -234,15 +236,52 @@ class LinuxGPUBackend(GPUBackendInterface):
             return False, "PyTorch unavailable"
     
     def check_idle(self) -> int:
-        """Check idle time using /proc on Linux."""
-        # Mock implementation - real would read /proc/uptime
-        # Governance testing only
-        return 120  # Default idle
+        """Check idle time using real OS APIs on Linux."""
+        # Try xprintidle first (X11, most accurate)
+        try:
+            result = subprocess.run(
+                ["xprintidle"], capture_output=True, text=True, timeout=5,
+            )
+            if result.returncode == 0:
+                return int(result.stdout.strip()) // 1000
+        except (subprocess.SubprocessError, ValueError, FileNotFoundError):
+            pass
+        # Fallback: check /dev/input device timestamps
+        try:
+            from pathlib import Path
+            input_dir = Path("/dev/input")
+            if input_dir.exists():
+                latest = 0.0
+                for device in input_dir.iterdir():
+                    if device.name.startswith(("event", "mouse", "kbd")):
+                        try:
+                            mtime = device.stat().st_mtime
+                            if mtime > latest:
+                                latest = mtime
+                        except (OSError, PermissionError):
+                            continue
+                if latest > 0:
+                    return max(0, int(time.time() - latest))
+        except (OSError, PermissionError):
+            pass
+        return 0  # Safe default — prevents accidental training trigger
     
     def check_power(self) -> bool:
-        """Check power status on Linux."""
-        # Mock - real would check /sys/class/power_supply
-        return True
+        """Check power status on Linux via /sys/class/power_supply."""
+        try:
+            from pathlib import Path
+            power_dir = Path("/sys/class/power_supply")
+            if power_dir.exists():
+                for supply in power_dir.iterdir():
+                    online = supply / "online"
+                    if online.exists() and online.read_text().strip() == "1":
+                        return True
+                    type_file = supply / "type"
+                    if type_file.exists() and type_file.read_text().strip().lower() in ("mains", "ac"):
+                        return True
+            return True  # Desktop without battery
+        except (OSError, PermissionError):
+            return True
     
     def get_memory_mb(self) -> int:
         """Get GPU memory on Linux."""
@@ -278,13 +317,46 @@ class WindowsGPUBackend(GPUBackendInterface):
             return False, "PyTorch unavailable"
     
     def check_idle(self) -> int:
-        """Check idle time using Win32 APIs on Windows."""
-        # Mock implementation - real would use ctypes/GetLastInputInfo
-        return 120
+        """Check idle time using Win32 GetLastInputInfo."""
+        try:
+            import ctypes
+            from ctypes import Structure, c_uint, byref, sizeof
+
+            class LASTINPUTINFO(Structure):
+                _fields_ = [("cbSize", c_uint), ("dwTime", c_uint)]
+
+            lii = LASTINPUTINFO()
+            lii.cbSize = sizeof(LASTINPUTINFO)
+            if ctypes.windll.user32.GetLastInputInfo(byref(lii)):
+                idle_ms = ctypes.windll.kernel32.GetTickCount() - lii.dwTime
+                if idle_ms < 0:
+                    idle_ms += 0xFFFFFFFF + 1
+                return idle_ms // 1000
+        except (ImportError, AttributeError, OSError):
+            pass
+        return 0  # Safe default — prevents accidental training trigger
     
     def check_power(self) -> bool:
-        """Check power status on Windows."""
-        # Mock - real would use GetSystemPowerStatus
+        """Check power status on Windows via GetSystemPowerStatus."""
+        try:
+            import ctypes
+            from ctypes import Structure, c_byte, byref
+
+            class SYSTEM_POWER_STATUS(Structure):
+                _fields_ = [
+                    ("ACLineStatus", c_byte),
+                    ("BatteryFlag", c_byte),
+                    ("BatteryLifePercent", c_byte),
+                    ("SystemStatusFlag", c_byte),
+                    ("BatteryLifeTime", ctypes.c_ulong),
+                    ("BatteryFullLifeTime", ctypes.c_ulong),
+                ]
+
+            status = SYSTEM_POWER_STATUS()
+            if ctypes.windll.kernel32.GetSystemPowerStatus(byref(status)):
+                return status.ACLineStatus == 1
+        except (ImportError, AttributeError, OSError):
+            pass
         return True
     
     def get_memory_mb(self) -> int:

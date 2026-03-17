@@ -153,7 +153,7 @@ async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
         from backend.observability.metrics import metrics_registry
         metrics_registry.record("voice_inference_latency_ms", _voice_latency)
     except Exception:
-        pass
+        logger.debug("Metrics recording unavailable", exc_info=True)
 
     audit = _get_audit()
     audit.log(
@@ -217,7 +217,7 @@ async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
         from backend.observability.metrics import metrics_registry
         metrics_registry.record("voice_inference_latency_ms", _voice_latency)
     except Exception:
-        pass
+        logger.debug("Metrics recording unavailable", exc_info=True)
 
     # Audit
     audit = _get_audit()

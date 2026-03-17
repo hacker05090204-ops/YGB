@@ -228,14 +228,23 @@ class TrainingReportGenerator:
         self,
         session_id: str,
         samples_processed: int,
+        confidence_calibration: Optional[float] = None,
+        duplicate_detection_accuracy: Optional[float] = None,
+        noise_detection_accuracy: Optional[float] = None,
     ) -> LearnedFeatures:
-        """Generate learned features report."""
+        """Generate learned features report.
+
+        Args:
+            confidence_calibration: Real calibration from validation eval, or None if unavailable.
+            duplicate_detection_accuracy: Real duplicate detection accuracy, or None.
+            noise_detection_accuracy: Real noise detection accuracy, or None.
+        """
         return LearnedFeatures(
             session_id=session_id,
             domains_learned=[d.value for d in LearnedDomain],
-            confidence_calibration=0.85,  # Initial calibration baseline
-            duplicate_detection_accuracy=0.78,
-            noise_detection_accuracy=0.82,
+            confidence_calibration=confidence_calibration if confidence_calibration is not None else 0.0,
+            duplicate_detection_accuracy=duplicate_detection_accuracy if duplicate_detection_accuracy is not None else 0.0,
+            noise_detection_accuracy=noise_detection_accuracy if noise_detection_accuracy is not None else 0.0,
             proof_learning=False,  # NEVER True for MODE-A
             total_samples_processed=samples_processed,
             representation_only=True,  # ALWAYS True
@@ -358,6 +367,9 @@ EXPLANATION:
         checkpoints_saved: int,
         last_checkpoint_hash: str,
         samples_processed: int,
+        confidence_calibration: Optional[float] = None,
+        duplicate_detection_accuracy: Optional[float] = None,
+        noise_detection_accuracy: Optional[float] = None,
     ) -> Dict[str, Path]:
         """Generate all training reports."""
         session_id = self.generate_session_id()
@@ -377,6 +389,9 @@ EXPLANATION:
         features = self.generate_learned_features(
             session_id=session_id,
             samples_processed=samples_processed,
+            confidence_calibration=confidence_calibration,
+            duplicate_detection_accuracy=duplicate_detection_accuracy,
+            noise_detection_accuracy=noise_detection_accuracy,
         )
         
         not_learned = self.generate_not_learned(session_id=session_id)
@@ -439,11 +454,17 @@ def generate_training_report(
     samples_processed: int = 0,
     training_mode: TrainingMode = TrainingMode.MODE_A,
     reports_dir: str = "reports/g38_training",
+    confidence_calibration: Optional[float] = None,
+    duplicate_detection_accuracy: Optional[float] = None,
+    noise_detection_accuracy: Optional[float] = None,
 ) -> Dict[str, str]:
     """
     Main function to generate training reports after training stops.
     
     Call this after each training session completes.
+    Callers should supply real calibration metrics from
+    the latest validation checkpoint. If unavailable, pass None
+    and the report will record 0.0 ("not yet calibrated").
     """
     generator = TrainingReportGenerator(reports_dir)
     
@@ -456,6 +477,9 @@ def generate_training_report(
         checkpoints_saved=checkpoints_saved,
         last_checkpoint_hash=last_checkpoint_hash,
         samples_processed=samples_processed,
+        confidence_calibration=confidence_calibration,
+        duplicate_detection_accuracy=duplicate_detection_accuracy,
+        noise_detection_accuracy=noise_detection_accuracy,
     )
     
     update_latest_symlinks(reports_dir)

@@ -149,7 +149,7 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
             from backend.observability.metrics import metrics_registry
             metrics_registry.record("voice_inference_latency_ms", _voice_latency)
         except Exception:
-            pass
+            logger.debug("Metrics recording unavailable", exc_info=True)
 
         return {
             "intent_id": intent.intent_id,

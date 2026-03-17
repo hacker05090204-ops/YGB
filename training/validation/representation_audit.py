@@ -291,21 +291,27 @@ def run_representation_audit(features: np.ndarray,
 # =============================================================================
 
 if __name__ == "__main__":
-    from impl_v1.training.data.scaled_dataset import (
-        ScaledDatasetGenerator, DatasetConfig,
+    from impl_v1.training.data.real_dataset_loader import (
+        IngestionPipelineDataset, STRICT_REAL_MODE, FIXED_SEED,
     )
-    from impl_v1.training.data.real_dataset_loader import RealTrainingDataset
 
     print("=" * 60)
     print("REPRESENTATION SPACE AUDIT — PHASE 1")
     print("=" * 60)
 
-    # Load dataset
-    config = DatasetConfig(total_samples=20000)
-    dataset = RealTrainingDataset(config=config, seed=42)
+    # Load dataset — real ingestion data in production, synthetic only in lab
+    if STRICT_REAL_MODE:
+        dataset = IngestionPipelineDataset(feature_dim=256, min_samples=100, seed=FIXED_SEED)
+        source_label = "INGESTION_PIPELINE"
+    else:
+        from impl_v1.training.data.scaled_dataset import DatasetConfig
+        from impl_v1.training.data.real_dataset_loader import SyntheticTrainingDataset
+        dataset = SyntheticTrainingDataset(config=DatasetConfig(total_samples=20000), seed=42)
+        source_label = "SYNTHETIC_GENERATOR"
+
     stats = dataset.get_statistics()
     print(f"\nDataset: {stats['total']} samples, "
-          f"{stats['feature_dim']}D features")
+          f"{stats['feature_dim']}D features  (source: {source_label})")
 
     # Extract features and labels
     features = np.array([dataset[i][0].numpy() for i in range(len(dataset))])

@@ -51,8 +51,8 @@ class TestNoSyntheticFallback:
         
         assert "real_dataset_loader" in source, \
             "_init_gpu_resources must use real_dataset_loader"
-        assert "create_training_dataloader" in source, \
-            "_init_gpu_resources must use create_training_dataloader"
+        assert "create_training_dataloader" in source or "_build_training_dataloaders" in source, \
+            "_init_gpu_resources must use create_training_dataloader or _build_training_dataloaders"
     
     def test_uses_validate_dataset_integrity(self):
         """_init_gpu_resources must validate dataset before use."""
@@ -176,6 +176,48 @@ class TestStrictModeEnforcement:
         # In lab mode, synthetic should work fine
         assert valid, f"Lab mode validation failed: {msg}"
         assert "LAB" in msg, f"Lab mode message should mention LAB, got: {msg}"
+
+
+class TestNoMockInAllTrainingPaths:
+    """Ensure no synthetic/mock code in any training method, not just init."""
+
+    def test_gpu_train_step_no_synthetic(self):
+        """_gpu_train_step must NOT contain synthetic data generation."""
+        from impl_v1.phase49.runtime.auto_trainer import AutoTrainer
+        source = inspect.getsource(AutoTrainer._gpu_train_step).lower()
+        assert "synthetic" not in source, \
+            "Found 'synthetic' in _gpu_train_step"
+        assert "mock" not in source, \
+            "Found 'mock' in _gpu_train_step"
+
+    def test_gpu_train_step_uses_real_dataloader(self):
+        """_gpu_train_step must iterate over _gpu_dataloader (real data)."""
+        from impl_v1.phase49.runtime.auto_trainer import AutoTrainer
+        source = inspect.getsource(AutoTrainer._gpu_train_step)
+        assert "_gpu_dataloader" in source, \
+            "_gpu_train_step must iterate over the real DataLoader"
+
+    def test_train_representation_only_no_synthetic(self):
+        """_train_representation_only must NOT use synthetic data."""
+        from impl_v1.phase49.runtime.auto_trainer import AutoTrainer
+        source = inspect.getsource(AutoTrainer._train_representation_only).lower()
+        assert "synthetic" not in source, \
+            "Found 'synthetic' in _train_representation_only"
+        assert "mock" not in source, \
+            "Found 'mock' in _train_representation_only"
+
+    def test_force_start_training_no_synthetic(self):
+        """force_start_training must NOT use synthetic or mock data."""
+        from impl_v1.phase49.runtime.auto_trainer import AutoTrainer
+        source = inspect.getsource(AutoTrainer.force_start_training).lower()
+        assert "synthetic" not in source
+        assert "mock" not in source
+
+    def test_build_training_dataloaders_uses_real_loader(self):
+        """_build_training_dataloaders must import real_dataset_loader."""
+        from impl_v1.phase49.runtime.auto_trainer import AutoTrainer
+        source = inspect.getsource(AutoTrainer._build_training_dataloaders)
+        assert "real_dataset_loader" in source
 
 
 if __name__ == "__main__":

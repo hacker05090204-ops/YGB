@@ -807,7 +807,7 @@ def export_video_plan(plan: VideoExplanationPlan) -> bytes:
     """
     Export video plan as serialized bytes.
     
-    MOCK IMPLEMENTATION: Real rendering deferred to C++.
+    PLAN-ONLY: Real video rendering is deferred to C++.
     Returns JSON representation as bytes.
     """
     import json

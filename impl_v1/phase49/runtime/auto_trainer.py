@@ -44,6 +44,7 @@ from datetime import datetime, timezone
 from dataclasses import dataclass
 from typing import Optional, Callable, List, Tuple, Dict, Any
 from enum import Enum
+import warnings
 
 from backend.training.runtime_artifacts import (
     ensure_local_mode_a_bootstrap,
@@ -1813,12 +1814,17 @@ class AutoTrainer:
         }
     
     def abort_training_legacy(self) -> None:
-        """Legacy abort - use abort_training() instead."""
-        self._abort_flag.set()
-        self._emit_event(
-            "TRAINING_ABORTED",
-            "Manual abort requested",
+        """Legacy abort - use abort_training() instead.
+
+        .. deprecated:: 2024-03
+            Use :meth:`abort_training` which returns a status dict.
+        """
+        warnings.warn(
+            "abort_training_legacy() is deprecated — use abort_training()",
+            DeprecationWarning,
+            stacklevel=2,
         )
+        self.abort_training()
     
     def force_start_training(self, epochs: int = 5) -> dict:
         """
@@ -2030,6 +2036,18 @@ class AutoTrainer:
             "training_mode": "CONTINUOUS" if is_continuous else getattr(self, '_training_mode_label', 'MANUAL'),
             "continuous_mode": is_continuous,
             "last_error": self._last_error or None,
+            # Explicit dependency availability — never imply success with zeros
+            "dependencies": {
+                "pytorch": "AVAILABLE" if TORCH_AVAILABLE else "UNAVAILABLE",
+                "pytorch_backend": "AVAILABLE" if PYTORCH_AVAILABLE else "UNAVAILABLE",
+                "safetensors": "AVAILABLE" if SAFETENSORS_AVAILABLE else "UNAVAILABLE",
+                "cuda": (
+                    "AVAILABLE" if (TORCH_AVAILABLE and torch.cuda.is_available())
+                    else "UNAVAILABLE"
+                ),
+                "amp": "AVAILABLE" if AMP_AVAILABLE else "UNAVAILABLE",
+                "numpy": "AVAILABLE",  # numpy is a hard dependency (imported at top)
+            },
         }
 
 

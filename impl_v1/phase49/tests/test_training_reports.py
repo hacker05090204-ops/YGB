@@ -261,7 +261,7 @@ class TestReportFileWriting:
         features = LearnedFeatures(
             session_id="TEST-001",
             domains_learned=["code_patterns", "ui_layouts"],
-            confidence_calibration=0.85,
+            confidence_calibration=0.0,
             duplicate_detection_accuracy=0.78,
             noise_detection_accuracy=0.82,
             proof_learning=False,

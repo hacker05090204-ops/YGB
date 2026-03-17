@@ -66,7 +66,8 @@ def _mutual_information(features: np.ndarray, labels: np.ndarray, n_bins: int = 
 
 
 def run_data_audit(features: np.ndarray, labels: np.ndarray,
-                   edge_mask: np.ndarray = None) -> AuditResult:
+                   edge_mask: np.ndarray = None,
+                   dataset_source: str = "UNKNOWN") -> AuditResult:
     """
     Run full Phase 1 data validation audit.
     
@@ -155,7 +156,9 @@ def run_data_audit(features: np.ndarray, labels: np.ndarray,
         "class_ratio": round(class_ratio, 4),
         "edge_case_count": n_edge,
         "edge_case_ratio": round(edge_ratio, 4),
-        "synthetic_ratio": 1.0,  # All data is generated
+        "synthetic_ratio": 0.0 if dataset_source == "INGESTION_PIPELINE" else (
+            1.0 if dataset_source == "SYNTHETIC_GENERATOR" else None
+        ),
         "label_leakage_detected": label_leakage,
         "max_single_feature_correlation": round(max_corr_val, 4),
         "max_corr_feature_dim": max_corr_idx,
@@ -384,37 +387,48 @@ def generate_audit_report(result: AuditResult) -> str:
 
 if __name__ == "__main__":
     """Run standalone data audit."""
-    from impl_v1.training.data.scaled_dataset import ScaledDatasetGenerator, DatasetConfig
-    from impl_v1.training.data.real_dataset_loader import RealTrainingDataset
-    
+    from impl_v1.training.data.real_dataset_loader import (
+        IngestionPipelineDataset, STRICT_REAL_MODE, FIXED_SEED,
+    )
+
     print("Loading dataset...")
-    config = DatasetConfig(total_samples=18000)
-    dataset = RealTrainingDataset(config=config)
-    
+
+    if STRICT_REAL_MODE:
+        # PRODUCTION: real ingestion pipeline data only
+        dataset = IngestionPipelineDataset(feature_dim=256, min_samples=100, seed=FIXED_SEED)
+        dataset_source = "INGESTION_PIPELINE"
+    else:
+        # LAB ONLY: synthetic data for development
+        from impl_v1.training.data.scaled_dataset import DatasetConfig
+        from impl_v1.training.data.real_dataset_loader import SyntheticTrainingDataset
+        dataset = SyntheticTrainingDataset(config=DatasetConfig(total_samples=18000))
+        dataset_source = "SYNTHETIC_GENERATOR"
+
     features = dataset._features_tensor.numpy()
     labels = dataset._labels_tensor.numpy()
-    
-    # Build edge mask from samples
+
+    # Build edge mask from samples (always available via .samples)
     edge_mask = np.array([s.is_edge_case for s in dataset.samples], dtype=bool)
-    
+
     print(f"Dataset loaded: {len(labels)} samples, {features.shape[1]} features")
+    print(f"Source: {dataset_source}")
     print()
-    
-    result = run_data_audit(features, labels, edge_mask)
+
+    result = run_data_audit(features, labels, edge_mask, dataset_source=dataset_source)
     report = generate_audit_report(result)
     print(report)
-    
+
     # Save report
-    report_path = os.path.join(os.path.dirname(__file__), '..', '..', 
+    report_path = os.path.join(os.path.dirname(__file__), '..', '..',
                                'reports', 'g38_training', 'phase1_data_audit.txt')
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
     with open(report_path, 'w', encoding='utf-8') as f:
         f.write(report)
     print(f"\nReport saved to: {report_path}")
-    
+
     # Save JSON
     json_path = report_path.replace('.txt', '.json')
     with open(json_path, 'w') as f:
         json.dump(result.to_dict(), f, indent=2)
-    
+
     sys.exit(0 if result.passed else 1)

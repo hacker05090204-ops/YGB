@@ -301,19 +301,59 @@ def is_power_connected() -> bool:
 
 
 # =============================================================================
-# SCAN STATUS (placeholder - to be integrated)
+# SCAN STATUS — file-backed with in-memory fast-path
 # =============================================================================
 
 _scan_active = False
+_SCAN_STATE_FILE = Path(__file__).resolve().parents[3] / "data" / "scan_state.json"
+
+
+def _load_scan_state() -> bool:
+    """Load persisted scan state from disk (cold start)."""
+    try:
+        if _SCAN_STATE_FILE.exists():
+            import json
+            data = json.loads(_SCAN_STATE_FILE.read_text(encoding="utf-8"))
+            return bool(data.get("active", False))
+    except (OSError, ValueError, KeyError):
+        pass
+    return False
+
+
+def _persist_scan_state(active: bool) -> None:
+    """Persist scan state to disk so it survives restarts."""
+    try:
+        import json
+        _SCAN_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _SCAN_STATE_FILE.write_text(
+            json.dumps({"active": active, "updated_at": time.time()}),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass  # Best-effort persistence; in-memory state is authoritative
+
+
+# Initialize from persisted state on module load
+_scan_active = _load_scan_state()
 
 
 def is_scan_active() -> bool:
-    """Check if a scan is currently active."""
-    global _scan_active
+    """Check if a scan is currently active.
+
+    Returns the in-memory cached value for fast hot-path reads.
+    The state is written to disk by set_scan_active() so it
+    survives process restarts.
+    """
     return _scan_active
 
 
 def set_scan_active(active: bool) -> None:
-    """Set scan active state (called by scanner)."""
+    """Set scan active state.
+
+    Called by scanner entry/exit points (target/start, target/stop,
+    hunter/start, bounty/start, workflow completion).
+    Persists to data/scan_state.json for restart resilience.
+    """
     global _scan_active
     _scan_active = active
+    _persist_scan_state(active)

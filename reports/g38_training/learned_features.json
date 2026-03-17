@@ -1,6 +1,6 @@
 {
-  "session_id": "G38-20260308_165543",
-  "generated_at": "2026-03-08T16:55:43.910652+00:00",
+  "session_id": "G38-20260315_105521",
+  "generated_at": "2026-03-15T10:55:21.209956+00:00",
   "domains_learned": [
     "code_patterns",
     "ui_layouts",
@@ -11,11 +11,11 @@
     "syntax_structure"
   ],
   "representation_only": true,
-  "confidence_calibration_trend": 0.85,
-  "duplicate_detection_accuracy": 0.78,
-  "noise_detection_accuracy": 0.82,
+  "confidence_calibration_trend": 0.0,
+  "duplicate_detection_accuracy": 0.0,
+  "noise_detection_accuracy": 0.0,
   "proof_learning": false,
-  "total_samples_processed": 112640,
+  "total_samples_processed": 0,
   "governance": {
     "ai_has_authority": false,
     "can_decide_bugs": false,
