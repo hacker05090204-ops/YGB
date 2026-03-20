@@ -110,7 +110,7 @@ def train_for_calibration(features, labels, epochs=15, seed=42):
             bx = torch.tensor(train_f[perm[i:end]], dtype=torch.float32).to(device)
             by = torch.tensor(train_l[perm[i:end]], dtype=torch.long).to(device)
             loss = criterion(model(bx), by)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
         scheduler.step()

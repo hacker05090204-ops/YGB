@@ -162,7 +162,7 @@ def train_fold(train_features: np.ndarray, train_labels: np.ndarray,
             
             batch_x = torch.tensor(batch_f, dtype=torch.float32).to(device)
             batch_y = torch.tensor(batch_l, dtype=torch.long).to(device)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             out = model(batch_x)
             loss = criterion(out, batch_y)
             

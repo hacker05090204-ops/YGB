@@ -94,7 +94,7 @@ def _build_and_train(features, labels, device, epochs=15):
             
             bx = torch.tensor(batch_f, dtype=torch.float32).to(device)
             by = torch.tensor(batch_l, dtype=torch.long).to(device)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             logits = model(bx)
             ce_loss = criterion(logits, by)
             

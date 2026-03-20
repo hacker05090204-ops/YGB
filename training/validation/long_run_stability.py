@@ -130,7 +130,7 @@ def run_long_run_stability(features, labels, n_cycles=N_CYCLES):
             bx = torch.tensor(train_f[perm[i:end]], dtype=torch.float32).to(device)
             by = torch.tensor(train_l[perm[i:end]], dtype=torch.long).to(device)
             loss = criterion(model(bx), by)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
 
@@ -157,7 +157,7 @@ def run_long_run_stability(features, labels, n_cycles=N_CYCLES):
             bx = torch.tensor(train_f[perm[i:end]], dtype=torch.float32).to(device)
             by = torch.tensor(train_l[perm[i:end]], dtype=torch.long).to(device)
             loss = criterion(model(bx), by)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
 

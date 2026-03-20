@@ -37,7 +37,7 @@ def _train(model, features, labels, device, epochs=15):
     for _ in range(epochs):
         for bx, by in loader:
             bx, by = bx.to(device), by.to(device)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             criterion(model(bx), by).backward()
             optimizer.step()
     return model

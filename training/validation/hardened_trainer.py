@@ -26,7 +26,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, GradScaler
 
 # Feature bridge
 from backend.training.feature_bridge import (
@@ -100,7 +100,7 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     criterion = nn.CrossEntropyLoss()
-    scaler = GradScaler() if torch.cuda.is_available() else None
+    scaler = GradScaler('cuda') if torch.cuda.is_available() else None
     
     # Calibration loss weight
     cal_weight = 0.1
@@ -138,7 +138,7 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
         epoch_f = drift_aug.apply_random_missingness(epoch_f, miss_rate=0.10, seed=aug_seed + 3)
         
         n_batches = (len(epoch_l) + batch_size - 1) // batch_size
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         
         for b in range(n_batches):
             start = b * batch_size
@@ -163,7 +163,7 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
             
             # Forward pass with AMP
             if scaler is not None:
-                with autocast(dtype=torch.float16):
+                with autocast('cuda', dtype=torch.float16):
                     logits = model(bx)
                     ce_loss = criterion(logits, by)
             else:
@@ -196,7 +196,7 @@ def train_hardened(features: np.ndarray, labels: np.ndarray,
                     scaler.update()
                 else:
                     optimizer.step()
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
             
             total_loss += ce_loss.item() * (end - start)
             total_cal_penalty += cal_penalty * (end - start)

@@ -17,7 +17,7 @@
     8. Post-epoch telemetry
 ═══════════════════════════════════════════════════════════════════════
 """
-import sys, os, time, json, hashlib, logging, math
+import sys, os, time, json, hashlib, logging
 sys.path.insert(0, os.path.dirname(__file__))
 
 import numpy as np
@@ -25,7 +25,9 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, GradScaler
+
+from impl_v1.training.distributed.hash_utils import hash_model_weights
 
 logging.basicConfig(
     level=logging.INFO,
@@ -213,7 +215,7 @@ def find_optimal_batch(model, feature_dim, device, max_vram_pct=0.85):
 
     batch_sizes = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768]
     optimal = 256
-    scaler = GradScaler()
+    scaler = GradScaler('cuda')
     criterion = nn.CrossEntropyLoss()
 
     for bs in batch_sizes:
@@ -225,7 +227,7 @@ def find_optimal_batch(model, feature_dim, device, max_vram_pct=0.85):
             dummy_y = torch.randint(0, 2, (bs,), device=device)
 
             model.train()
-            with autocast(dtype=torch.float16):
+            with autocast('cuda', dtype=torch.float16):
                 out = model(dummy_x)
                 loss = criterion(out, dummy_y)
             scaler.scale(loss).backward()
@@ -255,13 +257,17 @@ def find_optimal_batch(model, feature_dim, device, max_vram_pct=0.85):
 
 
 # Build model for batch calibration
-model = MaxPowerEncoder(FEATURE_DIM, freeze_encoder=False).to(device)
-param_count = sum(p.numel() for p in model.parameters())
-trainable_count = sum(p.numel() for p in model.parameters() if p.requires_grad)
+_calib_model = MaxPowerEncoder(FEATURE_DIM, freeze_encoder=False).to(device)
+param_count = sum(p.numel() for p in _calib_model.parameters())
+trainable_count = sum(p.numel() for p in _calib_model.parameters() if p.requires_grad)
 log.info(f"  Model: {param_count:,} params ({trainable_count:,} trainable)")
 
-optimal_batch_3050 = find_optimal_batch(model, FEATURE_DIM, device, max_vram_pct=0.85)
+optimal_batch_3050 = find_optimal_batch(_calib_model, FEATURE_DIM, device, max_vram_pct=0.85)
 log.info(f"  ✅ optimal_batch_3050 = {optimal_batch_3050}")
+
+# Discard calibration model to prevent gradient/state leak into training
+del _calib_model
+torch.cuda.empty_cache()
 
 # ═══════════════════════════════════════════════════════════════════════
 # STEP 4 — GPU CAPACITY SCORE → AUTHORITY
@@ -269,10 +275,12 @@ log.info(f"  ✅ optimal_batch_3050 = {optimal_batch_3050}")
 log.info("═══ STEP 4: GPU Capacity Score ═══")
 
 # Benchmark: measure actual throughput at optimal batch
+# Use a fresh model for benchmark to avoid calibration state leak
 torch.cuda.empty_cache()
 torch.cuda.reset_peak_memory_stats()
+model = MaxPowerEncoder(FEATURE_DIM, freeze_encoder=False).to(device)
 model.train()
-scaler = GradScaler()
+scaler = GradScaler('cuda')
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
 
@@ -281,26 +289,26 @@ bench_y = torch.randint(0, 2, (optimal_batch_3050,), device=device)
 
 # Warmup
 for _ in range(3):
-    with autocast(dtype=torch.float16):
+    with autocast('cuda', dtype=torch.float16):
         out = model(bench_x)
         loss = criterion(out, bench_y)
     scaler.scale(loss).backward()
     scaler.step(optimizer)
     scaler.update()
-    optimizer.zero_grad()
+    optimizer.zero_grad(set_to_none=True)
 torch.cuda.synchronize()
 
 # Timed run
 t0 = time.perf_counter()
 BENCH_ITERS = 20
 for _ in range(BENCH_ITERS):
-    with autocast(dtype=torch.float16):
+    with autocast('cuda', dtype=torch.float16):
         out = model(bench_x)
         loss = criterion(out, bench_y)
     scaler.scale(loss).backward()
     scaler.step(optimizer)
     scaler.update()
-    optimizer.zero_grad()
+    optimizer.zero_grad(set_to_none=True)
 torch.cuda.synchronize()
 bench_time = time.perf_counter() - t0
 
@@ -393,6 +401,9 @@ ENCODER_FREEZE_EPOCHS = 0  # Set > 0 to freeze encoder for first N epochs
 T_0 = 10          # Cosine warm restart period
 T_MULT = 2        # Period multiplier after each restart
 ETA_MIN = 1e-6    # Minimum LR
+WEIGHT_HASH_MODE = os.environ.get("YGB_WEIGHT_HASH_MODE", "sampled").strip().lower()
+EVAL_EVERY = max(1, int(os.environ.get("YGB_EVAL_EVERY", "1")))
+MAX_EVAL_SAMPLES = max(0, int(os.environ.get("YGB_MAX_EVAL_SAMPLES", "4096")))
 
 optimizer = optim.AdamW(
     filter(lambda p: p.requires_grad, model.parameters()),
@@ -402,18 +413,26 @@ scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
     optimizer, T_0=T_0, T_mult=T_MULT, eta_min=ETA_MIN,
 )
 criterion = nn.CrossEntropyLoss()
-scaler = GradScaler()
+scaler = GradScaler('cuda')
 
 # Build DataLoader with optimal batch
 train_ds = TensorDataset(
     torch.tensor(train_f[:shard_samples], dtype=torch.float32),
     torch.tensor(train_l[:shard_samples], dtype=torch.long),
 )
-# Windows DataLoader: use 2 workers (was 0) with fallback
-import sys as _sys
-_dl_num_workers = 2 if _sys.platform == 'win32' else 4
+# Seeded DataLoader generator keeps shuffle deterministic without first-batch probe overhead
+_dl_num_workers = 2 if sys.platform == 'win32' else 4
 _dl_persistent = _dl_num_workers > 0
 _dl_prefetch = 2 if _dl_num_workers > 0 else None
+_dl_generator = torch.Generator()
+_dl_generator.manual_seed(42)
+
+
+def _seed_worker(worker_id):
+    worker_seed = 42 + worker_id
+    np.random.seed(worker_seed)
+    torch.manual_seed(worker_seed)
+
 
 try:
     train_loader = DataLoader(
@@ -421,11 +440,9 @@ try:
         num_workers=_dl_num_workers, pin_memory=True, drop_last=False,
         persistent_workers=_dl_persistent,
         prefetch_factor=_dl_prefetch,
+        generator=_dl_generator,
+        worker_init_fn=_seed_worker,
     )
-    # Force iteration to test workers
-    _test_iter = iter(train_loader)
-    next(_test_iter)
-    del _test_iter
     log.info(f"  DataLoader: num_workers={_dl_num_workers}, persistent={_dl_persistent}")
 except Exception as e:
     log.warning(f"  DataLoader with workers={_dl_num_workers} failed: {e}")
@@ -436,6 +453,7 @@ except Exception as e:
     train_loader = DataLoader(
         train_ds, batch_size=optimal_batch_3050, shuffle=True,
         num_workers=0, pin_memory=True, drop_last=False,
+        generator=_dl_generator,
     )
     log.info(f"  DataLoader: num_workers=0 (fallback)")
 
@@ -444,13 +462,23 @@ log.info(f"  Effective batch: {optimal_batch_3050 * GRAD_ACCUM}")
 log.info(f"  Grad clip: {GRAD_CLIP}")
 log.info(f"  Scheduler: CosineAnnealingWarmRestarts(T_0={T_0}, T_mult={T_MULT})")
 log.info(f"  Encoder freeze epochs: {ENCODER_FREEZE_EPOCHS}")
+log.info(f"  Weight hash mode: {WEIGHT_HASH_MODE}")
 
 torch.cuda.empty_cache()
 torch.cuda.reset_peak_memory_stats()
 
 # Pre-allocate test tensors on GPU (avoid per-epoch CPU→GPU transfer)
-test_features_gpu = torch.tensor(test_f, dtype=torch.float32, device=device)
-test_labels_gpu = torch.tensor(test_l, dtype=torch.long, device=device)
+if MAX_EVAL_SAMPLES > 0 and len(test_l) > MAX_EVAL_SAMPLES:
+    eval_f = test_f[:MAX_EVAL_SAMPLES]
+    eval_l = test_l[:MAX_EVAL_SAMPLES]
+else:
+    eval_f = test_f
+    eval_l = test_l
+
+log.info(f"  Eval cadence: every {EVAL_EVERY} epoch(s), samples={len(eval_l)}")
+
+test_features_gpu = torch.tensor(eval_f, dtype=torch.float32, device=device)
+test_labels_gpu = torch.tensor(eval_l, dtype=torch.long, device=device)
 
 epoch_reports = []
 t_total = time.perf_counter()
@@ -481,13 +509,13 @@ for epoch in range(EPOCHS):
     total_correct_gpu = torch.zeros(1, dtype=torch.long, device=device)
     total_samples = 0
     max_grad_norm = 0.0
-    optimizer.zero_grad()
+    optimizer.zero_grad(set_to_none=True)
 
     for b_idx, (bx, by) in enumerate(train_loader):
         bx = bx.to(device, non_blocking=True)
         by = by.to(device, non_blocking=True)
 
-        with autocast(dtype=torch.float16):
+        with autocast('cuda', dtype=torch.float16):
             logits = model(bx)
             loss = criterion(logits, by) / GRAD_ACCUM
 
@@ -502,10 +530,10 @@ for epoch in range(EPOCHS):
             max_grad_norm = max(max_grad_norm, grad_norm.item())
             scaler.step(optimizer)
             scaler.update()
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
 
-        total_loss_gpu += loss.detach() * GRAD_ACCUM * bx.size(0)
-        total_correct_gpu += (logits.argmax(1) == by).sum()
+        total_loss_gpu += loss.detach().float() * GRAD_ACCUM * bx.size(0)
+        total_correct_gpu += (logits.detach().float().argmax(1) == by).sum()
         total_samples += bx.size(0)
 
     # Flush remaining
@@ -517,17 +545,21 @@ for epoch in range(EPOCHS):
         max_grad_norm = max(max_grad_norm, grad_norm.item())
         scaler.step(optimizer)
         scaler.update()
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
 
     scheduler.step(epoch + 1)
 
     # Eval (using pre-allocated GPU tensors + AMP)
-    model.eval()
-    with torch.no_grad():
-        with autocast(dtype=torch.float16):
-            test_logits = model(test_features_gpu)
-        test_acc = (test_logits.argmax(1) == test_labels_gpu).float().mean().item()
-        del test_logits
+    should_eval = ((epoch + 1) % EVAL_EVERY == 0) or (epoch == EPOCHS - 1)
+    if should_eval:
+        model.eval()
+        with torch.no_grad():
+            with autocast('cuda', dtype=torch.float16):
+                test_logits = model(test_features_gpu)
+            test_acc = (test_logits.argmax(1) == test_labels_gpu).float().mean().item()
+            del test_logits
+    else:
+        test_acc = epoch_reports[-1]["test_acc"] if epoch_reports else 0.0
 
     ep_time = time.perf_counter() - ep_start
     # Single GPU→CPU sync point per epoch (instead of per-batch)
@@ -573,10 +605,7 @@ log.info("═══ STEP 8: Post-Epoch Telemetry ═══")
 
 # Compute merged weight hash
 raw_model = model.module if USE_DDP else model
-h = hashlib.sha256()
-for k in sorted(raw_model.state_dict().keys()):
-    h.update(raw_model.state_dict()[k].cpu().numpy().tobytes())
-merged_weight_hash = h.hexdigest()[:16]
+merged_weight_hash = hash_model_weights(raw_model, mode=WEIGHT_HASH_MODE)[:16]
 
 # Determinism check (3 single-epoch runs)
 log.info("  Running determinism verification (3 runs)...")
@@ -585,15 +614,23 @@ for run_i in range(3):
     torch.manual_seed(42)
     torch.cuda.manual_seed_all(42)
     np.random.seed(42)
+    # Create a fresh DataLoader with a seeded generator for deterministic shuffle
+    _det_gen = torch.Generator()
+    _det_gen.manual_seed(42)
+    _det_loader = DataLoader(
+        train_ds, batch_size=optimal_batch_3050, shuffle=True,
+        num_workers=0, pin_memory=True, drop_last=False,
+        generator=_det_gen,
+    )
     m = MaxPowerEncoder(FEATURE_DIM).to(device)
     opt = optim.AdamW(m.parameters(), lr=0.001, weight_decay=1e-4)
-    sc = GradScaler()
+    sc = GradScaler('cuda')
     cr = nn.CrossEntropyLoss()
     m.train()
-    opt.zero_grad()
-    for b_idx, (bx, by) in enumerate(train_loader):
+    opt.zero_grad(set_to_none=True)
+    for b_idx, (bx, by) in enumerate(_det_loader):
         bx, by = bx.to(device, non_blocking=True), by.to(device, non_blocking=True)
-        with autocast(dtype=torch.float16):
+        with autocast('cuda', dtype=torch.float16):
             out = m(bx)
             l = cr(out, by) / GRAD_ACCUM
         sc.scale(l).backward()
@@ -602,20 +639,17 @@ for run_i in range(3):
             torch.nn.utils.clip_grad_norm_(m.parameters(), max_norm=GRAD_CLIP)
             sc.step(opt)
             sc.update()
-            opt.zero_grad()
+            opt.zero_grad(set_to_none=True)
     if (b_idx + 1) % GRAD_ACCUM != 0:
         sc.unscale_(opt)
         torch.nn.utils.clip_grad_norm_(m.parameters(), max_norm=GRAD_CLIP)
         sc.step(opt)
         sc.update()
-        opt.zero_grad()
-    dh = hashlib.sha256()
-    for k in sorted(m.state_dict().keys()):
-        dh.update(m.state_dict()[k].cpu().numpy().tobytes())
-    wh = dh.hexdigest()[:16]
+        opt.zero_grad(set_to_none=True)
+    wh = hash_model_weights(m, mode=WEIGHT_HASH_MODE)[:16]
     det_hashes.append(wh)
     log.info(f"    Run {run_i+1}: {wh}")
-    del m, opt, sc, cr
+    del m, opt, sc, cr, _det_loader, _det_gen
 
 det_match = len(set(det_hashes)) == 1
 log.info(f"  Determinism: {'PASS' if det_match else 'FAIL'}")
@@ -650,6 +684,9 @@ telemetry = {
         "force_fresh_train": FORCE_FRESH,
         "num_workers": _dl_num_workers,
         "persistent_workers": _dl_persistent,
+        "weight_hash_mode": WEIGHT_HASH_MODE,
+        "eval_every": EVAL_EVERY,
+        "eval_samples": int(test_labels_gpu.numel()),
     },
     "results": {
         "total_time_sec": round(total_time, 2),

@@ -1,17 +1,3 @@
-# CI/CD Coverage Enforcement Workflow
-#
-# Triggers on push/PR to main.
-# Fails if Python coverage <95%, C++ coverage <85%, or JS/TS coverage <80%.
-#
-# Step order:
-#   0. Environment setup (PYTHONPATH, HMAC from GitHub Secrets)
-#   1. Runtime safety tests (fail-fast)
-#   2. Governance tests (all test files via directory discovery)
-#   3. Python coverage (produces coverage_python.json)
-#   4. C++ coverage (produces coverage_cpp.json)
-#   5. JS/TS coverage (produces coverage-summary.json)
-#   6. coverage_gate.py (reads artifacts, exits if missing)
-
 name: Coverage Gate
 
 on:
@@ -20,22 +6,24 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  PYTHONPATH: ${{ github.workspace }}
+  YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
+  YGB_ENV: test
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_PYTHON_VERSION_WARNING: "1"
+
 jobs:
-  coverage-gate:
+  backend-quality:
     runs-on: ubuntu-latest
-    env:
-      PYTHONPATH: ${{ github.workspace }}
-      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
-      YGB_ENV: test
     steps:
       - uses: actions/checkout@v4
 
-      # ========== PHASE 2: Show commit for debugging ==========
       - name: Show commit
         run: git log -1 --oneline
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
         with:
           python-version: '3.11'
 
@@ -43,84 +31,64 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            frontend/package-lock.json
+            frontend/npm-shrinkwrap.json
+            package-lock.json
 
       - name: Install system dependencies
         run: |
           sudo apt-get update -q
           sudo apt-get install -y gcovr g++
 
-      # ========== PHASE 1: Install ALL Python dependencies ==========
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Install Python dependencies
+      - name: Verify Python environment
         run: |
-          pip install numpy
-          pip install pytest pytest-cov pytest-asyncio coverage gcovr
-          pip install pycryptodome bcrypt
-          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
-          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+          python -c "import numpy; print('numpy', numpy.__version__)"
+          grep "_validate_structure" backend/api/runtime_api.py
 
-      # ========== PHASE 1: Verify numpy ==========
-      - name: Verify numpy
-        run: python -c "import numpy; print('numpy', numpy.__version__)"
-
-      # ========== PHASE 4: Verify _validate_structure exists ==========
-      - name: Verify _validate_structure
-        run: grep "_validate_structure" backend/api/runtime_api.py
-
-      # ========== STEP 0: ENVIRONMENT VALIDATION ==========
       - name: Validate environment
         run: |
-          echo "=== Environment ==="
           echo "::add-mask::$YGB_HMAC_SECRET"
           pwd
           echo "PYTHONPATH: $PYTHONPATH"
-          if [ -z "$YGB_HMAC_SECRET" ]; then
-            echo "FATAL: YGB_HMAC_SECRET not configured"
-            exit 1
-          fi
-          echo "YGB_HMAC_SECRET configured: YES (masked)"
+          test -n "$YGB_HMAC_SECRET" || { echo "FATAL: YGB_HMAC_SECRET not configured"; exit 1; }
           test -d backend || { echo "FATAL: backend/ not found"; exit 1; }
           test -f backend/__init__.py || { echo "FATAL: backend/__init__.py missing"; exit 1; }
           test -f backend/tests/__init__.py || { echo "FATAL: backend/tests/__init__.py missing"; exit 1; }
-          echo "Backend test files:"
           ls -la backend/tests/test_*.py
-          echo "=== OK ==="
 
-      # ========== DIAGNOSTIC: Collect tests first ==========
-      - name: Collect tests (diagnostic)
-        run: |
-          echo "=== Collecting tests ==="
-          pytest backend/tests/ --collect-only -q 2>&1 || true
-          echo "=== Collection complete ==="
-
-      # ========== STEP 1: RUNTIME SAFETY TESTS ==========
       - name: Runtime safety tests
         run: pytest backend/tests/test_runtime_safety.py -v -s --tb=long
 
-      # ========== STEP 2: GOVERNANCE TESTS (directory discovery) ==========
-      - name: Governance and integration tests
-        continue-on-error: true
+      - name: Backend tests with JUnit and coverage
         run: |
+          set -o pipefail
           mkdir -p test-results
-          pytest backend/tests/ -v -s --tb=long --junitxml=test-results/junit.xml 2>&1 | tee test-results/test-output.txt
+          pytest backend/tests/ -v -s --tb=long \
+            --junitxml=test-results/junit.xml \
+            --cov=backend \
+            --cov-report=json:coverage_python.json \
+            --cov-report=xml:coverage_python.xml \
+            --cov-report=term \
+            2>&1 | tee test-results/test-output.txt
+          test -f coverage_python.json
 
-      - name: Upload test results
+      - name: Upload backend test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results
+          name: backend-test-results
           path: test-results/
+          if-no-files-found: warn
 
-      - name: Check test results
+      - name: Check backend test results
         if: always()
         run: |
           python3 - <<'PYEOF'
+          import os
+          import sys
           import xml.etree.ElementTree as ET
-          import sys, os
 
           junit_path = "test-results/junit.xml"
           txt_path = "test-results/test-output.txt"
@@ -128,94 +96,66 @@ jobs:
           if not os.path.exists(junit_path):
               print("::error::JUnit XML not found — tests may not have run")
               if os.path.exists(txt_path):
-                  with open(txt_path) as f:
-                      lines = f.readlines()
-                  print("=== LAST 30 LINES ===")
-                  for l in lines[-30:]:
-                      print(l, end='')
+                  with open(txt_path, encoding="utf-8", errors="replace") as f:
+                      for line in f.readlines()[-50:]:
+                          print(line, end="")
               sys.exit(1)
 
           tree = ET.parse(junit_path)
           root = tree.getroot()
-
-          # Get totals
-          tests = int(root.attrib.get('tests', 0))
-          failures = int(root.attrib.get('failures', 0))
-          errors = int(root.attrib.get('errors', 0))
-          skipped = int(root.attrib.get('skipped', 0))
+          suites = [root] if root.tag == "testsuite" else list(root.iter("testsuite"))
+          tests = sum(int(s.attrib.get("tests", 0)) for s in suites)
+          failures = sum(int(s.attrib.get("failures", 0)) for s in suites)
+          errors = sum(int(s.attrib.get("errors", 0)) for s in suites)
+          skipped = sum(int(s.attrib.get("skipped", 0)) for s in suites)
 
           print(f"Tests: {tests}, Failures: {failures}, Errors: {errors}, Skipped: {skipped}")
 
-          if failures == 0 and errors == 0:
-              print(f"ALL {tests} TESTS PASSED ({skipped} skipped)")
-              sys.exit(0)
-
-          # Print each failure as a GitHub annotation
-          for suite in root.iter('testsuite'):
-              for tc in suite.iter('testcase'):
-                  fail = tc.find('failure')
-                  err = tc.find('error')
+          for suite in suites:
+              for tc in suite.iter("testcase"):
+                  fail = tc.find("failure")
+                  err = tc.find("error")
                   if fail is not None:
-                      name = tc.attrib.get('name', '?')
-                      cls = tc.attrib.get('classname', '?')
-                      msg = fail.attrib.get('message', fail.text or '(no message)')
+                      name = tc.attrib.get("name", "?")
+                      cls = tc.attrib.get("classname", "?")
+                      msg = fail.attrib.get("message", fail.text or "(no message)")
                       print(f"::error::FAILED: {cls}::{name} — {msg[:200]}")
                   elif err is not None:
-                      name = tc.attrib.get('name', '?')
-                      cls = tc.attrib.get('classname', '?')
-                      msg = err.attrib.get('message', err.text or '(no message)')
+                      name = tc.attrib.get("name", "?")
+                      cls = tc.attrib.get("classname", "?")
+                      msg = err.attrib.get("message", err.text or "(no message)")
                       print(f"::error::ERROR: {cls}::{name} — {msg[:200]}")
 
-          # Also print last 30 lines of output
-          if os.path.exists(txt_path):
-              with open(txt_path) as f:
-                  lines = f.readlines()
-              print("\n=== LAST 30 LINES OF OUTPUT ===")
-              for l in lines[-30:]:
-                  print(l, end='')
-
-          sys.exit(1)
+          if failures or errors:
+              if os.path.exists(txt_path):
+                  print("\n=== LAST 50 LINES OF OUTPUT ===")
+                  with open(txt_path, encoding="utf-8", errors="replace") as f:
+                      for line in f.readlines()[-50:]:
+                          print(line, end="")
+              sys.exit(1)
           PYEOF
 
-      # ========== STEP 3: PYTHON COVERAGE ==========
-      - name: Python coverage
-        id: python_cov
-        run: |
-          echo "=== PYTHON COVERAGE ==="
-          pytest backend/tests/ \
-            --cov=backend \
-            --cov-report=json:coverage_python.json \
-            --cov-report=xml:coverage_python.xml \
-            --cov-report=term \
-            -v --tb=short || true
-          echo "---"
-          test -f coverage_python.json || echo "WARNING: coverage_python.json not generated"
-
-      # ========== STEP 4: C++ COVERAGE ==========
       - name: C++ coverage
-        id: cpp_cov
         run: |
           chmod +x scripts/build_cpp_tests.sh
-          bash scripts/build_cpp_tests.sh || true
-          test -f coverage_cpp.json || echo "WARNING: coverage_cpp.json not generated"
+          bash scripts/build_cpp_tests.sh
+          test -f coverage_cpp.json
 
-      # ========== STEP 5: JS/TS COVERAGE ==========
       - name: JS/TS coverage
-        id: js_cov
         run: |
-          echo "=== JS/TS COVERAGE ==="
           if [ -d frontend ]; then
             cd frontend
             npm ci --legacy-peer-deps
-            npm test -- --coverage 2>&1 || true
-            test -f coverage/coverage-summary.json || echo "WARNING: coverage-summary.json not generated"
+            npm test -- --coverage
+            test -f coverage/coverage-summary.json
           else
             echo "No frontend directory -- skipping JS/TS coverage"
           fi
 
-      # ========== STEP 6: COVERAGE GATE (informational) ==========
       - name: Run coverage gate
-        run: python scripts/coverage_gate.py || true
+        env:
+          COVERAGE_GATE_MODE: strict
+        run: python scripts/coverage_gate.py
 
       - name: Upload coverage artifacts
         uses: actions/upload-artifact@v4
@@ -228,147 +168,17 @@ jobs:
             coverage_cpp.json
             frontend/coverage/
             reports/coverage_report.json
+          if-no-files-found: warn
 
-  governance-check:
-    runs-on: ubuntu-latest
-    env:
-      PYTHONPATH: ${{ github.workspace }}
-      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
-      YGB_ENV: test
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Show commit
-        run: git log -1 --oneline
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Upgrade pip
-        run: python -m pip install --upgrade pip
-
-      - name: Install dependencies
-        run: |
-          pip install numpy
-          pip install pytest pytest-cov pytest-asyncio
-          pip install pycryptodome bcrypt
-          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
-          if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
-
-      - name: Verify numpy
-        run: python -c "import numpy; print('numpy', numpy.__version__)"
-
-      - name: Verify _validate_structure
-        run: grep "_validate_structure" backend/api/runtime_api.py
-
-      - name: Validate environment
-        run: |
-          pwd
-          test -d backend || { echo "FATAL: backend/ not found"; exit 1; }
-          test -f backend/__init__.py || { echo "FATAL: backend/__init__.py missing"; exit 1; }
-          test -f backend/tests/__init__.py || { echo "FATAL: backend/tests/__init__.py missing"; exit 1; }
-
-      # Diagnostic: collect first to identify import errors
-      - name: Collect tests (diagnostic)
-        run: |
-          echo "=== Collecting tests ==="
-          pytest backend/tests/ --collect-only -q 2>&1 || true
-          echo "=== Collection complete ==="
-
-      # Run ALL tests in backend/tests/ via directory discovery
-      - name: Run all governance and safety tests
-        continue-on-error: true
-        run: |
-          mkdir -p test-results-gov
-          pytest backend/tests/ -v -s --tb=long --junitxml=test-results-gov/junit.xml 2>&1 | tee test-results-gov/test-output.txt
-
-      - name: Upload governance test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: governance-test-results
-          path: test-results-gov/
-
-      - name: Check governance test results
-        if: always()
-        run: |
-          python3 - <<'PYEOF'
-          import xml.etree.ElementTree as ET
-          import sys, os
-
-          junit_path = "test-results-gov/junit.xml"
-          txt_path = "test-results-gov/test-output.txt"
-
-          if not os.path.exists(junit_path):
-              print("::error::JUnit XML not found — tests may not have run")
-              if os.path.exists(txt_path):
-                  with open(txt_path) as f:
-                      for l in f.readlines()[-30:]:
-                          print(l, end='')
-              sys.exit(1)
-
-          tree = ET.parse(junit_path)
-          root = tree.getroot()
-          tests = int(root.attrib.get('tests', 0))
-          failures = int(root.attrib.get('failures', 0))
-          errors = int(root.attrib.get('errors', 0))
-          skipped = int(root.attrib.get('skipped', 0))
-
-          print(f"Tests: {tests}, Failures: {failures}, Errors: {errors}, Skipped: {skipped}")
-
-          if failures == 0 and errors == 0:
-              print(f"ALL {tests} TESTS PASSED ({skipped} skipped)")
-              sys.exit(0)
-
-          for suite in root.iter('testsuite'):
-              for tc in suite.iter('testcase'):
-                  fail = tc.find('failure')
-                  err = tc.find('error')
-                  if fail is not None:
-                      name = tc.attrib.get('name', '?')
-                      cls = tc.attrib.get('classname', '?')
-                      msg = fail.attrib.get('message', fail.text or '(no message)')
-                      print(f"::error::FAILED: {cls}::{name} — {msg[:200]}")
-                  elif err is not None:
-                      name = tc.attrib.get('name', '?')
-                      cls = tc.attrib.get('classname', '?')
-                      msg = err.attrib.get('message', err.text or '(no message)')
-                      print(f"::error::ERROR: {cls}::{name} — {msg[:200]}")
-
-          if os.path.exists(txt_path):
-              with open(txt_path) as f:
-                  for l in f.readlines()[-30:]:
-                      print(l, end='')
-          sys.exit(1)
-          PYEOF
-
-  # =====================================================================
-  # SECURITY REGRESSION GATE — block merges with security anti-patterns
-  # =====================================================================
   security-regression:
     runs-on: ubuntu-latest
-    env:
-      PYTHONPATH: ${{ github.workspace }}
-      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
-      YGB_ENV: test
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
         with:
           python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install numpy
-          pip install pytest pytest-asyncio
-          pip install pycryptodome bcrypt
-          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
 
       - name: Run security regression scanner
         run: python scripts/security_regression_scan.py
@@ -382,33 +192,21 @@ jobs:
         with:
           name: security-regression-report
           path: reports/security_regression_report.json
+          if-no-files-found: warn
 
-  # =====================================================================
-  # RELIABILITY GATE — readiness latency, timeout rate, completeness
-  # =====================================================================
   reliability-gate:
     runs-on: ubuntu-latest
     env:
-      PYTHONPATH: ${{ github.workspace }}
-      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
-      YGB_ENV: test
       GATE_READINESS_LATENCY_MS: "5000"
       GATE_TIMEOUT_RATE: "0.05"
       GATE_COMPLETENESS: "0.95"
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
         with:
           python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install numpy
-          pip install pytest pytest-asyncio
-          pip install pycryptodome bcrypt
-          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
 
       - name: Run reliability tests
         run: pytest backend/tests/test_reliability.py backend/tests/test_observability.py backend/tests/test_api_v2_contract.py backend/tests/test_wiring_audit.py -v --tb=short
@@ -422,30 +220,17 @@ jobs:
         with:
           name: reliability-gate-report
           path: reports/reliability_gate_report.json
+          if-no-files-found: warn
 
-  # =====================================================================
-  # TRAINING & INFERENCE GATE — block deploys if AI pipeline is broken
-  # =====================================================================
   training-inference-gate:
     runs-on: ubuntu-latest
-    env:
-      PYTHONPATH: ${{ github.workspace }}
-      YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
-      YGB_ENV: test
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Set up Python environment
+        uses: ./.github/actions/setup-python-env
         with:
           python-version: '3.11'
-
-      - name: Install dependencies
-        run: |
-          pip install numpy
-          pip install pytest pytest-asyncio
-          pip install pycryptodome bcrypt
-          pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
 
       - name: Training pipeline import validation
         run: |
@@ -480,5 +265,3 @@ jobs:
         run: |
           pytest backend/tests/test_system_status.py -v --tb=short
           pytest backend/tests/test_e2e_audit.py::TestTrainingStateManagerNoMocks -v --tb=short
-
-

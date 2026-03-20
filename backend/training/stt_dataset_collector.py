@@ -6,10 +6,13 @@ Builds a real on-disk supervised dataset from browser voice sessions:
   - appends JSONL manifest entries
   - reports dataset/training quality
   - can trigger local Conformer training when enough samples exist
+  - tracks training sessions/checkpoints truthfully
+  - rejects exact duplicate auto-grab samples
 """
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import logging
@@ -31,6 +34,11 @@ try:
 except Exception:  # pragma: no cover
     get_storage_topology = None
     resolve_path = None
+
+try:
+    from impl_v1.training.voice.stt_model import _CHECKPOINT_DIR
+except Exception:  # pragma: no cover
+    _CHECKPOINT_DIR = PROJECT_ROOT / "checkpoints" / "stt"
 
 
 def _dataset_root() -> Path:
@@ -60,6 +68,18 @@ def _status_path() -> Path:
     return root / "stt_dataset_status.json"
 
 
+def _training_status_path() -> Path:
+    root = _dataset_root()
+    root.mkdir(parents=True, exist_ok=True)
+    return root / "stt_training_status.json"
+
+
+def _training_lock_path() -> Path:
+    root = _dataset_root()
+    root.mkdir(parents=True, exist_ok=True)
+    return root / "stt_training.lock"
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat()
 
@@ -74,6 +94,14 @@ def _min_samples_for_training() -> int:
 def _sanitize_transcript(text: str) -> str:
     cleaned = " ".join((text or "").strip().split())
     return cleaned[:280]
+
+
+def _sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _sha256_text(payload: str) -> str:
+    return hashlib.sha256(payload.encode("utf-8", errors="ignore")).hexdigest()
 
 
 def _inspect_wav(audio_bytes: bytes) -> Tuple[bool, Dict[str, Any] | str]:
@@ -127,6 +155,32 @@ def _write_status(status: Dict[str, Any]) -> None:
     path.write_text(json.dumps(status, indent=2), encoding="utf-8")
 
 
+def _read_training_status() -> Dict[str, Any]:
+    path = _training_status_path()
+    if not path.exists():
+        return {
+            "status": "IDLE",
+            "last_training_at": None,
+            "last_completed_session": None,
+            "latest_checkpoint": None,
+            "best_checkpoint": None,
+        }
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return {
+            "status": "UNKNOWN",
+            "last_training_at": None,
+            "last_completed_session": None,
+            "latest_checkpoint": None,
+            "best_checkpoint": None,
+        }
+
+
+def _write_training_status(payload: Dict[str, Any]) -> None:
+    _training_status_path().write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
 def _read_manifest_entries() -> List[Dict[str, Any]]:
     path = _manifest_path()
     if not path.exists():
@@ -144,6 +198,51 @@ def _read_manifest_entries() -> List[Dict[str, Any]]:
     return entries
 
 
+def _checkpoint_info() -> Dict[str, Any]:
+    checkpoint_dir = Path(_CHECKPOINT_DIR)
+    latest = checkpoint_dir / "conformer_ctc_latest.pt"
+    best = checkpoint_dir / "conformer_ctc_best.pt"
+
+    def _file_info(path: Path) -> Dict[str, Any] | None:
+        if not path.exists():
+            return None
+        try:
+            stat = path.stat()
+            return {
+                "path": str(path),
+                "size_bytes": stat.st_size,
+                "modified_at": datetime.fromtimestamp(stat.st_mtime, UTC).isoformat(),
+            }
+        except Exception:
+            return {"path": str(path)}
+
+    return {
+        "checkpoint_dir": str(checkpoint_dir),
+        "latest_checkpoint": _file_info(latest),
+        "best_checkpoint": _file_info(best),
+    }
+
+
+def _recent_duplicate(
+    entries: List[Dict[str, Any]],
+    *,
+    transcript_hash: str,
+    audio_sha256: str,
+    user_id: str,
+    device_id: str,
+) -> Dict[str, Any] | None:
+    # Exact duplicate protection for auto-grabbed browser samples.
+    for entry in reversed(entries[-250:]):
+        if (
+            entry.get("transcript_hash") == transcript_hash
+            and entry.get("audio_sha256") == audio_sha256
+            and entry.get("user_id") == user_id
+            and entry.get("device_id") == device_id
+        ):
+            return entry
+    return None
+
+
 def get_dataset_status() -> Dict[str, Any]:
     entries = _read_manifest_entries()
     sample_count = len(entries)
@@ -154,7 +253,10 @@ def get_dataset_status() -> Dict[str, Any]:
     languages = Counter(str(entry.get("language", "unknown")) for entry in entries)
     providers = Counter(str(entry.get("provider", "unknown")) for entry in entries)
     users = Counter(str(entry.get("user_id", "unknown")) for entry in entries)
+    sessions = Counter(str(entry.get("session_id", "unknown")) for entry in entries)
     topology = get_storage_topology() if get_storage_topology else {}
+    training_status = _read_training_status()
+    checkpoint_info = _checkpoint_info()
 
     quality = "EMPTY"
     if sample_count >= _min_samples_for_training():
@@ -162,6 +264,7 @@ def get_dataset_status() -> Dict[str, Any]:
     elif sample_count >= max(10, _min_samples_for_training() // 5):
         quality = "COLLECTING"
 
+    latest_entry = entries[-1] if entries else None
     status = {
         "status": quality,
         "dataset_root": str(_dataset_root()),
@@ -179,8 +282,13 @@ def get_dataset_status() -> Dict[str, Any]:
         "languages": dict(languages),
         "providers": dict(providers),
         "unique_users": len(users),
-        "last_sample_at": entries[-1].get("captured_at") if entries else None,
+        "unique_sessions": len([s for s in sessions.keys() if s and s != "unknown"]),
+        "last_sample_at": latest_entry.get("captured_at") if latest_entry else None,
+        "last_sample_id": latest_entry.get("sample_id") if latest_entry else None,
+        "last_session_id": latest_entry.get("session_id") if latest_entry else None,
         "storage_topology": topology,
+        "training_status": training_status,
+        **checkpoint_info,
         "checked_at": _now(),
     }
     _write_status(status)
@@ -195,10 +303,14 @@ def save_sample(
     device_id: str,
     language: str = "en-US",
     provider: str = "BROWSER_WEBSPEECH",
+    session_id: str = "",
 ) -> Dict[str, Any]:
     transcript = _sanitize_transcript(transcript)
     decision = _evaluate_sample(audio_bytes, transcript)
     sample_id = f"STT-{uuid.uuid4().hex[:16].upper()}"
+    audio_sha256 = _sha256_bytes(audio_bytes)
+    transcript_hash = _sha256_text(transcript)
+    normalized_session_id = (session_id or "").strip()[:96] or f"BROWSER-{user_id}-{device_id}"
 
     if not decision.accepted:
         status = get_dataset_status()
@@ -210,6 +322,27 @@ def save_sample(
             "dataset": status,
         }
 
+    existing_entries = _read_manifest_entries()
+    duplicate = _recent_duplicate(
+        existing_entries,
+        transcript_hash=transcript_hash,
+        audio_sha256=audio_sha256,
+        user_id=user_id,
+        device_id=device_id,
+    )
+    if duplicate is not None:
+        status = get_dataset_status()
+        return {
+            "accepted": False,
+            "sample_id": sample_id,
+            "reason": "DUPLICATE_SAMPLE",
+            "details": {
+                "existing_sample_id": duplicate.get("sample_id"),
+                "existing_captured_at": duplicate.get("captured_at"),
+            },
+            "dataset": status,
+        }
+
     audio_path = _audio_root() / f"{sample_id}.wav"
     with open(audio_path, "wb") as f:
         f.write(audio_bytes)
@@ -218,11 +351,14 @@ def save_sample(
         "audio": str(audio_path),
         "text": transcript,
         "sample_id": sample_id,
+        "session_id": normalized_session_id,
         "user_id": user_id,
         "device_id": device_id,
         "language": language,
         "provider": provider,
         "captured_at": _now(),
+        "audio_sha256": audio_sha256,
+        "transcript_hash": transcript_hash,
         **decision.details,
     }
 
@@ -233,6 +369,7 @@ def save_sample(
     return {
         "accepted": True,
         "sample_id": sample_id,
+        "session_id": normalized_session_id,
         "audio_path": str(audio_path),
         "manifest_path": str(_manifest_path()),
         "details": decision.details,
@@ -261,49 +398,104 @@ def train_local_stt_model(
             "dataset": get_dataset_status(),
         }
 
-    from torch.utils.data import DataLoader
-    from impl_v1.training.voice.stt_trainer import SpeechDataset, STTTrainer, collate_fn
+    lock_path = _training_lock_path()
+    if lock_path.exists():
+        return {
+            "started": False,
+            "reason": "TRAINING_ALREADY_RUNNING",
+            "dataset": get_dataset_status(),
+            "training_status": _read_training_status(),
+        }
 
-    train_entries: List[Dict[str, Any]] = []
-    val_entries: List[Dict[str, Any]] = []
-    stride = max(2, int(round(1 / max(min(val_ratio, 0.5), 0.05))))
-    for idx, entry in enumerate(entries):
-        if idx % stride == 0:
-            val_entries.append(entry)
-        else:
-            train_entries.append(entry)
+    session_id = f"STT-TRAIN-{uuid.uuid4().hex[:12].upper()}"
+    lock_path.write_text(session_id, encoding="utf-8")
+    _write_training_status({
+        "status": "RUNNING",
+        "session_id": session_id,
+        "started_at": _now(),
+        "requested_epochs": int(epochs),
+        "batch_size": int(batch_size),
+        "latest_checkpoint": _checkpoint_info().get("latest_checkpoint"),
+        "best_checkpoint": _checkpoint_info().get("best_checkpoint"),
+    })
 
-    if not train_entries or not val_entries:
-        split = max(1, len(entries) // 10)
-        val_entries = entries[:split]
-        train_entries = entries[split:]
+    try:
+        from torch.utils.data import DataLoader
+        from impl_v1.training.voice.stt_trainer import SpeechDataset, STTTrainer, collate_fn
 
-    manifests_root = _dataset_root() / "manifests"
-    train_manifest = manifests_root / "train_manifest.jsonl"
-    val_manifest = manifests_root / "val_manifest.jsonl"
-    _write_subset_manifest(train_manifest, train_entries)
-    _write_subset_manifest(val_manifest, val_entries)
+        train_entries: List[Dict[str, Any]] = []
+        val_entries: List[Dict[str, Any]] = []
+        stride = max(2, int(round(1 / max(min(val_ratio, 0.5), 0.05))))
+        for idx, entry in enumerate(entries):
+            if idx % stride == 0:
+                val_entries.append(entry)
+            else:
+                train_entries.append(entry)
 
-    trainer = STTTrainer()
-    train_ds = SpeechDataset(str(train_manifest))
-    val_ds = SpeechDataset(str(val_manifest))
-    train_loader = DataLoader(
-        train_ds, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
-    )
-    val_loader = DataLoader(
-        val_ds, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
-    )
-    metrics = trainer.train(train_loader, val_loader, epochs=epochs)
+        if not train_entries or not val_entries:
+            split = max(1, len(entries) // 10)
+            val_entries = entries[:split]
+            train_entries = entries[split:]
 
-    result = {
-        "started": True,
-        "epochs": epochs,
-        "batch_size": batch_size,
-        "train_samples": len(train_entries),
-        "val_samples": len(val_entries),
-        "metrics": metrics,
-        "dataset": get_dataset_status(),
-        "completed_at": _now(),
-    }
-    logger.info("[STT_DATASET] Training complete: %s", result)
-    return result
+        manifests_root = _dataset_root() / "manifests"
+        train_manifest = manifests_root / "train_manifest.jsonl"
+        val_manifest = manifests_root / "val_manifest.jsonl"
+        _write_subset_manifest(train_manifest, train_entries)
+        _write_subset_manifest(val_manifest, val_entries)
+
+        trainer = STTTrainer()
+        resumed_from_checkpoint = trainer.load_checkpoint()
+        train_ds = SpeechDataset(str(train_manifest))
+        val_ds = SpeechDataset(str(val_manifest))
+        train_loader = DataLoader(
+            train_ds, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+        )
+        val_loader = DataLoader(
+            val_ds, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
+        )
+        metrics = trainer.train(train_loader, val_loader, epochs=epochs)
+
+        checkpoint_info = _checkpoint_info()
+        result = {
+            "started": True,
+            "session_id": session_id,
+            "epochs": epochs,
+            "batch_size": batch_size,
+            "train_samples": len(train_entries),
+            "val_samples": len(val_entries),
+            "metrics": metrics,
+            "resumed_from_checkpoint": bool(resumed_from_checkpoint),
+            "checkpoints": checkpoint_info,
+            "dataset": get_dataset_status(),
+            "completed_at": _now(),
+        }
+        _write_training_status({
+            "status": "COMPLETED",
+            "session_id": session_id,
+            "started_at": _read_training_status().get("started_at"),
+            "completed_at": result["completed_at"],
+            "requested_epochs": int(epochs),
+            "batch_size": int(batch_size),
+            "resumed_from_checkpoint": bool(resumed_from_checkpoint),
+            "metrics": metrics,
+            "last_training_at": result["completed_at"],
+            "last_completed_session": session_id,
+            **checkpoint_info,
+        })
+        logger.info("[STT_DATASET] Training complete: %s", result)
+        return result
+    except Exception as exc:
+        failure = {
+            "status": "FAILED",
+            "session_id": session_id,
+            "failed_at": _now(),
+            "error": str(exc),
+            **_checkpoint_info(),
+        }
+        _write_training_status(failure)
+        raise
+    finally:
+        try:
+            lock_path.unlink()
+        except FileNotFoundError:
+            pass

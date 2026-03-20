@@ -196,7 +196,7 @@ def _train_and_eval(
     for i in range(0, split, batch_size):
         bx = X_train[i:i + batch_size]
         by = y_train[i:i + batch_size]
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         loss = criterion(model(bx), by)
         loss.backward()
         optimizer.step()

@@ -75,7 +75,7 @@ def run_rare_class_test(features: np.ndarray, labels: np.ndarray) -> RareClassRe
     for _ in range(15):
         for bx, by in loader:
             bx, by = bx.to(device), by.to(device)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             criterion(model(bx), by).backward()
             optimizer.step()
     

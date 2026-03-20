@@ -106,8 +106,8 @@ def run_benchmark(
     scaler = None
     if amp_enabled:
         try:
-            from torch.cuda.amp import GradScaler, autocast
-            scaler = GradScaler()
+            from torch.amp import GradScaler, autocast
+            scaler = GradScaler('cuda')
         except ImportError:
             amp_enabled = False
 
@@ -121,10 +121,10 @@ def run_benchmark(
             batch_x = X[i:i+batch_size]
             batch_y = y[i:i+batch_size]
 
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
 
             if amp_enabled and scaler:
-                with autocast(dtype=torch.float16):
+                with autocast('cuda', dtype=torch.float16):
                     out = model(batch_x)
                     loss = criterion(out, batch_y)
                 scaler.scale(loss).backward()

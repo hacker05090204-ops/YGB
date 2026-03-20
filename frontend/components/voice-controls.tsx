@@ -209,10 +209,22 @@ export function VoiceControls({
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null)
   const audioChunksRef = useRef<Float32Array[]>([])
   const sampleRateRef = useRef<number>(TARGET_SAMPLE_RATE)
+  const offlineGrabberSessionRef = useRef<string>("")
 
   const isResearchMode = voiceMode === "RESEARCH"
   const hasResearchResult =
     lastIntent?.research_result && lastIntent.intent_type === "RESEARCH_QUERY"
+
+  const getOfflineGrabberSessionId = useCallback(() => {
+    if (!offlineGrabberSessionRef.current) {
+      const randomPart =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID().replace(/-/g, "").slice(0, 16)
+          : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`
+      offlineGrabberSessionRef.current = `BROWSER-GRAB-${randomPart.toUpperCase()}`
+    }
+    return offlineGrabberSessionRef.current
+  }, [])
 
   const refreshSttStatus = useCallback(async () => {
     try {
@@ -302,6 +314,7 @@ export function VoiceControls({
           device_id: "browser",
           language: language === "EN" ? "en-US" : "hi-IN",
           provider: "BROWSER_WEBSPEECH",
+          session_id: getOfflineGrabberSessionId(),
         }),
       })
       const data = await res.json().catch(() => null)
@@ -323,7 +336,7 @@ export function VoiceControls({
     } catch {
       setSampleStatus("Offline STT sample upload failed.")
     }
-  }, [language, refreshSttStatus])
+  }, [getOfflineGrabberSessionId, language, refreshSttStatus])
 
   const startAudioCapture = useCallback(async () => {
     if (typeof window === "undefined" || !navigator.mediaDevices?.getUserMedia) {

@@ -1,0 +1,18 @@
+
+> temp-app@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.1.6 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://100.108.59.126:3000
+- Environments: .env.local
+
+✓ Starting...
+✓ Ready in 1935ms
+○ Compiling /control ...
+ GET /control 200 in 14.1s (compile: 13.7s, render: 435ms)
+ GET / 200 in 67ms (compile: 7ms, render: 60ms)
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 6.2s (compile: 5.8s, render: 464ms)
+ GET /control 200 in 123ms (compile: 34ms, render: 90ms)
+ GET /control 200 in 437ms (compile: 96ms, render: 341ms)

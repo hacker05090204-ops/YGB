@@ -7,7 +7,7 @@
   Outputs structured JSON to reports/cluster_authority_report.json.
 ═══════════════════════════════════════════════════════════════════════
 """
-import sys, os, json, hashlib, logging, time
+import sys, os, json, logging
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -215,7 +215,7 @@ crit = nn.CrossEntropyLoss()
 
 sanity_model.train()
 for _ in range(5):
-    opt.zero_grad()
+    opt.zero_grad(set_to_none=True)
     loss = crit(sanity_model(sx), sy)
     loss.backward()
     opt.step()

@@ -62,6 +62,13 @@ except ImportError:
     CVE_SCANNER_AVAILABLE = False
     print("[INFO] CVE scanner not available.")
 
+try:
+    from backend.cve.verification_engine import VerificationEngine
+    VERIFICATION_ENGINE_AVAILABLE = True
+except ImportError:
+    VERIFICATION_ENGINE_AVAILABLE = False
+    VerificationEngine = None
+
 
 # ==============================================================================
 # DATA CLASSES
@@ -110,6 +117,8 @@ class WorkflowContext:
     current_phase: int = 0
     stopped: bool = False
     report_file: Optional[str] = None
+    report_json_file: Optional[str] = None
+    verification_summary: Dict[str, Any] = field(default_factory=dict)
 
 
 # ==============================================================================
@@ -127,6 +136,7 @@ class UnifiedPhaseRunner:
         self.action_count = 0
         self.driver = None
         self.use_browser = False
+        self.verification_engine = VerificationEngine() if VERIFICATION_ENGINE_AVAILABLE else None
         
     async def _emit(self, data: Dict[str, Any]):
         """Emit progress update."""
@@ -156,13 +166,18 @@ class UnifiedPhaseRunner:
             "severity": finding.severity,
             "title": finding.title,
             "description": finding.description,
-            "url": finding.url
+            "url": finding.url,
+            "evidence": finding.evidence,
+            "verification": finding.evidence.get("verification", {}),
+            "identified_as": finding.evidence.get("identified_as", []),
+            "auto_poc_steps": finding.evidence.get("auto_poc_steps", []),
         })
     
     def _gen_id(self, prefix: str) -> str:
         return f"{prefix}-{hashlib.md5(str(datetime.now(UTC)).encode()).hexdigest()[:8]}"
     
-    async def _add_finding(self, context: WorkflowContext, category: str, severity: str, title: str, description: str, url: str = ""):
+    async def _add_finding(self, context: WorkflowContext, category: str, severity: str, title: str,
+                           description: str, url: str = "", evidence: Optional[Dict[str, Any]] = None):
         """Add and emit a finding."""
         finding = Finding(
             finding_id=self._gen_id("FND"),
@@ -170,8 +185,11 @@ class UnifiedPhaseRunner:
             severity=severity,
             title=title,
             description=description,
-            url=url or context.target_url
+            url=url or context.target_url,
+            evidence=evidence or {},
         )
+        if self.verification_engine:
+            finding.evidence = self.verification_engine.enrich_finding(finding, context)
         context.findings.append(finding)
         await self._emit_finding(finding)
     
@@ -742,7 +760,12 @@ class UnifiedPhaseRunner:
             if header not in headers:
                 await self._add_finding(context, "HEADERS", severity,
                     f"Missing {display_name}",
-                    f"Response is missing the {display_name} header ({desc})")
+                    f"Response is missing the {display_name} header ({desc})",
+                    evidence={
+                        "missing_header": display_name,
+                        "response_headers": sorted(headers.keys()),
+                        "verification_notes": [f"Missing hardening header: {display_name}"],
+                    })
                 findings += 1
         
         # Check for info disclosure headers
@@ -757,7 +780,11 @@ class UnifiedPhaseRunner:
             if header in headers:
                 await self._add_finding(context, "INFO_DISCLOSURE", "INFO",
                     f"Server info disclosed via {display_name}",
-                    f"{display_name}: {headers[header]}")
+                    f"{display_name}: {headers[header]}",
+                    evidence={
+                        "response_headers": {display_name: headers[header]},
+                        "verification_notes": [f"Technology disclosure via {display_name}"],
+                    })
                 findings += 1
         
         await self._emit_action("HEADERS", context.target_url, {"findings": findings})
@@ -820,7 +847,11 @@ class UnifiedPhaseRunner:
         if len(event_handlers) > 5:
             await self._add_finding(context, "XSS", "LOW",
                 f"Multiple inline event handlers ({len(event_handlers)})",
-                "Inline event handlers can be XSS vectors if user input is reflected")
+                "Inline event handlers can be XSS vectors if user input is reflected",
+                evidence={
+                    "dom_event_handlers": event_handlers[:10],
+                    "verification_notes": ["Inline JavaScript handlers increase XSS exposure."],
+                })
             findings += 1
         
         # Dangerous JavaScript patterns
@@ -842,7 +873,15 @@ class UnifiedPhaseRunner:
             if count > 0:
                 await self._add_finding(context, "XSS", severity,
                     f"Potential XSS: {desc} ({count} occurrences)",
-                    f"Found {count} instances of {pattern} which could lead to XSS")
+                    f"Found {count} instances of {pattern} which could lead to XSS",
+                    evidence={
+                        "request_response_pairs": [{
+                            "url": context.target_url,
+                            "matched_pattern": pattern,
+                            "count": count,
+                        }],
+                        "verification_notes": [f"Client-side sink/source detected: {desc}"],
+                    })
                 findings += 1
         
         # Check for reflected parameters in URL
@@ -854,7 +893,15 @@ class UnifiedPhaseRunner:
                     if value and value in content:
                         await self._add_finding(context, "XSS", "MEDIUM",
                             f"URL parameter reflected in page",
-                            f"Parameter value appears in response - potential reflected XSS")
+                            f"Parameter value appears in response - potential reflected XSS",
+                            evidence={
+                                "request_response_pairs": [{
+                                    "url": context.target_url,
+                                    "parameter": param.split('=')[0],
+                                    "reflected_value": value[:80],
+                                }],
+                                "verification_notes": ["Reflected parameter detected in response body."],
+                            })
                         findings += 1
                         break
         
@@ -865,7 +912,11 @@ class UnifiedPhaseRunner:
             if sink in content:
                 await self._add_finding(context, "XSS", "MEDIUM",
                     f"DOM-based XSS source detected: {sink}",
-                    "User-controllable data source found in JavaScript")
+                    "User-controllable data source found in JavaScript",
+                    evidence={
+                        "dom_sources": [sink],
+                        "verification_notes": [f"DOM source present: {sink}"],
+                    })
                 findings += 1
         
         await self._emit_action("XSS_SCAN", context.target_url, {"patterns_found": findings})
@@ -901,7 +952,15 @@ class UnifiedPhaseRunner:
             if pattern in content:
                 await self._add_finding(context, "SQLI", "CRITICAL",
                     f"SQL error message exposed",
-                    f"Found '{pattern}' indicating possible SQL injection vulnerability")
+                    f"Found '{pattern}' indicating possible SQL injection vulnerability",
+                    evidence={
+                        "error_messages": [pattern],
+                        "request_response_pairs": [{
+                            "url": context.target_url,
+                            "matched_pattern": pattern,
+                        }],
+                        "verification_notes": [f"Database error signature detected: {desc}"],
+                    })
                 findings += 1
                 break
         
@@ -912,7 +971,14 @@ class UnifiedPhaseRunner:
                 if f'{param}=' in link:
                     await self._add_finding(context, "SQLI", "LOW",
                         f"Potentially injectable parameter: {param}",
-                        f"Common SQL-injectable parameter found in URL: {link[:100]}")
+                        f"Common SQL-injectable parameter found in URL: {link[:100]}",
+                        evidence={
+                            "request_response_pairs": [{
+                                "url": link,
+                                "parameter": param,
+                            }],
+                            "verification_notes": [f"Common SQLi parameter candidate: {param}"],
+                        })
                     findings += 1
                     break
             if findings > 0:
@@ -1206,7 +1272,18 @@ class UnifiedPhaseRunner:
             if inputs:
                 await self._add_finding(context, "SQLI", "HIGH",
                     f"Form with inputs found at {url}",
-                    f"Inputs: {', '.join(inputs[:5])}. Test with SQL payloads: {sql_payloads[0]}")
+                    f"Inputs: {', '.join(inputs[:5])}. Test with SQL payloads: {sql_payloads[0]}",
+                    evidence={
+                        "request_response_pairs": [{
+                            "url": url,
+                            "inputs": inputs[:5],
+                        }],
+                        "auto_poc_steps": [
+                            "Capture the form submission request from the affected page.",
+                            f"Replay the request with a baseline payload such as {sql_payloads[0]} in a non-destructive field.",
+                            "Compare application behavior, status code, and response length against the baseline.",
+                        ],
+                    })
                 break
         
         # Check URL parameters
@@ -1214,7 +1291,11 @@ class UnifiedPhaseRunner:
         if parsed.query:
             await self._add_finding(context, "SQLI", "MEDIUM",
                 f"URL with parameters found",
-                f"URL: {url} - Test parameters for SQL injection")
+                f"URL: {url} - Test parameters for SQL injection",
+                evidence={
+                    "request_response_pairs": [{"url": url}],
+                    "verification_notes": ["Parameterized URL discovered during crawl."],
+                })
     
     async def _quick_scan(self, context: WorkflowContext, url: str, html: str, headers: Dict):
         """Quick security scan on crawled page."""
@@ -1222,11 +1303,19 @@ class UnifiedPhaseRunner:
         
         if 'x-frame-options' not in headers_lower:
             await self._add_finding(context, "HEADERS", "MEDIUM",
-                "Missing X-Frame-Options", f"Page {url} vulnerable to clickjacking", url)
-        
+                "Missing X-Frame-Options", f"Page {url} vulnerable to clickjacking", url,
+                evidence={
+                    "missing_header": "X-Frame-Options",
+                    "response_headers": sorted(headers_lower.keys()),
+                })
+
         if 'content-security-policy' not in headers_lower:
             await self._add_finding(context, "HEADERS", "MEDIUM",
-                "Missing CSP", f"Page {url} lacks Content-Security-Policy", url)
+                "Missing CSP", f"Page {url} lacks Content-Security-Policy", url,
+                evidence={
+                    "missing_header": "Content-Security-Policy",
+                    "response_headers": sorted(headers_lower.keys()),
+                })
     
     async def _phase_js_analysis(self, context: WorkflowContext) -> Dict:
         """Phase 14: JavaScript security analysis."""
@@ -1484,7 +1573,14 @@ class UnifiedPhaseRunner:
                 if f'{param}=' in link.lower():
                     await self._add_finding(context, "CMD_INJECTION", "HIGH",
                         f"Potential command injection: {param} parameter",
-                        f"Parameter may allow OS command injection: {link[:80]}")
+                        f"Parameter may allow OS command injection: {link[:80]}",
+                        evidence={
+                            "request_response_pairs": [{
+                                "url": link,
+                                "parameter": param,
+                            }],
+                            "verification_notes": [f"Potential OS command surface in parameter: {param}"],
+                        })
                     findings += 1
                     break
             if findings >= 2:
@@ -1503,7 +1599,14 @@ class UnifiedPhaseRunner:
                 if f'{param}=' in link.lower():
                     await self._add_finding(context, "PATH_TRAVERSAL", "MEDIUM",
                         f"Potential path traversal: {param} parameter",
-                        f"File path parameter found: {link[:80]}")
+                        f"File path parameter found: {link[:80]}",
+                        evidence={
+                            "request_response_pairs": [{
+                                "url": link,
+                                "parameter": param,
+                            }],
+                            "verification_notes": [f"File path parameter discovered: {param}"],
+                        })
                     findings += 1
                     break
             if findings >= 3:
@@ -1850,7 +1953,16 @@ class UnifiedPhaseRunner:
                 for cve in results.get("findings", []):
                     await self._add_finding(context, "CVE", cve["severity"],
                         f"{cve['cve_id']}: {cve['title']}",
-                        f"{cve['description']}. Remediation: {cve['remediation']}")
+                        f"{cve['description']}. Remediation: {cve['remediation']}",
+                        evidence={
+                            "detected_cve": cve["cve_id"],
+                            "confidence": cve.get("confidence"),
+                            "references": cve.get("references", []),
+                            "remediation": cve.get("remediation"),
+                            "component": cve.get("component"),
+                            "request_response_pairs": [],
+                            "error_messages": [],
+                        })
                 
                 await self._emit_action("CVE_SCAN", context.target_url, {
                     "total_cves": results.get("total_cves", 0),
@@ -1932,6 +2044,10 @@ class UnifiedPhaseRunner:
     
     async def _phase_generate_report(self, context: WorkflowContext) -> Dict:
         """Phase 49: Generate security report and save to file."""
+        verification_summary = {"verified_findings": 0, "likely_findings": 0, "mode_b_seeded_findings": 0}
+        if self.verification_engine:
+            verification_summary = self.verification_engine.enrich_findings(context.findings, context)
+
         # Count by severity
         severity_counts = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0, "INFO": 0}
         for f in context.findings:
@@ -1952,7 +2068,8 @@ class UnifiedPhaseRunner:
             "severity": severity_counts,
             "categories": category_counts,
             "pages_analyzed": len(context.pages_visited),
-            "technologies": context.technologies
+            "technologies": context.technologies,
+            "verification_summary": verification_summary,
         }
         
         # Generate TXT report
@@ -1962,6 +2079,7 @@ class UnifiedPhaseRunner:
         report_dir = PROJECT_ROOT / "report"
         report_dir.mkdir(parents=True, exist_ok=True)
         report_path = report_dir / f"{domain}_{timestamp}.txt"
+        report_json_path = report_dir / f"{domain}_{timestamp}.json"
         
         # Build full text report
         lines = []
@@ -1981,6 +2099,12 @@ class UnifiedPhaseRunner:
         lines.append(f"Pages Analyzed: {len(context.pages_visited)}")
         lines.append(f"Phases Executed: {len(context.phase_results)}")
         lines.append(f"Technologies: {', '.join(context.technologies) or 'None detected'}")
+        lines.append(
+            "Verification: "
+            f"{verification_summary.get('verified_findings', 0)} verified, "
+            f"{verification_summary.get('likely_findings', 0)} likely, "
+            f"{verification_summary.get('mode_b_seeded_findings', 0)} MODE-B seeded"
+        )
         lines.append("")
         lines.append("-" * 80)
         lines.append("SEVERITY BREAKDOWN")
@@ -2013,6 +2137,28 @@ class UnifiedPhaseRunner:
                     lines.append(f"  Description: {finding.description}")
                     if finding.url:
                         lines.append(f"  URL: {finding.url}")
+                    verification = finding.evidence.get("verification", {})
+                    identifiers = finding.evidence.get("identified_as", [])
+                    auto_poc_steps = finding.evidence.get("auto_poc_steps", [])
+                    public_poc_refs = finding.evidence.get("public_poc_refs", [])
+                    if verification:
+                        lines.append(
+                            "  Verification: "
+                            f"{verification.get('verification_status', 'UNVERIFIED')} "
+                            f"(score={verification.get('verification_score', 0)}, "
+                            f"strength={verification.get('evidence_strength', 'WEAK')})"
+                        )
+                        lines.append(f"  Rationale: {verification.get('rationale', '')}")
+                    if identifiers:
+                        lines.append(f"  Identification: {', '.join(identifiers)}")
+                    if auto_poc_steps:
+                        lines.append("  Auto-PoC:")
+                        for step in auto_poc_steps[:4]:
+                            lines.append(f"    - {step}")
+                    if public_poc_refs:
+                        lines.append("  Public PoC References:")
+                        for ref in public_poc_refs[:2]:
+                            lines.append(f"    - {ref.get('title', 'Reference')}: {ref.get('reference', '')}")
                     lines.append("")
         
         lines.append("=" * 80)
@@ -2039,10 +2185,30 @@ class UnifiedPhaseRunner:
         # Write report to file
         report_content = "\n".join(lines)
         report_path.write_text(report_content, encoding="utf-8")
-        
+        report_json_path.write_text(json.dumps({
+            **report,
+            "workflow_id": context.workflow_id,
+            "mode": context.mode,
+            "findings": [
+                {
+                    "finding_id": finding.finding_id,
+                    "category": finding.category,
+                    "severity": finding.severity,
+                    "title": finding.title,
+                    "description": finding.description,
+                    "url": finding.url,
+                    "evidence": finding.evidence,
+                }
+                for finding in context.findings
+            ],
+        }, indent=2), encoding="utf-8")
+
         # Store path in context for frontend
         context.report_file = str(report_path)
+        context.report_json_file = str(report_json_path)
+        context.verification_summary = verification_summary
         report["report_file"] = str(report_path)
+        report["report_json_file"] = str(report_json_path)
         
         await self._emit_action("REPORT", context.target_url, {
             **report,

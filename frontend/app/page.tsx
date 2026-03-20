@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { createAuthWebSocket } from "@/lib/ws-auth"
 import { authFetch } from "@/lib/ygb-api"
+import { useAuthUser } from "@/hooks/use-auth-user"
 import {
   CheckCircle,
   XCircle,
@@ -51,6 +53,40 @@ interface BrowserAction {
   timestamp?: string
 }
 
+interface VerificationSummary {
+  verified_findings?: number
+  likely_findings?: number
+  mode_b_seeded_findings?: number
+}
+
+interface FindingVerification {
+  verification_status?: string
+  verification_score?: number
+  evidence_strength?: string
+  rationale?: string
+}
+
+interface FindingEvidence {
+  verification?: FindingVerification
+  identified_as?: string[]
+  auto_poc_steps?: string[]
+  [key: string]: any
+}
+
+interface WorkflowFinding {
+  type?: string
+  finding_id?: string
+  category?: string
+  severity?: string
+  title?: string
+  description?: string
+  url?: string
+  evidence?: FindingEvidence
+  verification?: FindingVerification
+  identified_as?: string[]
+  auto_poc_steps?: string[]
+}
+
 interface WorkflowResult {
   summary?: {
     total_phases: number
@@ -59,8 +95,12 @@ interface WorkflowResult {
     findings_count: number
     total_duration_ms: number
     report_file?: string
+    report_json_file?: string
+    pages_visited?: number
+    technologies?: string[]
+    verification_summary?: VerificationSummary
   }
-  findings?: any[]
+  findings?: WorkflowFinding[]
   phases?: any[]
 }
 
@@ -89,6 +129,8 @@ interface G38Status {
 const API_BASE = "http://localhost:8000"
 
 export default function Home() {
+  const router = useRouter()
+  const authUser = useAuthUser()
   const containerRef = useRef(null)
   const phaseLogRef = useRef<HTMLDivElement>(null)
   const browserLogRef = useRef<HTMLDivElement>(null)
@@ -103,7 +145,7 @@ export default function Home() {
   const [isRunning, setIsRunning] = useState(false)
   const [phases, setPhases] = useState<PhaseUpdate[]>([])
   const [browserActions, setBrowserActions] = useState<BrowserAction[]>([])
-  const [findings, setFindings] = useState<any[]>([])
+  const [findings, setFindings] = useState<WorkflowFinding[]>([])
   const [currentPhase, setCurrentPhase] = useState(0)
   const [progress, setProgress] = useState(0)
   const [result, setResult] = useState<WorkflowResult | null>(null)
@@ -111,6 +153,12 @@ export default function Home() {
   const [g38Status, setG38Status] = useState<G38Status | null>(null)
 
   const wsRef = useRef<WebSocket | null>(null)
+
+  useEffect(() => {
+    if (authUser.status === "authenticated") {
+      router.replace("/dashboard")
+    }
+  }, [authUser.status, router])
 
   // Check API — use plain fetch, health endpoint requires no auth
   useEffect(() => {
@@ -206,14 +254,18 @@ export default function Home() {
             setBrowserActions(prev => [...prev, msg])
           }
           else if (msg.type === "finding") {
-            setFindings(prev => [...prev, msg])
+            setFindings(prev => [...prev, msg as WorkflowFinding])
           }
           else if (msg.type === "workflow_complete") {
             setProgress(100)
             setPhases(prev => [...prev, { type: "complete", ...msg }])
           }
           else if (msg.type === "complete") {
-            setResult(msg.result)
+            const nextResult = msg.result as WorkflowResult
+            setResult(nextResult)
+            if (Array.isArray(nextResult.findings) && nextResult.findings.length > 0) {
+              setFindings(nextResult.findings)
+            }
             setIsRunning(false)
             ws?.close()
           }
@@ -275,6 +327,26 @@ export default function Home() {
       case "INFO": return "bg-gray-500 text-white"
       default: return "bg-gray-500 text-white"
     }
+  }
+
+  const getVerificationColor = (status?: string) => {
+    switch (status?.toUpperCase()) {
+      case "VERIFIED": return "bg-emerald-500/15 text-emerald-300 border border-emerald-400/20"
+      case "LIKELY": return "bg-cyan-500/15 text-cyan-300 border border-cyan-400/20"
+      default: return "bg-[#262626] text-[#A3A3A3] border border-white/[0.06]"
+    }
+  }
+
+  if (authUser.status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+        <div className="text-gray-600 text-sm animate-pulse">Loading...</div>
+      </div>
+    )
+  }
+
+  if (authUser.status === "authenticated") {
+    return null
   }
 
   return (
@@ -700,16 +772,27 @@ export default function Home() {
                     </div>
                     <span className="text-xl font-semibold">Analysis Complete</span>
                   </div>
-                  {result.summary?.report_file && (
-                    <a
-                      href={`http://localhost:8000/api/reports/${result.summary.report_file.split(/[\\\/]/).pop()}`}
-                      download
-                      className="px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 border border-white/[0.1] rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
-                    >
-                      <ArrowRight className="w-4 h-4" />
-                      Download Report
-                    </a>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {result.summary?.report_file && (
+                      <a
+                        href={`${API_BASE}/api/reports/${result.summary.report_file.split(/[\\\/]/).pop()}`}
+                        download
+                        className="px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 border border-white/[0.1] rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                        Download Report
+                      </a>
+                    )}
+                    {result.summary?.report_json_file && (
+                      <a
+                        href={`${API_BASE}/api/reports/${result.summary.report_json_file.split(/[\\\/]/).pop()}`}
+                        download
+                        className="px-4 py-2 bg-[#111111] border border-white/[0.1] rounded-xl text-sm font-medium hover:bg-white/[0.04] transition-colors"
+                      >
+                        Download JSON
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
                   <div>
@@ -733,6 +816,28 @@ export default function Home() {
                     <div className="text-sm text-[#525252] mt-2">Duration</div>
                   </div>
                 </div>
+                {result.summary?.verification_summary && (
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="rounded-2xl bg-[#111111] border border-white/[0.06] p-5">
+                      <div className="text-3xl font-semibold text-emerald-300">
+                        {result.summary.verification_summary.verified_findings || 0}
+                      </div>
+                      <div className="text-sm text-[#737373] mt-1">Verified Findings</div>
+                    </div>
+                    <div className="rounded-2xl bg-[#111111] border border-white/[0.06] p-5">
+                      <div className="text-3xl font-semibold text-cyan-300">
+                        {result.summary.verification_summary.likely_findings || 0}
+                      </div>
+                      <div className="text-sm text-[#737373] mt-1">Likely Identified</div>
+                    </div>
+                    <div className="rounded-2xl bg-[#111111] border border-white/[0.06] p-5">
+                      <div className="text-3xl font-semibold text-amber-200">
+                        {result.summary.verification_summary.mode_b_seeded_findings || 0}
+                      </div>
+                      <div className="text-sm text-[#737373] mt-1">Auto-PoC Seeded</div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -751,38 +856,72 @@ export default function Home() {
 
                 <div className="max-h-[400px] overflow-y-auto">
                   <div className="p-4 space-y-2">
-                    {findings.map((finding, idx) => (
-                      <div
-                        key={idx}
-                        className="p-4 rounded-xl bg-[#171717] border border-white/[0.04] hover:border-white/[0.08] transition-colors"
-                      >
-                        <div className="flex items-start gap-3">
-                          <AlertTriangle className={`w-4 h-4 mt-0.5 ${finding.severity === "CRITICAL" ? "text-red-500" :
-                            finding.severity === "HIGH" ? "text-orange-500" :
-                              finding.severity === "MEDIUM" ? "text-yellow-500" :
-                                finding.severity === "LOW" ? "text-blue-400" :
-                                  "text-gray-400"
-                            }`} />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${getSeverityColor(finding.severity)}`}>
-                                {finding.severity}
-                              </span>
-                              <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#262626] text-[#a3a3a3]">
-                                {finding.category}
-                              </span>
-                            </div>
-                            <div className="text-sm font-medium text-[#FAFAFA] mb-1">{finding.title}</div>
-                            <div className="text-xs text-[#525252]">{finding.description}</div>
-                            {finding.url && (
-                              <div className="text-xs text-[#404040] mt-2 truncate">
-                                URL: {finding.url}
+                    {findings.map((finding, idx) => {
+                      const verification = finding.verification || finding.evidence?.verification
+                      const identifiers = finding.identified_as || finding.evidence?.identified_as || []
+                      const autoPocSteps = finding.auto_poc_steps || finding.evidence?.auto_poc_steps || []
+
+                      return (
+                        <div
+                          key={idx}
+                          className="p-4 rounded-xl bg-[#171717] border border-white/[0.04] hover:border-white/[0.08] transition-colors"
+                        >
+                          <div className="flex items-start gap-3">
+                            <AlertTriangle className={`w-4 h-4 mt-0.5 ${finding.severity === "CRITICAL" ? "text-red-500" :
+                              finding.severity === "HIGH" ? "text-orange-500" :
+                                finding.severity === "MEDIUM" ? "text-yellow-500" :
+                                  finding.severity === "LOW" ? "text-blue-400" :
+                                    "text-gray-400"
+                              }`} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-1">
+                                <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${getSeverityColor(finding.severity || "INFO")}`}>
+                                  {finding.severity}
+                                </span>
+                                <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-[#262626] text-[#a3a3a3]">
+                                  {finding.category}
+                                </span>
+                                {verification?.verification_status && (
+                                  <span className={`px-2 py-0.5 rounded-md text-xs font-medium ${getVerificationColor(verification.verification_status)}`}>
+                                    {verification.verification_status}
+                                  </span>
+                                )}
                               </div>
-                            )}
+                              <div className="text-sm font-medium text-[#FAFAFA] mb-1">{finding.title}</div>
+                              <div className="text-xs text-[#525252]">{finding.description}</div>
+                              {identifiers.length > 0 && (
+                                <div className="text-xs text-[#CFCFCF] mt-2">
+                                  Identification: {identifiers.join(", ")}
+                                </div>
+                              )}
+                              {verification?.verification_score !== undefined && (
+                                <div className="text-xs text-[#737373] mt-1">
+                                  Verification score {verification.verification_score}
+                                  {verification.evidence_strength ? ` • ${verification.evidence_strength}` : ""}
+                                </div>
+                              )}
+                              {autoPocSteps.length > 0 && (
+                                <div className="mt-2 rounded-xl bg-black/20 border border-white/[0.05] px-3 py-2">
+                                  <div className="text-[11px] uppercase tracking-[0.18em] text-[#737373] mb-2">Auto-PoC</div>
+                                  <div className="space-y-1">
+                                    {autoPocSteps.slice(0, 3).map((step, stepIdx) => (
+                                      <div key={stepIdx} className="text-xs text-[#A3A3A3]">
+                                        {stepIdx + 1}. {step}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {finding.url && (
+                                <div className="text-xs text-[#404040] mt-2 truncate">
+                                  URL: {finding.url}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               </div>

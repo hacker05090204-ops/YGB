@@ -17,6 +17,8 @@ import time
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional
 
+from impl_v1.training.distributed.hash_utils import hash_model_weights
+
 logger = logging.getLogger(__name__)
 
 
@@ -165,7 +167,7 @@ def run_cluster_benchmark(
             for i in range(0, shard_size, batch_size):
                 bx = X[i:i+batch_size]
                 by = y[i:i+batch_size]
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 loss = criterion(model(bx), by)
                 loss.backward()
                 optimizer.step()
@@ -178,10 +180,7 @@ def run_cluster_benchmark(
         total_samples += processed
 
         # Weight hash
-        wb = b""
-        for name, param in sorted(model.named_parameters()):
-            wb += param.detach().cpu().numpy().tobytes()
-        per_node_hashes.append(hashlib.sha256(wb).hexdigest())
+        per_node_hashes.append(hash_model_weights(model, mode="sampled"))
 
         del model, optimizer, X, y
         if torch.cuda.is_available():

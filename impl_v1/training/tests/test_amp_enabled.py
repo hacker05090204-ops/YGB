@@ -6,6 +6,8 @@ Validates that Automatic Mixed Precision is:
 - Available on the system
 - Properly configured with GradScaler
 - Using autocast for forward passes
+
+Uses modern torch.amp API (not deprecated torch.cuda.amp).
 """
 
 import pytest
@@ -19,18 +21,18 @@ class TestAMPEnabled:
     """Tests for AMP (Automatic Mixed Precision) configuration."""
     
     def test_torch_amp_available(self):
-        """torch.cuda.amp must be available."""
+        """torch.amp must be available (modern API)."""
         import torch
-        from torch.cuda.amp import autocast, GradScaler
+        from torch.amp import autocast, GradScaler
         
-        assert hasattr(torch.cuda.amp, 'autocast'), "autocast not available"
-        assert hasattr(torch.cuda.amp, 'GradScaler'), "GradScaler not available"
+        assert hasattr(torch.amp, 'autocast'), "autocast not available"
+        assert hasattr(torch.amp, 'GradScaler'), "GradScaler not available"
     
     def test_gradscaler_creation(self):
         """GradScaler must be creatable."""
-        from torch.cuda.amp import GradScaler
+        from torch.amp import GradScaler
         
-        scaler = GradScaler()
+        scaler = GradScaler('cuda')
         assert scaler is not None
         assert scaler.get_scale() > 0
     
@@ -41,11 +43,11 @@ class TestAMPEnabled:
     def test_autocast_context(self):
         """autocast context manager must work on CUDA tensors."""
         import torch
-        from torch.cuda.amp import autocast
+        from torch.amp import autocast
         
         x = torch.randn(32, 256, device='cuda')
         
-        with autocast(dtype=torch.float16):
+        with autocast('cuda', dtype=torch.float16):
             y = x @ x.T  # Matrix multiply
             assert y.dtype in [torch.float16, torch.bfloat16, torch.float32], \
                 "autocast should use mixed precision"

@@ -284,7 +284,7 @@ class STTTrainer:
             loss = self.ctc_loss(log_probs, targets, input_lengths, target_lengths)
 
             # Backward
-            self.optimizer.zero_grad()
+            self.optimizer.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), 5.0)
             self.optimizer.step()

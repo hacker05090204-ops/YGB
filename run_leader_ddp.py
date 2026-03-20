@@ -26,6 +26,8 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+from impl_v1.training.distributed.hash_utils import hash_model_weights
+
 # Setup path
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 if PROJECT_ROOT not in sys.path:
@@ -379,13 +381,9 @@ def adaptive_batch_size(
     return max(base_batch // world_size, 32)
 
 
-def compute_weight_hash(model) -> str:
-    """SHA-256 of model weights."""
-    raw = model.module if hasattr(model, 'module') else model
-    h = hashlib.sha256()
-    for p in raw.parameters():
-        h.update(p.detach().cpu().numpy().tobytes())
-    return h.hexdigest()
+def compute_weight_hash(model, mode: str = "sampled") -> str:
+    """Deterministic model hash with reduced CPU transfer overhead."""
+    return hash_model_weights(model, mode=mode)
 
 
 def run_training(
@@ -447,6 +445,10 @@ def run_training(
     )
     criterion = nn.CrossEntropyLoss()
 
+    # AMP support — use modern torch.amp API
+    use_amp = device.type == 'cuda'
+    scaler = torch.amp.GradScaler('cuda') if use_amp else None
+
     local_batch = adaptive_batch_size(
         config.base_batch_size, config.rank, config.world_size,
     )
@@ -455,6 +457,7 @@ def run_training(
     logger.info(f"STEP 5 — TRAINING")
     logger.info(f"{'='*60}")
     logger.info(f"  device: {device}")
+    logger.info(f"  AMP: {use_amp}")
     logger.info(f"  local_batch: {local_batch}")
     logger.info(f"  epochs: {config.num_epochs}")
     logger.info(f"  lr_schedule: {'cosine' if config.cosine_lr else 'constant'}")
@@ -480,16 +483,23 @@ def run_training(
             bx = X_t[i:i + local_batch]
             by = y_t[i:i + local_batch]
 
-            optimizer.zero_grad()
-            out = model(bx)
-            loss = criterion(out, by)
-            loss.backward()
+            optimizer.zero_grad(set_to_none=True)
 
-            # Gradient clip
-            raw = model.module if hasattr(model, 'module') else model
-            torch.nn.utils.clip_grad_norm_(raw.parameters(), config.gradient_clip)
-
-            optimizer.step()
+            if use_amp:
+                with torch.amp.autocast('cuda'):
+                    out = model(bx)
+                    loss = criterion(out, by)
+                scaler.scale(loss).backward()
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), config.gradient_clip)
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                out = model(bx)
+                loss = criterion(out, by)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), config.gradient_clip)
+                optimizer.step()
 
             total_loss += loss.item() * bx.size(0)
             correct += (out.argmax(1) == by).sum().item()
@@ -499,7 +509,7 @@ def run_training(
         avg_loss = total_loss / max(processed, 1)
         accuracy = correct / max(processed, 1)
         sps = processed / max(elapsed, 0.001)
-        w_hash = compute_weight_hash(model)
+        w_hash = compute_weight_hash(model, mode="sampled")
 
         result = EpochResult(
             epoch=epoch,

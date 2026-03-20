@@ -143,6 +143,7 @@ import logging
 import ipaddress
 import threading
 import time
+import mimetypes
 
 logger = logging.getLogger("ygb.server")
 from datetime import datetime, UTC
@@ -1361,10 +1362,11 @@ async def download_report(filename: str, user=Depends(require_auth)):
     if not str(file_path.resolve()).startswith(str(report_dir.resolve())):
         raise HTTPException(status_code=403, detail="Access denied")
     
+    media_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
     return FileResponse(
         path=str(file_path),
         filename=filename,
-        media_type="text/plain"
+        media_type=media_type,
     )
 
 
@@ -3885,13 +3887,18 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
         findings_data = []
         for f in context.findings:
             if hasattr(f, '__dict__'):
+                evidence = getattr(f, "evidence", {}) or {}
                 findings_data.append({
                     "finding_id": f.finding_id,
                     "category": f.category,
                     "severity": f.severity,
                     "title": f.title,
                     "description": f.description,
-                    "url": getattr(f, "url", "")
+                    "url": getattr(f, "url", ""),
+                    "evidence": evidence,
+                    "verification": evidence.get("verification", {}),
+                    "identified_as": evidence.get("identified_as", []),
+                    "auto_poc_steps": evidence.get("auto_poc_steps", []),
                 })
             else:
                 findings_data.append(f)
@@ -3906,7 +3913,9 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                 "pages_visited": len(context.pages_visited),
                 "technologies": context.technologies,
                 "total_duration_ms": total_duration,
-                "report_file": getattr(context, 'report_file', None)
+                "report_file": getattr(context, 'report_file', None),
+                "report_json_file": getattr(context, 'report_json_file', None),
+                "verification_summary": getattr(context, 'verification_summary', {}),
             },
             "findings": findings_data,
             "pages_visited": context.pages_visited,

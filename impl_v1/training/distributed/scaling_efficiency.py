@@ -97,7 +97,7 @@ def measure_single_node_baseline(
         for i in range(0, num_samples, batch_size):
             bx = X[i:i + batch_size]
             by = y[i:i + batch_size]
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss = criterion(model(bx), by)
             loss.backward()
             optimizer.step()

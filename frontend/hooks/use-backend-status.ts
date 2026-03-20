@@ -43,6 +43,7 @@ export function useBackendStatus(
   const failuresRef = useRef(0)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const mountedRef = useRef(true)
+  const scheduleNextRef = useRef<() => void>(() => {})
 
   const doCheck = useCallback(async () => {
     const start = performance.now()
@@ -87,21 +88,25 @@ export function useBackendStatus(
     )
     timerRef.current = setTimeout(async () => {
       await doCheck()
-      scheduleNext()
+      scheduleNextRef.current()
     }, interval)
   }, [baseIntervalMs, maxIntervalMs, doCheck])
+
+  useEffect(() => {
+    scheduleNextRef.current = scheduleNext
+  }, [scheduleNext])
 
   useEffect(() => {
     mountedRef.current = true
 
     // Initial check
-    doCheck().then(() => scheduleNext())
+    doCheck().then(() => scheduleNextRef.current())
 
     return () => {
       mountedRef.current = false
       if (timerRef.current) clearTimeout(timerRef.current)
     }
-  }, [doCheck, scheduleNext])
+  }, [doCheck])
 
   const recheckNow = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current)

@@ -313,7 +313,7 @@ def train_single_epoch(
     )
     
     # Forward pass
-    optimizer.zero_grad()
+    optimizer.zero_grad(set_to_none=True)
     outputs = model(features)
     loss = criterion(outputs, labels)
     

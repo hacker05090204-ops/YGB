@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2600" height="1700" viewBox="0 0 2600 1700">
+  <defs>
+    <style>
+      .bg { fill: #f6f3ee; }
+      .title { font: 700 46px 'Segoe UI', Arial, sans-serif; fill: #132018; }
+      .subtitle { font: 500 22px 'Segoe UI', Arial, sans-serif; fill: #4e5d52; }
+      .lane-title { font: 700 28px 'Segoe UI', Arial, sans-serif; fill: #173323; }
+      .node-title { font: 700 23px 'Segoe UI', Arial, sans-serif; fill: #163223; }
+      .node-text { font: 500 18px 'Segoe UI', Arial, sans-serif; fill: #20362a; }
+      .small { font: 500 16px 'Segoe UI', Arial, sans-serif; fill: #335242; }
+      .core { fill: #dcefdc; stroke: #2f6b48; stroke-width: 3; }
+      .runtime { fill: #d9ebf7; stroke: #2d6691; stroke-width: 3; }
+      .data { fill: #fff0d8; stroke: #b87a18; stroke-width: 3; }
+      .ml { fill: #f9deeb; stroke: #b04b73; stroke-width: 3; }
+      .gov { fill: #e7defb; stroke: #6550b9; stroke-width: 3; }
+      .art { fill: #ddeee7; stroke: #3e8764; stroke-width: 3; }
+      .proto { fill: #f4e4d1; stroke: #a96a21; stroke-width: 3; stroke-dasharray: 10 8; }
+      .lane { fill: #ffffff; stroke: #d3d8d3; stroke-width: 2; }
+      .arrow-core { stroke: #2f6b48; stroke-width: 5; fill: none; }
+      .arrow-runtime { stroke: #2d6691; stroke-width: 4; fill: none; }
+      .arrow-data { stroke: #b87a18; stroke-width: 4; fill: none; }
+      .arrow-ml { stroke: #b04b73; stroke-width: 4; fill: none; }
+      .arrow-gov { stroke: #6550b9; stroke-width: 4; fill: none; }
+      .arrow-art { stroke: #3e8764; stroke-width: 4; fill: none; }
+      .arrow-proto { stroke: #a96a21; stroke-width: 4; fill: none; stroke-dasharray: 10 8; }
+      .legend-text { font: 600 18px 'Segoe UI', Arial, sans-serif; fill: #20362a; }
+    </style>
+    <marker id="arrowCore" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#2f6b48"/>
+    </marker>
+    <marker id="arrowRuntime" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#2d6691"/>
+    </marker>
+    <marker id="arrowData" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#b87a18"/>
+    </marker>
+    <marker id="arrowMl" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#b04b73"/>
+    </marker>
+    <marker id="arrowGov" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#6550b9"/>
+    </marker>
+    <marker id="arrowArt" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#3e8764"/>
+    </marker>
+    <marker id="arrowProto" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#a96a21"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="2600" height="1700"/>
+
+  <text class="title" x="90" y="80">YGB Training System Branch Distribution</text>
+  <text class="subtitle" x="90" y="118">Large shareable view of the active G38 training path, data branch, ML stack, governance controls, artifacts, and side branches</text>
+
+  <rect class="core" x="945" y="155" rx="28" ry="28" width="710" height="130"/>
+  <text class="title" x="1120" y="222" style="font-size:40px;">YGB Training Core</text>
+  <text class="subtitle" x="1055" y="258">Entry point for G38 training and status exposure</text>
+
+  <rect class="lane" x="70" y="360" rx="28" ry="28" width="2460" height="1220"/>
+
+  <text class="lane-title" x="165" y="430">1. Runtime / API Branch</text>
+  <text class="lane-title" x="760" y="430">2. Data Branch</text>
+  <text class="lane-title" x="1395" y="430">3. ML / Training Branch</text>
+  <text class="lane-title" x="2055" y="430">4. Governance / Artifacts / Side Branches</text>
+
+  <rect class="runtime" x="110" y="480" rx="24" ry="24" width="470" height="180"/>
+  <text class="node-title" x="145" y="530">API Surface</text>
+  <text class="node-text" x="145" y="570">`api/server.py`</text>
+  <text class="node-text" x="145" y="603">Exposes `/api/g38/status`, `/start`, `/abort`, events</text>
+  <text class="small" x="145" y="638">Live status is read from the singleton trainer</text>
+
+  <rect class="runtime" x="110" y="730" rx="24" ry="24" width="470" height="230"/>
+  <text class="node-title" x="145" y="780">AutoTrainer</text>
+  <text class="node-text" x="145" y="820">`impl_v1/phase49/runtime/auto_trainer.py`</text>
+  <text class="node-text" x="145" y="853">Builds model, optimizer, scheduler, dataloaders</text>
+  <text class="node-text" x="145" y="886">Runs epoch loop, checkpointing, telemetry</text>
+  <text class="small" x="145" y="921">This is the active runtime branch for G38</text>
+
+  <rect class="runtime" x="110" y="1035" rx="24" ry="24" width="470" height="200"/>
+  <text class="node-title" x="145" y="1085">Status / Progress Output</text>
+  <text class="node-text" x="145" y="1125">Current state, epoch, loss, accuracy, samples/sec</text>
+  <text class="node-text" x="145" y="1158">GPU memory and dependency availability</text>
+  <text class="small" x="145" y="1193">Feeds dashboards and runtime APIs</text>
+
+  <rect class="data" x="680" y="480" rx="24" ry="24" width="540" height="180"/>
+  <text class="node-title" x="715" y="530">RealTrainingDataset Adapter</text>
+  <text class="node-text" x="715" y="570">`real_dataset_loader.py`</text>
+  <text class="node-text" x="715" y="603">Strict mode resolves to real ingestion data</text>
+  <text class="small" x="715" y="638">Blocks synthetic fallback in production path</text>
+
+  <rect class="data" x="680" y="730" rx="24" ry="24" width="540" height="250"/>
+  <text class="node-title" x="715" y="780">IngestionPipelineDataset</text>
+  <text class="node-text" x="715" y="820">C++ bridge + persisted sample store</text>
+  <text class="node-text" x="715" y="853">Verified samples only</text>
+  <text class="node-text" x="715" y="886">Policy filter + quality scoring + label derivation</text>
+  <text class="node-text" x="715" y="919">Builds deterministic 256-d feature vectors</text>
+  <text class="small" x="715" y="954">Authoritative source: `INGESTION_PIPELINE`</text>
+
+  <rect class="data" x="680" y="1060" rx="24" ry="24" width="540" height="210"/>
+  <text class="node-title" x="715" y="1110">DataLoader Layer</text>
+  <text class="node-text" x="715" y="1150">Pinned-memory train/holdout loaders</text>
+  <text class="node-text" x="715" y="1183">Worker fallback on Windows</text>
+  <text class="small" x="715" y="1218">Feeds batches into the active CUDA trainer</text>
+
+  <rect class="ml" x="1310" y="480" rx="24" ry="24" width="560" height="180"/>
+  <text class="node-title" x="1345" y="530">Active G38 Model</text>
+  <text class="node-text" x="1345" y="570">`BugClassifier(nn.Module)`</text>
+  <text class="node-text" x="1345" y="603">MLP: 256 -&gt; 512 -&gt; 256 -&gt; 128 -&gt; 2</text>
+  <text class="small" x="1345" y="638">This is ML, but it is not a Transformer</text>
+
+  <rect class="ml" x="1310" y="730" rx="24" ry="24" width="560" height="270"/>
+  <text class="node-title" x="1345" y="780">Training Stack</text>
+  <text class="node-text" x="1345" y="820">Optimizer: Adam in `AutoTrainer`</text>
+  <text class="node-text" x="1345" y="853">Loss: CrossEntropyLoss</text>
+  <text class="node-text" x="1345" y="886">Scheduler: CosineAnnealingWarmRestarts</text>
+  <text class="node-text" x="1345" y="919">AMP: autocast + GradScaler</text>
+  <text class="node-text" x="1345" y="952">CUDA stream prefetch + full-epoch loop</text>
+  <text class="small" x="1345" y="987">Standalone trainer `run_real_training.py` uses larger MLP + AdamW</text>
+
+  <rect class="ml" x="1310" y="1085" rx="24" ry="24" width="560" height="215"/>
+  <text class="node-title" x="1345" y="1135">Epoch Output</text>
+  <text class="node-text" x="1345" y="1175">Train accuracy, holdout accuracy, loss, LR</text>
+  <text class="node-text" x="1345" y="1208">Samples per second, GPU usage, checkpoint state</text>
+  <text class="small" x="1345" y="1243">Sent onward to governance and artifact writers</text>
+
+  <rect class="gov" x="1960" y="480" rx="24" ry="24" width="490" height="250"/>
+  <text class="node-title" x="1995" y="530">Governance Pipeline</text>
+  <text class="node-text" x="1995" y="570">`pre_training_gate()` before training</text>
+  <text class="node-text" x="1995" y="603">`post_epoch_audit()` after each epoch</text>
+  <text class="node-text" x="1995" y="636">Quality, balance, label, ingestion, C++ DLL checks</text>
+  <text class="small" x="1995" y="671">This branch decides whether training may proceed</text>
+
+  <rect class="gov" x="1960" y="785" rx="24" ry="24" width="490" height="220"/>
+  <text class="node-title" x="1995" y="835">Curriculum / Promotion Branch</text>
+  <text class="node-text" x="1995" y="875">`RealDataCurriculum` stage progression</text>
+  <text class="node-text" x="1995" y="908">`GovernedFieldPromotion` gate evaluation</text>
+  <text class="small" x="1995" y="943">Controls freeze/readiness logic from real metrics</text>
+
+  <rect class="art" x="1960" y="1065" rx="24" ry="24" width="490" height="220"/>
+  <text class="node-title" x="1995" y="1115">Artifacts / Reports</text>
+  <text class="node-text" x="1995" y="1155">Safetensors checkpoints + metadata JSON</text>
+  <text class="node-text" x="1995" y="1188">Telemetry reports and runtime status snapshots</text>
+  <text class="small" x="1995" y="1223">Backed by `reports/` and training storage paths</text>
+
+  <rect class="proto" x="1960" y="1360" rx="24" ry="24" width="490" height="170"/>
+  <text class="node-title" x="1995" y="1410">Side / Prototype Branches</text>
+  <text class="node-text" x="1995" y="1450">`phase49/moe/moe_architecture.py` = MoE Transformer prototype</text>
+  <text class="node-text" x="1995" y="1483">`training/voice/stt_model.py` = Conformer attention model</text>
+  <text class="small" x="1995" y="1518">Transformer-family code exists, but not in active G38 branch</text>
+
+  <path class="arrow-runtime" d="M1300 285 C1300 350,345 350,345 480" marker-end="url(#arrowRuntime)"/>
+  <path class="arrow-runtime" d="M345 660 L345 730" marker-end="url(#arrowRuntime)"/>
+  <path class="arrow-runtime" d="M345 960 L345 1035" marker-end="url(#arrowRuntime)"/>
+
+  <path class="arrow-data" d="M1400 285 C1400 350,950 350,950 480" marker-end="url(#arrowData)"/>
+  <path class="arrow-data" d="M950 660 L950 730" marker-end="url(#arrowData)"/>
+  <path class="arrow-data" d="M950 980 L950 1060" marker-end="url(#arrowData)"/>
+
+  <path class="arrow-ml" d="M1600 285 C1600 350,1590 350,1590 480" marker-end="url(#arrowMl)"/>
+  <path class="arrow-ml" d="M1590 660 L1590 730" marker-end="url(#arrowMl)"/>
+  <path class="arrow-ml" d="M1590 1000 L1590 1085" marker-end="url(#arrowMl)"/>
+
+  <path class="arrow-gov" d="M1750 285 C1750 350,2205 350,2205 480" marker-end="url(#arrowGov)"/>
+  <path class="arrow-gov" d="M2205 730 L2205 785" marker-end="url(#arrowGov)"/>
+  <path class="arrow-art" d="M2205 1005 L2205 1065" marker-end="url(#arrowArt)"/>
+  <path class="arrow-proto" d="M2205 1285 L2205 1360" marker-end="url(#arrowProto)"/>
+
+  <path class="arrow-core" d="M580 845 C630 845,645 845,680 845" marker-end="url(#arrowCore)"/>
+  <path class="arrow-core" d="M1220 855 C1260 855,1270 855,1310 855" marker-end="url(#arrowCore)"/>
+  <path class="arrow-core" d="M1870 855 C1910 855,1920 855,1960 855" marker-end="url(#arrowCore)"/>
+
+  <path class="arrow-core" d="M1220 1165 C1260 1165,1270 1165,1310 1165" marker-end="url(#arrowCore)"/>
+  <path class="arrow-core" d="M1870 1188 C1910 1188,1920 1188,1960 1188" marker-end="url(#arrowCore)"/>
+
+  <rect x="90" y="1605" width="1930" height="55" rx="18" ry="18" fill="#ffffff" stroke="#d3d8d3" stroke-width="2"/>
+  <rect x="120" y="1620" width="36" height="24" class="core"/>
+  <text class="legend-text" x="170" y="1639">Active training path</text>
+  <rect x="420" y="1620" width="36" height="24" class="proto"/>
+  <text class="legend-text" x="470" y="1639">Prototype / side branch</text>
+  <rect x="790" y="1620" width="36" height="24" class="data"/>
+  <text class="legend-text" x="840" y="1639">Real-data path</text>
+  <rect x="1090" y="1620" width="36" height="24" class="ml"/>
+  <text class="legend-text" x="1140" y="1639">ML stack</text>
+  <rect x="1360" y="1620" width="36" height="24" class="gov"/>
+  <text class="legend-text" x="1410" y="1639">Governance</text>
+  <rect x="1665" y="1620" width="36" height="24" class="art"/>
+  <text class="legend-text" x="1715" y="1639">Artifacts / reports</text>
+
+  <text class="small" x="2055" y="1640">Generated from the current repo structure on 2026-03-18</text>
+</svg>

@@ -69,6 +69,7 @@ class STTSampleRequest(BaseModel):
     device_id: str = "browser"
     language: str = "en-US"
     provider: str = "BROWSER_WEBSPEECH"
+    session_id: str = ""
 
 
 class STTTrainRequest(BaseModel):
@@ -309,6 +310,7 @@ async def upload_stt_sample(req: STTSampleRequest, user=Depends(require_auth)):
         device_id=req.device_id,
         language=req.language,
         provider=req.provider,
+        session_id=req.session_id,
     )
     audit = _get_audit()
     audit.log(

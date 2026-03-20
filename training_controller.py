@@ -24,6 +24,8 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+from impl_v1.training.distributed.hash_utils import hash_model_weights
+
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
@@ -430,6 +432,7 @@ def phase3_training_execution(
     per_epoch = []
     best_acc = 0.0
     drift_aborted = False
+    t_training_start = time.perf_counter()
 
     for epoch in range(config.num_epochs):
         # Cosine LR
@@ -453,7 +456,7 @@ def phase3_training_execution(
             bx = X_t[i:i + local_batch]
             by = y_t[i:i + local_batch]
 
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
 
             if use_amp:
                 with torch.amp.autocast('cuda'):
@@ -486,11 +489,12 @@ def phase3_training_execution(
         sps = processed / max(elapsed, 0.001)
         best_acc = max(best_acc, accuracy)
 
-        # Weight hash
-        w_hash = hashlib.sha256()
-        for p in model.parameters():
-            w_hash.update(p.detach().cpu().numpy().tobytes())
-        weight_hash = w_hash.hexdigest()
+        # Weight hash — sampled hash keeps determinism checks cheap during training
+        is_last_epoch = (epoch == config.num_epochs - 1)
+        if epoch % 5 == 0 or is_last_epoch:
+            weight_hash = hash_model_weights(model, mode="sampled")
+        else:
+            weight_hash = ""
 
         epoch_data = {
             'epoch': epoch,
@@ -523,7 +527,7 @@ def phase3_training_execution(
             break
 
     # Emit training latency to observability metrics (best-effort)
-    _total_training_ms = round((time.perf_counter() - t0) * 1000, 2)
+    _total_training_ms = round((time.perf_counter() - t_training_start) * 1000, 2)
     try:
         from backend.observability.metrics import metrics_registry
         metrics_registry.record("training_latency_ms", _total_training_ms)
@@ -532,9 +536,7 @@ def phase3_training_execution(
         pass
 
     # Final weight hash
-    final_hash = hashlib.sha256()
-    for p in model.parameters():
-        final_hash.update(p.detach().cpu().numpy().tobytes())
+    final_hash = hash_model_weights(model, mode="sampled")
 
     cluster_sps = sps * config.world_size
 
@@ -544,7 +546,7 @@ def phase3_training_execution(
         final_accuracy=per_epoch[-1]['accuracy'],
         best_accuracy=round(best_acc, 4),
         cluster_sps=round(cluster_sps, 2),
-        merged_weight_hash=final_hash.hexdigest(),
+        merged_weight_hash=final_hash,
         drift_aborted=drift_aborted,
         per_epoch=per_epoch,
     )

@@ -117,7 +117,7 @@ def run_single_training(features, labels, run_id, seed=SEED, epochs=EPOCHS):
             by = torch.tensor(train_l[perm[i:end]], dtype=torch.long).to(device)
             logits = model(bx)
             loss = criterion(logits, by)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
             total_loss += loss.item()

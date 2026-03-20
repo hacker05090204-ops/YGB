@@ -22,6 +22,8 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+from impl_v1.training.distributed.hash_utils import hash_model_weights
+
 logger = logging.getLogger(__name__)
 
 
@@ -244,7 +246,7 @@ def run_single_epoch(
         for i in range(0, X_t.size(0), config.batch_size):
             bx = X_t[i:i + config.batch_size]
             by = y_t[i:i + config.batch_size]
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss = criterion(model(bx), by)
             loss.backward()
             optimizer.step()
@@ -255,10 +257,7 @@ def run_single_epoch(
 
         # Weight hash
         raw_model = model.module if hasattr(model, 'module') else model
-        w_hash = hashlib.sha256()
-        for p in raw_model.parameters():
-            w_hash.update(p.detach().cpu().numpy().tobytes())
-        weight_hash = w_hash.hexdigest()
+        weight_hash = hash_model_weights(raw_model, mode="sampled")
 
         device_name = "CPU"
         if torch.cuda.is_available():

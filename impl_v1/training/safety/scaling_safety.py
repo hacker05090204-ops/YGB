@@ -18,6 +18,8 @@ from typing import Tuple
 
 import numpy as np
 
+from impl_v1.training.distributed.hash_utils import hash_model_weights
+
 logger = logging.getLogger(__name__)
 
 
@@ -77,16 +79,13 @@ def verify_scaling_determinism(
             for i in range(0, 4000, batch_size):
                 bx = X[i:i+batch_size]
                 by = y[i:i+batch_size]
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 loss = criterion(model(bx), by)
                 loss.backward()
                 optimizer.step()
 
         # Hash weights
-        wb = b""
-        for name, param in sorted(model.named_parameters()):
-            wb += param.detach().cpu().numpy().tobytes()
-        h = hashlib.sha256(wb).hexdigest()
+        h = hash_model_weights(model, mode="sampled")
         hashes.append(h)
 
         del model, optimizer, X, y

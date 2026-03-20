@@ -18,6 +18,8 @@ import time
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional, Tuple
 
+from impl_v1.training.distributed.hash_utils import hash_model_weights
+
 logger = logging.getLogger(__name__)
 
 BLACKLIST_PATH = os.path.join('secure_data', 'node_blacklist.json')
@@ -99,11 +101,8 @@ def init_deterministic_ddp(
 
 
 def compute_weight_hash(model) -> str:
-    """Compute SHA-256 of model weights."""
-    weight_bytes = b""
-    for name, param in sorted(model.named_parameters()):
-        weight_bytes += param.detach().cpu().numpy().tobytes()
-    return hashlib.sha256(weight_bytes).hexdigest()
+    """Compute deterministic model hash with reduced CPU transfer overhead."""
+    return hash_model_weights(model, mode="sampled")
 
 
 def verify_epoch_hashes(

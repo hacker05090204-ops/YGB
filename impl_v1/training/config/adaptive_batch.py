@@ -121,7 +121,7 @@ def _run_warmup(batch_size: int, input_dim: int = 256, num_samples: int = 4000) 
         for i in range(0, num_samples, batch_size):
             bx = X[i:i+batch_size]
             by = y[i:i+batch_size]
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss = criterion(model(bx), by)
             loss.backward()
             optimizer.step()

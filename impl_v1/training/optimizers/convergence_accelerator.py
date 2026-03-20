@@ -106,7 +106,7 @@ def find_optimal_lr(
         batch_x = batch_x.to(device, non_blocking=True)
         batch_y = batch_y.to(device, non_blocking=True)
 
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         output = model(batch_x)
         loss = criterion(output, batch_y)
         loss.backward()

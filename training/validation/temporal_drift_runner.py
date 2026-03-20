@@ -20,7 +20,6 @@ GOVERNANCE: MODE-A only. Zero decision authority.
 import sys
 import os
 import json
-import time
 import logging
 from datetime import datetime, timezone
 from dataclasses import dataclass, field, asdict
@@ -31,7 +30,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.cuda.amp import autocast, GradScaler
 
 from training.validation.representation_audit import (
     compute_entropy, compute_kl_divergence, FEATURE_GROUPS,
@@ -118,7 +116,7 @@ def quick_train(features, labels, epochs=5, lr=0.002, seed=42):
             bx = torch.tensor(train_f[perm[i:end]], dtype=torch.float32).to(device)
             by = torch.tensor(train_l[perm[i:end]], dtype=torch.long).to(device)
             loss = criterion(model(bx), by)
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
 

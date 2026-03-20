@@ -56,6 +56,9 @@ class Evidence:
     screenshots: List[str] = field(default_factory=list)
     videos: List[str] = field(default_factory=list)
     poc_steps: List[str] = field(default_factory=list)
+    auto_poc_steps: List[str] = field(default_factory=list)
+    identifiers: List[str] = field(default_factory=list)
+    verification_notes: List[str] = field(default_factory=list)
     request_response_pairs: List[Dict] = field(default_factory=list)
     error_messages: List[str] = field(default_factory=list)
 
@@ -72,6 +75,7 @@ class ReportDraft:
     steps_to_reproduce: List[str] = field(default_factory=list)
     evidence: Evidence = field(default_factory=Evidence)
     confidence_band: ConfidenceBand = field(default_factory=ConfidenceBand)
+    verification: Dict[str, Any] = field(default_factory=dict)
     created_at: str = ""
     hash: str = ""
 
@@ -110,7 +114,7 @@ class ReportOrchestrator:
 
     def create_report(self, title, vuln_type, severity, target,
                       description, impact, steps, evidence,
-                      confidence):
+                      confidence, verification: Optional[Dict[str, Any]] = None):
         report = ReportDraft(
             report_id=f"RPT-{int(time.time())}-"
                       f"{hashlib.sha256(title.encode()).hexdigest()[:8]}",
@@ -118,7 +122,7 @@ class ReportOrchestrator:
             severity=severity, target=target,
             description=description, impact=impact,
             steps_to_reproduce=steps, evidence=evidence,
-            confidence_band=confidence,
+            confidence_band=confidence, verification=verification or {},
             created_at=datetime.now(timezone.utc).isoformat(),
         )
         data = json.dumps(asdict(report), sort_keys=True, default=str)
@@ -136,7 +140,8 @@ class ReportOrchestrator:
 
         total_ev = (len(report.evidence.screenshots) +
                     len(report.evidence.videos) +
-                    len(report.evidence.poc_steps))
+                    len(report.evidence.poc_steps) +
+                    len(report.evidence.auto_poc_steps))
         if total_ev >= 5:
             score += 3
         elif total_ev >= self.MIN_EVIDENCE_ITEMS:
@@ -144,7 +149,13 @@ class ReportOrchestrator:
 
         if len(report.steps_to_reproduce) >= self.MIN_POC_STEPS:
             score += 2
+        elif len(report.evidence.auto_poc_steps) >= self.MIN_POC_STEPS:
+            score += 1
         if report.confidence_band.scope_compliant:
+            score += 1
+        if report.verification.get("verification_status") == "VERIFIED":
+            score += 2
+        elif report.verification.get("verification_status") == "LIKELY":
             score += 1
         if report.confidence_band.duplicate_risk_pct >= self.DUPLICATE_RISK_BLOCK:
             return ReportQuality.INSUFFICIENT
@@ -196,10 +207,18 @@ class ReportOrchestrator:
         if not report.confidence_band.scope_compliant:
             warnings.append("SCOPE: Target may be OUT OF SCOPE")
         if len(report.steps_to_reproduce) < self.MIN_POC_STEPS:
-            warnings.append(f"POC: Only {len(report.steps_to_reproduce)} steps")
+            fallback_steps = len(report.evidence.auto_poc_steps)
+            if fallback_steps < self.MIN_POC_STEPS:
+                warnings.append(f"POC: Only {len(report.steps_to_reproduce)} manual steps")
         total_ev = len(report.evidence.screenshots) + len(report.evidence.videos)
         if total_ev == 0:
             warnings.append("EVIDENCE: No screenshots or videos")
+        if report.verification:
+            status = report.verification.get("verification_status", "UNVERIFIED")
+            if status == "UNVERIFIED":
+                warnings.append("VERIFICATION: Finding remains behavior-only")
+        else:
+            warnings.append("VERIFICATION: No verification metadata attached")
         return warnings
 
 

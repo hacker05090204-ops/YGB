@@ -119,7 +119,7 @@ def _single_run(
     
     model.train()
     for epoch in range(epochs):
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
         outputs = model(X)
         loss = criterion(outputs, y)
         loss.backward()

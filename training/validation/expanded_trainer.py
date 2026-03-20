@@ -30,7 +30,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.cuda.amp import autocast, GradScaler
+from torch.amp import autocast, GradScaler
 
 from backend.training.representation_bridge import (
     RepresentationExpander, ExpansionConfig,
@@ -180,7 +180,7 @@ def train_expanded(epochs: int = 30, batch_size: int = 256,
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer, T_max=epochs)
     criterion = nn.CrossEntropyLoss()
-    scaler = GradScaler() if torch.cuda.is_available() else None
+    scaler = GradScaler('cuda') if torch.cuda.is_available() else None
 
     # -----------------------------------------------------------------
     # 6. Training loop with early stopping
@@ -202,7 +202,7 @@ def train_expanded(epochs: int = 30, batch_size: int = 256,
         total_correct = 0
         total_samples = 0
         n_batches = (len(ep_l) + batch_size - 1) // batch_size
-        optimizer.zero_grad()
+        optimizer.zero_grad(set_to_none=True)
 
         for b in range(n_batches):
             start = b * batch_size
@@ -211,7 +211,7 @@ def train_expanded(epochs: int = 30, batch_size: int = 256,
             by = torch.tensor(ep_l[start:end], dtype=torch.long).to(device)
 
             if scaler is not None:
-                with autocast(dtype=torch.float16):
+                with autocast('cuda', dtype=torch.float16):
                     logits = model(bx)
                     loss = criterion(logits, by)
                 scaler.scale(loss / grad_accum).backward()
@@ -226,7 +226,7 @@ def train_expanded(epochs: int = 30, batch_size: int = 256,
                     scaler.update()
                 else:
                     optimizer.step()
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
 
             total_loss += loss.item() * (end - start)
             with torch.no_grad():

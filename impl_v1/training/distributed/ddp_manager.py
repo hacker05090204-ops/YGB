@@ -14,6 +14,8 @@ import os
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
+from impl_v1.training.distributed.hash_utils import hash_model_weights
+
 logger = logging.getLogger(__name__)
 
 
@@ -110,11 +112,7 @@ def compute_weight_hash(model) -> str:
     except ImportError:
         return "unavailable"
 
-    weight_bytes = b""
-    for name, param in sorted(model.named_parameters()):
-        weight_bytes += param.detach().cpu().numpy().tobytes()
-
-    return hashlib.sha256(weight_bytes).hexdigest()
+    return hash_model_weights(model, mode="sampled")
 
 
 def verify_weight_consistency(

@@ -1,12 +1,22 @@
 "use client"
 
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
 import { buildLoginRedirectTarget } from "@/lib/post-login-redirect"
 import { useAuthUser } from "@/hooks/use-auth-user"
 
-export function AuthGuard({ children }: { children: React.ReactNode }) {
+function AuthGuardFallback() {
+  return (
+    <div className="min-h-screen bg-[#000000] flex items-center justify-center">
+      <div className="text-gray-600 text-sm animate-pulse">
+        Checking authentication...
+      </div>
+    </div>
+  )
+}
+
+function AuthGuardContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -25,13 +35,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }, [authUser.status, authUser.unavailableReason, pathname, router, search])
 
   if (authUser.status === "loading") {
-    return (
-      <div className="min-h-screen bg-[#000000] flex items-center justify-center">
-        <div className="text-gray-600 text-sm animate-pulse">
-          Checking authentication...
-        </div>
-      </div>
-    )
+    return <AuthGuardFallback />
   }
 
   if (authUser.status !== "authenticated") {
@@ -52,4 +56,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>
+}
+
+export function AuthGuard({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<AuthGuardFallback />}>
+      <AuthGuardContent>{children}</AuthGuardContent>
+    </Suspense>
+  )
 }

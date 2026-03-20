@@ -23,6 +23,8 @@ import hashlib
 import json
 import logging
 import os
+
+from impl_v1.training.distributed.hash_utils import hash_model_weights
 import time
 from dataclasses import dataclass, asdict, field
 from typing import Any, Dict, List, Optional
@@ -519,7 +521,7 @@ class RTX3050Follower:
                 bx = X_t[i:i + batch_size]
                 by = y_t[i:i + batch_size]
 
-                optimizer.zero_grad()
+                optimizer.zero_grad(set_to_none=True)
                 out = model(bx)
                 loss = criterion(out, by)
                 loss.backward()  # ← all-reduce via DDP
@@ -676,11 +678,8 @@ class RTX3050Follower:
     # -----------------------------------------------------------------
     @staticmethod
     def _compute_weight_hash(model) -> str:
-        """SHA-256 of model weights."""
-        weight_bytes = b""
-        for name, param in sorted(model.named_parameters()):
-            weight_bytes += param.detach().cpu().numpy().tobytes()
-        return hashlib.sha256(weight_bytes).hexdigest()
+        """Deterministic model hash with reduced CPU transfer overhead."""
+        return hash_model_weights(model, mode="sampled")
 
     def _build_result(
         self,
