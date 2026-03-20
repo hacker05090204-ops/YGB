@@ -6,7 +6,8 @@
  * between modules that share the same namespace (e.g. data_freshness).
  *
  * Build:
- *   scripts/build_cpp_tests.ps1
+ *   PowerShell: scripts/build_cpp_tests.ps1
+ *   Bash:       scripts/build_cpp_tests.sh
  */
 
 #include <cstdio>

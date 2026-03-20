@@ -37,6 +37,7 @@ def __getattr__(name):
         "impl_v1.training.distributed.cluster_authority",
         "impl_v1.training.distributed.checkpoint_consensus",
         "impl_v1.training.distributed.cloud_backup",
+        "impl_v1.training.distributed.distributed_training_orchestrator",
         "impl_v1.training.distributed.wipe_protection",
         "training.safetensors_io",
     ]:

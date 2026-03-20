@@ -22,6 +22,9 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 
+from impl_v1.training.checkpoints.checkpoint_hardening import (
+    HardenedCheckpointManager,
+)
 from impl_v1.training.voice.stt_model import (
     ConformerCTCModel, text_to_indices, indices_to_text,
     ctc_greedy_decode, BLANK_IDX, VOCAB_SIZE,
@@ -267,6 +270,7 @@ class STTTrainer:
         self.warmup_steps = warmup_steps
         self.global_step = 0
         self.best_val_loss = float("inf")
+        self.checkpoint_manager = HardenedCheckpointManager(_CHECKPOINT_DIR)
 
     def train_epoch(self, dataloader: DataLoader) -> Dict[str, float]:
         """Train for one epoch. Returns metrics dict."""
@@ -346,10 +350,43 @@ class STTTrainer:
             "n_samples": n_samples,
         }
 
-    def save_checkpoint(self, path: Optional[str] = None, tag: str = "latest"):
+    def save_checkpoint(
+        self,
+        path: Optional[str] = None,
+        tag: str = "latest",
+        *,
+        epoch: int = 0,
+        metrics: Optional[Dict[str, float]] = None,
+    ):
         """Save model checkpoint."""
         if path is None:
-            path = str(_CHECKPOINT_DIR / f"conformer_ctc_{tag}.pt")
+            best_val_loss = (
+                None if self.best_val_loss == float("inf") else float(self.best_val_loss)
+            )
+            future = self.checkpoint_manager.save_checkpoint_async(
+                self.model.state_dict(),
+                epoch=epoch,
+                step=self.global_step,
+                global_step=self.global_step,
+                metrics=metrics or {},
+                optimizer_state=self.optimizer.state_dict(),
+                rng_state=self.checkpoint_manager.capture_rng_state(),
+                training_state={
+                    "best_val_loss": best_val_loss,
+                    "tag": tag,
+                },
+                is_best=(tag == "best"),
+                extra_metadata={
+                    "model_name": "conformer_ctc",
+                    "tag": tag,
+                },
+            )
+            logger.info(
+                "[STT_TRAIN] Checkpoint scheduled: tag=%s global_step=%s",
+                tag,
+                self.global_step,
+            )
+            return future
 
         torch.save({
             "model_state_dict": self.model.state_dict(),
@@ -357,23 +394,46 @@ class STTTrainer:
             "global_step": self.global_step,
             "best_val_loss": self.best_val_loss,
         }, path)
-        logger.info(f"[STT_TRAIN] Checkpoint saved: {path}")
+        logger.info(f"[STT_TRAIN] Legacy checkpoint saved: {path}")
+        return path
 
     def load_checkpoint(self, path: Optional[str] = None):
         """Load model checkpoint."""
-        if path is None:
-            path = str(_CHECKPOINT_DIR / "conformer_ctc_latest.pt")
+        self.checkpoint_manager.wait_for_pending_writes()
 
-        if not os.path.exists(path):
-            logger.warning(f"[STT_TRAIN] No checkpoint at {path}")
+        if path is not None and os.path.isfile(path):
+            state = torch.load(path, map_location=self.device, weights_only=False)
+            self.model.load_state_dict(state["model_state_dict"])
+            if state.get("optimizer_state_dict") is not None:
+                self.optimizer.load_state_dict(state["optimizer_state_dict"])
+            self.global_step = int(state.get("global_step", 0))
+            self.best_val_loss = float(state.get("best_val_loss", float("inf")))
+            logger.info(f"[STT_TRAIN] Loaded legacy checkpoint: {path}")
+            return True
+
+        payload = self.checkpoint_manager.load_checkpoint(
+            checkpoint_id=path,
+            device=self.device,
+        )
+        if payload is None:
+            logger.warning("[STT_TRAIN] No checkpoint available for resume")
             return False
 
-        state = torch.load(path, map_location=self.device, weights_only=True)
-        self.model.load_state_dict(state["model_state_dict"])
-        self.optimizer.load_state_dict(state["optimizer_state_dict"])
-        self.global_step = state.get("global_step", 0)
-        self.best_val_loss = state.get("best_val_loss", float("inf"))
-        logger.info(f"[STT_TRAIN] Loaded checkpoint: {path}")
+        self.model.load_state_dict(payload["model_state_dict"])
+        if payload.get("optimizer_state_dict") is not None:
+            self.optimizer.load_state_dict(payload["optimizer_state_dict"])
+        self.checkpoint_manager.restore_rng_state(payload.get("rng_state"))
+
+        training_state = payload.get("training_state", {})
+        metrics = payload.get("metadata", {}).get("metrics", {})
+        self.global_step = int(training_state.get("global_step", 0))
+        if training_state.get("best_val_loss") is not None:
+            self.best_val_loss = float(training_state["best_val_loss"])
+        elif metrics.get("val_loss") is not None:
+            self.best_val_loss = float(metrics["val_loss"])
+
+        checkpoint_id = payload.get("checkpoint_id", "")
+        logger.info(f"[STT_TRAIN] Loaded checkpoint: {checkpoint_id}")
         return True
 
     def train(self, train_loader: DataLoader, val_loader: Optional[DataLoader] = None,
@@ -404,11 +464,26 @@ class STTTrainer:
                 # Save best
                 if val_metrics["val_loss"] < self.best_val_loss:
                     self.best_val_loss = val_metrics["val_loss"]
-                    self.save_checkpoint(tag="best")
+                    checkpoint_tag = "best"
+                else:
+                    checkpoint_tag = "latest"
+            else:
+                checkpoint_tag = "latest"
 
             logger.info(log_msg)
-            self.save_checkpoint(tag="latest")
+            checkpoint_metrics = {
+                "train_loss": float(train_metrics["train_loss"]),
+                "val_loss": float(val_metrics["val_loss"]) if val_metrics else float(train_metrics["train_loss"]),
+                "wer": float(val_metrics["wer"]) if val_metrics else 0.0,
+                "cer": float(val_metrics["cer"]) if val_metrics else 0.0,
+            }
+            self.save_checkpoint(
+                tag=checkpoint_tag,
+                epoch=epoch + 1,
+                metrics=checkpoint_metrics,
+            )
 
+        self.checkpoint_manager.wait_for_pending_writes()
         return {**train_metrics, **val_metrics}
 
 

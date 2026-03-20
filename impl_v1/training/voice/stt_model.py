@@ -27,6 +27,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from impl_v1.training.checkpoints.checkpoint_hardening import (
+    HardenedCheckpointManager,
+)
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -501,13 +505,38 @@ class LocalSTTService:
             )
             self._model_loaded = False
 
+            for checkpoint_dir in self._candidate_checkpoint_dirs():
+                try:
+                    manager = HardenedCheckpointManager(checkpoint_dir)
+                    payload = manager.load_checkpoint(device="cpu")
+                    if payload is None:
+                        continue
+                    self._model.load_state_dict(payload["model_state_dict"])
+                    self._model_loaded = True
+                    checkpoint_id = str(payload.get("checkpoint_id", ""))
+                    resolved_path = manager.get_checkpoint_path(checkpoint_id)
+                    self._loaded_checkpoint_path = str(resolved_path)
+                    logger.info("[STT] Loaded hardened checkpoint: %s", resolved_path)
+                    break
+                except Exception as checkpoint_error:
+                    logger.warning(
+                        "[STT] Failed to load hardened checkpoint from %s: %s",
+                        checkpoint_dir,
+                        checkpoint_error,
+                    )
+
             for checkpoint_path in self._candidate_checkpoint_paths():
+                if self._model_loaded:
+                    break
                 if not checkpoint_path.exists():
                     continue
 
                 try:
-                    state = torch.load(str(checkpoint_path), map_location="cpu",
-                                       weights_only=True)
+                    state = torch.load(
+                        str(checkpoint_path),
+                        map_location="cpu",
+                        weights_only=False,
+                    )
                     self._model.load_state_dict(state["model_state_dict"])
                     self._model_loaded = True
                     self._loaded_checkpoint_path = str(checkpoint_path)

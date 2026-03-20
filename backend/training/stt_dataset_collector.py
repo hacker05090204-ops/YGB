@@ -40,6 +40,13 @@ try:
 except Exception:  # pragma: no cover
     _CHECKPOINT_DIR = PROJECT_ROOT / "checkpoints" / "stt"
 
+try:
+    from impl_v1.training.checkpoints.checkpoint_hardening import (
+        HardenedCheckpointManager,
+    )
+except Exception:  # pragma: no cover
+    HardenedCheckpointManager = None
+
 
 def _dataset_root() -> Path:
     if resolve_path:
@@ -200,8 +207,6 @@ def _read_manifest_entries() -> List[Dict[str, Any]]:
 
 def _checkpoint_info() -> Dict[str, Any]:
     checkpoint_dir = Path(_CHECKPOINT_DIR)
-    latest = checkpoint_dir / "conformer_ctc_latest.pt"
-    best = checkpoint_dir / "conformer_ctc_best.pt"
 
     def _file_info(path: Path) -> Dict[str, Any] | None:
         if not path.exists():
@@ -215,6 +220,24 @@ def _checkpoint_info() -> Dict[str, Any]:
             }
         except Exception:
             return {"path": str(path)}
+
+    if HardenedCheckpointManager is not None:
+        try:
+            manager = HardenedCheckpointManager(checkpoint_dir)
+            latest_id = manager.get_latest_valid_checkpoint()
+            best_id = manager.get_best_checkpoint()
+            latest_path = manager.get_checkpoint_path(latest_id) if latest_id else None
+            best_path = manager.get_checkpoint_path(best_id) if best_id else None
+            return {
+                "checkpoint_dir": str(checkpoint_dir),
+                "latest_checkpoint": _file_info(latest_path) if latest_path else None,
+                "best_checkpoint": _file_info(best_path) if best_path else None,
+            }
+        except Exception:
+            pass
+
+    latest = checkpoint_dir / "conformer_ctc_latest.pt"
+    best = checkpoint_dir / "conformer_ctc_best.pt"
 
     return {
         "checkpoint_dir": str(checkpoint_dir),
