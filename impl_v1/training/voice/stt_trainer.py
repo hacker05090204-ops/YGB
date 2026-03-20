@@ -100,13 +100,18 @@ class SpeechDataset(Dataset):
             with open(manifest) as f:
                 for line in f:
                     entry = json.loads(line.strip())
+                    audio_path = Path(entry["audio"])
+                    if not audio_path.exists():
+                        raise FileNotFoundError(
+                            f"[STT_TRAIN] Missing real audio file in manifest: {audio_path}"
+                        )
                     self.samples.append({
-                        "audio": entry["audio"],
+                        "audio": str(audio_path),
                         "text": entry["text"],
                     })
-            logger.info(f"[STT_TRAIN] Loaded {len(self.samples)} samples from {manifest_path}")
+            logger.info(f"[STT_TRAIN] Loaded {len(self.samples)} real samples from {manifest_path}")
         else:
-            logger.warning(f"[STT_TRAIN] Manifest not found: {manifest_path}")
+            raise FileNotFoundError(f"[STT_TRAIN] Manifest not found: {manifest_path}")
 
     def __len__(self):
         return len(self.samples)
@@ -144,8 +149,10 @@ class SpeechDataset(Dataset):
                 else:
                     audio_np = np.fromfile(audio_path, dtype=np.int16).astype(np.float32)
                     audio_np /= 32768.0
-        except Exception:
-            audio_np = np.zeros(self.max_audio_len, dtype=np.float32)
+        except Exception as exc:
+            raise RuntimeError(
+                f"[STT_TRAIN] Failed to load real audio sample: {audio_path} ({exc})"
+            ) from exc
 
         # Pad/truncate
         if len(audio_np) > self.max_audio_len:

@@ -99,11 +99,26 @@ else:
 if FORCE_FRESH:
     log.info("  ⚡ FORCE_FRESH_TRAIN=1 — starting from scratch (no checkpoint resume)")
 
-from impl_v1.training.data.scaled_dataset import DatasetConfig
-from impl_v1.training.data.real_dataset_loader import RealTrainingDataset
+from impl_v1.training.data.real_dataset_loader import (
+    RealTrainingDataset,
+    validate_dataset_integrity,
+)
 
-config = DatasetConfig(total_samples=50000)
-dataset = RealTrainingDataset(config=config)
+min_real_samples = int(os.environ.get("YGB_MIN_REAL_SAMPLES", "125000"))
+preflight_ok, preflight_msg = validate_dataset_integrity(
+    feature_dim=256,
+    min_samples=min_real_samples,
+    seed=42,
+)
+if not preflight_ok:
+    raise RuntimeError(f"FATAL: Dataset preflight failed: {preflight_msg}")
+log.info(f"  ✅ Dataset preflight: {preflight_msg}")
+
+dataset = RealTrainingDataset(
+    feature_dim=256,
+    min_samples=min_real_samples,
+    seed=42,
+)
 features = dataset._features_tensor.numpy()
 labels = dataset._labels_tensor.numpy()
 
@@ -202,9 +217,9 @@ class MaxPowerEncoder(nn.Module):
         return self.head(self.encoder(x))
 
 
-def find_optimal_batch(model, feature_dim, device, max_vram_pct=0.85):
+def find_optimal_batch(model, feature_dim, device, real_features, real_labels, max_vram_pct=0.85):
     """
-    Binary search for largest batch size that fits in VRAM.
+    Search for largest batch size that fits in VRAM using REAL dataset slices.
     Target: use up to max_vram_pct of total GPU memory.
     """
     torch.cuda.empty_cache()
@@ -218,30 +233,33 @@ def find_optimal_batch(model, feature_dim, device, max_vram_pct=0.85):
     scaler = GradScaler('cuda')
     criterion = nn.CrossEntropyLoss()
 
+    if len(real_features) == 0 or len(real_labels) == 0:
+        raise RuntimeError("FATAL: No real data available for batch calibration")
+
     for bs in batch_sizes:
         try:
             torch.cuda.empty_cache()
             torch.cuda.reset_peak_memory_stats()
 
-            dummy_x = torch.randn(bs, feature_dim, device=device)
-            dummy_y = torch.randint(0, 2, (bs,), device=device)
+            effective_bs = min(bs, len(real_features))
+            batch_x = torch.as_tensor(real_features[:effective_bs], device=device, dtype=torch.float32)
+            batch_y = torch.as_tensor(real_labels[:effective_bs], device=device, dtype=torch.long)
 
             model.train()
             with autocast('cuda', dtype=torch.float16):
-                out = model(dummy_x)
-                loss = criterion(out, dummy_y)
+                out = model(batch_x)
+                loss = criterion(out, batch_y)
             scaler.scale(loss).backward()
 
             peak = torch.cuda.max_memory_allocated()
             if peak < target_mem:
-                optimal = bs
-                log.info(f"  batch={bs:6d} → VRAM={peak / 1024**2:.0f} MB — OK")
+                optimal = effective_bs
+                log.info(f"  batch={effective_bs:6d} → VRAM={peak / 1024**2:.0f} MB — OK")
             else:
-                log.info(f"  batch={bs:6d} → VRAM={peak / 1024**2:.0f} MB — EXCEEDS {max_vram_pct*100:.0f}%")
+                log.info(f"  batch={effective_bs:6d} → VRAM={peak / 1024**2:.0f} MB — EXCEEDS {max_vram_pct*100:.0f}%")
                 break
 
-            # Cleanup
-            del dummy_x, dummy_y, out, loss
+            del batch_x, batch_y, out, loss
             model.zero_grad(set_to_none=True)
 
         except RuntimeError as e:
@@ -262,7 +280,14 @@ param_count = sum(p.numel() for p in _calib_model.parameters())
 trainable_count = sum(p.numel() for p in _calib_model.parameters() if p.requires_grad)
 log.info(f"  Model: {param_count:,} params ({trainable_count:,} trainable)")
 
-optimal_batch_3050 = find_optimal_batch(_calib_model, FEATURE_DIM, device, max_vram_pct=0.85)
+optimal_batch_3050 = find_optimal_batch(
+    _calib_model,
+    FEATURE_DIM,
+    device,
+    train_f,
+    train_l,
+    max_vram_pct=0.85,
+)
 log.info(f"  ✅ optimal_batch_3050 = {optimal_batch_3050}")
 
 # Discard calibration model to prevent gradient/state leak into training

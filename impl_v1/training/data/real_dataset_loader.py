@@ -2,15 +2,15 @@
 Dataset Loader — Training Data Source
 ======================================
 
-STRICT_REAL_MODE (default True):
-  - SyntheticTrainingDataset is BLOCKED
+REAL DATA ONLY:
+  - SyntheticTrainingDataset is BLOCKED everywhere
   - Only IngestionPipelineDataset (Phase 3) is permitted
   - Training aborts if dataset_source != "INGESTION_PIPELINE"
 
 SyntheticTrainingDataset (formerly RealTrainingDataset):
   - Uses ScaledDatasetGenerator (SYNTHETIC data)
-  - Renamed for honest labeling
-  - Blocked in STRICT_REAL_MODE (production)
+  - Retained only as a blocked compatibility symbol
+  - Never permitted for training
 
 FORBIDDEN FIELDS (hard blocked):
 - valid, accepted, rejected, severity, platform_decision
@@ -37,18 +37,16 @@ from impl_v1.training.data.scaled_dataset import (
 
 import os as _os
 
-STRICT_REAL_MODE = _os.environ.get("YGB_STRICT_REAL_MODE", "true").lower() != "false"
+STRICT_REAL_MODE = True
 
 
 def _enforce_strict_real_mode(cls_name: str):
-    """Abort if STRICT_REAL_MODE is on and caller tries to use synthetic data."""
-    if STRICT_REAL_MODE:
-        raise RuntimeError(
-            f"ABORT: {cls_name} is BLOCKED. STRICT_REAL_MODE=True. "
-            f"Only IngestionPipelineDataset (dataset_source='INGESTION_PIPELINE') "
-            f"is permitted for training. Set STRICT_REAL_MODE=False for lab-only use "
-            f"with governance override."
-        )
+    """Abort all synthetic training paths unconditionally."""
+    raise RuntimeError(
+        f"ABORT: {cls_name} is BLOCKED. Real-data-only mode is enforced. "
+        f"Only IngestionPipelineDataset (dataset_source='INGESTION_PIPELINE') "
+        f"is permitted for training."
+    )
 
 
 # =============================================================================
@@ -266,34 +264,25 @@ class RealTrainingDataset(Dataset):
     """
     Backward-compatible dataset adapter.
 
-    Legacy callers still import/use `RealTrainingDataset`. After strict-mode
-    hardening, the concrete dataset split into:
-      - IngestionPipelineDataset (production / STRICT_REAL_MODE=True)
-      - SyntheticTrainingDataset (lab / STRICT_REAL_MODE=False)
-
-    This adapter preserves old imports without weakening strict governance.
+    Legacy callers still import/use `RealTrainingDataset`.
+    It now always resolves to IngestionPipelineDataset so synthetic data
+    paths cannot be re-enabled accidentally.
     """
 
     def __new__(cls, *args, **kwargs):
-        if STRICT_REAL_MODE:
-            # Preserve legacy call shape while forcing real ingestion source.
-            # `config` is ignored in strict mode because real data volume comes
-            # from authoritative ingestion state, not synthetic sample config.
-            seed = int(kwargs.pop("seed", FIXED_SEED))
-            feature_dim = int(kwargs.pop("feature_dim", 256))
-            min_samples = int(
-                kwargs.pop(
-                    "min_samples",
-                    int(_os.environ.get("YGB_MIN_REAL_SAMPLES", "125000")),
-                )
+        seed = int(kwargs.pop("seed", FIXED_SEED))
+        feature_dim = int(kwargs.pop("feature_dim", 256))
+        min_samples = int(
+            kwargs.pop(
+                "min_samples",
+                int(_os.environ.get("YGB_MIN_REAL_SAMPLES", "125000")),
             )
-            return IngestionPipelineDataset(
-                feature_dim=feature_dim,
-                min_samples=min_samples,
-                seed=seed,
-            )
-
-        return SyntheticTrainingDataset(*args, **kwargs)
+        )
+        return IngestionPipelineDataset(
+            feature_dim=feature_dim,
+            min_samples=min_samples,
+            seed=seed,
+        )
 
 
 @dataclass
@@ -366,12 +355,9 @@ def create_training_dataloader(
     """
     Create optimized DataLoaders for GPU training.
 
-    STRICT_REAL_MODE (default True):
-      Uses IngestionPipelineDataset — real data from ingestion bridge ONLY.
-      SyntheticTrainingDataset is BLOCKED.
-
-    Lab mode (STRICT_REAL_MODE=False):
-      Falls back to SyntheticTrainingDataset for development.
+    Real-data-only mode:
+      Uses IngestionPipelineDataset from the ingestion bridge ONLY.
+      SyntheticTrainingDataset is blocked and never selected.
 
     Args:
         batch_size: Samples per batch (default 1024 for RTX 2050)
@@ -385,57 +371,33 @@ def create_training_dataloader(
     """
     min_samples = YGB_MIN_REAL_SAMPLES
 
-    if STRICT_REAL_MODE:
-        # === STRICT PATH: IngestionPipelineDataset only ===
-        # SyntheticTrainingDataset is BLOCKED — never instantiated here.
-        train_dataset = IngestionPipelineDataset(
-            feature_dim=256,
-            min_samples=min_samples,
-            seed=seed,
-        )
-        # Holdout: use a portion of the same pipeline data
-        # (IngestionPipelineDataset does not support is_holdout,
-        #  so we split the single dataset via random_split)
-        total = len(train_dataset)
-        holdout_size = max(1, int(total * 0.1))
-        train_size = total - holdout_size
-        train_subset, holdout_subset = torch.utils.data.random_split(
-            train_dataset,
-            [train_size, holdout_size],
-            generator=torch.Generator().manual_seed(seed),
-        )
-        stats = {
-            "train": {**train_dataset.get_statistics(), "total": train_size},
-            "holdout": {**train_dataset.get_statistics(), "total": holdout_size},
-            "batch_size": batch_size,
-            "num_workers": num_workers,
-            "pin_memory": pin_memory,
-            "dataset_source": "INGESTION_PIPELINE",
-        }
-        effective_train = train_subset
-        effective_holdout = holdout_subset
-    else:
-        # === LAB MODE: SyntheticTrainingDataset (development only) ===
-        train_dataset = SyntheticTrainingDataset(
-            config=DatasetConfig(total_samples=20000),
-            seed=seed,
-            is_holdout=False,
-        )
-        holdout_dataset = SyntheticTrainingDataset(
-            config=DatasetConfig(total_samples=20000),
-            seed=seed,
-            is_holdout=True,
-        )
-        stats = {
-            "train": train_dataset.get_statistics(),
-            "holdout": holdout_dataset.get_statistics(),
-            "batch_size": batch_size,
-            "num_workers": num_workers,
-            "pin_memory": pin_memory,
-            "dataset_source": "SYNTHETIC_GENERATOR",
-        }
-        effective_train = train_dataset
-        effective_holdout = holdout_dataset
+    # === REAL-DATA PATH: IngestionPipelineDataset only ===
+    train_dataset = IngestionPipelineDataset(
+        feature_dim=256,
+        min_samples=min_samples,
+        seed=seed,
+    )
+    # Holdout: use a portion of the same pipeline data
+    # (IngestionPipelineDataset does not support is_holdout,
+    #  so we split the single dataset via random_split)
+    total = len(train_dataset)
+    holdout_size = max(1, int(total * 0.1))
+    train_size = total - holdout_size
+    train_subset, holdout_subset = torch.utils.data.random_split(
+        train_dataset,
+        [train_size, holdout_size],
+        generator=torch.Generator().manual_seed(seed),
+    )
+    stats = {
+        "train": {**train_dataset.get_statistics(), "total": train_size},
+        "holdout": {**train_dataset.get_statistics(), "total": holdout_size},
+        "batch_size": batch_size,
+        "num_workers": num_workers,
+        "pin_memory": pin_memory,
+        "dataset_source": "INGESTION_PIPELINE",
+    }
+    effective_train = train_subset
+    effective_holdout = holdout_subset
 
     # Deterministic generator for shuffle reproducibility
     g = torch.Generator()
@@ -475,120 +437,75 @@ def create_training_dataloader(
 YGB_MIN_REAL_SAMPLES = int(_os.environ.get("YGB_MIN_REAL_SAMPLES", "125000"))
 
 
-def validate_dataset_integrity() -> Tuple[bool, str]:
+def validate_dataset_integrity(
+    *,
+    feature_dim: int = 256,
+    min_samples: Optional[int] = None,
+    seed: int = FIXED_SEED,
+) -> Tuple[bool, str]:
     """
     Validate dataset meets all requirements:
-    - Min YGB_MIN_REAL_SAMPLES samples (default 18000)
+    - Min YGB_MIN_REAL_SAMPLES samples
     - No forbidden fields
     - Class balance within 10%
 
-    STRICT_REAL_MODE (default True):
-      - Uses IngestionPipelineDataset ONLY — never SyntheticTrainingDataset.
+    Real-data-only mode:
+      - Uses IngestionPipelineDataset ONLY.
       - Returns explicit fail reasons:
         INSUFFICIENT_REAL_SAMPLES, INGESTION_SOURCE_INVALID,
-        STRICT_REAL_MODE_VIOLATION
-
-    Lab mode (STRICT_REAL_MODE=False):
-      - Uses SyntheticTrainingDataset for development convenience.
+        REAL_DATA_REQUIRED
 
     Returns:
         Tuple of (passed, message)
     """
-    min_samples = YGB_MIN_REAL_SAMPLES
+    min_samples = YGB_MIN_REAL_SAMPLES if min_samples is None else int(min_samples)
 
-    if STRICT_REAL_MODE:
-        # ── STRICT PATH: IngestionPipelineDataset only ──────────────
-        # NEVER instantiate SyntheticTrainingDataset here.
-        try:
-            dataset = IngestionPipelineDataset(
-                feature_dim=256,
-                min_samples=min_samples,
-                seed=FIXED_SEED,
-            )
-        except FileNotFoundError:
+    # ── REAL-DATA PATH: IngestionPipelineDataset only ──────────────
+    try:
+        dataset = IngestionPipelineDataset(
+            feature_dim=feature_dim,
+            min_samples=min_samples,
+            seed=seed,
+        )
+    except FileNotFoundError:
+        return False, (
+            "INGESTION_SOURCE_INVALID: Ingestion bridge library not found. "
+            "Real ingestion pipeline is required."
+        )
+    except RuntimeError as e:
+        msg = str(e)
+        if "Insufficient" in msg:
             return False, (
-                "INGESTION_SOURCE_INVALID: Ingestion bridge library not found. "
-                "Real ingestion pipeline is required when STRICT_REAL_MODE=True."
+                f"INSUFFICIENT_REAL_SAMPLES: {msg} "
+                f"(threshold: {min_samples})"
             )
-        except RuntimeError as e:
-            msg = str(e)
-            if "Insufficient" in msg:
-                return False, (
-                    f"INSUFFICIENT_REAL_SAMPLES: {msg} "
-                    f"(threshold: {min_samples})"
-                )
-            return False, f"STRICT_REAL_MODE_VIOLATION: {msg}"
-        except Exception as e:
-            return False, f"INGESTION_SOURCE_INVALID: {str(e)}"
+        return False, f"REAL_DATA_REQUIRED: {msg}"
+    except Exception as e:
+        return False, f"INGESTION_SOURCE_INVALID: {str(e)}"
 
-        stats = dataset.get_statistics()
+    stats = dataset.get_statistics()
 
-        # Check minimum samples
-        if stats["total"] < min_samples:
-            deficit = min_samples - stats["total"]
-            return False, (
-                f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples} "
-                f"(deficit: {deficit} samples needed)"
-            )
-
-        # Check class balance (within 10%)
-        if stats["total"] > 0:
-            positive_ratio = stats["positive"] / stats["total"]
-            if not (0.40 <= positive_ratio <= 0.60):
-                return False, (
-                    f"STRICT_REAL_MODE_VIOLATION: Class imbalance: "
-                    f"{positive_ratio:.2%} positive"
-                )
-        else:
-            return False, "INSUFFICIENT_REAL_SAMPLES: 0 samples available"
-
-        return True, (
-            f"Dataset valid (STRICT_REAL): {stats['total']} samples, "
-            f"{positive_ratio:.2%} positive, source={stats.get('dataset_source', 'INGESTION_PIPELINE')}"
+    if stats["total"] < min_samples:
+        deficit = min_samples - stats["total"]
+        return False, (
+            f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples} "
+            f"(deficit: {deficit} samples needed)"
         )
 
-    else:
-        # ── LAB MODE (LAB_ONLY): SyntheticTrainingDataset (development only) ──
-        # Generate enough synthetic samples to meet lab threshold
-        # Request 25% more than threshold so that after the 80/20
-        # train/holdout split inside ScaledDatasetGenerator, the train
-        # portion still exceeds min_samples.
-        lab_sample_count = max(int(min_samples * 1.25), 20000)
-        try:
-            dataset = SyntheticTrainingDataset(
-                config=DatasetConfig(total_samples=lab_sample_count),
-                seed=FIXED_SEED,
-            )
-
-            stats = dataset.get_statistics()
-
-            # Check minimum samples
-            if stats["total"] < min_samples:
-                deficit = min_samples - stats["total"]
-                return False, (
-                    f"Insufficient samples: {stats['total']} < {min_samples} "
-                    f"(deficit: {deficit} samples needed)"
-                )
-
-            # Check class balance (within 10%)
-            positive_ratio = stats["positive"] / stats["total"]
-            if not (0.40 <= positive_ratio <= 0.60):
-                return False, (
-                    f"Class imbalance: {positive_ratio:.2%} positive"
-                )
-
-            # Validate no forbidden fields in first sample
-            sample = dataset.samples[0]
-            if not validate_no_forbidden_fields(sample.features):
-                return False, "Forbidden fields detected in samples"
-
-            return True, (
-                f"Dataset valid (LAB): {stats['total']} samples, "
+    if stats["total"] > 0:
+        positive_ratio = stats["positive"] / stats["total"]
+        if not (0.40 <= positive_ratio <= 0.60):
+            return False, (
+                f"REAL_DATA_REQUIRED: Class imbalance: "
                 f"{positive_ratio:.2%} positive"
             )
+    else:
+        return False, "INSUFFICIENT_REAL_SAMPLES: 0 samples available"
 
-        except Exception as e:
-            return False, f"Validation failed: {str(e)}"
+    return True, (
+        f"Dataset valid (REAL): {stats['total']} samples, "
+        f"{positive_ratio:.2%} positive, source={stats.get('dataset_source', 'INGESTION_PIPELINE')}"
+    )
 
 
 # =============================================================================
