@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "agents": [
+    {
+      "agent_id": "training-controller",
+      "role": "orchestrates distributed training, checkpoints, and monitoring",
+      "topics": ["training", "checkpoint", "fault"]
+    },
+    {
+      "agent_id": "accuracy-engine",
+      "role": "prediction classification verification deduplication",
+      "topics": ["finding", "verification", "accuracy"]
+    },
+    {
+      "agent_id": "voice-stream",
+      "role": "streaming stt reasoning tts bridge",
+      "topics": ["voice", "reasoning", "tts"]
+    }
+  ]
+}

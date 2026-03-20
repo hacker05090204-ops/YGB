@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 from typing import Any, Callable
 
 logger = logging.getLogger("ygb.db_safety")
+_TX_FLAG = "_ygb_tx_active"
 
 
 @asynccontextmanager
@@ -24,6 +25,16 @@ async def db_transaction(db):
             await conn.execute("UPDATE ...")
         # auto-committed on success, rolled back on exception
     """
+    nested = bool(getattr(db, _TX_FLAG, False))
+    if nested:
+        yield db
+        return
+
+    try:
+        setattr(db, _TX_FLAG, True)
+    except Exception:
+        pass
+
     try:
         await db.execute("BEGIN IMMEDIATE")
         yield db
@@ -34,6 +45,29 @@ async def db_transaction(db):
         except Exception:
             logger.error("ROLLBACK failed — database may be inconsistent")
         raise
+    finally:
+        try:
+            setattr(db, _TX_FLAG, False)
+        except Exception:
+            pass
+
+
+def _resolve_db_handle(args: tuple, kwargs: dict) -> Any:
+    """Best-effort DB handle lookup for transaction-wrapping decorators."""
+    db = kwargs.get("db")
+    if hasattr(db, "execute"):
+        return db
+
+    for arg in args:
+        if hasattr(arg, "execute"):
+            return arg
+
+        for attr in ("db", "_db", "conn", "_conn"):
+            candidate = getattr(arg, attr, None)
+            if hasattr(candidate, "execute"):
+                return candidate
+
+    return None
 
 
 def safe_db_write(func: Callable) -> Callable:
@@ -43,8 +77,13 @@ def safe_db_write(func: Callable) -> Callable:
     """
     @functools.wraps(func)
     async def wrapper(*args, **kwargs):
+        db = _resolve_db_handle(args, kwargs)
         try:
-            return await func(*args, **kwargs)
+            if db is None or getattr(db, _TX_FLAG, False):
+                return await func(*args, **kwargs)
+
+            async with db_transaction(db):
+                return await func(*args, **kwargs)
         except Exception as e:
             logger.error(
                 "DB write failed in %s: %s",

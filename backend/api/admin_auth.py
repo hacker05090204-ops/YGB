@@ -377,9 +377,13 @@ def get_totp_uri(secret: str, email: str) -> str:
         totp = pyotp.TOTP(secret)
         return totp.provisioning_uri(name=email, issuer_name='YGB Admin')
     except ImportError:
-        from urllib.parse import quote
-        return (f"otpauth://totp/YGB%20Admin:{quote(email)}"
-                f"?secret={secret}&issuer=YGB%20Admin")
+        from urllib.parse import quote, urlencode
+
+        query = urlencode({
+            "secret": secret,
+            "issuer": "YGB Admin",
+        })
+        return f"otpauth://totp/YGB%20Admin:{quote(email)}?{query}"
 
 
 # =========================================================================

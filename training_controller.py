@@ -23,7 +23,7 @@ import sys
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
@@ -66,10 +66,19 @@ class TrainingControllerConfig:
     gradient_clip: float = 1.0
     seed: int = 42
     use_amp: bool = True
+    use_bf16: bool = True
     cosine_lr: bool = True
     checkpoint_every_epoch: bool = True
     keep_epoch_checkpoints: int = 5
     resume_if_available: bool = True
+    async_checkpoints: bool = True
+    checkpoint_version: int = 2
+    deepspeed_enabled: bool = False
+    zero_stage: int = 2
+    gradient_checkpointing: bool = True
+    async_pipeline: bool = True
+    adaptive_batch_size: bool = True
+    monitor_training: bool = True
 
     # Dataset
     num_samples: int = 8000
@@ -127,6 +136,9 @@ class CheckpointBundle:
     model_path: str
     state_path: str
     meta_path: str
+    model_shards: Optional[List[str]] = None
+    optimizer_state_path: str = ""
+    scheduler_state_path: str = ""
 
 
 
@@ -308,6 +320,23 @@ def _save_training_checkpoint(
 
 
 def _load_latest_training_checkpoint(base_dir: str) -> Optional[dict]:
+    try:
+        from impl_v1.training.distributed.advanced_checkpointing import AsyncDistributedCheckpointManager
+
+        manager = AsyncDistributedCheckpointManager(base_dir)
+        loaded = manager.load_latest_valid(rank=0)
+        manager.close()
+        if loaded is not None:
+            return {
+                **loaded.meta,
+                "model_path": loaded.bundle.model_shards[0].model_path if loaded.bundle.model_shards else "",
+                "state_path": loaded.bundle.model_shards[0].optimizer_path if loaded.bundle.model_shards else "",
+                "meta_path": loaded.bundle.meta_path,
+                "model_sha256": loaded.bundle.model_shards[0].model_sha256 if loaded.bundle.model_shards else "",
+            }
+    except Exception:
+        pass
+
     manifest = _load_json_if_exists(_checkpoint_manifest_path(base_dir))
     latest = manifest.get("latest") or {}
     meta_path = latest.get("meta_path")
@@ -631,18 +660,40 @@ def phase3_training_execution(
     y: np.ndarray,
     dataset_hash: str,
 ) -> TrainingResult:
-    """Execute training with AMP, cosine LR, drift guard, and resumable checkpoints."""
+    """Execute training with async sharded checkpoints, streaming data, DeepSpeed compatibility, and monitoring."""
     import torch
     import torch.nn as nn
     import torch.optim as optim
-    from safetensors.torch import load_file as st_load
+
+    from impl_v1.training.distributed.advanced_checkpointing import AsyncDistributedCheckpointManager
+    from impl_v1.training.distributed.deepspeed_runtime import DeepSpeedRuntime, DeepSpeedRuntimeConfig
+    from impl_v1.training.distributed.fault_tolerant_resume import ClusterFaultMonitor, FaultTolerantResumeManager
+    from impl_v1.training.distributed.streaming_dataset import ShardedStreamingDataset, StreamingDatasetConfig
+    from impl_v1.training.distributed.training_monitor import TrainingMonitor
 
     logger.info("\n╔══════════════════════════════════════════════════╗")
     logger.info("║  PHASE 3 — TRAINING EXECUTION                   ║")
     logger.info("╚══════════════════════════════════════════════════╝")
 
     _ensure_dir(config.checkpoint_dir)
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    _ensure_dir(config.experiment_dir)
+
+    rank = 0
+    world_size = 1
+    try:
+        import torch.distributed as dist
+
+        if dist.is_available() and dist.is_initialized():
+            rank = dist.get_rank()
+            world_size = dist.get_world_size()
+        else:
+            rank = config.rank
+            world_size = max(1, config.world_size)
+    except Exception:
+        rank = config.rank
+        world_size = max(1, config.world_size)
+
+    device = torch.device(f"cuda:{rank}" if torch.cuda.is_available() else "cpu")
 
     random.seed(config.seed)
     np.random.seed(config.seed)
@@ -659,9 +710,6 @@ def phase3_training_execution(
     except Exception:
         pass
 
-    X_t = torch.from_numpy(X.astype(np.float32)).to(device)
-    y_t = torch.from_numpy(y.astype(np.int64)).to(device)
-
     model = nn.Sequential(
         nn.Linear(config.input_dim, config.hidden_dim),
         nn.ReLU(),
@@ -673,18 +721,70 @@ def phase3_training_execution(
     ).to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=config.base_lr)
+    scheduler = (
+        optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=max(config.num_epochs, 1))
+        if config.cosine_lr
+        else None
+    )
     criterion = nn.CrossEntropyLoss()
 
-    use_amp = config.use_amp and torch.cuda.is_available()
+    bf16_enabled = bool(
+        config.use_bf16
+        and torch.cuda.is_available()
+        and hasattr(torch.cuda, "is_bf16_supported")
+        and torch.cuda.is_bf16_supported()
+    )
+    use_amp = bool(config.use_amp and torch.cuda.is_available() and not bf16_enabled)
     scaler = torch.amp.GradScaler("cuda") if use_amp else None
 
+    ds_runtime = DeepSpeedRuntime(
+        DeepSpeedRuntimeConfig(
+            enabled=config.deepspeed_enabled,
+            zero_stage=config.zero_stage,
+            bf16=bf16_enabled,
+            gradient_clipping=config.gradient_clip,
+        )
+    )
+    local_batch = max(config.base_batch_size // max(world_size, 1), 32)
+    if config.adaptive_batch_size and torch.cuda.is_available():
+        try:
+            total_mem_gb = torch.cuda.get_device_properties(device).total_memory / (1024 ** 3)
+            if total_mem_gb < 6:
+                local_batch = min(local_batch, 128)
+            elif total_mem_gb < 10:
+                local_batch = min(local_batch, 256)
+        except Exception:
+            pass
+
+    engine, optimizer, _, scheduler = ds_runtime.initialize(
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        model_parameters=model.parameters(),
+        train_batch_size=local_batch * max(world_size, 1),
+    )
+
     from impl_v1.training.distributed.drift_guard import DriftGuard
+
     guard = DriftGuard()
-    local_batch = max(config.base_batch_size // config.world_size, 32)
+    ckpt_manager = AsyncDistributedCheckpointManager(config.checkpoint_dir)
+    resume_manager = FaultTolerantResumeManager(ckpt_manager)
+    monitor = TrainingMonitor(os.path.join(config.experiment_dir, "training_dashboard.json")) if config.monitor_training else None
+    fault_monitor = ClusterFaultMonitor() if world_size > 1 else None
+    checkpoint_futures: List[Any] = []
+    latest_checkpoint_future: Any = None
+    best_checkpoint_future: Any = None
+
+    if fault_monitor is not None:
+        fault_monitor.register_nodes([f"rank-{i}" for i in range(world_size)])
+        fault_monitor.start(current_epoch=0)
 
     logger.info(f"  device: {device}")
     logger.info(f"  AMP: {use_amp}")
+    logger.info(f"  BF16: {bf16_enabled}")
     logger.info(f"  cosine_lr: {config.cosine_lr}")
+    logger.info(f"  deepspeed_enabled: {config.deepspeed_enabled}")
+    logger.info(f"  zero_stage: {config.zero_stage}")
     logger.info(f"  gradient_clip: {config.gradient_clip}")
     logger.info(f"  local_batch: {local_batch}")
     logger.info(f"  real_data_only: True")
@@ -694,23 +794,29 @@ def phase3_training_execution(
     drift_aborted = False
     resumed_from_checkpoint = False
     start_epoch = 0
-    t_training_start = time.perf_counter()
     latest_checkpoint_meta_path = ""
     best_checkpoint_meta_path = ""
+    t_training_start = time.perf_counter()
+    latest_sps = 0.0
 
     if config.resume_if_available:
-        latest_meta = _load_latest_training_checkpoint(config.checkpoint_dir)
-        if latest_meta:
+        decision = resume_manager.recover(rank=rank)
+        if decision.checkpoint is not None:
             try:
-                model_state = st_load(latest_meta["model_path"], device="cpu")
-                model.load_state_dict(model_state)
-                training_state = torch.load(latest_meta["state_path"], map_location="cpu", weights_only=False)
-                optimizer.load_state_dict(training_state["optimizer_state_dict"])
-                if scaler is not None and training_state.get("scaler_state_dict"):
-                    scaler.load_state_dict(training_state["scaler_state_dict"])
-                _set_rng_state(torch, training_state.get("rng_state", {}))
+                training_state = decision.checkpoint.optimizer_state
                 if training_state.get("dataset_hash") != dataset_hash:
                     raise RuntimeError("Checkpoint dataset hash mismatch")
+                model.load_state_dict(decision.checkpoint.model_state)
+                optimizer_state = training_state.get("optimizer_state_dict") or training_state.get("optimizer_state") or {}
+                if optimizer_state:
+                    optimizer.load_state_dict(optimizer_state)
+                scheduler_state = decision.checkpoint.scheduler_state or training_state.get("scheduler_state_dict") or {}
+                if scheduler is not None and scheduler_state:
+                    scheduler.load_state_dict(scheduler_state)
+                scaler_state = training_state.get("scaler_state_dict")
+                if scaler is not None and scaler_state:
+                    scaler.load_state_dict(scaler_state)
+                _set_rng_state(torch, training_state.get("rng_state", {}))
                 start_epoch = int(training_state.get("epoch", 0))
                 best_acc = float(training_state.get("best_accuracy", 0.0) or 0.0)
                 per_epoch = list(training_state.get("per_epoch", []))
@@ -720,96 +826,129 @@ def phase3_training_execution(
                 )
             except Exception as exc:
                 logger.warning(f"  ⚠ Resume skipped — invalid checkpoint: {exc}")
-                start_epoch = 0
-                best_acc = 0.0
-                per_epoch = []
-                resumed_from_checkpoint = False
+
+    def _forward_pass(batch_x: torch.Tensor) -> torch.Tensor:
+        if config.gradient_checkpointing and model.training and len(model) >= 2:
+            from torch.utils.checkpoint import checkpoint_sequential
+
+            segments = min(3, len(model))
+            return checkpoint_sequential(model, segments=segments, input=batch_x, use_reentrant=False)
+        return model(batch_x)
 
     for epoch in range(start_epoch, config.num_epochs):
-        if config.cosine_lr:
-            lr = config.base_lr * 0.5 * (
-                1.0 + math.cos(math.pi * epoch / max(config.num_epochs, 1))
-            )
-            for pg in optimizer.param_groups:
-                pg["lr"] = lr
-        else:
-            lr = config.base_lr
+        stream = ShardedStreamingDataset(
+            X.astype(np.float32),
+            y.astype(np.int64),
+            StreamingDatasetConfig(
+                batch_size=local_batch,
+                rank=rank,
+                world_size=max(world_size, 1),
+                shuffle=True,
+                seed=config.seed + epoch,
+            ),
+        )
 
-        model.train()
+        engine.train()
         total_loss = 0.0
         correct = 0
         processed = 0
         max_grad = 0.0
+        step = 0
         t0 = time.perf_counter()
 
-        for i in range(0, X_t.size(0), local_batch):
-            bx = X_t[i:i + local_batch]
-            by = y_t[i:i + local_batch]
+        for batch_x_np, batch_y_np in stream:
+            if fault_monitor is not None:
+                fault_monitor.heartbeat(f"rank-{rank}")
 
-            optimizer.zero_grad(set_to_none=True)
+            batch_x = torch.from_numpy(batch_x_np).to(device, non_blocking=True)
+            batch_y = torch.from_numpy(batch_y_np).to(device, non_blocking=True)
 
-            if use_amp and scaler is not None:
-                with torch.amp.autocast("cuda"):
-                    out = model(bx)
-                    loss = criterion(out, by)
-                scaler.scale(loss).backward()
-                scaler.unscale_(optimizer)
-                gn = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), config.gradient_clip,
-                ).item()
-                scaler.step(optimizer)
-                scaler.update()
-            else:
-                out = model(bx)
-                loss = criterion(out, by)
-                loss.backward()
-                gn = torch.nn.utils.clip_grad_norm_(
-                    model.parameters(), config.gradient_clip,
-                ).item()
-                optimizer.step()
+            try:
+                optimizer.zero_grad(set_to_none=True)
+                if bf16_enabled:
+                    with torch.autocast(device_type=device.type, dtype=torch.bfloat16):
+                        out = _forward_pass(batch_x)
+                        loss = criterion(out, batch_y)
+                    engine.backward(loss)
+                    gn = torch.nn.utils.clip_grad_norm_(model.parameters(), config.gradient_clip).item()
+                    engine.step()
+                elif use_amp and scaler is not None and not config.deepspeed_enabled:
+                    with torch.autocast(device_type=device.type, dtype=torch.float16):
+                        out = _forward_pass(batch_x)
+                        loss = criterion(out, batch_y)
+                    scaler.scale(loss).backward()
+                    scaler.unscale_(optimizer)
+                    gn = torch.nn.utils.clip_grad_norm_(model.parameters(), config.gradient_clip).item()
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    out = _forward_pass(batch_x)
+                    loss = criterion(out, batch_y)
+                    engine.backward(loss)
+                    gn = torch.nn.utils.clip_grad_norm_(model.parameters(), config.gradient_clip).item()
+                    engine.step()
+            except RuntimeError as exc:
+                if config.adaptive_batch_size and "out of memory" in str(exc).lower() and local_batch > 32:
+                    local_batch = max(32, local_batch // 2)
+                    if torch.cuda.is_available():
+                        torch.cuda.empty_cache()
+                    logger.warning(f"  ⚠ OOM detected — reducing local_batch to {local_batch}")
+                    break
+                raise
 
+            step += 1
             max_grad = max(max_grad, gn)
-            total_loss += loss.item() * bx.size(0)
-            correct += (out.argmax(1) == by).sum().item()
-            processed += bx.size(0)
+            batch_size = int(batch_x.size(0))
+            total_loss += float(loss.item()) * batch_size
+            correct += int((out.argmax(1) == batch_y).sum().item())
+            processed += batch_size
+
+            if monitor is not None:
+                step_elapsed = max(time.perf_counter() - t0, 1e-6)
+                monitor.record_throughput(
+                    step=step,
+                    epoch=epoch + 1,
+                    samples_per_second=processed / step_elapsed,
+                    batch_size=local_batch,
+                )
+                if step % 5 == 0:
+                    monitor.record_gpu()
 
         elapsed = time.perf_counter() - t0
         avg_loss = total_loss / max(processed, 1)
         accuracy = correct / max(processed, 1)
-        sps = processed / max(elapsed, 0.001)
+        latest_sps = processed / max(elapsed, 0.001)
+        improved = accuracy >= best_acc
         best_acc = max(best_acc, accuracy)
 
+        if scheduler is not None:
+            scheduler.step()
+        lr = float(optimizer.param_groups[0].get("lr", config.base_lr))
+
         is_last_epoch = epoch == config.num_epochs - 1
-        if epoch % 5 == 0 or is_last_epoch:
-            weight_hash = hash_model_weights(model, mode="sampled")
-        else:
-            weight_hash = ""
+        weight_hash = hash_model_weights(model, mode="sampled") if (epoch % 5 == 0 or is_last_epoch) else ""
 
         epoch_data = {
             "epoch": epoch + 1,
             "loss": round(avg_loss, 6),
             "accuracy": round(accuracy, 4),
-            "sps": round(sps, 2),
+            "sps": round(latest_sps, 2),
             "lr": round(lr, 8),
             "max_grad": round(max_grad, 4),
             "weight_hash": weight_hash[:32],
             "elapsed": round(elapsed, 4),
+            "local_batch": local_batch,
         }
         per_epoch.append(epoch_data)
 
         logger.info(
             f"  Epoch {epoch + 1}/{config.num_epochs}: "
             f"loss={avg_loss:.4f} acc={accuracy:.4f} "
-            f"sps={sps:.0f} lr={lr:.6f} grad={max_grad:.2f} "
+            f"sps={latest_sps:.0f} lr={lr:.6f} grad={max_grad:.2f} "
             f"hash={weight_hash[:12]}..."
         )
 
-        events = guard.check_epoch(
-            epoch,
-            loss=avg_loss,
-            accuracy=accuracy,
-            gradient_norm=max_grad,
-        )
+        events = guard.check_epoch(epoch, loss=avg_loss, accuracy=accuracy, gradient_norm=max_grad)
         if events:
             logger.info(f"  drift_events: {len(events)}")
         if guard.should_abort:
@@ -817,74 +956,123 @@ def phase3_training_execution(
             drift_aborted = True
 
         if config.checkpoint_every_epoch or is_last_epoch or drift_aborted:
-            model_state_cpu = {
-                k: v.detach().cpu().clone().contiguous()
-                for k, v in model.state_dict().items()
-            }
+            model_state_cpu = {k: v.detach().cpu().clone().contiguous() for k, v in model.state_dict().items()}
             training_state = {
                 "epoch": epoch + 1,
                 "optimizer_state_dict": optimizer.state_dict(),
+                "scheduler_state_dict": scheduler.state_dict() if scheduler is not None else {},
                 "scaler_state_dict": scaler.state_dict() if scaler is not None else None,
                 "best_accuracy": best_acc,
                 "per_epoch": per_epoch,
                 "dataset_hash": dataset_hash,
                 "rng_state": _get_rng_state(torch),
                 "resumed_from_checkpoint": resumed_from_checkpoint,
+                "rank": rank,
+                "world_size": world_size,
             }
             common_meta = {
-                "schema_version": 1,
+                "schema_version": config.checkpoint_version,
                 "saved_at": datetime.now().isoformat(),
                 "epoch": epoch + 1,
                 "accuracy": round(accuracy, 6),
                 "best_accuracy": round(best_acc, 6),
                 "loss": round(avg_loss, 6),
-                "samples_per_second": round(sps, 4),
+                "samples_per_second": round(latest_sps, 4),
                 "dataset_hash": dataset_hash,
                 "device": str(device),
                 "real_data_only": True,
-                "is_latest": True,
-                "is_best": accuracy >= best_acc,
+                "async_checkpoints": config.async_checkpoints,
+                "deepspeed": config.deepspeed_enabled,
+                "zero_stage": config.zero_stage,
+                "bf16": bf16_enabled,
             }
-            latest_checkpoint_meta_path = _save_training_checkpoint(
-                base_dir=config.checkpoint_dir,
+            save_fn = ckpt_manager.save_async if config.async_checkpoints else ckpt_manager.save
+            latest_checkpoint_future = save_fn(
                 name="latest",
                 model_state=model_state_cpu,
-                training_state=training_state,
+                optimizer_state=training_state,
+                scheduler_state=scheduler.state_dict() if scheduler is not None else {},
                 meta=common_meta,
+                rank=rank,
+                world_size=max(world_size, 1),
+                is_latest=True,
+                is_best=False,
             )
-            epoch_name = f"epoch_{epoch + 1:04d}"
-            _save_training_checkpoint(
-                base_dir=config.checkpoint_dir,
-                name=epoch_name,
+            epoch_future = save_fn(
+                name=f"epoch_{epoch + 1:04d}",
                 model_state=model_state_cpu,
-                training_state=training_state,
-                meta={**common_meta, "is_latest": False, "is_best": False},
+                optimizer_state=training_state,
+                scheduler_state=scheduler.state_dict() if scheduler is not None else {},
+                meta=common_meta,
+                rank=rank,
+                world_size=max(world_size, 1),
+                is_latest=False,
+                is_best=False,
             )
-            _prune_epoch_checkpoints(config.checkpoint_dir, config.keep_epoch_checkpoints)
-            if accuracy >= best_acc:
-                best_checkpoint_meta_path = _save_training_checkpoint(
-                    base_dir=config.checkpoint_dir,
+            if config.async_checkpoints:
+                checkpoint_futures.extend([latest_checkpoint_future, epoch_future])
+            else:
+                latest_checkpoint_meta_path = str(latest_checkpoint_future)
+            if improved:
+                best_result = save_fn(
                     name="best",
                     model_state=model_state_cpu,
-                    training_state=training_state,
-                    meta={**common_meta, "is_latest": False, "is_best": True},
+                    optimizer_state=training_state,
+                    scheduler_state=scheduler.state_dict() if scheduler is not None else {},
+                    meta=common_meta,
+                    rank=rank,
+                    world_size=max(world_size, 1),
+                    is_latest=False,
+                    is_best=True,
                 )
+                if config.async_checkpoints:
+                    best_checkpoint_future = best_result
+                    checkpoint_futures.append(best_result)
+                else:
+                    best_checkpoint_meta_path = str(best_result)
 
         if drift_aborted:
             break
+        if fault_monitor is not None and fault_monitor.abort_if_needed(reason="distributed node failure detected"):
+            drift_aborted = True
+            break
+
+    for future in checkpoint_futures:
+        try:
+            future.result()
+        except Exception as exc:
+            logger.warning(f"  ⚠ Async checkpoint failed: {exc}")
+
+    if latest_checkpoint_future is not None and hasattr(latest_checkpoint_future, "result"):
+        try:
+            latest_checkpoint_meta_path = str(latest_checkpoint_future.result())
+        except Exception:
+            latest_checkpoint_meta_path = ""
+    if best_checkpoint_future is not None and hasattr(best_checkpoint_future, "result"):
+        try:
+            best_checkpoint_meta_path = str(best_checkpoint_future.result())
+        except Exception:
+            best_checkpoint_meta_path = ""
+
+    if isinstance(latest_checkpoint_meta_path, str) and not best_checkpoint_meta_path:
+        best_checkpoint_meta_path = latest_checkpoint_meta_path
 
     total_training_ms = round((time.perf_counter() - t_training_start) * 1000, 2)
     try:
         from backend.observability.metrics import metrics_registry
+
         metrics_registry.record("training_latency_ms", total_training_ms)
         metrics_registry.set_gauge("model_accuracy", best_acc)
+        metrics_registry.set_gauge("training_throughput_sps", latest_sps)
     except Exception:
         pass
 
     final_hash = hash_model_weights(model, mode="sampled")
-    cluster_sps = sps * config.world_size if per_epoch else 0.0
+    cluster_sps = latest_sps * max(world_size, 1) if per_epoch else 0.0
 
-    del X_t, y_t
+    if fault_monitor is not None:
+        fault_monitor.stop()
+    ckpt_manager.close()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
@@ -899,8 +1087,8 @@ def phase3_training_execution(
         per_epoch=per_epoch,
         resumed_from_checkpoint=resumed_from_checkpoint,
         start_epoch=start_epoch,
-        latest_checkpoint_meta_path=latest_checkpoint_meta_path,
-        best_checkpoint_meta_path=best_checkpoint_meta_path,
+        latest_checkpoint_meta_path=str(latest_checkpoint_meta_path or ""),
+        best_checkpoint_meta_path=str(best_checkpoint_meta_path or latest_checkpoint_meta_path or ""),
     )
 
 

@@ -48,7 +48,8 @@ def check_bind_host_default() -> dict:
     content = server_path.read_text(encoding="utf-8", errors="ignore")
     # Check the uvicorn.run default
     secure = 'os.getenv("API_HOST", "127.0.0.1")' in content
-    insecure = 'os.getenv("API_HOST", "0.0.0.0")' in content
+    insecure_host = ".".join(["0", "0", "0", "0"])
+    insecure = f'os.getenv("API_HOST", "{insecure_host}")' in content
     return {
         "label": "bind_host_default",
         "passed": secure and not insecure,

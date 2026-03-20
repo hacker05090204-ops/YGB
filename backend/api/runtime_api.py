@@ -51,6 +51,7 @@ REQUIRED_FIELDS = [
 ]
 
 STALE_THRESHOLD_MS = 30_000  # 30 seconds
+_TRUTHY_VALUES = {"1", "true", "yes", "on"}
 
 
 def _validate_structure(data: dict) -> list:
@@ -386,7 +387,7 @@ def get_runtime_status():
     GET /runtime/status
 
     Returns validated runtime state from RUNTIME_STATE_PATH.
-    Falls back to HMAC-validated telemetry if state file missing.
+    Falls back to HMAC-validated telemetry only when explicitly enabled.
     Separates storage_engine_status from dataset_readiness_status.
     Blocks 'training ready' if dataset is blocked.
     """
@@ -466,8 +467,16 @@ def get_runtime_status():
                 "timestamp": int(_time.time() * 1000)
             }
 
-    # Fall back to HMAC-validated telemetry
-    if os.path.exists(TELEMETRY_PATH):
+    # Optional telemetry fallback for deployments that still expose only the
+    # signed telemetry stream. Default is fail-safe awaiting_data because test
+    # and cold-start environments often have stale telemetry artifacts.
+    telemetry_fallback_enabled = (
+        os.environ.get("YGB_RUNTIME_ALLOW_TELEMETRY_FALLBACK", "false")
+        .strip()
+        .lower()
+        in _TRUTHY_VALUES
+    )
+    if telemetry_fallback_enabled and os.path.exists(TELEMETRY_PATH):
         result = validate_telemetry()
         result["storage_engine_status"] = "ACTIVE" if result.get("status") == "ok" else "ERROR"
         result["dataset_readiness"] = dataset_readiness

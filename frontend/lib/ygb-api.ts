@@ -116,7 +116,10 @@ export function getApiBase(): string {
  * Centralized fetch wrapper that includes auth credentials (HttpOnly cookies).
  */
 export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  return credentialedFetch(url, options);
+  return credentialedFetch(url, {
+    ...options,
+    cache: "no-store",
+  });
 }
 
 export interface PhaseInfo {

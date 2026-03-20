@@ -21,6 +21,7 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisco
 from pydantic import BaseModel
 
 from backend.auth.auth_guard import require_auth
+from backend.auth.ownership import check_resource_owner
 
 logger = logging.getLogger(__name__)
 
@@ -220,6 +221,12 @@ async def host_action_session_status(session_id: str, user=Depends(require_auth)
     status = governor.describe_session(session_id)
     if status["status"] == "missing":
         raise HTTPException(status_code=404, detail="Session not found")
+    check_resource_owner(
+        {"owner_id": status.get("requested_by", "")},
+        user,
+        resource_name="host_action_session",
+        resource_id=session_id,
+    )
     return status
 
 

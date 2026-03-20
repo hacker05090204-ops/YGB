@@ -298,11 +298,34 @@ def _build_runtime_status(ladder_state: dict) -> dict:
         "merge_status": None,
     }
 
-    # Load persisted runtime status if available
+    # Fully persisted ladder states may load the full runtime overlay.
+    # Minimal in-memory helper states are allowed to consume only a narrow,
+    # observational subset so local workspace artifacts cannot inject stale
+    # safety flags into pure unit tests.
+    use_full_persisted_runtime = bool(ladder_state.get("last_updated"))
+    minimal_runtime_keys = {
+        "gpu_utilization",
+        "training_velocity_samples_hr",
+        "training_velocity_batches_sec",
+        "data_freshness",
+        "merge_status",
+        "drift_alert",
+    }
+
     if os.path.exists(RUNTIME_STATE_PATH):
         try:
             with open(RUNTIME_STATE_PATH) as f:
                 persisted = json.load(f)
+
+            if not use_full_persisted_runtime:
+                if set(persisted).issubset(minimal_runtime_keys):
+                    persisted = {
+                        key: value
+                        for key, value in persisted.items()
+                        if key in minimal_runtime_keys
+                    }
+                else:
+                    persisted = {}
 
             # Only use explicitly set values — no fallback assumptions
             for key in runtime:

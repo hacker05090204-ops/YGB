@@ -12,6 +12,7 @@ Production behavior is NOT weakened:
 
 import os
 import secrets
+import asyncio
 
 import pytest
 
@@ -28,3 +29,17 @@ def _ensure_approval_secret(monkeypatch):
     """
     if not os.environ.get("YGB_KEY_DIR") and not os.environ.get("YGB_APPROVAL_SECRET"):
         monkeypatch.setenv("YGB_APPROVAL_SECRET", secrets.token_hex(32))
+
+
+@pytest.fixture(autouse=True)
+def _ensure_event_loop():
+    """Keep a default main-thread event loop available for legacy sync tests."""
+    try:
+        loop = asyncio.get_event_loop_policy().get_event_loop()
+        if loop.is_closed():
+            raise RuntimeError
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    yield

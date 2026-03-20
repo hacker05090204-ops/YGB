@@ -181,8 +181,16 @@ def classify_path(filepath):
         # Governors are runtime policy modules by default. Only an explicit
         # test-only marker should downgrade them to tooling.
         if 'governors' in parts:
-            _TEST_ONLY_GOVERNORS = set()
-            if parts[-1] in _TEST_ONLY_GOVERNORS:
+            _TEST_ONLY_GOVERNORS = {
+                'g01_test_governor.py',
+            }
+            filename = parts[-1].lower()
+            if (
+                filename in _TEST_ONLY_GOVERNORS
+                or filename.startswith('test_')
+                or filename.endswith('_test.py')
+                or '_test_' in filename
+            ):
                 return 'CI_TOOLING'
             return 'PRODUCTION'
         # Phase governance/freeze Python files

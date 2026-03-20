@@ -24,7 +24,7 @@ runs:
         python -m pip install --upgrade pip
         pip install numpy pytest pytest-cov pytest-asyncio coverage gcovr
         pip install pycryptodome bcrypt
-        pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets
+        pip install fastapi uvicorn pydantic httpx psutil aiosqlite PyJWT python-dotenv websockets safetensors
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
         if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi

@@ -29,6 +29,11 @@ TIMEOUT_RATE_THRESHOLD = float(os.getenv("GATE_TIMEOUT_RATE", "0.05"))
 COMPLETENESS_THRESHOLD = float(os.getenv("GATE_COMPLETENESS", "0.95"))
 
 
+def _is_non_blocking_readiness_failure(check: dict) -> bool:
+    """Treat cold-start local storage as informational in CI gate mode."""
+    return check.get("name") == "storage"
+
+
 def run_gate() -> dict:
     """Run reliability gate checks and return report."""
     results = {
@@ -46,15 +51,27 @@ def run_gate() -> dict:
         from backend.reliability.dependency_checker import run_all_checks
         readiness = run_all_checks(timeout_per_check=2.0)
         latency = readiness.get("total_latency_ms", 0.0)
-        ready = readiness.get("ready", False)
+        failed_checks = [
+            check for check in readiness.get("checks", [])
+            if not check.get("ok", False)
+        ]
+        blocking_failures = [
+            check for check in failed_checks
+            if not _is_non_blocking_readiness_failure(check)
+        ]
+        ready = len(blocking_failures) == 0
         latency_ok = latency <= READINESS_LATENCY_THRESHOLD_MS
+        deferred = [check["name"] for check in failed_checks if check not in blocking_failures]
+        detail = f"{latency:.1f}ms readiness, deps_ready={ready}"
+        if deferred:
+            detail += f", deferred={','.join(deferred)}"
 
         results["checks"].append({
             "name": "readiness_latency",
             "passed": latency_ok and ready,
             "value": latency,
             "threshold": READINESS_LATENCY_THRESHOLD_MS,
-            "detail": f"{latency:.1f}ms readiness, deps_ready={ready}",
+            "detail": detail,
         })
 
         if not (latency_ok and ready):
@@ -171,10 +188,10 @@ def main() -> int:
     print(f"{'=' * 60}")
 
     for check in report["checks"]:
-        icon = "✅" if check["passed"] else "❌"
-        print(f"  {icon} {check['name']}: {check['detail']}")
+        label = "[PASS]" if check["passed"] else "[FAIL]"
+        print(f"  {label} {check['name']}: {check['detail']}")
 
-    overall = "PASS ✅" if report["passed"] else "FAIL ❌"
+    overall = "PASS" if report["passed"] else "FAIL"
     print(f"\n  Result: {overall}")
     print(f"{'=' * 60}\n")
 

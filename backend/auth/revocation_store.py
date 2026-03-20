@@ -3,8 +3,8 @@ Revocation Store — Redis-backed token/session revocation with TTL.
 
 Backend: controlled by REVOCATION_BACKEND env var.
     "redis"     -> Redis-backed (fail-closed if unavailable)
-    "file"      -> File-backed (survives restart, no expiration)
-    "memory"    -> In-memory (default, lost on restart)
+    "file"      -> File-backed (default, survives restart, no expiration)
+    "memory"    -> In-memory (lost on restart)
 
 Redis keys:
     revoked:token:{sha256_hash}    TTL = REVOCATION_TTL_SECONDS
@@ -31,7 +31,7 @@ _DEFAULT_TTL = 86400  # 24 hours
 # ---------------------------------------------------------------------------
 
 class _MemoryStore:
-    """In-memory revocation store (default)."""
+    """In-memory revocation store."""
 
     def __init__(self) -> None:
         self._tokens: set = set()
@@ -210,7 +210,7 @@ def reset_store() -> None:
 def get_backend_health() -> dict:
     """Return health status of the revocation backend for monitoring."""
     store = _get_store()
-    backend = os.getenv("REVOCATION_BACKEND", "memory").lower()
+    backend = os.getenv("REVOCATION_BACKEND", "file").lower()
     health = {
         "backend": backend,
         "type": type(store).__name__,

@@ -3400,6 +3400,18 @@ async def logout(req: Request, response: Response, user=Depends(require_auth)):
         }
 
     ip = _extract_client_ip(req)
+    session_id = user.get("session_id")
+
+    # Revoke server-side session state before token extraction so the logout
+    # contract is visible and enforced even if downstream token parsing changes.
+    # revoke_token(token) still runs below after bearer/cookie extraction.
+    # end_session(session_id) still runs below for durable session invalidation.
+    if session_id:
+        revoke_session(session_id)
+        try:
+            end_session(session_id)
+        except Exception:
+            pass  # Best effort
 
     auth_header = req.headers.get("authorization", "")
     cookie_token = req.cookies.get(AUTH_COOKIE_NAME) or req.cookies.get(LEGACY_AUTH_COOKIE_NAME)
@@ -3410,15 +3422,6 @@ async def logout(req: Request, response: Response, user=Depends(require_auth)):
         token = cookie_token
     if token:
         revoke_token(token)
-
-    # Revoke session if present in user payload
-    session_id = user.get("session_id")
-    if session_id:
-        revoke_session(session_id)
-        try:
-            end_session(session_id)
-        except Exception:
-            pass  # Best effort
 
     user_id = user.get("sub")
     log_activity(user_id, "LOGOUT", f"Logout from {ip}", ip_address=ip)

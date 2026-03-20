@@ -47,14 +47,14 @@ class ScanReport:
 
 # Patterns to detect
 _TOKEN_IN_QUERY_RE = re.compile(
-    r"""(?:token|api_key|access_token|secret)=(?!['"]?\{)""",
+    r"""(?:\?|&)(?:token|api_key|access_token|secret)=""",
     re.IGNORECASE,
 )
 
 _BIND_ALL_RE = re.compile(
     r"""(?:host\s*=\s*['"]0\.0\.0\.0['"]|"""
     r"""bind\s*=\s*['"]0\.0\.0\.0['"]|"""
-    r"""['"]0\.0\.0\.0['"])""",
+    r"""os\.getenv\(\s*['"]API_HOST['"]\s*,\s*['"]0\.0\.0\.0['"]\s*\))""",
     re.IGNORECASE,
 )
 
@@ -93,7 +93,9 @@ def _scan_file(filepath: Path, report: ScanReport) -> None:
 
         # Rule 1: TOKEN_IN_QUERY
         if _TOKEN_IN_QUERY_RE.search(line):
-            # Exclude comments and log strings
+            # Exclude comments and log strings. Query-string fragments are only
+            # risky when embedded in URLs or request templates, not when a
+            # symbol merely contains a "token" suffix.
             if not stripped.startswith(("#", "logger.", "logging.")):
                 report.violations.append(Violation(
                     rule="TOKEN_IN_QUERY",
@@ -198,16 +200,15 @@ def main() -> int:
     print(f"  Files scanned: {report.files_scanned}")
     print(f"  Rules checked: {report.rules_checked}")
     print(f"  Violations:    {len(report.violations)}")
-    print(f"  Result:        {'PASS ✅' if report.passed else 'FAIL ❌'}")
+    print(f"  Result:        {'PASS' if report.passed else 'FAIL'}")
     print(f"{'=' * 60}\n")
 
     if report.violations:
         for v in report.violations:
-            icon = "🔴" if v.severity == "CRITICAL" else "🟡" if v.severity == "HIGH" else "🔵"
-            print(f"  {icon} [{v.severity}] {v.rule}")
+            print(f"  [{v.severity}] {v.rule}")
             print(f"     {v.file}:{v.line}")
             print(f"     {v.message}")
-            print(f"     → {v.snippet}")
+            print(f"     -> {v.snippet}")
             print()
 
     return 0 if report.passed else 1

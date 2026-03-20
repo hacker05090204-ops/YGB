@@ -9,10 +9,8 @@ Provides save_safetensors() and load_safetensors() with:
 """
 
 import hashlib
-import json
 import logging
 import os
-import tempfile
 from typing import Dict, Optional, Tuple
 
 logger = logging.getLogger(__name__)
@@ -24,12 +22,33 @@ def _compute_tensor_hash(tensors: Dict) -> str:
     for k in sorted(tensors.keys()):
         t = tensors[k]
         if hasattr(t, 'cpu'):
-            h.update(t.cpu().numpy().tobytes())
+            h.update(t.detach().cpu().numpy().tobytes())
         elif hasattr(t, 'tobytes'):
             h.update(t.tobytes())
         else:
             h.update(str(t).encode())
     return h.hexdigest()
+
+
+def _normalize_tensors_for_save(tensors: Dict) -> Dict:
+    """Normalize tensors to CPU torch.Tensor objects for safetensors."""
+    import torch
+
+    normalized = {}
+    for name, value in tensors.items():
+        if isinstance(value, torch.Tensor):
+            normalized[name] = value.detach().cpu()
+            continue
+
+        if hasattr(value, "shape") and hasattr(value, "dtype"):
+            normalized[name] = torch.as_tensor(value)
+            continue
+
+        raise TypeError(
+            f"Unsupported tensor payload for '{name}': {type(value).__name__}"
+        )
+
+    return normalized
 
 
 def _compute_file_hash(path: str) -> str:
@@ -60,6 +79,8 @@ def save_safetensors(
     """
     import torch
     from safetensors.torch import save_file
+
+    tensors = _normalize_tensors_for_save(tensors)
 
     # FP16 conversion
     if convert_fp16:
