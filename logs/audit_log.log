@@ -389,3 +389,62 @@
 2026-03-21 01:10:24,796 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
 2026-03-21 01:10:24,798 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
 2026-03-21 01:10:24,799 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #2
+2026-03-21 07:46:12,173 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 07:46:12,174 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #1
+2026-03-21 07:46:12,176 [REPR-GUARD] BLOCKED: Empty after strip in input #1
+2026-03-21 07:46:12,178 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 07:46:12,179 [REPR-GUARD] ALLOWED: input #1, stripped=2 fields
+2026-03-21 07:46:12,181 [REPR-GUARD] BLOCKED: MODE-B token in input #1
+2026-03-21 07:46:12,182 [REPR-GUARD] ALLOWED: input #1, stripped=1 fields
+2026-03-21 07:46:12,185 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 07:46:12,187 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 07:46:12,188 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 07:46:12,188 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #2
+2026-03-21 07:49:31,918 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 07:49:31,919 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #1
+2026-03-21 07:49:31,920 [REPR-GUARD] BLOCKED: Empty after strip in input #1
+2026-03-21 07:49:31,921 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 07:49:31,922 [REPR-GUARD] ALLOWED: input #1, stripped=2 fields
+2026-03-21 07:49:31,924 [REPR-GUARD] BLOCKED: MODE-B token in input #1
+2026-03-21 07:49:31,926 [REPR-GUARD] ALLOWED: input #1, stripped=1 fields
+2026-03-21 07:49:31,927 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 07:49:31,929 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 07:49:31,931 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 07:49:31,931 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #2
+2026-03-21 08:03:10,407 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 08:03:10,408 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #1
+2026-03-21 08:03:10,409 [REPR-GUARD] BLOCKED: Empty after strip in input #1
+2026-03-21 08:03:10,410 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 08:03:10,411 [REPR-GUARD] ALLOWED: input #1, stripped=2 fields
+2026-03-21 08:03:10,414 [REPR-GUARD] BLOCKED: MODE-B token in input #1
+2026-03-21 08:03:10,417 [REPR-GUARD] ALLOWED: input #1, stripped=1 fields
+2026-03-21 08:03:10,420 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 08:03:10,423 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 08:03:10,424 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 08:03:10,424 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #2
+2026-03-21 10:36:25,262 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 10:36:25,263 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #1
+2026-03-21 10:36:25,264 [REPR-GUARD] BLOCKED: Empty after strip in input #1
+2026-03-21 10:36:25,265 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 10:36:25,268 [REPR-GUARD] ALLOWED: input #1, stripped=2 fields
+2026-03-21 10:36:25,270 [REPR-GUARD] BLOCKED: MODE-B token in input #1
+2026-03-21 10:36:25,271 [REPR-GUARD] ALLOWED: input #1, stripped=1 fields
+2026-03-21 10:36:25,276 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 10:36:25,280 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 10:36:25,282 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 10:36:25,282 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #2
+2026-03-21 13:54:10,854 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 13:54:10,856 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #1
+2026-03-21 13:54:10,857 [REPR-GUARD] BLOCKED: Empty after strip in input #1
+2026-03-21 13:54:10,859 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 13:54:10,861 [REPR-GUARD] ALLOWED: input #1, stripped=2 fields
+2026-03-21 13:54:10,863 [REPR-GUARD] BLOCKED: MODE-B token in input #1
+2026-03-21 13:54:10,864 [REPR-GUARD] ALLOWED: input #1, stripped=1 fields
+2026-03-21 13:54:10,867 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 13:54:10,871 [REPR-GUARD] BLOCKED: Exploit pattern in input #1
+2026-03-21 13:54:10,874 [REPR-GUARD] ALLOWED: input #1, stripped=0 fields
+2026-03-21 13:54:10,874 [REPR-GUARD] BLOCKED: Decision token 'is_valid' in input #2
+2026-03-21 13:56:36,460 [REPR-GUARD] ALLOWED: input #1, stripped=1 fields
+2026-03-21 13:56:36,460 [REPR-GUARD] BLOCKED: Decision token 'is_bug' in input #2
+2026-03-21 13:56:36,460 [REPR-GUARD] BLOCKED: Exploit pattern in input #3
+2026-03-21 13:56:36,461 [REPR-GUARD] BLOCKED: MODE-B token in input #4
