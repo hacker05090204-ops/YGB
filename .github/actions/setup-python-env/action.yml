@@ -53,6 +53,34 @@ runs:
                 handle.write(f"YGB_HMAC_SECRET={normalized}\n")
         PYEOF
 
+    - name: Prepare CI auth secrets
+      shell: bash
+      run: |
+        python - <<'PYEOF'
+        import hashlib
+        import os
+
+        def normalize(name: str, fallback: str) -> str:
+            raw = (os.environ.get(name) or "").strip() or fallback
+            try:
+                bytes.fromhex(raw)
+                value = raw.lower()
+            except ValueError:
+                value = hashlib.sha256(raw.encode("utf-8")).hexdigest()
+            print(f"::add-mask::{value}")
+            return value
+
+        jwt_secret = normalize("JWT_SECRET", "ygb-ci-jwt-secret")
+        video_secret = normalize("YGB_VIDEO_JWT_SECRET", "ygb-ci-video-secret")
+
+        github_env = os.environ.get("GITHUB_ENV")
+        if github_env:
+            with open(github_env, "a", encoding="utf-8") as handle:
+                handle.write(f"JWT_SECRET={jwt_secret}\n")
+                handle.write(f"YGB_VIDEO_JWT_SECRET={video_secret}\n")
+                handle.write("YGB_TEMP_AUTH_BYPASS=false\n")
+        PYEOF
+
     - name: Prepare CI workspace
       shell: bash
       run: |
@@ -84,6 +112,11 @@ runs:
             "native_cpp_entry": str(native_cpp_entry.relative_to(root)),
             "native_cpp_build_script": str(native_cpp_build.relative_to(root)),
             "flags": flags,
+            "auth": {
+                "jwt_secret_present": bool(os.environ.get("JWT_SECRET")),
+                "video_jwt_secret_present": bool(os.environ.get("YGB_VIDEO_JWT_SECRET")),
+                "temporary_bypass": os.environ.get("YGB_TEMP_AUTH_BYPASS", "false"),
+            },
         }
         (root / "reports" / "ci_bootstrap.json").write_text(
             json.dumps(report, indent=2) + "\n",

@@ -22,6 +22,7 @@ env:
   PYTHONNOUSERSITE: "1"
   YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
   YGB_ENV: test
+  YGB_TEMP_AUTH_BYPASS: "false"
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PIP_NO_PYTHON_VERSION_WARNING: "1"
   NEXT_TELEMETRY_DISABLED: "1"
@@ -265,22 +266,29 @@ jobs:
 
       - name: Safetensors I/O validation
         run: |
-          python -c "
-          import tempfile, os
-          from training.safetensors_io import save_safetensors, load_safetensors
+          python - <<'PYEOF'
+          import os
+          import tempfile
+
           import numpy as np
-          data = {'weights': np.random.randn(4, 4).astype(np.float32)}
-          with tempfile.NamedTemporaryFile(suffix='.safetensors', delete=False) as f:
-              path = f.name
+
+          from training.safetensors_io import load_safetensors, save_safetensors
+
+          data = {"weights": np.random.randn(4, 4).astype(np.float32)}
+          with tempfile.NamedTemporaryFile(suffix=".safetensors", delete=False) as handle:
+              path = handle.name
+
           try:
               save_safetensors(data, path)
               loaded = load_safetensors(path)
-              assert 'weights' in loaded, 'Missing weights after roundtrip'
-              assert loaded['weights'].shape == (4, 4), f'Wrong shape: {loaded[\"weights\"].shape}'
-              print('Safetensors roundtrip OK')
+              assert "weights" in loaded, "Missing weights after roundtrip"
+              assert loaded["weights"].shape == (4, 4), (
+                  f"Wrong shape: {loaded['weights'].shape}"
+              )
+              print("Safetensors roundtrip OK")
           finally:
               os.unlink(path)
-          "
+          PYEOF
 
       - name: Run training and system status tests
         run: |

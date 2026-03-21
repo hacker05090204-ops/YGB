@@ -39,6 +39,12 @@ def _run(coro):
 class TestWsAuthenticateUnit(unittest.TestCase):
     """Unit tests for ws_authenticate — no server dependency."""
 
+    def setUp(self):
+        os.environ["YGB_TEMP_AUTH_BYPASS"] = "false"
+
+    def tearDown(self):
+        os.environ.pop("YGB_TEMP_AUTH_BYPASS", None)
+
     def test_returns_none_no_token(self):
         """ws_authenticate returns None when no token provided."""
         from backend.auth.auth_guard import ws_authenticate
@@ -146,6 +152,12 @@ DASHBOARD_FRAME_KEYS = {
 
 class TestDashboardFrameShape(unittest.TestCase):
     """Tests for /training/dashboard WebSocket frame shape."""
+
+    def setUp(self):
+        os.environ["YGB_TEMP_AUTH_BYPASS"] = "false"
+
+    def tearDown(self):
+        os.environ.pop("YGB_TEMP_AUTH_BYPASS", None)
 
     def test_dashboard_frame_has_all_keys(self):
         """A DashboardFrame must contain all expected keys."""

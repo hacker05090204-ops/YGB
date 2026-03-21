@@ -160,7 +160,7 @@ async def init_database():
     db = await _get_db()
     await db.executescript(SCHEMA_SQL)
     await db.commit()
-    print(f"✅ SQLite database initialized at: {DB_PATH}")
+    print(f"[OK] SQLite database initialized at: {DB_PATH}")
 
 
 async def close_pool():

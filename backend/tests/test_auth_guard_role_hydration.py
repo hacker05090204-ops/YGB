@@ -19,6 +19,16 @@ def _install_storage_bridge(monkeypatch, get_user_impl):
     monkeypatch.setitem(sys.modules, "backend.storage.storage_bridge", fake)
 
 
+@pytest.fixture(autouse=True)
+def _disable_temp_bypass(monkeypatch):
+    monkeypatch.setenv("YGB_TEMP_AUTH_BYPASS", "false")
+    monkeypatch.delenv("YGB_TEMP_AUTH_ROLE", raising=False)
+    monkeypatch.delenv("YGB_TEMP_AUTH_USER_ID", raising=False)
+    monkeypatch.delenv("YGB_TEMP_AUTH_NAME", raising=False)
+    monkeypatch.delenv("YGB_TEMP_AUTH_EMAIL", raising=False)
+    monkeypatch.delenv("YGB_TEMP_AUTH_SESSION_ID", raising=False)
+
+
 @pytest.mark.asyncio
 async def test_require_auth_hydrates_role_from_storage(monkeypatch):
     monkeypatch.setattr(auth_guard, "is_token_revoked", lambda _t: False)
