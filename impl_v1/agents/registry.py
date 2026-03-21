@@ -10,6 +10,9 @@ class AgentMessage:
     recipient: str
     topic: str
     payload: Dict[str, Any]
+    correlation_id: str = ""
+    thread_id: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -18,6 +21,7 @@ class RegisteredAgent:
     role: str
     handler: Callable[[AgentMessage], Dict[str, Any]]
     subscriptions: List[str] = field(default_factory=list)
+    capabilities: List[str] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -33,6 +37,16 @@ class AgentRegistry:
 
     def list_agents(self) -> List[RegisteredAgent]:
         return list(self._agents.values())
+
+    def list_by_role(self, role: str) -> List[RegisteredAgent]:
+        return [agent for agent in self._agents.values() if agent.role == role]
+
+    def find_by_capability(self, capability: str) -> List[RegisteredAgent]:
+        return [
+            agent
+            for agent in self._agents.values()
+            if capability in agent.capabilities
+        ]
 
     def route(self, message: AgentMessage) -> Dict[str, Any]:
         agent = self.get(message.recipient)

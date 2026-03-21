@@ -160,12 +160,20 @@ def _bundle_paths(base_dir: str, name: str, version: int, world_size: int) -> Di
 class AsyncDistributedCheckpointManager:
     """Versioned sharded checkpoint manager with SafeTensors-backed shards."""
 
-    def __init__(self, base_dir: str, max_workers: int = 2):
+    def __init__(self, base_dir: str, max_workers: int = 2, tiered_storage_root: str = ""):
         self.base_dir = base_dir
         self.executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="ckpt-save")
         self._lock = threading.Lock()
+        self._tiered_storage = None
         _ensure_dir(base_dir)
         self.manifest_path = os.path.join(base_dir, "manifest.json")
+        if tiered_storage_root:
+            try:
+                from impl_v1.unified.storage import TieredCheckpointStorageEngine
+
+                self._tiered_storage = TieredCheckpointStorageEngine(tiered_storage_root)
+            except Exception as exc:  # pragma: no cover
+                logger.warning("[ADV_CKPT] tiered storage unavailable: %s", exc)
 
     def close(self) -> None:
         self.executor.shutdown(wait=True)
@@ -184,6 +192,14 @@ class AsyncDistributedCheckpointManager:
 
     def _persist_manifest(self, manifest: Dict[str, Any]) -> None:
         _atomic_write_json(self.manifest_path, manifest)
+
+    def _load_json(self, path: str) -> Dict[str, Any]:
+        try:
+            with open(path, "r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+            return payload if isinstance(payload, dict) else {}
+        except Exception:
+            return {}
 
     def save_async(
         self,
@@ -233,6 +249,7 @@ class AsyncDistributedCheckpointManager:
             shard = bundle.model_shards[rank]
             _ensure_dir(bundle.dir_path)
             manifest = self._load_manifest()
+            latest_entry = manifest.get("latest", {})
             manifest["next_version"] = version + 1
             self._persist_manifest(manifest)
 
@@ -279,6 +296,24 @@ class AsyncDistributedCheckpointManager:
             "dir_path": bundle.dir_path,
             "shards": [asdict(s) for s in bundle.model_shards],
         }
+
+        if self._tiered_storage is not None:
+            previous_meta_path = str(latest_entry.get("meta_path", "") or "")
+            parent_manifest = self._load_json(previous_meta_path) if previous_meta_path else None
+            parent_checkpoint_id = ""
+            if parent_manifest:
+                parent_checkpoint_id = f"{parent_manifest.get('name', 'checkpoint')}.v{int(parent_manifest.get('version', 0)):04d}"
+            checkpoint_id = f"{name}.v{version:04d}"
+            delta_record = self._tiered_storage.store_checkpoint_manifest(
+                checkpoint_id=checkpoint_id,
+                manifest=bundle_meta,
+                parent_manifest=parent_manifest or None,
+                parent_checkpoint_id=parent_checkpoint_id,
+                mirror_remote=False,
+            )
+            bundle_meta["delta_manifest_path"] = delta_record.delta_manifest_path
+            bundle_meta["delta_parent_checkpoint_id"] = delta_record.parent_checkpoint_id
+
         _atomic_write_json(bundle.meta_path, bundle_meta)
 
         with self._lock:
