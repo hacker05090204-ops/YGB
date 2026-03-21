@@ -99,6 +99,21 @@ class TestSafetensorsIO:
         with pytest.raises(FileNotFoundError):
             load_safetensors("/nonexistent/path.safetensors")
 
+    def test_numpy_roundtrip_without_torch(self, tmp_path, monkeypatch):
+        """Numpy-only roundtrip should work when torch is unavailable."""
+        import training.safetensors_io as safetensors_io
+
+        monkeypatch.setattr(safetensors_io, "_import_torch", lambda: None)
+
+        tensors = {"weight": np.arange(16, dtype=np.float32).reshape(4, 4)}
+        path = str(tmp_path / "numpy_only.safetensors")
+        safetensors_io.save_safetensors(tensors, path, convert_fp16=True)
+
+        loaded = safetensors_io.load_safetensors(path)
+        assert loaded["weight"].shape == (4, 4)
+        assert loaded["weight"].dtype == np.float16
+        assert np.array_equal(loaded["weight"], tensors["weight"].astype(np.float16))
+
 
 # ===========================================================================
 # MODEL VERSIONING (SAFETENSORS)

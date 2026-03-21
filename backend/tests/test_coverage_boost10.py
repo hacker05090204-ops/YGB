@@ -90,7 +90,8 @@ class TestApprovalLedgerEdgeCases(unittest.TestCase):
 
     def test_check_file_permissions_windows(self):
         from backend.governance.approval_ledger import KeyManager
-        ok, reason = KeyManager._check_file_permissions("some_path")
+        with patch("backend.governance.approval_ledger.os.name", "nt"):
+            ok, reason = KeyManager._check_file_permissions("some_path")
         self.assertTrue(ok)
         self.assertEqual(reason, "WINDOWS_NTFS")
 
@@ -98,8 +99,11 @@ class TestApprovalLedgerEdgeCases(unittest.TestCase):
         from backend.governance.approval_ledger import KeyManager
         tmp = tempfile.mkdtemp()
         try:
-            with open(os.path.join(tmp, "test-key.key"), "wb") as f:
+            key_path = os.path.join(tmp, "test-key.key")
+            with open(key_path, "wb") as f:
                 f.write(secrets.token_bytes(32))
+            if os.name != "nt":
+                os.chmod(key_path, 0o600)
             with patch.dict(os.environ, {"YGB_KEY_DIR": tmp, "YGB_ENV": "dev"}):
                 km = KeyManager(strict=False)
             self.assertIn("test-key", km.available_key_ids)
@@ -110,8 +114,11 @@ class TestApprovalLedgerEdgeCases(unittest.TestCase):
         from backend.governance.approval_ledger import KeyManager
         tmp = tempfile.mkdtemp()
         try:
-            with open(os.path.join(tmp, "key-v2.key"), "wb") as f:
+            key_path = os.path.join(tmp, "key-v2.key")
+            with open(key_path, "wb") as f:
                 f.write(secrets.token_bytes(32))
+            if os.name != "nt":
+                os.chmod(key_path, 0o600)
             with open(os.path.join(tmp, "revoked_keys.json"), "w") as f:
                 json.dump(["key-v1"], f)
             with patch.dict(os.environ, {"YGB_KEY_DIR": tmp}):

@@ -16,6 +16,14 @@ from typing import Dict, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 
+def _import_torch():
+    try:
+        import torch
+    except ImportError:
+        return None
+    return torch
+
+
 def _compute_tensor_hash(tensors: Dict) -> str:
     """Compute SHA-256 hash of tensor dict (sorted keys)."""
     h = hashlib.sha256()
@@ -31,17 +39,21 @@ def _compute_tensor_hash(tensors: Dict) -> str:
 
 
 def _normalize_tensors_for_save(tensors: Dict) -> Dict:
-    """Normalize tensors to CPU torch.Tensor objects for safetensors."""
-    import torch
+    """Normalize tensors for the available safetensors backend."""
+    torch = _import_torch()
 
     normalized = {}
     for name, value in tensors.items():
-        if isinstance(value, torch.Tensor):
+        if torch is not None and isinstance(value, torch.Tensor):
             normalized[name] = value.detach().cpu()
             continue
 
         if hasattr(value, "shape") and hasattr(value, "dtype"):
-            normalized[name] = torch.as_tensor(value)
+            if torch is not None:
+                normalized[name] = torch.as_tensor(value)
+            else:
+                import numpy as np
+                normalized[name] = np.asarray(value)
             continue
 
         raise TypeError(
@@ -77,19 +89,31 @@ def save_safetensors(
     Returns:
         (file_sha256, tensor_hash) tuple.
     """
-    import torch
-    from safetensors.torch import save_file
+    torch = _import_torch()
+    if torch is not None:
+        from safetensors.torch import save_file
+    else:
+        from safetensors.numpy import save_file
 
     tensors = _normalize_tensors_for_save(tensors)
 
     # FP16 conversion
     if convert_fp16:
         out = {}
-        for k, v in tensors.items():
-            if isinstance(v, torch.Tensor) and v.is_floating_point():
-                out[k] = v.half()
-            else:
-                out[k] = v
+        if torch is not None:
+            for k, v in tensors.items():
+                if isinstance(v, torch.Tensor) and v.is_floating_point():
+                    out[k] = v.half()
+                else:
+                    out[k] = v
+        else:
+            import numpy as np
+
+            for k, v in tensors.items():
+                if np.issubdtype(v.dtype, np.floating):
+                    out[k] = v.astype(np.float16, copy=False)
+                else:
+                    out[k] = v
         tensors = out
 
     # Compute tensor hash before save
@@ -150,19 +174,33 @@ def load_safetensors(
         FileNotFoundError: If file doesn't exist.
         RuntimeError: If hash verification fails.
     """
-    from safetensors.torch import load_file
     from safetensors import safe_open
+    torch = _import_torch()
+
+    if torch is not None:
+        from safetensors.torch import load_file
+        framework = "pt"
+    else:
+        if device != "cpu":
+            raise RuntimeError(
+                "SafeTensors numpy fallback only supports device='cpu'"
+            )
+        from safetensors.numpy import load_file
+        framework = "np"
 
     if not os.path.exists(path):
         raise FileNotFoundError(f"SafeTensors file not found: {path}")
 
     # Load tensors
-    tensors = load_file(path, device=device)
+    if torch is not None:
+        tensors = load_file(path, device=device)
+    else:
+        tensors = load_file(path)
 
     # Verify hash if requested
     if verify_hash:
         try:
-            with safe_open(path, framework="pt") as f:
+            with safe_open(path, framework=framework) as f:
                 meta = f.metadata()
             if meta and "tensor_hash" in meta:
                 expected = meta["tensor_hash"]

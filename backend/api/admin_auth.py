@@ -66,13 +66,25 @@ def _temporary_auth_bypass_enabled() -> bool:
 
 def _ensure_secure_dir():
     """Create secure_data directory with proper permissions."""
-    os.makedirs(SESSION_DIR, exist_ok=True)
-    os.makedirs(os.path.dirname(AUDIT_LOG_PATH), exist_ok=True)
+    secure_dirs = {
+        SESSION_DIR,
+        os.path.dirname(AUDIT_LOG_PATH),
+        os.path.dirname(USERS_DB_PATH),
+        os.path.dirname(LOCKOUT_PATH),
+    }
 
-    # Set permissions on Linux
+    for path in secure_dirs:
+        if path:
+            os.makedirs(path, exist_ok=True)
+
     if os.name != 'nt':
-        secure_root = os.path.join(PROJECT_ROOT, 'secure_data')
-        os.chmod(secure_root, 0o700)
+        for path in secure_dirs:
+            if not path:
+                continue
+            try:
+                os.chmod(path, 0o700)
+            except OSError:
+                pass
 
 
 # =========================================================================
