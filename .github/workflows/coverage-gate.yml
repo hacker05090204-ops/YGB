@@ -6,16 +6,30 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: coverage-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
 env:
   PYTHONPATH: ${{ github.workspace }}
+  PYTHONNOUSERSITE: "1"
   YGB_HMAC_SECRET: ${{ secrets.YGB_HMAC_SECRET }}
   YGB_ENV: test
   PIP_DISABLE_PIP_VERSION_CHECK: "1"
   PIP_NO_PYTHON_VERSION_WARNING: "1"
+  NEXT_TELEMETRY_DISABLED: "1"
 
 jobs:
   backend-quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -28,16 +42,18 @@ jobs:
           python-version: '3.11'
 
       - name: Set up Node.js
+        if: ${{ env.YGB_HAS_FRONTEND == 'true' }}
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
-      - name: Install system dependencies
+      - name: Verify native toolchain
+        if: ${{ env.YGB_HAS_NATIVE_CPP == 'true' }}
         run: |
-          sudo apt-get update -q
-          sudo apt-get install -y gcovr g++
+          command -v g++ >/dev/null 2>&1 || { echo "FATAL: g++ not available on runner"; exit 1; }
+          command -v gcovr >/dev/null 2>&1 || { echo "FATAL: gcovr not available in Python environment"; exit 1; }
+          g++ --version
+          gcovr --version
 
       - name: Verify Python environment
         run: |
@@ -51,6 +67,7 @@ jobs:
           echo "PYTHONPATH: $PYTHONPATH"
           test -n "$YGB_HMAC_SECRET" || { echo "FATAL: YGB_HMAC_SECRET not configured"; exit 1; }
           test -f config/hmac_secret.key || { echo "FATAL: config/hmac_secret.key missing"; exit 1; }
+          test -f reports/ci_bootstrap.json || { echo "FATAL: reports/ci_bootstrap.json missing"; exit 1; }
           test -d backend || { echo "FATAL: backend/ not found"; exit 1; }
           test -f backend/__init__.py || { echo "FATAL: backend/__init__.py missing"; exit 1; }
           test -f backend/tests/__init__.py || { echo "FATAL: backend/tests/__init__.py missing"; exit 1; }
@@ -134,21 +151,23 @@ jobs:
           PYEOF
 
       - name: C++ coverage
+        if: ${{ env.YGB_HAS_NATIVE_CPP == 'true' }}
         run: |
           chmod +x scripts/build_cpp_tests.sh
           bash scripts/build_cpp_tests.sh
           test -f coverage_cpp.json
 
       - name: JS/TS coverage
+        if: ${{ env.YGB_HAS_FRONTEND == 'true' }}
         run: |
-          if [ -d frontend ]; then
-            cd frontend
+          cd frontend
+          if [ -f package-lock.json ]; then
             npm ci --legacy-peer-deps
-            npm test -- --coverage
-            test -f coverage/coverage-summary.json
           else
-            echo "No frontend directory -- skipping JS/TS coverage"
+            npm install --legacy-peer-deps
           fi
+          npm test
+          test -f coverage/coverage-summary.json
 
       - name: Run coverage gate
         env:
@@ -165,11 +184,13 @@ jobs:
             coverage_python.xml
             coverage_cpp.json
             frontend/coverage/
+            reports/ci_bootstrap.json
             reports/coverage_report.json
           if-no-files-found: warn
 
   security-regression:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -194,6 +215,7 @@ jobs:
 
   reliability-gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       GATE_READINESS_LATENCY_MS: "5000"
       GATE_TIMEOUT_RATE: "0.05"
@@ -222,6 +244,7 @@ jobs:
 
   training-inference-gate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 

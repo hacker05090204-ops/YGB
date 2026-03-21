@@ -14,9 +14,8 @@ runs:
         python-version: ${{ inputs.python-version }}
         cache: 'pip'
         cache-dependency-path: |
-          requirements.txt
+          pyproject.toml
           api/requirements.txt
-          backend/requirements.txt
 
     - name: Install Python dependencies
       shell: bash
@@ -52,4 +51,48 @@ runs:
         if github_env:
             with open(github_env, "a", encoding="utf-8") as handle:
                 handle.write(f"YGB_HMAC_SECRET={normalized}\n")
+        PYEOF
+
+    - name: Prepare CI workspace
+      shell: bash
+      run: |
+        python - <<'PYEOF'
+        import json
+        import os
+        from pathlib import Path
+
+        root = Path.cwd()
+        frontend_package = root / "frontend" / "package.json"
+        frontend_lockfile = root / "frontend" / "package-lock.json"
+        native_cpp_entry = root / "native" / "run_cpp_tests.cpp"
+        native_cpp_build = root / "scripts" / "build_cpp_tests.sh"
+
+        flags = {
+            "YGB_HAS_FRONTEND": str(frontend_package.exists()).lower(),
+            "YGB_HAS_FRONTEND_LOCKFILE": str(frontend_lockfile.exists()).lower(),
+            "YGB_HAS_NATIVE_CPP": str(
+                native_cpp_entry.exists() and native_cpp_build.exists()
+            ).lower(),
+        }
+
+        (root / "reports").mkdir(exist_ok=True)
+        (root / "test-results").mkdir(exist_ok=True)
+
+        report = {
+            "frontend_package": str(frontend_package.relative_to(root)),
+            "frontend_lockfile": str(frontend_lockfile.relative_to(root)),
+            "native_cpp_entry": str(native_cpp_entry.relative_to(root)),
+            "native_cpp_build_script": str(native_cpp_build.relative_to(root)),
+            "flags": flags,
+        }
+        (root / "reports" / "ci_bootstrap.json").write_text(
+            json.dumps(report, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+        github_env = os.environ.get("GITHUB_ENV")
+        if github_env:
+            with open(github_env, "a", encoding="utf-8") as handle:
+                for key, value in flags.items():
+                    handle.write(f"{key}={value}\n")
         PYEOF

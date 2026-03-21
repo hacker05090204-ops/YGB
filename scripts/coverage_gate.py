@@ -51,6 +51,42 @@ def _pick_existing_file(paths: list[str]) -> str | None:
     return existing[0]
 
 
+def _read_json(path: str) -> dict | None:
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+
+
+def _python_component_present(project_root: str) -> bool:
+    return os.path.isdir(os.path.join(project_root, "backend"))
+
+
+def _cpp_component_present(project_root: str) -> bool:
+    return all(
+        os.path.exists(path) for path in (
+            os.path.join(project_root, "native", "run_cpp_tests.cpp"),
+            os.path.join(project_root, "scripts", "build_cpp_tests.sh"),
+        )
+    )
+
+
+def _frontend_component_status(project_root: str) -> tuple[bool, str]:
+    package_path = os.path.join(project_root, "frontend", "package.json")
+    package_data = _read_json(package_path)
+    if not package_data:
+        return False, "frontend package.json not found"
+
+    test_script = str(package_data.get("scripts", {}).get("test", "")).strip()
+    if not test_script:
+        return False, "frontend test script not configured"
+
+    return True, "frontend test script configured"
+
+
 def read_python_coverage(project_root: str, strict: bool) -> dict:
     """Read Python coverage from available coverage JSON artifacts."""
     path = _pick_existing_file([
@@ -58,6 +94,15 @@ def read_python_coverage(project_root: str, strict: bool) -> dict:
         os.path.join(project_root, "coverage.json"),
     ])
     if not path:
+        if not _python_component_present(project_root):
+            return {
+                "tool": "pytest-cov",
+                "threshold": PYTHON_COVERAGE_THRESHOLD,
+                "coverage_pct": -1.0,
+                "passed": True,
+                "available": False,
+                "reason": "backend directory not found",
+            }
         msg = "No Python coverage artifact found (coverage_python.json / coverage.json)."
         print(f"WARNING: {msg}")
         return {
@@ -100,6 +145,10 @@ def read_cpp_coverage(project_root: str, strict: bool) -> dict:
     }
 
     if not os.path.exists(path):
+        if not _cpp_component_present(project_root):
+            result["passed"] = True
+            result["reason"] = "native C++ coverage target not configured"
+            return result
         print(f"WARNING: coverage_cpp.json not found at {path}")
         result["reason"] = "coverage_cpp.json missing"
         result["passed"] = not strict
@@ -144,13 +193,12 @@ def read_jsts_coverage(project_root: str, strict: bool) -> dict:
         result["artifact"] = path
         return result
 
-    # No frontend = not applicable
-    frontend_dir = os.path.join(project_root, "frontend")
-    if not os.path.isdir(frontend_dir):
+    frontend_enabled, reason = _frontend_component_status(project_root)
+    if not frontend_enabled:
         result["passed"] = True
         result["coverage_pct"] = -1
         result["available"] = False
-        result["reason"] = "frontend directory not found"
+        result["reason"] = reason
         return result
 
     print("WARNING: frontend exists but no coverage-summary.json found")
