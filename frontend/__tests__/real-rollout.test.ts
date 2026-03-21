@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const authFetch = vi.fn()
-const getApiBase = vi.fn(() => 'https://ygb.example')
+const { authFetch, getApiBase } = vi.hoisted(() => ({
+  authFetch: vi.fn(),
+  getApiBase: vi.fn(() => 'https://ygb.example'),
+}))
 
 vi.mock('@/lib/ygb-api', () => ({
   authFetch,
