@@ -24,7 +24,7 @@ def _tokenize(value: Any) -> set[str]:
     elif isinstance(value, (list, tuple, set)):
         text = json.dumps(list(value), sort_keys=True)
     else:
-        text = str(value or "")
+        text = "" if value is None else str(value)
     return set(_TOKEN_RE.findall(text.lower()))
 
 
