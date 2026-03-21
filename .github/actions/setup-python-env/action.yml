@@ -28,3 +28,28 @@ runs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f api/requirements.txt ]; then pip install -r api/requirements.txt; fi
         if [ -f backend/requirements.txt ]; then pip install -r backend/requirements.txt; fi
+
+    - name: Prepare CI HMAC key
+      shell: bash
+      run: |
+        python - <<'PYEOF'
+        import hashlib
+        import os
+        from pathlib import Path
+
+        raw_secret = (os.environ.get("YGB_HMAC_SECRET") or "").strip() or "ygb-ci-test-secret"
+        try:
+            bytes.fromhex(raw_secret)
+            normalized = raw_secret.lower()
+        except ValueError:
+            normalized = hashlib.sha256(raw_secret.encode("utf-8")).hexdigest()
+
+        Path("config").mkdir(parents=True, exist_ok=True)
+        Path("config/hmac_secret.key").write_text(normalized + "\n", encoding="utf-8")
+        print(f"::add-mask::{normalized}")
+
+        github_env = os.environ.get("GITHUB_ENV")
+        if github_env:
+            with open(github_env, "a", encoding="utf-8") as handle:
+                handle.write(f"YGB_HMAC_SECRET={normalized}\n")
+        PYEOF
