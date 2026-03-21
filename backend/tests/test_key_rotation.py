@@ -77,10 +77,15 @@ class TestKeyManager(unittest.TestCase):
         """Keys should load from YGB_KEY_DIR filesystem."""
         with tempfile.TemporaryDirectory() as tmpdir:
             # Write key files
-            with open(os.path.join(tmpdir, "prod-key-v1.key"), "wb") as f:
+            key_v1_path = os.path.join(tmpdir, "prod-key-v1.key")
+            with open(key_v1_path, "wb") as f:
                 f.write(b"prod-secret-v1")
-            with open(os.path.join(tmpdir, "prod-key-v2.key"), "wb") as f:
+            key_v2_path = os.path.join(tmpdir, "prod-key-v2.key")
+            with open(key_v2_path, "wb") as f:
                 f.write(b"prod-secret-v2")
+            if os.name != "nt":
+                os.chmod(key_v1_path, 0o600)
+                os.chmod(key_v2_path, 0o600)
 
             # Write revocation list
             with open(os.path.join(tmpdir, "revoked_keys.json"), "w") as f:

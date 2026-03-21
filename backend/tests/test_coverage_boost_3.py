@@ -156,6 +156,8 @@ class TestApprovalLedgerKeyDir(unittest.TestCase):
         key_path = os.path.join(key_dir, "test_key.key")
         with open(key_path, "wb") as f:
             f.write(b"test-secret-key-data-here")
+        if os.name != "nt":
+            os.chmod(key_path, 0o600)
 
         ledger_path = os.path.join(tmpdir, "ledger.jsonl")
         old_env = os.environ.get("YGB_KEY_DIR")
