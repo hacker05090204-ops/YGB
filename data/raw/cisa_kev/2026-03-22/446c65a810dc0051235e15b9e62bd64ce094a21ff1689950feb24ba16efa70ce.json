@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-3113",
+  "ingested_at": "2026-03-22T07:45:18.124533+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Heap-based buffer overflow vulnerability in Adobe Flash Player allows remote attackers to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "446c65a810dc0051235e15b9e62bd64ce094a21ff1689950feb24ba16efa70ce",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

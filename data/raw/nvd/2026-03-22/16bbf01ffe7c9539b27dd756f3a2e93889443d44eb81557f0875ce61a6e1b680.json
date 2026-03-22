@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-1697",
+  "ingested_at": "2026-03-22T07:54:32.625620+00:00",
+  "lang": "en",
+  "raw_text": "The Secure and SameSite attribute are missing in the GraphicalData web services and WebClient web app of PcVue in version 12.0.0 through 16.3.3 included.",
+  "severity": "MEDIUM",
+  "sha256_hash": "16bbf01ffe7c9539b27dd756f3a2e93889443d44eb81557f0875ce61a6e1b680",
+  "source": "nvd",
+  "tags": [
+    "CWE-614",
+    "CWE-1275"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1697"
+}

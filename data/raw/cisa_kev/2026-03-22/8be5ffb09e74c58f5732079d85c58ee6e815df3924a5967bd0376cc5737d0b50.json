@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-7238",
+  "ingested_at": "2026-03-22T07:45:18.908834+00:00",
+  "lang": "en",
+  "raw_text": "Sonatype Nexus Repository Manager Sonatype Nexus Repository Manager before 3.15.0 has an incorrect access control vulnerability. Exploitation allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8be5ffb09e74c58f5732079d85c58ee6e815df3924a5967bd0376cc5737d0b50",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

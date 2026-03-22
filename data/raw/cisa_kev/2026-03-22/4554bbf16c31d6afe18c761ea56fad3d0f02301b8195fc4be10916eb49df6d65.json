@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4879",
+  "ingested_at": "2026-03-22T07:45:16.901511+00:00",
+  "lang": "en",
+  "raw_text": "ServiceNow Utah, Vancouver, and Washington DC Now Platform ServiceNow Utah, Vancouver, and Washington DC Now Platform releases contain a jelly template injection vulnerability in UI macros. An unauthenticated user could exploit this vulnerability to execute code remotely.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4554bbf16c31d6afe18c761ea56fad3d0f02301b8195fc4be10916eb49df6d65",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

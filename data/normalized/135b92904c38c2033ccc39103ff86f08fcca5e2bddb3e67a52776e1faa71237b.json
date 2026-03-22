@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Roxy-WI is a web interface for managing Haproxy, Nginx, Apache and Keepalived servers. Prior to version 8.2.6.3, a command injection vulnerability exists in the `/config/compare/ / /show` endpoint, allowed authenticated users to execute arbitrary system commands on the app host. The vulnerability exists in `app/modules/config/config.py` on line 362, where user input is directly formatted in the template string that is eventually executed. Version 8.2.6.3 fixes the issue.",
+  "token_count": 67
+}

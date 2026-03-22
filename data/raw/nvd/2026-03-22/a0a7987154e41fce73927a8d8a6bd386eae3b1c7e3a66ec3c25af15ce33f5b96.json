@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30911",
+  "ingested_at": "2026-03-22T07:54:47.047374+00:00",
+  "lang": "en",
+  "raw_text": "Apache Airflow versions 3.1.0 through 3.1.7 missing authorization vulnerability in the Execution API's Human-in-the-Loop (HITL) endpoints that allows any authenticated task instance to read, approve, or reject HITL workflows belonging to any other task instance. Users are recommended to upgrade to Apache Airflow 3.1.8 or later, which resolves this issue.",
+  "severity": "HIGH",
+  "sha256_hash": "a0a7987154e41fce73927a8d8a6bd386eae3b1c7e3a66ec3c25af15ce33f5b96",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30911"
+}

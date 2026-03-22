@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jenkins Jenkins Jenkins contains a remote code execution vulnerability. This vulnerability that could allowed attackers to transfer a serialized Java SignedObject object to the remoting-based Jenkins CLI, that would be deserialized using a new ObjectInputStream, bypassing the existing blocklist-based protection mechanism.",
+  "token_count": 41
+}

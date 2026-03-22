@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1313",
+  "ingested_at": "2026-03-22T07:54:49.271594+00:00",
+  "lang": "en",
+  "raw_text": "The MimeTypes Link Icons plugin for WordPress is vulnerable to Server-Side Request Forgery in all versions up to, and including, 3.2.20. This is due to the plugin making outbound HTTP requests to user-controlled URLs without proper validation when the \"Show file size\" option is enabled. This makes it possible for authenticated attackers, with Contributor-level access and above, to make web requests to arbitrary locations originating from the web application and can be used to query and modify information from internal services via crafted links in post content.",
+  "severity": "HIGH",
+  "sha256_hash": "18c75f68860c1a65e14ec5d47afd6fef06489edaf4c6b63b796a2ce8ab3ff476",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1313"
+}

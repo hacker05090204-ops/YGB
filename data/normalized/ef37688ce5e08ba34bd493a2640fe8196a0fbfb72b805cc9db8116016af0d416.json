@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows The Authenticode Signature Verification function in Microsoft Windows (WinVerifyTrust) does not properly validate the digest of a signed portable executable (PE) file, which allows user-assisted remote attackers to execute code.",
+  "token_count": 32
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-12462",
+  "ingested_at": "2026-03-22T07:54:33.574595+00:00",
+  "lang": "en",
+  "raw_text": "A Blind SQL injection vulnerability has been identified in DobryCMS. A remote unauthenticated attacker is able to inject SQL syntax into URL path resulting in Blind SQL Injection. This issue was fixed in versions above 8.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b356bae3219fd3bcf83db64e8a7a714d455fdb180e1d4872c149099b131c914a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12462"
+}

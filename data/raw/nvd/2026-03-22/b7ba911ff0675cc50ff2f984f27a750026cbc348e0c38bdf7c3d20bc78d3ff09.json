@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28773",
+  "ingested_at": "2026-03-22T07:54:34.384937+00:00",
+  "lang": "en",
+  "raw_text": "The web-based Ping diagnostic utility (/IDC_Ping/main.cgi) in International Datacasting Corporation (IDC) SFX Series SuperFlex Satellite Receiver Web Management Interface version 101 is vulnerable to OS Command Injection. The application insecurely parses the `IPaddr` parameter. An authenticated attacker can bypass server-side semicolon exclusion checks by using alternate shell metacharacters (such as the pipe `|` operator) to append and execute arbitrary shell commands with root privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "b7ba911ff0675cc50ff2f984f27a750026cbc348e0c38bdf7c3d20bc78d3ff09",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28773"
+}

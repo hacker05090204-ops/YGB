@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-5689",
+  "ingested_at": "2026-03-22T07:45:18.805350+00:00",
+  "lang": "en",
+  "raw_text": "Intel Active Management Technology (AMT), Small Business Technology (SBT), and Standard Manageability Intel products contain a vulnerability which can allow attackers to perform privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4e92ef3b23d9f3efb25075d5280ef090667708924525a6ecc7b441a6b577b2fd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

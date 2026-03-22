@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2946",
+  "ingested_at": "2026-03-22T07:54:30.962236+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in rymcu forest up to 0.0.5. Affected by this issue is the function XssUtils.replaceHtmlCode of the file src/main/java/com/rymcu/forest/util/XssUtils.java of the component Article Content/Comments/Portfolio. The manipulation leads to cross site scripting. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "30f29bbb6b98a131f7589e1db3e9c40c220941e2620e8034861774d1b521edea",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2946"
+}

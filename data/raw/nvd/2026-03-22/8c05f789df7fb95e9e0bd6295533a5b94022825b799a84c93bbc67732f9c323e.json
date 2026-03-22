@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-4276",
+  "ingested_at": "2026-03-22T07:54:46.863094+00:00",
+  "lang": "en",
+  "raw_text": "LibreChat RAG API, version 0.7.0, contains a log-injection vulnerability that allows attackers to forge log entries.",
+  "severity": "HIGH",
+  "sha256_hash": "8c05f789df7fb95e9e0bd6295533a5b94022825b799a84c93bbc67732f9c323e",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4276"
+}

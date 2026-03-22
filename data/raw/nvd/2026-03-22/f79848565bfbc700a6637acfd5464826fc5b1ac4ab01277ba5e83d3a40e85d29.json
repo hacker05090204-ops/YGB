@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-12345",
+  "ingested_at": "2026-03-22T07:54:34.030781+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in LLM-Claw 0.1.0/0.1.1/0.1.1a/0.1.1a-p1. The affected element is the function agent_deploy_init of the file /agents/deploy/initiate.c of the component Agent Deployment. Such manipulation leads to buffer overflow. It is possible to launch the attack remotely. A patch should be applied to remediate this issue.",
+  "severity": "HIGH",
+  "sha256_hash": "f79848565bfbc700a6637acfd5464826fc5b1ac4ab01277ba5e83d3a40e85d29",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12345"
+}

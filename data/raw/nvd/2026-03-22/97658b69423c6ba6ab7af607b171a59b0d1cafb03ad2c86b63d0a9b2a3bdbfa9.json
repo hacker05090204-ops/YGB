@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2835",
+  "ingested_at": "2026-03-22T07:54:34.853079+00:00",
+  "lang": "en",
+  "raw_text": "An HTTP Request Smuggling vulnerability (CWE-444) has been found in Pingora's parsing of HTTP/1.0 and Transfer-Encoding requests. The issue occurs due to improperly allowing HTTP/1.0 request bodies to be close-delimited and incorrect handling of multiple Transfer-Encoding values, allowing attackers to send HTTP/1.0 requests in a way that would desync Pingora\u2019s request framing from backend servers\u2019. Impact This vulnerability primarily affects standalone Pingora deployments in front of certain backends that accept HTTP/1.0 requests. An attacker could craft a malicious payload following this request that Pingora forwards to the backend in order to: * Bypass proxy-level ACL controls and WAF logic * Poison caches and upstream connections, causing subsequent requests from legitimate users to receive responses intended for smuggled requests * Perform cross-user attacks by hijacking sessions or smuggling requests that appear to originate from the trusted proxy IP Cloudflare's CDN infrastructure was not affected by this vulnerability, as its ingress proxy layers forwarded HTTP/1.1 requests only, rejected ambiguous framing such as invalid Content-Length values, and forwarded a single Transfer-Encoding: chunked header for chunked requests. Mitigation: Pingora users should upgrade to Pingora v0.8.0 or higher that fixes this issue by correctly parsing message length headers per RFC 9112 and strictly adhering to more RFC guidelines, including that HTTP request bodies are never close-delimited. As a workaround, users can reject certain requests with an error in the request filter logic in order to stop processing bytes on the connection and disable downstream connection reuse. The user should reject any non-HTTP/1.1 request, or a request that has invalid Content-Length, multiple Transfer-Encoding headers, or Transfer-Encoding header that is not an exact \u201cchunked\u201d string match.",
+  "severity": "CRITICAL",
+  "sha256_hash": "97658b69423c6ba6ab7af607b171a59b0d1cafb03ad2c86b63d0a9b2a3bdbfa9",
+  "source": "nvd",
+  "tags": [
+    "CWE-444"
+  ],
+  "token_count": 269,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2835"
+}

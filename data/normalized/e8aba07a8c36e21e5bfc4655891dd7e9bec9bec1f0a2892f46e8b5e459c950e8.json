@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OrientDB 3.0.17 GA Community Edition contains cross-site request forgery vulnerabilities that allow attackers to perform unauthorized actions by crafting malicious requests to endpoints like /database/, /command/, and /document/. Attackers can create or delete databases, modify schema classes, manage users, and create functions by sending authenticated requests without token validation, combined with reflected and stored cross-site scripting vulnerabilities in the web interface.",
+  "token_count": 61
+}

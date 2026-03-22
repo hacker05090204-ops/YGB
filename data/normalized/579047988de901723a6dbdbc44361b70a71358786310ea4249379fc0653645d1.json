@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker can obtain valid session tokens because they are exposed in plaintext within the URL parameters of the wwwupdate.cgi endpoint in UBR.",
+  "token_count": 25
+}

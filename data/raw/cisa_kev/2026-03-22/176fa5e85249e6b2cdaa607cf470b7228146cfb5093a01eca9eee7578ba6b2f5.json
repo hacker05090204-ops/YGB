@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-0028",
+  "ingested_at": "2026-03-22T07:45:17.702602+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS A Palo Alto Networks PAN-OS URL filtering policy misconfiguration could allow a network-based attacker to conduct reflected and amplified TCP denial-of-service (RDoS) attacks.",
+  "severity": "CRITICAL",
+  "sha256_hash": "176fa5e85249e6b2cdaa607cf470b7228146cfb5093a01eca9eee7578ba6b2f5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

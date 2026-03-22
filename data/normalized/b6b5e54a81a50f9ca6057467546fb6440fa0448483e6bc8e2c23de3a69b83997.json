@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Rejected reason: After the publication of the PoC by the researcher and further analysis, we have determined that this issue does not constitute a valid vulnerability. The technique described is an obfuscation method and does not bypass or impact any implicit or explicit security controls.",
+  "token_count": 45
+}

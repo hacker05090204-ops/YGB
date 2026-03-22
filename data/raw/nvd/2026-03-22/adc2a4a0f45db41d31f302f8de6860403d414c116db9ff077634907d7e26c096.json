@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69337",
+  "ingested_at": "2026-03-22T07:54:30.231777+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in don-themes Wolmart Core wolmart-core allows Blind SQL Injection.This issue affects Wolmart Core: from n/a through < = 1.9.6.",
+  "severity": "CRITICAL",
+  "sha256_hash": "adc2a4a0f45db41d31f302f8de6860403d414c116db9ff077634907d7e26c096",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69337"
+}

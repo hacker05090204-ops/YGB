@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32895",
+  "ingested_at": "2026-03-22T07:54:49.234993+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.26 fail to enforce sender authorization in member and message subtype system event handlers, allowing unauthorized events to be enqueued. Attackers can bypass Slack DM allowlists and per-channel user allowlists by sending system events from non-allowlisted senders through message_changed, message_deleted, and thread_broadcast events.",
+  "severity": "MEDIUM",
+  "sha256_hash": "15abf053ed25029d9d79a65f1c8cca36e656ba4f083fd6a440a7e39fc19484e0",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32895"
+}

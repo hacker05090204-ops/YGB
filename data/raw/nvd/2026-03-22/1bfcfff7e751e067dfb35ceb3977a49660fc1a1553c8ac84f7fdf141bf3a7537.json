@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30828",
+  "ingested_at": "2026-03-22T07:54:41.757745+00:00",
+  "lang": "en",
+  "raw_text": "Wallos is an open-source, self-hostable personal subscription tracker. Prior to version 4.6.2, the url parameter can be used to retrieve local system files. This issue has been patched in version 4.6.2.",
+  "severity": "HIGH",
+  "sha256_hash": "1bfcfff7e751e067dfb35ceb3977a49660fc1a1553c8ac84f7fdf141bf3a7537",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-29",
+    "CWE-918"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30828"
+}

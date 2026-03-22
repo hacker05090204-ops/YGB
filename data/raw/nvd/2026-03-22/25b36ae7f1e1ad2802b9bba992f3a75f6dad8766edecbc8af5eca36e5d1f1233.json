@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15589",
+  "ingested_at": "2026-03-22T07:54:31.448411+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in MuYuCMS 2.7. Affected is the function delete_dir_file of the file application/admin/controller/Template.php of the component Template Management Page. This manipulation of the argument temn/tp causes path traversal. It is possible to initiate the attack remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "25b36ae7f1e1ad2802b9bba992f3a75f6dad8766edecbc8af5eca36e5d1f1233",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15589"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0803",
+  "ingested_at": "2026-03-22T07:45:19.354060+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Microsoft Win32k contains an unspecified vulnerability due to it failing to properly handle objects in memory causing privilege escalation. Successful exploitation allows an attacker to run code in kernel mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4fbd6bd65352511cbea714616defb685d5202b21162a342ec55c40cb7d892e22",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

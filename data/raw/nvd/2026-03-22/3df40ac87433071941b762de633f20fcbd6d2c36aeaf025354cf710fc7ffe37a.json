@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28438",
+  "ingested_at": "2026-03-22T07:54:41.317350+00:00",
+  "lang": "en",
+  "raw_text": "CocoIndex is a data transformation framework for AI. Prior to version 0.3.34, the Doris target connector didn't verify the configured table name before creating some SQL statements (ALTER TABLE). So, in the application code, if the table name is provided by an untrusted upstream, it expose vulnerability to SQL injection when target schema change. This issue has been patched in version 0.3.34.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3df40ac87433071941b762de633f20fcbd6d2c36aeaf025354cf710fc7ffe37a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28438"
+}

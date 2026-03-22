@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In JetBrains TeamCity before 2025.11.3 disabling versioned settings left a credentials config on disk",
+  "token_count": 14
+}

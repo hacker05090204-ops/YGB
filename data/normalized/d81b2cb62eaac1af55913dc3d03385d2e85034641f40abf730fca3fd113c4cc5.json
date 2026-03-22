@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GetSimple CMS is a content management system. All versions of GetSimple CMS have a flaw in the Uploaded Files feature that allows for arbitrary file reads. This issue has not been fixed at the time of publication.",
+  "token_count": 37
+}

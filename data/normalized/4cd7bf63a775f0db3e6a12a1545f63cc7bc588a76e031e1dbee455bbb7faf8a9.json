@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Tenda F453 1.0.0.3/3.As. Impacted is the function fromPptpUserAdd of the file /goform/PPTPDClient. Such manipulation of the argument username/opttype leads to stack-based buffer overflow. The attack can be executed remotely. The exploit is publicly available and might be used.",
+  "token_count": 43
+}

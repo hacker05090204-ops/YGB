@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27516",
+  "ingested_at": "2026-03-22T07:54:31.665523+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior expose user passwords in plaintext within the administrative interface and HTTP responses, allowing recovery of valid credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "20c1e0c1dc3e4251e84ced4d74fe717acf46f25047c8d0b91fcdfcd93b9c1a4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-201",
+    "CWE-317"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27516"
+}

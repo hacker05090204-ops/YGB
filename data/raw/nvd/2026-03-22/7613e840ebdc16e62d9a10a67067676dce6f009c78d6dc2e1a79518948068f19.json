@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33154",
+  "ingested_at": "2026-03-22T07:54:48.997610+00:00",
+  "lang": "en",
+  "raw_text": "dynaconf is a configuration management tool for Python. Prior to version 3.2.13, Dynaconf is vulnerable to Server-Side Template Injection (SSTI) due to unsafe template evaluation in the @Jinja resolver. When the jinja2 package is installed, Dynaconf evaluates template expressions embedded in configuration values without a sandboxed environment. This issue has been patched in version 3.2.13.",
+  "severity": "HIGH",
+  "sha256_hash": "7613e840ebdc16e62d9a10a67067676dce6f009c78d6dc2e1a79518948068f19",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-1336"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33154"
+}

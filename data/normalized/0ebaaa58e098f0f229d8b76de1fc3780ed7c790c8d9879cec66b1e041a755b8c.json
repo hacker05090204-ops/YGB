@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In smmu_detach_dev of arm-smmu-v3.c, there is a possible out of bounds write due to a use after free. This could lead to local escalation of privilege with System execution privileges needed. User interaction is not needed for exploitation.",
+  "token_count": 38
+}

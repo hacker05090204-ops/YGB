@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Installer contains a privilege escalation vulnerability when MSI packages process symbolic links, which allows attackers to bypass access restrictions to add or remove files.",
+  "token_count": 28
+}

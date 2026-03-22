@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3090",
+  "ingested_at": "2026-03-22T07:54:47.524414+00:00",
+  "lang": "en",
+  "raw_text": "The Post SMTP \u2013 Complete Email Deliverability and SMTP Solution with Email Logs, Alerts, Backup SMTP & Mobile App plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the \u2018event_type\u2019 parameter in all versions up to, and including, 3.8.0 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. The vulnerability is only exploitable when the Post SMTP Pro plugin is also installed and its Reporting and Tracking extension is enabled.",
+  "severity": "HIGH",
+  "sha256_hash": "df54ef254406b2c5f29aa32cb1329cc744e8e7f9019f9b5deb56013bbbf50dc1",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3090"
+}

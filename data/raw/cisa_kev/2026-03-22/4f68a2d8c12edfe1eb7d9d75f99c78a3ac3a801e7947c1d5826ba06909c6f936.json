@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-34026",
+  "ingested_at": "2026-03-22T07:45:15.966639+00:00",
+  "lang": "en",
+  "raw_text": "Versa Concerto Versa Concerto SD-WAN orchestration platform contains an improper authentication vulnerability in the Traefik reverse proxy configuration, allowing at attacker to access administrative endpoints. The internal Actuator endpoint can be leveraged for access to heap dumps and trace logs.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4f68a2d8c12edfe1eb7d9d75f99c78a3ac3a801e7947c1d5826ba06909c6f936",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

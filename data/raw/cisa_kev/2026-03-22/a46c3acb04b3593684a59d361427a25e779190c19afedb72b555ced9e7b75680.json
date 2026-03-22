@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-7331",
+  "ingested_at": "2026-03-22T07:45:17.909866+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer An information disclosure vulnerability exists in Internet Explorer which allows resources loaded into memory to be queried. This vulnerability could allow an attacker to detect anti-malware applications.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a46c3acb04b3593684a59d361427a25e779190c19afedb72b555ced9e7b75680",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

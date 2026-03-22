@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3631",
+  "ingested_at": "2026-03-22T07:54:42.146693+00:00",
+  "lang": "en",
+  "raw_text": "Delta Electronics COMMGR2 has Buffer Over-read DoS vulnerability.",
+  "severity": "HIGH",
+  "sha256_hash": "52c36c6a492a987e9210e65550bd3ef936beb264b7d3022602f2d3c56fb8a356",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 8,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3631"
+}

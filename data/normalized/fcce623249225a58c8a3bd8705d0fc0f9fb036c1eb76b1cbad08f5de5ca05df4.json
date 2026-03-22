@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Code Aurora ACDB Audio Driver The Code Aurora audio calibration database (acdb) audio driver contains a stack-based buffer overflow vulnerability that allows for privilege escalation. Code Aurora is used in third-party products such as Qualcomm and Android.",
+  "token_count": 37
+}

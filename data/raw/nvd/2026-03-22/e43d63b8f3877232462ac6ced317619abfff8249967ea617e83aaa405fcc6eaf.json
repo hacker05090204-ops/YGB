@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28472",
+  "ingested_at": "2026-03-22T07:54:41.075060+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.2 contain a vulnerability in the gateway WebSocket connect handshake in which it allows skipping device identity checks when auth.token is present but not validated. Attackers can connect to the gateway without providing device identity or pairing by exploiting the presence check instead of validation, potentially gaining operator access in vulnerable deployments.",
+  "severity": "HIGH",
+  "sha256_hash": "e43d63b8f3877232462ac6ced317619abfff8249967ea617e83aaa405fcc6eaf",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28472"
+}

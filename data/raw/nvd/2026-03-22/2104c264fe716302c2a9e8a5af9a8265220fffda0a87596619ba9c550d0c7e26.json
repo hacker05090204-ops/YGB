@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22897",
+  "ingested_at": "2026-03-22T07:54:48.891496+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability has been reported to affect QuNetSwitch. The remote attackers can then exploit the vulnerability to execute arbitrary commands. We have already fixed the vulnerability in the following version: QuNetSwitch 2.0.4.0415 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "2104c264fe716302c2a9e8a5af9a8265220fffda0a87596619ba9c550d0c7e26",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22897"
+}

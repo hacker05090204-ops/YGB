@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "beefree.io SDK is vulnerable to Stored XSS in Social Media icon URL parameter in email builder functionality. Malicious attacker can inject arbitrary HTML and JS into template, which will be rendered/executed when visiting preview page. However due to beefree's Content Security Policy not all payloads will execute successfully. This issue has been fixed in version 3.47.0.",
+  "token_count": 56
+}

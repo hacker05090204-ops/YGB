@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-7961",
+  "ingested_at": "2026-03-22T07:45:19.260401+00:00",
+  "lang": "en",
+  "raw_text": "Liferay Liferay Portal Liferay Portal contains a deserialization of untrusted data vulnerability that allows remote attackers to execute code via JSON web services.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0370591f9a764172f42cf8559cc8c860403498236f9c81c70b723e5c984da5d9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

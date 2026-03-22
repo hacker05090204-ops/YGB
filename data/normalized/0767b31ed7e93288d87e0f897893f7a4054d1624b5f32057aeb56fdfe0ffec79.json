@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw has been found in Tenda FH1202 1.2.0.14(408). The impacted element is the function fromNatStaticSetting of the file /goform/NatSaticSetting. Executing a manipulation of the argument page can lead to stack-based buffer overflow. The attack may be launched remotely. The exploit has been published and may be used.",
+  "token_count": 48
+}

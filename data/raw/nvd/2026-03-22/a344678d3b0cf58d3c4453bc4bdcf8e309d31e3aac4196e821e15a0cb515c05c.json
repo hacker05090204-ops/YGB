@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-33369",
+  "ingested_at": "2026-03-22T07:54:48.835160+00:00",
+  "lang": "en",
+  "raw_text": "Zimbra Collaboration (ZCS) 10.0 and 10.1 contains an LDAP injection vulnerability in the Mailbox SOAP service within a FolderAction operation. The application fails to properly sanitize user-supplied input before incorporating it into an LDAP search filter. An authenticated attacker can exploit this issue by sending a crafted SOAP request that manipulates the LDAP query, allowing retrieval of sensitive directory attributes.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a344678d3b0cf58d3c4453bc4bdcf8e309d31e3aac4196e821e15a0cb515c05c",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33369"
+}

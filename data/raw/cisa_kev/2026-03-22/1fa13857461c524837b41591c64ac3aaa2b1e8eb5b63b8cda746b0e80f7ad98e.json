@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3715",
+  "ingested_at": "2026-03-22T07:45:19.248405+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick ImageMagick ImageMagick contains an unspecified vulnerability that could allow users to delete files by using ImageMagick's 'ephemeral' pseudo protocol, which deletes files after reading.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1fa13857461c524837b41591c64ac3aaa2b1e8eb5b63b8cda746b0e80f7ad98e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

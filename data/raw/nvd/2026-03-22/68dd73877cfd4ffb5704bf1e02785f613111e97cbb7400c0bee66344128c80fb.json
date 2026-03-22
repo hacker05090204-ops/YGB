@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2493",
+  "ingested_at": "2026-03-22T07:54:46.469060+00:00",
+  "lang": "en",
+  "raw_text": "IceWarp collaboration Directory Traversal Information Disclosure Vulnerability. This vulnerability allows remote attackers to disclose sensitive information on affected installations of IceWarp. Authentication is not required to exploit this vulnerability. The specific flaw exists within handling of the ticket parameter provided to the collaboration endpoint. The issue results from the lack of proper validation of a user-supplied path prior to using it in file operations. An attacker can leverage this vulnerability to disclose information in the context of root. Was ZDI-CAN-25440.",
+  "severity": "HIGH",
+  "sha256_hash": "68dd73877cfd4ffb5704bf1e02785f613111e97cbb7400c0bee66344128c80fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2493"
+}

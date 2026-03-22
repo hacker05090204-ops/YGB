@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28673",
+  "ingested_at": "2026-03-22T07:54:47.257625+00:00",
+  "lang": "en",
+  "raw_text": "xiaoheiFS is a self-hosted financial and operational system for cloud service businesses. In versions up to and including 0.3.15, the standard plugin system allows admins to upload a ZIP file containing a binary and a `manifest.json`. The server trusts the `binaries` field in the manifest and executes the specified file without any validation of its contents or behavior, leading to Remote Code Execution (RCE). Version 0.4.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "258c33c6dcb6e54983f49c894a0cc469664eb61fa08f38cbfc504c27c672945c",
+  "source": "nvd",
+  "tags": [
+    "CWE-78",
+    "CWE-434"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28673"
+}

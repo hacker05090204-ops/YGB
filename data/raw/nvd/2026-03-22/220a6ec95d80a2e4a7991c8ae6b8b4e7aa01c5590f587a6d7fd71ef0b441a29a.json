@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2743",
+  "ingested_at": "2026-03-22T07:54:40.715163+00:00",
+  "lang": "en",
+  "raw_text": "Arbitrary File Write via Path Traversal upload to Remote Code Execution in SeppMail User Web Interface. The affected feature is the large file transfer (LFT). This issue affects SeppMail: 15.0.2.1 and before",
+  "severity": "CRITICAL",
+  "sha256_hash": "220a6ec95d80a2e4a7991c8ae6b8b4e7aa01c5590f587a6d7fd71ef0b441a29a",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-434",
+    "CWE-22"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2743"
+}

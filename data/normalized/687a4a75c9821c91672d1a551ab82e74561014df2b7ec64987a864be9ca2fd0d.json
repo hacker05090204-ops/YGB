@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer The Microsoft JScript nd VBScript engines, as used in Internet Explorer and other products, allow attackers to execute remote code or cause a denial of service (memory corruption) via a crafted web site.",
+  "token_count": 36
+}

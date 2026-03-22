@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50198",
+  "ingested_at": "2026-03-22T07:54:33.684079+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, Chamilo is vulnerable to deserialization of untrusted data in /plugin/vchamilo/views/import.php via POST configuration_file; POST course_path; POST home_path parameters. This issue has been patched in version 1.11.30.",
+  "severity": "MEDIUM",
+  "sha256_hash": "20f8d34ad70cb30bd95f7b8b2623a970ca1086960ebd8b960d315e8266ee8015",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50198"
+}

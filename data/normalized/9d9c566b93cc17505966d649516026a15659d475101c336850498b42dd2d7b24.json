@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MinIO MinIO MinIO contains a vulnerability in a cluster deployment where MinIO returns all environment variables, which allows for information disclosure.",
+  "token_count": 21
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3588",
+  "ingested_at": "2026-03-22T07:54:42.326673+00:00",
+  "lang": "en",
+  "raw_text": "A server-side request forgery (SSRF) vulnerability in IKEA Dirigera v2.866.4 allows an attacker to exfiltrate private keys by sending a crafted request.",
+  "severity": "HIGH",
+  "sha256_hash": "ad30f7489035dd42c51b1a6d14fc3bf10158eb87872c9d8880456747366cf24a",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3588"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer An information disclosure vulnerability exists when Internet Explorer does not properly handle JavaScript. The vulnerability could allow an attacker to detect specific files on the user's computer.",
+  "token_count": 30
+}

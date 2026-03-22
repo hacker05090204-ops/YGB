@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29611",
+  "ingested_at": "2026-03-22T07:54:41.120053+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a local file inclusion vulnerability in BlueBubbles extension (must be installed and enabled) media path handling that allows attackers to read arbitrary files from the local filesystem. The sendBlueBubblesMedia function fails to validate mediaPath parameters against an allowlist, enabling attackers to request sensitive files like /etc/passwd and exfiltrate them as media attachments.",
+  "severity": "HIGH",
+  "sha256_hash": "e24e15ba6a3089264f703b6bd2847c60c73bad971307cb0294c87b87a41b6262",
+  "source": "nvd",
+  "tags": [
+    "CWE-73"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29611"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69304",
+  "ingested_at": "2026-03-22T07:54:30.200318+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Allmart allmart-core allows Blind SQL Injection.This issue affects Allmart: from n/a through < = 1.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "740e3c6baedaa7305fed5d2530c38364c76561cb6819deef2a79e6f4bb51a31f",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69304"
+}

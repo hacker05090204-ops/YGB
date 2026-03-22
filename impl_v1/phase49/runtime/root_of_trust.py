@@ -17,7 +17,7 @@ import time
 from pathlib import Path
 from typing import Optional, Dict, List, Tuple
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 
 
@@ -213,7 +213,7 @@ def create_build_metadata(
     """Create build metadata for embedding in artifact."""
     return BuildMetadata(
         build_host_fingerprint=get_build_host_fingerprint(),
-        build_timestamp=datetime.utcnow().isoformat(),
+            build_timestamp=datetime.now(timezone.utc).isoformat(),
         baseline_hash=baseline_hash,
         compiler_version=compiler_version,
         signed_by=signing_key,
@@ -337,7 +337,7 @@ class SystemLock:
     def activate_emergency_lock(self, reason: str) -> None:
         """Activate emergency lock mode."""
         self.LOCK_FILE.write_text(json.dumps({
-            "activated_at": datetime.utcnow().isoformat(),
+            "activated_at": datetime.now(timezone.utc).isoformat(),
             "reason": reason,
         }))
         self._mode = EmergencyLockMode.EMERGENCY_LOCK

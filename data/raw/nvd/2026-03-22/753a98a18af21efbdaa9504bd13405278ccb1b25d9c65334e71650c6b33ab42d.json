@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-63409",
+  "ingested_at": "2026-03-22T07:54:31.653499+00:00",
+  "lang": "en",
+  "raw_text": "Privilege escalation and improper access control in GCOM EPON 1GE C00R371V00B01 allows remote authenticated users to modify administrator only settings and extract administrator credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "753a98a18af21efbdaa9504bd13405278ccb1b25d9c65334e71650c6b33ab42d",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-63409"
+}

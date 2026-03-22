@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28470",
+  "ingested_at": "2026-03-22T07:54:41.070060+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.2 contain an exec approvals (must be enabled) allowlist bypass vulnerability that allows attackers to execute arbitrary commands by injecting command substitution syntax. Attackers can bypass the allowlist protection by embedding unescaped $() or backticks inside double-quoted strings to execute unauthorized commands.",
+  "severity": "HIGH",
+  "sha256_hash": "efc94bb0b92174c8d71f1f433ef81a153825728fad7b90ad08def72a899c9939",
+  "source": "nvd",
+  "tags": [
+    "CWE-78",
+    "CWE-78"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28470"
+}

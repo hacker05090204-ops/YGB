@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-1151",
+  "ingested_at": "2026-03-22T07:45:18.424796+00:00",
+  "lang": "en",
+  "raw_text": "phpMyAdmin phpMyAdmin Setup script used to generate configuration can be fooled using a crafted POST request to include arbitrary PHP code in generated configuration file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "282a0f358a54689966503b7f0d91aab80e1b96adde8004ac0546d4402ea03416",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

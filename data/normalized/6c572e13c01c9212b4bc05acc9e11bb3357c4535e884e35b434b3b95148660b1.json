@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in Keycloak. An unauthenticated remote attacker can trigger an application level Denial of Service (DoS) by sending a highly compressed SAMLRequest through the SAML Redirect Binding. The server fails to enforce size limits during DEFLATE decompression, leading to an OutOfMemoryError (OOM) and subsequent process termination. This vulnerability allows an attacker to disrupt the availability of the service.",
+  "token_count": 61
+}

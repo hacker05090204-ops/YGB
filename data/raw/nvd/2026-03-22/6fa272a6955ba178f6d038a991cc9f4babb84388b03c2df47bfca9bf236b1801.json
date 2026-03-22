@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27934",
+  "ingested_at": "2026-03-22T07:54:48.137948+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Versions prior to 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 have a lack of visibility checks with a user action API endpoint that results in disclosure of the title and post excerpt to unauthorized users, leading to information disclosure. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "6fa272a6955ba178f6d038a991cc9f4babb84388b03c2df47bfca9bf236b1801",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27934"
+}

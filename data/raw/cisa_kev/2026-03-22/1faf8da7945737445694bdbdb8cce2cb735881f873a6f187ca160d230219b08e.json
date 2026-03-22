@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-57968",
+  "ingested_at": "2026-03-22T07:45:16.534267+00:00",
+  "lang": "en",
+  "raw_text": "Advantive VeraCore Advantive VeraCore contains an unrestricted file upload vulnerability that allows a remote unauthenticated attacker to upload files to unintended folders via upload.apsx.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1faf8da7945737445694bdbdb8cce2cb735881f873a6f187ca160d230219b08e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

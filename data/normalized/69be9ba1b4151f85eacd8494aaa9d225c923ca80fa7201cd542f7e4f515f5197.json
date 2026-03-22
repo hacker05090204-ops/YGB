@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in LimeSurvey before v.6.15.4+250710 allows a remote attacker to obtain sensitive information from the database.",
+  "token_count": 18
+}

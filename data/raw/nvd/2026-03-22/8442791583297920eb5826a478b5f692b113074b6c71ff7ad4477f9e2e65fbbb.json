@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29096",
+  "ingested_at": "2026-03-22T07:54:48.293714+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, when creating or editing a report (AOR_Reports module), the `field_function` parameter from POST data is saved directly into the `aor_fields` table without any validation. Later, when the report is executed/viewed, this value is concatenated directly into a SQL SELECT query without sanitization, enabling second-order SQL injection. Any authenticated user with Reports access can extract arbitrary database contents (password hashes, API tokens, config values). On MySQL with FILE privilege, this could lead to RCE via SELECT INTO OUTFILE. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "8442791583297920eb5826a478b5f692b113074b6c71ff7ad4477f9e2e65fbbb",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29096"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62843",
+  "ingested_at": "2026-03-22T07:54:48.880483+00:00",
+  "lang": "en",
+  "raw_text": "An improper restriction of communication channel to intended endpoints vulnerability has been reported to affect QHora. If an attacker gains physical access, they can then exploit the vulnerability to gain the privileges that were intended for the original endpoint. We have already fixed the vulnerability in the following version: QuRouter 2.6.3.009 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e39b05abb5251f255eae656ed85ef36715c53d184063c0b34f3a447709c42a8a",
+  "source": "nvd",
+  "tags": [
+    "CWE-923"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62843"
+}

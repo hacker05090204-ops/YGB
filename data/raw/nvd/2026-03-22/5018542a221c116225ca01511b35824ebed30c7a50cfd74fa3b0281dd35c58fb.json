@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47383",
+  "ingested_at": "2026-03-22T07:54:33.749936+00:00",
+  "lang": "en",
+  "raw_text": "Weak configuration may lead to cryptographic issue when a VoWiFi call is triggered from UE.",
+  "severity": "HIGH",
+  "sha256_hash": "5018542a221c116225ca01511b35824ebed30c7a50cfd74fa3b0281dd35c58fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-325"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47383"
+}

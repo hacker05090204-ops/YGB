@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-31874",
+  "ingested_at": "2026-03-22T07:54:43.846351+00:00",
+  "lang": "en",
+  "raw_text": "Taskosaur is an open source project management platform with conversational AI for task execution in-app. In 1.0.0, the application does not properly validate or restrict the role parameter during the user registration process. An attacker can manually modify the request payload and assign themselves elevated privileges. Because the backend does not enforce role assignment restrictions or ignore client-supplied role parameters, the server accepts the manipulated value and creates the account with SUPER_ADMIN privileges. This allows any unauthenticated attacker to register a fully privileged administrative account.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6715e839e7edea33b5c74eaf8ef6da15e57cf0c54fb687cb1ed092ff687e2293",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-639",
+    "CWE-639"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31874"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Fortinet FortiOS contains an out-of-bound write vulnerability that allows a remote unauthenticated attacker to execute code or commands via specially crafted HTTP requests.",
+  "token_count": 25
+}

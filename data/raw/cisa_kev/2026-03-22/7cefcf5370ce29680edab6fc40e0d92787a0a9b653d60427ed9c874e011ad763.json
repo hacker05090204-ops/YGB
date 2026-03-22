@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30762",
+  "ingested_at": "2026-03-22T07:45:19.032115+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS Apple iOS WebKit contains a use-after-free vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7cefcf5370ce29680edab6fc40e0d92787a0a9b653d60427ed9c874e011ad763",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ivanti Connect Secure, Policy Secure, and ZTA Gateways Ivanti Connect Secure, Policy Secure, and ZTA Gateways contain a stack-based buffer overflow which can lead to unauthenticated remote code execution.",
+  "token_count": 29
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27745",
+  "ingested_at": "2026-03-22T07:54:31.940485+00:00",
+  "lang": "en",
+  "raw_text": "The SPIP interface_traduction_objets plugin versions prior to 2.2.2 contain an authenticated remote code execution vulnerability in the translation interface workflow. The plugin incorporates untrusted request data into a hidden form field that is rendered without SPIP output filtering. Because fields prefixed with an underscore bypass protection mechanisms and the hidden content is rendered with filtering disabled, an authenticated attacker with editor-level privileges can inject crafted content that is evaluated through SPIP's template processing chain, resulting in execution of code in the context of the web server.",
+  "severity": "HIGH",
+  "sha256_hash": "d8f9cef0e9fec4edf733908a5e9ebeff806f1766a22d7a26dfbd82f68273eda6",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27745"
+}

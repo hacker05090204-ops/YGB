@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists when the Windows kernel-mode driver improperly handles TrueType fonts.",
+  "token_count": 17
+}

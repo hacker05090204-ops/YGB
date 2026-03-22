@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32776",
+  "ingested_at": "2026-03-22T07:54:46.569946+00:00",
+  "lang": "en",
+  "raw_text": "libexpat before 2.7.5 allows a NULL pointer dereference with empty external parameter entity content.",
+  "severity": "MEDIUM",
+  "sha256_hash": "60028d73e8a59aa71057dcfbd6e19dfc8005c1b704d2f959b900af7de933348a",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32776"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2636",
+  "ingested_at": "2026-03-22T07:54:32.287192+00:00",
+  "lang": "en",
+  "raw_text": "This vulnerability is caused by a CWE\u2010159: \"Improper Handling of Invalid Use of Special Elements\" weakness, which leads to an unrecoverable inconsistency in the CLFS.sys driver. This condition forces a call to the KeBugCheckEx function, allowing an unprivileged user to trigger a system crash. Microsoft silently fixed this vulnerability in the September 2025 cumulative update for Windows 11 2024 LTSC and Windows Server 2025. Windows 25H2 (released in September) was released with the patch. Windows 1123h2 and earlier versions remain vulnerable.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b5cce8797fedeb2f03eee64f3d888353b385953a35a6598497d16572f78dec94",
+  "source": "nvd",
+  "tags": [
+    "CWE-159"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2636"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-47886",
+  "ingested_at": "2026-03-22T07:54:33.593918+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Chamillo is affected by a post-authentication phar unserialize which leads to a remote code execution (RCE) within versions 1.11.12 to 1.11.26. By abusing multiple supported features from the virtualization plugin vchamilo, the vulnerability allows an administrator to execute arbitrary code on the server. This issue has been patched in version 1.11.26.",
+  "severity": "HIGH",
+  "sha256_hash": "a249a3cc6833070d4031783ab90b11e0a479ae16643c56131e44aa27eec94ece",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-47886"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-7287",
+  "ingested_at": "2026-03-22T07:45:18.002217+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS Apple iOS contains a memory corruption vulnerability which could allow an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d84e46cb960fdc5ff95380465d5bd7e79c721d5662f00b7fec730fa9e270ff62",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

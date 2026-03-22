@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-26134",
+  "ingested_at": "2026-03-22T07:54:42.830698+00:00",
+  "lang": "en",
+  "raw_text": "Integer overflow or wraparound in Microsoft Office allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "7971169ac99f1495c43a7cdde9fe6161e254a03a681aba5ae4b28358e9355c10",
+  "source": "nvd",
+  "tags": [
+    "CWE-190",
+    "CWE-416",
+    "CWE-190"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26134"
+}

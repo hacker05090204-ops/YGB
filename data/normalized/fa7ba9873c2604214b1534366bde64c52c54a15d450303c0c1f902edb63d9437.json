@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GNU InetUtils GNU InetUtils contains an argument injection vulnerability in telnetd that could allow for remote authentication bypass via a \"-f root\" value for the USER environment variable.",
+  "token_count": 28
+}

@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-27123",
+  "ingested_at": "2026-03-22T07:54:41.520666+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: Reason: This candidate was issued in error.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "168665b247dceacc1c760e2c4f73f940a1b14847a5d5494b6e88feb6ae121493",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 9,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27123"
+}

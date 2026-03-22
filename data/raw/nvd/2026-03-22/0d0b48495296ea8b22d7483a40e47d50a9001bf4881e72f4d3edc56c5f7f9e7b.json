@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2994",
+  "ingested_at": "2026-03-22T07:54:34.360456+00:00",
+  "lang": "en",
+  "raw_text": "Concrete CMS below version 9.4.8 is subject to CSRF by a Rogue Administrator using the Anti-Spam Allowlist Group Configuration via group_id parameter which can leads to a security bypass since changes are saved prior to checking the CSRF token. The Concrete CMS security team gave this vulnerability a CVSS v.4.0 score of 2.3 with vector CVSS:4.0/AV:N/AC:L/AT:P/PR:L/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N. Thanks z3rco for reporting",
+  "severity": "MEDIUM",
+  "sha256_hash": "0d0b48495296ea8b22d7483a40e47d50a9001bf4881e72f4d3edc56c5f7f9e7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2994"
+}

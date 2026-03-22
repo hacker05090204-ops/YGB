@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-43510",
+  "ingested_at": "2026-03-22T07:45:15.828953+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple watchOS, iOS, iPadOS, macOS, visionOS, and tvOS contain an improper locking vulnerability that could allow a malicious application to cause unexpected changes in memory shared between processes.",
+  "severity": "CRITICAL",
+  "sha256_hash": "638a364dea87d5f17495fc66da4ab7003e2ca2d3412b16db3cc95ed5fb04816c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

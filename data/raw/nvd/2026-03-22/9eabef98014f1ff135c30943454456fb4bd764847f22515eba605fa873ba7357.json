@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2844",
+  "ingested_at": "2026-03-22T07:54:33.405729+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authentication for Critical Function vulnerability in Microchip TimePictra allows Configuration/Environment Manipulation.This issue affects TimePictra: from 11.0 through 11.3 SP2.",
+  "severity": "HIGH",
+  "sha256_hash": "9eabef98014f1ff135c30943454456fb4bd764847f22515eba605fa873ba7357",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2844"
+}

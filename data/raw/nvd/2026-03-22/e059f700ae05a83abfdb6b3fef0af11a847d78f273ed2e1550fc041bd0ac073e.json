@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22207",
+  "ingested_at": "2026-03-22T07:54:32.763680+00:00",
+  "lang": "en",
+  "raw_text": "OpenViking through version 0.1.18, prior to commit 0251c70, contains a broken access control vulnerability that allows unauthenticated attackers to gain ROOT privileges when the root_api_key configuration is omitted. Attackers can send requests to protected endpoints without authentication headers to access administrative functions including account management, resource operations, and system configuration.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e059f700ae05a83abfdb6b3fef0af11a847d78f273ed2e1550fc041bd0ac073e",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22207"
+}

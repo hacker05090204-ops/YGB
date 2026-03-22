@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to version 1.14.3, this is a configuration bypass vulnerability that enables arbitrary code execution. The @backstage/plugin-techdocs-node package uses an allowlist to filter dangerous MkDocs configuration keys during the documentation build process. A gap in this allowlist allows attackers to craft an mkdocs.yml that causes arbitrary Python code execution, completely bypassing TechDocs' security controls. This issue has been patched in version 1.14.3.",
+  "token_count": 71
+}

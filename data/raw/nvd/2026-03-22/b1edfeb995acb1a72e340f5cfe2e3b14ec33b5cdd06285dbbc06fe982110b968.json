@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67977",
+  "ingested_at": "2026-03-22T07:54:30.020770+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in VillaTheme HAPPY happy-helpdesk-support-ticket-system allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects HAPPY: from n/a through < = 1.0.8.",
+  "severity": "HIGH",
+  "sha256_hash": "b1edfeb995acb1a72e340f5cfe2e3b14ec33b5cdd06285dbbc06fe982110b968",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67977"
+}

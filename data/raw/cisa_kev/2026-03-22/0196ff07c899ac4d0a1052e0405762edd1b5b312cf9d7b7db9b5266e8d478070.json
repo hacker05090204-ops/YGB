@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-2423",
+  "ingested_at": "2026-03-22T07:45:17.916460+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java Runtime Environment (JRE) Unspecified vulnerability in hotspot for Java Runtime Environment (JRE) allows remote attackers to affect integrity.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0196ff07c899ac4d0a1052e0405762edd1b5b312cf9d7b7db9b5266e8d478070",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3542",
+  "ingested_at": "2026-03-22T07:54:34.791521+00:00",
+  "lang": "en",
+  "raw_text": "Inappropriate implementation in WebAssembly in Google Chrome prior to 145.0.7632.159 allowed a remote attacker to perform out of bounds memory access via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "HIGH",
+  "sha256_hash": "b74a91623da873a0fd37b4d7dd9745d1487e8dd791ac70cfb7ff54f437872d33",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3542"
+}

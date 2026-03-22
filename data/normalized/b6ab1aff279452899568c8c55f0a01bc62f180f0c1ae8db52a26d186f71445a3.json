@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Git Git Git contains a link following vulnerability that stems from Git\u2019s inconsistent handling of carriage return characters in configuration files.",
+  "token_count": 21
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-30190",
+  "ingested_at": "2026-03-22T07:45:17.759539+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists when MSDT is called using the URL protocol from a calling application such as Word. An attacker who successfully exploits this vulnerability can run code with the privileges of the calling application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2acfbed14e58ba7842b4e662e3523f635ed82e91829dae6a972c82324815c9c2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

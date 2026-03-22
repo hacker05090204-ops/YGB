@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Elastic Elasticsearch Elasticsearch enables dynamic scripting, which allows remote attackers to execute arbitrary MVEL expressions and Java code.",
+  "token_count": 18
+}

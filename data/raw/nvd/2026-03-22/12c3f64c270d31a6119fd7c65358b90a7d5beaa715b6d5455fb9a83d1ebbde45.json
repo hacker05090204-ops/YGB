@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27799",
+  "ingested_at": "2026-03-22T07:54:32.430547+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a heap buffer over-read vulnerability exists in the DJVU image format handler. The vulnerability occurs due to integer truncation when calculating the stride (row size) for pixel buffer allocation. The stride calculation overflows a 32-bit signed integer, resulting in an out-of-bounds memory reads. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "12c3f64c270d31a6119fd7c65358b90a7d5beaa715b6d5455fb9a83d1ebbde45",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-126"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27799"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27938",
+  "ingested_at": "2026-03-22T07:54:32.518470+00:00",
+  "lang": "en",
+  "raw_text": "WPGraphQL provides a GraphQL API for WordPress sites. Prior to version 2.9.1, the `wp-graphql/wp-graphql` repository contains a GitHub Actions workflow (`release.yml`) vulnerable to OS command injection through direct use of `${{ github.event.pull_request.body }}` inside a `run:` shell block. When a pull request from `develop` to `master` is merged, the PR body is injected verbatim into a shell command, allowing arbitrary command execution on the Actions runner. Version 2.9.1 contains a fix for the vulnerability.",
+  "severity": "HIGH",
+  "sha256_hash": "200b1bd6ad2e971125ff12ca17bb81d1c5049c7fad136d26c67d00cccc9c2b2a",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27938"
+}

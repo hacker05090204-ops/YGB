@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-42013",
+  "ingested_at": "2026-03-22T07:45:18.993321+00:00",
+  "lang": "en",
+  "raw_text": "Apache HTTP Server Apache HTTP Server contains a path traversal vulnerability that allows an attacker to perform remote code execution if files outside directories configured by Alias-like directives are not under default require all denied or if CGI scripts are enabled. This CVE ID resolves an incomplete patch for CVE-2021-41773.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c27a8f51d6568e4f57df00987aa79872b9c9ec297a40c3ca5ac476c90155079f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-0010",
+  "ingested_at": "2026-03-22T07:54:33.903906+00:00",
+  "lang": "en",
+  "raw_text": "In onTransact of IDrmManagerService.cpp, there is a possible out of bounds write due to a missing bounds check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "8ec83f9b147571b04d4a9eddbc4bff0a855e361f8619e25448f4ea6580eb2908",
+  "source": "nvd",
+  "tags": [
+    "CWE-787",
+    "CWE-787"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0010"
+}

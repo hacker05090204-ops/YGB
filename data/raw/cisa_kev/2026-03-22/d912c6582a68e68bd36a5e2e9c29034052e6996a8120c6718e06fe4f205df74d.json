@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-9791",
+  "ingested_at": "2026-03-22T07:45:18.765457+00:00",
+  "lang": "en",
+  "raw_text": "Apache Struts 1 The Struts 1 plugin in Apache Struts might allow remote code execution via a malicious field value passed in a raw message to the ActionMessage.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d912c6582a68e68bd36a5e2e9c29034052e6996a8120c6718e06fe4f205df74d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

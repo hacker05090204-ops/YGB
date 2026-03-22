@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-15556",
+  "ingested_at": "2026-03-22T07:45:15.916494+00:00",
+  "lang": "en",
+  "raw_text": "Notepad++ Notepad++ Notepad++ when using the WinGUp updater, contains a download of code without integrity check vulnerability that could allow an attacker to intercept or redirect update traffic to download and execute an attacker-controlled installer. This could lead to arbitrary code execution with the privileges of the user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d496e2e006f3ce7b2e456a7251aac9fcc745f914e7654e0ad7ae682e8d8e788a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 48,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

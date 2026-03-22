@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-0232",
+  "ingested_at": "2026-03-22T07:45:18.698446+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows The kernel in Microsoft Windows, when access to 16-bit applications is enabled on a 32-bit x86 platform, does not properly validate certain BIOS calls, which allows local users to gain privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "122d3707050f82d5f898f9d6f4ff6803b906ce197e390edcf6e692a8120640ab",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

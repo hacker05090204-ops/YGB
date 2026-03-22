@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-0938",
+  "ingested_at": "2026-03-22T07:45:19.311219+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Adobe Font Manager Library contains an unspecified vulnerability when handling specially crafted multi-master fonts (Adobe Type 1 PostScript format) that allows for remote code execution for all systems except Windows 10. For systems running Windows 10, an attacker who successfully exploited the vulnerability could execute code in an AppContainer sandbox context with limited privileges and capabilities.",
+  "severity": "CRITICAL",
+  "sha256_hash": "379dac4f84be6a4d29eb5e941357d08612b76e29512b11336dcc963bc3a23e46",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 60,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

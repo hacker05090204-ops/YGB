@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29077",
+  "ingested_at": "2026-03-22T07:54:40.998804+00:00",
+  "lang": "en",
+  "raw_text": "Frappe is a full-stack web application framework. Prior to versions 15.98.0 and 14.100.0, due to a lack of validation when sharing documents, a user could share a document with a permission that they themselves didn't have. This issue has been patched in versions 15.98.0 and 14.100.0.",
+  "severity": "HIGH",
+  "sha256_hash": "1bd37395b92c0879cff57d9d53ab4d898eba6096b368c24f8b8cde5f50d77224",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-602"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29077"
+}

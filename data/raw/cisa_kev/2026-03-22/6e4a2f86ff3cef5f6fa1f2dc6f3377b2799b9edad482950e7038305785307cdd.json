@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-3129",
+  "ingested_at": "2026-03-22T07:45:17.248346+00:00",
+  "lang": "en",
+  "raw_text": "Laravel Ignition Laravel Ignition contains a file upload vulnerability that allows unauthenticated remote attackers to execute malicious code due to insecure usage of file_get_contents() and file_put_contents().",
+  "severity": "CRITICAL",
+  "sha256_hash": "6e4a2f86ff3cef5f6fa1f2dc6f3377b2799b9edad482950e7038305785307cdd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

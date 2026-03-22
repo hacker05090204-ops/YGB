@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27522",
+  "ingested_at": "2026-03-22T07:54:47.296095+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.24 contain a local media root bypass vulnerability in sendAttachment and setGroupIcon message actions when sandboxRoot is unset. Attackers can hydrate media from local absolute paths to read arbitrary host files accessible by the runtime user.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c5ebdfd80b4532d42d54184403bb6540f8167525db792904e906796b743400d0",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27522"
+}

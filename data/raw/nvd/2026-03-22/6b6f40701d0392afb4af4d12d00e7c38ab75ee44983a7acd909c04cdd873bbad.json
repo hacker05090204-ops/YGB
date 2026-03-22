@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26186",
+  "ingested_at": "2026-03-22T07:54:32.404443+00:00",
+  "lang": "en",
+  "raw_text": "Fleet is open source device management software. A SQL injection vulnerability in versions prior to 4.80.1 allowed authenticated users to inject arbitrary SQL expressions via the `order_key` query parameter. Due to unsafe use of `goqu.I()` when constructing the `ORDER BY` clause, specially crafted input could escape identifier quoting and be interpreted as executable SQL. An authenticated attacker with access to the affected endpoint could inject SQL expressions into the underlying MySQL query. Although the injection occurs in an `ORDER BY` context, it is sufficient to enable blind SQL injection techniques that can disclose database information through conditional expressions that affect result ordering. Crafted expressions may also cause excessive computation or query failures, potentially leading to degraded performance or denial of service. No direct evidence of reliable data modification or stacked query execution was demonstrated. Version 4.80.1 fixes the issue. If an immediate upgrade is not possible, users should restrict access to the affected endpoint to trusted roles only and ensure that any user-supplied sort or column parameters are strictly allow-listed at the application or proxy layer.",
+  "severity": "HIGH",
+  "sha256_hash": "6b6f40701d0392afb4af4d12d00e7c38ab75ee44983a7acd909c04cdd873bbad",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 176,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26186"
+}

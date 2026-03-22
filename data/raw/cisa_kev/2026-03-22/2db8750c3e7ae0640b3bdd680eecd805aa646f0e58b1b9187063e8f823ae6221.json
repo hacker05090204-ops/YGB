@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-5591",
+  "ingested_at": "2026-03-22T07:45:19.181820+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Fortinet FortiOS contains a default configuration vulnerability that may allow an unauthenticated attacker on the same subnet to intercept sensitive information by impersonating the Lightweight Directory Access Protocol (LDAP) server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2db8750c3e7ae0640b3bdd680eecd805aa646f0e58b1b9187063e8f823ae6221",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

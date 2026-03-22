@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24898",
+  "ingested_at": "2026-03-22T07:54:34.285675+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0, an unauthenticated token disclosure vulnerability in the MedEx callback endpoint allows any unauthenticated visitor to obtain the practice's MedEx API tokens, leading to complete third-party service compromise, PHI exfiltration, unauthorized actions on the MedEx platform, and HIPAA violations. The vulnerability exists because the endpoint bypasses authentication ($ignoreAuth = true) and performs a MedEx login whenever $_POST['callback_key'] is provided, returning the full JSON response including sensitive API tokens. This vulnerability is fixed in 8.0.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3161cbcd8fad7810f9fa67440d0a4016d0b5d5c0275e8dac76189a5e50e058e3",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24898"
+}

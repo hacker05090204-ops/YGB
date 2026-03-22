@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-26284",
+  "ingested_at": "2026-03-22T07:54:31.402450+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, ImageMagick lacks proper boundary checking when processing Huffman-coded data from PCD (Photo CD) files. The decoder contains an function that has an incorrect initialization that could cause an out of bounds read. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bb8334cecfbcb6c798120413766488dd9f4b34d280ab9eca32e740720a1cf868",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-787",
+    "CWE-125"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26284"
+}

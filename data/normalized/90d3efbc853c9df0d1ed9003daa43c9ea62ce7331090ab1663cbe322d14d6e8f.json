@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Input Method Editor (IME) Japanese Microsoft Input Method Editor (IME) Japanese is a keyboard with Japanese characters that can be enabled on Windows systems as it is included by default (with the default set as disabled). IME Japanese contains an unspecified vulnerability when IMJPDCT.EXE (IME for Japanese) is installed which allows attackers to bypass a sandbox and perform privilege escalation.",
+  "token_count": 61
+}

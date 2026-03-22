@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30860",
+  "ingested_at": "2026-03-22T07:54:41.932513+00:00",
+  "lang": "en",
+  "raw_text": "WeKnora is an LLM-powered framework designed for deep document understanding and semantic retrieval. Prior to version 0.2.12, a remote code execution (RCE) vulnerability exists in the application's database query functionality. The validation system fails to recursively inspect child nodes within PostgreSQL array expressions and row expressions, allowing attackers to bypass SQL injection protections. By smuggling dangerous PostgreSQL functions inside these expressions and chaining them with large object operations and library loading capabilities, an unauthenticated attacker can achieve arbitrary code execution on the database server with database user privileges. This issue has been patched in version 0.2.12.",
+  "severity": "CRITICAL",
+  "sha256_hash": "21046963371e43f91970c29e5490aa503b28111724d6ba394e021eaf5add8c8d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 96,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30860"
+}

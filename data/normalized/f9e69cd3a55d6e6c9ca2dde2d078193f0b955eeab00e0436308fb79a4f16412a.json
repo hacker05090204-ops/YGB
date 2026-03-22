@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The GL-iNet Comet (GL-RM1) KVM does not sufficiently verify the authenticity of uploaded firmware files. An attacker-in-the-middle or a compromised update server could modify the firmware and the corresponding MD5 hash to pass verification.",
+  "token_count": 34
+}

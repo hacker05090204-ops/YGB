@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Global file reads caused by improper URL checks in webserver in Softing Industrial Automation GmbH smartLinks on docker (filesystem modules) allows file access. This issue affects smartLink SW-HT: through 1.42 smartLink SW-PN: through 1.03.",
+  "token_count": 34
+}

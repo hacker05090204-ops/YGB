@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An administrator may attempt to block all traffic by configuring a pass filter with an empty table. However, in UBR, an empty list does not enforce any restrictions and allows all network traffic to pass unfiltered.",
+  "token_count": 36
+}

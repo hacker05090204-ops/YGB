@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains a heap out-of-bounds write vulnerability that could allow an attacker to gain privileges or cause a DoS (via heap memory corruption) through user name space.",
+  "token_count": 30
+}

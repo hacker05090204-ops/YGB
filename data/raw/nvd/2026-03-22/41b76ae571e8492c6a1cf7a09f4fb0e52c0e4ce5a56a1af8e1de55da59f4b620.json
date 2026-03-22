@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4439",
+  "ingested_at": "2026-03-22T07:54:48.444306+00:00",
+  "lang": "en",
+  "raw_text": "Out of bounds memory access in WebGL in Google Chrome on Android prior to 146.0.7680.153 allowed a remote attacker to potentially perform a sandbox escape via a crafted HTML page. (Chromium security severity: Critical)",
+  "severity": "HIGH",
+  "sha256_hash": "41b76ae571e8492c6a1cf7a09f4fb0e52c0e4ce5a56a1af8e1de55da59f4b620",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-787"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4439"
+}

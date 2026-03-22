@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SQL injection vulnerability in the UDDI server in SAP NetWeaver J2EE Engine 7.40 allows remote attackers to execute arbitrary SQL commands via unspecified vectors.",
+  "token_count": 26
+}

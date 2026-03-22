@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25188",
+  "ingested_at": "2026-03-22T07:54:42.756050+00:00",
+  "lang": "en",
+  "raw_text": "Heap-based buffer overflow in Windows Telephony Service allows an unauthorized attacker to elevate privileges over an adjacent network.",
+  "severity": "HIGH",
+  "sha256_hash": "4ea787384bc5b7486ce5d2063f075af07f7d8d11e90a2624c7cbc33e3f861497",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25188"
+}

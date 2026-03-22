@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-21590",
+  "ingested_at": "2026-03-22T07:45:16.510632+00:00",
+  "lang": "en",
+  "raw_text": "Juniper Junos OS Juniper Junos OS contains an improper isolation or compartmentalization vulnerability. This vulnerability could allows a local attacker with high privileges to inject arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "49588758e1bd660b31b0a2d4652b0a3666a6c2b8f19bdc20f825946e13b1af6d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

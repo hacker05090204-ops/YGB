@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4233",
+  "ingested_at": "2026-03-22T07:54:46.787744+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in ThingsGateway 12. This affects an unknown part of the file /api/file/download. The manipulation of the argument fileName leads to path traversal. Remote exploitation of the attack is possible. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bcc3bbf46152b9e85b70804de785235f6cab2e03c5dfe60cbcf2b683643791c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4233"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jettweb Php Hazir Ilan Sitesi Scripti V2 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'kat' parameter. Attackers can send GET requests to the katgetir.php endpoint with malicious 'kat' values to extract sensitive database information.",
+  "token_count": 46
+}

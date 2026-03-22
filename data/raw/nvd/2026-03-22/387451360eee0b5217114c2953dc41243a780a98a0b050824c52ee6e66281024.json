@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2845",
+  "ingested_at": "2026-03-22T07:54:32.335814+00:00",
+  "lang": "en",
+  "raw_text": "An issue has been discovered in GitLab CE/EE affecting all versions from 11.2 before 18.7.5, 18.8 before 18.8.5, and 18.9 before 18.9.1 that could have allowed an authenticated user to cause denial of service by exploiting a Bitbucket Server import endpoint via repeatedly sending large responses.",
+  "severity": "MEDIUM",
+  "sha256_hash": "387451360eee0b5217114c2953dc41243a780a98a0b050824c52ee6e66281024",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2845"
+}

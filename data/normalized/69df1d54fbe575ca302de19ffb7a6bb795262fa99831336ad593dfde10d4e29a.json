@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Tenda FH451 1.0.0.9. This impacts the function fromSetCfm of the file /goform/setcfm. The manipulation of the argument funcname/funcpara1 results in stack-based buffer overflow. The attack may be performed from remote. The exploit has been made public and could be used.",
+  "token_count": 45
+}

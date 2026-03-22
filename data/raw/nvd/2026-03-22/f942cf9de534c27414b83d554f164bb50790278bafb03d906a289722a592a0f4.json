@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27225",
+  "ingested_at": "2026-03-22T07:54:43.332000+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Experience Manager versions 6.5.23 and earlier are affected by a stored Cross-Site Scripting (XSS) vulnerability that could be abused by a low-privileged attacker to inject malicious scripts into vulnerable form fields. Malicious JavaScript may be executed in a victim\u2019s browser when they browse to the page containing the vulnerable field.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f942cf9de534c27414b83d554f164bb50790278bafb03d906a289722a592a0f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27225"
+}

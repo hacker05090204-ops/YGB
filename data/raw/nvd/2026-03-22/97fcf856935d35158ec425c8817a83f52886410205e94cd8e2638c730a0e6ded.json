@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29091",
+  "ingested_at": "2026-03-22T07:54:41.561762+00:00",
+  "lang": "en",
+  "raw_text": "Locutus brings stdlibs of other programming languages to JavaScript for educational purposes. Prior to version 3.0.0, a remote code execution (RCE) flaw was discovered in the locutus project, specifically within the call_user_func_array function implementation. The vulnerability allows an attacker to inject arbitrary JavaScript code into the application's runtime environment. This issue stems from an insecure implementation of the call_user_func_array function (and its wrapper call_user_func), which fails to properly validate all components of a callback array before passing them to eval(). This issue has been patched in version 3.0.0.",
+  "severity": "HIGH",
+  "sha256_hash": "97fcf856935d35158ec425c8817a83f52886410205e94cd8e2638c730a0e6ded",
+  "source": "nvd",
+  "tags": [
+    "CWE-95"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29091"
+}

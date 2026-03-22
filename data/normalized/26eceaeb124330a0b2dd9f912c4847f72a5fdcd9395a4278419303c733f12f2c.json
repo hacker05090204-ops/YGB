@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper session management in D-Link Wireless N 300 ADSL2+ Modem Router DSL-124 ME_1.00 allows attackers to execute a session hijacking attack via spoofing the IP address of an authenticated user.",
+  "token_count": 30
+}

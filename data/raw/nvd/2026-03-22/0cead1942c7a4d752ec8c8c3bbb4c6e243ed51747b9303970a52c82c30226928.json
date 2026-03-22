@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25544",
+  "ingested_at": "2026-03-22T07:54:49.479394+00:00",
+  "lang": "en",
+  "raw_text": "Pidgin 2.13.0 contains a denial of service vulnerability that allows local attackers to crash the application by providing an excessively long username string during account creation. Attackers can input a buffer of 1000 characters in the username field and trigger a crash when joining a chat, causing the application to become unavailable.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0cead1942c7a4d752ec8c8c3bbb4c6e243ed51747b9303970a52c82c30226928",
+  "source": "nvd",
+  "tags": [
+    "CWE-807"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25544"
+}

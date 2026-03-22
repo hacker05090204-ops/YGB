@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22479",
+  "ingested_at": "2026-03-22T07:54:40.154593+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in ThemeRuby Easy Post Submission easy-post-submission allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Easy Post Submission: from n/a through < = 2.2.0.",
+  "severity": "HIGH",
+  "sha256_hash": "7d68a7515e6a17df34a1b96635df338f8929bee82483aa90e813be955c826bc9",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22479"
+}

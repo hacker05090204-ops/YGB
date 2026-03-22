@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28520",
+  "ingested_at": "2026-03-22T07:54:46.434415+00:00",
+  "lang": "en",
+  "raw_text": "arduino-TuyaOpen before version 1.2.1 contains a single-byte buffer overflow vulnerability in the WiFiMulti component. When the victim's smart hardware connects to an attacker-controlled AP hotspot, the attacker can exploit the overflow to execute arbitrary code on the affected embedded device.",
+  "severity": "HIGH",
+  "sha256_hash": "ff2c2fee7c5b2c14ecc23c2b8845003fbe6513e7a6e4e8bf21f659e8bf12c79a",
+  "source": "nvd",
+  "tags": [
+    "CWE-193"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28520"
+}

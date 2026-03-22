@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22203",
+  "ingested_at": "2026-03-22T07:54:44.624155+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an information disclosure vulnerability that allows administrators to inadvertently expose OAuth secrets by exporting plugin options as JSON. Attackers can obtain exported files containing plaintext API secrets like fbAppSecret, googleClientSecret, twitterAppSecret, and other social login credentials from support tickets, backups, or version control repositories.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ba5517a4cec3db76a06529362e35f66216576ee2b694e6e490f0eb517b4e116d",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22203"
+}

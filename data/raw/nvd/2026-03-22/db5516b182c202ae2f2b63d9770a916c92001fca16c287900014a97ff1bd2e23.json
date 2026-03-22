@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27653",
+  "ingested_at": "2026-03-22T07:54:33.060767+00:00",
+  "lang": "en",
+  "raw_text": "The installers for multiple products provided by Soliton Systems K.K. contain an issue with incorrect default permissions, which may allow arbitrary code to be executed with SYSTEM privileges.",
+  "severity": "MEDIUM",
+  "sha256_hash": "db5516b182c202ae2f2b63d9770a916c92001fca16c287900014a97ff1bd2e23",
+  "source": "nvd",
+  "tags": [
+    "CWE-276",
+    "CWE-863"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27653"
+}

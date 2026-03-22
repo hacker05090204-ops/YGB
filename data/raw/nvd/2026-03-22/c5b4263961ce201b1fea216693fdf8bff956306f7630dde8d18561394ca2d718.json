@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-6969",
+  "ingested_at": "2026-03-22T07:54:46.357893+00:00",
+  "lang": "en",
+  "raw_text": "in OpenHarmony v5.1.0 and prior versions allow a local attacker cause DOS through improper input.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c5b4263961ce201b1fea216693fdf8bff956306f7630dde8d18561394ca2d718",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-6969"
+}

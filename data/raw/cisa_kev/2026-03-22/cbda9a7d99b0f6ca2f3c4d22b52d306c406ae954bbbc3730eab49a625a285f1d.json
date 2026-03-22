@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-0738",
+  "ingested_at": "2026-03-22T07:45:17.935870+00:00",
+  "lang": "en",
+  "raw_text": "Red Hat JBoss The JMX-Console web application in JBossAs in Red Hat JBoss Enterprise Application Platform performs access control only for the GET and POST methods, which allows remote attackers to send requests to this application's GET handler by using a different method.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cbda9a7d99b0f6ca2f3c4d22b52d306c406ae954bbbc3730eab49a625a285f1d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 43,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

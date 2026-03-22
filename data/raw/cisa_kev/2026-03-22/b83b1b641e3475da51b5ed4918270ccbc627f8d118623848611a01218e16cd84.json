@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-57819",
+  "ingested_at": "2026-03-22T07:45:16.196172+00:00",
+  "lang": "en",
+  "raw_text": "Sangoma FreePBX Sangoma FreePBX contains an authentication bypass vulnerability due to insufficiently sanitized user-supplied data allows unauthenticated access to FreePBX Administrator leading to arbitrary database manipulation and remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b83b1b641e3475da51b5ed4918270ccbc627f8d118623848611a01218e16cd84",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

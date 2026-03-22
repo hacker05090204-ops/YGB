@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Server/Data Center Atlassian Confluence Server and Data Center contain a remote code execution vulnerability that allows for an unauthenticated attacker to perform remote code execution.",
+  "token_count": 27
+}

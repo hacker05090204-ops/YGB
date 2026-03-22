@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, `xf_AppUpdateWindowFromSurface` reuses a cached `XImage` whose `data` pointer references a freed RDPGFX surface buffer, because `gdi_DeleteSurface` frees `surface->data` without invalidating the `appWindow->image` that aliases it. Version 3.23.0 fixes the issue.",
+  "token_count": 44
+}

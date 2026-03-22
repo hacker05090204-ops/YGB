@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Catalyst 4500 Series Switches and Cisco Catalyst 4500-X Series Switches A vulnerability in the Bidirectional Forwarding Detection (BFD) offload implementation of Cisco Catalyst 4500 Series Switches and Cisco Catalyst 4500-X Series Switches could allow an unauthenticated, remote attacker to cause a crash of the iosd process, causing a denial-of-service (DoS) condition.",
+  "token_count": 52
+}

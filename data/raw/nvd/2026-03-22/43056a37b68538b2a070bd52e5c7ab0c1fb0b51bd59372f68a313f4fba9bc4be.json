@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27729",
+  "ingested_at": "2026-03-22T07:54:31.324760+00:00",
+  "lang": "en",
+  "raw_text": "Astro is a web framework. In versions 9.0.0 through 9.5.3, Astro server actions have no default request body size limit, which can lead to memory exhaustion DoS. A single large POST to a valid action endpoint can crash the server process on memory-constrained deployments. On-demand rendered sites built with Astro can define server actions, which automatically parse incoming request bodies (JSON or FormData). The body is buffered entirely into memory with no size limit \u2014 a single oversized request is sufficient to exhaust the process heap and crash the server. Astro's Node adapter (`mode: 'standalone'`) creates an HTTP server with no body size protection. In containerized environments, the crashed process is automatically restarted, and repeated requests cause a persistent crash-restart loop. Action names are discoverable from HTML form attributes on any public page, so no authentication is required. The vulnerability allows unauthenticated denial of service against SSR standalone deployments using server actions. A single oversized request crashes the server process, and repeated requests cause a persistent crash-restart loop in containerized environments. Version 9.5.4 contains a fix.",
+  "severity": "MEDIUM",
+  "sha256_hash": "43056a37b68538b2a070bd52e5c7ab0c1fb0b51bd59372f68a313f4fba9bc4be",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 176,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27729"
+}

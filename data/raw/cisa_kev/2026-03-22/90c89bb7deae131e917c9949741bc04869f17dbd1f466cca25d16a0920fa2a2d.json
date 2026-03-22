@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-17562",
+  "ingested_at": "2026-03-22T07:45:18.917643+00:00",
+  "lang": "en",
+  "raw_text": "Embedthis GoAhead Embedthis GoAhead before 3.6.5 allows remote code execution if CGI is enabled and a CGI program is dynamically linked.",
+  "severity": "CRITICAL",
+  "sha256_hash": "90c89bb7deae131e917c9949741bc04869f17dbd1f466cca25d16a0920fa2a2d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24097",
+  "ingested_at": "2026-03-22T07:54:44.651256+00:00",
+  "lang": "en",
+  "raw_text": "Improper permission enforcement in Checkmk versions 2.4.0 before 2.4.0p23, 2.3.0 before 2.3.0p43, and 2.2.0 (EOL) allows authenticated users to enumerate existing hosts by observing different HTTP response codes in agent-receiver/register_existing endpoint, which could lead to information disclosure.",
+  "severity": "MEDIUM",
+  "sha256_hash": "360309eeb444cc8236a3ce7e75d34eda5a6a7d36386a78efe916b877b82be2fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-204"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24097"
+}

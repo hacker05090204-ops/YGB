@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an out-of-bounds write vulnerability in libimagecodec.quram.so. This vulnerability could allow remote attackers to execute arbitrary code.",
+  "token_count": 23
+}

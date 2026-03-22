@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30882",
+  "ingested_at": "2026-03-22T07:54:46.952836+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo LMS is a learning management system. Chamilo LMS version 1.11.34 and prior contains a Reflected Cross-Site Scripting (XSS) vulnerability in the session category listing page. The keyword parameter from $_REQUEST is echoed directly into an HTML href attribute without any encoding or sanitization. An attacker can inject arbitrary HTML/JavaScript by breaking out of the attribute context using \">followed by a malicious payload. The vulnerability is triggered when the pagination controls are rendered \u2014 which occurs when the number of session categories exceeds 20 (the page limit). This issue has been patched in version 1.11.36.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bc74944d9901165d9fefe302cc5a54cda11d92c1852fecdfc04e9bf7835696a3",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30882"
+}

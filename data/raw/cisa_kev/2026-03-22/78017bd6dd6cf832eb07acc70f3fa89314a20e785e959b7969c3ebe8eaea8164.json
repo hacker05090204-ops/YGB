@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-19320",
+  "ingested_at": "2026-03-22T07:45:17.609187+00:00",
+  "lang": "en",
+  "raw_text": "GIGABYTE Multiple Products The GDrv low-level driver in GIGABYTE App Center, AORUS Graphics Engine, XTREME Gaming Engine, and OC GURU II exposes ring0 memcpy-like functionality that could allow a local attacker to take complete control of the affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "78017bd6dd6cf832eb07acc70f3fa89314a20e785e959b7969c3ebe8eaea8164",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

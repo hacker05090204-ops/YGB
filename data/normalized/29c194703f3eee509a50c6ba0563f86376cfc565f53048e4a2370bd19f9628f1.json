@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains a position-independent executable (PIE) stack buffer corruption vulnerability in load_elf_ binary() that allows a local attacker to escalate privileges.",
+  "token_count": 24
+}

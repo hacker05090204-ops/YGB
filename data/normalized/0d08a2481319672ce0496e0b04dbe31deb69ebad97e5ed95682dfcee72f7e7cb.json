@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: btrfs: fix reservation leak in some error paths when inserting inline extent If we fail to allocate a path or join a transaction, we return from __cow_file_range_inline() without freeing the reserved qgroup data, resulting in a leak. Fix this by ensuring we call btrfs_qgroup_free_data() in such cases.",
+  "token_count": 57
+}

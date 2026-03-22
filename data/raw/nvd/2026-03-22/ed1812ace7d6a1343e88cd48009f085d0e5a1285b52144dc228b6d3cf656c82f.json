@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28466",
+  "ingested_at": "2026-03-22T07:54:41.060051+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a vulnerability in the gateway in which it fails to sanitize internal approval fields in node.invoke parameters, allowing authenticated clients to bypass exec approval gating for system.run commands. Attackers with valid gateway credentials can inject approval control fields to execute arbitrary commands on connected node hosts, potentially compromising developer workstations and CI runners.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ed1812ace7d6a1343e88cd48009f085d0e5a1285b52144dc228b6d3cf656c82f",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28466"
+}

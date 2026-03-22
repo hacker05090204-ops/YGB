@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter contains an improper check for dropped privileges vulnerability. This vulnerability could allow an attacker with network access to the vCenter Server to escalate privileges to root by sending a specially crafted packet.",
+  "token_count": 37
+}

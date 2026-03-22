@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28480",
+  "ingested_at": "2026-03-22T07:54:41.095576+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain an authorization bypass vulnerability where Telegram allowlist matching accepts mutable usernames instead of immutable numeric sender IDs. Attackers can spoof identity by obtaining recycled usernames to bypass allowlist restrictions and interact with bots as unauthorized senders.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f0966d7f77bddd96a7fdf31afd83a0617ed6277235ac5370c3408f009cc18cf2",
+  "source": "nvd",
+  "tags": [
+    "CWE-290"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28480"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27588",
+  "ingested_at": "2026-03-22T07:54:31.701218+00:00",
+  "lang": "en",
+  "raw_text": "Caddy is an extensible server platform that uses TLS by default. Prior to version 2.11.1, Caddy's HTTP `host` request matcher is documented as case-insensitive, but when configured with a large host list (>100 entries) it becomes case-sensitive due to an optimized matching path. An attacker can bypass host-based routing and any access controls attached to that route by changing the casing of the `Host` header. Version 2.11.1 contains a fix for the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cc8f5aefcb6e20bd6fd30df59064b1507c47926e531aceb8f49d0dca9839d9bb",
+  "source": "nvd",
+  "tags": [
+    "CWE-178"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27588"
+}

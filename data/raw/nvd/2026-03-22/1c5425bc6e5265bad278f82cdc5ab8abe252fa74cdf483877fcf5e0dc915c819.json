@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-10461",
+  "ingested_at": "2026-03-22T07:54:46.291314+00:00",
+  "lang": "en",
+  "raw_text": "Global file reads caused by improper URL checks in webserver in Softing Industrial Automation GmbH smartLinks on docker (filesystem modules) allows file access. This issue affects smartLink SW-HT: through 1.42 smartLink SW-PN: through 1.03.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "1c5425bc6e5265bad278f82cdc5ab8abe252fa74cdf483877fcf5e0dc915c819",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-10461"
+}

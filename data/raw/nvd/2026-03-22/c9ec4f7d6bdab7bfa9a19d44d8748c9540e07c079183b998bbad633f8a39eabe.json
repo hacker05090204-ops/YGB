@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-13785",
+  "ingested_at": "2026-03-22T07:54:49.249992+00:00",
+  "lang": "en",
+  "raw_text": "The The Contact Form, Survey, Quiz & Popup Form Builder \u2013 ARForms plugin for WordPress is vulnerable to arbitrary shortcode execution in all versions up to, and including, 1.7.2. This is due to the software allowing users to execute an action that does not properly validate a value before running do_shortcode. This makes it possible for unauthenticated attackers to execute arbitrary shortcodes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c9ec4f7d6bdab7bfa9a19d44d8748c9540e07c079183b998bbad633f8a39eabe",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-13785"
+}

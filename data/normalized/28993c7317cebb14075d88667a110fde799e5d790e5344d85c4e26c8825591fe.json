@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "FreeType FreeType FreeType contains an out-of-bounds write vulnerability when attempting to parse font subglyph structures related to TrueType GX and variable font files that may allow for arbitrary code execution.",
+  "token_count": 30
+}

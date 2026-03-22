@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23231",
+  "ingested_at": "2026-03-22T07:54:34.470162+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: netfilter: nf_tables: fix use-after-free in nf_tables_addchain() nf_tables_addchain() publishes the chain to table->chains via list_add_tail_rcu() (in nft_chain_add()) before registering hooks. If nf_tables_register_hook() then fails, the error path calls nft_chain_del() (list_del_rcu()) followed by nf_tables_chain_destroy() with no RCU grace period in between. This creates two use-after-free conditions: 1) Control-plane: nf_tables_dump_chains() traverses table->chains under rcu_read_lock(). A concurrent dump can still be walking the chain when the error path frees it. 2) Packet path: for NFPROTO_INET, nf_register_net_hook() briefly installs the IPv4 hook before IPv6 registration fails. Packets entering nft_do_chain() via the transient IPv4 hook can still be dereferencing chain->blob_gen_X when the error path frees the chain. Add synchronize_rcu() between nft_chain_del() and the chain destroy so that all RCU readers -- both dump threads and in-flight packet evaluation -- have finished before the chain is freed.",
+  "severity": "HIGH",
+  "sha256_hash": "9e428c30e77bc049b53a32b33b7df2da0b9bb8d965aec2900ed48ebb74564fb2",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 140,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23231"
+}

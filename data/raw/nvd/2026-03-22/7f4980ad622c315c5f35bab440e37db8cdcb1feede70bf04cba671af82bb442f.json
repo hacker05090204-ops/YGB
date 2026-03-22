@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24848",
+  "ingested_at": "2026-03-22T07:54:34.282674+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. In 7.0.4 and earlier, the disposeDocument() method in EtherFaxActions.php allows authenticated users to write arbitrary content to arbitrary locations on the server filesystem. This vulnerability can be exploited to achieve Remote Code Execution (RCE) by uploading malicious PHP web shells.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7f4980ad622c315c5f35bab440e37db8cdcb1feede70bf04cba671af82bb442f",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24848"
+}

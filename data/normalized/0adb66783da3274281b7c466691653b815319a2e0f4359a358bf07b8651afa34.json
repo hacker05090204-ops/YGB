@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mozilla Firefox Mozilla Firefox and Firefox ESR contain a use-after-free vulnerability in Animation timelines that allows for code execution in the content process.",
+  "token_count": 23
+}

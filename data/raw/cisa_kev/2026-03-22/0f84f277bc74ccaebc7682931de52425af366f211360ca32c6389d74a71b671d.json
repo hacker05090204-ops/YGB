@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-23227",
+  "ingested_at": "2026-03-22T07:45:16.670629+00:00",
+  "lang": "en",
+  "raw_text": "NUUO NVRmini2 Devices NUUO NVRmini2 devices contain a missing authentication vulnerability that allows an unauthenticated attacker to upload an encrypted TAR archive, which can be abused to add arbitrary users.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0f84f277bc74ccaebc7682931de52425af366f211360ca32c6389d74a71b671d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

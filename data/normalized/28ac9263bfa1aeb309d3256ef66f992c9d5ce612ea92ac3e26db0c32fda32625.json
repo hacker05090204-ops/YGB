@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Roundcube Webmail RoundCube Webmail contains a cross-site scripting vulnerability. This vulnerability could allow a remote attacker to steal and send emails of a victim via a crafted e-mail message that abuses a Desanitization issue in message_body() in program/actions/mail/show.php.",
+  "token_count": 38
+}

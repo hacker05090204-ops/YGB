@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3070",
+  "ingested_at": "2026-03-22T07:54:31.444413+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in SourceCodester Modern Image Gallery App 1.0. Affected by this vulnerability is an unknown functionality of the file upload.php. The manipulation of the argument filename results in cross site scripting. The attack may be launched remotely. The exploit is now public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f32c5215e79db6de947f5c8d12dcae789ae52fb7e6fefe23c7d961f4649fd84d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3070"
+}

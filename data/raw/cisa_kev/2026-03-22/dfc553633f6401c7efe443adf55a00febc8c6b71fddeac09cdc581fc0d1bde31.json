@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-100005",
+  "ingested_at": "2026-03-22T07:45:16.975504+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DIR-600 Router D-Link DIR-600 routers contain a cross-site request forgery (CSRF) vulnerability that allows an attacker to change router configurations by hijacking an existing administrator session.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dfc553633f6401c7efe443adf55a00febc8c6b71fddeac09cdc581fc0d1bde31",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

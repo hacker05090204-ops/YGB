@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-4135",
+  "ingested_at": "2026-03-22T07:45:17.575807+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium GPU Google Chromium GPU contains a heap buffer overflow vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fbb1eb877ae8dbdd311d4050d7a163b6d28cc4d1db05b8b03d690579b6f426c4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 55,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

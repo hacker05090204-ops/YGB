@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70614",
+  "ingested_at": "2026-03-22T07:54:40.968167+00:00",
+  "lang": "en",
+  "raw_text": "OpenCode Systems OC Messaging / USSD Gateway OC Release 6.32.2 contains a broken access control vulnerability in the web-based control panel allowing authenticated low-privileged attackers to gain to access to arbitrary SMS messages via a crafted company or tenant identifier parameter.",
+  "severity": "HIGH",
+  "sha256_hash": "b16b8833ed857f3412dda3591fa57eac5cf01c058e2675b8c4cd5b1d83d459f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70614"
+}

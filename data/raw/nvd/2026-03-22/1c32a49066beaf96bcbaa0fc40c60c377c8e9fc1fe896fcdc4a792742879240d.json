@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2025-67041",
+  "ingested_at": "2026-03-22T07:54:43.680261+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Lantronix EDS3000PS 3.1.0.0R2. The host parameter of the TFTP client in the Filesystem Browser page is not properly sanitized. This can be exploited to escape from the original command and execute an arbitrary one with root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1c32a49066beaf96bcbaa0fc40c60c377c8e9fc1fe896fcdc4a792742879240d",
+  "source": "nvd",
+  "tags": [
+    "CWE-78",
+    "CWE-288",
+    "CWE-620"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67041"
+}

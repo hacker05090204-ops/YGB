@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69340",
+  "ingested_at": "2026-03-22T07:54:39.990078+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in BuddhaThemes WeDesignTech Ultimate Booking Addon wedesigntech-ultimate-booking-addon allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WeDesignTech Ultimate Booking Addon: from n/a through < = 1.0.3.",
+  "severity": "HIGH",
+  "sha256_hash": "7d93acba26195ec0f511692972f0e70eb711c8cd1a33ddc6dbf565f8ead9bc7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69340"
+}

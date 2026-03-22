@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to 3.24.0, Integer Underflow in update_read_cache_bitmap_order Function of FreeRDP's Core Library This vulnerability is fixed in 3.24.0.",
+  "token_count": 28
+}

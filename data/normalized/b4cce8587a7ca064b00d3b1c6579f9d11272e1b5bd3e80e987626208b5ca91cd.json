@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Scripting Engine contains a type confusion vulnerability that allows an unauthorized attacker to execute code over a network via a specially crafted URL.",
+  "token_count": 27
+}

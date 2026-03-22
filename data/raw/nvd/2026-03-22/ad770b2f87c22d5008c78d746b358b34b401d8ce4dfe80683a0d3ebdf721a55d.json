@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30345",
+  "ingested_at": "2026-03-22T07:54:47.531502+00:00",
+  "lang": "en",
+  "raw_text": "A zip slip vulnerability in the Admin import functionality of CTFd v3.8.1-18-gdb5a18c4 allows attackers to write arbitrary files outside the intended directories via supplying a crafted import.",
+  "severity": "HIGH",
+  "sha256_hash": "ad770b2f87c22d5008c78d746b358b34b401d8ce4dfe80683a0d3ebdf721a55d",
+  "source": "nvd",
+  "tags": [
+    "CWE-23"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30345"
+}

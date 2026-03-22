@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25571",
+  "ingested_at": "2026-03-22T07:54:49.537751+00:00",
+  "lang": "en",
+  "raw_text": "MediaMonkey 4.1.23 contains a denial of service vulnerability that allows local attackers to crash the application by opening a specially crafted MP3 file containing an excessively long URL string. Attackers can create a malicious MP3 file with a buffer containing 4000 bytes of data appended to a URL, which causes the application to crash when the file is opened through the File > Open URL dialog.",
+  "severity": "MEDIUM",
+  "sha256_hash": "686015c2fdff95b8772517a7f723586bccff059178cbfb3e7185f647ecb9c867",
+  "source": "nvd",
+  "tags": [
+    "CWE-226"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25571"
+}

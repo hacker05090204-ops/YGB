@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Wavlink WL-WN579A3 220323. This issue affects the function SetName/GuestWifi of the file /cgi-bin/wireless.cgi of the component POST Request Handler. Performing a manipulation results in command injection. It is possible to initiate the attack remotely. The exploit is now public and may be used. Upgrading the affected component is recommended.",
+  "token_count": 54
+}

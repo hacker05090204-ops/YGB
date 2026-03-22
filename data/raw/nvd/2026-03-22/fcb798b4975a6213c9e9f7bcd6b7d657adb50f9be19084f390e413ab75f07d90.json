@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3383",
+  "ingested_at": "2026-03-22T07:54:33.439721+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in ChaiScript up to 6.1.0. This affects the function chaiscript::Boxed_Number::go of the file include/chaiscript/dispatchkit/boxed_number.hpp. Executing a manipulation can lead to divide by zero. The attack requires local access. The exploit has been made available to the public and could be used for attacks. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "fcb798b4975a6213c9e9f7bcd6b7d657adb50f9be19084f390e413ab75f07d90",
+  "source": "nvd",
+  "tags": [
+    "CWE-369",
+    "CWE-404"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3383"
+}

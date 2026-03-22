@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25312",
+  "ingested_at": "2026-03-22T07:54:47.882527+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in EventPrime allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects EventPrime: from n/a through 4.2.8.3.",
+  "severity": "HIGH",
+  "sha256_hash": "8ceba7a271ed10502e4aa31488f290e15af0c9f487124104f518a0ab2ade1266",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25312"
+}

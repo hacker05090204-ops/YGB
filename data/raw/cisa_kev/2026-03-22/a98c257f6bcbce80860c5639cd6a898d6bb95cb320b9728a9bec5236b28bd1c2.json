@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-8439",
+  "ingested_at": "2026-03-22T07:45:17.894968+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player has a vulnerability in the way it handles a dereferenced memory pointer which could lead to code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a98c257f6bcbce80860c5639cd6a898d6bb95cb320b9728a9bec5236b28bd1c2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

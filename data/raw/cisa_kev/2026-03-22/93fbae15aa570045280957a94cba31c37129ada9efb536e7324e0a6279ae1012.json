@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-27532",
+  "ingested_at": "2026-03-22T07:45:17.279236+00:00",
+  "lang": "en",
+  "raw_text": "Veeam Backup & Replication Veeam Backup & Replication Cloud Connect component contains a missing authentication for critical function vulnerability that allows an unauthenticated user operating within the backup infrastructure network perimeter to obtain encrypted credentials stored in the configuration database. This may lead to an attacker gaining access to the backup infrastructure hosts.",
+  "severity": "CRITICAL",
+  "sha256_hash": "93fbae15aa570045280957a94cba31c37129ada9efb536e7324e0a6279ae1012",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

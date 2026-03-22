@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0037",
+  "ingested_at": "2026-03-22T07:45:18.217667+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Edge and Internet Explorer Microsoft Edge and Internet Explorer have a type confusion vulnerability in mshtml.dll, which allows remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "08fca3a389bf4e7a993d69f579314bfcfc34b07952e190b5a11e4f2bac8d015e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

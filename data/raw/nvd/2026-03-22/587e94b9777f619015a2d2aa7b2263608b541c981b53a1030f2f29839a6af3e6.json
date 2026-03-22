@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25162",
+  "ingested_at": "2026-03-22T07:54:41.392863+00:00",
+  "lang": "en",
+  "raw_text": "2-Plan Team 1.0.4 contains an arbitrary file upload vulnerability that allows authenticated attackers to upload executable PHP files by sending multipart form data to managefile.php. Attackers can upload PHP files through the userfile1 parameter with action=upload, which are stored in the files directory and executed by the web server for remote code execution.",
+  "severity": "MEDIUM",
+  "sha256_hash": "587e94b9777f619015a2d2aa7b2263608b541c981b53a1030f2f29839a6af3e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25162"
+}

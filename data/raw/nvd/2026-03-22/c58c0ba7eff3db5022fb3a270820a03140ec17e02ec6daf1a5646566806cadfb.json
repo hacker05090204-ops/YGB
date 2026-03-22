@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28231",
+  "ingested_at": "2026-03-22T07:54:33.299181+00:00",
+  "lang": "en",
+  "raw_text": "pillow_heif is a Python library for working with HEIF images and plugin for Pillow. Prior to version 1.3.0, an integer overflow in the encode path buffer validation of `_pillow_heif.c` allows an attacker to bypass bounds checks by providing large image dimensions, resulting in a heap out-of-bounds read. This can lead to information disclosure (server heap memory leaking into encoded images) or denial of service (process crash). No special configuration is required \u2014 this triggers under default settings. Version 1.3.0 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c58c0ba7eff3db5022fb3a270820a03140ec17e02ec6daf1a5646566806cadfb",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-190"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28231"
+}

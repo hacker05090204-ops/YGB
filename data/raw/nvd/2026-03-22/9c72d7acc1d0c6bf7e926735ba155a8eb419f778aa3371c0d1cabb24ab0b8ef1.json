@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30909",
+  "ingested_at": "2026-03-22T07:54:41.968019+00:00",
+  "lang": "en",
+  "raw_text": "Crypt::NaCl::Sodium versions through 2.002 for Perl has potential integer overflows. bin2hex, encrypt, aes256gcm_encrypt_afternm and seal functions do not check that output size will be less than SIZE_MAX, which could lead to integer wraparound causing an undersized output buffer. Encountering this issue is unlikely as the message length would need to be very large. For bin2hex() the bin_len would have to be > SIZE_MAX / 2 For encrypt() the msg_len would need to be > SIZE_MAX - 16U For aes256gcm_encrypt_afternm() the msg_len would need to be > SIZE_MAX - 16U For seal() the enc_len would need to be > SIZE_MAX - 64U",
+  "severity": "CRITICAL",
+  "sha256_hash": "9c72d7acc1d0c6bf7e926735ba155a8eb419f778aa3371c0d1cabb24ab0b8ef1",
+  "source": "nvd",
+  "tags": [
+    "CWE-190"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30909"
+}

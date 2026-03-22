@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Stored Cross-Site Scripting (XSS) vulnerability exists in the PluXml article comments feature for PluXml versions 5.8.22 and earlier. The application fails to properly sanitize or validate user-supplied input in the \"link\" field of a comment. An attacker can inject arbitrary JavaScript code using a",
+  "token_count": 45
+}

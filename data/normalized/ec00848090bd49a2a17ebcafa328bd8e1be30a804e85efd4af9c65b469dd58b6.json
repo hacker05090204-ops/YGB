@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Pulse Secure Pulse Connect Secure A code injection vulnerability exists in Pulse Connect Secure that allows an attacker to crafted a URI to perform an arbitrary code execution via the admin web interface.",
+  "token_count": 33
+}

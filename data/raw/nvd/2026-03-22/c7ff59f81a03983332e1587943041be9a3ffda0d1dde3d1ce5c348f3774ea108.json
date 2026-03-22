@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32032",
+  "ingested_at": "2026-03-22T07:54:48.229312+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an arbitrary shell execution vulnerability in shell environment fallback that trusts the unvalidated SHELL path from the host environment. An attacker with local environment access can inject a malicious SHELL variable to execute arbitrary commands with the privileges of the OpenClaw process.",
+  "severity": "HIGH",
+  "sha256_hash": "c7ff59f81a03983332e1587943041be9a3ffda0d1dde3d1ce5c348f3774ea108",
+  "source": "nvd",
+  "tags": [
+    "CWE-426"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32032"
+}

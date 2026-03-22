@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-58402",
+  "ingested_at": "2026-03-22T07:54:33.568601+00:00",
+  "lang": "en",
+  "raw_text": "The CGM CLININET application uses direct, sequential object identifiers \"MessageID\" without proper authorization checks. By modifying the parameter in the GET request, an attacker can access messages and attachments belonging to other users.",
+  "severity": "HIGH",
+  "sha256_hash": "ae7b49467be408d498502d692ec5b389f176acd660a7e2d0ce6f83f15eb00cfc",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-58402"
+}

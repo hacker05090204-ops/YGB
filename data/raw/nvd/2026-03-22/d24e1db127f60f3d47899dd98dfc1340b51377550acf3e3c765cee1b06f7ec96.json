@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30831",
+  "ingested_at": "2026-03-22T07:54:41.570775+00:00",
+  "lang": "en",
+  "raw_text": "Rocket.Chat is an open-source, secure, fully customizable communications platform. Prior to versions 7.10.8, 7.11.5, 7.12.5, 7.13.4, 8.0.2, 8.1.1, and 8.2.0, authentication vulnerabilities exist in Rocket.Chat's enterprise DDP Streamer service. The Account.login method exposed through the DDP Streamer does not enforce Two-Factor Authentication (2FA) or validate user account status (deactivated users can still login), despite these checks being mandatory in the standard Meteor login flow. This issue has been patched in versions 7.10.8, 7.11.5, 7.12.5, 7.13.4, 8.0.2, 8.1.1, and 8.2.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d24e1db127f60f3d47899dd98dfc1340b51377550acf3e3c765cee1b06f7ec96",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-304"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30831"
+}

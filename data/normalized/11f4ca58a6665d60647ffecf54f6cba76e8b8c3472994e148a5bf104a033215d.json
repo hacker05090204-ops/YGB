@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mitel MiCollab Mitel MiCollab contains a path traversal vulnerability that could allow an authenticated attacker with administrative privileges to read local files within the system due to insufficient input sanitization. This vulnerability can be chained with CVE-2024-41713, which allows an unauthenticated, remote attacker to read arbitrary files on the server.",
+  "token_count": 50
+}

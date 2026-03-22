@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-16651",
+  "ingested_at": "2026-03-22T07:45:19.533500+00:00",
+  "lang": "en",
+  "raw_text": "Roundcube Roundcube Webmail Roundcube Webmail contains a file disclosure vulnerability caused by insufficient input validation in conjunction with file-based attachment plugins, which are used by default.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ea6f86b23d7555b6d4611080bd9ed0cd86710056bed8308357fcb4f852d70aab",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

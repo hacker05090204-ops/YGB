@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-48645",
+  "ingested_at": "2026-03-22T07:54:33.883756+00:00",
+  "lang": "en",
+  "raw_text": "In loadDescription of DeviceAdminInfo.java, there is a possible persistent package due to improper input validation. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "e90ccc86e0c0a0e625894129c4321c433d26a27401969b737eb7e7615b4e8cc2",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-269"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48645"
+}

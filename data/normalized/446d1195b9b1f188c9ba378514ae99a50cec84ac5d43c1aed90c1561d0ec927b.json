@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The CombinedMult function in the CIRCL ecc/p384 package (secp384r1 curve) produces an incorrect value for specific inputs. The issue is fixed by using complete addition formulas. ECDH and ECDSA signing relying on this curve are not affected. The bug was fixed in v1.6.3 https://github.com/cloudflare/circl/releases/tag/v1.6.3 .",
+  "token_count": 45
+}

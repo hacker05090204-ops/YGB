@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-28206",
+  "ingested_at": "2026-03-22T07:45:17.448944+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple iOS, iPadOS, and macOS IOSurfaceAccelerator contain an out-of-bounds write vulnerability that allows an app to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f973e21a2dbb841d6fc1c20cc57637392978dc0408e7f4032dbb6e8b69ce070b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

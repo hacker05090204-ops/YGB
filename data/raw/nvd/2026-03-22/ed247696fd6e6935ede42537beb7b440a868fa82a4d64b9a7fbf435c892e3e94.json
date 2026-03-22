@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2860",
+  "ingested_at": "2026-03-22T07:54:30.765630+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in feng_ha_ha/megagao ssm-erp and production_ssm up to 4288d53bd35757b27f2d070057aefb2c07bdd097. Impacted is an unknown function of the file EmployeeController.java. The manipulation leads to improper authorization. It is possible to initiate the attack remotely. The exploit has been disclosed publicly and may be used. This product is using a rolling release to provide continious delivery. Therefore, no version details for affected nor updated releases are available. This product is distributed under two entirely different names. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed247696fd6e6935ede42537beb7b440a868fa82a4d64b9a7fbf435c892e3e94",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2860"
+}

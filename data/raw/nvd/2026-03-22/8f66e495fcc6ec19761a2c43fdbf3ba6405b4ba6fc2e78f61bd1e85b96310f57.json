@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32403",
+  "ingested_at": "2026-03-22T07:54:46.030946+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in toocheke Toocheke Companion toocheke-companion allows DOM-Based XSS.This issue affects Toocheke Companion: from n/a through < = 1.194.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8f66e495fcc6ec19761a2c43fdbf3ba6405b4ba6fc2e78f61bd1e85b96310f57",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32403"
+}

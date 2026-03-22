@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32456",
+  "ingested_at": "2026-03-22T07:54:46.144525+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in Janis Elsts Admin Menu Editor admin-menu-editor allows Cross Site Request Forgery.This issue affects Admin Menu Editor: from n/a through < = 1.14.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8c0942a1dbb9701895b91adc555cdae2fbc422808ee05614ae549e37e2649837",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32456"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SonicWall SMA1000 Appliances SonicWall SMA1000 Appliance Management Console (AMC) and Central Management Console (CMC) contain a deserialization of untrusted data vulnerability, which can enable a remote, unauthenticated attacker to execute arbitrary OS commands.",
+  "token_count": 33
+}

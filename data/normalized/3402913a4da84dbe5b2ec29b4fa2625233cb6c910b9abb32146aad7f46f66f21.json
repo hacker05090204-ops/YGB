@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Clinic Pro contains a SQL injection vulnerability that allows authenticated attackers to manipulate database queries by injecting SQL code through the month parameter. Attackers can send POST requests to the monthly_expense_overview endpoint with crafted month values using boolean-based blind, time-based blind, or error-based SQL injection techniques to extract sensitive database information.",
+  "token_count": 51
+}

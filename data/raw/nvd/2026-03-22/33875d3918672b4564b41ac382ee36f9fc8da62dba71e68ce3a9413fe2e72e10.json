@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32062",
+  "ingested_at": "2026-03-22T07:54:43.574966+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions2026.2.21-2 prior to 2026.2.22 and @openclaw/voice-call versions 2026.2.21 prior to 2026.2.22 accept media-stream WebSocket upgrades before stream validation, allowing unauthenticated clients to establish connections. Remote attackers can hold idle pre-authenticated sockets open to consume connection resources and degrade service availability for legitimate streams.",
+  "severity": "HIGH",
+  "sha256_hash": "33875d3918672b4564b41ac382ee36f9fc8da62dba71e68ce3a9413fe2e72e10",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32062"
+}

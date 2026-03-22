@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-4006",
+  "ingested_at": "2026-03-22T07:45:19.649023+00:00",
+  "lang": "en",
+  "raw_text": "VMware Multiple Products VMware Workspace One Access, Access Connector, Identity Manager, and Identity Manager Connector contain a command injection vulnerability. An attacker with network access to the administrative configurator on port 8443 and a valid password for the configurator administrator account can execute commands with unrestricted privileges on the underlying operating system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6b0b0202a493df136e6ca0442aeaa16e2ac8ec3fce4a0357429f9fdcf80b8fd3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 52,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

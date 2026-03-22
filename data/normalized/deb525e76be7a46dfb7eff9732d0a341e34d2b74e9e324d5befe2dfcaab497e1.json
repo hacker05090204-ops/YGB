@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Trimble Cityworks Trimble Cityworks contains a deserialization vulnerability. This could allow an authenticated user to perform a remote code execution attack against a customer's Microsoft Internet Information Services (IIS) web server.",
+  "token_count": 31
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Rails Ruby on Rails Rails Ruby on Rails contains a path traversal vulnerability in Action View. Specially crafted accept headers in combination with calls to `render file:` can cause arbitrary files on the target server to be rendered, disclosing the file contents.",
+  "token_count": 42
+}

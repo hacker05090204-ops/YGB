@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Facturation System 1.0 contains an SQL injection vulnerability that allows authenticated attackers to execute arbitrary SQL queries by injecting malicious code through the 'mod_id' parameter. Attackers can send POST requests to the editar_producto.php endpoint with crafted SQL payloads in the mod_id parameter to extract sensitive database information including usernames, database names, and version details.",
+  "token_count": 54
+}

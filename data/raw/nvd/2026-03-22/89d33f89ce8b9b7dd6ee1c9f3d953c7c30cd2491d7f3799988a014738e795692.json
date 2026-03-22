@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25533",
+  "ingested_at": "2026-03-22T07:54:44.334520+00:00",
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Business Directory 4.2 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the Email parameter. Attackers can send POST requests to the loginaction.php endpoint with crafted SQL payloads in the Email field to extract sensitive database information or bypass authentication.",
+  "severity": "HIGH",
+  "sha256_hash": "89d33f89ce8b9b7dd6ee1c9f3d953c7c30cd2491d7f3799988a014738e795692",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25533"
+}

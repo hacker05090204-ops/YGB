@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3266",
+  "ingested_at": "2026-03-22T07:54:34.338217+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in OpenTextTM Filr allows Authentication Bypass. The vulnerability could allow unauthenticated users to get XSRF token and do RPC with carefully crafted programs. This issue affects Filr: through 25.1.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aefc03a25c3d75bc72a2f40b34c05a5345746a12cbdd2dbe99afdfe39d6c9a4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3266"
+}

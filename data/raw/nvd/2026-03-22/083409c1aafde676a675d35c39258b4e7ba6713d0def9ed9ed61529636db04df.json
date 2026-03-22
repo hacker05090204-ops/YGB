@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3570",
+  "ingested_at": "2026-03-22T07:54:49.407794+00:00",
+  "lang": "en",
+  "raw_text": "The Smarter Analytics plugin for WordPress is vulnerable to unauthorized access in all versions up to, and including, 2.0. This is due to missing authentication and capability checks on the configuration reset functionality in the global scope of smarter-analytics.php. This makes it possible for unauthenticated attackers to reset all plugin configuration and delete all per-page/per-post analytics settings via the 'reset' parameter.",
+  "severity": "MEDIUM",
+  "sha256_hash": "083409c1aafde676a675d35c39258b4e7ba6713d0def9ed9ed61529636db04df",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3570"
+}

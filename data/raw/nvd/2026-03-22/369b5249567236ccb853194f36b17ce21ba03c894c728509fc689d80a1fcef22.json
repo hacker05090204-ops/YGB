@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30929",
+  "ingested_at": "2026-03-22T07:54:42.431284+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-16 and 6.9.13-41, MagnifyImage uses a fixed-size stack buffer. When using a specific image it is possible to overflow this buffer and corrupt the stack. This vulnerability is fixed in 7.1.2-16 and 6.9.13-41.",
+  "severity": "HIGH",
+  "sha256_hash": "369b5249567236ccb853194f36b17ce21ba03c894c728509fc689d80a1fcef22",
+  "source": "nvd",
+  "tags": [
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30929"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40896",
+  "ingested_at": "2026-03-22T07:54:34.482571+00:00",
+  "lang": "en",
+  "raw_text": "The server certificate was not verified when an Arc agent connected to a Guardian or CMC. A malicious actor could perform a man-in-the-middle attack and intercept the communication between the Arc agent and the Guardian or CMC. This could result in theft of the client token and sensitive information (such as assets and alerts), impersonation of the server, or injection of spoofed data (such as false asset information or vulnerabilities) into the Guardian or CMC.",
+  "severity": "MEDIUM",
+  "sha256_hash": "93842d5dce162f0b873dd25903ad4b3bfa3ea21d0e5b09f3f20c2122bf9bd720",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40896"
+}

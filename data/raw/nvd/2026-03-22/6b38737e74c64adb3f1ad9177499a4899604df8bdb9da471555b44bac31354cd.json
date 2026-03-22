@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32768",
+  "ingested_at": "2026-03-22T07:54:48.615998+00:00",
+  "lang": "en",
+  "raw_text": "Chall-Manager is a platform-agnostic system able to start Challenges on Demand of a player. In versions prior to 0.6.5, due to a miswritten NetworkPolicy, a malicious actor can pivot from an instance to any Pod out of the origin namespace. This breaks the security-by-default property expected as part of the deployment program, leading to a potential lateral movement. In the specific case of sdk/kubernetes.Kompose it does not isolate the instances. This issue has been fixed in version 0.6.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "6b38737e74c64adb3f1ad9177499a4899604df8bdb9da471555b44bac31354cd",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32768"
+}

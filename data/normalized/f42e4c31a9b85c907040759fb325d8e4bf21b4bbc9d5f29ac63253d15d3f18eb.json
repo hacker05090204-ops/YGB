@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Shopware is an open commerce platform. /api/_info/config route exposes information about licenses. This vulnerability is fixed in 7.8.1 and 6.10.15.",
+  "token_count": 20
+}

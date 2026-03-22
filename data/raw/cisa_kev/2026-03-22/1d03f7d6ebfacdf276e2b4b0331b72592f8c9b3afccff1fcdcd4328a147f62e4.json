@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-30400",
+  "ingested_at": "2026-03-22T07:45:16.425328+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows DWM Core Library contains a use-after-free vulnerability that allows an authorized attacker to elevate privileges locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1d03f7d6ebfacdf276e2b4b0331b72592f8c9b3afccff1fcdcd4328a147f62e4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

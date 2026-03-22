@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet FortiClient EMS Fortinet FortiClient EMS contains a SQL injection vulnerability that allows an unauthenticated attacker to execute commands as SYSTEM via specifically crafted requests.",
+  "token_count": 25
+}

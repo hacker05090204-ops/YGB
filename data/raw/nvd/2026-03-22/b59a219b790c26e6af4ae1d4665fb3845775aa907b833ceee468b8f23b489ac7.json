@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1393",
+  "ingested_at": "2026-03-22T07:54:49.281595+00:00",
+  "lang": "en",
+  "raw_text": "The Add Google Social Profiles to Knowledge Graph Box plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 1.0. This is due to missing nonce validation on the settings update functionality. This makes it possible for unauthenticated attackers to update the plugin's Knowledge Graph settings via a forged request granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b59a219b790c26e6af4ae1d4665fb3845775aa907b833ceee468b8f23b489ac7",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1393"
+}

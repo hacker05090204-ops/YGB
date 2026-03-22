@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the discourse-graphviz plugin contains a stored cross-site scripting (XSS) vulnerability that allows authenticated users to inject malicious JavaScript code through DOT graph definitions. For instances with CSP disabled only. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. As a workaround, disable the graphviz plugin, upgrade to a patched version, or enable a content security policy.",
+  "token_count": 68
+}

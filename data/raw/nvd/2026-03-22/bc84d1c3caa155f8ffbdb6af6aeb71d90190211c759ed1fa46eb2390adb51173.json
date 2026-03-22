@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3068",
+  "ingested_at": "2026-03-22T07:54:31.440412+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in itsourcecode Document Management System 1.0. This impacts an unknown function of the file /deluser.php. Executing a manipulation of the argument user2del can lead to sql injection. The attack can be launched remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "bc84d1c3caa155f8ffbdb6af6aeb71d90190211c759ed1fa46eb2390adb51173",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3068"
+}

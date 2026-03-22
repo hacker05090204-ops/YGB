@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23980",
+  "ingested_at": "2026-03-22T07:54:31.484734+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in a SQL Command ('SQL Injection') vulnerability in Apache Superset allows an authenticated user with read access to conduct error-based SQL injection via the sqlExpression or where parameters. This issue affects Apache Superset: before 6.0.0. Users are recommended to upgrade to version 6.0.0, which fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6c25ba11eea87e6b0a9e4c05b4ebcff2a409bac20d67f4497831f1160162adf1",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23980"
+}

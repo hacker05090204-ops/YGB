@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69768",
+  "ingested_at": "2026-03-22T07:54:46.883696+00:00",
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in Chyrp v.2.5.2 and before allows a remote attacker to obtain sensitive information via the Admin.php component",
+  "severity": "HIGH",
+  "sha256_hash": "79803f20dd6f5d0e00a6fc9a4aae10d8a8705ffc910f5d6b8c7dfaa3357c4f1e",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69768"
+}

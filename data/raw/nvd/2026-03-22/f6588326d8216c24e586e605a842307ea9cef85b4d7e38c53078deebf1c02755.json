@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27946",
+  "ingested_at": "2026-03-22T07:54:32.487908+00:00",
+  "lang": "en",
+  "raw_text": "ZITADEL is an open source identity management platform. Prior to versions 4.11.1 and 3.4.7, a vulnerability in Zitadel's self-management capability allowed users to mark their email and phone as verified without going through an actual verification process. The patch in versions 4.11.1 and 3.4.7 resolves the issue by requiring the correct permission in case the verification flag is provided and only allows self-management of the email address and/or phone number itself. If an upgrade is not possible, an action (v2) could be used to prevent setting the verification flag on the own user.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f6588326d8216c24e586e605a842307ea9cef85b4d7e38c53078deebf1c02755",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27946"
+}

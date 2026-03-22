@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24289",
+  "ingested_at": "2026-03-22T07:54:42.697143+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Windows Kernel allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "faf29e6af7a3be2257905f2933e29f85982f51efbf4af05455d028f2d30e5dc2",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24289"
+}

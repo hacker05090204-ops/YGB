@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2917",
+  "ingested_at": "2026-03-22T07:54:43.526844+00:00",
+  "lang": "en",
+  "raw_text": "The Happy Addons for Elementor plugin for WordPress is vulnerable to Insecure Direct Object Reference in all versions up to, and including, 3.21.0 via the `ha_duplicate_thing` admin action handler. This is due to the `can_clone()` method only checking `current_user_can('edit_posts')` (a general capability) without performing object-level authorization such as `current_user_can('edit_post', $post_id)`, and the nonce being tied to the generic action name `ha_duplicate_thing` rather than to a specific post ID. This makes it possible for authenticated attackers, with Contributor-level access and above, to clone any published post, page, or custom post type by obtaining a valid clone nonce from their own posts and changing the `post_id` parameter to target other users' content. The clone operation copies the full post content, all post metadata (including potentially sensitive widget configurations and API tokens), and taxonomies into a new draft owned by the attacker.",
+  "severity": "MEDIUM",
+  "sha256_hash": "62da3ab750bdcb0f8d3c7d7b45a5bb31a150715af1c99737703f0fb16d9e5cba",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 139,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2917"
+}

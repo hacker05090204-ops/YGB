@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-7262",
+  "ingested_at": "2026-03-22T07:45:18.612765+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Excel A security feature bypass vulnerability exists when Microsoft Office improperly handles input. An attacker who successfully exploited the vulnerability could execute arbitrary commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8204c15982f8db36fe1ac173a4e1b65234a18b16bdf86db3cc304e3542883c3a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

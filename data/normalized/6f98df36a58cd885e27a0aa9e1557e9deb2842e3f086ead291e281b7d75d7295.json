@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Authentication bypass using an alternate path or channel in Azure Windows Virtual Machine Agent allows an authorized attacker to elevate privileges locally.",
+  "token_count": 22
+}

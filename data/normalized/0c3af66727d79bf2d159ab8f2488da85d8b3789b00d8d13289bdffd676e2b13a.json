@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in RealMag777 Active Products Tables for WooCommerce profit-products-tables-for-woocommerce allows DOM-Based XSS.This issue affects Active Products Tables for WooCommerce: from n/a through < = 1.0.7.",
+  "token_count": 35
+}

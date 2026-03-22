@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23263",
+  "ingested_at": "2026-03-22T07:54:47.581739+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: io_uring/zcrx: fix page array leak d9f595b9a65e (\"io_uring/zcrx: fix leaking pages on sg init fail\") fixed a page leakage but didn't free the page array, release it as well.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "029457125fefcb09eaed3d754e0bde5f6da478340ec9dbd006761742d18e72fb",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23263"
+}

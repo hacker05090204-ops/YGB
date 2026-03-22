@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use of a broken or risky cryptographic algorithm in Smart Switch prior to version 3.7.69.15 allows remote attackers to configure a downgraded scheme for authentication.",
+  "token_count": 25
+}

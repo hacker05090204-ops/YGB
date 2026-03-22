@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69329",
+  "ingested_at": "2026-03-22T07:54:30.227378+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Jthemes Prestige prestige allows Object Injection.This issue affects Prestige: from n/a through < 1.4.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e96771d5e5d96a4dcf1bd4d7dfdc069a85628260ef07012428bac1893c62101",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69329"
+}

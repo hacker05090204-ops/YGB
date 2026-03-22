@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The GINA web interface in SEPPmail Secure Email Gateway before version 15.0.1 does not properly check attachment filenames in GINA-encrypted emails, allowing an attacker to access files on the gateway.",
+  "token_count": 30
+}

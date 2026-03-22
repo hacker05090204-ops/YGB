@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Crestron Multiple Products Multiple Crestron products are vulnerable to command injection via the file_transfer.cgi HTTP endpoint. A remote, unauthenticated attacker can use this vulnerability to execute operating system commands as root.",
+  "token_count": 31
+}

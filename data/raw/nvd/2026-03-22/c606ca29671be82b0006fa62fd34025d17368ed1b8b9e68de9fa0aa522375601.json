@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-33370",
+  "ingested_at": "2026-03-22T07:54:48.837258+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Zimbra Collaboration (ZCS) 10.0 and 10.1. A stored cross-site scripting (XSS) vulnerability exists in the Zimbra Briefcase feature due to insufficient sanitization of specific uploaded file types. When a user opens a publicly shared Briefcase file containing malicious scripts, the embedded JavaScript executes in the context of the user's session. This allows an attacker to run arbitrary scripts, potentially leading to data exfiltration or other unauthorized actions on behalf of the victim user.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c606ca29671be82b0006fa62fd34025d17368ed1b8b9e68de9fa0aa522375601",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33370"
+}

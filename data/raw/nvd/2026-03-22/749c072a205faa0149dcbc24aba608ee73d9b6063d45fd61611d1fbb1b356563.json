@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23600",
+  "ingested_at": "2026-03-22T07:54:33.626655+00:00",
+  "lang": "en",
+  "raw_text": "A remote authentication bypass vulnerability exists in HPE AutoPass License Server (APLS).",
+  "severity": "UNKNOWN",
+  "sha256_hash": "749c072a205faa0149dcbc24aba608ee73d9b6063d45fd61611d1fbb1b356563",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 12,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23600"
+}

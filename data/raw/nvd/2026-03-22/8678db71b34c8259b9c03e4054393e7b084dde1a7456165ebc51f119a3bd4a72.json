@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2446",
+  "ingested_at": "2026-03-22T07:54:41.314817+00:00",
+  "lang": "en",
+  "raw_text": "The PowerPack for LearnDash WordPress plugin before 1.3.0 does not have authorization and CRSF checks in an AJAX action, allowing unauthenticated users to update arbitrary WordPress options (such as default_role etc) and create arbitrary admin users",
+  "severity": "CRITICAL",
+  "sha256_hash": "8678db71b34c8259b9c03e4054393e7b084dde1a7456165ebc51f119a3bd4a72",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2446"
+}

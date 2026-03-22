@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22474",
+  "ingested_at": "2026-03-22T07:54:40.143593+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Equestrian Centre equestrian-centre allows Object Injection.This issue affects Equestrian Centre: from n/a through < = 1.5.",
+  "severity": "CRITICAL",
+  "sha256_hash": "32c490f9edcf2c38c8836f022edf6e086b50b7118950effa364aecbec2ab2d2f",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22474"
+}

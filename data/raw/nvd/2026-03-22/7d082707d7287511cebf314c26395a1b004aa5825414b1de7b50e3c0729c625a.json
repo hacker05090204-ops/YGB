@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32445",
+  "ingested_at": "2026-03-22T07:54:46.118441+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Elementor Elementor Website Builder elementor allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Elementor Website Builder: from n/a through < = 3.35.5.",
+  "severity": "LOW",
+  "sha256_hash": "7d082707d7287511cebf314c26395a1b004aa5825414b1de7b50e3c0729c625a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32445"
+}

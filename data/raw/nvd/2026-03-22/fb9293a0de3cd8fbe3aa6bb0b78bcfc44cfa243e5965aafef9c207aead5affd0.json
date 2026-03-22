@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28679",
+  "ingested_at": "2026-03-22T07:54:41.286244+00:00",
+  "lang": "en",
+  "raw_text": "Home-Gallery.org is a self-hosted open-source web gallery to browse personal photos and videos. Prior to version 1.21.0, when a user requests a download, the application does not verify whether the requested file is located within the media source directory, which can result in sensitive system files being downloadable as well. This issue has been patched in version 1.21.0.",
+  "severity": "HIGH",
+  "sha256_hash": "fb9293a0de3cd8fbe3aa6bb0b78bcfc44cfa243e5965aafef9c207aead5affd0",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28679"
+}

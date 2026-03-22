@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1311",
+  "ingested_at": "2026-03-22T07:54:32.607366+00:00",
+  "lang": "en",
+  "raw_text": "The Worry Proof Backup plugin for WordPress is vulnerable to Path Traversal in all versions up to, and including, 0.2.4 via the backup upload functionality. This makes it possible for authenticated attackers, with Subscriber-level access and above, to upload a malicious ZIP archive with path traversal sequences to write arbitrary files anywhere on the server, including executable PHP files. This can lead to remote code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "b15c2050cb717ed38b96fb368ba85a6550fcbe8496b27d0e59b3163d262e93ef",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1311"
+}

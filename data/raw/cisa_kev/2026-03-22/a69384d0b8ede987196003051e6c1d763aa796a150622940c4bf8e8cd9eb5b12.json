@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-36884",
+  "ingested_at": "2026-03-22T07:45:17.308597+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Search contains an unspecified vulnerability that could allow an attacker to evade Mark of the Web (MOTW) defenses via a specially crafted malicious file, leading to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a69384d0b8ede987196003051e6c1d763aa796a150622940c4bf8e8cd9eb5b12",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

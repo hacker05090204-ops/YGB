@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33177",
+  "ingested_at": "2026-03-22T07:54:49.031754+00:00",
+  "lang": "en",
+  "raw_text": "Statamic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.14 and 6.7.0, low-privileged Control Panel users could create taxonomy terms by submitting requests to the field action processing endpoint with attacker-controlled field definitions. This bypasses the authorization checks enforced on the standard taxonomy term creation endpoint. This has been fixed in 5.73.14 and 6.7.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bc94eead6b5ccf4f01b1db88b3b8b69239cd777b0d246f310681034a8124ed5d",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33177"
+}

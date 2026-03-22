@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22497",
+  "ingested_at": "2026-03-22T07:54:40.156755+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in AncoraThemes Jardi jardi allows Object Injection.This issue affects Jardi: from n/a through < = 1.7.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a4d737480d954222e5b0f7ac1e5721376420995db0dbb9bff6b7947144d2da31",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22497"
+}

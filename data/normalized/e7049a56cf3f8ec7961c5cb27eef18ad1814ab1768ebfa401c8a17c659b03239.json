@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "arduino-TuyaOpen before version 1.2.1 contains a null pointer dereference vulnerability in the WiFiUDP component. An attacker on the same local area network can send a large volume of malicious UDP packets to cause memory exhaustion on the device, triggering a null pointer dereference and resulting in a denial-of-service condition.",
+  "token_count": 49
+}

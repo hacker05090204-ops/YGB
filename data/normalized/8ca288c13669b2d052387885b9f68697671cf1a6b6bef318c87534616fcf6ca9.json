@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager Mobile (EPMM) Ivanti Endpoint Manager Mobile (EPMM) contains a path traversal vulnerability that enables an authenticated administrator to perform malicious file writes to the EPMM server. This vulnerability can be used in conjunction with CVE-2023-35078 to bypass authentication and ACLs restrictions (if applicable).",
+  "token_count": 46
+}

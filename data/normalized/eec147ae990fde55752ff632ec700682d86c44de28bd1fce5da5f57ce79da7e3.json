@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The MDJM Event Management plugin for WordPress is vulnerable to unauthorized data modification due to a missing capability check on the 'custom_fields_controller' function in all versions up to, and including, 1.7.8.1. This makes it possible for unauthenticated attackers to delete arbitrary custom event fields via the 'delete_custom_field' and 'id' parameters.",
+  "token_count": 50
+}

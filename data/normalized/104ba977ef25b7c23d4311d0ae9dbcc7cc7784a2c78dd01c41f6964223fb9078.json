@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Citrix NetScaler Citrix NetScaler ADC and NetScaler Gateway contain a memory overflow vulnerability that could allow for remote code execution and/or denial of service.",
+  "token_count": 24
+}

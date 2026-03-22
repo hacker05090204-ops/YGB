@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-5410",
+  "ingested_at": "2026-03-22T07:45:18.291763+00:00",
+  "lang": "en",
+  "raw_text": "VMware Tanzu Spring Cloud Configuration (Config) Server Spring, by VMware Tanzu, Cloud Config contains a path traversal vulnerability that allows applications to serve arbitrary configuration files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5bc27ad3d1553877e1d8775b73911bdd62b2921b26cf34c1b50f068d132087a8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

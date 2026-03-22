@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-31956",
+  "ingested_at": "2026-03-22T07:45:19.304257+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows New Technology File System (NTFS) contains an unspecified vulnerability that allows attackers to escalate privileges via a specially crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9bee37bd952fb9f151373d5c5d75bca0552dc4fffffef8633850f62d01d2e355",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

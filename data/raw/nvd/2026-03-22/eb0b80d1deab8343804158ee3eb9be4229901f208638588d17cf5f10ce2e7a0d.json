@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23862",
+  "ingested_at": "2026-03-22T07:54:46.888796+00:00",
+  "lang": "en",
+  "raw_text": "Dell ThinOS 10 versions prior to ThinOS 2602_10.0573, contain an Improper Neutralization of Special Elements used in a Command ('Command Injection') vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Elevation of Privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "eb0b80d1deab8343804158ee3eb9be4229901f208638588d17cf5f10ce2e7a0d",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23862"
+}

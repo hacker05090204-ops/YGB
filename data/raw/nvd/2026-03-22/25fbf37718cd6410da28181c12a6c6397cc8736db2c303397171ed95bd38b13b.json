@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30790",
+  "ingested_at": "2026-03-22T07:54:40.817304+00:00",
+  "lang": "en",
+  "raw_text": "Improper Restriction of Excessive Authentication Attempts, Use of Password Hash With Insufficient Computational Effort vulnerability in rustdesk-server-pro RustDesk Server Pro rustdesk-server-pro on Windows, MacOS, Linux (Peer authentication, API login modules), rustdesk-server RustDesk Server (OSS) rustdesk-server on Windows, MacOS, Linux (Peer authentication, API login modules) allows Password Brute Forcing. This vulnerability is associated with program files src/server/connection.Rs and program routines Salt/challenge generation, SHA256(SHA256(pwd+salt)+challenge) verification. This issue affects RustDesk Server Pro: through 1.7.5; RustDesk Server (OSS): through 1.1.15.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "25fbf37718cd6410da28181c12a6c6397cc8736db2c303397171ed95bd38b13b",
+  "source": "nvd",
+  "tags": [
+    "CWE-307",
+    "CWE-916"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30790"
+}

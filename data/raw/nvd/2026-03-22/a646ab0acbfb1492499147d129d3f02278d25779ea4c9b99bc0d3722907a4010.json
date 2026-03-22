@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28254",
+  "ingested_at": "2026-03-22T07:54:44.411452+00:00",
+  "lang": "en",
+  "raw_text": "A Missing Authorization vulnerability in Trane Tracer SC, Tracer SC+, and Tracer Concierge could allow an unauthenticated attacker to access sensitive information through unprotected APIs.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a646ab0acbfb1492499147d129d3f02278d25779ea4c9b99bc0d3722907a4010",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28254"
+}

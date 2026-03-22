@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use after free in WebView in Google Chrome on Android prior to 146.0.7680.71 allowed a remote attacker to potentially exploit heap corruption via a crafted HTML page. (Chromium security severity: Medium)",
+  "token_count": 31
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32138",
+  "ingested_at": "2026-03-22T07:54:44.463162+00:00",
+  "lang": "en",
+  "raw_text": "NEXULEAN is a cybersecurity portfolio & service platform for an Ethical Hacker, AI Enthusiast, and Penetration Tester. Prior to 2.0.0, a security vulnerability was identified where Firebase and Web3Forms API keys were exposed. An attacker could use these keys to interact with backend services without authentication, potentially leading to unauthorized access to application resources and user data. This vulnerability is fixed in 2.0.0.",
+  "severity": "HIGH",
+  "sha256_hash": "d72834e38962db47384ee0caf0641196f29b258b44ed38803d273f885de6c368",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-798"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32138"
+}

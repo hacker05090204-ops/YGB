@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-7256",
+  "ingested_at": "2026-03-22T07:45:17.017912+00:00",
+  "lang": "en",
+  "raw_text": "Nice Linear eMerge E3-Series Nice Linear eMerge E3-Series contains an OS command injection vulnerability that allows an attacker to conduct remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0368856b3e072e19f1fb6c298e6294abcd6bb94882d6cc68c793a10e0d9f7bca",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

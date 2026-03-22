@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Use of Hard-coded, Security-relevant Constants vulnerability in Trane Tracer SC, Tracer SC+, and Tracer Concierge could allow an attacker to disclose sensitive information and take over accounts.",
+  "token_count": 28
+}

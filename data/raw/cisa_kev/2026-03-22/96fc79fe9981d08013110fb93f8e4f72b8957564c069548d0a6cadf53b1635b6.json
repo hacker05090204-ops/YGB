@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-7855",
+  "ingested_at": "2026-03-22T07:45:18.610756+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Use-after-free vulnerability in Adobe Flash Player Windows and OS and Linux allows remote attackers to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "96fc79fe9981d08013110fb93f8e4f72b8957564c069548d0a6cadf53b1635b6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

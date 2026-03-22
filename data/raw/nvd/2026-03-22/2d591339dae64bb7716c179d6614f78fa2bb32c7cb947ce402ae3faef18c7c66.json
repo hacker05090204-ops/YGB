@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23694",
+  "ingested_at": "2026-03-22T07:54:31.198245+00:00",
+  "lang": "en",
+  "raw_text": "Aruba HiSpeed Cache (aruba-hispeed-cache) WordPress plugin versions prior to 3.0.5 contain a cross-site request forgery (CSRF) vulnerability affecting multiple administrative AJAX actions. The handlers for ahsc_reset_options, ahsc_debug_status, and ahsc_enable_purge perform authentication and capability checks but do not verify a WordPress nonce for state-changing requests. An attacker can induce a logged-in administrator to visit a malicious webpage that submits forged requests to admin-ajax.php, resulting in unauthorized resetting of plugin settings, toggling of the WordPress WP_DEBUG configuration, or modification of cache purging behavior without the administrator\u2019s intent.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "2d591339dae64bb7716c179d6614f78fa2bb32c7cb947ce402ae3faef18c7c66",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23694"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38107",
+  "ingested_at": "2026-03-22T07:45:16.872314+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Power Dependency Coordinator contains an unspecified vulnerability that allows for privilege escalation, enabling a local attacker to obtain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "14b1983db946f26986c836fbeae0eea02903a10e42ea1d9deef304245049a869",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

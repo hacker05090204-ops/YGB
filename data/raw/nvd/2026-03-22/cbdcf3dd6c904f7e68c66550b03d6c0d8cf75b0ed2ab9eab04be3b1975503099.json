@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27747",
+  "ingested_at": "2026-03-22T07:54:31.946486+00:00",
+  "lang": "en",
+  "raw_text": "The SPIP interface_traduction_objets plugin versions prior to 2.2.2 contain an authenticated SQL injection vulnerability in interface_traduction_objets_pipelines.php. When handling translation requests, the plugin reads the id_parent parameter from user-supplied input and concatenates it directly into a SQL WHERE clause in a call to sql_getfetsel() without input validation or parameterization. An authenticated attacker with editor-level privileges can inject crafted SQL expressions into the id_parent parameter to manipulate the backend query. Successful exploitation can result in disclosure or modification of database contents and may lead to denial of service depending on the database configuration and privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "cbdcf3dd6c904f7e68c66550b03d6c0d8cf75b0ed2ab9eab04be3b1975503099",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27747"
+}

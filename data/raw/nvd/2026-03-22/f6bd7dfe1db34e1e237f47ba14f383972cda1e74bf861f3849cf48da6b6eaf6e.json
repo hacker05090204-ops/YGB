@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3194",
+  "ingested_at": "2026-03-22T07:54:32.219526+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Chia Blockchain 2.1.0. The affected element is the function send_transaction/get_private_key of the component RPC Server Master Passphrase Handler. This manipulation causes missing authentication. The attack can only be executed locally. The attack's complexity is rated as high. The exploitability is described as difficult. The exploit has been published and may be used. The vendor was informed early via email. A separate report via bugbounty was rejected with the reason \"This is by design. The user is responsible for host security\".",
+  "severity": "MEDIUM",
+  "sha256_hash": "f6bd7dfe1db34e1e237f47ba14f383972cda1e74bf861f3849cf48da6b6eaf6e",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-306",
+    "CWE-306"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3194"
+}

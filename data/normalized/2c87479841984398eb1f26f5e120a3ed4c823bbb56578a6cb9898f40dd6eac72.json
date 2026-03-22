@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "InduSoft Web Studio InduSoft Web Studio NTWebServer contains a directory traversal vulnerability that allows remote attackers to read administrative passwords in APP files, allowing for remote code execution.",
+  "token_count": 28
+}

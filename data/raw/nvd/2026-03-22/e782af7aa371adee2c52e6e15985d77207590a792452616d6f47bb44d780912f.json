@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32263",
+  "ingested_at": "2026-03-22T07:54:46.957850+00:00",
+  "lang": "en",
+  "raw_text": "Craft CMS is a content management system (CMS). From version 5.6.0 to before version 5.9.11, in src/controllers/EntryTypesController.php, the $settings array from parse_str is passed directly to Craft::configure() without Component::cleanseConfig(). This allows injecting Yii2 behavior/event handlers via \"as\" or \"on\" prefixed keys, the same attack vector as the original advisory. Craft control panel administrator permissions and allowAdminChanges must be enabled for this to work. This issue has been patched in version 5.9.11.",
+  "severity": "HIGH",
+  "sha256_hash": "e782af7aa371adee2c52e6e15985d77207590a792452616d6f47bb44d780912f",
+  "source": "nvd",
+  "tags": [
+    "CWE-470"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32263"
+}

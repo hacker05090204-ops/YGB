@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In multiple functions of MediaProvider.java, there is a possible external storage write permission bypass due to a confused deputy. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "token_count": 40
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An out\u2010of\u2010bounds write vulnerability exists in the EMF functionality of Canva Affinity. By using a specially crafted EMF file, an attacker could exploit this vulnerability to perform an out\u2010of\u2010bounds write, potentially leading to code execution.",
+  "token_count": 35
+}

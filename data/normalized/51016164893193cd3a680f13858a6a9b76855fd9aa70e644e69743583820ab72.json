@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: tcp: secure_seq: add back ports to TS offset This reverts 28ee1b746f49 (\"secure_seq: downgrade to per-host timestamp offsets\") tcp_tw_recycle went away in 2017. Zhouyan Deng reported off-path TCP source port leakage via SYN cookie side-channel that can be fixed in multiple ways. One of them is to bring back TCP ports in TS offset randomization. As a bonus, we perform a single siphash() computation to provide both an ISN and a TS offset.",
+  "token_count": 82
+}

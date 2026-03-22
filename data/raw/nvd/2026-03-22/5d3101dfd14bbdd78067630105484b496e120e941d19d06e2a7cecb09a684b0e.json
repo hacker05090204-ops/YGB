@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25997",
+  "ingested_at": "2026-03-22T07:54:32.322463+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, `xf_clipboard_format_equal` reads freed `lastSentFormats` memory because `xf_clipboard_formats_free` (called from the cliprdr channel thread during auto-reconnect) frees the array while the X11 event thread concurrently iterates it in `xf_clipboard_changed`, triggering a heap use after free. Version 3.23.0 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5d3101dfd14bbdd78067630105484b496e120e941d19d06e2a7cecb09a684b0e",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25997"
+}

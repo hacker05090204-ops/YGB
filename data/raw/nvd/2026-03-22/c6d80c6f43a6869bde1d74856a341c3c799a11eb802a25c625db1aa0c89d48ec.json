@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-25679",
+  "ingested_at": "2026-03-22T07:54:41.653188+00:00",
+  "lang": "en",
+  "raw_text": "url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.",
+  "severity": "HIGH",
+  "sha256_hash": "c6d80c6f43a6869bde1d74856a341c3c799a11eb802a25c625db1aa0c89d48ec",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25679"
+}

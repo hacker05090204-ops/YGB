@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3818",
+  "ingested_at": "2026-03-22T07:54:42.271740+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Tiandy Easy7 CMS Windows 7.17.0. Impacted is an unknown function of the file /Easy7/apps/WebService/GetDBData.jsp. This manipulation of the argument strTBName causes sql injection. The attack may be initiated remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "c1df08e46402e60822176d055cce2b93dad6945a95ae30bed0014f5e6905f59a",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3818"
+}

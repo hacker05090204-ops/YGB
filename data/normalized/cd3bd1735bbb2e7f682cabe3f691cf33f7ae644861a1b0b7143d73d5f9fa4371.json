@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An improper neutralization of special elements used in an os command ('os command injection') vulnerability in Fortinet FortiSandbox Cloud 5.0.4 may allow a privileged attacker with super-admin profile and CLI access to execute unauthorized code or commands via crafted HTTP requests.",
+  "token_count": 41
+}

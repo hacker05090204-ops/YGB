@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26137",
+  "ingested_at": "2026-03-22T07:54:48.058988+00:00",
+  "lang": "en",
+  "raw_text": "Server-side request forgery (ssrf) in Microsoft 365 Copilot's Business Chat allows an authorized attacker to elevate privileges over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "c7831d28e6b3f760126cb8b4d4c39418b5add450465b45ba9077c321015ebc29",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26137"
+}

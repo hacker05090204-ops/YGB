@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SonicWall SonicWall Email Security SonicWall Email Security contains a path traversal vulnerability that allows a post-authenticated attacker to read files on the remote host. This vulnerability has known usage in a SonicWall Email Security exploit chain along with CVE-2021-20021 and CVE-2021-20022 to achieve privilege escalation.",
+  "token_count": 45
+}

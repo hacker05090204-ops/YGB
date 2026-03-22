@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25534",
+  "ingested_at": "2026-03-22T07:54:44.336517+00:00",
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Car Dealer contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the features[] parameter. Attackers can submit POST requests to index.php with crafted SQL payloads in the features[] parameter to extract sensitive database information or manipulate database queries.",
+  "severity": "HIGH",
+  "sha256_hash": "809a202c197de692ac0ddeee8d5b7324386071119079da63981fd832f0c9f617",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25534"
+}

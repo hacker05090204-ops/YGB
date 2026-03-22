@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33251",
+  "ingested_at": "2026-03-22T07:54:49.108241+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, an authorization bypass vulnerability in hidden Solved topics may allow unauthorized users to accept or unaccept solutions. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. As a workaround, ensure only trusted users are part of the Site Setting for accept_all_solutions_allowed_groups.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3526eb2a562926a7c6794d7e8c13682017bd2e9be85f926a4875b1907f27db67",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33251"
+}

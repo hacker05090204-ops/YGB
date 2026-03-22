@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30982",
+  "ingested_at": "2026-03-22T07:54:42.927230+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a heap out-of-bounds read in CIccPcsXform::pushXYZConvert() causing crash and potentially leaking memory contents. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1017a22b0d05d8b001d5688ce5b0f104a1e20a21b1534366cd7e604b059d15a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-125",
+    "CWE-129"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30982"
+}

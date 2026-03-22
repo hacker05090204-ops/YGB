@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WordPress Snap Creek Duplicator Plugin WordPress Snap Creek Duplicator plugin contains a file download vulnerability when an administrator creates a new copy of their site that allows an attacker to download the generated files from their Wordpress dashboard. This vulnerability affects Duplicator and Dulplicator Pro.",
+  "token_count": 45
+}

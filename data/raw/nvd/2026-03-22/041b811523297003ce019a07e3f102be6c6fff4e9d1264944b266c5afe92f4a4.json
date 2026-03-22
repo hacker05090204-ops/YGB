@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26194",
+  "ingested_at": "2026-03-22T07:54:40.878494+00:00",
+  "lang": "en",
+  "raw_text": "Gogs is an open source self-hosted Git service. Prior to version 0.14.2, there's a security issue in gogs where deleting a release can fail if a user controlled tag name is passed to git without the right separator, this lets git options get injected and mess with the process. This issue has been patched in version 0.14.2.",
+  "severity": "HIGH",
+  "sha256_hash": "041b811523297003ce019a07e3f102be6c6fff4e9d1264944b266c5afe92f4a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-88"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26194"
+}

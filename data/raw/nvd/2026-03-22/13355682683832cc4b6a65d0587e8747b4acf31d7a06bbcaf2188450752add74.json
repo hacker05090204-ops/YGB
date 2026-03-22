@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29790",
+  "ingested_at": "2026-03-22T07:54:41.620789+00:00",
+  "lang": "en",
+  "raw_text": "dbt-common is the shared common utilities for dbt-core and adapter implementations use. Prior to versions 1.34.2 and 1.37.3, a path traversal vulnerability exists in dbt-common's safe_extract() function used when extracting tarball archives. The function uses os.path.commonprefix() to validate that extracted files remain within the intended destination directory. However, commonprefix() compares paths character-by-character rather than by path components, allowing a malicious tarball to write files to sibling directories with matching name prefixes. This issue has been patched in versions 1.34.2 and 1.37.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "13355682683832cc4b6a65d0587e8747b4acf31d7a06bbcaf2188450752add74",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29790"
+}

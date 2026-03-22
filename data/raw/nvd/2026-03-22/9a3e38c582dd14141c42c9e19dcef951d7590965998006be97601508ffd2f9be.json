@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28807",
+  "ingested_at": "2026-03-22T07:54:43.228158+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in gleam-wisp wisp allows arbitrary file read via percent-encoded path traversal. The wisp.serve_static function is vulnerable to path traversal because sanitization runs before percent-decoding. The encoded sequence %2e%2e passes through string.replace unchanged, then uri.percent_decode converts it to .., which the OS resolves as directory traversal when the file is read. An unauthenticated attacker can read any file readable by the application process in a single HTTP request, including application source code, configuration files, secrets, and system files. This issue affects wisp: from 2.1.1 before 2.2.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9a3e38c582dd14141c42c9e19dcef951d7590965998006be97601508ffd2f9be",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28807"
+}

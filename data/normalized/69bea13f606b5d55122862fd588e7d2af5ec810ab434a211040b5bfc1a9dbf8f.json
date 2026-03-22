@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the command line interface of AOS-CX Switches could allow an authenticated remote attacker to execute arbitrary commands on the underlying operating system.",
+  "token_count": 25
+}

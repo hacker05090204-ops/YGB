@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-62215",
+  "ingested_at": "2026-03-22T07:45:16.056380+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Kernel contains a race condition vulnerability that allows a local attacker with low-level privileges to escalate privileges. Successful exploitation of this vulnerability could enable the attacker to gain SYSTEM-level access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7fd6022af4c66132e539aeed973bc2eb6dfc252ff54de870dc4ffbb6869a0332",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

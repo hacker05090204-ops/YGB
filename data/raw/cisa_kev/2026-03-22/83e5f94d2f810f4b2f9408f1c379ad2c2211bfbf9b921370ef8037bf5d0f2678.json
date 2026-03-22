@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1297",
+  "ingested_at": "2026-03-22T07:45:18.521812+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Excel A remote code execution vulnerability exists in Microsoft Excel when the software fails to properly handle objects in memory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "83e5f94d2f810f4b2f9408f1c379ad2c2211bfbf9b921370ef8037bf5d0f2678",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

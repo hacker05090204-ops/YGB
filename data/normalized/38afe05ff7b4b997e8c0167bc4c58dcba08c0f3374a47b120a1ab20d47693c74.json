@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 does not properly communicate PGP signature verification results, leaving users unable to detect forged emails.",
+  "token_count": 22
+}

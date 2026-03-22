@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3817",
+  "ingested_at": "2026-03-22T07:54:42.269738+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in SourceCodester Patients Waiting Area Queue Management System 1.0. This issue affects some unknown processing of the file /patient-search.php. The manipulation results in improper authorization. The attack can be launched remotely. The exploit is now public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0da70af371eb973b60961a114fdb8d76d33a375f0d796787d396d82adad1e77c",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3817"
+}

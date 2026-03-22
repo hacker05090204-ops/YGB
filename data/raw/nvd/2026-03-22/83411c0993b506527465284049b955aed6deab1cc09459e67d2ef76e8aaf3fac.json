@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25191",
+  "ingested_at": "2026-03-22T07:54:32.612374+00:00",
+  "lang": "en",
+  "raw_text": "The installer of FinalCode Client provided by Digital Arts Inc. contains an issue with the DLL search path. If a user is directed to place a malicious DLL file and the installer to the same directory and execute the installer, arbitrary code may be executed with the installer's execution privilege.",
+  "severity": "HIGH",
+  "sha256_hash": "83411c0993b506527465284049b955aed6deab1cc09459e67d2ef76e8aaf3fac",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25191"
+}

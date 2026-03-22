@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-11680",
+  "ingested_at": "2026-03-22T07:45:16.692343+00:00",
+  "lang": "en",
+  "raw_text": "ProjectSend ProjectSend ProjectSend contains an improper authentication vulnerability that allows a remote, unauthenticated attacker to enable unauthorized modification of the application's configuration via crafted HTTP requests to options.php. Successful exploitation allows attackers to create accounts, upload webshells, and embed malicious JavaScript.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ad842d480e1ec3005356649ddd17a0dca5ab1742fbf6cf545622b8c197ffc33b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

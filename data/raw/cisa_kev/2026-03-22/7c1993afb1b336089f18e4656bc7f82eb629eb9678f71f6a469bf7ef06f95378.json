@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-16278",
+  "ingested_at": "2026-03-22T07:45:16.735561+00:00",
+  "lang": "en",
+  "raw_text": "Nostromo nhttpd Nostromo nhttpd contains a directory traversal vulnerability in the http_verify() function in a non-chrooted nhttpd server allowing for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7c1993afb1b336089f18e4656bc7f82eb629eb9678f71f6a469bf7ef06f95378",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

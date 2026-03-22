@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PHP Group PHP PHP, specifically Windows-based PHP used in CGI mode, contains an OS command injection vulnerability that allows for arbitrary code execution. This vulnerability is a patch bypass for CVE-2012-1823.",
+  "token_count": 31
+}

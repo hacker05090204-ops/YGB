@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WebKit - 'WebCore::AXObjectCache::performDeferredCacheUpdate' Use-After-Free",
+  "token_count": 4
+}

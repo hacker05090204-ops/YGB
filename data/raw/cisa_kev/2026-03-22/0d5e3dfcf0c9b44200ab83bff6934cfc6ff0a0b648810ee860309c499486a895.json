@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-37079",
+  "ingested_at": "2026-03-22T07:45:15.961609+00:00",
+  "lang": "en",
+  "raw_text": "Broadcom VMware vCenter Server Broadcom VMware vCenter Server contains an out-of-bounds write vulnerability in the implementation of the DCERPC protocol. This could allow a malicious actor with network access to vCenter Server to send specially crafted network packets, potentially leading to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0d5e3dfcf0c9b44200ab83bff6934cfc6ff0a0b648810ee860309c499486a895",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

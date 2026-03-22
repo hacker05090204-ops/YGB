@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1132",
+  "ingested_at": "2026-03-22T07:45:18.445805+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k A privilege escalation vulnerability exists in Windows when the Win32k component fails to properly handle objects in memory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6a20933ad34f1ad8d74204cc8c893cfc225e68b13e2f5cfc6c5ab4ecab24da2a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

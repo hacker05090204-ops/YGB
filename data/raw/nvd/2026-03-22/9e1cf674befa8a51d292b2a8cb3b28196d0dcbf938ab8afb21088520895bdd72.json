@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25186",
+  "ingested_at": "2026-03-22T07:54:41.448653+00:00",
+  "lang": "en",
+  "raw_text": "Tina4 Stack 1.0.3 contains a cross-site request forgery vulnerability that allows attackers to modify admin user credentials by submitting forged POST requests to the profile endpoint. Attackers can craft HTML forms targeting the /kim/profile endpoint with hidden fields containing malicious user data like passwords and email addresses to update administrator accounts without authentication.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9e1cf674befa8a51d292b2a8cb3b28196d0dcbf938ab8afb21088520895bdd72",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25186"
+}

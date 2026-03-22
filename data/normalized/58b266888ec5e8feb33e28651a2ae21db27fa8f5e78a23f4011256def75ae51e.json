@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The MC4WP: Mailchimp for WordPress plugin for WordPress is vulnerable to Missing Authorization in all versions up to, and including, 4.11.1. This is due to the plugin trusting the `_mc4wp_action` POST parameter without validation, allowing unauthenticated attackers to force the form to process unsubscribe actions instead of subscribe actions. This makes it possible for unauthenticated attackers to arbitrarily unsubscribe any email address from the connected Mailchimp audience via the `_mc4wp_action` parameter, granted they can obtain the form ID (which is publicly exposed in the HTML source).",
+  "token_count": 86
+}

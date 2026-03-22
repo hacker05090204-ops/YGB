@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sudo Sudo Sudo contains an off-by-one error that can result in a heap-based buffer overflow, which allows for privilege escalation.",
+  "token_count": 20
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-27915",
+  "ingested_at": "2026-03-22T07:45:16.119587+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting vulnerability that exists in the Classic Web Client due to insufficient sanitization of HTML content in ICS files. When a user views an e-mail message containing a malicious ICS entry, its embedded JavaScript executes via an ontoggle event inside a tag. This allows an attacker to run arbitrary JavaScript within the victim's session, potentially leading to unauthorized actions such as setting e-mail filters to redirect messages to an attacker-controlled address. As a result, an attacker can perform unauthorized actions on the victim's account, including e-mail redirection and data exfiltration.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b945bbbf166f12b2ace1780b18aa3554678d176a6ad21152029d0d22bc2a39e0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 103,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

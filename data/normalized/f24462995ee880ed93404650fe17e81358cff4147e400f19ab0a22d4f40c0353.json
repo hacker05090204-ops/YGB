@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Missing authentication for critical function in Azure IoT Explorer allows an unauthorized attacker to disclose information over a network.",
+  "token_count": 19
+}

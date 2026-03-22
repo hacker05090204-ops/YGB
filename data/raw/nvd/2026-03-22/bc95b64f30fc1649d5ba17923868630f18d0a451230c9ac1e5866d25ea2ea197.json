@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3796",
+  "ingested_at": "2026-03-22T07:54:42.152630+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Qi-ANXIN QAX Virus Removal up to 2025-10-22. The affected element is the function ZwTerminateProcess in the library QKSecureIO_Imp.sys of the component Mini Filter Driver. Executing a manipulation can lead to improper access controls. The attack is restricted to local execution. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bc95b64f30fc1649d5ba17923868630f18d0a451230c9ac1e5866d25ea2ea197",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284",
+    "NVD-CWE-Other"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3796"
+}

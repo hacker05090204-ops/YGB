@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vSphere Client contains an improper input validation vulnerability in the Virtual SAN Health Check plug-in, which is enabled by default in vCenter Server, which allows for remote code execution.",
+  "token_count": 33
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0703",
+  "ingested_at": "2026-03-22T07:45:18.008217+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows An information disclosure vulnerability exists in the way that the Windows SMB Server handles certain requests, which could lead to information disclosure from the server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ad24150680b745b21df5a15b1f183c47de933316039b44dcdb1f620ec5b3ce15",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3037",
+  "ingested_at": "2026-03-22T07:54:33.017845+00:00",
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an authenticated attacker to achieve remote code execution on the system by modifying malicious input injected into the MBird SMS service URL and/or code via the utility route which is later processed during system setup, leading to remote code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "7f383bb1f234c9be441dbea4f4b29504b23c652fe05df522d3bd1aa13ca5a893",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3037"
+}

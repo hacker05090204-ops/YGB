@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22357",
+  "ingested_at": "2026-03-22T07:54:30.358169+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Spencer Haws Link Whisper Free link-whisper allows Reflected XSS.This issue affects Link Whisper Free: from n/a through < = 0.9.0.",
+  "severity": "HIGH",
+  "sha256_hash": "2f493c2590bc23469c491a0671d435f61f0e2557e0cd5ad8459b2529d2105937",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22357"
+}

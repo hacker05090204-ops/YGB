@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A NestJS application using @nestjs/platform-fastify can allow bypass of authentication/authorization middleware when Fastify path-normalization options are enabled. This issue affects nest.Js: 11.1.13.",
+  "token_count": 22
+}

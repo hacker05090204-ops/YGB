@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Db2 Recovery Expert for Linux, UNIX and Windows 5.5 IF 2 could allow an attacker to modify or corrupt data due to an insecure mechanism used for verifying the integrity of the data during transmission.",
+  "token_count": 36
+}

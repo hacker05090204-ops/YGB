@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0196",
+  "ingested_at": "2026-03-22T07:45:17.406268+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains a race condition vulnerability within the n_tty_write function that allows local users to cause a denial-of-service (DoS) or gain privileges via read and write operations with long strings.",
+  "severity": "CRITICAL",
+  "sha256_hash": "973b280c9541cf7e25157d4ed859b1830b51e34e9a9e08c57a122d4e2cbb28ab",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

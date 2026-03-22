@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25557",
+  "ingested_at": "2026-03-22T07:54:49.507982+00:00",
+  "lang": "en",
+  "raw_text": "TwistedBrush Pro Studio 24.06 contains a denial of service vulnerability that allows local attackers to crash the application by importing a malformed .srp script file. Attackers can create a .srp file containing an excessively large buffer and import it through the Script Player interface to trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1448b42c70c19f0df6e34ba4cfafcbbc76cd5318baa09d8c2f2762f431363588",
+  "source": "nvd",
+  "tags": [
+    "CWE-775"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25557"
+}

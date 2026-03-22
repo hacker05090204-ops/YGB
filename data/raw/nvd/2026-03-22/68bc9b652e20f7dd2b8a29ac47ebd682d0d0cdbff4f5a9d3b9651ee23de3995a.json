@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27696",
+  "ingested_at": "2026-03-22T07:54:31.960949+00:00",
+  "lang": "en",
+  "raw_text": "changedetection.io is a free open source web page change detection tool. In versions prior to 0.54.1, changedetection.io is vulnerable to Server-Side Request Forgery (SSRF) because the URL validation function `is_safe_valid_url()` does not validate the resolved IP address of watch URLs against private, loopback, or link-local address ranges. An authenticated user (or any user when no password is configured, which is the default) can add a watch for internal network URLs. The application fetches these URLs server-side, stores the response content, and makes it viewable through the web UI \u2014 enabling full data exfiltration from internal services. Version 0.54.1 contains a fix for the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "68bc9b652e20f7dd2b8a29ac47ebd682d0d0cdbff4f5a9d3b9651ee23de3995a",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 104,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27696"
+}

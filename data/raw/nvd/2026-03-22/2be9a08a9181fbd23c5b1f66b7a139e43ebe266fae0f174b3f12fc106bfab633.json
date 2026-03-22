@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2941",
+  "ingested_at": "2026-03-22T07:54:49.367814+00:00",
+  "lang": "en",
+  "raw_text": "The Linksy Search and Replace plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the 'linksy_search_and_replace_item_details' function in all versions up to, and including, 1.0.4. This makes it possible for authenticated attackers, with subscriber-level access and above, to update any database table, any value, including the wp_capabilities database field, which allows attackers to change their own role to administrator, which leads to privilege escalation.",
+  "severity": "HIGH",
+  "sha256_hash": "2be9a08a9181fbd23c5b1f66b7a139e43ebe266fae0f174b3f12fc106bfab633",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2941"
+}

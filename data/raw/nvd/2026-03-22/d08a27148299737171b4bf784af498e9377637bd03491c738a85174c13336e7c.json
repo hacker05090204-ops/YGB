@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29064",
+  "ingested_at": "2026-03-22T07:54:41.531664+00:00",
+  "lang": "en",
+  "raw_text": "Zarf is an Airgap Native Packager Manager for Kubernetes. From version 0.54.0 to before version 0.73.1, a path traversal vulnerability in archive extraction allows a specifically crafted Zarf package to create symlinks pointing outside the destination directory, enabling arbitrary file read or write on the system processing the package. This issue has been patched in version 0.73.1.",
+  "severity": "HIGH",
+  "sha256_hash": "d08a27148299737171b4bf784af498e9377637bd03491c738a85174c13336e7c",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29064"
+}

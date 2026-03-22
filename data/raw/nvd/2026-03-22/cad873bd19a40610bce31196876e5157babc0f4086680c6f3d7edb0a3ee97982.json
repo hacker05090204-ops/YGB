@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4189",
+  "ingested_at": "2026-03-22T07:54:46.690221+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in phpipam up to 1.7.4. The impacted element is an unknown function of the file app/admin/sections/edit-result.php of the component Section Handler. Executing a manipulation of the argument subnetOrdering can lead to sql injection. The attack may be launched remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cad873bd19a40610bce31196876e5157babc0f4086680c6f3d7edb0a3ee97982",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4189"
+}

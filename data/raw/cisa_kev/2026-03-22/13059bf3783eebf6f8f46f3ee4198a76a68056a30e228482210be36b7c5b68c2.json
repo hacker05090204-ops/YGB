@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-43890",
+  "ingested_at": "2026-03-22T07:45:18.895960+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows AppX Installer contains a spoofing vulnerability which has a high impacts to confidentiality, integrity, and availability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "13059bf3783eebf6f8f46f3ee4198a76a68056a30e228482210be36b7c5b68c2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

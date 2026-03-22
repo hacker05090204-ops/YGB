@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4216",
+  "ingested_at": "2026-03-22T07:54:46.755767+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in i-SENS SmartLog App up to 2.6.8 on Android. This affects an unknown function of the component air.SmartLog.android. This manipulation causes hard-coded credentials. The attack can only be executed locally. The exploit has been made available to the public and could be used for attacks. The vendor explains: \"The function referenced in the report currently exists in our deployed system. It is related to a developer mode used during the configuration process for Bluetooth pairing between the blood glucose meter and the SmartLog application. This function is intended for configuration purposes related to device integration and testing. (...) [I]n a future application update, we plan to review measures to either remove the developer mode function or restrict access to it.\"",
+  "severity": "MEDIUM",
+  "sha256_hash": "ce65797c8c104456c143897713fab13f1174f6b2907035c48e2f46c92f709af9",
+  "source": "nvd",
+  "tags": [
+    "CWE-259",
+    "CWE-798"
+  ],
+  "token_count": 125,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4216"
+}

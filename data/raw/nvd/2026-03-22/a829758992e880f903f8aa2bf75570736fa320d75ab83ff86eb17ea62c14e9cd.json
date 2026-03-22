@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3278",
+  "ingested_at": "2026-03-22T07:54:47.471819+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of input during web page generation ('cross-site scripting') vulnerability in OpenTextTM ZENworks Service Desk allows Cross-Site Scripting (XSS). The vulnerability could allow an attacker to execute arbitrary JavaScript leading to unauthorized actions on behalf of the user.This issue affects ZENworks Service Desk: 25.2, 25.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a829758992e880f903f8aa2bf75570736fa320d75ab83ff86eb17ea62c14e9cd",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3278"
+}

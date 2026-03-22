@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27758",
+  "ingested_at": "2026-03-22T07:54:33.247844+00:00",
+  "lang": "en",
+  "raw_text": "SODOLA SL902-SWTGW124AS firmware versions through 200.1.20 contain a cross-site request forgery vulnerability in its management interface that allows attackers to induce authenticated users into submitting forged requests. Attackers can craft malicious requests that execute unauthorized configuration or administrative actions with the victim's privileges when the authenticated user visits a malicious webpage.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7f328ba8cea19f6a963aee12ed148a2f11b99b1f889fa31c11a412b8517141bb",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27758"
+}

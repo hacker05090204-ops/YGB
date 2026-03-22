@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32343",
+  "ingested_at": "2026-03-22T07:54:45.893069+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in Magazine3 Easy Table of Contents easy-table-of-contents allows Cross Site Request Forgery.This issue affects Easy Table of Contents: from n/a through < = 2.0.80.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1f19832d1e65f80e1bf6c714402cd0696903d2ea75279448244649aecbbbe2a3",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32343"
+}

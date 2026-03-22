@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32021",
+  "ingested_at": "2026-03-22T07:54:48.204524+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an authorization bypass vulnerability in the Feishu allowFrom allowlist implementation that accepts mutable sender display names instead of enforcing ID-only matching. An attacker can set a display name equal to an allowlisted ID string to bypass authorization checks and gain unauthorized access.",
+  "severity": "MEDIUM",
+  "sha256_hash": "433b1f65edd677a99079605212e6ba2f4ab3536e774a5c92aefae48083488e68",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32021"
+}

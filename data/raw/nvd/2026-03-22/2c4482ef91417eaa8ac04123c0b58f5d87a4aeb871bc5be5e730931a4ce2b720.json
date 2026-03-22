@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25560",
+  "ingested_at": "2026-03-22T07:54:49.513748+00:00",
+  "lang": "en",
+  "raw_text": "Lyric Video Creator 2.1 contains a denial of service vulnerability that allows attackers to crash the application by processing malformed MP3 files. Attackers can create a crafted MP3 file with an oversized buffer and trigger the crash by opening the file through the Browse song functionality.",
+  "severity": "HIGH",
+  "sha256_hash": "2c4482ef91417eaa8ac04123c0b58f5d87a4aeb871bc5be5e730931a4ce2b720",
+  "source": "nvd",
+  "tags": [
+    "CWE-226"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25560"
+}

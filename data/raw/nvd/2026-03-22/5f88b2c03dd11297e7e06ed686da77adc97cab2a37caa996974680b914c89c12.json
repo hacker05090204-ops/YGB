@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28426",
+  "ingested_at": "2026-03-22T07:54:33.385726+00:00",
+  "lang": "en",
+  "raw_text": "Statmatic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.11 and 6.4.0, stored XSS vulnerability in svg and icon related components allow authenticated users with appropriate permissions to inject malicious JavaScript that executes when viewed by higher-privileged users. This has been fixed in 5.73.11 and 6.4.0.",
+  "severity": "HIGH",
+  "sha256_hash": "5f88b2c03dd11297e7e06ed686da77adc97cab2a37caa996974680b914c89c12",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28426"
+}

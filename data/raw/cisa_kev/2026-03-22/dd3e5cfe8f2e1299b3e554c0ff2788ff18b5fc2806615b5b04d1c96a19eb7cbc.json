@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-49138",
+  "ingested_at": "2026-03-22T07:45:16.685345+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Common Log File System (CLFS) driver contains a heap-based buffer overflow vulnerability that allows a local attacker to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dd3e5cfe8f2e1299b3e554c0ff2788ff18b5fc2806615b5b04d1c96a19eb7cbc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

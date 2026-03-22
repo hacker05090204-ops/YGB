@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-15107",
+  "ingested_at": "2026-03-22T07:45:18.313381+00:00",
+  "lang": "en",
+  "raw_text": "Webmin Webmin An issue was discovered in Webmin. The parameter old in password_change.cgi contains a command injection vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eae212cb910e1580b70d9894718c9ae3ab2c6217a63de7d9654f075eed031073",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

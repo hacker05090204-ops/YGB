@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Easy File Sharing Web Server 7.2 contains a local structured exception handling buffer overflow vulnerability that allows local attackers to execute arbitrary code by creating a malicious username. Attackers can craft a username with a payload containing 4059 bytes of padding followed by a nseh value and seh pointer to trigger the overflow when adding a new user account.",
+  "token_count": 59
+}

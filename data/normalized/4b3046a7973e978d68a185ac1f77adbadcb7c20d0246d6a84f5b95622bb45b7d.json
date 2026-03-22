@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') vulnerability in Johnson Controls Frick Controls Quantum HD allows OS Command Injection. Insufficient validation of input in certain parameters may permit unexpected actions, which could impact the security of the device before authentication occurs.This issue affects Frick Controls Quantum HD version 10.22 and prior.",
+  "token_count": 57
+}

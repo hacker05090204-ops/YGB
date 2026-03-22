@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Multiple Products Cisco Secure Email Gateway, Secure Email, AsyncOS Software, and Web Manager appliances contains an improper input validation vulnerability that allows threat actors to execute arbitrary commands with root privileges on the underlying operating system of an affected appliance.",
+  "token_count": 41
+}

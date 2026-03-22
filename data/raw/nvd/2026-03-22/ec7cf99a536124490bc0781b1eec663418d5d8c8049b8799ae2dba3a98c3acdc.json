@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27524",
+  "ingested_at": "2026-03-22T07:54:47.300109+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.21 accept prototype-reserved keys in runtime /debug set override object values, allowing prototype pollution attacks. Authorized /debug set callers can inject __proto__, constructor, or prototype keys to manipulate object prototypes and bypass command gate restrictions.",
+  "severity": "LOW",
+  "sha256_hash": "ec7cf99a536124490bc0781b1eec663418d5d8c8049b8799ae2dba3a98c3acdc",
+  "source": "nvd",
+  "tags": [
+    "CWE-1321"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27524"
+}

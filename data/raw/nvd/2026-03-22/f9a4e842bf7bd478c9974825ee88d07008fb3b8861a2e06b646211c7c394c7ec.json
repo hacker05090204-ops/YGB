@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11739",
+  "ingested_at": "2026-03-22T07:54:42.552833+00:00",
+  "lang": "en",
+  "raw_text": "CWE\u2010502: Deserialization of Untrusted Data vulnerability exists that could cause arbitrary code execution with administrative privileges when a locally authenticated attacker sends a crafted data stream, triggering unsafe deserialization.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f9a4e842bf7bd478c9974825ee88d07008fb3b8861a2e06b646211c7c394c7ec",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11739"
+}

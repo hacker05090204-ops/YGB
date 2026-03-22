@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28419",
+  "ingested_at": "2026-03-22T07:54:33.367121+00:00",
+  "lang": "en",
+  "raw_text": "Vim is an open source, command line text editor. Prior to version 9.2.0075, a heap-based buffer underflow exists in Vim's Emacs-style tags file parsing logic. When processing a malformed tags file where a delimiter appears at the start of a line, Vim attempts to read memory immediately preceding the allocated buffer. Version 9.2.0075 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8266ea7385fd4763f267552b62c8a77bce4eedd035d3fc2f96a4a1aee30083d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-124",
+    "CWE-125"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28419"
+}

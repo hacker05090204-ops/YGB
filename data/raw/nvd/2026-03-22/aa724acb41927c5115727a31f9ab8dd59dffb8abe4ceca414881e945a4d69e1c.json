@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3289",
+  "ingested_at": "2026-03-22T07:54:33.056769+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Sanluan PublicCMS 6.202506.d. This impacts the function saveMetadata of the file TemplateCacheComponent.java of the component Template Cache Generation. Executing a manipulation can lead to path traversal. The attack can be executed remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aa724acb41927c5115727a31f9ab8dd59dffb8abe4ceca414881e945a4d69e1c",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3289"
+}

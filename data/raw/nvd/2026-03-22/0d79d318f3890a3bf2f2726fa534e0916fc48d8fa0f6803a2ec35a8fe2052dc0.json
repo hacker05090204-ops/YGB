@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28092",
+  "ingested_at": "2026-03-22T07:54:40.593167+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Sounder sounder allows PHP Local File Inclusion.This issue affects Sounder: from n/a through < = 1.3.11.",
+  "severity": "HIGH",
+  "sha256_hash": "0d79d318f3890a3bf2f2726fa534e0916fc48d8fa0f6803a2ec35a8fe2052dc0",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28092"
+}

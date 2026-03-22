@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26514",
+  "ingested_at": "2026-03-22T07:54:34.543180+00:00",
+  "lang": "en",
+  "raw_text": "An Argument Injection vulnerability exists in bird-lg-go before commit 6187a4e. The traceroute module uses shlex.Split to parse user input without validation, allowing remote attackers to inject arbitrary flags (e.g., -w, -q) via the q parameter. This can be exploited to cause a Denial of Service (DoS) by exhausting system resources.",
+  "severity": "HIGH",
+  "sha256_hash": "ba578ded1be0edc58d7664808ccf6778edafc2a68e29d42f7037e70f7841dc6f",
+  "source": "nvd",
+  "tags": [
+    "CWE-88"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26514"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An input validation vulnerability was reported in the LenovoProductivitySystemAddin used in Lenovo Vantage and Lenovo Baiying that could allow a local authenticated user to terminate arbitrary processes with elevated privileges.",
+  "token_count": 30
+}

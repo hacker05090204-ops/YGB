@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Spark Apache Spark contains a command injection vulnerability via Spark User Interface (UI) when Access Control Lists (ACLs) are enabled.",
+  "token_count": 21
+}

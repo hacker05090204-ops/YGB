@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26113",
+  "ingested_at": "2026-03-22T07:54:42.803341+00:00",
+  "lang": "en",
+  "raw_text": "Untrusted pointer dereference in Microsoft Office allows an unauthorized attacker to execute code locally.",
+  "severity": "HIGH",
+  "sha256_hash": "4c6af90fd95bfc6242d3f22b403b55733c955a4eda1ff0f78b5f0551150f22b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-822",
+    "NVD-CWE-Other"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26113"
+}

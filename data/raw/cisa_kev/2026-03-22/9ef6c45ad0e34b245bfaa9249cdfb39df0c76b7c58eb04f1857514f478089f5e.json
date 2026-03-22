@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22960",
+  "ingested_at": "2026-03-22T07:45:18.077196+00:00",
+  "lang": "en",
+  "raw_text": "VMware Multiple Products VMware Workspace ONE Access, Identity Manager and vRealize Automation contain a privilege escalation vulnerability due to improper permissions in support scripts.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9ef6c45ad0e34b245bfaa9249cdfb39df0c76b7c58eb04f1857514f478089f5e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

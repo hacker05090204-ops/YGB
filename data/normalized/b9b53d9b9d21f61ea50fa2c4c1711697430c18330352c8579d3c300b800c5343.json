@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chromium WebP Google Chromium WebP contains a heap-based buffer overflow vulnerability that allows a remote attacker to perform an out-of-bounds memory write via a crafted HTML page. This vulnerability can affect applications that use the WebP Codec.",
+  "token_count": 38
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DIR-859 Router D-Link DIR-859 router contains a command execution vulnerability in the UPnP endpoint URL, /gena.cgi. Exploitation allows an unauthenticated remote attacker to execute system commands as root by sending a specially crafted HTTP SUBSCRIBE request to the UPnP service when connecting to the local network.",
+  "token_count": 47
+}

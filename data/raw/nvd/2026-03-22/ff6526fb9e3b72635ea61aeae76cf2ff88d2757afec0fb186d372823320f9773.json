@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4287",
+  "ingested_at": "2026-03-22T07:54:46.994307+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Tiandy Easy7 Integrated Management Platform 7.17.0. The affected element is an unknown function of the file /rest/devStatus/queryResources of the component Endpoint. Performing a manipulation of the argument areaId results in sql injection. The attack can be initiated remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "ff6526fb9e3b72635ea61aeae76cf2ff88d2757afec0fb186d372823320f9773",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4287"
+}

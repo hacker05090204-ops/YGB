@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22170",
+  "ingested_at": "2026-03-22T07:54:47.270603+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 with the optional BlueBubbles plugin contain an access control bypass vulnerability where empty allowFrom configuration causes dmPolicy pairing and allowlist restrictions to be ineffective. Remote attackers can send direct messages to BlueBubbles accounts by exploiting the misconfigured allowlist validation logic to bypass intended sender authorization checks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "551575ff7bc32d9071ca5c5342acf3b835ed0d6867231856979a3ae31fa61ec3",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22170"
+}

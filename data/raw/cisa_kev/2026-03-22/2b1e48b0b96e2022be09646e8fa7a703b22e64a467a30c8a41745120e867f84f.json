@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-6205",
+  "ingested_at": "2026-03-22T07:45:16.077678+00:00",
+  "lang": "en",
+  "raw_text": "Dassault Syst\u00e8mes DELMIA Apriso Dassault Syst\u00e8mes DELMIA Apriso contains a missing authorization vulnerability that could allow an attacker to gain privileged access to the application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2b1e48b0b96e2022be09646e8fa7a703b22e64a467a30c8a41745120e867f84f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

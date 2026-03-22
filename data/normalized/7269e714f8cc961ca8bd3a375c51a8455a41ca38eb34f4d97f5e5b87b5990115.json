@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IM-LogicDesigner module of intra-mart Accel Platform contains insecure deserialization issue. This can be exploited only when IM-LogicDesigner is deployed on the system. Arbitrary code may be executed when some crafted file is imported by a user with the administrative privilege.",
+  "token_count": 40
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30666",
+  "ingested_at": "2026-03-22T07:45:19.044216+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS Apple iOS WebKit contains a buffer-overflow vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "84458e36567e8df5eb508042150c24446e9719d5d129f7f32136cbafdd84a95b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

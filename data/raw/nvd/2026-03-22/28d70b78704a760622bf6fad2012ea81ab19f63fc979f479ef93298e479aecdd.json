@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69219",
+  "ingested_at": "2026-03-22T07:54:42.250927+00:00",
+  "lang": "en",
+  "raw_text": "A user with access to the DB could craft a database entry that would result in executing code on Triggerer - which gives anyone who have access to DB the same permissions as Dag Author. Since direct DB access is not usual and recommended for Airflow, the likelihood of it making any damage is low. You should upgrade to version 6.0.0 of the provider to avoid even that risk.",
+  "severity": "HIGH",
+  "sha256_hash": "28d70b78704a760622bf6fad2012ea81ab19f63fc979f479ef93298e479aecdd",
+  "source": "nvd",
+  "tags": [
+    "CWE-913"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69219"
+}

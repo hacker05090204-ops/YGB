@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Nagios Nagios XI Nagios XI contains a remote code execution vulnerability in which a user can modify the check_plugin executable and insert malicious commands to execute as root.",
+  "token_count": 28
+}

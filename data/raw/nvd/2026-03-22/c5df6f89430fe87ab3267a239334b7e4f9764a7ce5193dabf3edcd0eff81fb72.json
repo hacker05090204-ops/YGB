@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26271",
+  "ingested_at": "2026-03-22T07:54:32.324453+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, a buffer overread in `freerdp_image_copy_from_icon_data()` (libfreerdp/codec/color.c) can be triggered by crafted RDP Window Icon (TS_ICON_INFO) data. The bug is reachable over the network when a client processes icon data from an RDP server (or from a man-in-the-middle). Version 3.23.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c5df6f89430fe87ab3267a239334b7e4f9764a7ce5193dabf3edcd0eff81fb72",
+  "source": "nvd",
+  "tags": [
+    "CWE-126"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26271"
+}

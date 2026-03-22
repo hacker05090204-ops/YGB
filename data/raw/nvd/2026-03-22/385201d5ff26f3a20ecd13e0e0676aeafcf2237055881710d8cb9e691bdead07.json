@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68971",
+  "ingested_at": "2026-03-22T07:54:46.931198+00:00",
+  "lang": "en",
+  "raw_text": "In Forgejo through 13.0.3, the attachment component allows a denial of service by uploading a multi-gigabyte file attachment (e.g., to be associated with an issue or a release).",
+  "severity": "MEDIUM",
+  "sha256_hash": "385201d5ff26f3a20ecd13e0e0676aeafcf2237055881710d8cb9e691bdead07",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68971"
+}

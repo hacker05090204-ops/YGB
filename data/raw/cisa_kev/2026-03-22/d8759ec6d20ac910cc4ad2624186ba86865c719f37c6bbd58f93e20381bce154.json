@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-5777",
+  "ingested_at": "2026-03-22T07:45:16.318308+00:00",
+  "lang": "en",
+  "raw_text": "Citrix NetScaler ADC and Gateway Citrix NetScaler ADC and Gateway contain an out-of-bounds read vulnerability due to insufficient input validation. This vulnerability can lead to memory overread when the NetScaler is configured as a Gateway (VPN virtual server, ICA Proxy, CVPN, RDP Proxy) OR AAA virtual server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d8759ec6d20ac910cc4ad2624186ba86865c719f37c6bbd58f93e20381bce154",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

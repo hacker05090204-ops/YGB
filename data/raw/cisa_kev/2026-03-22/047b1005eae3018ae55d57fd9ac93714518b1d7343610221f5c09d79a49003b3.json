@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-6352",
+  "ingested_at": "2026-03-22T07:45:18.726750+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows allow remote attackers to execute arbitrary code via a crafted OLE object.",
+  "severity": "CRITICAL",
+  "sha256_hash": "047b1005eae3018ae55d57fd9ac93714518b1d7343610221f5c09d79a49003b3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

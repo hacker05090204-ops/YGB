@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft HTTP Protocol Stack Microsoft HTTP Protocol Stack contains a vulnerability in http.sys that allows for remote code execution.",
+  "token_count": 19
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Scripting Engine contains a memory corruption vulnerability that allows unauthenticated attacker to initiate remote code execution via a specially crafted URL.",
+  "token_count": 25
+}

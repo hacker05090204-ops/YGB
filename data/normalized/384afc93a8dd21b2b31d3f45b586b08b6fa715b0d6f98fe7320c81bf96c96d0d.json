@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability allowing a Backup Viewer to perform remote code execution (RCE) as the postgres user.",
+  "token_count": 16
+}

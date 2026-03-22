@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33194",
+  "ingested_at": "2026-03-22T07:54:49.077246+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to version 3.6.2, the `IsSensitivePath()` function in `kernel/util/path.go` uses a denylist approach that was recently expanded (GHSA-h5vh-m7fg-w5h6, commit 9914fd1) but remains incomplete. Multiple security-relevant Linux directories are not blocked, including `/opt` (application data), `/usr` (local configs/binaries), `/home` (other users), `/mnt` and `/media` (mounted volumes). The `globalCopyFiles` and `importStdMd` endpoints rely on `IsSensitivePath` as their primary defense against reading files outside the workspace. Version 3.6.2 contains an updated fix.",
+  "severity": "MEDIUM",
+  "sha256_hash": "904b9094d8b3e018064a81cdd57367255fdc06a86acc3229fe118e6ece4ce8f5",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33194"
+}

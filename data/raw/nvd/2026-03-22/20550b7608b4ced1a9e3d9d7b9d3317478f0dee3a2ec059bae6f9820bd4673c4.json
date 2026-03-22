@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28460",
+  "ingested_at": "2026-03-22T07:54:47.797158+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an allowlist bypass vulnerability in system.run that allows attackers to execute non-allowlisted commands by splitting command substitution using shell line-continuation characters. Attackers can bypass security analysis by injecting $\\\\ followed by a newline and opening parenthesis inside double quotes, causing the shell to fold the line continuation into executable command substitution that circumvents approval boundaries.",
+  "severity": "MEDIUM",
+  "sha256_hash": "20550b7608b4ced1a9e3d9d7b9d3317478f0dee3a2ec059bae6f9820bd4673c4",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28460"
+}

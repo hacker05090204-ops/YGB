@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0022",
+  "ingested_at": "2026-03-22T07:45:17.949369+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft XML Core Services Microsoft XML Core Services (MSXML) improperly handles objects in memory, allowing attackers to test for files on disk via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "084d174f0710e7e5895038e3dcee397244341c72aafd4da29ce2c869873d6d55",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

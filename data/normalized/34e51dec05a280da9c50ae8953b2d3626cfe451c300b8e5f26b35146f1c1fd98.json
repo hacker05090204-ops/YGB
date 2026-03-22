@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in shufflehound Lemmony lemmony allows Cross Site Request Forgery.This issue affects Lemmony: from n/a through < 1.7.1.",
+  "token_count": 22
+}

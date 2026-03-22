@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-24990",
+  "ingested_at": "2026-03-22T07:45:17.529985+00:00",
+  "lang": "en",
+  "raw_text": "TerraMaster TerraMaster OS TerraMaster OS contains a remote command execution vulnerability that allows an unauthenticated user to execute commands on the target endpoint.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0627a954a16effe83ec13c0d63487a5486e8ae79ead01f24938131a33f53e5a5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

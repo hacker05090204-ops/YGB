@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "telnetd in GNU inetutils through 2.7 allows privilege escalation that can be exploited by abusing systemd service credentials support added to the login(1) implementation of util-linux in release 2.40. This is related to client control over the CREDENTIALS_DIRECTORY environment variable, and requires an unprivileged local user to create a login.noauth file.",
+  "token_count": 51
+}

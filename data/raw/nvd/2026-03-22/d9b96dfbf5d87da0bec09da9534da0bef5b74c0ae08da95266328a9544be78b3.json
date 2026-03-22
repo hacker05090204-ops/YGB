@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23767",
+  "ingested_at": "2026-03-22T07:54:40.162755+00:00",
+  "lang": "en",
+  "raw_text": "ESC/POS, a printer control language designed by Seiko Epson Corporation, lacks mechanisms for user authentication and command authorization, does not provide controls to restrict sources or destinations of network communication, and transmits commands without encryption or integrity protection.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d9b96dfbf5d87da0bec09da9534da0bef5b74c0ae08da95266328a9544be78b3",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23767"
+}

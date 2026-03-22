@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1090",
+  "ingested_at": "2026-03-22T07:54:43.628439+00:00",
+  "lang": "en",
+  "raw_text": "GitLab has remediated an issue in GitLab CE/EE affecting all versions from 10.6 before 18.7.6, 18.8 before 18.8.6, and 18.9 before 18.9.2 that could have allowed an authenticated user, when the `markdown_placeholders` feature flag was enabled, to inject JavaScript in a browser due to improper sanitization of placeholder content in markdown processing.",
+  "severity": "HIGH",
+  "sha256_hash": "2641507ae139e065ce04118ec2bb9e1b18858c8abedceaf6ae83ac8320f9fdfc",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1090"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-4181",
+  "ingested_at": "2026-03-22T07:54:46.673959+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in D-Link DIR-816 1.10CNB05. This affects an unknown function of the file /goform/form2RepeaterStep2.cgi of the component goahead. The manipulation of the argument key1/key2/key3/key4/pskValue results in stack-based buffer overflow. The attack may be launched remotely. The exploit has been released to the public and may be used for attacks. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2d75fc3b1b6ff28b65d0a2d0e780bee7630d714220156728d3114e35637652fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4181"
+}

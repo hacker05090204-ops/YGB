@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Tomcat When running Apache Tomcat on Windows with HTTP PUTs enabled, it is possible to upload a JSP file to the server via a specially crafted request. This JSP could then be requested and any code it contained would be executed by the server.",
+  "token_count": 45
+}

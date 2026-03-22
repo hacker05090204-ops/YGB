@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30873",
+  "ingested_at": "2026-03-22T07:54:48.157096+00:00",
+  "lang": "en",
+  "raw_text": "OpenWrt Project is a Linux operating system targeting embedded devices. In versions prior to both 24.10.6 and 25.12.1, the jp_get_token function, which performs lexical analysis by breaking input expressions into tokens, contains a memory leak vulnerability when extracting string literals, field labels, and regular expressions using dynamic memory allocation. These extracted results are stored in a jp_opcode struct, which is later copied to a newly allocated jp_opcode object via jp_alloc_op. During this transfer, if a string was previously extracted and stored in the initial jp_opcode, it is copied to the new allocation but the original memory is never freed, resulting in a memory leak. This issue has been fixed in versions 24.10.6 and 25.12.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "915ab05de70869f7b56dd208986b51565c2c0d07e25e761a09bd12df6d75915a",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 114,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30873"
+}

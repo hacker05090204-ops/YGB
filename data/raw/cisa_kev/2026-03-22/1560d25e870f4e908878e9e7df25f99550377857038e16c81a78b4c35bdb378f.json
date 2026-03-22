@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-8291",
+  "ingested_at": "2026-03-22T07:45:17.959495+00:00",
+  "lang": "en",
+  "raw_text": "Artifex Ghostscript Artifex Ghostscript allows -dSAFER bypass and remote command execution via .rsdparams type confusion with a \"/OutputFile.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1560d25e870f4e908878e9e7df25f99550377857038e16c81a78b4c35bdb378f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

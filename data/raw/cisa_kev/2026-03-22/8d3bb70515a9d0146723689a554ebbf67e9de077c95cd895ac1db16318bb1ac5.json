@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1147",
+  "ingested_at": "2026-03-22T07:45:19.444441+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft .NET Framework, SharePoint, Visual Studio Microsoft .NET Framework, Microsoft SharePoint, and Visual Studio contain a remote code execution vulnerability when the software fails to check the source markup of XML file input. Successful exploitation allows an attacker to execute code in the context of the process responsible for deserialization of the XML content.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8d3bb70515a9d0146723689a554ebbf67e9de077c95cd895ac1db16318bb1ac5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 54,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

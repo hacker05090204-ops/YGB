@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4308",
+  "ingested_at": "2026-03-22T07:54:47.010839+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in frdel/agent0ai agent-zero 0.9.7. This affects the function handle_pdf_document of the file python/helpers/document_query.py. This manipulation causes server-side request forgery. The attack is possible to be carried out remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "11603654d61cd3a223164d64e9670229e07429b20262942740fc874d1e3d4648",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4308"
+}

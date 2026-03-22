@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25794",
+  "ingested_at": "2026-03-22T07:54:31.293390+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. `WriteUHDRImage` in `coders/uhdr.c` uses `int` arithmetic to compute the pixel buffer size. Prior to version 7.1.2-15, when image dimensions are large, the multiplication overflows 32-bit `int`, causing an undersized heap allocation followed by an out-of-bounds write. This can crash the process or potentially lead to an out of bounds heap write. Version 7.1.2-15 contains a patch.",
+  "severity": "HIGH",
+  "sha256_hash": "4ebd6b454e9e0b71628c9ba1d744802594c6580fac3a022d9fa7223abf968f9e",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-190"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25794"
+}

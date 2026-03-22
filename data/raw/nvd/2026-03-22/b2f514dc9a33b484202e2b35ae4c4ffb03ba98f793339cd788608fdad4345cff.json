@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22473",
+  "ingested_at": "2026-03-22T07:54:40.141591+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in designthemes Dental Clinic dental allows Object Injection.This issue affects Dental Clinic: from n/a through < = 3.7.",
+  "severity": "HIGH",
+  "sha256_hash": "b2f514dc9a33b484202e2b35ae4c4ffb03ba98f793339cd788608fdad4345cff",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22473"
+}

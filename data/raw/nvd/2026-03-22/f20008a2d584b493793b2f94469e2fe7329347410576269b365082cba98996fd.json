@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2863",
+  "ingested_at": "2026-03-22T07:54:30.794123+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in feng_ha_ha/megagao ssm-erp and production_ssm up to 4288d53bd35757b27f2d070057aefb2c07bdd097. The impacted element is the function deleteFile of the file FileServiceImpl.java. This manipulation causes path traversal. The attack can be initiated remotely. The exploit has been published and may be used. Continious delivery with rolling releases is used by this product. Therefore, no version details of affected nor updated releases are available. This product is distributed under two entirely different names. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f20008a2d584b493793b2f94469e2fe7329347410576269b365082cba98996fd",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2863"
+}

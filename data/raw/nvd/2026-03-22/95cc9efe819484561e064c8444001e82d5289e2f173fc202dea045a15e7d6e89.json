@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4173",
+  "ingested_at": "2026-03-22T07:54:46.663489+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in CodePhiliaX Chat2DB up to 0.3.7. This vulnerability affects the function exportTable/exportTableColumnComment/exportView/exportProcedure/exportTriggers/exportTrigger/updateProcedure of the file DMDBManage.java of the component Database Export Handler. This manipulation causes sql injection. It is possible to initiate the attack remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "95cc9efe819484561e064c8444001e82d5289e2f173fc202dea045a15e7d6e89",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4173"
+}

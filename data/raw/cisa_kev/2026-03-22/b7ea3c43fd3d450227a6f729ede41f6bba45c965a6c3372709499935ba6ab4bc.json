@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0641",
+  "ingested_at": "2026-03-22T07:45:18.667832+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Reader A buffer overflow vulnerability exists in Adobe Reader which allows an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b7ea3c43fd3d450227a6f729ede41f6bba45c965a6c3372709499935ba6ab4bc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24494",
+  "ingested_at": "2026-03-22T07:54:31.038869+00:00",
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in the /api/integrations/getintegrations endpoint of Order Up Online Ordering System 1.0 allows an unauthenticated attacker to access sensitive backend database data via a crafted store_id parameter in a POST request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1e32df0619586b1b25bad3ef3f71f0b074251386115dab4b01f2c205855c3aae",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24494"
+}

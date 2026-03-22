@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30948",
+  "ingested_at": "2026-03-22T07:54:43.177814+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to 9.5.2-alpha.4 and 8.6.17, a stored cross-site scripting (XSS) vulnerability allows any authenticated user to upload an SVG file containing JavaScript. The file is served inline with Content-Type: image/svg+xml and without protective headers, causing the browser to execute embedded scripts in the Parse Server origin. This can be exploited to steal session tokens from localStorage and achieve account takeover. The default fileExtensions option blocks HTML file extensions but does not block SVG, which is a well-known XSS vector. All Parse Server deployments where file upload is enabled for authenticated users (the default) are affected. This vulnerability is fixed in 9.5.2-alpha.4 and 8.6.17.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2ace5a5fbcac37f3de967deb70af568a2761cd1f66493d4969f58676ea7cd541",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 121,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30948"
+}

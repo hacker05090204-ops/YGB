@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0143",
+  "ingested_at": "2026-03-22T07:45:19.337632+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Server Message Block 1.0 (SMBv1) contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d9a5eecc1e72cbffd9177f638b830567dc2bbc0a539d946d63b69cdaaf50d395",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

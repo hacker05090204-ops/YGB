@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware vCenter Server and Cloud Foundation VMware vCenter Server and Cloud Foundation Server contain a SSRF vulnerability due to improper validation of URLs in a vCenter Server plugin. This allows for information disclosure.",
+  "token_count": 33
+}

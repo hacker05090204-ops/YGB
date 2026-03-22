@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-3248",
+  "ingested_at": "2026-03-22T07:45:16.437257+00:00",
+  "lang": "en",
+  "raw_text": "Langflow Langflow Langflow contains a missing authentication vulnerability in the /api/v1/validate/code endpoint that allows a remote, unauthenticated attacker to execute arbitrary code via crafted HTTP requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1ebd4c2ef212f46611b218222351cef6ddcf5114c4f89298e6d9bb839de3cebd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

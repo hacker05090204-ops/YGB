@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The server certificate was not verified when an Arc agent connected to a Guardian or CMC. A malicious actor could perform a man-in-the-middle attack and intercept the communication between the Arc agent and the Guardian or CMC. This could result in theft of the client token and sensitive information (such as assets and alerts), impersonation of the server, or injection of spoofed data (such as false asset information or vulnerabilities) into the Guardian or CMC.",
+  "token_count": 75
+}

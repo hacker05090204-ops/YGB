@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27748",
+  "ingested_at": "2026-03-22T07:54:40.782780+00:00",
+  "lang": "en",
+  "raw_text": "Avira Internet Security contains an improper link resolution vulnerability in the Software Updater component. During the update process, a privileged service running as SYSTEM deletes a file under C:\\\\ProgramData without validating whether the path resolves through a symbolic link or reparse point. A local attacker can create a malicious link to redirect the delete operation to an arbitrary file, resulting in deletion of attacker-chosen files with SYSTEM privileges. This may lead to local privilege escalation, denial of service, or system integrity compromise depending on the targeted file and operating system configuration.",
+  "severity": "HIGH",
+  "sha256_hash": "001ec45cc96b9efd861bc8c2d7a7c8f2c7861feeeda9f4b97be83d80f9fee25c",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27748"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An improper access control vulnerability in Fortinet FortiSwitchAXFixed 1.0.0 through 1.0.1 may allow an authenticated admin to execute system commands via a specifically crafted SSH config file.",
+  "token_count": 27
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-47986",
+  "ingested_at": "2026-03-22T07:45:17.512829+00:00",
+  "lang": "en",
+  "raw_text": "IBM Aspera Faspex IBM Aspera Faspex could allow a remote attacker to execute code on the system, caused by a YAML deserialization flaw.",
+  "severity": "CRITICAL",
+  "sha256_hash": "85a52b03ad20c94135468193643a1dd14d5aa32261f8b7f74f1e1bedb2f849e0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Failure to validate the sizes of `gstup` and `gstdwn` before concatenating them into `gstruleQos` may lead to buffer overflow.",
+  "token_count": 27
+}

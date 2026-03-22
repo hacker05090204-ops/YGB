@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in itsourcecode University Management System 1.0. Affected by this vulnerability is an unknown functionality of the file /view_result.php. Executing a manipulation of the argument vr can lead to cross site scripting. The attack can be executed remotely. The exploit has been publicly disclosed and may be utilized.",
+  "token_count": 51
+}

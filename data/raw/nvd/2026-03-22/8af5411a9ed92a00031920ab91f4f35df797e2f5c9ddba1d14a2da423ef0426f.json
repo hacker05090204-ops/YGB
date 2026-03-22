@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3936",
+  "ingested_at": "2026-03-22T07:54:44.090711+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in WebView in Google Chrome on Android prior to 146.0.7680.71 allowed a remote attacker to potentially exploit heap corruption via a crafted HTML page. (Chromium security severity: Medium)",
+  "severity": "HIGH",
+  "sha256_hash": "8af5411a9ed92a00031920ab91f4f35df797e2f5c9ddba1d14a2da423ef0426f",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3936"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-42827",
+  "ingested_at": "2026-03-22T07:45:17.596264+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and iPadOS Apple iOS and iPadOS kernel contain an out-of-bounds write vulnerability which can allow an application to perform code execution with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6645b81254fd436972266cd67dc92cc3b947500dc52aae11a9f7f3865e17bc28",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

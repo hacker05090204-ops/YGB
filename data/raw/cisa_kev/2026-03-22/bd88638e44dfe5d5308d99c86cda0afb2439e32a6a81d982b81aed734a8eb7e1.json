@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-24919",
+  "ingested_at": "2026-03-22T07:45:16.955460+00:00",
+  "lang": "en",
+  "raw_text": "Check Point Quantum Security Gateways Check Point Quantum Security Gateways contain an unspecified information disclosure vulnerability. The vulnerability potentially allows an attacker to access information on Gateways connected to the internet, with IPSec VPN, Remote Access VPN or Mobile Access enabled. This issue affects several product lines from Check Point, including CloudGuard Network, Quantum Scalable Chassis, Quantum Security Gateways, and Quantum Spark Appliances.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bd88638e44dfe5d5308d99c86cda0afb2439e32a6a81d982b81aed734a8eb7e1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 63,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

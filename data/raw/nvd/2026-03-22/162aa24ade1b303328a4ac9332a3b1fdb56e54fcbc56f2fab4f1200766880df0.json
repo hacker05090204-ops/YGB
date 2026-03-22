@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-30578",
+  "ingested_at": "2026-03-22T07:54:48.907529+00:00",
+  "lang": "en",
+  "raw_text": "File Thinghie 2.5.7 is vulnerable to Cross Site Scripting (XSS). A malicious user can leverage the \"dir\" parameter of the GET request to invoke arbitrary javascript code.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "162aa24ade1b303328a4ac9332a3b1fdb56e54fcbc56f2fab4f1200766880df0",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30578"
+}

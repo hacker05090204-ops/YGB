@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27976",
+  "ingested_at": "2026-03-22T07:54:32.456902+00:00",
+  "lang": "en",
+  "raw_text": "Zed, a code editor, has an extension installer allows tar/gzip downloads. Prior to version 0.224.4, the tar extractor (`async_tar::Archive::unpack`) creates symlinks from the archive without validation, and the path guard (`writeable_path_from_extension`) only performs lexical prefix checks without resolving symlinks. An attacker can ship a tar that first creates a symlink inside the extension workdir pointing outside (e.g., `escape -> /`), then writes files through the symlink, causing writes to arbitrary host paths. This escapes the extension sandbox and enables code execution. Version 0.224.4 patches the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "2eb099ec661e6af7b17ddb1b34144f86a3e11fc9a388ecbf9150db6f41ac0488",
+  "source": "nvd",
+  "tags": [
+    "CWE-61"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27976"
+}

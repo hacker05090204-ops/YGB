@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-18426",
+  "ingested_at": "2026-03-22T07:45:18.022719+00:00",
+  "lang": "en",
+  "raw_text": "Meta Platforms WhatsApp A vulnerability in WhatsApp Desktop when paired with WhatsApp for iPhone allows cross-site scripting and local file reading.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9fa98a3f8d9576991d5bde3c59eed0a6aac91a6755a200748000f98b06cec90e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

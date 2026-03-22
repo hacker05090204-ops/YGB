@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33305",
+  "ingested_at": "2026-03-22T07:54:48.114001+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.2, an authorization bypass in the optional FaxSMS module (`oe-module-faxsms`) allows any authenticated OpenEMR user to invoke controller methods \u2014 including `getNotificationLog()`, which returns patient appointment data (PHI) \u2014 regardless of whether they hold the required ACL permissions. The `AppDispatch` constructor dispatches user-controlled actions and exits the process before any calling code can enforce ACL checks. Version 8.0.0.2 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5afefaadd77faab5e623f32ad18623d60d0baf166615decfcb7b940f0e28db75",
+  "source": "nvd",
+  "tags": [
+    "CWE-696",
+    "CWE-862"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33305"
+}

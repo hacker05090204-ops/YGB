@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Tenda HG9 300001138. Affected is an unknown function of the file /boaform/formSamba of the component Samba Configuration Endpoint. The manipulation of the argument sambaCap results in stack-based buffer overflow. The attack may be launched remotely. The exploit has been released to the public and may be used for attacks.",
+  "token_count": 56
+}

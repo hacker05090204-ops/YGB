@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-4656",
+  "ingested_at": "2026-03-22T07:45:17.974640+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS A memory corruption vulnerability in Apple iOS kernel allows attackers to execute code in a privileged context or cause a denial-of-service (DoS) via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1c45a5b86d67f59784a4674370182a410692b26e3d07f3060fb20a1957d7610f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

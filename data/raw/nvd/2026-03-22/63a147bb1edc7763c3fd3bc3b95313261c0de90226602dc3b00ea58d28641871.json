@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52645",
+  "ingested_at": "2026-03-22T07:54:46.823603+00:00",
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where model packaging and distribution mechanisms may not include sufficient authenticity verification. This may allow the possibility of unverified or modified model artifacts being used, potentially leading to integrity concerns or unintended behaviour.",
+  "severity": "LOW",
+  "sha256_hash": "63a147bb1edc7763c3fd3bc3b95313261c0de90226602dc3b00ea58d28641871",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52645"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1390",
+  "ingested_at": "2026-03-22T07:54:49.276593+00:00",
+  "lang": "en",
+  "raw_text": "The Redirect countdown plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 1.0. This is due to missing nonce validation on the `countdown_settings_content()` function. This makes it possible for unauthenticated attackers to update the plugin settings including the countdown timeout, redirect URL, and custom text, via a forged request granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2d661c0424e66c08f3a25700f7624d671b79d24b2443a109d1b47bec4d2eb60c",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1390"
+}

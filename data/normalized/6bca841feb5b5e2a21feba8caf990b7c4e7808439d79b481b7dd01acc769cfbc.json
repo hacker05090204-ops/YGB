@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, the function `Stream_EnsureCapacity` can create an endless blocking loop. This may affect all client and server implementations using `FreeRDP`. For practical exploitation this will only work on 32bit systems where the available physical memory is `>= SIZE_MAX`. Version 3.23.0 contains a patch. No known workarounds are available.",
+  "token_count": 61
+}

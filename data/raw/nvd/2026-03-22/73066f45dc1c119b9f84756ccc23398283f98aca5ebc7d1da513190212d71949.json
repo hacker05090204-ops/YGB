@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28548",
+  "ingested_at": "2026-03-22T07:54:40.759161+00:00",
+  "lang": "en",
+  "raw_text": "Vulnerability of improper verification in the email application. Impact: Successful exploitation of this vulnerability may affect service confidentiality.",
+  "severity": "HIGH",
+  "sha256_hash": "73066f45dc1c119b9f84756ccc23398283f98aca5ebc7d1da513190212d71949",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28548"
+}

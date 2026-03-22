@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3767",
+  "ingested_at": "2026-03-22T07:54:42.113793+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in itsourcecode sanitize or validate this input 1.0. Affected is an unknown function of the file /admin/teacher-attendance.php. Executing a manipulation of the argument teacher_id can lead to sql injection. The attack may be launched remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c9f6f87cb9e24c1a8315a5cd6ddad06427b33871cfb0a3ff1576c5a6b7c8f591",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3767"
+}

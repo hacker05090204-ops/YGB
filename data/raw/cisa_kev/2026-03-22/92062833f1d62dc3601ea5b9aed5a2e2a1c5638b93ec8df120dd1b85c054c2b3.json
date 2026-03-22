@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-35405",
+  "ingested_at": "2026-03-22T07:45:17.629541+00:00",
+  "lang": "en",
+  "raw_text": "Zoho ManageEngine Zoho ManageEngine PAM360, Password Manager Pro, and Access Manager Plus contain an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "92062833f1d62dc3601ea5b9aed5a2e2a1c5638b93ec8df120dd1b85c054c2b3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

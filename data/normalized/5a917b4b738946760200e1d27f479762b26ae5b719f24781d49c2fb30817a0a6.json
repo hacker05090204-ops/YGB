@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tenda F453 1.0.0.3. This impacts the function fromSafeEmailFilter of the file /goform/SafeEmailFilter of the component httpd. The manipulation of the argument page leads to buffer overflow. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used.",
+  "token_count": 50
+}

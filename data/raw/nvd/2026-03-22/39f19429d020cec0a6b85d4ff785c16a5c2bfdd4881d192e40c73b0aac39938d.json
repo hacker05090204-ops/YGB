@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32457",
+  "ingested_at": "2026-03-22T07:54:46.147540+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Wombat Plugins Advanced Product Fields (Product Addons) for WooCommerce advanced-product-fields-for-woocommerce allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Advanced Product Fields (Product Addons) for WooCommerce: from n/a through < = 1.6.18.",
+  "severity": "MEDIUM",
+  "sha256_hash": "39f19429d020cec0a6b85d4ff785c16a5c2bfdd4881d192e40c73b0aac39938d",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32457"
+}

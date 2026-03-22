@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-1701",
+  "ingested_at": "2026-03-22T07:45:18.644798+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k An unspecified vulnerability exists in the Win32k.sys kernel-mode driver in Microsoft Windows Server that allows a local attacker to execute arbitrary code with elevated privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7067bf04ca228a01811a0c4ace6774e84accb6add3d19a3e099716296441f445",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

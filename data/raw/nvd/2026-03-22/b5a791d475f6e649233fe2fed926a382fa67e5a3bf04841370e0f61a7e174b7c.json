@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24948",
+  "ingested_at": "2026-03-22T07:54:30.435290+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in fox-themes Reflector reflector-plugins allows Reflected XSS.This issue affects Reflector: from n/a through < = 1.2.2.",
+  "severity": "HIGH",
+  "sha256_hash": "b5a791d475f6e649233fe2fed926a382fa67e5a3bf04841370e0f61a7e174b7c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24948"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27933",
+  "ingested_at": "2026-03-22T07:54:32.452904+00:00",
+  "lang": "en",
+  "raw_text": "Manyfold is an open source, self-hosted web application for managing a collection of 3d models, particularly focused on 3d printing. Versions prior to 0.133.0 are vulnerable to session hijack via cookie leakage in proxy caches. Version 0.133.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e468a2d24711f40e300874c1dedd20fbb75e1e3d133ef5aa8e08845558701d5e",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27933"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-27348",
+  "ingested_at": "2026-03-22T07:45:16.812766+00:00",
+  "lang": "en",
+  "raw_text": "Apache HugeGraph-Server Apache HugeGraph-Server contains an improper access control vulnerability that could allow a remote attacker to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f0c4de5423fd32718316b6f8153023a52ef3ebf55e2de4f3f766d4aaf5b7b922",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

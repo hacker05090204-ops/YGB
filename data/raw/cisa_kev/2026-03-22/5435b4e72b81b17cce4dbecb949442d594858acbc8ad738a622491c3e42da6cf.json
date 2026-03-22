@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-3906",
+  "ingested_at": "2026-03-22T07:45:18.754138+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Graphics Component Microsoft Graphics Component contains a memory corruption vulnerability which can allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5435b4e72b81b17cce4dbecb949442d594858acbc8ad738a622491c3e42da6cf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

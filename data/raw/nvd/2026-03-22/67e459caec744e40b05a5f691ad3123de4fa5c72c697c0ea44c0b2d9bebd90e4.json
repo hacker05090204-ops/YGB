@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4220",
+  "ingested_at": "2026-03-22T07:54:46.764771+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Technologies Integrated Management Platform 7.17.0. Affected by this issue is some unknown functionality of the file /SetWebpagePic.jsp. The manipulation of the argument targetPath/Suffix leads to unrestricted upload. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "67e459caec744e40b05a5f691ad3123de4fa5c72c697c0ea44c0b2d9bebd90e4",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4220"
+}

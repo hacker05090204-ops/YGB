@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WebKit JSC - BytecodeGenerator::hoistSloppyModeFunctionIfNecessary Does not Invalidate the 'ForInContext' Object",
+  "token_count": 10
+}

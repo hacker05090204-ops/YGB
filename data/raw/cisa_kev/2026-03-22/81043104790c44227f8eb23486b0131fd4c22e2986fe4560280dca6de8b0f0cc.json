@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11580",
+  "ingested_at": "2026-03-22T07:45:19.079721+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Crowd and Crowd Data Center Atlassian Crowd and Crowd Data Center contain a remote code execution vulnerability resulting from a pdkinstall development plugin being incorrectly enabled in release builds.",
+  "severity": "CRITICAL",
+  "sha256_hash": "81043104790c44227f8eb23486b0131fd4c22e2986fe4560280dca6de8b0f0cc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

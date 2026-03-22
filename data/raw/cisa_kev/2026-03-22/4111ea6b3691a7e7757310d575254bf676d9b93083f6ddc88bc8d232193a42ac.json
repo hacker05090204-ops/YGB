@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0175",
+  "ingested_at": "2026-03-22T07:45:18.531892+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS, XR, and XE Software Format string vulnerability in the Link Layer Discovery Protocol (LLDP) subsystem of Cisco IOS Software, Cisco IOS XE Software, and Cisco IOS XR Software could allow an unauthenticated, adjacent attacker to cause a denial of service (DoS) condition or execute arbitrary code with elevated privileges on an affected device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4111ea6b3691a7e7757310d575254bf676d9b93083f6ddc88bc8d232193a42ac",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 55,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

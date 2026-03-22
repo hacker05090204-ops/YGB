@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15558",
+  "ingested_at": "2026-03-22T07:54:34.548465+00:00",
+  "lang": "en",
+  "raw_text": "Docker CLI for Windows searches for plugin binaries in C:\\ProgramData\\Docker\\cli-plugins, a directory that does not exist by default. A low-privileged attacker can create this directory and place malicious CLI plugin binaries (docker-compose.exe, docker-buildx.exe, etc.) that are executed when a victim user opens Docker Desktop or invokes Docker CLI plugin features, and allow privilege-escalation if the docker CLI is executed as a privileged user. This issue affects Docker CLI: through 29.1.5 and Windows binaries acting as a CLI-plugin manager using the github.com/docker/cli/cli-plugins/manager https://pkg.go.dev/github.com/docker/cli@v29.1.5+incompatible/cli-plugins/manager package, such as Docker Compose. This issue does not impact non-Windows binaries, and projects not using the plugin-manager code.",
+  "severity": "HIGH",
+  "sha256_hash": "952faf497d41f97e7b94a1ad29ad361b4793bac869555c251765a5487abcb392",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15558"
+}

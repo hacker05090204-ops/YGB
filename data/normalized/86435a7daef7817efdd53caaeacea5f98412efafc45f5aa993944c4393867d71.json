@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A command injection vulnerability in the UPnP function of the Zyxel EX3510-B0 firmware versions through 5.17(ABUP.15.1)C0 could allow a remote attacker to execute operating system (OS) commands on an affected device by sending specially crafted UPnP SOAP requests.",
+  "token_count": 38
+}

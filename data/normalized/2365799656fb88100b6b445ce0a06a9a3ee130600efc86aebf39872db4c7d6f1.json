@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a cross-site request forgery vulnerability that allows attackers to delete all comments associated with an email address by crafting a malicious GET request with a valid HMAC key. Attackers can embed the deletecomments action URL in image tags or other resources to trigger permanent deletion of comments without user confirmation or POST-based CSRF protection.",
+  "token_count": 58
+}

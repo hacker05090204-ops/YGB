@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Meta React Server Components Meta React Server Components contains a remote code execution vulnerability that could allow unauthenticated remote code execution by exploiting a flaw in how React decodes payloads sent to React Server Function endpoints. Please note CVE-2025-66478 has been rejected, but it is associated with CVE-2025- 55182.",
+  "token_count": 49
+}

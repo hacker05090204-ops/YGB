@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper input validation in the error message page in Devolutions Server 2025.3.16 and earlier allows remote attackers to spoof the displayed error message via a specially crafted URL.",
+  "token_count": 28
+}

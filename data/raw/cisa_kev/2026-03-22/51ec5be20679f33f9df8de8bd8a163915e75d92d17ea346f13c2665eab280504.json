@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-0787",
+  "ingested_at": "2026-03-22T07:45:18.803348+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows BITS is vulnerable to to a privilege elevation vulnerability if it improperly handles symbolic links. An actor can exploit this vulnerability to execute arbitrary code with system-level privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "51ec5be20679f33f9df8de8bd8a163915e75d92d17ea346f13c2665eab280504",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

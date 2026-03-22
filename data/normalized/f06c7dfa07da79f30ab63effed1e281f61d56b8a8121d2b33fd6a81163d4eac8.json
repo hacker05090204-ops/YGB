@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell Command | Intel vPro Out of Band, versions prior to 4.7.0, contain an Uncontrolled Search Path Element vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Elevation of privileges.",
+  "token_count": 36
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Disable Admin Notices \u2013 Hide Dashboard Notifications plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 1.4.2. This is due to missing nonce validation in the `showPageContent()` function. This makes it possible for unauthenticated attackers to add arbitrary URLs to the blocked redirects list via a forged request granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "token_count": 73
+}

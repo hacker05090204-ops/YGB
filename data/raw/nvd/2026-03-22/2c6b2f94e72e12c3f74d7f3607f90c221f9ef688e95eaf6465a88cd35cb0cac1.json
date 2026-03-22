@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3606",
+  "ingested_at": "2026-03-22T07:54:41.131068+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Ettercap 0.8.4-Garofalo. Affected by this vulnerability is the function add_data_segment of the file src/ettercap/utils/etterfilter/ef_output.c of the component etterfilter. The manipulation leads to out-of-bounds read. Local access is required to approach this attack. The exploit has been disclosed to the public and may be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "2c6b2f94e72e12c3f74d7f3607f90c221f9ef688e95eaf6465a88cd35cb0cac1",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125",
+    "CWE-787"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3606"
+}

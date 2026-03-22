@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29858",
+  "ingested_at": "2026-03-22T07:54:47.625151+00:00",
+  "lang": "en",
+  "raw_text": "A lack of path validation in aaPanel v7.57.0 allows attackers to execute a local file inclusion (LFI), leadingot sensitive information exposure.",
+  "severity": "HIGH",
+  "sha256_hash": "4ebb7b4dda43cf8ececc310bdb4b8e057803d332a1224e2a7262e561a6bd467d",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29858"
+}

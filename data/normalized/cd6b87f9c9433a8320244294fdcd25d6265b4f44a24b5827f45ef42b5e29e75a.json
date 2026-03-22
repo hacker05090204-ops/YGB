@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Tenda HG9 300001138. This impacts an unknown function of the file /boaform/formWlanSetup of the component Wireless Configuration Endpoint. The manipulation of the argument ssid leads to stack-based buffer overflow. The attack may be initiated remotely. The exploit is publicly available and might be used.",
+  "token_count": 49
+}

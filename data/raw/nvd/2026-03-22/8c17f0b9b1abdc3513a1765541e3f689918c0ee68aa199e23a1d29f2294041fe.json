@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21732",
+  "ingested_at": "2026-03-22T07:54:49.041260+00:00",
+  "lang": "en",
+  "raw_text": "A web page that contains unusual GPU shader code is loaded into the GPU compiler process and can trigger a write out-of-bounds write crash in the GPU shader compiler library. On certain platforms, when the compiler process has system privileges this could enable further exploits on the device. An edge case using a very large value in switch statements in GPU shader code can cause a segmentation fault in the GPU shader compiler due to an out-of-bounds write access.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8c17f0b9b1abdc3513a1765541e3f689918c0ee68aa199e23a1d29f2294041fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-823"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21732"
+}

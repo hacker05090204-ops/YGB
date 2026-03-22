@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-58034",
+  "ingested_at": "2026-03-22T07:45:16.049055+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiWeb Fortinet FortiWeb contains an OS command Injection vulnerability that may allow an authenticated attacker to execute unauthorized code on the underlying system via crafted HTTP requests or CLI commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aecbe8d394b76452e3acc8d721feee58de2c706aa3cd2a54c7b2c6ef2f3a5f78",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

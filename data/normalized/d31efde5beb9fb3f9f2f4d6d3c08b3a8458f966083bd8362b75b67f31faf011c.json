@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to 3.6.1, POST /api/template/renderSprig lacks model.CheckAdminRole, allowing any authenticated user to execute arbitrary SQL queries against the SiYuan workspace database and exfiltrate all note content, metadata, and custom attributes. This vulnerability is fixed in 3.6.1.",
+  "token_count": 43
+}

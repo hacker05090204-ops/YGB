@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4105",
+  "ingested_at": "2026-03-22T07:54:46.199868+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in systemd. The systemd-machined service contains an Improper Access Control vulnerability due to insufficient validation of the class parameter in the RegisterMachine D-Bus (Desktop Bus) method. A local unprivileged user can exploit this by attempting to register a machine with a specific class value, which may leave behind a usable, attacker-controlled machine object. This allows the attacker to invoke methods on the privileged object, leading to the execution of arbitrary commands with root privileges on the host system.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f497c977e6042b8161624a997052117d10e1d3d972ff9507fe7e93747fd9c37f",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4105"
+}

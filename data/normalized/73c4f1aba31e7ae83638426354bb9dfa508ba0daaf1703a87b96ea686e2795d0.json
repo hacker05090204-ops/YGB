@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle E-Business Suite Oracle E-Business Suite contains a server-side request forgery (SSRF) vulnerability in the Runtime component of Oracle Configurator. This vulnerability is remotely exploitable without authentication.",
+  "token_count": 27
+}

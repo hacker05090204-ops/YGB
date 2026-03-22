@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3545",
+  "ingested_at": "2026-03-22T07:54:34.796627+00:00",
+  "lang": "en",
+  "raw_text": "Insufficient data validation in Navigation in Google Chrome prior to 145.0.7632.159 allowed a remote attacker to potentially perform a sandbox escape via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "CRITICAL",
+  "sha256_hash": "c24405e4cdbbec83cfc57534d92d6e7283106450f1a28fb63e66d37d9d70130c",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3545"
+}

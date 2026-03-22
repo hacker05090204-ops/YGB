@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27367",
+  "ingested_at": "2026-03-22T07:54:40.232047+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in ThemeGoods Musico musico allows Reflected XSS.This issue affects Musico: from n/a through < = 3.2.4.",
+  "severity": "HIGH",
+  "sha256_hash": "cbc95f69435bde105074caec2147e8b7ddda3371dae96ea39f1505ab893d8b03",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27367"
+}

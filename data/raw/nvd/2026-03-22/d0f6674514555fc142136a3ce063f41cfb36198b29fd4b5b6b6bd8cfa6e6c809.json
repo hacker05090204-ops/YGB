@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3725",
+  "ingested_at": "2026-03-22T07:54:42.029162+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in 1024-lab/lab1024 SmartAdmin up to 3.29. Affected by this issue is the function freemarkerResolverContent of the file sa-base/src/main/java/net/lab1024/sa/base/module/support/mail/MailService.java of the component FreeMarker Template Handler. Executing a manipulation of the argument template_content can lead to improper neutralization of special elements used in a template engine. The attack can be launched remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d0f6674514555fc142136a3ce063f41cfb36198b29fd4b5b6b6bd8cfa6e6c809",
+  "source": "nvd",
+  "tags": [
+    "CWE-791",
+    "CWE-1336"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3725"
+}

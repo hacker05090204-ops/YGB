@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27705",
+  "ingested_at": "2026-03-22T07:54:32.175102+00:00",
+  "lang": "en",
+  "raw_text": "Plane is an an open-source project management tool. Prior to version 1.2.2, the `ProjectAssetEndpoint.patch()` method in `apps/api/plane/app/views/asset/v2.py` (lines 579\u2013593) performs a global asset lookup using only the asset ID (`pk`) via `FileAsset.objects.get(id=pk)`, without verifying that the asset belongs to the workspace and project specified in the URL path. This allows any authenticated user (including those with the GUEST role) to modify the `attributes` and `is_uploaded` status of assets belonging to any workspace or project in the entire Plane instance by guessing or enumerating asset UUIDs. Version 1.2.2 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "512afaba06d90f0f6a8766c77507d4c6e3d301d2de16cfe78e1bf6d96e5f4bea",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27705"
+}

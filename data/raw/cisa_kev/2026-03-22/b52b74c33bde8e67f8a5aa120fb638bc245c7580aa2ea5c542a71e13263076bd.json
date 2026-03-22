@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-13671",
+  "ingested_at": "2026-03-22T07:45:18.847554+00:00",
+  "lang": "en",
+  "raw_text": "Drupal Drupal core Improper sanitization in the extension file names is present in Drupal core.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b52b74c33bde8e67f8a5aa120fb638bc245c7580aa2ea5c542a71e13263076bd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

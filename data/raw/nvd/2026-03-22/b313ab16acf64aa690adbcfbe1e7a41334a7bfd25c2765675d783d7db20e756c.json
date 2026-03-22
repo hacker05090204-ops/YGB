@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-60237",
+  "ingested_at": "2026-03-22T07:54:47.896348+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Themeton Finag allows Object Injection.This issue affects Finag: from n/a through 1.5.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b313ab16acf64aa690adbcfbe1e7a41334a7bfd25c2765675d783d7db20e756c",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-60237"
+}

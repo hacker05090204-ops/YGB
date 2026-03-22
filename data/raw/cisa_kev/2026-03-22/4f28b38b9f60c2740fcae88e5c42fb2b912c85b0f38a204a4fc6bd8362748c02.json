@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-5544",
+  "ingested_at": "2026-03-22T07:45:19.634022+00:00",
+  "lang": "en",
+  "raw_text": "VMware VMware ESXi and Horizon DaaS VMware ESXi and Horizon Desktop as a Service (DaaS) OpenSLP contains a heap-based buffer overflow vulnerability that allows an attacker with network access to port 427 to overwrite the heap of the OpenSLP service to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4f28b38b9f60c2740fcae88e5c42fb2b912c85b0f38a204a4fc6bd8362748c02",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-295: Improper Certificate Validation was discovered in jxcore jxm master. The application disables TLS/SSL certificate validation by setting 'rejectUnauthorized': false in HTTPS request options when 'jx_obj.IsSecure' is true",
+  "token_count": 32
+}

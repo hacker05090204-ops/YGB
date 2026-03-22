@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27983",
+  "ingested_at": "2026-03-22T07:54:40.291224+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect Privilege Assignment vulnerability in designthemes LMS Elementor Pro lms-elementor-pro allows Privilege Escalation.This issue affects LMS Elementor Pro: from n/a through < = 1.0.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4ec75ed79da9c1d75aee53337801c29a43289bbcf52a3ed1613f9011df0afec2",
+  "source": "nvd",
+  "tags": [
+    "CWE-266"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27983"
+}

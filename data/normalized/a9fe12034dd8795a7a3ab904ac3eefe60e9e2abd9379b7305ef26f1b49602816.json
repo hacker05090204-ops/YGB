@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Out-of-bounds character read vulnerability in Bluetooth. Impact: Successful exploitation of this vulnerability may affect service confidentiality.",
+  "token_count": 16
+}

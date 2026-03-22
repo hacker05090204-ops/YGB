@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8373",
+  "ingested_at": "2026-03-22T07:45:18.333163+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Scripting Engine A remote code execution vulnerability exists in the way that the scripting engine handles objects in memory in Internet Explorer.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3de2e24136a7565d9ab2d005dccded78c8e8ced415d19cfd37a6da2f2480c355",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

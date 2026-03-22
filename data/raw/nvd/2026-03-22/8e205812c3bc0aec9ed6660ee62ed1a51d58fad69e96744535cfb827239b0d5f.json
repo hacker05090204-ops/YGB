@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14558",
+  "ingested_at": "2026-03-22T07:54:42.259351+00:00",
+  "lang": "en",
+  "raw_text": "The rtsol(8) and rtsold(8) programs do not validate the domain search list options provided in router advertisement messages; the option body is passed to resolvconf(8) unmodified. resolvconf(8) is a shell script which does not validate its input. A lack of quoting meant that shell commands pass as input to resolvconf(8) may be executed.",
+  "severity": "HIGH",
+  "sha256_hash": "8e205812c3bc0aec9ed6660ee62ed1a51d58fad69e96744535cfb827239b0d5f",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14558"
+}

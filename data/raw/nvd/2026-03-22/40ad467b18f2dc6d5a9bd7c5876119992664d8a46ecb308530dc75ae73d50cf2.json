@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-55019",
+  "ingested_at": "2026-03-22T07:54:34.177231+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect access control in the component download_wb.cgi of Weintek cMT-3072XH2 easyweb Web Version v2.1.53, OS v20231011 allows unauthenticated attack to download arbitrary files.",
+  "severity": "HIGH",
+  "sha256_hash": "40ad467b18f2dc6d5a9bd7c5876119992664d8a46ecb308530dc75ae73d50cf2",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-55019"
+}

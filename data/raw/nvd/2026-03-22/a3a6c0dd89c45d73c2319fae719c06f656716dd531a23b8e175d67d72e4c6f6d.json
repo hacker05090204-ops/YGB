@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20027",
+  "ingested_at": "2026-03-22T07:54:46.244083+00:00",
+  "lang": "en",
+  "raw_text": "ZKTeco ZKBioSecurity 3.0 contains multiple reflected cross-site scripting vulnerabilities that allow attackers to execute arbitrary HTML and script code by injecting malicious payloads through unsanitized parameters in multiple scripts. Attackers can craft malicious URLs with XSS payloads in vulnerable parameters to execute scripts in a user's browser session within the context of the affected application.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a3a6c0dd89c45d73c2319fae719c06f656716dd531a23b8e175d67d72e4c6f6d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20027"
+}

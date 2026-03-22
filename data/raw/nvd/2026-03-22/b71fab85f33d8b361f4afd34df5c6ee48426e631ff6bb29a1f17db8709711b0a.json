@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26979",
+  "ingested_at": "2026-03-22T07:54:32.746142+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, TL4 users are able to close, archive and pin topics in private categories they don't have access to. Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. No known workarounds are available.",
+  "severity": "LOW",
+  "sha256_hash": "b71fab85f33d8b361f4afd34df5c6ee48426e631ff6bb29a1f17db8709711b0a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26979"
+}

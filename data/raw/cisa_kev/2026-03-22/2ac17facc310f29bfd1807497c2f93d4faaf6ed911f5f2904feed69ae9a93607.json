@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-25337",
+  "ingested_at": "2026-03-22T07:45:17.586807+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an improper access control vulnerability in clipboard service which allows untrusted applications to read or write arbitrary files. This vulnerability was chained with CVE-2021-25369 and CVE-2021-25370.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2ac17facc310f29bfd1807497c2f93d4faaf6ed911f5f2904feed69ae9a93607",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "StudioCMS is a server-side-rendered, Astro native, headless content management system. Prior to 0.4.3, the updateUserNotifications endpoint accepts a user ID from the request payload and uses it to update that user's notification preferences. It checks that the caller is logged in but never verifies that the caller owns the target account (id !== userData.user.id). Any authenticated visitor can modify notification preferences for any user, including disabling admin notifications to suppress detection of malicious activity. This vulnerability is fixed in 0.4.3.",
+  "token_count": 80
+}

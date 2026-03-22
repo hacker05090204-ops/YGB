@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-31324",
+  "ingested_at": "2026-03-22T07:45:16.448517+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Visual Composer Metadata Uploader contains an unrestricted file upload vulnerability that allows an unauthenticated agent to upload potentially malicious executable binaries.",
+  "severity": "CRITICAL",
+  "sha256_hash": "278de45e96e77ee1eb247e1a387b38564f279b2397e8e8c5f63a70ec369ac5c9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

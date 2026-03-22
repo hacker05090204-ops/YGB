@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3399",
+  "ingested_at": "2026-03-22T07:54:33.466947+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Tenda F453 1.0.0.3. Affected by this vulnerability is the function fromGstDhcpSetSer of the file /goform/GstDhcpSetSer of the component httpd. The manipulation of the argument dips leads to buffer overflow. The attack may be initiated remotely. The exploit is publicly available and might be used.",
+  "severity": "HIGH",
+  "sha256_hash": "efbbc7d07fa98c90df2645d073fdb8ae1bd60258ac69d65d3c82c1bc6d1d8a50",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3399"
+}

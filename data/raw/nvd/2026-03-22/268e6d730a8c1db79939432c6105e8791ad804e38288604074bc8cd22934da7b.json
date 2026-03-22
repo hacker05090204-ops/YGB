@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28405",
+  "ingested_at": "2026-03-22T07:54:40.983652+00:00",
+  "lang": "en",
+  "raw_text": "MarkUs is a web application for the submission and grading of student assignments. Prior to version 2.9.1, the courses/ < :course_id>/assignments/ < :assignment_id>/submissions/html_content route reads the contents of a student-submitted file and renders them without sanitization. This issue has been patched in version 2.9.1.",
+  "severity": "HIGH",
+  "sha256_hash": "268e6d730a8c1db79939432c6105e8791ad804e38288604074bc8cd22934da7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28405"
+}

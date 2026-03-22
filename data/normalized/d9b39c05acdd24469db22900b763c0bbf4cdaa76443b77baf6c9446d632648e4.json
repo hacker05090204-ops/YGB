@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. From 5.0.2 to before 8.0.0, there are (at least) two paths where the gateway_api_key secret value is rendered to the client in plaintext. These secret keys being leaked could result in arbitrary money movement or broad account takeover of payment gateway APIs. This vulnerability is fixed in 8.0.0.",
+  "token_count": 63
+}

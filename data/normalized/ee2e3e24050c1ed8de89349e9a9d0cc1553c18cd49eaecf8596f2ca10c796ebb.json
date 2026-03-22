@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Seraphinite Solutions Seraphinite Accelerator seraphinite-accelerator allows Retrieve Embedded Sensitive Data.This issue affects Seraphinite Accelerator: from n/a through < = 2.22.15.",
+  "token_count": 24
+}

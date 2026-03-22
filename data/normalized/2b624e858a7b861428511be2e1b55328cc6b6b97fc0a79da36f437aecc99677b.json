@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SODOLA SL902-SWTGW124AS firmware versions through 200.1.20 contain an authentication vulnerability that allows authenticated users to change account passwords without verifying the current password. Attackers who gain access to an authenticated session can modify credentials to maintain persistent access to the management interface.",
+  "token_count": 42
+}

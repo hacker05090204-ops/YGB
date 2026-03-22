@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2023-40693",
+  "ingested_at": "2026-03-22T07:54:44.541594+00:00",
+  "lang": "en",
+  "raw_text": "IBM Sterling B2B Integrator and IBM Sterling File Gateway 6.1.0.0 through 6.1.2.7_2, and 6.2.0.0 through 6.2.0.5_1, 6.2.1.0 through 6.2.1.1_1 are vulnerable to cross-site scripting. This vulnerability allows users to embed arbitrary JavaScript code in the Web UI thus altering the intended functionality potentially leading to credentials disclosure within a trusted session.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8cfd45fa36b2b2be3ceba31ab1b48f36e3c143dc78d4b3b6c317da8cca0504ed",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-40693"
+}

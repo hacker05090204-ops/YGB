@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2935",
+  "ingested_at": "2026-03-22T07:54:30.946947+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in UTT HiPER 810G up to 1.7.7-171114. This issue affects the function strcpy of the file /goform/ConfigExceptMSN. Executing a manipulation of the argument remark can lead to buffer overflow. The attack can be executed remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "e4bf83f5776cdeab907b1f4eb9b31e0f31d1292f57d86888a9fc18ba8bebf5f5",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2935"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2277",
+  "ingested_at": "2026-03-22T07:54:49.329103+00:00",
+  "lang": "en",
+  "raw_text": "The rexCrawler plugin for WordPress is vulnerable to Reflected Cross-Site Scripting via the 'url' and 'regex' parameters in the search-pattern tester page in all versions up to, and including, 1.0.15 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that execute if they can successfully trick an administrator into performing an action such as clicking on a link. This only affects multi-site installations and installations where unfiltered_html has been disabled.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b54a3adc4a2c0f250705da7edf501c1f8fd6696c3f8b912385e946932a74ac87",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2277"
+}

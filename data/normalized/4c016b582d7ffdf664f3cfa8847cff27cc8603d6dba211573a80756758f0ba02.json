@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiAnalyzer, FortiManager, FortiOS, and FortiProxy contain an authentication bypass using an alternate path or channel that could allow an attacker with a FortiCloud account and a registered device to log into other devices registered to other accounts, if FortiCloud SSO authentication is enabled on those devices.",
+  "token_count": 50
+}

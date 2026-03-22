@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25438",
+  "ingested_at": "2026-03-22T07:54:30.630839+00:00",
+  "lang": "en",
+  "raw_text": "LabCollector 5.423 contains multiple SQL injection vulnerabilities that allow unauthenticated attackers to execute arbitrary SQL commands by injecting malicious code through POST parameters. Attackers can submit crafted SQL payloads in the login parameter of login.php or the user_name parameter of retrieve_password.php to extract sensitive database information without authentication.",
+  "severity": "HIGH",
+  "sha256_hash": "c60ac8953efb576ce80a362736f8368829f23d8e549e3e152bf59206d2ee224b",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25438"
+}

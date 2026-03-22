@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-2597",
+  "ingested_at": "2026-03-22T07:45:17.636057+00:00",
+  "lang": "en",
+  "raw_text": "Code Aurora ACDB Audio Driver The Code Aurora audio calibration database (acdb) audio driver contains a stack-based buffer overflow vulnerability that allows for privilege escalation. Code Aurora is used in third-party products such as Qualcomm and Android.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fcce623249225a58c8a3bd8705d0fc0f9fb036c1eb76b1cbad08f5de5ca05df4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

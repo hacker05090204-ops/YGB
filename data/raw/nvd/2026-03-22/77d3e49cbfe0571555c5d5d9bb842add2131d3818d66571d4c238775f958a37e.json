@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2013-20006",
+  "ingested_at": "2026-03-22T07:54:46.208475+00:00",
+  "lang": "en",
+  "raw_text": "Qool CMS contains multiple persistent cross-site scripting vulnerabilities in several administrative scripts where POST parameters are not properly sanitized before being stored and returned to users. Attackers can inject malicious JavaScript code through parameters like 'title', 'name', 'email', 'username', 'link', and 'task' in endpoints such as addnewtype, addnewdatafield, addmenu, addusergroup, addnewuserfield, adduser, addgeneraldata, and addcontentitem to execute arbitrary scripts in administrator browsers.",
+  "severity": "HIGH",
+  "sha256_hash": "77d3e49cbfe0571555c5d5d9bb842add2131d3818d66571d4c238775f958a37e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2013-20006"
+}

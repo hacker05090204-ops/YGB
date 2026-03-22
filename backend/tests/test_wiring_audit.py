@@ -46,13 +46,16 @@ class TestMetricsRegistryWiring:
 
     def test_infrastructure_vs_training_split(self):
         from backend.observability.metrics import (
-            INFRASTRUCTURE_METRICS, TRAINING_ONLY_METRICS, CRITICAL_METRICS,
+            CRITICAL_METRICS,
+            GPU_RUNTIME_METRICS,
+            INFRASTRUCTURE_METRICS,
+            TRAINING_ONLY_METRICS,
         )
         # Infrastructure and training-only must be disjoint
         overlap = INFRASTRUCTURE_METRICS & TRAINING_ONLY_METRICS
         assert len(overlap) == 0, f"Overlap: {overlap}"
-        # Combined must equal CRITICAL_METRICS
-        assert INFRASTRUCTURE_METRICS | TRAINING_ONLY_METRICS == CRITICAL_METRICS
+        # Combined must equal CRITICAL_METRICS, including GPU runtime telemetry.
+        assert INFRASTRUCTURE_METRICS | TRAINING_ONLY_METRICS | GPU_RUNTIME_METRICS == CRITICAL_METRICS
 
     def test_check_critical_metrics_only_flags_infrastructure(self):
         """check_critical_metrics() should NOT flag training-only metrics."""

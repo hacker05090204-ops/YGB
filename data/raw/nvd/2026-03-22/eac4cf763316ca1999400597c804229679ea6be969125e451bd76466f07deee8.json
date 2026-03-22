@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33191",
+  "ingested_at": "2026-03-22T07:54:48.685492+00:00",
+  "lang": "en",
+  "raw_text": "Free5GC is an open-source Linux Foundation project for 5th generation (5G) mobile core networks. Versions prior to 1.4.2 are vulnerable to null byte injection in URL path parameters. A remote attacker can inject null bytes (URL-encoded as %00) into the supi path parameter of the UDM's Nudm_SubscriberDataManagement API. This causes URL parsing failure in Go's net/url package with the error \"invalid control character in URL\", resulting in a 500 Internal Server Error. This null byte injection vulnerability can be exploited for denial of service attacks. When the supi parameter contains null characters, the UDM attempts to construct a URL for UDR that includes these control characters. Go's URL parser rejects them, causing the request to fail with 500 instead of properly validating input and returning 400 Bad Request. This issue has been fixed in version 1.4.2.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "eac4cf763316ca1999400597c804229679ea6be969125e451bd76466f07deee8",
+  "source": "nvd",
+  "tags": [
+    "CWE-158",
+    "CWE-248"
+  ],
+  "token_count": 136,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33191"
+}

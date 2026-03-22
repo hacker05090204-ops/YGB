@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4194",
+  "ingested_at": "2026-03-22T07:54:46.703497+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in D-Link DNS-120, DNR-202L, DNS-315L, DNS-320, DNS-320L, DNS-320LW, DNS-321, DNR-322L, DNS-323, DNS-325, DNS-326, DNS-327L, DNR-326, DNS-340L, DNS-343, DNS-345, DNS-726-4, DNS-1100-4, DNS-1200-05 and DNS-1550-04 up to 20260205. The impacted element is the function cgi_set_wto of the file /cgi-bin/system_mgr.cgi. Performing a manipulation results in improper access controls. Remote exploitation of the attack is possible. The exploit is now public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "ba04f0953329938c02a2bbff3062f34e8a16a6934dd30e38e7638895c5116b7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4194"
+}

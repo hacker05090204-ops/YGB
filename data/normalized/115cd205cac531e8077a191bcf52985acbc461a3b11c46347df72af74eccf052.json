@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "FXC AE1021, AE1021PE FXC AE1021 and AE1021PE contain an OS command injection vulnerability that allows authenticated users to execute commands via a network.",
+  "token_count": 23
+}

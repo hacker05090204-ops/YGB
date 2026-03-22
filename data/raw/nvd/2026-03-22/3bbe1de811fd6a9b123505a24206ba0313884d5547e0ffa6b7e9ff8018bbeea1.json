@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26861",
+  "ingested_at": "2026-03-22T07:54:33.225433+00:00",
+  "lang": "en",
+  "raw_text": "CleverTap Web SDK version 1.15.2 and earlier is vulnerable to Cross-Site Scripting (XSS) via window.postMessage. The handleCustomHtmlPreviewPostMessageEvent function in src/util/campaignRender/nativeDisplay.js performs insufficient origin validation using the includes() method, which can be bypassed by an attacker using a subdomain",
+  "severity": "HIGH",
+  "sha256_hash": "3bbe1de811fd6a9b123505a24206ba0313884d5547e0ffa6b7e9ff8018bbeea1",
+  "source": "nvd",
+  "tags": [
+    "CWE-346"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26861"
+}

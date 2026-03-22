@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-31125",
+  "ingested_at": "2026-03-22T07:45:15.969633+00:00",
+  "lang": "en",
+  "raw_text": "Vite Vitejs Vite Vitejs contains an improper access control vulnerability that exposes content of non-allowed files using ?inline&import or ?raw?import. Only apps explicitly exposing the Vite dev server to the network (using --host or server.host config option) are affected.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3f96c9bbc76f3304e903db2b100aea9391650ca1c1706c72ab64881533e96518",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

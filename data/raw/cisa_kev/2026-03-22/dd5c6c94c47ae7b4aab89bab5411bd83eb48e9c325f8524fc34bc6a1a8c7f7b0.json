@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-33538",
+  "ingested_at": "2026-03-22T07:45:16.351229+00:00",
+  "lang": "en",
+  "raw_text": "TP-Link Multiple Routers TP-Link TL-WR940N V2/V4, TL-WR841N V8/V10, and TL-WR740N V1/V2 contain a command injection vulnerability via the component /userRpm/WlanNetworkRpm. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dd5c6c94c47ae7b4aab89bab5411bd83eb48e9c325f8524fc34bc6a1a8c7f7b0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

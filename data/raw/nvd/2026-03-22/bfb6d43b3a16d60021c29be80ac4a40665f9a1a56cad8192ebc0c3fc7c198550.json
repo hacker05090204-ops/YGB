@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25897",
+  "ingested_at": "2026-03-22T07:54:31.343065+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, an Integer Overflow vulnerability exists in the sun decoder. On 32-bit systems/builds, a carefully crafted image can lead to an out of bounds heap write. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bfb6d43b3a16d60021c29be80ac4a40665f9a1a56cad8192ebc0c3fc7c198550",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-190"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25897"
+}

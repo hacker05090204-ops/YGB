@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Incorrect permission assignment (world-writable file) in /etc/udhcpc/default.script in International Data Casting (IDC) SFX2100 Satellite Receiver allows a local unprivileged attacker to potentially execute arbitrary commands with root privileges (local privilege escalation and persistence) via modification of a root-owned, world-writable BusyBox udhcpc DHCP event script, which is executed when a DHCP lease is obtained, renewed, or lost.",
+  "token_count": 56
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2746",
+  "ingested_at": "2026-03-22T07:54:34.424685+00:00",
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 does not properly communicate PGP signature verification results, leaving users unable to detect forged emails.",
+  "severity": "MEDIUM",
+  "sha256_hash": "38afe05ff7b4b997e8c0167bc4c58dcba08c0f3374a47b120a1ab20d47693c74",
+  "source": "nvd",
+  "tags": [
+    "CWE-347"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2746"
+}

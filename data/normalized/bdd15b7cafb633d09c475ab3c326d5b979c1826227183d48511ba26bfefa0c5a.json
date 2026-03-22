@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Concurrent execution using shared resource with improper synchronization ('race condition') in Windows Kerberos allows an unauthorized attacker to bypass a security feature over a network.",
+  "token_count": 25
+}

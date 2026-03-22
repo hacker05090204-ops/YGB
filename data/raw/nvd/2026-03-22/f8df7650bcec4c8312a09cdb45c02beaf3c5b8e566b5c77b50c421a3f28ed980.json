@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32737",
+  "ingested_at": "2026-03-22T07:54:47.774445+00:00",
+  "lang": "en",
+  "raw_text": "Romeo gives the capability to reach high code coverage of Go \u22651.20 apps by helping to measure code coverage for functional and integration tests within GitHub Actions. Prior to version 0.2.1, due to a mis-written NetworkPolicy, a malicious actor can pivot from the \"hardened\" namespace to any Pod out of it. This breaks the security-by-default property expected as part of the deployment program, leading to a potential lateral movement. Removing the `inter-ns` NetworkPolicy patches the vulnerability in version 0.2.1. If updates are not possible in production environments, manually delete `inter-ns` and update as soon as possible. Given one's context, delete the failing network policy that should be prefixed by `inter-ns-` in the target namespace.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f8df7650bcec4c8312a09cdb45c02beaf3c5b8e566b5c77b50c421a3f28ed980",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 114,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32737"
+}

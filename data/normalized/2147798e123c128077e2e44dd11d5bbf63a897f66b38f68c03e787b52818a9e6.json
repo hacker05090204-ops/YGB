@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A stack-based buffer overflow in the device's file installation workflow allows a high-privileged attacker to send oversized POST parameters that overflow a fixed-size stack buffer within an internal process, resulting in a DoS attack.",
+  "token_count": 34
+}

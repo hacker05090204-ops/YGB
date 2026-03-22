@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20030",
+  "ingested_at": "2026-03-22T07:54:46.251820+00:00",
+  "lang": "en",
+  "raw_text": "ZKTeco ZKBioSecurity 3.0 contains a user enumeration vulnerability that allows unauthenticated attackers to discover valid usernames by submitting partial characters via the username parameter. Attackers can send requests to the authLoginAction!login.do script with varying username inputs to enumerate valid user accounts based on application responses.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff61bd0bea1c03dc527bde69629cde16dc3ef527b86003964f996e8e9541409d",
+  "source": "nvd",
+  "tags": [
+    "CWE-551"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20030"
+}

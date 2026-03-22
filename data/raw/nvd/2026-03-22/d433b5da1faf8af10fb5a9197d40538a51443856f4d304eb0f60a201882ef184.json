@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25523",
+  "ingested_at": "2026-03-22T07:54:44.310507+00:00",
+  "lang": "en",
+  "raw_text": "XooGallery Latest contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the cat_id parameter. Attackers can send GET requests to cat.php with malicious cat_id values to bypass authentication, extract sensitive data, or modify database contents.",
+  "severity": "HIGH",
+  "sha256_hash": "d433b5da1faf8af10fb5a9197d40538a51443856f4d304eb0f60a201882ef184",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25523"
+}

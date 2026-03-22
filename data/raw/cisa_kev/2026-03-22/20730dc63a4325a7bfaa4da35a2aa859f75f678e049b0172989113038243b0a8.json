@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-3519",
+  "ingested_at": "2026-03-22T07:45:17.306596+00:00",
+  "lang": "en",
+  "raw_text": "Citrix NetScaler ADC and NetScaler Gateway Citrix NetScaler ADC and NetScaler Gateway contains a code injection vulnerability that allows for unauthenticated remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "20730dc63a4325a7bfaa4da35a2aa859f75f678e049b0172989113038243b0a8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

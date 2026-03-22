@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0109",
+  "ingested_at": "2026-03-22T07:54:43.135811+00:00",
+  "lang": "en",
+  "raw_text": "In dhd_tcpdata_info_get of dhd_ip.c, there is a possible Denial of Service due to a precondition check failure. This could lead to remote denial of service with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "73af43c24669fac93a31b0c1c2ee2e412c69e36d1ebe9e9ee93059f801acfab5",
+  "source": "nvd",
+  "tags": [
+    "CWE-754"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0109"
+}

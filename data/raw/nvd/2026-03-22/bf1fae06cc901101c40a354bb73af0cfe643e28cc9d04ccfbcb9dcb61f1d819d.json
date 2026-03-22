@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70821",
+  "ingested_at": "2026-03-22T07:54:34.075086+00:00",
+  "lang": "en",
+  "raw_text": "renren-secuity before v5.5.0 is vulnerable to SQL Injection in the BaseServiceImpl.java component",
+  "severity": "CRITICAL",
+  "sha256_hash": "bf1fae06cc901101c40a354bb73af0cfe643e28cc9d04ccfbcb9dcb61f1d819d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 12,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70821"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Common Log File System (CLFS) driver contains a heap-based buffer overflow vulnerability that allows a local attacker to escalate privileges.",
+  "token_count": 24
+}

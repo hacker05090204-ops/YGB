@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SonicWall Secure Remote Access (SRA) SonicWall Secure Remote Access (SRA) products contain an improper neutralization of a SQL Command leading to SQL injection.",
+  "token_count": 23
+}

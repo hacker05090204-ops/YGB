@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-0556",
+  "ingested_at": "2026-03-22T07:45:15.983869+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office PowerPoint contains a code injection vulnerability that allows remote attackers to execute arbitrary code via a PowerPoint file with an OutlineTextRefAtom containing an invalid index value that triggers memory corruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "49e56486fb5809dd8eea070f05affe00f618bab340dbfd1eba48d651aa9457fa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

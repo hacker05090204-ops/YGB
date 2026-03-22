@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32321",
+  "ingested_at": "2026-03-22T07:54:47.708522+00:00",
+  "lang": "en",
+  "raw_text": "ClipBucket v5 is an open source video sharing platform. An authenticated time-based blind SQL injection vulnerability exists in ClipBucket prior to 5.5.3 #80 within the `actions/ajax.php` endpoint. Due to insufficient input sanitization of the `userid` parameter, an authenticated attacker can execute arbitrary SQL queries, leading to full database disclosure and potential administrative account takeover. Version 5.5.3 #80 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "3c794c5e698dc65e92fa7cac1b7c04aa650c775cedffc0e532759b93b078e724",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32321"
+}

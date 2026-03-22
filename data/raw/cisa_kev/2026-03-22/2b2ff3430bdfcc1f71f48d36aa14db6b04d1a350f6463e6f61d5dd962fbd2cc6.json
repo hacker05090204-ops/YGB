@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0497",
+  "ingested_at": "2026-03-22T07:45:16.820766+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains an integer underflow vulnerability that allows a remote attacker to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2b2ff3430bdfcc1f71f48d36aa14db6b04d1a350f6463e6f61d5dd962fbd2cc6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

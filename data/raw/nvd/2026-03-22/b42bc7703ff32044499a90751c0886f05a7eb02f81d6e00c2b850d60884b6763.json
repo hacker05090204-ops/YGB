@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32808",
+  "ingested_at": "2026-03-22T07:54:48.414981+00:00",
+  "lang": "en",
+  "raw_text": "pyLoad is a free and open-source download manager written in Python. Versions before 0.5.0b3.dev97 are vulnerable to path traversal during password verification of certain encrypted 7z archives (encrypted files with non-encrypted headers), causing arbitrary file deletion outside of the extraction directory. During password verification, pyLoad derives an archive entry name from 7z listing output and treats it as a filesystem path without constraining it to the extraction directory. This issue has been fixed in version 0.5.0b3.dev97.",
+  "severity": "HIGH",
+  "sha256_hash": "b42bc7703ff32044499a90751c0886f05a7eb02f81d6e00c2b850d60884b6763",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32808"
+}

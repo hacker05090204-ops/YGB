@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28697",
+  "ingested_at": "2026-03-22T07:54:34.585273+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 4.17.0-beta.1 and 5.9.0-beta.1, an authenticated administrator can achieve Remote Code Execution (RCE) by injecting a Server-Side Template Injection (SSTI) payload into Twig template fields (e.g., Email Templates). By calling the craft.app.fs.write() method, an attacker can write a malicious PHP script to a web-accessible directory and subsequently access it via the browser to execute arbitrary system commands. This vulnerability is fixed in 4.17.0-beta.1 and 5.9.0-beta.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "871c7c54da1f2ddbef378c4aa6e334423435dd52ca5b12ab6fe38150605058bf",
+  "source": "nvd",
+  "tags": [
+    "CWE-1336"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28697"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27704",
+  "ingested_at": "2026-03-22T07:54:32.113429+00:00",
+  "lang": "en",
+  "raw_text": "The Dart and Flutter SDKs provide software development kits for the Dart programming language. In versions of the Dart SDK prior to 3.11.0 and the Flutter SDK prior to version 3.41.0, when the pub client (`dart pub` and `flutter pub`) extracts a package in the pub cache, a malicious package archive can have files extracted outside the destination directory in the `PUB_CACHE`. A fix has been landed in commit 26c6985c742593d081f8b58450f463a584a4203a. By normalizing the file path before writing file, the attacker can no longer traverse up via a symlink. This patch is released in Dart 3.11.0 and Flutter 3.41.0.vAll packages on pub.dev have been vetted for this vulnerability. New packages are no longer allowed to contain symlinks. The pub client itself doesn't upload symlinks, but duplicates the linked entry, and has been doing this for years. Those whose dependencies are all from pub.dev, third-party repositories trusted to not contain malicious code, or git dependencies are not affected by this vulnerability.",
+  "severity": "HIGH",
+  "sha256_hash": "0a88308b568ad29daa303a304f3310de50dee3b9eadccd84cb6dfbaacb4bcd15",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 159,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27704"
+}

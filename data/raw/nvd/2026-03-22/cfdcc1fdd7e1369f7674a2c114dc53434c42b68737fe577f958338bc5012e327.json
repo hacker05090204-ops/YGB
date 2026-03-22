@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32722",
+  "ingested_at": "2026-03-22T07:54:47.724744+00:00",
+  "lang": "en",
+  "raw_text": "Memray is a memory profiler for Python. Prior to Memray 1.19.2, Memray rendered the command line of the tracked process directly into generated HTML reports without escaping. Because there was no escaping, attacker-controlled command line arguments were inserted as raw HTML into the generated report. This allowed JavaScript execution when a victim opened the generated report in a browser. Version 1.19.2 fixes the issue.",
+  "severity": "LOW",
+  "sha256_hash": "cfdcc1fdd7e1369f7674a2c114dc53434c42b68737fe577f958338bc5012e327",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32722"
+}

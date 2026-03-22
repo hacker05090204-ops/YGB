@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2968",
+  "ingested_at": "2026-03-22T07:54:31.053061+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Cesanta Mongoose up to 7.20. This impacts the function mg_chacha20_poly1305_decrypt of the file /src/tls_chacha20.c of the component Poly1305 Authentication Tag Handler. The manipulation results in improper verification of cryptographic signature. The attack may be launched remotely. This attack is characterized by high complexity. The exploitability is said to be difficult. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "a8c14e4949a02ddf60409fef615ecaaf98edd1366aa8db1ed8e1952d0511ec94",
+  "source": "nvd",
+  "tags": [
+    "CWE-345",
+    "CWE-347"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2968"
+}

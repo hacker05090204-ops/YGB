@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26929",
+  "ingested_at": "2026-03-22T07:54:47.041080+00:00",
+  "lang": "en",
+  "raw_text": "Apache Airflow versions 3.0.0 through 3.1.7 FastAPI DagVersion listing API does not apply per-DAG authorization filtering when the request is made with dag_id set to \"~\" (wildcard for all DAGs). As a result, version metadata of DAGs that the requester is not authorized to access is returned. Users are recommended to upgrade to Apache Airflow 3.1.8 or later, which resolves this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "92dcd970b64f04238dc07aed84d9f27be0ade32c008fdc71e9f3a418fc904db4",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26929"
+}

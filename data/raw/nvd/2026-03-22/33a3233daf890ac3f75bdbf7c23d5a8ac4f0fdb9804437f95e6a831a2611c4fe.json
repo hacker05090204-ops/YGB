@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25193",
+  "ingested_at": "2026-03-22T07:54:41.467031+00:00",
+  "lang": "en",
+  "raw_text": "Mongoose Web Server 6.9 contains a denial of service vulnerability that allows remote attackers to crash the service by establishing multiple socket connections. Attackers can repeatedly create connections to the default port and send malformed data to exhaust server resources and cause service unavailability.",
+  "severity": "HIGH",
+  "sha256_hash": "33a3233daf890ac3f75bdbf7c23d5a8ac4f0fdb9804437f95e6a831a2611c4fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-1188"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25193"
+}

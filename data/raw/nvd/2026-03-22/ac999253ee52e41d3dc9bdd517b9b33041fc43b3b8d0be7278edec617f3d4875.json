@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32345",
+  "ingested_at": "2026-03-22T07:54:45.896080+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Perfect Portfolio perfect-portfolio allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Perfect Portfolio: from n/a through < = 1.2.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ac999253ee52e41d3dc9bdd517b9b33041fc43b3b8d0be7278edec617f3d4875",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32345"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-3837",
+  "ingested_at": "2026-03-22T07:45:17.749962+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and watchOS contain a memory corruption vulnerability that could allow an application to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9b2c0300819d8ead9c6b6937fbd9d9e8c3764ebc42ef297de7d147e810f1dfd2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

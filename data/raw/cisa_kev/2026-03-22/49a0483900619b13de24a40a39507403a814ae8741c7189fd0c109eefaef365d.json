@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27059",
+  "ingested_at": "2026-03-22T07:45:19.402428+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "49a0483900619b13de24a40a39507403a814ae8741c7189fd0c109eefaef365d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 14,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24950",
+  "ingested_at": "2026-03-22T07:54:30.439292+00:00",
+  "lang": "en",
+  "raw_text": "Authorization Bypass Through User-Controlled Key vulnerability in themeplugs Authorsy authorsy allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Authorsy: from n/a through < = 1.0.6.",
+  "severity": "HIGH",
+  "sha256_hash": "c001ccd9e3675b6fb1171b43a8750c942281637485e360fed3e218d3e7d2f23e",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24950"
+}

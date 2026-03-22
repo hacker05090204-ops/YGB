@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3240",
+  "ingested_at": "2026-03-22T07:54:34.363453+00:00",
+  "lang": "en",
+  "raw_text": "In Concrete CMS below version 9.4.8, a user with permission to edit a page with element Legacy form can perform a stored XSS attack towards high-privilege accounts via the Question field. The Concrete CMS security team gave this vulnerability a CVSS v.4.0 score of 4.8 with vector CVSS:4.0/AV:N/AC:L/AT:N/PR:H/UI:P/VC:N/VI:L/VA:N/SC:N/SI:N/SA:N Thanks minhnn42, namdi and quanlna2 from VCSLab-Viettel Cyber Security for reporting.",
+  "severity": "MEDIUM",
+  "sha256_hash": "95da6ada252ba6b58c7702831bb94fc06bd9e27da9b167a37d45f16a77a30d61",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3240"
+}

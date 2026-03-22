@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0995",
+  "ingested_at": "2026-03-22T07:54:33.624415+00:00",
+  "lang": "en",
+  "raw_text": "An issue has been identified in Arm C1-Pro before r1p2-50eac0, where, under certain conditions, a TLBI+DSB might fail to ensure the completion of memory accesses related to SME.",
+  "severity": "LOW",
+  "sha256_hash": "a5126a166f8681c8b7b0a87837f37089d8d99344db0d30282cbdaa378a65d5b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0995"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67601",
+  "ingested_at": "2026-03-22T07:54:32.028750+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified within Rancher Manager, where using self-signed CA certificates and passing the -skip-verify flag to the Rancher CLI login command without also passing the \u2013cacert flag results in the CLI attempting to fetch CA certificates stored in Rancher\u2019s setting cacerts.",
+  "severity": "HIGH",
+  "sha256_hash": "e32ed48c3fc656c127d2b678166abc54a19ff8f30ff763d8fb115a0c56577f72",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67601"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-8068",
+  "ingested_at": "2026-03-22T07:45:16.229149+00:00",
+  "lang": "en",
+  "raw_text": "Citrix Session Recording Citrix Session Recording contains an improper privilege management vulnerability that could allow for privilege escalation to NetworkService Account access. An attacker must be an authenticated user in the same Windows Active Directory domain as the session recording server domain.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bc1ed90ffc19dc10ab62c6a74a45450936b90da1c20c83eb58ada053d5fead30",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

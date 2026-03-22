@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62846",
+  "ingested_at": "2026-03-22T07:54:48.886488+00:00",
+  "lang": "en",
+  "raw_text": "An SQL injection vulnerability has been reported to affect QHora. If a local attacker gains an administrator account, they can then exploit the vulnerability to execute unauthorized code or commands. We have already fixed the vulnerability in the following version: QuRouter 2.6.2.007 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ff4c6984933888e419b461895f16fe5272b674d7631b80be0752ead6ed8ed78d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62846"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28255",
+  "ingested_at": "2026-03-22T07:54:44.413453+00:00",
+  "lang": "en",
+  "raw_text": "A Use of Hard-coded Credentials vulnerability in Trane Tracer SC, Tracer SC+, and Tracer Concierge could allow an attacker to disclose sensitive information and take over accounts.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "826a695b5520799f55a6b5f7b8dc184709c2faae2a664db589ca9519b788bed7",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28255"
+}

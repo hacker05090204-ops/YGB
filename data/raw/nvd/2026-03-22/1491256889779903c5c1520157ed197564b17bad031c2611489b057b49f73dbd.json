@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29113",
+  "ingested_at": "2026-03-22T07:54:43.086763+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 4.17.4 and 5.9.7, Craft CMS has a CSRF issue in the preview token endpoint at /actions/preview/create-token. The endpoint accepts an attacker-supplied previewToken. Because the action does not require POST and does not enforce a CSRF token, an attacker can force a logged-in victim editor to mint a preview token chosen by the attacker. That token can then be used by the attacker (without authentication) to access previewed/unpublished content tied to the victim\u2019s authorized preview scope. This vulnerability is fixed in 4.17.4 and 5.9.7.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1491256889779903c5c1520157ed197564b17bad031c2611489b057b49f73dbd",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29113"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1948",
+  "ingested_at": "2026-03-22T07:54:46.376743+00:00",
+  "lang": "en",
+  "raw_text": "The NEX-Forms \u2013 Ultimate Forms Plugin for WordPress plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the deactivate_license() function in all versions up to, and including, 9.1.9. This makes it possible for authenticated attackers, with Subscriber-level access and above, to to deactivate the plugin license.",
+  "severity": "MEDIUM",
+  "sha256_hash": "da1e2fde9bb7ebf7bb907506ef1ef0d3f381b399f67c5386cdf8f0dfe7afe123",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1948"
+}

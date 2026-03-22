@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2473",
+  "ingested_at": "2026-03-22T07:54:30.562375+00:00",
+  "lang": "en",
+  "raw_text": "Predictable bucket naming in Vertex AI Experiments in Google Cloud Vertex AI from version 1.21.0 up to (but not including) 1.133.0 on Google Cloud Platform allows an unauthenticated remote attacker to achieve cross-tenant remote code execution, model theft, and poisoning via pre-creating predictably named Cloud Storage buckets (Bucket Squatting). This vulnerability was patched and no customer action is needed.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "76853f06350fb70345ab1566b16a73931b4b3b684fa5a715310c71d5f9d03c9a",
+  "source": "nvd",
+  "tags": [
+    "CWE-340"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2473"
+}

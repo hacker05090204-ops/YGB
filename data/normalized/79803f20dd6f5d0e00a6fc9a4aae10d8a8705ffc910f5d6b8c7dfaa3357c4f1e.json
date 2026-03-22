@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in Chyrp v.2.5.2 and before allows a remote attacker to obtain sensitive information via the Admin.php component",
+  "token_count": 20
+}

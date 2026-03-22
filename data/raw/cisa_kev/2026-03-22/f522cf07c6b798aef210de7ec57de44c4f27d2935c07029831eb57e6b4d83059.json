@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-30406",
+  "ingested_at": "2026-03-22T07:45:16.475901+00:00",
+  "lang": "en",
+  "raw_text": "Gladinet CentreStack Gladinet CentreStack and Triofox contains a use of hard-coded cryptographic key vulnerability in the way that the application manages keys used for ViewState integrity verification. Successful exploitation allows an attacker to forge ViewState payloads for server-side deserialization, allowing for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f522cf07c6b798aef210de7ec57de44c4f27d2935c07029831eb57e6b4d83059",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

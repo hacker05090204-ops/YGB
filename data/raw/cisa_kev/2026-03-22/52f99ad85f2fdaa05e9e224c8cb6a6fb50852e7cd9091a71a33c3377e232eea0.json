@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-8394",
+  "ingested_at": "2026-03-22T07:45:19.670879+00:00",
+  "lang": "en",
+  "raw_text": "Zoho ManageEngine Zoho ManageEngine ServiceDesk Plus (SDP) contains an unspecified vulnerability that allows remote users to upload files via login page customization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "52f99ad85f2fdaa05e9e224c8cb6a6fb50852e7cd9091a71a33c3377e232eea0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

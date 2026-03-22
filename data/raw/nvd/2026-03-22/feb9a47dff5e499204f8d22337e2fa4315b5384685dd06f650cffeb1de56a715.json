@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1492",
+  "ingested_at": "2026-03-22T07:54:34.021787+00:00",
+  "lang": "en",
+  "raw_text": "The User Registration & Membership \u2013 Custom Registration Form Builder, Custom Login Form, User Profile, Content Restriction & Membership Plugin plugin for WordPress is vulnerable to improper privilege management in all versions up to, and including, 5.1.2. This is due to the plugin accepting a user-supplied role during membership registration without properly enforcing a server-side allowlist. This makes it possible for unauthenticated attackers to create administrator accounts by supplying a role value during membership registration.",
+  "severity": "CRITICAL",
+  "sha256_hash": "feb9a47dff5e499204f8d22337e2fa4315b5384685dd06f650cffeb1de56a715",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1492"
+}

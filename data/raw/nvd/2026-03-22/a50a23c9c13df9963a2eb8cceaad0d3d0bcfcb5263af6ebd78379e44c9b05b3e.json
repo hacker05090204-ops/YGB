@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27939",
+  "ingested_at": "2026-03-22T07:54:33.334122+00:00",
+  "lang": "en",
+  "raw_text": "Statmatic is a Laravel and Git powered content management system (CMS). Starting in version 6.0.0 and prior to version 6.4.0, Authenticated Control Panel users may under certain conditions obtain elevated privileges without completing the intended verification step. This can allow access to sensitive operations and, depending on the user\u2019s existing permissions, may lead to privilege escalation. This has been fixed in 6.4.0.",
+  "severity": "HIGH",
+  "sha256_hash": "a50a23c9c13df9963a2eb8cceaad0d3d0bcfcb5263af6ebd78379e44c9b05b3e",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27939"
+}

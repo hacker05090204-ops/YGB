@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Emlog is an open source website building system. In 2.6.6 and earlier, the delete_async action (asynchronous delete) lacks a call to LoginAuth::checkToken(), enabling CSRF attacks.",
+  "token_count": 25
+}

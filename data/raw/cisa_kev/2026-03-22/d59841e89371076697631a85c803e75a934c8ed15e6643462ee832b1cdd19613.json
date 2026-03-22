@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30761",
+  "ingested_at": "2026-03-22T07:45:19.055246+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS Apple iOS WebKit contains a memory corruption vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d59841e89371076697631a85c803e75a934c8ed15e6643462ee832b1cdd19613",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

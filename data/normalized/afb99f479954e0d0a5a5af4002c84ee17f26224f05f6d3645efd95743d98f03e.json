@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Server Affected versions of Atlassian Confluence Server allow remote attackers to view restricted resources via a pre-authorization arbitrary file read vulnerability in the /s/ endpoint.",
+  "token_count": 27
+}

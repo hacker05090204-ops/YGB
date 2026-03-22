@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-4810",
+  "ingested_at": "2026-03-22T07:45:18.403671+00:00",
+  "lang": "en",
+  "raw_text": "Hewlett Packard (HP) ProCurve Manager (PCM), PCM+, Identity Driven Manager (IDM), and Application Lifecycle Management HP ProCurve Manager (PCM), PCM+, Identity Driven Manager (IDM), and Application Lifecycle Management allow remote attackers to execute arbitrary code via a marshalled object to (1) EJBInvokerServlet or (2) JMXInvokerServlet.",
+  "severity": "CRITICAL",
+  "sha256_hash": "580010ebb49b4b85138cf9af05d6f35bd83418e5109cddb5e6f09ce681c3ad0e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

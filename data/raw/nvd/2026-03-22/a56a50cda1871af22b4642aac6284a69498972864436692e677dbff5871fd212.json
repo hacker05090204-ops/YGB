@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20026",
+  "ingested_at": "2026-03-22T07:54:46.242080+00:00",
+  "lang": "en",
+  "raw_text": "ZKTeco ZKBioSecurity 3.0 contains hardcoded credentials in the bundled Apache Tomcat server that allow unauthenticated attackers to access the manager application. Attackers can authenticate with hardcoded credentials stored in tomcat-users.xml to upload malicious WAR archives containing JSP applications and execute arbitrary code with SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a56a50cda1871af22b4642aac6284a69498972864436692e677dbff5871fd212",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20026"
+}

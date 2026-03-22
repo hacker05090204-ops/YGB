@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-36193",
+  "ingested_at": "2026-03-22T07:45:17.698597+00:00",
+  "lang": "en",
+  "raw_text": "PEAR Archive_Tar PEAR Archive_Tar Tar.php allows write operations with directory traversal due to inadequate checking of symbolic links. PEAR stands for PHP Extension and Application Repository and it is an open-source framework and distribution system for reusable PHP components with known usage in third-party products such as Drupal Core and Red Hat Linux.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fedd4964adb6f6cc19e75f50d28ded984699972945d959f883783413f55f71e9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

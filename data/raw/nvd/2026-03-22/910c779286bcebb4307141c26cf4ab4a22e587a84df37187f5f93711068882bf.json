@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3164",
+  "ingested_at": "2026-03-22T07:54:31.982599+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in itsourcecode News Portal Project 1.0. This issue affects some unknown processing of the file /admin/contactus.php. The manipulation of the argument pagetitle results in sql injection. It is possible to launch the attack remotely. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "910c779286bcebb4307141c26cf4ab4a22e587a84df37187f5f93711068882bf",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3164"
+}

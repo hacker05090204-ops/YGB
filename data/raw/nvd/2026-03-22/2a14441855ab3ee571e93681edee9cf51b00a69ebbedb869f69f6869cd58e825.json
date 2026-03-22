@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2017-20218",
+  "ingested_at": "2026-03-22T07:54:46.270977+00:00",
+  "lang": "en",
+  "raw_text": "Serviio PRO 1.8 contains an unquoted search path vulnerability in the Windows service that allows local users to execute arbitrary code with elevated privileges by placing malicious executables in the system root path. Additionally, improper directory permissions with full access for the Users group allow authenticated users to replace the executable file with arbitrary binaries, enabling privilege escalation during service startup or system reboot.",
+  "severity": "HIGH",
+  "sha256_hash": "2a14441855ab3ee571e93681edee9cf51b00a69ebbedb869f69f6869cd58e825",
+  "source": "nvd",
+  "tags": [
+    "CWE-428"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2017-20218"
+}

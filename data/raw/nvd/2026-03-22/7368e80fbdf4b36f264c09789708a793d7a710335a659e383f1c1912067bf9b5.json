@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69246",
+  "ingested_at": "2026-03-22T07:54:46.355651+00:00",
+  "lang": "en",
+  "raw_text": "Raytha CMS does not have any brute force protection mechanism implemented. It allows an attacker to send multiple automated logon requests without triggering lockout, throttling, or step-up challenges. This issue was fixed in version 1.4.6.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7368e80fbdf4b36f264c09789708a793d7a710335a659e383f1c1912067bf9b5",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69246"
+}

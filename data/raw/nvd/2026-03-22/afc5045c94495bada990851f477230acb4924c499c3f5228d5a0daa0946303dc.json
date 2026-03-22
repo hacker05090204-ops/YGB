@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22408",
+  "ingested_at": "2026-03-22T07:54:40.028583+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Mikado-Themes Justicia justicia allows PHP Local File Inclusion.This issue affects Justicia: from n/a through < = 1.2.",
+  "severity": "HIGH",
+  "sha256_hash": "afc5045c94495bada990851f477230acb4924c499c3f5228d5a0daa0946303dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22408"
+}

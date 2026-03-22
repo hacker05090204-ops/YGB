@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25529",
+  "ingested_at": "2026-03-22T07:54:44.324516+00:00",
+  "lang": "en",
+  "raw_text": "Placeto CMS Alpha rv.4 contains an SQL injection vulnerability that allows authenticated attackers to manipulate database queries by injecting SQL code through the 'page' parameter. Attackers can send GET requests to the admin/edit.php endpoint with malicious 'page' values using boolean-based blind, time-based blind, or union-based techniques to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "368a477018e27408be6965e795a389fe83b11530a4b697be13af49a465bcefcc",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25529"
+}

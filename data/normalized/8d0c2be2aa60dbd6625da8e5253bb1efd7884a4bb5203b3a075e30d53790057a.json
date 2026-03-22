@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Roundcube Roundcube Webmail Roundcube Webmail contains an remote code execution vulnerability that allows attackers to execute code via shell metacharacters in a configuration setting for im_convert_path or im_identify_path.",
+  "token_count": 28
+}

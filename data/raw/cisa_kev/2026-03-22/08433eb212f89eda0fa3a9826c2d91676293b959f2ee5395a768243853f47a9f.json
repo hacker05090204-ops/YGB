@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27562",
+  "ingested_at": "2026-03-22T07:45:19.065889+00:00",
+  "lang": "en",
+  "raw_text": "Arm Trusted Firmware Arm Trusted Firmware contains an out-of-bounds write vulnerability allowing the non-secure (NS) world to trigger a system halt, overwrite secure data, or print out secure data when calling secure functions under the non-secure processing environment (NSPE) handler mode. This vulnerability affects Yealink Device Management servers.",
+  "severity": "CRITICAL",
+  "sha256_hash": "08433eb212f89eda0fa3a9826c2d91676293b959f2ee5395a768243853f47a9f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 48,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

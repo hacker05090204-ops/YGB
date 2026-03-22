@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0541",
+  "ingested_at": "2026-03-22T07:45:19.394973+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft MSHTML Microsoft MSHTML engine contains an improper input validation vulnerability that allows for remote code execution vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "18c3093a32f7da4184f3624db53133c265132143c43180f74ef77ae57de12937",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

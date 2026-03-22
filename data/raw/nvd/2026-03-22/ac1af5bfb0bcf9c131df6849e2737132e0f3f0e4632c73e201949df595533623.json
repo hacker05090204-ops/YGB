@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4163",
+  "ingested_at": "2026-03-22T07:54:46.642544+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Wavlink WL-WN579A3 220323. This issue affects the function SetName/GuestWifi of the file /cgi-bin/wireless.cgi of the component POST Request Handler. Performing a manipulation results in command injection. It is possible to initiate the attack remotely. The exploit is now public and may be used. Upgrading the affected component is recommended.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ac1af5bfb0bcf9c131df6849e2737132e0f3f0e4632c73e201949df595533623",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4163"
+}

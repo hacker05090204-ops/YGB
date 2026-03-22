@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0119",
+  "ingested_at": "2026-03-22T07:54:43.157814+00:00",
+  "lang": "en",
+  "raw_text": "In usim_SendMCCMNCIndMsg of usim_Registration.c, there is a possible out of bounds write due to memory corruption. This could lead to physical escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "53d1936de6eb161accdaedded10f0e9f1ce1484fb057291e063b695deb068903",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0119"
+}

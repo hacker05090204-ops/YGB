@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-56605",
+  "ingested_at": "2026-03-22T07:54:32.665867+00:00",
+  "lang": "en",
+  "raw_text": "A reflected Cross-Site Scripting (XSS) vulnerability exists in the register.php backend script of PuneethReddyHC Event Management System 1.0. The mobile POST parameter is improperly validated and echoed back in the HTTP response without sanitization, allowing an attacker to inject and execute arbitrary JavaScript code in the victim's browser.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed6fa03d6091b1e69616e8db7107487cbca0f2988470e3c35cf5bfa9c58b6185",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-56605"
+}

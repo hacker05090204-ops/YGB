@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26982",
+  "ingested_at": "2026-03-22T07:54:42.395259+00:00",
+  "lang": "en",
+  "raw_text": "Ghostty is a cross-platform terminal emulator. Ghostty allows control characters such as 0x03 (Ctrl+C) in pasted and dropped text. These can be used to execute arbitrary commands in some shell environments. This attack requires an attacker to convince the user to copy and paste or drag and drop malicious text. The attack requires user interaction to be triggered, but the dangerous characters are invisible in most GUI environments so it isn't trivially detected, especially if the string contents are complex. Fixed in Ghostty v1.3.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4038f9568322cc7c11aa821214bb66344c1c39c2e86a04c7b81c3a30b41b6233",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26982"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4044",
+  "ingested_at": "2026-03-22T07:54:44.364026+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in projectsend up to r1945. This affects the function realpath of the file /import-orphans.php of the component Delete Handler. Performing a manipulation of the argument files[] results in path traversal. Remote exploitation of the attack is possible. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "3a02a6f0e6878a2c502e5f2d6599ac3f6751b6528555b3df8a99ed0991d15fab",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4044"
+}

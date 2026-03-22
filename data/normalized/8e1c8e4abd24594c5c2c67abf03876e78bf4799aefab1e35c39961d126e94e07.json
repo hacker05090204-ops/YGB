@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zed, a code editor, has a symlink escape vulnerability in versions prior to 0.225.9 in Agent file tools (`read_file`, `edit_file`). It allows reading and writing files **outside the project directory** when a project contains symbolic links pointing to external paths. This bypasses the intended workspace boundary and privacy protections (`file_scan_exclusions`, `private_files`), potentially leaking sensitive user data to the LLM. Version 0.225.9 fixes the issue.",
+  "token_count": 64
+}

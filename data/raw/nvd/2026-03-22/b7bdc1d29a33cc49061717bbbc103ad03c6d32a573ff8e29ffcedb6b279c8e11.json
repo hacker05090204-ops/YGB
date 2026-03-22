@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27797",
+  "ingested_at": "2026-03-22T07:54:41.745392+00:00",
+  "lang": "en",
+  "raw_text": "Homarr is an open-source dashboard. Prior to version 1.54.0, an unauthenticated Server-Side Request Forgery (SSRF) vulnerability allows a remote attacker to force the Homarr server to perform arbitrary outbound HTTP requests. This can be used as an internal network access primitive (e.g., reaching loopback/private ranges) from the Homarr host/container network context. This issue has been patched in version 1.54.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b7bdc1d29a33cc49061717bbbc103ad03c6d32a573ff8e29ffcedb6b279c8e11",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27797"
+}

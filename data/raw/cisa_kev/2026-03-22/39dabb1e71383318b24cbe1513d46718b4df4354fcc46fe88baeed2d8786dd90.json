@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-21042",
+  "ingested_at": "2026-03-22T07:45:16.061601+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an out-of-bounds write vulnerability in libimagecodec.quram.so. This vulnerability could allow remote attackers to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "39dabb1e71383318b24cbe1513d46718b4df4354fcc46fe88baeed2d8786dd90",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

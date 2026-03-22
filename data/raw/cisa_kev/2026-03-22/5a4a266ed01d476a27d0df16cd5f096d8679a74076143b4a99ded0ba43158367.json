@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-23006",
+  "ingested_at": "2026-03-22T07:45:16.629127+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SMA1000 Appliances SonicWall SMA1000 Appliance Management Console (AMC) and Central Management Console (CMC) contain a deserialization of untrusted data vulnerability, which can enable a remote, unauthenticated attacker to execute arbitrary OS commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5a4a266ed01d476a27d0df16cd5f096d8679a74076143b4a99ded0ba43158367",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

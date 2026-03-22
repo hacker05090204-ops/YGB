@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33054",
+  "ingested_at": "2026-03-22T07:54:48.645983+00:00",
+  "lang": "en",
+  "raw_text": "Mesop is a Python-based UI framework that allows users to build web applications. Versions 1.2.2 and below contain a Path Traversal vulnerability that allows any user supplying an untrusted state_token through the UI stream payload to arbitrarily target files on the disk under the standard file-based runtime backend. This can result in application denial of service (via crash loops when reading non-msgpack target files as configurations), or arbitrary file manipulation. This vulnerability heavily exposes systems hosted utilizing FileStateSessionBackend. Unauthorized malicious actors could interact with arbitrary payloads overwriting or explicitly removing underlying service resources natively outside the application bounds. This issue has been fixed in version 1.2.3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "50db0b949d42279cdde4bd65741cd09467b36e61c601aee6b83ddbc4ef51b3b3",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33054"
+}

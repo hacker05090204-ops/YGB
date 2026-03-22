@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11539",
+  "ingested_at": "2026-03-22T07:45:19.522918+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure and Pulse Policy Secure Ivanti Pulse Connect Secure and Policy Secure allows an authenticated attacker from the admin web interface to inject and execute commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "db29d0b8817521be8cd755fedf57c484374ad11f795c44d24811b0b951a2d6ea",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

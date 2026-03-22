@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21365",
+  "ingested_at": "2026-03-22T07:54:42.978234+00:00",
+  "lang": "en",
+  "raw_text": "Substance3D - Painter versions 11.1.2 and earlier are affected by an out-of-bounds read vulnerability that could lead to memory exposure. An attacker could leverage this vulnerability to access sensitive information stored in memory. Exploitation of this issue requires user interaction in that a victim must open a malicious file.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3f42f7e17c95ad64f2f13724bdce79ee5c17fc0ee562f51d27286dc1191668e2",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21365"
+}

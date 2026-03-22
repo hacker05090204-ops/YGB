@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68862",
+  "ingested_at": "2026-03-22T07:54:30.165823+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in Murtaza Bhurgri Woo File Dropzone woo-file-dropzone allows Path Traversal.This issue affects Woo File Dropzone: from n/a through < = 1.1.7.",
+  "severity": "HIGH",
+  "sha256_hash": "6f94737bbe8dff01bb88c5a98a506896555d57c4d07bb852da7449eafc616bef",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68862"
+}

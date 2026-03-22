@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-64301",
+  "ingested_at": "2026-03-22T07:54:47.126259+00:00",
+  "lang": "en",
+  "raw_text": "An out\u2010of\u2010bounds write vulnerability exists in the EMF functionality of Canva Affinity. By using a specially crafted EMF file, an attacker could exploit this vulnerability to perform an out\u2010of\u2010bounds write, potentially leading to code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "2fd682ed11503a51249fadf204b0315e5a283371b64f02ac5a83faf5c40fc580",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-64301"
+}

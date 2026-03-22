@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4437",
+  "ingested_at": "2026-03-22T07:54:48.962933+00:00",
+  "lang": "en",
+  "raw_text": "Calling gethostbyaddr or gethostbyaddr_r with a configured nsswitch.conf that specifies the library's DNS backend in the GNU C Library version 2.34 to version 2.43 could, with a crafted response from the configured DNS server, result in a violation of the DNS specification that causes the application to treat a non-answer section of the DNS response as a valid answer.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c38dfa10235eda4a906e86a2753b772955e221bed78c4718c46e241761caf279",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4437"
+}

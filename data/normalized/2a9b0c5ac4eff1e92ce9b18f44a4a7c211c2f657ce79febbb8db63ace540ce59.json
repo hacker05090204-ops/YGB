@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and watchOS contain a time-of-check/time-of-use (TOCTOU) memory corruption vulnerability that allows an attacker with read and write capabilities to bypass Pointer Authentication.",
+  "token_count": 30
+}

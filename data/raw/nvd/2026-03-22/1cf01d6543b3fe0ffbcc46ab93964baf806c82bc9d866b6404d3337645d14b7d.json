@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33143",
+  "ingested_at": "2026-03-22T07:54:48.983372+00:00",
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. Prior to version 10.0.34, the WhatsApp POST webhook handler (/notification/whatsapp/webhook) processes incoming status update events without verifying the Meta/WhatsApp X-Hub-Signature-256 HMAC signature, allowing any unauthenticated attacker to send forged webhook payloads that manipulate notification delivery status records, suppress alerts, and corrupt audit trails. The codebase already implements proper signature verification for Slack webhooks. This issue has been patched in version 10.0.34.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "1cf01d6543b3fe0ffbcc46ab93964baf806c82bc9d866b6404d3337645d14b7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33143"
+}

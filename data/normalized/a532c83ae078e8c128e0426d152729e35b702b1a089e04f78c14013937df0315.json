@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "eWON Firmware versions 12.2 to 13.0 contain an authentication bypass vulnerability that allows attackers with minimal privileges to retrieve sensitive user data by exploiting the wsdReadForm endpoint. Attackers can send POST requests to /wrcgi.bin/wsdReadForm with base64-encoded partial credentials and a crafted wsdList parameter to extract encrypted passwords for all users, which can be decrypted using a hardcoded XOR key.",
+  "token_count": 59
+}

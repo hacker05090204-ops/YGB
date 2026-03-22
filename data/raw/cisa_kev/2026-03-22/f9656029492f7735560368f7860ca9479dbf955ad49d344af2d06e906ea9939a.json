@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-16928",
+  "ingested_at": "2026-03-22T07:45:18.517797+00:00",
+  "lang": "en",
+  "raw_text": "Exim Exim Internet Mailer Exim contains an out-of-bounds write vulnerability which can allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f9656029492f7735560368f7860ca9479dbf955ad49d344af2d06e906ea9939a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

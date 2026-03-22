@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the Post Edits admin report (/admin/reports/post_edits) leaked the first 40 characters of raw post content from private messages and secure categories to moderators who shouldn't have access. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "token_count": 53
+}

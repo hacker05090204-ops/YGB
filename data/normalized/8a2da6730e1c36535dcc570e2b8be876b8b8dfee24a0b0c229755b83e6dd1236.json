@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "telnet in GNU inetutils through 2.7 allows servers to read arbitrary environment variables from clients via NEW_ENVIRON SEND USERVAR.",
+  "token_count": 19
+}

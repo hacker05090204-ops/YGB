@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-31966",
+  "ingested_at": "2026-03-22T07:54:47.048375+00:00",
+  "lang": "en",
+  "raw_text": "HCL Sametime is vulnerable to broken server-side validation. While the application performs client-side input checks, these are not enforced by the web server. An attacker can bypass these restrictions by sending manipulated HTTP requests directly to the server.",
+  "severity": "LOW",
+  "sha256_hash": "70cbdfe9440135e85bd5f348ac6ffc9de4e9d83e225149a70b0d6c2a47c7c88e",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-31966"
+}

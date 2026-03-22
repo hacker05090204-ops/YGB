@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-0557",
+  "ingested_at": "2026-03-22T07:45:17.843922+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains an object record corruption vulnerability that allows remote attackers to execute code via a crafted Excel file with a malformed record object.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dfba42b304a900d3b7364f1da1fc4d3bef0d762cdb2dcfe77ddf0670ec4e3f41",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

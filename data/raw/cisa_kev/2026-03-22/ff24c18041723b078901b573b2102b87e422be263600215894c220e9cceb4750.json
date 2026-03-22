@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-34048",
+  "ingested_at": "2026-03-22T07:45:17.071546+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter Server contains an out-of-bounds write vulnerability in the implementation of the DCERPC protocol that allows an attacker to conduct remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff24c18041723b078901b573b2102b87e422be263600215894c220e9cceb4750",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

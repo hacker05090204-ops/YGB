@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32129",
+  "ingested_at": "2026-03-22T07:54:44.428790+00:00",
+  "lang": "en",
+  "raw_text": "soroban-poseidon provides Poseidon and Poseidon2 cryptographic hash functions for Soroban smart contracts. Poseidon V1 (PoseidonSponge) accepts variable-length inputs without injective padding. When a caller provides fewer inputs than the sponge rate (inputs.len() < T - 1), unused rate positions are implicitly zero-filled. This allows trivial hash collisions: for any input vector [m1, ..., mk] hashed with a sponge of rate > k, hash([m1, ..., mk]) equals hash([m1, ..., mk, 0]) because both produce identical pre-permutation states. This affects any use of PoseidonSponge or poseidon_hash where the number of inputs is less than T - 1 (e.g., hashing 1 input with T=3). Poseidon2 (Poseidon2Sponge) is not affected.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0aa70e75c74f50b9ffca9b30102d85bf4ecf42a9158cb190a1c400ac8e8193d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-328"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32129"
+}

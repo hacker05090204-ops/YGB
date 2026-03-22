@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3427",
+  "ingested_at": "2026-03-22T07:45:17.413095+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE and JRockit Oracle Java SE and JRockit contains an unspecified vulnerability that allows remote attackers to affect confidentiality, integrity, and availability via vectors related to Java Management Extensions (JMX). This vulnerability can be exploited through sandboxed Java Web Start applications and sandboxed Java applets. It can also be exploited by supplying data to APIs in the specified component without using sandboxed Java Web Start applications or sandboxed Java applets, such as through a web service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e9f80fee845fbacfacf26c58c669af23cb480e8a94eb98f5b3dfd47ee6b185d7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 78,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

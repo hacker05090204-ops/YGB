@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GeoVision Multiple Devices Multiple GeoVision devices contain an OS command injection vulnerability that allows a remote, unauthenticated attacker to inject and execute arbitrary system commands. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "token_count": 40
+}

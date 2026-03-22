@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1947",
+  "ingested_at": "2026-03-22T07:54:46.374703+00:00",
+  "lang": "en",
+  "raw_text": "The NEX-Forms \u2013 Ultimate Forms Plugin for WordPress plugin for WordPress is vulnerable to Insecure Direct Object Reference in all versions up to, and including, 9.1.9 via the submit_nex_form() function due to missing validation on a user controlled key. This makes it possible for unauthenticated attackers to to overwrite arbitrary form entries via the 'nf_set_entry_update_id' parameter.",
+  "severity": "HIGH",
+  "sha256_hash": "8144eb818c11b38b228b15575ab16b8abe02b288e1befd8c5e7b9cc7477829e5",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1947"
+}

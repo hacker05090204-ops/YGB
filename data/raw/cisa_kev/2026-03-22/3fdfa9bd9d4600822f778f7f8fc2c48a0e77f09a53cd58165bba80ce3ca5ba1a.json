@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-50603",
+  "ingested_at": "2026-03-22T07:45:16.635130+00:00",
+  "lang": "en",
+  "raw_text": "Aviatrix Controllers Aviatrix Controllers contain an OS command injection vulnerability that could allow an unauthenticated attacker to execute arbitrary code. Shell metacharacters can be sent to /v1/api in cloud_type for list_flightpath_destination_instances, or src_cloud_type for flightpath_connection_test.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3fdfa9bd9d4600822f778f7f8fc2c48a0e77f09a53cd58165bba80ce3ca5ba1a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

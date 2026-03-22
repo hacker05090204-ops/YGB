@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8515",
+  "ingested_at": "2026-03-22T07:45:19.152103+00:00",
+  "lang": "en",
+  "raw_text": "DrayTek Multiple Vigor Routers DrayTek Vigor3900, Vigor2960, and Vigor300B routers contain an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cb2073cd79de32051f5d710e67df7cf57268349a4b6ae3c7e498563135487c60",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

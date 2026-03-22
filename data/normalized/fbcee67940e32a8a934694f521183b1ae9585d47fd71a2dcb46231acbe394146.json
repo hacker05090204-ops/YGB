@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to send traffic that should be denied through an affected device. This vulnerability is due to improper error handling when an affected device that is joining a cluster runs out of memory while replicating access control rules. An attacker could exploit this vulnerability by sending traffic that should be blocked through the device. A successful exploit could allow the attacker to bypass access controls and reach devices in protected networks.",
+  "token_count": 95
+}

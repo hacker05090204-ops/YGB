@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32239",
+  "ingested_at": "2026-03-22T07:54:44.501288+00:00",
+  "lang": "en",
+  "raw_text": "Cap'n Proto is a data interchange format and capability-based RPC system. Prior to 1.4.0, a negative Content-Length value was converted to unsigned, treating it as an impossibly large length instead. In theory, this bug could enable HTTP request/response smuggling. This vulnerability is fixed in 1.4.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b47128c77ace2e9ed740b5b39165949a31fe498b6c831836b0b17bb5cefce813",
+  "source": "nvd",
+  "tags": [
+    "CWE-190",
+    "CWE-444"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32239"
+}

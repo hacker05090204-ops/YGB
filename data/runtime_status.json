@@ -5,11 +5,11 @@
   "determinism_pass": true,
   "drift_alert": false,
   "freeze_reason": "",
-  "freeze_valid": true,
-  "gpu_utilization": 37.0,
+  "freeze_valid": null,
+  "gpu_utilization": 27.0,
   "merge_status": null,
-  "precision_breach": true,
-  "training_velocity_batches_sec": 41.167020665556954,
-  "training_velocity_samples_hr": 152765873.647402,
-  "updated_at": "2026-03-21T11:26:01.528338+00:00"
+  "precision_breach": false,
+  "training_velocity_batches_sec": null,
+  "training_velocity_samples_hr": null,
+  "updated_at": "2026-03-22T07:13:59.389295+00:00"
 }

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4268",
+  "ingested_at": "2026-03-22T07:54:47.319157+00:00",
+  "lang": "en",
+  "raw_text": "The WP Go Maps (formerly WP Google Maps) plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the \u2018wpgmza_custom_js\u2019 parameter in all versions up to, and including, 10.0.05 due to insufficient input sanitization and output escaping and missing capability check in the 'admin_post_wpgmza_save_settings' hook anonymous function. This makes it possible for authenticated attackers, with Subscriber-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "35ba30ccf6ce3bbd6afa1ebcaafc85803f8637cd30cb0d28cdd6f8cfe90f7ee6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4268"
+}

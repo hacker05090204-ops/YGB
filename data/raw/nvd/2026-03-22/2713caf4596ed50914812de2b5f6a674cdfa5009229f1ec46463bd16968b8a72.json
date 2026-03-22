@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28226",
+  "ingested_at": "2026-03-22T07:54:32.847399+00:00",
+  "lang": "en",
+  "raw_text": "Phishing Club is a phishing simulation and man-in-the-middle framework. Prior to version 1.30.2, an authenticated SQL injection vulnerability exists in the GetOrphaned recipient listing endpoint in versions prior to v1.30.2. The endpoint constructs a raw SQL query and concatenates the user-controlled sortBy value directly into the ORDER BY clause without allowlist validation. Because unknown values are silently passed through `RemapOrderBy()`, an authenticated attacker can inject SQL expressions into the `ORDER BY` clause. This issue was patched in v1.30.2 by validating the order-by column against an allowlist and clearing unknown mappings.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2713caf4596ed50914812de2b5f6a674cdfa5009229f1ec46463bd16968b8a72",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28226"
+}

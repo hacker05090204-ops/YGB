@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices using Mali GPU contain an incorrect implementation handling file descriptor in dpu driver. This incorrect implementation results in memory corruption, leading to kernel panic. This vulnerability was chained with CVE-2021-25337 and CVE-2021-25369.",
+  "token_count": 38
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-26086",
+  "ingested_at": "2026-03-22T07:45:16.722269+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Jira Server and Data Center Atlassian Jira Server and Data Center contain a path traversal vulnerability that allows a remote attacker to read particular files in the /WEB-INF/web.xml endpoint.",
+  "severity": "CRITICAL",
+  "sha256_hash": "49a4ec33d1e39f3be60b61f5cf3704ebc88f4d156c9ca88859ab16529701187c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

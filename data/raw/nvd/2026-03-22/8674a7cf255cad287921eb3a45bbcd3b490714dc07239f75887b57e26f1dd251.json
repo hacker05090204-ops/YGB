@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2424",
+  "ingested_at": "2026-03-22T07:54:49.344446+00:00",
+  "lang": "en",
+  "raw_text": "The Reward Video Ad for WordPress plugin for WordPress is vulnerable to Stored Cross-Site Scripting via admin settings in all versions up to, and including, 1.6. This is due to insufficient input sanitization and output escaping on plugin settings such as the 'Account ID', 'Message before the video', and color fields. This makes it possible for authenticated attackers, with Administrator-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8674a7cf255cad287921eb3a45bbcd3b490714dc07239f75887b57e26f1dd251",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2424"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2640",
+  "ingested_at": "2026-03-22T07:54:43.967909+00:00",
+  "lang": "en",
+  "raw_text": "During an internal security assessment, a potential vulnerability was discovered in Lenovo PC Manager that could allow a local authenticated user to terminate privileged processes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0111e9e6a0aaa37de1e875d4ac6976af3ce0c9dd2ec4a78693cbe2fded835006",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2640"
+}

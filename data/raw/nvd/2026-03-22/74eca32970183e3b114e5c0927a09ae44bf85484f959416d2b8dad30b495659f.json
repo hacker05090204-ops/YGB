@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28270",
+  "ingested_at": "2026-03-22T07:54:33.312271+00:00",
+  "lang": "en",
+  "raw_text": "Kiteworks is a private data network (PDN). Prior to version 9.2.0, a vulnerability in Kiteworks configuration allows uploading of arbitrary files without proper validation. Malicious administrators could exploit this to upload unauthorized file types to the system. Version 9.2.0 contains a patch for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "74eca32970183e3b114e5c0927a09ae44bf85484f959416d2b8dad30b495659f",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28270"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the Remote Access SSL VPN functionality of Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Secure Firewall Threat Defense (FTD) Software could allow an authenticated, remote attacker with a valid VPN connection to exhaust device memory resulting in a denial of service (DoS) condition.This does not affect the management or MUS interfaces. This vulnerability is due to trusting user input without validation. An attacker could exploit this vulnerability by sending crafted packets to the Remote Access SSL VPN server. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "token_count": 101
+}

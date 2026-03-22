@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23982",
+  "ingested_at": "2026-03-22T07:54:31.486736+00:00",
+  "lang": "en",
+  "raw_text": "An Improper Authorization vulnerability exists in Apache Superset that allows a low-privileged user to bypass data access controls. When creating a dataset, Superset enforces permission checks to prevent users from querying unauthorized data. However, an authenticated attacker with permissions to write datasets and read charts can bypass these checks by overwriting the SQL query of an existing dataset. This issue affects Apache Superset: before 6.0.0. Users are recommended to upgrade to version 6.0.0, which fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d84a38ef649e98b9eed5eb69df38d8a712713443b421c35f1d9f05fb756a399e",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23982"
+}

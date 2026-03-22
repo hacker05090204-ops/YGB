@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A technique has been identified that adapts a known port-stealing method to Wi-Fi environments that use multiple BSSIDs. By leveraging the relationship between BSSIDs and their associated virtual ports, an attacker could potentially bypass inter-BSSID isolation controls. Successful exploitation may enable an attacker to redirect and intercept the victim's network traffic, potentially resulting in eavesdropping, session hijacking, or denial of service.",
+  "token_count": 61
+}

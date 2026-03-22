@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-16920",
+  "ingested_at": "2026-03-22T07:45:18.311064+00:00",
+  "lang": "en",
+  "raw_text": "D-Link Multiple Routers Multiple D-Link routers contain a command injection vulnerability which can allow attackers to achieve full system compromise.",
+  "severity": "CRITICAL",
+  "sha256_hash": "429bd508a23e930b788f622b2b9194fa44680c6edfef04c36272ae12dc581c1d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

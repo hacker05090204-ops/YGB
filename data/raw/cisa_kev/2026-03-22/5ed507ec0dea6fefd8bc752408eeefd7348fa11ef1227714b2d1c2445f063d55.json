@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-6223",
+  "ingested_at": "2026-03-22T07:45:19.016634+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and macOS Apple iOS and macOS Group FaceTime contains an unspecified vulnerability where the call initiator can cause the recipient's Apple device to answer unknowingly or without user interaction.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5ed507ec0dea6fefd8bc752408eeefd7348fa11ef1227714b2d1c2445f063d55",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

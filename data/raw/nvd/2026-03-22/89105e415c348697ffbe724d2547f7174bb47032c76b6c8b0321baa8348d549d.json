@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27386",
+  "ingested_at": "2026-03-22T07:54:40.261575+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in designthemes DesignThemes Directory Addon designthemes-directory-addon allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects DesignThemes Directory Addon: from n/a through < = 1.8.",
+  "severity": "HIGH",
+  "sha256_hash": "89105e415c348697ffbe724d2547f7174bb47032c76b6c8b0321baa8348d549d",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27386"
+}

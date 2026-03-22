@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22502",
+  "ingested_at": "2026-03-22T07:45:19.269880+00:00",
+  "lang": "en",
+  "raw_text": "Micro Focus Operation Bridge Reporter (OBR) Micro Focus Operation Bridge Report (OBR) contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e949298083754c857c3add6b22d927bb8904e598312f53556578957dd8682751",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

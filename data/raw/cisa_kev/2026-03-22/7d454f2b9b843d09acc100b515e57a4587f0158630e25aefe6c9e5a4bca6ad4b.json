@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-8088",
+  "ingested_at": "2026-03-22T07:45:16.256018+00:00",
+  "lang": "en",
+  "raw_text": "RARLAB WinRAR RARLAB WinRAR contains a path traversal vulnerability affecting the Windows version of WinRAR. This vulnerability could allow an attacker to execute arbitrary code by crafting malicious archive files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7d454f2b9b843d09acc100b515e57a4587f0158630e25aefe6c9e5a4bca6ad4b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

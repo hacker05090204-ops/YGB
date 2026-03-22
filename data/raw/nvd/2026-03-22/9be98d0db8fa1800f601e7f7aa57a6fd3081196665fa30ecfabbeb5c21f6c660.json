@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-3029",
+  "ingested_at": "2026-03-22T07:54:47.988831+00:00",
+  "lang": "en",
+  "raw_text": "A path traversal and arbitrary file write vulnerability exist in the embedded get function in '_main_.py' in PyMuPDF version, 1.26.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9be98d0db8fa1800f601e7f7aa57a6fd3081196665fa30ecfabbeb5c21f6c660",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3029"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chromium Mojo Google Chromium Mojo contains an insufficient data validation vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "token_count": 55
+}

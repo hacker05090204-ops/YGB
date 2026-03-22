@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-9875",
+  "ingested_at": "2026-03-22T07:45:16.490410+00:00",
+  "lang": "en",
+  "raw_text": "Sitecore CMS and Experience Platform (XP) Sitecore CMS and Experience Platform (XP) contain a deserialization vulnerability in the Sitecore.Security.AntiCSRF module that allows an authenticated attacker to execute arbitrary code by sending a serialized .NET object in the HTTP POST parameter __CSRFTOKEN.",
+  "severity": "CRITICAL",
+  "sha256_hash": "747a5edabf70cd44ce1a37bcfcdfd27010242168446f1c66973f149ab07d9de1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

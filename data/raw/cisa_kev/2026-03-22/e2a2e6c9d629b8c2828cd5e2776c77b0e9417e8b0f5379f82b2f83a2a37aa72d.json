@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-43798",
+  "ingested_at": "2026-03-22T07:45:16.113586+00:00",
+  "lang": "en",
+  "raw_text": "Grafana Labs Grafana Grafana contains a path traversal vulnerability that could allow access to local files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e2a2e6c9d629b8c2828cd5e2776c77b0e9417e8b0f5379f82b2f83a2a37aa72d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

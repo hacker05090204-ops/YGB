@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-3931",
+  "ingested_at": "2026-03-22T07:45:16.329879+00:00",
+  "lang": "en",
+  "raw_text": "Looking Glass Multi-Router Looking Glass (MRLG) Multi-Router Looking Glass (MRLG) contains a buffer overflow vulnerability that could allow remote attackers to cause an arbitrary memory write and memory corruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d51ae5ed032295b61b629a91d766d29440c65ad65b878471b2d7e5fcfe80d911",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

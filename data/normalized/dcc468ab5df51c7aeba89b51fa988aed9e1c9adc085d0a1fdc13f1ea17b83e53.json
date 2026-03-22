@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Web Wiz Forums 12.01 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the PF parameter. Attackers can send GET requests to member_profile.asp with malicious PF values to extract sensitive database information.",
+  "token_count": 41
+}

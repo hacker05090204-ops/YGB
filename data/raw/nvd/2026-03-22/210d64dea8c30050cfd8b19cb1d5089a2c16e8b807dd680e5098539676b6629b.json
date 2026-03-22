@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25689",
+  "ingested_at": "2026-03-22T07:54:42.775064+00:00",
+  "lang": "en",
+  "raw_text": "An improper neutralization of argument delimiters in a command ('argument injection') vulnerability in Fortinet FortiDeceptor 6.2.0, FortiDeceptor 6.0 all versions, FortiDeceptor 5.3 all versions, FortiDeceptor 5.2 all versions, FortiDeceptor 5.1 all versions, FortiDeceptor 5.0 all versions, FortiDeceptor 4.3 all versions, FortiDeceptor 4.2 all versions, FortiDeceptor 4.1 all versions, FortiDeceptor 4.0 all versions may allow a privileged attacker with super-admin profile and CLI access to delete sensitive files via crafted HTTP requests.",
+  "severity": "MEDIUM",
+  "sha256_hash": "210d64dea8c30050cfd8b19cb1d5089a2c16e8b807dd680e5098539676b6629b",
+  "source": "nvd",
+  "tags": [
+    "CWE-88"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25689"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14675",
+  "ingested_at": "2026-03-22T07:54:41.774758+00:00",
+  "lang": "en",
+  "raw_text": "The Meta Box plugin for WordPress is vulnerable to arbitrary file deletion due to insufficient file path validation in the 'ajax_delete_file' function in all versions up to, and including, 5.11.1. This makes it possible for authenticated attackers, with Contributor-level access and above, to delete arbitrary files on the server, which can easily lead to remote code execution when the right file is deleted (such as wp-config.php).",
+  "severity": "HIGH",
+  "sha256_hash": "ae52fef25cf19d052a9f2f84e0580e0c91ec3ad61dc77833dcdd6041fd0d1933",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14675"
+}

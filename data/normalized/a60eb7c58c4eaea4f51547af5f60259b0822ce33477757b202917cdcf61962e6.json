@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the API user authentication of Cisco Catalyst SD-WAN Manager could allow an unauthenticated, remote attacker to gain access to an affected system as a user who has the netadmin role. The vulnerability is due to improper authentication for requests that are sent to the API. An attacker could exploit this vulnerability by sending a crafted request to the API of an affected system. A successful exploit could allow the attacker to execute commands with the privileges of the netadmin role. Note: Cisco Catalyst SD-WAN Manager releases 20.18 and later are not affected by this vulnerability.",
+  "token_count": 98
+}

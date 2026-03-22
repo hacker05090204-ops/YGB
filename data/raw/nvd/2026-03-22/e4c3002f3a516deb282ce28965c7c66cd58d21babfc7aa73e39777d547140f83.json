@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28473",
+  "ingested_at": "2026-03-22T07:54:41.077195+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.2 contain an authorization bypass vulnerability where clients with operator.write scope can approve or deny exec approval requests by sending the /approve chat command. The /approve command path invokes exec.approval.resolve through an internal privileged gateway client, bypassing the operator.approvals permission check that protects direct RPC calls.",
+  "severity": "HIGH",
+  "sha256_hash": "e4c3002f3a516deb282ce28965c7c66cd58d21babfc7aa73e39777d547140f83",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28473"
+}

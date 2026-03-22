@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in a standardized wireless roaming protocol that could enable a malicious actor to install an attacker-controlled Group Temporal Key (GTK) on a client device. Successful exploitation of this vulnerability could allow a remote malicious actor to perform unauthorized frame injection, bypass client isolation, interfere with cross-client traffic, and compromise network segmentation, integrity, and confidentiality.",
+  "token_count": 59
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SmarterTools SmarterMail SmarterTools SmarterMail contains an authentication bypass using an alternate path or channel vulnerability in the password reset API. The force-reset-password endpoint permits anonymous requests and fails to verify the existing password or a reset token when resetting system administrator accounts. This could allow an unauthenticated attacker to supply a target administrator username and a new password to reset the account, resulting in full administrative compromise of the SmarterMail instance.",
+  "token_count": 71
+}

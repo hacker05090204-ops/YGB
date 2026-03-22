@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1128",
+  "ingested_at": "2026-03-22T07:54:41.312819+00:00",
+  "lang": "en",
+  "raw_text": "The WP eCommerce WordPress plugin through 3.15.1 does not have CSRF check in place when deleting coupons, which could allow attackers to make a logged in admin remove them via a CSRF attack",
+  "severity": "MEDIUM",
+  "sha256_hash": "a9122c00ab5e4f15456cb1ab79357340d18a328d5dd63435656fc01e216becc5",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1128"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25073",
+  "ingested_at": "2026-03-22T07:54:41.694140+00:00",
+  "lang": "en",
+  "raw_text": "XikeStor SKS8310-8X Network Switch firmware versions 1.04.B07 and prior contain a stored cross-site scripting vulnerability that allows authenticated attackers to inject arbitrary script content through the System Name field. Attackers can inject malicious scripts that execute in a victim's browser when the stored value is viewed due to improper output encoding.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fd7b2567628a2e22b063360bf8df737ab35da91c4f04fec1a294502deb807677",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25073"
+}

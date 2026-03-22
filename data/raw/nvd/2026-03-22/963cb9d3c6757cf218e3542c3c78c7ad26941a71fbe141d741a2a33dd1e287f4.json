@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32385",
+  "ingested_at": "2026-03-22T07:54:45.992287+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Metagauss RegistrationMagic custom-registration-form-builder-with-submission-manager allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects RegistrationMagic: from n/a through < = 6.0.7.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "963cb9d3c6757cf218e3542c3c78c7ad26941a71fbe141d741a2a33dd1e287f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32385"
+}

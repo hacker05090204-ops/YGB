@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "LG MRA58K - Out-of-Bounds Heap Read in CAVIFileParser::Destroy Resulting in Invalid Free",
+  "token_count": 12
+}

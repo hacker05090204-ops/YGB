@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3755",
+  "ingested_at": "2026-03-22T07:54:42.089791+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in SourceCodester Sales and Inventory System 1.0. This impacts an unknown function of the file /check_customer_details.php of the component POST Handler. Executing a manipulation of the argument stock_name1 can lead to sql injection. The attack can be launched remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cbb9a681a5994c795e59e0358677d571afcd023d62d23b35bd269d88cc463bd7",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3755"
+}

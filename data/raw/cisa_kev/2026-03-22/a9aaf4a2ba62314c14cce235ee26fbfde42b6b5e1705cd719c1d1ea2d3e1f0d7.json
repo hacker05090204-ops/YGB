@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-6627",
+  "ingested_at": "2026-03-22T07:45:18.575395+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Software A vulnerability in the UDP processing code of Cisco IOS and IOS XE could allow an unauthenticated, remote attacker to cause the input queue of an affected system to hold UDP packets, causing an interface queue wedge and denial of service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a9aaf4a2ba62314c14cce235ee26fbfde42b6b5e1705cd719c1d1ea2d3e1f0d7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

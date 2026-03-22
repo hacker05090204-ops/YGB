@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2774",
+  "ingested_at": "2026-03-22T07:54:31.540262+00:00",
+  "lang": "en",
+  "raw_text": "Integer overflow in the Audio/Video component. This vulnerability affects Firefox < 148, Firefox ESR < 115.33, Firefox ESR < 140.8, Thunderbird < 148, and Thunderbird < 140.8.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d377ce3982ff8ccbf4f1a97759af0979b7b9808568551570f4625c2653c6b385",
+  "source": "nvd",
+  "tags": [
+    "CWE-190",
+    "CWE-190"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2774"
+}

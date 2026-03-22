@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Airflow versions 3.1.0 through 3.1.7 session token (_token) in cookies is set to path=/ regardless of the configured [webserver] base_url or [api] base_url. This allows any application co-hosted under the same domain to capture valid Airflow session tokens from HTTP request headers, allowing full session takeover without attacking Airflow itself. Users are recommended to upgrade to Apache Airflow 3.1.8 or later, which resolves this issue.",
+  "token_count": 66
+}

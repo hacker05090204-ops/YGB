@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-46748",
+  "ingested_at": "2026-03-22T07:45:17.178697+00:00",
+  "lang": "en",
+  "raw_text": "F5 BIG-IP Configuration Utility F5 BIG-IP Configuration utility contains an SQL injection vulnerability that may allow an authenticated attacker with network access through the BIG-IP management port and/or self IP addresses to execute system commands. This vulnerability can be used in conjunction with CVE-2023-46747.",
+  "severity": "CRITICAL",
+  "sha256_hash": "68a42335686ee45b30afe5d4c8949ee6c788731f808c9766dae5002e29956ed0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

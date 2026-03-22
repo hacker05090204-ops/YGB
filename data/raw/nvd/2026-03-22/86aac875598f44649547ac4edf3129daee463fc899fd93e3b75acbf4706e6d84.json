@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27191",
+  "ingested_at": "2026-03-22T07:54:30.739881+00:00",
+  "lang": "en",
+  "raw_text": "Feathersjs is a framework for creating web APIs and real-time applications with TypeScript or JavaScript. Versions 5.0.39 and below the redirect query parameter is appended to the base origin without validation, allowing attackers to steal access tokens via URL authority injection. This leads to full account takeover, as the attacker obtains the victim's access token and can impersonate them. The application constructs the final redirect URL by concatenating the base origin with the user-supplied redirect parameter. This is exploitable when the origins array is configured and origin values do not end with /. An attacker can supply @attacker.com as the redirect value results in https://target.com@attacker.com#access_token=..., where the browser interprets attacker.com as the host, leading to full account takeover. This issue has been fixed in version 5.0.40.",
+  "severity": "MEDIUM",
+  "sha256_hash": "86aac875598f44649547ac4edf3129daee463fc899fd93e3b75acbf4706e6d84",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 126,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27191"
+}

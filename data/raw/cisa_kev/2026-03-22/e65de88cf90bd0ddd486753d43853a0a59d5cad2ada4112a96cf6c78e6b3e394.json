@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-20118",
+  "ingested_at": "2026-03-22T07:45:16.559501+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Small Business RV Series Routers Multiple Cisco Small Business RV Series Routers contains a command injection vulnerability in the web-based management interface. Successful exploitation could allow an authenticated, remote attacker to gain root-level privileges and access unauthorized data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e65de88cf90bd0ddd486753d43853a0a59d5cad2ada4112a96cf6c78e6b3e394",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

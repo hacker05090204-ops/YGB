@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22005",
+  "ingested_at": "2026-03-22T07:45:19.642022+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter Server contains a file upload vulnerability in the Analytics service that allows a user with network access to port 443 to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4c1c7280b03d99ed24574001400f3d740170a58ee47fe209f0cbbc76d32ac7e3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

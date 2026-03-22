@@ -1,0 +1,444 @@
+{
+  "repo_counts": {
+    "python_files": 1300,
+    "ts_files": 90,
+    "cpp_files": 244,
+    "test_files": 555,
+    "source_files": 1079,
+    "test_ratio": 0.3397
+  },
+  "repo_loc_by_folder": {
+    "impl_v1": 142295,
+    "backend": 57557,
+    "native": 51270,
+    "python": 21577,
+    "HUMANOID_HUNTER": 19589,
+    "frontend": 19438,
+    "api": 10352,
+    "training": 5806,
+    ".": 4578,
+    "scripts": 3342,
+    "tests": 2422,
+    "governance": 1160,
+    "edge": 279,
+    "voice_mode": 45,
+    "ingest_reports_media": 44,
+    "ai_report_generator": 41,
+    "proposed_upgrades": 25
+  },
+  "repo_import_edges": {
+    ".": {
+      "impl_v1": 33,
+      "backend": 2
+    },
+    "api": {
+      "backend": 66,
+      "impl_v1": 21,
+      "governance": 2
+    },
+    "backend": {
+      "governance": 25,
+      "impl_v1": 18,
+      "native": 13,
+      "api": 3,
+      "scripts": 8,
+      "training": 1
+    },
+    "governance": {
+      "backend": 12
+    },
+    "impl_v1": {
+      "backend": 21,
+      "training": 6
+    },
+    "proposed_upgrades": {
+      "backend": 6,
+      "impl_v1": 1
+    },
+    "scripts": {
+      "backend": 7,
+      "impl_v1": 2
+    },
+    "tests": {
+      "backend": 9,
+      "impl_v1": 25,
+      "native": 1,
+      "training": 7,
+      "api": 1,
+      "scripts": 2
+    },
+    "training": {
+      "impl_v1": 38,
+      "backend": 13
+    }
+  },
+  "module_map": {
+    "api": {
+      "roots": [
+        "api"
+      ],
+      "exists": true,
+      "files": 108643,
+      "code_files": 9,
+      "python_files": 9,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 10352,
+      "test_files": 2,
+      "source_files": 7,
+      "test_ratio": 0.2222,
+      "readmes": [],
+      "stub_hits_sample": [
+        "api/cve_scanner.py",
+        "api/database.py",
+        "api/phase_runner.py",
+        "api/server.py",
+        "api/voice_gateway.py"
+      ],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {
+        "backend": 66,
+        "impl_v1": 21,
+        "api": 6,
+        "governance": 2
+      }
+    },
+    "backend": {
+      "roots": [
+        "backend"
+      ],
+      "exists": true,
+      "files": 247,
+      "code_files": 247,
+      "python_files": 247,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 57829,
+      "test_files": 101,
+      "source_files": 146,
+      "test_ratio": 0.4089,
+      "readmes": [],
+      "stub_hits_sample": [
+        "backend/alerts/email_alerts.py",
+        "backend/api/admin_auth.py",
+        "backend/api/db_safety.py",
+        "backend/api/report_generator.py",
+        "backend/api/runtime_api.py",
+        "backend/api/training_progress.py",
+        "backend/api/vault_session.py",
+        "backend/assistant/voice_runtime.py",
+        "backend/auth/auth_guard.py",
+        "backend/bridge/bridge_state.py"
+      ],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {
+        "backend": 1203,
+        "governance": 25,
+        "impl_v1": 19,
+        "native": 13,
+        "scripts": 8,
+        "api": 3,
+        "training": 1
+      }
+    },
+    "backend/ingestion": {
+      "roots": [
+        "backend/ingestion"
+      ],
+      "exists": true,
+      "files": 14,
+      "code_files": 14,
+      "python_files": 14,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 960,
+      "test_files": 0,
+      "source_files": 14,
+      "test_ratio": 0.0,
+      "readmes": [],
+      "stub_hits_sample": [],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {
+        "backend": 41,
+        "impl_v1": 2
+      }
+    },
+    "frontend": {
+      "roots": [
+        "frontend"
+      ],
+      "exists": true,
+      "files": 111,
+      "code_files": 90,
+      "python_files": 0,
+      "ts_files": 90,
+      "cpp_files": 0,
+      "loc": 19438,
+      "test_files": 8,
+      "source_files": 82,
+      "test_ratio": 0.0889,
+      "readmes": [
+        "frontend/README.md"
+      ],
+      "stub_hits_sample": [],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {}
+    },
+    "python": {
+      "roots": [
+        "python"
+      ],
+      "exists": true,
+      "files": 189,
+      "code_files": 186,
+      "python_files": 186,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 21577,
+      "test_files": 103,
+      "source_files": 83,
+      "test_ratio": 0.5538,
+      "readmes": [
+        "python/phase01_core/README.md",
+        "python/phase02_actors/README.md",
+        "python/phase03_trust/README.md"
+      ],
+      "stub_hits_sample": [
+        "python/phase02_actors/tests/test_roles.py",
+        "python/phase04_validation/tests/test_action_types.py",
+        "python/phase04_validation/tests/test_validation_results.py",
+        "python/phase05_workflow/tests/test_states.py",
+        "python/phase05_workflow/tests/test_transitions.py"
+      ],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {
+        "python": 1874
+      }
+    },
+    "impl_v1": {
+      "roots": [
+        "impl_v1"
+      ],
+      "exists": true,
+      "files": 674,
+      "code_files": 653,
+      "python_files": 633,
+      "ts_files": 0,
+      "cpp_files": 20,
+      "loc": 142295,
+      "test_files": 231,
+      "source_files": 422,
+      "test_ratio": 0.3538,
+      "readmes": [],
+      "stub_hits_sample": [
+        "impl_v1/aviation/decision_trace.py",
+        "impl_v1/enterprise/checkpoint_sync.py",
+        "impl_v1/enterprise/training_controller.py",
+        "impl_v1/governance/evolution_test.py",
+        "impl_v1/governance/human_override.py",
+        "impl_v1/governance/incident_automation.py",
+        "impl_v1/governance/model_registry.py",
+        "impl_v1/phase49/ci/regression_blocker.py",
+        "impl_v1/phase49/governors/g24_system_evolution.py",
+        "impl_v1/phase49/governors/g25_ungoogled_chromium.py"
+      ],
+      "empty_code_sample": [
+        "impl_v1/training/distributed/__init__.py",
+        "impl_v1/training/distributed/tests/__init__.py",
+        "impl_v1/training/optimizers/__init__.py",
+        "impl_v1/training/safety/__init__.py",
+        "impl_v1/training/telemetry/__init__.py",
+        "impl_v1/training/validation/__init__.py"
+      ],
+      "imports_to_project_roots": {
+        "impl_v1": 1231,
+        "backend": 21,
+        "training": 6
+      }
+    },
+    "HUMANOID_HUNTER": {
+      "roots": [
+        "HUMANOID_HUNTER"
+      ],
+      "exists": true,
+      "files": 154,
+      "code_files": 153,
+      "python_files": 152,
+      "ts_files": 0,
+      "cpp_files": 1,
+      "loc": 19589,
+      "test_files": 91,
+      "source_files": 62,
+      "test_ratio": 0.5948,
+      "readmes": [
+        "HUMANOID_HUNTER/README.md"
+      ],
+      "stub_hits_sample": [
+        "HUMANOID_HUNTER/authorization/tests/test_authorization_types.py"
+      ],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {
+        "HUMANOID_HUNTER": 918
+      }
+    },
+    "training": {
+      "roots": [
+        "training"
+      ],
+      "exists": true,
+      "files": 4738,
+      "code_files": 22,
+      "python_files": 22,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 5806,
+      "test_files": 1,
+      "source_files": 21,
+      "test_ratio": 0.0455,
+      "readmes": [],
+      "stub_hits_sample": [
+        "training/safetensors_io.py",
+        "training/__init__.py",
+        "training/validation/determinism_validator.py"
+      ],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {
+        "impl_v1": 38,
+        "training": 15,
+        "backend": 13
+      }
+    },
+    "scripts": {
+      "roots": [
+        "scripts"
+      ],
+      "exists": true,
+      "files": 23,
+      "code_files": 14,
+      "python_files": 14,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 3342,
+      "test_files": 0,
+      "source_files": 14,
+      "test_ratio": 0.0,
+      "readmes": [],
+      "stub_hits_sample": [
+        "scripts/ci_banned_tokens.py",
+        "scripts/ci_security_scan.py",
+        "scripts/fast_bridge_ingest.py",
+        "scripts/ingestion_bootstrap.py",
+        "scripts/migrate_pt_to_safetensors.py",
+        "scripts/remediation_scan.py"
+      ],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {
+        "backend": 7,
+        "impl_v1": 2,
+        "scripts": 1
+      }
+    },
+    "native": {
+      "roots": [
+        "native",
+        "edge"
+      ],
+      "exists": true,
+      "files": 246,
+      "code_files": 232,
+      "python_files": 9,
+      "ts_files": 0,
+      "cpp_files": 223,
+      "loc": 51549,
+      "test_files": 5,
+      "source_files": 227,
+      "test_ratio": 0.0216,
+      "readmes": [],
+      "stub_hits_sample": [
+        "native/hdd_engine/hdd_engine.py",
+        "native/hdd_engine/secure_wiper.py"
+      ],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {}
+    },
+    "data": {
+      "roots": [
+        "data"
+      ],
+      "exists": true,
+      "files": 6,
+      "code_files": 0,
+      "python_files": 0,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 0,
+      "test_files": 0,
+      "source_files": 0,
+      "test_ratio": 0.0,
+      "readmes": [],
+      "stub_hits_sample": [],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {}
+    },
+    "config": {
+      "roots": [
+        "config",
+        ".github",
+        ".vscode"
+      ],
+      "exists": true,
+      "files": 12,
+      "code_files": 0,
+      "python_files": 0,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 0,
+      "test_files": 0,
+      "source_files": 0,
+      "test_ratio": 0.0,
+      "readmes": [],
+      "stub_hits_sample": [],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {}
+    },
+    "voice_mode": {
+      "roots": [
+        "voice_mode"
+      ],
+      "exists": true,
+      "files": 1,
+      "code_files": 1,
+      "python_files": 1,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 45,
+      "test_files": 0,
+      "source_files": 1,
+      "test_ratio": 0.0,
+      "readmes": [],
+      "stub_hits_sample": [],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {}
+    },
+    "reports": {
+      "roots": [
+        "reports",
+        "ai_report_generator"
+      ],
+      "exists": true,
+      "files": 1819,
+      "code_files": 1,
+      "python_files": 1,
+      "ts_files": 0,
+      "cpp_files": 0,
+      "loc": 41,
+      "test_files": 0,
+      "source_files": 1,
+      "test_ratio": 0.0,
+      "readmes": [],
+      "stub_hits_sample": [],
+      "empty_code_sample": [],
+      "imports_to_project_roots": {}
+    }
+  }
+}

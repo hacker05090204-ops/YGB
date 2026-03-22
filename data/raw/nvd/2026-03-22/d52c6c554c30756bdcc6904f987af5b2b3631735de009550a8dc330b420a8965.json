@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27344",
+  "ingested_at": "2026-03-22T07:54:40.210710+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in inseriswiss inseri core inseri-core allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects inseri core: from n/a through < = 1.0.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d52c6c554c30756bdcc6904f987af5b2b3631735de009550a8dc330b420a8965",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27344"
+}

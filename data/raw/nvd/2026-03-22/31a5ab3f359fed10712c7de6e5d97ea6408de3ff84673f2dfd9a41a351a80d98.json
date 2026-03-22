@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32742",
+  "ingested_at": "2026-03-22T07:54:47.734400+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to 9.6.0-alpha.17 and 8.6.42, an authenticated user can overwrite server-generated session fields (`sessionToken`, `expiresAt`, `createdWith`) when creating a session object via `POST /classes/_Session`. This allows bypassing the server's session expiration policy by setting an arbitrary far-future expiration date. It also allows setting a predictable session token value. Starting in version 9.6.0-alpha.17 and 8.6.42, the session creation endpoint filters out server-generated fields from user-supplied data, preventing them from being overwritten. As a workaround, add a `beforeSave` trigger on the `_Session` class to validate and reject or strip any user-supplied values for `sessionToken`, `expiresAt`, and `createdWith`.",
+  "severity": "MEDIUM",
+  "sha256_hash": "31a5ab3f359fed10712c7de6e5d97ea6408de3ff84673f2dfd9a41a351a80d98",
+  "source": "nvd",
+  "tags": [
+    "CWE-915"
+  ],
+  "token_count": 113,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32742"
+}

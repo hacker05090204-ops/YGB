@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A low-privileged remote attacker can trigger a stack-based buffer overflow via a crafted HTTP POST request using the ubr-network method resulting in full device compromise.",
+  "token_count": 25
+}

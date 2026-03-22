@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Roundcube Webmail RoundCube Webmail contains a cross-site scripting (XSS) vulnerability in the handling of SVG animate attributes that allows a remote attacker to run malicious JavaScript code.",
+  "token_count": 27
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28769",
+  "ingested_at": "2026-03-22T07:54:34.370652+00:00",
+  "lang": "en",
+  "raw_text": "A path traversal vulnerability exists in the /IDC_Logging/checkifdone.cgi script in International Datacasting Corporation (IDC) SFX Series SuperFlex Satellite Receiver Web management portal version 101. An authenticated attacker can manipulate the `file` parameter to traverse directories and enumerate arbitrary files on the underlying filesystem. Due to the insecure perl file path handling function in use, a authenticated actor is able to preform directory traversal, with the backup endpoint confirming a file exists by indicating that a backup operation was successful or when using the path of a non existent file, the returned status is failed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed68bcd686a0fb5f30598f1a26249b3b1dfb20175c0f36f98c03adc9848b6ab7",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28769"
+}

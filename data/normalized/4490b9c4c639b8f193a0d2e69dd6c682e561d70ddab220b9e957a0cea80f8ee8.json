@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The embedded web interface of the device does not support HTTPS/TLS for authentication and uses HTTP Basic Authentication. Traffic is encoded but not encrypted, exposing user credentials to passive interception by attackers on the same network.",
+  "token_count": 36
+}

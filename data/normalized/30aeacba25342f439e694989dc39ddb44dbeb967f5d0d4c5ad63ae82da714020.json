@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to version 2.2.3, if a malicious authenticated user uploads SVG and creates a hotlink for it, they can achieve stored XSS. This issue has been patched in version 2.2.3.",
+  "token_count": 43
+}

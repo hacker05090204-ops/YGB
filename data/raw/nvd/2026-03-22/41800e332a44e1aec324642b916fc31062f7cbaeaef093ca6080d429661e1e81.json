@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28676",
+  "ingested_at": "2026-03-22T07:54:41.280243+00:00",
+  "lang": "en",
+  "raw_text": "OpenSift is an AI study tool that sifts through large datasets using semantic search and generative AI. Prior to version 1.6.3-alpha, multiple storage helpers used path construction patterns that did not uniformly enforce base-directory containment. This created path-injection risk in file read/write/delete flows if malicious path-like values were introduced. This issue has been patched in version 1.6.3-alpha.",
+  "severity": "HIGH",
+  "sha256_hash": "41800e332a44e1aec324642b916fc31062f7cbaeaef093ca6080d429661e1e81",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28676"
+}

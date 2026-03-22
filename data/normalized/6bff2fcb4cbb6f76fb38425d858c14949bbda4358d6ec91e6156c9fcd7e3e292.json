@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Unauthenticated Remote Code Execution and Information Disclosure due to Local File Inclusion (LFI) vulnerability in Johnson Controls Frick Controls Quantum HD allow an unauthenticated attacker to execute arbitrary code on the affected device, leading to full system compromise. This issue affects Frick Controls Quantum HD: Frick Controls Quantum HD version 10.22 and prior.",
+  "token_count": 53
+}

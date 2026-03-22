@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24351",
+  "ingested_at": "2026-03-22T07:54:33.148057+00:00",
+  "lang": "en",
+  "raw_text": "PluXml CMS is vulnerable to Stored XSS in Static Pages editing functionality. Attacker with editing privileges can inject arbitrary HTML and JS into website, which will be rendered/executed when visiting edited page. The vendor was notified early about this vulnerability, but didn't respond with the details of vulnerability or vulnerable version range. Only versions 5.8.21 and 5.9.0-rc7 were tested and confirmed as vulnerable, other versions were not tested and might also be vulnerable.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e15ada6cd79388e837b3e3921133bc307ba67b1d4660dd32bdd0ce3a2f2ed235",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24351"
+}

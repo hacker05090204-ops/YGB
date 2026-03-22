@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28686",
+  "ingested_at": "2026-03-22T07:54:42.411264+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-16 and 6.9.13-41, A heap-buffer-overflow vulnerability exists in the PCL encode due to an undersized output buffer allocation. This vulnerability is fixed in 7.1.2-16 and 6.9.13-41.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4a16f3752c35c75a5fc70aec5ceeeb317387044decbe22a6d6a7b493bdb46add",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-131"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28686"
+}

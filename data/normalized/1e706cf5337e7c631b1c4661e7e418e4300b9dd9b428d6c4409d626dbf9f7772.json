@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper validation of API end-point in 2N Access Commander version 3.4.2 and prior allows attacker to bypass password policy for backup file encryption. This vulnerability can only be exploited after authenticating with administrator privileges.",
+  "token_count": 34
+}

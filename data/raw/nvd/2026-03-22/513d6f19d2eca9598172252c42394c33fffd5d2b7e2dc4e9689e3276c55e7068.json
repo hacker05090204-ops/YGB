@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3047",
+  "ingested_at": "2026-03-22T07:54:40.923162+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in org.keycloak.broker.saml. When a disabled Security Assertion Markup Language (SAML) client is configured as an Identity Provider (IdP)-initiated broker landing target, it can still complete the login process and establish a Single Sign-On (SSO) session. This allows a remote attacker to gain unauthorized access to other enabled clients without re-authentication, effectively bypassing security restrictions.",
+  "severity": "HIGH",
+  "sha256_hash": "513d6f19d2eca9598172252c42394c33fffd5d2b7e2dc4e9689e3276c55e7068",
+  "source": "nvd",
+  "tags": [
+    "CWE-305"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3047"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28353",
+  "ingested_at": "2026-03-22T07:54:40.959278+00:00",
+  "lang": "en",
+  "raw_text": "Trivy Vulnerability Scanner is a VS Code extension that helps find vulnerabilities. In Trivy VSCode Extension version 1.8.12, which was distributed via OpenVSX marketplace was compromised and contained malicious code designed to leverage local AI coding agent to collect and exfiltrate sensitive information. Users using the affected artifact are advised to immediately remove it and rotate environment secrets. The malicious artifact has been removed from the marketplace. No other affected artifacts have been identified.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "42884848d4e23128bf42b838192e7fb4b88d16f7be5498416fa362d61ccbc0e3",
+  "source": "nvd",
+  "tags": [
+    "CWE-506"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28353"
+}

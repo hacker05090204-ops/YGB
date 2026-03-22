@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Airflow versions 3.1.0 through 3.1.7 missing authorization vulnerability in the Execution API's Human-in-the-Loop (HITL) endpoints that allows any authenticated task instance to read, approve, or reject HITL workflows belonging to any other task instance. Users are recommended to upgrade to Apache Airflow 3.1.8 or later, which resolves this issue.",
+  "token_count": 50
+}

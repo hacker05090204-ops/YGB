@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30862",
+  "ingested_at": "2026-03-22T07:54:42.512408+00:00",
+  "lang": "en",
+  "raw_text": "Appsmith is a platform to build admin panels, internal tools, and dashboards. Prior to 1.96, a Critical Stored XSS vulnerability exists in the Table Widget (TableWidgetV2). The root cause is a lack of HTML sanitization in the React component rendering pipeline, allowing malicious attributes to be interpolated into the DOM. By leveraging the \"Invite Users\" feature, an attacker with a regular user account (user@gmail.com) can force a System Administrator to execute a high-privileged API call (/api/v1/admin/env), resulting in a Full Administrative Account Takeover. This vulnerability is fixed in 1.96.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1a9b0d1db1fdc729a377c70ca38a47c4d46f23d0fffc8d54834dcfc01838907a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30862"
+}

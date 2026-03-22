@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Flink Apache Flink contains an improper access control vulnerability that allows an attacker to read any file on the local filesystem of the JobManager through its REST interface.",
+  "token_count": 29
+}

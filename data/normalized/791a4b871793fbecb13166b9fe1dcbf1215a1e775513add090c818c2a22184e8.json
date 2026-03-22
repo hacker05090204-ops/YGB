@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper authentication in Windows SMB Server allows an authorized attacker to elevate privileges locally.",
+  "token_count": 14
+}

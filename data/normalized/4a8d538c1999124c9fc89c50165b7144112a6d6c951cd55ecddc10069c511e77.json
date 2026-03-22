@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Sterling Partner Engagement Manager 6.2.3.0 through 6.2.3.5 and 6.2.4.0 through 6.2.4.2 could allow a remote attacker to obtain sensitive information when detailed technical error messages are returned. This information could be used in further attacks against the system.",
+  "token_count": 39
+}

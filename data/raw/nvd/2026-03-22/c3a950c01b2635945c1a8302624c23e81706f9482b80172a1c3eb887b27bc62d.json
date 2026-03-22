@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40895",
+  "ingested_at": "2026-03-22T07:54:34.480205+00:00",
+  "lang": "en",
+  "raw_text": "A Stored HTML Injection vulnerability was discovered in the CMC's Sensor Map functionality due to improper validation on connected Guardians' properties. A malicious authenticated user with administrator privileges on a Guardian connected to a CMC can edit the Guardian's properties to inject HTML tags. If the Sensor Map functionality is enabled in the CMC, when a victim CMC user interacts with it, then the injected HTML may render in their browser, enabling phishing and possibly open redirect attacks. Full XSS exploitation and direct information disclosure are prevented by the existing input validation and Content Security Policy configuration.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c3a950c01b2635945c1a8302624c23e81706f9482b80172a1c3eb887b27bc62d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40895"
+}

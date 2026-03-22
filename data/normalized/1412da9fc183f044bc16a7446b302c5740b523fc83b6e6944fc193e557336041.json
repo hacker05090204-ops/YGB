@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Kernel - 'win32k!NtGdiEngCreatePalette' Stack Memory Disclosure",
+  "token_count": 8
+}

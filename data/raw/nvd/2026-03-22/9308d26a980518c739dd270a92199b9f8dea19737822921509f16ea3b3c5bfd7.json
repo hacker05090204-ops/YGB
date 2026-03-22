@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27417",
+  "ingested_at": "2026-03-22T07:54:40.278366+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in SeventhQueen Sweet Date sweetdate allows Object Injection.This issue affects Sweet Date: from n/a through < 4.0.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9308d26a980518c739dd270a92199b9f8dea19737822921509f16ea3b3c5bfd7",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27417"
+}

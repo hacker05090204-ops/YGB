@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of untrusted data in Windows System Image Manager allows an authorized attacker to execute code locally.",
+  "token_count": 17
+}

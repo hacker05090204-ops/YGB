@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Roundcube Webmail RoundCube Webmail contains a deserialization of untrusted data vulnerability that allows remote code execution by authenticated users because the _from parameter in a URL is not validated in program/actions/settings/upload.php.",
+  "token_count": 31
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the SAML 2.0 single sign-on (SSO) feature of Cisco Secure Firewall ASA Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to conduct a cross-site scripting (XSS) attack against the SAML feature and access sensitive, browser-based information. This vulnerability is due to insufficient input validation of multiple HTTP parameters. An attacker could exploit this vulnerability by persuading a user to access a malicious link. A successful exploit could allow the attacker to conduct a reflected XSS attack through an affected device.",
+  "token_count": 90
+}

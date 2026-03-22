@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32013",
+  "ingested_at": "2026-03-22T07:54:48.185177+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 contain a symlink traversal vulnerability in the agents.files.get and agents.files.set methods that allows reading and writing files outside the agent workspace. Attackers can exploit symlinked allowlisted files to access arbitrary host files within gateway process permissions, potentially enabling code execution through file overwrite attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "88279f5f1f865fc6acad02b84362cb6d8dda40e19fdfbbc1a97eacb88ba3006f",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32013"
+}

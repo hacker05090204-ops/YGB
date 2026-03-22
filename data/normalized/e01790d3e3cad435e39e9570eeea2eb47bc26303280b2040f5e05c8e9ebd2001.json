@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Pigeon is a message board/notepad/social system/blog. Prior to 1.0.201, the application uses $_SERVER['HTTP_HOST'] without validation to construct email verification URLs in the register and resendmail flows. An attacker can manipulate the Host header in the HTTP request, causing the verification link sent to the user's email to point to an attacker-controlled domain. This can lead to account takeover by stealing the email verification token. This vulnerability is fixed in 1.0.201.",
+  "token_count": 70
+}

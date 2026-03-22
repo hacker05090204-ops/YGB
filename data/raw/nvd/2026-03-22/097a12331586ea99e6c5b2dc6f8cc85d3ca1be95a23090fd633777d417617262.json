@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29072",
+  "ingested_at": "2026-03-22T07:54:48.148641+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, users who do not belong to the allowed policy creation groups can create functional policy acceptance widgets in posts under the right conditions. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. As a workaround, disable the discourse-policy plugin by disabling the `policy_enabled` site setting.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "097a12331586ea99e6c5b2dc6f8cc85d3ca1be95a23090fd633777d417617262",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29072"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0123",
+  "ingested_at": "2026-03-22T07:54:43.165810+00:00",
+  "lang": "en",
+  "raw_text": "In EfwApTransport::ProcessRxRing of efw_ap_transport.cc, there is a possible out of bounds write due to a missing bounds check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "1904607e2d78edeb7bfd321df24a7ab90061bf39ec0240bd3d4de2585c200ff7",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0123"
+}

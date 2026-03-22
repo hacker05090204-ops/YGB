@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3617",
+  "ingested_at": "2026-03-22T07:54:49.410813+00:00",
+  "lang": "en",
+  "raw_text": "The Paypal Shortcode plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'amount' and 'name' shortcode attributes in all versions up to, and including, 0.3. This is due to insufficient input sanitization and output escaping on user-supplied shortcode attributes. The swer_paypal_shortcode() function extracts shortcode attributes using extract() and shortcode_atts() at line 89, then directly concatenates the $name and $amount values into HTML input element value attributes at lines 105-106 without applying esc_attr() or any other escaping function. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3e5fd5fb52c6aeddd3a856d7a79a4a355d2a4e8783cc6f83e0651ab48e88644b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 108,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3617"
+}

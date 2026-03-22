@@ -231,7 +231,7 @@ async def host_action_session_status(session_id: str, user=Depends(require_auth)
 
 
 @voice_router.get("/api/voice/status")
-async def voice_pipeline_status():
+async def voice_pipeline_status(user=Depends(require_auth)):
     """Get voice pipeline health status — truthful reporting."""
     from backend.assistant.voice_runtime import build_voice_pipeline_status
 
@@ -239,14 +239,14 @@ async def voice_pipeline_status():
 
 
 @voice_router.get("/api/voice/metrics")
-async def voice_metrics():
+async def voice_metrics(user=Depends(require_auth)):
     """Get detailed voice SLO metrics."""
     from impl_v1.training.voice.voice_metrics import get_voice_health
     return get_voice_health()
 
 
 @voice_router.get("/api/voice/history")
-async def voice_audit_history(limit: int = 50):
+async def voice_audit_history(limit: int = 50, user=Depends(require_auth)):
     """Get voice command audit history."""
     audit = _get_audit()
     return {

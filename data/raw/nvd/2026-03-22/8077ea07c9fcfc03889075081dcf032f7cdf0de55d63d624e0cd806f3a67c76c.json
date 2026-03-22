@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29086",
+  "ingested_at": "2026-03-22T07:54:34.842946+00:00",
+  "lang": "en",
+  "raw_text": "Hono is a Web application framework that provides support for any JavaScript runtime. Prior to version 4.12.4, the setCookie() utility did not validate semicolons (;), carriage returns (\\r), or newline characters (\\n) in the domain and path options when constructing the Set-Cookie header. Because cookie attributes are delimited by semicolons, this could allow injection of additional cookie attributes if untrusted input was passed into these fields. This issue has been patched in version 4.12.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8077ea07c9fcfc03889075081dcf032f7cdf0de55d63d624e0cd806f3a67c76c",
+  "source": "nvd",
+  "tags": [
+    "CWE-1113",
+    "NVD-CWE-Other"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29086"
+}

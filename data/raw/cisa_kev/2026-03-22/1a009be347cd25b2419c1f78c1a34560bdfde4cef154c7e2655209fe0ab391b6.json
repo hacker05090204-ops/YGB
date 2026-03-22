@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-29059",
+  "ingested_at": "2026-03-22T07:45:16.621127+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft .NET Framework Microsoft .NET Framework contains an information disclosure vulnerability that exposes the ObjRef URI to an attacker, ultimately enabling remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1a009be347cd25b2419c1f78c1a34560bdfde4cef154c7e2655209fe0ab391b6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

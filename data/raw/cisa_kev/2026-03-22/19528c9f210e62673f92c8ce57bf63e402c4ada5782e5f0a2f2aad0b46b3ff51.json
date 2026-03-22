@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-11978",
+  "ingested_at": "2026-03-22T07:45:18.852556+00:00",
+  "lang": "en",
+  "raw_text": "Apache Airflow A remote code/command injection vulnerability was discovered in one of the example DAGs shipped with Airflow.",
+  "severity": "CRITICAL",
+  "sha256_hash": "19528c9f210e62673f92c8ce57bf63e402c4ada5782e5f0a2f2aad0b46b3ff51",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

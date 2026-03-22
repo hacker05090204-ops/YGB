@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-32709",
+  "ingested_at": "2026-03-22T07:45:16.416634+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Ancillary Function Driver for WinSock contains a use-after-free vulnerability that allows an authorized attacker to escalate privileges to administrator.",
+  "severity": "CRITICAL",
+  "sha256_hash": "71e36504b1c1335a60f9811839b74b37a6a5a5985c85c46525d421d2e0feb37b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

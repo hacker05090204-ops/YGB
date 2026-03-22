@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28357",
+  "ingested_at": "2026-03-22T07:54:33.786246+00:00",
+  "lang": "en",
+  "raw_text": "NocoDB is software for building databases as spreadsheets. Prior to version 0.301.3, a stored XSS vulnerability exists in the Formula virtual cell. Formula results containing URI::() patterns are rendered via v-html without sanitization, allowing injected HTML to execute. This issue has been patched in version 0.301.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f647556f0bf0e464030964a893a9e3b3069e508c179ddbfb151d7b2b552417a7",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28357"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-30413",
+  "ingested_at": "2026-03-22T07:54:41.154701+00:00",
+  "lang": "en",
+  "raw_text": "Credentials are not deleted from Acronis Agent after plan revocation. The following products are affected: Acronis Cyber Protect Cloud Agent (Linux, macOS, Windows) before build 40497, Acronis Cyber Protect 17 (Linux, macOS, Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "54be50db2e001286205c9e7c4012e9e028aa2cf1e01a963b42e784f89651c71e",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30413"
+}

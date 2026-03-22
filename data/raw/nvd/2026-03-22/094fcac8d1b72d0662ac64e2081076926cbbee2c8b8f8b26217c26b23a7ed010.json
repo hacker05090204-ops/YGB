@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25455",
+  "ingested_at": "2026-03-22T07:54:30.997163+00:00",
+  "lang": "en",
+  "raw_text": "Web Ofisi E-Ticaret v3 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'a' parameter. Attackers can send GET requests to with malicious 'a' parameter values to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "094fcac8d1b72d0662ac64e2081076926cbbee2c8b8f8b26217c26b23a7ed010",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25455"
+}

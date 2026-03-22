@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Path traversal vulnerability in the certificate management module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "token_count": 17
+}

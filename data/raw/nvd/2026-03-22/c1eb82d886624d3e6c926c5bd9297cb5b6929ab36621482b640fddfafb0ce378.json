@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-63945",
+  "ingested_at": "2026-03-22T07:54:31.169542+00:00",
+  "lang": "en",
+  "raw_text": "A privilege escalation (PE) vulnerability in the Tencent iOA app thru 210.9.28693.621001 on Windows devices enables a local user to execute programs with elevated privileges. However, execution requires that the local user is able to successfully exploit a race condition.",
+  "severity": "HIGH",
+  "sha256_hash": "c1eb82d886624d3e6c926c5bd9297cb5b6929ab36621482b640fddfafb0ce378",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-63945"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-14644",
+  "ingested_at": "2026-03-22T07:45:16.805702+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server, a product within the Fusion Middleware suite, contains a deserialization vulnerability. Unauthenticated attackers with network access via T3 or IIOP can exploit this vulnerability to achieve remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f57242eca6430e6a16be2766ea44c2d5872d4cbd1fdfe994ebd48d9e0217f299",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

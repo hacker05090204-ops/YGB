@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Control of Generation of Code ('Code Injection') vulnerability in OpenTextTM Carbonite Safe Server Backup allows Code Injection. The vulnerability could be exploited through an open port, potentially allowing unauthorized access. This issue affects Carbonite Safe Server Backup: through 6.8.3.",
+  "token_count": 40
+}

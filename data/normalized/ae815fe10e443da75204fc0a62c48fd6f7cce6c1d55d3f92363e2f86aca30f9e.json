@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sunhillo SureLine Sunhillo SureLine contains an OS command injection vulnerability that allows an attacker to cause a denial-of-service or utilize the device for persistence on the network via shell metacharacters in ipAddr or dnsAddr in /cgi/networkDiag.cgi.",
+  "token_count": 36
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mozilla Multiple Products Mozilla Firefox, SeaMonkey, and Thunderbird contain an unspecified vulnerability when JavaScript is enabled. This allows remote attackers to execute arbitrary code via vectors related to nsCSSFrameConstructor::ContentAppended, the appendChild method, incorrect index tracking, and the creation of multiple frames, which triggers memory corruption.",
+  "token_count": 45
+}

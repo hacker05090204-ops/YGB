@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, a stored cross-site scripting vulnerability in the GAD-7 anxiety assessment form allows authenticated users with clinician privileges to inject malicious JavaScript that executes when other users view the form. This enables session hijacking, account takeover, and privilege escalation from clinician to administrator. Version 8.0.0 fixes the issue.",
+  "token_count": 66
+}

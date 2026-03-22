@@ -1,0 +1,5 @@
+{
+  "lang": "ro",
+  "raw_text": "Linux Kernel < 2.6.22 - 'ftruncate()'/'open()' Local Privilege Escalation",
+  "token_count": 9
+}

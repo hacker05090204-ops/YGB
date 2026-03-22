@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27443",
+  "ingested_at": "2026-03-22T07:54:34.414665+00:00",
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 does not properly sanitize the headers from S/MIME protected MIME entities, allowing an attacker to control trusted headers.",
+  "severity": "HIGH",
+  "sha256_hash": "f9b73f69e920c11a0f4228e65a68773da5d8d26e21bc7c8aa123f95fabbe94be",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27443"
+}

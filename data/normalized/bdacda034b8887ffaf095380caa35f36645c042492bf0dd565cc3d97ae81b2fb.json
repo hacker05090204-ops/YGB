@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zoho ManageEngine Multiple Zoho ManageEngine products contain an unauthenticated remote code execution vulnerability due to the usage of an outdated third-party dependency, Apache Santuario.",
+  "token_count": 24
+}

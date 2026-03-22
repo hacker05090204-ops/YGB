@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32097",
+  "ingested_at": "2026-03-22T07:54:43.926507+00:00",
+  "lang": "en",
+  "raw_text": "PingPong is a platform for using large language models (LLMs) for teaching and learning. Prior to 7.27.2, an authenticated user may be able to retrieve or delete files outside the intended authorization scope. This issue could result in retrieval or deletion of private files, including user-uploaded files and model-generated output files. Exploitation required authentication and permission to view at least one thread for retrieval, and authentication and permission to participate in at least one thread for deletion. This vulnerability is fixed in 7.27.2.",
+  "severity": "HIGH",
+  "sha256_hash": "9e2c566e3324515249242523d4d0164204c25ff50dc5f7cf9659ff61834fc33a",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32097"
+}

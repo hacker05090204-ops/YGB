@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. In versions up to and including 8.0.0, an arbitrary file exfiltration vulnerability in the fax sending endpoint allows any authenticated user to read and transmit any file on the server (including database credentials, patient documents, system files, and source code) via fax to an attacker-controlled phone number. The vulnerability exists because the endpoint accepts arbitrary file paths from user input and streams them to the fax gateway without path restrictions or authorization checks. As of time of publication, no known patched versions are available.",
+  "token_count": 99
+}

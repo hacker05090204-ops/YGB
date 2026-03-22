@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2297",
+  "ingested_at": "2026-03-22T07:54:34.844939+00:00",
+  "lang": "en",
+  "raw_text": "The import hook in CPython that handles legacy *.pyc files (SourcelessFileLoader) is incorrectly handled in FileLoader (a base class) and so does not use io.open_code() to read the .pyc files. sys.audit handlers for this audit event therefore do not fire.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "cbce147ca6fb6b711e971862d68440b099a2964b1207fbd90512cc031df59613",
+  "source": "nvd",
+  "tags": [
+    "CWE-668"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2297"
+}

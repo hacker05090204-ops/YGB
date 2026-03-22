@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Campcodes Division Regional Athletic Meet Game Result Matrix System 2.1. This vulnerability affects unknown code of the file save_up_athlete.php. This manipulation of the argument a_name causes cross site scripting. It is possible to initiate the attack remotely. The exploit has been made available to the public and could be used for attacks.",
+  "token_count": 58
+}

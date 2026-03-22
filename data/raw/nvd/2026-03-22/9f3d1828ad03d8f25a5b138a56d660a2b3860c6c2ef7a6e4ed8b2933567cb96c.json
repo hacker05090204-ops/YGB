@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3392",
+  "ingested_at": "2026-03-22T07:54:33.456880+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in FascinatedBox lily up to 2.3. The affected element is the function eval_tree of the file src/lily_emitter.c. This manipulation causes null pointer dereference. The attack is restricted to local execution. The exploit has been made available to the public and could be used for attacks. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "9f3d1828ad03d8f25a5b138a56d660a2b3860c6c2ef7a6e4ed8b2933567cb96c",
+  "source": "nvd",
+  "tags": [
+    "CWE-404",
+    "CWE-476"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3392"
+}

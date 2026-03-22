@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27438",
+  "ingested_at": "2026-03-22T07:54:40.283361+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Kingler kingler allows Object Injection.This issue affects Kingler: from n/a through < = 1.7.",
+  "severity": "CRITICAL",
+  "sha256_hash": "af0be279ef580e5a16ebf82531e5775847e5b8de3f186bd05ab984326ba43b95",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27438"
+}

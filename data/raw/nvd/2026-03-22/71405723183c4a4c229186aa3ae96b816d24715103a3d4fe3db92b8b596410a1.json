@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22552",
+  "ingested_at": "2026-03-22T07:54:41.156697+00:00",
+  "lang": "en",
+  "raw_text": "WebSocket endpoints lack proper authentication mechanisms, enabling attackers to perform unauthorized station impersonation and manipulate data sent to the backend. An unauthenticated attacker can connect to the OCPP WebSocket endpoint using a known or discovered charging station identifier, then issue or receive OCPP commands as a legitimate charger. Given that no authentication is required, this can lead to privilege escalation, unauthorized control of charging infrastructure, and corruption of charging network data reported to the backend.",
+  "severity": "CRITICAL",
+  "sha256_hash": "71405723183c4a4c229186aa3ae96b816d24715103a3d4fe3db92b8b596410a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22552"
+}

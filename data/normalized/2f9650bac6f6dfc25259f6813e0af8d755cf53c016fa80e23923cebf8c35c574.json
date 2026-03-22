@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode E-Logbook with Health Monitoring System for COVID-19 1.0. This vulnerability affects unknown code of the file /check_profile_old.php. The manipulation of the argument profile_id leads to sql injection. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used.",
+  "token_count": 52
+}

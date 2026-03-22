@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27514",
+  "ingested_at": "2026-03-22T07:54:31.144992+00:00",
+  "lang": "en",
+  "raw_text": "Shenzhen Tenda F3 Wireless Router firmware V12.01.01.55_multi contains a sensitive information exposure vulnerability in the configuration download functionality. The configuration download response includes the router password and administrative password in plaintext. The endpoint also omits appropriate Cache-Control directives, which can allow the response to be stored in client-side caches and recovered by other local users or processes with access to cached browser data.",
+  "severity": "MEDIUM",
+  "sha256_hash": "45f11f0d608d526d02f5619430cda11bfaabbaa7564d300dcf3383f595f336e8",
+  "source": "nvd",
+  "tags": [
+    "CWE-201",
+    "CWE-525"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27514"
+}

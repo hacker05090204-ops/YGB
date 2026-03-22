@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26272",
+  "ingested_at": "2026-03-22T07:54:34.306476+00:00",
+  "lang": "en",
+  "raw_text": "HomeBox is a home inventory and organization system. Prior to 0.24.0-rc.1, a stored cross-site scripting (XSS) vulnerability exists in the item attachment upload functionality. The application does not properly validate or restrict uploaded file types, allowing an authenticated user to upload malicious HTML or SVG files containing executable JavaScript (also, potentially other formats that render scripts). Uploaded attachments are accessible via direct links. When a user accesses such a file in their browser, the embedded JavaScript executes in the context of the application's origin. This vulnerability is fixed in 0.24.0-rc.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "62416f943b19f317d09e6a10728bed4b2f2c15588f3489e8329d6254aa465b73",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26272"
+}

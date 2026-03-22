@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-15505",
+  "ingested_at": "2026-03-22T07:45:19.255243+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti MobileIron Multiple Products Ivanti MobileIron's Core & Connector, Sentry, and Monitor and Reporting Database (RDB) products contain an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4b87a51a8051774408477c57be610fcf0dddd327167b51f0a04f8edd8d278f78",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

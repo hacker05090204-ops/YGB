@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31887",
+  "ingested_at": "2026-03-22T07:54:43.860354+00:00",
+  "lang": "en",
+  "raw_text": "Shopware is an open commerce platform. Prior to 6.7.8.1 and 6.6.10.15, an insufficient check on the filter types for unauthenticated customers allows access to orders of other customers. This is part of the deepLinkCode support on the store-api.order endpoint. This vulnerability is fixed in 6.7.8.1 and 6.6.10.15.",
+  "severity": "HIGH",
+  "sha256_hash": "993ebb2cdea20a948e088974ea03dd139338a64a37d40c4ddb703da5d481c3a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31887"
+}

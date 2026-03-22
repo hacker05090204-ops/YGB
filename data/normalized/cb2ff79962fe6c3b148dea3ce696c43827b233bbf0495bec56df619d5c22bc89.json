@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Realtek SDK Realtek SDK contains an improper input validation vulnerability in the miniigd SOAP service that allows remote attackers to execute malicious code via a crafted NewInternalClient request.",
+  "token_count": 28
+}

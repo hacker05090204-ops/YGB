@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69401",
+  "ingested_at": "2026-03-22T07:54:30.309022+00:00",
+  "lang": "en",
+  "raw_text": "Authentication Bypass by Spoofing vulnerability in mdalabar WooODT Lite byconsole-woo-order-delivery-time allows Identity Spoofing.This issue affects WooODT Lite: from n/a through < = 2.5.2.",
+  "severity": "HIGH",
+  "sha256_hash": "49b11218730fe0767cb261fb997f42895f86a86b1e19ac929ce379136050f511",
+  "source": "nvd",
+  "tags": [
+    "CWE-290"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69401"
+}

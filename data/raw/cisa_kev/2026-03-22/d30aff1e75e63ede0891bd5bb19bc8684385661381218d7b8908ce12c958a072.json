@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-52691",
+  "ingested_at": "2026-03-22T07:45:15.952510+00:00",
+  "lang": "en",
+  "raw_text": "SmarterTools SmarterMail SmarterTools SmarterMail contains an unrestricted upload of file with dangerous type vulnerability that could allow an unauthenticated attacker to upload arbitrary files to any location on the mail server, potentially enabling remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d30aff1e75e63ede0891bd5bb19bc8684385661381218d7b8908ce12c958a072",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

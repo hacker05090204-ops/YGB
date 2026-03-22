@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-27691",
+  "ingested_at": "2026-03-22T07:54:32.067656+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. In versions up to and including 2.3.1.4, signed integer overflow in iccFromCube.cpp during multiplication triggers undefined behavior, potentially causing crashes or incorrect ICC profile generation when processing crafted/large cube inputs. Commit 43ae18dd69fc70190d3632a18a3af2f3da1e052a fixes the issue. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7a9bec07ab8dbbeb8feccbd787785a42667173bd007575db479e537247bf8f49",
+  "source": "nvd",
+  "tags": [
+    "CWE-190",
+    "CWE-681",
+    "CWE-190"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27691"
+}

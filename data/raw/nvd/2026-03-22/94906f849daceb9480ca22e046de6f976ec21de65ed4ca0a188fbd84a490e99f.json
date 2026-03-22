@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25887",
+  "ingested_at": "2026-03-22T07:54:41.255716+00:00",
+  "lang": "en",
+  "raw_text": "Chartbrew is an open-source web application that can connect directly to databases and APIs and use the data to create charts. Prior to version 4.8.1, there is a remote code execution vulnerability via the MongoDB dataset Query. This issue has been patched in version 4.8.1.",
+  "severity": "HIGH",
+  "sha256_hash": "94906f849daceb9480ca22e046de6f976ec21de65ed4ca0a188fbd84a490e99f",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25887"
+}

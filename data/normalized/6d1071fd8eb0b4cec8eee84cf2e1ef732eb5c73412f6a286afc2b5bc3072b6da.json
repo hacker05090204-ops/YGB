@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Reolink Multiple IP Cameras Reolink RLC-410W, C1 Pro, C2 Pro, RLC-422W, and RLC-511W IP cameras contain an authenticated OS command injection vulnerability. This vulnerability allows an authenticated admin to use the \"TestEmail\" functionality to inject and run OS commands as root.",
+  "token_count": 41
+}

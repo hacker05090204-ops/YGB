@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0824",
+  "ingested_at": "2026-03-22T07:45:16.890928+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft COM for Windows contains a deserialization of untrusted data vulnerability that allows for privilege escalation and remote code execution via a specially crafted file or script.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f8147b8a7c6f22f4295eff643c4efc2b091c8069b423a6231758009c341a3507",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

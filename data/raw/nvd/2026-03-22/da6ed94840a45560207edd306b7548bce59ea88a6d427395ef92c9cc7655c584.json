@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52644",
+  "ingested_at": "2026-03-22T07:54:46.821605+00:00",
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where certain user actions are not adequately audited or logged. The absence of proper auditing mechanisms may reduce traceability of user activities and could potentially impact monitoring, accountability, or incident investigation processes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "da6ed94840a45560207edd306b7548bce59ea88a6d427395ef92c9cc7655c584",
+  "source": "nvd",
+  "tags": [
+    "CWE-778"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52644"
+}

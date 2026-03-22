@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30945",
+  "ingested_at": "2026-03-22T07:54:42.885948+00:00",
+  "lang": "en",
+  "raw_text": "StudioCMS is a server-side-rendered, Astro native, headless content management system. Prior to 0.4.0, the DELETE /studiocms_api/dashboard/api-tokens endpoint allows any authenticated user with editor privileges or above to revoke API tokens belonging to any other user, including admin and owner accounts. The handler accepts tokenID and userID directly from the request payload without verifying token ownership, caller identity, or role hierarchy. This enables targeted denial of service against critical integrations and automations. This vulnerability is fixed in 0.4.0.",
+  "severity": "HIGH",
+  "sha256_hash": "564edd49d2c40c2d9a8341eb73f093dc4c52332f947d2d8b59bab2c1812bf4e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-639",
+    "CWE-863"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30945"
+}

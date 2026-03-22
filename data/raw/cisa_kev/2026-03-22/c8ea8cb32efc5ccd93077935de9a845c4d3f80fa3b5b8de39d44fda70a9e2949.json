@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-3393",
+  "ingested_at": "2026-03-22T07:45:16.658060+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS Palo Alto Networks PAN-OS contains a vulnerability in parsing and logging malicious DNS packets in the DNS Security feature that, when exploited, allows an unauthenticated attacker to remotely reboot the firewall. Repeated attempts to trigger this condition will cause the firewall to enter maintenance mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c8ea8cb32efc5ccd93077935de9a845c4d3f80fa3b5b8de39d44fda70a9e2949",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

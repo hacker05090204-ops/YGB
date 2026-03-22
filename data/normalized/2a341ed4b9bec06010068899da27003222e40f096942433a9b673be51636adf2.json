@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An arbitrary file upload vulnerability in aaPanel v7.57.0 allows attackers to execute arbitrary code via uploading a crafted file.",
+  "token_count": 19
+}

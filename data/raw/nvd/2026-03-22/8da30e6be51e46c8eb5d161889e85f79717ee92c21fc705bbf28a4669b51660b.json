@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32887",
+  "ingested_at": "2026-03-22T07:54:49.020756+00:00",
+  "lang": "en",
+  "raw_text": "Effect is a TypeScript framework that consists of several packages that work together to help build TypeScript applications. Prior to version 3.20.0, when using `RpcServer.toWebHandler` (or `HttpApp.toWebHandlerRuntime`) inside a Next.js App Router route handler, any Node.js `AsyncLocalStorage`-dependent API called from within an Effect fiber can read another concurrent request's context \u2014 or no context at all. Under production traffic, `auth()` from `@clerk/nextjs/server` returns a different user's session. Version 3.20.0 contains a fix for the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "8da30e6be51e46c8eb5d161889e85f79717ee92c21fc705bbf28a4669b51660b",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32887"
+}

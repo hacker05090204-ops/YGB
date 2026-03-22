@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-5521",
+  "ingested_at": "2026-03-22T07:45:17.670764+00:00",
+  "lang": "en",
+  "raw_text": "NETGEAR Multiple Devices Multiple NETGEAR devices are prone to admin password disclosure via simple crafted requests to the web management server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "835b27f2ce9487dbb82621a2c5a4eed7fba39052a74b110d8ab5a3767d0ba806",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

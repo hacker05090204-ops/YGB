@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33221",
+  "ingested_at": "2026-03-22T07:54:49.089244+00:00",
+  "lang": "en",
+  "raw_text": "Nhost is an open source Firebase alternative with GraphQL. Prior to version 0.12.0, the storage service's file upload handler trusts the client-provided Content-Type header without performing server-side MIME type detection. This allows an attacker to upload files with an arbitrary MIME type, bypassing any MIME-type-based restrictions configured on storage buckets. This issue has been patched in version 0.12.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "562c2f15eee34acceccf1393a4ed9e14c74d4ccc181c42fbdd6d690cd4ebd7fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-343",
+    "CWE-345"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33221"
+}

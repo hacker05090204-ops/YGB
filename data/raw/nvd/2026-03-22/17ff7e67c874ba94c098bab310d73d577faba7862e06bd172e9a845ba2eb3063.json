@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23546",
+  "ingested_at": "2026-03-22T07:54:40.160753+00:00",
+  "lang": "en",
+  "raw_text": "Insertion of Sensitive Information Into Sent Data vulnerability in RadiusTheme Classified Listing classified-listing allows Retrieve Embedded Sensitive Data.This issue affects Classified Listing: from n/a through < = 5.3.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "17ff7e67c874ba94c098bab310d73d577faba7862e06bd172e9a845ba2eb3063",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23546"
+}

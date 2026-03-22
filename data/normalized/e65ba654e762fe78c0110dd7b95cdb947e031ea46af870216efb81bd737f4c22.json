@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Veritas Backup Exec Agent Veritas Backup Exec (BE) Agent contains an improper authentication vulnerability that could allow an attacker unauthorized access to the BE Agent via SHA authentication scheme.",
+  "token_count": 29
+}

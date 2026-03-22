@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Untrusted pointer dereference in Microsoft Office Excel allows an unauthorized attacker to execute code locally.",
+  "token_count": 15
+}

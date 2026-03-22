@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62328",
+  "ingested_at": "2026-03-22T07:54:44.023922+00:00",
+  "lang": "en",
+  "raw_text": "HCL Nomad server on Domino did not configure the frame-ancestors directive in the Content-Security-Policy header by default which could allow an attacker to obtain sensitive information via unspecified vectors.",
+  "severity": "LOW",
+  "sha256_hash": "e12f9a56cc928e0663e339d74b7d976d695ac604134ee036127f1cbe9fbc7beb",
+  "source": "nvd",
+  "tags": [
+    "CWE-1021"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62328"
+}

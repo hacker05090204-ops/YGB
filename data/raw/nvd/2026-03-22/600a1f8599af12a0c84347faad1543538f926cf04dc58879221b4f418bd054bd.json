@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30919",
+  "ingested_at": "2026-03-22T07:54:42.535605+00:00",
+  "lang": "en",
+  "raw_text": "facileManager is a modular suite of web apps built with the sysadmin in mind. Prior to 6.0.4 , stored XSS (also known as persistent or second-order XSS) occurs when an application receives data from an untrusted source and includes that data in its subsequent HTTP responses in an unsafe manner. This vulnerability was found in the fmDNS module. This vulnerability is fixed in 6.0.4.",
+  "severity": "HIGH",
+  "sha256_hash": "600a1f8599af12a0c84347faad1543538f926cf04dc58879221b4f418bd054bd",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30919"
+}

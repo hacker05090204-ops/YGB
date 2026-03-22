@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-39144",
+  "ingested_at": "2026-03-22T07:45:17.498978+00:00",
+  "lang": "en",
+  "raw_text": "XStream XStream XStream contains a remote code execution vulnerability that allows an attacker to manipulate the processed input stream and replace or inject objects that result in the execution of a local command on the server. This vulnerability can affect multiple products, including but not limited to VMware Cloud Foundation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "af8d372bb5f760dc6e16dc2751b62ebb0587b42792e50f61f28871cc8fb0e510",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

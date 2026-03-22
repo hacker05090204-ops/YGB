@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A DTrace component, dtprobed, allows arbitrary file creation through crafted USDT provider names.",
+  "token_count": 13
+}

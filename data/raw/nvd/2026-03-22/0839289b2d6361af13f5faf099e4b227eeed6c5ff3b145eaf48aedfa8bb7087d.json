@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-2418",
+  "ingested_at": "2026-03-22T07:54:40.703429+00:00",
+  "lang": "en",
+  "raw_text": "The Login with Salesforce WordPress plugin through 1.0.2 does not validate that users are allowed to login through Salesforce, allowing unauthenticated users to be authenticated as any user (such as admin) by simply knowing the email",
+  "severity": "CRITICAL",
+  "sha256_hash": "0839289b2d6361af13f5faf099e4b227eeed6c5ff3b145eaf48aedfa8bb7087d",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2418"
+}

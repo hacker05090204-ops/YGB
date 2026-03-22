@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper link resolution before file access ('link following') in Winlogon allows an authorized attacker to elevate privileges locally.",
+  "token_count": 18
+}

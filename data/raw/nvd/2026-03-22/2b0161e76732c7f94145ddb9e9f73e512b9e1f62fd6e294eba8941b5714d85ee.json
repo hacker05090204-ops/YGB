@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28267",
+  "ingested_at": "2026-03-22T07:54:42.496639+00:00",
+  "lang": "en",
+  "raw_text": "Multiple i-\u30d5\u30a3\u30eb\u30bf\u30fc products are configured with improper file access permission settings. Files may be created or overwritten in the system directory or backup directory by a non-administrative user.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2b0161e76732c7f94145ddb9e9f73e512b9e1f62fd6e294eba8941b5714d85ee",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28267"
+}

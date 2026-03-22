@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70329",
+  "ingested_at": "2026-03-22T07:54:31.176943+00:00",
+  "lang": "en",
+  "raw_text": "TOTOLink X5000R v9.1.0cu_2415_B20250515 contains an OS command injection vulnerability in the setIptvCfg handler of the /usr/sbin/lighttpd executable. The vlanVidLan1 (and other vlanVidLanX) parameters are retrieved via Uci_Get_Str and passed to the CsteSystem function without adequate validation or filtering. This allows an authenticated attacker to execute arbitrary shell commands with root privileges by injecting shell metacharacters into the affected parameters.",
+  "severity": "HIGH",
+  "sha256_hash": "7a2f04dd147bbb6c67371a0cb27ac2413c6ffdef8d5f54b50ae2abcb5bb37500",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70329"
+}

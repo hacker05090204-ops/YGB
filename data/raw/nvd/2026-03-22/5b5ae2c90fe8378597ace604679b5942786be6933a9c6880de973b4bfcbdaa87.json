@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32043",
+  "ingested_at": "2026-03-22T07:54:49.190339+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 contain a time-of-check-time-of-use vulnerability in approval-bound system.run execution where the cwd parameter is validated at approval time but resolved at execution time. Attackers can retarget a symlinked cwd between approval and execution to bypass command execution restrictions and execute arbitrary commands on node hosts.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5b5ae2c90fe8378597ace604679b5942786be6933a9c6880de973b4bfcbdaa87",
+  "source": "nvd",
+  "tags": [
+    "CWE-367"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32043"
+}

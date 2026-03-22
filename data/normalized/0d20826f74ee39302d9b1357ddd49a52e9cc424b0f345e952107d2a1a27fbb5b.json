@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The \"Privileged Helper\" component of the Arturia Software Center (MacOS) does not perform sufficient client code signature validation when a client connects. This leads to an attacker being able to connect to the helper and execute privileged actions leading to local privilege escalation.",
+  "token_count": 43
+}

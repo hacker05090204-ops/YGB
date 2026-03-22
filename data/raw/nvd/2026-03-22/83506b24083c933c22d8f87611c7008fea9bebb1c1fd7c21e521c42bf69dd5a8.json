@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-27607",
+  "ingested_at": "2026-03-22T07:54:31.871335+00:00",
+  "lang": "en",
+  "raw_text": "RustFS is a distributed object storage system built in Rust. In versions 1.0.0-alpha.56 through 1.0.0-alpha.82, RustFS does not validate policy conditions in presigned POST uploads (PostObject), allowing attackers to bypass content-length-range, starts-with, and Content-Type constraints. This enables unauthorized file uploads exceeding size limits, uploads to arbitrary object keys, and content-type spoofing, potentially leading to storage exhaustion, unauthorized data access, and security bypasses. Version 1.0.0-alpha.83 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "83506b24083c933c22d8f87611c7008fea9bebb1c1fd7c21e521c42bf69dd5a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-863",
+    "CWE-863"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27607"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32933",
+  "ingested_at": "2026-03-22T07:54:48.527107+00:00",
+  "lang": "en",
+  "raw_text": "AutoMapper is a convention-based object-object mapper in .NET. Versions prior to 15.1.1 and 16.1.1 are vulnerable to a Denial of Service (DoS) attack. When mapping deeply nested object graphs, the library uses recursive method calls without enforcing a default maximum depth limit. This allows an attacker to provide a specially crafted object graph that exhausts the thread's stack memory, triggering a `StackOverflowException` and causing the entire application process to terminate. Versions 15.1.1 and 16.1.1 fix the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "1cb3deb625a53ee1347808a1384a92009372213664124ee445834a03b22ed68f",
+  "source": "nvd",
+  "tags": [
+    "CWE-674"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32933"
+}

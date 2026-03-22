@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel 2.6.9 < 2.6.11 (RHEL 4) - 'SYS_EPoll_Wait' Local Integer Overflow / Local Privilege Escalation",
+  "token_count": 16
+}

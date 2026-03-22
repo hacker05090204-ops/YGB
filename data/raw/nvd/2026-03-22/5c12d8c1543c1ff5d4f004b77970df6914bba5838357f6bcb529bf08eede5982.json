@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32720",
+  "ingested_at": "2026-03-22T07:54:46.550499+00:00",
+  "lang": "en",
+  "raw_text": "The CTFer.io Monitoring component is in charge of the collection, process and storage of various signals (i.e. logs, metrics and distributed traces). Prior to 0.2.1, due to a mis-written NetworkPolicy, a malicious actor can pivot from a component to any other namespace. This breaks the security-by-default property expected as part of the deployment program, leading to a potential lateral movement. This vulnerability is fixed in 0.2.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "5c12d8c1543c1ff5d4f004b77970df6914bba5838357f6bcb529bf08eede5982",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32720"
+}

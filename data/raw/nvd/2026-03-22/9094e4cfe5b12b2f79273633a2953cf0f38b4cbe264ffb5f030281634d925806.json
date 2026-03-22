@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29522",
+  "ingested_at": "2026-03-22T07:54:46.976214+00:00",
+  "lang": "en",
+  "raw_text": "ZwickRoell Test Data Management versions prior to 3.0.8 contain a local file inclusion (LFI) vulnerability in the /server/node_upgrade_srv.js endpoint. An unauthenticated attacker can supply directory traversal sequences via the firmware parameter to access arbitrary files on the server, leading to information disclosure of sensitive system files.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9094e4cfe5b12b2f79273633a2953cf0f38b4cbe264ffb5f030281634d925806",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29522"
+}

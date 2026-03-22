@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25522",
+  "ingested_at": "2026-03-22T07:54:44.304328+00:00",
+  "lang": "en",
+  "raw_text": "XooGallery Latest contains multiple SQL injection vulnerabilities that allow unauthenticated attackers to manipulate database queries by injecting SQL code through the photo_id parameter. Attackers can send GET requests to photo.php with malicious photo_id values to extract sensitive data, bypass authentication, or modify database contents.",
+  "severity": "HIGH",
+  "sha256_hash": "91dcce3cf6daa7841726676ad92e9be32b272cb4211f00ab2e4381056b404484",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25522"
+}

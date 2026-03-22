@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32355",
+  "ingested_at": "2026-03-22T07:54:45.924192+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Crocoblock JetEngine jet-engine allows Object Injection.This issue affects JetEngine: from n/a through < 3.8.4.1.",
+  "severity": "HIGH",
+  "sha256_hash": "6ec26f074fc662e1433fa52a230f86ef6146ff63e7c00f2bd60796d1ec915458",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32355"
+}

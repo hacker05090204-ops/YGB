@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-66687",
+  "ingested_at": "2026-03-22T07:54:46.881694+00:00",
+  "lang": "en",
+  "raw_text": "Doom Launcher 3.8.1.0 is vulnerable to Directory Traversal due to missing file path validation during the extraction of game files",
+  "severity": "HIGH",
+  "sha256_hash": "db828c40e066e3e8573cef1b165782efd9adf70316205076c1efc62b583b8112",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66687"
+}

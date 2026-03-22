@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20101",
+  "ingested_at": "2026-03-22T07:54:34.716798+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the SAML 2.0 single sign-on (SSO) feature of Cisco Secure Firewall ASA Software and Secure FTD Software could allow an unauthenticated, remote attacker to cause the device to reload unexpectedly, resulting in a DoS condition. This vulnerability is due to insufficient error checking when processing SAML messages. An attacker could exploit this vulnerability by sending crafted SAML messages to the SAML service. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "severity": "HIGH",
+  "sha256_hash": "888a26c9e4d769e2232bf20d0138a47b43c50e08077a958f828a0f5a999c6c82",
+  "source": "nvd",
+  "tags": [
+    "CWE-330"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20101"
+}

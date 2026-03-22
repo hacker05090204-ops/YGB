@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14343",
+  "ingested_at": "2026-03-22T07:54:32.645864+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation (XSS or 'Cross-site Scripting') vulnerability in Dokuzsoft Technology Ltd. E-Commerce Product allows Reflected XSS.This issue affects E-Commerce Product: through 10122025.",
+  "severity": "HIGH",
+  "sha256_hash": "62755b85569e06acdf088e0e2d5072c6b916ed03adacfb3d3dc9267c9abb7799",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14343"
+}

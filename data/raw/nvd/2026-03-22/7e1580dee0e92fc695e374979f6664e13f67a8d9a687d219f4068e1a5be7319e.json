@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26022",
+  "ingested_at": "2026-03-22T07:54:40.876499+00:00",
+  "lang": "en",
+  "raw_text": "Gogs is an open source self-hosted Git service. Prior to version 0.14.2, a stored cross-site scripting (XSS) vulnerability exists in the comment and issue description functionality. The application's HTML sanitizer explicitly allows data: URI schemes, enabling authenticated users to inject arbitrary JavaScript execution via malicious links. This issue has been patched in version 0.14.2.",
+  "severity": "HIGH",
+  "sha256_hash": "7e1580dee0e92fc695e374979f6664e13f67a8d9a687d219f4068e1a5be7319e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26022"
+}

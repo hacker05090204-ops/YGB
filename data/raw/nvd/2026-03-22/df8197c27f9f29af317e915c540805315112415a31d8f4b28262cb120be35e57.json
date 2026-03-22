@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0025",
+  "ingested_at": "2026-03-22T07:54:33.929334+00:00",
+  "lang": "en",
+  "raw_text": "In hasImage of Notification.java, there is a possible way to reveal information across users due to a permissions bypass. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "df8197c27f9f29af317e915c540805315112415a31d8f4b28262cb120be35e57",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0025"
+}

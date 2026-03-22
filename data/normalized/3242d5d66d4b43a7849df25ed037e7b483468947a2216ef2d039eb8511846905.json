@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Common Log File System (CLFS) driver improperly handles objects in memory which can allow for privilege escalation.",
+  "token_count": 21
+}

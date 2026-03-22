@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-37973",
+  "ingested_at": "2026-03-22T07:45:19.209469+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Portals Google Chromium Portals contains a use-after-free vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page. This vulnerability affects web browsers that utilize Chromium, including Google Chrome and Microsoft Edge.",
+  "severity": "CRITICAL",
+  "sha256_hash": "152b514c1d1585d150eb1c77714a2c06789a42790723465b6e2982148172c119",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25477",
+  "ingested_at": "2026-03-22T07:54:43.828221+00:00",
+  "lang": "en",
+  "raw_text": "RAR Password Recovery 1.80 contains a buffer overflow vulnerability that allows local attackers to crash the application by supplying an oversized payload in the registration dialog. Attackers can craft a malicious input string exceeding 6000 bytes and paste it into the User Name and Registration Code field to trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0e68e006f906eb89881c52c25a7522e2e350744623587127bdd1f5a5b5570cc0",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25477"
+}

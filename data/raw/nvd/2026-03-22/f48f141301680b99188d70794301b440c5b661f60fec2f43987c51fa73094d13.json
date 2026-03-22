@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2807",
+  "ingested_at": "2026-03-22T07:54:31.613014+00:00",
+  "lang": "en",
+  "raw_text": "Memory safety bugs present in Firefox 147 and Thunderbird 147. Some of these bugs showed evidence of memory corruption and we presume that with enough effort some of these could have been exploited to run arbitrary code. This vulnerability affects Firefox < 148 and Thunderbird < 148.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f48f141301680b99188d70794301b440c5b661f60fec2f43987c51fa73094d13",
+  "source": "nvd",
+  "tags": [
+    "CWE-787",
+    "CWE-787"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2807"
+}

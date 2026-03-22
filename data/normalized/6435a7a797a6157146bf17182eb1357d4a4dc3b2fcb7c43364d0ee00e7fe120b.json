@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in JoomSky JS Help Desk js-support-ticket allows Blind SQL Injection.This issue affects JS Help Desk: from n/a through < = 3.0.1.",
+  "token_count": 34
+}

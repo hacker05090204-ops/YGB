@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27962",
+  "ingested_at": "2026-03-22T07:54:46.891129+00:00",
+  "lang": "en",
+  "raw_text": "Authlib is a Python library which builds OAuth and OpenID Connect servers. Prior to version 1.6.9, a JWK Header Injection vulnerability in authlib's JWS implementation allows an unauthenticated attacker to forge arbitrary JWT tokens that pass signature verification. When key=None is passed to any JWS deserialization function, the library extracts and uses the cryptographic key embedded in the attacker-controlled JWT jwk header field. An attacker can sign a token with their own private key, embed the matching public key in the header, and have the server accept the forged token as cryptographically valid \u2014 bypassing authentication and authorization entirely. This issue has been patched in version 1.6.9.",
+  "severity": "CRITICAL",
+  "sha256_hash": "717f0e4632cc4b8b6a4a6930cb593cb1318da9086768691af5546025eeeec7f6",
+  "source": "nvd",
+  "tags": [
+    "CWE-347"
+  ],
+  "token_count": 107,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27962"
+}

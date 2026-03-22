@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-0646",
+  "ingested_at": "2026-03-22T07:45:19.437942+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft .NET Framework Microsoft .NET Framework contains an improper input validation vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "531e68c1f0e070d72149c1e9f5e997a3f566de8932aca39103691accf4192a7c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

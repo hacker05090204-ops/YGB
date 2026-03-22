@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30665",
+  "ingested_at": "2026-03-22T07:45:19.051213+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, watchOS, and tvOS WebKit contain a memory corruption vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b0437ba543cb6ef1d0e877d2f03030a0361adc0544814a6eb3b38a0af7e51947",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Broadcom VMware vCenter Server Broadcom VMware vCenter Server contains an out-of-bounds write vulnerability in the implementation of the DCERPC protocol. This could allow a malicious actor with network access to vCenter Server to send specially crafted network packets, potentially leading to remote code execution.",
+  "token_count": 44
+}

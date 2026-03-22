@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26148",
+  "ingested_at": "2026-03-22T07:54:42.837696+00:00",
+  "lang": "en",
+  "raw_text": "External initialization of trusted variables or data stores in Azure Entra ID allows an unauthorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "09c7334dfc72132e409b9d6adab833136f975b318a83a7474f7e6192f5404b66",
+  "source": "nvd",
+  "tags": [
+    "CWE-454",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26148"
+}

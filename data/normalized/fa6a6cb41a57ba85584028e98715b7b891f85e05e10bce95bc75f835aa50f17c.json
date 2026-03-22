@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zed, a code editor, has a Zip Slip (Path Traversal) vulnerability exists in its extension archive extraction functionality prior to version 0.224.4. The `extract_zip()` function in `crates/util/src/archive.rs` fails to validate ZIP entry filenames for path traversal sequences (e.g., `../`). This allows a malicious extension to write files outside its designated sandbox directory by downloading and extracting a crafted ZIP archive. Version 0.224.4 fixes the issue.",
+  "token_count": 65
+}

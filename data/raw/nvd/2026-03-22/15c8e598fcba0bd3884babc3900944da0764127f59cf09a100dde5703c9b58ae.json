@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48602",
+  "ingested_at": "2026-03-22T07:54:33.858100+00:00",
+  "lang": "en",
+  "raw_text": "In exitKeyguardAndFinishSurfaceBehindRemoteAnimation of KeyguardViewMediator.java, there is a possible lockscreen bypass due to a logic error in the code. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "15c8e598fcba0bd3884babc3900944da0764127f59cf09a100dde5703c9b58ae",
+  "source": "nvd",
+  "tags": [
+    "CWE-693"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48602"
+}

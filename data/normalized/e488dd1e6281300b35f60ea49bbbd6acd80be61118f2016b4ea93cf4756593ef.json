@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Kanboard is project management software focused on Kanban methodology. Versions prior to 1.2.51 have an authenticated SQL injection vulnerability. Attackers with the permission to add users to a project can leverage this vulnerability to dump the entirety of the kanboard database. Version 1.2.51 fixes the issue.",
+  "token_count": 46
+}

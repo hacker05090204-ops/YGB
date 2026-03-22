@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "EverSync 0.5 contains an arbitrary file download vulnerability that allows unauthenticated attackers to access sensitive files by requesting them directly from the files directory. Attackers can send GET requests to the files directory to download database files like db.sq3 containing application data and credentials.",
+  "token_count": 44
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21533",
+  "ingested_at": "2026-03-22T07:45:15.927281+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Remote Desktop Services contains an improper privilege management vulnerability that could allow an authorized attacker to elevate privileges locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e9e6c3fff5ae4b2b09c369c148975871c5cdcaf14369e955cff142d814978d53",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

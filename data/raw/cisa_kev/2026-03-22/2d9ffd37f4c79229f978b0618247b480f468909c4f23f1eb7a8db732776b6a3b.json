@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-15271",
+  "ingested_at": "2026-03-22T07:45:17.779700+00:00",
+  "lang": "en",
+  "raw_text": "Cisco RV Series Routers A deserialization of untrusted data vulnerability in the web-based management interface of certain Cisco Small Business RV Series Routers could allow an attacker to execute code with root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2d9ffd37f4c79229f978b0618247b480f468909c4f23f1eb7a8db732776b6a3b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

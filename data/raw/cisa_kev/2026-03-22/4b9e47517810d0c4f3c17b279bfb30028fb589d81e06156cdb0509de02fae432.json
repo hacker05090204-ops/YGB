@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-40870",
+  "ingested_at": "2026-03-22T07:45:18.832283+00:00",
+  "lang": "en",
+  "raw_text": "Aviatrix Aviatrix Controller Unrestricted upload of a file with a dangerous type is possible, which allows an unauthenticated user to execute arbitrary code via directory traversal.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4b9e47517810d0c4f3c17b279bfb30028fb589d81e06156cdb0509de02fae432",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25479",
+  "ingested_at": "2026-03-22T07:54:44.259444+00:00",
+  "lang": "en",
+  "raw_text": "Inout RealEstate contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the city parameter. Attackers can send POST requests to the agents/agentlistdetails endpoint with malicious SQL payloads in the city parameter to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "2b80cb8ec4cbe12f4ec786c783407f5634c978796daac20a46d8447b7887121f",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25479"
+}

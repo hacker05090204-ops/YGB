@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3069",
+  "ingested_at": "2026-03-22T07:54:31.442410+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode Document Management System 1.0. Affected is an unknown function of the file /edtlbls.php. The manipulation of the argument field1 leads to sql injection. The attack may be initiated remotely. The exploit has been disclosed publicly and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "77122155201838bbaddebb95afae732897fdee6ec1361013fe18a6f6760d570c",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3069"
+}

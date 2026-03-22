@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WebKit - Universal XSS in JSObject::putInlineSlow and JSValue::putToPrimitive",
+  "token_count": 8
+}

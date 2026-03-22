@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2671",
+  "ingested_at": "2026-03-22T07:54:41.941016+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Mendi Neurofeedback Headset V4. Affected by this vulnerability is an unknown functionality of the component Bluetooth Low Energy Handler. Performing a manipulation results in cleartext transmission of sensitive information. The attack can only be performed from the local network. The attack's complexity is rated as high. The exploitation appears to be difficult. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "97a6ef1ce004e57166b5230a3b1479b83f05f9c0a62e3d36d6b83f67d5bed3cd",
+  "source": "nvd",
+  "tags": [
+    "CWE-310",
+    "CWE-319"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2671"
+}

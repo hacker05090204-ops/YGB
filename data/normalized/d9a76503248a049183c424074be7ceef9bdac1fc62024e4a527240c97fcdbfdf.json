@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "When doing a second SMB request to the same host again, curl would wrongly use a data pointer pointing into already freed memory.",
+  "token_count": 23
+}

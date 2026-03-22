@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-29256",
+  "ingested_at": "2026-03-22T07:45:17.324221+00:00",
+  "lang": "en",
+  "raw_text": "Arm Mali Graphics Processing Unit (GPU) Arm Mali GPU Kernel Driver contains a use-after-free vulnerability that may allow a non-privileged user to gain root privilege and/or disclose information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0433ef22ef18afe40f6a2dec91e09516a06a0899995ea6028753b537a5a00ca6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

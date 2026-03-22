@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in vran-dev databaseir v.1.0.7 and before allows a remote attacker to execute arbitrary code via the query parameter in the search API endpoint",
+  "token_count": 26
+}

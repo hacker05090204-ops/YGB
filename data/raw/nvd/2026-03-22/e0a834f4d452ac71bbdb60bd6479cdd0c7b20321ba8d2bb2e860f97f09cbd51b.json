@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3564",
+  "ingested_at": "2026-03-22T07:54:47.061582+00:00",
+  "lang": "en",
+  "raw_text": "A condition in ScreenConnect may allow an actor with access to server-level cryptographic material used for authentication to obtain unauthorized access, including elevated privileges, in certain scenarios.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e0a834f4d452ac71bbdb60bd6479cdd0c7b20321ba8d2bb2e860f97f09cbd51b",
+  "source": "nvd",
+  "tags": [
+    "CWE-347"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3564"
+}

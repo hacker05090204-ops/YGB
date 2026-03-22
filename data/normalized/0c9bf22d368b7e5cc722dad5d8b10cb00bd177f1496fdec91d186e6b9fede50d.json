@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Srimax Output Messenger Srimax Output Messenger contains a directory traversal vulnerability that allows an attacker to access sensitive files outside the intended directory, potentially leading to configuration leakage or arbitrary file access.",
+  "token_count": 32
+}

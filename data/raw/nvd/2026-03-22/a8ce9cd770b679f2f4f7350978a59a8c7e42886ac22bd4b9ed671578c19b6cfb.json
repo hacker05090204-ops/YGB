@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-20998",
+  "ingested_at": "2026-03-22T07:54:46.400478+00:00",
+  "lang": "en",
+  "raw_text": "Improper authentication in Smart Switch prior to version 3.7.69.15 allows remote attackers to bypass authentication.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a8ce9cd770b679f2f4f7350978a59a8c7e42886ac22bd4b9ed671578c19b6cfb",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20998"
+}

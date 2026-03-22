@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows - 'gdi32.dll' EMR_SETDIBITSTODEVICE Heap Out-of-Bounds Reads / Memory Disclosure",
+  "token_count": 11
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-20035",
+  "ingested_at": "2026-03-22T07:45:16.467227+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SMA100 Appliances SonicWall SMA100 appliances contain an OS command injection vulnerability in the management interface that allows a remote authenticated attacker to inject arbitrary commands as a 'nobody' user, which could potentially lead to code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a30cf63c32d83e6f025b0cf0249bc66bd480cd7d66ca18c0bb21b100449b44ec",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

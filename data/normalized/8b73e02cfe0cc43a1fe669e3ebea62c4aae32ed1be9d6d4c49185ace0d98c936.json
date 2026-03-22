@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IETF HTTP/2 HTTP/2 contains a rapid reset vulnerability that allows for a distributed denial-of-service attack (DDoS).",
+  "token_count": 16
+}

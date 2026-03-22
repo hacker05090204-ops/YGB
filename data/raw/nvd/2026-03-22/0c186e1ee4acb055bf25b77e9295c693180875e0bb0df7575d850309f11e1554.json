@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1695",
+  "ingested_at": "2026-03-22T07:54:32.621618+00:00",
+  "lang": "en",
+  "raw_text": "An XSS vulnerability affects the OAuth web services used by the WebVue, WebScheduler, TouchVue and SnapVue features of PcVue in version 12.0.0 through 16.3.3 included. It might allow a remote attacker to trick a legitimate user into loading content from another site upon unsuccessful user authentication on an unknown application (unknown client_id). This vulnerability only affects the error page of the OAuth server.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0c186e1ee4acb055bf25b77e9295c693180875e0bb0df7575d850309f11e1554",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1695"
+}

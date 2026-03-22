@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0639",
+  "ingested_at": "2026-03-22T07:54:46.363889+00:00",
+  "lang": "en",
+  "raw_text": "in OpenHarmony v6.0 and prior versions allow a local attacker case DOS through missing release of memory.",
+  "severity": "LOW",
+  "sha256_hash": "d517ea8ac8a1672a98129dc7fccf81192c0ffaa147d5d15337df9be4767b835c",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0639"
+}

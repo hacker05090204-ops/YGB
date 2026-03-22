@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32094",
+  "ingested_at": "2026-03-22T07:54:43.919505+00:00",
+  "lang": "en",
+  "raw_text": "Shescape is a simple shell escape library for JavaScript. Prior to 2.1.10, Shescape#escape() does not escape square-bracket glob syntax for Bash, BusyBox sh, and Dash. Applications that interpolate the return value directly into a shell command string can cause an attacker-controlled value like secret[12] to expand into multiple filesystem matches instead of a single literal argument, turning one argument into multiple trusted-pathname matches. This vulnerability is fixed in 2.1.10.",
+  "severity": "MEDIUM",
+  "sha256_hash": "69e0687d9c2cbf61d492ea6643fe689c38677cacd4497a6c2c4bb0c307f3225f",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32094"
+}

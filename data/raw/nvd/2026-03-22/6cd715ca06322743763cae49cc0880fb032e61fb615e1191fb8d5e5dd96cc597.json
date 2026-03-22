@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-53217",
+  "ingested_at": "2026-03-22T07:54:29.980746+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in staviravn AIO WP Builder all-in-one-wp-builder allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects AIO WP Builder: from n/a through < = 2.0.2.",
+  "severity": "HIGH",
+  "sha256_hash": "6cd715ca06322743763cae49cc0880fb032e61fb615e1191fb8d5e5dd96cc597",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53217"
+}

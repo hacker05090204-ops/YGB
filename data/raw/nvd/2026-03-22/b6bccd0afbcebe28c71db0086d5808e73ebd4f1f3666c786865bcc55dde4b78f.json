@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23552",
+  "ingested_at": "2026-03-22T07:54:31.078782+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Realm Token Acceptance Bypass in KeycloakSecurityPolicy Apache Camel Keycloak component. The Camel-Keycloak KeycloakSecurityPolicy does not validate the iss (issuer) claim of JWT tokens against the configured realm. A token issued by one Keycloak realm is silently accepted by a policy configured for a completely different realm, breaking tenant isolation. This issue affects Apache Camel: from 4.15.0 before 4.18.0. Users are recommended to upgrade to version 4.18.0, which fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b6bccd0afbcebe28c71db0086d5808e73ebd4f1f3666c786865bcc55dde4b78f",
+  "source": "nvd",
+  "tags": [
+    "CWE-346"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23552"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4217",
+  "ingested_at": "2026-03-22T07:54:46.758770+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in XREAL Nebula App up to 3.2.1 on Android. This impacts an unknown function of the file in ai/nreal/nebula/flutterPlugin/CloudStoragePlugin.java of the component ai.nreal.nebula.universal. Such manipulation of the argument accessKey/secretAccessKey/securityToken leads to unprotected storage of credentials. The attack can only be performed from a local environment. The attack requires a high level of complexity. The exploitability is said to be difficult. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "d890e764ab671d9f2fa71ab7973b5f22d7a14906c05c8edeb60c68abeda0c542",
+  "source": "nvd",
+  "tags": [
+    "CWE-255",
+    "CWE-256"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4217"
+}

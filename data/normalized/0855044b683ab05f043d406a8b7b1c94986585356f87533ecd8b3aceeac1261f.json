@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qlik Sense Qlik Sense contains a path traversal vulnerability that allows a remote, unauthenticated attacker to create an anonymous session by sending maliciously crafted HTTP requests. This anonymous session could allow the attacker to send further requests to unauthorized endpoints.",
+  "token_count": 40
+}

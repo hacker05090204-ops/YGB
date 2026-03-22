@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-7841",
+  "ingested_at": "2026-03-22T07:45:18.091502+00:00",
+  "lang": "en",
+  "raw_text": "Schneider Electric U.motion Builder A SQL Injection vulnerability exists in U.motion Builder software which could cause unwanted code execution when an improper set of characters is entered.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5c8aa5a7bcada0cb113b6c36fe21199cf82632d05252148f6a3403aea35caf08",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

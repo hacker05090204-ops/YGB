@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-13965",
+  "ingested_at": "2026-03-22T07:45:16.926456+00:00",
+  "lang": "en",
+  "raw_text": "Roundcube Webmail Roundcube Webmail contains a cross-site scripting (XSS) vulnerability that allows a remote attacker to manipulate data via a malicious XML attachment.",
+  "severity": "CRITICAL",
+  "sha256_hash": "830a957a02d8595fa44b4cc633701b174973f2257f3b298b7338d8faf7faa564",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

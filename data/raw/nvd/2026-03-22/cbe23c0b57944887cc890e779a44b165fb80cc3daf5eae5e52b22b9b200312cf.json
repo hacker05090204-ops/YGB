@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3668",
+  "ingested_at": "2026-03-22T07:54:41.897866+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Freedom Factory dGEN1 up to 20260221. This affects the function AndroidEthereum of the component org.ethosmobile.webpwaemul. This manipulation causes improper access controls. Remote exploitation of the attack is possible. The attack is considered to have high complexity. The exploitability is reported as difficult. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "cbe23c0b57944887cc890e779a44b165fb80cc3daf5eae5e52b22b9b200312cf",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3668"
+}

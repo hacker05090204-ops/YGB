@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0520",
+  "ingested_at": "2026-03-22T07:54:43.949521+00:00",
+  "lang": "en",
+  "raw_text": "A potential vulnerability was reported in the Lenovo FileZ Android application that, under certain conditions, could allow a local authenticated user to retrieve some sensitive data stored in a log file.",
+  "severity": "LOW",
+  "sha256_hash": "6eedb66bd456022e2de0589c126f1547cd53bec257a7fe4e1d0a347c5d4aa6a2",
+  "source": "nvd",
+  "tags": [
+    "CWE-532"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0520"
+}

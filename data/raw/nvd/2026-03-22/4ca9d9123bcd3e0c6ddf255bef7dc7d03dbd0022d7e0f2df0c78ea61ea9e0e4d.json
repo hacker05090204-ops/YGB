@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-62817",
+  "ingested_at": "2026-03-22T07:54:34.110911+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Samsung Mobile Processor Exynos 1280, 2200, 1380, 1480, 2400, 1580, and 2500. A NULL pointer dereference of session->ncp_hdr_buf in __pilot_parsing_ncp() causes a denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "4ca9d9123bcd3e0c6ddf255bef7dc7d03dbd0022d7e0f2df0c78ea61ea9e0e4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-476",
+    "CWE-476"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62817"
+}

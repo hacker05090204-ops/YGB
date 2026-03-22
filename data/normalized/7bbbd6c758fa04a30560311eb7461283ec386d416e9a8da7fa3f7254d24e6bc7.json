@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An unsafe parsing of OpenMQ's configuration, allows a remote attacker to read arbitrary files from a MQ Broker's server. A full exploitation could read unauthorized files of the OpenMQ\u2019s host OS. In some scenarios RCE could be achieved.",
+  "token_count": 38
+}

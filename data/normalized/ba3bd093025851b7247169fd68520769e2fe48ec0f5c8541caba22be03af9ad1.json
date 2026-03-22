@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in itsourcecode College Management System 1.0. This issue affects some unknown processing of the file /admin/class-result.php. Performing a manipulation of the argument course_code results in sql injection. The attack can be initiated remotely. The exploit has been made public and could be used.",
+  "token_count": 47
+}

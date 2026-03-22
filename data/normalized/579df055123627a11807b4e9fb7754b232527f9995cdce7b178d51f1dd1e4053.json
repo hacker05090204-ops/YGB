@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Red Hat JBoss RichFaces Framework Red Hat JBoss RichFaces Framework contains an expression language injection vulnerability via the UserResource resource. A remote, unauthenticated attacker could exploit this vulnerability to execute malicious code using a chain of Java serialized objects via org.ajax4jsf.resource.UserResource$UriData.",
+  "token_count": 41
+}

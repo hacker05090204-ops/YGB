@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2878",
+  "ingested_at": "2026-03-22T07:54:32.078628+00:00",
+  "lang": "en",
+  "raw_text": "In Progress\u00ae Telerik\u00ae UI for AJAX, versions prior to 2026.1.225, an insufficient entropy vulnerability exists in RadAsyncUpload, where a predictable temporary identifier, based on timestamp and filename, can enable collisions and file content tampering.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cee86f39e16050590f7b57ccf0ac87417a2da944360ac45585b97f8e52ae8435",
+  "source": "nvd",
+  "tags": [
+    "CWE-331"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2878"
+}

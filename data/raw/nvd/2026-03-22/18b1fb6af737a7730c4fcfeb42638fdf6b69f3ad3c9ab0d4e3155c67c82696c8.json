@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25906",
+  "ingested_at": "2026-03-22T07:54:34.268926+00:00",
+  "lang": "en",
+  "raw_text": "Dell Optimizer, versions prior to 6.3.1, contain an Improper Link Resolution Before File Access ('Link Following') vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Elevation of Privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "18b1fb6af737a7730c4fcfeb42638fdf6b69f3ad3c9ab0d4e3155c67c82696c8",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25906"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41764",
+  "ingested_at": "2026-03-22T07:54:42.206240+00:00",
+  "lang": "en",
+  "raw_text": "Due to insufficient authorization enforcement, an unauthorized remote attacker can exploit the wwwupdate.cgi endpoint to upload and apply arbitrary updates.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a0bd5b18a69ab7b2bf7ff97d21b587260b90110f05fffe7ad11ffde4e4da217a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41764"
+}

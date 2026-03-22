@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "arduino-TuyaOpen before version 1.2.1 contains an out-of-bounds memory read vulnerability in the TuyaIoT component. An attacker who hijacks or controls the Tuya cloud service can issue malicious DP event data to victim devices, causing out-of-bounds memory access that may result in information disclosure or a denial-of-service condition.",
+  "token_count": 47
+}

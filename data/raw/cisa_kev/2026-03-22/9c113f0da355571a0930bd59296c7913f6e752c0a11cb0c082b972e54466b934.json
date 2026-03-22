@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-31955",
+  "ingested_at": "2026-03-22T07:45:19.283889+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Kernel contains an unspecified vulnerability that allows for information disclosure. Successful exploitation allows attackers to read the contents of kernel memory from a user-mode process.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9c113f0da355571a0930bd59296c7913f6e752c0a11cb0c082b972e54466b934",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

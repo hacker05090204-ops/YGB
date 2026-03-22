@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32291",
+  "ingested_at": "2026-03-22T07:54:47.092949+00:00",
+  "lang": "en",
+  "raw_text": "The GL-iNet Comet (GL-RM1) KVM does not require authentication on the UART serial console. This attack requires physically opening the device and connecting to the UART pins.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aa11ef86329e76703ffa3b50c1beb920916ae626affddd7e08d3395125aaaad1",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32291"
+}

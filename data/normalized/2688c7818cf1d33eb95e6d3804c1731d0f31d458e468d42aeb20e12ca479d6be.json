@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "XML::Parser versions through 2.45 for Perl could overflow the pre-allocated buffer size cause a heap corruption (double free or corruption) and crashes. A :utf8 PerlIO layer, parse_stream() in Expat.xs could overflow the XML input buffer because Perl's read() returns decoded characters while SvPV() gives back multi-byte UTF-8 bytes that can exceed the pre-allocated buffer size. This can cause heap corruption (double free or corruption) and crashes.",
+  "token_count": 66
+}

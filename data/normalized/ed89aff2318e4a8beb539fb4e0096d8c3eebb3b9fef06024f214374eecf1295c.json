@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sophos SFOS Sophos Firewall operating system (SFOS) firmware contains a SQL injection vulnerability when configured with either the administration (HTTPS) service or the User Portal is exposed on the WAN zone. Successful exploitation may cause remote code execution to exfiltrate usernames and hashed passwords for the local device admin(s), portal admins, and user accounts used for remote access (but not external Active Directory or LDAP passwords).",
+  "token_count": 66
+}

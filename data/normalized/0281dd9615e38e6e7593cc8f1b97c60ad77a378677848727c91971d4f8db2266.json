@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux < 4.20.14 - Virtual Address 0 is Mappable via Privileged write() to /proc/*/mem",
+  "token_count": 14
+}

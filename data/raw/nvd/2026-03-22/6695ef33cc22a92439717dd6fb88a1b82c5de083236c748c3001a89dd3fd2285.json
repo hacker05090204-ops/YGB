@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27373",
+  "ingested_at": "2026-03-22T07:54:40.238066+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Essekia Tablesome tablesome allows Blind SQL Injection.This issue affects Tablesome: from n/a through < = 1.2.3.",
+  "severity": "HIGH",
+  "sha256_hash": "6695ef33cc22a92439717dd6fb88a1b82c5de083236c748c3001a89dd3fd2285",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27373"
+}

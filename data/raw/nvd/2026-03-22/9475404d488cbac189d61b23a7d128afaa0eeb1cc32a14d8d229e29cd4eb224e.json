@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25798",
+  "ingested_at": "2026-03-22T07:54:31.302734+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a NULL pointer dereference in ClonePixelCacheRepository allows a remote attacker to crash any application linked against ImageMagick by supplying a crafted image file, resulting in denial of service. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9475404d488cbac189d61b23a7d128afaa0eeb1cc32a14d8d229e29cd4eb224e",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25798"
+}

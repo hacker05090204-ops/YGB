@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22345",
+  "ingested_at": "2026-03-22T07:54:30.341131+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in A WP Life Image Gallery \u2013 Lightbox Gallery, Responsive Photo Gallery, Masonry Gallery new-image-gallery allows Object Injection.This issue affects Image Gallery \u2013 Lightbox Gallery, Responsive Photo Gallery, Masonry Gallery: from n/a through < = 1.6.0.",
+  "severity": "HIGH",
+  "sha256_hash": "54cce699951f23ee6313368d43c447939e162101fe266f0902bf9b6e59b89914",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22345"
+}

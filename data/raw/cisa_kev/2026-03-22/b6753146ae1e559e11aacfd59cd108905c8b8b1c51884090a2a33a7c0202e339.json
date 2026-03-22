@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-4114",
+  "ingested_at": "2026-03-22T07:45:18.650866+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A vulnerability exists in Windows Object Linking & Embedding (OLE) that could allow remote code execution if a user opens a file that contains a specially crafted OLE object.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b6753146ae1e559e11aacfd59cd108905c8b8b1c51884090a2a33a7c0202e339",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

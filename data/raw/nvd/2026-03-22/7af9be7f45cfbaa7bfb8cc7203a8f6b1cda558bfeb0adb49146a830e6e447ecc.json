@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3709",
+  "ingested_at": "2026-03-22T07:54:42.004049+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in code-projects Simple Flight Ticket Booking System 1.0. This affects an unknown function of the file /register.php. Executing a manipulation of the argument Username can lead to sql injection. The attack may be launched remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "7af9be7f45cfbaa7bfb8cc7203a8f6b1cda558bfeb0adb49146a830e6e447ecc",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3709"
+}

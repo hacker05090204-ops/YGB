@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3739",
+  "ingested_at": "2026-03-22T07:54:42.055158+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in suitenumerique messages 0.2.0. This issue affects the function ThreadAccessSerializer of the file src/backend/core/api/serializers.py of the component ThreadAccess. The manipulation results in improper authentication. The attack can be executed remotely. The exploit has been released to the public and may be used for attacks. Upgrading to version 0.3.0 is capable of addressing this issue. The patch is identified as d7729f4b885449f6dee3faf8b5f2a05769fb3d6e. The affected component should be upgraded.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3a2fb7b959b682dbafff6aaf62ecc85810f25186796ad817346e3478f5b12656",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3739"
+}

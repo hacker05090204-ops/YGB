@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-20198",
+  "ingested_at": "2026-03-22T07:45:17.190714+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS XE Web UI Cisco IOS XE Web UI contains a privilege escalation vulnerability in the web user interface that could allow a remote, unauthenticated attacker to create an account with privilege level 15 access. The attacker can then use that account to gain control of the affected device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e689d0a7335dcd198008606782c727f9164da27ac07f0b00848d12a131a60a7c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

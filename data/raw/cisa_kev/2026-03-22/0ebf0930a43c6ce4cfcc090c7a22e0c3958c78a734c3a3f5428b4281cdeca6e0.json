@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1040",
+  "ingested_at": "2026-03-22T07:45:19.358571+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Hyper-V RemoteFX Microsoft Hyper-V RemoteFX vGPU contains an improper input validation vulnerability due to the host server failing to properly validate input from an authenticated user on a guest operating system. Successful exploitation allows for remote code execution on the host operating system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0ebf0930a43c6ce4cfcc090c7a22e0c3958c78a734c3a3f5428b4281cdeca6e0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

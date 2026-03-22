@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-31277",
+  "ingested_at": "2026-03-22T07:45:15.832950+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple Safari, iOS, watchOS, visionOS, iPadOS, macOS, and tvOS contain a buffer overflow vulnerability that could allow the processing of maliciously crafted web content which may lead to memory corruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ab2c843869be85855944526400cfe793320b4d4607add420ad218a2fb404b675",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

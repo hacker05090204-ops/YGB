@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Smart Licensing Utility Cisco Smart Licensing Utility contains a static credential vulnerability that allows an unauthenticated, remote attacker to log in to an affected system and gain administrative credentials.",
+  "token_count": 30
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-5326",
+  "ingested_at": "2026-03-22T07:45:19.545541+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server Java Platforms Invoker Servlet does not require authentication, allowing for remote code execution via a HTTP or HTTPS request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e2cf3282c1f1f813ee9f8e22f08026b48a257e917b40a1c5bd7b4e6caf4a5c0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

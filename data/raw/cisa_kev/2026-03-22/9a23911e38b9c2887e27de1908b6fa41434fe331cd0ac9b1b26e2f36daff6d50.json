@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-13161",
+  "ingested_at": "2026-03-22T07:45:16.526861+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager (EPM) Ivanti Endpoint Manager (EPM) contains an absolute path traversal vulnerability that allows a remote unauthenticated attacker to leak sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9a23911e38b9c2887e27de1908b6fa41434fe331cd0ac9b1b26e2f36daff6d50",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

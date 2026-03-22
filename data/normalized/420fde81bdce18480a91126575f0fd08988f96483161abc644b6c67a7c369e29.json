@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 fails to properly sanitize file uploads, allowing attackers to store malicious scripts through the file POST parameter in admin/tools.php. Attackers can upload files containing JavaScript code that executes in the context of admin/tools.php when accessed by other users.",
+  "token_count": 43
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1800",
+  "ingested_at": "2026-03-22T07:54:49.295025+00:00",
+  "lang": "en",
+  "raw_text": "The Fonts Manager | Custom Fonts plugin for WordPress is vulnerable to time-based SQL Injection via the \u2018fmcfIdSelectedFnt\u2019 parameter in all versions up to, and including, 1.2 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "HIGH",
+  "sha256_hash": "b6673e8b9b432a21b91a93486c5537a39a85a5f21ddbdba74583732b2897b3fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1800"
+}

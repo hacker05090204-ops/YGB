@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2007-5659",
+  "ingested_at": "2026-03-22T07:45:17.849026+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contain a buffer overflow vulnerability that allows remote attackers to execute code via a PDF file with long arguments to unspecified JavaScript methods.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bff8b0fc4c4c016c91b0447554b8745c17835d898b2a7e0169f80250bbce79bf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

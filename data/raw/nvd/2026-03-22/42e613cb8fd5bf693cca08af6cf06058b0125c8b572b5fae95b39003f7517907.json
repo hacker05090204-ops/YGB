@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3735",
+  "ingested_at": "2026-03-22T07:54:42.048157+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in code-projects Simple Flight Ticket Booking System 1.0. Affected by this vulnerability is an unknown functionality of the file SearchResultOneway.php. Such manipulation of the argument from leads to sql injection. The attack can be launched remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "42e613cb8fd5bf693cca08af6cf06058b0125c8b572b5fae95b39003f7517907",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3735"
+}

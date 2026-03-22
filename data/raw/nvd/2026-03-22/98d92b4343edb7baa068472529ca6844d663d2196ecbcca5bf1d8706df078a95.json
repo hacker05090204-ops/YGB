@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33151",
+  "ingested_at": "2026-03-22T07:54:48.996005+00:00",
+  "lang": "en",
+  "raw_text": "Socket.IO is an open source, real-time, bidirectional, event-based, communication framework. Prior to versions 3.3.5, 3.4.4, and 4.2.6, a specially crafted Socket.IO packet can make the server wait for a large number of binary attachments and buffer them, which can be exploited to make the server run out of memory. This issue has been patched in versions 3.3.5, 3.4.4, and 4.2.6.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "98d92b4343edb7baa068472529ca6844d663d2196ecbcca5bf1d8706df078a95",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-754"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33151"
+}

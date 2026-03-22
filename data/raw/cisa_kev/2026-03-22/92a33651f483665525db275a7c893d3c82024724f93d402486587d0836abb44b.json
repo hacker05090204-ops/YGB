@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-29748",
+  "ingested_at": "2026-03-22T07:45:17.009907+00:00",
+  "lang": "en",
+  "raw_text": "Android Pixel Android Pixel contains a privilege escalation vulnerability that allows an attacker to interrupt a factory reset triggered by a device admin app.",
+  "severity": "CRITICAL",
+  "sha256_hash": "92a33651f483665525db275a7c893d3c82024724f93d402486587d0836abb44b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

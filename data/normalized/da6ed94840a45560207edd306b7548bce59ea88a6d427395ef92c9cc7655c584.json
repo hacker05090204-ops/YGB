@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where certain user actions are not adequately audited or logged. The absence of proper auditing mechanisms may reduce traceability of user activities and could potentially impact monitoring, accountability, or incident investigation processes.",
+  "token_count": 39
+}

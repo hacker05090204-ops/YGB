@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32736",
+  "ingested_at": "2026-03-22T07:54:47.772251+00:00",
+  "lang": "en",
+  "raw_text": "The Hytale Modding Wiki is a free service for Hytale mods to host their documentation & wikis. An Insecure Direct Object Reference (IDOR) vulnerability in versions of the wiki prior to 1.0.0 exposes mod authors' personal information - including full names and email addresses - to any authenticated user who visits a mod page. Any user who creates an account can access sensitive author details by simply navigating to a mod's page via its slug. Version 1.0.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6fc29d2c09413ee071cd673b746310de979acf9a91e27d106f9b9285ba4dc762",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32736"
+}

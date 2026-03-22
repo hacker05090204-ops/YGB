@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel fb_mmap function in drivers/video/fbmem.c contains an integer overflow vulnerability that allows for privilege escalation.",
+  "token_count": 18
+}

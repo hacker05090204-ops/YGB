@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dahua IP Camera Firmware Dahua IP cameras and related products contain an authentication bypass vulnerability when the loopback device is specified by the client during authentication.",
+  "token_count": 26
+}

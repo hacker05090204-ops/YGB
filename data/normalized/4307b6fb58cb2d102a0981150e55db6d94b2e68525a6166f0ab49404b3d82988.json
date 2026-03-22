@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains an improper initialization vulnerability where an unprivileged local user could escalate their privileges on the system. This vulnerability has the moniker of \"Dirty Pipe.\"",
+  "token_count": 29
+}

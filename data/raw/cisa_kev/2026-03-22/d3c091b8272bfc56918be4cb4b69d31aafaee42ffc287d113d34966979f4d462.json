@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-35464",
+  "ingested_at": "2026-03-22T07:45:19.178817+00:00",
+  "lang": "en",
+  "raw_text": "ForgeRock Access Management (AM) ForgeRock Access Management (AM) Core Server allows an attacker who sends a specially crafted HTTP request to one of three endpoints (/ccversion/Version, /ccversion/Masthead, or /ccversion/ButtonFrame) to execute code in the context of the current user (unless ForgeRock AM is running as root user, which the vendor does not recommend).",
+  "severity": "CRITICAL",
+  "sha256_hash": "d3c091b8272bfc56918be4cb4b69d31aafaee42ffc287d113d34966979f4d462",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

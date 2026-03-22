@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25882",
+  "ingested_at": "2026-03-22T07:54:31.785485+00:00",
+  "lang": "en",
+  "raw_text": "Fiber is an Express inspired web framework written in Go. A denial of service vulnerability exists in Fiber v2 and v3 that allows remote attackers to crash the application by sending requests to routes with more than 30 parameters. The vulnerability results from missing validation during route registration combined with an unbounded array write during request matching. Version 2.52.12 patches the issue in the v2 branch and 3.1.0 patches the issue in the v3 branch.",
+  "severity": "HIGH",
+  "sha256_hash": "f920b87d4b2c9b839f5be9f049b2b56617c29b431de93c66f88e5af56c945631",
+  "source": "nvd",
+  "tags": [
+    "CWE-129"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25882"
+}

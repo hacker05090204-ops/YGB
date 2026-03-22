@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32462",
+  "ingested_at": "2026-03-22T07:54:46.158381+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Liton Arefin Master Addons for Elementor master-addons allows DOM-Based XSS.This issue affects Master Addons for Elementor: from n/a through < = 2.1.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f3894c3ba473dcf13a8ebc9355e7c62cc8d5c9aaf3302abd2fb2052e16a439f8",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32462"
+}

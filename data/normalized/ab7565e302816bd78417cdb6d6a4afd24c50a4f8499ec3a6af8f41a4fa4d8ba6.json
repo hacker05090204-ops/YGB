@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tenda HG9 300001138. Affected by this issue is some unknown functionality of the file /boaform/formLoopBack of the component Loopback Detection Configuration Endpoint. Such manipulation of the argument Ethtype leads to stack-based buffer overflow. The attack can be executed remotely. The exploit has been disclosed publicly and may be used.",
+  "token_count": 56
+}

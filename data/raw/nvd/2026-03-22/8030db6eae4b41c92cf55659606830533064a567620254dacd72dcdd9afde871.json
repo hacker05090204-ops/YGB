@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24443",
+  "ingested_at": "2026-03-22T07:54:31.782481+00:00",
+  "lang": "en",
+  "raw_text": "EventSentry versions prior to 6.0.1.20 contain an unverified password change vulnerability in the account management functionality of the Web Reports interface. The password change mechanism does not require validation of the current password before allowing a new password to be set. An attacker who gains temporary access to an authenticated user session can change the account password without knowledge of the original credentials. This enables persistent account takeover and, if administrative accounts are affected, may result in privilege escalation.",
+  "severity": "HIGH",
+  "sha256_hash": "8030db6eae4b41c92cf55659606830533064a567620254dacd72dcdd9afde871",
+  "source": "nvd",
+  "tags": [
+    "CWE-620",
+    "NVD-CWE-Other"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24443"
+}

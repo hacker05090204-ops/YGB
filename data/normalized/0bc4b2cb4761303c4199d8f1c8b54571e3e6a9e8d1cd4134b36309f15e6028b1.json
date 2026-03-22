@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Missing authorization checks on multiple gRPC service endpoints in PowerShell Universal before 2026.1.4 allows an authenticated user with any valid token to bypass role-based access controls and perform privileged operations \u2014 including reading sensitive data, creating or deleting resources, and disrupting service operations \u2014 via crafted gRPC requests.",
+  "token_count": 48
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32357",
+  "ingested_at": "2026-03-22T07:54:45.928250+00:00",
+  "lang": "en",
+  "raw_text": "Server-Side Request Forgery (SSRF) vulnerability in Katsushi Kawamori Simple Blog Card simple-blog-card allows Server Side Request Forgery.This issue affects Simple Blog Card: from n/a through < = 2.37.",
+  "severity": "MEDIUM",
+  "sha256_hash": "316fb7b471c7b7b021177ccae19d34826994abdec2b667ee6e14c20aad2ed030",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32357"
+}

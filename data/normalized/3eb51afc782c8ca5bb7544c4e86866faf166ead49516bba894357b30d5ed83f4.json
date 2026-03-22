@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "McAfee McAfee Total Protection (MTP) McAfee Total Protection (MTP) contains an improper privilege management vulnerability that allows a local user to gain elevated privileges and execute code, bypassing MTP self-defense.",
+  "token_count": 30
+}

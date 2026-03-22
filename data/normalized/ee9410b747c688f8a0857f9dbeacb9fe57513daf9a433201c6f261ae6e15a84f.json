@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in RealMag777 WOLF bulk-editor allows Blind SQL Injection.This issue affects WOLF: from n/a through < = 1.0.8.7.",
+  "token_count": 30
+}

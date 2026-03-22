@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38094",
+  "ingested_at": "2026-03-22T07:45:16.757777+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SharePoint Microsoft SharePoint contains a deserialization vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0c6a3912d1bd3c4676622198305cfb6474a159e639cf6c2a405cfcdf60f3d43b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 14,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-66376",
+  "ingested_at": "2026-03-22T07:45:15.838292+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting vulnerability in the Classic UI where attackers could abuse Cascading Style Sheets (CSS) @import directives in email HTML.",
+  "severity": "CRITICAL",
+  "sha256_hash": "93dab91aa188d589dd1ce09d57590a2274ba730c043670722e8be581d55ccbd1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

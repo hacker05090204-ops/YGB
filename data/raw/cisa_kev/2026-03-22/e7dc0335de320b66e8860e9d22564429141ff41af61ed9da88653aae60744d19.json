@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-5065",
+  "ingested_at": "2026-03-22T07:45:18.655019+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows NDProxy.sys in the kernel contains an improper input validation vulnerability which can allow a local attacker to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e7dc0335de320b66e8860e9d22564429141ff41af61ed9da88653aae60744d19",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

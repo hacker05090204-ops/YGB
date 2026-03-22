@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-5030",
+  "ingested_at": "2026-03-22T07:45:17.797028+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 Engine contains a memory corruption vulnerability that allows a remote attacker to execute code via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6f0d6eee95743c5496c04848d29a6e2db9bd6db6877584159b73eca3c6cbf146",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

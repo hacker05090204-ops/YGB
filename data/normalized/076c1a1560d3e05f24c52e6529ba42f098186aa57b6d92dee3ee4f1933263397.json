@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The webbrowser.open() API would accept leading dashes in the URL which could be handled as command line options for certain web browsers. New behavior rejects leading dashes. Users are recommended to sanitize URLs prior to passing to webbrowser.open().",
+  "token_count": 38
+}

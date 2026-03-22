@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3619",
+  "ingested_at": "2026-03-22T07:54:49.412804+00:00",
+  "lang": "en",
+  "raw_text": "The Sheets2Table plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'titles' shortcode attribute in the [sheets2table-render-table] shortcode in all versions up to and including 0.4.1. This is due to insufficient input sanitization and output escaping. Specifically, the 'titles' attribute value from the shortcode is passed through S2T_Functions::trim_array_values() (which only trims whitespace) and then echoed directly into HTML via `echo $header` inside a tag in the display_table_header() function without any escaping such as esc_html(). This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fafcdb02099f8deafeab1e78bd413ffbc76d218542e03d9eea1d82e293b570fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3619"
+}

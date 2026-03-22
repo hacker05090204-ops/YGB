@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sudo Sudo Sudo contains an inclusion of functionality from untrusted control sphere vulnerability. This vulnerability could allow local attacker to leverage sudo\u2019s -R (--chroot) option to run arbitrary commands as root, even if they are not listed in the sudoers file.",
+  "token_count": 41
+}

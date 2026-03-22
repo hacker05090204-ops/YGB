@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21426",
+  "ingested_at": "2026-03-22T07:54:34.465969+00:00",
+  "lang": "en",
+  "raw_text": "Dell PowerScale OneFS, versions prior to 9.10.1.6 and versions 9.11.0.0 through 9.12.0.1, contains an execution with unnecessary privileges vulnerability. A high privileged attacker with local access could potentially exploit this vulnerability, leading to denial of service, elevation of privileges, and information disclosure.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e59a2fab65647be47073c336dca2a0d10003305da4e81fa167899c2f263b9e34",
+  "source": "nvd",
+  "tags": [
+    "CWE-250"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21426"
+}

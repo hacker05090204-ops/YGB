@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20436",
+  "ingested_at": "2026-03-22T07:54:33.535517+00:00",
+  "lang": "en",
+  "raw_text": "In wlan STA driver, there is a possible escalation of privilege due to a missing bounds check. This could lead to local escalation of privilege if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: WCNCR00473802; Issue ID: MSV-5970.",
+  "severity": "MEDIUM",
+  "sha256_hash": "04319bd797a2d14cce527683648dac4d483c48d299b39aefc4fe2d7bd3dfb4c5",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20436"
+}

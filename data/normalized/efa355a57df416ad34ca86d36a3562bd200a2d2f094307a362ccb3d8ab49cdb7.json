@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Exim Mail Transfer Agent (MTA) Improper validation of recipient address in deliver_message() function in /src/deliver.c may lead to remote command execution.",
+  "token_count": 21
+}

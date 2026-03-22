@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-27997",
+  "ingested_at": "2026-03-22T07:45:17.370029+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS and FortiProxy SSL-VPN Fortinet FortiOS and FortiProxy SSL-VPN contain a heap-based buffer overflow vulnerability which can allow an unauthenticated, remote attacker to execute code or commands via specifically crafted requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1e87ba88a67f4fa18c5505be201dc908b1f48fa79ab7424b6381c4dfd7938963",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

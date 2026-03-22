@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-15386",
+  "ingested_at": "2026-03-22T07:54:31.446413+00:00",
+  "lang": "en",
+  "raw_text": "The Responsive Lightbox & Gallery WordPress plugin before 2.6.1 is vulnerable to an Unauthenticated Stored-XSS attack due to flawed regex replacement rules that can be abused by posting a comment with a malicious link when lightbox for comments are enabled and then approved.",
+  "severity": "HIGH",
+  "sha256_hash": "9102ebaf8ebab91e62344b55885262a8e70de149bb0ea693152701ed2a63f616",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15386"
+}

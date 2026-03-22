@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30881",
+  "ingested_at": "2026-03-22T07:54:46.949836+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo LMS is a learning management system. Version 1.11.34 and prior contains a SQL Injection vulnerability in the statistics AJAX endpoint. The parameters date_start and date_end from $_REQUEST are embedded directly into a raw SQL string without proper sanitization. Although Database::escape_string() is called downstream, its output is immediately neutralized by str_replace(\"\\'\", \"'\", ...), which restores any injected single quotes \u2014 effectively bypassing the escaping mechanism entirely. This allows an authenticated attacker to inject arbitrary SQL statements into the database query, enabling blind time-based and conditional data extraction. This issue has been patched in version 1.11.36.",
+  "severity": "HIGH",
+  "sha256_hash": "af6b9d75f3c227a5f473657a9a252e99b696f55607128813f2d5773c98fbc778",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30881"
+}

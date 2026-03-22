@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2466",
+  "ingested_at": "2026-03-22T07:54:43.490986+00:00",
+  "lang": "en",
+  "raw_text": "The DukaPress WordPress plugin through 3.2.4 does not sanitise and escape a parameter before outputting it back in the page, leading to a Reflected Cross-Site Scripting which could be used against high privilege users such as admin.",
+  "severity": "HIGH",
+  "sha256_hash": "841decb65ed2ec073b698c6379eedc48cfe12b5a31ac63027db6fe16b2270ca1",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2466"
+}

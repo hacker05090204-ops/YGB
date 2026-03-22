@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21888",
+  "ingested_at": "2026-03-22T07:54:43.640441+00:00",
+  "lang": "en",
+  "raw_text": "NanoMQ MQTT Broker (NanoMQ) is an all-around Edge Messaging Platform. MQTT v5 Variable Byte Integer parsing out-of-bounds: get_var_integer() accepts 5-byte varints without bounds checks; reliably triggers OOB read / crash when built with ASan. This affects 0.24.6 and earlier.",
+  "severity": "HIGH",
+  "sha256_hash": "c62e4323db881e858f6b102eaa49737de1832445bf1dcba7a658b4b15268bd13",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21888"
+}

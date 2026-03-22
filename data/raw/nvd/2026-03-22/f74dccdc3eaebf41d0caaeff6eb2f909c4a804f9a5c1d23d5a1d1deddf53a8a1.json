@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-61145",
+  "ingested_at": "2026-03-22T07:54:31.156458+00:00",
+  "lang": "en",
+  "raw_text": "libtiff up to v4.7.1 was discovered to contain a double free via the component tools/tiffcrop.c.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f74dccdc3eaebf41d0caaeff6eb2f909c4a804f9a5c1d23d5a1d1deddf53a8a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-415",
+    "CWE-415"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-61145"
+}

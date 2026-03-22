@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21422",
+  "ingested_at": "2026-03-22T07:54:34.456492+00:00",
+  "lang": "en",
+  "raw_text": "Dell PowerScale OneFS, versions 9.10.0.0 through 9.10.1.5 and versions 9.11.0.0 through 9.12.0.1, contains an external control of system or configuration setting vulnerability. A high privileged attacker with local access could potentially exploit this vulnerability, leading to protection mechanism bypass.",
+  "severity": "LOW",
+  "sha256_hash": "79ed791541f36583bcbfd3a4083e88939d075acc30bb2fc0dd39feba6c55112a",
+  "source": "nvd",
+  "tags": [
+    "CWE-15"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21422"
+}

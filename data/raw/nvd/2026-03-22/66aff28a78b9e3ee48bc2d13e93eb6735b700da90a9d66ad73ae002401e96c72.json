@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59388",
+  "ingested_at": "2026-03-22T07:54:44.140265+00:00",
+  "lang": "en",
+  "raw_text": "A use of hard-coded password vulnerability has been reported to affect Hyper Data Protector. The remote attackers can then exploit the vulnerability to gain unauthorized access. We have already fixed the vulnerability in the following version: Hyper Data Protector 2.3.1.455 and later",
+  "severity": "CRITICAL",
+  "sha256_hash": "66aff28a78b9e3ee48bc2d13e93eb6735b700da90a9d66ad73ae002401e96c72",
+  "source": "nvd",
+  "tags": [
+    "CWE-259"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59388"
+}

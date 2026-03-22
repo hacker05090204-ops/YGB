@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server Java Platforms Invoker Servlet does not require authentication, allowing for remote code execution via a HTTP or HTTPS request.",
+  "token_count": 25
+}

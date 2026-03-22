@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32842",
+  "ingested_at": "2026-03-22T07:54:47.204335+00:00",
+  "lang": "en",
+  "raw_text": "Edimax GS-5008PL firmware version 1.00.54 and prior contain an insecure credential storage vulnerability that allows attackers to obtain administrator credentials by accessing configuration backup files. Attackers can download the config.bin file through fupload.cgi to extract plaintext username and password fields for unauthorized administrative access.",
+  "severity": "MEDIUM",
+  "sha256_hash": "071268a624b315a1fdf6476898d0ee8ce06d83104aedd32191a767fe7b88bc69",
+  "source": "nvd",
+  "tags": [
+    "CWE-312"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32842"
+}

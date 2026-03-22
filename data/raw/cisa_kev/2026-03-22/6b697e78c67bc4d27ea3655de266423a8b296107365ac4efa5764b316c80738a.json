@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-2465",
+  "ingested_at": "2026-03-22T07:45:18.250268+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE Unspecified vulnerability in the Java Runtime Environment (JRE) component in Oracle Java SE allows remote attackers to affect confidentiality, integrity, and availability via Unknown vectors related to 2D",
+  "severity": "CRITICAL",
+  "sha256_hash": "6b697e78c67bc4d27ea3655de266423a8b296107365ac4efa5764b316c80738a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TeleMessage TM SGNL TeleMessage TM SGNL contains an exposure of core dump file to an unauthorized control sphere Vulnerability. This vulnerability is based on a JSP application in which the heap content is roughly equivalent to a \"core dump\" in which a password previously sent over HTTP would be included in this dump.",
+  "token_count": 53
+}

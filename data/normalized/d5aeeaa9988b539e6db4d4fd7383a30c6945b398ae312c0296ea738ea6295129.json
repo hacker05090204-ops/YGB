@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VBScript - 'OLEAUT32!VariantClear' and 'scrrun!VBADictionary::put_Item' Use-After-Free",
+  "token_count": 6
+}

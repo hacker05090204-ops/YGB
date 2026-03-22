@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Wowza Streaming Engine 4.5.0 contains a local privilege escalation vulnerability that allows authenticated users to escalate privileges by replacing executable files due to improper file permissions granting full access to the Everyone group. Attackers can replace the nssm_x64.exe binary in the manager and engine service directories with malicious executables to execute code with LocalSystem privileges when services restart.",
+  "token_count": 58
+}

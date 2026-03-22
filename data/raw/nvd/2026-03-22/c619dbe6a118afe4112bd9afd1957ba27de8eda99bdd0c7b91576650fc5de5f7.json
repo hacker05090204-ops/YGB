@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-9909",
+  "ingested_at": "2026-03-22T07:54:33.093929+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in the Red Hat Ansible Automation Platform Gateway route creation component. This vulnerability allows credential theft via the creation of misleading routes using a double-slash (//) prefix in the gateway_path. A malicious or socially engineered administrator can configure a honey-pot route to intercept and exfiltrate user credentials, potentially maintaining persistent access or creating a backdoor even after their permissions are revoked.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c619dbe6a118afe4112bd9afd1957ba27de8eda99bdd0c7b91576650fc5de5f7",
+  "source": "nvd",
+  "tags": [
+    "CWE-647"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-9909"
+}

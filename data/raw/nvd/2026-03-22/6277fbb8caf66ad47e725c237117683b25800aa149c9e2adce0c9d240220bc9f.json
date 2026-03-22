@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69388",
+  "ingested_at": "2026-03-22T07:54:30.280875+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in cliengo Cliengo \u2013 Chatbot cliengo allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Cliengo \u2013 Chatbot: from n/a through < = 3.0.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6277fbb8caf66ad47e725c237117683b25800aa149c9e2adce0c9d240220bc9f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69388"
+}

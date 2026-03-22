@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-13382",
+  "ingested_at": "2026-03-22T07:45:18.873275+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS and FortiProxy An Improper Authorization vulnerability in Fortinet FortiOS and FortiProxy under SSL VPN web portal allows an unauthenticated attacker to modify the password.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0f9ab54f7382296c08f33ac89641e8d03914cb47b2a57dc593f2c36a821f70e6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

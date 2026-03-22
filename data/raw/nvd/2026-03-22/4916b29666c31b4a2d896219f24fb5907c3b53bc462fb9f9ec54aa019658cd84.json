@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31857",
+  "ingested_at": "2026-03-22T07:54:43.757607+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 5.9.9 and 4.17.4, a Remote Code Execution vulnerability exists in the Craft CMS 5 conditions system. The BaseElementSelectConditionRule::getElementIds() method passes user-controlled string input through renderObjectTemplate() -- an unsandboxed Twig rendering function with escaping disabled. Any authenticated Control Panel user (including non-admin roles such as Author or Editor) can achieve full RCE by sending a crafted condition rule via standard element listing endpoints. This vulnerability requires no admin privileges, no special permissions beyond basic control panel access, and bypasses all production hardening settings (allowAdminChanges: false, devMode: false, enableTwigSandbox: true). Users should update to the patched 5.9.9 or 4.17.4 release to mitigate the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "4916b29666c31b4a2d896219f24fb5907c3b53bc462fb9f9ec54aa019658cd84",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 111,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31857"
+}

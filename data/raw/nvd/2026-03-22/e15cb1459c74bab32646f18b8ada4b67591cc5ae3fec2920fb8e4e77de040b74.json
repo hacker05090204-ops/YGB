@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3223",
+  "ingested_at": "2026-03-22T07:54:33.166722+00:00",
+  "lang": "en",
+  "raw_text": "Arbitrary file write & potential privilege escalation exploiting zip slip vulnerability in Google Web Designer.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e15cb1459c74bab32646f18b8ada4b67591cc5ae3fec2920fb8e4e77de040b74",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3223"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31961",
+  "ingested_at": "2026-03-22T07:54:43.907508+00:00",
+  "lang": "en",
+  "raw_text": "Quill provides simple mac binary signing and notarization from any platform. Quill before version v0.7.1 contains an unbounded memory allocation vulnerability when parsing Mach-O binaries. Exploitation requires that Quill processes an attacker-supplied Mach-O binary, which is most likely in environments such as CI/CD pipelines, shared signing services, or any workflow where externally-submitted binaries are accepted for signing. When parsing a Mach-O binary, Quill reads several size and count fields from the LC_CODE_SIGNATURE load command and embedded code signing structures (SuperBlob, BlobIndex) and uses them to allocate memory buffers without validating that the values are reasonable or consistent with the actual file size. Affected fields include DataSize, DataOffset, and Size from the load command, Count from the SuperBlob header, and Length from individual blob headers. An attacker can craft a minimal (~4KB) malicious Mach-O binary with extremely large values in these fields, causing Quill to attempt to allocate excessive memory. This leads to memory exhaustion and denial of service, potentially crashing the host process. Both the Quill CLI and Go library are affected when used to parse untrusted Mach-O files. This vulnerability is fixed in 0.7.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "938dd53ad2a8c1554508cad8a6aaedc5be571e07f0ca1fb551c2e3267b400485",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 185,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31961"
+}

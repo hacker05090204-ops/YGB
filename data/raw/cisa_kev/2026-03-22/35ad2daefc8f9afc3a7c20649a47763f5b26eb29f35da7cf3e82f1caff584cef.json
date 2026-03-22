@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-4632",
+  "ingested_at": "2026-03-22T07:45:16.389923+00:00",
+  "lang": "en",
+  "raw_text": "Samsung MagicINFO 9 Server Samsung MagicINFO 9 Server contains a path traversal vulnerability that allows an attacker to write arbitrary file as system authority.",
+  "severity": "CRITICAL",
+  "sha256_hash": "35ad2daefc8f9afc3a7c20649a47763f5b26eb29f35da7cf3e82f1caff584cef",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

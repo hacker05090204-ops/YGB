@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27754",
+  "ingested_at": "2026-03-22T07:54:33.240846+00:00",
+  "lang": "en",
+  "raw_text": "SODOLA SL902-SWTGW124AS firmware versions through 200.1.20 use the cryptographically broken MD5 hash function for session cookie generation, weakening session security. Attackers can exploit predictable session tokens combined with MD5's collision vulnerabilities to forge valid session cookies and gain unauthorized access to the device.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7d26f482d876025e91d8296c3c0f41a7601f5244b36160aa10f4c4ff2da4fcf5",
+  "source": "nvd",
+  "tags": [
+    "CWE-328"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27754"
+}

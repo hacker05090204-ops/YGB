@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14483",
+  "ingested_at": "2026-03-22T07:54:44.564638+00:00",
+  "lang": "en",
+  "raw_text": "IBM Sterling B2B Integrator and IBM Sterling File Gateway 6.1.0.0 through 6.1.2.7_2, 6.2.0.0 through 6.2.0.5_1, 6.2.1.0 through 6.2.1.1_1, and 6.2.2.0 could disclose sensitive host information to authenticated users in responses that could be used in further attacks against the system.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1e88e268a3bae38f742143762b50133d58bbffe77f8d1839b35a19662a073012",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14483"
+}

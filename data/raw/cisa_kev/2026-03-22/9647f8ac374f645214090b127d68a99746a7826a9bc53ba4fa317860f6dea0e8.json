@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-30088",
+  "ingested_at": "2026-03-22T07:45:16.771111+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Kernel contains a time-of-check to time-of-use (TOCTOU) race condition vulnerability that could allow for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9647f8ac374f645214090b127d68a99746a7826a9bc53ba4fa317860f6dea0e8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

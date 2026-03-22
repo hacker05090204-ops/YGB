@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-48365",
+  "ingested_at": "2026-03-22T07:45:16.644543+00:00",
+  "lang": "en",
+  "raw_text": "Qlik Sense Qlik Sense contains an HTTP tunneling vulnerability that allows an attacker to escalate privileges and execute HTTP requests on the backend server hosting the software.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bd146de91ef60cf365be78b0e13cd795c605b1ea9bfe98bc78396269c697ba02",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

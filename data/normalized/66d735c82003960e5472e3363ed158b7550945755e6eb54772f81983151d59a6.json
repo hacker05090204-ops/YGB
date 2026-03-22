@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Unraid Unraid Unraid contains an authentication bypass vulnerability that allows attackers to gain access to the administrative interface. This CVE is chainable with CVE-2020-5847 for remote code execution.",
+  "token_count": 28
+}

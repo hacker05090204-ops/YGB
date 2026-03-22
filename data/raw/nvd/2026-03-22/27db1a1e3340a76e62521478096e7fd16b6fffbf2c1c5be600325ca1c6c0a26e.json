@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1648",
+  "ingested_at": "2026-03-22T07:54:49.293595+00:00",
+  "lang": "en",
+  "raw_text": "The Performance Monitor plugin for WordPress is vulnerable to Server-Side Request Forgery in all versions up to, and including, 1.0.6. This is due to insufficient validation of the 'url' parameter in the '/wp-json/performance-monitor/v1/curl_data' REST API endpoint. This makes it possible for unauthenticated attackers to make web requests to arbitrary locations, including internal services, via the Gopher protocol and other dangerous protocols. This can be exploited to achieve Remote Code Execution by chaining with services like Redis.",
+  "severity": "HIGH",
+  "sha256_hash": "27db1a1e3340a76e62521478096e7fd16b6fffbf2c1c5be600325ca1c6c0a26e",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1648"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3422",
+  "ingested_at": "2026-03-22T07:54:33.506792+00:00",
+  "lang": "en",
+  "raw_text": "U-Office Force developed by e-Excellence has a Insecure Deserialization vulnerability, allowing unauthenticated remote attackers to execute arbitrary code on the server by sending maliciously crafted serialized content.",
+  "severity": "CRITICAL",
+  "sha256_hash": "41eff4f25ea1d48ca59876bdf4724106a73d07a0dd8887ba576987961fbd6707",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3422"
+}

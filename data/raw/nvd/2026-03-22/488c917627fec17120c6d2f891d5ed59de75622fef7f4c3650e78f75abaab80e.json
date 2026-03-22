@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22341",
+  "ingested_at": "2026-03-22T07:54:30.337120+00:00",
+  "lang": "en",
+  "raw_text": "Authentication Bypass Using an Alternate Path or Channel vulnerability in Case-Themes Booked booked allows Authentication Abuse.This issue affects Booked: from n/a through < = 3.0.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "488c917627fec17120c6d2f891d5ed59de75622fef7f4c3650e78f75abaab80e",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22341"
+}

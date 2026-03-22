@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22356",
+  "ingested_at": "2026-03-22T07:54:30.355172+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Automattic Jetpack CRM zero-bs-crm allows PHP Local File Inclusion.This issue affects Jetpack CRM: from n/a through < = 6.7.0.",
+  "severity": "HIGH",
+  "sha256_hash": "91888a67bf76c66d8f3f9773815b9c8a757f2dfa7b7f255c21a5d377455d2e24",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22356"
+}

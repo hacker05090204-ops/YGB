@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-32764",
+  "ingested_at": "2026-03-22T07:54:48.385754+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: This repository is no longer public.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e4ae03158682dac88ed4ad66038ad777b15b78b42595056b3cc1dafd08c48d5f",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 8,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32764"
+}

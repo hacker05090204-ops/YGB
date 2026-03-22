@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a server-side request forgery (SSRF) vulnerability via the ProxyServlet component.",
+  "token_count": 21
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A logic error in the remove_password() function in Checkmk GmbH's Checkmk versions < 2.4.0p23, < 2.3.0p43, and 2.2.0 (EOL) allows a low-privileged user to cause data loss.",
+  "token_count": 27
+}

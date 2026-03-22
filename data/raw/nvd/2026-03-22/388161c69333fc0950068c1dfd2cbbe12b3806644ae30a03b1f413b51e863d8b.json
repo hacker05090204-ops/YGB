@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3669",
+  "ingested_at": "2026-03-22T07:54:41.944024+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Freedom Factory dGEN1 up to 20260221. This impacts the function AlarmService of the component com.dgen.alarm. Such manipulation leads to improper authorization. The attack needs to be performed locally. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "388161c69333fc0950068c1dfd2cbbe12b3806644ae30a03b1f413b51e863d8b",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3669"
+}

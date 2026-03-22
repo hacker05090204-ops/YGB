@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23262",
+  "ingested_at": "2026-03-22T07:54:47.579722+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: gve: Fix stats report corruption on queue count change The driver and the NIC share a region in memory for stats reporting. The NIC calculates its offset into this region based on the total size of the stats region and the size of the NIC's stats. When the number of queues is changed, the driver's stats region is resized. If the queue count is increased, the NIC can write past the end of the allocated stats region, causing memory corruption. If the queue count is decreased, there is a gap between the driver and NIC stats, leading to incorrect stats reporting. This change fixes the issue by allocating stats region with maximum size, and the offset calculation for NIC stats is changed to match with the calculation of the NIC.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f04aadc20d57533611524707662b1782e6cbf90010db7f5e3c67a3536f00028b",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 140,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23262"
+}

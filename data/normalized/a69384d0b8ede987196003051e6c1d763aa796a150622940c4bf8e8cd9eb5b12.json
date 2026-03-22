@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Search contains an unspecified vulnerability that could allow an attacker to evade Mark of the Web (MOTW) defenses via a specially crafted malicious file, leading to remote code execution.",
+  "token_count": 33
+}

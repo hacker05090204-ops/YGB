@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25446",
+  "ingested_at": "2026-03-22T07:54:30.980653+00:00",
+  "lang": "en",
+  "raw_text": "DIGIT CENTRIS ERP contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the datum1, datum2, KID, and PID parameters. Attackers can send POST requests to /korisnikinfo.php with malicious SQL syntax in these parameters to extract or modify sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "de91a09309cd5262aaa495a05ae89d66fc72928606cd3f341dfd7a436b4f84fa",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25446"
+}

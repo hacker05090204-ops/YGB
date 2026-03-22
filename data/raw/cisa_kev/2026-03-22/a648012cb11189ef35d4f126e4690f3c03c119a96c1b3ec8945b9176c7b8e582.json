@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-27932",
+  "ingested_at": "2026-03-22T07:45:19.025777+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and watchOS contain a type confusion vulnerability that may allow a malicious application to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a648012cb11189ef35d4f126e4690f3c03c119a96c1b3ec8945b9176c7b8e582",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

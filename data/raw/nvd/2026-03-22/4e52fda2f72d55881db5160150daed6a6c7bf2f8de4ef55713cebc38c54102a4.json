@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-32693",
+  "ingested_at": "2026-03-22T07:54:47.466346+00:00",
+  "lang": "en",
+  "raw_text": "In Juju from version 3.0.0 through 3.6.18, the authorization of the \"secret-set\" tool is not performed correctly, which allows a grantee to update the secret content, and can lead to reading or updating other secrets. When the \"secret-set\" tool logs an error in an exploitation attempt, the secret is still updated contrary to expectations, and the new value is visible to both the owner and the grantee.",
+  "severity": "HIGH",
+  "sha256_hash": "4e52fda2f72d55881db5160150daed6a6c7bf2f8de4ef55713cebc38c54102a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-778",
+    "CWE-863"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32693"
+}

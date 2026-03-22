@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Commvault Command Center Commvault Command Center contains a path traversal vulnerability that allows a remote, unauthenticated attacker to execute arbitrary code.",
+  "token_count": 21
+}

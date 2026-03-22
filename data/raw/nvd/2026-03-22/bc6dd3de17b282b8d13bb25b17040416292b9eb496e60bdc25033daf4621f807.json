@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27151",
+  "ingested_at": "2026-03-22T07:54:32.774679+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, the `move_posts` action only checked `can_move_posts?` on the source topic but never validated write permissions on the destination topic. This allowed TL4 users and category group moderators to move posts into topics in categories where they lack posting privileges (e.g., read-only categories or categories with group-restricted write access). Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. No known workarounds are available.",
+  "severity": "LOW",
+  "sha256_hash": "bc6dd3de17b282b8d13bb25b17040416292b9eb496e60bdc25033daf4621f807",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27151"
+}

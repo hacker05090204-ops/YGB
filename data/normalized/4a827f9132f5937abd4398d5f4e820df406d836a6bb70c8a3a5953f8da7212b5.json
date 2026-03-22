@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "telnetd in GNU inetutils through 2.7 allows an out-of-bounds write in the LINEMODE SLC (Set Local Characters) suboption handler because add_slc does not check whether the buffer is full.",
+  "token_count": 29
+}

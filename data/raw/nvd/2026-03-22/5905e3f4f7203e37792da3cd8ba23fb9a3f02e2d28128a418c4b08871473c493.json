@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28561",
+  "ingested_at": "2026-03-22T07:54:33.424494+00:00",
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains a stored cross-site scripting vulnerability that allows administrators to inject persistent JavaScript via forum description fields echoed without output escaping across multiple theme template files. On multisite installations or with a compromised admin account, attackers set a forum description containing HTML event handlers that execute when any user views the forum listing.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5905e3f4f7203e37792da3cd8ba23fb9a3f02e2d28128a418c4b08871473c493",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28561"
+}

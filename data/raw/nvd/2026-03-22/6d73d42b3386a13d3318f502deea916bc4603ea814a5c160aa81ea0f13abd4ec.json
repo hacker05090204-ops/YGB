@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28209",
+  "ingested_at": "2026-03-22T07:54:40.907004+00:00",
+  "lang": "en",
+  "raw_text": "FreePBX is an open source IP PBX. From versions 16.0.17.2 to before 16.0.20 and from version 17.0.2.4 to before 17.0.5, a command injection vulnerability exists in FreePBX when using the ElevenLabs Text-to-Speech (TTS) engine in the recordings module. This issue has been patched in versions 16.0.20 and 17.0.5.",
+  "severity": "HIGH",
+  "sha256_hash": "6d73d42b3386a13d3318f502deea916bc4603ea814a5c160aa81ea0f13abd4ec",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28209"
+}

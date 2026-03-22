@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "AMPPS 2.7 contains a denial of service vulnerability that allows remote attackers to crash the service by sending malformed data to the default HTTP port. Attackers can establish multiple socket connections and transmit invalid payloads to exhaust server resources and cause service unavailability.",
+  "token_count": 43
+}

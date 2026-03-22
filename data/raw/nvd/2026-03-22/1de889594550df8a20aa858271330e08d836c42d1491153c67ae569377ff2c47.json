@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27847",
+  "ingested_at": "2026-03-22T07:54:32.121431+00:00",
+  "lang": "en",
+  "raw_text": "Due to improper neutralization of special elements, SQL statements can be injected via the handshake of a TLS-SRP connection. This can be used to inject known credentials into the database that can be utilized to successfully complete the handshake and use the protected service. This issue affects MR9600: 1.0.4.205530; MX4200: 1.0.13.210200.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1de889594550df8a20aa858271330e08d836c42d1491153c67ae569377ff2c47",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27847"
+}

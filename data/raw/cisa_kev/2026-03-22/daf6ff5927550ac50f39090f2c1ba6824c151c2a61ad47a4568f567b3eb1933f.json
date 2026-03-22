@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41992",
+  "ingested_at": "2026-03-22T07:45:17.229124+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and watchOS contain an unspecified vulnerability that allows for local privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "daf6ff5927550ac50f39090f2c1ba6824c151c2a61ad47a4568f567b3eb1933f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

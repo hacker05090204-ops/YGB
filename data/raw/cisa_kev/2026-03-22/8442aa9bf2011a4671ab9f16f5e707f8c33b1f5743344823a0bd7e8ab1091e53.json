@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-2551",
+  "ingested_at": "2026-03-22T07:45:17.148207+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Fusion Middleware Oracle Fusion Middleware contains an unspecified vulnerability in the WLS Core Components that allows an unauthenticated attacker with network access via IIOP to compromise the WebLogic Server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8442aa9bf2011a4671ab9f16f5e707f8c33b1f5743344823a0bd7e8ab1091e53",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "XooGallery Latest contains multiple SQL injection vulnerabilities that allow unauthenticated attackers to manipulate database queries by injecting SQL code through the photo_id parameter. Attackers can send GET requests to photo.php with malicious photo_id values to extract sensitive data, bypass authentication, or modify database contents.",
+  "token_count": 44
+}

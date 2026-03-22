@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27459",
+  "ingested_at": "2026-03-22T07:54:47.228755+00:00",
+  "lang": "en",
+  "raw_text": "pyOpenSSL is a Python wrapper around the OpenSSL library. Starting in version 22.0.0 and prior to version 26.0.0, if a user provided callback to `set_cookie_generate_callback` returned a cookie value greater than 256 bytes, pyOpenSSL would overflow an OpenSSL provided buffer. Starting in version 26.0.0, cookie values that are too long are now rejected.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a9d577af3de9ae962224dc9af88519617df1b00a11721ad4da8d796fd0d56c95",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27459"
+}

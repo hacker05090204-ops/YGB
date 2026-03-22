@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In Progress\u00ae Telerik\u00ae UI for AJAX, versions prior to 2026.1.225, an insufficient entropy vulnerability exists in RadAsyncUpload, where a predictable temporary identifier, based on timestamp and filename, can enable collisions and file content tampering.",
+  "token_count": 34
+}

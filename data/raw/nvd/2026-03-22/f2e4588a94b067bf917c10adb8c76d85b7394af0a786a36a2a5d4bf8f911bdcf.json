@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33236",
+  "ingested_at": "2026-03-22T07:54:49.102237+00:00",
+  "lang": "en",
+  "raw_text": "NLTK (Natural Language Toolkit) is a suite of open source Python modules, data sets, and tutorials supporting research and development in Natural Language Processing. In versions 3.9.3 and prior, the NLTK downloader does not validate the `subdir` and `id` attributes when processing remote XML index files. Attackers can control a remote XML index server to provide malicious values containing path traversal sequences (such as `../`), which can lead to arbitrary directory creation, arbitrary file creation, and arbitrary file overwrite. Commit 89fe2ec2c6bae6e2e7a46dad65cc34231976ed8a patches the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "f2e4588a94b067bf917c10adb8c76d85b7394af0a786a36a2a5d4bf8f911bdcf",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33236"
+}

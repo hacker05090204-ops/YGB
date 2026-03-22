@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22475",
+  "ingested_at": "2026-03-22T07:54:40.144588+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in axiomthemes Estate estate allows Object Injection.This issue affects Estate: from n/a through < = 1.3.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f37ec2a8089f5ab470afc75e01b52f3fe098a41e12d2f5c84f35bd1989476cc2",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22475"
+}

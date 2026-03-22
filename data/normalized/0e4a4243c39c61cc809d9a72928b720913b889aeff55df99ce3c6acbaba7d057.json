@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contains an array boundary issue in Universal 3D (U3D) support that could lead to remote code execution.",
+  "token_count": 25
+}

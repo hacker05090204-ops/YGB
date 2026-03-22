@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32841",
+  "ingested_at": "2026-03-22T07:54:47.201333+00:00",
+  "lang": "en",
+  "raw_text": "Edimax GS-5008PL firmware version 1.00.54 and prior contain an authentication bypass vulnerability that allows unauthenticated attackers to access the management interface. Attackers can exploit the global authentication flag mechanism to gain administrative access without credentials after any user authenticates, enabling unauthorized password changes, firmware uploads, and configuration modifications.",
+  "severity": "HIGH",
+  "sha256_hash": "5baf26e9519b8ea42c15d8670bbc211f44e4c6c188c5330662e0828fa11629ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-1108"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32841"
+}

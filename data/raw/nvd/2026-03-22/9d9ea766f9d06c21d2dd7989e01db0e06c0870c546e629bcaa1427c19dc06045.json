@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32053",
+  "ingested_at": "2026-03-22T07:54:49.213830+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.23 contain a vulnerability in Twilio webhook event deduplication where normalized event IDs are randomized per parse, allowing replay events to bypass manager dedupe checks. Attackers can replay Twilio webhook events to trigger duplicate or stale call-state transitions, potentially causing incorrect call handling and state corruption.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d9ea766f9d06c21d2dd7989e01db0e06c0870c546e629bcaa1427c19dc06045",
+  "source": "nvd",
+  "tags": [
+    "CWE-294"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32053"
+}

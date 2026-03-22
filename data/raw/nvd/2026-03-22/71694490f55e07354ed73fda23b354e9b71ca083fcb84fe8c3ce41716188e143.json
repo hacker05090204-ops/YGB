@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29100",
+  "ingested_at": "2026-03-22T07:54:48.304144+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. SuiteCRM 7.15.0 contains a reflected HTML injection vulnerability in the login page that allows attackers to inject arbitrary HTML content, enabling phishing attacks and page defacement. Version 7.15.1 patches the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "71694490f55e07354ed73fda23b354e9b71ca083fcb84fe8c3ce41716188e143",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29100"
+}

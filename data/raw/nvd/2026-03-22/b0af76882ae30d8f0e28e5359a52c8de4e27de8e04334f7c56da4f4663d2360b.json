@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32020",
+  "ingested_at": "2026-03-22T07:54:48.202441+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain a path traversal vulnerability in the static file handler that follows symbolic links, allowing out-of-root file reads. Attackers can place symlinks under the Control UI root directory to bypass directory confinement checks and read arbitrary files outside the intended root.",
+  "severity": "LOW",
+  "sha256_hash": "b0af76882ae30d8f0e28e5359a52c8de4e27de8e04334f7c56da4f4663d2360b",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32020"
+}

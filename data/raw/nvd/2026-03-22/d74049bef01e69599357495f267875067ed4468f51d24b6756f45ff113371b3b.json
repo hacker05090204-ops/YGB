@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32597",
+  "ingested_at": "2026-03-22T07:54:46.166412+00:00",
+  "lang": "en",
+  "raw_text": "PyJWT is a JSON Web Token implementation in Python. Prior to 2.12.0, PyJWT does not validate the crit (Critical) Header Parameter defined in RFC 7515 \u00a74.1.11. When a JWS token contains a crit array listing extensions that PyJWT does not understand, the library accepts the token instead of rejecting it. This violates the MUST requirement in the RFC. This vulnerability is fixed in 2.12.0.",
+  "severity": "HIGH",
+  "sha256_hash": "d74049bef01e69599357495f267875067ed4468f51d24b6756f45ff113371b3b",
+  "source": "nvd",
+  "tags": [
+    "CWE-345",
+    "CWE-863"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32597"
+}

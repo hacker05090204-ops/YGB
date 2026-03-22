@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69653",
+  "ingested_at": "2026-03-22T07:54:41.588282+00:00",
+  "lang": "en",
+  "raw_text": "A crafted JavaScript input can trigger an internal assertion failure in QuickJS release 2025-09-13, fixed in commit 1dbba8a88eaa40d15a8a9b70bb1a0b8fb5b552e6 (2025-12-11), in file gc_decref_child in quickjs.c, when executed with the qjs interpreter using the -m option. This leads to an abort (SIGABRT) during garbage collection and causes a denial-of-service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e878e8f13b73bc86cfd0a34f74c94f944bfe78e884baa0f40135439a881098d4",
+  "source": "nvd",
+  "tags": [
+    "CWE-617"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69653"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69809",
+  "ingested_at": "2026-03-22T07:54:46.926185+00:00",
+  "lang": "en",
+  "raw_text": "A write-what-where condition in p2r3 Bareiron commit 8e4d40 allows unauthenticated attackers to write arbitrary values to memory, enabling arbitrary code execution via a crafted packet.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f607ef91522f68957f6422248c24a3923dce24f94d364a27d4dd3b7b0d069164",
+  "source": "nvd",
+  "tags": [
+    "CWE-123"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69809"
+}

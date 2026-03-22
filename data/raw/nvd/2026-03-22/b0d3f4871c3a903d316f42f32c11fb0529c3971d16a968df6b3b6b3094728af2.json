@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3384",
+  "ingested_at": "2026-03-22T07:54:33.441724+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in ChaiScript up to 6.1.0. This impacts the function chaiscript::eval::AST_Node_Impl::eval/chaiscript::eval::Function_Push_Pop of the file include/chaiscript/language/chaiscript_eval.hpp. The manipulation leads to uncontrolled recursion. An attack has to be approached locally. The exploit has been disclosed publicly and may be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "b0d3f4871c3a903d316f42f32c11fb0529c3971d16a968df6b3b6b3094728af2",
+  "source": "nvd",
+  "tags": [
+    "CWE-404",
+    "CWE-674"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3384"
+}

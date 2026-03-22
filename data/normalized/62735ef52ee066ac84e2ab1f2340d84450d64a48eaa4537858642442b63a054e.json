@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Secure Firewall Adaptive Security Appliance and Secure Firewall Threat Defense Cisco Secure Firewall Adaptive Security (ASA) Appliance and Secure Firewall Threat Defense (FTD) Software VPN Web Server contain a buffer overflow vulnerability that allows for remote code execution. This vulnerability could be chained with CVE-2025-20362.",
+  "token_count": 46
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Kestra is an event-driven orchestration platform. In versions from 1.1.10 and prior, Kestra\u2019s execution-file preview renders user-supplied Markdown (.md) with markdown-it instantiated as html:true and injects the resulting HTML with Vue\u2019s v-html without sanitisation. At time of publication, there are no publicly available patches.",
+  "token_count": 44
+}

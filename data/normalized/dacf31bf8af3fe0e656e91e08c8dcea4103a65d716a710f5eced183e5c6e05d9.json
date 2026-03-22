@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Edimax GS-5008PL firmware version 1.00.54 and prior contain a cross-site request forgery vulnerability that allows remote attackers to perform unauthorized administrative actions by inducing logged-in administrators to visit malicious pages. Attackers can exploit the lack of anti-CSRF tokens and request validation to change passwords, upload firmware, reboot the device, perform factory resets, or modify network configurations.",
+  "token_count": 56
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-0158",
+  "ingested_at": "2026-03-22T07:45:19.387707+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft MSCOMCTL.OCX Microsoft MSCOMCTL.OCX contains an unspecified vulnerability that allows for remote code execution, allowing an attacker to take complete control of an affected system under the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "40c566a4a978a085acf5012a7f5f98f7f99a70f54e485492366e7cf37816f401",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

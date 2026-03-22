@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-30154",
+  "ingested_at": "2026-03-22T07:45:16.496536+00:00",
+  "lang": "en",
+  "raw_text": "reviewdog action-setup GitHub Action reviewdog action-setup GitHub Action contains an embedded malicious code vulnerability that dumps exposed secrets to Github Actions Workflow Logs.",
+  "severity": "CRITICAL",
+  "sha256_hash": "df49ed8c4c28d6e755bdae8cb860feb816b57eabea3304ecc9ffeb8a364fdffa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

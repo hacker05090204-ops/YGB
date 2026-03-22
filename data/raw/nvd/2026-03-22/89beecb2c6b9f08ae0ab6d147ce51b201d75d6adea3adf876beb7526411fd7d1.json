@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3404",
+  "ingested_at": "2026-03-22T07:54:33.477178+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in thinkgem JeeSite up to 5.15.1. Impacted is an unknown function of the file /com/jeesite/common/shiro/cas/CasOutHandler.java of the component Endpoint. Executing a manipulation can lead to xml external entity reference. The attack may be performed from remote. Attacks of this nature are highly complex. The exploitability is considered difficult. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "89beecb2c6b9f08ae0ab6d147ce51b201d75d6adea3adf876beb7526411fd7d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-610",
+    "CWE-611",
+    "CWE-611"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3404"
+}

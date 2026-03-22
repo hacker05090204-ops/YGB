@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30713",
+  "ingested_at": "2026-03-22T07:45:19.046213+00:00",
+  "lang": "en",
+  "raw_text": "Apple macOS Apple macOS Transparency, Consent, and Control (TCC) contains an unspecified permissions issue which may allow a malicious application to bypass privacy preferences.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d9d926e7e5917835886db08f7b32d9990f7310fd3a2965ccb0bdfa510dd5bbf0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

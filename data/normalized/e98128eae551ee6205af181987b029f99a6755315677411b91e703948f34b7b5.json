@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Symantec Symantec Messaging Gateway Symantec Messaging Gateway contains an unspecified vulnerability which can allow for remote code execution. With the ability to perform remote code execution, an attacker may also desire to perform privilege escalating actions.",
+  "token_count": 36
+}

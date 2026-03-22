@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67618",
+  "ingested_at": "2026-03-22T07:54:47.900914+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in ArtstudioWorks Brookside allows Reflected XSS.This issue affects Brookside: from n/a through 1.4.",
+  "severity": "HIGH",
+  "sha256_hash": "164dc584b8598aa9bf37f233b55e4328f63047212048ff64e2890a20d4aa0f11",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67618"
+}

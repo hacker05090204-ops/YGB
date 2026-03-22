@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The PowerPack for LearnDash WordPress plugin before 1.3.0 does not have authorization and CRSF checks in an AJAX action, allowing unauthenticated users to update arbitrary WordPress options (such as default_role etc) and create arbitrary admin users",
+  "token_count": 36
+}

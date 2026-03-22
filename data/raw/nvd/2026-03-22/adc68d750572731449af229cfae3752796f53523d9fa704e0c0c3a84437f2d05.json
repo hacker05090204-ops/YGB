@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22179",
+  "ingested_at": "2026-03-22T07:54:47.285762+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 in macOS node-host system.run contain an allowlist bypass vulnerability that allows remote attackers to execute non-allowlisted commands by exploiting improper parsing of command substitution tokens. Attackers can craft shell payloads with command substitution syntax within double-quoted text to bypass security restrictions and execute arbitrary commands on the system.",
+  "severity": "MEDIUM",
+  "sha256_hash": "adc68d750572731449af229cfae3752796f53523d9fa704e0c0c3a84437f2d05",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22179"
+}

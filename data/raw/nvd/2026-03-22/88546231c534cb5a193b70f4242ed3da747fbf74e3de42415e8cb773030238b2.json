@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62878",
+  "ingested_at": "2026-03-22T07:54:32.024718+00:00",
+  "lang": "en",
+  "raw_text": "A malicious user can manipulate the parameters.pathPattern to create PersistentVolumes in arbitrary locations on the host node, potentially overwriting sensitive files or gaining access to unintended directories.",
+  "severity": "CRITICAL",
+  "sha256_hash": "88546231c534cb5a193b70f4242ed3da747fbf74e3de42415e8cb773030238b2",
+  "source": "nvd",
+  "tags": [
+    "CWE-23"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62878"
+}

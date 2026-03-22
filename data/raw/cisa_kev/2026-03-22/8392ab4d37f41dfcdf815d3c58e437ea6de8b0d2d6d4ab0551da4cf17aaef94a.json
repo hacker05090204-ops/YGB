@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-4344",
+  "ingested_at": "2026-03-22T07:45:18.415198+00:00",
+  "lang": "en",
+  "raw_text": "Exim Exim Heap-based buffer overflow in the string_vformat function in string.c in Exim before 4.70 allows remote attackers to execute arbitrary code via an SMTP session.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8392ab4d37f41dfcdf815d3c58e437ea6de8b0d2d6d4ab0551da4cf17aaef94a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-37415",
+  "ingested_at": "2026-03-22T07:45:18.940712+00:00",
+  "lang": "en",
+  "raw_text": "Zoho ManageEngine ServiceDesk Plus (SDP) Zoho ManageEngine ServiceDesk Plus before 11302 is vulnerable to authentication bypass that allows a few REST-API URLs without authentication",
+  "severity": "CRITICAL",
+  "sha256_hash": "ad75f7639c40e354195a2fe9343c6d632440fa945fe60a39e347bcfb6ecad47c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

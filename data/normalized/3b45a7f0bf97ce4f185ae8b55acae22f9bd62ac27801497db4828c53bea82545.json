@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Yealink Device Management Yealink Device Management contains a server-side request forgery (SSRF) vulnerability that allows for unauthenticated remote code execution.",
+  "token_count": 20
+}

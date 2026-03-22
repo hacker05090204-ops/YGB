@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24959",
+  "ingested_at": "2026-03-22T07:54:30.447531+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in JoomSky JS Help Desk js-support-ticket allows Blind SQL Injection.This issue affects JS Help Desk: from n/a through < = 3.0.1.",
+  "severity": "HIGH",
+  "sha256_hash": "6435a7a797a6157146bf17182eb1357d4a4dc3b2fcb7c43364d0ee00e7fe120b",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24959"
+}

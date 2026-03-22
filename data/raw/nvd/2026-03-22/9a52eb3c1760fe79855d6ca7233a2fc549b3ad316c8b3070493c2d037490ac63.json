@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13476",
+  "ingested_at": "2026-03-22T07:54:40.845685+00:00",
+  "lang": "en",
+  "raw_text": "Rakuten Viber Cloak mode in Android v25.7.2.0g and Windows v25.6.0.0\u2013v25.8.1.0 uses a static and predictable TLS ClientHello fingerprint lacking extension diversity, allowing Deep Packet Inspection (DPI) systems to trivially identify and block proxy traffic, undermining censorship circumvention. (CWE-327)",
+  "severity": "CRITICAL",
+  "sha256_hash": "9a52eb3c1760fe79855d6ca7233a2fc549b3ad316c8b3070493c2d037490ac63",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13476"
+}

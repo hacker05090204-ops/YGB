@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "dr_libs dr_flac.h version 0.13.3 and earlier contain an uncontrolled memory allocation vulnerability in drflac__read_and_decode_metadata() that allows attackers to trigger excessive memory allocation by supplying crafted PICTURE metadata blocks. Attackers can exploit attacker-controlled mimeLength and descriptionLength fields to cause denial of service through memory exhaustion when processing FLAC streams with metadata callbacks.",
+  "token_count": 51
+}

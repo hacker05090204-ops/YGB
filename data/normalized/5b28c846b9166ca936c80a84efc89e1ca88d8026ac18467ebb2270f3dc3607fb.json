@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ERP developed by eAI Technologies has a DLL Hijacking vulnerability, allowing authenticated local attackers to place a crafted DLL file in the same directory as the program, thereby executing arbitrary code.",
+  "token_count": 31
+}

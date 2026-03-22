@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-56422",
+  "ingested_at": "2026-03-22T07:54:42.599014+00:00",
+  "lang": "en",
+  "raw_text": "A deserialization vulnerability in LimeSurvey before v6.15.0+250623 allows a remote attacker to execute arbitrary code on the server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "48b065dddb68b614ba34317c0a4ed35cf44886c63136333782ec64e07e68a94f",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-56422"
+}

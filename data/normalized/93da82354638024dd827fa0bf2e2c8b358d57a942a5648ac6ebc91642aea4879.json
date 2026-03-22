@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Palo Alto Networks Expedition Palo Alto Networks Expedition contains a missing authentication vulnerability that allows an attacker with network access to takeover an Expedition admin account and potentially access configuration secrets, credentials, and other data.",
+  "token_count": 35
+}

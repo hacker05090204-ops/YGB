@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-67112",
+  "ingested_at": "2026-03-22T07:54:47.999320+00:00",
+  "lang": "en",
+  "raw_text": "Use of a hard-coded AES-256-CBC key in the configuration backup/restore implementation of Small Cell Sercomm SCE4255W (FreedomFi Englewood) firmware before DG3934v3@2308041842 allows remote authenticated users to decrypt, modify, and re-encrypt device configurations, enabling credential manipulation and privilege escalation via the GUI import/export functions.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ff653baa7d42da1d271c3a692d9e9ec6cf17a0863c1903b387cc56b6d409f6ec",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67112"
+}

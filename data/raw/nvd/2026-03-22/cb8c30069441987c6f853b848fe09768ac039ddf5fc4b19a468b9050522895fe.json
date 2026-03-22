@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22169",
+  "ingested_at": "2026-03-22T07:54:47.268560+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an allowlist bypass vulnerability in the safeBins configuration that allows attackers to invoke external helpers through the compress-program option. When sort is explicitly added to tools.exec.safeBins, remote attackers can bypass intended safe-bin approval constraints by leveraging the compress-program parameter to execute unauthorized external programs.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cb8c30069441987c6f853b848fe09768ac039ddf5fc4b19a468b9050522895fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22169"
+}

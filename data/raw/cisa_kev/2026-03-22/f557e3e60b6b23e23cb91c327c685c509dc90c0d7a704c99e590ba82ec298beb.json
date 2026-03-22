@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-20439",
+  "ingested_at": "2026-03-22T07:45:16.486147+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Smart Licensing Utility Cisco Smart Licensing Utility contains a static credential vulnerability that allows an unauthenticated, remote attacker to log in to an affected system and gain administrative credentials.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f557e3e60b6b23e23cb91c327c685c509dc90c0d7a704c99e590ba82ec298beb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

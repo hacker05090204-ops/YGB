@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31879",
+  "ingested_at": "2026-03-22T07:54:43.855360+00:00",
+  "lang": "en",
+  "raw_text": "Frappe is a full-stack web application framework. Prior to 14.100.2, 15.101.0, and 16.10.0, due to a lack of validation and improper permission checks, users could modify other user's private workspaces. Specially crafted requests could lead to stored XSS here. This vulnerability is fixed in 14.100.2, 15.101.0, and 16.10.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ac9d963f496a59c5960c559e1d24849fefe4352a09a028603f8a4929d890de38",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31879"
+}

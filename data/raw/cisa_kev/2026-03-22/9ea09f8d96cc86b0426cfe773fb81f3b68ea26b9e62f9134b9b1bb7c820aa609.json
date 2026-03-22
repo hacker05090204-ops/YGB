@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-3066",
+  "ingested_at": "2026-03-22T07:45:16.570518+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe ColdFusion contains a deserialization vulnerability in the Apache BlazeDS library that allows for arbitrary code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9ea09f8d96cc86b0426cfe773fb81f3b68ea26b9e62f9134b9b1bb7c820aa609",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows Mount Manager component improperly processes symbolic links.",
+  "token_count": 17
+}

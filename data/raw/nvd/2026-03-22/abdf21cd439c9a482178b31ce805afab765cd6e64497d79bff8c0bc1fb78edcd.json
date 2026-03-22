@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69232",
+  "ingested_at": "2026-03-22T07:54:31.214159+00:00",
+  "lang": "en",
+  "raw_text": "free5GC is an open-source project for 5th generation (5G) mobile core networks. free5GC go-upf versions up to and including 1.2.6, corresponding to free5gc smf up to and including 1.4.0, have an Improper Input Validation and Protocol Compliance vulnerability leading to Denial of Service. Remote attackers can disrupt core network functionality by sending a malformed PFCP Association Setup Request. The UPF incorrectly accepts it, entering an inconsistent state that causes subsequent legitimate requests to trigger SMF reconnection loops and service degradation. All deployments of free5GC using the UPF and SMF components may be affected. As of time of publication, a fix is in development but not yet available. No direct workaround is available at the application level. Applying the official patch, once released, is recommended.",
+  "severity": "HIGH",
+  "sha256_hash": "abdf21cd439c9a482178b31ce805afab765cd6e64497d79bff8c0bc1fb78edcd",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 124,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69232"
+}

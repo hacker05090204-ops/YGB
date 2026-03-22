@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-8875",
+  "ingested_at": "2026-03-22T07:45:16.252019+00:00",
+  "lang": "en",
+  "raw_text": "N-able N-Central N-able N-Central contains an insecure deserialization vulnerability that could lead to command execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "46b656908a73472ed372e25ded225b35a921d41592784fc5b237ddeb639535f8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

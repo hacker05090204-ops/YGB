@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20967",
+  "ingested_at": "2026-03-22T07:54:42.624307+00:00",
+  "lang": "en",
+  "raw_text": "Improper input validation in System Center Operations Manager allows an authorized attacker to elevate privileges over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "5ee5076db342bc9d5a152a1d99f9eb6a0906235a9ad39e025e37dba1079d0882",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20967"
+}

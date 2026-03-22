@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A CSRF vulnerability in the Link Aggregation configuration interface allows an unauthenticated remote attacker to trick authenticated users into sending unauthorized POST requests to the device by luring them to a malicious webpage. This can silently alter the device\u2019s configuration without the victim\u2019s knowledge or consent. Availability impact was set to low because after a successful attack the device will automatically recover without external intervention.",
+  "token_count": 65
+}

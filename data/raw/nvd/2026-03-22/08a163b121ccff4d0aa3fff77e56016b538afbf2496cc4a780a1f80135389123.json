@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27778",
+  "ingested_at": "2026-03-22T07:54:41.164146+00:00",
+  "lang": "en",
+  "raw_text": "The WebSocket Application Programming Interface lacks restrictions on the number of authentication requests. This absence of rate limiting may allow an attacker to conduct denial-of-service attacks by suppressing or mis-routing legitimate charger telemetry, or conduct brute-force attacks to gain unauthorized access.",
+  "severity": "HIGH",
+  "sha256_hash": "08a163b121ccff4d0aa3fff77e56016b538afbf2496cc4a780a1f80135389123",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27778"
+}

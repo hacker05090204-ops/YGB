@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22715",
+  "ingested_at": "2026-03-22T07:54:32.719886+00:00",
+  "lang": "en",
+  "raw_text": "VMWare Workstation and Fusion contain a logic flaw in the management of network packets. Known attack vectors: A malicious actor with administrative privileges on a Guest VM may be able to interrupt or intercept network connections of other Guest VM's. Resolution: To remediate CVE-2026-22715 please upgrade to VMware Workstation or Fusion Version 25H2U1",
+  "severity": "MEDIUM",
+  "sha256_hash": "d7796c461849f817123ae36066aa0f3bbe1f7278042758dc57c1ac85c0799898",
+  "source": "nvd",
+  "tags": [
+    "CWE-923"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22715"
+}

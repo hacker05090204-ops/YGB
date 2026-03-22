@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25576",
+  "ingested_at": "2026-03-22T07:54:49.550804+00:00",
+  "lang": "en",
+  "raw_text": "Kepler Wallpaper Script 1.1 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code into the category parameter. Attackers can send GET requests to the category endpoint with URL-encoded SQL UNION statements to extract database information including usernames, database names, and MySQL version details.",
+  "severity": "HIGH",
+  "sha256_hash": "3d2d41a86b26e8b90e62f448cb9561b659561c1671f4109f4ac4b2871780708d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25576"
+}

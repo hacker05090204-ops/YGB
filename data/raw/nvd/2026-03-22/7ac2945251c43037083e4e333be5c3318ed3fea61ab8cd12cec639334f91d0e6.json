@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28776",
+  "ingested_at": "2026-03-22T07:54:34.391936+00:00",
+  "lang": "en",
+  "raw_text": "International Datacasting Corporation (IDC) SFX Series SuperFlex SatelliteReceiver contains hardcoded credentials for the `monitor` account. A remote unauthenticated attacker can use these trivial, undocumented credentials to access the system via SSH. While initially dropped into a restricted shell, the attacker can trivially break out to achieve standard shell functionality.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7ac2945251c43037083e4e333be5c3318ed3fea61ab8cd12cec639334f91d0e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28776"
+}

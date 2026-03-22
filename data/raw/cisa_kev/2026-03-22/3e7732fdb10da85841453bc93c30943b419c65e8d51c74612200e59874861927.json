@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-4428",
+  "ingested_at": "2026-03-22T07:45:16.403014+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager Mobile (EPMM) Ivanti Endpoint Manager Mobile (EPMM) contains a code injection vulnerability in the API component that allows an authenticated attacker to remotely execute arbitrary code via crafted API requests. This vulnerability results from an insecure implementation of the Hibernate Validator open-source library, as represented by CVE-2025-35036.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3e7732fdb10da85841453bc93c30943b419c65e8d51c74612200e59874861927",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

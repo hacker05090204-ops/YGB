@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the Do Not Decrypt exclusion feature of the SSL decryption feature of Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to cause a denial of service (DoS) condition on an affected device. This vulnerability is due to improper memory management during the inspection of TLS 1.2 encrypted traffic. An attacker could exploit this vulnerability by sending crafted TLS 1.2 encrypted traffic through an affected device. A successful exploit could allow the attacker to cause a reload of an affected device. Note: This vulnerability only affects traffic that is encrypted by TLS 1.2. Other versions of TLS are not affected.",
+  "token_count": 107
+}

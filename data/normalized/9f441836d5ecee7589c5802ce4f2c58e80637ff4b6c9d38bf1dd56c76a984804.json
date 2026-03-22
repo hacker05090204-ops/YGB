@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CWP Control Web Panel CWP Control Web Panel (formerly CentOS Web Panel) contains an OS command injection vulnerability that allows remote attackers to execute commands via shell metacharacters in the login parameter.",
+  "token_count": 32
+}

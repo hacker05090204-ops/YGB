@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20018",
+  "ingested_at": "2026-03-22T07:54:34.659741+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the sftunnel functionality of Cisco Secure Firewall Management Center (FMC) Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an authenticated, remote attacker with administrative privileges to write arbitrary files as root on the underlying operating system. This vulnerability is due to insufficient validation of the directory path during file synchronization. An attacker could exploit this vulnerability by crafting a directory path outside of the expected file location. A successful exploit could allow the attacker to create or replace any file on the underlying operating system.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f36ae0609ae4c45078bb07f97352d122ae28ae56711f6ee8fdd601927ef2db45",
+  "source": "nvd",
+  "tags": [
+    "CWE-27"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20018"
+}

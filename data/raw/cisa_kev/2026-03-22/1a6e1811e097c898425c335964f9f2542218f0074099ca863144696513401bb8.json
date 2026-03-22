@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-33891",
+  "ingested_at": "2026-03-22T07:45:17.506488+00:00",
+  "lang": "en",
+  "raw_text": "Apache Spark Apache Spark contains a command injection vulnerability via Spark User Interface (UI) when Access Control Lists (ACLs) are enabled.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1a6e1811e097c898425c335964f9f2542218f0074099ca863144696513401bb8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

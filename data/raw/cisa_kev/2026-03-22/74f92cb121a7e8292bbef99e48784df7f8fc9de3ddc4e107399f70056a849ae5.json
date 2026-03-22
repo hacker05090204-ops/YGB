@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-42237",
+  "ingested_at": "2026-03-22T07:45:18.277513+00:00",
+  "lang": "en",
+  "raw_text": "Sitecore XP Sitcore XP contains an insecure deserialization vulnerability which can allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "74f92cb121a7e8292bbef99e48784df7f8fc9de3ddc4e107399f70056a849ae5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25476",
+  "ingested_at": "2026-03-22T07:54:32.243090+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the session expiration check in `library/auth.inc.php` runs only when `skip_timeout_reset` is not present in the request. When `skip_timeout_reset=1` is sent, the entire block that calls `SessionTracker::isSessionExpired()` and forces logout on timeout is skipped. As a result, any request that includes this parameter (e.g. from auto-refresh pages like the Patient Flow Board) never runs the expiration check: expired sessions can continue to access data indefinitely, abandoned workstations stay active, and an attacker with a stolen session cookie can keep sending `skip_timeout_reset=1` to avoid being logged out. Version 8.0.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "5f2ab66607207746134144b2b0098e8a7f0f3ec36640d141db58d6255b5c0541",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25476"
+}

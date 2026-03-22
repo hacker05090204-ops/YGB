@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper neutralization of input during web page generation ('cross-site scripting') vulnerability in OpenTextTM ZENworks Service Desk allows Cross-Site Scripting (XSS). The vulnerability could allow an attacker to execute arbitrary JavaScript leading to unauthorized actions on behalf of the user.This issue affects ZENworks Service Desk: 25.2, 25.3.",
+  "token_count": 46
+}

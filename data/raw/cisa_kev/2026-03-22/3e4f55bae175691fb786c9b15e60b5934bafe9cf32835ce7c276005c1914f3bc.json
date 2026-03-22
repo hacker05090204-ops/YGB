@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-20362",
+  "ingested_at": "2026-03-22T07:45:16.163137+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Secure Firewall Adaptive Security Appliance and Secure Firewall Threat Defense Cisco Secure Firewall Adaptive Security (ASA) Appliance and Secure Firewall Threat Defense (FTD) Software VPN Web Server contain a missing authorization vulnerability. This vulnerability could be chained with CVE-2025-20333.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3e4f55bae175691fb786c9b15e60b5934bafe9cf32835ce7c276005c1914f3bc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

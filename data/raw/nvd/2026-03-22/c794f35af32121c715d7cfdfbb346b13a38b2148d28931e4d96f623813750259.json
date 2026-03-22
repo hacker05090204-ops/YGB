@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2972",
+  "ingested_at": "2026-03-22T07:54:31.063247+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in a466350665 Smart-SSO up to 2.1.1. This affects the function Save of the file smart-sso-server/src/main/java/openjoe/smart/sso/server/controller/admin/UserController.java of the component Role Edit Page. Executing a manipulation can lead to cross site scripting. The attack may be performed from remote. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "c794f35af32121c715d7cfdfbb346b13a38b2148d28931e4d96f623813750259",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2972"
+}

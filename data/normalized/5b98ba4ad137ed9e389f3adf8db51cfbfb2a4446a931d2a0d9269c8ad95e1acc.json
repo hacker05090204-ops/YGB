@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Aspera Console 3.3.0 through 3.4.8 could allow an attacker to enumerate usernames due to an observable response discrepancy.",
+  "token_count": 19
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MikroTik RouterOS In MikroTik RouterOS, a stack-based buffer overflow occurs when processing NetBIOS session request messages. Remote attackers with access to the service can exploit this vulnerability and gain code execution on the system.",
+  "token_count": 34
+}

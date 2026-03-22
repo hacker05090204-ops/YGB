@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-17530",
+  "ingested_at": "2026-03-22T07:45:19.005921+00:00",
+  "lang": "en",
+  "raw_text": "Apache Struts Forced Object-Graph Navigation Language (OGNL) evaluation in Apache Struts, when evaluated on raw user input in tag attributes, can lead to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7913c65f59f1513b12a9baa15208de535a7b56b788cf1eb40d2eb611cb68d42f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

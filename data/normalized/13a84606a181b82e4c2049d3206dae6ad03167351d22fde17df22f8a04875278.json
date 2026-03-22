@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A post-authentication Stack-based Buffer Overflow vulnerability in SonicOS certificate handling allows a remote attacker to crash a firewall.",
+  "token_count": 18
+}

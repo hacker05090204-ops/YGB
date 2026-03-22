@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14353",
+  "ingested_at": "2026-03-22T07:54:41.696143+00:00",
+  "lang": "en",
+  "raw_text": "The ZIP Code Based Content Protection plugin for WordPress is vulnerable to SQL Injection in all versions up to, and including, 1.0.2 via the 'zipcode' parameter. This is due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "HIGH",
+  "sha256_hash": "1c526d78dfd149cde4d5f7432fc0ecf029d4e6f180958295096b49d47858ee63",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14353"
+}

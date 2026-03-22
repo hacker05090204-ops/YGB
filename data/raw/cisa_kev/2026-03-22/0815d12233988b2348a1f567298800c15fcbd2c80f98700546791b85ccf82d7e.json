@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-36971",
+  "ingested_at": "2026-03-22T07:45:16.888930+00:00",
+  "lang": "en",
+  "raw_text": "Android Kernel Android contains an unspecified vulnerability in the kernel that allows for remote code execution. This vulnerability resides in Linux Kernel and could impact other products, including but not limited to Android OS.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0815d12233988b2348a1f567298800c15fcbd2c80f98700546791b85ccf82d7e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23858",
+  "ingested_at": "2026-03-22T07:54:31.747617+00:00",
+  "lang": "en",
+  "raw_text": "Dell Wyse Management Suite, versions prior to WMS 5.5, contain an Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability. A low privileged attacker with remote access could potentially exploit this vulnerability, leading to Script Injection.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1a9a4dcf71d0d121c4184c5ffeece23afbbf22f147e45db3e24c4fb3366a22c3",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23858"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An arbitrary file-read vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling unauthenticated attackers to read arbitrary files on the system, and potentially causing a denial-of-service attack.",
+  "token_count": 28
+}

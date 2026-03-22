@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-48384",
+  "ingested_at": "2026-03-22T07:45:16.223762+00:00",
+  "lang": "en",
+  "raw_text": "Git Git Git contains a link following vulnerability that stems from Git\u2019s inconsistent handling of carriage return characters in configuration files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b6ab1aff279452899568c8c55f0a01bc62f180f0c1ae8db52a26d186f71445a3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

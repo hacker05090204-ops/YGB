@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SGLang's multimodal generation module is vulnerable to unauthenticated remote code execution through the ZMQ broker, which deserializes untrusted data using pickle.loads() without authentication.",
+  "token_count": 23
+}

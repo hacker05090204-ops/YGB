@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Accellion FTA Accellion FTA contains a SQL injection vulnerability exploited via a crafted host header in a request to document_root.html.",
+  "token_count": 20
+}

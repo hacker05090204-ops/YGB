@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21386",
+  "ingested_at": "2026-03-22T07:54:46.831062+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to use consistent error responses when handling the /mute command which allows an authenticated team member to enumerate private channels they are not authorized to know about via differing error messages for nonexistent versus private channels. Mattermost Advisory ID: MMSA-2026-00588",
+  "severity": "MEDIUM",
+  "sha256_hash": "17f4729a339c6a443ae8491c31c02f57f73fe4bbe573861662d9e17121a55d4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-203"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21386"
+}

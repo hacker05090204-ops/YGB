@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13690",
+  "ingested_at": "2026-03-22T07:54:43.616958+00:00",
+  "lang": "en",
+  "raw_text": "GitLab has remediated an issue in GitLab CE/EE affecting all versions from 16.11 before 18.7.6, 18.8 before 18.8.6, and 18.9 before 18.9.2 that could have allowed an authenticated user to cause a denial of service condition due to improper input validation on webhook custom header names under certain conditions.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5a95cc7f8b5a285066d3bc680bb00c80779d761be2448ecfac838b28436e7e38",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13690"
+}

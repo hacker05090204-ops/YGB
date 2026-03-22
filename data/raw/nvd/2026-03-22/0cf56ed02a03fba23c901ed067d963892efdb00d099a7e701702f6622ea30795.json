@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1902",
+  "ingested_at": "2026-03-22T07:54:41.701140+00:00",
+  "lang": "en",
+  "raw_text": "The Hammas Calendar plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'apix' parameter in the 'hp-calendar-manage-redirect' shortcode in all versions up to, and including, 1.5.11 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0cf56ed02a03fba23c901ed067d963892efdb00d099a7e701702f6622ea30795",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1902"
+}

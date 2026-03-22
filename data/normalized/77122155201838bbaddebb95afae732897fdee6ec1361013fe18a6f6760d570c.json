@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode Document Management System 1.0. Affected is an unknown function of the file /edtlbls.php. The manipulation of the argument field1 leads to sql injection. The attack may be initiated remotely. The exploit has been disclosed publicly and may be used.",
+  "token_count": 47
+}

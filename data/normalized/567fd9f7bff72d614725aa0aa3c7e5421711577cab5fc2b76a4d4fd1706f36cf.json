@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "NoviSmart CMS contains an SQL injection vulnerability that allows remote attackers to execute arbitrary SQL queries by injecting malicious code through the Referer HTTP header field. Attackers can craft requests with time-based SQL injection payloads in the Referer header to extract sensitive database information or cause denial of service.",
+  "token_count": 49
+}

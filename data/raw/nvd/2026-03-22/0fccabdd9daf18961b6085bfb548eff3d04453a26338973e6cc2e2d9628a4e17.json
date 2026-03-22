@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28406",
+  "ingested_at": "2026-03-22T07:54:33.342778+00:00",
+  "lang": "en",
+  "raw_text": "kaniko is a tool to build container images from a Dockerfile, inside a container or Kubernetes cluster. Starting in version 1.25.4 and prior to version 1.25.10, kaniko unpacks build context archives using `filepath.Join(dest, cleanedName)` without enforcing that the final path stays within `dest`. A tar entry like `../outside.txt` escapes the extraction root and writes files outside the destination directory. In environments with registry authentication, this can be chained with docker credential helpers to achieve code execution within the executor process. Version 1.25.10 uses securejoin for path resolution in tar extraction.",
+  "severity": "HIGH",
+  "sha256_hash": "0fccabdd9daf18961b6085bfb548eff3d04453a26338973e6cc2e2d9628a4e17",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28406"
+}

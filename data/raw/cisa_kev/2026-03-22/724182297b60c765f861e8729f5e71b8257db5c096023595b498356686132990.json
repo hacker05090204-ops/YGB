@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-8735",
+  "ingested_at": "2026-03-22T07:45:17.415095+00:00",
+  "lang": "en",
+  "raw_text": "Apache Tomcat Apache Tomcat contains an unspecified vulnerability that allows for remote code execution if JmxRemoteLifecycleListener is used and an attacker can reach Java Management Extension (JMX) ports. This CVE exists because this listener wasn't updated for consistency with the Oracle patched issues for CVE-2016-3427 which affected credential types.",
+  "severity": "CRITICAL",
+  "sha256_hash": "724182297b60c765f861e8729f5e71b8257db5c096023595b498356686132990",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33011",
+  "ingested_at": "2026-03-22T07:54:48.586249+00:00",
+  "lang": "en",
+  "raw_text": "Nest is a framework for building scalable Node.js server-side applications. In versions 11.1.15 and below, a NestJS application using @nestjs/platform-fastify GET middleware can be bypassed because Fastify automatically redirects HEAD requests to the corresponding GET handlers (if they exist). As a result: middleware will be completely skipped, the HTTP response won't include a body (since the response is truncated when redirecting a HEAD request to a GET handler), and the actual handler will still be executed. This issue is fixed in version 11.1.16.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "955c0e6cc48ea7d2c1a2530006870f5c2e94559b089049a33947e9034563cf5b",
+  "source": "nvd",
+  "tags": [
+    "CWE-670"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33011"
+}

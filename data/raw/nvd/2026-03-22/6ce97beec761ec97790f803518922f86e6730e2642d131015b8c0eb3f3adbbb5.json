@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28078",
+  "ingested_at": "2026-03-22T07:54:40.562313+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in Stylemix uListing ulisting allows Path Traversal.This issue affects uListing: from n/a through < = 2.2.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6ce97beec761ec97790f803518922f86e6730e2642d131015b8c0eb3f3adbbb5",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28078"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-3962",
+  "ingested_at": "2026-03-22T07:45:16.125597+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains an uninitialized memory corruption vulnerability that could allow for remote code execution. The impacted product could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "babaa3921f4a0ea4cddbb298ccb399e672e02787df3693e76c7294ae0c56dc97",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

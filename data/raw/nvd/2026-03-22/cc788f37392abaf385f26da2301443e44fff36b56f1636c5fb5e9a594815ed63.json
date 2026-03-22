@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27269",
+  "ingested_at": "2026-03-22T07:54:43.003764+00:00",
+  "lang": "en",
+  "raw_text": "Premiere Pro versions 25.5 and earlier are affected by an out-of-bounds read vulnerability when parsing a crafted file, which could result in a read past the end of an allocated memory structure. An attacker could leverage this vulnerability to execute code in the context of the current user. Exploitation of this issue requires user interaction in that a victim must open a malicious file.",
+  "severity": "HIGH",
+  "sha256_hash": "cc788f37392abaf385f26da2301443e44fff36b56f1636c5fb5e9a594815ed63",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27269"
+}

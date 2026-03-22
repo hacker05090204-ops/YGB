@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-70239",
+  "ingested_at": "2026-03-22T07:54:34.259459+00:00",
+  "lang": "en",
+  "raw_text": "Stack buffer overflow vulnerability in D-Link DIR-513 v1.10 via the curTime parameter to goform/formSetWAN_Wizard55.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f5c223c4a3a3e4378ceefe7f75618627ea516c216ca5513928cecc4af83686fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-787",
+    "CWE-121"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70239"
+}

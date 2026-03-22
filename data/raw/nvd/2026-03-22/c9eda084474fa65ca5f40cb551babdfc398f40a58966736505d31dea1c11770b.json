@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32044",
+  "ingested_at": "2026-03-22T07:54:49.192343+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.3.2 contain an archive extraction vulnerability in the tar.bz2 installer path that bypasses safety checks enforced on other archive formats. Attackers can craft malicious tar.bz2 skill archives to bypass special-entry blocking and extracted-size guardrails, causing local denial of service during skill installation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c9eda084474fa65ca5f40cb551babdfc398f40a58966736505d31dea1c11770b",
+  "source": "nvd",
+  "tags": [
+    "CWE-409"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32044"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3723",
+  "ingested_at": "2026-03-22T07:54:42.025161+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in code-projects Simple Flight Ticket Booking System 1.0. This affects an unknown function of the file /Admindelete.php. The manipulation of the argument flightno results in sql injection. The attack may be performed from remote. The exploit has been released to the public and may be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "ab1a0eef69ab35d9e24559fb73928221a3aca0bd5b9a0dea02c70c2e810c1a3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3723"
+}

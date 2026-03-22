@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27128",
+  "ingested_at": "2026-03-22T07:54:31.418139+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). In versions 4.5.0-RC1 through 4.16.18 and 5.0.0-RC1 through 5.8.22, a Time-of-Check-Time-of-Use (TOCTOU) race condition exists in Craft CMS\u2019s token validation service for tokens that explicitly set a limited usage. The `getTokenRoute()` method reads a token\u2019s usage count, checks if it\u2019s within limits, then updates the database in separate non-atomic operations. By sending concurrent requests, an attacker can use a single-use impersonation token multiple times before the database update completes. To make this work, an attacker needs to obtain a valid user account impersonation URL with a non-expired token via some other means and exploit a race condition while bypassing any rate-limiting rules in place. For this to be a privilege escalation, the impersonation URL must include a token for a user account with more permissions than the current user. Versions 4.16.19 and 5.8.23 patch the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d502be8d7a8013ffbf53d16494b09cd3747a99c3c90cfbe30aa66cea49c9e4a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-367"
+  ],
+  "token_count": 143,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27128"
+}

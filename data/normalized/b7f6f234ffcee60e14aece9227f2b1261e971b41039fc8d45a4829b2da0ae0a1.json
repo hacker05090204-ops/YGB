@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in UTT HiPER 1250GW up to 3.2.7-210907-180535. Affected is the function strcpy of the file /goform/setSysAdm. Such manipulation of the argument GroupName leads to buffer overflow. It is possible to launch the attack remotely. The exploit is publicly available and might be used.",
+  "token_count": 47
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, a Stored XSS vulnerability exists in the glossary function, enabling all users with the Teachers role to inject JavaScript malicious code against the administrator. This issue has been patched in version 1.11.30.",
+  "token_count": 42
+}

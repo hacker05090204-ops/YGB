@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An attacker may exploit the use of weak CBC-based cipher suites in the device\u2019s SSH service to potentially observe or manipulate parts of the encrypted SSH communication, if they are able to intercept or interact with the network traffic.",
+  "token_count": 39
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3298",
+  "ingested_at": "2026-03-22T07:45:17.983708+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer An information disclosure vulnerability exists when the Microsoft Internet Messaging API improperly handles objects in memory. An attacker who successfully exploited this vulnerability could allow the attacker to test for the presence of files on disk.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f33a56eb18b4d30bee0f4e36f5fa824721ef493ee037366e0f618a0c51465f53",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

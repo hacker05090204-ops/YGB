@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The encryption mechanism used in Eaton's EasySoft project file was insecure and susceptible to brute force attacks, an attacker with access to this file and the local host machine could potentially read the sensitive information stored and tamper with the project file. This security issue has been fixed in the latest version of Eaton EasySoft which is available on the Eaton download centre.",
+  "token_count": 63
+}

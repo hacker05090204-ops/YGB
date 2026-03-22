@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27757",
+  "ingested_at": "2026-03-22T07:54:33.245847+00:00",
+  "lang": "en",
+  "raw_text": "SODOLA SL902-SWTGW124AS firmware versions through 200.1.20 contain an authentication vulnerability that allows authenticated users to change account passwords without verifying the current password. Attackers who gain access to an authenticated session can modify credentials to maintain persistent access to the management interface.",
+  "severity": "HIGH",
+  "sha256_hash": "2b624e858a7b861428511be2e1b55328cc6b6b97fc0a79da36f437aecc99677b",
+  "source": "nvd",
+  "tags": [
+    "CWE-620"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27757"
+}

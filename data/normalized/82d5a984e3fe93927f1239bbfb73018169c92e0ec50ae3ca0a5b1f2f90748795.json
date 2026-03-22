@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OPEXUS eComplaint and eCASE before 10.2.0.0 do not correctly sanitize the contents of first and last name fields in a user profile. An authenticated attacker can inject parts of an XSS payload in their first and last name fields. The payload is executed when the user's full name is rendered. The attacker can run script in the context of a victim's session.",
+  "token_count": 62
+}

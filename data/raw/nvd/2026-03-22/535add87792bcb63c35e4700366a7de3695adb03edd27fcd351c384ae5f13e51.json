@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-20997",
+  "ingested_at": "2026-03-22T07:54:46.398286+00:00",
+  "lang": "en",
+  "raw_text": "Improper verification of cryptographic signature in Smart Switch prior to version 3.7.69.15 allows remote attackers to potentially bypass authentication.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "535add87792bcb63c35e4700366a7de3695adb03edd27fcd351c384ae5f13e51",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20997"
+}

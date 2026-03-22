@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50193",
+  "ingested_at": "2026-03-22T07:54:33.672431+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, there is an OS command Injection vulnerability in /plugin/vchamilo/views/import.php with the POST to_main_database parameter. This issue has been patched in version 1.11.30.",
+  "severity": "HIGH",
+  "sha256_hash": "7180bdff6a9ff18c11a728b2ad2ad1dd85a26b1b1c316a6473db3be3246da9fd",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50193"
+}

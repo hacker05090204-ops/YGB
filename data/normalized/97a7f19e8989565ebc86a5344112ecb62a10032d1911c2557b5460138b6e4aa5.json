@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Secure Firewall Management Center (FMC) Cisco Secure Firewall Management Center (FMC) Software and Cisco Security Cloud Control (SCC) Firewall Management contain a deserialization of untrusted data vulnerability in the web-based management interface that could allow an unauthenticated, remote attacker to execute arbitrary Java code as root on an affected device.",
+  "token_count": 51
+}

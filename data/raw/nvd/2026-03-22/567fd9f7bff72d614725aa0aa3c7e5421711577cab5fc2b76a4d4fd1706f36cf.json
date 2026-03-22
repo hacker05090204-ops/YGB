@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25439",
+  "ingested_at": "2026-03-22T07:54:30.971240+00:00",
+  "lang": "en",
+  "raw_text": "NoviSmart CMS contains an SQL injection vulnerability that allows remote attackers to execute arbitrary SQL queries by injecting malicious code through the Referer HTTP header field. Attackers can craft requests with time-based SQL injection payloads in the Referer header to extract sensitive database information or cause denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "567fd9f7bff72d614725aa0aa3c7e5421711577cab5fc2b76a4d4fd1706f36cf",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25439"
+}

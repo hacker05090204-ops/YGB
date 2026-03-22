@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14037",
+  "ingested_at": "2026-03-22T07:54:49.254983+00:00",
+  "lang": "en",
+  "raw_text": "The Invelity Product Feeds plugin for WordPress is vulnerable to arbitrary file deletion via path traversal in all versions up to, and including, 1.2.6. This is due to missing validation and sanitization in the 'createManageFeedPage' function. This makes it possible for authenticated administrator-level attackers to delete arbitrary files on the server via specially crafted requests that include path traversal sequences, granted they can trick an admin into clicking a malicious link.",
+  "severity": "HIGH",
+  "sha256_hash": "de56edc139f039869e23732d9e35fa799fb87f54efe33a5e33f00ddcce617ca5",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14037"
+}

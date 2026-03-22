@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4009",
+  "ingested_at": "2026-03-22T07:54:44.200317+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in jarikomppa soloud up to 20200207. Impacted is the function drwav_read_pcm_frames_s16__msadpcm in the library src/audiosource/wav/dr_wav.h of the component WAV File Parser. The manipulation leads to out-of-bounds read. The attack needs to be performed locally. The exploit has been disclosed to the public and may be used. Upgrading to version 20200207 is recommended to address this issue. It is recommended to upgrade the affected component. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "246313edba2dcda6f4a5a6bccf78c0aee9ca4755648c53d63de6a868a92ede21",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4009"
+}

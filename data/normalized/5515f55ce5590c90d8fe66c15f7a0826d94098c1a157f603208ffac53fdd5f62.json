@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Progress MOVEit Transfer Progress MOVEit Transfer contains a SQL injection vulnerability that could allow an unauthenticated attacker to gain unauthorized access to MOVEit Transfer's database. Depending on the database engine being used (MySQL, Microsoft SQL Server, or Azure SQL), an attacker may be able to infer information about the structure and contents of the database in addition to executing SQL statements that alter or delete database elements.",
+  "token_count": 67
+}

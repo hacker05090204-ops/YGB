@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4494",
+  "ingested_at": "2026-03-22T07:54:48.926093+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in atjiu pybbs 6.0.0. This affects the function create of the file src/main/java/co/yiiu/pybbs/controller/api/TopicApiController.java. The manipulation leads to cross site scripting. It is possible to initiate the attack remotely. The exploit is publicly available and might be used.",
+  "severity": "LOW",
+  "sha256_hash": "253ccd2ebd0d1005b58b32c87d1d3dc517ba103ad6584e7ce54b90165f496907",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4494"
+}

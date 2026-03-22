@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32724",
+  "ingested_at": "2026-03-22T07:54:46.552907+00:00",
+  "lang": "en",
+  "raw_text": "PX4 autopilot is a flight control solution for drones. Prior to 1.17.0-rc1, a heap-use-after-free is detected in the MavlinkShell::available() function. The issue is caused by a race condition between the MAVLink receiver thread (which handles shell creation/destruction) and the telemetry sender thread (which polls the shell for available output). The issue is remotely triggerable via MAVLink SERIAL_CONTROL messages (ID 126), which can be sent by an external ground station or automated script. This vulnerability is fixed in 1.17.0-rc1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7bebbc14075ba38f3aa2e9637783cf573c4bcad2aea5de775b12d7d6984ca1d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32724"
+}

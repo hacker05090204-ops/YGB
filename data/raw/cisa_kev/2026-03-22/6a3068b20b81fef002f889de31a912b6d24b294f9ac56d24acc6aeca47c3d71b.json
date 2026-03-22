@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4358",
+  "ingested_at": "2026-03-22T07:45:16.937457+00:00",
+  "lang": "en",
+  "raw_text": "Progress Telerik Report Server Progress Telerik Report Server contains an authorization bypass by spoofing vulnerability that allows an attacker to obtain unauthorized access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6a3068b20b81fef002f889de31a912b6d24b294f9ac56d24acc6aeca47c3d71b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

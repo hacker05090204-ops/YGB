@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-33063",
+  "ingested_at": "2026-03-22T07:45:17.126362+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a use-after-free vulnerability due to memory corruption in DSP Services during a remote call from HLOS to DSP.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5595558c029d79ec0985a4eef320839ad27da718da598da45c0cda726a121508",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

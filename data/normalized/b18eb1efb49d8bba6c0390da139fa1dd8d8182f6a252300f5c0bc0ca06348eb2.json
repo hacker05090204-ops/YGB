@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure contains an unrestricted file upload vulnerability that allows an authenticated administrator to perform a file write via a maliciously crafted archive upload in the administrator web interface.",
+  "token_count": 35
+}

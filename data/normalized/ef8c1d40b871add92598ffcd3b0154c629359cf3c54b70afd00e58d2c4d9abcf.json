@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in richplugins Rich Showcase for Google Reviews widget-google-reviews allows Stored XSS.This issue affects Rich Showcase for Google Reviews: from n/a through < = 6.9.4.3.",
+  "token_count": 35
+}

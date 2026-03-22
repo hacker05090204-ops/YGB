@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Out-of-bound read vulnerability in VMware Workstation 25H1 and below on any platform allows an actor with non-administrative privileges on a guest VM to obtain limited information disclosure from the machine where VMware Workstation is installed.",
+  "token_count": 35
+}

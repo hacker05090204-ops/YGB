@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26741",
+  "ingested_at": "2026-03-22T07:54:42.981237+00:00",
+  "lang": "en",
+  "raw_text": "PX4 Autopilot versions 1.12.x through 1.15.x contain a logic flaw in the mode switching mechanism. When switching from Auto mode to Manual mode while the drone is in the \"ARMED\" state (after landing and before the automatic disarm triggered by the COM_DISARM_LAND parameter), the system lacks a throttle threshold safety check for the physical throttle stick. This flaw can directly cause the drone to lose control, experience rapid uncontrolled ascent (flyaway), and result in property damage",
+  "severity": "HIGH",
+  "sha256_hash": "f48b48524c1e4b8d8826ed4e0fbfdbe6711a5ef93b0f45647a45c86576401a2d",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26741"
+}

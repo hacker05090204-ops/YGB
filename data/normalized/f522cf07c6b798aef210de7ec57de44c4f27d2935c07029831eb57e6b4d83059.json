@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Gladinet CentreStack Gladinet CentreStack and Triofox contains a use of hard-coded cryptographic key vulnerability in the way that the application manages keys used for ViewState integrity verification. Successful exploitation allows an attacker to forge ViewState payloads for server-side deserialization, allowing for remote code execution.",
+  "token_count": 44
+}

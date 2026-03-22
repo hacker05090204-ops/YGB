@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Server and Data Center Atlassian Confluence Server and Data Center contain a path traversal vulnerability in the downloadallattachments resource that may allow a privileged, remote attacker to write files. Exploitation can lead to remote code execution.",
+  "token_count": 38
+}

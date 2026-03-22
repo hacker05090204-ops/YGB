@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27639",
+  "ingested_at": "2026-03-22T07:54:31.925265+00:00",
+  "lang": "en",
+  "raw_text": "Mercator is an open source web application designed to enable mapping of information systems. A stored Cross-Site Scripting (XSS) vulnerability exists in Mercator prior to version 2026.02.22 due to the use of unescaped Blade directives (`{!! !!}`) in display templates. An authenticated user with the User role can inject arbitrary JavaScript payloads into fields such as \"contact point\" when creating or editing entities. The payload is then executed in the browser of any user who views the affected page, including administrators. Version 2026.02.22 fixes the vulnerability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3fac9ce65ae1ae8acd5f130e62fff6ac6a4f1a3c01fb161a0f7160ee7b3f2588",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27639"
+}

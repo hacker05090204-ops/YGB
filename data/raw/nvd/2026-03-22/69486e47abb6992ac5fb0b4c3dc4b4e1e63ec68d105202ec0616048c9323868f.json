@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31884",
+  "ingested_at": "2026-03-22T07:54:44.726402+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to 3.24.0, division by zero in MS-ADPCM and IMA-ADPCM decoders when nBlockAlign is 0, leading to a crash. In libfreerdp/codec/dsp.c, both ADPCM decoders use size % block_size where block_size = context->common.format.nBlockAlign. The nBlockAlign value comes from the Server Audio Formats PDU on the RDPSND channel. The value 0 is not validated anywhere before reaching the decoder. When nBlockAlign = 0, the modulo operation causes a SIGFPE (floating point exception) crash. This vulnerability is fixed in 3.24.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "69486e47abb6992ac5fb0b4c3dc4b4e1e63ec68d105202ec0616048c9323868f",
+  "source": "nvd",
+  "tags": [
+    "CWE-369"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31884"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28218",
+  "ingested_at": "2026-03-22T07:54:32.801202+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, fail-open access control in Data Explorer plugin allows any authenticated user to execute SQL queries that have no explicit group assignments, including built-in system queries. Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. As a workaround, either explicitly set group permissions on each Data Explorer query that doesn't have permissions, or disable discourse-data-explorer plugin.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fbcab061c7ff9f549b9efc67aa895c5ccca6d7b6eb0819a0cb7ce481427d7915",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28218"
+}

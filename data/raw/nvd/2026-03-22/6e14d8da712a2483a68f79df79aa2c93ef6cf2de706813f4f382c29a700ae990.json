@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27482",
+  "ingested_at": "2026-03-22T07:54:30.833268+00:00",
+  "lang": "en",
+  "raw_text": "Ray is an AI compute engine. In versions 2.53.0 and below, thedashboard HTTP server blocks browser-origin POST/PUT but does not cover DELETE, and key DELETE endpoints are unauthenticated by default. If the dashboard/agent is reachable (e.g., --dashboard-host=0.0.0.0), a web page via DNS rebinding or same-network access can issue DELETE requests that shut down Serve or delete jobs without user interaction. This is a drive-by availability impact. The fix for this vulnerability is to update to Ray 2.54.0 or higher.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6e14d8da712a2483a68f79df79aa2c93ef6cf2de706813f4f382c29a700ae990",
+  "source": "nvd",
+  "tags": [
+    "CWE-396"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27482"
+}

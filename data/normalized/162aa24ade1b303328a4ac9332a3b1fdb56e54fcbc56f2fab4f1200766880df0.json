@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "File Thinghie 2.5.7 is vulnerable to Cross Site Scripting (XSS). A malicious user can leverage the \"dir\" parameter of the GET request to invoke arbitrary javascript code.",
+  "token_count": 27
+}

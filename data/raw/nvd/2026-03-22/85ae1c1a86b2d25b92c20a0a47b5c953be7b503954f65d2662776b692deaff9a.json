@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28544",
+  "ingested_at": "2026-03-22T07:54:40.738160+00:00",
+  "lang": "en",
+  "raw_text": "Race condition vulnerability in the printing module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "85ae1c1a86b2d25b92c20a0a47b5c953be7b503954f65d2662776b692deaff9a",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28544"
+}

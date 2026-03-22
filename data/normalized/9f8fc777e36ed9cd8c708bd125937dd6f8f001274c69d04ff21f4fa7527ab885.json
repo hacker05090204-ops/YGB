@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Accellion FTA Accellion FTA contains an OS command injection vulnerability exploited via a crafted POST request to various admin endpoints.",
+  "token_count": 20
+}

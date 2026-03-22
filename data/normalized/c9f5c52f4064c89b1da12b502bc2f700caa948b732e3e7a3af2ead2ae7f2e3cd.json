@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "libtiff up to v4.7.1 was discovered to contain a NULL pointer dereference via the component libtiff/tif_open.c.",
+  "token_count": 16
+}

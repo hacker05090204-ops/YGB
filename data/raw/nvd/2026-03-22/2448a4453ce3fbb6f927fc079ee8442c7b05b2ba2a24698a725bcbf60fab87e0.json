@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3186",
+  "ingested_at": "2026-03-22T07:54:32.064657+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in feiyuchuixue sz-boot-parent up to 1.3.2-beta. Affected by this vulnerability is an unknown functionality of the file /api/admin/sys-user/reset/password/ of the component Password Reset Handler. This manipulation of the argument userId causes use of default password. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized. Upgrading to version 1.3.3-beta addresses this issue. Patch name: aefaabfd7527188bfba3c8c9eee17c316d094802. It is suggested to upgrade the affected component. The project was informed beforehand and acted very professional: \"We have added authorization validation to the password reset interface; now only users with the corresponding permissions are allowed to perform password resets.\"",
+  "severity": "MEDIUM",
+  "sha256_hash": "2448a4453ce3fbb6f927fc079ee8442c7b05b2ba2a24698a725bcbf60fab87e0",
+  "source": "nvd",
+  "tags": [
+    "CWE-1393"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3186"
+}

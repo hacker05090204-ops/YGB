@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-36948",
+  "ingested_at": "2026-03-22T07:45:19.328630+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Update Medic Service contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cf6ef69df16dc7d0b4da7db0d7d7286818d629a79c76f24734ee08bb20442d27",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

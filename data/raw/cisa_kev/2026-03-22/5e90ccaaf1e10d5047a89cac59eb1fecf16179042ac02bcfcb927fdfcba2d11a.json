@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-17496",
+  "ingested_at": "2026-03-22T07:45:19.631018+00:00",
+  "lang": "en",
+  "raw_text": "vBulletin vBulletin The PHP module within vBulletin contains an unspecified vulnerability that allows for remote code execution via crafted subWidgets data in an ajax/render/widget_tabbedcontainer_tab_panel request. This CVE ID resolves an incomplete patch for CVE-2019-16759.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5e90ccaaf1e10d5047a89cac59eb1fecf16179042ac02bcfcb927fdfcba2d11a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

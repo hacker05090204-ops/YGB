@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-40711",
+  "ingested_at": "2026-03-22T07:45:16.762079+00:00",
+  "lang": "en",
+  "raw_text": "Veeam Backup & Replication Veeam Backup and Replication contains a deserialization vulnerability allowing an unauthenticated user to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "767918577da0e9fff07027da159688745a9e1abb2f9f38138296e4848c7853c1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

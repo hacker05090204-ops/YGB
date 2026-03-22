@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23241",
+  "ingested_at": "2026-03-22T07:54:47.031522+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: audit: add missing syscalls to read class The \"at\" variant of getxattr() and listxattr() are missing from the audit read class. Calling getxattrat() or listxattrat() on a file to read its extended attributes will bypass audit rules such as: -w /tmp/test -p rwa -k test_rwa The current patch adds missing syscalls to the audit read class.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "1f98befd04590d54b5618f05ff1d983445ee58204398537dc594659ddbdf12e1",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23241"
+}

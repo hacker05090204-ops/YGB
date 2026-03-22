@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ghost is a Node.js content management system. From version 0.7.2 to 6.19.0, specifically crafted malicious themes can execute arbitrary code on the server running Ghost. This issue has been patched in version 6.19.1.",
+  "token_count": 33
+}

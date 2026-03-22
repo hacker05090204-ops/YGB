@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27936",
+  "ingested_at": "2026-03-22T07:54:48.143616+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, a restriction bypass allows restricted post action counts to be disclosed to non-privileged users through a carefully crafted request. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8dd0d271a8098a0fa47db2bc3e626483491278cc210bb1fc77c5e64a251a116b",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27936"
+}

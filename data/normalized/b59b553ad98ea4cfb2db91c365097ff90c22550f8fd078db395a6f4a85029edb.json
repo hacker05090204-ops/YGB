@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in the NeuVector scanner where the scanner process accepts registry and controller credentials as command-line arguments, potentially exposing sensitive credentials to local users.",
+  "token_count": 28
+}

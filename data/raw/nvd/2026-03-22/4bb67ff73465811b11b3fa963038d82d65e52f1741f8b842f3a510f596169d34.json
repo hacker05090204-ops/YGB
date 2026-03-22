@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3401",
+  "ingested_at": "2026-03-22T07:54:33.470951+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in SourceCodester Web-based Pharmacy Product Management System 1.0. This affects an unknown part. This manipulation causes session expiration. Remote exploitation of the attack is possible. The complexity of an attack is rather high. It is indicated that the exploitability is difficult. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "LOW",
+  "sha256_hash": "4bb67ff73465811b11b3fa963038d82d65e52f1741f8b842f3a510f596169d34",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3401"
+}

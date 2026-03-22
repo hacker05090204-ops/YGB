@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Silverlight Microsoft Silverlight does not properly validate pointers during access to Silverlight elements, which allows remote attackers to obtain sensitive information via a crafted Silverlight application.",
+  "token_count": 27
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An attacker may exploit the use of outdated and weak MAC algorithms in the device\u2019s SSH service to potentially compromise the integrity of the SSH session, allowing manipulation of transmitted data if the attacker can interact with the network traffic.",
+  "token_count": 40
+}

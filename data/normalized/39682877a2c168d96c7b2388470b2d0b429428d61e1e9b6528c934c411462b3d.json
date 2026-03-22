@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MongoDB mongo-express mongo-express before 0.54.0 is vulnerable to Remote Code Execution via endpoints that uses the `toBSON` method.",
+  "token_count": 18
+}

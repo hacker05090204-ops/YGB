@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2494",
+  "ingested_at": "2026-03-22T07:54:41.715530+00:00",
+  "lang": "en",
+  "raw_text": "The ProfileGrid \u2013 User Profiles, Groups and Communities plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 5.9.8.2. This is due to missing nonce validation on the membership request management page (approve and decline actions). This makes it possible for unauthenticated attackers to approve or deny group membership requests via a forged request granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "976dae97847273a71c1f7d7b9a9b8594a272ded503a607ec319e86b9b7390b12",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2494"
+}

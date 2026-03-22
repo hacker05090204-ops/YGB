@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in ThemeGoods Grand Conference grandconference allows Reflected XSS.This issue affects Grand Conference: from n/a through < = 5.3.4.",
+  "token_count": 29
+}

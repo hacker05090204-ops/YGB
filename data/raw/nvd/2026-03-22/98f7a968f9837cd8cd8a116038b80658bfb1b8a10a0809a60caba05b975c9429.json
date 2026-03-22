@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3059",
+  "ingested_at": "2026-03-22T07:54:44.218428+00:00",
+  "lang": "en",
+  "raw_text": "SGLang's multimodal generation module is vulnerable to unauthenticated remote code execution through the ZMQ broker, which deserializes untrusted data using pickle.loads() without authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "98f7a968f9837cd8cd8a116038b80658bfb1b8a10a0809a60caba05b975c9429",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3059"
+}

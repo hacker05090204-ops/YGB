@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-8766",
+  "ingested_at": "2026-03-22T07:54:44.584643+00:00",
+  "lang": "en",
+  "raw_text": "A container privilege escalation flaw was found in certain Multi-Cloud Object Gateway Core images. This issue stems from the /etc/passwd file being created with group-writable permissions during build time. In certain conditions, an attacker who can execute commands within an affected container, even as a non-root user, can leverage their membership in the root group to modify the /etc/passwd file. This could allow the attacker to add a new user with any arbitrary UID, including UID 0, leading to full root privileges within the container",
+  "severity": "MEDIUM",
+  "sha256_hash": "17266a87fa55e173a8e0b2294f4da4fd4b1d78e664b146ede27a79c65843d91a",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-8766"
+}

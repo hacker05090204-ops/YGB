@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22163",
+  "ingested_at": "2026-03-22T07:54:49.043258+00:00",
+  "lang": "en",
+  "raw_text": "Requires malware code to misuse the DDK kernel module IOCTL interface. Such code can use the interface in an unsupported way that allows subversion of the GPU to perform writes to arbitrary physical memory pages. The product utilises a shared resource in a concurrent manner but does not attempt to synchronise access to the resource.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "54fdcfa5102d084a1578ceb9f91bd095e3baf6e17b361997dc66ad8a4a0e3cf9",
+  "source": "nvd",
+  "tags": [
+    "CWE-820"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22163"
+}

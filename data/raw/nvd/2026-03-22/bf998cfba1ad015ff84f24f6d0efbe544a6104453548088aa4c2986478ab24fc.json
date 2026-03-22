@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27950",
+  "ingested_at": "2026-03-22T07:54:32.366699+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, the fix for the heap-use-after-free described in CVE-2026-24680 is incomplete. While the vulnerable execution flow referenced in the advisory exists in the SDL2 implementation, the fix appears to have been applied only to the SDL3 code path. In the SDL2 implementation, the pointer is not nulled after free. This creates a situation where the advisory suggests the vulnerability is fully resolved, while builds or environments still using SDL2 may retain the vulnerable logic. A complete fix is available in version 3.23.0.",
+  "severity": "HIGH",
+  "sha256_hash": "bf998cfba1ad015ff84f24f6d0efbe544a6104453548088aa4c2986478ab24fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27950"
+}

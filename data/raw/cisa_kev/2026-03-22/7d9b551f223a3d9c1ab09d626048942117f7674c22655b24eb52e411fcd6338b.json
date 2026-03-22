@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-9563",
+  "ingested_at": "2026-03-22T07:45:19.548666+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server Java Platforms contains an unspecified vulnerability in BC-BMT-BPM-DSK which allows remote, authenticated users to conduct XML External Entity (XXE) attacks.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7d9b551f223a3d9c1ab09d626048942117f7674c22655b24eb52e411fcd6338b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

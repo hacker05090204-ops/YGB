@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21410",
+  "ingested_at": "2026-03-22T07:54:31.776622+00:00",
+  "lang": "en",
+  "raw_text": "InSAT MasterSCADA BUK-TS is susceptible to SQL Injection through its main web interface. Malicious users that use the vulnerable endpoint are potentially able to cause remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5b0e9d335a98526c7b83977b48fca2a643e4da6e89da817222e536964537b32c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21410"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-4117",
+  "ingested_at": "2026-03-22T07:45:18.620828+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player An access of resource using incompatible type vulnerability exists within Adobe Flash Player that allows an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cdda70794548310beb9ac2b30ad4b8be615fe2ca51c9f964196bc280a5ea0725",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-14839",
+  "ingested_at": "2026-03-22T07:45:18.338232+00:00",
+  "lang": "en",
+  "raw_text": "LG N1A1 NAS LG N1A1 NAS 3718.510 is affected by a remote code execution vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2196a28c5e5242f778b13bb3995685325a829adb84591f3c1105e9e2eb7f47a2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

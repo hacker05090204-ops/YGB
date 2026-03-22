@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26341",
+  "ingested_at": "2026-03-22T07:54:31.757616+00:00",
+  "lang": "en",
+  "raw_text": "Tattile Smart+, Vega, and Basic device families firmware versions 1.181.5 and prior ship with default credentials that are not forced to be changed during installation or commissioning. An attacker who can reach the management interface can authenticate using the default credentials and gain administrative access, enabling unauthorized access to device configuration and data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ef3d7bb8676913476e84f3c38d4b61dc038c77c20301742a154f10c2948b4f8c",
+  "source": "nvd",
+  "tags": [
+    "CWE-1392"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26341"
+}

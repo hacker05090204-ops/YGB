@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27148",
+  "ingested_at": "2026-03-22T07:54:32.353299+00:00",
+  "lang": "en",
+  "raw_text": "Storybook is a frontend workshop for building user interface components and pages in isolation. Prior to versions 7.6.23, 8.6.17, 9.1.19, and 10.2.10, the WebSocket functionality in Storybook's dev server, used to create and update stories, is vulnerable to WebSocket hijacking. This vulnerability only affects the Storybook dev server; production builds are not impacted. Exploitation requires a developer to visit a malicious website while their local Storybook dev server is running. Because the WebSocket connection does not validate the origin of incoming connections, a malicious site can silently send WebSocket messages to the local instance without any further user interaction. If the Storybook dev server is intentionally exposed publicly (e.g. for design reviews or stakeholder demos) the risk is higher, as no malicious site visit is required. Any unauthenticated attacker can send WebSocket messages to it directly. The vulnerability affects the WebSocket message handlers for creating and saving stories. Both are vulnerable to injection via unsanitized input in the componentFilePath field, which can be exploited to achieve persistent XSS or Remote Code Execution (RCE). Versions 7.6.23, 8.6.17, 9.1.19, and 10.2.10 contain a fix for the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "532a6163243c8872bacbd426ad45aa317dac596dfe1048248d20a135674be709",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-79"
+  ],
+  "token_count": 185,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27148"
+}

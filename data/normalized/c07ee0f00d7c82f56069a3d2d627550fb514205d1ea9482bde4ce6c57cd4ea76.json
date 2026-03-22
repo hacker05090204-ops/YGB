@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In MAE, there is a possible out of bounds write due to a race condition. This could lead to local escalation of privilege if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: ALPS10431920; Issue ID: MSV-5835.",
+  "token_count": 46
+}

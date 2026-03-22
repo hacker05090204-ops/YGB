@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-20887",
+  "ingested_at": "2026-03-22T07:45:17.356883+00:00",
+  "lang": "en",
+  "raw_text": "VMware Aria Operations for Networks VMware Aria Operations for Networks (formerly vRealize Network Insight) contains a command injection vulnerability that allows a malicious actor with network access to perform an attack resulting in remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9c1c3eed07d7b116c029b4e15d577560bcaee0df00087ddb2e17951ccff84713",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

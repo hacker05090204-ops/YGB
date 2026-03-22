@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4067",
+  "ingested_at": "2026-03-22T07:54:49.435222+00:00",
+  "lang": "en",
+  "raw_text": "The Ad Short plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'ad' shortcode's 'client' attribute in all versions up to and including 2.0.1. This is due to insufficient input sanitization and output escaping on the 'client' shortcode attribute. The ad_func() shortcode handler at line 71 accepts a 'client' attribute via shortcode_atts() and directly concatenates it into a double-quoted HTML attribute (data-ad-client) at line 130 without applying esc_attr() or any other sanitization. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b0ba29c55377f151d938c166409e2ddced52527949752a31c9d735068dcea834",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4067"
+}

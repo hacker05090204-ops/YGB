@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33003",
+  "ingested_at": "2026-03-22T07:54:47.519890+00:00",
+  "lang": "en",
+  "raw_text": "Jenkins LoadNinja Plugin 2.1 and earlier stores LoadNinja API keys unencrypted in job config.xml files on the Jenkins controller where they can be viewed by users with Item/Extended Read permission or access to the Jenkins controller file system.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2faa1de16836d9ba023e0a32a80d7b1f4c7ab28c9a31b5a854e161820bd8120a",
+  "source": "nvd",
+  "tags": [
+    "CWE-312"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33003"
+}

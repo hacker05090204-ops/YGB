@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24290",
+  "ingested_at": "2026-03-22T07:54:42.699366+00:00",
+  "lang": "en",
+  "raw_text": "Improper access control in Windows Projected File System allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "622f19e6b77d4fbbdea99e57db74cda89d05ba79a248dc9c82319b7246508b73",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24290"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-21882",
+  "ingested_at": "2026-03-22T07:54:33.969156+00:00",
+  "lang": "en",
+  "raw_text": "theshit is a command-line utility that automatically detects and fixes common mistakes in shell commands. Prior to version 0.2.0, improper privilege dropping allows local privilege escalation via command re-execution. This issue has been patched in version 0.2.0.",
+  "severity": "HIGH",
+  "sha256_hash": "e43c118bca1e592006de197d348726a25575afc0a5021827b48681a779cb4e41",
+  "source": "nvd",
+  "tags": [
+    "CWE-250",
+    "CWE-269",
+    "CWE-273"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21882"
+}

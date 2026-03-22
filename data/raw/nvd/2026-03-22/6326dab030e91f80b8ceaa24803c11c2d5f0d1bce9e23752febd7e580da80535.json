@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3534",
+  "ingested_at": "2026-03-22T07:54:43.508735+00:00",
+  "lang": "en",
+  "raw_text": "The Astra theme for WordPress is vulnerable to Stored Cross-Site Scripting via the `ast-page-background-meta` and `ast-content-background-meta` post meta fields in all versions up to, and including, 4.12.3. This is due to insufficient input sanitization on meta registration and missing output escaping in the `astra_get_responsive_background_obj()` function for four CSS-context sub-properties (`background-color`, `background-image`, `overlay-color`, `overlay-gradient`). This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6326dab030e91f80b8ceaa24803c11c2d5f0d1bce9e23752febd7e580da80535",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3534"
+}

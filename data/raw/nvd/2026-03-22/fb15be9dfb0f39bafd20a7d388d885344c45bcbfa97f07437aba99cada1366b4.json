@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30844",
+  "ingested_at": "2026-03-22T07:54:41.601321+00:00",
+  "lang": "en",
+  "raw_text": "Wekan is an open source kanban tool built with Meteor. Versions 8.32 and 8.33 are vulnerable to Server-Side Request Forgery (SSRF) via attachment URL loading. During board import in Wekan, attachment URLs from user-supplied JSON data are fetched directly by the server without any URL validation or filtering, affecting both the Wekan and Trello import flows. The parseActivities() and parseActions() methods extract user-controlled attachment URLs, which are then passed directly to Attachments.load() for download with no sanitization. This Server-Side Request Forgery (SSRF) vulnerability allows any authenticated user to make the server issue arbitrary HTTP requests, potentially accessing internal network services such as cloud instance metadata endpoints (exposing IAM credentials), internal databases, and admin panels that are otherwise unreachable from outside the network. This issue has been fixed in version 8.34.",
+  "severity": "HIGH",
+  "sha256_hash": "fb15be9dfb0f39bafd20a7d388d885344c45bcbfa97f07437aba99cada1366b4",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 130,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30844"
+}

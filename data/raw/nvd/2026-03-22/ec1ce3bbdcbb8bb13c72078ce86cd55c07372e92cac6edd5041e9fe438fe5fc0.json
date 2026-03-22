@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25169",
+  "ingested_at": "2026-03-22T07:54:41.409373+00:00",
+  "lang": "en",
+  "raw_text": "AMPPS 2.7 contains a denial of service vulnerability that allows remote attackers to crash the service by sending malformed data to the default HTTP port. Attackers can establish multiple socket connections and transmit invalid payloads to exhaust server resources and cause service unavailability.",
+  "severity": "HIGH",
+  "sha256_hash": "ec1ce3bbdcbb8bb13c72078ce86cd55c07372e92cac6edd5041e9fe438fe5fc0",
+  "source": "nvd",
+  "tags": [
+    "CWE-1188"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25169"
+}

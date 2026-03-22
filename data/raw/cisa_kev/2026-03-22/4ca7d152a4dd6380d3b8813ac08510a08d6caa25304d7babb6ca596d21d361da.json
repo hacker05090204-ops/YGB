@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25108",
+  "ingested_at": "2026-03-22T07:45:15.884944+00:00",
+  "lang": "en",
+  "raw_text": "Soliton Systems K.K FileZen Soliton Systems K.K FileZen contains an OS command injection vulnerability when an user logs-in to the affected product and sends a specially crafted HTTP request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4ca7d152a4dd6380d3b8813ac08510a08d6caa25304d7babb6ca596d21d361da",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28204",
+  "ingested_at": "2026-03-22T07:54:49.050950+00:00",
+  "lang": "en",
+  "raw_text": "Charging station authentication identifiers are publicly accessible via web-based mapping platforms.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7ea775a76ffd6394ebfe2e397f8301625ae1daa654020909fd03565ab6387bf1",
+  "source": "nvd",
+  "tags": [
+    "CWE-522"
+  ],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28204"
+}

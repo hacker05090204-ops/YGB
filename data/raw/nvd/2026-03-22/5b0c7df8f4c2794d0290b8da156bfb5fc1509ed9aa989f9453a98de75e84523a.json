@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30825",
+  "ingested_at": "2026-03-22T07:54:41.752738+00:00",
+  "lang": "en",
+  "raw_text": "hoppscotch is an open source API development ecosystem. Prior to version 2026.2.1, the DELETE /v1/access-tokens/revoke endpoint allows any authenticated user to delete any other user's PAT by providing its ID, with no ownership verification. This issue has been patched in version 2026.2.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "5b0c7df8f4c2794d0290b8da156bfb5fc1509ed9aa989f9453a98de75e84523a",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30825"
+}

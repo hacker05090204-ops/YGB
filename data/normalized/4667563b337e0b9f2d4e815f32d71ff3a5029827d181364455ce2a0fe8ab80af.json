@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Magic Iso Maker 5.5 build 281 contains a buffer overflow vulnerability in the Serial Code registration field that allows local attackers to crash the application by submitting an oversized input. Attackers can generate a file containing 5000 bytes of data, paste it into the Serial Code field during registration, and trigger a denial of service condition that crashes the application.",
+  "token_count": 60
+}

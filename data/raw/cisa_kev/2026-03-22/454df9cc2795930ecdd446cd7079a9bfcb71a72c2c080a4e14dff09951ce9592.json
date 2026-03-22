@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-9276",
+  "ingested_at": "2026-03-22T07:45:16.619131+00:00",
+  "lang": "en",
+  "raw_text": "Paessler PRTG Network Monitor Paessler PRTG Network Monitor contains an OS command injection vulnerability that allows an attacker with administrative privileges to execute commands via the PRTG System Administrator web console.",
+  "severity": "CRITICAL",
+  "sha256_hash": "454df9cc2795930ecdd446cd7079a9bfcb71a72c2c080a4e14dff09951ce9592",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Apache A crafted request uri-path can cause mod_proxy to forward the request to an origin server choosen by the remote user. This issue affects Apache HTTP Server 2.4.48 and earlier.",
+  "token_count": 31
+}

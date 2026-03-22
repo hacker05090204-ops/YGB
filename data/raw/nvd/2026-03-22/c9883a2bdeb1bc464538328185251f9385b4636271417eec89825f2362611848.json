@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28085",
+  "ingested_at": "2026-03-22T07:54:40.573019+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Mahogany mahogany allows PHP Local File Inclusion.This issue affects Mahogany: from n/a through < = 2.9.",
+  "severity": "HIGH",
+  "sha256_hash": "c9883a2bdeb1bc464538328185251f9385b4636271417eec89825f2362611848",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28085"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32016",
+  "ingested_at": "2026-03-22T07:54:48.191890+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 on macOS contain a path validation bypass vulnerability in the exec-approval allowlist mode that allows local attackers to execute unauthorized binaries by exploiting basename-only allowlist entries. Attackers can execute same-name local binaries ./echo without approval when security=allowlist and ask=on-miss are configured, bypassing intended path-based policy restrictions.",
+  "severity": "HIGH",
+  "sha256_hash": "2649d80695a7e0cffb876168f09d94c8e9db1c053e72b4af9ee3c0bc8af258fd",
+  "source": "nvd",
+  "tags": [
+    "CWE-426"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32016"
+}

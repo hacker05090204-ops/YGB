@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-5735",
+  "ingested_at": "2026-03-22T07:45:18.982071+00:00",
+  "lang": "en",
+  "raw_text": "Amcrest Cameras and Network Video Recorder (NVR) Amcrest cameras and NVR contain a stack-based buffer overflow vulnerability through port 37777 that allows an unauthenticated, remote attacker to crash the device and possibly execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c0f14bce4aa9538e9fdfe2ec3ba0bc00f865e7bc70acfe9a07491a733c79d6a6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

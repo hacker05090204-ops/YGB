@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29057",
+  "ingested_at": "2026-03-22T07:54:47.263115+00:00",
+  "lang": "en",
+  "raw_text": "Next.js is a React framework for building full-stack web applications. Starting in version 9.5.0 and prior to versions 15.5.13 and 16.1.7, when Next.js rewrites proxy traffic to an external backend, a crafted `DELETE`/`OPTIONS` request using `Transfer-Encoding: chunked` could trigger request boundary disagreement between the proxy and backend. This could allow request smuggling through rewritten routes. An attacker could smuggle a second request to unintended backend routes (for example, internal/admin endpoints), bypassing assumptions that only the configured rewrite destination/path is reachable. This does not impact applications hosted on providers that handle rewrites at the CDN level, such as Vercel. The vulnerability originated in an upstream library vendored by Next.js. It is fixed in Next.js 15.5.13 and 16.1.7 by updating that dependency\u2019s behavior so `content-length: 0` is added only when both `content-length` and `transfer-encoding` are absent, and `transfer-encoding` is no longer removed in that code path. If upgrading is not immediately possible, block chunked `DELETE`/`OPTIONS` requests on rewritten routes at the edge/proxy, and/or enforce authentication/authorization on backend routes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ebff3e1e455a92afe2e627bf1e2477ae7bac6f29c0c0d58f3cf711ecfd8997a2",
+  "source": "nvd",
+  "tags": [
+    "CWE-444"
+  ],
+  "token_count": 166,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29057"
+}

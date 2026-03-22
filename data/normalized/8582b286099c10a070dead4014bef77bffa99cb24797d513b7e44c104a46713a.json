@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SolarWinds Web Help Desk SolarWinds Web Help Desk contain a deserialization of untrusted data vulnerability in AjaxProxy that could allow an attacker to run commands on the host machine.",
+  "token_count": 29
+}

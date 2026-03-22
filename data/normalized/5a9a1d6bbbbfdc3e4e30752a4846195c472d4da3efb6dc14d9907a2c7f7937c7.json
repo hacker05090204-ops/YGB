@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Under certain conditions, an attacker could bind to the same port used by WebCTRL. This could allow the attacker to craft and send malicious packets and impersonate the WebCTRL service without requiring code injection into the WebCTRL software.",
+  "token_count": 38
+}

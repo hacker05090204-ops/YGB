@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An integer underflow vulnerability is present in Silicon Lab\u2019s implementation of PSA Crypto and SE Manager EC-JPAKE APIs during ZKP parsing. Triggering the underflow can lead to a hard fault, causing a temporary denial of service.",
+  "token_count": 36
+}

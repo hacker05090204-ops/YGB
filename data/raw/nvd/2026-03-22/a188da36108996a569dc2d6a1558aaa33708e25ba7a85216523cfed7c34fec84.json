@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48582",
+  "ingested_at": "2026-03-22T07:54:33.851103+00:00",
+  "lang": "en",
+  "raw_text": "In multiple locations, there is a possible way to delete media without the MANAGE_EXTERNAL_STORAGE permission due to an intent redirect. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "a188da36108996a569dc2d6a1558aaa33708e25ba7a85216523cfed7c34fec84",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48582"
+}

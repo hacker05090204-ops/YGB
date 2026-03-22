@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in @fastify/middie versions < 9.2.0 can result in authentication/authorization bypass when using path-scoped middleware (for example, app.use('/secret', auth)). When Fastify router normalization options are enabled (such as ignoreDuplicateSlashes, useSemicolonDelimiter, and related trailing-slash behavior), crafted request paths may bypass middleware checks while still being routed to protected handlers.",
+  "token_count": 49
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0110",
+  "ingested_at": "2026-03-22T07:54:43.137809+00:00",
+  "lang": "en",
+  "raw_text": "In MM_DATA_IND of cn_NrSmMsgHdlrFromMM.cpp, there is a possible EoP due to memory corruption. This could lead to remote escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "69d774f0f5ef0c111e6fd9e0bf1ec8d71fdad225efe536aab0f7dc2b648ebe3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0110"
+}

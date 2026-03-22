@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Atlassian Crowd and Crowd Data Center Atlassian Crowd and Crowd Data Center contain a remote code execution vulnerability resulting from a pdkinstall development plugin being incorrectly enabled in release builds.",
+  "token_count": 30
+}

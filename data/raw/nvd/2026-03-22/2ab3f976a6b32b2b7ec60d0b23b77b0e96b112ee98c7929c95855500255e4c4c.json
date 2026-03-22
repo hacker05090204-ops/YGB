@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32266",
+  "ingested_at": "2026-03-22T07:54:47.359415+00:00",
+  "lang": "en",
+  "raw_text": "The Google Cloud Storage for Craft CMS plugin provides a Google Cloud Storage integration for Craft CMS. In versions on the 2.x branch prior to 2.2.1, the `DefaultController->actionLoadBucketData()` endpoint allows unauthenticated users with a valid CSRF token to view a list of buckets that the plugin is allowed to see. Users should update to version 2.2.1 of the plugin to mitigate the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "2ab3f976a6b32b2b7ec60d0b23b77b0e96b112ee98c7929c95855500255e4c4c",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32266"
+}

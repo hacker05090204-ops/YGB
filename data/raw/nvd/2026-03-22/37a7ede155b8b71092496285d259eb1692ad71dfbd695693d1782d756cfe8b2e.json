@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27025",
+  "ingested_at": "2026-03-22T07:54:30.593364+00:00",
+  "lang": "en",
+  "raw_text": "pypdf is a free and open-source pure-python PDF library. Prior to 6.7.1, an attacker who uses this vulnerability can craft a PDF which leads to long runtimes and large memory consumption. This requires parsing the /ToUnicode entry of a font with unusually large values, for example during text extraction. This vulnerability is fixed in 6.7.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "37a7ede155b8b71092496285d259eb1692ad71dfbd695693d1782d756cfe8b2e",
+  "source": "nvd",
+  "tags": [
+    "CWE-834"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27025"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-28252",
+  "ingested_at": "2026-03-22T07:45:17.444949+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Common Log File System (CLFS) driver contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b95ccaf5b6fd0b8f43ef9582484d150130a602d109c157a9b656754909724c7b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

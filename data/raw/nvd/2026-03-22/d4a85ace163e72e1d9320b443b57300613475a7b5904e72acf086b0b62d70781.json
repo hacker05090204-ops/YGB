@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28782",
+  "ingested_at": "2026-03-22T07:54:34.589273+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 5.9.0-beta.1 and 4.17.0-beta.1, the \"Duplicate\" entry action does not properly verify if the user has permission to perform this action on the specific target elements. Even with only \"View Entries\" permission (where the \"Duplicate\" action is restricted in the UI), a user can bypass this restriction by sending a direct request. Furthermore, this vulnerability allows duplicating other users' entries by specifying their Entry IDs. Since Entry IDs are incremental, an attacker can trivially brute-force these IDs to duplicate and access restricted content across the system. This vulnerability is fixed in 5.9.0-beta.1 and 4.17.0-beta.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d4a85ace163e72e1d9320b443b57300613475a7b5904e72acf086b0b62d70781",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28782"
+}

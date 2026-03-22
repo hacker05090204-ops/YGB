@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24241",
+  "ingested_at": "2026-03-22T07:54:31.752616+00:00",
+  "lang": "en",
+  "raw_text": "NVIDIA Delegated Licensing Service for all appliance platforms contains a vulnerability where an attacker could exploit an improper authentication issue. A successful exploit of this vulnerability might lead to information disclosure.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7b725a76a3e161869b51379a8043988dd0edb7da2556ba87e6515459f76c9cc1",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24241"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and watchOS Apple iOS, iPadOS, and watchOS Mail contains an out-of-bounds write vulnerability which may allow memory modification or application termination when processing a maliciously crafted mail message.",
+  "token_count": 31
+}

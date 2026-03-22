@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38014",
+  "ingested_at": "2026-03-22T07:45:16.830207+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Installer contains an improper privilege management vulnerability that could allow an attacker to gain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8a88dabc679c11b7873baad0fdbebeb20bb5f4e2c6821a83ae57215fb3c3a64b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

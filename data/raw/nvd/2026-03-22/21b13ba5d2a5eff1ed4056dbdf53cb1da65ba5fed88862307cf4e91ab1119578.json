@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0118",
+  "ingested_at": "2026-03-22T07:54:43.154818+00:00",
+  "lang": "en",
+  "raw_text": "In oobconfig, there is a possible bypass of carrier restrictions due to a logic error. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "21b13ba5d2a5eff1ed4056dbdf53cb1da65ba5fed88862307cf4e91ab1119578",
+  "source": "nvd",
+  "tags": [
+    "CWE-693"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0118"
+}

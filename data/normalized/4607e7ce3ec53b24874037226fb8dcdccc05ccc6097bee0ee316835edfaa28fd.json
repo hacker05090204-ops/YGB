@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "macOS < 10.14.3 / iOS < 12.1.3 XNU - 'vm_map_copy' Optimization which Requires Atomicity isn't Atomic",
+  "token_count": 16
+}

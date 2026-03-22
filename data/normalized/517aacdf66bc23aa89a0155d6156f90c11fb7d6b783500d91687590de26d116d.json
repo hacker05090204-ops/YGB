@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: wifi: mac80211: bounds-check link_id in ieee80211_ml_reconfiguration link_id is taken from the ML Reconfiguration element (control & 0x000f), so it can be 0..15. link_removal_timeout[] has IEEE80211_MLD_MAX_NUM_LINKS (15) elements, so index 15 is out-of-bounds. Skip subelements with link_id >= IEEE80211_MLD_MAX_NUM_LINKS to avoid a stack out-of-bounds write.",
+  "token_count": 54
+}

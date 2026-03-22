@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2244",
+  "ingested_at": "2026-03-22T07:54:32.660863+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in Google Cloud Vertex AI Workbench from 7/21/2025 to 01/30/2026 allows an attacker to exfiltrate valid Google Cloud access tokens of other users via abuse of a built-in startup script. All instances after January 30th, 2026 have been patched to protect from this vulnerability. No user action is required for this.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8e23ff396cece092a2296555ff4e9e07b25ec1798766611792a61b1073b43a4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2244"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-17463",
+  "ingested_at": "2026-03-22T07:45:18.923170+00:00",
+  "lang": "en",
+  "raw_text": "Fuel CMS Fuel CMS FUEL CMS 1.4.7 allows SQL Injection via the col parameter to /pages/items, /permissions/items, or /navigation/items.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d24d0223ae7661f375e9b86188babbb329c4b0bd7764dae0b01ac86e9ca78c6d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

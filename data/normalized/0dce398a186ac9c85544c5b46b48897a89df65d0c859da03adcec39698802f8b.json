@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Mark of the Web (MOTW) contains a protection mechanism failure vulnerability that allows an attacker to bypass MOTW-based defenses. This can result in a limited loss of integrity and availability of security features such as Protected View in Microsoft Office, which rely on MOTW tagging.",
+  "token_count": 49
+}

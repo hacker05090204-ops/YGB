@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-34028",
+  "ingested_at": "2026-03-22T07:45:16.439260+00:00",
+  "lang": "en",
+  "raw_text": "Commvault Command Center Commvault Command Center contains a path traversal vulnerability that allows a remote, unauthenticated attacker to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f9cba2aa4fd17478d3dcc54029d6dfd8d4c6190fd77b682b075b5516c3dd1284",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

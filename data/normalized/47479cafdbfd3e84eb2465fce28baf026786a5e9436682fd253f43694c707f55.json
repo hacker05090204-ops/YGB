@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Smolder versions through 1.51 for Perl uses insecure rand() function for cryptographic functions. Smolder 1.51 and earlier for Perl uses the rand() function as the default source of entropy, which is not cryptographically secure, for cryptographic functions. Specifically Smolder::DB::Developer uses the Data::Random library which specifically states that it is \"Useful mostly for test programs\". Data::Random uses the rand() function.",
+  "token_count": 59
+}

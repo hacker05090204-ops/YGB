@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3497",
+  "ingested_at": "2026-03-22T07:54:44.496287+00:00",
+  "lang": "en",
+  "raw_text": "Vulnerability in the OpenSSH GSSAPI delta included in various Linux distributions. This vulnerability affects the GSSAPI patches added by various Linux distributions and does not affect the OpenSSH upstream project itself. The usage of sshpkt_disconnect() on an error, which does not terminate the process, allows an attacker to send an unexpected GSSAPI message type during the GSSAPI key exchange to the server, which will call the underlying function and continue the execution of the program without setting the related connection variables. As the variables are not initialized to NULL the code later accesses those uninitialized variables, accessing random memory, which could lead to undefined behavior. The recommended workaround is to use ssh_packet_disconnect() instead, which does terminate the process. The impact of the vulnerability depends heavily on the compiler flag hardening configuration.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d4dc121ff74851e1c789dfd85c0b95146441a29e3808355b79c5321d7db17e4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-908"
+  ],
+  "token_count": 131,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3497"
+}

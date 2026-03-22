@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-3161",
+  "ingested_at": "2026-03-22T07:45:19.108604+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Cisco IP Phones Cisco IP Phones contain an improper input validation vulnerability for HTTP requests. Exploitation could allow an attacker to execute code remotely with root privileges or cause a denial-of-service (DoS) condition.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1f056ac79aac385af9e18d9adc5663bb0c02d78999cc95ba4447d500ea06cdb7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

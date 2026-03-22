@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "macOS 10.13 (17A365) - Kernel Memory Disclosure due to Lack of Bounds Checking in 'AppleIntelCapriController::getDisplayPipeCapability'",
+  "token_count": 15
+}

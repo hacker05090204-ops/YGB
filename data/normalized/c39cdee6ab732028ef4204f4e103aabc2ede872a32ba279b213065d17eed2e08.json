@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains a buffer overflow vulnerability that allows remote attackers to execute code via a Word document with a crafted tag containing an invalid length field.",
+  "token_count": 29
+}

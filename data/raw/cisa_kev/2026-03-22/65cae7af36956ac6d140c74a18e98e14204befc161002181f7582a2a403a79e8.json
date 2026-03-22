@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-21445",
+  "ingested_at": "2026-03-22T07:45:16.808208+00:00",
+  "lang": "en",
+  "raw_text": "Oracle ADF Faces Oracle ADF Faces library, included with Oracle JDeveloper Distribution, contains a deserialization of untrusted data vulnerability leading to unauthenticated remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "65cae7af36956ac6d140c74a18e98e14204befc161002181f7582a2a403a79e8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

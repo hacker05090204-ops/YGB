@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-32030",
+  "ingested_at": "2026-03-22T07:45:16.378924+00:00",
+  "lang": "en",
+  "raw_text": "ASUS Routers ASUS Lyra Mini and ASUS GT-AC2900 devices contain an improper authentication vulnerability that allows an attacker to gain unauthorized access to the administrative interface. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "98e6a5699a6478b51e9788dc45482ede4d36234a66955e5cd8f83350cae060c2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

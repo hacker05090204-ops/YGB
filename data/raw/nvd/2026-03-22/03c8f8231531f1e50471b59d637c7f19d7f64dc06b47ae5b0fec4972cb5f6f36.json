@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3411",
+  "ingested_at": "2026-03-22T07:54:33.492925+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode University Management System 1.0. Affected by this issue is some unknown functionality of the file /admin_single_student_update.php. The manipulation of the argument ID leads to sql injection. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "03c8f8231531f1e50471b59d637c7f19d7f64dc06b47ae5b0fec4972cb5f6f36",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3411"
+}

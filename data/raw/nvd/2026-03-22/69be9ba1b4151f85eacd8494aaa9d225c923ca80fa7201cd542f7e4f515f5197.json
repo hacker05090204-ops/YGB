@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-56421",
+  "ingested_at": "2026-03-22T07:54:42.596005+00:00",
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in LimeSurvey before v.6.15.4+250710 allows a remote attacker to obtain sensitive information from the database.",
+  "severity": "HIGH",
+  "sha256_hash": "69be9ba1b4151f85eacd8494aaa9d225c923ca80fa7201cd542f7e4f515f5197",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-56421"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25573",
+  "ingested_at": "2026-03-22T07:54:42.770050+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in SICAM SIAPP SDK (All versions < V2.1.7). The affected application builds shell commands with caller-provided strings and executes them. An attacker could influence the executed command, potentially resulting in command injection and full system compromise.",
+  "severity": "HIGH",
+  "sha256_hash": "932b7e865bd71b20c3969e5a16418fd2d7cf6d325a3d75d8605c0f8374adbed1",
+  "source": "nvd",
+  "tags": [
+    "CWE-73"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25573"
+}

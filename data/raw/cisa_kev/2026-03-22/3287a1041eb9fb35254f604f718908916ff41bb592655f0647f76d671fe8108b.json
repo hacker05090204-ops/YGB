@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-32756",
+  "ingested_at": "2026-03-22T07:45:16.414628+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiFone, FortiVoice, FortiNDR and FortiMail contain a stack-based overflow vulnerability that may allow a remote unauthenticated attacker to execute arbitrary code or commands via crafted HTTP requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3287a1041eb9fb35254f604f718908916ff41bb592655f0647f76d671fe8108b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

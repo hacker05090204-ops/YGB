@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2864",
+  "ingested_at": "2026-03-22T07:54:30.821215+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in feng_ha_ha/megagao ssm-erp and production_ssm up to 4288d53bd35757b27f2d070057aefb2c07bdd097. This affects the function pictureDelete of the file PictureController.java. Such manipulation of the argument picName leads to path traversal. The attack can be launched remotely. The exploit has been disclosed to the public and may be used. This product does not use versioning. This is why information about affected and unaffected releases are unavailable. This product is distributed under two entirely different names. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "36f28512db3b6e4ca8636b28c464de9d1de9ba9bea42dfaeca41ccfe444184cd",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2864"
+}

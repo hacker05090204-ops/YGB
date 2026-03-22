@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-5430",
+  "ingested_at": "2026-03-22T07:45:17.554474+00:00",
+  "lang": "en",
+  "raw_text": "TIBCO JasperReports TIBCO JasperReports Server contain a vulnerability which may allow any authenticated user read-only access to the contents of the web application, including key configuration files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "78936527544a39a71fdc46ffc7ef68032474d6bcad78947b5dcdc0b579016130",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

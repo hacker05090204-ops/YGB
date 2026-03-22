@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in itsourcecode Event Management System 1.0. The affected element is an unknown function of the file /admin/index.php. Performing a manipulation of the argument ID results in sql injection. The attack is possible to be carried out remotely. The exploit is now public and may be used.",
+  "token_count": 50
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the lockdown mechanism of Cisco Secure Firewall Management Center (FMC) Software could allow an authenticated, local attacker to perform arbitrary commands as root. This vulnerability is due to insufficient restrictions on remediation modules while in lockdown mode. An attacker could exploit this vulnerability by sending crafted input to the system CLI of the affected device. A successful exploit could allow the attacker to run arbitrary commands or code as root, even when the system is in lockdown mode. To exploit this vulnerability, the attacker must have valid administrative credentials.",
+  "token_count": 92
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: audit: add missing syscalls to read class The \"at\" variant of getxattr() and listxattr() are missing from the audit read class. Calling getxattrat() or listxattrat() on a file to read its extended attributes will bypass audit rules such as: -w /tmp/test -p rwa -k test_rwa The current patch adds missing syscalls to the audit read class.",
+  "token_count": 66
+}

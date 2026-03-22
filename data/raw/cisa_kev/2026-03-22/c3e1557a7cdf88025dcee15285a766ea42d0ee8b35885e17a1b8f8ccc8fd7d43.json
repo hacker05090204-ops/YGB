@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-43468",
+  "ingested_at": "2026-03-22T07:45:15.913134+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Configuration Manager Microsoft Configuration Manager contains an SQL injection vulnerability. An unauthenticated attacker could exploit this vulnerability by sending specially crafted requests to the target environment which are processed in an unsafe manner enabling the attacker to execute commands on the server and/or underlying database.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c3e1557a7cdf88025dcee15285a766ea42d0ee8b35885e17a1b8f8ccc8fd7d43",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

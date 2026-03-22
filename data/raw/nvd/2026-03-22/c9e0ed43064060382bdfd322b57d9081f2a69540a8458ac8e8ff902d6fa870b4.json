@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20034",
+  "ingested_at": "2026-03-22T07:54:46.260791+00:00",
+  "lang": "en",
+  "raw_text": "Wowza Streaming Engine 4.5.0 contains a privilege escalation vulnerability that allows authenticated read-only users to elevate privileges to administrator by manipulating POST parameters. Attackers can send POST requests to the user edit endpoint with accessLevel set to 'admin' and advUser parameters set to 'true' and 'on' to gain administrative access.",
+  "severity": "HIGH",
+  "sha256_hash": "c9e0ed43064060382bdfd322b57d9081f2a69540a8458ac8e8ff902d6fa870b4",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20034"
+}

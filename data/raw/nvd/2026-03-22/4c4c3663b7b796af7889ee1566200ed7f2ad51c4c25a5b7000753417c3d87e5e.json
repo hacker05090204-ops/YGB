@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-27139",
+  "ingested_at": "2026-03-22T07:54:41.659179+00:00",
+  "lang": "en",
+  "raw_text": "On Unix platforms, when listing the contents of a directory using File.ReadDir or File.Readdir the returned FileInfo could reference a file outside of the Root in which the File was opened. The impact of this escape is limited to reading metadata provided by lstat from arbitrary locations on the filesystem without permitting reading or writing files outside the root.",
+  "severity": "LOW",
+  "sha256_hash": "4c4c3663b7b796af7889ee1566200ed7f2ad51c4c25a5b7000753417c3d87e5e",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27139"
+}

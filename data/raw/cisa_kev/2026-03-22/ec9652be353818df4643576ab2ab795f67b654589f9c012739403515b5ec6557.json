@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-44077",
+  "ingested_at": "2026-03-22T07:45:18.943750+00:00",
+  "lang": "en",
+  "raw_text": "Zoho ManageEngine ServiceDesk Plus (SDP) / SupportCenter Plus Zoho ManageEngine ServiceDesk Plus before 11306, ServiceDesk Plus MSP before 10530, and SupportCenter Plus before 11014 are vulnerable to unauthenticated remote code execution",
+  "severity": "CRITICAL",
+  "sha256_hash": "ec9652be353818df4643576ab2ab795f67b654589f9c012739403515b5ec6557",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

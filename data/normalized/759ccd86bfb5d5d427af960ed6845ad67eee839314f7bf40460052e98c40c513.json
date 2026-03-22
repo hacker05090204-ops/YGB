@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A cross-site scripting (XSS) vulnerability has been reported to affect QuFTP Service. If a remote attacker gains an administrator account, they can then exploit the vulnerability to bypass security mechanisms or read application data. We have already fixed the vulnerability in the following versions: QuFTP Service 1.4.3 and later QuFTP Service 1.5.2 and later QuFTP Service 1.6.2 and later",
+  "token_count": 59
+}

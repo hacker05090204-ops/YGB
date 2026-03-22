@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30797",
+  "ingested_at": "2026-03-22T07:54:40.839685+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android (Flutter URI scheme handler, config import modules) allows Application API Message Manipulation via Man-in-the-Middle. This vulnerability is associated with program files flutter/lib/common.Dart and program routines importConfig() via URI handler. This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "68903883416a5619f1ebb22325aeb15265ef0b22abb137613ea55633c1cf4b2e",
+  "source": "nvd",
+  "tags": [
+    "CWE-749",
+    "CWE-862"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30797"
+}

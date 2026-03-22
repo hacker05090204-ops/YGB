@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in fox-themes Whizz Plugins whizz-plugins allows Reflected XSS.This issue affects Whizz Plugins: from n/a through < = 1.9.",
+  "token_count": 29
+}

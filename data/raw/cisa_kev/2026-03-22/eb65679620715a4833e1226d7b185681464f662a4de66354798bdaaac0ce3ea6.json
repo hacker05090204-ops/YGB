@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4761",
+  "ingested_at": "2026-03-22T07:45:16.970754+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 Engine contains an unspecified out-of-bounds memory write vulnerability via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eb65679620715a4833e1226d7b185681464f662a4de66354798bdaaac0ce3ea6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

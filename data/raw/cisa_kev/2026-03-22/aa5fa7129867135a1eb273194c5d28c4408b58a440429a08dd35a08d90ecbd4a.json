@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-39793",
+  "ingested_at": "2026-03-22T07:45:18.141309+00:00",
+  "lang": "en",
+  "raw_text": "Google Pixel Google Pixel contains a possible out-of-bounds write due to a logic error in the code that could lead to local escalation of privilege.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aa5fa7129867135a1eb273194c5d28c4408b58a440429a08dd35a08d90ecbd4a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

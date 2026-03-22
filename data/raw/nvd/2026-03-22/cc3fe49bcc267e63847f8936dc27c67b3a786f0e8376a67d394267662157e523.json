@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28516",
+  "ingested_at": "2026-03-22T07:54:33.389726+00:00",
+  "lang": "en",
+  "raw_text": "openDCIM version 23.04, through commit 4467e9c4, contains a SQL injection vulnerability in Config::UpdateParameter. The install.php and container-install.php handlers pass user-supplied input directly into SQL statements using string interpolation without prepared statements or proper input sanitation. An authenticated user can execute arbitrary SQL statements against the underlying database.",
+  "severity": "HIGH",
+  "sha256_hash": "cc3fe49bcc267e63847f8936dc27c67b3a786f0e8376a67d394267662157e523",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28516"
+}

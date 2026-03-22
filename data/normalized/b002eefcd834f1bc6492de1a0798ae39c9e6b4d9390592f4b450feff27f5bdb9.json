@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco IOS software A vulnerability in the implementation of Network Address Translation (NAT) functionality in Cisco IOS could allow an unauthenticated, remote attacker to cause a denial of service.",
+  "token_count": 29
+}

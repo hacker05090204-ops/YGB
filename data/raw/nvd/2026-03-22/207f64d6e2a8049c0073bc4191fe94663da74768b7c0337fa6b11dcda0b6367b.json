@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24963",
+  "ingested_at": "2026-03-22T07:54:40.175769+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect Privilege Assignment vulnerability in ameliabooking Amelia ameliabooking allows Privilege Escalation.This issue affects Amelia: from n/a through < = 1.2.38.",
+  "severity": "HIGH",
+  "sha256_hash": "207f64d6e2a8049c0073bc4191fe94663da74768b7c0337fa6b11dcda0b6367b",
+  "source": "nvd",
+  "tags": [
+    "CWE-266"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24963"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-3929",
+  "ingested_at": "2026-03-22T07:45:18.084322+00:00",
+  "lang": "en",
+  "raw_text": "Crestron Multiple Products Multiple Crestron products are vulnerable to command injection via the file_transfer.cgi HTTP endpoint. A remote, unauthenticated attacker can use this vulnerability to execute operating system commands as root.",
+  "severity": "CRITICAL",
+  "sha256_hash": "62eacc06a6aca2988e6b645328c36328ca20584a6831baf9c1d5e3280e58da06",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

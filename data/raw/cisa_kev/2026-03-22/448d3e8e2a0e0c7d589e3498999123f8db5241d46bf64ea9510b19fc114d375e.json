@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-64446",
+  "ingested_at": "2026-03-22T07:45:16.051052+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiWeb Fortinet FortiWeb contains a relative path traversal vulnerability that may allow an unauthenticated attacker to execute administrative commands on the system via crafted HTTP or HTTPS requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "448d3e8e2a0e0c7d589e3498999123f8db5241d46bf64ea9510b19fc114d375e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

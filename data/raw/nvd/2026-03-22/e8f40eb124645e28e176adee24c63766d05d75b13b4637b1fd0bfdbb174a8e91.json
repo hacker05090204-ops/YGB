@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27126",
+  "ingested_at": "2026-03-22T07:54:31.412670+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). In versions 4.5.0-RC1 through 4.16.18 and 5.0.0-RC1 through 5.8.22, a stored Cross-site Scripting (XSS) vulnerability exists in the `editableTable.twig` component when using the `html` column type. The application fails to sanitize the input, allowing an attacker to execute arbitrary JavaScript when another user views a page with the malicious table field. In order to exploit the vulnerability, an attacker must have an administrator account, and `allowAdminChanges` must be enabled in production, which is against Craft's security recommendations. Versions 4.16.19 and 5.8.23 patch the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e8f40eb124645e28e176adee24c63766d05d75b13b4637b1fd0bfdbb174a8e91",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27126"
+}

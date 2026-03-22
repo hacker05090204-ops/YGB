@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23802",
+  "ingested_at": "2026-03-22T07:54:40.170765+00:00",
+  "lang": "en",
+  "raw_text": "Unrestricted Upload of File with Dangerous Type vulnerability in Jordy Meow AI Engine ai-engine allows Using Malicious Files.This issue affects AI Engine: from n/a through < = 3.3.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3f743a7894d4a09fb253d394ea0f3dd8a364c429462131229a6498e68d3c09e4",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23802"
+}

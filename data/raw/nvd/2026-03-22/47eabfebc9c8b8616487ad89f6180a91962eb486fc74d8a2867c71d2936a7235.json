@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3667",
+  "ingested_at": "2026-03-22T07:54:41.895873+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Freedom Factory dGEN1 up to 20260221. The impacted element is the function FakeAppService of the component org.ethosmobile.ethoslauncher. The manipulation results in improper authorization. The attack must be initiated from a local position. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "47eabfebc9c8b8616487ad89f6180a91962eb486fc74d8a2867c71d2936a7235",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3667"
+}

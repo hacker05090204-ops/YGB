@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68845",
+  "ingested_at": "2026-03-22T07:54:30.146454+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in aThemeArt Translations eDS Responsive Menu eds-responsive-menu allows Reflected XSS.This issue affects eDS Responsive Menu: from n/a through < = 1.2.",
+  "severity": "HIGH",
+  "sha256_hash": "c8bceee4e661171e15ca15795c0e87694d12dc83ed14bffa981409d8b080bf7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68845"
+}

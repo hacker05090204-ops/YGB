@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29787",
+  "ingested_at": "2026-03-22T07:54:41.882934+00:00",
+  "lang": "en",
+  "raw_text": "mcp-memory-service is an open-source memory backend for multi-agent systems. Prior to version 10.21.0, the /api/health/detailed endpoint returns detailed system information including OS version, Python version, CPU count, memory totals, disk usage, and the full database filesystem path. When MCP_ALLOW_ANONYMOUS_ACCESS=true is set (required for the HTTP server to function without OAuth/API key), this endpoint is accessible without authentication. Combined with the default 0.0.0.0 binding, this exposes sensitive reconnaissance data to the entire network. This issue has been patched in version 10.21.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "187bef20a586d63aea7de76ae934aaa54f2b87d232334338281253955faa1773",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29787"
+}

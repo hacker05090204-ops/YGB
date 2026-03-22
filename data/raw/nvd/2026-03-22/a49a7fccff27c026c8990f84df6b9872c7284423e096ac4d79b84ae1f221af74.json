@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21262",
+  "ingested_at": "2026-03-22T07:54:42.628304+00:00",
+  "lang": "en",
+  "raw_text": "Improper access control in SQL Server allows an authorized attacker to elevate privileges over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "a49a7fccff27c026c8990f84df6b9872c7284423e096ac4d79b84ae1f221af74",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21262"
+}

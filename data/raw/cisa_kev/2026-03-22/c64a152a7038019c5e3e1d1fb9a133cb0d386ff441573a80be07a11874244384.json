@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-3075",
+  "ingested_at": "2026-03-22T07:45:17.651708+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Mojo Google Chromium Mojo contains an insufficient data validation vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c64a152a7038019c5e3e1d1fb9a133cb0d386ff441573a80be07a11874244384",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 55,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

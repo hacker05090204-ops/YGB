@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3230",
+  "ingested_at": "2026-03-22T07:54:48.123696+00:00",
+  "lang": "en",
+  "raw_text": "Missing required cryptographic step in the TLS 1.3 client HelloRetryRequest handshake logic in wolfSSL could lead to a compromise in the confidentiality of TLS-protected communications via a crafted HelloRetryRequest followed by a ServerHello message that omits the required key_share extension, resulting in derivation of predictable traffic secrets from (EC)DHE shared secret. This issue does not affect the client's authentication of the server during TLS handshakes.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f21a64d041cbe781b707429de3e167bdf8c991b1bf5d57bc2a1cea34ec31fe76",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3230"
+}

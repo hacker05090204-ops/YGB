@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20008",
+  "ingested_at": "2026-03-22T07:54:34.644735+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in a small subset of CLI commands that are used on Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an authenticated, local attacker to craft Lua code that could be used on the underlying operating system as root. This vulnerability exists because user-provided input is not properly sanitized. An attacker could exploit this vulnerability by crafting valid Lua code and submitting it as a malicious parameter for a CLI command. A successful exploit could allow the attacker to inject Lua code, which could lead to arbitrary code execution as the root user. To exploit this vulnerability, an attacker must have valid Administrator credentials.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bc6271037df8f14bea989078b6ba3f724359d0faa2603f2fe8abdc0db741fbca",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 115,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20008"
+}

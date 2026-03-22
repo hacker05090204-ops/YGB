@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe ColdFusion contains a deserialization of untrusted data vulnerability that could result in code execution in the context of the current user.",
+  "token_count": 24
+}

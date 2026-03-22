@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a heap buffer over-read vulnerability occurs when processing an image with small dimension using the `-wavelet-denoise` operator. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "token_count": 43
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11848",
+  "ingested_at": "2026-03-22T07:54:31.385552+00:00",
+  "lang": "en",
+  "raw_text": "A null pointer dereference vulnerability in the Wake-on-LAN CGI program of the Zyxel VMG3625-T50B firmware version through 5.50(ABPM.9.6)C0 and the Zyxel WX3100-T0 firmware versions through 5.50(ABVL.4.8)C0 could allow an authenticated attacker with administrator privileges to trigger a denial-of-service (DoS) condition by sending a crafted HTTP request.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6a44dcd20edbc4005c60f2b58c9a4ab844cf0932b41ee06da77bfe3bd78683b2",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11848"
+}

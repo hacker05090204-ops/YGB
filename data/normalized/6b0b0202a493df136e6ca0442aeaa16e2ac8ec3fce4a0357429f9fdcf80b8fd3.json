@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware Multiple Products VMware Workspace One Access, Access Connector, Identity Manager, and Identity Manager Connector contain a command injection vulnerability. An attacker with network access to the administrative configurator on port 8443 and a valid password for the configurator administrator account can execute commands with unrestricted privileges on the underlying operating system.",
+  "token_count": 52
+}

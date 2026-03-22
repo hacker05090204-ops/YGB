@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27091",
+  "ingested_at": "2026-03-22T07:54:47.865032+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in UiPress UiPress lite allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects UiPress lite: from n/a through 3.5.09.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a0c474425a3183ed9f716e19cf362b97ca368a06bb68278e1a67490381e9681b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27091"
+}

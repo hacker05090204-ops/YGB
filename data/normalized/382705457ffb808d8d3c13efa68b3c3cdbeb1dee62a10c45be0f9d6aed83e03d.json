@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TP-Link TL-WR841N TP-Link TL-WR841N contains an authentication bypass by spoofing vulnerability within the httpd service, which listens on TCP port 80 by default, leading to the disclose of stored credentials. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "token_count": 45
+}

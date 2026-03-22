@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PluXml CMS is vulnerable to Stored XSS in file uploading functionality. An authenticated attacker can upload an SVG file containing a malicious payload, which will be executed when a victim clicks the link associated with the uploaded image. In version 5.9.0-rc7 clicking the link associated with the uploaded image doesn't execute malicious code but directly accessing the file will still execute the embedded payload. The vendor was notified early about this vulnerability, but didn't respond with the details of vulnerability or vulnerable version range. Only versions 5.8.21 and 5.9.0-rc7 were tested and confirmed as vulnerable, other versions were not tested and might also be vulnerable.",
+  "token_count": 105
+}

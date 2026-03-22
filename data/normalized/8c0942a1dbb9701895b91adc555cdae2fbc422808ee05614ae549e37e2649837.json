@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in Janis Elsts Admin Menu Editor admin-menu-editor allows Cross Site Request Forgery.This issue affects Admin Menu Editor: from n/a through < = 1.14.1.",
+  "token_count": 28
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Denial of service due to insufficient input validation in authentication logging. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "token_count": 25
+}

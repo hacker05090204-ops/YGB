@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32840",
+  "ingested_at": "2026-03-22T07:54:47.199332+00:00",
+  "lang": "en",
+  "raw_text": "Edimax GS-5008PL firmware version 1.00.54 and prior contain a stored cross-site scripting vulnerability in the system_name_set.cgi script that allows attackers to inject arbitrary script code by manipulating the sysName parameter. Attackers can send a crafted POST request with malicious script payload that executes when management pages including system_data.js are viewed by administrators.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2a447fd6c77a9a747f6dc940aad43d9e2fe1ec6fdbc737403e5952ef3d5fc246",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32840"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-4014",
+  "ingested_at": "2026-03-22T07:54:44.208315+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in itsourcecode Cafe Reservation System 1.0. This impacts an unknown function of the file /curvus2/signup.php of the component Registration. Performing a manipulation of the argument Username results in sql injection. Remote exploitation of the attack is possible. The exploit has been released to the public and may be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "c268bdbdabfda4570200a413028f82dacef64ee48230291529ee172d7dd1b2bc",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4014"
+}

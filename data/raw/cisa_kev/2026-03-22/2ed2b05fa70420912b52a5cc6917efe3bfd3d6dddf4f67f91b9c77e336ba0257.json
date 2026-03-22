@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-34102",
+  "ingested_at": "2026-03-22T07:45:16.912281+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Commerce and Magento Open Source Adobe Commerce and Magento Open Source contain an improper restriction of XML external entity reference (XXE) vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2ed2b05fa70420912b52a5cc6917efe3bfd3d6dddf4f67f91b9c77e336ba0257",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

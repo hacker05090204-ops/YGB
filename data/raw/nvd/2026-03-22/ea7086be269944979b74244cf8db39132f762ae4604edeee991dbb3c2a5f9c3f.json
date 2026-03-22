@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27361",
+  "ingested_at": "2026-03-22T07:54:40.224868+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in WebCodingPlace Responsive Posts Carousel Pro responsive-posts-carousel-pro allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Responsive Posts Carousel Pro: from n/a through < = 15.1.",
+  "severity": "HIGH",
+  "sha256_hash": "ea7086be269944979b74244cf8db39132f762ae4604edeee991dbb3c2a5f9c3f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27361"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android (Flutter URI scheme handler, FFI bridge modules) allows Privilege Escalation. This vulnerability is associated with program files flutter/lib/common.Dart, src/flutter_ffi.Rs and program routines URI handler for rustdesk://password/, bind.MainSetPermanentPassword(). This issue affects RustDesk Client: through 1.4.5.",
+  "token_count": 50
+}

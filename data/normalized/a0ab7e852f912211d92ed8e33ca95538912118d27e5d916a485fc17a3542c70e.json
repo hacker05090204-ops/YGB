@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco IOS Software and Cisco IOS XE Software A vulnerability in the Smart Install feature of Cisco IOS Software and Cisco IOS XE Software could allow an unauthenticated, remote attacker to trigger a reload of an affected device, resulting in a denial-of-service (DoS) condition.",
+  "token_count": 44
+}

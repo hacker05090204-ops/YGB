@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-3156",
+  "ingested_at": "2026-03-22T07:45:18.154808+00:00",
+  "lang": "en",
+  "raw_text": "Sudo Sudo Sudo contains an off-by-one error that can result in a heap-based buffer overflow, which allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a695b8063ec25eb86b6256286cf5e022b945340f867ad8eec301c1b8253a59de",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

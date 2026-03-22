@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28271",
+  "ingested_at": "2026-03-22T07:54:33.314272+00:00",
+  "lang": "en",
+  "raw_text": "Kiteworks is a private data network (PDN). Prior to version 9.2.0, a vulnerability in Kiteworks configuration functionality allows bypassing of SSRF protections through DNS rebinding attacks. Malicious administrators could exploit this to access internal services that should be restricted. Version 9.2.0 contains a patch for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5caa70326ad769f1b26c4145760576e1899f9dbaf3a0fab16930fc0c9a3d17dd",
+  "source": "nvd",
+  "tags": [
+    "CWE-350",
+    "CWE-918"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28271"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-50623",
+  "ingested_at": "2026-03-22T07:45:16.682351+00:00",
+  "lang": "en",
+  "raw_text": "Cleo Multiple Products Cleo Harmony, VLTrader, and LexiCom, which are managed file transfer products, contain an unrestricted file upload and download vulnerability that can lead to remote code execution with elevated privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "04727d740510e6d2192034281fec3a9a850ffc88783721d8e396ff6ff54b284d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

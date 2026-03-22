@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-30694",
+  "ingested_at": "2026-03-22T07:54:48.022738+00:00",
+  "lang": "en",
+  "raw_text": "An issue in DedeCMS v.5.7.118 and before allows a remote attacker to execute arbitrary code via the array_filter component",
+  "severity": "UNKNOWN",
+  "sha256_hash": "59fd8968d8a4505100737c028a20d6aad36635abb600c72ec3624efd1460daea",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30694"
+}

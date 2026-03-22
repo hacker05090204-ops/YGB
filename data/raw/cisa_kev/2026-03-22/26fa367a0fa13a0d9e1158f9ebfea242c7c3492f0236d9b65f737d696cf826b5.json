@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-29303",
+  "ingested_at": "2026-03-22T07:45:17.309844+00:00",
+  "lang": "en",
+  "raw_text": "SolarView Compact SolarView Compact contains a command injection vulnerability due to improper validation of input values on the send test mail console of the product's web server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "26fa367a0fa13a0d9e1158f9ebfea242c7c3492f0236d9b65f737d696cf826b5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

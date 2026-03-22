@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3101",
+  "ingested_at": "2026-03-22T07:54:31.646501+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Intelbras TIP 635G 1.12.3.5. This vulnerability affects unknown code of the component Ping Handler. The manipulation results in os command injection. The attack can be executed remotely. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "322bb58587ad549fc8fdfa2c829ac1243a6367cda1d8fb3e0a8a101c6c041e9a",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78",
+    "CWE-78"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3101"
+}

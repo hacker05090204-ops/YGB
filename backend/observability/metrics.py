@@ -7,7 +7,8 @@ detection.
 
 Metrics:
     - Counters:    request_count, error_count, timeout_count, metric_missing_counter
-    - Gauges:      measurement_completeness_ratio, null_metric_ratio
+    - Gauges:      measurement_completeness_ratio, null_metric_ratio,
+                   gpu_fallback_active, gpu_memory_used_mb, gpu_utilization_pct
     - Histograms:  request_latency_ms, dependency_latency_ms, readiness_latency_ms
 
 If a critical metric is missing when checked, a structured warning is
@@ -47,8 +48,15 @@ TRAINING_ONLY_METRICS = frozenset({
     "duplicate_rate",
 })
 
+GPU_RUNTIME_METRICS = frozenset({
+    "gpu_fallback_active",
+    "gpu_memory_used_mb",
+    "gpu_utilization_pct",
+    "gpu_watchdog_alert_total",
+})
+
 # Combined set for snapshot completeness
-CRITICAL_METRICS = INFRASTRUCTURE_METRICS | TRAINING_ONLY_METRICS
+CRITICAL_METRICS = INFRASTRUCTURE_METRICS | TRAINING_ONLY_METRICS | GPU_RUNTIME_METRICS
 
 
 class MetricsRegistry:

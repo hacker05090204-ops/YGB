@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22900",
+  "ingested_at": "2026-03-22T07:45:19.508362+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure contains an unrestricted file upload vulnerability that allows an authenticated administrator to perform a file write via a maliciously crafted archive upload in the administrator web interface.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b18eb1efb49d8bba6c0390da139fa1dd8d8182f6a252300f5c0bc0ca06348eb2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

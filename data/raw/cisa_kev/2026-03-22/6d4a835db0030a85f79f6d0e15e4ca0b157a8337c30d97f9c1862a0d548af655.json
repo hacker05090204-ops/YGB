@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-1709",
+  "ingested_at": "2026-03-22T07:45:17.044976+00:00",
+  "lang": "en",
+  "raw_text": "ConnectWise ScreenConnect ConnectWise ScreenConnect contains an authentication bypass vulnerability that allows an attacker with network access to the management interface to create a new, administrator-level account on affected devices.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6d4a835db0030a85f79f6d0e15e4ca0b157a8337c30d97f9c1862a0d548af655",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

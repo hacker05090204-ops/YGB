@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in delphiknight Geo to Lat geo-to-lat allows Blind SQL Injection.This issue affects Geo to Lat: from n/a through < = 1.0.19.",
+  "token_count": 34
+}

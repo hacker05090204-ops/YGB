@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68495",
+  "ingested_at": "2026-03-22T07:54:30.101230+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Crocoblock JetEngine jet-engine allows Reflected XSS.This issue affects JetEngine: from n/a through < = 3.8.0.",
+  "severity": "HIGH",
+  "sha256_hash": "61583cd589da4fa1036611ddfd45300e1111b65ee0b837b7b26d5faeb53104f3",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68495"
+}

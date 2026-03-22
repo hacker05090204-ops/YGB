@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-14847",
+  "ingested_at": "2026-03-22T07:45:18.938601+00:00",
+  "lang": "en",
+  "raw_text": "MikroTik RouterOS MikroTik RouterOS through 6.42 allows unauthenticated remote attackers to read arbitrary files and remote authenticated attackers to write arbitrary files due to a directory traversal vulnerability in the WinBox interface.",
+  "severity": "CRITICAL",
+  "sha256_hash": "676f73e07fd982dbcd53d1b0dc3fe28eaa921a5464b5ccc6edac6843de7a788f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-22719",
+  "ingested_at": "2026-03-22T07:45:15.875234+00:00",
+  "lang": "en",
+  "raw_text": "Broadcom VMware Aria Operations Broadcom VMware Aria Operations formerly known as vRealize Operations (vROps) contains a command injection vulnerability that allows an unauthenticated attacker to execute arbitrary commands, potentially leading to remote code execution during support\u2010assisted product migration.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8d346ea305bea9008663469d597286053a0eebe5732f318accbf05a88b749219",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

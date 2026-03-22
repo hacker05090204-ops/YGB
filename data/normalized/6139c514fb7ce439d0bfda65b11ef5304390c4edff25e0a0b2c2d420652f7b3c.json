@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue in Step-Video-T2V allows a remote attacker to execute arbitrary code via the /vae-api , /caption-api , feature = pickle.loads(request.get_data()) component",
+  "token_count": 22
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20006",
+  "ingested_at": "2026-03-22T07:54:34.640414+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the TLS cryptography functionality of the Snort 3 Detection Engine of Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to cause the Snort 3 Detection Engine to unexpectedly restart, resulting in a denial of service (DoS) condition. This vulnerability is due to improper implementation of the TLS protocol. An attacker could exploit this vulnerability by sending a crafted TLS packet to an affected system. A successful exploit could allow the attacker to cause a device that is running Cisco Secure FTD Software to drop network traffic, resulting in a DoS condition. Note: TLS 1.3 is not affected by this vulnerability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "766eacba6865449692fbea299bcda54c4e18218974ae55954b12e6e8ee0b5430",
+  "source": "nvd",
+  "tags": [
+    "CWE-388"
+  ],
+  "token_count": 108,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20006"
+}

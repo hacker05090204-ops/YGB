@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32583",
+  "ingested_at": "2026-03-22T07:54:46.855944+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Webnus Inc. Modern Events Calendar allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Modern Events Calendar: from n/a through 7.29.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e15eb74c80b2ea5a350efe56c602da410217953b5f0934a0f016c5a5ce1135b8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32583"
+}

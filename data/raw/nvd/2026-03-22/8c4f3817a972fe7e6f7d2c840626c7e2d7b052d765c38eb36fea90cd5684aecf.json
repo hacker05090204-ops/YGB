@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-54001",
+  "ingested_at": "2026-03-22T07:54:39.969184+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Classter classter allows Object Injection.This issue affects Classter: from n/a through < = 2.5.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8c4f3817a972fe7e6f7d2c840626c7e2d7b052d765c38eb36fea90cd5684aecf",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-54001"
+}

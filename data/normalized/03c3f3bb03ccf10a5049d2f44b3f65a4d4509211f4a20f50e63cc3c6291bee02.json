@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an IP spoofing vulnerability in the getIP() function that allows attackers to bypass IP-based rate limiting and ban enforcement by trusting untrusted HTTP headers. Attackers can set HTTP_CLIENT_IP or HTTP_X_FORWARDED_FOR headers to spoof their IP address and circumvent security controls.",
+  "token_count": 44
+}

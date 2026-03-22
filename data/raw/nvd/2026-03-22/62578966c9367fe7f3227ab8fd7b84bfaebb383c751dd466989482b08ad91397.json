@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1919",
+  "ingested_at": "2026-03-22T07:54:42.462373+00:00",
+  "lang": "en",
+  "raw_text": "The Booking Calendar for Appointments and Service Businesses \u2013 Booktics plugin for WordPress is vulnerable to unauthorized access of data due to a missing capability check on multiple REST API endpoints in all versions up to, and including, 1.0.16. This makes it possible for unauthenticated attackers to query sensitive data.",
+  "severity": "MEDIUM",
+  "sha256_hash": "62578966c9367fe7f3227ab8fd7b84bfaebb383c751dd466989482b08ad91397",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1919"
+}

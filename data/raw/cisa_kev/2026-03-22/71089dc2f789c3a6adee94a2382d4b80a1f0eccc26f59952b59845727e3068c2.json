@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-6207",
+  "ingested_at": "2026-03-22T07:45:19.553665+00:00",
+  "lang": "en",
+  "raw_text": "SAP Solution Manager SAP Solution Manager User Experience Monitoring contains a missing authentication for critical function vulnerability which results in complete compromise of all SMDAgents connected to the Solution Manager.",
+  "severity": "CRITICAL",
+  "sha256_hash": "71089dc2f789c3a6adee94a2382d4b80a1f0eccc26f59952b59845727e3068c2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4427",
+  "ingested_at": "2026-03-22T07:54:47.972594+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in pgproto3. A malicious or compromised PostgreSQL server can exploit this by sending a DataRow message with a negative field length. This input validation vulnerability can lead to a denial of service (DoS) due to a slice bounds out of range panic.",
+  "severity": "HIGH",
+  "sha256_hash": "7b1c94d01b7ae22aeab426459172bf60f5a5178690d0edd630cf289deba81f29",
+  "source": "nvd",
+  "tags": [
+    "CWE-129"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4427"
+}

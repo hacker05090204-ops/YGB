@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32954",
+  "ingested_at": "2026-03-22T07:54:48.584238+00:00",
+  "lang": "en",
+  "raw_text": "ERP is a free and open source Enterprise Resource Planning tool. In versions prior to 16.8.0 and 15.100.0, certain endpoints were vulnerable to time-based and boolean-based blind SQL injection due to insufficient parameter validation, allowing attackers to infer database information. This issue has been fixed in versions 15.100.0 and 16.8.0.",
+  "severity": "HIGH",
+  "sha256_hash": "13017dbe65b20597834dba5b13a46ef350648e49768cb7982566e3c418043499",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32954"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The HUMN-1 AI Website Scanner & Human Certification by Winston AI plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the winston_disconnect() function in all versions up to, and including, 0.0.3. This makes it possible for authenticated attackers, with Subscriber-level access and above, to reset the plugin's API connection settings via the 'winston_disconnect' AJAX action.",
+  "token_count": 63
+}

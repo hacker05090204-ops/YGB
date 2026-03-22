@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in ThemeHunk Gutenberg Blocks allows Reflected XSS.This issue affects Gutenberg Blocks: from n/a through 1.2.8.",
+  "token_count": 26
+}

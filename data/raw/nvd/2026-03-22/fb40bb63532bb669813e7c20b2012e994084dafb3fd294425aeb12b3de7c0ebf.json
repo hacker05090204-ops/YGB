@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28772",
+  "ingested_at": "2026-03-22T07:54:34.382939+00:00",
+  "lang": "en",
+  "raw_text": "A Reflected Cross-Site Scripting (XSS) vulnerability in the /IDC_Logging/index.cgi endpoint of International Datacasting Corporation (IDC) SFX Series SuperFlex SatelliteReceiver Web Management Interface version 101 allows a remote attacker to execute arbitrary web scripts or HTML. The vulnerability is triggered by sending a crafted payload through the `submitType` parameter, which is reflected directly into the DOM without proper escaping.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fb40bb63532bb669813e7c20b2012e994084dafb3fd294425aeb12b3de7c0ebf",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28772"
+}

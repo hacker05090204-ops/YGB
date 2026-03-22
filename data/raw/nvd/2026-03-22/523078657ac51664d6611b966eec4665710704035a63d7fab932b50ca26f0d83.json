@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3053",
+  "ingested_at": "2026-03-22T07:54:31.381089+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in DataLinkDC dinky up to 1.2.5. This affects the function addInterceptors of the file dinky-admin/src/main/java/org/dinky/configure/AppConfig.java of the component OpenAPI Endpoint. Executing a manipulation can lead to missing authentication. It is possible to launch the attack remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "523078657ac51664d6611b966eec4665710704035a63d7fab932b50ca26f0d83",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-306",
+    "CWE-306"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3053"
+}

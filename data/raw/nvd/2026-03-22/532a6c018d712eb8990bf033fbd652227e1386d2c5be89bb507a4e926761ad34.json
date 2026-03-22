@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1286",
+  "ingested_at": "2026-03-22T07:54:42.622304+00:00",
+  "lang": "en",
+  "raw_text": "CWE-502: Deserialization of untrusted data vulnerability exists that could lead to loss of confidentiality, integrity and potential remote code execution on workstation when an admin authenticated user opens a malicious project file.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "532a6c018d712eb8990bf033fbd652227e1386d2c5be89bb507a4e926761ad34",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1286"
+}

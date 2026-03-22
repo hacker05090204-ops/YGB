@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25179",
+  "ingested_at": "2026-03-22T07:54:42.746052+00:00",
+  "lang": "en",
+  "raw_text": "Improper validation of specified type of input in Windows Ancillary Function Driver for WinSock allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "d351341094b220d861b85879e4b557af827c2deaf80031b5849a90ae2febce0f",
+  "source": "nvd",
+  "tags": [
+    "CWE-1287"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25179"
+}

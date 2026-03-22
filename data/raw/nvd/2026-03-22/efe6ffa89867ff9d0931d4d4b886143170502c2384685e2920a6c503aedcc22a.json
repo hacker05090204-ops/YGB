@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-29046",
+  "ingested_at": "2026-03-22T07:54:41.248338+00:00",
+  "lang": "en",
+  "raw_text": "TinyWeb is a web server (HTTP, HTTPS) written in Delphi for Win32. Prior to version 2.04, TinyWeb accepts request header values and later maps them into CGI environment variables (HTTP_*). The parser did not strictly reject dangerous control characters in header lines and header values, including CR, LF, and NUL, and did not consistently defend against encoded forms such as %0d, %0a, and %00. This can enable header value confusion across parser boundaries and may create unsafe data in the CGI execution context. This issue has been patched in version 2.04.",
+  "severity": "HIGH",
+  "sha256_hash": "efe6ffa89867ff9d0931d4d4b886143170502c2384685e2920a6c503aedcc22a",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-74",
+    "CWE-93",
+    "CWE-114"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29046"
+}

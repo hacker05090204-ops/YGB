@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4537",
+  "ingested_at": "2026-03-22T07:54:49.615261+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Cudy TR1200 R46-2.4.15-20250721-164017. Impacted is the function action_ipsec_conn of the file /usr/bin/lib/lua/luci/controller/ipsec.lua. Executing a manipulation can lead to command injection. The attack may be launched remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "888710336a108243cd3c8f2878d02f231509bcbfe9f9b0133098e16834f098cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4537"
+}

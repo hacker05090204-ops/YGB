@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70025",
+  "ingested_at": "2026-03-22T07:54:42.616303+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-79: Improper Neutralization of Input During Web Page Generation was discovered in benkeen generatedata 4.0.14.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9ef4df1b0850bc0a8e022ca131d1c251b9b859cba9da672a799ea95072854bf3",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70025"
+}

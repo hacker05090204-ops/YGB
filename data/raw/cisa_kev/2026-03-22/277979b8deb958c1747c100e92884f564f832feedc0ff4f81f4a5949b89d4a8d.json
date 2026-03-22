@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-28229",
+  "ingested_at": "2026-03-22T07:45:17.214781+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows CNG Key Isolation Service Microsoft Windows Cryptographic Next Generation (CNG) Key Isolation Service contains an unspecified vulnerability that allows an attacker to gain specific limited SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "277979b8deb958c1747c100e92884f564f832feedc0ff4f81f4a5949b89d4a8d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

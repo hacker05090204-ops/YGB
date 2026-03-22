@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28131",
+  "ingested_at": "2026-03-22T07:54:32.631618+00:00",
+  "lang": "en",
+  "raw_text": "Insertion of Sensitive Information Into Sent Data vulnerability in WPVibes Elementor Addon Elements addon-elements-for-elementor-page-builder allows Retrieve Embedded Sensitive Data.This issue affects Elementor Addon Elements: from n/a through < = 1.14.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "41c4f345ba8a04bc8765fd59b3053acc02241b2ad3a0fbaada2c6d81301bf5aa",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28131"
+}

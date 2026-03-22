@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3003",
+  "ingested_at": "2026-03-22T07:54:49.369813+00:00",
+  "lang": "en",
+  "raw_text": "The Vagaro Booking Widget plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the \u2018vagaro_code\u2019 parameter in all versions up to, and including, 0.3 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "HIGH",
+  "sha256_hash": "f599d02ed9a700b50dca53f58378fb58bc2cb29a8d5093c14477062a9826b3d3",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3003"
+}

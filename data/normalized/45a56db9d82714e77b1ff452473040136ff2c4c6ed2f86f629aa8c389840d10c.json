@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an out-of-bounds read vulnerability within the modem interface driver due to a lack of boundary checking of a buffer in set_skb_priv(), leading to remote code execution by dereference of an invalid function pointer.",
+  "token_count": 40
+}

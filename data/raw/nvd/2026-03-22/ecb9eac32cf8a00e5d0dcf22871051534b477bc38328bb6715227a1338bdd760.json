@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-0869",
+  "ingested_at": "2026-03-22T07:54:34.221385+00:00",
+  "lang": "en",
+  "raw_text": "Authentication bypass in Brocade ASCG 3.4.0 Could allow an unauthorized user to perform ASCG operations related to Brocade Support Link(BSL) and streaming configuration. and could even disable the ASCG application or disable use of BSL data collection on Brocade switches within the fabric.",
+  "severity": "HIGH",
+  "sha256_hash": "ecb9eac32cf8a00e5d0dcf22871051534b477bc38328bb6715227a1338bdd760",
+  "source": "nvd",
+  "tags": [
+    "CWE-305",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0869"
+}

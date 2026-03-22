@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27362",
+  "ingested_at": "2026-03-22T07:54:40.227928+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in kamleshyadav WP Bakery Autoresponder Addon vc-autoresponder-addon allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WP Bakery Autoresponder Addon: from n/a through < = 1.0.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6fff655c633a8a9ce7428620eada512fb477d0670bed0ad15f1151e40075b3af",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27362"
+}

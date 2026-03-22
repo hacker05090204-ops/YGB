@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "melange allows users to build apk packages using declarative pipelines. In version 0.40.5 and prior, melange update-cache downloads URIs from build configs via io.Copy without any size limit or HTTP client timeout (pkg/renovate/cache/cache.go). An attacker-controlled URI in a melange config can cause unbounded disk writes, exhausting disk on the build runne. There is no known patch publicly available.",
+  "token_count": 58
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple Safari, iOS, watchOS, visionOS, iPadOS, macOS, and tvOS contain a buffer overflow vulnerability that could allow the processing of maliciously crafted web content which may lead to memory corruption.",
+  "token_count": 33
+}

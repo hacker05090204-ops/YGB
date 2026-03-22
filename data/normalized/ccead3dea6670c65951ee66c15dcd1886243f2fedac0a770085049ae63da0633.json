@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: espintcp: Fix race condition in espintcp_close() This issue was discovered during a code audit. After cancel_work_sync() is called from espintcp_close(), espintcp_tx_work() can still be scheduled from paths such as the Delayed ACK handler or ksoftirqd. As a result, the espintcp_tx_work() worker may dereference a freed espintcp ctx or sk. The following is a simple race scenario: cpu0 cpu1 espintcp_close() cancel_work_sync(&ctx->work); espintcp_write_space() schedule_work(&ctx->work); To prevent this race condition, cancel_work_sync() is replaced with disable_work_sync().",
+  "token_count": 82
+}

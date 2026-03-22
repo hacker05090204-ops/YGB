@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An Out-of-Bounds Read vulnerability exists in the ASUS Business System Control Interface driver. This vulnerability can be triggered by an unprivileged local user sending a specially crafted IOCTL request, potentially leading to a disclosure of kernel information or a system crash. Refer to the \"Security Update for ASUS Business System Control Interface\" section on the ASUS Security Advisory for more information.",
+  "token_count": 61
+}

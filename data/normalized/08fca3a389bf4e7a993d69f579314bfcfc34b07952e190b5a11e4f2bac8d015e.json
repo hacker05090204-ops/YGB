@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Edge and Internet Explorer Microsoft Edge and Internet Explorer have a type confusion vulnerability in mshtml.dll, which allows remote code execution.",
+  "token_count": 22
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32386",
+  "ingested_at": "2026-03-22T07:54:45.994444+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in EnvoThemes Envo Extra envo-extra allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Envo Extra: from n/a through < = 1.9.13.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9afe97001e3476a5118ca64c2f02c5d41d3f8684c488ba296543cc363578923b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32386"
+}

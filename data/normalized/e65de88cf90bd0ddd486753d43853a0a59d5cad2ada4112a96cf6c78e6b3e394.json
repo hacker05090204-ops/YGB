@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Small Business RV Series Routers Multiple Cisco Small Business RV Series Routers contains a command injection vulnerability in the web-based management interface. Successful exploitation could allow an authenticated, remote attacker to gain root-level privileges and access unauthorized data.",
+  "token_count": 39
+}

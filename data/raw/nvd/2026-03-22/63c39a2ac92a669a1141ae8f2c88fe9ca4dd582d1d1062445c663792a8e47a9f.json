@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26106",
+  "ingested_at": "2026-03-22T07:54:42.787692+00:00",
+  "lang": "en",
+  "raw_text": "Improper input validation in Microsoft Office SharePoint allows an authorized attacker to execute code over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "63c39a2ac92a669a1141ae8f2c88fe9ca4dd582d1d1062445c663792a8e47a9f",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26106"
+}

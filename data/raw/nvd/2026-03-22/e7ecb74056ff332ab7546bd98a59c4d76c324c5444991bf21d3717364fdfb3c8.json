@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33180",
+  "ingested_at": "2026-03-22T07:54:49.071243+00:00",
+  "lang": "en",
+  "raw_text": "HAPI FHIR is a complete implementation of the HL7 FHIR standard for healthcare interoperability in Java. Prior to version 6.9.0, when setting headers in HTTP requests, the internal HTTP client sends headers first to the host in the initial URL but also, if asked to follow redirects and a 30X HTTP response code is returned, to the host mentioned in URL in the Location: response header value. Sending the same set of headers to subsequent hosts is a problem as this header often contains privacy sensitive information or data that could allow others to impersonate the client's request. This issue has been patched in release 6.9.0. No known workarounds are available.",
+  "severity": "HIGH",
+  "sha256_hash": "e7ecb74056ff332ab7546bd98a59c4d76c324c5444991bf21d3717364fdfb3c8",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 111,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33180"
+}

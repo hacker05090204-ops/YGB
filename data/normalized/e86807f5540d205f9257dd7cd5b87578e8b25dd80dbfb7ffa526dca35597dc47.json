@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware vRealize Operations Manager API Server Side Request Forgery (SSRF) in vRealize Operations Manager API prior to 8.4 may allow a malicious actor with network access to the vRealize Operations Manager API to perform a SSRF attack to steal administrative credentials.",
+  "token_count": 41
+}

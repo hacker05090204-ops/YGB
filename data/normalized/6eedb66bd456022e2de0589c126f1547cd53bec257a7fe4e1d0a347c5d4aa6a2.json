@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A potential vulnerability was reported in the Lenovo FileZ Android application that, under certain conditions, could allow a local authenticated user to retrieve some sensitive data stored in a log file.",
+  "token_count": 31
+}

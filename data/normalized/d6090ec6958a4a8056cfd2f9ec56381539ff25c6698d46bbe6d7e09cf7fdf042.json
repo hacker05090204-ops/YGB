@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Cisco IOS and IOS XE contain an out-of-bounds write vulnerability in the Group Encrypted Transport VPN (GET VPN) feature that could allow an authenticated, remote attacker who has administrative control of either a group member or a key server to execute malicious code or cause a device to crash.",
+  "token_count": 54
+}

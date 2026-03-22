@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "RARLAB UnRAR RARLAB UnRAR on Linux and UNIX contains a directory traversal vulnerability, allowing an attacker to write to files during an extract (unpack) operation.",
+  "token_count": 25
+}

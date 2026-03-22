@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3737",
+  "ingested_at": "2026-03-22T07:54:42.052160+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in SourceCodester Pet Grooming Management Software 1.0. This affects an unknown part of the file add_user.php of the component User Creation Handler. Executing a manipulation can lead to improper authorization. The attack may be launched remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "MEDIUM",
+  "sha256_hash": "93c1e97823cf2d15031cefab39f5e5c358859dd214dec3dce92b264f0fe4d218",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3737"
+}

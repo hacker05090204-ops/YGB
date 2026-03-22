@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting (XSS) vulnerability that allows a remote authenticated attacker to execute arbitrary code via a crafted script to the /h/autoSaveDraft function.",
+  "token_count": 34
+}

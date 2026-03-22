@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-58360",
+  "ingested_at": "2026-03-22T07:45:16.020051+00:00",
+  "lang": "en",
+  "raw_text": "OSGeo GeoServer OSGeo GeoServer contains an improper restriction of XML external entity reference vulnerability that occurs when the application accepts XML input through a specific endpoint /geoserver/wms operation GetMap and could allow an attacker to define external entities within the XML request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2d08d086f394d22f7728eb39cd9083ba3e041be3c3786c78902c3a3858d0f939",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

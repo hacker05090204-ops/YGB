@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Due to a missing authorization check in SAP NetWeaver Application Server for ABAP, an authenticated attacker with user privileges could read Database Analyzer Log Files via a specific RFC function module. The attacker with the necessary privileges to execute this function module could potentially escalate their privileges and read the sensitive data, resulting in a limited impact on the confidentiality of the information stored. However, the integrity and availability of the system are not affected.",
+  "token_count": 75
+}

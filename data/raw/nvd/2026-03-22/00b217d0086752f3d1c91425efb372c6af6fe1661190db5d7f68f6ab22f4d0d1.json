@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24310",
+  "ingested_at": "2026-03-22T07:54:42.470374+00:00",
+  "lang": "en",
+  "raw_text": "Due to missing authorization check in SAP NetWeaver Application Server for ABAP, an authenticated attacker could execute specific ABAP function module and read the sensitive information from database catalog of the ABAP system. This vulnerability has low impact on the application's confidentiality with no effect on the integrity and availability.",
+  "severity": "LOW",
+  "sha256_hash": "00b217d0086752f3d1c91425efb372c6af6fe1661190db5d7f68f6ab22f4d0d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24310"
+}

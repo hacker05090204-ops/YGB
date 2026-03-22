@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23749",
+  "ingested_at": "2026-03-22T07:54:32.694890+00:00",
+  "lang": "en",
+  "raw_text": "Golioth Firmware SDK version 0.19.1 prior to 0.22.0, fixed in commit 0e788217, contain an out-of-bounds read due to improper null termination of a blockwise transfer path. blockwise_transfer_init() accepts a path whose length equals CONFIG_GOLIOTH_COAP_MAX_PATH_LEN and copies it using strncpy() without guaranteeing a trailing NUL byte, leaving ctx->path unterminated. A later strlen() on this buffer (in golioth_coap_client_get_internal()) can read past the end of the allocation, resulting in a crash/denial of service. The input is application-controlled (not network by default).",
+  "severity": "LOW",
+  "sha256_hash": "22b83a04b9f9891d0a9de8ec735ebb515256d1688e2c516c053d2df56bfa6cc3",
+  "source": "nvd",
+  "tags": [
+    "CWE-170"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23749"
+}

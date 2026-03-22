@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Timetics WordPress plugin before 1.0.52 does not have authorization in a REST endpoint, allowing unauthenticated users to arbitrarily change a booking's payment status and post status for the \"timetics-booking\" custom post type.",
+  "token_count": 33
+}

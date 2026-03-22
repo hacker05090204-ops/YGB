@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "7-Zip 7-Zip 7-Zip contains a protection mechanism failure vulnerability that allows remote attackers to bypass the Mark-of-the-Web security feature to execute arbitrary code in the context of the current user.",
+  "token_count": 30
+}

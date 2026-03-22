@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-6530",
+  "ingested_at": "2026-03-22T07:45:17.663765+00:00",
+  "lang": "en",
+  "raw_text": "D-Link Multiple Routers Multiple D-Link routers contain an unspecified vulnerability that allows for execution of OS commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "db9007a9f5782c61a24a2e6b27fd0af4c8743197ed841e461719ec6695413908",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

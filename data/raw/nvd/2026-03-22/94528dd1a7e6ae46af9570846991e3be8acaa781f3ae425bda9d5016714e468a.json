@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27444",
+  "ingested_at": "2026-03-22T07:54:34.416671+00:00",
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 incorrectly interprets email addresses in the email headers, causing an interpretation conflict with other mail infrastructure that allows an attacker to fake the source of the email or decrypt it.",
+  "severity": "HIGH",
+  "sha256_hash": "94528dd1a7e6ae46af9570846991e3be8acaa781f3ae425bda9d5016714e468a",
+  "source": "nvd",
+  "tags": [
+    "CWE-436"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27444"
+}

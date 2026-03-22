@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26948",
+  "ingested_at": "2026-03-22T07:54:47.616926+00:00",
+  "lang": "en",
+  "raw_text": "Dell Integrated Dell Remote Access Controller 9, 14G versions prior to 7.00.00.174, 15G and 16G versions prior to 7.10.90.00, contain an Exposure of Sensitive System Information Due to Uncleared Debug Information vulnerability. A high privileged attacker with remote access could potentially exploit this vulnerability, leading to information disclosure.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2a303ab22e6be2188332ab111e5e1abdc3cb3fbc6a66eac21004028d5dd19465",
+  "source": "nvd",
+  "tags": [
+    "CWE-1258"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26948"
+}

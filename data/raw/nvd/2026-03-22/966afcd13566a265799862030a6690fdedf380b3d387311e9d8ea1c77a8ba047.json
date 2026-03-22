@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29196",
+  "ingested_at": "2026-03-22T07:54:41.902870+00:00",
+  "lang": "en",
+  "raw_text": "Netmaker makes networks with WireGuard. Prior to version 1.5.0, a user assigned the platform-user role can retrieve WireGuard private keys of all wireguard configs in a network by calling GET /api/extclients/{network} or GET /api/nodes/{network}. While the Netmaker UI restricts visibility, the API endpoints return full records, including private keys, without filtering based on the requesting user's ownership. This issue has been patched in version 1.5.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "966afcd13566a265799862030a6690fdedf380b3d387311e9d8ea1c77a8ba047",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29196"
+}

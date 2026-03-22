@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-32537",
+  "ingested_at": "2026-03-22T07:54:48.769402+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site request forgery (CSRF) vulnerability in joshuae1974 Flash Video Player allows Cross Site Request Forgery.This issue affects Flash Video Player: from n/a through 5.0.4.",
+  "severity": "HIGH",
+  "sha256_hash": "72e47304150e5f7c161c430bd433887bdffbde77f882bbe2c5fa0f5d786e17f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-32537"
+}

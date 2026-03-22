@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GNU GNU C Library GNU C Library's dynamic loader ld.so contains a buffer overflow vulnerability when processing the GLIBC_TUNABLES environment variable, allowing a local attacker to execute code with elevated privileges.",
+  "token_count": 31
+}

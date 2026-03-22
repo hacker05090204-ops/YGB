@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Reader and Acrobat The Universal 3D (U3D) component in Adobe Reader and Acrobat contains a memory corruption vulnerability which could allow remote attackers to execute code or cause denial-of-service (DoS).",
+  "token_count": 31
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple iOS and macOS Apple iOS and macOS contain an out-of-bounds write vulnerability that could allow for remote code execution when processing malicious crafted web content.",
+  "token_count": 26
+}

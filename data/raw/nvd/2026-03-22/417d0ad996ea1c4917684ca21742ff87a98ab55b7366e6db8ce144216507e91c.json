@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28130",
+  "ingested_at": "2026-03-22T07:54:40.683912+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in AndonDesign UDesign u-design allows Reflected XSS.This issue affects UDesign: from n/a through < = 4.14.0.",
+  "severity": "HIGH",
+  "sha256_hash": "417d0ad996ea1c4917684ca21742ff87a98ab55b7366e6db8ce144216507e91c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28130"
+}

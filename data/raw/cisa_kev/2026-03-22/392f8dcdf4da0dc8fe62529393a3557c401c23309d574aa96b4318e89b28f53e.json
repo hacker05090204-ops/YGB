@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-28310",
+  "ingested_at": "2026-03-22T07:45:19.361575+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Microsoft Windows Win32k contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "392f8dcdf4da0dc8fe62529393a3557c401c23309d574aa96b4318e89b28f53e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 14,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

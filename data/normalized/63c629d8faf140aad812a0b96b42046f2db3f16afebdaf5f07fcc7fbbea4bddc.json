@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A broken access control may allow an authenticated user to perform a horizontal privilege escalation. The vulnerability only impacts specific configurations.",
+  "token_count": 21
+}

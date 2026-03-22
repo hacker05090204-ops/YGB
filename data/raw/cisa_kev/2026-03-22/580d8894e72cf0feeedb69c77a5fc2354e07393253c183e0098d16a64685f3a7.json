@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-35247",
+  "ingested_at": "2026-03-22T07:45:18.820189+00:00",
+  "lang": "en",
+  "raw_text": "SolarWinds Serv-U SolarWinds Serv-U versions 15.2.5 and earlier contain an improper input validation vulnerability that allows attackers to build and send queries without sanitization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "580d8894e72cf0feeedb69c77a5fc2354e07393253c183e0098d16a64685f3a7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29793",
+  "ingested_at": "2026-03-22T07:54:43.107810+00:00",
+  "lang": "en",
+  "raw_text": "Feathersjs is a framework for creating web APIs and real-time applications with TypeScript or JavaScript. From 5.0.0 to before 5.0.42, Socket.IO clients can send arbitrary JavaScript objects as the id argument to any service method (get, patch, update, remove). The transport layer performs no type checking on this argument. When the service uses the MongoDB adapter, these objects pass through getObjectId() and land directly in the MongoDB query as operators. Sending {$ne: null} as the id matches every document in the collection. This vulnerability is fixed in 5.0.42.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cbe4c187bf7fdcd83f89400e6af31a3e5bd3046afeebf57af06ad53d914036d3",
+  "source": "nvd",
+  "tags": [
+    "CWE-943"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29793"
+}

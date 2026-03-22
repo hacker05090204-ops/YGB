@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13902",
+  "ingested_at": "2026-03-22T07:54:42.557835+00:00",
+  "lang": "en",
+  "raw_text": "CWE-79 Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability exists that could cause condition where authenticated attackers can have a victim\u2019s browser run arbitrary JavaScript when the victim hovers over a maliciously crafted element on a web server containing the injected payload.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d038e4b23197ca7883f5ab464a1068f4b73b4eb12141645a93dfde5091de9897",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13902"
+}

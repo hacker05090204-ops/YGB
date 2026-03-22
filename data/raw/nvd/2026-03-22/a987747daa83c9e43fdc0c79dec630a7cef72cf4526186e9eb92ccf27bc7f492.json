@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26418",
+  "ingested_at": "2026-03-22T07:54:40.893006+00:00",
+  "lang": "en",
+  "raw_text": "Missing authentication and authorization in the web API of Tata Consultancy Services Cognix Recon Client v3.0 allows remote attackers to access application functionality without restriction via the network.",
+  "severity": "HIGH",
+  "sha256_hash": "a987747daa83c9e43fdc0c79dec630a7cef72cf4526186e9eb92ccf27bc7f492",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26418"
+}

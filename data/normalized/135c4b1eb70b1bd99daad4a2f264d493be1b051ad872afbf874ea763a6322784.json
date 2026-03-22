@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, SuiteCRM contains an authenticated arbitrary file upload vulnerability in the Configurator module. An authenticated administrator can bypass intended file type restrictions when uploading PDF font files, allowing arbitrary files with attacker\u2010controlled filenames to be written to the server. Although the upload directory is not directly web\u2010accessible by default, this behavior breaks security boundaries and may enable further attacks when combined with other vulnerabilities or in certain deployment configurations. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "token_count": 92
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use of a deterministic credential generation algorithm in /ftl/bin/calc_f2 in Small Cell Sercomm SCE4255W (FreedomFi Englewood) firmware before DG3934v3@2308041842 allows remote attackers to derive valid administrative/root credentials from the device's MAC address, enabling authentication bypass and full device access.",
+  "token_count": 39
+}

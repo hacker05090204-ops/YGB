@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25185",
+  "ingested_at": "2026-03-22T07:54:42.750058+00:00",
+  "lang": "en",
+  "raw_text": "Exposure of sensitive information to an unauthorized actor in Windows Shell Link Processing allows an unauthorized attacker to perform spoofing over a network.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7d7057632ecdb15afdec209ae778b71393126950131052ae541c720b6088a3ec",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25185"
+}

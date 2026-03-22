@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1652",
+  "ingested_at": "2026-03-22T07:45:18.519794+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Small Business RV320 and RV325 Dual Gigabit WAN VPN Routers A vulnerability in the web-based management interface of Cisco Small Business RV320 and RV325 Dual Gigabit WAN VPN Routers could allow an authenticated, remote attacker with administrative privileges on an affected device to execute arbitrary commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "84e3ea3974e1b48c3cd6ed788a123eabd766dc86a09214d06d69b0ebe75bac04",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

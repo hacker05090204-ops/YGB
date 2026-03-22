@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32754",
+  "ingested_at": "2026-03-22T07:54:48.269598+00:00",
+  "lang": "en",
+  "raw_text": "FreeScout is a free help desk and shared inbox built with PHP's Laravel framework. Versions 1.8.208 and below are vulnerable to Stored Cross-Site Scripting (XSS) through FreeScout's email notification templates. Incoming email bodies are stored in the database without sanitization and rendered unescaped in outgoing email notifications using Blade's raw output syntax {!! $thread->body !!}. An unauthenticated attacker can exploit this vulnerability by simply sending an email, and when opened by any subscribed agent or admin as part of their normal workflow, enabling universal HTML injection (phishing, tracking) and, in vulnerable email clients, JavaScript execution (session hijacking, credential theft, account takeover) affecting all recipients simultaneously. This issue has been fixed in version 1.8.209.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e488822be6cddaee7718d8b4e62183a9b7cd1b281162c3761e5c4ae39370724c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-116"
+  ],
+  "token_count": 113,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32754"
+}

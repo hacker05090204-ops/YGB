@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-53770",
+  "ingested_at": "2026-03-22T07:45:16.311313+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SharePoint Microsoft SharePoint Server on-premises contains a deserialization of untrusted data vulnerability that could allow an unauthorized attacker to execute code over a network. This vulnerability could be chained with CVE-2025-53771. CVE-2025-53770 is a patch bypass for CVE-2025-49704, and the updates for CVE-2025-53770 include more robust protection than those for CVE-2025-49704.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1200d389a0d9cce58d9f18262a116e3be5c92cc43ac12b1720d2a932f10f7490",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 52,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

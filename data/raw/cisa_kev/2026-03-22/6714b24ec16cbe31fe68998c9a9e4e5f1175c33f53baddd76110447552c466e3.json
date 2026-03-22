@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-53197",
+  "ingested_at": "2026-03-22T07:45:16.471567+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains an out-of-bounds access vulnerability in the USB-audio driver that allows an attacker with physical access to the system to use a malicious USB device to potentially manipulate system memory, escalate privileges, or execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6714b24ec16cbe31fe68998c9a9e4e5f1175c33f53baddd76110447552c466e3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

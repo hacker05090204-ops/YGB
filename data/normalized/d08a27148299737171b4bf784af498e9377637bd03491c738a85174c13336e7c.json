@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zarf is an Airgap Native Packager Manager for Kubernetes. From version 0.54.0 to before version 0.73.1, a path traversal vulnerability in archive extraction allows a specifically crafted Zarf package to create symlinks pointing outside the destination directory, enabling arbitrary file read or write on the system processing the package. This issue has been patched in version 0.73.1.",
+  "token_count": 57
+}

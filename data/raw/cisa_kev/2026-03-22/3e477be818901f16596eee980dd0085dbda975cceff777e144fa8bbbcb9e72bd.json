@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-0185",
+  "ingested_at": "2026-03-22T07:45:19.291062+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Media Center contains a remote code execution vulnerability when Windows Media Center opens a specially crafted Media Center link (.mcl) file that references malicious code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3e477be818901f16596eee980dd0085dbda975cceff777e144fa8bbbcb9e72bd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

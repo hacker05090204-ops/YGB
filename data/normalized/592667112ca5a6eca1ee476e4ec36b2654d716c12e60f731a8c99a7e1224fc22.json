@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "EHG2408 series switch developed by Atop Technologies has a Stack-based Buffer Overflow vulnerability, allowing unauthenticated remote attackers to control the program's execution flow and execute arbitrary code.",
+  "token_count": 27
+}

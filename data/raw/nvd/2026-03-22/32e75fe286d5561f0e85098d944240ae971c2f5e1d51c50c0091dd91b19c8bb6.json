@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28446",
+  "ingested_at": "2026-03-22T07:54:41.022039+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.1 with the voice-call extension installed and enabled contain an authentication bypass vulnerability in inbound allowlist policy validation that accepts empty caller IDs and uses suffix-based matching instead of strict equality. Remote attackers can bypass inbound access controls by placing calls with missing caller IDs or numbers ending with allowlisted digits to reach the voice-call agent and execute tools.",
+  "severity": "CRITICAL",
+  "sha256_hash": "32e75fe286d5561f0e85098d944240ae971c2f5e1d51c50c0091dd91b19c8bb6",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-303"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28446"
+}

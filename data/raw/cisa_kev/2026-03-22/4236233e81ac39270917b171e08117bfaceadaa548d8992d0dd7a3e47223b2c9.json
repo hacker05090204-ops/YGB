@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-42824",
+  "ingested_at": "2026-03-22T07:45:17.210786+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and iPadOS Apple iOS and iPadOS contain an unspecified vulnerability that allows for local privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4236233e81ac39270917b171e08117bfaceadaa548d8992d0dd7a3e47223b2c9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

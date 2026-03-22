@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-28949",
+  "ingested_at": "2026-03-22T07:45:17.700596+00:00",
+  "lang": "en",
+  "raw_text": "PEAR Archive_Tar PEAR Archive_Tar allows an unserialization attack because phar: is blocked but PHAR: is not blocked. PEAR stands for PHP Extension and Application Repository and it is an open-source framework and distribution system for reusable PHP components with known usage in third-party products such as Drupal Core and Red Hat Linux.",
+  "severity": "CRITICAL",
+  "sha256_hash": "654726fd499654e5ade784ce3ccbbe81cab3e40b87b81c0504edb8de8476473a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 52,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

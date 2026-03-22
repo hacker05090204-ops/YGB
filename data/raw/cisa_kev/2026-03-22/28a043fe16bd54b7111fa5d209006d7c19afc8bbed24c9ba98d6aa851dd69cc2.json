@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-4398",
+  "ingested_at": "2026-03-22T07:45:18.269069+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Stack-based buffer overflow in the RtlQueryRegistryValues function in win32k.sys in Microsoft Windows allows local users to gain privileges, and bypass the User Account Control (UAC) feature.",
+  "severity": "CRITICAL",
+  "sha256_hash": "28a043fe16bd54b7111fa5d209006d7c19afc8bbed24c9ba98d6aa851dd69cc2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior expose user passwords in plaintext within the administrative interface and HTTP responses, allowing recovery of valid credentials.",
+  "token_count": 26
+}

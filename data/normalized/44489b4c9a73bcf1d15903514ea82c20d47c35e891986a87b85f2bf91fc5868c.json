@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Intelligence Enterprise Edition Path traversal vulnerability, where an attacker can target the preview FilePath parameter of the getPreviewImage function to get access to arbitrary system file.",
+  "token_count": 27
+}

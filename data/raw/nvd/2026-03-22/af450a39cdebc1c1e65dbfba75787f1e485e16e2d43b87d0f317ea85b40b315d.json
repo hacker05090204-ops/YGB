@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2025-15576",
+  "ingested_at": "2026-03-22T07:54:42.266479+00:00",
+  "lang": "en",
+  "raw_text": "If two sibling jails are restricted to separate filesystem trees, which is to say that neither of the two jail root directories is an ancestor of the other, jailed processes may nonetheless be able to access a shared directory via a nullfs mount, if the administrator has configured one. In this case, cooperating processes in the two jails may establish a connection using a unix domain socket and exchange directory descriptors with each other. When performing a filesystem name lookup, at each step of the lookup, the kernel checks whether the lookup would descend below the jail root of the current process. If the jail root directory is not encountered, the lookup continues. In a configuration where processes in two different jails are able to exchange file descriptors using a unix domain socket, it is possible for a jailed process to receive a directory for a descriptor that is below that process' jail root. This enables full filesystem access for a jailed process, breaking the chroot. Note that the system administrator is still responsible for ensuring that an unprivileged user on the jail host is not able to pass directory descriptors to a jailed process, even in a patched kernel.",
+  "severity": "HIGH",
+  "sha256_hash": "af450a39cdebc1c1e65dbfba75787f1e485e16e2d43b87d0f317ea85b40b315d",
+  "source": "nvd",
+  "tags": [
+    "CWE-269",
+    "CWE-488",
+    "CWE-790"
+  ],
+  "token_count": 200,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15576"
+}

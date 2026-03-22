@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the HTML Cascading Style Sheets (CSS) module of ClamAV could allow an unauthenticated, remote attacker to cause a denial of service (DoS) condition on an affected device. This vulnerability is due to improper error handling when splitting UTF-8 strings. An attacker could exploit this vulnerability by submitting a crafted HTML file to be scanned by ClamAV on an affected device. A successful exploit could allow the attacker to terminate the scanning process.",
+  "token_count": 75
+}

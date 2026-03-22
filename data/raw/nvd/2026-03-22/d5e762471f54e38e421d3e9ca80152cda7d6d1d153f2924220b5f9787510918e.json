@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33346",
+  "ingested_at": "2026-03-22T07:54:48.118431+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.2, a stored cross-site scripting (XSS) vulnerability in the patient portal payment flow allows a patient portal user to persist arbitrary JavaScript that executes in the browser of a staff member who reviews the payment submission. The payload is stored via `portal/lib/paylib.php` and rendered without escaping in `portal/portal_payment.php`. Version 8.0.0.2 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "d5e762471f54e38e421d3e9ca80152cda7d6d1d153f2924220b5f9787510918e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33346"
+}

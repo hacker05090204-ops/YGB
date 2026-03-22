@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26682",
+  "ingested_at": "2026-03-22T07:54:32.702887+00:00",
+  "lang": "en",
+  "raw_text": "An issue in fastCMS before v.0.1.6 allows a local attacker to execute arbitrary code via the PluginController.java component",
+  "severity": "HIGH",
+  "sha256_hash": "8b5211f93ae3b2a90df4a97e40dd2ddddbe71ee5eb27834b4804b685a20ed1be",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26682"
+}

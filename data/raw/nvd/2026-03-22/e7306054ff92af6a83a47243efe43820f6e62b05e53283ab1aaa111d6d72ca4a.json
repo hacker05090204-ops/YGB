@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28223",
+  "ingested_at": "2026-03-22T07:54:40.944166+00:00",
+  "lang": "en",
+  "raw_text": "Wagtail is an open source content management system built on Django. Prior to versions 6.3.8, 7.0.6, 7.2.3, and 7.3.1, a stored cross-site scripting (XSS) vulnerability exists on confirmation messages within the wagtail.contrib.simple_translation module. A user with access to the Wagtail admin area may create a page with a specially-crafted title which, when another user performs the \"Translate\" action, causes arbitrary JavaScript code to run. This could lead to performing actions with that user's credentials. The vulnerability is not exploitable by an ordinary site visitor without access to the Wagtail admin. This issue has been patched in versions 6.3.8, 7.0.6, 7.2.3, and 7.3.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e7306054ff92af6a83a47243efe43820f6e62b05e53283ab1aaa111d6d72ca4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28223"
+}

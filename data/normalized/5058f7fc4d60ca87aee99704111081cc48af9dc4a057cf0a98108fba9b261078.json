@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CyberPersons CyberPanel CyberPanel contains an incorrect default permissions vulnerability that allows for authentication bypass and the execution of arbitrary commands using shell metacharacters in the statusfile property.",
+  "token_count": 27
+}

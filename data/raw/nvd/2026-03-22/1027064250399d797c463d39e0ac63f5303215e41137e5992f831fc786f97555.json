@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-52387",
+  "ingested_at": "2026-03-22T07:54:29.969735+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Liton Arefin Master Addons for Elementor master-addons allows Stored XSS.This issue affects Master Addons for Elementor: from n/a through < = 2.0.9.9.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1027064250399d797c463d39e0ac63f5303215e41137e5992f831fc786f97555",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-52387"
+}

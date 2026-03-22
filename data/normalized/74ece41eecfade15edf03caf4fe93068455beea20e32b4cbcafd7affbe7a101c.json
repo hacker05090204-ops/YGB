@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A cross-site scripting (XSS) vulnerability in a FileMaker WebDirect custom homepage could lead to unauthorized access and remote code execution. This vulnerability has been fully addressed in FileMaker Server 22.0.4 and FileMaker Server 21.1.7.",
+  "token_count": 34
+}

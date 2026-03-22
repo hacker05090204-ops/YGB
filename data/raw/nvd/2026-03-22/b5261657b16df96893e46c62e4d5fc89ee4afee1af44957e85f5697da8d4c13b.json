@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3390",
+  "ingested_at": "2026-03-22T07:54:33.453386+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in FascinatedBox lily up to 2.3. This issue affects the function patch_line_end of the file src/lily_build_error.c of the component Error Reporting. The manipulation leads to out-of-bounds read. The attack can only be performed from a local environment. The exploit is publicly available and might be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "b5261657b16df96893e46c62e4d5fc89ee4afee1af44957e85f5697da8d4c13b",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125",
+    "CWE-125"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3390"
+}

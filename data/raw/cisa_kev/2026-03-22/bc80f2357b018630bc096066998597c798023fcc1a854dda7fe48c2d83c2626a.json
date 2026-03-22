@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-6558",
+  "ingested_at": "2026-03-22T07:45:16.297608+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Google Chromium contains an improper input validation vulnerability in ANGLE and GPU. This vulnerability could allow a remote attacker to potentially perform a sandbox escape via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bc80f2357b018630bc096066998597c798023fcc1a854dda7fe48c2d83c2626a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

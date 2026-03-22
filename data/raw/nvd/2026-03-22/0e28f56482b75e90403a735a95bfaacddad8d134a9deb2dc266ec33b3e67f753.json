@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23237",
+  "ingested_at": "2026-03-22T07:54:34.516850+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: platform/x86: classmate-laptop: Add missing NULL pointer checks In a few places in the Classmate laptop driver, code using the accel object may run before that object's address is stored in the driver data of the input device using it. For example, cmpc_accel_sensitivity_store_v4() is the \"show\" method of cmpc_accel_sensitivity_attr_v4 which is added in cmpc_accel_add_v4(), before calling dev_set_drvdata() for inputdev->dev. If the sysfs attribute is accessed prematurely, the dev_get_drvdata(&inputdev->dev) call in in cmpc_accel_sensitivity_store_v4() returns NULL which leads to a NULL pointer dereference going forward. Moreover, sysfs attributes using the input device are added before initializing that device by cmpc_add_acpi_notify_device() and if one of them is accessed before running that function, a NULL pointer dereference will occur. For example, cmpc_accel_sensitivity_attr_v4 is added before calling cmpc_add_acpi_notify_device() and if it is read prematurely, the dev_get_drvdata(&acpi->dev) call in cmpc_accel_sensitivity_show_v4() returns NULL which leads to a NULL pointer dereference going forward. Fix this by adding NULL pointer checks in all of the relevant places.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0e28f56482b75e90403a735a95bfaacddad8d134a9deb2dc266ec33b3e67f753",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 167,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23237"
+}

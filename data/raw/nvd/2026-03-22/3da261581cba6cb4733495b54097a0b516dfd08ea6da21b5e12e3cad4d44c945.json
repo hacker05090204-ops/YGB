@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33072",
+  "ingested_at": "2026-03-22T07:54:48.752368+00:00",
+  "lang": "en",
+  "raw_text": "FileRise is a self-hosted web file manager / WebDAV server. In versions prior to 3.9.0, a hardcoded default encryption key (default_please_change_this_key) is used for all cryptographic operations \u2014 HMAC token generation, AES config encryption, and session tokens \u2014 allowing any unauthenticated attacker to forge upload tokens for arbitrary file upload to shared folders, and to decrypt admin configuration secrets including OIDC client secrets and SMTP passwords. FileRise uses a single key (PERSISTENT_TOKENS_KEY) for all crypto operations. The default value default_please_change_this_key is hardcoded in two places and used unless the deployer explicitly overrides the environment variable. This issue is fixed in version 3.9.0.",
+  "severity": "HIGH",
+  "sha256_hash": "3da261581cba6cb4733495b54097a0b516dfd08ea6da21b5e12e3cad4d44c945",
+  "source": "nvd",
+  "tags": [
+    "CWE-798",
+    "CWE-1188"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33072"
+}

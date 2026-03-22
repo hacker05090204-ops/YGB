@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22384",
+  "ingested_at": "2026-03-22T07:54:30.422288+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in leafcolor Applay - Shortcodes applay-shortcodes allows Object Injection.This issue affects Applay - Shortcodes: from n/a through < = 3.7.",
+  "severity": "HIGH",
+  "sha256_hash": "cd763e2d9737962672be770875eaaa1d46369e6e101422a5f695d0b7c230738d",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22384"
+}

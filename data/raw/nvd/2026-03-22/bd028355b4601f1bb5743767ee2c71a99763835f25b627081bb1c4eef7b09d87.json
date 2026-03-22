@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30830",
+  "ingested_at": "2026-03-22T07:54:41.762743+00:00",
+  "lang": "en",
+  "raw_text": "Defuddle cleans up HTML pages. Prior to version 0.9.0, the _findContentBySchemaText method in src/defuddle.ts interpolates image src and alt attributes directly into an HTML string without escaping. An attacker can use a \" in the alt attribute to break out of the attribute context and inject event handler. This issue has been patched in version 0.9.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bd028355b4601f1bb5743767ee2c71a99763835f25b627081bb1c4eef7b09d87",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30830"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-9465",
+  "ingested_at": "2026-03-22T07:45:16.718219+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks Expedition Palo Alto Networks Expedition contains a SQL injection vulnerability that allows an unauthenticated attacker to reveal Expedition database contents, such as password hashes, usernames, device configurations, and device API keys. With this, attackers can also create and read arbitrary files on the Expedition system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7a08cbccecc254bad10978d17e358c872e4d7323308c8b139bf92e3045c1f80",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 48,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

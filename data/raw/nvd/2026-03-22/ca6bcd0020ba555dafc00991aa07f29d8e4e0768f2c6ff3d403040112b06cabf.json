@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33144",
+  "ingested_at": "2026-03-22T07:54:48.987934+00:00",
+  "lang": "en",
+  "raw_text": "GPAC is an open-source multimedia framework. Prior to commit 86b0e36, a heap-based buffer overflow (write) vulnerability was discovered in GPAC MP4Box. The vulnerability exists in the gf_xml_parse_bit_sequence_bs function in utils/xml_bin_custom.c when processing a crafted NHML file containing malicious (BitSequence) elements. An attacker can exploit this by providing a specially crafted NHML file, causing an out-of-bounds write on the heap. This issue has been via commit 86b0e36.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ca6bcd0020ba555dafc00991aa07f29d8e4e0768f2c6ff3d403040112b06cabf",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33144"
+}

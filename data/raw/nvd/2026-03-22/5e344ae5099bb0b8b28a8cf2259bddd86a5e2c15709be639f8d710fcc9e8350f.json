@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48613",
+  "ingested_at": "2026-03-22T07:54:33.864099+00:00",
+  "lang": "en",
+  "raw_text": "In VBMeta, there is a possible way to modify and resign VBMeta using a test key, assuming the original image was previously signed with the same key. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "5e344ae5099bb0b8b28a8cf2259bddd86a5e2c15709be639f8d710fcc9e8350f",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48613"
+}

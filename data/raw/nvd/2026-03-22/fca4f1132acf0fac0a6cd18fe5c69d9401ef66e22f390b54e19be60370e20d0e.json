@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30837",
+  "ingested_at": "2026-03-22T07:54:43.169810+00:00",
+  "lang": "en",
+  "raw_text": "Elysia is a Typescript framework for request validation, type inference, OpenAPI documentation and client-server communication. Prior to 1.4.26 , t.String({ format: 'url' }) is vulnerable to ReDoS. Repeating a partial url format (protocol and hostname) multiple times cause regex to slow down significantly. This vulnerability is fixed in 1.4.26.",
+  "severity": "HIGH",
+  "sha256_hash": "fca4f1132acf0fac0a6cd18fe5c69d9401ef66e22f390b54e19be60370e20d0e",
+  "source": "nvd",
+  "tags": [
+    "CWE-1333"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30837"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14287",
+  "ingested_at": "2026-03-22T07:54:46.304594+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability exists in mlflow/mlflow versions before v3.7.0, specifically in the `mlflow/sagemaker/__init__.py` file at lines 161-167. The vulnerability arises from the direct interpolation of user-supplied container image names into shell commands without proper sanitization, which are then executed using `os.system()`. This allows attackers to execute arbitrary commands by supplying malicious input through the `--container` parameter of the CLI. The issue affects environments where MLflow is used, including development setups, CI/CD pipelines, and cloud deployments.",
+  "severity": "HIGH",
+  "sha256_hash": "918dc2143d8ff7e59e3f4c1b2213b2927ee8937f18e02bd512eac045474c1ed7",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14287"
+}

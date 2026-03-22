@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27951",
+  "ingested_at": "2026-03-22T07:54:32.369704+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, the function `Stream_EnsureCapacity` can create an endless blocking loop. This may affect all client and server implementations using `FreeRDP`. For practical exploitation this will only work on 32bit systems where the available physical memory is `>= SIZE_MAX`. Version 3.23.0 contains a patch. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6bca841feb5b5e2a21feba8caf990b7c4e7808439d79b481b7dd01acc769cfbc",
+  "source": "nvd",
+  "tags": [
+    "CWE-190"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27951"
+}

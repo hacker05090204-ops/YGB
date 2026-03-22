@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in UTT HiPER 810G 1.7.7-171114. This affects the function strcpy of the file /goform/ConfigExceptAli. Executing a manipulation can lead to buffer overflow. The attack can be launched remotely. The exploit has been publicly disclosed and may be utilized.",
+  "token_count": 42
+}

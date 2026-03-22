@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Versions 25.0 and below are vulnerable to unauthenticated application takeover through the install/checkConfiguration.php endpoint. install/checkConfiguration.php performs full application initialization: database setup, admin account creation, and configuration file write, all from an unauthenticated POST input. The only guard is checking whether videos/configuration.php already exists. On uninitialized deployments, any remote attacker can complete the installation with attacker-controlled credentials and an attacker-controlled database, gaining full administrative access. This issue has been fixed in version 26.0.",
+  "token_count": 80
+}

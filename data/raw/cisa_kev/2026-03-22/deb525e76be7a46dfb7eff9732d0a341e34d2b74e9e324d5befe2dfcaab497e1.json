@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-0994",
+  "ingested_at": "2026-03-22T07:45:16.601959+00:00",
+  "lang": "en",
+  "raw_text": "Trimble Cityworks Trimble Cityworks contains a deserialization vulnerability. This could allow an authenticated user to perform a remote code execution attack against a customer's Microsoft Internet Information Services (IIS) web server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "deb525e76be7a46dfb7eff9732d0a341e34d2b74e9e324d5befe2dfcaab497e1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

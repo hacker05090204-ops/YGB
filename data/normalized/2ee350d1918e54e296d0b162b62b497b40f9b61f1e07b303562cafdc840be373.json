@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Appointment Booking Calendar \u2014 Simply Schedule Appointments Booking Plugin plugin for WordPress is vulnerable to SQL Injection via the 'fields' parameter in all versions up to, and including, 1.6.10.0 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database, including usernames, email addresses, and password hashes.",
+  "token_count": 83
+}

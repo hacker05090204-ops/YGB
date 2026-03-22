@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8816",
+  "ingested_at": "2026-03-22T07:45:18.926934+00:00",
+  "lang": "en",
+  "raw_text": "Pi-hole AdminLTE Pi-hole Web v4.3.2 (aka AdminLTE) allows Remote Code Execution by privileged dashboard users via a crafted DHCP static lease.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ddf99fc3325b616d446cd056e4d38c7110fe8f0ac5075ac6f74ee2c92af1d13c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

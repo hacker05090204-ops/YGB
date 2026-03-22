@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25105",
+  "ingested_at": "2026-03-22T07:54:33.010664+00:00",
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an authenticated attacker to achieve remote code execution on the system by injecting malicious input into parameters of the Modbus command tool in the debug route.",
+  "severity": "HIGH",
+  "sha256_hash": "e2e46b52e236c0ed893b90e5ce59acb2895289b514b07cef36bdc58b9aecde60",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25105"
+}

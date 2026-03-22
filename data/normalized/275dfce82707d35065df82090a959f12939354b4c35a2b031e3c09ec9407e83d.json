@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in trueleaf ApiFlow 0.9.7. The impacted element is the function validateUrlSecurity of the file packages/server/src/service/proxy/http_proxy.service.ts of the component URL Validation Handler. This manipulation causes server-side request forgery. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized.",
+  "token_count": 48
+}

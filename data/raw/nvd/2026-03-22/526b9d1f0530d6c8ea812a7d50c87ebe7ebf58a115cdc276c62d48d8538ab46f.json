@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-66319",
+  "ingested_at": "2026-03-22T07:54:40.717162+00:00",
+  "lang": "en",
+  "raw_text": "Permission control vulnerability in the resource scheduling module. Impact: Successful exploitation of this vulnerability may affect service integrity.",
+  "severity": "LOW",
+  "sha256_hash": "526b9d1f0530d6c8ea812a7d50c87ebe7ebf58a115cdc276c62d48d8538ab46f",
+  "source": "nvd",
+  "tags": [
+    "CWE-264",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66319"
+}

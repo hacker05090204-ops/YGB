@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-28987",
+  "ingested_at": "2026-03-22T07:45:16.765083+00:00",
+  "lang": "en",
+  "raw_text": "SolarWinds Web Help Desk SolarWinds Web Help Desk contains a hardcoded credential vulnerability that could allow a remote, unauthenticated user to access internal functionality and modify data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c3542b6a5f0e772b2b8cfa5fd9fdb993120364536d1f02f8272cba1704413b15",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

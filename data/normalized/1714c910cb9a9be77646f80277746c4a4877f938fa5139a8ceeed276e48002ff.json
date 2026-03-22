@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TeleMessage TM SGNL TeleMessage TM SGNL contains a hidden functionality vulnerability in which the archiving backend holds cleartext copies of messages from TM SGNL application users.",
+  "token_count": 26
+}

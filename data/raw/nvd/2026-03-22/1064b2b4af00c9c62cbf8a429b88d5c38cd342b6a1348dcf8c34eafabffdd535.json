@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31898",
+  "ingested_at": "2026-03-22T07:54:47.346912+00:00",
+  "lang": "en",
+  "raw_text": "jsPDF is a library to generate PDFs in JavaScript. Prior to version 4.2.1, user control of arguments of the `createAnnotation` method allows users to inject arbitrary PDF objects, such as JavaScript actions. If given the possibility to pass unsanitized input to the following method, a user can inject arbitrary PDF objects, such as JavaScript actions, which might trigger when the PDF is opened or interacted with the `createAnnotation`: `color` parameter. The vulnerability has been fixed in jsPDF@4.2.1. As a workaround, sanitize user input before passing it to the vulnerable API members.",
+  "severity": "HIGH",
+  "sha256_hash": "1064b2b4af00c9c62cbf8a429b88d5c38cd342b6a1348dcf8c34eafabffdd535",
+  "source": "nvd",
+  "tags": [
+    "CWE-116"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31898"
+}

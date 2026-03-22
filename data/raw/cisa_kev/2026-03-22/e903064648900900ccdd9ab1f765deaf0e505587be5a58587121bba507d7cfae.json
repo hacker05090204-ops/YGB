@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0422",
+  "ingested_at": "2026-03-22T07:45:17.923492+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java Runtime Environment (JRE) A vulnerability in the way Java restricts the permissions of Java applets could allow an attacker to execute commands on a vulnerable system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e903064648900900ccdd9ab1f765deaf0e505587be5a58587121bba507d7cfae",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15509",
+  "ingested_at": "2026-03-22T07:54:33.076775+00:00",
+  "lang": "en",
+  "raw_text": "The SmartRemote module has insufficient restrictions on loading URLs, which may lead to some information leakage.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7ad81130b53d86a2a4135806fd6b2814dfb547fc17ab28fc14382f9867c63c4c",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15509"
+}

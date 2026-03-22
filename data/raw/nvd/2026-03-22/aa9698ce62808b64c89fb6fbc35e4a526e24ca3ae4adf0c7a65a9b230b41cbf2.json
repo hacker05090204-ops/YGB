@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1487",
+  "ingested_at": "2026-03-22T07:54:34.002501+00:00",
+  "lang": "en",
+  "raw_text": "The LatePoint \u2013 Calendar Booking Plugin for Appointments and Events plugin for WordPress is vulnerable to SQL Injection via the JSON Import in all versions up to, and including, 5.2.7 due to insufficient validation on the user-supplied JSON data. This makes it possible for authenticated attackers, with Administrator-level access and above, to execute arbitrary SQL queries on the database that can be used to extract information via time-based techniques, drop tables, or modify data.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aa9698ce62808b64c89fb6fbc35e4a526e24ca3ae4adf0c7a65a9b230b41cbf2",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1487"
+}

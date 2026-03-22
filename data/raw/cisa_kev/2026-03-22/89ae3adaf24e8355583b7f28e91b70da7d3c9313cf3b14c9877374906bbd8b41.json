@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-0609",
+  "ingested_at": "2026-03-22T07:45:18.735110+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Animation Google Chromium Animation contains a use-after-free vulnerability that allows a remote attacker to potentially exploit heap corruption via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "89ae3adaf24e8355583b7f28e91b70da7d3c9313cf3b14c9877374906bbd8b41",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

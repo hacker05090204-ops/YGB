@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32771",
+  "ingested_at": "2026-03-22T07:54:48.404267+00:00",
+  "lang": "en",
+  "raw_text": "The CTFer.io Monitoring component is in charge of the collection, process and storage of various signals (i.e. logs, metrics and distributed traces). In versions prior to 0.2.2, the sanitizeArchivePath function in pkg/extract/extract.go (lines 248\u2013254) is vulnerable to Path Traversal due to a missing trailing path separator in the strings.HasPrefix check. The extractor allows arbitrary file writes (e.g., overwriting shell configs, SSH keys, kubeconfig, or crontabs), enabling RCE and persistent backdoors. The attack surface is further amplified by the default ReadWriteMany PVC access mode, which lets any pod in the cluster inject a malicious payload. This issue has been fixed in version 0.2.2.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "584a62a465e30f218cdfe29803b6cac209f7411fc22659d5b03e063952258c16",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32771"
+}

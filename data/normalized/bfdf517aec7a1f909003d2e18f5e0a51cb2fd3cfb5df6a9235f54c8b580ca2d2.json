@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure contains a command injection vulnerability that allows remote authenticated users to perform remote code execution via Windows File Resource Profiles.",
+  "token_count": 28
+}

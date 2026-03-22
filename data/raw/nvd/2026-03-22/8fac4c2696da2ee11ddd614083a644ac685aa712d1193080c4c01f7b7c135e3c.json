@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28122",
+  "ingested_at": "2026-03-22T07:54:40.662705+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in CridioStudio ListingPro listingpro-plugin allows Reflected XSS.This issue affects ListingPro: from n/a through < = 2.9.8.",
+  "severity": "HIGH",
+  "sha256_hash": "8fac4c2696da2ee11ddd614083a644ac685aa712d1193080c4c01f7b7c135e3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28122"
+}

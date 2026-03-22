@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28275",
+  "ingested_at": "2026-03-22T07:54:32.858395+00:00",
+  "lang": "en",
+  "raw_text": "Initiative is a self-hosted project management platform. Versions of the application prior to 0.32.4 do not invalidate previously issued JWT access tokens after a user changes their password. As a result, older tokens remain valid until expiration and can still be used to access protected API endpoints. This behavior allows continued authenticated access even after the account password has been updated. Version 0.32.4 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "ac904ace8b1009ca7b8d8cc7c515a4d94187f5c7e693a71b5c87e7f7712a2ebe",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28275"
+}

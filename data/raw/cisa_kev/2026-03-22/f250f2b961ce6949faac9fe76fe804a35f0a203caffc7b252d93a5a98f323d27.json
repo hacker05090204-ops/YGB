@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0631",
+  "ingested_at": "2026-03-22T07:45:18.489364+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe Coldfusion contains an unspecified vulnerability, which could result in information disclosure from a compromised server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f250f2b961ce6949faac9fe76fe804a35f0a203caffc7b252d93a5a98f323d27",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

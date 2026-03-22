@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an SQL injection vulnerability in the getAllSubscriptions() function where string parameters lack proper quote escaping in SQL queries. Attackers can inject malicious SQL code through email, activation_key, subscription_date, and imported_from parameters to manipulate database queries and extract sensitive information.",
+  "token_count": 43
+}

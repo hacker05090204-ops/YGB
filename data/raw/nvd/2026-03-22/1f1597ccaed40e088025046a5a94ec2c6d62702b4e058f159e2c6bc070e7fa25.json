@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28252",
+  "ingested_at": "2026-03-22T07:54:44.407460+00:00",
+  "lang": "en",
+  "raw_text": "A Use of a Broken or Risky Cryptographic Algorithm vulnerability in Trane Tracer SC, Tracer SC+, and Tracer Concierge could allow an attacker to bypass authentication and gain root-level access to the device.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "1f1597ccaed40e088025046a5a94ec2c6d62702b4e058f159e2c6bc070e7fa25",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28252"
+}

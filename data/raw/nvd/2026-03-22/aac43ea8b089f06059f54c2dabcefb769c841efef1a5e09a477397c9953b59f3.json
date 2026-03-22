@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28447",
+  "ingested_at": "2026-03-22T07:54:41.024052+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.1.29-beta.1 prior to 2026.2.1 contain a path traversal vulnerability in plugin installation that allows malicious plugin package names to escape the extensions directory. Attackers can craft scoped package names containing path traversal sequences like .. to write files outside the intended installation directory when victims run the plugins install command.",
+  "severity": "HIGH",
+  "sha256_hash": "aac43ea8b089f06059f54c2dabcefb769c841efef1a5e09a477397c9953b59f3",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28447"
+}

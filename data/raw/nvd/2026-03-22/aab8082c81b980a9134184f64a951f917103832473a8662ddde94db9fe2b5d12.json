@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31994",
+  "ingested_at": "2026-03-22T07:54:47.819183+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 contain a local command injection vulnerability in Windows scheduled task script generation due to unsafe handling of cmd metacharacters and expansion-sensitive characters in gateway.cmd files. Local attackers with control over service script generation arguments can inject arbitrary commands by providing metacharacter-only values or CR/LF sequences that execute unintended code in the scheduled task context.",
+  "severity": "HIGH",
+  "sha256_hash": "aab8082c81b980a9134184f64a951f917103832473a8662ddde94db9fe2b5d12",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31994"
+}

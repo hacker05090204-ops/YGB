@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-36226",
+  "ingested_at": "2026-03-22T07:54:43.032910+00:00",
+  "lang": "en",
+  "raw_text": "IBM Aspera Faspex 5 5.0.0 through 5.0.14.3 is vulnerable to cross-site scripting. This vulnerability allows an authenticated user to embed arbitrary JavaScript code in the Web UI thus altering the intended functionality potentially leading to credentials disclosure within a trusted session.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4fe0d6fd1bf2d82d13ce5b5ab8ea657d78e8f9e1cffd6ad98cba2b50987e0261",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-36226"
+}

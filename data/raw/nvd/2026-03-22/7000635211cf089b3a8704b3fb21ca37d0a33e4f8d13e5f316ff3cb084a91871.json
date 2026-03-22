@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23659",
+  "ingested_at": "2026-03-22T07:54:48.050446+00:00",
+  "lang": "en",
+  "raw_text": "Exposure of sensitive information to an unauthorized actor in Azure Data Factory allows an unauthorized attacker to disclose information over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "7000635211cf089b3a8704b3fb21ca37d0a33e4f8d13e5f316ff3cb084a91871",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23659"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31999",
+  "ingested_at": "2026-03-22T07:54:47.832172+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.2.26 prior to 2026.3.1 on Windows contain a current working directory injection vulnerability in wrapper resolution for .cmd/.bat files that allows attackers to influence execution behavior through cwd manipulation. Remote attackers can exploit improper shell execution fallback mechanisms to achieve command execution integrity loss by controlling the current working directory during wrapper resolution.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7eed23c0d73d6f1b935e6d2a8de56970e5e6723ee81f36be3d4df38cbfd461cd",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31999"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "U-Office Force developed by e-Excellence has a Insecure Deserialization vulnerability, allowing unauthenticated remote attackers to execute arbitrary code on the server by sending maliciously crafted serialized content.",
+  "token_count": 27
+}

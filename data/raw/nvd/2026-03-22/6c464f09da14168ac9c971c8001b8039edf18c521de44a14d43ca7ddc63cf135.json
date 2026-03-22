@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3149",
+  "ingested_at": "2026-03-22T07:54:31.965156+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in itsourcecode College Management System 1.0. Affected by this issue is some unknown functionality of the file /admin/asign-single-student-subjects.php. Executing a manipulation of the argument course_code can lead to sql injection. The attack can be executed remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6c464f09da14168ac9c971c8001b8039edf18c521de44a14d43ca7ddc63cf135",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3149"
+}

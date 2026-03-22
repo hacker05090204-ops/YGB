@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28463",
+  "ingested_at": "2026-03-22T07:54:41.053054+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw exec-approvals allowlist validation checks pre-expansion argv tokens but execution uses real shell expansion, allowing safe bins like head, tail, or grep to read arbitrary local files via glob patterns or environment variables. Authorized callers or prompt-injection attacks can exploit this to disclose files readable by the gateway or node process when host execution is enabled in allowlist mode.",
+  "severity": "HIGH",
+  "sha256_hash": "a2032fe002cf4bfa71362d9c373ebe2936a97884efbeecb9b09861b90a80a2aa",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28463"
+}

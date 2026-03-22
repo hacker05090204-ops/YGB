@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2890",
+  "ingested_at": "2026-03-22T07:54:44.693090+00:00",
+  "lang": "en",
+  "raw_text": "The Formidable Forms plugin for WordPress is vulnerable to a payment integrity bypass in all versions up to, and including, 6.28. This is due to the Stripe Link return handler (`handle_one_time_stripe_link_return_url`) marking payment records as complete based solely on the Stripe PaymentIntent status without comparing the intent's charged amount against the expected payment amount, and the `verify_intent()` function validating only client secret ownership without binding intents to specific forms or actions. This makes it possible for unauthenticated attackers to reuse a PaymentIntent from a completed low-value payment to mark a high-value payment as complete, effectively bypassing payment for goods or services.",
+  "severity": "HIGH",
+  "sha256_hash": "d1461dbb98771c2ae4de4bd4814f56afb774805f5508ae9737779996c4d6c408",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2890"
+}

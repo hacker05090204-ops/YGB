@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23925",
+  "ingested_at": "2026-03-22T07:54:41.375498+00:00",
+  "lang": "en",
+  "raw_text": "An authenticated Zabbix user (User role) with template/host write permissions is able to create objects via the configuration.import API. This can lead to confidentiality loss by creating unauthorized hosts. Note that the User role is normally not sufficient to create and edit templates/hosts even with write permissions.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "349a0f5784ceaa077eef92766a26028ddfa7a06a8aa1b1519745fc8eddcc56a3",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23925"
+}

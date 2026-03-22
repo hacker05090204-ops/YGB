@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Navtor NavBox exposes sensitive configuration and operational data due to missing authentication on HTTP API endpoints. An unauthenticated remote attacker with network access to the device can execute HTTP GET requests to TCP port 8080 to retrieve internal network parameters including ECDIS & OT Information, device identifiers, and service status logs.",
+  "token_count": 51
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32358",
+  "ingested_at": "2026-03-22T07:54:45.930259+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in wpdevelop Booking Calendar booking allows Blind SQL Injection.This issue affects Booking Calendar: from n/a through < = 10.14.15.",
+  "severity": "HIGH",
+  "sha256_hash": "8c216de26f351f083be648554dd2d57343f27fabf9dc292c81059ad460c64257",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32358"
+}

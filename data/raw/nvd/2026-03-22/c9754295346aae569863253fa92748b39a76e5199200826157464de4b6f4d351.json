@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29078",
+  "ingested_at": "2026-03-22T07:54:44.665801+00:00",
+  "lang": "en",
+  "raw_text": "Lexbor is a web browser engine library. Prior to 2.7.0, the ISO\u20102022\u2010JP encoder in Lexbor fails to reset the temporary size variable between iterations. The statement ctx->buffer_used -= size with a stale size = 3 causes an integer underflow that wraps to SIZE_MAX. Afterwards, memcpy is called with a negative length, leading to an out\u2010of\u2010bounds read from the stack and an out\u2010of\u2010bounds write to the heap. The source data is partially controllable via the contents of the DOM tree. This vulnerability is fixed in 2.7.0.",
+  "severity": "HIGH",
+  "sha256_hash": "c9754295346aae569863253fa92748b39a76e5199200826157464de4b6f4d351",
+  "source": "nvd",
+  "tags": [
+    "CWE-191",
+    "CWE-787"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29078"
+}

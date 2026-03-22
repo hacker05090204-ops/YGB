@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3970",
+  "ingested_at": "2026-03-22T07:54:44.136165+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Tenda i3 1.0.0.6(2204). Affected is the function formwrlSSIDget of the file /goform/wifiSSIDget. Executing a manipulation of the argument index can lead to stack-based buffer overflow. The attack may be launched remotely. The exploit has been published and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "875fc3baeb73773fad29727cc68a7d064619b4fb92ddd7beace944bc39cd03d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3970"
+}

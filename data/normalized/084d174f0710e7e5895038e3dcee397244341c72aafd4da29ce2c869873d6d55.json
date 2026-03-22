@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft XML Core Services Microsoft XML Core Services (MSXML) improperly handles objects in memory, allowing attackers to test for files on disk via a crafted web site.",
+  "token_count": 27
+}

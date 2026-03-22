@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30247",
+  "ingested_at": "2026-03-22T07:54:41.726037+00:00",
+  "lang": "en",
+  "raw_text": "WeKnora is an LLM-powered framework designed for deep document understanding and semantic retrieval. Prior to version 0.2.12, the application's \"Import document via URL\" feature is vulnerable to Server-Side Request Forgery (SSRF) through HTTP redirects. While the backend implements comprehensive URL validation (blocking private IPs, loopback addresses, reserved hostnames, and cloud metadata endpoints), it fails to validate redirect targets. An attacker can bypass all protections by using a redirect chain, forcing the server to access internal services. Additionally, Docker-specific internal addresses like host.docker.internal are not blocked. This issue has been patched in version 0.2.12.",
+  "severity": "MEDIUM",
+  "sha256_hash": "00294ca8382a4b097846f165469c54cec5fc37036967480ec6c3b9fed64b8ef1",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30247"
+}

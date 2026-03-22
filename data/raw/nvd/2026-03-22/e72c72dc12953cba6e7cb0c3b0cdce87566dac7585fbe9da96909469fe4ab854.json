@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27348",
+  "ingested_at": "2026-03-22T07:54:40.212711+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in ThemeGoods Photography photography allows DOM-Based XSS.This issue affects Photography: from n/a through < = 7.6.1.",
+  "severity": "HIGH",
+  "sha256_hash": "e72c72dc12953cba6e7cb0c3b0cdce87566dac7585fbe9da96909469fe4ab854",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27348"
+}

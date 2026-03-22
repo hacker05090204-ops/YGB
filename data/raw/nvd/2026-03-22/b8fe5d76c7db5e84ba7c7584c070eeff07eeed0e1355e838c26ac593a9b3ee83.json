@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32888",
+  "ingested_at": "2026-03-22T07:54:48.517186+00:00",
+  "lang": "en",
+  "raw_text": "Open Source Point of Sale is a web based point-of-sale application written in PHP using CodeIgniter framework. Versions contain an SQL Injection in the Items search functionality. When the custom attribute search feature is enabled (search_custom filter), user-supplied input from the search GET parameter is interpolated directly into a HAVING clause without parameterization or sanitization. This allows an authenticated attacker with basic item search permissions to execute arbitrary SQL queries. A patch did not exist at the time of publication.",
+  "severity": "HIGH",
+  "sha256_hash": "b8fe5d76c7db5e84ba7c7584c070eeff07eeed0e1355e838c26ac593a9b3ee83",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32888"
+}

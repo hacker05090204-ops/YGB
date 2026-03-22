@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25444",
+  "ingested_at": "2026-03-22T07:54:30.544355+00:00",
+  "lang": "en",
+  "raw_text": "Fiverr Clone Script 1.2.2 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the page parameter. Attackers can supply malicious SQL syntax in the page parameter to extract sensitive database information or modify database contents.",
+  "severity": "CRITICAL",
+  "sha256_hash": "249b7d1d43decad00d3a3c5553d3c83816aa191ec8f6d4030a3748832d4f8a88",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25444"
+}

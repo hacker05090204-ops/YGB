@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27826",
+  "ingested_at": "2026-03-22T07:54:43.021780+00:00",
+  "lang": "en",
+  "raw_text": "MCP Atlassian is a Model Context Protocol (MCP) server for Atlassian products (Confluence and Jira). Prior to version 0.17.0, an unauthenticated attacker who can reach the mcp-atlassian HTTP endpoint can force the server process to make outbound HTTP requests to an arbitrary attacker-controlled URL by supplying two custom HTTP headers without an `Authorization` header. No authentication is required. The vulnerability exists in the HTTP middleware and dependency injection layer \u2014 not in any MCP tool handler - making it invisible to tool-level code analysis. In cloud deployments, this could enable theft of IAM role credentials via the instance metadata endpoint (`169[.]254[.]169[.]254`). In any HTTP deployment it enables internal network reconnaissance and injection of attacker-controlled content into LLM tool results. Version 0.17.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "971ab6ffdc66705e9ef55f599bc6b81753d289cf9ea73c3e7c5170db987f0e39",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 124,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27826"
+}

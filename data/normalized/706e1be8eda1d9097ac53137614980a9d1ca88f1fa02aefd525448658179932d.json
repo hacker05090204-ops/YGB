@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PaperCut MF/NG PaperCut MF/NG contains an improper access control vulnerability within the SetupCompleted class that allows authentication bypass and code execution in the context of system.",
+  "token_count": 26
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28412",
+  "ingested_at": "2026-03-22T07:54:33.735940+00:00",
+  "lang": "en",
+  "raw_text": "Textream is a free macOS teleprompter app. Prior to version 1.5.1, the `DirectorServer` WebSocket server imposes no limit on concurrent connections. Combined with a broadcast timer that sends state to all connected clients every 100 ms, an attacker can exhaust CPU and memory by flooding the server with connections, causing the Textream application to freeze and crash during a live session. Version 1.5.1 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "426395b3d35f622566e0156dd04ff15a33c2ce8418822ab4ec90678c1588bb5b",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28412"
+}

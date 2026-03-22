@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31863",
+  "ingested_at": "2026-03-22T07:54:43.771670+00:00",
+  "lang": "en",
+  "raw_text": "Anytype Heart is the middleware library for Anytype. The challenge-based authentication for the local gRPC client API can be bypassed, allowing an attacker to gain access without the 4-digit code. This vulnerability is fixed in anytype-heart 0.48.4, anytype-cli 0.1.11, and Anytype Desktop 0.54.5.",
+  "severity": "LOW",
+  "sha256_hash": "6eb13d41d22b89f30e9a1c7e9ac126224dd11c1cbf6ab9063b6973911d552854",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31863"
+}

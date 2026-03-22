@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-61611",
+  "ingested_at": "2026-03-22T07:54:42.216288+00:00",
+  "lang": "en",
+  "raw_text": "In modem, there is a possible improper input validation. This could lead to remote denial of service with no additional execution privileges needed..",
+  "severity": "HIGH",
+  "sha256_hash": "cf49c073d04ae4f549157801955a59eecab2c9a83e02ae456686dd11ec6f4d23",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-20"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-61611"
+}

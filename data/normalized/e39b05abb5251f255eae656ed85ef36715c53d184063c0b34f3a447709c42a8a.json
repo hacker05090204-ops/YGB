@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An improper restriction of communication channel to intended endpoints vulnerability has been reported to affect QHora. If an attacker gains physical access, they can then exploit the vulnerability to gain the privileges that were intended for the original endpoint. We have already fixed the vulnerability in the following version: QuRouter 2.6.3.009 and later",
+  "token_count": 53
+}

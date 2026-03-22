@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29607",
+  "ingested_at": "2026-03-22T07:54:47.801884+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an authorization bypass vulnerability in allow-always wrapper persistence that allows attackers to bypass approval checks by persisting wrapper-level allowlist entries instead of validating inner executable intent. Remote attackers can approve benign wrapped system.run commands and subsequently execute different payloads without approval, enabling remote code execution on gateway and node-host execution flows.",
+  "severity": "MEDIUM",
+  "sha256_hash": "08817eafcfb1ca2d9e7463f167fb18a06a93f942942d5677ed364b5281997d67",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29607"
+}

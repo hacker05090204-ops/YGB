@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50180",
+  "ingested_at": "2026-03-22T07:54:32.096405+00:00",
+  "lang": "en",
+  "raw_text": "esm.sh is a no-build content delivery network (CDN) for web development. In version 136, esm.sh is vulnerable to a full-response SSRF, allowing an attacker to retrieve information from internal websites through the vulnerability. Version 137 fixes the vulnerability.",
+  "severity": "HIGH",
+  "sha256_hash": "99621f9c05c2a38208c17541b8453f414fd620de322de80179cc8ccfbb3a7438",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50180"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-57543",
+  "ingested_at": "2026-03-22T07:54:46.847310+00:00",
+  "lang": "en",
+  "raw_text": "Cross Site scripting vulnerability (XSS) in NetBox 4.3.5 \"comment\" field on object forms. An attacker can inject arbitrary HTML, which will be rendered in the web UI when viewed by other users. This could potentially lead to user interface redress attacks or be escalated to XSS in certain contexts.",
+  "severity": "MEDIUM",
+  "sha256_hash": "191fb5ff2242b1fb4796de13b2d2a0272861d170555bbd53b4af53553edf33ba",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-57543"
+}

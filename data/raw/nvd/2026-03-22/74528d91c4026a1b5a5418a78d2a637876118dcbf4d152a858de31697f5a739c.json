@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-22444",
+  "ingested_at": "2026-03-22T07:54:43.306006+00:00",
+  "lang": "en",
+  "raw_text": "Exposure of resource to wrong sphere in the UEFI PdaSmm module for some Intel(R) reference platforms may allow an information disclosure. System software adversary with a privileged user combined with a high complexity attack may enable data exposure. This result may potentially occur via local access when attack requirements are not present without special internal knowledge and requires no user interaction. The potential vulnerability may impact the confidentiality (high), integrity (none) and availability (none) of the vulnerable system, resulting in subsequent system confidentiality (none), integrity (none) and availability (none) impacts.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "74528d91c4026a1b5a5418a78d2a637876118dcbf4d152a858de31697f5a739c",
+  "source": "nvd",
+  "tags": [
+    "CWE-668"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-22444"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Easyndexer 1.0 contains an arbitrary file download vulnerability that allows unauthenticated attackers to download sensitive files by manipulating the file parameter. Attackers can send POST requests to showtif.php with arbitrary file paths in the file parameter to retrieve system files like configuration and initialization files.",
+  "token_count": 45
+}

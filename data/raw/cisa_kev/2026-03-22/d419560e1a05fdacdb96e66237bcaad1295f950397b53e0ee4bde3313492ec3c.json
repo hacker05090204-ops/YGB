@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-6287",
+  "ingested_at": "2026-03-22T07:45:18.394359+00:00",
+  "lang": "en",
+  "raw_text": "Rejetto HTTP File Server (HFS) The findMacroMarker function in parserLib.pas in Rejetto HTTP File Server (HFS or HttpFileServer) allows remote attackers to execute arbitrary programs.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d419560e1a05fdacdb96e66237bcaad1295f950397b53e0ee4bde3313492ec3c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

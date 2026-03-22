@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11043",
+  "ingested_at": "2026-03-22T07:45:18.318621+00:00",
+  "lang": "en",
+  "raw_text": "PHP FastCGI Process Manager (FPM) In some versions of PHP in certain configurations of FPM setup, it is possible to cause FPM module to write past allocated buffers allowing the possibility of remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "08051e707924519b9f3795a4ec222a0232537542664f4b81bda37e27ecbe92a7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

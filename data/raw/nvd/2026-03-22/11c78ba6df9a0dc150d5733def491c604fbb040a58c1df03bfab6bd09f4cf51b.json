@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4497",
+  "ingested_at": "2026-03-22T07:54:48.950587+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Totolink WA300 5.2cu.7112_B20190227. Affected by this issue is the function recvUpgradeNewFw of the file /cgi-bin/cstecgi.cgi. This manipulation causes os command injection. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "11c78ba6df9a0dc150d5733def491c604fbb040a58c1df03bfab6bd09f4cf51b",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4497"
+}

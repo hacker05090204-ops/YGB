@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Out-of-bounds read in .NET allows an unauthorized attacker to deny service over a network.",
+  "token_count": 14
+}

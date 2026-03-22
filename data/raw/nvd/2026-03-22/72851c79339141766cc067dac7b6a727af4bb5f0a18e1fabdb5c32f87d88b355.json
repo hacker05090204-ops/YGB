@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28269",
+  "ingested_at": "2026-03-22T07:54:32.854396+00:00",
+  "lang": "en",
+  "raw_text": "Kiteworks is a private data network (PDN). Prior to version 9.2.0, avulnerability in Kiteworks command execution functionality allows authenticated users to redirect command output to arbitrary file locations. This could be exploited to overwrite critical system files and gain elevated access. Version 9.2.0 contains a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "72851c79339141766cc067dac7b6a727af4bb5f0a18e1fabdb5c32f87d88b355",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28269"
+}

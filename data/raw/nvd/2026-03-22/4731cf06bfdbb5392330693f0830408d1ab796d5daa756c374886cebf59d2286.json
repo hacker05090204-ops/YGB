@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3407",
+  "ingested_at": "2026-03-22T07:54:33.483696+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in YosysHQ yosys up to 0.62. This affects the function Yosys::RTLIL::Const::set of the file kernel/rtlil.h of the component BLIF File Parser. This manipulation causes heap-based buffer overflow. It is possible to launch the attack on the local host. The exploit has been publicly disclosed and may be utilized. Applying a patch is the recommended action to fix this issue. It appears that the issue is not reproducible all the time.",
+  "severity": "LOW",
+  "sha256_hash": "4731cf06bfdbb5392330693f0830408d1ab796d5daa756c374886cebf59d2286",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-122"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3407"
+}

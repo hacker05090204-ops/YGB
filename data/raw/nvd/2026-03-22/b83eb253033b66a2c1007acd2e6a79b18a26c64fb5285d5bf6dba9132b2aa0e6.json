@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32981",
+  "ingested_at": "2026-03-22T07:54:47.171281+00:00",
+  "lang": "en",
+  "raw_text": "A path traversal vulnerability was identified in Ray Dashboard (default port 8265) in Ray versions prior to 2.8.1. Due to improper validation and sanitization of user-supplied paths in the static file handling mechanism, an attacker can use traversal sequences (e.g., ../) to access files outside the intended static directory, resulting in local file disclosure.",
+  "severity": "HIGH",
+  "sha256_hash": "b83eb253033b66a2c1007acd2e6a79b18a26c64fb5285d5bf6dba9132b2aa0e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32981"
+}

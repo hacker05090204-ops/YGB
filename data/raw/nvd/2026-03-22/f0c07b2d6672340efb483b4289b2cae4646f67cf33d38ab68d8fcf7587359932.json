@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68856",
+  "ingested_at": "2026-03-22T07:54:30.163797+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in keeswolters Mopinion Feedback Form mopinion-feedback-form allows DOM-Based XSS.This issue affects Mopinion Feedback Form: from n/a through < = 1.1.1.",
+  "severity": "HIGH",
+  "sha256_hash": "f0c07b2d6672340efb483b4289b2cae4646f67cf33d38ab68d8fcf7587359932",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68856"
+}

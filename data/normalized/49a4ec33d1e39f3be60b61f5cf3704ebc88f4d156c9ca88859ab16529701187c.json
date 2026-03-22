@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Atlassian Jira Server and Data Center Atlassian Jira Server and Data Center contain a path traversal vulnerability that allows a remote attacker to read particular files in the /WEB-INF/web.xml endpoint.",
+  "token_count": 30
+}

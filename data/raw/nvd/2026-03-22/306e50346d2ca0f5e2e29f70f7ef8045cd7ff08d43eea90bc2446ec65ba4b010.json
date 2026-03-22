@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25927",
+  "ingested_at": "2026-03-22T07:54:32.252088+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the DICOM viewer state API (e.g. upload or state save/load) accepts a document ID (`doc_id`) without verifying that the document belongs to the current user\u2019s authorized patient or encounter. An authenticated user can read or modify DICOM viewer state (e.g. annotations, view settings) for any document by enumerating document IDs. Version 8.0.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "306e50346d2ca0f5e2e29f70f7ef8045cd7ff08d43eea90bc2446ec65ba4b010",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25927"
+}

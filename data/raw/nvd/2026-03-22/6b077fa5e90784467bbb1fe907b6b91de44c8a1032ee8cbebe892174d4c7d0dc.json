@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27793",
+  "ingested_at": "2026-03-22T07:54:33.282778+00:00",
+  "lang": "en",
+  "raw_text": "Seerr is an open-source media request and discovery manager for Jellyfin, Plex, and Emby. Prior to version 3.1.0, the `GET /api/v1/user/:id` endpoint returns the full settings object for any user, including Pushover, Pushbullet, and Telegram credentials, to any authenticated requester regardless of their privilege level. This vulnerability can be exploited alone or combined with the reported unauthenticated account creation vulnerability, CVE-2026-27707. When combined, the two vulnerabilities create a zero-prior-access chain that leaks third-party API credentials for all users, including administrators. Version 3.1.0 contains a fix for both this vulnerability and for CVE-2026-27707.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6b077fa5e90784467bbb1fe907b6b91de44c8a1032ee8cbebe892174d4c7d0dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27793"
+}

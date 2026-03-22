@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33075",
+  "ingested_at": "2026-03-22T07:54:48.754363+00:00",
+  "lang": "en",
+  "raw_text": "FastGPT is an AI Agent building platform. In versions 4.14.8.3 and below, the fastgpt-preview-image.yml workflow is vulnerable to arbitrary code execution and secret exfiltration by any external contributor. It uses pull_request_target (which runs with access to repository secrets) but checks out code from the pull request author's fork, then builds and pushes Docker images using attacker-controlled Dockerfiles. This also enables a supply chain attack via the production container registry. A patch was not available at the time of publication.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "30971732b914faf3892154d15961a665fa279e162adacbb4f3f5dd76697c9a82",
+  "source": "nvd",
+  "tags": [
+    "CWE-494",
+    "CWE-829"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33075"
+}

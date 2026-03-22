@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2355",
+  "ingested_at": "2026-03-22T07:54:34.446739+00:00",
+  "lang": "en",
+  "raw_text": "The My Calendar \u2013 Accessible Event Manager plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the `template` attribute of the `[my_calendar_upcoming]` shortcode in all versions up to, and including, 3.7.3. This is due to the use of `stripcslashes()` on user-supplied shortcode attribute values in the `mc_draw_template()` function, which decodes C-style hex escape sequences (e.g., `\\x3c` to ` < `) at render time, bypassing WordPress's `wp_kses_post()` content sanitization that runs at save time. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "59c79247e15c1e70bca698a612b91fd8cc725c6ea96366b21e82bd8a2cf47d42",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2355"
+}

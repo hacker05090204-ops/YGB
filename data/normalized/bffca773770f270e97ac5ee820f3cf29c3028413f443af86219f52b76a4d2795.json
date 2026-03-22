@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Redis Debian-specific Redis Servers Redis is prone to a (Debian-specific) Lua sandbox escape, which could result in remote code execution.",
+  "token_count": 20
+}

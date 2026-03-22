@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14769",
+  "ingested_at": "2026-03-22T07:54:42.261350+00:00",
+  "lang": "en",
+  "raw_text": "In some cases, the `tcp-setmss` handler may free the packet data and throw an error without halting the rule processing engine. A subsequent rule can then allow the traffic after the packet data is gone, resulting in a NULL pointer dereference. Maliciously crafted packets sent from a remote host may result in a Denial of Service (DoS) if the `tcp-setmss` directive is used and a subsequent rule would allow the traffic to pass.",
+  "severity": "HIGH",
+  "sha256_hash": "c09a95a4d2d4876bd10bc5277bbcd7fc0e77f89889c282e8a9a005bd6b9d9d3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14769"
+}

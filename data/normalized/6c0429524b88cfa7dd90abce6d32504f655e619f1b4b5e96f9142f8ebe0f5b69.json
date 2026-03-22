@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Multiple versions of Fortinet FortiOS SSL-VPN contain a heap-based buffer overflow vulnerability which can allow an unauthenticated, remote attacker to execute arbitrary code or commands via specifically crafted requests.",
+  "token_count": 31
+}

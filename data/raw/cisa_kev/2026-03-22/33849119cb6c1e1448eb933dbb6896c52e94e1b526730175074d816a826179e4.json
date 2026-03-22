@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-2596",
+  "ingested_at": "2026-03-22T07:45:17.640068+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel fb_mmap function in drivers/video/fbmem.c contains an integer overflow vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "33849119cb6c1e1448eb933dbb6896c52e94e1b526730175074d816a826179e4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

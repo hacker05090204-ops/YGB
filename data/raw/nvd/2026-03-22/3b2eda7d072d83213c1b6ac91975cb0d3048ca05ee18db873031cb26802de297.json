@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23703",
+  "ingested_at": "2026-03-22T07:54:32.609367+00:00",
+  "lang": "en",
+  "raw_text": "The installer of FinalCode Client provided by Digital Arts Inc. contains an incorrect default permissions vulnerability. A non-administrative user may execute arbitrary code with SYSTEM privilege.",
+  "severity": "HIGH",
+  "sha256_hash": "3b2eda7d072d83213c1b6ac91975cb0d3048ca05ee18db873031cb26802de297",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23703"
+}

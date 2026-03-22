@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3455",
+  "ingested_at": "2026-03-22T07:54:34.027782+00:00",
+  "lang": "en",
+  "raw_text": "Versions of the package mailparser before 3.9.3 are vulnerable to Cross-site Scripting (XSS) via the textToHtml() function due to the improper sanitisation of URLs in the email content. An attacker can execute arbitrary scripts in victim browsers by adding extra quote \" to the URL with embedded malicious JavaScript code.",
+  "severity": "MEDIUM",
+  "sha256_hash": "97375e0a886011b54a3665fbb3beab6ba7037ca49365054a5597719fd6d96555",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3455"
+}

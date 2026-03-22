@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26710",
+  "ingested_at": "2026-03-22T07:54:33.962027+00:00",
+  "lang": "en",
+  "raw_text": "code-projects Simple Food Order System v1.0 is vulnerable to SQL Injection in /food/routers/edit-orders.php.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a515dae3ea87e4b8ac5cd939f47cdf11e6399f9e20d050c44d286ce1e1488140",
+  "source": "nvd",
+  "tags": [
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26710"
+}

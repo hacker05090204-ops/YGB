@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-1000253",
+  "ingested_at": "2026-03-22T07:45:16.837327+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains a position-independent executable (PIE) stack buffer corruption vulnerability in load_elf_ binary() that allows a local attacker to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "29c194703f3eee509a50c6ba0563f86376cfc565f53048e4a2370bd19f9628f1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "When a plugin is installed using the Arturia Software Center (MacOS), it also installs an uninstall.sh bash script in a root owned path. This script is written to disk with the file permissions 777, meaning it is writable by any user. When uninstalling a plugin via the Arturia Software Center the Privileged Helper gets instructed to execute this script. When the bash script is manipulated by an attacker this scenario will lead to privilege escalation.",
+  "token_count": 75
+}

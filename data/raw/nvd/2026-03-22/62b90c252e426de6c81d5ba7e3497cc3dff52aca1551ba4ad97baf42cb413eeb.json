@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29521",
+  "ingested_at": "2026-03-22T07:54:46.905685+00:00",
+  "lang": "en",
+  "raw_text": "Hereta ETH-IMC408M firmware version 1.0.15 and prior contain a cross-site request forgery vulnerability that allows attackers to modify device configuration by exploiting missing CSRF protections in setup.cgi. Attackers can host malicious pages that submit forged requests using automatically-included HTTP Basic Authentication credentials to add RADIUS accounts, alter network settings, or trigger diagnostics.",
+  "severity": "MEDIUM",
+  "sha256_hash": "62b90c252e426de6c81d5ba7e3497cc3dff52aca1551ba4ad97baf42cb413eeb",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29521"
+}

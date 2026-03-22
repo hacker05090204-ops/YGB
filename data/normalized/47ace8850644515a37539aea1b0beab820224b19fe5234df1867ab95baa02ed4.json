@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Unity Catalog is an open, multi-modal Catalog for data and AI. In 0.4.0 and earlier, a critical authentication bypass vulnerability exists in the Unity Catalog token exchange endpoint (/api/1.0/unity-control/auth/tokens). The endpoint extracts the issuer (iss) claim from incoming JWTs and uses it to dynamically fetch the JWKS endpoint for signature validation without validating that the issuer is a trusted identity provider.",
+  "token_count": 61
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29087",
+  "ingested_at": "2026-03-22T07:54:41.556766+00:00",
+  "lang": "en",
+  "raw_text": "@hono/node-server allows running the Hono application on Node.js. Prior to version 1.19.10, when using @hono/node-server's static file serving together with route-based middleware protections (e.g. protecting /admin/*), inconsistent URL decoding can allow protected static resources to be accessed without authorization. In particular, paths containing encoded slashes (%2F) may be evaluated differently by routing/middleware matching versus static file path resolution, enabling a bypass where middleware does not run but the static file is still served. This issue has been patched in version 1.19.10.",
+  "severity": "HIGH",
+  "sha256_hash": "1a5e89cac8fecb9da58f094128d9bf9f46d4bb3ef1c4f9d0c75ed41a48345c01",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29087"
+}

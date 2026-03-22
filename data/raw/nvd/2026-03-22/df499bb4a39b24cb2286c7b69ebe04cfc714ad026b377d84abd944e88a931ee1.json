@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3664",
+  "ingested_at": "2026-03-22T07:54:41.851476+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in xlnt-community xlnt up to 1.6.1. Impacted is the function xlnt::detail::compound_document::read_directory of the file source/detail/cryptography/compound_document.cpp of the component Encrypted XLSX File Parser. Executing a manipulation can lead to out-of-bounds read. The attack is restricted to local execution. The exploit has been publicly disclosed and may be utilized. This patch is called 147. Applying a patch is advised to resolve this issue.",
+  "severity": "LOW",
+  "sha256_hash": "df499bb4a39b24cb2286c7b69ebe04cfc714ad026b377d84abd944e88a931ee1",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3664"
+}

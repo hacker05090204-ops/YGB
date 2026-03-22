@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-20963",
+  "ingested_at": "2026-03-22T07:45:17.440829+00:00",
+  "lang": "en",
+  "raw_text": "Android Framework Android Framework contains an unspecified vulnerability that allows for privilege escalation after updating an app to a higher Target SDK with no additional execution privileges needed.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fc0533d51d3c5a373718a032559a779c234f47a0fd803c430c87c861d06a9f79",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

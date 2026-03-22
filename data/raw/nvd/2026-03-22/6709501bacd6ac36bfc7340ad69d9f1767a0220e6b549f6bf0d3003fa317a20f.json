@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32899",
+  "ingested_at": "2026-03-22T07:54:49.244989+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 fail to consistently apply sender-policy checks to reaction_* and pin_* non-message events before adding them to system-event context. Attackers can bypass configured DM policies and channel user allowlists to inject unauthorized reaction and pin events from restricted senders.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6709501bacd6ac36bfc7340ad69d9f1767a0220e6b549f6bf0d3003fa317a20f",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32899"
+}

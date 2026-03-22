@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Raytha CMS is vulnerable to Server-Side Request Forgery in the \u201cThemes - Import from URL\u201d feature. It allows an attacker with high privileges to provide the URL for redirecting server-side HTTP request. This issue was fixed in version 1.4.6.",
+  "token_count": 39
+}

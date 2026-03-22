@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69241",
+  "ingested_at": "2026-03-22T07:54:46.349094+00:00",
+  "lang": "en",
+  "raw_text": "Raytha CMS is vulnerable to Stored XSS via FirstName and LastName parameters in profile editing functionality. Authenticated attacker can inject arbitrary HTML and JS into website, which will be rendered/executed when visiting edited page. This issue was fixed in version 1.4.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "42fa44d820a37fd9204a49a7561a9130dfc1bdb6bf3190d9e596f82ba2ba2932",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69241"
+}

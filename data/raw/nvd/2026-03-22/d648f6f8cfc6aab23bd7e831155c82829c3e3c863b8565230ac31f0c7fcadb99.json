@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27807",
+  "ingested_at": "2026-03-22T07:54:41.234341+00:00",
+  "lang": "en",
+  "raw_text": "MarkUs is a web application for the submission and grading of student assignments. Prior to version 2.9.4, MarkUs allows course instructors to upload YAML files to create/update various entities (e.g., assignment settings). These YAML files are parsed with aliases enabled. This issue has been patched in version 2.9.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d648f6f8cfc6aab23bd7e831155c82829c3e3c863b8565230ac31f0c7fcadb99",
+  "source": "nvd",
+  "tags": [
+    "CWE-776"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27807"
+}

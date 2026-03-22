@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27511",
+  "ingested_at": "2026-03-22T07:54:31.136634+00:00",
+  "lang": "en",
+  "raw_text": "Shenzhen Tenda F3 Wireless Router firmware V12.01.01.55_multi contains a clickjacking vulnerability in the web-based administrative interface. The interface does not set the X-Frame-Options header, allowing attacker-controlled sites to embed administrative pages in an iframe and trick an authenticated administrator into unintended interactions that may result in unauthorized configuration changes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e587530296d5eeb4b41bbfe8652c40570f2dc93bba0970a5e93599693645297b",
+  "source": "nvd",
+  "tags": [
+    "CWE-1021"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27511"
+}

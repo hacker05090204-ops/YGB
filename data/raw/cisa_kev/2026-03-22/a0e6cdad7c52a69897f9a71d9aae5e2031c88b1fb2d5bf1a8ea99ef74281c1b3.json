@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-23222",
+  "ingested_at": "2026-03-22T07:45:17.069548+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and Safari WebKit contain a type confusion vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a0e6cdad7c52a69897f9a71d9aae5e2031c88b1fb2d5bf1a8ea99ef74281c1b3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0903",
+  "ingested_at": "2026-03-22T07:45:18.328623+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Graphics Device Interface (GDI) A remote code execution vulnerability exists in the way that the Windows Graphics Device Interface (GDI) handles objects in the memory. An attacker who successfully exploited this vulnerability could take control of the affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "be27126ed40ab4d430b60ddda65e432d49056b1a4eb398fac57e280f0e41dab5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

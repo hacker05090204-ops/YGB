@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains a race condition vulnerability within the n_tty_write function that allows local users to cause a denial-of-service (DoS) or gain privileges via read and write operations with long strings.",
+  "token_count": 33
+}

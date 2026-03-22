@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33063",
+  "ingested_at": "2026-03-22T07:54:48.538604+00:00",
+  "lang": "en",
+  "raw_text": "free5GC is an open source 5G core network. free5GC AUSF prior to version 1.4.2 has is an Improper Null Check vulnerability leading to Denial of Service. All deployments of free5GC v4.0.1 using the AUSF UE authentication service (`/nausf-auth/v1/ue-authentications` endpoint) are affected. A remote attacker can cause the AUSF service to panic and crash by sending a crafted UE authentication request that triggers a nil interface conversion in the `GetSupiFromSuciSupiMap` function. This results in complete denial of service for the AUSF authentication service. The `GetSupiFromSuciSupiMap` function attempts to perform an interface conversion from `interface{}` to `*context.SuciSupiMap` without checking if the underlying value is nil. When `SuciSupiMap` is nil, the code panics with \"interface conversion: interface {} is nil, not *context.SuciSupiMap\". free5GC AUSF version 1.4.2 patches the issue. There is no direct workaround at the application level. The recommendation is to apply the provided patch or restrict access to the AUSF API to trusted sources only.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8056c08e9f735ea1ea3cebe4cca962c6246993685515ce0086f9c1a719f4a78c",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 154,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33063"
+}

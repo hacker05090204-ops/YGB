@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29123",
+  "ingested_at": "2026-03-22T07:54:39.933414+00:00",
+  "lang": "en",
+  "raw_text": "A SUID root-owned binary in /home/xd/terminal/XDTerminal in International Data Casting (IDC) SFX2100 on Linux allows a local actor to potentially preform local privilege escalation depending on conditions of the system via execution of the affected SUID binary. This can be via PATH hijacking, symlink abuse or shared object hijacking.",
+  "severity": "HIGH",
+  "sha256_hash": "cda232779f0fe0814175350ce7455e98a64a49d6b5073e22872295ba7aa8763f",
+  "source": "nvd",
+  "tags": [
+    "CWE-269",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29123"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22017",
+  "ingested_at": "2026-03-22T07:45:18.855561+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server Rhttproxy as used in vCenter Server contains a vulnerability due to improper implementation of URI normalization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa1b090965fc1024a50afe79c9557f2699784f683f5e34fb55bdbae2314311dd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

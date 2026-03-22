@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sangoma FreePBX Sangoma FreePBX Endpoint Manager contains an OS command injection vulnerability that could allow for a post-authentication command injection by an authenticated known user via the testconnection -> check_ssh_connect() function. An attacker can leverage this vulnerability to potentially obtain remote access to the system as an asterisk user.",
+  "token_count": 49
+}

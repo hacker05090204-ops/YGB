@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-30333",
+  "ingested_at": "2026-03-22T07:45:17.725959+00:00",
+  "lang": "en",
+  "raw_text": "RARLAB UnRAR RARLAB UnRAR on Linux and UNIX contains a directory traversal vulnerability, allowing an attacker to write to files during an extract (unpack) operation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4e9495c3c6bd75814815aabc2116b0d660ab9805655914ace853c6b5cba6f353",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An improper neutralization of input during web page generation ('cross-site scripting') vulnerability in Fortinet FortiSIEM 7.4.0, FortiSIEM 7.3.0 through 7.3.4 may allow a remote unauthenticated attacker to provide arbitrary data enabling a social engineering attack via spoofed URL parameters.",
+  "token_count": 39
+}

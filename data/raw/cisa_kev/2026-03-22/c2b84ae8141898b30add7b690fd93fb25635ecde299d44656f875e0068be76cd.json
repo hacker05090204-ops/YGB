@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38112",
+  "ingested_at": "2026-03-22T07:45:16.923457+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows MSHTML Platform contains a spoofing vulnerability that has a high impact to confidentiality, integrity, and availability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c2b84ae8141898b30add7b690fd93fb25635ecde299d44656f875e0068be76cd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

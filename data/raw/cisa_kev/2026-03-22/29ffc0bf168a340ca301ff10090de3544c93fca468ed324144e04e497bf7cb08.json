@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-25079",
+  "ingested_at": "2026-03-22T07:45:16.270840+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DCS-2530L and DCS-2670L Devices D-Link DCS-2530L and DCS-2670L devices contains a command injection vulnerability in the cgi-bin/ddns_enc.cgi. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "29ffc0bf168a340ca301ff10090de3544c93fca468ed324144e04e497bf7cb08",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

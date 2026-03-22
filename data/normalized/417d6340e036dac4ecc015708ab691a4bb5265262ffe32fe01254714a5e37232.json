@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in libucl. A remote attacker could exploit this by providing a specially crafted Universal Configuration Language (UCL) input that contains a key with an embedded null byte. This can cause a segmentation fault (SEGV fault) in the `ucl_object_emit` function when parsing and emitting the object, leading to a Denial of Service (DoS) for the affected system.",
+  "token_count": 60
+}

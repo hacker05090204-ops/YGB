@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4508",
+  "ingested_at": "2026-03-22T07:54:49.127741+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in PbootCMS up to 3.2.12. The impacted element is the function checkUsername of the file apps/home/controller/MemberController.php of the component Member Login. The manipulation of the argument Username leads to sql injection. The attack may be initiated remotely. The exploit is publicly available and might be used.",
+  "severity": "HIGH",
+  "sha256_hash": "f1cd2acda2cdee1aff6d9be31a18bedfc794872f255148281e85b9f00ca3c096",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4508"
+}

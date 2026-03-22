@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Rockwell Multiple Products Multiple Rockwell products contain an insufficient protected credentials vulnerability. Studio 5000 Logix Designer software may allow a key to be discovered. This key is used to verify Logix controllers are communicating with Rockwell Automation design software. If successfully exploited, this vulnerability could allow an unauthorized application to connect with Logix controllers. To leverage this vulnerability, an unauthorized user would require network access to the controller.",
+  "token_count": 68
+}

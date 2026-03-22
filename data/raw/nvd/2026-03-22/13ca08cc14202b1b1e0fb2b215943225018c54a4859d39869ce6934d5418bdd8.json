@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33209",
+  "ingested_at": "2026-03-22T07:54:49.085244+00:00",
+  "lang": "en",
+  "raw_text": "Avo is a framework to create admin panels for Ruby on Rails apps. Prior to version 3.30.3, a reflected cross-site scripting (XSS) vulnerability exists in the return_to query parameter used in the avo interface. An attacker can craft a malicious URL that injects arbitrary JavaScript, which is executed when he clicks a dynamically generated navigation button. This issue has been patched in version 3.30.3.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "13ca08cc14202b1b1e0fb2b215943225018c54a4859d39869ce6934d5418bdd8",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33209"
+}

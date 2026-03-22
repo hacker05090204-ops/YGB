@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69294",
+  "ingested_at": "2026-03-22T07:54:30.179232+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in fuelthemes PeakShops peakshops allows Object Injection.This issue affects PeakShops: from n/a through < = 1.5.9.",
+  "severity": "HIGH",
+  "sha256_hash": "30870fc7556a4d2659609a72880fde54b8e2d17966f3daac405688266ba8c2cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69294"
+}

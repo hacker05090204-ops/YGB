@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15540",
+  "ingested_at": "2026-03-22T07:54:46.309595+00:00",
+  "lang": "en",
+  "raw_text": "\"Functions\" module in Raytha CMS allows privileged users to write custom code to add functionality to application. Due to a lack of sandboxing or access restrictions, JavaScript code executed through Raytha\u2019s \u201cfunctions\u201d feature can instantiate .NET components and perform arbitrary operations within the application\u2019s hosting environment. This issue was fixed in version 1.4.6.",
+  "severity": "HIGH",
+  "sha256_hash": "f2804b7c92ec666531c7461efac47b88deaf4993c79735c3e0e9c9b4d62b92f8",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15540"
+}

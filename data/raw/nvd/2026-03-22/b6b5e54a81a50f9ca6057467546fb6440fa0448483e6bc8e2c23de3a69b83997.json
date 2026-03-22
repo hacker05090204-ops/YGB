@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-0866",
+  "ingested_at": "2026-03-22T07:54:47.674357+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: After the publication of the PoC by the researcher and further analysis, we have determined that this issue does not constitute a valid vulnerability. The technique described is an obfuscation method and does not bypass or impact any implicit or explicit security controls.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b6b5e54a81a50f9ca6057467546fb6440fa0448483e6bc8e2c23de3a69b83997",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0866"
+}

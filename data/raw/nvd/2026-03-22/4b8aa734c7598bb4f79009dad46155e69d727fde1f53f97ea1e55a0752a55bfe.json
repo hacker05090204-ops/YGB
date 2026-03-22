@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32565",
+  "ingested_at": "2026-03-22T07:54:47.418521+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in WebberZone Contextual Related Posts allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Contextual Related Posts: from n/a before 4.2.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4b8aa734c7598bb4f79009dad46155e69d727fde1f53f97ea1e55a0752a55bfe",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32565"
+}

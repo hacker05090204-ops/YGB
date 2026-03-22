@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "NanoMQ MQTT Broker (NanoMQ) is an all-around Edge Messaging Platform. In version 0.24.6, by generating a combined traffic pattern of high-frequency publishes and rapid reconnect/kick-out using the same ClientID and massive subscribe/unsubscribe jitter, it is possible to reliably trigger heap memory corruption in the Broker process, causing it to exit immediately with SIGABRT due to free(): invalid pointer. As of time of publication, no known patched versions are available.",
+  "token_count": 69
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-11667",
+  "ingested_at": "2026-03-22T07:45:16.689349+00:00",
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Firewalls Multiple Zyxel firewalls contain a path traversal vulnerability in the web management interface that could allow an attacker to download or upload files via a crafted URL.",
+  "severity": "CRITICAL",
+  "sha256_hash": "50dadaeb89f8bb55b27c0eba4efae82aa38cf00b85bc2355c19738d5fc83c97a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

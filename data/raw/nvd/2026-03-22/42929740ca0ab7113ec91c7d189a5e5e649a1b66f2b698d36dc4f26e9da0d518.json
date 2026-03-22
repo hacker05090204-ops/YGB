@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0848",
+  "ingested_at": "2026-03-22T07:54:40.978648+00:00",
+  "lang": "en",
+  "raw_text": "NLTK versions < =3.9.2 are vulnerable to arbitrary code execution due to improper input validation in the StanfordSegmenter module. The module dynamically loads external Java .jar files without verification or sandboxing. An attacker can supply or replace the JAR file, enabling the execution of arbitrary Java bytecode at import time. This vulnerability can be exploited through methods such as model poisoning, MITM attacks, or dependency poisoning, leading to remote code execution. The issue arises from the direct execution of the JAR file via subprocess with unvalidated classpath input, allowing malicious classes to execute when loaded by the JVM.",
+  "severity": "CRITICAL",
+  "sha256_hash": "42929740ca0ab7113ec91c7d189a5e5e649a1b66f2b698d36dc4f26e9da0d518",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0848"
+}

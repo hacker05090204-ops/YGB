@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3572",
+  "ingested_at": "2026-03-22T07:54:49.178890+00:00",
+  "lang": "en",
+  "raw_text": "The iTracker360 plugin for WordPress is vulnerable to Cross-Site Request Forgery leading to Stored Cross-Site Scripting in all versions up to and including 2.2.0. This is due to missing nonce verification on the settings form submission and insufficient input sanitization combined with missing output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts via a forged request granted they can trick an administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e96a139e8a74c76312da7653e66c631c8def24b3fbe2b803d18689b02ecdf598",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3572"
+}

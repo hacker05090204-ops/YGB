@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "AVideo is a video-sharing Platform software. Prior to version 7.0, an unauthenticated attacker can execute arbitrary OS commands on the server by injecting shell command substitution into the base64Url GET parameter. This can lead to full server compromise, data exfiltration (e.g., configuration secrets, internal keys, credentials), and service disruption. This issue has been patched in version 7.0.",
+  "token_count": 57
+}

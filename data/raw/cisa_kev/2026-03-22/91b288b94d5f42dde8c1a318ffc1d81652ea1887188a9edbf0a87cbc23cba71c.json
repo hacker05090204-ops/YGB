@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-3400",
+  "ingested_at": "2026-03-22T07:45:17.001713+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS Palo Alto Networks PAN-OS GlobalProtect feature contains a command injection vulnerability that allows an unauthenticated attacker to execute commands with root privileges on the firewall.",
+  "severity": "CRITICAL",
+  "sha256_hash": "91b288b94d5f42dde8c1a318ffc1d81652ea1887188a9edbf0a87cbc23cba71c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

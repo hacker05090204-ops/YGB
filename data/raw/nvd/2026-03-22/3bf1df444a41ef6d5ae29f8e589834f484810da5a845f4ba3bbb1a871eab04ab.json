@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3759",
+  "ingested_at": "2026-03-22T07:54:42.096791+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in projectworlds Online Art Gallery Shop 1.0. This affects an unknown part of the file /admin/adminHome.php. Such manipulation of the argument reach_nm leads to sql injection. The attack can be executed remotely. The exploit has been disclosed publicly and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "3bf1df444a41ef6d5ae29f8e589834f484810da5a845f4ba3bbb1a871eab04ab",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3759"
+}

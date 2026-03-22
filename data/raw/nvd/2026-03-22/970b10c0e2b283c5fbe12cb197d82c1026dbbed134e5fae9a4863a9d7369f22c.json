@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3270",
+  "ingested_at": "2026-03-22T07:54:32.932245+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in psi-probe PSI Probe up to 5.3.0. This affects the function lookup of the file psi-probe-core/src/main/java/psiprobe/tools/Whois.java of the component Whois. The manipulation leads to server-side request forgery. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "970b10c0e2b283c5fbe12cb197d82c1026dbbed134e5fae9a4863a9d7369f22c",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3270"
+}

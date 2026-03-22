@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27397",
+  "ingested_at": "2026-03-22T07:54:47.850067+00:00",
+  "lang": "en",
+  "raw_text": "Authorization Bypass Through User-Controlled Key vulnerability in Really Simple Plugins B.V. Really Simple Security Pro allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Really Simple Security Pro: from n/a through 9.5.4.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cb82149cecea0527141c38a9c57174bbe7e37df553c678e8868e5ec26302d615",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27397"
+}

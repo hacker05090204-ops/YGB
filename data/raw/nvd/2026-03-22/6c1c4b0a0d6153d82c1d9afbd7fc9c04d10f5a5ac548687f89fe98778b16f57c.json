@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27458",
+  "ingested_at": "2026-03-22T07:54:30.802121+00:00",
+  "lang": "en",
+  "raw_text": "LinkAce is a self-hosted archive to collect website links. Versions 2.4.2 and below have a Stored Cross-site Scripting vulnerability through the Atom feed endpoint for lists (/lists/feed). An authenticated user can inject a CDATA-breaking payload into a list description that escapes the XML CDATA section, injects a native SVG element into the Atom XML document, and executes arbitrary JavaScript directly in the browser when the feed URL is visited. No RSS reader or additional rendering context is required \u2014 the browser's native XML parser processes the injected SVG and fires the onload event handler. This vulnerability exists because the lists feed template outputs list descriptions using Blade's raw syntax ({!! !!}) without sanitization inside a CDATA block. The critical detail is that because the output sits inside , an attacker can inject the sequence ]]> to close the CDATA section prematurely, then inject arbitrary XML/SVG elements that the browser parses and executes natively as part of the Atom document. This issue has been fixed in version 2.4.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6c1c4b0a0d6153d82c1d9afbd7fc9c04d10f5a5ac548687f89fe98778b16f57c",
+  "source": "nvd",
+  "tags": [
+    "CWE-80"
+  ],
+  "token_count": 167,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27458"
+}

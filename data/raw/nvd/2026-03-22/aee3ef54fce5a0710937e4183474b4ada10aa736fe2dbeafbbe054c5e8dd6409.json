@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24956",
+  "ingested_at": "2026-03-22T07:54:30.445534+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Shahjada Download Manager Addons for Elementor wpdm-elementor allows Blind SQL Injection.This issue affects Download Manager Addons for Elementor: from n/a through < = 1.3.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aee3ef54fce5a0710937e4183474b4ada10aa736fe2dbeafbbe054c5e8dd6409",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24956"
+}

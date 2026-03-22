@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ZKTeco BioTime ZKTeco BioTime contains a path traversal vulnerability in the iclock API that allows an unauthenticated attacker to read arbitrary files via supplying a crafted payload.",
+  "token_count": 27
+}

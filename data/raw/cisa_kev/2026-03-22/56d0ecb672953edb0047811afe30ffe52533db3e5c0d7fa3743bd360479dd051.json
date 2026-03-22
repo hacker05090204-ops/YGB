@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22265",
+  "ingested_at": "2026-03-22T07:45:17.240342+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung devices with selected Exynos chipsets contain a use-after-free vulnerability that allows malicious memory write and code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "56d0ecb672953edb0047811afe30ffe52533db3e5c0d7fa3743bd360479dd051",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

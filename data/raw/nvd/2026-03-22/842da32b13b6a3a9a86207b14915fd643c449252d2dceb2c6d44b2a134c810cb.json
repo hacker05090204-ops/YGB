@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3206",
+  "ingested_at": "2026-03-22T07:54:32.127430+00:00",
+  "lang": "en",
+  "raw_text": "Improper Resource Shutdown or Release vulnerability in KrakenD, SLU KrakenD-CE (CircuitBreaker modules), KrakenD, SLU KrakenD-EE (CircuitBreaker modules). This issue affects KrakenD-CE: before 2.13.1; KrakenD-EE: before 2.12.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "842da32b13b6a3a9a86207b14915fd643c449252d2dceb2c6d44b2a134c810cb",
+  "source": "nvd",
+  "tags": [
+    "CWE-404"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3206"
+}

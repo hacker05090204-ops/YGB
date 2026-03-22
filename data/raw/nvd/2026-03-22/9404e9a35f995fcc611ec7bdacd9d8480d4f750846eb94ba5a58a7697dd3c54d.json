@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32405",
+  "ingested_at": "2026-03-22T07:54:46.035010+00:00",
+  "lang": "en",
+  "raw_text": "Exposure of Sensitive System Information to an Unauthorized Control Sphere vulnerability in xtemos WoodMart woodmart allows Retrieve Embedded Sensitive Data.This issue affects WoodMart: from n/a through < = 8.3.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9404e9a35f995fcc611ec7bdacd9d8480d4f750846eb94ba5a58a7697dd3c54d",
+  "source": "nvd",
+  "tags": [
+    "CWE-497"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32405"
+}

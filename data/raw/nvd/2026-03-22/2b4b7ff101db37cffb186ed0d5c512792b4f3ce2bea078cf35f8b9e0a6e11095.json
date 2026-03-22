@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-14055",
+  "ingested_at": "2026-03-22T07:54:29.951394+00:00",
+  "lang": "en",
+  "raw_text": "An integer underflow vulnerability in Silicon Labs Secure NCP host implementation allows a buffer overread via a specially crafted packet.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "2b4b7ff101db37cffb186ed0d5c512792b4f3ce2bea078cf35f8b9e0a6e11095",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-191"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14055"
+}

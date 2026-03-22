@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-10181",
+  "ingested_at": "2026-03-22T07:45:19.583159+00:00",
+  "lang": "en",
+  "raw_text": "Sumavision Enhanced Multimedia Router (EMR) Sumavision Enhanced Multimedia Router (EMR) contains a cross-site request forgery (CSRF) vulnerability allowing the creation of users with elevated privileges as administrator on a device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "359b0cca41352eafa88116c629a411d01f7968092e0a1278529f24d8b5a3a909",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

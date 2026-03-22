@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70027",
+  "ingested_at": "2026-03-22T07:54:43.588970+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-918: Server-Side Request Forgery was discovered in Sunbird-Ed SunbirdEd-portal v1.13.4. This allows attackers to obtain sensitive information",
+  "severity": "HIGH",
+  "sha256_hash": "eb2ac20c500cf0336809b456cc545220a5300ae1924be96ccca74ad6b26ed426",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70027"
+}

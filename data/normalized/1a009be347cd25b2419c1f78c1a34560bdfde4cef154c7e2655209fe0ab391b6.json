@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft .NET Framework Microsoft .NET Framework contains an information disclosure vulnerability that exposes the ObjRef URI to an attacker, ultimately enabling remote code execution.",
+  "token_count": 24
+}

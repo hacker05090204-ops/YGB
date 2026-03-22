@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28075",
+  "ingested_at": "2026-03-22T07:54:40.555312+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in p-themes Porto porto allows Reflected XSS.This issue affects Porto: from n/a through < = 7.6.2.",
+  "severity": "HIGH",
+  "sha256_hash": "ccf1c0e51d0b6e62a551c856a6fbc2b5e1c26163e46494de6736a562bd8c180b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28075"
+}

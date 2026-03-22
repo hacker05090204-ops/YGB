@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11251",
+  "ingested_at": "2026-03-22T07:54:33.144054+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Dayneks Software Industry and Trade Inc. E-Commerce Platform allows SQL Injection.This issue affects E-Commerce Platform: through 27022026. NOTE: The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "CRITICAL",
+  "sha256_hash": "99b3f66d0d5fd52ea74cf607d13ce6a3e78e328080d62aa8110aef412d41befa",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11251"
+}

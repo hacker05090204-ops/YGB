@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32587",
+  "ingested_at": "2026-03-22T07:54:46.858957+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Saad Iqbal WP EasyPay allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WP EasyPay: from n/a through 4.2.11.",
+  "severity": "MEDIUM",
+  "sha256_hash": "010771c92f763147dc504d2b348294e2f20393e0cb20fffeafc1d5cec92e8b4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32587"
+}

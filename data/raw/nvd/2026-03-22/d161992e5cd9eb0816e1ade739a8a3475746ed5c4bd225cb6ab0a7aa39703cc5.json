@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25797",
+  "ingested_at": "2026-03-22T07:54:31.299736+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, the ps coders, responsible for writing PostScript files, fails to sanitize the input before writing it into the PostScript header. An attacker can provide a malicous file and inject arbitrary PostScript code. When the resulting file is processed by a printer or a viewer (like Ghostscript), the injected code is interpreted and executed. The html encoder does not properly escape strings that are written to in the html document. An attacker can provide a malicious file and injection arbitrary html code. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d161992e5cd9eb0816e1ade739a8a3475746ed5c4bd225cb6ab0a7aa39703cc5",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 107,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25797"
+}

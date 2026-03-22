@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2751",
+  "ingested_at": "2026-03-22T07:54:33.163664+00:00",
+  "lang": "en",
+  "raw_text": "Blind SQL Injection via unsanitized array keys in Service Dependencies deletion. Vulnerability in Centreon Centreon Web on Central Server on Linux (Service Dependencies modules) allows Blind SQL Injection.This issue affects Centreon Web on Central Server before 25.10.8, 24.10.20, 24.04.24.",
+  "severity": "HIGH",
+  "sha256_hash": "541b1665c267030539f4ce65f478937b9b0f96ce48c4b5da500701c04100f663",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2751"
+}

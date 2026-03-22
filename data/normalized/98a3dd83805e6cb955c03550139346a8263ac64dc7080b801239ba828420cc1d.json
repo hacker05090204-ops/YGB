@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in levelfourdevelopment WP EasyCart wp-easycart allows Blind SQL Injection.This issue affects WP EasyCart: from n/a through < = 5.8.13.",
+  "token_count": 32
+}

@@ -18,12 +18,13 @@ import logging
 from pathlib import Path
 
 try:
-    from fastapi import APIRouter, HTTPException, Request, Response
+    from fastapi import APIRouter, Depends, HTTPException, Request, Response
     from fastapi.responses import JSONResponse
 except ImportError:
     # Stub for import safety when FastAPI not available
     pass
 
+from backend.auth.auth_guard import require_auth
 from backend.sync.manifest import load_manifest, DEVICE_ID
 from backend.sync.chunker import get_chunk, has_chunk, store_chunk, CHUNK_CACHE
 from backend.sync.health import get_sync_health, should_alert
@@ -31,7 +32,7 @@ from backend.sync.peer_transport import get_peers, save_peer_manifest, SYNC_META
 
 logger = logging.getLogger("ygb.sync.routes")
 
-sync_router = APIRouter(tags=["sync"])
+sync_router = APIRouter(tags=["sync"], dependencies=[Depends(require_auth)])
 
 
 @sync_router.get("/manifest")

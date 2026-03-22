@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2628",
+  "ingested_at": "2026-03-22T07:54:34.010633+00:00",
+  "lang": "en",
+  "raw_text": "The All-in-One Microsoft 365 & Entra ID / Azure AD SSO Login plugin for WordPress is vulnerable to authentication bypass in all versions up to, and including, 2.2.5. This makes it possible for unauthenticated attackers to bypass authentication and log in as other users, including administrators.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d14845664a43f0d0fe9d5c828c023deccababd420ecd9d2548b00f04df3b261e",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2628"
+}

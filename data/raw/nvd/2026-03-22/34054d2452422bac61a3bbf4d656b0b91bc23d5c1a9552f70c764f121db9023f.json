@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1806",
+  "ingested_at": "2026-03-22T07:54:49.298544+00:00",
+  "lang": "en",
+  "raw_text": "The Tour & Activity Operator Plugin for TourCMS plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'target' parameter of the tourcms_doc_link shortcode in all versions up to, and including, 1.7.0 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "34054d2452422bac61a3bbf4d656b0b91bc23d5c1a9552f70c764f121db9023f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1806"
+}

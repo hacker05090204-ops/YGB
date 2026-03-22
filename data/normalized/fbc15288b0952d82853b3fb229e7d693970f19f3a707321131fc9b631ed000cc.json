@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 24.0, an unauthenticated SQL Injection vulnerability exists in AVideo within the objects/videos.json.php and objects/video.php components. The application fails to properly sanitize the catName parameter when it is supplied via a JSON-formatted POST request body. Because JSON input is parsed and merged into $_REQUEST after global security checks are executed, the payload bypasses the existing sanitization mechanisms. This issue has been patched in version 24.0.",
+  "token_count": 75
+}

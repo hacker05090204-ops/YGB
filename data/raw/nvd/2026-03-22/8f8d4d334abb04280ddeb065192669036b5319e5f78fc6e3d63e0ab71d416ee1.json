@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22900",
+  "ingested_at": "2026-03-22T07:54:48.895718+00:00",
+  "lang": "en",
+  "raw_text": "A use of hard-coded credentials vulnerability has been reported to affect QuNetSwitch. The remote attackers can then exploit the vulnerability to gain unauthorized access. We have already fixed the vulnerability in the following version: QuNetSwitch 2.0.5.0906 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8f8d4d334abb04280ddeb065192669036b5319e5f78fc6e3d63e0ab71d416ee1",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22900"
+}

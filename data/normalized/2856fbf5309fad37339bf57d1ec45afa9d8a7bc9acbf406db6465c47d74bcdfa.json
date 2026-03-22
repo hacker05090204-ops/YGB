@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements Used in a Template Engine (CWE-1336) exists in Workflows in Kibana which could allow an attacker to read arbitrary files from the Kibana server filesystem, and perform Server-Side Request Forgery (SSRF) via Code Injection (CAPEC-242). This requires an authenticated user who has the workflowsManagement:executeWorkflow privilege.",
+  "token_count": 50
+}

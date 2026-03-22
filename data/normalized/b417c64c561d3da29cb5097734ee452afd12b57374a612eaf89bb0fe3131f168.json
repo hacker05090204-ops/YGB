@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Exposure of sensitive functionality to an unauthorized actor in Smart Switch prior to version 3.7.69.15 allows remote attackers to set a specific configuration.",
+  "token_count": 23
+}

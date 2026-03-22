@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-70041",
+  "ingested_at": "2026-03-22T07:54:43.947520+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-259: Use of Hard-coded Password was discovered in oslabs-beta ThermaKube master.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b33754ed6c2bb198f1112edf1f3bf9cc64669ac53989e9e2830954cade8a0161",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70041"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an unauthenticated attacker to achieve remote code execution on the system by sending a crafted request to the libraries installation route and injecting malicious input into the request body.",
+  "token_count": 43
+}

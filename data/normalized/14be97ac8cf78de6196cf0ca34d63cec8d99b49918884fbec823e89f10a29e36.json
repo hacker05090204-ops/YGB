@@ -1,0 +1,5 @@
+{
+  "lang": "ro",
+  "raw_text": "Linux Kernel 2.4.1 < 2.4.37 / 2.6.1 < 2.6.32-rc5 - 'pipe.c' Local Privilege Escalation (3)",
+  "token_count": 15
+}

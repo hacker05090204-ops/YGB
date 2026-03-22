@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-16057",
+  "ingested_at": "2026-03-22T07:45:18.087989+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DNS-320 Storage Device The login_mgr.cgi script in D-Link DNS-320 is vulnerable to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cd5e804040cb0bf06d93429722ed9b88134aaf71c6e1ed6084e7f4b4fe631ecb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

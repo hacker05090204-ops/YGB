@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-2749",
+  "ingested_at": "2026-03-22T07:54:33.175724+00:00",
+  "lang": "en",
+  "raw_text": "Vulnerability in Centreon Centreon Open Tickets on Central Server on Linux (Centroen Open Ticket modules).This issue affects Centreon Open Tickets on Central Server: from all before 25.10.3, 24.10.8, 24.04.7.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e09c1e941dbb44884e0dbcce0a771cbed6594496aaf09dd3d49fd6ca4ec51519",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2749"
+}

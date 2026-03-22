@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22991",
+  "ingested_at": "2026-03-22T07:45:18.842548+00:00",
+  "lang": "en",
+  "raw_text": "F5 BIG-IP Traffic Management Microkernel The Traffic Management Microkernel of BIG-IP ASM Risk Engine has a buffer overflow vulnerability, leading to a bypassing of URL-based access controls.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d6f40054a26ffba1bec9a3945bba86544d68f371714246a9b12f8869bfa4732c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

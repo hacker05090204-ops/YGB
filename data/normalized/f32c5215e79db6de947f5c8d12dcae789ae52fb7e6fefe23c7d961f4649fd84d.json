@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in SourceCodester Modern Image Gallery App 1.0. Affected by this vulnerability is an unknown functionality of the file upload.php. The manipulation of the argument filename results in cross site scripting. The attack may be launched remotely. The exploit is now public and may be used.",
+  "token_count": 49
+}

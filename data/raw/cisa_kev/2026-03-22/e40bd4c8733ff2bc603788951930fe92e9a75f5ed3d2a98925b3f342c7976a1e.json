@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-39891",
+  "ingested_at": "2026-03-22T07:45:16.903772+00:00",
+  "lang": "en",
+  "raw_text": "Twilio Authy Twilio Authy contains an information disclosure vulnerability in its API that allows an unauthenticated endpoint to accept a request containing a phone number and respond with information about whether the phone number was registered with Authy.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e40bd4c8733ff2bc603788951930fe92e9a75f5ed3d2a98925b3f342c7976a1e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

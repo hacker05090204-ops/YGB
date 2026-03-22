@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25941",
+  "ingested_at": "2026-03-22T07:54:32.284145+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Versions on the 2.x branch prior to to 2.11.8 and on the 3.x branch prior to 3.23.0 have an out-of-bounds read vulnerability in the FreeRDP client's RDPGFX channel that allows a malicious RDP server to read uninitialized heap memory by sending a crafted WIRE_TO_SURFACE_2 PDU with a `bitmapDataLength` value larger than the actual data in the packet. This can lead to information disclosure or client crashes when a user connects to a malicious server. Versions 2.11.8 and 3.23.0 fix the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f63e300d621f17ca2174883dde4262d52158daf0a2e4842d873ecedb898bb6b5",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-125"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25941"
+}

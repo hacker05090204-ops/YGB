@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-3950",
+  "ingested_at": "2026-03-22T07:45:19.639022+00:00",
+  "lang": "en",
+  "raw_text": "VMware Multiple Products VMware Fusion, Remote Console (VMRC) for Mac, and Horizon Client for Mac contain a privilege escalation vulnerability due to improper use of setuid binaries that allows attackers to escalate privileges to root.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5f433a718e5d2725b6efc133ae88aee38a773c63afca491666387b303acd2958",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

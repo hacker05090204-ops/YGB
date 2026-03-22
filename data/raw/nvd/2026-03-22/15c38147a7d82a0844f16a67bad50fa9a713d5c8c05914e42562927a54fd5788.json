@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26048",
+  "ingested_at": "2026-03-22T07:54:30.470175+00:00",
+  "lang": "en",
+  "raw_text": "The Wi-Fi router is vulnerable to de-authentication attacks due to the absence of management frame protection, allowing forged deauthentication and disassociation frames to be broadcast without authentication or encryption. An attacker can use this to cause unauthorized disruptions and create a denial-of-service condition.",
+  "severity": "HIGH",
+  "sha256_hash": "15c38147a7d82a0844f16a67bad50fa9a713d5c8c05914e42562927a54fd5788",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26048"
+}

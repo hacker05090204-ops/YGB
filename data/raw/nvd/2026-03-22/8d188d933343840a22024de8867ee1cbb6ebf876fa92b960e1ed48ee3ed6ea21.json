@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-1524",
+  "ingested_at": "2026-03-22T07:54:31.462991+00:00",
+  "lang": "en",
+  "raw_text": "When the \"Silent Just-In-Time Provisioning\" feature is enabled for a federated identity provider (IDP) there is a risk that a local user store user's information may be replaced during the account provisioning process in cases where federated users share the same username as local users. There will be no impact on your deployment if any of the preconditions mentioned below are not met. Only when all the preconditions mentioned below are fulfilled could a malicious actor associate a targeted local user account with a federated IDP user account that they control. The Deployment should have: -An IDP configured for federated authentication with Silent JIT provisioning enabled. The malicious actor should have: -A fresh valid user account in the federated IDP that has not been used earlier. -Knowledge of the username of a valid user in the local IDP. -An account at the federated IDP matching the targeted local username.",
+  "severity": "HIGH",
+  "sha256_hash": "8d188d933343840a22024de8867ee1cbb6ebf876fa92b960e1ed48ee3ed6ea21",
+  "source": "nvd",
+  "tags": [
+    "CWE-290"
+  ],
+  "token_count": 149,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-1524"
+}

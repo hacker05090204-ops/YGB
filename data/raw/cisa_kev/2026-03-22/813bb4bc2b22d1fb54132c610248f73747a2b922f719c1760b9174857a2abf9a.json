@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-6549",
+  "ingested_at": "2026-03-22T07:45:17.077543+00:00",
+  "lang": "en",
+  "raw_text": "Citrix NetScaler ADC and NetScaler Gateway Citrix NetScaler ADC and NetScaler Gateway contain a buffer overflow vulnerability that allows for a denial-of-service when configured as a Gateway (VPN virtual server, ICA Proxy, CVPN, RDP Proxy) or AAA virtual server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "813bb4bc2b22d1fb54132c610248f73747a2b922f719c1760b9174857a2abf9a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

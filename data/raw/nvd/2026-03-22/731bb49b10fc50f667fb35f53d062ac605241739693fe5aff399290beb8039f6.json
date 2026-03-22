@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4487",
+  "ingested_at": "2026-03-22T07:54:48.857275+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in UTT HiPER 1200GW up to 2.5.3-170306. This impacts the function strcpy of the file /goform/websHostFilter. This manipulation causes buffer overflow. It is possible to initiate the attack remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "731bb49b10fc50f667fb35f53d062ac605241739693fe5aff399290beb8039f6",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4487"
+}

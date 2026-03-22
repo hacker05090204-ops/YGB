@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3034",
+  "ingested_at": "2026-03-22T07:54:39.961184+00:00",
+  "lang": "en",
+  "raw_text": "The OoohBoi Steroids for Elementor plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the _ob_spacerat_link, _ob_bbad_link, and _ob_teleporter_link URL parameters in all versions up to, and including, 2.1.24. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user clicks on the injected element.",
+  "severity": "MEDIUM",
+  "sha256_hash": "344749af6c81dcf80fd0faa35346965fadf57700e5d02fc015a3054be005e3af",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3034"
+}

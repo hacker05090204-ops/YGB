@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Grandstream UCM6200 Grandstream UCM6200 series is vulnerable to an unauthenticated remote SQL injection via crafted HTTP request. Exploitation can allow for code execution as root.",
+  "token_count": 25
+}

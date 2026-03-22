@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet FortiWeb Fortinet FortiWeb contains an OS command Injection vulnerability that may allow an authenticated attacker to execute unauthorized code on the underlying system via crafted HTTP requests or CLI commands.",
+  "token_count": 31
+}

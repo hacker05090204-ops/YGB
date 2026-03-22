@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32704",
+  "ingested_at": "2026-03-22T07:54:46.525365+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to 3.6.1, POST /api/template/renderSprig lacks model.CheckAdminRole, allowing any authenticated user to execute arbitrary SQL queries against the SiYuan workspace database and exfiltrate all note content, metadata, and custom attributes. This vulnerability is fixed in 3.6.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d31efde5beb9fb3f9f2f4d6d3c08b3a8458f966083bd8362b75b67f31faf011c",
+  "source": "nvd",
+  "tags": [
+    "CWE-285",
+    "CWE-732"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32704"
+}

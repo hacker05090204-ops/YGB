@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3168",
+  "ingested_at": "2026-03-22T07:54:31.995606+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Tenda F453 1.0.0.3. This affects the function fromNatStaticSetting of the file /goform/NatStaticSetting of the component httpd. Executing a manipulation of the argument page can lead to buffer overflow. The attack may be launched remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "152eb85531e085d6d7fce597385a456b89f5f2fa354f25020b65e7d4f3b45994",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3168"
+}

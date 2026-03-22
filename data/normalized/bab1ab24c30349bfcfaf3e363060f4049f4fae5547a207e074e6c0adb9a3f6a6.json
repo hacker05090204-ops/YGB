@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Planning Analytics IBM Planning Analytics is vulnerable to a configuration overwrite that allows an unauthenticated user to login as \"admin\", and then execute code as root or SYSTEM via TM1 scripting.",
+  "token_count": 32
+}

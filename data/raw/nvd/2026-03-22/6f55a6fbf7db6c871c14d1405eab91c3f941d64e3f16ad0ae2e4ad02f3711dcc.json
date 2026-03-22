@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1378",
+  "ingested_at": "2026-03-22T07:54:49.274594+00:00",
+  "lang": "en",
+  "raw_text": "The WP Posts Re-order plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 1.0. This is due to missing nonce validation on the `cpt_plugin_options()` function. This makes it possible for unauthenticated attackers to update the plugin settings including capability, autosort, and adminsort settings, via a forged request granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6f55a6fbf7db6c871c14d1405eab91c3f941d64e3f16ad0ae2e4ad02f3711dcc",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1378"
+}

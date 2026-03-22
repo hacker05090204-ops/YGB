@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31949",
+  "ingested_at": "2026-03-22T07:54:44.753402+00:00",
+  "lang": "en",
+  "raw_text": "LibreChat is a ChatGPT clone with additional features. Prior to 0.8.3-rc1, a Denial of Service (DoS) vulnerability exists in the DELETE /api/convos endpoint that allows an authenticated attacker to crash the Node.js server process by sending malformed requests. The DELETE /api/convos route handler attempts to destructure req.body.arg without validating that it exists. The server crashes due to an unhandled TypeError that bypasses Express error handling middleware and triggers process.exit(1). This vulnerability is fixed in 0.8.3-rc1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f2f90745c2fc8d1485900c059441d5e47ce79d6b0da7c08a6c9c01ba4a3cf9ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-248"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31949"
+}

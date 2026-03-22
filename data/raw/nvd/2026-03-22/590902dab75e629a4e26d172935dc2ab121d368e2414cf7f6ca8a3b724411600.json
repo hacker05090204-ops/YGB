@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26983",
+  "ingested_at": "2026-03-22T07:54:31.410667+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, the MSL interpreter crashes when processing a invalid ` ` element that causes it to use an image after it has been freed. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "590902dab75e629a4e26d172935dc2ab121d368e2414cf7f6ca8a3b724411600",
+  "source": "nvd",
+  "tags": [
+    "CWE-476",
+    "CWE-416"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26983"
+}

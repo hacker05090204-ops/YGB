@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ignite Realtime Openfire Ignite Realtime Openfire contains a path traversal vulnerability that allows an unauthenticated attacker to access restricted pages in the Openfire Admin Console reserved for administrative users.",
+  "token_count": 29
+}

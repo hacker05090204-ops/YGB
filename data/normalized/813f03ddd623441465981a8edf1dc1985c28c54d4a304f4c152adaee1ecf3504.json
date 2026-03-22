@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple iOS and macOS Apple IOMobileFrameBuffer contains a memory corruption vulnerability which can allow a malicious application to execute arbitrary code with kernel privileges.",
+  "token_count": 24
+}

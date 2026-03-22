@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MikroTik RouterOS MikroTik RouterOS through 6.42 allows unauthenticated remote attackers to read arbitrary files and remote authenticated attackers to write arbitrary files due to a directory traversal vulnerability in the WinBox interface.",
+  "token_count": 32
+}

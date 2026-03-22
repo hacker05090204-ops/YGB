@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69378",
+  "ingested_at": "2026-03-22T07:54:30.260025+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect Privilege Assignment vulnerability in XforWooCommerce Product Filter for WooCommerce prdctfltr allows Privilege Escalation.This issue affects Product Filter for WooCommerce: from n/a through < = 9.1.2.",
+  "severity": "HIGH",
+  "sha256_hash": "240958d3dda66c3607b9e4a1c288dadb63f63bf415c711fea39fffba2085775d",
+  "source": "nvd",
+  "tags": [
+    "CWE-266"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69378"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32453",
+  "ingested_at": "2026-03-22T07:54:46.138384+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in ThemeFusion Avada Core fusion-core allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Avada Core: from n/a through < 5.15.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4f60f0d50baa50f0a8eed6df13845091fbd3a988363a44240f959aed24a5f4a5",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32453"
+}

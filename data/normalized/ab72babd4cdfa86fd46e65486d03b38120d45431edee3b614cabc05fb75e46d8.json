@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Grafana Labs Grafana Grafana contains an authentication bypass vulnerability that allows authenticated and unauthenticated users to view and delete all snapshot data, potentially resulting in complete snapshot data loss.",
+  "token_count": 29
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2021-4456",
+  "ingested_at": "2026-03-22T07:54:32.937242+00:00",
+  "lang": "en",
+  "raw_text": "Net::CIDR versions before 0.24 for Perl mishandle leading zeros in IP CIDR addresses, which may have unspecified impact. The functions `addr2cidr` and `cidrlookup` may return leading zeros in a CIDR string, which may in turn be parsed as octal numbers by subsequent users. In some cases an attacker may be able to leverage this to bypass access controls based on IP addresses. The documentation advises validating untrusted CIDR strings with the `cidrvalidate` function. However, this mitigation is optional and not enforced by default. In practice, users may call `addr2cidr` or `cidrlookup` with untrusted input and without validation, incorrectly assuming that this is safe.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8b6ba9666e871271c44ccc402d6096eb3d9e3dfc752c63b64d770d4e84dcaad6",
+  "source": "nvd",
+  "tags": [
+    "CWE-704"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-4456"
+}

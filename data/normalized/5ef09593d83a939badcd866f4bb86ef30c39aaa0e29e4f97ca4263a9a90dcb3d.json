@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "North Grid Proself North Grid Proself Enterprise/Standard, Gateway, and Mail Sanitize contain an improper restriction of XML External Entity (XXE) reference vulnerability, which could allow a remote, unauthenticated attacker to conduct an XXE attack.",
+  "token_count": 34
+}

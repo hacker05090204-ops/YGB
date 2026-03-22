@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-55046",
+  "ingested_at": "2026-03-22T07:54:47.495112+00:00",
+  "lang": "en",
+  "raw_text": "MuraCMS through 10.1.10 contains a CSRF vulnerability that allows attackers to permanently destroy all deleted content stored in the trash system through a simple CSRF attack. The vulnerable cTrash.empty function lacks CSRF token validation, enabling malicious websites to forge requests that irreversibly delete all trashed content when an authenticated administrator visits a crated webpage. Successful exploitation of the CSRF vulnerability results in potentially catastrophic data loss within the MuraCMS system. When an authenticated administrator visits a malicious page containing the CSRF exploit, their browser automatically submits a hidden form that permanently empties the entire trash system without any validation, confirmation dialog, or user consent.",
+  "severity": "HIGH",
+  "sha256_hash": "79368411666997c944396d1a09a00f86728cea34d00380daa604824eccdea5dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 104,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-55046"
+}

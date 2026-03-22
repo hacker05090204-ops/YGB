@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20106",
+  "ingested_at": "2026-03-22T07:54:34.726800+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the Remote Access SSL VPN, HTTP management and MUS functionality, of Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to exhaust device memory resulting in a denial of service (DoS) condition requiring a manual reboot. This vulnerability is due to trusting user input without validation. An attacker could exploit this vulnerability by sending crafted packets to the Remote Access SSL VPN server. A successful exploit could allow the attacker to cause the device to stop responding, resulting in a DoS condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8be25fba0f01283ff621ae18e73c5c09329451ebd35688d42d98cb44cffa0a66",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20106"
+}

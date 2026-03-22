@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Musicco 2.0.0 contains a path traversal vulnerability that allows unauthenticated attackers to download arbitrary directories by manipulating the parent parameter. Attackers can supply directory traversal sequences in the parent parameter of the getAlbum endpoint to access sensitive system directories and download them as ZIP files.",
+  "token_count": 45
+}

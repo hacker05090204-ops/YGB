@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "arduino-TuyaOpen before version 1.2.1 contains a single-byte buffer overflow vulnerability in the WiFiMulti component. When the victim's smart hardware connects to an attacker-controlled AP hotspot, the attacker can exploit the overflow to execute arbitrary code on the affected embedded device.",
+  "token_count": 40
+}

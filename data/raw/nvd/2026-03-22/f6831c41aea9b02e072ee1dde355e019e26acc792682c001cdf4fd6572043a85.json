@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3612",
+  "ingested_at": "2026-03-22T07:54:41.211338+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Wavlink WL-NU516U1 V240425. This affects the function sub_405AF4 of the file /cgi-bin/adm.cgi of the component OTA Online Upgrade. This manipulation of the argument firmware_url causes command injection. It is possible to initiate the attack remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure.",
+  "severity": "HIGH",
+  "sha256_hash": "f6831c41aea9b02e072ee1dde355e019e26acc792682c001cdf4fd6572043a85",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3612"
+}

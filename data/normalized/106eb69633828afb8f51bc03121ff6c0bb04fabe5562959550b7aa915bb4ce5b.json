@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chrome FreeType Google Chrome uses FreeType, an open-source software library to render fonts, which contains a heap buffer overflow vulnerability in the function Load_SBit_Png when processing PNG images embedded into fonts. This vulnerability is part of an exploit chain with CVE-2020-17087 on Windows and CVE-2020-16010 on Android.",
+  "token_count": 48
+}

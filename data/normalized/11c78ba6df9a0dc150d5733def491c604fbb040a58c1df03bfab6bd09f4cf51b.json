@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Totolink WA300 5.2cu.7112_B20190227. Affected by this issue is the function recvUpgradeNewFw of the file /cgi-bin/cstecgi.cgi. This manipulation causes os command injection. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized.",
+  "token_count": 43
+}

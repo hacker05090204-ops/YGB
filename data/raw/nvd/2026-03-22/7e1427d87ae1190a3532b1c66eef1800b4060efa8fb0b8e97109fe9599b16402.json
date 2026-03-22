@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0111",
+  "ingested_at": "2026-03-22T07:54:43.140816+00:00",
+  "lang": "en",
+  "raw_text": "In ns_GetUserData of ns_SmscbUtilities.c, there is a possible out of bounds write due to an incorrect bounds check. This could lead to remote escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7e1427d87ae1190a3532b1c66eef1800b4060efa8fb0b8e97109fe9599b16402",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0111"
+}

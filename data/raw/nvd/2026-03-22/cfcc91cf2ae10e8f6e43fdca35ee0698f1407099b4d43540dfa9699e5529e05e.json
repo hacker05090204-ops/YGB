@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32298",
+  "ingested_at": "2026-03-22T07:54:47.112878+00:00",
+  "lang": "en",
+  "raw_text": "The Angeet ES3 KVM does not properly sanitize user-supplied variables parsed by the 'cfg.lua' script, allowing an authenticated attacker to execute OS-level commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cfcc91cf2ae10e8f6e43fdca35ee0698f1407099b4d43540dfa9699e5529e05e",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32298"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32375",
+  "ingested_at": "2026-03-22T07:54:45.970942+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Travel Diaries travel-diaries allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Travel Diaries: from n/a through < = 1.2.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "80f4cbc05d4979743a9e8a30bf5e72a04f9c7fd9d5bbd35d422e8eb7f1dc055c",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32375"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1692",
+  "ingested_at": "2026-03-22T07:54:32.615362+00:00",
+  "lang": "en",
+  "raw_text": "A missing origin validation in WebSockets vulnerability affects the GraphicalData web services used by the WebVue, WebScheduler, TouchVue and SnapVue features of PcVue in version 12.0.0 through 16.3.3 included. It might allow a remote attacker to lure a successfully authenticated user to a malicious website. This vulnerability only affects the following two endpoints: GraphicalData/js/signalR/connect and GraphicalData/js/signalR/reconnect.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b5dfb6b0864aa789723520312b827746d09e0137b8796f8dfd377e1260b47439",
+  "source": "nvd",
+  "tags": [
+    "CWE-1385"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1692"
+}

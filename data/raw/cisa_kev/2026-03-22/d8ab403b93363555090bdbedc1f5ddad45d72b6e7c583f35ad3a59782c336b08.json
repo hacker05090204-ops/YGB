@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-12238",
+  "ingested_at": "2026-03-22T07:45:18.581898+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Catalyst 6800 Series Switches A vulnerability in the Virtual Private LAN Service (VPLS) code of Cisco IOS for Cisco Catalyst 6800 Series Switches could allow an unauthenticated, adjacent attacker to cause a denial of service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d8ab403b93363555090bdbedc1f5ddad45d72b6e7c583f35ad3a59782c336b08",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

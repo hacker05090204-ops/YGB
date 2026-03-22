@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22071",
+  "ingested_at": "2026-03-22T07:45:17.129694+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a use-after-free vulnerability when process shell memory is freed using IOCTL munmap call and process initialization is in progress.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a2ad7568bff1f3a8ff74727864e5cba5c717b053089d50c83f1d4d001c733e92",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

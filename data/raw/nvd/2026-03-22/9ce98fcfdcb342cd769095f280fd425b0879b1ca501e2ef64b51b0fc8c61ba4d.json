@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30777",
+  "ingested_at": "2026-03-22T07:54:40.704429+00:00",
+  "lang": "en",
+  "raw_text": "EC-CUBE provided by EC-CUBE CO.,LTD. contains a multi-factor authentication (MFA) bypass vulnerability. An attacker who has obtained a valid administrator ID and password may be able to bypass two-factor authentication and gain unauthorized access to the administrative page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9ce98fcfdcb342cd769095f280fd425b0879b1ca501e2ef64b51b0fc8c61ba4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30777"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-54253",
+  "ingested_at": "2026-03-22T07:45:16.101956+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Experience Manager (AEM) Forms Adobe Experience Manager Forms in JEE contains an unspecified vulnerability that allows for arbitrary code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "16e47bb86f315844394d5c9243dc51e4b07374b2a38e52b18c4bafcb342d92ea",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

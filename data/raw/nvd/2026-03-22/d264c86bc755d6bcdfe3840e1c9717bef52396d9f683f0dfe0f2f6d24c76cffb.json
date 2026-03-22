@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3180",
+  "ingested_at": "2026-03-22T07:54:33.826101+00:00",
+  "lang": "en",
+  "raw_text": "The Contest Gallery \u2013 Upload & Vote Photos, Media, Sell with PayPal & Stripe plugin for WordPress is vulnerable to blind SQL Injection via the \u2018cgLostPasswordEmail\u2019 and the \u2019cgl_mail\u2019 parameter in all versions up to, and including, 28.1.4 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database. The vulnerability's \u2019cgLostPasswordEmail\u2019 parameter was patched in version 28.1.4, and the \u2019cgl_mail\u2019 parameter was patched in version 28.1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "d264c86bc755d6bcdfe3840e1c9717bef52396d9f683f0dfe0f2f6d24c76cffb",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3180"
+}

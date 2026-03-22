@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32030",
+  "ingested_at": "2026-03-22T07:54:48.225262+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 contain a path traversal vulnerability in the stageSandboxMedia function that accepts arbitrary absolute paths when iMessage remote attachment fetching is enabled. An attacker who can tamper with attachment path metadata can disclose files readable by the OpenClaw process on the configured remote host via SCP.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fd9ccbffd913aca7de4176ed19b4aebabf39dfef0d0b74e0d3f20bf1143104c8",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32030"
+}

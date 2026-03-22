@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67036",
+  "ingested_at": "2026-03-22T07:54:43.673250+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Lantronix EDS5000 2.1.0.0R3. The Log Info page allows users to see log files by specifying their names. Due to a missing sanitization in the file name parameter, an authenticated attacker can inject arbitrary OS commands that are executed with root privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "ab0b591e616d0a0734446d6bd13809f2d44ab439f1654acd3ff066b85c71e490",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67036"
+}

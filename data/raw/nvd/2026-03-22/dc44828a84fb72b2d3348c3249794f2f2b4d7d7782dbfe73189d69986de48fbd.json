@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28477",
+  "ingested_at": "2026-03-22T07:54:41.086066+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain an oauth state validation bypass vulnerability in the manual Chutes login flow that allows attackers to bypass CSRF protection. An attacker can convince a user to paste attacker-controlled OAuth callback data, enabling credential substitution and token persistence for unauthorized accounts.",
+  "severity": "HIGH",
+  "sha256_hash": "dc44828a84fb72b2d3348c3249794f2f2b4d7d7782dbfe73189d69986de48fbd",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28477"
+}

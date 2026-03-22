@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1385",
+  "ingested_at": "2026-03-22T07:45:18.025113+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows AppX Deployment Extensions improperly performs privilege management, resulting in access to system files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b6a72e367bb4990d451994c985ac386c384971eda25e9b761608da0a4263375e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

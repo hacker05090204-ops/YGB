@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Superset Apache Superset contains an insecure default initialization of a resource vulnerability that allows an attacker to authenticate and access unauthorized resources on installations that have not altered the default configured SECRET_KEY according to installation instructions.",
+  "token_count": 37
+}

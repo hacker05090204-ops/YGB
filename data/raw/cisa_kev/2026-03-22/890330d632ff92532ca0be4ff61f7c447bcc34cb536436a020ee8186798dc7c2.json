@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-3893",
+  "ingested_at": "2026-03-22T07:45:16.261425+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a memory corruption vulnerability that allows for remote code execution. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "890330d632ff92532ca0be4ff61f7c447bcc34cb536436a020ee8186798dc7c2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

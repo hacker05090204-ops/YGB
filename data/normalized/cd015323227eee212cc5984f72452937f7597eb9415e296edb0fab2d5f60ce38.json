@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Double free vulnerability in the window module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "token_count": 16
+}

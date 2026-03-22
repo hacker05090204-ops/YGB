@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-71258",
+  "ingested_at": "2026-03-22T07:54:47.943354+00:00",
+  "lang": "en",
+  "raw_text": "BMC FootPrints ITSM versions 20.20.02 through 20.24.01.001 contain a blind server-side request forgery vulnerability in the searchWeb API component that allows authenticated attackers to cause the server to initiate arbitrary outbound requests. Attackers can exploit improper URL validation to perform internal network scanning or interact with internal services, impacting system availability. The following hotfixes remediate the vulnerability: 20.20.02, 20.20.03.002, 20.21.01.001, 20.21.02.002, 20.22.01, 20.22.01.001, 20.23.01, 20.23.01.002, and 20.24.01.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ccfb119d9e8888b9c8ea59addcbecfc32df739b935e5dda9191c9bc5a4759bf7",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-71258"
+}

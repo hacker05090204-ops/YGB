@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30917",
+  "ingested_at": "2026-03-22T07:54:42.530577+00:00",
+  "lang": "en",
+  "raw_text": "Bucket is a MediaWiki extension to store and retrieve structured data on articles. Prior to 2.1.1, a stored XSS can be inserted into any Bucket table field that has a PAGE type, which will execute whenever a user views that table's corresponding Bucket namespace page. This vulnerability is fixed in 2.1.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d3469d0754ea27dfd85abf2dbbd2de6c205a493688ffd5b4fd8f5011f20b8bb1",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30917"
+}

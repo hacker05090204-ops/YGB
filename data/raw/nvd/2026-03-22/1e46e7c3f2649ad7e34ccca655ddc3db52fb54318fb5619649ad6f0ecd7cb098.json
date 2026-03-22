@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2698",
+  "ingested_at": "2026-03-22T07:54:31.147458+00:00",
+  "lang": "en",
+  "raw_text": "An improper access control vulnerability exists where an authenticated user could access areas outside of their authorized scope.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1e46e7c3f2649ad7e34ccca655ddc3db52fb54318fb5619649ad6f0ecd7cb098",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2698"
+}

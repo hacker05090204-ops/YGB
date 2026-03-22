@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28115",
+  "ingested_at": "2026-03-22T07:54:40.645332+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in loopus WP Attractive Donations System - Easy Stripe & Paypal donations WP_AttractiveDonationsSystem allows Blind SQL Injection.This issue affects WP Attractive Donations System - Easy Stripe & Paypal donations: from n/a through < = 1.25.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b29420ca570dd5fba6c2143e42ee6f238b4ec466b44f50968361dce6c3361000",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28115"
+}

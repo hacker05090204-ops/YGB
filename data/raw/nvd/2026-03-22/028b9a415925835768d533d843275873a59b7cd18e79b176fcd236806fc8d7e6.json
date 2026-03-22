@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28217",
+  "ingested_at": "2026-03-22T07:54:32.842394+00:00",
+  "lang": "en",
+  "raw_text": "hoppscotch is an open source API development ecosystem. Prior to version 2026.2.0, the `userCollection` GraphQL query accepts an arbitrary collection ID and returns the full collection data \u2014 including title, type, and the serialized `data` field containing HTTP requests with headers and potentially secrets \u2014 to any authenticated user, without verifying that the requesting user owns the collection. This is an Insecure Direct Object Reference (IDOR) caused by a missing authorization check that exists on every other operation in the same resolver. Version 2026.2.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "028b9a415925835768d533d843275873a59b7cd18e79b176fcd236806fc8d7e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-862",
+    "CWE-639"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28217"
+}

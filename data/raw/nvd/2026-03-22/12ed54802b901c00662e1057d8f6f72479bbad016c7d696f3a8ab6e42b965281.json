@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3153",
+  "ingested_at": "2026-03-22T07:54:31.978261+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in itsourcecode Document Management System 1.0. Impacted is an unknown function of the file /register.php. Such manipulation of the argument Username leads to sql injection. It is possible to launch the attack remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "12ed54802b901c00662e1057d8f6f72479bbad016c7d696f3a8ab6e42b965281",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3153"
+}

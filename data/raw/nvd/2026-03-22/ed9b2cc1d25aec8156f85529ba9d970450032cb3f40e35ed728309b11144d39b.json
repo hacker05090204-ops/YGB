@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20991",
+  "ingested_at": "2026-03-22T07:54:46.385809+00:00",
+  "lang": "en",
+  "raw_text": "Improper privilege management in ThemeManager prior to SMR Mar-2026 Release 1 allows local privileged attackers to reuse trial contents.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed9b2cc1d25aec8156f85529ba9d970450032cb3f40e35ed728309b11144d39b",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20991"
+}

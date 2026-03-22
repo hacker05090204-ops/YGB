@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27876",
+  "ingested_at": "2026-03-22T07:45:17.450944+00:00",
+  "lang": "en",
+  "raw_text": "Veritas Backup Exec Agent Veritas Backup Exec (BE) Agent contains a file access vulnerability that could allow an attacker to specially craft input parameters on a data management protocol command to access files on the BE Agent machine.",
+  "severity": "CRITICAL",
+  "sha256_hash": "72dafd28bae2304e8d008d6585670eff57d4fca61b5eda9ca4412dab0671172e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

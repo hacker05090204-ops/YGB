@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in rxi fe up to ed4cda96bd582cbb08520964ba627efb40f3dd91. The impacted element is the function read_ of the file src/fe.c. This manipulation with the input 1 causes out-of-bounds read. The attack requires local access. The exploit has been publicly disclosed and may be utilized. This product uses a rolling release model to deliver continuous updates. As a result, specific version information for affected or updated releases is not available. The project was informed of the problem early through an issue report but has not responded yet.",
+  "token_count": 87
+}

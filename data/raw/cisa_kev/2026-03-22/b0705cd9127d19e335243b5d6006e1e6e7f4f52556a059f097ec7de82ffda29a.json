@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-7892",
+  "ingested_at": "2026-03-22T07:45:18.363336+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player has an exploitable use-after-free vulnerability in the TextField class.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b0705cd9127d19e335243b5d6006e1e6e7f4f52556a059f097ec7de82ffda29a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-43228",
+  "ingested_at": "2026-03-22T07:54:29.960504+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in SecuPress SecuPress Free secupress.This issue affects SecuPress Free: from n/a through < = 2.2.5.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "57b6a903c50a72a397bc4d915813ee910a12cb06461ff677fb5efcf490dca78f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43228"
+}

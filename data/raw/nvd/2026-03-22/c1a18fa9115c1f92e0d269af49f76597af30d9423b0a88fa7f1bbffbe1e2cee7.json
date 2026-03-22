@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27829",
+  "ingested_at": "2026-03-22T07:54:32.459903+00:00",
+  "lang": "en",
+  "raw_text": "Astro is a web framework. In versions 9.0.0 through 9.5.3, a bug in Astro's image pipeline allows bypassing `image.domains` / `image.remotePatterns` restrictions, enabling the server to fetch content from unauthorized remote hosts. Astro provides an `inferSize` option that fetches remote images at render time to determine their dimensions. Remote image fetches are intended to be restricted to domains the site developer has manually authorized (using the `image.domains` or `image.remotePatterns` options). However, when `inferSize` is used, no domain validation is performed \u2014 the image is fetched from any host regardless of the configured restrictions. An attacker who can influence the image URL (e.g., via CMS content or user-supplied data) can cause the server to fetch from arbitrary hosts. This allows bypassing `image.domains` / `image.remotePatterns` restrictions to make server-side requests to unauthorized hosts. This includes the risk of server-side request forgery (SSRF) against internal network services and cloud metadata endpoints. Version 9.5.4 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c1a18fa9115c1f92e0d269af49f76597af30d9423b0a88fa7f1bbffbe1e2cee7",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 153,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27829"
+}

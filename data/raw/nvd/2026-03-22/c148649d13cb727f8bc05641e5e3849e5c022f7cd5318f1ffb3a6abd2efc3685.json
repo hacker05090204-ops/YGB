@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26937",
+  "ingested_at": "2026-03-22T07:54:32.723889+00:00",
+  "lang": "en",
+  "raw_text": "Uncontrolled Resource Consumption (CWE-400) in the Timelion component in Kibana can lead Denial of Service via Input Data Manipulation (CAPEC-153)",
+  "severity": "MEDIUM",
+  "sha256_hash": "c148649d13cb727f8bc05641e5e3849e5c022f7cd5318f1ffb3a6abd2efc3685",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26937"
+}

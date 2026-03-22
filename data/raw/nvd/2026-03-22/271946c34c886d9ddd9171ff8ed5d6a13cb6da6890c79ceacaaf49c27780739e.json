@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68841",
+  "ingested_at": "2026-03-22T07:54:30.138028+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Themepul TopperPack \u2013 Complete Elementor Addons, Theme & CPT Builder topper-pack allows PHP Local File Inclusion.This issue affects TopperPack \u2013 Complete Elementor Addons, Theme & CPT Builder: from n/a through < = 1.2.1.",
+  "severity": "HIGH",
+  "sha256_hash": "271946c34c886d9ddd9171ff8ed5d6a13cb6da6890c79ceacaaf49c27780739e",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68841"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-18187",
+  "ingested_at": "2026-03-22T07:45:19.604880+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro OfficeScan Trend Micro OfficeScan contains a directory traversal vulnerability by extracting files from a zip file to a specific folder on the OfficeScan server, leading to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c234a6c610d5a179ce6e390eec2e80516efc14502c06827a35726489ebb2104b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

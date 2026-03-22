@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32626",
+  "ingested_at": "2026-03-22T07:54:46.508061+00:00",
+  "lang": "en",
+  "raw_text": "AnythingLLM is an application that turns pieces of content into context that any LLM can use as references during chatting. In 1.11.1 and earlier, AnythingLLM Desktop contains a Streaming Phase XSS vulnerability in the chat rendering pipeline that escalates to Remote Code Execution on the host OS due to insecure Electron configuration. This works with default settings and requires no user interaction beyond normal chat usage. The custom markdown-it image renderer in frontend/src/utils/chat/markdown.js interpolates token.content directly into the alt attribute without HTML entity escaping. The PromptReply component renders this output via dangerouslySetInnerHTML without DOMPurify sanitization \u2014 unlike HistoricalMessage which correctly applies DOMPurify.sanitize().",
+  "severity": "CRITICAL",
+  "sha256_hash": "22444c86b27af3f091b0a969c5b58d007642532d507ae12eb17ca84f2245a47d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32626"
+}

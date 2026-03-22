@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28392",
+  "ingested_at": "2026-03-22T07:54:41.012805+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a privilege escalation vulnerability in the Slack slash-command handler that incorrectly authorizes any direct message sender when dmPolicy is set to open (must be configured). Attackers can execute privileged slash commands via direct message to bypass allowlist and access-group restrictions.",
+  "severity": "HIGH",
+  "sha256_hash": "8482ec63e2e779a5389c8937f2ecf40870708a9ab74b62b6205a21df6c70b468",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28392"
+}

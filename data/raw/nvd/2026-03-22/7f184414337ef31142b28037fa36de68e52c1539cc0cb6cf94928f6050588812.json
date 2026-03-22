@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27746",
+  "ingested_at": "2026-03-22T07:54:31.942485+00:00",
+  "lang": "en",
+  "raw_text": "The SPIP jeux plugin versions prior to 4.1.1 contain a reflected cross-site scripting (XSS) vulnerability in the pre_propre pipeline. The plugin incorporates untrusted request parameters into HTML output without proper output encoding, allowing attackers to inject arbitrary script content into pages that render a jeux block. When a victim is induced to visit a crafted URL, the injected content is reflected into the response and executed in the victim's browser context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7f184414337ef31142b28037fa36de68e52c1539cc0cb6cf94928f6050588812",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27746"
+}

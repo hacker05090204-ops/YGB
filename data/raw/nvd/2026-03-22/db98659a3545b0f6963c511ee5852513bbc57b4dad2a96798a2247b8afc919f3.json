@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32335",
+  "ingested_at": "2026-03-22T07:54:45.874266+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme The Conference the-conference allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects The Conference: from n/a through < = 1.2.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "db98659a3545b0f6963c511ee5852513bbc57b4dad2a96798a2247b8afc919f3",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32335"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28713",
+  "ingested_at": "2026-03-22T07:54:41.174154+00:00",
+  "lang": "en",
+  "raw_text": "Default credentials set for local privileged user in Virtual Appliance. The following products are affected: Acronis Cyber Protect Cloud Agent (VMware) before build 36943, Acronis Cyber Protect 17 (VMware) before build 41186.",
+  "severity": "HIGH",
+  "sha256_hash": "326bbeb6b333ec7efd1a786469a3cb082f10380b82913ecc1229e9f5985c19eb",
+  "source": "nvd",
+  "tags": [
+    "CWE-1392"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28713"
+}

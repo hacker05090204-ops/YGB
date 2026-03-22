@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25187",
+  "ingested_at": "2026-03-22T07:54:41.450651+00:00",
+  "lang": "en",
+  "raw_text": "Tina4 Stack 1.0.3 contains multiple vulnerabilities allowing unauthenticated attackers to access sensitive database files and execute SQL injection attacks. Attackers can directly request the kim.db database file to retrieve user credentials and password hashes, or inject SQL code through the menu endpoint to manipulate database queries.",
+  "severity": "HIGH",
+  "sha256_hash": "fdeaba6e3dcb702348128076c88c7a49c77d6fff6f8ab4d18705c4fc12de8c33",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25187"
+}

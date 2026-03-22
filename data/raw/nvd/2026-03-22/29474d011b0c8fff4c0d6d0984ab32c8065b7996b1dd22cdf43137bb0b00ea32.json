@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32352",
+  "ingested_at": "2026-03-22T07:54:45.916339+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Elementor Elementor Website Builder elementor allows DOM-Based XSS.This issue affects Elementor Website Builder: from n/a through < = 3.35.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "29474d011b0c8fff4c0d6d0984ab32c8065b7996b1dd22cdf43137bb0b00ea32",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32352"
+}

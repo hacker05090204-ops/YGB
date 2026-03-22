@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30968",
+  "ingested_at": "2026-03-22T07:54:42.904031+00:00",
+  "lang": "en",
+  "raw_text": "Coral Server is open collaboration infrastructure that enables communication, coordination, trust and payments for The Internet of Agents. Prior to 1.1.0, the SSE endpoint (/sse/v1/...) in Coral Server did not strongly validate that a connecting agent was a legitimate participant in the session. This could theoretically allow unauthorized message injection or observation. This vulnerability is fixed in 1.1.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f0fcdca6604be79496a733eee0b9ca85b68eff1d00021bc818cd5deebc34aacb",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30968"
+}

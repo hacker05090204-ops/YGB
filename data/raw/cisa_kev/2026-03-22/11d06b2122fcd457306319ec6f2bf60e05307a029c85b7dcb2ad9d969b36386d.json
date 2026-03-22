@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-35311",
+  "ingested_at": "2026-03-22T07:45:17.318431+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Outlook Microsoft Outlook contains a security feature bypass vulnerability that allows an attacker to bypass the Microsoft Outlook Security Notice prompt.",
+  "severity": "CRITICAL",
+  "sha256_hash": "11d06b2122fcd457306319ec6f2bf60e05307a029c85b7dcb2ad9d969b36386d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

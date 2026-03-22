@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-26855",
+  "ingested_at": "2026-03-22T07:45:19.422638+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Exchange Server Microsoft Exchange Server contains an unspecified vulnerability that allows for remote code execution. This vulnerability is part of the ProxyLogon exploit chain.",
+  "severity": "CRITICAL",
+  "sha256_hash": "38814938b9c218c33783b40af3f9d0e0e477dda390e0b9a3f6c35f57f22c9389",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

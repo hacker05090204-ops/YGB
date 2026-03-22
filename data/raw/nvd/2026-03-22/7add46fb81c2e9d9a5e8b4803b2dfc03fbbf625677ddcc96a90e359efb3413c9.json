@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-29106",
+  "ingested_at": "2026-03-22T07:54:48.319213+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, the value of the return_id request parameter is copied into the value of an HTML tag attribute which is an event handler and is encapsulated in double quotation marks. Versions 7.15.1 and 8.9.3 patch the issue. Users should also use a Content Security Policy (CSP) header to completely mitigate XSS.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7add46fb81c2e9d9a5e8b4803b2dfc03fbbf625677ddcc96a90e359efb3413c9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-80",
+    "CWE-116",
+    "CWE-159"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29106"
+}

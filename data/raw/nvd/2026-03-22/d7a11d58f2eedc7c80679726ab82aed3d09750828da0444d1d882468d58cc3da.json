@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26127",
+  "ingested_at": "2026-03-22T07:54:42.820348+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bounds read in .NET allows an unauthorized attacker to deny service over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "d7a11d58f2eedc7c80679726ab82aed3d09750828da0444d1d882468d58cc3da",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26127"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25507",
+  "ingested_at": "2026-03-22T07:54:34.626869+00:00",
+  "lang": "en",
+  "raw_text": "Ashop Shopping Cart Software contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'shop' parameter. Attackers can send GET requests to index.php with malicious 'shop' values using UNION-based SQL injection to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "42b362c00651f7468015c574ce10592ce04c899c437cca3683c983e2572ad697",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25507"
+}

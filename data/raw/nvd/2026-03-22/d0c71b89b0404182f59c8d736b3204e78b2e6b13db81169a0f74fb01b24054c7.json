@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69301",
+  "ingested_at": "2026-03-22T07:54:30.193236+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeGoods PhotoMe photome allows Object Injection.This issue affects PhotoMe: from n/a through < = 5.6.11.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d0c71b89b0404182f59c8d736b3204e78b2e6b13db81169a0f74fb01b24054c7",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69301"
+}

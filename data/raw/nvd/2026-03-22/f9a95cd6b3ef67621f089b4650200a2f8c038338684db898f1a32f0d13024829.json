@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52468",
+  "ingested_at": "2026-03-22T07:54:33.689135+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, an input validation vulnerability exists when importing user data from CSV files. This flaw occurs due to insufficient sanitization of user data, specifically in the \"Last Name\", \"First Name\", and \"Username\" fields. It allows attackers to inject a stored cross-site scripting (XSS) payload that is triggered when the user profile is viewed, potentially leading to malicious script execution in the context of the authenticated use. This issue has been patched in version 1.11.30.",
+  "severity": "HIGH",
+  "sha256_hash": "f9a95cd6b3ef67621f089b4650200a2f8c038338684db898f1a32f0d13024829",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52468"
+}

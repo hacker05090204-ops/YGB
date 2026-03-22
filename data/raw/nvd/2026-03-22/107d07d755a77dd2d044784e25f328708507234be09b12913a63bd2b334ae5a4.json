@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48578",
+  "ingested_at": "2026-03-22T07:54:33.846099+00:00",
+  "lang": "en",
+  "raw_text": "In multiple functions of MediaProvider.java, there is a possible way to bypass the WRITE_EXTERNAL_STORAGE permission due to a missing permission check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "107d07d755a77dd2d044784e25f328708507234be09b12913a63bd2b334ae5a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48578"
+}

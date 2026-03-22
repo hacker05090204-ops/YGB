@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52744",
+  "ingested_at": "2026-03-22T07:54:29.978258+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Generation of Code ('Code Injection') vulnerability in inpersttion Inpersttion For Theme err-our-team allows Code Injection.This issue affects Inpersttion For Theme: from n/a through < = 1.0.",
+  "severity": "HIGH",
+  "sha256_hash": "573b7d32a30f214b531e7ba6753a66c11f279c6b48962479f77e59152402b173",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52744"
+}

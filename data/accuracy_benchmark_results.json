@@ -1,0 +1,11 @@
+{
+  "samples": 1500,
+  "source": "bridge_state",
+  "threshold": 0.499886843,
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "auc_roc": 1.0,
+  "ece": 2.7531603222693474e-05
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28555",
+  "ingested_at": "2026-03-22T07:54:33.411724+00:00",
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains a missing authorization vulnerability that allows authenticated subscribers to close or reopen any forum topic via the wpforo_close_ajax handler. Attackers submit a valid nonce with an arbitrary topic ID to bypass the moderator permission requirement and disrupt forum discussions.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a6b20ded733b426c5192a28c87e2c9878ad83ef9283fdc49c9b32fe8d48c1bfb",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28555"
+}

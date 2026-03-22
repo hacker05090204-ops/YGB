@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28409",
+  "ingested_at": "2026-03-22T07:54:33.350861+00:00",
+  "lang": "en",
+  "raw_text": "WeGIA is a web manager for charitable institutions. Prior to version 3.6.5, a critical Remote Code Execution (RCE) vulnerability exists in the WeGIA application's database restoration functionality. An attacker with administrative access (which can be obtained via the previously reported Authentication Bypass) can execute arbitrary OS commands on the server by uploading a backup file with a specifically crafted filename. Version 3.6.5 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "532f4919c05fe6e0e03e7d20c6049b2b94089909819e6be160e7ab83782dd8a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28409"
+}

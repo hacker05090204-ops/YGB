@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22954",
+  "ingested_at": "2026-03-22T07:45:18.109203+00:00",
+  "lang": "en",
+  "raw_text": "VMware Workspace ONE Access and Identity Manager VMware Workspace ONE Access and Identity Manager allow for remote code execution due to server-side template injection.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fc88f389a4293aa38d639739b13329284f343ff310dbcbac82be264e7b715cf9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

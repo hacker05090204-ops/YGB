@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25548",
+  "ingested_at": "2026-03-22T07:54:49.488536+00:00",
+  "lang": "en",
+  "raw_text": "BlueStacks 4.80.0.1060 contains a denial of service vulnerability that allows local attackers to crash the application by submitting oversized input to the search field. Attackers can paste a buffer of 100,000 'A' characters into the search field and trigger a search operation to cause the application to crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d41fc98e70aaa0ef73899b0b6ee44ce3bff680d65424dab297d9862e6985722",
+  "source": "nvd",
+  "tags": [
+    "CWE-466"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25548"
+}

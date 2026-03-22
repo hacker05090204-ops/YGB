@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adminer Adminer Adminer contains a server-side request forgery vulnerability that, when exploited, allows a remote attacker to obtain potentially sensitive information.",
+  "token_count": 21
+}

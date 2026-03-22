@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28675",
+  "ingested_at": "2026-03-22T07:54:41.278255+00:00",
+  "lang": "en",
+  "raw_text": "OpenSift is an AI study tool that sifts through large datasets using semantic search and generative AI. Prior to version 1.6.3-alpha, some endpoints returned raw exception strings to clients. Additionally, login token material was exposed in UI/rendered responses and token rotation output. This issue has been patched in version 1.6.3-alpha.",
+  "severity": "MEDIUM",
+  "sha256_hash": "077756092b842d9ee59bbd83ee2ada4d94654b037672cfee401eec152e6a0e3a",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-209"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28675"
+}

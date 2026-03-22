@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "N-able N-Central N-able N-Central contains an insecure deserialization vulnerability that could lead to command execution.",
+  "token_count": 15
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0193",
+  "ingested_at": "2026-03-22T07:45:18.911365+00:00",
+  "lang": "en",
+  "raw_text": "Apache Solr The optional Apache Solr module DataImportHandler contains a code injection vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "55d91b2c821e0b033d2fc50932b13b10022c64f5d4c1f801444d9b9290fcc9f1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 13,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

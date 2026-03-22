@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenLiteSpeed and LSWS Enterprise provided by LiteSpeed Technologies contain an OS command injection vulnerability. An arbitrary OS command may be executed by an attacker with the administrative privilege.",
+  "token_count": 28
+}

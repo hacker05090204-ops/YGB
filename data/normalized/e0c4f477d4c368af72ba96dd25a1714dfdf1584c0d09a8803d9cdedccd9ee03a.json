@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco IOS XE Software A vulnerability in the DHCP option 82 encapsulation functionality of Cisco IOS Software and Cisco IOS XE Software could allow for denial-of-service (DoS).",
+  "token_count": 27
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29612",
+  "ingested_at": "2026-03-22T07:54:41.123057+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 decode base64-backed media inputs into buffers before enforcing decoded-size budget limits, allowing attackers to trigger large memory allocations. Remote attackers can supply oversized base64 payloads to cause memory pressure and denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d14140700e7466e1cde2ab24a24dbcfca2b35f35fd1ee6e263e5a6f0105bd9f0",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29612"
+}

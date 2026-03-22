@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-42793",
+  "ingested_at": "2026-03-22T07:45:17.213782+00:00",
+  "lang": "en",
+  "raw_text": "JetBrains TeamCity JetBrains TeamCity contains an authentication bypass vulnerability that allows for remote code execution on TeamCity Server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7caf024616e2f0bf01df8fa01f02b8883759c9936609b2578277cfc8dc3a936c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

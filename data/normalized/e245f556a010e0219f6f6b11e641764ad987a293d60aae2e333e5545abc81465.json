@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jenkins Matrix Project Plugin Jenkins Matrix Project plugin contains a vulnerability which can allow users to escape the sandbox, opening opportunity to perform remote code execution.",
+  "token_count": 26
+}

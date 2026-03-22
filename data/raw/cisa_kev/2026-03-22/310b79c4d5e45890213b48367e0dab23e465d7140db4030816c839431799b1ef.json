@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-0071",
+  "ingested_at": "2026-03-22T07:45:17.874800+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer allows remote attackers to bypass the address space layout randomization (ASLR) protection mechanism via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "310b79c4d5e45890213b48367e0dab23e465d7140db4030816c839431799b1ef",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

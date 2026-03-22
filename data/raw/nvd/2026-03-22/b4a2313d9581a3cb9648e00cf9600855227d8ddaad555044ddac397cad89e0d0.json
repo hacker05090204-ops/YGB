@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3845",
+  "ingested_at": "2026-03-22T07:54:42.962230+00:00",
+  "lang": "en",
+  "raw_text": "Heap buffer overflow in the Audio/Video: Playback component in Firefox for Android. This vulnerability affects Firefox < 148.0.2.",
+  "severity": "HIGH",
+  "sha256_hash": "b4a2313d9581a3cb9648e00cf9600855227d8ddaad555044ddac397cad89e0d0",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3845"
+}

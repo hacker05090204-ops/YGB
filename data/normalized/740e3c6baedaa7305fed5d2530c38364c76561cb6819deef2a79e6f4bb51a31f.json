@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Allmart allmart-core allows Blind SQL Injection.This issue affects Allmart: from n/a through < = 1.1.",
+  "token_count": 30
+}

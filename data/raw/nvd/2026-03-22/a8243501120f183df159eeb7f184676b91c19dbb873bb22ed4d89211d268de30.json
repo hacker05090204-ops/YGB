@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32130",
+  "ingested_at": "2026-03-22T07:54:44.034930+00:00",
+  "lang": "en",
+  "raw_text": "ZITADEL is an open source identity management platform. From 2.68.0 to before 3.4.8 and 4.12.2, Zitadel provides a System for Cross-domain Identity Management (SCIM) API to provision users from external providers into Zitadel. Request to the API with URL-encoded path values were correctly routed but would bypass necessary authentication and permission checks. This allowed unauthenticated attackers to retrieve sensitive information such as names, email addresses, phone numbers, addresses, external IDs, and roles. Note that due to additional checks when manipulating data, an attacker could not modify or delete any user data. This vulnerability is fixed in 3.4.8 and 4.12.2.",
+  "severity": "HIGH",
+  "sha256_hash": "a8243501120f183df159eeb7f184676b91c19dbb873bb22ed4d89211d268de30",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32130"
+}

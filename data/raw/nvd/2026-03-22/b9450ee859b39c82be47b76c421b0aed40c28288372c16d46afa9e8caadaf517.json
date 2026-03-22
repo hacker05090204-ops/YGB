@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25967",
+  "ingested_at": "2026-03-22T07:54:31.353058+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to version 7.1.2-15, a stack-based buffer overflow exists in the ImageMagick FTXT image reader. A crafted FTXT file can cause out-of-bounds writes on the stack, leading to a crash. Version 7.1.2-15 contains a patch.",
+  "severity": "HIGH",
+  "sha256_hash": "b9450ee859b39c82be47b76c421b0aed40c28288372c16d46afa9e8caadaf517",
+  "source": "nvd",
+  "tags": [
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25967"
+}

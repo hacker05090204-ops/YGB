@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24313",
+  "ingested_at": "2026-03-22T07:54:42.474376+00:00",
+  "lang": "en",
+  "raw_text": "SAP Solution Tools Plug-In (ST-PI) contains a function module that does not perform the necessary authorization checks for authenticated users, allowing system information to be disclosed. This vulnerability has a low impact on confidentiality and does not affect integrity or availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aedb8f487be27ab36213a98e698fa01c215c9c851a70d878f462d5c3e37496c7",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24313"
+}

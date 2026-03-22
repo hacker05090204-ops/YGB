@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2256",
+  "ingested_at": "2026-03-22T07:54:33.984844+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability in ModelScope's ms-agent versions v1.6.0rc1 and earlier exists, allowing an attacker to execute arbitrary operating system commands through crafted prompt-derived input.",
+  "severity": "MEDIUM",
+  "sha256_hash": "965dec33387b26b5ca4c186b8d5dda9b3ca31cbcf0325bd178a71c9caf5e6c44",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2256"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2637",
+  "ingested_at": "2026-03-22T07:54:34.092908+00:00",
+  "lang": "en",
+  "raw_text": "iBoysoft NTFS for Mac contains a local privilege escalation vulnerability in its privileged helper daemon ntfshelperd. The daemon exposes an NSConnection service that runs as root without implementing any authentication or authorization checks. This issue affects iBoysoft NTFS: 8.0.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ddcb257fb88c04c5e784e41a3929fdf2634570f9d7048563f1adae259221da4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2637"
+}

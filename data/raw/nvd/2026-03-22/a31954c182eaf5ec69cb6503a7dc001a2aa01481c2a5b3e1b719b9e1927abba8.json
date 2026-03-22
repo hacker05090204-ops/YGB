@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3023",
+  "ingested_at": "2026-03-22T07:54:46.582294+00:00",
+  "lang": "en",
+  "raw_text": "Non-relational SQL injection vulnerability (NoSQLi) in the Wakyma web application, specifically in the endpoint 'vets.wakyma.com/pets/print-tags'. This vulnerability could allow an authenticated user to alter a POST request to the affected endpoint for the purpose of injecting NoSQL commands, allowing them to list both pets and owner names.",
+  "severity": "HIGH",
+  "sha256_hash": "a31954c182eaf5ec69cb6503a7dc001a2aa01481c2a5b3e1b719b9e1927abba8",
+  "source": "nvd",
+  "tags": [
+    "CWE-943",
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3023"
+}

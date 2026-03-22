@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Japanized for WooCommerce plugin for WordPress is vulnerable to Improper Authentication in versions up to, and including, 2.8.4. This is due to a flawed permission check in the `paidy_webhook_permission_check` function that unconditionally returns `true` when the webhook signature header is omitted. This makes it possible for unauthenticated attackers to bypass payment verification and fraudulently mark orders as \"Processing\" or \"Completed\" without actual payment via a crafted POST request to the Paidy webhook endpoint.",
+  "token_count": 74
+}

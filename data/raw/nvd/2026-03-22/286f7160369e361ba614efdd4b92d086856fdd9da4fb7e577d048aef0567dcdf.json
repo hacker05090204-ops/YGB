@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32042",
+  "ingested_at": "2026-03-22T07:54:49.187341+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.2.22 prior to 2026.2.25 contain a privilege escalation vulnerability allowing unpaired device identities to bypass operator pairing requirements and self-assign elevated operator scopes including operator.admin. Attackers with valid shared gateway authentication can present a self-signed unpaired device identity to request and obtain higher operator scopes before pairing approval is granted.",
+  "severity": "HIGH",
+  "sha256_hash": "286f7160369e361ba614efdd4b92d086856fdd9da4fb7e577d048aef0567dcdf",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32042"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SonicWall SonicOS A buffer overflow vulnerability in SonicOS allows a remote attacker to cause Denial of Service (DoS) and potentially execute arbitrary code by sending a malicious request to the firewall.",
+  "token_count": 31
+}

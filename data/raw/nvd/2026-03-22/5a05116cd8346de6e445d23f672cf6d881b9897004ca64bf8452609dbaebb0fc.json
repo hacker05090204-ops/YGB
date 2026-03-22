@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29190",
+  "ingested_at": "2026-03-22T07:54:41.858573+00:00",
+  "lang": "en",
+  "raw_text": "Karapace is an open-source implementation of Kafka REST and Schema Registry. Prior to version 6.0.0, there is a Path Traversal vulnerability in the backup reader (backup/backends/v3/backend.py). If a malicious backup file is provided to Karapace, an attacker may exploit insufficient path validation to perform arbitrary file read on the system where Karapace is running. The issue affects deployments that use the backup/restore functionality and process backups from untrusted sources. The impact depends on the file system permissions of the Karapace process. This issue has been patched in version 6.0.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5a05116cd8346de6e445d23f672cf6d881b9897004ca64bf8452609dbaebb0fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29190"
+}

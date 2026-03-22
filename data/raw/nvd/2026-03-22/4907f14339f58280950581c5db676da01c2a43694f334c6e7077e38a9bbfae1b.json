@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3281",
+  "ingested_at": "2026-03-22T07:54:33.024033+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in libvips 8.19.0. This affects the function vips_bandrank_build of the file libvips/conversion/bandrank.c. Performing a manipulation of the argument index results in heap-based buffer overflow. The attack must be initiated from a local position. The exploit is now public and may be used. The patch is named fd28c5463697712cb0ab116a2c55e4f4d92c4088. It is suggested to install a patch to address this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4907f14339f58280950581c5db676da01c2a43694f334c6e7077e38a9bbfae1b",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-122"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3281"
+}

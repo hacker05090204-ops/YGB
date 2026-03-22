@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33304",
+  "ingested_at": "2026-03-22T07:54:48.111883+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.2, an authorization bypass in the dated reminders log allows any authenticated non-admin user to view reminder messages belonging to other users, including associated patient names and free-text message content, by crafting a GET request with arbitrary user IDs in the `sentTo[]` or `sentBy[]` parameters. Version 8.0.0.2 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b7fa78298668bf9553f040d6b09324819f799b089af585ddc5c55ba22d352ea1",
+  "source": "nvd",
+  "tags": [
+    "CWE-639",
+    "CWE-862"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33304"
+}

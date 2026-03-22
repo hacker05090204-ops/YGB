@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-1731",
+  "ingested_at": "2026-03-22T07:45:15.908126+00:00",
+  "lang": "en",
+  "raw_text": "BeyondTrust Remote Support (RS) and Privileged Remote Access (PRA) BeyondTrust Remote Support (RS) and Privileged Remote Access (PRA)contain an OS command injection vulnerability. Successful exploitation could allow an unauthenticated remote attacker to execute operating system commands in the context of the site user. Successful exploitation requires no authentication or user interaction and may lead to system compromise, including unauthorized access, data exfiltration, and service disruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "234e60782fb66ba5f08143a493dcba39791a4ec4797fbe2d9883e1895e6d1063",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 65,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29775",
+  "ingested_at": "2026-03-22T07:54:44.674802+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to 3.24.0, a client-side heap out-of-bounds read/write occurs in FreeRDP's bitmap cache subsystem due to an off-by-one boundary check in bitmap_cache_put. A malicious server can send a CACHE_BITMAP_ORDER (Rev1) with cacheId equal to maxCells, bypassing the guard and accessing cells[] one element past the allocated array. This vulnerability is fixed in 3.24.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c589006cfe61a2f1ca9cfc5944b546ee850ec8859cd71801606b098a57fc668e",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29775"
+}

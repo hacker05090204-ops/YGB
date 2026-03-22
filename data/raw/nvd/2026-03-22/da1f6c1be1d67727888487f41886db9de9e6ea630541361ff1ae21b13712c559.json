@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32400",
+  "ingested_at": "2026-03-22T07:54:46.022457+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemetechMount Boldman boldman allows PHP Local File Inclusion.This issue affects Boldman: from n/a through < = 7.7.",
+  "severity": "HIGH",
+  "sha256_hash": "da1f6c1be1d67727888487f41886db9de9e6ea630541361ff1ae21b13712c559",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32400"
+}

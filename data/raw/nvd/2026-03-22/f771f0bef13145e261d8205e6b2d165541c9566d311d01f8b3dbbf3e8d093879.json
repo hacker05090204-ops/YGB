@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27895",
+  "ingested_at": "2026-03-22T07:54:47.236372+00:00",
+  "lang": "en",
+  "raw_text": "LDAP Account Manager (LAM) is a webfrontend for managing entries (e.g. users, groups, DHCP settings) stored in an LDAP directory. Prior to version 9.5, the PDF export component does not correctly validate uploaded file extensions. This way any file type (including .php files) can be uploaded. With GHSA-w7xq-vjr3-p9cf, an attacker can achieve remote code execution as the web server user. Version 9.5 fixes the issue. Although upgrading is recommended, a workaround would be to make /var/lib/ldap-account-manager/config read-only for the web-server user.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f771f0bef13145e261d8205e6b2d165541c9566d311d01f8b3dbbf3e8d093879",
+  "source": "nvd",
+  "tags": [
+    "CWE-185"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27895"
+}

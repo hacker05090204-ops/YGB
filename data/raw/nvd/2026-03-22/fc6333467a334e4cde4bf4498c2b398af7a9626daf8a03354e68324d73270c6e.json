@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30876",
+  "ingested_at": "2026-03-22T07:54:46.946278+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo LMS is a learning management system. Prior to version 1.11.36, Chamilo is vulnerable to user enumeration with valid/invalid username. This issue has been patched in version 1.11.36.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fc6333467a334e4cde4bf4498c2b398af7a9626daf8a03354e68324d73270c6e",
+  "source": "nvd",
+  "tags": [
+    "CWE-204"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30876"
+}

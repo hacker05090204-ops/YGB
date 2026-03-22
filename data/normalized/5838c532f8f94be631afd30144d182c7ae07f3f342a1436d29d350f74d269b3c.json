@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "UnQLite versions through 0.06 for Perl uses a potentially insecure version of the UnQLite library. UnQLite for Perl embeds the UnQLite library. Version 0.06 and earlier of the Perl module uses a version of the library from 2014 that may be vulnerable to a heap-based overflow.",
+  "token_count": 46
+}

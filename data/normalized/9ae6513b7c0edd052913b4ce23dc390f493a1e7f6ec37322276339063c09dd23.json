@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "macOS 10.14.6 (18G87) - Kernel Use-After-Free due to Race Condition in wait_for_namespace_event()",
+  "token_count": 12
+}

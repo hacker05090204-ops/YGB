@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-1019",
+  "ingested_at": "2026-03-22T07:45:18.621838+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player allows remote attackers to cause a denial of service or possibly execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5ff564fc42101f62eac6318e23266ddf82cf8aa8edd2abcb9d28d7b39e26d47c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "vBulletin vBulletin The PHP module within vBulletin contains an unspecified vulnerability that allows for remote code execution via the widgetConfig[code] parameter in an ajax/render/widget_php routestring request.",
+  "token_count": 26
+}

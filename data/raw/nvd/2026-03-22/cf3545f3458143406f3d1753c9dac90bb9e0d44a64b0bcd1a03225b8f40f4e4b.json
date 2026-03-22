@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3130",
+  "ingested_at": "2026-03-22T07:54:34.294706+00:00",
+  "lang": "en",
+  "raw_text": "Improper Enforcement of Behavioral Controls in Devolutions Server 2025.3.15 and earlier allows an authenticated attacker with the delete permission to delete a PAM account that is currently checked out by selecting it alongside at least one non-checked-out account and performing a bulk deletion.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cf3545f3458143406f3d1753c9dac90bb9e0d44a64b0bcd1a03225b8f40f4e4b",
+  "source": "nvd",
+  "tags": [
+    "CWE-841"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3130"
+}

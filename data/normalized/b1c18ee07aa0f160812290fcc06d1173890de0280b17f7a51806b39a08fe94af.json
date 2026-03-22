@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ncurses v6.5 and v6.4 are vulnerable to Buffer Overflow in progs/infocmp.c, function analyze_string().",
+  "token_count": 13
+}

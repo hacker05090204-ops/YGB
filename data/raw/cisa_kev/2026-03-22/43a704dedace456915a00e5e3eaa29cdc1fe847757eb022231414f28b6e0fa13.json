@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-57727",
+  "ingested_at": "2026-03-22T07:45:16.585632+00:00",
+  "lang": "en",
+  "raw_text": "SimpleHelp SimpleHelp SimpleHelp remote support software contains multiple path traversal vulnerabilities that allow unauthenticated remote attackers to download arbitrary files from the SimpleHelp host via crafted HTTP requests. These files may include server configuration files and hashed user passwords.",
+  "severity": "CRITICAL",
+  "sha256_hash": "43a704dedace456915a00e5e3eaa29cdc1fe847757eb022231414f28b6e0fa13",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

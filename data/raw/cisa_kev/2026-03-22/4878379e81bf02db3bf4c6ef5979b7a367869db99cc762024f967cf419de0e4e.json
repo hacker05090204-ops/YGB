@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-0840",
+  "ingested_at": "2026-03-22T07:45:17.932873+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java Runtime Environment (JRE) Unspecified vulnerability in the Java Runtime Environment (JRE) in Java SE component allows remote attackers to affect confidentiality, integrity, and availability via Unknown vectors.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4878379e81bf02db3bf4c6ef5979b7a367869db99cc762024f967cf419de0e4e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

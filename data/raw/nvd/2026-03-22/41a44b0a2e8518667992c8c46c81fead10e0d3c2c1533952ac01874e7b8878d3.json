@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-71276",
+  "ingested_at": "2026-03-22T07:54:49.596036+00:00",
+  "lang": "en",
+  "raw_text": "SOGo before 5.12.5 is prone to a XSS vulnerability with events, tasks, and contacts categories.",
+  "severity": "MEDIUM",
+  "sha256_hash": "41a44b0a2e8518667992c8c46c81fead10e0d3c2c1533952ac01874e7b8878d3",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-71276"
+}

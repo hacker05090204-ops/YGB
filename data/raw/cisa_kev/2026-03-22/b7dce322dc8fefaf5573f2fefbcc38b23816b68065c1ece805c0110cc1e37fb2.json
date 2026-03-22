@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-48572",
+  "ingested_at": "2026-03-22T07:45:16.036707+00:00",
+  "lang": "en",
+  "raw_text": "Android Framework Android Framework contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b7dce322dc8fefaf5573f2fefbcc38b23816b68065c1ece805c0110cc1e37fb2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 13,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

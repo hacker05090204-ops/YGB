@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3478",
+  "ingested_at": "2026-03-22T07:54:49.395243+00:00",
+  "lang": "en",
+  "raw_text": "The Content Syndication Toolkit plugin for WordPress is vulnerable to Server-Side Request Forgery in all versions up to, and including, 1.3 via the redux_p AJAX action in the bundled ReduxFramework library. The plugin registers a proxy endpoint (wp_ajax_nopriv_redux_p) that is accessible to unauthenticated users. The proxy() method in the Redux_P class takes a URL directly from $_GET['url'] without any validation (the regex is set to /.*/ which matches all URLs) and passes it to wp_remote_request(), which does not have built-in SSRF protection like wp_safe_remote_request(). There is no authentication check, no nonce verification, and no URL restriction. The response from the requested URL is then returned to the attacker, making this a full-read SSRF. This makes it possible for unauthenticated attackers to make web requests to arbitrary locations originating from the web application, which can be used to query and modify information from internal services, scan internal network ports, or interact with cloud metadata endpoints.",
+  "severity": "HIGH",
+  "sha256_hash": "5eb1fe0a1e0372ef3fc811288b5fa2df57223d6bae3fbb6d1effd427e30a35fa",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 154,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3478"
+}

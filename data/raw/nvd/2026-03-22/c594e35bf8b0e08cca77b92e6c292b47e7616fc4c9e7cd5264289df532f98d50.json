@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59819",
+  "ingested_at": "2026-03-22T07:54:29.935720+00:00",
+  "lang": "en",
+  "raw_text": "This vulnerability allows authenticated attackers to read an arbitrary file by changing a filepath parameter into an internal system path.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c594e35bf8b0e08cca77b92e6c292b47e7616fc4c9e7cd5264289df532f98d50",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59819"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "phpMyAdmin phpMyAdmin Setup script used to generate configuration can be fooled using a crafted POST request to include arbitrary PHP code in generated configuration file.",
+  "token_count": 25
+}

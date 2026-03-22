@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 does not properly sanitize the headers from S/MIME protected MIME entities, allowing an attacker to control trusted headers.",
+  "token_count": 25
+}

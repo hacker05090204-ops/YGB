@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32425",
+  "ingested_at": "2026-03-22T07:54:46.079896+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in linknacional Payment Gateway Pix For GiveWP payment-gateway-pix-for-givewp allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Payment Gateway Pix For GiveWP: from n/a through < = 2.2.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "868644ba0221093418fddacdf6479adde9e225b2f05837a20b1d14f49cbfd011",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32425"
+}

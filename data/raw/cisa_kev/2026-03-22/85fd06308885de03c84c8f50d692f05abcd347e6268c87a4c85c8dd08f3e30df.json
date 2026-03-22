@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-8759",
+  "ingested_at": "2026-03-22T07:45:19.373139+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft .NET Framework Microsoft .NET Framework contains a remote code execution vulnerability when processing untrusted input that could allow an attacker to take control of an affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "85fd06308885de03c84c8f50d692f05abcd347e6268c87a4c85c8dd08f3e30df",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

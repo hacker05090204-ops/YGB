@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS and FortiProxy An Improper Authorization vulnerability in Fortinet FortiOS and FortiProxy under SSL VPN web portal allows an unauthenticated attacker to modify the password.",
+  "token_count": 26
+}

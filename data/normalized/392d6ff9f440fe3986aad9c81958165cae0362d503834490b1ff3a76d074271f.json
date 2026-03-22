@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows contains an NTLMv2 hash spoofing vulnerability that could result in disclosing a user's NTLMv2 hash to an attacker via a file open operation. The attacker could then leverage this hash to impersonate that user.",
+  "token_count": 38
+}

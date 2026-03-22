@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3431",
+  "ingested_at": "2026-03-22T07:54:33.578882+00:00",
+  "lang": "en",
+  "raw_text": "On SimStudio version below to 0.5.74, the MongoDB tool endpoints accept arbitrary connection parameters from the caller without authentication or host restrictions. An attacker can leverage these endpoints to connect to any reachable MongoDB instance and perform unauthorized operations including reading, modifying, and deleting data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "65629916af8e06315f2d4c9c67cbbf90c24bd6d7c4ada1ef8b2e2a9288fefca9",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3431"
+}

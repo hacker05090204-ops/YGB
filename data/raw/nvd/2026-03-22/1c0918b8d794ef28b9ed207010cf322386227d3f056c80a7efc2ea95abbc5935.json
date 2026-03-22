@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-55043",
+  "ingested_at": "2026-03-22T07:54:47.485221+00:00",
+  "lang": "en",
+  "raw_text": "MuraCMS through 10.1.10 contains a CSRF vulnerability in the bundle creation functionality (csettings.cfc createBundle method) that allows unauthenticated attackers to force administrators to create and save site bundles containing sensitive data to publicly accessible directories. This vulnerability enables complete data exfiltration including user accounts, password hashes, form submissions, email lists, plugins, and site content without administrator knowledge. This CSRF vulnerability enables complete data exfiltration from MuraCMS installations without requiring authentication. Attackers can force administrators to unknowingly create site bundles containing sensitive data, which are saved to publicly accessible web directories. The attack executes silently, leaving administrators unaware that confidential information has been compromised and is available for unauthorized download.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1c0918b8d794ef28b9ed207010cf322386227d3f056c80a7efc2ea95abbc5935",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-55043"
+}

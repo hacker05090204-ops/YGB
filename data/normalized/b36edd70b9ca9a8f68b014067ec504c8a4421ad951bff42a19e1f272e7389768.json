@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: regmap: maple: free entry on mas_store_gfp() failure regcache_maple_write() allocates a new block ('entry') to merge adjacent ranges and then stores it with mas_store_gfp(). When mas_store_gfp() fails, the new 'entry' remains allocated and is never freed, leaking memory. Free 'entry' on the failure path; on success continue freeing the replaced neighbor blocks ('lower', 'upper').",
+  "token_count": 63
+}

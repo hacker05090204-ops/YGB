@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-25736",
+  "ingested_at": "2026-03-22T07:54:32.282129+00:00",
+  "lang": "en",
+  "raw_text": "Rucio is a software framework that provides functionality to organize, manage, and access large volumes of scientific data using customizable policies. Versions prior to 35.8.3, 38.5.4, and 39.3.1 have a stored Cross-Site Scripting (XSS) vulnerability in the Custom RSE Attribute of the WebUI where attacker-controlled input is persisted by the backend and later rendered in the WebUI without proper output encoding. This allows arbitrary JavaScript execution in the context of the WebUI for users who view affected pages, potentially enabling session token theft or unauthorized actions. Versions 35.8.3, 38.5.4, and 39.3.1 fix the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "82c37461ba5f2a428628029a835d3d61e403fc14df833ed984b6e6b724d0d329",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-1004",
+    "CWE-79"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25736"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22600",
+  "ingested_at": "2026-03-22T07:45:18.146325+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains a flaw in the packet socket (AF_PACKET) implementation which could lead to incorrectly freeing memory. A local user could exploit this for denial-of-service (DoS) or possibly for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "52027b27d8f2365d8ee9d158eb692b14caa814ea00fa82999ae322872423f823",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

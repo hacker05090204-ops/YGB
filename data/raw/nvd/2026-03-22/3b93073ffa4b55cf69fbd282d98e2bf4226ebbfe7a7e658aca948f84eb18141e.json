@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2219",
+  "ingested_at": "2026-03-22T07:54:41.823144+00:00",
+  "lang": "en",
+  "raw_text": "It was discovered that dpkg-deb (a component of dpkg, the Debian package management system) does not properly validate the end of the data stream when uncompressing a zstd-compressed .deb archive, which may result in denial of service (infinite loop spinning the CPU).",
+  "severity": "HIGH",
+  "sha256_hash": "3b93073ffa4b55cf69fbd282d98e2bf4226ebbfe7a7e658aca948f84eb18141e",
+  "source": "nvd",
+  "tags": [
+    "CWE-835"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2219"
+}

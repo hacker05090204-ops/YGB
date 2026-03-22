@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Hyperterse is a tool-first MCP framework for building AI-ready backend surfaces from declarative config. Prior to v2.2.0, the search tool allows LLMs to search for tools using natural language. While returning results, Hyperterse also returned the raw SQL queries, exposing statements which were supposed to be executed under the hood, and protected from being displayed publicly. This issue has been fixed as of v2.2.0.",
+  "token_count": 64
+}

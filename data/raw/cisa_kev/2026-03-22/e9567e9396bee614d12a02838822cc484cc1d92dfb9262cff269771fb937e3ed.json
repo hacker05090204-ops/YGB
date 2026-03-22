@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-48927",
+  "ingested_at": "2026-03-22T07:45:16.336793+00:00",
+  "lang": "en",
+  "raw_text": "TeleMessage TM SGNL TeleMessage TM SGNL contains an initialization of a resource with an insecure default vulnerability. This vulnerability relies on how the Spring Boot Actuator is configured with an exposed heap dump endpoint at a /heapdump URI.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e9567e9396bee614d12a02838822cc484cc1d92dfb9262cff269771fb937e3ed",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

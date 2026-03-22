@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-24086",
+  "ingested_at": "2026-03-22T07:45:18.733112+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Commerce and Magento Open Source Adobe Commerce and Magento Open Source contain an improper input validation vulnerability which can allow for arbitrary code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5536ffaf186b2cda81d5ec7084661e36d74cd9a557c04978fd136bc1c9300aa8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

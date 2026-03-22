@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MinIO MinIO MinIO contains a security feature bypass vulnerability that allows an attacker to use crafted requests to bypass metadata bucket name checking and put an object into any bucket while processing `PostPolicyBucket` to conduct privilege escalation. To carry out this attack, the attacker requires credentials with `arn:aws:s3:::*` permission, as well as enabled Console API access.",
+  "token_count": 56
+}

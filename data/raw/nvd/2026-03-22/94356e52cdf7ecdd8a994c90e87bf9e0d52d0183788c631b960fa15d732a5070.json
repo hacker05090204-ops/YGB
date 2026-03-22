@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24481",
+  "ingested_at": "2026-03-22T07:54:31.271279+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a heap information disclosure vulnerability exists in ImageMagick's PSD (Adobe Photoshop) format handler. When processing a maliciously crafted PSD file containing ZIP-compressed layer data that decompresses to less than the expected size, uninitialized heap memory is leaked into the output image. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "HIGH",
+  "sha256_hash": "94356e52cdf7ecdd8a994c90e87bf9e0d52d0183788c631b960fa15d732a5070",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24481"
+}

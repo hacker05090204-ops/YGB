@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A denial-of-service vulnerability was identified in Moodle\u2019s TeX formula editor. When rendering TeX content using mimetex, insufficient execution time limits could allow specially crafted formulas to consume excessive server resources. An authenticated user could abuse this behavior to degrade performance or cause service interruption.",
+  "token_count": 44
+}

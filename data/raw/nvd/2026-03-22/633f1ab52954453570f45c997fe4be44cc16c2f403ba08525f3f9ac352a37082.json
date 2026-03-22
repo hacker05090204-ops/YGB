@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69323",
+  "ingested_at": "2026-03-22T07:54:30.216890+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in VeronaLabs Slimstat Analytics wp-slimstat allows Reflected XSS.This issue affects Slimstat Analytics: from n/a through < = 5.3.2.",
+  "severity": "HIGH",
+  "sha256_hash": "633f1ab52954453570f45c997fe4be44cc16c2f403ba08525f3f9ac352a37082",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69323"
+}

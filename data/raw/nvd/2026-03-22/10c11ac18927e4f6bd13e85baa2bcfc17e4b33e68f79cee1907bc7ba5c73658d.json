@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-69969",
+  "ingested_at": "2026-03-22T07:54:34.556557+00:00",
+  "lang": "en",
+  "raw_text": "A lack of authentication and authorization mechanisms in the Bluetooth Low Energy (BLE) communication protocol of SRK Powertech Pvt Ltd Pebble Prism Ultra v2.9.2 allows attackers to reverse engineer the protocol and execute arbitrary commands on the device without establishing a connection. This is exploitable over Bluetooth Low Energy (BLE) proximity (Adjacent), requiring no physical contact with the device. Furthermore, the vulnerability is not limited to arbitrary commands but includes cleartext data interception and unauthenticated firmware hijacking via OTA services.",
+  "severity": "CRITICAL",
+  "sha256_hash": "10c11ac18927e4f6bd13e85baa2bcfc17e4b33e68f79cee1907bc7ba5c73658d",
+  "source": "nvd",
+  "tags": [
+    "CWE-311",
+    "CWE-319"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69969"
+}

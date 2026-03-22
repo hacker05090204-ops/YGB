@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3132",
+  "ingested_at": "2026-03-22T07:54:33.824099+00:00",
+  "lang": "en",
+  "raw_text": "The Master Addons for Elementor Premium plugin for WordPress is vulnerable to Remote Code Execution in all versions up to, and including, 2.1.3 via the 'JLTMA_Widget_Admin::render_preview'. This is due to missing capability check. This makes it possible for authenticated attackers, with Subscriber-level access and above, to execute code on the server.",
+  "severity": "HIGH",
+  "sha256_hash": "b063a0ae52d977a04ce4b536b88399ba13c13dd4f01fd025f9a378f2933dcedd",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3132"
+}

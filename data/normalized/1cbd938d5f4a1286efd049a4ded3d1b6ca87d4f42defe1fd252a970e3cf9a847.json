@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Cisco IOS and IOS XE Software improperly validates packet data, allowing an unauthenticated, remote attacker to trigger a reload of an affected device, cause a denial-of-service (DoS) condition, or perform code execution on the affected device.",
+  "token_count": 41
+}

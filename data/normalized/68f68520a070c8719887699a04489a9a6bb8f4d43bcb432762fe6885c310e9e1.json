@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jettweb PHP Hazir Haber Sitesi Scripti V3 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the videoid parameter. Attackers can send GET requests to fonksiyonlar.php with malicious videoid values using UNION-based injection to extract sensitive database information.",
+  "token_count": 47
+}

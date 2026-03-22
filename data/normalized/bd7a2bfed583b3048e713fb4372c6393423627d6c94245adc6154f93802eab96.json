@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Magento 1.2 - '/app/code/core/Mage/Admin/Model/Session.php?login['Username']' Cross-Site Scripting",
+  "token_count": 6
+}

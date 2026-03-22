@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-61154",
+  "ingested_at": "2026-03-22T07:54:44.448164+00:00",
+  "lang": "en",
+  "raw_text": "Heap buffer overflow vulnerability in LibreDWG versions v0.13.3.7571 up to v0.13.3.7835 allows a crafted DWG file to cause a Denial of Service (DoS) via the function decompress_R2004_section at decode.c.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2a42aa79e94388009da9cde704b44df58a03d64d8913791f3b160a6f1781dcb8",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-61154"
+}

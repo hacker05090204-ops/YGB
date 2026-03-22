@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2849",
+  "ingested_at": "2026-03-22T07:54:30.528346+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in yeqifu warehouse up to aaf29962ba407d22d991781de28796ee7b4670e4. Affected by this issue is the function deleteCache/removeAllCache/syncCache of the file dataset\\repos\\warehouse\\src\\main\\java\\com\\yeqifu\\sys\\controller\\CacheController.java of the component Cache Sync Handler. Such manipulation leads to improper access controls. The attack may be launched remotely. The exploit has been disclosed to the public and may be used. This product operates on a rolling release basis, ensuring continuous delivery. Consequently, there are no version details for either affected or updated releases. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "443cf992156bbc14b1bcb5f1d35b40ae6177869d53833dcffda0e13cf34f5a29",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2849"
+}

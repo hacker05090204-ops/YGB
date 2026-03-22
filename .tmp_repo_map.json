@@ -1,0 +1,165 @@
+{
+  "root": "C:\\Users\\Unkno\\YGB",
+  "total_dirs": 467,
+  "total_files": 120280,
+  "counts": {
+    "python_files": 1299,
+    "ts_files": 99,
+    "cpp_files": 244,
+    "test_files": 554,
+    "source_files": 1088,
+    "test_ratio": 0.3374
+  },
+  "requirements_files": [
+    "api/requirements-lock.txt",
+    "api/requirements.txt"
+  ],
+  "loc_by_top": {
+    "impl_v1": 142295,
+    "backend": 57213,
+    "native": 51270,
+    "python": 21577,
+    "frontend": 20403,
+    "HUMANOID_HUNTER": 19589,
+    "api": 10352,
+    "training": 5806,
+    "scripts": 3342,
+    "tests": 2422,
+    "training_controller.py": 2112,
+    "governance": 1160,
+    "run_real_training.py": 761,
+    "run_leader_ddp.py": 749,
+    "storage_backend.py": 491,
+    "run_cluster_authority.py": 304,
+    "edge": 279,
+    "run_rtx3050_follower.py": 138,
+    "voice_mode": 45,
+    "ingest_reports_media": 44,
+    "ai_report_generator": 41,
+    "proposed_upgrades": 25,
+    "test_training_debug.py": 23
+  },
+  "project_folders_present": [
+    ".github",
+    ".vscode",
+    "HUMANOID_HUNTER",
+    "ai_report_generator",
+    "api",
+    "backend",
+    "config",
+    "data",
+    "edge",
+    "frontend",
+    "governance",
+    "impl_v1",
+    "native",
+    "python",
+    "reports",
+    "scripts",
+    "tests",
+    "training",
+    "voice_mode"
+  ],
+  "top_level_dirs": [
+    ".agent",
+    ".agents",
+    ".git",
+    ".github",
+    ".pytest_cache",
+    ".tmp_ci_artifacts",
+    ".tmp_ci_logs",
+    ".venv",
+    ".vscode",
+    "HUMANOID_HUNTER",
+    "__pycache__",
+    "ai_report_generator",
+    "api",
+    "backend",
+    "backend-test-results-artifact",
+    "checkpoints",
+    "config",
+    "data",
+    "docs",
+    "edge",
+    "frontend",
+    "governance",
+    "impl_v1",
+    "ingest_reports_media",
+    "logs",
+    "native",
+    "node_modules",
+    "obj",
+    "proposed_upgrades",
+    "python",
+    "report",
+    "reports",
+    "scripts",
+    "secure_data",
+    "test-results",
+    "tests",
+    "testsprite_tests",
+    "training",
+    "voice_mode"
+  ],
+  "import_edges": {
+    "api": {
+      "backend": 66,
+      "impl_v1": 21,
+      "governance": 2
+    },
+    "backend": {
+      "governance": 25,
+      "impl_v1": 18,
+      "native": 13,
+      "api": 3,
+      "scripts": 8,
+      "training": 1
+    },
+    "governance": {
+      "backend": 12
+    },
+    "impl_v1": {
+      "backend": 21,
+      "training": 6
+    },
+    "proposed_upgrades": {
+      "backend": 6,
+      "impl_v1": 1
+    },
+    "run_cluster_authority.py": {
+      "impl_v1": 3
+    },
+    "run_leader_ddp.py": {
+      "impl_v1": 2
+    },
+    "run_real_training.py": {
+      "impl_v1": 2
+    },
+    "run_rtx3050_follower.py": {
+      "impl_v1": 1
+    },
+    "scripts": {
+      "backend": 7,
+      "impl_v1": 2
+    },
+    "test_training_debug.py": {
+      "impl_v1": 1
+    },
+    "tests": {
+      "backend": 9,
+      "impl_v1": 25,
+      "native": 1,
+      "training": 7,
+      "api": 1,
+      "scripts": 2
+    },
+    "training": {
+      "impl_v1": 38,
+      "backend": 13
+    },
+    "training_controller.py": {
+      "impl_v1": 24,
+      "backend": 2
+    }
+  }
+}

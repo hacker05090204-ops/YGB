@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-43451",
+  "ingested_at": "2026-03-22T07:45:16.731502+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows contains an NTLMv2 hash spoofing vulnerability that could result in disclosing a user's NTLMv2 hash to an attacker via a file open operation. The attacker could then leverage this hash to impersonate that user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "392d6ff9f440fe3986aad9c81958165cae0362d503834490b1ff3a76d074271f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

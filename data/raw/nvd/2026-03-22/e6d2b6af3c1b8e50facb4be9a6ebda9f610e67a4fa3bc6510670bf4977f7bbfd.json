@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4185",
+  "ingested_at": "2026-03-22T07:54:46.681978+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in GPAC up to 2.5-DEV-rev2167-gcc9d617c0-master. This vulnerability affects the function swf_def_bits_jpeg of the file src/scene_manager/swf_parse.c of the component MP4Box. The manipulation of the argument szName results in stack-based buffer overflow. It is possible to launch the attack remotely. The exploit has been made public and could be used. The patch is identified as 8961c74f87ae3fe2d3352e622f7730ca96d50cf1. A patch should be applied to remediate this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e6d2b6af3c1b8e50facb4be9a6ebda9f610e67a4fa3bc6510670bf4977f7bbfd",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4185"
+}

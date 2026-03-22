@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-42258",
+  "ingested_at": "2026-03-22T07:45:19.084723+00:00",
+  "lang": "en",
+  "raw_text": "BQE BillQuick Web Suite BQE BillQuick Web Suite contains an SQL injection vulnerability when accessing the username parameter that may allow for unauthenticated, remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eee5f6583f4064033c301af3b2fbecf571a1532a0848155054a9650442ca6e29",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

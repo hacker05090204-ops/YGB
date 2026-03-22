@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69382",
+  "ingested_at": "2026-03-22T07:54:30.266849+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in themesflat Themesflat Elementor themesflat-elementor allows Object Injection.This issue affects Themesflat Elementor: from n/a through < = 1.0.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9c33a0d58e97a29cb0888a2ad458afa40878cd303dd317799b70b93842dad3bd",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69382"
+}

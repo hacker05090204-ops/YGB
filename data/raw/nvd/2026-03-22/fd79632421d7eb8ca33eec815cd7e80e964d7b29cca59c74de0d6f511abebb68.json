@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24641",
+  "ingested_at": "2026-03-22T07:54:42.717461+00:00",
+  "lang": "en",
+  "raw_text": "A NULL Pointer Dereference vulnerability [CWE-476] vulnerability in Fortinet FortiWeb 8.0.0 through 8.0.2, FortiWeb 7.6.0 through 7.6.6, FortiWeb 7.4 all versions, FortiWeb 7.2 all versions, FortiWeb 7.0 all versions may allow an authenticated attacker to crash the HTTP daemon via crafted HTTP requests.",
+  "severity": "LOW",
+  "sha256_hash": "fd79632421d7eb8ca33eec815cd7e80e964d7b29cca59c74de0d6f511abebb68",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24641"
+}

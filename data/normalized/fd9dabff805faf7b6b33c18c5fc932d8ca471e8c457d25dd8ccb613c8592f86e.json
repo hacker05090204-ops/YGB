@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "F5 BIG-IP F5 BIG-IP contains a missing authentication in critical function vulnerability which can allow for remote code execution, creation or deletion of files, or disabling services.",
+  "token_count": 27
+}

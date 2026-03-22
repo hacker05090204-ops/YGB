@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains a missing capability check vulnerability that allows authenticated users to trigger bulk wpForo usergroup reassignment via the wpforo_synch_roles AJAX handler. Attackers access the usergroups admin page, accessible to any authenticated user, to obtain a nonce, then remap all wpForo usergroups to arbitrary WordPress roles.",
+  "token_count": 48
+}

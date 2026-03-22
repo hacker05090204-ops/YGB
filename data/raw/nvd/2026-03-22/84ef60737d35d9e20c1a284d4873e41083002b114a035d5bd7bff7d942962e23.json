@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2581",
+  "ingested_at": "2026-03-22T07:54:44.535289+00:00",
+  "lang": "en",
+  "raw_text": "This is an uncontrolled resource consumption vulnerability (CWE-400) that can lead to Denial of Service (DoS). In vulnerable Undici versions, when interceptors.deduplicate() is enabled, response data for deduplicated requests could be accumulated in memory for downstream handlers. An attacker-controlled or untrusted upstream endpoint can exploit this with large/chunked responses and concurrent identical requests, causing high memory usage and potential OOM process termination. Impacted users are applications that use Undici\u2019s deduplication interceptor against endpoints that may produce large or long-lived response bodies. PatchesThe issue has been patched by changing deduplication behavior to stream response chunks to downstream handlers as they arrive (instead of full-body accumulation), and by preventing late deduplication when body streaming has already started. Users should upgrade to the first official Undici (and Node.js, where applicable) releases that include this patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "84ef60737d35d9e20c1a284d4873e41083002b114a035d5bd7bff7d942962e23",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 132,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2581"
+}

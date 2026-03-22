@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67445",
+  "ingested_at": "2026-03-22T07:54:31.618010+00:00",
+  "lang": "en",
+  "raw_text": "TOTOLINK X5000R V9.1.0cu.2415_B20250515 contains a denial-of-service vulnerability in /cgi-bin/cstecgi.cgi. The CGI reads the CONTENT_LENGTH environment variable and allocates memory using malloc (CONTENT_LENGTH + 1) without sufficient bounds checking. When lighttpd s request size limit is not enforced, a crafted large POST request can cause memory exhaustion or a segmentation fault, leading to a crash of the management CGI and loss of availability of the web interface.",
+  "severity": "HIGH",
+  "sha256_hash": "a3d422a0ec1f67200ee637312f6d20202a2a528b732bc4ef7852adee58b2d4b3",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67445"
+}

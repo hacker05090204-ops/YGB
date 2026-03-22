@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Sterling Partner Engagement Manager 6.2.3.0 through 6.2.3.5 and 6.2.4.0 through 6.2.4.2 could allow an attacker to obtain sensitive user information using an expired access token",
+  "token_count": 26
+}

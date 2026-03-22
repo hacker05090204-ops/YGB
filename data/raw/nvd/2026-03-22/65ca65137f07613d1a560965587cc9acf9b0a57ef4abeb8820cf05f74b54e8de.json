@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2766",
+  "ingested_at": "2026-03-22T07:54:31.520513+00:00",
+  "lang": "en",
+  "raw_text": "Use-after-free in the JavaScript Engine: JIT component. This vulnerability affects Firefox < 148, Firefox ESR < 140.8, Thunderbird < 148, and Thunderbird < 140.8.",
+  "severity": "CRITICAL",
+  "sha256_hash": "65ca65137f07613d1a560965587cc9acf9b0a57ef4abeb8820cf05f74b54e8de",
+  "source": "nvd",
+  "tags": [
+    "CWE-416",
+    "CWE-416"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2766"
+}

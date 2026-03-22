@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33411",
+  "ingested_at": "2026-03-22T07:54:49.114242+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Versions prior to 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 have a potential stored XSS in topic titles for the solved posts stream. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. As a workaround, ensure that the Content Security Policy is enabled, and has not been modified in a way which would make it more vulnerable to XSS attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "53aaa057f9943191ccb92759e0c13bccc914497f92397dcdcec5eadb0f2d0bac",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33411"
+}

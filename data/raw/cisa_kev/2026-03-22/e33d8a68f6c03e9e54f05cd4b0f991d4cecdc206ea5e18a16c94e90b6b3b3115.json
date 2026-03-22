@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-3566",
+  "ingested_at": "2026-03-22T07:45:19.104216+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS XR Cisco IOS XR Distance Vector Multicast Routing Protocol (DVMRP) incorrectly handles Internet Group Management Protocol (IGMP) packets. Exploitation could allow an unauthenticated, remote attacker to immediately crash the IGMP process or make it consume available memory and eventually crash.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e33d8a68f6c03e9e54f05cd4b0f991d4cecdc206ea5e18a16c94e90b6b3b3115",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "phpTransformer 2016.9 contains a directory traversal vulnerability that allows unauthenticated attackers to access arbitrary files by manipulating the path parameter. Attackers can send requests to the jQueryFileUploadmaster server endpoint with traversal sequences ../../../../../../ to list and retrieve files outside the intended directory.",
+  "token_count": 42
+}

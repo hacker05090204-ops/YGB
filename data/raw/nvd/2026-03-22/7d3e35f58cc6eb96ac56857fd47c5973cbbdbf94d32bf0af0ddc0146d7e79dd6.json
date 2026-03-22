@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32351",
+  "ingested_at": "2026-03-22T07:54:45.914332+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in blubrry PowerPress Podcasting powerpress allows Stored XSS.This issue affects PowerPress Podcasting: from n/a through < = 11.15.13.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7d3e35f58cc6eb96ac56857fd47c5973cbbdbf94d32bf0af0ddc0146d7e79dd6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32351"
+}

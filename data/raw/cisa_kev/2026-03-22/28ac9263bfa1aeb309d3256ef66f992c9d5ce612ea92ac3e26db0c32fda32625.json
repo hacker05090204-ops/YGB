@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-42009",
+  "ingested_at": "2026-03-22T07:45:16.360235+00:00",
+  "lang": "en",
+  "raw_text": "Roundcube Webmail RoundCube Webmail contains a cross-site scripting vulnerability. This vulnerability could allow a remote attacker to steal and send emails of a victim via a crafted e-mail message that abuses a Desanitization issue in message_body() in program/actions/mail/show.php.",
+  "severity": "CRITICAL",
+  "sha256_hash": "28ac9263bfa1aeb309d3256ef66f992c9d5ce612ea92ac3e26db0c32fda32625",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

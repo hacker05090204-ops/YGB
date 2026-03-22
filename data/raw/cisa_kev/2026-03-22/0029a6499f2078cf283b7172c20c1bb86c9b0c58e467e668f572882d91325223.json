@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0160",
+  "ingested_at": "2026-03-22T07:45:18.049828+00:00",
+  "lang": "en",
+  "raw_text": "OpenSSL OpenSSL The TLS and DTLS implementations in OpenSSL do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0029a6499f2078cf283b7172c20c1bb86c9b0c58e467e668f572882d91325223",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

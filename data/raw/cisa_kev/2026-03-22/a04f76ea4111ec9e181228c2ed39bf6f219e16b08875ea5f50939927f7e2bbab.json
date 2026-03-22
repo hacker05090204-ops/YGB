@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-2120",
+  "ingested_at": "2026-03-22T07:45:16.725453+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) Cisco Adaptive Security Appliance (ASA) contains a cross-site scripting (XSS) vulnerability in the WebVPN login page. This vulnerability allows remote attackers to inject arbitrary web script or HTML via an unspecified parameter.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a04f76ea4111ec9e181228c2ed39bf6f219e16b08875ea5f50939927f7e2bbab",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

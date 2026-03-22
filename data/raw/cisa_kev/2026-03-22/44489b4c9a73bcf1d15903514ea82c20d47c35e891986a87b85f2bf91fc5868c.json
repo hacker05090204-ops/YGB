@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-14864",
+  "ingested_at": "2026-03-22T07:45:18.844546+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Intelligence Enterprise Edition Path traversal vulnerability, where an attacker can target the preview FilePath parameter of the getPreviewImage function to get access to arbitrary system file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "44489b4c9a73bcf1d15903514ea82c20d47c35e891986a87b85f2bf91fc5868c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-0185",
+  "ingested_at": "2026-03-22T07:45:16.860671+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains a heap-based buffer overflow vulnerability in the legacy_parse_param function in the Filesystem Context functionality. This allows an attacker to open a filesystem that does not support the Filesystem Context API and ultimately escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "75181b5004e2e5017753c4ded4c00291b7ad92b89fbec05a20111104f82cb48f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

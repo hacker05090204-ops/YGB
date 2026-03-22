@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29184",
+  "ingested_at": "2026-03-22T07:54:41.831588+00:00",
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to version 3.1.4, a malicious scaffolder template can bypass the log redaction mechanism to exfiltrate secrets provided run through task event logs. This issue has been patched in version 3.1.4.",
+  "severity": "LOW",
+  "sha256_hash": "3a6eb976182d0ec064884dd1f7eeb97374026a731fbbe4a9460c0aa0b2e20be2",
+  "source": "nvd",
+  "tags": [
+    "CWE-532"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29184"
+}

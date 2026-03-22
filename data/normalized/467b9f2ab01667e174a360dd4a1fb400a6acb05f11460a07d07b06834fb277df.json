@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mozilla Firefox Mozilla Firefox contains a use-after-free vulnerability in WebGPU IPC Framework which can be exploited to perform arbitrary code execution.",
+  "token_count": 21
+}

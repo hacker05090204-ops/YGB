@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2301",
+  "ingested_at": "2026-03-22T07:54:32.017717+00:00",
+  "lang": "en",
+  "raw_text": "The Post Duplicator plugin for WordPress is vulnerable to unauthorized arbitrary protected post meta insertion in all versions up to, and including, 3.0.8. This is due to the `duplicate_post()` function in `includes/api.php` using `$wpdb->insert()` directly to the `wp_postmeta` table instead of WordPress's standard `add_post_meta()` function, which would call `is_protected_meta()` to prevent lower-privileged users from setting protected meta keys (those starting with `_`). This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary protected post meta keys such as `_wp_page_template`, `_wp_attached_file`, and other sensitive meta keys on duplicated posts via the `customMetaData` JSON array parameter in the `/wp-json/post-duplicator/v1/duplicate-post` REST API endpoint.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d721b83a03eb9858cf5d431a3027db2aa41b4eac0b389a9a411f48423c89d615",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2301"
+}

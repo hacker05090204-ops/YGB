@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67970",
+  "ingested_at": "2026-03-22T07:54:30.008160+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in vertim Schedula schedula-smart-appointment-booking allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Schedula: from n/a through < = 1.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "841e14ab832c1bd080197922e857e65e55f73cb12d804684ceb26102fd24bea7",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67970"
+}

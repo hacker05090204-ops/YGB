@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-21351",
+  "ingested_at": "2026-03-22T07:45:17.051987+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows SmartScreen contains a security feature bypass vulnerability that allows an attacker to bypass the SmartScreen user experience and inject code to potentially gain code execution, which could lead to some data exposure, lack of system availability, or both.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cb62aa21cee98e90441240d523ab86c201bf8cbfd2a613af4cd1f9036411f51a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

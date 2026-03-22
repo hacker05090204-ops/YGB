@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15547",
+  "ingested_at": "2026-03-22T07:54:42.263349+00:00",
+  "lang": "en",
+  "raw_text": "By default, jailed processes cannot mount filesystems, including nullfs(4). However, the allow.mount.nullfs option enables mounting nullfs filesystems, subject to privilege checks. If a privileged user within a jail is able to nullfs-mount directories, a limitation of the kernel's path lookup logic allows that user to escape the jail's chroot, yielding access to the full filesystem of the host or parent jail. In a jail configured to allow nullfs(4) mounts from within the jail, the jailed root user can escape the jail's filesystem root.",
+  "severity": "HIGH",
+  "sha256_hash": "533a3819476f8e5c13662d90bddca7c111d7bb6746dcd633b51c2948aecffa05",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15547"
+}

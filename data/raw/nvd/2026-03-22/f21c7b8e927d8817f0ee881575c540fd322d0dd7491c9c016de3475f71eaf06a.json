@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28099",
+  "ingested_at": "2026-03-22T07:54:40.612712+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in LambertGroup UberSlider Ultra uberSlider_ultra allows Reflected XSS.This issue affects UberSlider Ultra: from n/a through < = 2.3.",
+  "severity": "HIGH",
+  "sha256_hash": "f21c7b8e927d8817f0ee881575c540fd322d0dd7491c9c016de3475f71eaf06a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28099"
+}

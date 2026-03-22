@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SysAK v2.0 and before is vulnerable to command execution via aaa;cat /etc/passwd.",
+  "token_count": 12
+}

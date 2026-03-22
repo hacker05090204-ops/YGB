@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32036",
+  "ingested_at": "2026-03-22T07:54:48.239903+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw gateway plugin versions prior to 2026.2.26 contain a path traversal vulnerability that allows remote attackers to bypass route authentication checks by manipulating /api/channels paths with encoded dot-segment traversal sequences. Attackers can craft alternate paths using encoded traversal patterns to access protected plugin channel routes when handlers normalize the incoming path, circumventing security controls.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b2d5ddf089f04f330681a6f58fa1e3245871100fa665fa0ca23f33166aa5944a",
+  "source": "nvd",
+  "tags": [
+    "CWE-289"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32036"
+}

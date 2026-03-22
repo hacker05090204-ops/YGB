@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3257",
+  "ingested_at": "2026-03-22T07:54:39.942523+00:00",
+  "lang": "en",
+  "raw_text": "UnQLite versions through 0.06 for Perl uses a potentially insecure version of the UnQLite library. UnQLite for Perl embeds the UnQLite library. Version 0.06 and earlier of the Perl module uses a version of the library from 2014 that may be vulnerable to a heap-based overflow.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5838c532f8f94be631afd30144d182c7ae07f3f342a1436d29d350f74d269b3c",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3257"
+}

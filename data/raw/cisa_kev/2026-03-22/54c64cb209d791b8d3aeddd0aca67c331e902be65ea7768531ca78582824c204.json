@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-19356",
+  "ingested_at": "2026-03-22T07:45:19.477219+00:00",
+  "lang": "en",
+  "raw_text": "Netis WF2419 Devices Netis WF2419 devices contains an unspecified vulnerability that allows an attacker to perform remote code execution as root through the router's web management page.",
+  "severity": "CRITICAL",
+  "sha256_hash": "54c64cb209d791b8d3aeddd0aca67c331e902be65ea7768531ca78582824c204",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

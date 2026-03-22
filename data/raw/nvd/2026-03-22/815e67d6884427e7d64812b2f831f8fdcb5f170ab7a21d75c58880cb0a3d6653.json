@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21360",
+  "ingested_at": "2026-03-22T07:54:43.451145+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Commerce versions 2.4.9-alpha3, 2.4.8-p3, 2.4.7-p8, 2.4.6-p13, 2.4.5-p15, 2.4.4-p16 and earlier are affected by an Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability that could result in a security feature bypass. A high-privileged attacker could leverage this vulnerability to access unauthorized files or directories outside the intended restricted path. Exploitation of this issue does not require user interaction.",
+  "severity": "MEDIUM",
+  "sha256_hash": "815e67d6884427e7d64812b2f831f8fdcb5f170ab7a21d75c58880cb0a3d6653",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21360"
+}

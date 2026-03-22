@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-23662",
+  "ingested_at": "2026-03-22T07:54:42.659425+00:00",
+  "lang": "en",
+  "raw_text": "Missing authentication for critical function in Azure IoT Explorer allows an unauthorized attacker to disclose information over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "f24462995ee880ed93404650fe17e81358cff4147e400f19ab0a22d4f40c0353",
+  "source": "nvd",
+  "tags": [
+    "CWE-306",
+    "CWE-319"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23662"
+}

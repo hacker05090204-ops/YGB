@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Drupal Core In Drupal Core, some field types do not properly sanitize data from non-form sources. This can lead to arbitrary PHP code execution in some cases.",
+  "token_count": 27
+}

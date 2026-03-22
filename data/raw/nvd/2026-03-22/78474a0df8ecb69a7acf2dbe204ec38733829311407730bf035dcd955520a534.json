@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33147",
+  "ingested_at": "2026-03-22T07:54:48.990633+00:00",
+  "lang": "en",
+  "raw_text": "GMT is an open source collection of command-line tools for manipulating geographic and Cartesian data sets. In versions from 6.6.0 and prior, a stack-based buffer overflow vulnerability was identified in the gmt_remote_dataset_id function within src/gmt_remote.c. This issue occurs when a specially crafted long string is passed as a dataset identifier (e.g., via the which module), leading to a crash or potential arbitrary code execution. This issue has been patched via commit 0ad2b49.",
+  "severity": "HIGH",
+  "sha256_hash": "78474a0df8ecb69a7acf2dbe204ec38733829311407730bf035dcd955520a534",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33147"
+}

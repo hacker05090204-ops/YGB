@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26698",
+  "ingested_at": "2026-03-22T07:54:33.589613+00:00",
+  "lang": "en",
+  "raw_text": "code-projects Simple Student Alumni System v1.0 is vulnerable to SQL Injection in /TracerStudy/modal_edit.php.",
+  "severity": "MEDIUM",
+  "sha256_hash": "49b64c1cad69508776962f5b4adaf3ebdd88c3595666a4ff3bca37bcadd2469c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26698"
+}

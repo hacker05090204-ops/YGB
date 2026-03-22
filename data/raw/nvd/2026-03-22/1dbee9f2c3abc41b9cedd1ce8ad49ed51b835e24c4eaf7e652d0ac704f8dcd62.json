@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3910",
+  "ingested_at": "2026-03-22T07:54:46.187235+00:00",
+  "lang": "en",
+  "raw_text": "Inappropriate implementation in V8 in Google Chrome prior to 146.0.7680.75 allowed a remote attacker to execute arbitrary code inside a sandbox via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "HIGH",
+  "sha256_hash": "1dbee9f2c3abc41b9cedd1ce8ad49ed51b835e24c4eaf7e652d0ac704f8dcd62",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-119"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3910"
+}

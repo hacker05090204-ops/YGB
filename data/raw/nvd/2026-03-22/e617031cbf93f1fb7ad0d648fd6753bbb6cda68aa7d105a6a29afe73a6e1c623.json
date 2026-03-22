@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2954",
+  "ingested_at": "2026-03-22T07:54:31.017629+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Dromara UJCMS 10.0.2. Impacted is the function importChanel of the file /api/backend/ext/import-data/import-channel of the component ImportDataController. Performing a manipulation of the argument driverClassName/url results in injection. It is possible to initiate the attack remotely. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e617031cbf93f1fb7ad0d648fd6753bbb6cda68aa7d105a6a29afe73a6e1c623",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-707"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2954"
+}

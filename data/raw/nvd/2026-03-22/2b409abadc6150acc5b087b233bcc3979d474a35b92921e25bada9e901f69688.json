@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32745",
+  "ingested_at": "2026-03-22T07:54:46.174559+00:00",
+  "lang": "en",
+  "raw_text": "In JetBrains Datalore before 2026.1 session hijacking was possible due to missing secure attribute for cookie settings",
+  "severity": "MEDIUM",
+  "sha256_hash": "2b409abadc6150acc5b087b233bcc3979d474a35b92921e25bada9e901f69688",
+  "source": "nvd",
+  "tags": [
+    "CWE-614"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32745"
+}

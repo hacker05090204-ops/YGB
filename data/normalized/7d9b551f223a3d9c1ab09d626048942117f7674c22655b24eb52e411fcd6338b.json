@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server Java Platforms contains an unspecified vulnerability in BC-BMT-BPM-DSK which allows remote, authenticated users to conduct XML External Entity (XXE) attacks.",
+  "token_count": 26
+}

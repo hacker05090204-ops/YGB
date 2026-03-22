@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PTZOptics PT30X-SDI/NDI Cameras PTZOptics PT30X-SDI/NDI cameras contain an OS command injection vulnerability that allows a remote, authenticated attacker to escalate privileges to root via a crafted payload with the ntp_addr parameter of the /cgi-bin/param.cgi CGI script.",
+  "token_count": 36
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-3120",
+  "ingested_at": "2026-03-22T07:45:18.397655+00:00",
+  "lang": "en",
+  "raw_text": "Elastic Elasticsearch Elasticsearch enables dynamic scripting, which allows remote attackers to execute arbitrary MVEL expressions and Java code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e8130f3a4081e06d3e54e4578cf3c86e43ae04f0ac91d98dd54c6b753eee3369",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

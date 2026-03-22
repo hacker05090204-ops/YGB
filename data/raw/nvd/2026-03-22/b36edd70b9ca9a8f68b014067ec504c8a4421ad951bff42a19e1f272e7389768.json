@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23260",
+  "ingested_at": "2026-03-22T07:54:47.574299+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: regmap: maple: free entry on mas_store_gfp() failure regcache_maple_write() allocates a new block ('entry') to merge adjacent ranges and then stores it with mas_store_gfp(). When mas_store_gfp() fails, the new 'entry' remains allocated and is never freed, leaking memory. Free 'entry' on the failure path; on success continue freeing the replaced neighbor blocks ('lower', 'upper').",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b36edd70b9ca9a8f68b014067ec504c8a4421ad951bff42a19e1f272e7389768",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23260"
+}

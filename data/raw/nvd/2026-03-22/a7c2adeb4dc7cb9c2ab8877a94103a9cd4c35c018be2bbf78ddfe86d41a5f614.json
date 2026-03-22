@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1704",
+  "ingested_at": "2026-03-22T07:54:44.602153+00:00",
+  "lang": "en",
+  "raw_text": "The Appointment Booking Calendar \u2014 Simply Schedule Appointments Booking Plugin plugin for WordPress is vulnerable to Insecure Direct Object Reference in all versions up to, and including, 1.6.9.29. This is due to the `get_item_permissions_check` method granting access to users with the `ssa_manage_appointments` capability without validating staff ownership of the requested appointment. This makes it possible for authenticated attackers, with custom-level access and above (users granted the ssa_manage_appointments capability, such as Team Members), to view appointment records belonging to other staff members and access sensitive customer personally identifiable information via the appointment ID parameter.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a7c2adeb4dc7cb9c2ab8877a94103a9cd4c35c018be2bbf78ddfe86d41a5f614",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1704"
+}

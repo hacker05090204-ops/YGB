@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0262",
+  "ingested_at": "2026-03-22T07:45:18.775015+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office A remote code execution vulnerability exists in Microsoft Office.",
+  "severity": "CRITICAL",
+  "sha256_hash": "78ad27bfd69669412f3a48433a7286c28d3474113d421a2777ba3779ee9df0e9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 11,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

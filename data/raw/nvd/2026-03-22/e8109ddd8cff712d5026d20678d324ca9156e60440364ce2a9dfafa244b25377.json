@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2913",
+  "ingested_at": "2026-03-22T07:54:30.923563+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in libvips up to 8.19.0. The affected element is the function vips_source_read_to_memory of the file libvips/iofuncs/source.c. This manipulation causes heap-based buffer overflow. It is possible to launch the attack on the local host. The attack's complexity is rated as high. The exploitability is described as difficult. The exploit has been publicly disclosed and may be utilized. Patch name: a56feecbe9ed66521d9647ec9fbcd2546eccd7ee. Applying a patch is the recommended action to fix this issue. The confirmation of the bugfix mentions: \"[T]he impact of this is negligible, since this only affects custom seekable sources larger than 4 GiB (and the crash occurs in user code rather than libvips itself).\"",
+  "severity": "LOW",
+  "sha256_hash": "e8109ddd8cff712d5026d20678d324ca9156e60440364ce2a9dfafa244b25377",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-122"
+  ],
+  "token_count": 108,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2913"
+}

@@ -1,0 +1,54 @@
+Repository root: C:\Users\Unkno\YGB
+Total dirs: 467
+Total files: 120280
+Python files: 1299
+TS/TSX files: 99
+C++/Header files: 244
+Test files: 554
+Source files: 1088
+Test ratio: 0.3374
+
+Top-level LOC:
+  impl_v1: 142295
+  backend: 57213
+  native: 51270
+  python: 21577
+  frontend: 20403
+  HUMANOID_HUNTER: 19589
+  api: 10352
+  training: 5806
+  scripts: 3342
+  tests: 2422
+  training_controller.py: 2112
+  governance: 1160
+  run_real_training.py: 761
+  run_leader_ddp.py: 749
+  storage_backend.py: 491
+  run_cluster_authority.py: 304
+  edge: 279
+  run_rtx3050_follower.py: 138
+  voice_mode: 45
+  ingest_reports_media: 44
+  ai_report_generator: 41
+  proposed_upgrades: 25
+  test_training_debug.py: 23
+
+Requirements files:
+  api/requirements-lock.txt
+  api/requirements.txt
+
+Import edges:
+  api -> backend(66), impl_v1(21), governance(2)
+  backend -> governance(25), impl_v1(18), native(13), scripts(8), api(3), training(1)
+  governance -> backend(12)
+  impl_v1 -> backend(21), training(6)
+  proposed_upgrades -> backend(6), impl_v1(1)
+  run_cluster_authority.py -> impl_v1(3)
+  run_leader_ddp.py -> impl_v1(2)
+  run_real_training.py -> impl_v1(2)
+  run_rtx3050_follower.py -> impl_v1(1)
+  scripts -> backend(7), impl_v1(2)
+  test_training_debug.py -> impl_v1(1)
+  tests -> impl_v1(25), backend(9), training(7), scripts(2), api(1), native(1)
+  training -> impl_v1(38), backend(13)
+  training_controller.py -> impl_v1(24), backend(2)

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Weintek cMT-3072XH2 easyweb v2.1.53, OS v20231011 was discovered to contain an authenticated command injection vulnerability via the HMI Name parameter.",
+  "token_count": 20
+}

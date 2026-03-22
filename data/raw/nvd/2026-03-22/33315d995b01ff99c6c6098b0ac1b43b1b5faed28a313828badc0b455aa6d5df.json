@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11950",
+  "ingested_at": "2026-03-22T07:54:33.157255+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation (XSS or 'Cross-site Scripting') vulnerability in KNOWHY Advanced Technology Trading Ltd. Co. EduAsist allows Reflected XSS.This issue affects EduAsist: before v2.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "33315d995b01ff99c6c6098b0ac1b43b1b5faed28a313828badc0b455aa6d5df",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11950"
+}

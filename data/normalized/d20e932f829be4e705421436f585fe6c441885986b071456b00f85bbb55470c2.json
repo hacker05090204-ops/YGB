@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Integer overflow or wraparound in Windows Routing and Remote Access Service (RRAS) allows an authorized attacker to execute code over a network.",
+  "token_count": 22
+}

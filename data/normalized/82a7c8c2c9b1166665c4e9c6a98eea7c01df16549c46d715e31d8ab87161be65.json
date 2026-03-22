@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains an incorrect default permissions vulnerability in the Firefox sandbox that allows a remote attacker to execute arbitrary code via crafted SWF content.",
+  "token_count": 29
+}

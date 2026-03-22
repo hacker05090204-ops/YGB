@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26004",
+  "ingested_at": "2026-03-22T07:54:47.224746+00:00",
+  "lang": "en",
+  "raw_text": "Sentry is a developer-first error tracking and performance monitoring tool. Versions prior to 26.1.0 have a cross-organization Insecure Direct Object Reference (IDOR) vulnerability in Sentry's GroupEventJsonView endpoint. Version 26.1.0 patches the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "11d3e00b48cbcc683dc801db58c58db35673b1957712a6918e35d2b594e9cc4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26004"
+}

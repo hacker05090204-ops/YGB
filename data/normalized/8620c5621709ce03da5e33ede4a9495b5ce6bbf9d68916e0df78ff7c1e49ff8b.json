@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Java SE Unspecified vulnerability in the Java Runtime Environment (JRE) component in Oracle Java SE allows remote attackers to affect confidentiality, integrity, and availability via Unknown vectors related to Hotspot.",
+  "token_count": 31
+}

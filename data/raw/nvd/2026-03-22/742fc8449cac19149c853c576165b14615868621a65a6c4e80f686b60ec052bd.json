@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-9120",
+  "ingested_at": "2026-03-22T07:54:31.266662+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Generation of Code ('Code Injection') vulnerability in OpenTextTM Carbonite Safe Server Backup allows Code Injection. The vulnerability could be exploited through an open port, potentially allowing unauthorized access. This issue affects Carbonite Safe Server Backup: through 6.8.3.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "742fc8449cac19149c853c576165b14615868621a65a6c4e80f686b60ec052bd",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-9120"
+}

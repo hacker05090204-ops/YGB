@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8655",
+  "ingested_at": "2026-03-22T07:45:19.169375+00:00",
+  "lang": "en",
+  "raw_text": "EyesOfNetwork EyesOfNetwork EyesOfNetwork contains an improper privilege management vulnerability that may allow a user to run commands as root via a crafted Nmap Scripting Engine (NSE) script to nmap7.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e54e4b9167c270a73d89ce8693450c765421bd38a63b3bc0643dd65038bd7382",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

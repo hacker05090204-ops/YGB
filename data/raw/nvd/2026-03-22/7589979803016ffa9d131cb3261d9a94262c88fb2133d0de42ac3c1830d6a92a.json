@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26195",
+  "ingested_at": "2026-03-22T07:54:40.880494+00:00",
+  "lang": "en",
+  "raw_text": "Gogs is an open source self-hosted Git service. Prior to version 0.14.2, stored xss is still possible through unsafe template rendering that mixes user input with safe plus permissive sanitizer handling of data urls. This issue has been patched in version 0.14.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7589979803016ffa9d131cb3261d9a94262c88fb2133d0de42ac3c1830d6a92a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26195"
+}

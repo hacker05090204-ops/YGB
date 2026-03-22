@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20439",
+  "ingested_at": "2026-03-22T07:54:33.540871+00:00",
+  "lang": "en",
+  "raw_text": "In imgsys, there is a possible system crash due to use after free. This could lead to local denial of service if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: ALPS10431955; Issue ID: MSV-5826.",
+  "severity": "MEDIUM",
+  "sha256_hash": "de36226151b16e98de51f642f35a037747dda1e6b0c3e66ef55743251112d33f",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20439"
+}

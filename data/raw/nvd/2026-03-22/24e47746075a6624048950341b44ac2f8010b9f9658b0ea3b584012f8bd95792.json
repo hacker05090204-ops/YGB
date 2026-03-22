@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26464",
+  "ingested_at": "2026-03-22T07:54:31.149463+00:00",
+  "lang": "en",
+  "raw_text": "Stored Cross-Site Scripting (XSS) was found in the /admin/edit_user.php page of Society Management System Portal V1.0, which allows remote attackers to inject and store arbitrary JavaScript code that is executed in users' browsers. This vulnerability can be exploited via the name parameter in a POST HTTP request, leading to execution of malicious scripts when the affected content is viewed by other users, including administrators.",
+  "severity": "MEDIUM",
+  "sha256_hash": "24e47746075a6624048950341b44ac2f8010b9f9658b0ea3b584012f8bd95792",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-79"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26464"
+}

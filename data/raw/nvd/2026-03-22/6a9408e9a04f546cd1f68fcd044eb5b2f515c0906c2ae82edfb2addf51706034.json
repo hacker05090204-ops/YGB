@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-2274",
+  "ingested_at": "2026-03-22T07:54:46.812186+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation in Forcepoint Web Security (On-Prem) on Windows allows Stored XSS.This issue affects Web Security through 8.5.6.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "6a9408e9a04f546cd1f68fcd044eb5b2f515c0906c2ae82edfb2addf51706034",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-2274"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-18362",
+  "ingested_at": "2026-03-22T07:45:17.963491+00:00",
+  "lang": "en",
+  "raw_text": "Kaseya Virtual System/Server Administrator (VSA) ConnectWise ManagedITSync integration for Kaseya VSA is vulnerable to unauthenticated remote commands that allow full direct access to the Kaseya VSA database.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3100d2576c58d5ba386751bf8051ac51e7745bc904fd08b92969284b6a5d7a7e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

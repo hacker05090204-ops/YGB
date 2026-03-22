@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30238",
+  "ingested_at": "2026-03-22T07:54:41.666177+00:00",
+  "lang": "en",
+  "raw_text": "Group-Office is an enterprise customer relationship management and groupware tool. Prior to versions 6.8.155, 25.0.88, and 26.0.10, there is a reflected XSS vulnerability in GroupOffice on the external/index flow. The f parameter (Base64 JSON) is decoded and then injected into an inline JavaScript block without strict escaping, allowing ... injection and arbitrary JavaScript execution in the victim's browser. This issue has been patched in versions 6.8.155, 25.0.88, and 26.0.10.",
+  "severity": "MEDIUM",
+  "sha256_hash": "42dd177825da539662a6ef6acb1b6310eaa1d186d081076eb39dc9f23ebc2bde",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30238"
+}

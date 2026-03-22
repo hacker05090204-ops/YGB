@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter Server contains an incorrect default file permissions vulnerability that allows a remote, privileged attacker to gain access to sensitive information.",
+  "token_count": 25
+}

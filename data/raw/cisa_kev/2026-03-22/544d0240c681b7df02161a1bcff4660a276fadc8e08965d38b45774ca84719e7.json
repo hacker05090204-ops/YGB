@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-3153",
+  "ingested_at": "2026-03-22T07:45:17.601670+00:00",
+  "lang": "en",
+  "raw_text": "Cisco AnyConnect Secure Cisco AnyConnect Secure Mobility Client for Windows allows for incorrect handling of directory paths. An attacker with valid credentials on Windows would be able to copy malicious files to arbitrary locations with system level privileges. This could include DLL pre-loading, DLL hijacking, and other related attacks.",
+  "severity": "CRITICAL",
+  "sha256_hash": "544d0240c681b7df02161a1bcff4660a276fadc8e08965d38b45774ca84719e7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

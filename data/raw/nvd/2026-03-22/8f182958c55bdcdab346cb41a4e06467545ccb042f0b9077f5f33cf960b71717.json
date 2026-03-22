@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27442",
+  "ingested_at": "2026-03-22T07:54:34.412439+00:00",
+  "lang": "en",
+  "raw_text": "The GINA web interface in SEPPmail Secure Email Gateway before version 15.0.1 does not properly check attachment filenames in GINA-encrypted emails, allowing an attacker to access files on the gateway.",
+  "severity": "HIGH",
+  "sha256_hash": "8f182958c55bdcdab346cb41a4e06467545ccb042f0b9077f5f33cf960b71717",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27442"
+}

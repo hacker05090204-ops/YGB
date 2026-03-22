@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-28790",
+  "ingested_at": "2026-03-22T07:54:40.963162+00:00",
+  "lang": "en",
+  "raw_text": "OliveTin gives access to predefined shell commands from a web interface. Prior to version 3000.11.0, OliveTin allows an unauthenticated guest to terminate running actions through KillAction even when authRequireGuestsToLogin: true is enabled. Guests are correctly blocked from dashboard access, but can still call the KillAction RPC directly and successfully stop a running action. This is a broken access control issue that causes unauthorized denial of service against legitimate action executions. This issue has been patched in version 3000.11.0.",
+  "severity": "HIGH",
+  "sha256_hash": "2f3865bb77aa136968da649fc70dc4817605c0e37d3560a70ec2bb50ed1d034d",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-862",
+    "CWE-863",
+    "CWE-862"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28790"
+}

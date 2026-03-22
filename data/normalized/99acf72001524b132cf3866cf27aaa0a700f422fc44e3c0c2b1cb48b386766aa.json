@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A stack-based buffer overflow in the CLI's TFTP file\u2010transfer command handling allows a low-privileged attacker with Telnet/SSH access to trigger memory corruption by supplying unexpected or oversized filename input. Exploitation results in the corruption of the internal buffer, causing the CLI and web dashboard to become unavailable and leading to a denial of service.",
+  "token_count": 54
+}

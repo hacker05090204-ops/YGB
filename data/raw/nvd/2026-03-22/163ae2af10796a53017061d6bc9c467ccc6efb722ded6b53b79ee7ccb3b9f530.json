@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33265",
+  "ingested_at": "2026-03-22T07:54:47.460889+00:00",
+  "lang": "en",
+  "raw_text": "In LibreChat 0.8.1-rc2, a logged-in user obtains a JWT for both the LibreChat API and the RAG API.",
+  "severity": "MEDIUM",
+  "sha256_hash": "163ae2af10796a53017061d6bc9c467ccc6efb722ded6b53b79ee7ccb3b9f530",
+  "source": "nvd",
+  "tags": [
+    "CWE-669"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33265"
+}

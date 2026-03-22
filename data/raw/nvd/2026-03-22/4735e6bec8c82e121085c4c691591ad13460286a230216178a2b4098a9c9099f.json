@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23271",
+  "ingested_at": "2026-03-22T07:54:48.687494+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: perf: Fix __perf_event_overflow() vs perf_remove_from_context() race Make sure that __perf_event_overflow() runs with IRQs disabled for all possible callchains. Specifically the software events can end up running it with only preemption disabled. This opens up a race vs perf_event_exit_event() and friends that will go and free various things the overflow path expects to be present, like the BPF program.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "4735e6bec8c82e121085c4c691591ad13460286a230216178a2b4098a9c9099f",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23271"
+}

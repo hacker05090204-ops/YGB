@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4165",
+  "ingested_at": "2026-03-22T07:54:46.645544+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Worksuite HR, CRM and Project Management up to 5.5.25. The affected element is an unknown function of the file /account/orders/create. The manipulation of the argument Client Note leads to cross site scripting. The attack can be initiated remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "LOW",
+  "sha256_hash": "1736fae5064ffb6c4b531ff285d5eadd81ef6344899da8cae75d357f6c6c4d9d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4165"
+}

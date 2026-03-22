@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23812",
+  "ingested_at": "2026-03-22T07:54:34.578218+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified where an attacker connecting to an access point as a standard wired or wireless client can impersonate a gateway by leveraging an address-based spoofing technique. Successful exploitation enables the redirection of data streams, allowing for the interception or modification of traffic intended for the legitimate network gateway via a Machine-in-the-Middle (MitM) position.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6d0cdac74cd40432d31bb642746b01904e2651c5d9a2f050fb25e79640fe0780",
+  "source": "nvd",
+  "tags": [
+    "CWE-300"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23812"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Guest posting / Frontend Posting / Front Editor WordPress plugin before 5.0.6 allows passing a URL parameter to regenerate a .json file based on demo data that it initially creates. If an administrator modifies the demo form and enables admin notifications in the Guest posting / Frontend Posting / Front Editor WordPress plugin before 5.0.6's settings, it is possible for an unauthenticated attacker to export and download all of the form data/settings, including the administrator's email address.",
+  "token_count": 78
+}

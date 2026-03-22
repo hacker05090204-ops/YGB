@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IFTOP developed by WellChoose has an Open redirect vulnerability, allowing authenticated remote attackers to craft a URL that tricks users into visiting malicious website.",
+  "token_count": 24
+}

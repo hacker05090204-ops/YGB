@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22681",
+  "ingested_at": "2026-03-22T07:45:15.864018+00:00",
+  "lang": "en",
+  "raw_text": "Rockwell Multiple Products Multiple Rockwell products contain an insufficient protected credentials vulnerability. Studio 5000 Logix Designer software may allow a key to be discovered. This key is used to verify Logix controllers are communicating with Rockwell Automation design software. If successfully exploited, this vulnerability could allow an unauthorized application to connect with Logix controllers. To leverage this vulnerability, an unauthorized user would require network access to the controller.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d8b30e67dbb3619d44c315d1d0f2580b60bce68e57a779b41f9cb837e38ce729",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 68,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

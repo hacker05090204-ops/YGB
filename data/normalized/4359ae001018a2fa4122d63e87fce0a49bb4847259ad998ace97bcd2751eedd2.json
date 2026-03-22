@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chrome for Android UI Google Chrome for Android UI contains a heap buffer overflow vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page.",
+  "token_count": 38
+}

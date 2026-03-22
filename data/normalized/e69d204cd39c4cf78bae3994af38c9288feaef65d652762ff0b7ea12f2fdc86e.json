@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Shiro Apache Shiro contains a vulnerability which may allow remote attackers to execute code or bypass intended access restrictions via an unspecified request parameter when a cipher key has not been configured for the \"remember me\" feature.",
+  "token_count": 38
+}

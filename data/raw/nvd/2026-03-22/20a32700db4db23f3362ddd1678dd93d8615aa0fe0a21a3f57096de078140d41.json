@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48609",
+  "ingested_at": "2026-03-22T07:54:33.863099+00:00",
+  "lang": "en",
+  "raw_text": "In multiple functions of MmsProvider.java, there is a possible way to arbitrarily delete files which affect telephony, SMS, and MMS functionalities due to a path traversal error. This could lead to local denial of service with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "20a32700db4db23f3362ddd1678dd93d8615aa0fe0a21a3f57096de078140d41",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48609"
+}

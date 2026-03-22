@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20992",
+  "ingested_at": "2026-03-22T07:54:46.388812+00:00",
+  "lang": "en",
+  "raw_text": "Improper authorization in Settings prior to SMR Mar-2026 Release 1 allows local attacker to disable configuring the background data usage of application.",
+  "severity": "LOW",
+  "sha256_hash": "81ea619cb64fbd6edb799e7438a09866c84c951adac252ad9e8261949c530664",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20992"
+}

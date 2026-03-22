@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27973",
+  "ingested_at": "2026-03-22T07:54:32.560921+00:00",
+  "lang": "en",
+  "raw_text": "Audiobookshelf is a self-hosted audiobook and podcast server. A stored cross-site scripting (XSS) vulnerability exists in versions prior to 0.12.0-beta of the Audiobookshelf mobile application that allows arbitrary JavaScript execution through malicious library metadata. Attackers with library modification privileges can execute code in victim users' browsers/WebViews, potentially leading to session hijacking, data exfiltration, and unauthorized access to native device APIs. The issue is fixed in audiobookshelf-app version 0.12.0-beta, corresponding to audiobookshelf version 2.12.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "44bc3bdb1d8f26247f9fbb420a77812489e173ac8de9a7da477833503ddc2ad2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27973"
+}

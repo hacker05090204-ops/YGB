@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4086",
+  "ingested_at": "2026-03-22T07:54:49.449226+00:00",
+  "lang": "en",
+  "raw_text": "The WP Random Button plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'cat', 'nocat', and 'text' shortcode attributes of the 'wp_random_button' shortcode in all versions up to, and including, 1.0. This is due to insufficient input sanitization and output escaping on user-supplied shortcode attributes. Specifically, the random_button_html() function directly concatenates the 'cat' and 'nocat' parameters into HTML data-attributes without esc_attr(), and the 'text' parameter into HTML content without esc_html(). This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "75d32efa84be209fa1c9fb7026ce807f01334ea23420fca1cf8644b5d25d5591",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4086"
+}

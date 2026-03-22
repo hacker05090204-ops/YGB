@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-25506",
+  "ingested_at": "2026-03-22T07:45:19.136967+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DNS-320 Device D-Link DNS-320 device contains a command injection vulnerability in the sytem_mgr.cgi component that may allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f3089148f350f44ef1b452f1ba1e69a1eaa6bcc9864b477080ae1a2cf449d6cd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

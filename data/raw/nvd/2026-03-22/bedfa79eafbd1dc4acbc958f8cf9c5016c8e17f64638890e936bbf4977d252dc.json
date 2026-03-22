@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41432",
+  "ingested_at": "2026-03-22T07:54:46.323874+00:00",
+  "lang": "en",
+  "raw_text": "in OpenHarmony v5.1.0 and prior versions allow a local attacker arbitrary code execution in pre-installed apps through out-of-bounds write. This vulnerability can be exploited only in restricted scenarios.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bedfa79eafbd1dc4acbc958f8cf9c5016c8e17f64638890e936bbf4977d252dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41432"
+}

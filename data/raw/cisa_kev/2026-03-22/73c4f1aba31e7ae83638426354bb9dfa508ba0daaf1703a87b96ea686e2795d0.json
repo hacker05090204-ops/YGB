@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-61884",
+  "ingested_at": "2026-03-22T07:45:16.098613+00:00",
+  "lang": "en",
+  "raw_text": "Oracle E-Business Suite Oracle E-Business Suite contains a server-side request forgery (SSRF) vulnerability in the Runtime component of Oracle Configurator. This vulnerability is remotely exploitable without authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "73c4f1aba31e7ae83638426354bb9dfa508ba0daaf1703a87b96ea686e2795d0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

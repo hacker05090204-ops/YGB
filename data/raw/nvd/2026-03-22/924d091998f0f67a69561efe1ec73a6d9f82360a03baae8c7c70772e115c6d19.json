@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3740",
+  "ingested_at": "2026-03-22T07:54:42.058162+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in itsourcecode University Management System 1.0. Impacted is an unknown function of the file /admin_search_student.php. This manipulation of the argument admin_search_student causes sql injection. The attack is possible to be carried out remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "924d091998f0f67a69561efe1ec73a6d9f82360a03baae8c7c70772e115c6d19",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3740"
+}

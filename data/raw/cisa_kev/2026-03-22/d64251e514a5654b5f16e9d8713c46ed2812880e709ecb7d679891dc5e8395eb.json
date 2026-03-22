@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-2586",
+  "ingested_at": "2026-03-22T07:45:16.932455+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains a use-after-free vulnerability in the nft_object, allowing local attackers to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d64251e514a5654b5f16e9d8713c46ed2812880e709ecb7d679891dc5e8395eb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

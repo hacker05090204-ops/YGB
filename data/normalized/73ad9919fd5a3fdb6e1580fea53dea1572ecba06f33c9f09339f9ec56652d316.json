@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The User Registration & Membership plugin for WordPress is vulnerable to authentication bypass in versions up to, and including, 5.1.2. This is due to incorrect authentication in the 'register_member' function. This makes it possible for unauthenticated attackers to log in a newly registered user on the site who has the 'urm_user_just_created' user meta set.",
+  "token_count": 54
+}

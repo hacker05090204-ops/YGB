@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-69651",
+  "ingested_at": "2026-03-22T07:54:41.551765+00:00",
+  "lang": "en",
+  "raw_text": "GNU Binutils thru 2.46 readelf contains a vulnerability that leads to an invalid pointer free when processing a crafted ELF binary with malformed relocation or symbol data. If dump_relocations returns early due to parsing errors, the internal all_relocations array may remain partially uninitialized. Later, process_got_section_contents() may attempt to free an invalid r_symbol pointer, triggering memory corruption checks in glibc and causing the program to terminate with SIGABRT. No evidence of further memory corruption or code execution was observed; the impact is limited to denial of service. NOTE: this is disputed by third parties because the observed behavior occurred only in pre-release code and did not affect any tagged version.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3b2f3bcd0a5228978ac79a2136f2b742ec115a9e34183440775dca73aa0dc8d5",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-476"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69651"
+}

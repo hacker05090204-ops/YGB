@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Red Hat Polkit The Red Hat polkit pkexec utility contains an out-of-bounds read and write vulnerability that allows for privilege escalation with administrative rights.",
+  "token_count": 24
+}

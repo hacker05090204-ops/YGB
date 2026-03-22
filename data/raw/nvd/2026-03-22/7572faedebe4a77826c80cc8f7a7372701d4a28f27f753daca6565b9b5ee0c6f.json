@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70342",
+  "ingested_at": "2026-03-22T07:54:34.489602+00:00",
+  "lang": "en",
+  "raw_text": "erase-install prior to v40.4 commit 2c31239 writes swiftDialog credential output to a hardcoded path /var/tmp/dialog.json. This allows an unauthenticated attacker to intercept admin credentials entered during reinstall/erase operations via creating a named pipe.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7572faedebe4a77826c80cc8f7a7372701d4a28f27f753daca6565b9b5ee0c6f",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70342"
+}

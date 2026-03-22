@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1574",
+  "ingested_at": "2026-03-22T07:54:41.794277+00:00",
+  "lang": "en",
+  "raw_text": "The MyQtip \u2013 easy qTip2 plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's `myqtip` shortcode in all versions up to, and including, 2.0.5 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7121af1bce45a782cb3edda9d97dcd5c60a7e3b2017e4ccb6f4fb46aab424e16",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1574"
+}

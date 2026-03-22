@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4187",
+  "ingested_at": "2026-03-22T07:54:46.686220+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Tiandy Easy7 Integrated Management Platform 7.17.0. Impacted is an unknown function of the file /WebService/UpdateLocalDevInfo.jsp of the component Device Identifier Handler. Such manipulation of the argument username/password leads to missing authentication. The attack can be launched remotely. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8afa9b650e092e26a90e4aa6fce2d2bbca4ef0905f94b82ac64c078128389cfc",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-306"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4187"
+}

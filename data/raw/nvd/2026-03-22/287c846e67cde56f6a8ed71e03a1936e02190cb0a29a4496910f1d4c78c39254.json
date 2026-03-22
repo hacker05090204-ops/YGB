@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27587",
+  "ingested_at": "2026-03-22T07:54:31.698039+00:00",
+  "lang": "en",
+  "raw_text": "Caddy is an extensible server platform that uses TLS by default. Prior to version 2.11.1, Caddy's HTTP `path` request matcher is intended to be case-insensitive, but when the match pattern contains percent-escape sequences (`%xx`) it compares against the request's escaped path without lowercasing. An attacker can bypass path-based routing and any access controls attached to that route by changing the casing of the request path. Version 2.11.1 contains a fix for the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "287c846e67cde56f6a8ed71e03a1936e02190cb0a29a4496910f1d4c78c39254",
+  "source": "nvd",
+  "tags": [
+    "CWE-178"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27587"
+}

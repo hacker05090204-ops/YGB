@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-21002",
+  "ingested_at": "2026-03-22T07:54:46.411350+00:00",
+  "lang": "en",
+  "raw_text": "Improper verification of cryptographic signature in Galaxy Store prior to version 4.6.03.8 allows local attacker to install arbitrary application.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "12b13fd3ef595a42495b4f53b07dc264d3bcdcb8a11e6db554c022a13a6d4a5b",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21002"
+}

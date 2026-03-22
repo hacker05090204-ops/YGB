@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-6287",
+  "ingested_at": "2026-03-22T07:45:19.550665+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server Java Platforms contains a missing authentication for critical function vulnerability allowing unauthenticated access to execute configuration tasks and create administrative users.",
+  "severity": "CRITICAL",
+  "sha256_hash": "503e32b4060f48545ae426bc115c8fb7dc95a8a557314fce5e06c9827d833a12",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

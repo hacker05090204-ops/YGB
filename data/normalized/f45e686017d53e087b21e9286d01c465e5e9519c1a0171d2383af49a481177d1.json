@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper neutralization of special elements in user-supplied input within the ZIA Admin UI could allow an authenticated administrator to access or retrieve unauthorized internal information in rare conditions.",
+  "token_count": 28
+}

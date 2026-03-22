@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortra Cobalt Strike Fortra Cobalt Strike contains a cross-site scripting (XSS) vulnerability in Teamserver that would allow an attacker to set a malformed username in the Beacon configuration, allowing them to execute code remotely.",
+  "token_count": 34
+}

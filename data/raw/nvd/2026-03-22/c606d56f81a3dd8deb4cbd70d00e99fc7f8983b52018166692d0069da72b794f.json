@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23656",
+  "ingested_at": "2026-03-22T07:54:42.651307+00:00",
+  "lang": "en",
+  "raw_text": "Insufficient verification of data authenticity in Windows App Installer allows an unauthorized attacker to perform spoofing over a network.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c606d56f81a3dd8deb4cbd70d00e99fc7f8983b52018166692d0069da72b794f",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23656"
+}

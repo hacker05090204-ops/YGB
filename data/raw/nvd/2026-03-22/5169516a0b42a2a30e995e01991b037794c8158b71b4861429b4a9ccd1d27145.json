@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27467",
+  "ingested_at": "2026-03-22T07:54:30.812174+00:00",
+  "lang": "en",
+  "raw_text": "BigBlueButton is an open-source virtual classroom. In versions 3.0.19 and below, when first joining a session with the microphone muted, the client sends audio to the server regardless of mute state. Media is discarded at the server side, so it isn't audible to any participants, but this may allow for malicious server operators to access audio data. The behavior is only incorrect between joining the meeting and the first time the user unmutes. This issue has been fixed in version 3.0.20.",
+  "severity": "LOW",
+  "sha256_hash": "5169516a0b42a2a30e995e01991b037794c8158b71b4861429b4a9ccd1d27145",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27467"
+}

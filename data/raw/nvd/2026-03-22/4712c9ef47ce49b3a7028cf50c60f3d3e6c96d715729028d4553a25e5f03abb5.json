@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3288",
+  "ingested_at": "2026-03-22T07:54:42.390265+00:00",
+  "lang": "en",
+  "raw_text": "A security issue was discovered in ingress-nginx where the `nginx.ingress.kubernetes.io/rewrite-target` Ingress annotation can be used to inject configuration into nginx. This can lead to arbitrary code execution in the context of the ingress-nginx controller, and disclosure of Secrets accessible to the controller. (Note that in the default installation, the controller can access all Secrets cluster-wide.)",
+  "severity": "HIGH",
+  "sha256_hash": "4712c9ef47ce49b3a7028cf50c60f3d3e6c96d715729028d4553a25e5f03abb5",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3288"
+}

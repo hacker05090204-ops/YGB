@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-13734",
+  "ingested_at": "2026-03-22T07:54:34.202465+00:00",
+  "lang": "en",
+  "raw_text": "IBM Engineering Requirements Management DOORS Next 7.1, and 7.2 could allow an authenticated user to view and edit data beyond their authorized access permissions.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0d3cda85850da193bfd34f2d609d2a11728a0a15141e59c1f82ebee343e6651e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862",
+    "CWE-863"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13734"
+}

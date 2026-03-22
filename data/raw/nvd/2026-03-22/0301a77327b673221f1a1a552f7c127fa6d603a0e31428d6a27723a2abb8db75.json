@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28718",
+  "ingested_at": "2026-03-22T07:54:41.183320+00:00",
+  "lang": "en",
+  "raw_text": "Denial of service due to insufficient input validation in authentication logging. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "severity": "HIGH",
+  "sha256_hash": "0301a77327b673221f1a1a552f7c127fa6d603a0e31428d6a27723a2abb8db75",
+  "source": "nvd",
+  "tags": [
+    "CWE-779"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28718"
+}

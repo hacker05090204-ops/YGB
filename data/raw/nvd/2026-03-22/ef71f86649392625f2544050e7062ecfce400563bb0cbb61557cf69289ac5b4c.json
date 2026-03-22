@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0977",
+  "ingested_at": "2026-03-22T07:54:46.366889+00:00",
+  "lang": "en",
+  "raw_text": "IBM CICS Transaction Gateway for Multiplatforms 9.3 and 10.1 could allow a user to transfer or view files due to improper access controls.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ef71f86649392625f2544050e7062ecfce400563bb0cbb61557cf69289ac5b4c",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0977"
+}

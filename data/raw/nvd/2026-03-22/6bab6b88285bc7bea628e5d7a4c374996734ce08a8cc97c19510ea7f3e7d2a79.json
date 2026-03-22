@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69376",
+  "ingested_at": "2026-03-22T07:54:30.255874+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in vanquish User Extra Fields wp-user-extra-fields allows Path Traversal.This issue affects User Extra Fields: from n/a through < = 17.0.",
+  "severity": "HIGH",
+  "sha256_hash": "6bab6b88285bc7bea628e5d7a4c374996734ce08a8cc97c19510ea7f3e7d2a79",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69376"
+}

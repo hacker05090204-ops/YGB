@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Green CMS 2.x contains a path traversal vulnerability that allows authenticated attackers to download arbitrary files and directories by injecting directory traversal sequences. Attackers can manipulate the theme_name parameter in the themeexporthandle action or supply base64-encoded file paths to the downfile action to retrieve sensitive files outside intended directories.",
+  "token_count": 49
+}

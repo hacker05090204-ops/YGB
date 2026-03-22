@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains a stored cross-site scripting vulnerability that allows authenticated subscribers to upload SVG files as profile avatars through the avatar upload functionality. Attackers upload a crafted SVG containing CSS injection or JavaScript event handlers that execute in the browsers of any user who views the attacker's profile page.",
+  "token_count": 51
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Path Traversal: '.../...//' vulnerability in primersoftware Primer MyData for Woocommerce primer-mydata allows Path Traversal.This issue affects Primer MyData for Woocommerce: from n/a through < = 4.2.8.",
+  "token_count": 26
+}

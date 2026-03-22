@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0754",
+  "ingested_at": "2026-03-22T07:54:34.000507+00:00",
+  "lang": "en",
+  "raw_text": "An embedded test key and certificate could be extracted from a Poly Voice device using specialized reverse engineering tools. This extracted certificate could be accepted by a SIP service provider if the service provider does not perform proper validation of the device certificate.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "3a4c7aa29a72f48a5e2791f2acf735c76e18101ea6db03863eceb384721e9a4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-321"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0754"
+}

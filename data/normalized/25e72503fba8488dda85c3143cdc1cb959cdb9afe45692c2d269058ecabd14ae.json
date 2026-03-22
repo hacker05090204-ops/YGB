@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware Tanzu Spring Cloud When using routing functionality in VMware Tanzu's Spring Cloud Function, it is possible for a user to provide a specially crafted SpEL as a routing-expression that may result in remote code execution and access to local resources.",
+  "token_count": 41
+}

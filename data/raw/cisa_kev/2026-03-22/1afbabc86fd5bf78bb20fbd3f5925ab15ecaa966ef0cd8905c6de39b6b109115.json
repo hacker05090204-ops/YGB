@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-41713",
+  "ingested_at": "2026-03-22T07:45:16.656045+00:00",
+  "lang": "en",
+  "raw_text": "Mitel MiCollab Mitel MiCollab contains a path traversal vulnerability that could allow an attacker to gain unauthorized and unauthenticated access. This vulnerability can be chained with CVE-2024-55550, which allows an unauthenticated, remote attacker to read arbitrary files on the server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1afbabc86fd5bf78bb20fbd3f5925ab15ecaa966ef0cd8905c6de39b6b109115",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

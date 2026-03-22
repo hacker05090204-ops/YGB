@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20430",
+  "ingested_at": "2026-03-22T07:54:33.528031+00:00",
+  "lang": "en",
+  "raw_text": "In wlan AP FW, there is a possible out of bounds write due to an incorrect bounds check. This could lead to remote (proximal/adjacent) escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation. Patch ID: WCNCR00467553; Issue ID: MSV-5151.",
+  "severity": "HIGH",
+  "sha256_hash": "880441cade1aee6ab0615d4f5101ed6e5a5af18cf8af8ab4850fe88eccbc8241",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20430"
+}

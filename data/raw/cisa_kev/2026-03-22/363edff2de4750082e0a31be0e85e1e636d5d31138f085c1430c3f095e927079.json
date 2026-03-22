@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1322",
+  "ingested_at": "2026-03-22T07:45:18.438810+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when Windows improperly handles authentication requests. An attacker who successfully exploited this vulnerability could run processes in an elevated context.",
+  "severity": "CRITICAL",
+  "sha256_hash": "363edff2de4750082e0a31be0e85e1e636d5d31138f085c1430c3f095e927079",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

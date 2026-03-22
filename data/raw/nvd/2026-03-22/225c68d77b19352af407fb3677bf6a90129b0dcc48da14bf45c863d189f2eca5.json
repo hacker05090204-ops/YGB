@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15498",
+  "ingested_at": "2026-03-22T07:54:33.161500+00:00",
+  "lang": "en",
+  "raw_text": "Pro3W CMS if vulnerable to SQL injection attacks. Improper neutralization of input provided into a login form allows an unauthenticated attacker to bypass authentication and gain administrative privileges. This issue was identified in version 1.2.0 of this software. Due to lack of response from the vendor exact version range could not be determined, but the vulnerability should be eliminated in versions released in January 2026 and later.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "225c68d77b19352af407fb3677bf6a90129b0dcc48da14bf45c863d189f2eca5",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15498"
+}

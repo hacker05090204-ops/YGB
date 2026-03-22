@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the CLI of Cisco IOS XR Software could allow an authenticated, local attacker to execute arbitrary commands as root on the underlying operating system of an affected device. This vulnerability is due to insufficient validation of user arguments that are passed to specific CLI commands. An attacker with a low-privileged account could exploit this vulnerability by using crafted commands at the prompt. A successful exploit could allow the attacker to elevate privileges to root and execute arbitrary commands on the underlying operating system.",
+  "token_count": 86
+}

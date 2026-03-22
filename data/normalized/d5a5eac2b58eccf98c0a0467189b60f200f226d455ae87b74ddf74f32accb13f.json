@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Tenda F453 1.0.0.3. Affected by this issue is the function WrlclientSet of the file /goform/WrlclientSet. The manipulation of the argument GO results in stack-based buffer overflow. The attack can be executed remotely. The exploit is now public and may be used.",
+  "token_count": 46
+}

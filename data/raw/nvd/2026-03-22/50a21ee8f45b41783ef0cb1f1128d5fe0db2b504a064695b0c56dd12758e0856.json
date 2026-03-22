@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28715",
+  "ingested_at": "2026-03-22T07:54:41.178319+00:00",
+  "lang": "en",
+  "raw_text": "Sensitive information disclosure due to improper authorization checks. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "50a21ee8f45b41783ef0cb1f1128d5fe0db2b504a064695b0c56dd12758e0856",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28715"
+}

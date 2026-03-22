@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-2628",
+  "ingested_at": "2026-03-22T07:45:17.666768+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server contains an unspecified vulnerability which can allow an unauthenticated attacker with T3 network access to compromise the server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "490c09c71f1c3c35c97fb1e576890d86438650cab3cd01ebf715a3ae8968c9a0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

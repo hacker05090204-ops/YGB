@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-21823",
+  "ingested_at": "2026-03-22T07:45:17.525973+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Graphic Component contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f34d20b3bd02b785eddc8bfde26473749f6ae599e3a447ca1695c9e8d9f00af9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24004",
+  "ingested_at": "2026-03-22T07:54:32.584824+00:00",
+  "lang": "en",
+  "raw_text": "Fleet is open source device management software. In versions prior to 4.80.1, a vulnerability in Fleet\u2019s Android MDM Pub/Sub handling could allow unauthenticated requests to trigger device unenrollment events. This may result in unauthorized removal of individual Android devices from Fleet management. If Android MDM is enabled, an attacker could send a crafted request to the Android Pub/Sub endpoint to unenroll a targeted Android device from Fleet without authentication. This issue does not grant access to Fleet, allow execution of commands, or provide visibility into device data. Impact is limited to disruption of Android device management for the affected device. Version 4.80.1 fixes the issue. If an immediate upgrade is not possible, affected Fleet users should temporarily disable Android MDM.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3757904d556a226aba14fe5f7a1aae94947e9dd4c71d3730871318a3e8043c2a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 120,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24004"
+}

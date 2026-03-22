@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30965",
+  "ingested_at": "2026-03-22T07:54:43.195343+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to 9.5.2-alpha.8 and 8.6.21, a vulnerability in Parse Server's query handling allows an authenticated or unauthenticated attacker to exfiltrate session tokens of other users by exploiting the redirectClassNameForKey query parameter. Exfiltrated session tokens can be used to take over user accounts. The vulnerability requires the attacker to be able to create or update an object with a new relation field, which depends on the Class-Level Permissions of at least one class. This vulnerability is fixed in 9.5.2-alpha.8 and 8.6.21.",
+  "severity": "CRITICAL",
+  "sha256_hash": "14e86b93e7ddaeebf47fc7fc43ce3df9e3c2bc300f0f9531ca803d99ce7743ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30965"
+}

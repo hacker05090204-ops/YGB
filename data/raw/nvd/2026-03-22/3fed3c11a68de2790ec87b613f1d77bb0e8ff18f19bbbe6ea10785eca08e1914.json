@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32949",
+  "ingested_at": "2026-03-22T07:54:48.576098+00:00",
+  "lang": "en",
+  "raw_text": "SQLBot is an intelligent data query system based on a large language model and RAG. Versions prior to 1.7.0 contain a Server-Side Request Forgery (SSRF) vulnerability that allows an attacker to retrieve arbitrary system and application files from the server. An attacker can exploit the /api/v1/datasource/check endpoint by configuring a forged MySQL data source with a malicious parameter extraJdbc=\"local_infile=1\". When the SQLBot backend attempts to verify the connectivity of this data source, an attacker-controlled Rogue MySQL server issues a malicious LOAD DATA LOCAL INFILE command during the MySQL handshake. This forces the target server to read arbitrary files from its local filesystem (such as /etc/passwd or configuration files) and transmit the contents back to the attacker. This issue was fixed in version 1.7.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "3fed3c11a68de2790ec87b613f1d77bb0e8ff18f19bbbe6ea10785eca08e1914",
+  "source": "nvd",
+  "tags": [
+    "CWE-73",
+    "CWE-918"
+  ],
+  "token_count": 123,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32949"
+}

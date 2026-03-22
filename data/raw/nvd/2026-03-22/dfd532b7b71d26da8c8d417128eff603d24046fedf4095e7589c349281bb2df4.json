@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3733",
+  "ingested_at": "2026-03-22T07:54:42.044160+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in xuxueli xxl-job up to 3.3.2. This impacts an unknown function of the file source-code/src/main/java/com/xxl/job/admin/controller/JobInfoController.java. The manipulation results in server-side request forgery. It is possible to launch the attack remotely. The exploit is now public and may be used. The project maintainer closed the issue report with the following statement: \"Access token security verification is required.\" (translated from Chinese)",
+  "severity": "MEDIUM",
+  "sha256_hash": "dfd532b7b71d26da8c8d417128eff603d24046fedf4095e7589c349281bb2df4",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3733"
+}

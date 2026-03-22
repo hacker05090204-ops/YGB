@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Airflow A remote code/command injection vulnerability was discovered in one of the example DAGs shipped with Airflow.",
+  "token_count": 18
+}

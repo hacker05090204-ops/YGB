@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Stored cross-site scripting (XSS) vulnerability affects HCL Unica Marketing Operations v12.1.8 and lower. Stored cross-site scripting (also known as second-order or persistent XSS) arises when an application receives data from an untrusted source and includes that data within its later HTTP responses in an unsafe way.",
+  "token_count": 47
+}

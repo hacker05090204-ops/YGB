@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27374",
+  "ingested_at": "2026-03-22T07:54:40.240063+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in vanquish WooCommerce Order Details woocommerce-order-details allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WooCommerce Order Details: from n/a through < = 3.1.",
+  "severity": "HIGH",
+  "sha256_hash": "51ab2124ace2b1658fd26e14b566d3cbe21a91ed1cbb47a1733859d57eeb1e61",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27374"
+}

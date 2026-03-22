@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3512",
+  "ingested_at": "2026-03-22T07:54:47.387051+00:00",
+  "lang": "en",
+  "raw_text": "The Writeprint Stylometry plugin for WordPress is vulnerable to Reflected Cross-Site Scripting via the 'p' GET parameter in all versions up to and including 0.1. This is due to insufficient input sanitization and output escaping in the bjl_wprintstylo_comments_nav() function. The function directly outputs the $_GET['p'] parameter into an HTML href attribute without any escaping. This makes it possible for authenticated attackers with Contributor-level permissions or higher to inject arbitrary web scripts in pages that execute if they can successfully trick another user into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "df70e697f0ca1649cdc3f1ae3a78d309767b01677835aba35f36aa5336862540",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3512"
+}

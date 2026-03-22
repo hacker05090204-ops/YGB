@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26120",
+  "ingested_at": "2026-03-22T07:54:48.054455+00:00",
+  "lang": "en",
+  "raw_text": "Server-side request forgery (ssrf) in Microsoft Bing allows an unauthorized attacker to perform tampering over a network.",
+  "severity": "MEDIUM",
+  "sha256_hash": "19d6d4e6aadfda46142f8f30714f291167ec566683ebfa8fece83116c67f7d44",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26120"
+}

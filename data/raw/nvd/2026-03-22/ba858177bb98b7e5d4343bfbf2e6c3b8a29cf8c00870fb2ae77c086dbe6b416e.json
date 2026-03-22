@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26104",
+  "ingested_at": "2026-03-22T07:54:32.036755+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in the udisks storage management daemon that allows unprivileged users to back up LUKS encryption headers without authorization. The issue occurs because a privileged D-Bus method responsible for exporting encryption metadata does not perform a policy check. As a result, sensitive cryptographic metadata can be read and written to attacker-controlled locations. This weakens the confidentiality guarantees of encrypted storage volumes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ba858177bb98b7e5d4343bfbf2e6c3b8a29cf8c00870fb2ae77c086dbe6b416e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26104"
+}

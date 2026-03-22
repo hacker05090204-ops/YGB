@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. `WriteUHDRImage` in `coders/uhdr.c` uses `int` arithmetic to compute the pixel buffer size. Prior to version 7.1.2-15, when image dimensions are large, the multiplication overflows 32-bit `int`, causing an undersized heap allocation followed by an out-of-bounds write. This can crash the process or potentially lead to an out of bounds heap write. Version 7.1.2-15 contains a patch.",
+  "token_count": 69
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Tomcat Apache Tomcat contains a path equivalence vulnerability that allows a remote attacker to execute code, disclose information, or inject malicious content via a partial PUT request.",
+  "token_count": 28
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32440",
+  "ingested_at": "2026-03-22T07:54:46.113177+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Ex-Themes WP Food wp-food allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WP Food: from n/a through < 2.7.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3a5ba02be8ac7b226eb5f736c980120fb89bd268da234c3f981a08bdc0fc6f2b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32440"
+}

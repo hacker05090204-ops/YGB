@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31993",
+  "ingested_at": "2026-03-22T07:54:47.816178+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an allowlist parsing mismatch vulnerability in the macOS companion app that allows authenticated operators to bypass exec approval checks. Attackers with operator.write privileges and a paired macOS beta node can craft shell-chain payloads that pass incomplete allowlist validation and execute arbitrary commands on the paired host.",
+  "severity": "MEDIUM",
+  "sha256_hash": "91af1ed0dade5140511f2ebba2c1dab2a0aac9e14ca236a01628b5de2800fff4",
+  "source": "nvd",
+  "tags": [
+    "CWE-184"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31993"
+}

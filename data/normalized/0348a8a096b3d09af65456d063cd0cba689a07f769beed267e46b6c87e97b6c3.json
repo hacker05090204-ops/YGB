@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, macOS, tvOS, watchOS, and visionOS contain an improper restriction of operations within the bounds of a memory buffer vulnerability that could allow an attacker with memory write the capability to execute arbitrary code.",
+  "token_count": 38
+}

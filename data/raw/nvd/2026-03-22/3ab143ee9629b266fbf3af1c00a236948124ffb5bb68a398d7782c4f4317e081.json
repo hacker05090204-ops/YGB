@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29068",
+  "ingested_at": "2026-03-22T07:54:41.352483+00:00",
+  "lang": "en",
+  "raw_text": "PJSIP is a free and open source multimedia communication library written in C. Prior to version 2.17, there is a stack buffer overflow vulnerability when pjmedia-codec parses an RTP payload contain more frames than the caller-provided frames can hold. This issue has been patched in version 2.17.",
+  "severity": "HIGH",
+  "sha256_hash": "3ab143ee9629b266fbf3af1c00a236948124ffb5bb68a398d7782c4f4317e081",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29068"
+}

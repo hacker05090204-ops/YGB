@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) contain an information disclosure vulnerability. An attacker could retrieve memory contents on an affected device, which could lead to the disclosure of confidential information due to a buffer tracking issue when the software parses invalid URLs that are requested from the web services interface. This vulnerability affects only specific AnyConnect and WebVPN configurations.",
+  "token_count": 73
+}

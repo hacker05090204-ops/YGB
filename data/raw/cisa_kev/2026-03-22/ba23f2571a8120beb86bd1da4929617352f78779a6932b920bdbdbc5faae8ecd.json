@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21519",
+  "ingested_at": "2026-03-22T07:45:15.928869+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Desktop Windows Manager contains a type confusion vulnerability that could allow an authorized attacker to elevate privileges locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ba23f2571a8120beb86bd1da4929617352f78779a6932b920bdbdbc5faae8ecd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

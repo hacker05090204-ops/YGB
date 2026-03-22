@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15595",
+  "ingested_at": "2026-03-22T07:54:34.032964+00:00",
+  "lang": "en",
+  "raw_text": "Privilege escalation via dll hijacking in Inno Setup 6.2.1 and ealier versions.",
+  "severity": "HIGH",
+  "sha256_hash": "6ab496ef814713a69d6ae4cb6ea572896c2a79fe4ac92dae42cec38f30fd94a7",
+  "source": "nvd",
+  "tags": [
+    "CWE-1390"
+  ],
+  "token_count": 12,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15595"
+}

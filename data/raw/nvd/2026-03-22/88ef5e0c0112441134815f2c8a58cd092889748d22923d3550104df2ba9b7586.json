@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27744",
+  "ingested_at": "2026-03-22T07:54:31.937488+00:00",
+  "lang": "en",
+  "raw_text": "The SPIP tickets plugin versions prior to 4.3.3 contain an unauthenticated remote code execution vulnerability in the forum preview handling for public ticket pages. The plugin appends untrusted request parameters into HTML that is later rendered by a template using unfiltered environment rendering (#ENV**), which disables SPIP output filtering. As a result, an unauthenticated attacker can inject crafted content that is evaluated through SPIP's template processing chain, leading to execution of code in the context of the web server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "88ef5e0c0112441134815f2c8a58cd092889748d22923d3550104df2ba9b7586",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27744"
+}

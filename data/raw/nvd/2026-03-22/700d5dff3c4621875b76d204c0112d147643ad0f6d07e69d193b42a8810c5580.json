@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2429",
+  "ingested_at": "2026-03-22T07:54:41.707140+00:00",
+  "lang": "en",
+  "raw_text": "The Community Events plugin for WordPress is vulnerable to SQL Injection via the 'ce_venue_name' CSV field in the `on_save_changes_venues` function in all versions up to, and including, 1.5.8. This is due to insufficient escaping on the user-supplied CSV data and lack of sufficient preparation on the existing SQL query. This makes it possible for authenticated attackers, with Administrator-level access and above, to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database via a crafted CSV file upload.",
+  "severity": "MEDIUM",
+  "sha256_hash": "700d5dff3c4621875b76d204c0112d147643ad0f6d07e69d193b42a8810c5580",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2429"
+}

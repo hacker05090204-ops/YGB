@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25537",
+  "ingested_at": "2026-03-22T07:54:44.343992+00:00",
+  "lang": "en",
+  "raw_text": "Netartmedia Event Portal 2.0 contains a time-based blind SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the Email parameter. Attackers can send POST requests to loginaction.php with malicious SQL payloads in the Email field to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "e1c0b18940ef06874b663a7cb2a9ba16f4ef9b40a23c85bb27bc16a1df179c60",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25537"
+}

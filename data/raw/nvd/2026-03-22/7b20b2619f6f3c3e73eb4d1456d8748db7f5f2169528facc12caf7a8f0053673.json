@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-30959",
+  "ingested_at": "2026-03-22T07:54:42.897027+00:00",
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. The resend-verification-code endpoint allows any authenticated user to trigger a verification code resend for any UserWhatsApp record by ID. Ownership is not validated (unlike the verify endpoint). This affects the UserWhatsAppAPI.ts endpoint and the UserWhatsAppService.ts service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7b20b2619f6f3c3e73eb4d1456d8748db7f5f2169528facc12caf7a8f0053673",
+  "source": "nvd",
+  "tags": [
+    "CWE-285",
+    "CWE-307",
+    "CWE-639",
+    "CWE-862"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30959"
+}

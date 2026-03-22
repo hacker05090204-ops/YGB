@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32836",
+  "ingested_at": "2026-03-22T07:54:47.166090+00:00",
+  "lang": "en",
+  "raw_text": "dr_libs dr_flac.h version 0.13.3 and earlier contain an uncontrolled memory allocation vulnerability in drflac__read_and_decode_metadata() that allows attackers to trigger excessive memory allocation by supplying crafted PICTURE metadata blocks. Attackers can exploit attacker-controlled mimeLength and descriptionLength fields to cause denial of service through memory exhaustion when processing FLAC streams with metadata callbacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "56f6a857702afe3faed2fef449e9991d8cea1fc150aa42e4dfe3e893ed41ef86",
+  "source": "nvd",
+  "tags": [
+    "CWE-789"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32836"
+}

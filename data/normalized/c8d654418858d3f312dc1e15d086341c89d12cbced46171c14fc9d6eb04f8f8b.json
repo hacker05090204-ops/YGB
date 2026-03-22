@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A broken access control vulnerability in the password reset functionality of Tata Consultancy Services Cognix Recon Client v3.0 allows authenticated users to reset passwords of arbitrary user accounts via crafted requests.",
+  "token_count": 31
+}

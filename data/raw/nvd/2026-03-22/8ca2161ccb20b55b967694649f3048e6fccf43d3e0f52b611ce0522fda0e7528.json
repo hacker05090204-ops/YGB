@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52998",
+  "ingested_at": "2026-03-22T07:54:33.706585+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, in the application, deserialization of data is performed, the data can be spoofed. An attacker can create objects of arbitrary classes, as well as fully control their properties, and thus modify the logic of the web application's operation. This issue has been patched in version 1.11.30.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8ca2161ccb20b55b967694649f3048e6fccf43d3e0f52b611ce0522fda0e7528",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52998"
+}

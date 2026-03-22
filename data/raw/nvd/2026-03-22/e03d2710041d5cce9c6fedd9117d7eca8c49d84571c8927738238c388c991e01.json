@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70058",
+  "ingested_at": "2026-03-22T07:54:31.124630+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-295: Improper Certificate Validation was discovered in YMFE yapi v1.12.0. The application disables TLS/SSL certificate validation by setting 'rejectUnauthorized': false in the HTTPS agent configuration for Axios requests",
+  "severity": "HIGH",
+  "sha256_hash": "e03d2710041d5cce9c6fedd9117d7eca8c49d84571c8927738238c388c991e01",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70058"
+}

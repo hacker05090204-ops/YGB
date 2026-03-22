@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25546",
+  "ingested_at": "2026-03-22T07:54:49.483480+00:00",
+  "lang": "en",
+  "raw_text": "NetAware 1.20 contains a buffer overflow vulnerability in the Share Name field that allows local attackers to crash the application by supplying an excessively long string. Attackers can trigger a denial of service by pasting a 1000-byte buffer into the Share Name parameter when adding a new share through the Manage Shares interface.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d9200ef18bcfd8f929edca2a867319e814ce98e4e2f2b685b9046d651182de33",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25546"
+}

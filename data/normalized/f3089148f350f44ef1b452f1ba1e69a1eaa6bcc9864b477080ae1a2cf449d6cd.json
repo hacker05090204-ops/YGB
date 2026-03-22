@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DNS-320 Device D-Link DNS-320 device contains a command injection vulnerability in the sytem_mgr.cgi component that may allow for remote code execution.",
+  "token_count": 22
+}

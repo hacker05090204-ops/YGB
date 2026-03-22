@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-32989",
+  "ingested_at": "2026-03-22T07:54:48.867292+00:00",
+  "lang": "en",
+  "raw_text": "Precurio Intranet Portal 4.4 contains a cross-site request forgery vulnerability that allows attackers to induce authenticated users to submit crafted requests to a profile update endpoint handling file uploads. Attackers can exploit this to upload executable files to web-accessible locations, leading to arbitrary code execution in the context of the web server.",
+  "severity": "HIGH",
+  "sha256_hash": "c6c33b85da85418084aa2f35a9cb72c9516463cd48d8d04db7c3e636be082cdb",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32989"
+}

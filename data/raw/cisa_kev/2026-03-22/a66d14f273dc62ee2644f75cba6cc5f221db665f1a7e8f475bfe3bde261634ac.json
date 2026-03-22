@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30657",
+  "ingested_at": "2026-03-22T07:45:19.048212+00:00",
+  "lang": "en",
+  "raw_text": "Apple macOS Apple macOS contains an unspecified logic issue in System Preferences that may allow a malicious application to bypass Gatekeeper checks.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a66d14f273dc62ee2644f75cba6cc5f221db665f1a7e8f475bfe3bde261634ac",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

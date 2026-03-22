@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27959",
+  "ingested_at": "2026-03-22T07:54:32.539091+00:00",
+  "lang": "en",
+  "raw_text": "Koa is middleware for Node.js using ES2017 async functions. Prior to versions 3.1.2 and 2.16.4, Koa's `ctx.hostname` API performs naive parsing of the HTTP Host header, extracting everything before the first colon without validating the input conforms to RFC 3986 hostname syntax. When a malformed Host header containing a `@` symbol is received, `ctx.hostname` returns `evil[.]com` - an attacker-controlled value. Applications using `ctx.hostname` for URL generation, password reset links, email verification URLs, or routing decisions are vulnerable to Host header injection attacks. Versions 3.1.2 and 2.16.4 fix the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "d3ec8887199d3eb281eb7c4dcdf291a12916a25634c42641d7f0704c03d17a84",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27959"
+}

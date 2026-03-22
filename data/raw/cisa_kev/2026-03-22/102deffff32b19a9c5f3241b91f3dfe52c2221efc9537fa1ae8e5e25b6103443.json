@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-7195",
+  "ingested_at": "2026-03-22T07:45:17.768615+00:00",
+  "lang": "en",
+  "raw_text": "QNAP Photo Station QNAP devices running Photo Station contain an external control of file name or path vulnerability allowing remote attackers to access or modify system files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "102deffff32b19a9c5f3241b91f3dfe52c2221efc9537fa1ae8e5e25b6103443",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

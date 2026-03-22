@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0344",
+  "ingested_at": "2026-03-22T07:45:16.793192+00:00",
+  "lang": "en",
+  "raw_text": "SAP Commerce Cloud SAP Commerce Cloud (formerly known as Hybris) contains a deserialization of untrusted data vulnerability within the mediaconversion and virtualjdbc extension that allows for code injection.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ea144533611fe8affd21e2f5df299c225d692c115d950299cdcb144153795e7a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

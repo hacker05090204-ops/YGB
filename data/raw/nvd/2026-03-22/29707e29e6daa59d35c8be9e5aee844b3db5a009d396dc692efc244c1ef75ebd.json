@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1558",
+  "ingested_at": "2026-03-22T07:54:33.048461+00:00",
+  "lang": "en",
+  "raw_text": "The WP Recipe Maker plugin for WordPress is vulnerable to an Insecure Direct Object Reference (IDOR) in versions up to, and including, 10.3.2. This is due to the /wp-json/wp-recipe-maker/v1/integrations/instacart REST API endpoint's permission_callback being set to __return_true and a lack of subsequent authorization or ownership checks on the user-supplied recipeId. This makes it possible for unauthenticated attackers to overwrite arbitrary post metadata (wprm_instacart_combinations) for any post ID on the site via the recipeId parameter.",
+  "severity": "MEDIUM",
+  "sha256_hash": "29707e29e6daa59d35c8be9e5aee844b3db5a009d396dc692efc244c1ef75ebd",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1558"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15037",
+  "ingested_at": "2026-03-22T07:54:44.147277+00:00",
+  "lang": "en",
+  "raw_text": "An Incorrect Permission Assignment vulnerability exists in the ASUS Business System Control Interface driver. This vulnerability can be triggered by an unprivileged local user sending a specially crafted IOCTL request, potentially leading to unauthorized access to sensitive hardware resources and kernel information disclosure. Refer to the \"ASUS Business System Control Interface\" section on the ASUS Security Advisory for more information.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d4864febf4df084e10d7156736016961508104f2b19ce6066a257ebdd151ff02",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15037"
+}

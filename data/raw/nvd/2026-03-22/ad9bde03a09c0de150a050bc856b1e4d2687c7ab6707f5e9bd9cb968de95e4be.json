@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27043",
+  "ingested_at": "2026-03-22T07:54:47.957345+00:00",
+  "lang": "en",
+  "raw_text": "Unrestricted Upload of File with Dangerous Type vulnerability in ThemeGoods Photography allows Path Traversal.This issue affects Photography: from n/a through 7.7.5.",
+  "severity": "HIGH",
+  "sha256_hash": "ad9bde03a09c0de150a050bc856b1e4d2687c7ab6707f5e9bd9cb968de95e4be",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27043"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "There is a memory corruption vulnerability due to an out-of-bounds write when loading a corrupted DSB file in Digilent DASYLab. This vulnerability may result in information disclosure or arbitrary code execution. Successful exploitation requires an attacker to get a user to open a specially crafted .DSB file. This vulnerability affects all versions of Digilent DASYLab.",
+  "token_count": 55
+}

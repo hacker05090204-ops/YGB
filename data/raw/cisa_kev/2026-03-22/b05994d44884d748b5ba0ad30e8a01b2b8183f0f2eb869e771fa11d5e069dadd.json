@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41064",
+  "ingested_at": "2026-03-22T07:45:17.264892+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple iOS, iPadOS, and macOS contain a buffer overflow vulnerability in ImageIO when processing a maliciously crafted image, which may lead to code execution. This vulnerability was chained with CVE-2023-41061.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b05994d44884d748b5ba0ad30e8a01b2b8183f0f2eb869e771fa11d5e069dadd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

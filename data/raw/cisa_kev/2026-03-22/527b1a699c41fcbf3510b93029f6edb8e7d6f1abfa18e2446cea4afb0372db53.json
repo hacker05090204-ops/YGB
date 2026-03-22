@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-21972",
+  "ingested_at": "2026-03-22T07:45:19.645023+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter Server vSphere Client contains a remote code execution vulnerability in a vCenter Server plugin which allows an attacker with network access to port 443 to execute commands with unrestricted privileges on the underlying operating system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "527b1a699c41fcbf3510b93029f6edb8e7d6f1abfa18e2446cea4afb0372db53",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

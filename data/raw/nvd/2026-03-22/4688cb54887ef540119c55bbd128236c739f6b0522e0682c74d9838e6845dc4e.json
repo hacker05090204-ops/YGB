@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27023",
+  "ingested_at": "2026-03-22T07:54:40.900008+00:00",
+  "lang": "en",
+  "raw_text": "Twenty is an open source CRM. Prior to version 1.18, the SSRF protection in SecureHttpClientService validated request URLs at the request level but did not validate redirect targets. An authenticated user who could control outbound request URLs (e.g., webhook endpoints, image URLs) could bypass private IP blocking by redirecting through an attacker-controlled server. This issue has been patched in version 1.18.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4688cb54887ef540119c55bbd128236c739f6b0522e0682c74d9838e6845dc4e",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27023"
+}

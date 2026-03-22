@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25968",
+  "ingested_at": "2026-03-22T07:54:31.355062+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a stack buffer overflow occurs when processing the an attribute in msl.c. A long value overflows a fixed-size stack buffer, leading to memory corruption. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "HIGH",
+  "sha256_hash": "2dfe348cc8abc8391fd63b9e0ff52d16079f0d1578c7af8248642e882c6da34e",
+  "source": "nvd",
+  "tags": [
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25968"
+}

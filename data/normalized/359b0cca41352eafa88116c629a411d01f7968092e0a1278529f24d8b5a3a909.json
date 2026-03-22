@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sumavision Enhanced Multimedia Router (EMR) Sumavision Enhanced Multimedia Router (EMR) contains a cross-site request forgery (CSRF) vulnerability allowing the creation of users with elevated privileges as administrator on a device.",
+  "token_count": 30
+}

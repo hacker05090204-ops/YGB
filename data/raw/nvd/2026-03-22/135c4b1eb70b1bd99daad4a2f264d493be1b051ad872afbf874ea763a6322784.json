@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29104",
+  "ingested_at": "2026-03-22T07:54:48.313392+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, SuiteCRM contains an authenticated arbitrary file upload vulnerability in the Configurator module. An authenticated administrator can bypass intended file type restrictions when uploading PDF font files, allowing arbitrary files with attacker\u2010controlled filenames to be written to the server. Although the upload directory is not directly web\u2010accessible by default, this behavior breaks security boundaries and may enable further attacks when combined with other vulnerabilities or in certain deployment configurations. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "LOW",
+  "sha256_hash": "135c4b1eb70b1bd99daad4a2f264d493be1b051ad872afbf874ea763a6322784",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29104"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-56208",
+  "ingested_at": "2026-03-22T07:54:29.974747+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in desertthemes NewsMash newsmash allows Stored XSS.This issue affects NewsMash: from n/a through < = 1.0.71.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5a51a75b2b88d4bca73f79257afd1fa48cfadf2ec2ac6b2a2f9d98838a4df95d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-56208"
+}

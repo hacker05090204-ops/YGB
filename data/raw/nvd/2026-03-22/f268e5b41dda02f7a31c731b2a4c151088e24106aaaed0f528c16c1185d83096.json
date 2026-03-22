@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32418",
+  "ingested_at": "2026-03-22T07:54:46.063456+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Jordy Meow Meow Gallery meow-gallery allows Blind SQL Injection.This issue affects Meow Gallery: from n/a through < = 5.4.4.",
+  "severity": "HIGH",
+  "sha256_hash": "f268e5b41dda02f7a31c731b2a4c151088e24106aaaed0f528c16c1185d83096",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32418"
+}

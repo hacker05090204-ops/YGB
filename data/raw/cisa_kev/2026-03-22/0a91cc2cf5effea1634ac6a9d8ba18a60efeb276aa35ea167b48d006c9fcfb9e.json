@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-54313",
+  "ingested_at": "2026-03-22T07:45:15.971637+00:00",
+  "lang": "en",
+  "raw_text": "Prettier eslint-config-prettier Prettier eslint-config-prettier contains an embedded malicious code vulnerability. Installing an affected package executes an install.js file that launches the node-gyp.dll malware on Windows.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0a91cc2cf5effea1634ac6a9d8ba18a60efeb276aa35ea167b48d006c9fcfb9e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

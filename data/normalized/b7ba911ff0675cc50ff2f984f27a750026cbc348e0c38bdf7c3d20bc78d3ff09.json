@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The web-based Ping diagnostic utility (/IDC_Ping/main.cgi) in International Datacasting Corporation (IDC) SFX Series SuperFlex Satellite Receiver Web Management Interface version 101 is vulnerable to OS Command Injection. The application insecurely parses the `IPaddr` parameter. An authenticated attacker can bypass server-side semicolon exclusion checks by using alternate shell metacharacters (such as the pipe `|` operator) to append and execute arbitrary shell commands with root privileges.",
+  "token_count": 64
+}

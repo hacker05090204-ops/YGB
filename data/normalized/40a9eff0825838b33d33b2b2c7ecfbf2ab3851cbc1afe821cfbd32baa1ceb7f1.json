@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chrome Media Google Chrome Media contains a use-after-free vulnerability that allows a remote attacker to execute code via a crafted HTML page.",
+  "token_count": 23
+}

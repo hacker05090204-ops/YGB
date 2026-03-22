@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Hardcoded Email Credentials Saved as Plaintext in Firmware (CWE-256: Plaintext Storage of a Password) vulnerability in Frick Controls Quantum HD version 10.22 and prior lead to unauthorized access, exposure of sensitive information, and potential misuse or system compromise This issue affects Frick Controls Quantum HD version 10.22 and prior.",
+  "token_count": 49
+}

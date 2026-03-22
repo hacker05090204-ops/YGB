@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24350",
+  "ingested_at": "2026-03-22T07:54:33.146064+00:00",
+  "lang": "en",
+  "raw_text": "PluXml CMS is vulnerable to Stored XSS in file uploading functionality. An authenticated attacker can upload an SVG file containing a malicious payload, which will be executed when a victim clicks the link associated with the uploaded image. In version 5.9.0-rc7 clicking the link associated with the uploaded image doesn't execute malicious code but directly accessing the file will still execute the embedded payload. The vendor was notified early about this vulnerability, but didn't respond with the details of vulnerability or vulnerable version range. Only versions 5.8.21 and 5.9.0-rc7 were tested and confirmed as vulnerable, other versions were not tested and might also be vulnerable.",
+  "severity": "MEDIUM",
+  "sha256_hash": "463d1a0fa1773df559c22ffb1aeb4885c4712235ccdbfac31b03f1d25919e114",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24350"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28461",
+  "ingested_at": "2026-03-22T07:54:47.799162+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.3.1 contain an unbounded memory growth vulnerability in the Zalo webhook endpoint that allows unauthenticated attackers to trigger in-memory key accumulation by varying query strings. Remote attackers can exploit this by sending repeated requests with different query parameters to cause memory pressure, process instability, or out-of-memory conditions that degrade service availability.",
+  "severity": "HIGH",
+  "sha256_hash": "9ac5ae7b51835c2fc0a13ee01c27246c75c6349dcfa13ba1b462e6da9163b99a",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28461"
+}

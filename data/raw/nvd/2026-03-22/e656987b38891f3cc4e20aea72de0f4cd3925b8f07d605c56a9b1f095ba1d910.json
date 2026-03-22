@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2808",
+  "ingested_at": "2026-03-22T07:54:44.122167+00:00",
+  "lang": "en",
+  "raw_text": "HashiCorp Consul and Consul Enterprise 1.18.20 up to 1.21.10 and 1.22.4 are vulnerable to arbitrary file read when configured with Kubernetes authentication. This vulnerability, CVE-2026-2808, is fixed in Consul 1.18.21, 1.21.11 and 1.22.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e656987b38891f3cc4e20aea72de0f4cd3925b8f07d605c56a9b1f095ba1d910",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2808"
+}

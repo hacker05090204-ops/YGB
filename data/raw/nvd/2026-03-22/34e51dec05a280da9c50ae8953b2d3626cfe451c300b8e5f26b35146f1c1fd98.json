@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32328",
+  "ingested_at": "2026-03-22T07:54:44.776032+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in shufflehound Lemmony lemmony allows Cross Site Request Forgery.This issue affects Lemmony: from n/a through < 1.7.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "34e51dec05a280da9c50ae8953b2d3626cfe451c300b8e5f26b35146f1c1fd98",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32328"
+}

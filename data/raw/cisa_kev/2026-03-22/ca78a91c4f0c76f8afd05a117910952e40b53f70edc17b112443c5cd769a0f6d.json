@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-21413",
+  "ingested_at": "2026-03-22T07:45:16.608659+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Outlook Microsoft Outlook contains an improper input validation vulnerability that allows for remote code execution. Successful exploitation of this vulnerability would allow an attacker to bypass the Office Protected View and open in editing mode rather than protected mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ca78a91c4f0c76f8afd05a117910952e40b53f70edc17b112443c5cd769a0f6d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

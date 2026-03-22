@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40701",
+  "ingested_at": "2026-03-22T07:54:31.098228+00:00",
+  "lang": "en",
+  "raw_text": "Reflected Cross-Site Scripting vulnerability in SOTESHOP, version 8.3.4. THis vulnerability allows an attacker execute JavaScript code in the victim's browser when a malicious URL with the 'id' parameter in '/adsTracker/checkAds' is sent to the victim. The vulnerability can be exploited to steal sensitive user information such as session cookies, or to perform actions on their behalf.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "777abd4a048341f0ba7cde6902007dab434ac2ce97eefb6b5cc0cf5fa66e74c7",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40701"
+}

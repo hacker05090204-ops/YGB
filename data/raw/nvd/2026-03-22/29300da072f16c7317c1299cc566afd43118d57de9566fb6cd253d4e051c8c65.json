@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25581",
+  "ingested_at": "2026-03-22T07:54:49.561567+00:00",
+  "lang": "en",
+  "raw_text": "i-doit CMDB 1.12 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the objGroupID parameter. Attackers can send GET requests with crafted SQL payloads in the objGroupID parameter to extract sensitive database information including usernames, database names, and version details.",
+  "severity": "HIGH",
+  "sha256_hash": "29300da072f16c7317c1299cc566afd43118d57de9566fb6cd253d4e051c8c65",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25581"
+}

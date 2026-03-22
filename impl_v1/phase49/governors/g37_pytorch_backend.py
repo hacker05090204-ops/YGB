@@ -20,7 +20,12 @@ from typing import Tuple, Dict, Optional, List, Any
 import hashlib
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timezone
+
+from backend.training.model_thresholds import (
+    classify_positive_probability,
+    load_positive_threshold,
+)
 
 # Try importing PyTorch - fail closed in training/inference paths if unavailable
 try:
@@ -132,7 +137,7 @@ def _hash_content(content: str) -> str:
 
 def _now_iso() -> str:
     """Current timestamp."""
-    return datetime.utcnow().isoformat() + "Z"
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _require_pytorch_runtime(operation: str) -> None:
@@ -197,37 +202,66 @@ def get_torch_device() -> Any:
 # =============================================================================
 
 if PYTORCH_AVAILABLE:
+    class ResidualBlock(nn.Module):
+        """Residual feed-forward block with normalization and GELU."""
+
+        def __init__(self, dim: int, dropout: float):
+            super().__init__()
+            self.linear = nn.Linear(dim, dim)
+            self.norm = nn.LayerNorm(dim)
+            self.act = nn.GELU()
+            self.drop = nn.Dropout(dropout)
+
+        def forward(self, x):
+            return x + self.drop(self.act(self.norm(self.linear(x))))
+
+
     class BugClassifier(nn.Module):
         """
         Neural network for bug classification.
-        
-        Architecture:
-        - Input layer
-        - Multiple hidden layers with ReLU + Dropout
-        - Output layer with softmax
         """
-        
+
         def __init__(self, config: ModelConfig):
             super().__init__()
-            
-            layers = []
-            prev_dim = config.input_dim
-            
-            for hidden_dim in config.hidden_dims:
-                layers.extend([
-                    nn.Linear(prev_dim, hidden_dim),
-                    nn.ReLU(),
-                    nn.Dropout(config.dropout),
-                ])
-                prev_dim = hidden_dim
-            
-            layers.append(nn.Linear(prev_dim, config.output_dim))
-            
-            self.network = nn.Sequential(*layers)
-        
+            hidden_dims = tuple(config.hidden_dims) if len(config.hidden_dims) >= 4 else (1024, 512, 256, 128)
+            dim_1024, dim_512, dim_256, dim_128 = hidden_dims[:4]
+            self.input_proj = nn.Linear(config.input_dim, dim_1024)
+            self.input_norm = nn.LayerNorm(dim_1024)
+            self.input_act = nn.GELU()
+            self.block_1024 = ResidualBlock(dim_1024, config.dropout)
+            self.down_1024_512 = nn.Sequential(
+                nn.Linear(dim_1024, dim_512),
+                nn.LayerNorm(dim_512),
+                nn.GELU(),
+                nn.Dropout(config.dropout),
+            )
+            self.block_512 = ResidualBlock(dim_512, config.dropout)
+            self.down_512_256 = nn.Sequential(
+                nn.Linear(dim_512, dim_256),
+                nn.LayerNorm(dim_256),
+                nn.GELU(),
+                nn.Dropout(config.dropout),
+            )
+            self.block_256 = ResidualBlock(dim_256, config.dropout)
+            self.down_256_128 = nn.Sequential(
+                nn.Linear(dim_256, dim_128),
+                nn.LayerNorm(dim_128),
+                nn.GELU(),
+                nn.Dropout(config.dropout),
+            )
+            self.head = nn.Linear(dim_128, config.output_dim)
+
         def forward(self, x):
-            return self.network(x)
+            x = self.input_act(self.input_norm(self.input_proj(x)))
+            x = self.block_1024(x)
+            x = self.down_1024_512(x)
+            x = self.block_512(x)
+            x = self.down_512_256(x)
+            x = self.block_256(x)
+            x = self.down_256_128(x)
+            return self.head(x)
 else:
+    ResidualBlock = None
     BugClassifier = None
 
 
@@ -236,9 +270,9 @@ else:
 # =============================================================================
 
 def create_model_config(
-    input_dim: int = 256,
+    input_dim: int = 512,
     output_dim: int = 2,
-    hidden_dims: Tuple[int, ...] = (512, 256, 128),
+    hidden_dims: Tuple[int, ...] = (1024, 512, 256, 128),
     dropout: float = 0.3,
     learning_rate: float = 0.001,
     batch_size: int = 32,
@@ -466,7 +500,18 @@ def infer_single(
         )
         outputs = model(features)
         probs = torch.softmax(outputs, dim=1)
-        confidence, predicted = torch.max(probs, 1)
+        positive_probability = float(probs[0][1].item())
+        threshold = load_positive_threshold()
+        predicted_value = classify_positive_probability(positive_probability, threshold)
+        predicted = torch.tensor([predicted_value], device=device)
+        confidence = torch.tensor(
+            [
+                positive_probability
+                if predicted_value == 1
+                else 1.0 - positive_probability
+            ],
+            device=device,
+        )
     
     elapsed = (time.time() - start) * 1000
     

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32015",
+  "ingested_at": "2026-03-22T07:54:48.188196+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.1.21 prior to 2026.2.19 contain a path hijacking vulnerability in tools.exec.safeBins that allows attackers to bypass allowlist checks by controlling process PATH resolution. Attackers who can influence the gateway process PATH or launch environment can execute trojan binaries with allowlisted names, such as jq, circumventing executable validation controls.",
+  "severity": "HIGH",
+  "sha256_hash": "0664704ae2194c1645f39573d82bf3d31f2668a7e8d9779b230cb5c848345b70",
+  "source": "nvd",
+  "tags": [
+    "CWE-426"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32015"
+}

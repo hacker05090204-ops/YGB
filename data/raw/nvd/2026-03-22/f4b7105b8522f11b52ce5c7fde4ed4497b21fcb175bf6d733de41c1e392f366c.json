@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25543",
+  "ingested_at": "2026-03-22T07:54:44.359027+00:00",
+  "lang": "en",
+  "raw_text": "Netartmedia Real Estate Portal 5.0 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the page parameter. Attackers can submit POST requests to index.php with malicious SQL payloads in the page field to bypass authentication, extract sensitive data, or modify database contents.",
+  "severity": "HIGH",
+  "sha256_hash": "f4b7105b8522f11b52ce5c7fde4ed4497b21fcb175bf6d733de41c1e392f366c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25543"
+}

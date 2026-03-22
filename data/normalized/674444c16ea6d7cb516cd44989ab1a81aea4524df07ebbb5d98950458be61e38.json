@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices running Android 11, 12, and 13 contain an insertion of sensitive information into log file vulnerability that allows a privileged, local attacker to conduct an address space layout randomization (ASLR) bypass.",
+  "token_count": 37
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An embedded test key and certificate could be extracted from a Poly Voice device using specialized reverse engineering tools. This extracted certificate could be accepted by a SIP service provider if the service provider does not perform proper validation of the device certificate.",
+  "token_count": 43
+}

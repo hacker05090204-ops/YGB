@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3163",
+  "ingested_at": "2026-03-22T07:54:31.980604+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in SourceCodester Website Link Extractor 1.0. This vulnerability affects the function file_get_contents of the component URL Handler. The manipulation leads to server-side request forgery. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aa5e8f932a1c1fcd9e1fb3fffc7a79594eb6d665c5753e615b2f5858e761cb57",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3163"
+}

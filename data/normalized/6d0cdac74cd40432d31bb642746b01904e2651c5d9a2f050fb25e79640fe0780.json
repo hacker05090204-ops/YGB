@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified where an attacker connecting to an access point as a standard wired or wireless client can impersonate a gateway by leveraging an address-based spoofing technique. Successful exploitation enables the redirection of data streams, allowing for the interception or modification of traffic intended for the legitimate network gateway via a Machine-in-the-Middle (MitM) position.",
+  "token_count": 57
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31862",
+  "ingested_at": "2026-03-22T07:54:43.768644+00:00",
+  "lang": "en",
+  "raw_text": "Cloud CLI (aka Claude Code UI) is a desktop and mobile UI for Claude Code, Cursor CLI, Codex, and Gemini-CLI. Prior to 1.24.0, multiple Git-related API endpoints use execAsync() with string interpolation of user-controlled parameters (file, branch, message, commit), allowing authenticated attackers to execute arbitrary OS commands. This vulnerability is fixed in 1.24.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c074cab59ea0dfcab2e030c3786d40f937385f88e3d448883dbce62f3a62b59a",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31862"
+}

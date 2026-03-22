@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ElementsKit Elementor Addons \u2013 Advanced Widgets & Templates Addons for Elementor (elementskit-lite) WordPress plugin versions prior to 3.7.9 expose the REST endpoint /wp-json/elementskit/v1/widget/mailchimp/subscribe without authentication. The endpoint accepts client-supplied Mailchimp API credentials and insufficiently validates certain parameters, including the list parameter, when constructing upstream Mailchimp API requests. An unauthenticated attacker can abuse the endpoint as an open proxy to Mailchimp, potentially triggering unauthorized API calls, manipulating subscription data, exhausting API quotas, or causing resource consumption on the affected WordPress site.",
+  "token_count": 80
+}

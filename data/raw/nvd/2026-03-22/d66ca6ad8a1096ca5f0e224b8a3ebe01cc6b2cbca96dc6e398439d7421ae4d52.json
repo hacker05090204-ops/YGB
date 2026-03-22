@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22722",
+  "ingested_at": "2026-03-22T07:54:32.721887+00:00",
+  "lang": "en",
+  "raw_text": "A malicious actor with authenticated user privileges on a Windows based Workstation host may be able to cause a null pointer dereference error. To Remediate CVE-2026-22722, apply the patches listed in the \"Fixed version\" column of the 'Response Matrix'",
+  "severity": "MEDIUM",
+  "sha256_hash": "d66ca6ad8a1096ca5f0e224b8a3ebe01cc6b2cbca96dc6e398439d7421ae4d52",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22722"
+}

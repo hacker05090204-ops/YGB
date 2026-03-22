@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MDaemon Email Server MDaemon Email Server contains a cross-site scripting (XSS) vulnerability that allows a remote attacker to load arbitrary JavaScript code via an HTML e-mail message.",
+  "token_count": 27
+}

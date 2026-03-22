@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27413",
+  "ingested_at": "2026-03-22T07:54:47.852073+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Cozmoslabs Profile Builder Pro allows Blind SQL Injection.This issue affects Profile Builder Pro: from n/a through 3.13.9.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2a2b6067f7512b0b9d5509c0b1063236106c20456e12553ddc97053e34fc1f4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27413"
+}

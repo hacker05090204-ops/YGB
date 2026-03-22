@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28038",
+  "ingested_at": "2026-03-22T07:54:40.442238+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Brainstorm_Force Ultimate Addons for WPBakery Page Builder ultimate_vc_addons allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Ultimate Addons for WPBakery Page Builder: from n/a through < = 3.21.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f1105c3d4da9f2b74e934ffc5807b8fe982553e0a015ec54e1790d4b1fcd9d01",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28038"
+}

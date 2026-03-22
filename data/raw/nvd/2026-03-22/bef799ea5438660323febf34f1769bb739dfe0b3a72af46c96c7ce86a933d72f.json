@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27352",
+  "ingested_at": "2026-03-22T07:54:40.214720+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in ThemeGoods Starto starto allows Reflected XSS.This issue affects Starto: from n/a through < = 2.1.9.",
+  "severity": "HIGH",
+  "sha256_hash": "bef799ea5438660323febf34f1769bb739dfe0b3a72af46c96c7ce86a933d72f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27352"
+}

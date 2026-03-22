@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69646",
+  "ingested_at": "2026-03-22T07:54:41.548774+00:00",
+  "lang": "en",
+  "raw_text": "Binutils objdump contains a denial-of-service vulnerability when processing a crafted binary with malformed DWARF debug_rnglists data. A logic error in the handling of the debug_rnglists header can cause objdump to repeatedly print the same warning message and fail to terminate, resulting in an unbounded logging loop until the process is interrupted. The issue was observed in binutils 2.44. A local attacker can exploit this vulnerability by supplying a malicious input file, leading to excessive CPU and I/O usage and preventing completion of the objdump analysis.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f987fa24330edb6955a4788f2eb54d4ce6e4b6a700b0448ef10ee3ab58b53bab",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69646"
+}

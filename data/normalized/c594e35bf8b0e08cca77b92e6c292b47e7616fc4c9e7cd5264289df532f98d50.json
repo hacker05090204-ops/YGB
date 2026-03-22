@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "This vulnerability allows authenticated attackers to read an arbitrary file by changing a filepath parameter into an internal system path.",
+  "token_count": 20
+}

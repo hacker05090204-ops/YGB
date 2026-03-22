@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Firewalls Multiple Zyxel firewalls contain a path traversal vulnerability in the web management interface that could allow an attacker to download or upload files via a crafted URL.",
+  "token_count": 30
+}

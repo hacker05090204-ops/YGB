@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14742",
+  "ingested_at": "2026-03-22T07:54:32.015718+00:00",
+  "lang": "en",
+  "raw_text": "The WP Recipe Maker plugin for WordPress is vulnerable to unauthorized access of data due to a missing capability check on the 'ajax_search_recipes' and 'ajax_get_recipe' functions in all versions up to, and including, 10.2.3. This makes it possible for authenticated attackers, with Subscriber-level access and above, to retrieve sensitive recipe information including draft, pending, and private recipes that they shouldn't be able to access.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5847a2c5545bee8b6ad3981b614cce0f5920f1c987c6ab7f268c5d7b1bfd263a",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14742"
+}

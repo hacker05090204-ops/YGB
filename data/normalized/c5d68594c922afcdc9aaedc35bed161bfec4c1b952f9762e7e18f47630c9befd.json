@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "macOS Kernel - Use-After-Free Due to Lack of Locking in 'AppleEmbeddedOSSupportHostClient::registerNotificationPort'",
+  "token_count": 11
+}

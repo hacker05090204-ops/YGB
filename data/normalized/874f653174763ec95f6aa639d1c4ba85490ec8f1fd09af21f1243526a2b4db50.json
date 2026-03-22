@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Insufficient Session Expiration in Truesec\u2019s LAPSWebUI before version 2.4 allows an attacker with access to a workstation to escalate their privileges via disclosure of local admin password.",
+  "token_count": 27
+}

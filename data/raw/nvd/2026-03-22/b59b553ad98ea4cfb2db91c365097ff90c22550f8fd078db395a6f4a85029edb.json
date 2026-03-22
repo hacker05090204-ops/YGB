@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67860",
+  "ingested_at": "2026-03-22T07:54:32.030747+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in the NeuVector scanner where the scanner process accepts registry and controller credentials as command-line arguments, potentially exposing sensitive credentials to local users.",
+  "severity": "LOW",
+  "sha256_hash": "b59b553ad98ea4cfb2db91c365097ff90c22550f8fd078db395a6f4a85029edb",
+  "source": "nvd",
+  "tags": [
+    "CWE-522"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67860"
+}

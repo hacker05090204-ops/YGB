@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue in fastCMS before v.0.1.6 allows a local attacker to execute arbitrary code via the PluginController.java component",
+  "token_count": 18
+}

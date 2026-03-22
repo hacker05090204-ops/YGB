@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A deserialization vulnerability in LimeSurvey before v6.15.0+250623 allows a remote attacker to execute arbitrary code on the server.",
+  "token_count": 18
+}

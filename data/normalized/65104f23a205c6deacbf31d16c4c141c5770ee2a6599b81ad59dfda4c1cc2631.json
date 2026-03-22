@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The WebSocket Application Programming Interface lacks restrictions on the number of authentication requests. This absence of rate limiting may allow an attacker to conduct denial-of-service attacks by suppressing or mis-routing legitimate charger telemetry, or conduct brute-force attacks to gain unauthorized access.",
+  "token_count": 41
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41760",
+  "ingested_at": "2026-03-22T07:54:42.199084+00:00",
+  "lang": "en",
+  "raw_text": "An administrator may attempt to block all traffic by configuring a pass filter with an empty table. However, in UBR, an empty list does not enforce any restrictions and allows all network traffic to pass unfiltered.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bcfaaade3cfb54039aee1df01ee179fceb1b0b541ae1b900efcff3b371ba6001",
+  "source": "nvd",
+  "tags": [
+    "CWE-636"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41760"
+}

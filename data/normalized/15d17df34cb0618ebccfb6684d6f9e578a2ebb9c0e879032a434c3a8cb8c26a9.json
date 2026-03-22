@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Plunk is an open-source email platform built on top of AWS SES. Prior to 0.7.1, Plunk's image upload endpoint accepted SVG files, which browsers treat as active documents capable of executing embedded JavaScript, creating a stored XSS vulnerability. This vulnerability is fixed in 0.7.1.",
+  "token_count": 44
+}

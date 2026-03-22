@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27147",
+  "ingested_at": "2026-03-22T07:54:30.717884+00:00",
+  "lang": "en",
+  "raw_text": "GetSimple CMS is a content management system. All versions of GetSimple CMS are vulnerable to XSS through SVG file uploads. Authenticated users can upload SVG files via the administrative upload functionality, but they are not properly sanitized or restricted, allowing an attacker to embed malicious JavaScript. When the uploaded SVG file is accessed, the script executes in the browser. This issue does not have a fix at the time of publication.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c2e531bd7ad1df5968272b51cab151b8cd5251e7300e15e85861fac29eaadbf6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27147"
+}

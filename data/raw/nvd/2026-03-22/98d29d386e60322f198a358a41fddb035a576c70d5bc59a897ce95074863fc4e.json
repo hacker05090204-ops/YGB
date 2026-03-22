@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28429",
+  "ingested_at": "2026-03-22T07:54:41.268081+00:00",
+  "lang": "en",
+  "raw_text": "Talishar is a fan-made Flesh and Blood project. Prior to commit 6be3871, a Path Traversal vulnerability was identified in the gameName parameter. While the application's primary entry points implement input validation, the ParseGamestate.php component can be accessed directly as a standalone script. In this scenario, the absence of internal sanitization allows for directory traversal sequences (e.g., ../) to be processed, potentially leading to unauthorized file access. This issue has been patched in commit 6be3871.",
+  "severity": "HIGH",
+  "sha256_hash": "98d29d386e60322f198a358a41fddb035a576c70d5bc59a897ce95074863fc4e",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28429"
+}

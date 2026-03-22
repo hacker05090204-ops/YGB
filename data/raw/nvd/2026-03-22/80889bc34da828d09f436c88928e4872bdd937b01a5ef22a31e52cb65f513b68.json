@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28557",
+  "ingested_at": "2026-03-22T07:54:33.415894+00:00",
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains a missing capability check vulnerability that allows authenticated users to trigger bulk wpForo usergroup reassignment via the wpforo_synch_roles AJAX handler. Attackers access the usergroups admin page, accessible to any authenticated user, to obtain a nonce, then remap all wpForo usergroups to arbitrary WordPress roles.",
+  "severity": "MEDIUM",
+  "sha256_hash": "80889bc34da828d09f436c88928e4872bdd937b01a5ef22a31e52cb65f513b68",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28557"
+}

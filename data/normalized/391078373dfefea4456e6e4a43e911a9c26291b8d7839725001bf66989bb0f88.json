@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Aspera Orchestrator 3.0.0 through 4.1.2 stores sensitive information in URL parameters. This may lead to information disclosure if unauthorized parties have access to the URLs via server logs, referrer header or browser history.",
+  "token_count": 34
+}

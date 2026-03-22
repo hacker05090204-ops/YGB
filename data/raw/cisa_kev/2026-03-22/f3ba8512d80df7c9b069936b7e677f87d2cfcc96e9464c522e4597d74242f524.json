@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-13927",
+  "ingested_at": "2026-03-22T07:45:18.853556+00:00",
+  "lang": "en",
+  "raw_text": "Apache Airflow's Experimental API The previous default setting for Airflow's Experimental API was to allow all API requests without authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f3ba8512d80df7c9b069936b7e677f87d2cfcc96e9464c522e4597d74242f524",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

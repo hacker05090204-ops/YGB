@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-1427",
+  "ingested_at": "2026-03-22T07:45:18.383249+00:00",
+  "lang": "en",
+  "raw_text": "Elastic Elasticsearch The Groovy scripting engine in Elasticsearch allows remote attackers to bypass the sandbox protection mechanism and execute arbitrary shell commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2111986d4a45f18ab709d2e20396cc7343686934feec2f2e1371ef3a26eb773d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaborate Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting (XSS) vulnerability in the Calendar feature that allows an attacker to execute arbitrary code.",
+  "token_count": 28
+}

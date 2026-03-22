@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67971",
+  "ingested_at": "2026-03-22T07:54:30.010160+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in WPManageNinja FluentCart fluent-cart allows Reflected XSS.This issue affects FluentCart: from n/a through < 1.3.0.",
+  "severity": "HIGH",
+  "sha256_hash": "2c5d57bf663bdbad4d97bb7d3f2046275ba9ef7c5986642bb63613c8867fc696",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67971"
+}

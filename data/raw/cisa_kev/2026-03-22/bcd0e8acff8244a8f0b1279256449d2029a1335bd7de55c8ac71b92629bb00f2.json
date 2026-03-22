@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30869",
+  "ingested_at": "2026-03-22T07:45:19.057249+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple iOS, iPadOS, and macOS contain a type confusion vulnerability in the XNU which may allow a malicious application to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bcd0e8acff8244a8f0b1279256449d2029a1335bd7de55c8ac71b92629bb00f2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

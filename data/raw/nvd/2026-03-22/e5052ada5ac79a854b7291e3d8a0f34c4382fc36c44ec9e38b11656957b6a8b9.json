@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25551",
+  "ingested_at": "2026-03-22T07:54:49.492915+00:00",
+  "lang": "en",
+  "raw_text": "Sandboxie 5.30 contains a denial of service vulnerability that allows local attackers to crash the application by supplying an excessively long string in the Program Alerts configuration field. Attackers can paste a buffer of 5000 characters into the 'Select or enter a program' field during program alert configuration to trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e5052ada5ac79a854b7291e3d8a0f34c4382fc36c44ec9e38b11656957b6a8b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-1282"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25551"
+}

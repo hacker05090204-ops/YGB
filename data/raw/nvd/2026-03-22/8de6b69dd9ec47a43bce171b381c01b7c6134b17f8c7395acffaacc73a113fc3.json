@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3409",
+  "ingested_at": "2026-03-22T07:54:33.488709+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in eosphoros-ai db-gpt 0.7.5. Affected is the function importlib.machinery.SourceFileLoader.exec_module of the file /api/v1/serve/awel/flow/import of the component Flow Import Endpoint. Performing a manipulation as part of File results in code injection. The attack may be initiated remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "8de6b69dd9ec47a43bce171b381c01b7c6134b17f8c7395acffaacc73a113fc3",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-94"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3409"
+}

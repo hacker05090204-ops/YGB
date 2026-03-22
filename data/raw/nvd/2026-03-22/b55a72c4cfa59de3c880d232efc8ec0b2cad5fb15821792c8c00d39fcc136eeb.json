@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3544",
+  "ingested_at": "2026-03-22T07:54:34.795515+00:00",
+  "lang": "en",
+  "raw_text": "Heap buffer overflow in WebCodecs in Google Chrome prior to 145.0.7632.159 allowed a remote attacker to perform an out of bounds memory write via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "HIGH",
+  "sha256_hash": "b55a72c4cfa59de3c880d232efc8ec0b2cad5fb15821792c8c00d39fcc136eeb",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-787"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3544"
+}

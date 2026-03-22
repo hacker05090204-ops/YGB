@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24060",
+  "ingested_at": "2026-03-22T07:54:49.129743+00:00",
+  "lang": "en",
+  "raw_text": "Service information is not encrypted when transmitted as BACnet packets over the wire, and can be sniffed, intercepted, and modified by an attacker. Valuable information such as the File Start Position and File Data can be sniffed from network traffic using Wireshark's BACnet dissector filter. The proprietary format used by WebCTRL to receive updates from the PLC can also be sniffed and reverse engineered.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2a25539e334dbbc9f92dfccc41d65c10c33468c90f90027dedc138274c2c27f9",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24060"
+}

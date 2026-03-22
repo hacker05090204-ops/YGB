@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32487",
+  "ingested_at": "2026-03-22T07:54:46.162397+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Lawyer Landing Page lawyer-landing-page allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Lawyer Landing Page: from n/a through < = 1.2.7.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fa6ee552625543ee0a71b73ad4020140fef3b43fc0d12b09bd1fcc937cb892d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32487"
+}

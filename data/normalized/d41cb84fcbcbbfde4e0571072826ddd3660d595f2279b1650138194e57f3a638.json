@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A command injection vulnerability in the DHCP activation feature of Weintek cMT-3072XH2 easyweb Web Version v2.1.53, OS v20231011 allows attackers to execute arbitrary commands with root privileges.",
+  "token_count": 27
+}

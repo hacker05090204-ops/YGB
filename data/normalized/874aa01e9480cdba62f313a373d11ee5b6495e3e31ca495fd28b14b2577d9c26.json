@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-16, an integer overflow vulnerability exists in the SIXEL decoer. The vulnerability allows an attacker to perform an out of bounds via a specially crafted image. This vulnerability is fixed in 7.1.2-16.",
+  "token_count": 48
+}

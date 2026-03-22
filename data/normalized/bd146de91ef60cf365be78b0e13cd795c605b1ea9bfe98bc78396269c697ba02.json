@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qlik Sense Qlik Sense contains an HTTP tunneling vulnerability that allows an attacker to escalate privileges and execute HTTP requests on the backend server hosting the software.",
+  "token_count": 27
+}

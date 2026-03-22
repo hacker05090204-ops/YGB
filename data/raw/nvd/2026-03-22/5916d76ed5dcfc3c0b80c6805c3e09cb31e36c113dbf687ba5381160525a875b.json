@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25459",
+  "ingested_at": "2026-03-22T07:54:31.005626+00:00",
+  "lang": "en",
+  "raw_text": "Web Ofisi Emlak V2 contains multiple SQL injection vulnerabilities in the endpoint that allow unauthenticated attackers to manipulate database queries through GET parameters. Attackers can inject SQL code into parameters like emlak_durumu, emlak_tipi, il, ilce, kelime, and semt to extract sensitive database information or perform time-based blind SQL injection attacks.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5916d76ed5dcfc3c0b80c6805c3e09cb31e36c113dbf687ba5381160525a875b",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25459"
+}

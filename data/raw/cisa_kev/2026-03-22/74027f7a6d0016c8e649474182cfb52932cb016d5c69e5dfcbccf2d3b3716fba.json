@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0625",
+  "ingested_at": "2026-03-22T07:45:18.495000+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe Coldfusion contains an authentication bypass vulnerability, which could result in an unauthorized user gaining administrative access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "74027f7a6d0016c8e649474182cfb52932cb016d5c69e5dfcbccf2d3b3716fba",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

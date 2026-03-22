@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23256",
+  "ingested_at": "2026-03-22T07:54:47.564039+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: net: liquidio: Fix off-by-one error in VF setup_nic_devices() cleanup In setup_nic_devices(), the initialization loop jumps to the label setup_nic_dev_free on failure. The current cleanup loop while(i--) skip the failing index i, causing a memory leak. Fix this by changing the loop to iterate from the current index i down to 0. Compile tested only. Issue found using code review.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d19a3a72ae9d5a2a67df3a99ad6c35d1ec433b15f00dec119dcc27627162b07c",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23256"
+}

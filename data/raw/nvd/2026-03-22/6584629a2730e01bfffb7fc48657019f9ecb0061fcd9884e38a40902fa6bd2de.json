@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28454",
+  "ingested_at": "2026-03-22T07:54:41.039052+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.2 fail to validate webhook secrets in Telegram webhook mode (must be enabled), allowing unauthenticated HTTP POST requests to the webhook endpoint that trust attacker-controlled JSON payloads. Remote attackers can forge Telegram updates by spoofing message.from.id and chat.id fields to bypass sender allowlists and execute privileged bot commands.",
+  "severity": "HIGH",
+  "sha256_hash": "6584629a2730e01bfffb7fc48657019f9ecb0061fcd9884e38a40902fa6bd2de",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28454"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) contain a missing release of resource after effective lifetime vulnerability that could allow an unauthenticated, remote attacker to cause a denial-of-service (DoS) of the RAVPN service.",
+  "token_count": 46
+}

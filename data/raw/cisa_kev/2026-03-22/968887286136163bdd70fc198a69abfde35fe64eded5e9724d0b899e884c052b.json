@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-35395",
+  "ingested_at": "2026-03-22T07:45:19.532400+00:00",
+  "lang": "en",
+  "raw_text": "Realtek AP-Router SDK Realtek AP-Router SDK HTTP web server boa contains a buffer overflow vulnerability due to unsafe copies of some overly long parameters submitted in the form that lead to denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "968887286136163bdd70fc198a69abfde35fe64eded5e9724d0b899e884c052b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

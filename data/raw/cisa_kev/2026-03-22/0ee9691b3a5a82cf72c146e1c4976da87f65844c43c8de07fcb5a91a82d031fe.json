@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-25371",
+  "ingested_at": "2026-03-22T07:45:17.341632+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an unspecified vulnerability within DSP driver that allows attackers to load ELF libraries inside DSP.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0ee9691b3a5a82cf72c146e1c4976da87f65844c43c8de07fcb5a91a82d031fe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23601",
+  "ingested_at": "2026-03-22T07:54:34.564113+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in the wireless encryption handling of Wi-Fi transmissions. A malicious actor can generate shared-key authenticated transmissions containing targeted payloads while impersonating the identity of a primary BSSID.Successful exploitation allows for the delivery of tampered data to specific endpoints, bypassing standard cryptographic separation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4972c80bfb456c8fc3001787770b976385aeffbe286635bc0650365ec90ef837",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23601"
+}

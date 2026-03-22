@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-7796",
+  "ingested_at": "2026-03-22T07:45:15.897076+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite Synacor Zimbra Collaboration Suite (ZCS) contains a server-side request forgery vulnerability if WebEx zimlet installed and zimlet JSP is enabled.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4b3c9ad309232dc140cc9328104b07f7b1bbba8e631e59547d5a2c392b62a6ee",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

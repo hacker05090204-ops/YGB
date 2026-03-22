@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Seraphinite Accelerator plugin for WordPress is vulnerable to Sensitive Information Exposure in all versions up to, and including, 2.28.14 via the `seraph_accel_api` AJAX action with `fn=GetData`. This is due to the `OnAdminApi_GetData()` function not performing any capability checks. This makes it possible for authenticated attackers, with Subscriber-level access and above, to retrieve sensitive operational data including cache status, scheduled task information, and external database state.",
+  "token_count": 66
+}

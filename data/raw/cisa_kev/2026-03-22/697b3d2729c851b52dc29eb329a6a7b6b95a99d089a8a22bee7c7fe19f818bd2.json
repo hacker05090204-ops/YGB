@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-6742",
+  "ingested_at": "2026-03-22T07:45:17.433579+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Software The Simple Network Management Protocol (SNMP) subsystem of Cisco IOS and IOS XE contains a vulnerability that could allow an authenticated, remote attacker to remotely execute code on an affected system or cause an affected system to reload.",
+  "severity": "CRITICAL",
+  "sha256_hash": "697b3d2729c851b52dc29eb329a6a7b6b95a99d089a8a22bee7c7fe19f818bd2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

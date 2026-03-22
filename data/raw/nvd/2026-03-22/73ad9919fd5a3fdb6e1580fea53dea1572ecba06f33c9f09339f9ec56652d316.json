@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1779",
+  "ingested_at": "2026-03-22T07:54:32.578219+00:00",
+  "lang": "en",
+  "raw_text": "The User Registration & Membership plugin for WordPress is vulnerable to authentication bypass in versions up to, and including, 5.1.2. This is due to incorrect authentication in the 'register_member' function. This makes it possible for unauthenticated attackers to log in a newly registered user on the site who has the 'urm_user_just_created' user meta set.",
+  "severity": "HIGH",
+  "sha256_hash": "73ad9919fd5a3fdb6e1580fea53dea1572ecba06f33c9f09339f9ec56652d316",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1779"
+}

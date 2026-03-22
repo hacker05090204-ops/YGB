@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2419",
+  "ingested_at": "2026-03-22T07:45:18.235672+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer JScript in Microsoft Internet Explorer allows remote attackers to execute remote code or cause a denial of service (memory corruption) via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3b94daecf1e28be8d4bbf11de14a1b2d8522bd555225fb427ddeda285c708bf3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

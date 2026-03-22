@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-27518",
+  "ingested_at": "2026-03-22T07:45:17.565807+00:00",
+  "lang": "en",
+  "raw_text": "Citrix Application Delivery Controller (ADC) and Gateway Citrix Application Delivery Controller (ADC) and Gateway, when configured with SAML SP or IdP configuration, contain an authentication bypass vulnerability that allows an attacker to execute code as administrator.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1084346578ddf44ef80cdeae378fb1bc6edbb59fb526426e0134e9a09e22fc0f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28478",
+  "ingested_at": "2026-03-22T07:54:41.089576+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.13 contain a denial of service vulnerability in webhook handlers that buffer request bodies without strict byte or time limits. Remote unauthenticated attackers can send oversized JSON payloads or slow uploads to webhook endpoints causing memory pressure and availability degradation.",
+  "severity": "HIGH",
+  "sha256_hash": "62bfd370e034e62753192f8e4456d2badbdb3c154a5fee773a0aae95a4f3105c",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28478"
+}

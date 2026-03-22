@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-58406",
+  "ingested_at": "2026-03-22T07:54:33.573595+00:00",
+  "lang": "en",
+  "raw_text": "The CGM CLININET application respond without essential security HTTP headers, exposing users to client\u2010side attacks such as clickjacking, MIME sniffing, unsafe caching, weak cross\u2010origin isolation, and missing transport security controls.",
+  "severity": "MEDIUM",
+  "sha256_hash": "870c60df285c3746b89bc08ecbf6ac7f9e825e6c4a462a9075dde8690a5e91fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-693"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-58406"
+}

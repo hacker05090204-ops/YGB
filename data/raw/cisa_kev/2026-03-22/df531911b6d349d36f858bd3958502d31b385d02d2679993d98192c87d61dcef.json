@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-4123",
+  "ingested_at": "2026-03-22T07:45:17.896975+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains an unspecified vulnerability that allows remote attackers to gain privileges via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "df531911b6d349d36f858bd3958502d31b385d02d2679993d98192c87d61dcef",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

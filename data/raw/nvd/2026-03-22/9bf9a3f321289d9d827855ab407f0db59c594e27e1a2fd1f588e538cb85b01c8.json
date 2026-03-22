@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32126",
+  "ingested_at": "2026-03-22T07:54:44.012913+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, an inverted boolean condition in ControllerRouter::route() causes the admin/super ACL check to be enforced only for controllers that already have their own internal authorization (review, log), while leaving all other CDR controllers \u2014 alerts, ajax, edit, add, detail, browse \u2014 accessible to any authenticated user. This allows any logged-in user to suppress clinical decision support alerts system-wide, delete or modify clinical plans, and edit rule configurations \u2014 all operations intended to require administrator privileges. This vulnerability is fixed in 8.0.0.1.",
+  "severity": "HIGH",
+  "sha256_hash": "9bf9a3f321289d9d827855ab407f0db59c594e27e1a2fd1f588e538cb85b01c8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32126"
+}

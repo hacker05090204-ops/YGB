@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle VirtualBox An input validation vulnerability exists in the VBoxDrv.sys driver of Sun xVM VirtualBox which allows attackers to locally execute arbitrary code.",
+  "token_count": 23
+}

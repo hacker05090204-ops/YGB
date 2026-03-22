@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3203",
+  "ingested_at": "2026-03-22T07:54:32.091398+00:00",
+  "lang": "en",
+  "raw_text": "RF4CE Profile protocol dissector crash in Wireshark 4.6.0 to 4.6.3 and 4.4.0 to 4.4.13 allows denial of service",
+  "severity": "MEDIUM",
+  "sha256_hash": "cd85c7e86588db10ef288911831e455605ba78a35f3b9e4b3ee1e9270c024503",
+  "source": "nvd",
+  "tags": [
+    "CWE-126",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3203"
+}

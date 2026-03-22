@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MediaTek Multiple Chipsets Multiple MediaTek chipsets contain an insufficient input validation vulnerability and have missing SELinux restrictions in the Command Queue drivers ioctl handlers. This causes an out-of-bounds write leading to privilege escalation. This vulnerability was observed chained with CVE-2019-2215 and CVE-2020-0041 under exploit chain \"AbstractEmu.\"",
+  "token_count": 46
+}

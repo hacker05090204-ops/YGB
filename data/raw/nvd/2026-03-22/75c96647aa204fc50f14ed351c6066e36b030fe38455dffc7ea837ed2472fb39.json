@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23809",
+  "ingested_at": "2026-03-22T07:54:34.570121+00:00",
+  "lang": "en",
+  "raw_text": "A technique has been identified that adapts a known port-stealing method to Wi-Fi environments that use multiple BSSIDs. By leveraging the relationship between BSSIDs and their associated virtual ports, an attacker could potentially bypass inter-BSSID isolation controls. Successful exploitation may enable an attacker to redirect and intercept the victim's network traffic, potentially resulting in eavesdropping, session hijacking, or denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "75c96647aa204fc50f14ed351c6066e36b030fe38455dffc7ea837ed2472fb39",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23809"
+}

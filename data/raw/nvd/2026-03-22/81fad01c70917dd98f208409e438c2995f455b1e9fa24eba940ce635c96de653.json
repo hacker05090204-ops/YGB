@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3745",
+  "ingested_at": "2026-03-22T07:54:42.069283+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in code-projects Student Web Portal 1.0. Affected is an unknown function of the file profile.php. The manipulation of the argument User results in sql injection. The attack can be launched remotely. The exploit has been made public and could be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "81fad01c70917dd98f208409e438c2995f455b1e9fa24eba940ce635c96de653",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3745"
+}

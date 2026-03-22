@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3406",
+  "ingested_at": "2026-03-22T07:54:33.481697+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in projectworlds Online Art Gallery Shop 1.0. The impacted element is an unknown function of the file /admin/registration.php of the component Registration Handler. The manipulation of the argument fname results in sql injection. It is possible to launch the attack remotely. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "17f95004c93e6d0203a276044aad310dd8c7a5457d817473a63a62efb533b730",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3406"
+}

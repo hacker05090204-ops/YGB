@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-40655",
+  "ingested_at": "2026-03-22T07:45:16.973042+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DIR-605 Router D-Link DIR-605 routers contain an information disclosure vulnerability that allows attackers to obtain a username and password by forging a post request to the /getcfg.php page.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d47721e1d5bd14260f73a7b9a7cd073457fc8474d4b78f3e9fbeb7ed703f0d71",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

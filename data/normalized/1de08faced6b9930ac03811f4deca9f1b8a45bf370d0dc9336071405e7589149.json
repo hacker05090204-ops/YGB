@@ -1,0 +1,5 @@
+{
+  "lang": "fr",
+  "raw_text": "Ubiquiti AirOS Certain Ubiquiti devices contain a command injection vulnerability via a GET request to stainfo.cgi.",
+  "token_count": 16
+}

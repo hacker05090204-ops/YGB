@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28465",
+  "ingested_at": "2026-03-22T07:54:41.058057+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw's voice-call plugin versions before 2026.2.3 contain an improper authentication vulnerability in webhook verification that allows remote attackers to bypass verification by supplying untrusted forwarded headers. Attackers can spoof webhook events by manipulating Forwarded or X-Forwarded-* headers in reverse-proxy configurations that implicitly trust these headers.",
+  "severity": "MEDIUM",
+  "sha256_hash": "65c0cad790354d8e5c6d5fc1e34ae1b2a0ef234733c887f20f94511b366d228c",
+  "source": "nvd",
+  "tags": [
+    "CWE-290",
+    "CWE-290"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28465"
+}

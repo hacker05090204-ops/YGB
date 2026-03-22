@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco HyperFlex HX Cisco HyperFlex HX Installer Virtual Machine contains an insufficient input validation vulnerability which could allow an attacker to execute commands on an affected device as the root user.",
+  "token_count": 31
+}

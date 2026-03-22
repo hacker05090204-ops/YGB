@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-9379",
+  "ingested_at": "2026-03-22T07:45:16.775423+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Cloud Services Appliance (CSA) Ivanti Cloud Services Appliance (CSA) contains a SQL injection vulnerability in the admin web console in versions prior to 5.0.2, which can allow a remote attacker authenticated as administrator to run arbitrary SQL statements.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3a6066789a1772315c0c9a3d102994127d356e1be7be788330479f15cdbcf228",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

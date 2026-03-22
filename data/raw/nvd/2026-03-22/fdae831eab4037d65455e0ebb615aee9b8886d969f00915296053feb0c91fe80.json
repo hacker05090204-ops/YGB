@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69404",
+  "ingested_at": "2026-03-22T07:54:30.315121+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Extreme Store extremestore allows Object Injection.This issue affects Extreme Store: from n/a through < = 1.5.7.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fdae831eab4037d65455e0ebb615aee9b8886d969f00915296053feb0c91fe80",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69404"
+}

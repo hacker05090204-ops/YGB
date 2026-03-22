@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-23748",
+  "ingested_at": "2026-03-22T07:45:16.609665+00:00",
+  "lang": "en",
+  "raw_text": "Audinate Dante Discovery Dante Discovery contains a process control vulnerability in mDNSResponder.exe that all allows for a DLL sideloading attack. A local attacker can leverage this vulnerability in the Dante Application Library to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5eb6e16e89c63d9903d66e2f8071e8b76305434d5685912ee4c785d8e084e97e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

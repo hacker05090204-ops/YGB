@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-60183",
+  "ingested_at": "2026-03-22T07:54:29.995761+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in silence Silencesoft RSS Reader external-rss-reader allows Stored XSS.This issue affects Silencesoft RSS Reader: from n/a through < = 0.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c5d255d892a863c6a34d4cecc9c75e8f9bdcfd67c9a604d0047e71a03093f54d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-60183"
+}

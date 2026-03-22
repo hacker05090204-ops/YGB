@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Uncontrolled Resource Consumption (CWE-400) in the Timelion component in Kibana can lead Denial of Service via Input Data Manipulation (CAPEC-153)",
+  "token_count": 20
+}

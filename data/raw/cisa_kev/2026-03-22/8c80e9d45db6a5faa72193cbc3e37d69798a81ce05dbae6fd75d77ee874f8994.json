@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8657",
+  "ingested_at": "2026-03-22T07:45:19.167237+00:00",
+  "lang": "en",
+  "raw_text": "EyesOfNetwork EyesOfNetwork EyesOfNetwork contains a use of hard-coded credentials vulnerability, as it uses the same API key by default. Exploitation allows an attacker to calculate or guess the admin access token.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8c80e9d45db6a5faa72193cbc3e37d69798a81ce05dbae6fd75d77ee874f8994",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

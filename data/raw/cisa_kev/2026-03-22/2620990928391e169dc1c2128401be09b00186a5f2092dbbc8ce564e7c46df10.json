@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-45519",
+  "ingested_at": "2026-03-22T07:45:16.786676+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains an unspecified vulnerability in the postjournal service that may allow an unauthenticated user to execute commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2620990928391e169dc1c2128401be09b00186a5f2092dbbc8ce564e7c46df10",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

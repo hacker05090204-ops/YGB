@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-1040",
+  "ingested_at": "2026-03-22T07:45:18.178201+00:00",
+  "lang": "en",
+  "raw_text": "Sophos Firewall An authentication bypass vulnerability in User Portal and Webadmin of Sophos Firewall allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4ce9233b02157dfcc6fb289898b0041e1a814bf013dba4636c64b44a93e89691",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

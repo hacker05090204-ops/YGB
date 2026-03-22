@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, memory leak exists in `coders/msl.c`. In the `WriteMSLImage` function of the `msl.c` file, resources are allocated. But the function returns early without releasing these allocated resources. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "token_count": 52
+}

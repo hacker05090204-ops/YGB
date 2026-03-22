@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache RocketMQ Several components of Apache RocketMQ, including NameServer, Broker, and Controller, are exposed to the extranet and lack permission verification. An attacker can exploit this vulnerability by using the update configuration function to execute commands as the system users that RocketMQ is running as or achieve the same effect by forging the RocketMQ protocol content.",
+  "token_count": 56
+}

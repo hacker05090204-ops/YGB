@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28723",
+  "ingested_at": "2026-03-22T07:54:41.192838+00:00",
+  "lang": "en",
+  "raw_text": "Unauthorized report deletion due to insufficient access control. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "37c03621dc6f3631d7e186172f68aca41ee8efd38db04d4d477e934826a19852",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28723"
+}

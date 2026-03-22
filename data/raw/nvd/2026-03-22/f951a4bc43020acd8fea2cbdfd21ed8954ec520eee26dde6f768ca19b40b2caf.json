@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-3197",
+  "ingested_at": "2026-03-22T07:54:32.084804+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: ** REJECT ** DO NOT USE THIS CANDIDATE NUMBER. Reason: This candidate was issued in error. Notes: All references and descriptions in this candidate have been removed to prevent accidental usage.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f951a4bc43020acd8fea2cbdfd21ed8954ec520eee26dde6f768ca19b40b2caf",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3197"
+}

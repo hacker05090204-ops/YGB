@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41179",
+  "ingested_at": "2026-03-22T07:45:17.235344+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One and Worry-Free Business Security Trend Micro Apex One and Worry-Free Business Security contain an unspecified vulnerability in the third-party anti-virus uninstaller that could allow an attacker to manipulate the module to conduct remote code execution. An attacker must first obtain administrative console access on the target system in order to exploit this vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f993f9f97e896679ea2bd9494ce6f18f8de3f99d2bf53905477fd561c52199eb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 57,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

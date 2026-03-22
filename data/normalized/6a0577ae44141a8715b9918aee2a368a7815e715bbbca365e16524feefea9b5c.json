@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SonicWall SonicWall Email Security SonicWall Email Security contains an unrestricted upload of file with dangerous type vulnerability that allows a post-authenticated attacker to upload a file to the remote host. This vulnerability has known usage in a SonicWall Email Security exploit chain along with CVE-2021-20021 and CVE-2021-20023 to achieve privilege escalation.",
+  "token_count": 51
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31886",
+  "ingested_at": "2026-03-22T07:54:44.731404+00:00",
+  "lang": "en",
+  "raw_text": "Dagu is a workflow engine with a built-in Web user interface. Prior to 2.2.4, the dagRunId request field accepted by the inline DAG execution endpoints is passed directly into filepath.Join to construct a temporary directory path without any format validation. Go's filepath.Join resolves .. segments lexically, so a caller can supply a value such as \"..\" to redirect the computed directory outside the intended /tmp/ / path. A deferred cleanup function that calls os.RemoveAll on that directory then runs unconditionally when the HTTP handler returns, deleting whatever directory the traversal resolved to. With dagRunId set to \"..\", the resolved directory is the system temporary directory (/tmp on Linux). On non-root deployments, os.RemoveAll(\"/tmp\") removes all files in /tmp owned by the dagu process user, disrupting every concurrent dagu run that has live temp files. On root or Docker deployments, the call removes the entire contents of /tmp, causing a system-wide denial of service. This vulnerability is fixed in 2.2.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "30eb7e3a146b3cfa0b0f701eda2c012f0e10629a6eaf21121efd943cd141d810",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 158,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31886"
+}

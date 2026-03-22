@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TwistedBrush Pro Studio 24.06 contains a denial of service vulnerability that allows local attackers to crash the application by importing a malformed .srp script file. Attackers can create a .srp file containing an excessively large buffer and import it through the Script Player interface to trigger an application crash.",
+  "token_count": 49
+}

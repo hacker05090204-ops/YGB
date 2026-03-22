@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in UTT HiPER 810G up to 1.7.7-171114. The affected element is the function strcpy of the file /goform/formP2PLimitConfig. The manipulation of the argument except leads to buffer overflow. Remote exploitation of the attack is possible. The exploit is publicly available and might be used.",
+  "token_count": 48
+}

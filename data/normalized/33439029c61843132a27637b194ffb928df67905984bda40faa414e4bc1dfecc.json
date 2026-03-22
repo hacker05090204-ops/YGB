@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in OpenCart 4.0.2.3. Affected by this issue is the function Save of the file admin/controller/design/template.php of the component Incomplete Fix CVE-2024-36694. Such manipulation leads to improper neutralization of special elements used in a template engine. The attack may be performed from remote. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 62
+}

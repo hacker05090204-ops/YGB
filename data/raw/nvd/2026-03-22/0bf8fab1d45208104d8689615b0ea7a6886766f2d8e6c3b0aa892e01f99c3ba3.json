@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68648",
+  "ingested_at": "2026-03-22T07:54:42.607016+00:00",
+  "lang": "en",
+  "raw_text": "A use of externally-controlled format string vulnerability in Fortinet FortiAnalyzer 7.6.0 through 7.6.4, FortiAnalyzer 7.4.0 through 7.4.7, FortiAnalyzer 7.2 all versions, FortiAnalyzer 7.0 all versions, FortiAnalyzer Cloud 7.6.0 through 7.6.4, FortiAnalyzer Cloud 7.4.0 through 7.4.7, FortiAnalyzer Cloud 7.2 all versions, FortiAnalyzer Cloud 7.0 all versions, FortiManager 7.6.0 through 7.6.4, FortiManager 7.4.0 through 7.4.7, FortiManager 7.2 all versions, FortiManager 7.0 all versions, FortiManager Cloud 7.6.0 through 7.6.4, FortiManager Cloud 7.4.0 through 7.4.7, FortiManager Cloud 7.2 all versions, FortiManager Cloud 7.0 all versions may allow an attacker to escalate its privileges via specially crafted requests.",
+  "severity": "HIGH",
+  "sha256_hash": "0bf8fab1d45208104d8689615b0ea7a6886766f2d8e6c3b0aa892e01f99c3ba3",
+  "source": "nvd",
+  "tags": [
+    "CWE-134"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68648"
+}

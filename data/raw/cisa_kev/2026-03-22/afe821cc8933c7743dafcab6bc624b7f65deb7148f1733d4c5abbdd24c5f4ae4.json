@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38813",
+  "ingested_at": "2026-03-22T07:45:16.705634+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter contains an improper check for dropped privileges vulnerability. This vulnerability could allow an attacker with network access to the vCenter Server to escalate privileges to root by sending a specially crafted packet.",
+  "severity": "CRITICAL",
+  "sha256_hash": "afe821cc8933c7743dafcab6bc624b7f65deb7148f1733d4c5abbdd24c5f4ae4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

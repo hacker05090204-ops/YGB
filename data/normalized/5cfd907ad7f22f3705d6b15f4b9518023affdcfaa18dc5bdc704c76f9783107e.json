@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sitecore Multiple Products Sitecore Experience Manager (XM), Experience Platform (XP), Experience Commerce (XC), and Managed Cloud contain a deserialization of untrusted data vulnerability involving the use of default machine keys. This flaw allows attackers to exploit exposed ASP.NET machine keys to achieve remote code execution.",
+  "token_count": 45
+}

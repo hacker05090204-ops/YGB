@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27643",
+  "ingested_at": "2026-03-22T07:54:31.322761+00:00",
+  "lang": "en",
+  "raw_text": "free5GC UDR is the user data repository (UDR) for free5GC, an an open-source project for 5th generation (5G) mobile core networks. In versions up to and including 1.4.1, the NEF component reliably leaks internal parsing error details (e.g., invalid character 'n' after top-level value) to remote clients, which can aid attackers in service fingerprinting. All deployments of free5GC using the Nnef_PfdManagement service may be affected. free5gc/udr pull request 56 contains a patch for the issue. There is no direct workaround at the application level. The recommendation is to apply the provided patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3059cc19ab9c5644473958185cb62229b58b1ef215e49ef433cd15f446b27f39",
+  "source": "nvd",
+  "tags": [
+    "CWE-209"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27643"
+}

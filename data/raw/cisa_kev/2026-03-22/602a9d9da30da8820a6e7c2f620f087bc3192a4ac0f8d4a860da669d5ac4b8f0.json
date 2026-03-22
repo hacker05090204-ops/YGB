@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2008-3431",
+  "ingested_at": "2026-03-22T07:45:18.708449+00:00",
+  "lang": "en",
+  "raw_text": "Oracle VirtualBox An input validation vulnerability exists in the VBoxDrv.sys driver of Sun xVM VirtualBox which allows attackers to locally execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "602a9d9da30da8820a6e7c2f620f087bc3192a4ac0f8d4a860da669d5ac4b8f0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability allowing an authenticated domain user to perform remote code execution (RCE) on the Backup Server.",
+  "token_count": 17
+}

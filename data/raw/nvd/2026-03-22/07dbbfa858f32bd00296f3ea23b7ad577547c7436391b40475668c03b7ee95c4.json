@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-66363",
+  "ingested_at": "2026-03-22T07:54:34.102908+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in LBS in Samsung Mobile Processor Exynos 2200. There was no check for memory initialization within DL NAS Transport messages.",
+  "severity": "HIGH",
+  "sha256_hash": "07dbbfa858f32bd00296f3ea23b7ad577547c7436391b40475668c03b7ee95c4",
+  "source": "nvd",
+  "tags": [
+    "CWE-665"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66363"
+}

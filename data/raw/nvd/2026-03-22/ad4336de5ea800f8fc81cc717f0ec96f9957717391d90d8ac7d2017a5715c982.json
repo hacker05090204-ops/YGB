@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25501",
+  "ingested_at": "2026-03-22T07:54:31.277986+00:00",
+  "lang": "en",
+  "raw_text": "free5GC SMF provides Session Management Function for free5GC, an open-source project for 5th generation (5G) mobile core networks. In versions up to and including 1.4.1, SMF panics due to nil pointer dereference and the SMF process terminates. This is triggered by a malformed PFCP SessionReportRequest on the SMF PFCP (UDP/8805) interface. No known upstream fix is available, but some workarounds are available. ACL/firewall the PFCP interface so only trusted UPF IPs can reach SMF (reduce spoofing/abuse surface); drop/inspect malformed PFCP SessionReportRequest messages at the network edge where feasible, and/or add recover() around PFCP handler dispatch to avoid whole-process termination (mitigation only).",
+  "severity": "HIGH",
+  "sha256_hash": "ad4336de5ea800f8fc81cc717f0ec96f9957717391d90d8ac7d2017a5715c982",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25501"
+}

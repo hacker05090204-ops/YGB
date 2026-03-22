@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4509",
+  "ingested_at": "2026-03-22T07:54:49.464341+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in PbootCMS up to 3.2.12. This affects an unknown function of the file core/function/file.php of the component File Upload. The manipulation of the argument black results in incomplete blacklist. The attack may be launched remotely. The exploit has been released to the public and may be used for attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "58745fee5d4647587044232157ddf3f12ec6e4ce24f826fd23ebb850fbb7baa5",
+  "source": "nvd",
+  "tags": [
+    "CWE-183",
+    "CWE-184"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4509"
+}

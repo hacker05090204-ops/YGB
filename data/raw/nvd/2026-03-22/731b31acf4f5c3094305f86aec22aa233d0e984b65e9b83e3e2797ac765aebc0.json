@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3261",
+  "ingested_at": "2026-03-22T07:54:32.810201+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in itsourcecode School Management System 1.0. This impacts an unknown function of the file /settings/index.php of the component Setting Handler. This manipulation of the argument ID causes sql injection. The attack may be initiated remotely. The exploit has been published and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "731b31acf4f5c3094305f86aec22aa233d0e984b65e9b83e3e2797ac765aebc0",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3261"
+}

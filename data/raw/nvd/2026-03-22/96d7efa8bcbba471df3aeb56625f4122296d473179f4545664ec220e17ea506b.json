@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68025",
+  "ingested_at": "2026-03-22T07:54:30.076874+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Addonify Addonify Floating Cart For WooCommerce addonify-floating-cart allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Addonify Floating Cart For WooCommerce: from n/a through < = 1.2.17.",
+  "severity": "MEDIUM",
+  "sha256_hash": "96d7efa8bcbba471df3aeb56625f4122296d473179f4545664ec220e17ea506b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68025"
+}

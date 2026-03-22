@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-31166",
+  "ingested_at": "2026-03-22T07:45:18.156807+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft HTTP Protocol Stack Microsoft HTTP Protocol Stack contains a vulnerability in http.sys that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1eabbaa89f501df97ab70e6c99f641342e6d3ef5b897ec3814c31eebaa299e16",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

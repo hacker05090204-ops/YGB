@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-10562",
+  "ingested_at": "2026-03-22T07:45:18.186350+00:00",
+  "lang": "en",
+  "raw_text": "Dasan Gigabit Passive Optical Network (GPON) Routers Dasan GPON Routers contain an authentication bypass vulnerability. When combined with CVE-2018-10561, exploitation can allow an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "22f5ff88bbe22b301c48471156a32df6cf298dd661fba927087611df847adb00",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

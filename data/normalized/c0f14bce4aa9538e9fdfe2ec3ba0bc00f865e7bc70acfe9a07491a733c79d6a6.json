@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Amcrest Cameras and Network Video Recorder (NVR) Amcrest cameras and NVR contain a stack-based buffer overflow vulnerability through port 37777 that allows an unauthenticated, remote attacker to crash the device and possibly execute code.",
+  "token_count": 34
+}

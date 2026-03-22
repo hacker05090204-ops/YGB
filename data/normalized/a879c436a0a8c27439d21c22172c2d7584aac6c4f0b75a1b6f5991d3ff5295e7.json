@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Kingsoft WPS Office Kingsoft WPS Office contains a path traversal vulnerability in promecefpluginhost.exe on Windows that allows an attacker to load an arbitrary Windows library.",
+  "token_count": 25
+}

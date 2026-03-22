@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28513",
+  "ingested_at": "2026-03-22T07:54:42.503643+00:00",
+  "lang": "en",
+  "raw_text": "Pocket ID is an OIDC provider that allows users to authenticate with their passkeys to your services. Prior to 2.4.0, the OIDC token endpoint rejects an authorization code only when both the client ID is wrong and the code is expired. This allows cross-client code exchange and expired code reuse. This vulnerability is fixed in 2.4.0.",
+  "severity": "HIGH",
+  "sha256_hash": "66d096899007a26c74a769a4520eb7b9e55bec7ad2434d94246769a46beb0276",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28513"
+}

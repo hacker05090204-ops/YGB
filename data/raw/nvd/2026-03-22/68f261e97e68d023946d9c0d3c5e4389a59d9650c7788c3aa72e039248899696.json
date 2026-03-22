@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3657",
+  "ingested_at": "2026-03-22T07:54:44.158774+00:00",
+  "lang": "en",
+  "raw_text": "The My Sticky Bar plugin for WordPress is vulnerable to SQL injection via the `stickymenu_contact_lead_form` AJAX action in all versions up to, and including, 2.8.6. This is due to the handler using attacker-controlled POST parameter names directly as SQL column identifiers in `$wpdb->insert()`. While parameter values are sanitized with `esc_sql()` and `sanitize_text_field()`, the parameter keys are used as-is to build the column list in the INSERT statement. This makes it possible for unauthenticated attackers to inject SQL via crafted parameter names, enabling blind time-based data extraction from the database.",
+  "severity": "HIGH",
+  "sha256_hash": "68f261e97e68d023946d9c0d3c5e4389a59d9650c7788c3aa72e039248899696",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3657"
+}

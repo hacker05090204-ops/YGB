@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-20440",
+  "ingested_at": "2026-03-22T07:54:33.542308+00:00",
+  "lang": "en",
+  "raw_text": "In MAE, there is a possible out of bounds write due to a missing bounds check. This could lead to local escalation of privilege if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: ALPS10431968; Issue ID: MSV-5824.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7522bd55307e739e70ab02112c8fee30f64bf7a97d05df66c6a78a23544af45a",
+  "source": "nvd",
+  "tags": [
+    "CWE-1285",
+    "CWE-787"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20440"
+}

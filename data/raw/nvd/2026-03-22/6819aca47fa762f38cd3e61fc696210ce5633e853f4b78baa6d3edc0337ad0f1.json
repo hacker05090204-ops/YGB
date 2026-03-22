@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3791",
+  "ingested_at": "2026-03-22T07:54:42.135792+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in SourceCodester Sales and Inventory System 1.0. Affected by this issue is some unknown functionality of the file dashboard.php of the component Search. The manipulation of the argument searchtxt leads to sql injection. The attack is possible to be carried out remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6819aca47fa762f38cd3e61fc696210ce5633e853f4b78baa6d3edc0337ad0f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3791"
+}

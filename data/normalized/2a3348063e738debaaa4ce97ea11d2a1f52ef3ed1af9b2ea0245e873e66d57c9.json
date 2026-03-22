@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Java SE JDK and JRE An access control vulnerability exists in the Applet Rhino Script Engine component of Oracle's Java Runtime Environment allows an attacker to remotely execute arbitrary code.",
+  "token_count": 31
+}

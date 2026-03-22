@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8174",
+  "ingested_at": "2026-03-22T07:45:18.739111+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists in the way that the VBScript engine handles objects in memory, aka \"Windows VBScript Engine Remote Code Execution\"",
+  "severity": "CRITICAL",
+  "sha256_hash": "d0402a7ae3f42508b4b83cb5985eac101e8318ba31f01ffaf467717e2ee029c1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25070",
+  "ingested_at": "2026-03-22T07:54:41.686183+00:00",
+  "lang": "en",
+  "raw_text": "XikeStor SKS8310-8X Network Switch firmware versions 1.04.B07 and prior contain an OS command injection vulnerability in the /goform/PingTestSet endpoint that allows unauthenticated remote attackers to execute arbitrary operating system commands. Attackers can inject malicious commands through the destIp parameter to achieve remote code execution with root privileges on the network switch.",
+  "severity": "CRITICAL",
+  "sha256_hash": "684d5c66b5ca465c7a5e81e58623be02e282361c8b5b53924a912e6600ece2b0",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25070"
+}

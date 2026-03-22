@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2387",
+  "ingested_at": "2026-03-22T07:45:18.641688+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft ATM Font Driver ATMFD.DLL in the Adobe Type Manager Font Driver in Microsoft Windows Server allows local users to gain privileges via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9d341b6696774664dfb30c135303da7f0a20f16bc92651212ff6f50c0525465b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

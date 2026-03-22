@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32986",
+  "ingested_at": "2026-03-22T07:54:48.864284+00:00",
+  "lang": "en",
+  "raw_text": "Textpattern CMS version 4.9.0 contains a second-order cross-site scripting vulnerability that allows attackers to inject malicious scripts by exploiting improper sanitization of user-supplied input in Atom feed XML elements. Attackers can embed unescaped payloads in parameters such as category that are reflected into Atom fields like and , which execute as JavaScript when feed readers or CMS aggregators consume the feed and insert content into the DOM using unsafe methods.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8b139818398140a6c7baccfd85b80a50354d146d37bd324e03b9095d08b174b7",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-116"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32986"
+}

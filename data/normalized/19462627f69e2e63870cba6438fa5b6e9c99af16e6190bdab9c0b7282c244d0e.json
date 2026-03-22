@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CWE-404 Improper Resource Shutdown or Release vulnerability exists that could cause partial Denial of Service on Machine Expert protocol when an unauthenticated attacker sends malicious payload to occupy active communication channels.",
+  "token_count": 31
+}

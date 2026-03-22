@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13723",
+  "ingested_at": "2026-03-22T07:54:44.555640+00:00",
+  "lang": "en",
+  "raw_text": "IBM Sterling Partner Engagement Manager 6.2.3.0 through 6.2.3.5 and 6.2.4.0 through 6.2.4.2 could allow an attacker to obtain sensitive user information using an expired access token",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed640c53ffde97645d8d0bbfebf8452292cf7333635b71ce23f5777ab183be17",
+  "source": "nvd",
+  "tags": [
+    "CWE-324"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13723"
+}

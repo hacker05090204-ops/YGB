@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4477",
+  "ingested_at": "2026-03-22T07:54:48.657980+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Yi Technology YI Home Camera 2 2.1.1_20171024151200. This affects an unknown function of the component WPA/WPS. Executing a manipulation can lead to use of hard-coded cryptographic key . The attack can only be done within the local network. This attack is characterized by high complexity. The exploitability is reported as difficult. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "22505a61d360dd0d8142f3d2e928ae0c904e34b9392229b4edc4089c4cbbb91c",
+  "source": "nvd",
+  "tags": [
+    "CWE-320",
+    "CWE-321"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4477"
+}

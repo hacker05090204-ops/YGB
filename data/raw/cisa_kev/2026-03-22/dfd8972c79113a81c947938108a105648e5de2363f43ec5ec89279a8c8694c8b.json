@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-21418",
+  "ingested_at": "2026-03-22T07:45:16.597967+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Ancillary Function Driver for WinSock contains a heap-based buffer overflow vulnerability that allows for privilege escalation, enabling a local attacker to gain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dfd8972c79113a81c947938108a105648e5de2363f43ec5ec89279a8c8694c8b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

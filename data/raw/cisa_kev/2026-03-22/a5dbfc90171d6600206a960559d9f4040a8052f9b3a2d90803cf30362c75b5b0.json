@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-27950",
+  "ingested_at": "2026-03-22T07:45:19.023778+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and watchOS contain a memory initialization vulnerability that may allow a malicious application to disclose kernel memory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a5dbfc90171d6600206a960559d9f4040a8052f9b3a2d90803cf30362c75b5b0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

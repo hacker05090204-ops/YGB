@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-29988",
+  "ingested_at": "2026-03-22T07:45:16.987523+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SmartScreen Prompt Microsoft SmartScreen Prompt contains a security feature bypass vulnerability that allows an attacker to bypass the Mark of the Web (MotW) feature. This vulnerability can be chained with CVE-2023-38831 and CVE-2024-21412 to execute a malicious file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3988c22257645a9dece6d21c3031469cf9e72658e7274dad27158ef9a69e37d5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

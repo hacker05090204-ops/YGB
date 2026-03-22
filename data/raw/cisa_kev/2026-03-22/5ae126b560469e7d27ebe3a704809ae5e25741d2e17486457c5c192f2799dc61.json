@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-35078",
+  "ingested_at": "2026-03-22T07:45:17.297584+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager Mobile (EPMM) Ivanti Endpoint Manager Mobile (EPMM, previously branded MobileIron Core) contains an authentication bypass vulnerability that allows unauthenticated access to specific API paths. An attacker with access to these API paths can access personally identifiable information (PII) such as names, phone numbers, and other mobile device details for users on a vulnerable system. An attacker can also make other configuration changes including installing software and modifying security profiles on registered devices.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5ae126b560469e7d27ebe3a704809ae5e25741d2e17486457c5c192f2799dc61",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 75,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Responsive Lightbox & Gallery WordPress plugin before 2.6.1 is vulnerable to an Unauthenticated Stored-XSS attack due to flawed regex replacement rules that can be abused by posting a comment with a malicious link when lightbox for comments are enabled and then approved.",
+  "token_count": 43
+}

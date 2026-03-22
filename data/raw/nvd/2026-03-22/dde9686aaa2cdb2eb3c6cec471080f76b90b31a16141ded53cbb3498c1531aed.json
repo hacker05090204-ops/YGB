@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28486",
+  "ingested_at": "2026-03-22T07:54:41.107577+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.1.16-2 prior to 2026.2.14 contain a path traversal vulnerability in archive extraction during installation commands that allows arbitrary file writes outside the intended directory. Attackers can craft malicious archives that, when extracted via skills install, hooks install, plugins install, or signal install commands, write files to arbitrary locations enabling persistence or code execution.",
+  "severity": "MEDIUM",
+  "sha256_hash": "dde9686aaa2cdb2eb3c6cec471080f76b90b31a16141ded53cbb3498c1531aed",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28486"
+}

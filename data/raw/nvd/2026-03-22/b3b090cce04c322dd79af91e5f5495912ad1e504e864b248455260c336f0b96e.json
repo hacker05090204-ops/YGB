@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68051",
+  "ingested_at": "2026-03-22T07:54:30.097140+00:00",
+  "lang": "en",
+  "raw_text": "Authorization Bypass Through User-Controlled Key vulnerability in Shiprocket Shiprocket shiprocket allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Shiprocket: from n/a through < = 2.0.8.",
+  "severity": "HIGH",
+  "sha256_hash": "b3b090cce04c322dd79af91e5f5495912ad1e504e864b248455260c336f0b96e",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68051"
+}

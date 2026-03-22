@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69397",
+  "ingested_at": "2026-03-22T07:54:30.300416+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Tint tint allows PHP Local File Inclusion.This issue affects Tint: from n/a through < = 1.7.",
+  "severity": "HIGH",
+  "sha256_hash": "436b78136c3cf6b7473a2ba680f05b64932417a23a0ad2d2d90b2eccae40daad",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69397"
+}

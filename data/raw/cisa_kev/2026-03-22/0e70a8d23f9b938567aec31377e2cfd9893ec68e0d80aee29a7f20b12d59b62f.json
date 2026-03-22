@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-5217",
+  "ingested_at": "2026-03-22T07:45:17.219783+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium libvpx Google Chromium libvpx contains a heap buffer overflow vulnerability in vp8 encoding that allows a remote attacker to potentially exploit heap corruption via a crafted HTML page. This vulnerability could impact web browsers using libvpx, including but not limited to Google Chrome.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e70a8d23f9b938567aec31377e2cfd9893ec68e0d80aee29a7f20b12d59b62f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

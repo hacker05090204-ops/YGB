@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2489",
+  "ingested_at": "2026-03-22T07:54:32.565135+00:00",
+  "lang": "en",
+  "raw_text": "The TP2WP Importer plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'Watched domains' textarea on the attachment importer settings page in all versions up to, and including, 1.1. This is due to insufficient input sanitization and output escaping when domains are saved via AJAX and rendered with echo implode() without esc_textarea(). This makes it possible for authenticated attackers, with Administrator-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses the attachment importer settings page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "94961ef07f241dc315f1cd10b833dfde4575ccac4677cf674033b1090a509a81",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2489"
+}

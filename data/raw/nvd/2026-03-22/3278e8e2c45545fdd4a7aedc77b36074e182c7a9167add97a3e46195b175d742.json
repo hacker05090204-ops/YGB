@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-55024",
+  "ingested_at": "2026-03-22T07:54:34.187026+00:00",
+  "lang": "en",
+  "raw_text": "An authentication bypass vulnerability in the authorization mechanism of Weintek cMT-3072XH2 easyweb v2.1.53, OS v20231011 allows unauthorized attackers to perform Administrative actions using service accounts.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3278e8e2c45545fdd4a7aedc77b36074e182c7a9167add97a3e46195b175d742",
+  "source": "nvd",
+  "tags": [
+    "CWE-693"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-55024"
+}

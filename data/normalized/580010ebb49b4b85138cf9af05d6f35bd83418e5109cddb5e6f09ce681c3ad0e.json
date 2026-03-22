@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Hewlett Packard (HP) ProCurve Manager (PCM), PCM+, Identity Driven Manager (IDM), and Application Lifecycle Management HP ProCurve Manager (PCM), PCM+, Identity Driven Manager (IDM), and Application Lifecycle Management allow remote attackers to execute arbitrary code via a marshalled object to (1) EJBInvokerServlet or (2) JMXInvokerServlet.",
+  "token_count": 45
+}

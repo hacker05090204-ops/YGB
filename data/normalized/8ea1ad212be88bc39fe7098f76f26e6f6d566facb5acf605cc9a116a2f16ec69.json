@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Gogs is an open source self-hosted Git service. Prior to version 0.14.2, overwritable LFS object across different repos leads to supply-chain attack, all LFS objects are vulnerable to be maliciously overwritten by malicious attackers. This issue has been patched in version 0.14.2.",
+  "token_count": 42
+}

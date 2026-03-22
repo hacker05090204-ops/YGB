@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure Collaboration Suite contains a buffer overflow vulnerabilities that allows a remote authenticated users to execute code as the root user via maliciously crafted meeting room.",
+  "token_count": 33
+}

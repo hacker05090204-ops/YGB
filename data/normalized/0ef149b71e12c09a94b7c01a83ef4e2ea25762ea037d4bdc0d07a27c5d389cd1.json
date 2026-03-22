@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TwistedBrush Pro Studio 24.06 contains a denial of service vulnerability in the Resize Image function that allows local attackers to crash the application by supplying an excessively long buffer. Attackers can paste a malicious string into the New Width or New Height field to trigger a buffer overflow that causes the application to crash.",
+  "token_count": 54
+}

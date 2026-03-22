@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29082",
+  "ingested_at": "2026-03-22T07:54:41.537766+00:00",
+  "lang": "en",
+  "raw_text": "Kestra is an event-driven orchestration platform. In versions from 1.1.10 and prior, Kestra\u2019s execution-file preview renders user-supplied Markdown (.md) with markdown-it instantiated as html:true and injects the resulting HTML with Vue\u2019s v-html without sanitisation. At time of publication, there are no publicly available patches.",
+  "severity": "HIGH",
+  "sha256_hash": "7be4ecb9de62df622c039f554e93b4bacebe2a1a3fb39ce4c955f17eea02a5f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29082"
+}

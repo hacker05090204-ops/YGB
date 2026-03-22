@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32843",
+  "ingested_at": "2026-03-22T07:54:47.965525+00:00",
+  "lang": "en",
+  "raw_text": "Location Aware Sensor System by Linkit ONE, up to commit f06bd20 (2023-04-26), contains a reflected cross-site scripting vulnerability in the PM25.php file that allows remote attackers to execute arbitrary JavaScript by injecting malicious code into GET parameters. Attackers can craft a malicious URL containing unencoded payloads in the site, city, district, channel, or apikey parameters to execute scripts in victims' browsers when they visit the page.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "afa86fd069d3dfc3c2fb0107e76555ade7a0ab074980a328fb925ed10e7a1442",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32843"
+}

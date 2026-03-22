@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4068",
+  "ingested_at": "2026-03-22T07:54:47.874471+00:00",
+  "lang": "en",
+  "raw_text": "The Add Custom Fields to Media plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 2.0.3. This is due to missing nonce validation on the field deletion functionality in the admin display template. The plugin properly validates a nonce for the 'add field' operation (line 24-36), but the 'delete field' operation (lines 38-49) processes the $_GET['delete'] parameter and calls update_option() without any nonce verification. This makes it possible for unauthenticated attackers to delete arbitrary custom media fields via a forged request, granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "04f03a1f93f33d25f711f0eb931191562ac9f1d94aa21af15ac6b5c49bd2cd18",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4068"
+}

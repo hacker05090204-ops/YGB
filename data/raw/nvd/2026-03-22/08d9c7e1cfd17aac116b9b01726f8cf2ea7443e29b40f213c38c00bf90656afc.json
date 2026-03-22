@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21788",
+  "ingested_at": "2026-03-22T07:54:47.906376+00:00",
+  "lang": "en",
+  "raw_text": "HCL Connections is vulnerable to a cross-site scripting attack where an attacker may leverage this issue to execute arbitrary script code in the browser of an unsuspecting user which leads to executing malicious script code. This may allow the attacker steal cookie-based authentication credentials and comprise user's account then launch other attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "08d9c7e1cfd17aac116b9b01726f8cf2ea7443e29b40f213c38c00bf90656afc",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21788"
+}

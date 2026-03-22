@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-10970",
+  "ingested_at": "2026-03-22T07:54:29.947392+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Kolay Software Inc. Talentics allows Blind SQL Injection.This issue affects Talentics: through 20022026. NOTE: The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b9a28e5722e68d84e737fb266ed0bede16df051c701a037fb558fe5dafcd7c82",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-10970"
+}

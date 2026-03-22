@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper enforcement of the Disable password saving in vaults setting in the connection entry component in Devolutions Remote Desktop Manager 2025.3.30 and earlier allows an authenticated user to persist credentials in vault entries, potentially exposing sensitive information to other users, by creating or editing certain connection types while password saving is disabled.",
+  "token_count": 52
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "i-doit CMDB 1.12 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the objGroupID parameter. Attackers can send GET requests with crafted SQL payloads in the objGroupID parameter to extract sensitive database information including usernames, database names, and version details.",
+  "token_count": 50
+}

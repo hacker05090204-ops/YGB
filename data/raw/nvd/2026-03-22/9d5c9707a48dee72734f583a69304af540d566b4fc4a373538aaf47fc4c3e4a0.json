@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3992",
+  "ingested_at": "2026-03-22T07:54:44.188798+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in CodeGenieApp serverless-express up to 4.17.1. This affects an unknown part of the file utils/dynamodb.ts of the component Users Endpoint. This manipulation of the argument filter causes injection. The attack may be initiated remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d5c9707a48dee72734f583a69304af540d566b4fc4a373538aaf47fc4c3e4a0",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-707"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3992"
+}

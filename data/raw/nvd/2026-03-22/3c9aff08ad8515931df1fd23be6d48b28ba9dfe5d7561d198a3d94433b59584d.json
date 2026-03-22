@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47378",
+  "ingested_at": "2026-03-22T07:54:33.745934+00:00",
+  "lang": "en",
+  "raw_text": "Cryptographic Issue when a shared VM reference allows HLOS to boot loader and access cert chain.",
+  "severity": "HIGH",
+  "sha256_hash": "3c9aff08ad8515931df1fd23be6d48b28ba9dfe5d7561d198a3d94433b59584d",
+  "source": "nvd",
+  "tags": [
+    "CWE-497"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47378"
+}

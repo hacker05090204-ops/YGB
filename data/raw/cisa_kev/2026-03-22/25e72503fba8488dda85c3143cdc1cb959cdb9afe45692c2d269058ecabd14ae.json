@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22963",
+  "ingested_at": "2026-03-22T07:45:17.687196+00:00",
+  "lang": "en",
+  "raw_text": "VMware Tanzu Spring Cloud When using routing functionality in VMware Tanzu's Spring Cloud Function, it is possible for a user to provide a specially crafted SpEL as a routing-expression that may result in remote code execution and access to local resources.",
+  "severity": "CRITICAL",
+  "sha256_hash": "25e72503fba8488dda85c3143cdc1cb959cdb9afe45692c2d269058ecabd14ae",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

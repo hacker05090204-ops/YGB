@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in SourceCodester Sales and Inventory System 1.0. Affected by this issue is some unknown functionality of the file dashboard.php of the component Search. The manipulation of the argument searchtxt leads to sql injection. The attack is possible to be carried out remotely. The exploit has been disclosed to the public and may be used.",
+  "token_count": 59
+}

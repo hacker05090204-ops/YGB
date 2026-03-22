@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28284",
+  "ingested_at": "2026-03-22T07:54:40.913165+00:00",
+  "lang": "en",
+  "raw_text": "FreePBX is an open source IP PBX. Prior to versions 16.0.10 and 17.0.5, the FreePBX logfiles module contains several authenticated SQL injection vulnerabilities. This issue has been patched in versions 16.0.10 and 17.0.5.",
+  "severity": "HIGH",
+  "sha256_hash": "7ef40c249ac8814ab48282505c71912c2c2dcf5a83bd87e6f6a68336d1d56363",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28284"
+}

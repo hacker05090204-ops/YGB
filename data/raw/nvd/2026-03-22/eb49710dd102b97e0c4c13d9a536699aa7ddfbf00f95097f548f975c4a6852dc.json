@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-23651",
+  "ingested_at": "2026-03-22T07:54:41.137066+00:00",
+  "lang": "en",
+  "raw_text": "Permissive regular expression in Azure Compute Gallery allows an authorized attacker to elevate privileges locally.",
+  "severity": "MEDIUM",
+  "sha256_hash": "eb49710dd102b97e0c4c13d9a536699aa7ddfbf00f95097f548f975c4a6852dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-625",
+    "NVD-CWE-Other"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23651"
+}

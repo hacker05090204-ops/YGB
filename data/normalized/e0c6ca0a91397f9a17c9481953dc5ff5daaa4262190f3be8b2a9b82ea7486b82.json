@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mozilla Firefox and Thunderbird Mozilla Firefox and Thunderbird contain a type confusion vulnerability due to incorrect alias information in the IonMonkey JIT compiler when setting array elements.",
+  "token_count": 27
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-28789",
+  "ingested_at": "2026-03-22T07:54:40.962163+00:00",
+  "lang": "en",
+  "raw_text": "OliveTin gives access to predefined shell commands from a web interface. Prior to version 3000.10.3, an unauthenticated denial-of-service vulnerability exists in OliveTin\u2019s OAuth2 login flow. Concurrent requests to /oauth/login can trigger unsynchronized access to a shared registeredStates map, causing a Go runtime panic (fatal error: concurrent map writes) and process termination. This allows remote attackers to crash the service when OAuth2 is enabled. This issue has been patched in version 3000.10.3.",
+  "severity": "HIGH",
+  "sha256_hash": "97282ebe52e128e3bad1b3580bcc970af0dc4aba56a2f870b04708f7f768bea1",
+  "source": "nvd",
+  "tags": [
+    "CWE-362",
+    "CWE-400",
+    "CWE-662"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28789"
+}

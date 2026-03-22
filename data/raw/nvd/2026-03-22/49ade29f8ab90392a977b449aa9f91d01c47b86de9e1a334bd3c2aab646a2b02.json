@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28551",
+  "ingested_at": "2026-03-22T07:54:40.763158+00:00",
+  "lang": "en",
+  "raw_text": "Race condition vulnerability in the device security management module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "49ade29f8ab90392a977b449aa9f91d01c47b86de9e1a334bd3c2aab646a2b02",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28551"
+}

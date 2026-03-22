@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Arm Trusted Firmware Arm Trusted Firmware contains an out-of-bounds write vulnerability allowing the non-secure (NS) world to trigger a system halt, overwrite secure data, or print out secure data when calling secure functions under the non-secure processing environment (NSPE) handler mode. This vulnerability affects Yealink Device Management servers.",
+  "token_count": 48
+}

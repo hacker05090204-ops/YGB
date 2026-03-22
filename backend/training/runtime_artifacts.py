@@ -293,9 +293,7 @@ def write_training_gate(
     cpu_temperature: Optional[float] = None,
 ) -> Dict[str, Any]:
     bootstrap = ensure_local_mode_a_bootstrap()
-    hmac_present = bool(os.environ.get("YGB_HMAC_SECRET")) or os.path.exists(
-        os.path.join(CONFIG_DIR, "hmac_secret.key")
-    )
+    hmac_present = bool(os.environ.get("YGB_HMAC_SECRET"))
 
     checks = {
         "device_identity": os.path.exists(DEVICE_IDENTITY_PATH),

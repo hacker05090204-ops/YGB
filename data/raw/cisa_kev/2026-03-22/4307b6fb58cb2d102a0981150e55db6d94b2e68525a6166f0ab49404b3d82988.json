@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-0847",
+  "ingested_at": "2026-03-22T07:45:18.062235+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains an improper initialization vulnerability where an unprivileged local user could escalate their privileges on the system. This vulnerability has the moniker of \"Dirty Pipe.\"",
+  "severity": "CRITICAL",
+  "sha256_hash": "4307b6fb58cb2d102a0981150e55db6d94b2e68525a6166f0ab49404b3d82988",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

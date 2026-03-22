@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-55044",
+  "ingested_at": "2026-03-22T07:54:47.488211+00:00",
+  "lang": "en",
+  "raw_text": "The Trash Restore CSRF vulnerability in MuraCMS through 10.1.10 allows attackers to restore deleted content from the trash to unauthorized locations through CSRF. The vulnerable cTrash.restore function lacks CSRF token validation, enabling malicious websites to forge requests that restore content to arbitrary parent locations when an authenticated administrator visits a crafted webpage. Successful exploitation of the Trash Restore CSRF vulnerability results in unauthorized restoration of deleted content to potentially inappropriate or malicious locations within the MuraCMS website structure. When an authenticated administrator visits a malicious webpage containing the CSRF exploit, their browser automatically submits a hidden form that restores specified content from the trash to a location determined by the attacker through the parentid parameter. This can lead to restoration of previously deleted malicious content, placement of sensitive documents in public areas, manipulation of website navigation structure, or restoration of outdated content that was intentionally removed for security or compliance reasons.",
+  "severity": "HIGH",
+  "sha256_hash": "54deabcf1029f249ce5e0c1c8fb590c0bf83b195a4387abfc3e3d6604ea96e58",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 151,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-55044"
+}

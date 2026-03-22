@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-34448",
+  "ingested_at": "2026-03-22T07:45:19.431798+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Scripting Engine contains an unspecified vulnerability that allows for memory corruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "73ca22ba3b4c2a8246020269a8f9fe526be384bd092b227345ea728f7a117981",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

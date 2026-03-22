@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28481",
+  "ingested_at": "2026-03-22T07:54:41.097583+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.1.30 and earlier, contain an information disclosure vulnerability, patched in 2026.2.1, in the MS Teams attachment downloader (optional extension must be enabled) that leaks bearer tokens to allowlisted suffix domains. When retrying downloads after receiving 401 or 403 responses, the application sends Authorization bearer tokens to untrusted hosts matching the permissive suffix-based allowlist, enabling token theft.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3be68811a422857474212d388b145e9afadb317337952d904fbe8e89cef570e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28481"
+}

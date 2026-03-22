@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48630",
+  "ingested_at": "2026-03-22T07:54:33.868579+00:00",
+  "lang": "en",
+  "raw_text": "In drawLayersInternal of SkiaRenderEngine.cpp, there is a possible way to access the GPU cache due to side channel information disclosure. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "f9d6aef7ef7b9b8c314f67cc3875c939b61d865211d7777e86ab5a86722c4aeb",
+  "source": "nvd",
+  "tags": [
+    "CWE-208"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48630"
+}

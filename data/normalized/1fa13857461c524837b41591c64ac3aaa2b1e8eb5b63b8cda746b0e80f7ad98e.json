@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick ImageMagick ImageMagick contains an unspecified vulnerability that could allow users to delete files by using ImageMagick's 'ephemeral' pseudo protocol, which deletes files after reading.",
+  "token_count": 25
+}

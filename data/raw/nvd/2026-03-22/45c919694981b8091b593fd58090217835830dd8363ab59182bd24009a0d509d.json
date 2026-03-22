@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14149",
+  "ingested_at": "2026-03-22T07:54:33.074773+00:00",
+  "lang": "en",
+  "raw_text": "The Xpro Addons \u2014 140+ Widgets for Elementor plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's Image Scroller widget box link attribute in all versions up to, and including, 1.4.24 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "45c919694981b8091b593fd58090217835830dd8363ab59182bd24009a0d509d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14149"
+}

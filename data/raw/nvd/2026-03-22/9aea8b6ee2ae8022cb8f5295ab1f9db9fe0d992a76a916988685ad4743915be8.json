@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-3989",
+  "ingested_at": "2026-03-22T07:54:44.223427+00:00",
+  "lang": "en",
+  "raw_text": "SGLangs `replay_request_dump.py` contains an insecure pickle.load() without validation and proper deserialization. An attacker can take advantage of this by providing a malicious .pkl file, which will execute the attackers code on the device running the script.",
+  "severity": "HIGH",
+  "sha256_hash": "9aea8b6ee2ae8022cb8f5295ab1f9db9fe0d992a76a916988685ad4743915be8",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3989"
+}

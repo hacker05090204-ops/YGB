@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-12989",
+  "ingested_at": "2026-03-22T07:45:18.317621+00:00",
+  "lang": "en",
+  "raw_text": "Citrix SD-WAN and NetScaler Citrix SD-WAN and NetScaler SD-WAN allow SQL Injection.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7588eb19fe751b9d0ded578141dbb0f19227f727db648e522bbe6d1afd49756",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 12,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

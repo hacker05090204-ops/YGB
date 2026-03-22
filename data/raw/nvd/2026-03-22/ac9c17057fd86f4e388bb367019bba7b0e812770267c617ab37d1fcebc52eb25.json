@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70242",
+  "ingested_at": "2026-03-22T07:54:43.050332+00:00",
+  "lang": "en",
+  "raw_text": "Stack buffer overflow vulnerability in D-Link DIR-513 v1.10 via the webPage parameter to goform/formSetWanPPTP.",
+  "severity": "HIGH",
+  "sha256_hash": "ac9c17057fd86f4e388bb367019bba7b0e812770267c617ab37d1fcebc52eb25",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70242"
+}

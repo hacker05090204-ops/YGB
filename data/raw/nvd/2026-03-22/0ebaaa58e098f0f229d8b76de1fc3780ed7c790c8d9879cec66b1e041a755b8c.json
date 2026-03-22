@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0027",
+  "ingested_at": "2026-03-22T07:54:33.933339+00:00",
+  "lang": "en",
+  "raw_text": "In smmu_detach_dev of arm-smmu-v3.c, there is a possible out of bounds write due to a use after free. This could lead to local escalation of privilege with System execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0ebaaa58e098f0f229d8b76de1fc3780ed7c790c8d9879cec66b1e041a755b8c",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0027"
+}

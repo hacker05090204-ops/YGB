@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue in ClasroomIO before v.0.2.6 allows a remote attacker to escalate privileges via the endpoints /api/verify and /rest/v1/profile",
+  "token_count": 19
+}

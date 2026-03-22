@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28012",
+  "ingested_at": "2026-03-22T07:54:40.345817+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Gridiron gridiron allows PHP Local File Inclusion.This issue affects Gridiron: from n/a through < = 1.0.14.",
+  "severity": "HIGH",
+  "sha256_hash": "d9fb068f9c7876c70c052151222073eb315e5a66680c3b4c097d4f6aa8effacc",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28012"
+}

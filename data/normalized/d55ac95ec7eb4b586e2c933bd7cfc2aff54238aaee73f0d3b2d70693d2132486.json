@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in Keycloak. A remote attacker could bypass security controls by sending a valid SAML response from an external Identity Provider (IdP) to the Keycloak SAML endpoint for IdP-initiated broker logins. This allows the attacker to complete broker logins even when the SAML Identity Provider is disabled, leading to unauthorized authentication.",
+  "token_count": 54
+}

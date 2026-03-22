@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CoreDNS is a DNS server that chains plugins. Prior to version 1.14.2, a denial of service vulnerability exists in CoreDNS's loop detection plugin that allows an attacker to crash the DNS server by sending specially crafted DNS queries. The vulnerability stems from the use of a predictable pseudo-random number generator (PRNG) for generating a secret query name, combined with a fatal error handler that terminates the entire process. This issue has been patched in version 1.14.2.",
+  "token_count": 76
+}

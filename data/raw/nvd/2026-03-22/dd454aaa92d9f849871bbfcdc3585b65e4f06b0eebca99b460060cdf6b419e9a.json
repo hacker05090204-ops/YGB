@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27948",
+  "ingested_at": "2026-03-22T07:54:32.530097+00:00",
+  "lang": "en",
+  "raw_text": "Copyparty is a portable file server. In versions prior to 1.20.9, an XSS allows for reflected cross-site scripting via URL-parameter `?setck=...`. Version 1.20.9 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "dd454aaa92d9f849871bbfcdc3585b65e4f06b0eebca99b460060cdf6b419e9a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27948"
+}

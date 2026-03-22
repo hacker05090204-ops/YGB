@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22205",
+  "ingested_at": "2026-03-22T07:54:32.759673+00:00",
+  "lang": "en",
+  "raw_text": "SPIP versions prior to 4.4.10 contain an authentication bypass vulnerability caused by PHP type juggling that allows unauthenticated attackers to access protected information. Attackers can exploit loose type comparisons in authentication logic to bypass login verification and retrieve sensitive internal data.",
+  "severity": "HIGH",
+  "sha256_hash": "f1d5c20ecd01116b5016db1096c321754f964a30a81af52317c0d3f8ec8bd3d9",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22205"
+}

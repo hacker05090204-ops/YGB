@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3633",
+  "ingested_at": "2026-03-22T07:54:47.036596+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in libsoup. A remote attacker, by controlling the method parameter of the `soup_message_new()` function, could inject arbitrary headers and additional request data. This vulnerability, known as CRLF (Carriage Return Line Feed) injection, occurs because the method value is not properly escaped during request line construction, potentially leading to HTTP request injection.",
+  "severity": "LOW",
+  "sha256_hash": "796ec07f162e035960718948334cc4598d1fdc73aacb7721a644588d15ceb8c1",
+  "source": "nvd",
+  "tags": [
+    "CWE-93"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3633"
+}

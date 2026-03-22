@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27441",
+  "ingested_at": "2026-03-22T07:54:34.410434+00:00",
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 insufficiently neutralizes the PDF encryption password, allowing OS command execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9fd17f0f8d9415295d9315f1105d5432b351f8bfb98af712b1f903993fe51171",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27441"
+}

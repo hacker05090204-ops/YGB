@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30979",
+  "ingested_at": "2026-03-22T07:54:42.921233+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a heap-based buffer overflow in CIccCalculatorFunc::InitSelectOp() triggered with local user interaction causing memory corruption/crash. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "369a6fde306f4e689ed6a9597cf0f6965aa6210eb73ea8f23ddfe8c92ac2e75f",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-122",
+    "CWE-787"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30979"
+}

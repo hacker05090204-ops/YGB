@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1069",
+  "ingested_at": "2026-03-22T07:45:18.449830+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Task Scheduler A privilege escalation vulnerability exists in the way the Task Scheduler Service validates certain file operations.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8da5d97ab7b9b927a9777c13caeae1a9cd383cc92d2859b0a4895b2c0ecc61f5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

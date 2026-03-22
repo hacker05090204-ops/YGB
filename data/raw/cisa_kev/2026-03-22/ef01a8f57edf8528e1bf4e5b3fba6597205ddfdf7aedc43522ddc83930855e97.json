@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-68645",
+  "ingested_at": "2026-03-22T07:45:15.963631+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a PHP remote file inclusion vulnerability that could allow for remote attackers to craft requests to the /h/rest endpoint to influence internal request dispatching, allowing inclusion of arbitrary files from the WebRoot directory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ef01a8f57edf8528e1bf4e5b3fba6597205ddfdf7aedc43522ddc83930855e97",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

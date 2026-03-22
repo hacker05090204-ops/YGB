@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27507",
+  "ingested_at": "2026-03-22T07:54:31.661500+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior contain hard-coded administrative credentials that cannot be changed by users. Knowledge of these credentials allows full administrative access to the device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9dbe7e3587c0b5e8a8315a03b19ea2c5a7083239fc4d9aae497e2e9b5e6ac920",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27507"
+}

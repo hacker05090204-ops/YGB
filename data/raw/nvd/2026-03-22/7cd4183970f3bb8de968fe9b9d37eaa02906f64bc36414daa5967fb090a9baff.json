@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4143",
+  "ingested_at": "2026-03-22T07:54:49.457341+00:00",
+  "lang": "en",
+  "raw_text": "The Neos Connector for Fakturama plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to and including 0.0.14. This is due to missing nonce validation in the ncff_add_plugin_page() function which handles settings updates. This makes it possible for unauthenticated attackers to modify plugin settings via a forged request, granted they can trick a site administrator into performing an action such as clicking a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7cd4183970f3bb8de968fe9b9d37eaa02906f64bc36414daa5967fb090a9baff",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4143"
+}

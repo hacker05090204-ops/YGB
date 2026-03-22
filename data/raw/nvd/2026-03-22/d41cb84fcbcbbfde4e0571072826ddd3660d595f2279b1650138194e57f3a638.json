@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-55020",
+  "ingested_at": "2026-03-22T07:54:34.179240+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability in the DHCP activation feature of Weintek cMT-3072XH2 easyweb Web Version v2.1.53, OS v20231011 allows attackers to execute arbitrary commands with root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d41cb84fcbcbbfde4e0571072826ddd3660d595f2279b1650138194e57f3a638",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-78"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-55020"
+}

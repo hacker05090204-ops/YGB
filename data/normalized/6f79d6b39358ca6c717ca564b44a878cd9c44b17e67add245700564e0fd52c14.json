@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenViking versions 0.2.1 and prior, fixed in commit 46b3e76, contain a path traversal vulnerability in the .ovpack import handling that allows attackers to write files outside the intended import directory. Attackers can craft malicious ZIP archives with traversal sequences, absolute paths, or drive prefixes in member names to overwrite or create arbitrary files with the importing process privileges.",
+  "token_count": 58
+}

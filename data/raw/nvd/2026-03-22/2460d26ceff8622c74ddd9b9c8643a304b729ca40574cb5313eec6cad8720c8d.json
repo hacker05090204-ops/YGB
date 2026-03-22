@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20102",
+  "ingested_at": "2026-03-22T07:54:34.719795+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the SAML 2.0 single sign-on (SSO) feature of Cisco Secure Firewall ASA Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to conduct a cross-site scripting (XSS) attack against the SAML feature and access sensitive, browser-based information. This vulnerability is due to insufficient input validation of multiple HTTP parameters. An attacker could exploit this vulnerability by persuading a user to access a malicious link. A successful exploit could allow the attacker to conduct a reflected XSS attack through an affected device.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2460d26ceff8622c74ddd9b9c8643a304b729ca40574cb5313eec6cad8720c8d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20102"
+}

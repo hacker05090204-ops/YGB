@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-32701",
+  "ingested_at": "2026-03-22T07:45:16.424328+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Common Log File System (CLFS) Driver contains a use-after-free vulnerability that allows an authorized attacker to elevate privileges locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "56ddc540a4ca0f79708efd1d6c798be648f42645229d639c647f51808d63c360",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

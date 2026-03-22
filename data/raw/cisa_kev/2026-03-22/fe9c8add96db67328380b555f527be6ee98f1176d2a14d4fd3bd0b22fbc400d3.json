@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0802",
+  "ingested_at": "2026-03-22T07:45:19.385599+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains a memory corruption vulnerability due to the way objects are handled in memory. Successful exploitation allows for remote code execution in the context of the current user. This vulnerability is known to be chained with CVE-2018-0798.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fe9c8add96db67328380b555f527be6ee98f1176d2a14d4fd3bd0b22fbc400d3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

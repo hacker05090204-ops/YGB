@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41974",
+  "ingested_at": "2026-03-22T07:45:15.872058+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and iPadOS Apple iOS and iPadOS contain a use-after-free vulnerability. An app may be able to execute arbitrary code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d207ab737f9bd94fb003ed6667cafeac8402747c40d27d1fa1c53841b3205274",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A compromised third party cloud server or man-in-the-middle attacker could send a malformed HTTP response and cause a crash in applications using the MongoDB C driver.",
+  "token_count": 26
+}

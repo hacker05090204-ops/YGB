@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32437",
+  "ingested_at": "2026-03-22T07:54:46.105655+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in vowelweb VW Portfolio vw-portfolio allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects VW Portfolio: from n/a through < = 1.3.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "96cdba79a05672cd32a84191a9d74818d3ad6f8c9a90814edb18d06f2562301f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32437"
+}

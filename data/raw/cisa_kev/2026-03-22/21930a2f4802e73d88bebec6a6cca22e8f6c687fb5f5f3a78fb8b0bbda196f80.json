@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-19949",
+  "ingested_at": "2026-03-22T07:45:17.942870+00:00",
+  "lang": "en",
+  "raw_text": "QNAP Network Attached Storage (NAS) A command injection vulnerability affecting QNAP NAS File Station could allow remote attackers to run commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "21930a2f4802e73d88bebec6a6cca22e8f6c687fb5f5f3a78fb8b0bbda196f80",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

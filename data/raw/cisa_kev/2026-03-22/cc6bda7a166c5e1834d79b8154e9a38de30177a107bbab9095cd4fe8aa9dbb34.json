@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-7445",
+  "ingested_at": "2026-03-22T07:45:17.661764+00:00",
+  "lang": "en",
+  "raw_text": "MikroTik RouterOS In MikroTik RouterOS, a stack-based buffer overflow occurs when processing NetBIOS session request messages. Remote attackers with access to the service can exploit this vulnerability and gain code execution on the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cc6bda7a166c5e1834d79b8154e9a38de30177a107bbab9095cd4fe8aa9dbb34",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

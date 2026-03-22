@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Incorrect permission assignment for critical resource in Windows Accessibility Infrastructure (ATBroker.exe) allows an authorized attacker to elevate privileges locally.",
+  "token_count": 19
+}

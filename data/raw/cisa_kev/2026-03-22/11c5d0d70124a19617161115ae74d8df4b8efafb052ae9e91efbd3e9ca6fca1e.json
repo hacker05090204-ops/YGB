@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-4428",
+  "ingested_at": "2026-03-22T07:45:19.244903+00:00",
+  "lang": "en",
+  "raw_text": "IBM Data Risk Manager IBM Data Risk Manager contains an unspecified vulnerability which could allow a remote, authenticated attacker to execute commands on the system.\ufffd",
+  "severity": "CRITICAL",
+  "sha256_hash": "11c5d0d70124a19617161115ae74d8df4b8efafb052ae9e91efbd3e9ca6fca1e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

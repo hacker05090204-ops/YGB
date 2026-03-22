@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24112",
+  "ingested_at": "2026-03-22T07:54:33.718864+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Attackers may exploit the vulnerability by specifying the value of `userInfo`. When `userInfo` is passed into the `addWewifiWhiteUser` function and processed by `sscanf` without size validation, it could lead to a buffer overflow vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2331dff47f0979587a93139a5ed0918e177fcebe0435dbf4d31b679d2030472c",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-120"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24112"
+}

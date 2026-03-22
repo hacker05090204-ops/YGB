@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A reflected Cross-Site Scripting (XSS) vulnerability has been found in Eventobot. This vulnerability allows an attacker to execute JavaScript code in the victim's browser by sending him/her a malicious URL using the 'name' parameter in '/search-results'. This vulnerability can be exploited to steal sensitive user data, such as session cookies, or to perform actions on behalf of the user.",
+  "token_count": 59
+}

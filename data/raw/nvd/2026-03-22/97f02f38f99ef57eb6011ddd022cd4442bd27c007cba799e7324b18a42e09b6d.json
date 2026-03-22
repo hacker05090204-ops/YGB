@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28506",
+  "ingested_at": "2026-03-22T07:54:47.074200+00:00",
+  "lang": "en",
+  "raw_text": "Outline is a service that allows for collaborative documentation. Prior to 1.5.0, the events.list API endpoint, used for retrieving activity logs, contains a logic flaw in its filtering mechanism. It allows any authenticated user to retrieve activity events associated with documents that have no collection (e.g., Private Drafts, Deleted Documents), regardless of the user's actual permissions on those documents. While the document content is not directly exposed, this vulnerability leaks sensitive metadata (such as Document IDs, user activity timestamps, and in some specific cases like the Document Title of Permanent Delete). Crucially, leaking valid Document IDs of deleted drafts removes the protection of UUID randomness, making High-severity IDOR attacks (such as the one identified in documents.restore) trivially exploitable by lowering the attack complexity. Version 1.5.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "97f02f38f99ef57eb6011ddd022cd4442bd27c007cba799e7324b18a42e09b6d",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 128,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28506"
+}

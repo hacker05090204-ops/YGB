@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20031",
+  "ingested_at": "2026-03-22T07:54:34.662760+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the HTML Cascading Style Sheets (CSS) module of ClamAV could allow an unauthenticated, remote attacker to cause a denial of service (DoS) condition on an affected device. This vulnerability is due to improper error handling when splitting UTF-8 strings. An attacker could exploit this vulnerability by submitting a crafted HTML file to be scanned by ClamAV on an affected device. A successful exploit could allow the attacker to terminate the scanning process.",
+  "severity": "MEDIUM",
+  "sha256_hash": "133936d747ede48087ae97ca842bda46f1b69f95dfc96cd9acc51672923903fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-248"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20031"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11634",
+  "ingested_at": "2026-03-22T07:45:19.130965+00:00",
+  "lang": "en",
+  "raw_text": "Citrix Workspace Application and Receiver for Windows Citrix Workspace Application and Receiver for Windows contains remote code execution vulnerability resulting from local drive access preferences not being enforced into the clients' local drives.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f1a7f3feb71a0bc7f045d854fa52f9c2ed20263775b433a5438abff704e2fcfb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

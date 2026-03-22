@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3237",
+  "ingested_at": "2026-03-22T07:54:47.015839+00:00",
+  "lang": "en",
+  "raw_text": "In affected versions of Octopus Server it was possible for a low privileged user to manipulate an API request to change the signing key expiration and revocation time frames via an API endpoint that had incorrect permission validation. It was not possible to expose the signing keys using this vulnerability.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "72de7eae021f6980ddbcc3efcac87ba0f04d7673e4f183b381bc035688191e0e",
+  "source": "nvd",
+  "tags": [
+    "CWE-285"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3237"
+}

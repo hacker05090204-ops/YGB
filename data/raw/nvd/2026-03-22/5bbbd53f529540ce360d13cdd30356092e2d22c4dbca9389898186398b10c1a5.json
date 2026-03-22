@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28137",
+  "ingested_at": "2026-03-22T07:54:40.691430+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in QuanticaLabs MediCenter - Health Medical Clinic medicenter allows Reflected XSS.This issue affects MediCenter - Health Medical Clinic: from n/a through < = 14.9.",
+  "severity": "HIGH",
+  "sha256_hash": "5bbbd53f529540ce360d13cdd30356092e2d22c4dbca9389898186398b10c1a5",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28137"
+}

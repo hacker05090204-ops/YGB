@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Statmatic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.11 and 6.4.0, user email addresses were included in responses from the user fieldtype\u2019s data endpoint for control panel users who did not have the \"view users\" permission. This has been fixed in 5.73.11 and 6.4.0.",
+  "token_count": 50
+}

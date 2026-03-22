@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-43000",
+  "ingested_at": "2026-03-22T07:45:15.867194+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple macOS, iOS, iPadOS, and Safari 16.6 contain a use-after-free vulnerability due to the processing of maliciously crafted web content that may lead to memory corruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "95b643740dc9e2a518f1b0d2665db5b0afea1235fda3f46b6a1c1a600f76d364",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28556",
+  "ingested_at": "2026-03-22T07:54:33.413894+00:00",
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains a missing authorization vulnerability that allows authenticated subscribers to move, merge, or split any forum topic via the topic_move, topic_merge, and topic_split form action handlers. Attackers with a valid form nonce can reorganize arbitrary forum content without moderator permissions, including relocating topics to private forums.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f7eaebe94997e23a9dbd2d164cd61bf1f9d2d9170e6370b47f91255bd31e7def",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28556"
+}

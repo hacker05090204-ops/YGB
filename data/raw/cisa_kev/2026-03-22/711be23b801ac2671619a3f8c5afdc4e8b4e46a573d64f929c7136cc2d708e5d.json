@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-10585",
+  "ingested_at": "2026-03-22T07:45:16.169659+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium contains a type confusion vulnerability in the V8 JavaScript and WebAssembly engine.",
+  "severity": "CRITICAL",
+  "sha256_hash": "711be23b801ac2671619a3f8c5afdc4e8b4e46a573d64f929c7136cc2d708e5d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2011-4723",
+  "ingested_at": "2026-03-22T07:45:17.674767+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DIR-300 Router The D-Link DIR-300 router stores cleartext passwords, which allows context-dependent attackers to obtain sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3040f6818fd8452f1294d8d409029cbd1ed29f53ab3be4e9c17ac6531e5a6f65",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

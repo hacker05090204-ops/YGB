@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-40890",
+  "ingested_at": "2026-03-22T07:45:16.595959+00:00",
+  "lang": "en",
+  "raw_text": "Zyxel DSL CPE Devices Multiple Zyxel DSL CPE devices contain a post-authentication command injection vulnerability in the CGI program that could allow an authenticated attacker to execute OS commands via a crafted HTTP request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d608039ad95d2714642d530d5a3ef7504c9fd9da8606b823893dde528bfab6f8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

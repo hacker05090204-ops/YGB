@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68022",
+  "ingested_at": "2026-03-22T07:54:30.069958+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in soporteblue Plugin BlueX for WooCommerce bluex-for-woocommerce allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Plugin BlueX for WooCommerce: from n/a through < = 3.1.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "07e5d2b5a8de5b743b10bfa38503ae3ad7e313cc1eeea4d07b5df6d2ccfd3af8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68022"
+}

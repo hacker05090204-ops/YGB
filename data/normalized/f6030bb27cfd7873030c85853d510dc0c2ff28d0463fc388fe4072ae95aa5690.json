@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Local privilege escalation in Genetec Update Service. An authenticated, low-privileged, Windows user could exploit this vulnerability to gain elevated privileges on the affected system.",
+  "token_count": 24
+}

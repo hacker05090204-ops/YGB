@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31807",
+  "ingested_at": "2026-03-22T07:54:43.210152+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to 3.5.10, SiYuan's SVG sanitizer (SanitizeSVG) blocks dangerous elements (",
+  "severity": "MEDIUM",
+  "sha256_hash": "3197d5fb182b76108057283d05fbfd9811b8bec87db3f31725df720e06f8dc7a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31807"
+}

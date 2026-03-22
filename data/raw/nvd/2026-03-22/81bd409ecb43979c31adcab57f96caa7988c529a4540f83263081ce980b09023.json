@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28292",
+  "ingested_at": "2026-03-22T07:54:43.024783+00:00",
+  "lang": "en",
+  "raw_text": "`simple-git`, an interface for running git commands in any node.js application, has an issue in versions 3.15.0 through 3.32.2 that allows an attacker to bypass two prior CVE fixes (CVE-2022-25860 and CVE-2022-25912) and achieve full remote code execution on the host machine. Version 3.23.0 contains an updated fix for the vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "81bd409ecb43979c31adcab57f96caa7988c529a4540f83263081ce980b09023",
+  "source": "nvd",
+  "tags": [
+    "CWE-78",
+    "CWE-178"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28292"
+}

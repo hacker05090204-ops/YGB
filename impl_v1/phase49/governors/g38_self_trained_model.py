@@ -36,7 +36,7 @@ import subprocess
 import time
 import uuid
 import platform
-from datetime import datetime
+from datetime import datetime, timezone
 from abc import ABC, abstractmethod
 
 
@@ -116,7 +116,7 @@ def check_idle_conditions(
     - GPU available (CPU fallback allowed)
     """
     result_id = f"IDL-{uuid.uuid4().hex[:16].upper()}"
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     
     # Check all conditions
     if not conditions.no_active_scan:
@@ -640,7 +640,7 @@ def evaluate_training_trigger(
     3. Pending training samples available
     """
     trigger_id = f"TRG-{uuid.uuid4().hex[:16].upper()}"
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     
     # Check idle conditions
     if not idle_check.can_train:
@@ -717,7 +717,7 @@ def make_auto_mode_decision(
         raise RuntimeError("SECURITY: AI cannot verify bugs")
     
     decision_id = f"AMD-{uuid.uuid4().hex[:16].upper()}"
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     
     # Determine action based on probabilities
     if inference.real_probability > PRECISION_THRESHOLD:

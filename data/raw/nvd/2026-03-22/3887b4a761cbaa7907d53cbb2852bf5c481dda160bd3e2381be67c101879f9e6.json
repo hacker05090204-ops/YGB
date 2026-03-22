@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4043",
+  "ingested_at": "2026-03-22T07:54:44.361026+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tenda i12 1.0.0.6(2204). The impacted element is the function formwrlSSIDget of the file /goform/wifiSSIDget. Such manipulation of the argument index leads to stack-based buffer overflow. The attack may be launched remotely. The exploit has been disclosed publicly and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "3887b4a761cbaa7907d53cbb2852bf5c481dda160bd3e2381be67c101879f9e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4043"
+}

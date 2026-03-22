@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WatchGuard Firebox WatchGuard Fireware OS iked process contains an out of bounds write vulnerability in the OS iked process. This vulnerability may allow a remote unauthenticated attacker to execute arbitrary code and affects both the mobile user VPN with IKEv2 and the branch office VPN using IKEv2 when configured with a dynamic gateway peer.",
+  "token_count": 54
+}

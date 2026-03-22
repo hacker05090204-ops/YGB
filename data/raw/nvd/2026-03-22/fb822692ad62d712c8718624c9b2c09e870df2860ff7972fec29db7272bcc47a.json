@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30835",
+  "ingested_at": "2026-03-22T07:54:41.650182+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to versions 8.6.7 and 9.5.0-alpha.6, malformed $regex query parameter (e.g. [abc) causes the database to return a structured error object that is passed unsanitized through the API response. This leaks database internals such as error messages, error codes, code names, cluster timestamps, and topology details. The vulnerability is exploitable by any client that can send query requests, depending on the deployment's permission configuration. This issue has been patched in versions 8.6.7 and 9.5.0-alpha.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fb822692ad62d712c8718624c9b2c09e870df2860ff7972fec29db7272bcc47a",
+  "source": "nvd",
+  "tags": [
+    "CWE-209"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30835"
+}

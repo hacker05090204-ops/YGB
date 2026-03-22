@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0222",
+  "ingested_at": "2026-03-22T07:45:18.723752+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer A remote code execution vulnerability exists when Internet Explorer improperly accesses objects in memory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "31bc9169ed72a7119e64a993fad2b569083a8fcbf641fdb8ea9a0372abd89294",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "hoppscotch is an open source API development ecosystem. Prior to version 2026.2.1, the DELETE /v1/access-tokens/revoke endpoint allows any authenticated user to delete any other user's PAT by providing its ID, with no ownership verification. This issue has been patched in version 2026.2.1.",
+  "token_count": 42
+}

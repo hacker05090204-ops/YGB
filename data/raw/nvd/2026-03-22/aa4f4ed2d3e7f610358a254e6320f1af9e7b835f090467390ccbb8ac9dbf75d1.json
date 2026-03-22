@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41756",
+  "ingested_at": "2026-03-22T07:54:42.188982+00:00",
+  "lang": "en",
+  "raw_text": "A low-privileged remote attacker can exploit the ubr-editfile method in wwwubr.cgi, an undocumented and unused API endpoint to write arbitrary files on the system.",
+  "severity": "HIGH",
+  "sha256_hash": "aa4f4ed2d3e7f610358a254e6320f1af9e7b835f090467390ccbb8ac9dbf75d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-1242"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41756"
+}

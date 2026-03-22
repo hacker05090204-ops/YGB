@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Laravel Laravel Framework Laravel Framework contains a deserialization of untrusted data vulnerability, allowing for remote command execution. This vulnerability may only be exploited if a malicious user has accessed the application encryption key (APP_KEY environment variable).",
+  "token_count": 36
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in don-themes Riode Core riode-core allows Blind SQL Injection.This issue affects Riode Core: from n/a through < = 1.6.26.",
+  "token_count": 32
+}

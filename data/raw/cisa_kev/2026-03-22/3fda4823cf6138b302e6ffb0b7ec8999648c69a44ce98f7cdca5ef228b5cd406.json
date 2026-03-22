@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-43200",
+  "ingested_at": "2026-03-22T07:45:16.353235+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, watchOS, and visionOS, contain an unspecified vulnerability when processing a maliciously crafted photo or video shared via an iCloud Link.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3fda4823cf6138b302e6ffb0b7ec8999648c69a44ce98f7cdca5ef228b5cd406",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-15415",
+  "ingested_at": "2026-03-22T07:45:16.795182+00:00",
+  "lang": "en",
+  "raw_text": "DrayTek Multiple Vigor Routers DrayTek Vigor3900, Vigor2960, and Vigor300B devices contain an OS command injection vulnerability in cgi-bin/mainfunction.cgi/cvmcfgupload that allows for remote code execution via shell metacharacters in a filename when the text/x-python-script content type is used.",
+  "severity": "CRITICAL",
+  "sha256_hash": "258c780ceda32270de26b732abd863a3ae901bbb68ca24bfbe7eba5fcb05dbf8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

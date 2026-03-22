@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4198",
+  "ingested_at": "2026-03-22T07:54:46.713109+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in hypermodel-labs mcp-server-auto-commit 1.0.0. Affected by this vulnerability is the function getGitChanges of the file index.ts. This manipulation causes command injection. The attack can only be executed locally. The exploit has been publicly disclosed and may be utilized. Patch name: f7d992c830c5f2ec5749852e66c0195e3ed7fe30. Applying a patch is the recommended action to fix this issue. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "33b2396ada891da9871b4862bb5b8a66af4f5290acd271e99041ee7e1cb2d8f5",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4198"
+}

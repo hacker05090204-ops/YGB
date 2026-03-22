@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-26222",
+  "ingested_at": "2026-03-22T07:54:31.718217+00:00",
+  "lang": "en",
+  "raw_text": "Altec DocLink (now maintained by Beyond Limits Inc.) version 4.0.336.0 exposes insecure .NET Remoting endpoints over TCP and HTTP/SOAP via Altec.RDCHostService.exe using the ObjectURI \"doclinkServer.soap\". The service does not require authentication and is vulnerable to unsafe object unmarshalling, allowing remote attackers to read arbitrary files from the underlying system by specifying local file paths. Additionally, attackers can coerce SMB authentication via UNC paths and write arbitrary files to server locations. Because writable paths may be web-accessible under IIS, this can result in unauthenticated remote code execution or denial of service through file overwrite.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9fcc384c2bfc477f70a3a8cf1d3ea6267b99130e69bfaf0f1b9d3c4ae0e1f9b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-502",
+    "CWE-918",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26222"
+}

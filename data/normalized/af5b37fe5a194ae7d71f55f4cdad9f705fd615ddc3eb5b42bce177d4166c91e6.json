@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WordPress Plugin \"Survey Maker\" versions 5.1.7.7 and prior contain a cross-site scripting vulnerability. If this vulnerability is exploited, an arbitrary script may be executed in the user's web browser.",
+  "token_count": 29
+}

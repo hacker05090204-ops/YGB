@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Soliton Systems K.K FileZen Soliton Systems K.K FileZen contains an OS command injection vulnerability when an user logs-in to the affected product and sends a specially crafted HTTP request.",
+  "token_count": 29
+}

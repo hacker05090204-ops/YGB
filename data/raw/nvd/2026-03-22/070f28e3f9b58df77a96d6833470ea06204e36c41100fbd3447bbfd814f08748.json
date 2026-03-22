@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-12150",
+  "ingested_at": "2026-03-22T07:54:33.102837+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in Keycloak\u2019s WebAuthn registration component. This vulnerability allows an attacker to bypass the configured attestation policy and register untrusted or forged authenticators via submission of an attestation object with fmt: \"none\", even when the realm is configured to require direct attestation. This can lead to weakened authentication integrity and unauthorized authenticator registration.",
+  "severity": "LOW",
+  "sha256_hash": "070f28e3f9b58df77a96d6833470ea06204e36c41100fbd3447bbfd814f08748",
+  "source": "nvd",
+  "tags": [
+    "CWE-347"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12150"
+}

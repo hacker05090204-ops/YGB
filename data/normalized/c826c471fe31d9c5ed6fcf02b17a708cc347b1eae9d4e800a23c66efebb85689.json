@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In affected versions of Octopus Server it was possible to create a new API key from an existing access token resulting in the new API key having a lifetime exceeding the original API key used to mint the access token.",
+  "token_count": 40
+}

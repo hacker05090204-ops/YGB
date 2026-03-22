@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4229",
+  "ingested_at": "2026-03-22T07:54:46.780241+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in vanna-ai vanna up to 2.0.2. This impacts the function remove_training_data of the file src/vanna/legacy/google/bigquery_vector.py. This manipulation of the argument ID causes sql injection. The attack can be initiated remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "97a19cafa155611cc8bc61d0f226f6cc3cc62556bedd4d7cf40c3c560ccf34fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4229"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27359",
+  "ingested_at": "2026-03-22T07:54:40.222862+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in fox-themes Awa Plugins awa-plugins allows Reflected XSS.This issue affects Awa Plugins: from n/a through < = 1.4.4.",
+  "severity": "HIGH",
+  "sha256_hash": "3d350869c66e3a430eba238270aa5c0ff29809fea0ccd8396f66ffd741f0a7d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27359"
+}

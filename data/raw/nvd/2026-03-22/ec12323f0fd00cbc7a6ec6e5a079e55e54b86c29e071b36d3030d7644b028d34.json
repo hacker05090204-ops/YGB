@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27115",
+  "ingested_at": "2026-03-22T07:54:30.534347+00:00",
+  "lang": "en",
+  "raw_text": "ADB Explorer is a fluent UI for ADB on Windows. Versions 0.9.26020 and below have an unvalidated command-line argument that allows any user to trigger recursive deletion of arbitrary directories on the Windows filesystem. ADB Explorer accepts an optional path argument to set a custom data directory, but only check whether the path exists. The ClearDrag() method calls Directory.Delete(dir, true) on every subdirectory of that path at both application startup and exit. An attacker can craft a malicious shortcut (.lnk) or batch script that launches ADB Explorer with a critical directory (e.g. C:\\Users\\%USERNAME%\\Documents) as the argument, causing permanent recursive deletion of all its subdirectories. Any user who launches ADB Explorer via a crafted shortcut, batch file, or script loses the contents of the targeted directory permanently (deletion bypasses the Recycle Bin). This issue has been fixed in version 0.9.26021.",
+  "severity": "HIGH",
+  "sha256_hash": "ec12323f0fd00cbc7a6ec6e5a079e55e54b86c29e071b36d3030d7644b028d34",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-73"
+  ],
+  "token_count": 139,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27115"
+}

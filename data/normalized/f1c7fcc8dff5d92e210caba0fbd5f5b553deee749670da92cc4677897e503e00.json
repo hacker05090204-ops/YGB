@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A low\u2010privileged local attacker who gains access to the UBR service account (e.g., via SSH) can escalate privileges to obtain full system access. This is due to the service account being permitted to execute certain binaries (e.g., tcpdump and ip) with sudo.",
+  "token_count": 42
+}

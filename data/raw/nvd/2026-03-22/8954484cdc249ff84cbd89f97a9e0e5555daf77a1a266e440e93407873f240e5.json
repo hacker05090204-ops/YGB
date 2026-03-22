@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22453",
+  "ingested_at": "2026-03-22T07:54:40.119121+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Pets Club petclub allows Object Injection.This issue affects Pets Club: from n/a through < = 2.3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8954484cdc249ff84cbd89f97a9e0e5555daf77a1a266e440e93407873f240e5",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22453"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Enable Media Replace plugin for WordPress is vulnerable to unauthorized modification of data due to an improper capability check on the 'RemoveBackGroundViewController::load' function in all versions up to, and including, 4.1.7. This makes it possible for authenticated attackers, with Author-level access and above, to replace any attachment with a removed background attachment.",
+  "token_count": 53
+}

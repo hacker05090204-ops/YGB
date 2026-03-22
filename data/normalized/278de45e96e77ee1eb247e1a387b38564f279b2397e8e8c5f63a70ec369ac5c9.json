@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Visual Composer Metadata Uploader contains an unrestricted file upload vulnerability that allows an unauthenticated agent to upload potentially malicious executable binaries.",
+  "token_count": 25
+}

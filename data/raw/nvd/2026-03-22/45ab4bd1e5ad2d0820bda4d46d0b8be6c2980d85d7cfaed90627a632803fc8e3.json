@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3539",
+  "ingested_at": "2026-03-22T07:54:34.786230+00:00",
+  "lang": "en",
+  "raw_text": "Object lifecycle issue in DevTools in Google Chrome prior to 145.0.7632.159 allowed an attacker who convinced a user to install a malicious extension to potentially exploit heap corruption via a crafted Chrome Extension. (Chromium security severity: High)",
+  "severity": "HIGH",
+  "sha256_hash": "45ab4bd1e5ad2d0820bda4d46d0b8be6c2980d85d7cfaed90627a632803fc8e3",
+  "source": "nvd",
+  "tags": [
+    "CWE-1091"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3539"
+}

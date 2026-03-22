@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1003030",
+  "ingested_at": "2026-03-22T07:45:18.325621+00:00",
+  "lang": "en",
+  "raw_text": "Jenkins Matrix Project Plugin Jenkins Matrix Project plugin contains a vulnerability which can allow users to escape the sandbox, opening opportunity to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e245f556a010e0219f6f6b11e641764ad987a293d60aae2e333e5545abc81465",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

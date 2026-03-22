@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in itsourcecode University Management System 1.0. This affects an unknown part of the file /att_single_view.php. The manipulation of the argument dt results in cross site scripting. The attack can be executed remotely. The exploit is now public and may be used.",
+  "token_count": 45
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-11652",
+  "ingested_at": "2026-03-22T07:45:19.535540+00:00",
+  "lang": "en",
+  "raw_text": "SaltStack Salt SaltStack Salt contains a path traversal vulnerability in the salt-master process ClearFuncs which allows directory access to authenticated users. Salt users who follow fundamental internet security guidelines and best practices are not affected by this vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "354ea68b72b41f8d6a49626bdb9a6b529f83c2f0bebd078995166e5e8fc1e680",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

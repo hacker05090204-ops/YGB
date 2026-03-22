@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-9978",
+  "ingested_at": "2026-03-22T07:45:19.658482+00:00",
+  "lang": "en",
+  "raw_text": "WordPress Social Warfare Plugin WordPress Social Warfare plugin contains a cross-site scripting (XSS) vulnerability that allows for remote code execution. This vulnerability affects Social Warfare and Social Warfare Pro.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c709ced2ea83aa8a2a176735ddaa49c6a568004a63e9e6d059306cbadd4828fe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29773",
+  "ingested_at": "2026-03-22T07:54:42.505937+00:00",
+  "lang": "en",
+  "raw_text": "Kubewarden is a policy engine for Kubernetes. Kubewarden cluster operators can grant permissions to users to deploy namespaced AdmissionPolicies and AdmissionPolicyGroups in their Namespaces. One of Kubewarden promises is that configured users can deploy namespaced policies in a safe manner, without privilege escalation. An attacker with privileged \"AdmissionPolicy\" create permissions (which isn't the default) could make use of 3 deprecated host-callback APIs: kubernetes/ingresses, kubernetes/namespaces, kubernetes/services. The attacker can craft a policy that exercises these deprecated API calls and would allow them read access to Ingresses, Namespaces, and Services resources respectively. This attack is read-only, there is no write capability and no access to Secrets, ConfigMaps, or other resource types beyond these three.",
+  "severity": "MEDIUM",
+  "sha256_hash": "011849793317b174adf96d9670c0df32ac25ff3cd2149cd0092d25f51e7e109b",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 112,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29773"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter Server contains a heap-based buffer overflow vulnerability in the implementation of the DCERPC protocol. This vulnerability could allow an attacker with network access to the vCenter Server to execute remote code by sending a specially crafted packet.",
+  "token_count": 42
+}

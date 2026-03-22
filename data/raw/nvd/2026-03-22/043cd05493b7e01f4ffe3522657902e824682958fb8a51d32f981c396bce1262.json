@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1527",
+  "ingested_at": "2026-03-22T07:54:44.527285+00:00",
+  "lang": "en",
+  "raw_text": "ImpactWhen an application passes user-controlled input to the upgrade option of client.request(), an attacker can inject CRLF sequences (\\r\\n) to: * Inject arbitrary HTTP headers * Terminate the HTTP request prematurely and smuggle raw data to non-HTTP services (Redis, Memcached, Elasticsearch) The vulnerability exists because undici writes the upgrade value directly to the socket without validating for invalid header characters: // lib/dispatcher/client-h1.js:1121 if (upgrade) { header += `connection: upgrade\\r\\nupgrade: ${upgrade}\\r\\n` }",
+  "severity": "MEDIUM",
+  "sha256_hash": "043cd05493b7e01f4ffe3522657902e824682958fb8a51d32f981c396bce1262",
+  "source": "nvd",
+  "tags": [
+    "CWE-93"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1527"
+}

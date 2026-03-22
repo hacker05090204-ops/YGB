@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-30579",
+  "ingested_at": "2026-03-22T07:54:48.910900+00:00",
+  "lang": "en",
+  "raw_text": "File Thingie 2.5.7 is vulnerable to Cross Site Scripting (XSS). A malicious user can leverage the \"upload file\" functionality to upload a file with a crafted file name used to trigger a Javascript payload.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "bf76e1544496019deed3f71dd55e8eed579da857a6c8a6b98818c0cd0c65768f",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30579"
+}

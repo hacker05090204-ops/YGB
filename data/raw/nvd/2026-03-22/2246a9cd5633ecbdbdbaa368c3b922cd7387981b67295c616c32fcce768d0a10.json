@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3105",
+  "ingested_at": "2026-03-22T07:54:31.768618+00:00",
+  "lang": "en",
+  "raw_text": "SummaryThis advisory addresses a SQL injection vulnerability in the API endpoint used for retrieving contact activities. A vulnerability exists in the query construction for the Contact Activity timeline where the parameter responsible for determining the sort direction was not strictly validated against an allowlist, potentially allowing authenticated users to inject arbitrary SQL commands via the API. MitigationPlease update to 4.4.19, 5.2.10, 6.0.8, 7.0.1 or later. WorkaroundsNone. ReferencesIf you have any questions or comments about this advisory: Email us at security@mautic.org",
+  "severity": "HIGH",
+  "sha256_hash": "2246a9cd5633ecbdbdbaa368c3b922cd7387981b67295c616c32fcce768d0a10",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3105"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27116",
+  "ingested_at": "2026-03-22T07:54:32.351265+00:00",
+  "lang": "en",
+  "raw_text": "Vikunja is an open-source self-hosted task management platform. Prior to version 2.0.0, a reflected HTML injection vulnerability exists in the Projects module where the `filter` URL parameter is rendered into the DOM without output encoding when the user clicks \"Filter.\" While `",
+  "severity": "MEDIUM",
+  "sha256_hash": "07bb0ed95732d4cec4cde8738d0bf0e06091b1937a8eca224e491c9f0883106d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-80"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27116"
+}

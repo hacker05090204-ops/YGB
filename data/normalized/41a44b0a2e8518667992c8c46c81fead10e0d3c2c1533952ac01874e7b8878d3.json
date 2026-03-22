@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SOGo before 5.12.5 is prone to a XSS vulnerability with events, tasks, and contacts categories.",
+  "token_count": 15
+}

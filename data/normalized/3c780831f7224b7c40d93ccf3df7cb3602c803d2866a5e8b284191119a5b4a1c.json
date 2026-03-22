@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Array Networks AG/vxAG ArrayOS Array Networks AG and vxAG ArrayOS contain a missing authentication for critical function vulnerability that allows an attacker to read local files and execute code on the SSL VPN gateway.",
+  "token_count": 34
+}

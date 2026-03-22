@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31973",
+  "ingested_at": "2026-03-22T07:54:47.705523+00:00",
+  "lang": "en",
+  "raw_text": "SAMtools is a program for reading, manipulating and writing bioinformatics file formats. Starting in version 1.17, in the cram-size command, used to write information about how well CRAM files are compressed, a check to see if the `cram_decode_compression_header()` was missing. If the function returned an error, this could lead to a NULL pointer dereference. Exploiting this bug causes a NULL pointer dereference. Typically this will cause the program to crash. Versions 1.23.1, 1.22.2 and 1.21.1 include fixes for this issue. There is no workaround for this issue.",
+  "severity": "HIGH",
+  "sha256_hash": "12cf9ddfe89dad7e08af3ce10a8b4573c60c754b93aa1e2e2a81dca596b0c379",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31973"
+}

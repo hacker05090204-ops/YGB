@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-23296",
+  "ingested_at": "2026-03-22T07:45:17.029005+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and watchOS RTKit contain a memory corruption vulnerability that allows an attacker with arbitrary kernel read and write capability to bypass kernel memory protections.",
+  "severity": "CRITICAL",
+  "sha256_hash": "df8439f303edb50de5f0c5e242c6b43a6ce0e2cb72d0e0f5f9a700cf983d5882",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

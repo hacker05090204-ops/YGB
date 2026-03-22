@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-4427",
+  "ingested_at": "2026-03-22T07:45:19.242901+00:00",
+  "lang": "en",
+  "raw_text": "IBM Data Risk Manager IBM Data Risk Manager contains a security bypass vulnerability that could allow a remote attacker to bypass security restrictions when configured with SAML authentication. By sending a specially crafted HTTP request, an attacker could exploit this vulnerability to bypass the authentication process and gain full administrative access to the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bacebec29bfe3e12085b1f8d3e7a2e5ea220c4735a2fd240fa4f96b000354938",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 54,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

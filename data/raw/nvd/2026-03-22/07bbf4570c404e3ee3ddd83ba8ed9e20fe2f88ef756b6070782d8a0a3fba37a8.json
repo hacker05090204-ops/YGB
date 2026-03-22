@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30914",
+  "ingested_at": "2026-03-22T07:54:44.699233+00:00",
+  "lang": "en",
+  "raw_text": "SFTPGo is an open source, event-driven file transfer solution. In SFTPGo versions prior to 2.7.1, a path normalization discrepancy between the protocol handlers and the internal Virtual Filesystem routing can lead to an authorization bypass. An authenticated attacker can craft specific file paths to bypass folder-level permissions or escape the boundaries of a configured Virtual Folder. This vulnerability is fixed in 2.7.1.",
+  "severity": "HIGH",
+  "sha256_hash": "07bbf4570c404e3ee3ddd83ba8ed9e20fe2f88ef756b6070782d8a0a3fba37a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30914"
+}

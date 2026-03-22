@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-30702",
+  "ingested_at": "2026-03-22T07:54:47.635455+00:00",
+  "lang": "en",
+  "raw_text": "The WiFi Extender WDR201A (HW V2.1, FW LFMZX28040922V1.02) implements a broken authentication mechanism in its web management interface. The login page does not properly enforce session validation, allowing attackers to bypass authentication by directly accessing restricted web application endpoints through forced browsing",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d6cdb61b918bed94d1bf3b7844133638350ecea5b8df5435f1d7645b919b021b",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30702"
+}

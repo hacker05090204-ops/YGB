@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50199",
+  "ingested_at": "2026-03-22T07:54:33.686089+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, there is a blind SSRF vulnerability in /index.php via the POST openid_url parameter. This issue has been patched in version 1.11.30.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3d03e45544f30d63717c3662fef957c84e3f65b74a63a91cfbb477460fbe3b09",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50199"
+}

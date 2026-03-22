@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SolarWinds Web Help Desk SolarWinds Web Help Desk contains a deserialization of untrusted data vulnerability that could lead to remote code execution, which would allow an attacker to run commands on the host machine. This could be exploited without authentication.",
+  "token_count": 40
+}

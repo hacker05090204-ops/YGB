@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25515",
+  "ingested_at": "2026-03-22T07:54:44.285587+00:00",
+  "lang": "en",
+  "raw_text": "Jettweb PHP Hazir Haber Sitesi Scripti V3 contains an authentication bypass vulnerability in the login.php administration panel that allows unauthenticated attackers to gain administrative access by submitting crafted SQL syntax. Attackers can bypass authentication by submitting equals signs and 'or' operators as username and password parameters to access the administration panel without valid credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "d6102958f63f479e00c7734e8e803a8208ee1ca035abb5d310af6b67aa2dcd87",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25515"
+}

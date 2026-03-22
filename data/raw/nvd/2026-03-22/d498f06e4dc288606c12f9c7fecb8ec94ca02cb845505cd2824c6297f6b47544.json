@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67969",
+  "ingested_at": "2026-03-22T07:54:30.004834+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in knitpay UPI QR Code Payment Gateway for WooCommerce upi-qr-code-payment-for-woocommerce allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects UPI QR Code Payment Gateway for WooCommerce: from n/a through < = 1.5.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d498f06e4dc288606c12f9c7fecb8ec94ca02cb845505cd2824c6297f6b47544",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67969"
+}

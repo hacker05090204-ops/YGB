@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Multiple post-authentication stack-based buffer overflow vulnerabilities in the SonicOS management interface due to improper bounds checking in a API endpoint.",
+  "token_count": 20
+}

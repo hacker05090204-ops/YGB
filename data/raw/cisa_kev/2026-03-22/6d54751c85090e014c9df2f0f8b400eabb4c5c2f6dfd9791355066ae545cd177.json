@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-21608",
+  "ingested_at": "2026-03-22T07:45:17.193977+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contains a use-after-free vulnerability that allows for code execution in the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6d54751c85090e014c9df2f0f8b400eabb4c5c2f6dfd9791355066ae545cd177",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

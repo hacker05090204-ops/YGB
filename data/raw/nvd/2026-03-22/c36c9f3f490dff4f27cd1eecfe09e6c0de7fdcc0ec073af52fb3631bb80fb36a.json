@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3118",
+  "ingested_at": "2026-03-22T07:54:32.043225+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw was identified in the Orchestrator Plugin of Red Hat Developer Hub (Backstage). The issue occurs due to insufficient input validation in GraphQL query handling. An authenticated user can inject specially crafted input into API requests, which disrupts backend query processing. This results in the entire Backstage application crashing and restarting, leading to a platform-wide Denial of Service (DoS). As a result, legitimate users temporarily lose access to the platform.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c36c9f3f490dff4f27cd1eecfe09e6c0de7fdcc0ec073af52fb3631bb80fb36a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3118"
+}

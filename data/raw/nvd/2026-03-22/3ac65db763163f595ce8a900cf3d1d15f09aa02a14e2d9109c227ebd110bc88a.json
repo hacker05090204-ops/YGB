@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27022",
+  "ingested_at": "2026-03-22T07:54:30.589361+00:00",
+  "lang": "en",
+  "raw_text": "@langchain/langgraph-checkpoint-redis is the Redis checkpoint and store implementation for LangGraph. A query injection vulnerability exists in the @langchain/langgraph-checkpoint-redis package's filter handling. The RedisSaver and ShallowRedisSaver classes construct RediSearch queries by directly interpolating user-provided filter keys and values without proper escaping. RediSearch has special syntax characters that can modify query behavior, and when user-controlled data contains these characters, the query logic can be manipulated to bypass intended access controls. This vulnerability is fixed in 1.0.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3ac65db763163f595ce8a900cf3d1d15f09aa02a14e2d9109c227ebd110bc88a",
+  "source": "nvd",
+  "tags": [
+    "CWE-74"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27022"
+}

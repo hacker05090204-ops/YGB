@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25198",
+  "ingested_at": "2026-03-22T07:54:41.478039+00:00",
+  "lang": "en",
+  "raw_text": "eToolz 3.4.8.0 contains a denial of service vulnerability that allows local attackers to crash the application by supplying oversized input buffers. Attackers can create a payload file containing 255 bytes of data that triggers a buffer overflow condition when processed by the application.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c12bbc643462be2684549093fa9a085ed5d652507d6e536a3f366b10c73a6003",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25198"
+}

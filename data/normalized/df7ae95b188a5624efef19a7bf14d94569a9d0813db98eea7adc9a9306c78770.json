@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel The futex_requeue function in kernel/futex.c in Linux kernel does not ensure that calls have two different futex addresses, which allows local users to gain privileges.",
+  "token_count": 27
+}

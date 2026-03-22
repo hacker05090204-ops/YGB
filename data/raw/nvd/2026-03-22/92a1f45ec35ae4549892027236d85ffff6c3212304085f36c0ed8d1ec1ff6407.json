@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30870",
+  "ingested_at": "2026-03-22T07:54:42.518575+00:00",
+  "lang": "en",
+  "raw_text": "PowerSync Service is the server-side component of the PowerSync sync engine. In version 1.20.0, when using new sync streams with config.edition: 3, certain subquery filters were ignored when determining which data to sync to users. Depending on the sync stream configuration, this could result in authenticated users syncing data that should have been restricted. Only queries that gate synchronization using subqueries without partitioning the result set are affected. This vulnerability is fixed in 1.20.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "92a1f45ec35ae4549892027236d85ffff6c3212304085f36c0ed8d1ec1ff6407",
+  "source": "nvd",
+  "tags": [
+    "CWE-285"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30870"
+}

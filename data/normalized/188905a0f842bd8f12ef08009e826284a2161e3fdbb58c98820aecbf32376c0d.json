@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell dbutil Driver Dell dbutil driver contains an insufficient access control vulnerability which may lead to escalation of privileges, denial-of-service (DoS), or information disclosure.",
+  "token_count": 24
+}

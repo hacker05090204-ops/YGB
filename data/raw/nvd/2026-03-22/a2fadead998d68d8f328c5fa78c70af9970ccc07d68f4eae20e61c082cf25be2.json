@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27506",
+  "ingested_at": "2026-03-22T07:54:30.519239+00:00",
+  "lang": "en",
+  "raw_text": "SVXportal version 2.5 and prior contain a stored cross-site scripting vulnerability in the user profile update workflow (user_settings.php submitting to admin/update_user.php). Authenticated users can store malicious HTML/JavaScript in fields such as Firstname, lastname, email, and image_url, which are later rendered without adequate output encoding in the administrator interface (admin/users.php), resulting in JavaScript execution in an administrator's browser when the affected page is viewed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a2fadead998d68d8f328c5fa78c70af9970ccc07d68f4eae20e61c082cf25be2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27506"
+}

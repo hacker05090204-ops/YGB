@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13350",
+  "ingested_at": "2026-03-22T07:54:40.931168+00:00",
+  "lang": "en",
+  "raw_text": "Ubuntu Linux 6.8 GA retains the legacy AF_UNIX garbage collector but backports upstream commit 8594d9b85c07 (\"af_unix: Don\u2019t call skb_get() for OOB skb\"). When orphaned MSG_OOB sockets hit unix_gc(), the garbage collector still calls kfree_skb() as if OOB SKBs held two references; on Ubuntu Linux 6.8 (Noble Numbat) kernel tree, they have only the queue reference, so the buffer is freed while still reachable and subsequent queue walks dereference freed memory, yielding a reliable local privilege escalation (LPE) caused by a use-after-free (UAF). Ubuntu builds that have already taken the new GC stack from commit 4090fa373f0e, and mainline Linux kernels shipping that infrastructure are unaffected because they no longer execute the legacy collector path. This issue affects Ubuntu Linux from 6.8.0-56.58 before 6.8.0-84.84.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d01e4485ac5afe5e484d2b893c07b36645aee4acab83688ae47ace89deb68e75",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 122,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13350"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30116",
+  "ingested_at": "2026-03-22T07:45:19.258404+00:00",
+  "lang": "en",
+  "raw_text": "Kaseya Virtual System/Server Administrator (VSA) Kaseya Virtual System/Server Administrator (VSA) contains an information disclosure vulnerability allowing an attacker to obtain the sessionId that can be used to execute further attacks against the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b3caeb8a27ddd2b70579d8db0b2c4aae17c9e46963662bb008e1ae394d89f131",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

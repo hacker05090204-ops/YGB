@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4454",
+  "ingested_at": "2026-03-22T07:54:48.474928+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Network in Google Chrome prior to 146.0.7680.153 allowed a remote attacker to potentially exploit heap corruption via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "HIGH",
+  "sha256_hash": "300ddf9add1f87eb5b173b6af6409bebfc5ea385d4c06642323372bd1f81c014",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4454"
+}

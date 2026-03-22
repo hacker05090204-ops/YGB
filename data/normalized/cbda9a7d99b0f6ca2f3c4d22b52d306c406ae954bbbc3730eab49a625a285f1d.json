@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Red Hat JBoss The JMX-Console web application in JBossAs in Red Hat JBoss Enterprise Application Platform performs access control only for the GET and POST methods, which allows remote attackers to send requests to this application's GET handler by using a different method.",
+  "token_count": 43
+}

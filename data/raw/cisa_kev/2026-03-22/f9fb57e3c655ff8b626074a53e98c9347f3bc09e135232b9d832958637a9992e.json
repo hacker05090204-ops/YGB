@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-12812",
+  "ingested_at": "2026-03-22T07:45:19.184200+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Fortinet FortiOS SSL VPN contains an improper authentication vulnerability that may allow a user to login successfully without being prompted for the second factor of authentication (FortiToken) if they change the case in their username.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f9fb57e3c655ff8b626074a53e98c9347f3bc09e135232b9d832958637a9992e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

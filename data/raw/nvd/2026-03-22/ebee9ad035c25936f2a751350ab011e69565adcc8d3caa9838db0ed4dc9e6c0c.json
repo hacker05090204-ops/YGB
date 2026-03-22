@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3343",
+  "ingested_at": "2026-03-22T07:54:34.061766+00:00",
+  "lang": "en",
+  "raw_text": "A reflected cross-site scripting (XSS) vulnerability in the Fireware OS Web UI enabled execution of malicious JavaScript in the context of an authenticated management user's browser when they click on a specially crafted link. This vulnerability affects Fireware OS 12.7 up to and including 12.11.7 and 2025.1 up to and including 2026.1.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ebee9ad035c25936f2a751350ab011e69565adcc8d3caa9838db0ed4dc9e6c0c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3343"
+}

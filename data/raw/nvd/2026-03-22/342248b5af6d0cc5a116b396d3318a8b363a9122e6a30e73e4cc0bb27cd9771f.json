@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2945",
+  "ingested_at": "2026-03-22T07:54:30.960235+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in JeecgBoot 3.9.0. Affected by this vulnerability is an unknown functionality of the file /sys/common/uploadImgByHttp. Executing a manipulation of the argument fileUrl can lead to server-side request forgery. The attack may be launched remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "342248b5af6d0cc5a116b396d3318a8b363a9122e6a30e73e4cc0bb27cd9771f",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2945"
+}

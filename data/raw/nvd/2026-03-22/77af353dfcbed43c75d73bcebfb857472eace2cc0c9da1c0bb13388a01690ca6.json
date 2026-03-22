@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30943",
+  "ingested_at": "2026-03-22T07:54:44.704238+00:00",
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to 2.2.4, An insufficient authorization check in the file replace API allows a user with only list visibility permission (UserPermListOtherUploads) to delete another user's file by abusing the deleteNewFile flag, bypassing the requirement for UserPermDeleteOtherUploads. This vulnerability is fixed in 2.2.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "77af353dfcbed43c75d73bcebfb857472eace2cc0c9da1c0bb13388a01690ca6",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30943"
+}

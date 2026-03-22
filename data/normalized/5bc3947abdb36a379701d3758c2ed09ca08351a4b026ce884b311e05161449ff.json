@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Accellion FTA Accellion FTA contains a server-side request forgery (SSRF) vulnerability exploited via a crafted POST request to wmProgressstat.html.",
+  "token_count": 19
+}

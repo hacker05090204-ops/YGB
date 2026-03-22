@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Dating Site contains a SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the Email parameter. Attackers can send POST requests to loginaction.php with time-based SQL injection payloads in the Email field to extract sensitive database information.",
+  "token_count": 46
+}

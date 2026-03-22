@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67733",
+  "ingested_at": "2026-03-22T07:54:31.173952+00:00",
+  "lang": "en",
+  "raw_text": "Valkey is a distributed key-value database. Prior to versions 9.0.2, 8.1.6, 8.0.7, and 7.2.12, a malicious user can use scripting commands to inject arbitrary information into the response stream for the given client, potentially corrupting or returning tampered data to other users on the same connection. The error handling code for lua scripts does not properly handle null characters. Versions 9.0.2, 8.1.6, 8.0.7, and 7.2.12 fix the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "7b6d86f1963539ebede2d115b8ff610bb6af50a343664001034591d1dce78bd9",
+  "source": "nvd",
+  "tags": [
+    "CWE-74"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67733"
+}

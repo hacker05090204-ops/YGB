@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-58041",
+  "ingested_at": "2026-03-22T07:54:31.247323+00:00",
+  "lang": "en",
+  "raw_text": "Smolder versions through 1.51 for Perl uses insecure rand() function for cryptographic functions. Smolder 1.51 and earlier for Perl uses the rand() function as the default source of entropy, which is not cryptographically secure, for cryptographic functions. Specifically Smolder::DB::Developer uses the Data::Random library which specifically states that it is \"Useful mostly for test programs\". Data::Random uses the rand() function.",
+  "severity": "CRITICAL",
+  "sha256_hash": "47479cafdbfd3e84eb2465fce28baf026786a5e9436682fd253f43694c707f55",
+  "source": "nvd",
+  "tags": [
+    "CWE-338"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-58041"
+}

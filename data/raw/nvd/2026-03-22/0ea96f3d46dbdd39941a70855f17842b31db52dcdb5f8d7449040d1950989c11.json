@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-70341",
+  "ingested_at": "2026-03-22T07:54:34.487605+00:00",
+  "lang": "en",
+  "raw_text": "Insecure permissions in App-Auto-Patch v3.4.2 create a race condition which allows attackers to write arbitrary files.",
+  "severity": "HIGH",
+  "sha256_hash": "0ea96f3d46dbdd39941a70855f17842b31db52dcdb5f8d7449040d1950989c11",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-732"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70341"
+}

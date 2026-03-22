@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Agile Product Lifecycle Management (PLM) Oracle Agile Product Lifecycle Management (PLM) contains a deserialization vulnerability that allows a low-privileged attacker with network access via HTTP to compromise the system.",
+  "token_count": 30
+}

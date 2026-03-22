@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32866",
+  "ingested_at": "2026-03-22T07:54:47.980207+00:00",
+  "lang": "en",
+  "raw_text": "OPEXUS eComplaint and eCASE before 10.2.0.0 do not correctly sanitize the contents of first and last name fields in a user profile. An authenticated attacker can inject parts of an XSS payload in their first and last name fields. The payload is executed when the user's full name is rendered. The attacker can run script in the context of a victim's session.",
+  "severity": "MEDIUM",
+  "sha256_hash": "82d5a984e3fe93927f1239bbfb73018169c92e0ec50ae3ca0a5b1f2f90748795",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32866"
+}

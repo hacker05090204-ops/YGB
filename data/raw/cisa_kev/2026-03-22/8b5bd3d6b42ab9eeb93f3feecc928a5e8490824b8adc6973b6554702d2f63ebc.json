@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-31200",
+  "ingested_at": "2026-03-22T07:45:16.464215+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and other Apple products contain a memory corruption vulnerability that allows for code execution when processing an audio stream in a maliciously crafted media file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8b5bd3d6b42ab9eeb93f3feecc928a5e8490824b8adc6973b6554702d2f63ebc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

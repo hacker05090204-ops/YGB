@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67038",
+  "ingested_at": "2026-03-22T07:54:43.677259+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Lantronix EDS5000 2.1.0.0R3. The HTTP RPC module executes a shell command to write logs when user's authantication fails. The username is directly concatenated with the command without any sanitization. This allow attackers to inject arbitrary OS commands into the username parameter. Injected commands are executed with root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "92011d9f877033cea41f664f92bd1f0d1d8d86d3fc2e6a2022b474ed25c82207",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67038"
+}

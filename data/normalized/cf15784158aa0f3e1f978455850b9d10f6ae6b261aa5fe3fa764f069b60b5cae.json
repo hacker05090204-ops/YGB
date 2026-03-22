@@ -1,0 +1,5 @@
+{
+  "lang": "it",
+  "raw_text": "sudo 1.8.0 < 1.8.3p1 - 'sudo_debug' glibc FORTIFY_SOURCE Bypass + Privilege Escalation",
+  "token_count": 12
+}

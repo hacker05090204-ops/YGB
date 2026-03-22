@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20069",
+  "ingested_at": "2026-03-22T07:54:34.699706+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the VPN web services component of Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to conduct browser-based attacks against users of an affected device. This vulnerability is due to improper validation of HTTP requests. An attacker could exploit this vulnerability by persuading a user to visit a website that is designed to pass malicious HTTP requests to a device that is running Cisco Secure Firewall ASA Software or Cisco Secure FTD Software and has web services endpoints supporting VPN features enabled. A successful exploit could allow the attacker to reflect malicious input from the affected device to the browser that is in use and conduct browser-based attacks, including cross-site scripting (XSS) attacks. The attacker is not able to directly impact the affected device.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bfef6ca77be8ed8aea2d6df7fc4b1656ee248af92bad78194032b09a375b4b74",
+  "source": "nvd",
+  "tags": [
+    "CWE-444"
+  ],
+  "token_count": 140,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20069"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22899",
+  "ingested_at": "2026-03-22T07:45:19.515508+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure contains a command injection vulnerability that allows remote authenticated users to perform remote code execution via Windows File Resource Profiles.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bfdf517aec7a1f909003d2e18f5e0a51cb2fd3cfb5df6a9235f54c8b580ca2d2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

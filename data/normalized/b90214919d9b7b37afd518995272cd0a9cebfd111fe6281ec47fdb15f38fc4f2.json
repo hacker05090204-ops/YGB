@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache APISIX Apache APISIX contains an authentication bypass vulnerability that allows for remote code execution.",
+  "token_count": 15
+}

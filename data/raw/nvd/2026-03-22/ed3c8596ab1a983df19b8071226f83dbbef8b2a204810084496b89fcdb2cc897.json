@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23254",
+  "ingested_at": "2026-03-22T07:54:47.558996+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: net: gro: fix outer network offset The udp GRO complete stage assumes that all the packets inserted the RX have the `encapsulation` flag zeroed. Such assumption is not true, as a few H/W NICs can set such flag when H/W offloading the checksum for an UDP encapsulated traffic, the tun driver can inject GSO packets with UDP encapsulation and the problematic layout can also be created via a veth based setup. Due to the above, in the problematic scenarios, udp4_gro_complete() uses the wrong network offset (inner instead of outer) to compute the outer UDP header pseudo checksum, leading to csum validation errors later on in packet processing. Address the issue always clearing the encapsulation flag at GRO completion time. Such flag will be set again as needed for encapsulated packets by udp_gro_complete().",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ed3c8596ab1a983df19b8071226f83dbbef8b2a204810084496b89fcdb2cc897",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 142,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23254"
+}

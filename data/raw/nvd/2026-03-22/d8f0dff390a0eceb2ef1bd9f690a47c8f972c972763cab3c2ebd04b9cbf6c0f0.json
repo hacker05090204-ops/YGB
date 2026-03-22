@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30842",
+  "ingested_at": "2026-03-22T07:54:41.772750+00:00",
+  "lang": "en",
+  "raw_text": "Wallos is an open-source, self-hostable personal subscription tracker. Prior to version 4.6.2, Wallos allows an authenticated user to delete avatar files uploaded by other users. The avatar deletion endpoint does not verify that the requested avatar belongs to the current user. As a result, any authenticated user who knows or can discover another user's uploaded avatar filename can delete that file. This issue has been patched in version 4.6.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d8f0dff390a0eceb2ef1bd9f690a47c8f972c972763cab3c2ebd04b9cbf6c0f0",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30842"
+}

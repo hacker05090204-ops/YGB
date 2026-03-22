@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-23874",
+  "ingested_at": "2026-03-22T07:45:19.264179+00:00",
+  "lang": "en",
+  "raw_text": "McAfee McAfee Total Protection (MTP) McAfee Total Protection (MTP) contains an improper privilege management vulnerability that allows a local user to gain elevated privileges and execute code, bypassing MTP self-defense.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3eb51afc782c8ca5bb7544c4e86866faf166ead49516bba894357b30d5ed83f4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

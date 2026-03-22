@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ARMBot contains an unrestricted file upload vulnerability in upload.php that allows unauthenticated attackers to upload arbitrary files by manipulating the file parameter with path traversal sequences. Attackers can upload PHP files with traversal payloads ../public_html/ to write executable code to the web root and achieve remote code execution.",
+  "token_count": 48
+}

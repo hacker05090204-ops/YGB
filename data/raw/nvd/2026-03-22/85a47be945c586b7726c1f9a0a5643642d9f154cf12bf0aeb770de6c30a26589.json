@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4190",
+  "ingested_at": "2026-03-22T07:54:46.692223+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in JawherKl node-api-postgres up to 2.5. This impacts the function User.getAll of the file models/user.js. The manipulation of the argument sort results in sql injection. The attack can be executed remotely. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "85a47be945c586b7726c1f9a0a5643642d9f154cf12bf0aeb770de6c30a26589",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4190"
+}

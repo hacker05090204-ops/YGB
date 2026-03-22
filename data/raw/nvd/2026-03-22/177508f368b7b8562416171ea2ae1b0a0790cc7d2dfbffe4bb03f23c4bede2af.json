@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2017-20219",
+  "ingested_at": "2026-03-22T07:54:46.273341+00:00",
+  "lang": "en",
+  "raw_text": "Serviio PRO 1.8 DLNA Media Streaming Server contains a DOM-based cross-site scripting vulnerability that allows attackers to execute arbitrary HTML and script code by injecting malicious payloads. Attackers can craft URLs with malicious input that is read from document.location and passed to document.write() in the mediabrowser component to execute code in a user's browser context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "177508f368b7b8562416171ea2ae1b0a0790cc7d2dfbffe4bb03f23c4bede2af",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2017-20219"
+}

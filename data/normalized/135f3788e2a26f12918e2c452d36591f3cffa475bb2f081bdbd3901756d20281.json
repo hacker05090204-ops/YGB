@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ZenTaoPMS v18.11 through v21.6.beta is vulnerable to Directory Traversal in /module/ai/control.php. This allows attackers to execute arbitrary code via a crafted file upload",
+  "token_count": 23
+}

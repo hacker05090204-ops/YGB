@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2934",
+  "ingested_at": "2026-03-22T07:54:30.944955+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in YiFang CMS up to 2.0.5. This impacts the function update of the file app/db/admin/D_friendLinkGroup.php of the component Extended Management Module. The manipulation of the argument Name leads to cross site scripting. It is possible to initiate the attack remotely. The exploit has been disclosed publicly and may be used.",
+  "severity": "LOW",
+  "sha256_hash": "976465381dff3cd58a1b6855b55d188663c8df04d863c19b8c1ce34279375693",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2934"
+}

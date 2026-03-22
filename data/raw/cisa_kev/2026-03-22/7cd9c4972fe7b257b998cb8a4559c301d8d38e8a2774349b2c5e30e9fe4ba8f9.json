@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-15944",
+  "ingested_at": "2026-03-22T07:45:17.718829+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS Palo Alto Networks PAN-OS contains multiple, unspecified vulnerabilities which can allow for remote code execution when chained.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7cd9c4972fe7b257b998cb8a4559c301d8d38e8a2774349b2c5e30e9fe4ba8f9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

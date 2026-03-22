@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3336",
+  "ingested_at": "2026-03-22T07:54:33.988085+00:00",
+  "lang": "en",
+  "raw_text": "Improper certificate validation in PKCS7_verify() in AWS-LC allows an unauthenticated user to bypass certificate chain verification when processing PKCS7 objects with multiple signers, except the final signer. Customers of AWS services do not need to take action. Applications using AWS-LC should upgrade to AWS-LC version 1.69.0.",
+  "severity": "HIGH",
+  "sha256_hash": "b724fc81e4d888a34c4644d5b38e97e4ffb49cc1b2093e463684710d25817867",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3336"
+}

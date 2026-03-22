@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3548",
+  "ingested_at": "2026-03-22T07:54:48.024746+00:00",
+  "lang": "en",
+  "raw_text": "Two buffer overflow vulnerabilities existed in the wolfSSL CRL parser when parsing CRL numbers: a heap-based buffer overflow could occur when improperly storing the CRL number as a hexadecimal string, and a stack-based overflow for sufficiently sized CRL numbers. With appropriately crafted CRLs, either of these out of bound writes could be triggered. Note this only affects builds that specifically enable CRL support, and the user would need to load a CRL from an untrusted source.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "eb26cc577df2b078f0a58418d89e6db635b3330713d1bf0eb4ad6f1fecb134c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-787"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3548"
+}

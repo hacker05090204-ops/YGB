@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4536",
+  "ingested_at": "2026-03-22T07:54:49.613265+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Acrel Environmental Monitoring Cloud Platform 1.1.0. This issue affects some unknown processing. Performing a manipulation results in unrestricted upload. The attack may be initiated remotely. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "15f792a5a9addc608e72984d94827e4ac7d1912b7b3c5432f76593e29e2fc251",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4536"
+}

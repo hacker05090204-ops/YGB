@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40639",
+  "ingested_at": "2026-03-22T07:54:42.244927+00:00",
+  "lang": "en",
+  "raw_text": "A SQL injection vulnerability has been found in Eventobot. This vulnerability allows an attacker to retrieve, create, update and delete databases through the 'promo_send' parameter in the '/assets/php/calculate_discount.php'.",
+  "severity": "CRITICAL",
+  "sha256_hash": "acdb28d04d0369cceaee31f60c3cc5febd70badadc6393185024a4a98b83e828",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40639"
+}

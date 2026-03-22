@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32947",
+  "ingested_at": "2026-03-22T07:54:48.573100+00:00",
+  "lang": "en",
+  "raw_text": "Harden-Runner is a CI/CD security agent that works like an EDR for GitHub Actions runners. In versions 2.15.1 and below, a DNS over HTTPS (DoH) vulnerability allows attackers to bypass egress-policy: block network restrictions by tunneling exfiltrated data through permitted HTTPS endpoints like dns.google. The attack works by encoding sensitive data (e.g., the runner's hostname) as subdomains in DoH queries, which appear as legitimate HTTPS traffic to Harden-Runner's domain-based filtering but are ultimately forwarded to an attacker-controlled domain. This effectively enables data exfiltration without directly connecting to any blocked destination. Exploitation requires the attacker to already have code execution within the GitHub Actions workflow. The issue was fixed in version 2.16.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "afb336856f88131af33665435e112313146f49da43cd80417838632db227b327",
+  "source": "nvd",
+  "tags": [
+    "CWE-693",
+    "CWE-863"
+  ],
+  "token_count": 111,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32947"
+}

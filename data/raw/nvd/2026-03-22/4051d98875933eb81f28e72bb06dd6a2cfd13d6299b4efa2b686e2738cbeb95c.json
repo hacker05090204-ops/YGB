@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2362",
+  "ingested_at": "2026-03-22T07:54:33.123420+00:00",
+  "lang": "en",
+  "raw_text": "The WP Accessibility plugin for WordPress is vulnerable to Stored DOM-Based Cross-Site Scripting via the 'alt' attribute of images processed by the \"Long Description UI\" feature in all versions up to, and including, 2.3.1. This is due to the plugin's JavaScript retrieving the alt attribute using getAttribute() and unsafely concatenating it into innerHTML and insertAdjacentHTML calls without proper sanitization or escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. Exploitation requires the \"Long Description UI\" setting to be enabled and set to \"Link to description.\"",
+  "severity": "MEDIUM",
+  "sha256_hash": "4051d98875933eb81f28e72bb06dd6a2cfd13d6299b4efa2b686e2738cbeb95c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2362"
+}

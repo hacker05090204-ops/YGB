@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3909",
+  "ingested_at": "2026-03-22T07:45:15.848714+00:00",
+  "lang": "en",
+  "raw_text": "Google Skia Google Skia contains an out-of-bounds write vulnerability that could allow a remote attacker to perform out of bounds memory access via a crafted HTML page. This vulnerability affects Google Chrome and ChromeOS, Android, Flutter, and possibly other products.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b67fd5532b2b965a3107b91218cc5a579c4ab707b9113acdf5fb4971ecdc3e4b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

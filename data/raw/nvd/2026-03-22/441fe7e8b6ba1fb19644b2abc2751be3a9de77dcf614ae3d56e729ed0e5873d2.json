@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29075",
+  "ingested_at": "2026-03-22T07:54:41.534769+00:00",
+  "lang": "en",
+  "raw_text": "Mesa is an open-source Python library for agent-based modeling, simulating complex systems and exploring emergent behaviors. In version 3.5.0 and prior, checking out of untrusted code in benchmarks.yml workflow may lead to code execution in privileged runner. This issue has been patched via commit c35b8cd.",
+  "severity": "HIGH",
+  "sha256_hash": "441fe7e8b6ba1fb19644b2abc2751be3a9de77dcf614ae3d56e729ed0e5873d2",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29075"
+}

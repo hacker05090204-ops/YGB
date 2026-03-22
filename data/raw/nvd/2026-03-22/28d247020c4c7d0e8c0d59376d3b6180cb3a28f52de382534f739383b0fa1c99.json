@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32342",
+  "ingested_at": "2026-03-22T07:54:45.889568+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in Ays Pro Quiz Maker quiz-maker allows Cross Site Request Forgery.This issue affects Quiz Maker: from n/a through < = 6.7.1.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "28d247020c4c7d0e8c0d59376d3b6180cb3a28f52de382534f739383b0fa1c99",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32342"
+}

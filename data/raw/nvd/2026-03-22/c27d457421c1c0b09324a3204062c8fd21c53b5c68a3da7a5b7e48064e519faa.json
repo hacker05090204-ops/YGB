@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3042",
+  "ingested_at": "2026-03-22T07:54:31.258412+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in itsourcecode Event Management System 1.0. The affected element is an unknown function of the file /admin/index.php. Performing a manipulation of the argument ID results in sql injection. The attack is possible to be carried out remotely. The exploit is now public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "c27d457421c1c0b09324a3204062c8fd21c53b5c68a3da7a5b7e48064e519faa",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3042"
+}

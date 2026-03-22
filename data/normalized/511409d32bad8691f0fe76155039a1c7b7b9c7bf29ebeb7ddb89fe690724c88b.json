@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WebRTC WebRTC WebRTC, an open-source project providing web browsers with real-time communication, contains a heap buffer overflow vulnerability that allows an attacker to perform shellcode execution. This vulnerability impacts web browsers using WebRTC including but not limited to Google Chrome.",
+  "token_count": 40
+}

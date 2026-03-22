@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "i-doit CMDB 1.12 contains an arbitrary file download vulnerability that allows authenticated attackers to download sensitive files by manipulating the file parameter in index.php. Attackers can send GET requests to index.php with file_manager=image and supply arbitrary file paths like src/config.inc.php to retrieve configuration files and sensitive system data.",
+  "token_count": 48
+}

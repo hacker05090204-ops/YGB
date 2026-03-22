@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29089",
+  "ingested_at": "2026-03-22T07:54:41.558763+00:00",
+  "lang": "en",
+  "raw_text": "TimescaleDB is a time-series database for high-performance real-time analytics packaged as a Postgres extension. From version 2.23.0 to 2.25.1, PostgreSQL uses the search_path setting to locate unqualified database objects (tables, functions, operators). If the search_path includes user-writable schemas a malicious user can create functions in that schema that shadow builtin postgres functions and will be called instead of the postgres functions leading to arbitrary code execution during extension upgrade. This issue has been patched in version 2.25.2.",
+  "severity": "HIGH",
+  "sha256_hash": "2d0735c05bf3cadb383ce68afdc2f06d5dfe59faae312b2ce1680d492d3bd881",
+  "source": "nvd",
+  "tags": [
+    "CWE-426"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29089"
+}

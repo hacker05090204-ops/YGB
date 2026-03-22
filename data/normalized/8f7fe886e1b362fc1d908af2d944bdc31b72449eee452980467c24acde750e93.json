@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Stack-based Buffer Overflow vulnerability [CWE-121] vulnerability in Fortinet FortiManager 7.4.0 through 7.4.2, FortiManager 7.2.0 through 7.2.10, FortiManager 6.4 all versions may allow a remote unauthenticated attacker to execute unauthorized commands via crafted requests, if the service is enabled. The success of the attack depends on the ability to bypass the stack protection mechanisms.",
+  "token_count": 54
+}

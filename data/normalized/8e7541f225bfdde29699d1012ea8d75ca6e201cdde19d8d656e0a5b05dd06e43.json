@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ASUS Live Update ASUS Live Update contains an embedded malicious code vulnerability client were distributed with unauthorized modifications introduced through a supply chain compromise. The modified builds could cause devices meeting specific targeting conditions to perform unintended actions. The impacted product could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "token_count": 53
+}

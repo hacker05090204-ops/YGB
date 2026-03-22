@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29085",
+  "ingested_at": "2026-03-22T07:54:34.840926+00:00",
+  "lang": "en",
+  "raw_text": "Hono is a Web application framework that provides support for any JavaScript runtime. Prior to version 4.12.4, when using streamSSE() in Streaming Helper, the event, id, and retry fields were not validated for carriage return (\\r) or newline (\\n) characters. Because the SSE protocol uses line breaks as field delimiters, this could allow injection of additional SSE fields within the same event frame if untrusted input was passed into these fields. This issue has been patched in version 4.12.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2cbb8c5edfdc72e4666f63794e61db8a3368295c1df7ca9a4ab5443db32cb0a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-74"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29085"
+}

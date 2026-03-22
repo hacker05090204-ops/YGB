@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Aryan Shirani Bid Abadi Site Suggest site-suggest allows Accessing Functionality Not Properly Constrained by ACLs.This issue affects Site Suggest: from n/a through < = 1.3.9.",
+  "token_count": 29
+}

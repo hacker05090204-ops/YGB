@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23693",
+  "ingested_at": "2026-03-22T07:54:31.195253+00:00",
+  "lang": "en",
+  "raw_text": "ElementsKit Elementor Addons \u2013 Advanced Widgets & Templates Addons for Elementor (elementskit-lite) WordPress plugin versions prior to 3.7.9 expose the REST endpoint /wp-json/elementskit/v1/widget/mailchimp/subscribe without authentication. The endpoint accepts client-supplied Mailchimp API credentials and insufficiently validates certain parameters, including the list parameter, when constructing upstream Mailchimp API requests. An unauthenticated attacker can abuse the endpoint as an open proxy to Mailchimp, potentially triggering unauthorized API calls, manipulating subscription data, exhausting API quotas, or causing resource consumption on the affected WordPress site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1239f57ba1d49a201d4aed0a73a6e03b51b96e874f71e3be6702e253a6240c97",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23693"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21725",
+  "ingested_at": "2026-03-22T07:54:32.047639+00:00",
+  "lang": "en",
+  "raw_text": "A time-of-create-to-time-of-use (TOCTOU) vulnerability lets recently deleted-then-recreated data sources be re-deleted without permission to do so. This requires several very stringent conditions to be met: - The attacker must have admin access to the specific datasource prior to its first deletion. - Upon deletion, all steps within the attack must happen within the next 30 seconds and on the same pod of Grafana. - The attacker must delete the datasource, then someone must recreate it. - The new datasource must not have the attacker as an admin. - The new datasource must have the same UID as the prior datasource. These are randomised by default. - The datasource can now be re-deleted by the attacker. - Once 30 seconds are up, the attack is spent and cannot be repeated. - No datasource with any other UID can be attacked.",
+  "severity": "LOW",
+  "sha256_hash": "a8e4ea904e695b25e8e642332afea90da24c7695e24fd28da44a33747afe1f90",
+  "source": "nvd",
+  "tags": [
+    "CWE-367"
+  ],
+  "token_count": 139,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21725"
+}

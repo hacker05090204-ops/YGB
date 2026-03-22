@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28126",
+  "ingested_at": "2026-03-22T07:54:40.673718+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in sizam RH Frontend Publishing Pro rh-frontend allows Reflected XSS.This issue affects RH Frontend Publishing Pro: from n/a through < = 4.3.2.",
+  "severity": "HIGH",
+  "sha256_hash": "fa17b10c366086f6ccedf5537b4e868fc5e2e047cd8cba4cf11eaefc4a29f123",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28126"
+}

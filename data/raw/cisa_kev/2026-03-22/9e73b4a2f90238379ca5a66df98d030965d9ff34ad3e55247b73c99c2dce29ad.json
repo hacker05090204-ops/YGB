@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-1000861",
+  "ingested_at": "2026-03-22T07:45:18.761443+00:00",
+  "lang": "en",
+  "raw_text": "Jenkins Jenkins Stapler Web Framework A code execution vulnerability exists in the Stapler web framework used by Jenkins",
+  "severity": "CRITICAL",
+  "sha256_hash": "9e73b4a2f90238379ca5a66df98d030965d9ff34ad3e55247b73c99c2dce29ad",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

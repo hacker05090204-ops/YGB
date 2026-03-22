@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In multiple functions of btm_ble_sec.cc, there is a possible unencrypted communication due to Invalid error handling. This could lead to remote (proximal/adjacent) information disclosure with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "token_count": 37
+}

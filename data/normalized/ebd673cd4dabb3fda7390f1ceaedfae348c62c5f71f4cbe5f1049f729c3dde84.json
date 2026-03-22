@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to properly enforce read permissions in search API endpoints which allows guest users without read permissions to access posts and files in channels via search API requests. Mattermost Advisory ID: MMSA-2025-00554",
+  "token_count": 46
+}

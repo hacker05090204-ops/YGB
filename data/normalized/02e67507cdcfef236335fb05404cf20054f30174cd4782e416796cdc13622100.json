@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Wowza Streaming Engine 4.5.0 contains multiple reflected cross-site scripting vulnerabilities in the enginemanager interface where input passed through various parameters is not properly sanitized before being returned to users. Attackers can inject malicious script code through parameters like appName, vhost, uiAppType, and wowzaCloudDestinationType in multiple endpoints to execute arbitrary HTML and JavaScript in a user's browser session.",
+  "token_count": 57
+}

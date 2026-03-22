@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Versa Concerto Versa Concerto SD-WAN orchestration platform contains an improper authentication vulnerability in the Traefik reverse proxy configuration, allowing at attacker to access administrative endpoints. The internal Actuator endpoint can be leveraged for access to heap dumps and trace logs.",
+  "token_count": 40
+}

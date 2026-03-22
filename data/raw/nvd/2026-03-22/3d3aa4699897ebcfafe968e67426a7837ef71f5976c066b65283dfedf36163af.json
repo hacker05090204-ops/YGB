@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20057",
+  "ingested_at": "2026-03-22T07:54:34.680483+00:00",
+  "lang": "en",
+  "raw_text": "Multiple Cisco products are affected by a vulnerability in the Snort 3 Visual Basic for Applications (VBA) feature which could allow an unauthenticated, remote attacker to cause the Snort 3 Detection Engine to crash. This vulnerability is due to lack of proper error checking when decompressing VBA data. An attacker could exploit this vulnerability by sending a crafted VBA data to the Snort 3 Detection Engine on the targeted device. A successful exploit could allow the attacker to cause the Snort 3 Detection Engine to unexpectedly restart causing a a denial of service (DoS) condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3d3aa4699897ebcfafe968e67426a7837ef71f5976c066b65283dfedf36163af",
+  "source": "nvd",
+  "tags": [
+    "CWE-369"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20057"
+}

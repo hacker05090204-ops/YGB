@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28410",
+  "ingested_at": "2026-03-22T07:54:40.986661+00:00",
+  "lang": "en",
+  "raw_text": "The Graph is an indexing protocol for querying networks like Ethereum, IPFS, Polygon, and other blockchains. Prior to version 3.0.0, a flaw in the token vesting contracts allows users to access tokens that should still be locked according to their vesting schedule. This issue has been patched in version 3.0.0.",
+  "severity": "HIGH",
+  "sha256_hash": "fc3c38e82cdfbf39c24a1735e3808322e38f88b08948b125253c61dba0f8c6a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-682"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28410"
+}

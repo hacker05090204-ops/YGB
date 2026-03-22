@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27509",
+  "ingested_at": "2026-03-22T07:54:32.751142+00:00",
+  "lang": "en",
+  "raw_text": "Unitree Go2 firmware versions V1.1.7 through V1.1.9 and V1.1.11 (EDU) do not implement DDS authentication or authorization for the Eclipse CycloneDDS topic rt/api/programming_actuator/request handled by actuator_manager.py. A network-adjacent, unauthenticated attacker can join DDS domain 0 and publish a crafted message (api_id=1002) containing arbitrary Python, which the robot writes to disk under /unitree/etc/programming/ and binds to a physical controller keybinding. When the keybinding is pressed, the code executes as root and the binding persists across reboots.",
+  "severity": "HIGH",
+  "sha256_hash": "b75ca732332b03ff9dddd2a0ec851049f8d94144c2bad6e1a98350e17f2955b4",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27509"
+}

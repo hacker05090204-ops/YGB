@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3503",
+  "ingested_at": "2026-03-22T07:54:48.029750+00:00",
+  "lang": "en",
+  "raw_text": "Protection mechanism failure in wolfCrypt post-quantum implementations (ML-KEM and ML-DSA) in wolfSSL on ARM Cortex-M microcontrollers allows a physical attacker to compromise key material and/or cryptographic outcomes via induced transient faults that corrupt or redirect seed/pointer values during Keccak-based expansion. This issue affects wolfSSL (wolfCrypt): commit hash d86575c766e6e67ef93545fa69c04d6eb49400c6.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "4121bf0da836fa3a88a1c43b0fe1915f9174d054a2639b2c9f964b08c114ca28",
+  "source": "nvd",
+  "tags": [
+    "CWE-335"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3503"
+}

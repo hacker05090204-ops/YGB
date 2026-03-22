@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27542",
+  "ingested_at": "2026-03-22T07:54:47.856080+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect Privilege Assignment vulnerability in Rymera Web Co Pty Ltd. Woocommerce Wholesale Lead Capture allows Privilege Escalation.This issue affects Woocommerce Wholesale Lead Capture: from n/a through 2.0.3.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "be9eb92ff24a0297c1564a0c6f17777571cf860d2fbb3bc4eebcf0bded241c1f",
+  "source": "nvd",
+  "tags": [
+    "CWE-266"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27542"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Identity Services Engine Cisco Identity Services Engine contains an injection vulnerability in a specific API of Cisco ISE and Cisco ISE-PIC due to insufficient validation of user-supplied input allowing an attacker to exploit this vulnerability by submitting a crafted API request. Successful exploitation could allow an attacker to perform remote code execution and obtaining root privileges on an affected device.",
+  "token_count": 61
+}

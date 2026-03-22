@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Android Android Kernel Android Kernel binder_transaction of binder.c contains an out-of-bounds write vulnerability due to an incorrect bounds check that could allow for local privilege escalation. This vulnerability was observed chained with CVE-2019-2215 and CVE-2020-0069 under exploit chain \"AbstractEmu.\"",
+  "token_count": 39
+}

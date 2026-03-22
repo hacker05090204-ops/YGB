@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WebCTRL systems that communicate over BACnet inherit the protocol's lack of network layer authentication. WebCTRL does not implement additional validation of BACnet traffic so an attacker with network access could spoof BACnet packets directed at either the WebCTRL server or associated AutomatedLogic controllers. Spoofed packets may be processed as legitimate.",
+  "token_count": 50
+}

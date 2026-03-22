@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A weakness has been identified in PbootCMS up to 3.2.12. This impacts the function alert_location of the file apps/home/controller/MemberController.php of the component Parameter Handler. This manipulation of the argument backurl causes cross site scripting. Remote exploitation of the attack is possible. The exploit has been made available to the public and could be used for attacks.",
+  "token_count": 56
+}

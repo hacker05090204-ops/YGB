@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28449",
+  "ingested_at": "2026-03-22T07:54:47.793565+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 lack durable replay state for Nextcloud Talk webhook events, allowing valid signed webhook requests to be replayed without suppression. Attackers can capture and replay previously valid signed webhook requests to trigger duplicate inbound message processing and cause integrity or availability issues.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d9a629ecd912f268487f4f0c8cecba4f833190da2687b859dc07fb2ac73dcecf",
+  "source": "nvd",
+  "tags": [
+    "CWE-294"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28449"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1229",
+  "ingested_at": "2026-03-22T07:54:31.460995+00:00",
+  "lang": "en",
+  "raw_text": "The CombinedMult function in the CIRCL ecc/p384 package (secp384r1 curve) produces an incorrect value for specific inputs. The issue is fixed by using complete addition formulas. ECDH and ECDSA signing relying on this curve are not affected. The bug was fixed in v1.6.3 https://github.com/cloudflare/circl/releases/tag/v1.6.3 .",
+  "severity": "CRITICAL",
+  "sha256_hash": "446d1195b9b1f188c9ba378514ae99a50cec84ac5d43c1aed90c1561d0ec927b",
+  "source": "nvd",
+  "tags": [
+    "CWE-682"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1229"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-9934",
+  "ingested_at": "2026-03-22T07:45:17.658766+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple iOS, iPadOS, and macOS contain an unspecified vulnerability involving input validation which can allow a local attacker to view sensitive user information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b3c2c88d2ec28a6c866a02c8b700b651d032d6be96f4be19efc773add4e8b8c6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

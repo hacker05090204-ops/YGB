@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "BlueStacks 4.80.0.1060 contains a denial of service vulnerability that allows local attackers to crash the application by submitting oversized input to the search field. Attackers can paste a buffer of 100,000 'A' characters into the search field and trigger a search operation to cause the application to crash.",
+  "token_count": 48
+}

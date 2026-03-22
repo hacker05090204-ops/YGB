@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-21005",
+  "ingested_at": "2026-03-22T07:54:46.416815+00:00",
+  "lang": "en",
+  "raw_text": "Path traversal in Smart Switch prior to version 3.7.69.15 allows adjacent attackers to overwrite arbitrary files with Smart Switch privilege.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "4404ea752e9bb4b622ad03ef7e525bdb5603d2bac726cb56be8e893967acd38f",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21005"
+}

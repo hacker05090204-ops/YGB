@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "zae-limiter is a rate limiting library using the token bucket algorithm. Prior to version 0.10.1, all rate limit buckets for a single entity share the same DynamoDB partition key (`namespace/ENTITY#{id}`). A high-traffic entity can exceed DynamoDB's per-partition throughput limits (~1,000 WCU/sec), causing throttling that degrades service for that entity \u2014 and potentially co-located entities in the same partition. Version 0.10.1 fixes the issue.",
+  "token_count": 63
+}

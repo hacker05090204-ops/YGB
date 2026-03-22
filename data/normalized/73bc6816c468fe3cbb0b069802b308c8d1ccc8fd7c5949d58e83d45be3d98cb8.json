@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Firewalls Zyxel ATP, USG FLEX, USG FLEX 50(W), USG20(W)-VPN, VPN, and ZyWALL/USG firewalls contain a buffer overflow vulnerability in the notification function that could allow an unauthenticated attacker to cause denial-of-service (DoS) conditions and remote code execution on an affected device.",
+  "token_count": 43
+}

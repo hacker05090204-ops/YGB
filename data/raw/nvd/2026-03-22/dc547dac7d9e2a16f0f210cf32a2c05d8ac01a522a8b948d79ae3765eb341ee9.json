@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32703",
+  "ingested_at": "2026-03-22T07:54:47.722713+00:00",
+  "lang": "en",
+  "raw_text": "OpenProject is an open-source, web-based project management software. In versions prior to 16.6.9, 17.0.6, 17.1.3, and 17.2.1, the Repositories module did not properly escape filenames displayed from repositories. This allowed an attacker with push access into the repository to create commits with filenames that included HTML code that was injected in the page without proper sanitation. This allowed a persisted XSS attack against all members of this project that accessed the repositories page to display a changeset where the maliciously crafted file was deleted. Versions 16.6.9, 17.0.6, 17.1.3, and 17.2.1 fix the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dc547dac7d9e2a16f0f210cf32a2c05d8ac01a522a8b948d79ae3765eb341ee9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32703"
+}

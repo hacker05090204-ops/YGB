@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24285",
+  "ingested_at": "2026-03-22T07:54:42.691969+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Windows Win32K allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "ecb133b80fbaf12855dce5279beadc917ab50d8d341f553b9f738fc9308a58d9",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24285"
+}

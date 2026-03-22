@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2413",
+  "ingested_at": "2026-03-22T07:54:43.471467+00:00",
+  "lang": "en",
+  "raw_text": "The Ally \u2013 Web Accessibility & Usability plugin for WordPress is vulnerable to SQL Injection via the URL path in all versions up to, and including, 4.0.3. This is due to insufficient escaping on the user-supplied URL parameter in the `get_global_remediations()` method, where it is directly concatenated into an SQL JOIN clause without proper sanitization for SQL context. While `esc_url_raw()` is applied for URL safety, it does not prevent SQL metacharacters (single quotes, parentheses) from being injected. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database via time-based blind SQL injection techniques. The Remediation module must be active, which requires the plugin to be connected to an Elementor account.",
+  "severity": "HIGH",
+  "sha256_hash": "624543e4c2a07cea84246e5b8c6d396e7749e374f3e33afdd225d71f8b124649",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 127,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2413"
+}

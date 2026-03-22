@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-2380",
+  "ingested_at": "2026-03-22T07:45:19.542542+00:00",
+  "lang": "en",
+  "raw_text": "SAP Customer Relationship Management (CRM) SAP Customer Relationship Management (CRM) contains a path traversal vulnerability that allows an attacker to exploit insufficient validation of path information provided by users.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4c9a94a310b842822cf52a4fce398da0f2dc69fead061e1acdb65c66f738c99b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

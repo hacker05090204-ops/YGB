@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4671",
+  "ingested_at": "2026-03-22T07:45:16.981519+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Google Chromium Visuals contains a use-after-free vulnerability that allows a remote attacker to exploit heap corruption via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1fde41a4e7e2c433a179f2ce83a83604738a19f31c8b0c2bc4340f110101a8cc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

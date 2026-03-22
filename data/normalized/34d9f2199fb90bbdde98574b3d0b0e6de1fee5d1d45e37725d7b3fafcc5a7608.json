@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a stack buffer overflow write in CIccXform3DLut::Apply() corrupting stack memory or crash. This vulnerability is fixed in 2.3.1.5.",
+  "token_count": 38
+}

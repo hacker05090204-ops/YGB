@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29109",
+  "ingested_at": "2026-03-22T07:54:48.354659+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Versions up to and including 8.9.2 contain an unsafe deserialization vulnerability in the SavedSearch filter processing component that allows an authenticated administrator to execute arbitrary system commands on the server. `FilterDefinitionProvider.php` calls `unserialize()` on user-controlled data from the `saved_search.contents` database column without restricting instantiable classes. Version 8.9.3 patches the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f9acf73608b808591256934f5bdcf39b90a948591b02dc29184ce1bea7d3a04d",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29109"
+}

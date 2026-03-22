@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3787",
+  "ingested_at": "2026-03-22T07:54:42.127797+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in UltraVNC 1.6.4.0 on Windows. This affects an unknown function in the library cryptbase.dll of the component Windows Service. This manipulation causes uncontrolled search path. The attack requires local access. A high degree of complexity is needed for the attack. The exploitability is reported as difficult. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "4ce2651916f00157bb64acba2ac696d7bcb6c2b8c205d3cd8ffe8dd89fa0dff9",
+  "source": "nvd",
+  "tags": [
+    "CWE-426",
+    "CWE-427",
+    "CWE-426"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3787"
+}

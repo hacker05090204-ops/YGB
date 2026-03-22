@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4039",
+  "ingested_at": "2026-03-22T07:54:44.225426+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in OpenClaw 2026.2.19-2. This vulnerability affects the function applySkillConfigenvOverrides of the component Skill Env Handler. Executing a manipulation can lead to code injection. It is possible to launch the attack remotely. Upgrading to version 2026.2.21-beta.1 is able to resolve this issue. This patch is called 8c9f35cdb51692b650ddf05b259ccdd75cc9a83c. It is recommended to upgrade the affected component.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d8c4727430a0cb20ebdd7496355d469da36d12df5c166c3519fd2691b8c628f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-94"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4039"
+}

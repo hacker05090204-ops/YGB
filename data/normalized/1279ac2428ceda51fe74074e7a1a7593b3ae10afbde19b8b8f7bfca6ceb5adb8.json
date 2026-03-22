@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a detection of error condition without action vulnerability when improper handling of address deregistration on failure can lead to new GPU address allocation failure.",
+  "token_count": 31
+}

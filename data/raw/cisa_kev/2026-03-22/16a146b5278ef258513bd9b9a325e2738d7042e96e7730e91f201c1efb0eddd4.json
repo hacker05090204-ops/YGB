@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-3881",
+  "ingested_at": "2026-03-22T07:45:18.355814+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE A vulnerability in the Cisco Cluster Management Protocol (CMP) processing code in Cisco IOS and Cisco IOS XE Software could allow an unauthenticated, remote attacker to cause a reload of an affected device or remotely execute code with elevated privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "16a146b5278ef258513bd9b9a325e2738d7042e96e7730e91f201c1efb0eddd4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

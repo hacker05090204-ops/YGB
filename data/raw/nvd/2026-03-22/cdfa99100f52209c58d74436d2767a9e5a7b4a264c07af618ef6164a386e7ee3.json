@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33393",
+  "ingested_at": "2026-03-22T07:54:48.277598+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the `allowed_spam_host_domains` check used `String#end_with?` without domain boundary validation, allowing domains like `attacker-example.com` to bypass spam protection when `example.com` was allowlisted. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 require exact match or proper subdomain match (preceded by `.`) to prevent suffix-based bypass of `newuser_spam_host_threshold`. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cdfa99100f52209c58d74436d2767a9e5a7b4a264c07af618ef6164a386e7ee3",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33393"
+}

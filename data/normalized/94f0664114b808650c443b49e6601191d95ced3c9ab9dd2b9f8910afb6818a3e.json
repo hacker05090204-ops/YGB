@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OSGeo GeoServer OSGeo GeoServer GeoTools contains an improper neutralization of directives in dynamically evaluated code vulnerability due to unsafely evaluating property names as XPath expressions. This allows unauthenticated attackers to conduct remote code execution via specially crafted input.",
+  "token_count": 38
+}

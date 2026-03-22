@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-46598",
+  "ingested_at": "2026-03-22T07:54:48.847279+00:00",
+  "lang": "en",
+  "raw_text": "Bitcoin Core through 29.0 allows a denial of service via a crafted transaction.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c5fd0bad4bb9522308bfe3b7a02f6a53f8f92a2be35baa3b6d9a56e576a19f98",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-46598"
+}

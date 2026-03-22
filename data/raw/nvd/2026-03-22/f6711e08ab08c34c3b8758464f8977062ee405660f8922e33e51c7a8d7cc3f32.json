@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2795",
+  "ingested_at": "2026-03-22T07:54:31.588794+00:00",
+  "lang": "en",
+  "raw_text": "Use-after-free in the JavaScript: GC component. This vulnerability affects Firefox < 148 and Thunderbird < 148.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f6711e08ab08c34c3b8758464f8977062ee405660f8922e33e51c7a8d7cc3f32",
+  "source": "nvd",
+  "tags": [
+    "CWE-416",
+    "CWE-416"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2795"
+}

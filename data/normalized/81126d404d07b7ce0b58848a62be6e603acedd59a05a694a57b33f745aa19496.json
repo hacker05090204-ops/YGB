@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a stack overflow in CIccBasicStructFactory::CreateStruct() causing uncontrolled recursion/stack exhaustion and crash. This vulnerability is fixed in 2.3.1.5.",
+  "token_count": 37
+}

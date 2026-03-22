@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where model packaging and distribution mechanisms may not include sufficient authenticity verification. This may allow the possibility of unverified or modified model artifacts being used, potentially leading to integrity concerns or unintended behaviour.",
+  "token_count": 40
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4428",
+  "ingested_at": "2026-03-22T07:54:48.135941+00:00",
+  "lang": "en",
+  "raw_text": "A logic error in CRL distribution point validation in AWS-LC before 1.71.0 causes partitioned CRLs to be incorrectly rejected as out of scope, which allows a revoked certificate to bypass certificate revocation checks. To remediate this issue, users should upgrade to AWS-LC 1.71.0 or AWS-LC-FIPS-3.3.0.",
+  "severity": "HIGH",
+  "sha256_hash": "2178115875cf11af155ed3a7a4aaea281522569de3f7e0b77241dc37ac652621",
+  "source": "nvd",
+  "tags": [
+    "CWE-299"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4428"
+}

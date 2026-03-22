@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31944",
+  "ingested_at": "2026-03-22T07:54:44.751406+00:00",
+  "lang": "en",
+  "raw_text": "LibreChat is a ChatGPT clone with additional features. From 0.8.2 to 0.8.2-rc3, The MCP (Model Context Protocol) OAuth callback endpoint accepts the redirect from the identity provider and stores OAuth tokens for the user who initiated the flow, without verifying that the browser hitting the redirect URL is logged in or that the logged-in user matches the initiator. An attacker can send the authorization URL to a victim; when the victim completes the flow, the victim\u2019s OAuth tokens are stored on the attacker\u2019s LibreChat account, enabling account takeover of the victim\u2019s MCP-linked services (e.g. Atlassian, Outlook). This vulnerability is fixed in 0.8.3-rc1.",
+  "severity": "HIGH",
+  "sha256_hash": "0cba01bff7334f8c26e8342bb4ec2e2c7531a3fb579e3a8a529ab3ad3cf18725",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31944"
+}

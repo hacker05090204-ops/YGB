@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenProject is an open-source, web-based project management software. Prior to versions 17.0.5 and 17.1.2, an attacker can create wiki pages belonging to unpermitted projects through an improperly authenticated request. This issue has been patched in versions 17.0.5 and 17.1.2.",
+  "token_count": 39
+}

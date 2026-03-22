@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Local privilege escalation due to improper directory permissions. The following products are affected: Acronis Cyber Protect 17 (Windows) before build 41186.",
+  "token_count": 21
+}

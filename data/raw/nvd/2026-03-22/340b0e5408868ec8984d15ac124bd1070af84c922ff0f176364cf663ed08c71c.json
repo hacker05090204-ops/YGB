@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4530",
+  "ingested_at": "2026-03-22T07:54:49.576852+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in apconw Aix-DB up to 1.2.3. This impacts an unknown function of the file agent/text2sql/rag/terminology_retriever.py. Performing a manipulation of the argument Description results in sql injection. The attack requires a local approach. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "340b0e5408868ec8984d15ac124bd1070af84c922ff0f176364cf663ed08c71c",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4530"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26114",
+  "ingested_at": "2026-03-22T07:54:42.806400+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of untrusted data in Microsoft Office SharePoint allows an authorized attacker to execute code over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "603e5c7933f07f53973660d08492d4c9f67f981b81008d0173752193368ad296",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26114"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0167",
+  "ingested_at": "2026-03-22T07:45:18.539908+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS, XR, and XE Software There is a buffer overflow vulnerability in the Link Layer Discovery Protocol (LLDP) subsystem of Cisco IOS Software, Cisco IOS XE Software, and Cisco IOS XR Software which could allow an unauthenticated, adjacent attacker to cause a denial of service (DoS) condition or execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa13fca7e7d4236ccd74e1083ebb2c92c5ffc2a5d95894267f0f0215f30a9ad1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 52,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

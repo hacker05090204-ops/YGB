@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27515",
+  "ingested_at": "2026-03-22T07:54:31.663505+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware versions prior to V300SP10260209 generate predictable numeric session identifiers in the web management interface. An attacker can guess valid session IDs and hijack authenticated sessions.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1e51f66064e3642a656490b0af40fd7617313bad64c4570a85afb05e6e27cbf7",
+  "source": "nvd",
+  "tags": [
+    "CWE-330"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27515"
+}

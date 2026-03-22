@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27954",
+  "ingested_at": "2026-03-22T07:54:32.536096+00:00",
+  "lang": "en",
+  "raw_text": "Live Helper Chat is an open-source application that enables live support websites. In versions up to and including 4.52, three chat action endpoints (holdaction.php, blockuser.php, and transferchat.php) load chat objects by ID without calling `erLhcoreClassChat::hasAccessToRead()`, allowing operators to act on chats in departments they are not assigned to. Operators with the relevant role permissions (holduse, allowblockusers, allowtransfer) can hold, block users from, or transfer chats in departments they are not assigned to. This is a horizontal privilege escalation within one organization. As of time of publication, no known patched versions are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "12b162bee238d8dc46709aeef245567f6ba58ef12d625f8cb9ed7a9053b99a0b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27954"
+}

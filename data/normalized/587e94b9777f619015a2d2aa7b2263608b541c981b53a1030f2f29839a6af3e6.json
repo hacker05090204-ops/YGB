@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "2-Plan Team 1.0.4 contains an arbitrary file upload vulnerability that allows authenticated attackers to upload executable PHP files by sending multipart form data to managefile.php. Attackers can upload PHP files through the userfile1 parameter with action=upload, which are stored in the files directory and executed by the web server for remote code execution.",
+  "token_count": 53
+}

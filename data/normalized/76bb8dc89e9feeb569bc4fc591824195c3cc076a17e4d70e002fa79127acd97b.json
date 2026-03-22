@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-16 and 6.9.13-41, MAT decoder uses 32-bit arithmetic due to incorrect parenthesization resulting in a heap over-read. This vulnerability is fixed in 7.1.2-16 and 6.9.13-41.",
+  "token_count": 41
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3083",
+  "ingested_at": "2026-03-22T07:54:46.591981+00:00",
+  "lang": "en",
+  "raw_text": "GStreamer rtpqdm2depay Out-Of-Bounds Write Remote Code Execution Vulnerability. This vulnerability allows remote attackers to execute arbitrary code on affected installations of GStreamer. Interaction with this library is required to exploit this vulnerability but attack vectors may vary depending on the implementation. The specific flaw exists within the processing of X-QDM RTP payload elements. When parsing the packetid element, the process does not properly validate user-supplied data, which can result in a write past the end of an allocated array. An attacker can leverage this vulnerability to execute code in the context of the current process. Was ZDI-CAN-28850.",
+  "severity": "HIGH",
+  "sha256_hash": "eec8a86142dafc195f458260d5bdcad8ee10a190a2c586d810ae7f86ba8d4fa9",
+  "source": "nvd",
+  "tags": [
+    "CWE-129"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3083"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-39717",
+  "ingested_at": "2026-03-22T07:45:16.856514+00:00",
+  "lang": "en",
+  "raw_text": "Versa Director The Versa Director GUI contains an unrestricted upload of file with dangerous type vulnerability that allows administrators with Provider-Data-Center-Admin or Provider-Data-Center-System-Admin privileges to customize the user interface. The \u201cChange Favicon\u201d (Favorite Icon) enables the upload of a .png file, which can be exploited to upload a malicious file with a .png extension disguised as an image.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4d9066d37ecfbda624977d9a2d6f0aee37d265d32f0b29a748c6165fa5f84cca",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 58,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

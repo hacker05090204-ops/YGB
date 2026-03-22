@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8260",
+  "ingested_at": "2026-03-22T07:45:19.513502+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Pulse Connect Secure contains an unspecified vulnerability that allows an authenticated attacker to perform code execution using uncontrolled gzip extraction.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e0e8c20d4c5e2736a8f38d6614868c9e5cf66e8fd222b4fbc911624ddda0ff4e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

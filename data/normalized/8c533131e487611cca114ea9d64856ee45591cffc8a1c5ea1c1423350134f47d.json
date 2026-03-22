@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Planning Analytics Local 2.1.0 through 2.1.17 could allow an unauthorized access to sensitive application data and administrative functionalities due to lack of proper access controls.",
+  "token_count": 26
+}

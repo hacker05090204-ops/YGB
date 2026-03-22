@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1129",
+  "ingested_at": "2026-03-22T07:45:18.447801+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when Windows AppXSVC improperly handles hard links. An attacker who successfully exploited this vulnerability could run processes in an elevated context.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d39b0f6bcd28882931834e163be2e7dae170bb764d17bda6473fd0b3ebfbaa47",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

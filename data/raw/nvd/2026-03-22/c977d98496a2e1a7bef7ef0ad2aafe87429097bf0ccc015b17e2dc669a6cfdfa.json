@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32410",
+  "ingested_at": "2026-03-22T07:54:46.045039+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in WBW Plugins WBW Currency Switcher for WooCommerce woo-currency allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WBW Currency Switcher for WooCommerce: from n/a through < = 2.2.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c977d98496a2e1a7bef7ef0ad2aafe87429097bf0ccc015b17e2dc669a6cfdfa",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32410"
+}

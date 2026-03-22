@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21359",
+  "ingested_at": "2026-03-22T07:54:43.448049+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Commerce versions 2.4.9-alpha3, 2.4.8-p3, 2.4.7-p8, 2.4.6-p13, 2.4.5-p15, 2.4.4-p16 and earlier are affected by an Incorrect Authorization vulnerability that could result in a Security feature bypass. An attacker could leverage this vulnerability to bypass security measures and have limited impact to the integrity and availability of data. The exploit depends on conditions beyond the attacker's control. Exploitation of this issue does not require user interaction.",
+  "severity": "MEDIUM",
+  "sha256_hash": "432519e91a12b9e607a0b49a6ff5332e0f183a532375ff6deb412516b3106e51",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21359"
+}

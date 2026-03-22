@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52564",
+  "ingested_at": "2026-03-22T07:54:33.704131+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, the open parameter of help.php fails to properly sanitize user input. This allows an attacker to inject arbitrary HTML, such as underlined text, via a crafted URL. This issue has been patched in version 1.11.30.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6d5231b457b32fbb783412ef47fabc4752709c0a8f843e66718ade63bc93eb27",
+  "source": "nvd",
+  "tags": [
+    "CWE-80"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52564"
+}

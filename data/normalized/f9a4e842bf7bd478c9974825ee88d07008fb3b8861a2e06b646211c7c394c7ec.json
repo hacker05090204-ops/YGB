@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CWE\u2010502: Deserialization of Untrusted Data vulnerability exists that could cause arbitrary code execution with administrative privileges when a locally authenticated attacker sends a crafted data stream, triggering unsafe deserialization.",
+  "token_count": 29
+}

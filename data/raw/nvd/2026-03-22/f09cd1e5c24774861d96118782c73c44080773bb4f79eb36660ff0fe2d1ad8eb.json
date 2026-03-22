@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3961",
+  "ingested_at": "2026-03-22T07:54:44.110169+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in zyddnys manga-image-translator up to beta-0.3. The affected element is the function to_pil_image of the file manga-image-translator-main/server/request_extraction.py of the component Translate Endpoints. This manipulation causes server-side request forgery. It is possible to initiate the attack remotely. The exploit has been publicly disclosed and may be utilized. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f09cd1e5c24774861d96118782c73c44080773bb4f79eb36660ff0fe2d1ad8eb",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3961"
+}

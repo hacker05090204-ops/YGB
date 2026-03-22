@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Aviatrix Aviatrix Controller Unrestricted upload of a file with a dangerous type is possible, which allows an unauthenticated user to execute arbitrary code via directory traversal.",
+  "token_count": 26
+}

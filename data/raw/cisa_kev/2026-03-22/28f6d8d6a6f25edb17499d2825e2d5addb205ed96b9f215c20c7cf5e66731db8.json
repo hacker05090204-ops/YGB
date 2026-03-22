@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-11261",
+  "ingested_at": "2026-03-22T07:45:18.933591+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Snapdragon Auto, Snapdragon Compute, Snapdragon Connectivity, Snapdragon Consumer IOT, Snapdragon Industrial IOT, Snapdragon Mobile, Snapdragon Voice & Music, Snapdragon Wearables Memory corruption due to improper check to return error when user application requests memory allocation of a huge size in Snapdragon Auto, Snapdragon Compute, Snapdragon Connectivity, Snapdragon Consumer IOT, Snapdragon Industrial IOT, Snapdragon Mobile, Snapdragon Voice & Music, Snapdragon Wearables",
+  "severity": "CRITICAL",
+  "sha256_hash": "28f6d8d6a6f25edb17499d2825e2d5addb205ed96b9f215c20c7cf5e66731db8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 61,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

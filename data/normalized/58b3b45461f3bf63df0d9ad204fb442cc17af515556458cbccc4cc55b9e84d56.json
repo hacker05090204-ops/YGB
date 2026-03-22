@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the web-based management interface of AOS-CX Switches could allow an unauthenticated remote attacker to redirect users to an arbitrary URL.",
+  "token_count": 23
+}

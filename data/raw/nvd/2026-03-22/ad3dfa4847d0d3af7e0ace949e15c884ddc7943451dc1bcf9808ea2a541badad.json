@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27605",
+  "ingested_at": "2026-03-22T07:54:41.263078+00:00",
+  "lang": "en",
+  "raw_text": "Chartbrew is an open-source web application that can connect directly to databases and APIs and use the data to create charts. Prior to version 4.8.4, the application allows uploading files (project logos) without validating the file type or content. It trusts the extension provided by the user. These files are saved to the uploads/ directory and served statically. An attacker can upload an HTML file containing malicious JavaScript. Since authentication tokens are likely stored in localStorage (as they are returned in the API body), this XSS can lead to account takeover. This issue has been patched in version 4.8.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ad3dfa4847d0d3af7e0ace949e15c884ddc7943451dc1bcf9808ea2a541badad",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-434"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27605"
+}

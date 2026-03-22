@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw has been found in Tenda A18 Pro 02.03.02.28. This issue affects the function setSchedWifi of the file /goform/openSchedWifi. This manipulation causes stack-based buffer overflow. Remote exploitation of the attack is possible. The exploit has been published and may be used.",
+  "token_count": 42
+}

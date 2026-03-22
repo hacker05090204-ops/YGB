@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32755",
+  "ingested_at": "2026-03-22T07:54:48.330247+00:00",
+  "lang": "en",
+  "raw_text": "Admidio is an open-source user management solution. In versions 5.0.6 and below, the save_membership action in modules/profile/profile_function.php saves changes to a member's role membership start and end dates but does not validate the CSRF token. The handler checks stop_membership and remove_former_membership against the CSRF token but omits save_membership from that check. Because membership UUIDs appear in the HTML source visible to authenticated users, an attacker can embed a crafted POST form on any external page and trick a role leader into submitting it, silently altering membership dates for any member of roles the victim leads. A role leader's session can be silently exploited via CSRF to manipulate any member's membership dates, terminating access by backdating, covertly extending unauthorized access, or revoking role-restricted features, all without confirmation, notification, or administrative approval. This issue has been fixed in version 5.0.7.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4c1dea7094fad22efccd1da1038daade75755a1492edf01d9e174ce29741c048",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 138,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32755"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-11182",
+  "ingested_at": "2026-03-22T07:45:16.400010+00:00",
+  "lang": "en",
+  "raw_text": "MDaemon Email Server MDaemon Email Server contains a cross-site scripting (XSS) vulnerability that allows a remote attacker to load arbitrary JavaScript code via an HTML e-mail message.",
+  "severity": "CRITICAL",
+  "sha256_hash": "08b1296264bbc5bd1695dd9e8ba8c41043ebf171597a6343551bdc8f24e7d6f8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

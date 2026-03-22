@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28518",
+  "ingested_at": "2026-03-22T07:54:34.090914+00:00",
+  "lang": "en",
+  "raw_text": "OpenViking versions 0.2.1 and prior, fixed in commit 46b3e76, contain a path traversal vulnerability in the .ovpack import handling that allows attackers to write files outside the intended import directory. Attackers can craft malicious ZIP archives with traversal sequences, absolute paths, or drive prefixes in member names to overwrite or create arbitrary files with the importing process privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "6f79d6b39358ca6c717ca564b44a878cd9c44b17e67add245700564e0fd52c14",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28518"
+}

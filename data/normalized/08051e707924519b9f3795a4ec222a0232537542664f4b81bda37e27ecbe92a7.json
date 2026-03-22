@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PHP FastCGI Process Manager (FPM) In some versions of PHP in certain configurations of FPM setup, it is possible to cause FPM module to write past allocated buffers allowing the possibility of remote code execution.",
+  "token_count": 35
+}

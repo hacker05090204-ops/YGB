@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8639",
+  "ingested_at": "2026-03-22T07:45:16.551270+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Win32k contains an improper resource shutdown or release vulnerability that allows for local, authenticated privilege escalation. An attacker who successfully exploited this vulnerability could run arbitrary code in kernel mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c64d2b43404096920dc354f5bb0249b594ef46cef82a9a4786e6c6c4cd1841bb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

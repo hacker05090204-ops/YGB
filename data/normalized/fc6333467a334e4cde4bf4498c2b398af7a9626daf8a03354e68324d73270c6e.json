@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Chamilo LMS is a learning management system. Prior to version 1.11.36, Chamilo is vulnerable to user enumeration with valid/invalid username. This issue has been patched in version 1.11.36.",
+  "token_count": 28
+}

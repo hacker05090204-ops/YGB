@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27133",
+  "ingested_at": "2026-03-22T07:54:30.662979+00:00",
+  "lang": "en",
+  "raw_text": "Strimzi provides a way to run an Apache Kafka cluster on Kubernetes or OpenShift in various deployment configurations. From 0.47.0 to before 0.50.1, when a chain consisting of multiple CA (Certificate Authority) certificates is used in the trusted certificates configuration of a Kafka Connect operand or of the target cluster in the Kafka MirrorMaker 2 operand, all of the certificates that are part of the CA chain will be trusted individually when connecting to the Apache Kafka cluster. Due to this error, the affected operand (Kafka Connect or Kafka MirrorMaker 2) might accept connections to Kafka brokers using server certificates signed by one of the other CAs in the CA chain and not just by the last CA in the chain. This issue is fixed in Strimzi 0.50.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ccf6b29c0a1af3be8c7930bb6ae91e6f0bd61aff77b16b3817ebbac10bbe6857",
+  "source": "nvd",
+  "tags": [
+    "CWE-295",
+    "CWE-296"
+  ],
+  "token_count": 128,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27133"
+}

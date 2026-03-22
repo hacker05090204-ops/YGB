@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32099",
+  "ingested_at": "2026-03-22T07:54:48.254158+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, when a user has `hide_profile` enabled, their bio, location, and website were still exposed through the user onebox preview. An authenticated user could request a onebox for a hidden user's profile URL and receive their hidden profile fields (bio, location, website) in the response. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "45ce2b04548b04b3463d2fe5b6ce0aebce5f7cc62ec30e3a42f9e292d19732f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32099"
+}

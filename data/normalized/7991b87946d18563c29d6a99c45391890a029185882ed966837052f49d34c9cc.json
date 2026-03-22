@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cleartext Storage of Sensitive Information (CWE-312) in the Command Centre Mobile Client on Android and iOS could allow an attacker with access to a logged-in Operator's mobile device to extract the session token and exploit access for a limited duration. This issue affects Command Centre Mobile Client versions prior to 9.40.123.",
+  "token_count": 51
+}

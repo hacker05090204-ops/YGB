@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23664",
+  "ingested_at": "2026-03-22T07:54:42.661425+00:00",
+  "lang": "en",
+  "raw_text": "Improper restriction of communication channel to intended endpoints in Azure IoT Explorer allows an unauthorized attacker to disclose information over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "7f558473e96798c2dbb1cf905cb0d2b4a90aae74d52279e737a6041110c402dd",
+  "source": "nvd",
+  "tags": [
+    "CWE-923"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23664"
+}

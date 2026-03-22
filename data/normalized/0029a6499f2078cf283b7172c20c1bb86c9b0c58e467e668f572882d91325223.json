@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenSSL OpenSSL The TLS and DTLS implementations in OpenSSL do not properly handle Heartbeat Extension packets, which allows remote attackers to obtain sensitive information.",
+  "token_count": 24
+}

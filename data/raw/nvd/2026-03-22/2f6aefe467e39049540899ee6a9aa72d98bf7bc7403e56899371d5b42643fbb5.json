@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2294",
+  "ingested_at": "2026-03-22T07:54:49.337447+00:00",
+  "lang": "en",
+  "raw_text": "The UiPress lite | Effortless custom dashboards, admin themes and pages plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the 'uip_save_global_settings' function in all versions up to, and including, 3.5.09. This makes it possible for authenticated attackers, with Subscriber-level access and above, to change arbitrary plugin settings.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2f6aefe467e39049540899ee6a9aa72d98bf7bc7403e56899371d5b42643fbb5",
+  "source": "nvd",
+  "tags": [
+    "CWE-285"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2294"
+}

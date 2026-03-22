@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell Integrated Dell Remote Access Controller 9, 14G versions prior to 7.00.00.181, 15G and 16G versions prior to 7.20.10.50 and Dell Integrated Dell Remote Access Controller 10, 17G versions prior to 1.20.25.00, contain a Process Control vulnerability. A high privileged attacker with adjacent network access could potentially exploit this vulnerability, leading to code execution.",
+  "token_count": 54
+}

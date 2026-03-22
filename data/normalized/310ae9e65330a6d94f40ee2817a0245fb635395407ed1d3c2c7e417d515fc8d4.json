@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Glances is an open-source system cross-platform monitoring tool. Prior to version 4.5.2, the Glances REST API web server ships with a default CORS configuration that sets `allow_origins=[\"*\"]` combined with `allow_credentials=True`. When both of these options are enabled together, Starlette's `CORSMiddleware` reflects the requesting `Origin` header value in the `Access-Control-Allow-Origin` response header instead of returning the literal `*` wildcard. This effectively grants any website the ability to make credentialed cross-origin API requests to the Glances server, enabling cross-site data theft of system monitoring information, configuration secrets, and command line arguments from any user who has an active browser session with a Glances instance. Version 4.5.2 fixes the issue.",
+  "token_count": 107
+}

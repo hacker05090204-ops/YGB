@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27967",
+  "ingested_at": "2026-03-22T07:54:32.454903+00:00",
+  "lang": "en",
+  "raw_text": "Zed, a code editor, has a symlink escape vulnerability in versions prior to 0.225.9 in Agent file tools (`read_file`, `edit_file`). It allows reading and writing files **outside the project directory** when a project contains symbolic links pointing to external paths. This bypasses the intended workspace boundary and privacy protections (`file_scan_exclusions`, `private_files`), potentially leaking sensitive user data to the LLM. Version 0.225.9 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "8e1c8e4abd24594c5c2c67abf03876e78bf4799aefab1e35c39961d126e94e07",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27967"
+}

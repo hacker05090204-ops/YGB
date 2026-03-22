@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41990",
+  "ingested_at": "2026-03-22T07:45:17.096682+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and watchOS contain an unspecified vulnerability that allows for code execution when processing a font file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a03153027197e9968a98819d4e9a8e714f35cc0890fc7ff23a3db3ded8ac29d2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

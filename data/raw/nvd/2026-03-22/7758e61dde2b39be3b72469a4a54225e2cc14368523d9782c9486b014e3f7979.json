@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3060",
+  "ingested_at": "2026-03-22T07:54:44.221423+00:00",
+  "lang": "en",
+  "raw_text": "SGLang' encoder parallel disaggregation system is vulnerable to unauthenticated remote code execution through the disaggregation module, which deserializes untrusted data using pickle.loads() without authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7758e61dde2b39be3b72469a4a54225e2cc14368523d9782c9486b014e3f7979",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3060"
+}

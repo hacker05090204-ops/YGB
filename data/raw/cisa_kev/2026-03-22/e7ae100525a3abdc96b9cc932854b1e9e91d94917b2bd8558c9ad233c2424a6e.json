@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-11774",
+  "ingested_at": "2026-03-22T07:45:19.413960+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office Outlook contains a security feature bypass vulnerability due to improperly handling objects in memory. Successful exploitation allows an attacker to execute commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e7ae100525a3abdc96b9cc932854b1e9e91d94917b2bd8558c9ad233c2424a6e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

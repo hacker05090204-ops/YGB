@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A use-after-free vulnerability can be triggered in sharded clusters by an authenticated user with the read role who issues a specially crafted $lookup or $graphLookup aggregation pipeline.",
+  "token_count": 27
+}

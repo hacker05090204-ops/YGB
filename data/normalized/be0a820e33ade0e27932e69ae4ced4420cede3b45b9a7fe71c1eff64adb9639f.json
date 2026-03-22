@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Out-of-bound write vulnerability in VMware Workstation 25H1 and below on any platform allows an actor with non-administrative privileges on a guest VM to terminate certain Workstation processes.",
+  "token_count": 27
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2952",
+  "ingested_at": "2026-03-22T07:54:30.993474+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Vaelsys 4.1.0. This vulnerability affects unknown code of the file /tree/tree_server.php of the component HTTP POST Request Handler. This manipulation of the argument xajaxargs causes os command injection. The attack is possible to be carried out remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "271a0bf024dcb7050b3f7906629191e309e7c0fea35a8792ecd9ba33c95a361f",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78",
+    "CWE-78"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2952"
+}

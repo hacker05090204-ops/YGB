@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Exim Exim Exim contains a buffer overflow vulnerability in the base64d function part of the SMTP listener that may allow for remote code execution.",
+  "token_count": 24
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A potential improper initialization vulnerability was reported in the BIOS of some ThinkPads that could allow a local privileged user to modify data and execute arbitrary code.",
+  "token_count": 27
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An authentication bypass vulnerability in the authorization mechanism of Weintek cMT-3072XH2 easyweb v2.1.53, OS v20231011 allows unauthorized attackers to perform Administrative actions using service accounts.",
+  "token_count": 25
+}

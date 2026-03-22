@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23242",
+  "ingested_at": "2026-03-22T07:54:47.433517+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: RDMA/siw: Fix potential NULL pointer dereference in header processing If siw_get_hdr() returns -EINVAL before set_rx_fpdu_context(), qp->rx_fpdu can be NULL. The error path in siw_tcp_rx_data() dereferences qp->rx_fpdu->more_ddp_segs without checking, which may lead to a NULL pointer deref. Only check more_ddp_segs when rx_fpdu is present. KASAN splat: [ 101.384271] KASAN: null-ptr-deref in range [0x00000000000000c0-0x00000000000000c7] [ 101.385869] RIP: 0010:siw_tcp_rx_data+0x13ad/0x1e50",
+  "severity": "UNKNOWN",
+  "sha256_hash": "72dda0aebbb12251824e65091309c39692b446c5c976283523a77a256bcd858d",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23242"
+}

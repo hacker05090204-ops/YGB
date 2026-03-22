@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33081",
+  "ingested_at": "2026-03-22T07:54:48.775405+00:00",
+  "lang": "en",
+  "raw_text": "PinchTab is a standalone HTTP server that gives AI agents direct control over a Chrome browser. Versions 0.8.2 and below have a Blind SSRF vulnerability in the /download endpoint. The validateDownloadURL() function only checks the initial user-supplied URL, but the embedded Chromium browser can follow attacker-controlled redirects/navigations to internal network addresses after validation. Exploitation requires security.allowDownload=true (disabled by default), limiting real-world impact. An attacker-controlled page can use JavaScript redirects or resource requests to make the browser reach internal services from the PinchTab host, resulting in a blind Server-Side Request Forgery (SSRF) condition against internal-only services. The issue has been patched in version 0.8.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "536104ae6c0dac34ddb9d05978c6af99f4aa514ad7560a46720d1eaa506c4d7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33081"
+}

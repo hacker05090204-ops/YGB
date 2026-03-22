@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27633",
+  "ingested_at": "2026-03-22T07:54:32.411444+00:00",
+  "lang": "en",
+  "raw_text": "TinyWeb is a web server (HTTP, HTTPS) written in Delphi for Win32. Versions prior to version 2.02 have a Denial of Service (DoS) vulnerability via memory exhaustion. Unauthenticated remote attackers can send an HTTP POST request to the server with an exceptionally large `Content-Length` header (e.g., `2147483647`). The server continuously allocates memory for the request body (`EntityBody`) while streaming the payload without enforcing any maximum limit, leading to all available memory being consumed and causing the server to crash. Anyone hosting services using TinyWeb is impacted. Version 2.02 fixes the issue. The patch introduces a `CMaxEntityBodySize` limit (set to 10MB) for the maximum size of accepted payloads. As a temporary workaround if upgrading is not immediately possible, consider placing the server behind a Web Application Firewall (WAF) or reverse proxy (like nginx or Cloudflare) configured to explicitly limit the maximum allowed HTTP request body size (e.g., `client_max_body_size` in nginx).",
+  "severity": "HIGH",
+  "sha256_hash": "460ae2af7426bc315785a1b7b2b86df1d081c6cea2c6bec77056b7b0aa94cc20",
+  "source": "nvd",
+  "tags": [
+    "CWE-400",
+    "CWE-770"
+  ],
+  "token_count": 149,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27633"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiOS, FortiProxy, and FortiSwitchManager contain an authentication bypass vulnerability that could allow an unauthenticated attacker to perform operations on the administrative interface via specially crafted HTTP or HTTPS requests.",
+  "token_count": 33
+}

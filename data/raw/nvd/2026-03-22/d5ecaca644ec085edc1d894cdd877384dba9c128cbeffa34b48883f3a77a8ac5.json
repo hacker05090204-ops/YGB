@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32379",
+  "ingested_at": "2026-03-22T07:54:45.979177+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Rara Academic rara-academic allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Rara Academic: from n/a through < = 1.2.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d5ecaca644ec085edc1d894cdd877384dba9c128cbeffa34b48883f3a77a8ac5",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32379"
+}

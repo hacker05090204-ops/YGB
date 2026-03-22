@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28065",
+  "ingested_at": "2026-03-22T07:54:40.533310+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Eject eject allows PHP Local File Inclusion.This issue affects Eject: from n/a through < = 2.17.",
+  "severity": "HIGH",
+  "sha256_hash": "9183f973e039226cc8b721562a24f98e238d5f6f100185600fccde93f888047f",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28065"
+}

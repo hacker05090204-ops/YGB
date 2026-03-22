@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25443",
+  "ingested_at": "2026-03-22T07:54:30.977608+00:00",
+  "lang": "en",
+  "raw_text": "Inventory Webapp contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through GET parameters. Attackers can supply malicious SQL payloads in the name, description, quantity, or cat_id parameters to add-item.php to execute arbitrary database commands.",
+  "severity": "HIGH",
+  "sha256_hash": "827937be28d9a26e4c9649919caf492c11c95eb0ef3652bb429c501ac1b45cb2",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25443"
+}

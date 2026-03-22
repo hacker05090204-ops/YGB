@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Versa Director The Versa Director GUI contains an unrestricted upload of file with dangerous type vulnerability that allows administrators with Provider-Data-Center-Admin or Provider-Data-Center-System-Admin privileges to customize the user interface. The \u201cChange Favicon\u201d (Favorite Icon) enables the upload of a .png file, which can be exploited to upload a malicious file with a .png extension disguised as an image.",
+  "token_count": 58
+}

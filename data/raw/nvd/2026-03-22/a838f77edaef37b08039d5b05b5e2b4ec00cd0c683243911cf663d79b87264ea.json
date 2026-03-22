@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69299",
+  "ingested_at": "2026-03-22T07:54:30.190238+00:00",
+  "lang": "en",
+  "raw_text": "Server-Side Request Forgery (SSRF) vulnerability in Laborator Oxygen oxygen allows Server Side Request Forgery.This issue affects Oxygen: from n/a through < = 6.0.8.",
+  "severity": "HIGH",
+  "sha256_hash": "a838f77edaef37b08039d5b05b5e2b4ec00cd0c683243911cf663d79b87264ea",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69299"
+}

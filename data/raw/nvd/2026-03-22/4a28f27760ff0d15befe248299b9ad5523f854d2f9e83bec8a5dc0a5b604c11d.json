@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1911",
+  "ingested_at": "2026-03-22T07:54:49.318630+00:00",
+  "lang": "en",
+  "raw_text": "The Twitter Feeds plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'tweet_title' parameter in the 'TwitterFeeds' shortcode in all versions up to, and including, 1.0.0 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4a28f27760ff0d15befe248299b9ad5523f854d2f9e83bec8a5dc0a5b604c11d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1911"
+}

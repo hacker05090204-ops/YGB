@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-3035",
+  "ingested_at": "2026-03-22T07:45:18.380121+00:00",
+  "lang": "en",
+  "raw_text": "TP-Link Multiple Archer Devices Directory traversal vulnerability in multiple TP-Link Archer devices allows remote attackers to read arbitrary files via a .. (dot dot) in the PATH_INFO to login/.",
+  "severity": "CRITICAL",
+  "sha256_hash": "de6c1f1b1531e237a7455c2bf768ac2032e824485d77e936a9d5d09c0ed45e1b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

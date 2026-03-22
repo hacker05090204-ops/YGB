@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sophos Web Appliance Sophos Web Appliance contains a command injection vulnerability in the warn-proceed handler that allows for remote code execution.",
+  "token_count": 21
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell Alienware Command Center (AWCC), versions prior to 6.12.24.0, contain an Improper Privilege Management vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Elevation of Privileges.",
+  "token_count": 32
+}

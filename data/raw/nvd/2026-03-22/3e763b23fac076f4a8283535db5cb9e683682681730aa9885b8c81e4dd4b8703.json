@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32417",
+  "ingested_at": "2026-03-22T07:54:46.061419+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in wppochipp Pochipp pochipp allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Pochipp: from n/a through < 1.18.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3e763b23fac076f4a8283535db5cb9e683682681730aa9885b8c81e4dd4b8703",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32417"
+}

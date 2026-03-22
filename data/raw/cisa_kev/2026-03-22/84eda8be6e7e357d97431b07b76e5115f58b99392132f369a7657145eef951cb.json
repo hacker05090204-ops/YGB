@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-14174",
+  "ingested_at": "2026-03-22T07:45:16.018042+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Google Chromium contains an out of bounds memory access vulnerability in ANGLE that could allow a remote attacker to perform out of bounds memory access via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "84eda8be6e7e357d97431b07b76e5115f58b99392132f369a7657145eef951cb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

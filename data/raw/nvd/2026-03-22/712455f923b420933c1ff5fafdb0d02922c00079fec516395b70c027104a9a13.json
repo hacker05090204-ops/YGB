@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30695",
+  "ingested_at": "2026-03-22T07:54:47.533500+00:00",
+  "lang": "en",
+  "raw_text": "A Cross-Site Scripting (XSS) vulnerability exists in the web-based configuration interface of Zucchetti Axess access control devices, including XA4, X3/X3BIO, X4, X7, and XIO / i-door / i-door+. The vulnerability is caused by improper sanitization of user-supplied input in the dirBrowse parameter of the /file_manager.cgi endpoint.",
+  "severity": "MEDIUM",
+  "sha256_hash": "712455f923b420933c1ff5fafdb0d02922c00079fec516395b70c027104a9a13",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30695"
+}

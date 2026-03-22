@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32029",
+  "ingested_at": "2026-03-22T07:54:48.222844+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.21 improperly parse the left-most X-Forwarded-For header value when requests originate from configured trusted proxies, allowing attackers to spoof client IP addresses. In proxy chains that append or preserve header values, attackers can inject malicious header content to influence security decisions including authentication rate-limiting and IP-based access controls.",
+  "severity": "LOW",
+  "sha256_hash": "6fe87906f5baa4a9aff7dca28ac65949831381d34b369cbb1fb723e1ce2a376c",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32029"
+}

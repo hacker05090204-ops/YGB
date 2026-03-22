@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-61146",
+  "ingested_at": "2026-03-22T07:54:31.158456+00:00",
+  "lang": "en",
+  "raw_text": "saitoha libsixel until v1.8.7 was discovered to contain a memory leak via the component malloc_stub.c.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bce130aa2e86ba70f747362c679f06f329c5afc9ee9b3166213c9051c18db2a0",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-61146"
+}

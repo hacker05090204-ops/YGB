@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2015-20118",
+  "ingested_at": "2026-03-22T07:54:46.223744+00:00",
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 contains a stored cross-site scripting vulnerability in the location_name parameter of the admin locations interface. Attackers can submit POST requests to the locations.php endpoint with JavaScript payloads in the location_name field to execute arbitrary code in administrator browsers.",
+  "severity": "HIGH",
+  "sha256_hash": "90bc4eee7dc719c7144aea7d432da94568a70cebba8d66ed3cde720daca10a54",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2015-20118"
+}

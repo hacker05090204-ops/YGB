@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32621",
+  "ingested_at": "2026-03-22T07:54:46.505057+00:00",
+  "lang": "en",
+  "raw_text": "Apollo Federation is an architecture for declaratively composing APIs into a unified graph. Prior to 2.9.6, 2.10.5, 2.11.6, 2.12.3, and 2.13.2, a vulnerability exists in query plan execution within the gateway that may allow pollution of Object.prototype in certain scenarios. A malicious client may be able to pollute Object.prototype in gateway directly by crafting operations with field aliases and/or variable names that target prototype-inheritable properties. Alternatively, if a subgraph were to be compromised by a malicious actor, they may be able to pollute Object.prototype in gateway by crafting JSON response payloads that target prototype-inheritable properties. This vulnerability is fixed in 2.9.6, 2.10.5, 2.11.6, 2.12.3, and 2.13.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ee042169bc37a47482659bdae31b20e3ec3df547b801fa21c0b62c1d8bf870dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-1321"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32621"
+}

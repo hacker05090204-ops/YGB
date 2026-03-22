@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28507",
+  "ingested_at": "2026-03-22T07:54:41.271241+00:00",
+  "lang": "en",
+  "raw_text": "Idno is a social publishing platform. Prior to version 1.6.4, there is a remote code execution vulnerability via chained import file write and template path traversal. This issue has been patched in version 1.6.4.",
+  "severity": "HIGH",
+  "sha256_hash": "a092d6cba7714c58179f9ca5ce0f3104c69db5e8e1b7b02a0fb6ad281dd20cc9",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28507"
+}

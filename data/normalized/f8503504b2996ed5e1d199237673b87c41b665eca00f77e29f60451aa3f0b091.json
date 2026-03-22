@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Step CA is an online certificate authority for secure, automated certificate management for DevOps. Versions 0.30.0-rc6 and below do not safeguard against unauthenticated certificate issuance through the SCEP UpdateReq. This issue has been fixed in version 0.30.0.",
+  "token_count": 37
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "All versions of InSAT MasterSCADA BUK-TS are susceptible to OS command injection through a field in its MMadmServ web interface. Malicious users that use the vulnerable endpoint are potentially able to cause remote code execution.",
+  "token_count": 35
+}

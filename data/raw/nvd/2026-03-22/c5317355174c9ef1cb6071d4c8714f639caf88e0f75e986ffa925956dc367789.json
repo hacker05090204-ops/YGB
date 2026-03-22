@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30704",
+  "ingested_at": "2026-03-22T07:54:47.639743+00:00",
+  "lang": "en",
+  "raw_text": "The WiFi Extender WDR201A (HW V2.1, FW LFMZX28040922V1.02) exposes an unprotected UART interface through accessible hardware pads on the PCB",
+  "severity": "CRITICAL",
+  "sha256_hash": "c5317355174c9ef1cb6071d4c8714f639caf88e0f75e986ffa925956dc367789",
+  "source": "nvd",
+  "tags": [
+    "CWE-912"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30704"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2462",
+  "ingested_at": "2026-03-22T07:54:46.458004+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to restrict plugin installation on CI test instances with default admin credentials which allows an unauthenticated attacker to achieve remote code execution and exfiltrate sensitive configuration data including AWS and SMTP credentials via uploading a malicious plugin after changing the import directory. Mattermost Advisory ID: MMSA-2025-00528",
+  "severity": "MEDIUM",
+  "sha256_hash": "8103eaab97769dd09f5c9ecf12bb1df4042d02718b0a4233721938ca17d0a509",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2462"
+}

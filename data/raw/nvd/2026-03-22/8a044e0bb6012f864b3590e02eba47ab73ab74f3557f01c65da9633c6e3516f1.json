@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2579",
+  "ingested_at": "2026-03-22T07:54:47.001814+00:00",
+  "lang": "en",
+  "raw_text": "The WowStore \u2013 Store Builder & Product Blocks for WooCommerce plugin for WordPress is vulnerable to SQL Injection via the \u2018search\u2019 parameter in all versions up to, and including, 4.4.3 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "HIGH",
+  "sha256_hash": "8a044e0bb6012f864b3590e02eba47ab73ab74f3557f01c65da9633c6e3516f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2579"
+}

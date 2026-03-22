@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-4227",
+  "ingested_at": "2026-03-22T07:54:46.776232+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in LB-LINK BL-WR9000 2.4.9. The impacted element is the function sub_44D844 of the file /goform/get_hidessid_cfg. The manipulation leads to buffer overflow. It is possible to initiate the attack remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "8b9a947bece9bd9169a8e78d1b95b6598dfb1b645c8cb0792e84e00da679a642",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120",
+    "CWE-125"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4227"
+}

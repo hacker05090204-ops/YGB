@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26279",
+  "ingested_at": "2026-03-22T07:54:34.308474+00:00",
+  "lang": "en",
+  "raw_text": "Froxlor is open source server administration software. Prior to 2.3.4, a typo in Froxlor's input validation code (== instead of =) completely disables email format checking for all settings fields declared as email type. This allows an authenticated admin to store arbitrary strings in the panel.adminmail setting. This value is later concatenated into a shell command executed as root by a cron job, where the pipe character | is explicitly whitelisted. The result is full root-level Remote Code Execution. This vulnerability is fixed in 2.3.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7cfea46d12a3496f492c5ae58bf48d58fae60225bff80887e503873c7f1b7ed1",
+  "source": "nvd",
+  "tags": [
+    "CWE-78",
+    "CWE-482"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26279"
+}

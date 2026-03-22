@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25072",
+  "ingested_at": "2026-03-22T07:54:41.690573+00:00",
+  "lang": "en",
+  "raw_text": "XikeStor SKS8310-8X Network Switch firmware versions 1.04.B07 and prior contain a predictable session identifier vulnerability in the /goform/SetLogin endpoint that allows remote attackers to hijack authenticated sessions. Attackers can predict session identifiers using insufficiently random cookie values and exploit exposed session parameters in URLs to gain unauthorized access to authenticated user sessions.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fe4e546f1c90f8e4262a7f6d82ffbbe0a08786c12466d4ef33a339572e1bbcae",
+  "source": "nvd",
+  "tags": [
+    "CWE-330"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25072"
+}

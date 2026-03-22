@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Shinetheme Traveler allows Object Injection.This issue affects Traveler: from n/a before 3.2.8.1.",
+  "token_count": 18
+}

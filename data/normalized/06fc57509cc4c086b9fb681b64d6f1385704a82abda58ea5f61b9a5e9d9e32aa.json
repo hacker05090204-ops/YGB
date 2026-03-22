@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of untrusted data in the LanguageModel class of Flair from versions 0.4.1 to latest are vulnerable to arbitrary code execution when loading a malicious model.",
+  "token_count": 26
+}

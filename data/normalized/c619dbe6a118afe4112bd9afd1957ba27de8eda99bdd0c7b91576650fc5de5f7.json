@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in the Red Hat Ansible Automation Platform Gateway route creation component. This vulnerability allows credential theft via the creation of misleading routes using a double-slash (//) prefix in the gateway_path. A malicious or socially engineered administrator can configure a honey-pot route to intercept and exfiltrate user credentials, potentially maintaining persistent access or creating a backdoor even after their permissions are revoked.",
+  "token_count": 65
+}

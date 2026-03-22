@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chromium Google Chromium contains an improper input validation vulnerability in ANGLE and GPU. This vulnerability could allow a remote attacker to potentially perform a sandbox escape via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "token_count": 53
+}

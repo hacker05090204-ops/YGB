@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DIR-600 Router D-Link DIR-600 routers contain a cross-site request forgery (CSRF) vulnerability that allows an attacker to change router configurations by hijacking an existing administrator session.",
+  "token_count": 27
+}

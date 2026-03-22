@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiFone, FortiVoice, FortiNDR and FortiMail contain a stack-based overflow vulnerability that may allow a remote unauthenticated attacker to execute arbitrary code or commands via crafted HTTP requests.",
+  "token_count": 31
+}

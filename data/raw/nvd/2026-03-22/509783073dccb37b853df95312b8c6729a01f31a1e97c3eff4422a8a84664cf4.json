@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32234",
+  "ingested_at": "2026-03-22T07:54:43.931507+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to 9.6.0-alpha.10 and 8.6.36, an attacker with access to the master key can inject malicious SQL via crafted field names used in query constraints when Parse Server is configured with PostgreSQL as the database. The field name in a $regex query operator is passed to PostgreSQL using unparameterized string interpolation, allowing the attacker to manipulate the SQL query. While the master key controls what can be done through the Parse Server abstraction layer, this SQL injection bypasses Parse Server entirely and operates at the database level. This vulnerability only affects Parse Server deployments using PostgreSQL. This vulnerability is fixed in 9.6.0-alpha.10 and 8.6.36.",
+  "severity": "MEDIUM",
+  "sha256_hash": "509783073dccb37b853df95312b8c6729a01f31a1e97c3eff4422a8a84664cf4",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 122,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32234"
+}

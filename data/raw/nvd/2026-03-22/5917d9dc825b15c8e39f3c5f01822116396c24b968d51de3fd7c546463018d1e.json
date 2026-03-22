@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27686",
+  "ingested_at": "2026-03-22T07:54:42.487135+00:00",
+  "lang": "en",
+  "raw_text": "Due to a Missing Authorization Check in SAP Business Warehouse (Service API), an authenticated attacker could perform unauthorized actions via an affected RFC function module. Successful exploitation could enable unauthorized configuration and control changes, potentially disrupting request processing and causing denial of service. This results in low impact on integrity and high impact on availability, while confidentiality remains unaffected.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5917d9dc825b15c8e39f3c5f01822116396c24b968d51de3fd7c546463018d1e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27686"
+}

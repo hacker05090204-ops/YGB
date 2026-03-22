@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28549",
+  "ingested_at": "2026-03-22T07:54:40.761160+00:00",
+  "lang": "en",
+  "raw_text": "Race condition vulnerability in the permission management service. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f3affedc5cb2b7d59c8aea019478d633d5b4c65868abbd018a34d2ad2e627fff",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28549"
+}

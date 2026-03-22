@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4505",
+  "ingested_at": "2026-03-22T07:54:48.973975+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in eosphoros-ai DB-GPT up to 0.7.5. This issue affects the function module_plugin.refresh_plugins of the file packages/dbgpt-serve/src/dbgpt_serve/agent/hub/controller.py of the component FastAPI Endpoint. Such manipulation leads to unrestricted upload. It is possible to launch the attack remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "89cb025414ab68fa63c747478a39a36c2d1c19d63ae1d85f165cb4669cc350e2",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4505"
+}

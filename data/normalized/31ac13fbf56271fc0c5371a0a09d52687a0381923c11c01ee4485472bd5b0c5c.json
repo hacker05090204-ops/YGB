@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-89: Improper Neutralization of Special Elements used in an SQL Command was discovered in benkeen generatedata 4.0.14.",
+  "token_count": 21
+}

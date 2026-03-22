@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in atjiu pybbs 6.0.0. This impacts the function create of the file src/main/java/co/yiiu/pybbs/controller/api/CommentApiController.java. The manipulation results in cross site scripting. It is possible to launch the attack remotely. The exploit has been released to the public and may be used for attacks.",
+  "token_count": 48
+}

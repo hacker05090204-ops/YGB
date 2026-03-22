@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2025-71057",
+  "ingested_at": "2026-03-22T07:54:32.667870+00:00",
+  "lang": "en",
+  "raw_text": "Improper session management in D-Link Wireless N 300 ADSL2+ Modem Router DSL-124 ME_1.00 allows attackers to execute a session hijacking attack via spoofing the IP address of an authenticated user.",
+  "severity": "HIGH",
+  "sha256_hash": "26eceaeb124330a0b2dd9f912c4847f72a5fdcd9395a4278419303c733f12f2c",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-345",
+    "CWE-384"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-71057"
+}

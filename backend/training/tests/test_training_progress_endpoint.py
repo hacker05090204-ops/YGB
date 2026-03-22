@@ -24,6 +24,12 @@ from backend.training.state_manager import (
     TrainingMetrics,
     get_training_state_manager,
 )
+from backend.observability.metrics import (
+    MetricsRegistry,
+    get_measurement_completeness,
+    get_null_metric_ratio,
+    metrics_registry,
+)
 
 
 class TestTrainingMetrics:
@@ -175,6 +181,104 @@ class TestTrainingStateManager:
             assert keyword not in source, \
                 f"Forbidden keyword '{keyword}' found in TrainingStateManager source"
 
+    def test_emit_training_metrics_records_latency_accuracy_and_gpu_gauges(self):
+        metrics_registry.reset()
+        mgr = TrainingStateManager()
+        metrics = TrainingMetrics(
+            status="training",
+            elapsed_seconds=2.5,
+            last_accuracy=0.91,
+            gpu_usage_percent=62.5,
+            gpu_memory_used_mb=1536.0,
+        )
+
+        mgr.emit_training_metrics(metrics)
+        snapshot = metrics_registry.get_snapshot()
+
+        assert snapshot["histograms"]["training_latency_ms"]["count"] == 1
+        assert metrics_registry.get_gauge("model_accuracy") == 0.91
+        assert metrics_registry.get_gauge("gpu_memory_used_mb") == 1536.0
+        assert metrics_registry.get_gauge("gpu_utilization_pct") == 62.5
+        assert metrics_registry.get_gauge("gpu_fallback_active") == 0.0
+
+    def test_get_training_progress_normalizes_zero_values_to_none(self):
+        mgr = TrainingStateManager()
+        mock_trainer = MagicMock()
+        mock_trainer.get_status.return_value = {
+            "is_training": True,
+            "state": "TRAINING",
+            "epoch": 1,
+            "total_epochs": 2,
+            "last_loss": 0.0,
+            "last_accuracy": 0.0,
+            "samples_per_sec": 0.0,
+            "dataset_size": 0,
+            "training_mode": "AUTO",
+        }
+        mgr._g38_available = True
+        mgr._trainer = mock_trainer
+
+        with patch.object(mgr, "get_gpu_metrics", return_value={"gpu_usage_percent": None, "gpu_memory_used_mb": None, "gpu_memory_total_mb": None}):
+            with patch.object(mgr, "get_cpu_usage", return_value=None):
+                result = mgr.get_training_progress()
+
+        assert result.loss is None
+        assert result.last_accuracy is None
+        assert result.throughput is None
+        assert result.dataset_size is None
+
+    def test_emit_training_metrics_marks_fallback_when_gpu_values_missing(self):
+        metrics_registry.reset()
+        mgr = TrainingStateManager()
+        metrics = TrainingMetrics(status="idle")
+
+        mgr.emit_training_metrics(metrics)
+        assert metrics_registry.get_gauge("gpu_fallback_active") == 1.0
+
+    def test_emit_training_metrics_swallows_registry_errors(self):
+        mgr = TrainingStateManager()
+        metrics = TrainingMetrics(status="training", elapsed_seconds=1.0)
+
+        with patch.object(metrics_registry, "record", side_effect=RuntimeError("boom")):
+            mgr.emit_training_metrics(metrics)
+
+
+class TestMetricsRegistryBehavior:
+    def test_histogram_helpers_and_snapshot_cover_edge_cases(self):
+        registry = MetricsRegistry()
+        assert registry.get_histogram_stats("missing") == {"count": 0}
+
+        for value in range(1001):
+            registry.record("latency", float(value))
+
+        stats = registry.get_histogram_stats("latency")
+        snapshot = registry.get_snapshot()
+
+        assert stats["count"] == 500
+        assert snapshot["histograms"]["latency"]["count"] == 500
+
+    def test_check_critical_metrics_reports_missing_entries(self, caplog):
+        registry = MetricsRegistry()
+        registry.reset()
+
+        with caplog.at_level("WARNING"):
+            missing = registry.check_critical_metrics()
+
+        assert "request_count" in missing
+        assert registry.get_counter("metric_missing_counter") == len(missing)
+        assert any("Critical metric never recorded" in record.getMessage() for record in caplog.records)
+
+    def test_measurement_completeness_and_null_ratio_helpers(self):
+        metrics_registry.reset()
+
+        assert get_measurement_completeness({}, []) == 1.0
+        completeness = get_measurement_completeness({"a": 1, "b": None}, ["a", "b"])
+        assert completeness == 0.5
+
+        assert get_null_metric_ratio({}, []) == 0.0
+        null_ratio = get_null_metric_ratio({"a": None, "b": 2}, ["a", "b"])
+        assert null_ratio == 0.5
+
 
 class TestSingleton:
     """Test singleton pattern."""
@@ -185,6 +289,9 @@ class TestSingleton:
         import backend.training.state_manager as sm
         sm._state_manager = None
 
-        mgr1 = get_training_state_manager()
-        mgr2 = get_training_state_manager()
+        with patch.object(sm.TrainingStateManager, "start_gpu_watchdog") as start_watchdog:
+            mgr1 = get_training_state_manager()
+            mgr2 = get_training_state_manager()
+
         assert mgr1 is mgr2
+        start_watchdog.assert_called_once()

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-7101",
+  "ingested_at": "2026-03-22T07:45:17.106089+00:00",
+  "lang": "en",
+  "raw_text": "Spreadsheet::ParseExcel Spreadsheet::ParseExcel Spreadsheet::ParseExcel contains a remote code execution vulnerability due to passing unvalidated input from a file into a string-type \u201ceval\u201d. Specifically, the issue stems from the evaluation of Number format strings within the Excel parsing logic.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2eb39898230aef165d061f1c7e4985558d51149d38115f96b498b1c2a47e7a50",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

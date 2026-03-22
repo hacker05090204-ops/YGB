@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-9907",
+  "ingested_at": "2026-03-22T07:54:33.088288+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in the Red Hat Ansible Automation Platform, Event-Driven Ansible (EDA) Event Stream API. This vulnerability allows exposure of sensitive client credentials and internal infrastructure headers via the test_headers field when an event stream is in test mode. The possible outcome includes leakage of internal infrastructure details, accidental disclosure of user or system credentials, privilege escalation if high-value tokens are exposed, and persistent sensitive data exposure to all users with read access on the event stream.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6bdc82b57c9b6b65c4ad349c9121cf1d78f7fcc686ac5f32f4dd2b6e3fd09916",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-9907"
+}

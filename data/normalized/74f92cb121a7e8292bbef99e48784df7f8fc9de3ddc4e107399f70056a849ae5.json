@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sitecore XP Sitcore XP contains an insecure deserialization vulnerability which can allow for remote code execution.",
+  "token_count": 16
+}

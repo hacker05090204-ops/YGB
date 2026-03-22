@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Struts Apache Struts REST Plugin uses an XStreamHandler with an instance of XStream for deserialization without any type filtering, which can lead to remote code execution when deserializing XML payloads.",
+  "token_count": 31
+}

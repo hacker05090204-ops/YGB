@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-43766",
+  "ingested_at": "2026-03-22T07:54:33.832097+00:00",
+  "lang": "en",
+  "raw_text": "In multiple functions of btm_ble_sec.cc, there is a possible unencrypted communication due to Invalid error handling. This could lead to remote (proximal/adjacent) information disclosure with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "444ab9fa640035e939a7a1fcefcab1a6233c876bfae21f96ada3af2bf57ae391",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43766"
+}

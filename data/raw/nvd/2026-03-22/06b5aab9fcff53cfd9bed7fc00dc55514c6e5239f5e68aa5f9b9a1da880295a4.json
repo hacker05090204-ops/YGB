@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33126",
+  "ingested_at": "2026-03-22T07:54:48.954590+00:00",
+  "lang": "en",
+  "raw_text": "Frigate is a network video recorder (NVR) with realtime local object detection for IP cameras. Prior to version 0.16.3, the /ffprobe endpoint accepts arbitrary user-controlled URLs without proper validation, allowing Server-Side Request Forgery (SSRF) attacks. An attacker can use the Frigate server to make HTTP requests to internal network resources, cloud metadata services, or perform port scanning. This issue has been patched in version 0.16.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "06b5aab9fcff53cfd9bed7fc00dc55514c6e5239f5e68aa5f9b9a1da880295a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33126"
+}

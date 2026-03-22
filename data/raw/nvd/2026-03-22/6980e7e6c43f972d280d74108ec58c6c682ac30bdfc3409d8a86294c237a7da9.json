@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22389",
+  "ingested_at": "2026-03-22T07:54:40.002331+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Mikado-Themes Cocco cocco allows PHP Local File Inclusion.This issue affects Cocco: from n/a through < = 1.5.1.",
+  "severity": "HIGH",
+  "sha256_hash": "6980e7e6c43f972d280d74108ec58c6c682ac30bdfc3409d8a86294c237a7da9",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22389"
+}

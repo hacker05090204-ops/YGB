@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-27198",
+  "ingested_at": "2026-03-22T07:45:17.026002+00:00",
+  "lang": "en",
+  "raw_text": "JetBrains TeamCity JetBrains TeamCity contains an authentication bypass vulnerability that allows an attacker to perform admin actions.",
+  "severity": "CRITICAL",
+  "sha256_hash": "65f1293c3caf40b2a7a192aeea73257c11a85e949dbeb62eb62337a550f9fc34",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "NAKIVO Backup and Replication NAKIVO Backup and Replication contains an absolute path traversal vulnerability that enables an attacker to read arbitrary files.",
+  "token_count": 22
+}

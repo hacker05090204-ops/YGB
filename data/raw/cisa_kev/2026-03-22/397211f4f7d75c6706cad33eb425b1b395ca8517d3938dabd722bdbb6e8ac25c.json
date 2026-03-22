@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-46805",
+  "ingested_at": "2026-03-22T07:45:17.087651+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Connect Secure and Policy Secure Ivanti Connect Secure (ICS, formerly known as Pulse Connect Secure) and Ivanti Policy Secure gateways contain an authentication bypass vulnerability in the web component that allows an attacker to access restricted resources by bypassing control checks. This vulnerability can be leveraged in conjunction with CVE-2024-21887, a command injection vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "397211f4f7d75c6706cad33eb425b1b395ca8517d3938dabd722bdbb6e8ac25c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 55,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

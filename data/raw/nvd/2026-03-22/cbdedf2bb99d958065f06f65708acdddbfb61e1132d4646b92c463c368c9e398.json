@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23798",
+  "ingested_at": "2026-03-22T07:54:40.164761+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in blubrry PowerPress Podcasting powerpress allows Object Injection.This issue affects PowerPress Podcasting: from n/a through < = 11.15.10.",
+  "severity": "HIGH",
+  "sha256_hash": "cbdedf2bb99d958065f06f65708acdddbfb61e1132d4646b92c463c368c9e398",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23798"
+}

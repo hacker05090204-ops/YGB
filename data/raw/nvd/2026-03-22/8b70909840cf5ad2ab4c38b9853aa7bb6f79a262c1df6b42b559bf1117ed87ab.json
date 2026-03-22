@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-42210",
+  "ingested_at": "2026-03-22T07:54:47.880522+00:00",
+  "lang": "en",
+  "raw_text": "A Stored cross-site scripting (XSS) vulnerability affects HCL Unica Marketing Operations v12.1.8 and lower. Stored cross-site scripting (also known as second-order or persistent XSS) arises when an application receives data from an untrusted source and includes that data within its later HTTP responses in an unsafe way.",
+  "severity": "HIGH",
+  "sha256_hash": "8b70909840cf5ad2ab4c38b9853aa7bb6f79a262c1df6b42b559bf1117ed87ab",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-42210"
+}

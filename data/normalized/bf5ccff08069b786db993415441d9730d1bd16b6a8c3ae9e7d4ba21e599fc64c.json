@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a stored cross-site scripting vulnerability in the inline comment preview functionality that allows authenticated users to inject malicious scripts by submitting comments with unescaped content. Attackers with unfiltered_html capabilities can inject JavaScript directly through comment content rendered in the AJAX response from the getLastInlineComments() function in class.WpdiscuzHelperAjax.php without proper HTML escaping.",
+  "token_count": 55
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Anchore Enterprise versions before 5.25.1 contain an SQL injection vulnerability in the GraphQL Reports API. An authenticated attacker that is able to access the GraphQL API could execute arbitrary SQL instructions resulting in modifications to the data contained in the Anchore Enterprise database.",
+  "token_count": 43
+}

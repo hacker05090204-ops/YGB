@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22627",
+  "ingested_at": "2026-03-22T07:54:42.636305+00:00",
+  "lang": "en",
+  "raw_text": "A buffer copy without checking size of input ('classic buffer overflow') vulnerability in Fortinet FortiSwitchAXFixed 1.0.0 through 1.0.1 may allow an unauthenticated attacker within the same adjacent network to execute unauthorized code or commands on the device via sending a crafted LLDP packet.",
+  "severity": "HIGH",
+  "sha256_hash": "b9c7e44ba2cf50e256d5c64526caa1e8e0896fea7e657422ddec544ca033ce75",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22627"
+}

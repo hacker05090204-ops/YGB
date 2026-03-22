@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-25223",
+  "ingested_at": "2026-03-22T07:45:18.294936+00:00",
+  "lang": "en",
+  "raw_text": "Sophos SG UTM A remote code execution vulnerability exists in the WebAdmin of Sophos SG UTM.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6bf9ea6da3aa8dccbcbd3c76ce8a9b9b672d2016d8a544ff55b5585947073120",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

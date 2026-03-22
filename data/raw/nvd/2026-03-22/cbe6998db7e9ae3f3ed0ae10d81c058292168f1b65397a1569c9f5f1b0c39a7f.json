@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27518",
+  "ingested_at": "2026-03-22T07:54:31.670528+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior lack CSRF protections for state-changing actions in the administrative interface. An attacker can trick an authenticated administrator into performing unauthorized configuration changes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cbe6998db7e9ae3f3ed0ae10d81c058292168f1b65397a1569c9f5f1b0c39a7f",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27518"
+}

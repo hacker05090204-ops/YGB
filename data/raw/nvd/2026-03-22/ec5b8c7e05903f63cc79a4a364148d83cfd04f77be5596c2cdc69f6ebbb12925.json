@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26246",
+  "ingested_at": "2026-03-22T07:54:46.429666+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to bound memory allocation when processing PSD image files which allows an authenticated attacker to cause server memory exhaustion and denial of service via uploading a specially crafted PSD file. Mattermost Advisory ID: MMSA-2026-00572",
+  "severity": "MEDIUM",
+  "sha256_hash": "ec5b8c7e05903f63cc79a4a364148d83cfd04f77be5596c2cdc69f6ebbb12925",
+  "source": "nvd",
+  "tags": [
+    "CWE-789"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26246"
+}

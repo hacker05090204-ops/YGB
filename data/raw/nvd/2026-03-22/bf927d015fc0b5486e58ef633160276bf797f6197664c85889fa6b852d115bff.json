@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2967",
+  "ingested_at": "2026-03-22T07:54:31.051067+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Cesanta Mongoose up to 7.20. This affects the function getpeer of the file /src/net_builtin.c of the component TCP Sequence Number Handler. The manipulation leads to improper verification of source of a communication channel. The attack may be initiated remotely. The attack's complexity is rated as high. The exploitability is reported as difficult. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "bf927d015fc0b5486e58ef633160276bf797f6197664c85889fa6b852d115bff",
+  "source": "nvd",
+  "tags": [
+    "CWE-940"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2967"
+}

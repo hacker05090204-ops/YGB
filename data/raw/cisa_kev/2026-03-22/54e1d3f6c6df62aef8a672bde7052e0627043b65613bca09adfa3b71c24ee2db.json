@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-3043",
+  "ingested_at": "2026-03-22T07:45:18.633570+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player A memory corruption vulnerability exists in Adobe Flash Player that allows an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "54e1d3f6c6df62aef8a672bde7052e0627043b65613bca09adfa3b71c24ee2db",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

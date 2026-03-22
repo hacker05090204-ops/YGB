@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1694",
+  "ingested_at": "2026-03-22T07:54:32.619623+00:00",
+  "lang": "en",
+  "raw_text": "HTTP headers are added by the default configuration of IIS and ASP.net, and are not removed at the deployment phase of the webservices used by the WebVue, WebScheduler, TouchVue and SnapVue features of PcVue in version 12.0.0 through 16.3.3 included. It unnecessarily exposes sensitive information about the server configuration.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f3f441cee28545767e647d6347a273258cee653751c5d3c195f778e691eb6a94",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1694"
+}

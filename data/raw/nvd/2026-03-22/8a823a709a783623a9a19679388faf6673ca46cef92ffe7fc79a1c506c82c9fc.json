@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29103",
+  "ingested_at": "2026-03-22T07:54:48.310369+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. A Critical Remote Code Execution (RCE) vulnerability exists in SuiteCRM 7.15.0 and 8.9.2, allowing authenticated administrators to execute arbitrary system commands. This vulnerability is a direct Patch Bypass of CVE-2024-49774. Although the vendor attempted to fix the issue in version 7.14.5, the underlying flaw in ModuleScanner.php regarding PHP token parsing remains. The scanner incorrectly resets its internal state ($checkFunction flag) when encountering any single-character token (such as =, ., or ;). This allows attackers to hide dangerous function calls (e.g., system(), exec()) using variable assignments or string concatenation, completely evading the MLP security controls. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8a823a709a783623a9a19679388faf6673ca46cef92ffe7fc79a1c506c82c9fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-358"
+  ],
+  "token_count": 112,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29103"
+}

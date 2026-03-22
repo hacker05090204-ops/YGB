@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3674",
+  "ingested_at": "2026-03-22T07:54:41.952026+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Freedom Factory dGEN1 up to 20260221. Affected by this vulnerability is the function FakeAppProvider of the component org.ethosmobile.ethoslauncher. Performing a manipulation results in improper authorization. The attack must be initiated from a local position. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f796afee831f394e8f9c4e428599273a0c523eea9759696c74f87568a84606e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3674"
+}

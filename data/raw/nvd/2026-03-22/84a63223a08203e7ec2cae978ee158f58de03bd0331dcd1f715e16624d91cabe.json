@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32230",
+  "ingested_at": "2026-03-22T07:54:44.468166+00:00",
+  "lang": "en",
+  "raw_text": "Uptime Kuma is an open source, self-hosted monitoring tool. From 2.0.0 to 2.1.3 , the GET /api/badge/:id/ping/:duration? endpoint in server/routers/api-router.js does not verify that the requested monitor belongs to a public group. All other badge endpoints check AND public = 1 in their SQL query before returning data. The ping endpoint skips this check entirely, allowing unauthenticated users to extract average ping/response time data for private monitors. This vulnerability is fixed in 2.2.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "84a63223a08203e7ec2cae978ee158f58de03bd0331dcd1f715e16624d91cabe",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32230"
+}

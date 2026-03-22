@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27388",
+  "ingested_at": "2026-03-22T07:54:40.263998+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in designthemes DesignThemes Booking Manager designthemes-booking-manager allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects DesignThemes Booking Manager: from n/a through < = 2.0.",
+  "severity": "HIGH",
+  "sha256_hash": "1c70dfbab9763b48843b77f0d39f7069fe2dcc8e7b894bb48d278977bef4972b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27388"
+}

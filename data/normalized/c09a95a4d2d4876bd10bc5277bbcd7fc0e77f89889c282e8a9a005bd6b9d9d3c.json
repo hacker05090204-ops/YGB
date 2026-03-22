@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In some cases, the `tcp-setmss` handler may free the packet data and throw an error without halting the rule processing engine. A subsequent rule can then allow the traffic after the packet data is gone, resulting in a NULL pointer dereference. Maliciously crafted packets sent from a remote host may result in a Denial of Service (DoS) if the `tcp-setmss` directive is used and a subsequent rule would allow the traffic to pass.",
+  "token_count": 73
+}

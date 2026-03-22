@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4232",
+  "ingested_at": "2026-03-22T07:54:46.785747+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Tiandy Integrated Management Platform 7.17.0. Affected by this issue is some unknown functionality of the file /rest/user/getAuthorityByUserId. Executing a manipulation of the argument userId can lead to sql injection. The attack may be launched remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "6ee61ca864365eae8ad5bb974f158ea59ffef297a2a7556279aa32d6fe456464",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4232"
+}

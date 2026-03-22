@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-42948",
+  "ingested_at": "2026-03-22T07:45:17.474953+00:00",
+  "lang": "en",
+  "raw_text": "Fortra Cobalt Strike Fortra Cobalt Strike User Interface contains an unspecified vulnerability rooted in Java Swing that may allow remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bb02a41a554b9ec18f390d4c1bbc071ae41d2f22fa99a0e2a12b2ebcef2a94ab",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

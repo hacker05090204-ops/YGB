@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32428",
+  "ingested_at": "2026-03-22T07:54:46.086153+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Ays Pro Popup Like box ays-facebook-popup-likebox allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Popup Like box: from n/a through < = 3.7.7.",
+  "severity": "MEDIUM",
+  "sha256_hash": "19fc564e8ed8379b9bbf54610df12d785b08f84618545b8ce2e3d4f6f23394b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32428"
+}

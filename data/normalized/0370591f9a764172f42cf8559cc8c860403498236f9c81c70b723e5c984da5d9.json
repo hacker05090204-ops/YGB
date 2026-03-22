@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Liferay Liferay Portal Liferay Portal contains a deserialization of untrusted data vulnerability that allows remote attackers to execute code via JSON web services.",
+  "token_count": 23
+}

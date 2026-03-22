@@ -30,6 +30,16 @@ logger = logging.getLogger(__name__)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 try:
+    from backend.training.state_manager import get_optimized_dataloader_kwargs
+except Exception:  # pragma: no cover
+    def get_optimized_dataloader_kwargs() -> Dict[str, Any]:
+        return {
+            "num_workers": 4,
+            "pin_memory": True,
+            "persistent_workers": True,
+        }
+
+try:
     from backend.storage.tiered_storage import get_storage_topology, resolve_path
 except Exception:  # pragma: no cover
     get_storage_topology = None
@@ -470,11 +480,20 @@ def train_local_stt_model(
         resumed_from_checkpoint = trainer.load_checkpoint()
         train_ds = SpeechDataset(str(train_manifest))
         val_ds = SpeechDataset(str(val_manifest))
+        dataloader_kwargs = get_optimized_dataloader_kwargs()
         train_loader = DataLoader(
-            train_ds, batch_size=batch_size, shuffle=True, collate_fn=collate_fn
+            train_ds,
+            batch_size=batch_size,
+            shuffle=True,
+            collate_fn=collate_fn,
+            **dataloader_kwargs,
         )
         val_loader = DataLoader(
-            val_ds, batch_size=batch_size, shuffle=False, collate_fn=collate_fn
+            val_ds,
+            batch_size=batch_size,
+            shuffle=False,
+            collate_fn=collate_fn,
+            **dataloader_kwargs,
         )
         metrics = trainer.train(train_loader, val_loader, epochs=epochs)
 

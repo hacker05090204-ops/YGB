@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3131",
+  "ingested_at": "2026-03-22T07:54:31.771621+00:00",
+  "lang": "en",
+  "raw_text": "Improper access control in multiple DVLS REST API endpoints in Devolutions Server 2025.3.14.0 and earlier allows an authenticated user with view-only permission to access sensitive connection data.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7281d70545e8a58d16eb9095d199d72cd07824d3b7dc221e153051dc48e236c8",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3131"
+}

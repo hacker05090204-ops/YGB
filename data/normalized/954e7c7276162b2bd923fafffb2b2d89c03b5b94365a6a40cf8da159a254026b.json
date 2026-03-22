@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to version 2.2.3, the upload status SSE implementation on /uploadStatus publishes global upload state to any authenticated listener and includes file_id values that are not scoped to the requesting user. This issue has been patched in version 2.2.3.",
+  "token_count": 52
+}

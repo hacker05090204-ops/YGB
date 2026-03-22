@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1870",
+  "ingested_at": "2026-03-22T07:45:19.036126+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple iOS, iPadOS, and macOS WebKit contain an unspecified logic vulnerability that allows a remote attacker to execute code. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5036e359be24ea8aa928ec12ca8f56bf103e486a714e1dbc01fdfbb72d447a49",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25167",
+  "ingested_at": "2026-03-22T07:54:42.723740+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Microsoft Brokering File System allows an unauthorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "afdca06e4014ded99543ddf9a6257964a4251dbad30d4a7e3acf019dfa989027",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25167"
+}

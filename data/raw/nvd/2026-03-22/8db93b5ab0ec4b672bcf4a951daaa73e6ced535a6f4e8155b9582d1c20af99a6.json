@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32133",
+  "ingested_at": "2026-03-22T07:54:44.042929+00:00",
+  "lang": "en",
+  "raw_text": "2FAuth is a web app to manage Two-Factor Authentication (2FA) accounts and generate their security codes. Prior to 6.1.0, a blind SSRF vulnerability exists in 2FAuth that allows authenticated users to make arbitrary HTTP requests from the server to internal networks and cloud metadata endpoints. The image parameter in OTP URL is not properly validated for internal / private IP addresses before making HTTP requests. While the previous fix added response validation to ensure only valid images are stored but HTTP request is still made to arbitrary URLs before this validation occurs. This vulnerability is fixed in 6.1.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8db93b5ab0ec4b672bcf4a951daaa73e6ced535a6f4e8155b9582d1c20af99a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32133"
+}

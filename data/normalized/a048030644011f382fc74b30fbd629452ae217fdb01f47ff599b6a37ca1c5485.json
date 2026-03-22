@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Jetty URI parser has some key differences to other common parsers when evaluating invalid or unusual URIs. Differential parsing of URIs in systems using multiple components may result in security by-pass. For example a component that enforces a black list may interpret the URIs differently from one that generates a response. At the very least, differential parsing may divulge implementation details.",
+  "token_count": 62
+}

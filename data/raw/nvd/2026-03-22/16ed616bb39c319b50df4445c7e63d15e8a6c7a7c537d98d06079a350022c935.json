@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32136",
+  "ingested_at": "2026-03-22T07:54:44.045926+00:00",
+  "lang": "en",
+  "raw_text": "AdGuard Home is a network-wide software for blocking ads and tracking. Prior to 0.107.73, an unauthenticated remote attacker can bypass all authentication in AdGuardHome by sending an HTTP/1.1 request that requests an upgrade to HTTP/2 cleartext (h2c). Once the upgrade is accepted, the resulting HTTP/2 connection is handled by the inner mux, which has no authentication middleware attached. All subsequent HTTP/2 requests on that connection are processed as fully authenticated, regardless of whether any credentials were provided. This vulnerability is fixed in 0.107.73.",
+  "severity": "CRITICAL",
+  "sha256_hash": "16ed616bb39c319b50df4445c7e63d15e8a6c7a7c537d98d06079a350022c935",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32136"
+}

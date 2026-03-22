@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-2539",
+  "ingested_at": "2026-03-22T07:45:18.258714+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Word Microsoft Word allows attackers to execute remote code or cause a denial-of-service (DoS) via crafted RTF data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "400b6acba3ec0d3c86d8ba90b7211a9cf6d7cf886296dc6ec5ea45684509a257",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

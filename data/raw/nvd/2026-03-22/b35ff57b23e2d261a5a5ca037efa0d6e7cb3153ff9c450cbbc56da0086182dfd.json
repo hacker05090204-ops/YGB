@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-65465",
+  "ingested_at": "2026-03-22T07:54:33.622417+00:00",
+  "lang": "en",
+  "raw_text": "A reflected Cross-Site Scripting (XSS) vulnerability in the RaiseError function of Skrol29 TbsZip version 2.17 and earlier allows remote attackers to execute arbitrary web script or HTML via a crafted payload in a filename parameter (e.g., to the FileRead function). This occurs because the error message is not properly sanitized before being output to the user. This vulnerability is fixed in version 2.18.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b35ff57b23e2d261a5a5ca037efa0d6e7cb3153ff9c450cbbc56da0086182dfd",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-65465"
+}

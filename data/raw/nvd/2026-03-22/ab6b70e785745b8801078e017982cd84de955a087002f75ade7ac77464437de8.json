@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59787",
+  "ingested_at": "2026-03-22T07:54:34.534337+00:00",
+  "lang": "en",
+  "raw_text": "2N Access Commander application version 3.4.2 and prior returns HTTP 500 Internal Server Error responses when receiving malformed or manipulated requests, indicating improper handling of invalid input and potential security or availability impacts.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ab6b70e785745b8801078e017982cd84de955a087002f75ade7ac77464437de8",
+  "source": "nvd",
+  "tags": [
+    "CWE-703"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59787"
+}

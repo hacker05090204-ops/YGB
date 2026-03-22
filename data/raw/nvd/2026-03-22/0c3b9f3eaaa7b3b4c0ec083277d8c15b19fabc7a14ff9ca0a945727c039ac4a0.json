@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3339",
+  "ingested_at": "2026-03-22T07:54:49.161792+00:00",
+  "lang": "en",
+  "raw_text": "The Keep Backup Daily plugin for WordPress is vulnerable to Limited Path Traversal in all versions up to, and including, 2.1.1 via the `kbd_open_upload_dir` AJAX action. This is due to insufficient validation of the `kbd_path` parameter, which is only sanitized with `sanitize_text_field()` - a function that does not strip path traversal sequences. This makes it possible for authenticated attackers, with Administrator-level access and above, to list the contents of arbitrary directories on the server outside of the intended uploads directory.",
+  "severity": "LOW",
+  "sha256_hash": "0c3b9f3eaaa7b3b4c0ec083277d8c15b19fabc7a14ff9ca0a945727c039ac4a0",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3339"
+}

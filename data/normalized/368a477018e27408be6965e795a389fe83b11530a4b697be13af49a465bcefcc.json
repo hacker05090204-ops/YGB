@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Placeto CMS Alpha rv.4 contains an SQL injection vulnerability that allows authenticated attackers to manipulate database queries by injecting SQL code through the 'page' parameter. Attackers can send GET requests to the admin/edit.php endpoint with malicious 'page' values using boolean-based blind, time-based blind, or union-based techniques to extract sensitive database information.",
+  "token_count": 51
+}

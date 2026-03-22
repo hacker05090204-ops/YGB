@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-39226",
+  "ingested_at": "2026-03-22T07:45:17.691449+00:00",
+  "lang": "en",
+  "raw_text": "Grafana Labs Grafana Grafana contains an authentication bypass vulnerability that allows authenticated and unauthenticated users to view and delete all snapshot data, potentially resulting in complete snapshot data loss.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ab72babd4cdfa86fd46e65486d03b38120d45431edee3b614cabc05fb75e46d8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

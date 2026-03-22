@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3741",
+  "ingested_at": "2026-03-22T07:54:42.059263+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in YiFang CMS 2.0.5. The affected element is the function update of the file app/db/admin/D_friendLink.php. Such manipulation of the argument linkName leads to cross site scripting. The attack may be performed from remote. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "d55a335fd2a51196d04a749f175d35a0b24057f6184c27160fa478c34072c2cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3741"
+}

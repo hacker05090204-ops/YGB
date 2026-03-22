@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Struts 2 The ExceptionDelegator component in Apache Struts 2 before 2.2.3.1 contains an improper input validation vulnerability that allows for remote code execution.",
+  "token_count": 24
+}

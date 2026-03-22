@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Vagaro Booking Widget plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the \u2018vagaro_code\u2019 parameter in all versions up to, and including, 0.3 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "token_count": 57
+}

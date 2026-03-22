@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-9248",
+  "ingested_at": "2026-03-22T07:45:19.590773+00:00",
+  "lang": "en",
+  "raw_text": "Progress ASP.NET AJAX and Sitefinity Progress Telerik UI for ASP.NET AJAX and Sitefinity have a cryptographic weakness in Telerik.Web.UI.dll that can be exploited to disclose encryption keys (Telerik.Web.UI.DialogParametersEncryptionKey and/or the MachineKey), perform cross-site-scripting (XSS) attacks, compromise the ASP.NET ViewState, and/or upload and download files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2a394b39d041c2990824ef26760b9a5a4d4ec9e6ed33ab3b409d913ed9a6d848",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

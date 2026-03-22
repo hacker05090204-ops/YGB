@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27161",
+  "ingested_at": "2026-03-22T07:54:30.718946+00:00",
+  "lang": "en",
+  "raw_text": "GetSimple CMS is a content management system. All versions of GetSimple CMS rely on .htaccess files to restrict access to sensitive directories such as /data/ and /backups/. If Apache AllowOverride is disabled (common in hardened or shared hosting environments), these protections are silently ignored, allowing unauthenticated attackers to list and download sensitive files including authorization.xml, which contains cryptographic salts and API keys. This issue does not have a fix at the time of publication.",
+  "severity": "HIGH",
+  "sha256_hash": "f5b32a60c9a0b1a226ac9d61a01660fb9f7e20b2d0788391ef11cb3b17a87acc",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27161"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30957",
+  "ingested_at": "2026-03-22T07:54:42.892032+00:00",
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. Prior to 10.0.21, OneUptime Synthetic Monitors allow a low-privileged authenticated project user to execute arbitrary commands on the oneuptime-probe server/container. The root cause is that untrusted Synthetic Monitor code is executed inside Node's vm while live host-realm Playwright browser and page objects are exposed to it. A malicious user can call Playwright APIs on the injected browser object and cause the probe to spawn an attacker-controlled executable. This is a server-side remote code execution issue. It does not require a separate vm sandbox escape. This vulnerability is fixed in 10.0.21.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a69219527e9c1e05f4d160ba7fac7904b30157218ba04a66fef150e6e0c94ab1",
+  "source": "nvd",
+  "tags": [
+    "CWE-749"
+  ],
+  "token_count": 100,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30957"
+}

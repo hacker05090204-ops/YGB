@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2940",
+  "ingested_at": "2026-03-22T07:54:30.953026+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Zaher1307 tiny_web_server up to 8d77b1044a0ca3a5297d8726ac8aa2cf944d481b. This affects the function tiny_web_server/tiny.c of the file tiny_web_server/tiny.c of the component URL Handler. This manipulation causes out-of-bounds write. The attack can be initiated remotely. The exploit has been publicly disclosed and may be utilized. Continious delivery with rolling releases is used by this product. Therefore, no version details of affected nor updated releases are available. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "HIGH",
+  "sha256_hash": "98262a714c4e51407198a174355ff99c9f08034e15c4dd203f6508cb63df260c",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-787"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2940"
+}

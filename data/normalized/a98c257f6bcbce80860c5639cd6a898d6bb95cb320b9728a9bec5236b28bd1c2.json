@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player has a vulnerability in the way it handles a dereferenced memory pointer which could lead to code execution.",
+  "token_count": 24
+}

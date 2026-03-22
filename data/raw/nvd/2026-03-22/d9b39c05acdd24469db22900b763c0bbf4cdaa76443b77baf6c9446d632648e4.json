@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25146",
+  "ingested_at": "2026-03-22T07:54:34.287695+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. From 5.0.2 to before 8.0.0, there are (at least) two paths where the gateway_api_key secret value is rendered to the client in plaintext. These secret keys being leaked could result in arbitrary money movement or broad account takeover of payment gateway APIs. This vulnerability is fixed in 8.0.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d9b39c05acdd24469db22900b763c0bbf4cdaa76443b77baf6c9446d632648e4",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25146"
+}

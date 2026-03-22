@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-0618",
+  "ingested_at": "2026-03-22T07:45:16.811650+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SQL Server Microsoft SQL Server Reporting Services contains a deserialization vulnerability when handling page requests incorrectly. An authenticated attacker can exploit this vulnerability to execute code in the context of the Report Server service account.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7d62f07f9ea53477bf91388c582012a4dc88be73e59c92adcecb5a66405650ad",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1367",
+  "ingested_at": "2026-03-22T07:54:31.072263+00:00",
+  "lang": "en",
+  "raw_text": "Zohocorp ManageEngine ADSelfService Plus versions 6522 and below are vulnerable to authenticated SQL Injection in the search report option.",
+  "severity": "HIGH",
+  "sha256_hash": "3f279c62e85128c4d424180811d75ad53a2620dfb3d483b823e939aa455e5dd9",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1367"
+}

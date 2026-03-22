@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1629",
+  "ingested_at": "2026-03-22T07:54:46.970890+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 10.11.x < = 10.11.10 Fail to invalidate cached permalink preview data when a user loses channel access which allows the user to continue viewing private channel content via previously cached permalink previews until cache reset or relogin.. Mattermost Advisory ID: MMSA-2026-00580",
+  "severity": "MEDIUM",
+  "sha256_hash": "3cb7277fd5722b282f828349791069183743c83d3b65abe8ecfba526a5edcb42",
+  "source": "nvd",
+  "tags": [
+    "CWE-672"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1629"
+}

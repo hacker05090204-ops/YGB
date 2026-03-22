@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41061",
+  "ingested_at": "2026-03-22T07:45:17.267040+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and watchOS Apple iOS, iPadOS, and watchOS contain an unspecified vulnerability due to a validation issue affecting Wallet in which a maliciously crafted attachment may result in code execution. This vulnerability was chained with CVE-2023-41064.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d43344dd830f7abdc824aa430ccaf7830fb8dc678239d344f6fb30e1b1d7c6c6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw has been found in D-Link DIR-868L 110b03. This affects the function sub_1BF84 of the component SSDP Service. This manipulation of the argument ST causes os command injection. It is possible to initiate the attack remotely. The exploit has been published and may be used. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "token_count": 59
+}

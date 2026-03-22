@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3562",
+  "ingested_at": "2026-03-22T07:54:46.635472+00:00",
+  "lang": "en",
+  "raw_text": "Philips Hue Bridge hk_hap Ed25519 Signature Verification Authentication Bypass Vulnerability. This vulnerability allows network-adjacent attackers to execute arbitrary code on affected installations of Philips Hue Bridge. Authentication is not required to exploit this vulnerability. The specific flaw exists within the ed25519_sign_open function. The issue results from improper verification of a cryptographic signature. An attacker can leverage this vulnerability to bypass authentication on the system. Was ZDI-CAN-28480.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f97b5b29389cd26e88f463aae1f062b31674cfa4cdb19d2c5a39a348a7514dab",
+  "source": "nvd",
+  "tags": [
+    "CWE-347"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3562"
+}

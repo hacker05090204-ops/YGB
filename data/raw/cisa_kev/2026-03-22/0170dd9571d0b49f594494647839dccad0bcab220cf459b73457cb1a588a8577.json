@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-7609",
+  "ingested_at": "2026-03-22T07:45:18.891943+00:00",
+  "lang": "en",
+  "raw_text": "Elastic Kibana Kibana contain an arbitrary code execution flaw in the Timelion visualizer.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0170dd9571d0b49f594494647839dccad0bcab220cf459b73457cb1a588a8577",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 13,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

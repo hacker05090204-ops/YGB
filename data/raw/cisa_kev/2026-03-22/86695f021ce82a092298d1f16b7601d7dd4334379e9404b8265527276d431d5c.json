@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-26500",
+  "ingested_at": "2026-03-22T07:45:17.567810+00:00",
+  "lang": "en",
+  "raw_text": "Veeam Backup & Replication The Veeam Distribution Service in the Backup & Replication application allows unauthenticated users to access internal API functions. A remote attacker can send input to the internal API which may lead to uploading and executing of malicious code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "86695f021ce82a092298d1f16b7601d7dd4334379e9404b8265527276d431d5c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24890",
+  "ingested_at": "2026-03-22T07:54:32.232067+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, an authorization bypass vulnerability in the patient portal signature endpoint allows authenticated portal users to upload and overwrite provider signatures by setting `type=admin-signature` and specifying any provider user ID. This could potentially lead to signature forgery on medical documents, legal compliance violations, and fraud. The issue occurs when portal users are allowed to modify provider signatures without proper authorization checks. Version 8.0.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "4a43f6f128b4d600765a731d92ad038ce42e78ba304413af6d46db530a23b6b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-285"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24890"
+}

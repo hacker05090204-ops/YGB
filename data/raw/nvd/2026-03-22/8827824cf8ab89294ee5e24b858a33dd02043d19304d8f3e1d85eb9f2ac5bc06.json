@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20107",
+  "ingested_at": "2026-03-22T07:54:32.155774+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the Object Model CLI component of Cisco Application Policy Infrastructure Controller (APIC) could allow an authenticated, local attacker to cause an affected device to reload unexpectedly, resulting in a denial of service (DoS) condition. To exploit this vulnerability, the attacker must have valid user credentials and any role that includes CLI access. This vulnerability is due to insufficient input validation. An attacker could exploit this vulnerability by issuing crafted commands at the CLI prompt. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8827824cf8ab89294ee5e24b858a33dd02043d19304d8f3e1d85eb9f2ac5bc06",
+  "source": "nvd",
+  "tags": [
+    "CWE-1220"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20107"
+}

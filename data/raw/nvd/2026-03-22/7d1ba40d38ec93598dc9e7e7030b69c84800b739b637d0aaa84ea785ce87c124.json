@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22380",
+  "ingested_at": "2026-03-22T07:54:30.415288+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in AncoraThemes UnlimHost unlimhost allows PHP Local File Inclusion.This issue affects UnlimHost: from n/a through < = 1.2.3.",
+  "severity": "HIGH",
+  "sha256_hash": "7d1ba40d38ec93598dc9e7e7030b69c84800b739b637d0aaa84ea785ce87c124",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22380"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4514",
+  "ingested_at": "2026-03-22T07:54:49.475342+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in PbootCMS up to 3.2.12. Affected by this issue is some unknown functionality of the file apps/admin/controller/system/UserController.php of the component Backend. Executing a manipulation of the argument Field can lead to improper access controls. The attack may be performed from remote. The exploit has been published and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7c6e0cdd81875b3bdd0da3e9f009a1adcc991b25b9e94330eb44e0b2aaf56edd",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4514"
+}

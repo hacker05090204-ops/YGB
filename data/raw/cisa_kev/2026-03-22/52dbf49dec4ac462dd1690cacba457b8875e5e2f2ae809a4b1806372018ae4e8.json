@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-2883",
+  "ingested_at": "2026-03-22T07:45:16.651878+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server, a product within the Fusion Middleware suite, contains an unspecified vulnerability exploitable by an unauthenticated attacker with network access via IIOP or T3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "52dbf49dec4ac462dd1690cacba457b8875e5e2f2ae809a4b1806372018ae4e8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

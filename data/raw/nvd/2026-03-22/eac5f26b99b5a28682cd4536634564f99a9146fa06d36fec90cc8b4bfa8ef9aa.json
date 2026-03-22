@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-48928",
+  "ingested_at": "2026-03-22T07:54:31.682039+00:00",
+  "lang": "en",
+  "raw_text": "Piwigo is an open source photo gallery application for the web. In versions on the 14.x branch, when installing, the secret_key configuration parameter is set to MD5(RAND()) in MySQL. However, RAND() only has 30 bits of randomness, making it feasible to brute-force the secret key. The CSRF token is constructed partially from the secret key, and this can be used to check if the brute force succeeded. Trying all possible values takes approximately one hour. The impact of this is limited. The auto login key uses the user's password on top of the secret key. The pwg token uses the user's session identifier on top of the secret key. It seems that values for get_ephemeral_key can be generated when one knows the secret key. Version 15.0.0 contains a fix for the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "eac5f26b99b5a28682cd4536634564f99a9146fa06d36fec90cc8b4bfa8ef9aa",
+  "source": "nvd",
+  "tags": [
+    "CWE-330"
+  ],
+  "token_count": 132,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-48928"
+}

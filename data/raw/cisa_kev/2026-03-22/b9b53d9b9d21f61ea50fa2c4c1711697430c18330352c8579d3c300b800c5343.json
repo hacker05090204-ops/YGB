@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-4863",
+  "ingested_at": "2026-03-22T07:45:17.259626+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium WebP Google Chromium WebP contains a heap-based buffer overflow vulnerability that allows a remote attacker to perform an out-of-bounds memory write via a crafted HTML page. This vulnerability can affect applications that use the WebP Codec.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b9b53d9b9d21f61ea50fa2c4c1711697430c18330352c8579d3c300b800c5343",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

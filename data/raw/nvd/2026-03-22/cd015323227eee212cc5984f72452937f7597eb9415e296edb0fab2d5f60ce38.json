@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28537",
+  "ingested_at": "2026-03-22T07:54:40.724163+00:00",
+  "lang": "en",
+  "raw_text": "Double free vulnerability in the window module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cd015323227eee212cc5984f72452937f7597eb9415e296edb0fab2d5f60ce38",
+  "source": "nvd",
+  "tags": [
+    "CWE-415"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28537"
+}

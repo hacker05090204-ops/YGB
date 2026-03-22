@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contain a buffer overflow vulnerability that allows remote attackers to execute code via a PDF file with long arguments to unspecified JavaScript methods.",
+  "token_count": 31
+}

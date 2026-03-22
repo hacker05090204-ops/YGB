@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2021-35484",
+  "ingested_at": "2026-03-22T07:54:34.141945+00:00",
+  "lang": "en",
+  "raw_text": "Nokia IMPACT through 19.11.2.10-20210118042150283 allows an authenticated user to perform a Time-based Boolean Blind SQL Injection attack on the endpoint /ui/rest-proxy/campaign/statistic (for the View Campaign page) via the sortColumn HTTP GET parameter. This allows an attacker to access sensitive data from the database and obtain access to the database user, database name, and database version information.",
+  "severity": "HIGH",
+  "sha256_hash": "dd62c4f4e5533d80553a22cea73a8ec47d290a5f3fbf3a5dbd8a1a88e3f94561",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-35484"
+}

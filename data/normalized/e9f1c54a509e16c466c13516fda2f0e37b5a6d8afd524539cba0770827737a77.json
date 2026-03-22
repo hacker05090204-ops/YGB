@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Net::NSCA::Client versions through 0.009002 for Perl uses a poor random number generator. Version v0.003 switched to use Data::Rand::Obscure instead of Crypt::Random for generation of a random initialisation vectors. Data::Rand::Obscure uses Perl's built-in rand() function, which is not suitable for cryptographic functions.",
+  "token_count": 41
+}

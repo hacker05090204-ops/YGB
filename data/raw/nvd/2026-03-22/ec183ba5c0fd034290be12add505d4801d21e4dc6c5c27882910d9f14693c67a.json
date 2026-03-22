@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-40926",
+  "ingested_at": "2026-03-22T07:54:39.926413+00:00",
+  "lang": "en",
+  "raw_text": "Plack::Middleware::Session::Simple versions before 0.05 for Perl generates session ids insecurely. The default session id generator returns a SHA-1 hash seeded with the built-in rand function, the epoch time, and the PID. The PID will come from a small set of numbers, and the epoch time may be guessed, if it is not leaked from the HTTP Date header. The built-in rand function is unsuitable for cryptographic usage. Predictable session ids could allow an attacker to gain access to systems. Plack::Middleware::Session::Simple is intended to be compatible with Plack::Middleware::Session, which had a similar security issue CVE-2025-40923.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ec183ba5c0fd034290be12add505d4801d21e4dc6c5c27882910d9f14693c67a",
+  "source": "nvd",
+  "tags": [
+    "CWE-338",
+    "CWE-340"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40926"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1468",
+  "ingested_at": "2026-03-22T07:54:41.380605+00:00",
+  "lang": "en",
+  "raw_text": "QuickCMS is vulnerable to Cross-Site Request Forgery across multiple endpoints. An attacker can craft special website, which when visited by the victim, will automatically send a POST request with victim's privileges. This software does not implement any protection against this type of attack. All forms available in this software are potentially vulnerable. The vendor was notified early about this vulnerability, but didn't respond with the details of vulnerability or vulnerable version range. Only version 6.8 was tested and confirmed as vulnerable, other versions were not tested and might also be vulnerable.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "08b1e77446f7433b254c754abcfd7c40d37856cffe8b2e94ef9a7951b87019ab",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1468"
+}

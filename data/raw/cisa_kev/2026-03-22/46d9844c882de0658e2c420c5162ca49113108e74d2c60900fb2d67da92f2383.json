@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-3152",
+  "ingested_at": "2026-03-22T07:45:19.482503+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Fusion Middleware Oracle Fusion Middleware Reports Developer contains an unspecified vulnerability that allows remote attackers to affect confidentiality and integrity of affected systems.",
+  "severity": "CRITICAL",
+  "sha256_hash": "46d9844c882de0658e2c420c5162ca49113108e74d2c60900fb2d67da92f2383",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29084",
+  "ingested_at": "2026-03-22T07:54:41.311813+00:00",
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to version 2.2.3, the login flow accepts credential-bearing requests without CSRF protection mechanisms tied to the browser session context. The handler parses form values directly and creates a session on successful credential validation. This issue has been patched in version 2.2.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b1f6af860bcb42b2dfaf12fce3cf57a27b121b7057138c2f6906bb7e32227ebe",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29084"
+}

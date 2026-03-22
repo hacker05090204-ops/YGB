@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-1799",
+  "ingested_at": "2026-03-22T07:54:41.490970+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: ** REJECT ** DO NOT USE THIS CANDIDATE NUMBER. Reason: This candidate has been determined not to be a valid vulnerability. Notes: All references and descriptions in this candidate have been removed to prevent accidental usage.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d91e296ceeba48eb23895a3f60cb486611ca142d38cdf8f117e39fe5be779d53",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1799"
+}

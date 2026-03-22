@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62814",
+  "ingested_at": "2026-03-22T07:54:34.097911+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Samsung Mobile Processor Exynos 1280, 2200, 1380, 1480, and 2400. A NULL pointer dereference of ft_handle in load_fw_utc_vector() causes a denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "3be94e3cb25fc4c909795eef75c76942eda986ad45be70ba9ee3873d76d8ddc5",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62814"
+}

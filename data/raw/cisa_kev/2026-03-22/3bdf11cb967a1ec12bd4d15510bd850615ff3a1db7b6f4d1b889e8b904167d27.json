@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-21715",
+  "ingested_at": "2026-03-22T07:45:17.520964+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office Publisher contains a security feature bypass vulnerability that allows for a local, authenticated attack on a targeted system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3bdf11cb967a1ec12bd4d15510bd850615ff3a1db7b6f4d1b889e8b904167d27",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26047",
+  "ingested_at": "2026-03-22T07:54:30.773642+00:00",
+  "lang": "en",
+  "raw_text": "A denial-of-service vulnerability was identified in Moodle\u2019s TeX formula editor. When rendering TeX content using mimetex, insufficient execution time limits could allow specially crafted formulas to consume excessive server resources. An authenticated user could abuse this behavior to degrade performance or cause service interruption.",
+  "severity": "MEDIUM",
+  "sha256_hash": "78b5f28ee858b2e32c8403338e6a8bb02f43f877c4dee7e8ada32bc86cd77c83",
+  "source": "nvd",
+  "tags": [
+    "CWE-400",
+    "CWE-770"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26047"
+}

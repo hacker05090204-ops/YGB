@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain an incorrect authorization vulnerability. This vulnerability allows for memory corruption due to unauthorized command execution in GPU micronode while executing specific sequence of commands.",
+  "token_count": 31
+}

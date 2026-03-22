@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29038",
+  "ingested_at": "2026-03-22T07:54:41.333496+00:00",
+  "lang": "en",
+  "raw_text": "changedetection.io is a free open source web page change detection tool. Prior to version 0.54.4, there is a reflected cross-site scripting (XSS) vulnerability identified in the /rss/tag/ endpoint of changedetection.io. The tag_uuid path parameter is reflected directly in the HTTP response body without HTML escaping. Since Flask returns text/html by default for plain string responses, the browser parses and executes injected JavaScript. This issue has been patched in version 0.54.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2ca78fae540104bbce25ba7d7e87ad79dfca66b7176d681bd8e5545abf5eea28",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29038"
+}

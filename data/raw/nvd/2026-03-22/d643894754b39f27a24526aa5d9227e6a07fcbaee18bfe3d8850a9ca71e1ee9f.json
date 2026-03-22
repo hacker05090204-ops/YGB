@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0400",
+  "ingested_at": "2026-03-22T07:54:31.622006+00:00",
+  "lang": "en",
+  "raw_text": "A post-authentication Format String vulnerability in SonicOS allows a remote attacker to crash a firewall.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d643894754b39f27a24526aa5d9227e6a07fcbaee18bfe3d8850a9ca71e1ee9f",
+  "source": "nvd",
+  "tags": [
+    "CWE-134"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0400"
+}

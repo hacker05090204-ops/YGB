@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Web Ofisi Platinum E-Ticaret v5 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'q' GET parameter. Attackers can send requests to the arama endpoint with malicious 'q' values using time-based SQL injection techniques to extract sensitive database information.",
+  "token_count": 49
+}

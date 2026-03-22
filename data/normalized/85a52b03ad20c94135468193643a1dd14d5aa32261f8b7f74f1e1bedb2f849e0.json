@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Aspera Faspex IBM Aspera Faspex could allow a remote attacker to execute code on the system, caused by a YAML deserialization flaw.",
+  "token_count": 23
+}

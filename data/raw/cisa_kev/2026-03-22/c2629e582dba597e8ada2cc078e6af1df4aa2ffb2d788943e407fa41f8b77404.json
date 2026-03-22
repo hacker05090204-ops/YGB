@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-32433",
+  "ingested_at": "2026-03-22T07:45:16.363239+00:00",
+  "lang": "en",
+  "raw_text": "Erlang Erlang/OTP Erlang Erlang/OTP SSH server contains a missing authentication for critical function vulnerability. This could allow an attacker to execute arbitrary commands without valid credentials, potentially leading to unauthenticated remote code execution (RCE). By exploiting a flaw in how SSH protocol messages are handled, a malicious actor could gain unauthorized access to affected systems. This vulnerability could affect various products that implement Erlang/OTP SSH server, including\u2014but not limited to\u2014Cisco, NetApp, and SUSE.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c2629e582dba597e8ada2cc078e6af1df4aa2ffb2d788943e407fa41f8b77404",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 73,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

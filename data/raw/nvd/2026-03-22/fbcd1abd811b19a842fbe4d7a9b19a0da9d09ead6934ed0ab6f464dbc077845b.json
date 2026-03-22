@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20068",
+  "ingested_at": "2026-03-22T07:54:34.697282+00:00",
+  "lang": "en",
+  "raw_text": "Multiple Cisco products are affected by a vulnerability in the Snort 3 detection engine that could allow an unauthenticated, remote attacker to cause the Snort 3 Detection Engine to restart, resulting in an interruption of packet inspection. This vulnerability is due to incomplete error checking when parsing remote procedure call (RPC) data. An attacker could exploit this vulnerability by sending crafted RPC packets through an established connection to be parsed by Snort 3. A successful exploit could allow the attacker to cause a DoS condition when the Snort 3 Detection Engine unexpectedly restarts.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fbcd1abd811b19a842fbe4d7a9b19a0da9d09ead6934ed0ab6f464dbc077845b",
+  "source": "nvd",
+  "tags": [
+    "CWE-248"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20068"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ServiceNow Utah, Vancouver, and Washington DC Now Platform ServiceNow Utah, Vancouver, and Washington DC Now Platform releases contain a jelly template injection vulnerability in UI macros. An unauthenticated user could exploit this vulnerability to execute code remotely.",
+  "token_count": 37
+}

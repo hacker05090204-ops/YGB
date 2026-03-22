@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2458",
+  "ingested_at": "2026-03-22T07:54:46.454726+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to properly validate team membership when searching channels which allows a removed team member to enumerate all public channels within a private team via the channel search API endpoint.. Mattermost Advisory ID: MMSA-2025-00568",
+  "severity": "MEDIUM",
+  "sha256_hash": "cdf39e2bafabfe3e171c8787fe70b7a95a2eabc88651f1f88af8a2c9125fa5bc",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2458"
+}

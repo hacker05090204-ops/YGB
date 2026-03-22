@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Server-side request forgery (ssrf) in Azure IoT Explorer allows an unauthorized attacker to perform spoofing over a network.",
+  "token_count": 18
+}

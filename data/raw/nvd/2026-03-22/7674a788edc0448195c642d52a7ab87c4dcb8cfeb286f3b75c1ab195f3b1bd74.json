@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67547",
+  "ingested_at": "2026-03-22T07:54:30.000836+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in uixthemes Konte konte allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Konte: from n/a through < = 2.4.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7674a788edc0448195c642d52a7ab87c4dcb8cfeb286f3b75c1ab195f3b1bd74",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67547"
+}

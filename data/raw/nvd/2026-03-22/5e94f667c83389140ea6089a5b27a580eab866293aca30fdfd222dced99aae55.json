@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32025",
+  "ingested_at": "2026-03-22T07:54:48.213636+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 contain an authentication hardening gap in browser-origin WebSocket clients that allows attackers to bypass origin checks and auth throttling on loopback deployments. An attacker can trick a user into opening a malicious webpage and perform password brute-force attacks against the gateway to establish an authenticated operator session and invoke control-plane methods.",
+  "severity": "HIGH",
+  "sha256_hash": "5e94f667c83389140ea6089a5b27a580eab866293aca30fdfd222dced99aae55",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32025"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Micro Focus Micro Focus Access Manager Micro Focus Access Manager contains an information leakage vulnerability resulting from a SAML service provider redirection issue when the Assertion Consumer Service URL is used.",
+  "token_count": 31
+}

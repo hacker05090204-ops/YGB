@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-7494",
+  "ingested_at": "2026-03-22T07:45:17.471952+00:00",
+  "lang": "en",
+  "raw_text": "Samba Samba Samba contains a remote code execution vulnerability, allowing a malicious client to upload a shared library to a writable share and then cause the server to load and execute it.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aa4777bc0b25b92a0948d18c6cca26a8a9bed492417c8bea2f0a8bc77cde9f7f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

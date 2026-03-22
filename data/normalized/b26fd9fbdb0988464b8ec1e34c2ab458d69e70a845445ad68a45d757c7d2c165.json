@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ChakraCore ChakraCore scripting engine The ChakraCore scripting engine contains a type confusion vulnerability which can allow for remote code execution.",
+  "token_count": 20
+}

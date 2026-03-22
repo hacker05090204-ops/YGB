@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-63946",
+  "ingested_at": "2026-03-22T07:54:31.170637+00:00",
+  "lang": "en",
+  "raw_text": "A privilege escalation (PE) vulnerability in the Tencent PC Manager app thru 17.10.28554.205 on Windows devices enables a local user to execute programs with elevated privileges. However, execution requires that the local user is able to successfully exploit a race condition.",
+  "severity": "HIGH",
+  "sha256_hash": "b87e3d89f3cac6143f42e6dde3742be5c89df2a0112dc5ba0883a2468ca8361a",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-63946"
+}

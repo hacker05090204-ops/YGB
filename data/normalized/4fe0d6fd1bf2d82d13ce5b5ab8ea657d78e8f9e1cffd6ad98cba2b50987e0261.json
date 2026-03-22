@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Aspera Faspex 5 5.0.0 through 5.0.14.3 is vulnerable to cross-site scripting. This vulnerability allows an authenticated user to embed arbitrary JavaScript code in the Web UI thus altering the intended functionality potentially leading to credentials disclosure within a trusted session.",
+  "token_count": 41
+}

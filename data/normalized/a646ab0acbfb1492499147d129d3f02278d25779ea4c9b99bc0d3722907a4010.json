@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Missing Authorization vulnerability in Trane Tracer SC, Tracer SC+, and Tracer Concierge could allow an unauthenticated attacker to access sensitive information through unprotected APIs.",
+  "token_count": 25
+}

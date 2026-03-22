@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33230",
+  "ingested_at": "2026-03-22T07:54:49.097084+00:00",
+  "lang": "en",
+  "raw_text": "NLTK (Natural Language Toolkit) is a suite of open source Python modules, data sets, and tutorials supporting research and development in Natural Language Processing. In versions 3.9.3 and prior, `nltk.app.wordnet_app` contains a reflected cross-site scripting issue in the `lookup_...` route. A crafted `lookup_ ` URL can inject arbitrary HTML/JavaScript into the response page because attacker-controlled `word` data is reflected into HTML without escaping. This impacts users running the local WordNet Browser server and can lead to script execution in the browser origin of that application. Commit 1c3f799607eeb088cab2491dcf806ae83c29ad8f fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c414b4aedb3397f43391060a151c4af9aca0ae5ba3ac1bb118abaae9c6eb591f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33230"
+}

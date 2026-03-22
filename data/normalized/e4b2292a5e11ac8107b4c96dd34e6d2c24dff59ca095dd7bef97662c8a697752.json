@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Streaming Service Microsoft Streaming Service contains an untrusted pointer dereference vulnerability that allows for privilege escalation, enabling a local attacker to gain SYSTEM privileges.",
+  "token_count": 25
+}

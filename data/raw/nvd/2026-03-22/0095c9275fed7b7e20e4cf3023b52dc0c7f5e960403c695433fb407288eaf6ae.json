@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29062",
+  "ingested_at": "2026-03-22T07:54:41.357485+00:00",
+  "lang": "en",
+  "raw_text": "jackson-core contains core low-level incremental (\"streaming\") parser and generator abstractions used by Jackson Data Processor. From version 3.0.0 to before version 3.1.0, the UTF8DataInputJsonParser, which is used when parsing from a java.io.DataInput source, bypasses the maxNestingDepth constraint (default: 500) defined in StreamReadConstraints. A similar issue was found in ReaderBasedJsonParser. This allows a user to supply a JSON document with excessive nesting, which can cause a StackOverflowError when the structure is processed, leading to a Denial of Service (DoS). This issue has been patched in version 3.1.0.",
+  "severity": "HIGH",
+  "sha256_hash": "0095c9275fed7b7e20e4cf3023b52dc0c7f5e960403c695433fb407288eaf6ae",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29062"
+}

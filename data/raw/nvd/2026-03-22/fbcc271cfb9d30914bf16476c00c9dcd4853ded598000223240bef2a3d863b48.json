@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-12518",
+  "ingested_at": "2026-03-22T07:54:47.421517+00:00",
+  "lang": "en",
+  "raw_text": "beefree.io SDK is vulnerable to Stored XSS in Social Media icon URL parameter in email builder functionality. Malicious attacker can inject arbitrary HTML and JS into template, which will be rendered/executed when visiting preview page. However due to beefree's Content Security Policy not all payloads will execute successfully. This issue has been fixed in version 3.47.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "fbcc271cfb9d30914bf16476c00c9dcd4853ded598000223240bef2a3d863b48",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12518"
+}

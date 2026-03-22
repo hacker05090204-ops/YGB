@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell Alienware Command Center (AWCC), versions prior to 6.12.24.0, contain an Improper Certificate Validation vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Information exposure.",
+  "token_count": 31
+}

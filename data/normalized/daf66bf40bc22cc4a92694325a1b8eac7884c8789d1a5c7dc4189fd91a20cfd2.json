@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm Chipsets contain a use after free vulnerability due to improper handling of memory mapping of multiple processes simultaneously.",
+  "token_count": 23
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2351",
+  "ingested_at": "2026-03-22T07:54:49.339446+00:00",
+  "lang": "en",
+  "raw_text": "The Task Manager plugin for WordPress is vulnerable to Arbitrary File Read in all versions up to, and including, 3.0.2 via the callback_get_text_from_url() function. This makes it possible for authenticated attackers, with Subscriber-level access and above, to read the contents of arbitrary files on the server, which can contain sensitive information.",
+  "severity": "MEDIUM",
+  "sha256_hash": "86a99bc23c035bd9487ca7455068be51fed596125af99c09b5aeae06a39a4759",
+  "source": "nvd",
+  "tags": [
+    "CWE-73"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2351"
+}

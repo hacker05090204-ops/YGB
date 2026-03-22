@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26720",
+  "ingested_at": "2026-03-22T07:54:33.730934+00:00",
+  "lang": "en",
+  "raw_text": "An issue in Twenty CRM v1.15.0 and before allows a remote attacker to execute arbitrary code via the local.driver.ts module.",
+  "severity": "CRITICAL",
+  "sha256_hash": "76c65a90ebb9bf12b5ab6113a0ece576d656ac76d3cae9b4e01069506fa76316",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26720"
+}

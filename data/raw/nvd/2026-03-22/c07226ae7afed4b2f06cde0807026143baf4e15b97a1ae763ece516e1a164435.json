@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28138",
+  "ingested_at": "2026-03-22T07:54:32.640861+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Stylemix uListing ulisting allows Object Injection.This issue affects uListing: from n/a through < = 2.2.0.",
+  "severity": "HIGH",
+  "sha256_hash": "c07226ae7afed4b2f06cde0807026143baf4e15b97a1ae763ece516e1a164435",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28138"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP Multiple Products SAP NetWeaver Application Server ABAP, SAP NetWeaver Application Server Java, ABAP Platform, SAP Content Server and SAP Web Dispatcher allow HTTP request smuggling. An unauthenticated attacker can prepend a victim's request with arbitrary data, allowing for function execution impersonating the victim or poisoning intermediary Web caches.",
+  "token_count": 49
+}

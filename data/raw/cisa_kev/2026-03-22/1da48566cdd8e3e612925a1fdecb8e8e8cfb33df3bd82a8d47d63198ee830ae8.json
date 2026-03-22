@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1782",
+  "ingested_at": "2026-03-22T07:45:19.034122+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOs, macOS, watchOS, and tvOS contain a race condition vulnerability that may allow a malicious application to elevate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1da48566cdd8e3e612925a1fdecb8e8e8cfb33df3bd82a8d47d63198ee830ae8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

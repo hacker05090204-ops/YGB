@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The installers for multiple products provided by Soliton Systems K.K. contain an issue with incorrect default permissions, which may allow arbitrary code to be executed with SYSTEM privileges.",
+  "token_count": 28
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47377",
+  "ingested_at": "2026-03-22T07:54:33.743936+00:00",
+  "lang": "en",
+  "raw_text": "Memory Corruption when accessing a buffer after it has been freed while processing IOCTL calls.",
+  "severity": "HIGH",
+  "sha256_hash": "e7a200e1bb989629687890c21fc44db89ac5c5f65dc1efac8cb9c200930d77a7",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47377"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-21587",
+  "ingested_at": "2026-03-22T07:45:17.535277+00:00",
+  "lang": "en",
+  "raw_text": "Oracle E-Business Suite Oracle E-Business Suite contains an unspecified vulnerability that allows an unauthenticated attacker with network access via HTTP to compromise Oracle Web Applications Desktop Integrator.",
+  "severity": "CRITICAL",
+  "sha256_hash": "be7867ac74ae317f4738fb94510dd78f6a83c17c8fabc08615f6a1c768be31a8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

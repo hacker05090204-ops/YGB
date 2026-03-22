@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Laravel Livewire Laravel Livewire contain a code injection vulnerability that could allow unauthenticated attackers to achieve remote command execution in specific scenarios.",
+  "token_count": 22
+}

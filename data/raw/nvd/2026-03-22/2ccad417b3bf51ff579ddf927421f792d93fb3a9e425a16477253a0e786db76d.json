@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24114",
+  "ingested_at": "2026-03-22T07:54:33.637803+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Failure to validate `pPortMapIndex` may lead to buffer overflows when using `strcpy`.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2ccad417b3bf51ff579ddf927421f792d93fb3a9e425a16477253a0e786db76d",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-120"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24114"
+}

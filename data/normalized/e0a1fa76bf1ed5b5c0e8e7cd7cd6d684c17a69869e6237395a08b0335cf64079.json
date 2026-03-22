@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability allowing a low-privileged user to extract saved SSH credentials.",
+  "token_count": 11
+}

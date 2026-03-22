@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in itsourcecode University Management System 1.0. This vulnerability affects unknown code of the file /view_result.php. Performing a manipulation of the argument seme results in sql injection. The attack is possible to be carried out remotely. The exploit is now public and may be used.",
+  "token_count": 48
+}

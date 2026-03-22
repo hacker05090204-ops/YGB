@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32008",
+  "ingested_at": "2026-03-22T07:54:48.175828+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.21 contain an improper URL scheme validation vulnerability in the assertBrowserNavigationAllowed() function that allows authenticated users with browser-tool access to navigate to file:// URLs. Attackers can exploit this by accessing local files readable by the OpenClaw process user through browser snapshot and extraction actions to exfiltrate sensitive data.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fe0349d94d52a9e2b07a50ec8e4ba1c674f013e81d482653402c40ab15ae4b02",
+  "source": "nvd",
+  "tags": [
+    "CWE-610"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32008"
+}

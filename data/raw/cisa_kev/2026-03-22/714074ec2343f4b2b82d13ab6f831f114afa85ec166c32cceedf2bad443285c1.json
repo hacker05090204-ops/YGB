@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-6820",
+  "ingested_at": "2026-03-22T07:45:19.465679+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox and Thunderbird Mozilla Firefox and Thunderbird contain a race condition vulnerability when handling a ReadableStream under certain conditions. The race condition creates a use-after-free vulnerability, causing unspecified impacts.",
+  "severity": "CRITICAL",
+  "sha256_hash": "714074ec2343f4b2b82d13ab6f831f114afa85ec166c32cceedf2bad443285c1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

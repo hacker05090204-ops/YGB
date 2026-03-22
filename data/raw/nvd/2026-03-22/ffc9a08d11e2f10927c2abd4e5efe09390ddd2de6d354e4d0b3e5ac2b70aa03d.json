@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-8899",
+  "ingested_at": "2026-03-22T07:54:41.740396+00:00",
+  "lang": "en",
+  "raw_text": "The Paid Videochat Turnkey Site \u2013 HTML5 PPV Live Webcams plugin for WordPress is vulnerable to Privilege Escalation in all versions up to, and including, 7.3.20. This is due to videowhisper_register_form() function not restricting user roles that can be set during registration. This makes it possible for authenticated attackers, with Author-level access and above, to create posts/pages with the registration form and administrator set as the role and subsequently use that form to register an administrator account. This can also be exploited by contributors, but is far less likely to be successful because an administrator would need to approve the form with the administrator role for the attack to be successful.",
+  "severity": "HIGH",
+  "sha256_hash": "ffc9a08d11e2f10927c2abd4e5efe09390ddd2de6d354e4d0b3e5ac2b70aa03d",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 111,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-8899"
+}

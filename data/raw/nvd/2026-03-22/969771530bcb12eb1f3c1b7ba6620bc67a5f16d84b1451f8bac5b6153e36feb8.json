@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69393",
+  "ingested_at": "2026-03-22T07:54:30.292296+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Jthemes Exzo exzo allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Exzo: from n/a through < = 1.2.4.",
+  "severity": "HIGH",
+  "sha256_hash": "969771530bcb12eb1f3c1b7ba6620bc67a5f16d84b1451f8bac5b6153e36feb8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69393"
+}

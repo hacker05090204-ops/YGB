@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32774",
+  "ingested_at": "2026-03-22T07:54:46.564020+00:00",
+  "lang": "en",
+  "raw_text": "Vulnogram 1.0.0 contains a stored cross-site scripting vulnerability in comment hypertext handling that allows attackers to inject malicious scripts. Remote attackers can inject XSS payloads through comments to execute arbitrary JavaScript in victims' browsers.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d01cc85d5a5605fd41ad1a6bb2fbf19ee4719137ae984065c00a9a3022ff4da0",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32774"
+}

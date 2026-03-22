@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in jarikomppa soloud up to 20200207. This affects the function SoLoud::Wav::loadwav of the file src/audiosource/wav/soloud_wav.cpp of the component WAV File Parser. Performing a manipulation results in memory corruption. The attack must be initiated from a local position. The exploit is now public and may be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "token_count": 67
+}

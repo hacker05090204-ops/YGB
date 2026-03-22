@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3665",
+  "ingested_at": "2026-03-22T07:54:41.892862+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in xlnt-community xlnt up to 1.6.1. The affected element is the function xlnt::detail::xlsx_consumer::read_office_document of the file source/detail/serialization/xlsx_consumer.cpp of the component XLSX File Parser. The manipulation leads to null pointer dereference. The attack must be carried out locally. The exploit is publicly available and might be used.",
+  "severity": "LOW",
+  "sha256_hash": "71803f27c5c51f98de671854a9e45280429fe129363771a7c6add652aed46468",
+  "source": "nvd",
+  "tags": [
+    "CWE-404",
+    "CWE-476"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3665"
+}

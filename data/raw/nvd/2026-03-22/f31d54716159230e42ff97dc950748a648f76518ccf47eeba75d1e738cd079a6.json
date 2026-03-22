@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23661",
+  "ingested_at": "2026-03-22T07:54:42.657427+00:00",
+  "lang": "en",
+  "raw_text": "Cleartext transmission of sensitive information in Azure IoT Explorer allows an unauthorized attacker to disclose information over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "f31d54716159230e42ff97dc950748a648f76518ccf47eeba75d1e738cd079a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23661"
+}

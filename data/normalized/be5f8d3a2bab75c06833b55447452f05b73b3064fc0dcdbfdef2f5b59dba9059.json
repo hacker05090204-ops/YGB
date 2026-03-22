@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a stored cross-site scripting vulnerability that allows authenticated attackers to inject malicious JavaScript by importing a crafted options file with unescaped customCss field values. Attackers can supply a malicious JSON import file containing script payloads in the customCss parameter that execute on every page when rendered through the options handler without proper sanitization.",
+  "token_count": 57
+}

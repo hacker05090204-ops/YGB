@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22216",
+  "ingested_at": "2026-03-22T07:54:44.637154+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a missing rate limiting vulnerability that allows unauthenticated attackers to subscribe arbitrary email addresses to post notifications by sending POST requests to the wpdAddSubscription handler in class.WpdiscuzHelperAjax.php. Attackers can exploit LIKE wildcard characters in the subscription query to match multiple email addresses and generate unwanted notification emails to victim accounts.",
+  "severity": "MEDIUM",
+  "sha256_hash": "82102971ea73856a2b247b0dd08794036008cfb8339f01103df4258a4406bae7",
+  "source": "nvd",
+  "tags": [
+    "CWE-799"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22216"
+}

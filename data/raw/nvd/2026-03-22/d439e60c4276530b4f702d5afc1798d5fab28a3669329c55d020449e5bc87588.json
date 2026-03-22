@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28424",
+  "ingested_at": "2026-03-22T07:54:33.379582+00:00",
+  "lang": "en",
+  "raw_text": "Statmatic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.11 and 6.4.0, user email addresses were included in responses from the user fieldtype\u2019s data endpoint for control panel users who did not have the \"view users\" permission. This has been fixed in 5.73.11 and 6.4.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d439e60c4276530b4f702d5afc1798d5fab28a3669329c55d020449e5bc87588",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28424"
+}

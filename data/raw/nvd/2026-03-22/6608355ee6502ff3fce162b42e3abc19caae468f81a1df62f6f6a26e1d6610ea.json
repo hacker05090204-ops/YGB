@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22545",
+  "ingested_at": "2026-03-22T07:54:46.833073+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 10.11.x < = 10.11.10 fail to validate user's authentication method when processing account auth type switch which allows an authenticated attacker to change account password without confirmation via falsely claiming a different auth provider.. Mattermost Advisory ID: MMSA-2026-00583",
+  "severity": "LOW",
+  "sha256_hash": "6608355ee6502ff3fce162b42e3abc19caae468f81a1df62f6f6a26e1d6610ea",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22545"
+}

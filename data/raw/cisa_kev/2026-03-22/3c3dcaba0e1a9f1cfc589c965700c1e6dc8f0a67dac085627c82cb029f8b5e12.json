@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22536",
+  "ingested_at": "2026-03-22T07:45:17.704601+00:00",
+  "lang": "en",
+  "raw_text": "SAP Multiple Products SAP NetWeaver Application Server ABAP, SAP NetWeaver Application Server Java, ABAP Platform, SAP Content Server and SAP Web Dispatcher allow HTTP request smuggling. An unauthenticated attacker can prepend a victim's request with arbitrary data, allowing for function execution impersonating the victim or poisoning intermediary Web caches.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3c3dcaba0e1a9f1cfc589c965700c1e6dc8f0a67dac085627c82cb029f8b5e12",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

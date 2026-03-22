@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3145",
+  "ingested_at": "2026-03-22T07:54:31.911401+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in libvips up to 8.18.0. The affected element is the function vips_foreign_load_matrix_file_is_a/vips_foreign_load_matrix_header of the file libvips/foreign/matrixload.c. Executing a manipulation can lead to memory corruption. The attack needs to be launched locally. This patch is called d4ce337c76bff1b278d7085c3c4f4725e3aa6ece. A patch should be applied to remediate this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d25691be3644a083c853c36ec239538836a1c0b0efd20c29cdfb05e6d2136c50",
+  "source": "nvd",
+  "tags": [
+    "CWE-119"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3145"
+}

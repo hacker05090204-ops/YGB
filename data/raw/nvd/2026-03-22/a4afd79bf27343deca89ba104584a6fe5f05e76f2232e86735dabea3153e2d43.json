@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2747",
+  "ingested_at": "2026-03-22T07:54:34.429137+00:00",
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 decrypts inline PGP messages without isolating them from surrounding unencrypted content, allowing exposure of sensitive information to an unauthorized actor.",
+  "severity": "HIGH",
+  "sha256_hash": "a4afd79bf27343deca89ba104584a6fe5f05e76f2232e86735dabea3153e2d43",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2747"
+}

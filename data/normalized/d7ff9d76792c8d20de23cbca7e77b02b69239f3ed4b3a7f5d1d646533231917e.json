@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Server-side request forgery (ssrf) in Azure Cloud Shell allows an unauthorized attacker to elevate privileges over a network.",
+  "token_count": 18
+}

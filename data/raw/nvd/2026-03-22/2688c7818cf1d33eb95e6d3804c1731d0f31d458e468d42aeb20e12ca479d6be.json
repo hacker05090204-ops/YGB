@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2006-10002",
+  "ingested_at": "2026-03-22T07:54:47.929902+00:00",
+  "lang": "en",
+  "raw_text": "XML::Parser versions through 2.45 for Perl could overflow the pre-allocated buffer size cause a heap corruption (double free or corruption) and crashes. A :utf8 PerlIO layer, parse_stream() in Expat.xs could overflow the XML input buffer because Perl's read() returns decoded characters while SvPV() gives back multi-byte UTF-8 bytes that can exceed the pre-allocated buffer size. This can cause heap corruption (double free or corruption) and crashes.",
+  "severity": "HIGH",
+  "sha256_hash": "2688c7818cf1d33eb95e6d3804c1731d0f31d458e468d42aeb20e12ca479d6be",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-176"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2006-10002"
+}

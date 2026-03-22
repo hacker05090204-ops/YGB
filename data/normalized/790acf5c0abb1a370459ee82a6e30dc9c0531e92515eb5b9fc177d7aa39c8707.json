@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the Eye Exam form module allows any authenticated user to be redirected to an arbitrary external URL. This can be exploited for phishing attacks against healthcare providers using OpenEMR. Version 8.0.0 fixes the issue.",
+  "token_count": 53
+}

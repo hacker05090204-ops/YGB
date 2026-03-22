@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "RARLAB WinRAR RARLAB WinRAR contains a path traversal vulnerability affecting the Windows version of WinRAR. This vulnerability could allow an attacker to execute arbitrary code by crafting malicious archive files.",
+  "token_count": 30
+}

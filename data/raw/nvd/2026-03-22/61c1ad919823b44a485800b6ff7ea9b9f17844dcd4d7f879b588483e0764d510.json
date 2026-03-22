@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-21671",
+  "ingested_at": "2026-03-22T07:54:44.249438+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability allowing an authenticated user with the Backup Administrator role to perform remote code execution (RCE) in high availability (HA) deployments of Veeam Backup & Replication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "61c1ad919823b44a485800b6ff7ea9b9f17844dcd4d7f879b588483e0764d510",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21671"
+}

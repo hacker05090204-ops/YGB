@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3793",
+  "ingested_at": "2026-03-22T07:54:42.138796+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in SourceCodester Sales and Inventory System 1.0. This vulnerability affects unknown code of the file sales_invoice1.php of the component GET Parameter Handler. This manipulation of the argument sellid causes sql injection. It is possible to initiate the attack remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "MEDIUM",
+  "sha256_hash": "859a0fada1b4c1ec8205f43fe8a9d96f18f6f0fd3378bf88da2a1ade4b2350f3",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3793"
+}

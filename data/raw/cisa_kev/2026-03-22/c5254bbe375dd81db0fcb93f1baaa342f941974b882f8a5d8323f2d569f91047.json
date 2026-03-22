@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-8651",
+  "ingested_at": "2026-03-22T07:45:17.887796+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Integer overflow in Adobe Flash Player allows attackers to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c5254bbe375dd81db0fcb93f1baaa342f941974b882f8a5d8323f2d569f91047",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 14,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

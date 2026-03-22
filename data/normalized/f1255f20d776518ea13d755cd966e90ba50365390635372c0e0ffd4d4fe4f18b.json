@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to 3.1.5, authenticated users with permission to execute scaffolder dry-runs can gain access to server-configured environment secrets through the dry-run API response. Secrets are properly redacted in log output but not in all parts of the response payload. Deployments that have configured scaffolder.defaultEnvironment.secrets are affected. This is patched in @backstage/plugin-scaffolder-backend version 3.1.5.",
+  "token_count": 62
+}

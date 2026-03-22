@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47379",
+  "ingested_at": "2026-03-22T07:54:33.746933+00:00",
+  "lang": "en",
+  "raw_text": "Memory Corruption when concurrent access to shared buffer occurs due to improper synchronization between assignment and deallocation of buffer resources.",
+  "severity": "HIGH",
+  "sha256_hash": "7b24cc980536a367ff0bfaef4694a5adcdd8c1f180f4b18996e6dc1037032ce0",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47379"
+}

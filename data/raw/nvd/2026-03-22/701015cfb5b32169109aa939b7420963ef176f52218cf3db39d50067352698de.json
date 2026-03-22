@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4063",
+  "ingested_at": "2026-03-22T07:54:46.194696+00:00",
+  "lang": "en",
+  "raw_text": "The Social Icons Widget & Block by WPZOOM plugin for WordPress is vulnerable to unauthorized data modification due to a missing capability check in the add_menu_item() method hooked to admin_menu in all versions up to, and including, 4.5.8. This is due to the method performing wp_insert_post() and update_post_meta() calls to create a sharing configuration without verifying the current user has administrator-level capabilities. This makes it possible for authenticated attackers, with Subscriber-level access and above, to trigger the creation of a published wpzoom-sharing configuration post with default sharing button settings, which causes social sharing buttons to be automatically injected into all post content on the frontend via the the_content filter.",
+  "severity": "MEDIUM",
+  "sha256_hash": "701015cfb5b32169109aa939b7420963ef176f52218cf3db39d50067352698de",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4063"
+}

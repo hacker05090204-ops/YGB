@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-14883",
+  "ingested_at": "2026-03-22T07:45:19.492509+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server contains an unspecified vulnerability in the Console component with high impacts to confidentilaity, integrity, and availability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "420eb425800c8546f3b9d97b375a2431cf51f83d8df765da1c8897822773c40b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

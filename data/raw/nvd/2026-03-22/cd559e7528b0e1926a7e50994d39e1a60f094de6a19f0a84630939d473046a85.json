@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28725",
+  "ingested_at": "2026-03-22T07:54:41.197831+00:00",
+  "lang": "en",
+  "raw_text": "Sensitive information disclosure due to improper configuration of a headless browser. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cd559e7528b0e1926a7e50994d39e1a60f094de6a19f0a84630939d473046a85",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28725"
+}

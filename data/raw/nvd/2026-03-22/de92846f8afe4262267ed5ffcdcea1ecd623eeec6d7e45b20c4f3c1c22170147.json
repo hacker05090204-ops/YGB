@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25988",
+  "ingested_at": "2026-03-22T07:54:31.376329+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, sometimes msl.c fails to update the stack index, so an image is stored in the wrong slot and never freed on error, causing leaks. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "de92846f8afe4262267ed5ffcdcea1ecd623eeec6d7e45b20c4f3c1c22170147",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25988"
+}

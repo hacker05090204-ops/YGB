@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23257",
+  "ingested_at": "2026-03-22T07:54:47.566037+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: net: liquidio: Fix off-by-one error in PF setup_nic_devices() cleanup In setup_nic_devices(), the initialization loop jumps to the label setup_nic_dev_free on failure. The current cleanup loop while(i--) skip the failing index i, causing a memory leak. Fix this by changing the loop to iterate from the current index i down to 0. Also, decrement i in the devlink_alloc failure path to point to the last successfully allocated index. Compile tested only. Issue found using code review.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f6d228320fdee9cf0e07429f1371772bc84c2167076bb6ffa7a0d5a0be37e912",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23257"
+}

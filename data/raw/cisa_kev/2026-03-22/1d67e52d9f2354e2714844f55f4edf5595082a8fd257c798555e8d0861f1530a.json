@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-24682",
+  "ingested_at": "2026-03-22T07:45:18.718310+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaborate Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting (XSS) vulnerability in the Calendar feature that allows an attacker to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1d67e52d9f2354e2714844f55f4edf5595082a8fd257c798555e8d0861f1530a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

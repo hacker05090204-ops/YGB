@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-22769",
+  "ingested_at": "2026-03-22T07:45:15.895071+00:00",
+  "lang": "en",
+  "raw_text": "Dell RecoverPoint for Virtual Machines (RP4VMs) Dell RecoverPoint for Virtual Machines (RP4VMs) contains an use of hard-coded credentials vulnerability that could allow an unauthenticated remote attacker to gain unauthorized access to the underlying operating system and root-level persistence.",
+  "severity": "CRITICAL",
+  "sha256_hash": "551ae9d1ef03cef9d23f28099671f7c5aafc160e5c7fe053aa9553b408c0631e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

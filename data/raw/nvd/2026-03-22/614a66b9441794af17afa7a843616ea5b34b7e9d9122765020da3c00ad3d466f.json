@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23654",
+  "ingested_at": "2026-03-22T07:54:42.649305+00:00",
+  "lang": "en",
+  "raw_text": "Dependency on vulnerable third-party component in GitHub Repo: zero-shot-scfoundation allows an unauthorized attacker to execute code over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "614a66b9441794af17afa7a843616ea5b34b7e9d9122765020da3c00ad3d466f",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23654"
+}

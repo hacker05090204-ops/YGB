@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32096",
+  "ingested_at": "2026-03-22T07:54:43.924508+00:00",
+  "lang": "en",
+  "raw_text": "Plunk is an open-source email platform built on top of AWS SES. Prior to 0.7.0, a Server-Side Request Forgery (SSRF) vulnerability existed in the SNS webhook handler. An unauthenticated attacker could send a crafted request that caused the server to make an arbitrary outbound HTTP GET request to any host accessible from the server. This vulnerability is fixed in 0.7.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c289fc1e75b7a63684669fa436a3d79a0228e285c98f2d46967f576b73d910e5",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32096"
+}

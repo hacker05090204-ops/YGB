@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3133",
+  "ingested_at": "2026-03-22T07:54:31.811961+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in itsourcecode Document Management System 1.0. This issue affects some unknown processing of the file /loging.php of the component Login. The manipulation of the argument Username leads to sql injection. Remote exploitation of the attack is possible. The exploit has been disclosed to the public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "26589c9502bc01a16404fad539d5d10f19af0d84122198f899b0c816f9a288a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3133"
+}

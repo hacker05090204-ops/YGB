@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22614",
+  "ingested_at": "2026-03-22T07:54:42.634311+00:00",
+  "lang": "en",
+  "raw_text": "The encryption mechanism used in Eaton's EasySoft project file was insecure and susceptible to brute force attacks, an attacker with access to this file and the local host machine could potentially read the sensitive information stored and tamper with the project file. This security issue has been fixed in the latest version of Eaton EasySoft which is available on the Eaton download centre.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ddaf40fafed2202ab7ad9d3d0f66a3982df0523c66068d6f9f80e7671f88d409",
+  "source": "nvd",
+  "tags": [
+    "CWE-257"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22614"
+}

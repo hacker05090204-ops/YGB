@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26107",
+  "ingested_at": "2026-03-22T07:54:42.789689+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Microsoft Office Excel allows an unauthorized attacker to execute code locally.",
+  "severity": "HIGH",
+  "sha256_hash": "fffac446a9acd0f74191616e52f4e2442235ff18141482865e316db9982990e8",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26107"
+}

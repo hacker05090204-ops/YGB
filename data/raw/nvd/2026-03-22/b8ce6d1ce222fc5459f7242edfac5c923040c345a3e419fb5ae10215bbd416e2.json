@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30958",
+  "ingested_at": "2026-03-22T07:54:42.894026+00:00",
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. Prior to 10.0.21, an unauthenticated path traversal in the /workflow/docs/:componentName endpoint allows reading arbitrary files from the server filesystem. The componentName route parameter is concatenated directly into a file path passed to res.sendFile() in orker/FeatureSet/Workflow/Index.ts with no sanitization or authentication middleware. This vulnerability is fixed in 10.0.21.",
+  "severity": "HIGH",
+  "sha256_hash": "b8ce6d1ce222fc5459f7242edfac5c923040c345a3e419fb5ae10215bbd416e2",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30958"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-1316",
+  "ingested_at": "2026-03-22T07:45:16.502866+00:00",
+  "lang": "en",
+  "raw_text": "Edimax IC-7100 IP Camera Edimax IC-7100 IP camera contains an OS command injection vulnerability due to improper input sanitization that allows an attacker to achieve remote code execution via specially crafted requests. The impacted product could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aa4d45c8b6bb968379754a4e4697bae148ee4fa85fc53093cfa1de511bec8667",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

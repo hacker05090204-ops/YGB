@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3231",
+  "ingested_at": "2026-03-22T07:54:43.543841+00:00",
+  "lang": "en",
+  "raw_text": "The Checkout Field Editor (Checkout Manager) for WooCommerce plugin for WordPress is vulnerable to Stored Cross-Site Scripting via custom radio and checkboxgroup field values submitted through the WooCommerce Block Checkout Store API in all versions up to, and including, 2.1.7. This is due to the `prepare_single_field_data()` method in `class-thwcfd-block-order-data.php` first escaping values with `esc_html()` then immediately reversing the escaping with `html_entity_decode()` for radio and checkboxgroup field types, combined with a permissive `wp_kses()` allowlist in `get_allowed_html()` that explicitly permits the ` ` element with the `onchange` event handler attribute. This makes it possible for unauthenticated attackers to inject arbitrary web scripts via the Store API checkout endpoint that execute when an administrator views the order details page.",
+  "severity": "HIGH",
+  "sha256_hash": "57f1bebc17d5f7afd808ac1a48dc766e6dbd7fbc6302dcd9e27fd83a82f0f93d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 116,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3231"
+}

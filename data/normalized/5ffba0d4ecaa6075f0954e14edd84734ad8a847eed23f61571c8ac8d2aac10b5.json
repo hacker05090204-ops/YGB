@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Identity based authorization bypass vulnerability (IDOR) that allows an attacker to modify the data of a legitimate user account, such as changing the victim's email address, validating the new email address, and requesting a new password. This could allow them to take complete control of other users' legitimate accounts",
+  "token_count": 49
+}

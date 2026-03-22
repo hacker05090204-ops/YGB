@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25504",
+  "ingested_at": "2026-03-22T07:54:34.620758+00:00",
+  "lang": "en",
+  "raw_text": "NCrypted Jobgator contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the experience parameter. Attackers can send POST requests to the agents Find-Jobs endpoint with malicious experience values to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "c075aa3e79826a3e3ca1904f36259d592036a130c75c1c9d4b642a1cf1a075a3",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25504"
+}

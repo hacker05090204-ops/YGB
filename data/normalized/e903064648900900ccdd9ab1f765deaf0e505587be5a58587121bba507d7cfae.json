@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Java Runtime Environment (JRE) A vulnerability in the way Java restricts the permissions of Java applets could allow an attacker to execute commands on a vulnerable system.",
+  "token_count": 28
+}

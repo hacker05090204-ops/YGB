@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23808",
+  "ingested_at": "2026-03-22T07:54:34.567117+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in a standardized wireless roaming protocol that could enable a malicious actor to install an attacker-controlled Group Temporal Key (GTK) on a client device. Successful exploitation of this vulnerability could allow a remote malicious actor to perform unauthorized frame injection, bypass client isolation, interfere with cross-client traffic, and compromise network segmentation, integrity, and confidentiality.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b5078e9829d38c5649b1cf4fc99c4fc38790d7be2a085f6e3a659debe08bfc20",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23808"
+}

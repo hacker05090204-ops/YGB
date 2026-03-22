@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Lexbor is a web browser engine library. Prior to 2.7.0, the ISO\u20102022\u2010JP encoder in Lexbor fails to reset the temporary size variable between iterations. The statement ctx->buffer_used -= size with a stale size = 3 causes an integer underflow that wraps to SIZE_MAX. Afterwards, memcpy is called with a negative length, leading to an out\u2010of\u2010bounds read from the stack and an out\u2010of\u2010bounds write to the heap. The source data is partially controllable via the contents of the DOM tree. This vulnerability is fixed in 2.7.0.",
+  "token_count": 85
+}

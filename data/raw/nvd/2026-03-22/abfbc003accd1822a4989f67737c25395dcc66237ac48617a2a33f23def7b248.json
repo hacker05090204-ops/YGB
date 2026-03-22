@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2015-20117",
+  "ingested_at": "2026-03-22T07:54:46.221368+00:00",
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 contains a cross-site request forgery vulnerability that allows unauthenticated attackers to create unauthorized user accounts and administrative users by crafting malicious forms. Attackers can submit hidden form data to /admin/addusers.php and /admin/editadmins.php endpoints to register new users with arbitrary credentials and escalate privileges to SUPERUSER level.",
+  "severity": "MEDIUM",
+  "sha256_hash": "abfbc003accd1822a4989f67737c25395dcc66237ac48617a2a33f23def7b248",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2015-20117"
+}

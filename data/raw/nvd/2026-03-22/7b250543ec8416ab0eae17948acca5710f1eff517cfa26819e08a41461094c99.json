@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70873",
+  "ingested_at": "2026-03-22T07:54:44.456163+00:00",
+  "lang": "en",
+  "raw_text": "An information disclosure issue in the zipfileInflate function in the zipfile extension in SQLite v3.51.1 and earlier allows attackers to obtain heap memory via supplying a crafted ZIP file.",
+  "severity": "HIGH",
+  "sha256_hash": "7b250543ec8416ab0eae17948acca5710f1eff517cfa26819e08a41461094c99",
+  "source": "nvd",
+  "tags": [
+    "CWE-244"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70873"
+}

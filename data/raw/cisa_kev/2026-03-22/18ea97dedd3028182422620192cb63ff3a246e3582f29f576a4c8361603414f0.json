@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-6448",
+  "ingested_at": "2026-03-22T07:45:17.113605+00:00",
+  "lang": "en",
+  "raw_text": "Unitronics Vision PLC and HMI Unitronics Vision Series PLCs and HMIs ship with an insecure default password, which if left unchanged, can allow attackers to execute remote commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "18ea97dedd3028182422620192cb63ff3a246e3582f29f576a4c8361603414f0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

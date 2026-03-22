@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in UEditor up to 1.4.3.2. This issue affects some unknown processing of the file php/controller.php?action=uploadimage of the component JSONP Callback Handler. This manipulation of the argument callback causes cross site scripting. The attack can be initiated remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "token_count": 79
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29063",
+  "ingested_at": "2026-03-22T07:54:41.590293+00:00",
+  "lang": "en",
+  "raw_text": "Immutable.js provides many Persistent Immutable data structures. Prior to versions 3.8.3, 4.3.7, and 5.1.5, Prototype Pollution is possible in immutable via the mergeDeep(), mergeDeepWith(), merge(), Map.toJS(), and Map.toObject() APIs. This issue has been patched in versions 3.8.3, 4.3.7, and 5.1.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8c55b49605d783bb8be64a9efcd4b5b1a4fce2206ff3ff1829a749cf401a02c3",
+  "source": "nvd",
+  "tags": [
+    "CWE-1321"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29063"
+}

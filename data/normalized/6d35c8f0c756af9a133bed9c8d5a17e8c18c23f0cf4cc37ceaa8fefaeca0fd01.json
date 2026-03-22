@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft DirectX Graphics Kernel (DXGKRNL) An elevation of privilege vulnerability exists when the DirectX Graphics Kernel (DXGKRNL) driver improperly handles objects in memory.",
+  "token_count": 23
+}

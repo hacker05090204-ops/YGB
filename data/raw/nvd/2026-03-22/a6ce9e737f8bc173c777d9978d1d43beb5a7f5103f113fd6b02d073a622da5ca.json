@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2694",
+  "ingested_at": "2026-03-22T07:54:32.371702+00:00",
+  "lang": "en",
+  "raw_text": "The The Events Calendar plugin for WordPress is vulnerable to unauthorized modification of data and loss of data due to an improper capability check on the 'can_edit' and 'can_delete' function in all versions up to, and including, 6.15.16. This makes it possible for authenticated attackers, with Contributor-level access and above, to update or trash events, organizers and venues via REST API.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a6ce9e737f8bc173c777d9978d1d43beb5a7f5103f113fd6b02d073a622da5ca",
+  "source": "nvd",
+  "tags": [
+    "CWE-285"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2694"
+}

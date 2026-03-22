@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ZKTeco ZKAccess Professional 3.5.3 contains an insecure file permissions vulnerability that allows authenticated users to escalate privileges by modifying executable files. Attackers can leverage the Modify permission granted to the Authenticated Users group to replace executable binaries with malicious code for privilege escalation.",
+  "token_count": 43
+}

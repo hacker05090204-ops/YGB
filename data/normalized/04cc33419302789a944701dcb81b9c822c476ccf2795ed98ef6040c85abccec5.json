@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick ImageMagick ImageMagick contains an improper input validation vulnerability that affects the EPHEMERAL, HTTPS, MVG, MSL, TEXT, SHOW, WIN, and PLT coders. This allows a remote attacker to execute arbitrary code via shell metacharacters in a crafted image.",
+  "token_count": 38
+}

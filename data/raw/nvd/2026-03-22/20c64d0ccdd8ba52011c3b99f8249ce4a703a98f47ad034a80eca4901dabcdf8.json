@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25445",
+  "ingested_at": "2026-03-22T07:54:47.916695+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Membership Software WishList Member X allows Object Injection.This issue affects WishList Member X: from n/a through 3.29.0.",
+  "severity": "HIGH",
+  "sha256_hash": "20c64d0ccdd8ba52011c3b99f8249ce4a703a98f47ad034a80eca4901dabcdf8",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25445"
+}

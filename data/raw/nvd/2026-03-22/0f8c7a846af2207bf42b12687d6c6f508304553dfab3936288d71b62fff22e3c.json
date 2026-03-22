@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59541",
+  "ingested_at": "2026-03-22T07:54:41.222343+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.34, a Cross-Site Request Forgery (CSRF) vulnerability allows an attacker to delete projects inside a course without the victim\u2019s consent. The issue arises because sensitive actions such as project deletion do not implement anti-CSRF protections (tokens) and GET based requests. As a result, an authenticated user (Trainer) can be tricked into executing this unwanted action by simply visiting a malicious page. This issue has been patched in version 1.11.34.",
+  "severity": "HIGH",
+  "sha256_hash": "0f8c7a846af2207bf42b12687d6c6f508304553dfab3936288d71b62fff22e3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59541"
+}

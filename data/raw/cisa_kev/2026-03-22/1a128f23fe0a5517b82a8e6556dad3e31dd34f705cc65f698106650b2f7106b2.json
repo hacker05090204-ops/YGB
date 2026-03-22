@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-23760",
+  "ingested_at": "2026-03-22T07:45:15.954737+00:00",
+  "lang": "en",
+  "raw_text": "SmarterTools SmarterMail SmarterTools SmarterMail contains an authentication bypass using an alternate path or channel vulnerability in the password reset API. The force-reset-password endpoint permits anonymous requests and fails to verify the existing password or a reset token when resetting system administrator accounts. This could allow an unauthenticated attacker to supply a target administrator username and a new password to reset the account, resulting in full administrative compromise of the SmarterMail instance.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1a128f23fe0a5517b82a8e6556dad3e31dd34f705cc65f698106650b2f7106b2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 71,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

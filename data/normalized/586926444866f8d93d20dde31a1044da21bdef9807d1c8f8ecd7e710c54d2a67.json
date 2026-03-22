@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MongoDB MongoDB and MongoDB Server MongoDB Server contains an improper handling of length parameter inconsistency vulnerability in Zlib compressed protocol headers. This vulnerability may allow a read of uninitialized heap memory by an unauthenticated client.",
+  "token_count": 35
+}

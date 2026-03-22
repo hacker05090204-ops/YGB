@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4013",
+  "ingested_at": "2026-03-22T07:54:44.206311+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in SourceCodester Web-based Pharmacy Product Management System 1.0. This affects an unknown function of the file add_admin.php. Such manipulation leads to improper authorization. The attack may be launched remotely.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a38c71bc7af4bb19d129dcf95249ea5c7d0dfd4270b2ad30b4e40adfca5c7f72",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4013"
+}

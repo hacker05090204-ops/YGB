@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27545",
+  "ingested_at": "2026-03-22T07:54:47.303105+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.26 contain an approval bypass vulnerability in system.run execution that allows attackers to execute commands from unintended filesystem locations by rebinding writable parent symlinks in the current working directory after approval. An attacker can modify mutable parent symlink path components between approval and execution time to redirect command execution to a different location while preserving the visible working directory string.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cb66979e26227ba9c05a024a09bd38516066465fe8a4e05fc100dcd03bf2f32b",
+  "source": "nvd",
+  "tags": [
+    "CWE-367"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27545"
+}

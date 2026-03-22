@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In Splunk Enterprise versions below 10.2.1 and 10.0.4, and Splunk Cloud Platform versions below 10.2.2510.5, 10.1.2507.16, and 10.0.2503.12, a low-privileged user that does not hold the \"admin\" or \"power\" Splunk roles could retrieve the Observability Cloud API access token through the Discover Splunk Observability Cloud app due to improper access control. This vulnerability does not affect Splunk Enterprise versions below 9.4.9 and 9.3.10 because the Discover Splunk Observability Cloud app does not come with Splunk Enterprise.",
+  "token_count": 76
+}

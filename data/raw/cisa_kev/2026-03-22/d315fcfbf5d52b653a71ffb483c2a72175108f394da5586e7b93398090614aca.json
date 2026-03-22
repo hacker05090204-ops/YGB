@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-53704",
+  "ingested_at": "2026-03-22T07:45:16.582637+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SonicOS SonicWall SonicOS contains an improper authentication vulnerability in the SSLVPN authentication mechanism that allows a remote attacker to bypass authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d315fcfbf5d52b653a71ffb483c2a72175108f394da5586e7b93398090614aca",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30229",
+  "ingested_at": "2026-03-22T07:54:41.640790+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to versions 8.6.6 and 9.5.0-alpha.4, the readOnlyMasterKey can call POST /loginAs to obtain a valid session token for any user. This allows a read-only credential to impersonate arbitrary users with full read and write access to their data. Any Parse Server deployment that uses readOnlyMasterKey is affected. This issue has been patched in versions 8.6.6 and 9.5.0-alpha.4.",
+  "severity": "HIGH",
+  "sha256_hash": "276a18491f065ca03dd983411f05e09d68367f9d191fa1e659e144f65c6c67a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30229"
+}

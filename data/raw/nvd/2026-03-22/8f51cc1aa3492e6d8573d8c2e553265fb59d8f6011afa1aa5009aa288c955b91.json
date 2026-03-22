@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27122",
+  "ingested_at": "2026-03-22T07:54:30.657356+00:00",
+  "lang": "en",
+  "raw_text": "svelte performance oriented web framework. Prior to 5.51.5, when using in server-side rendering, the provided tag name is not validated or sanitized before being emitted into the HTML output. If the tag string contains unexpected characters, it can result in HTML injection in the SSR output. Client-side rendering is not affected. This vulnerability is fixed in 5.51.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8f51cc1aa3492e6d8573d8c2e553265fb59d8f6011afa1aa5009aa288c955b91",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27122"
+}

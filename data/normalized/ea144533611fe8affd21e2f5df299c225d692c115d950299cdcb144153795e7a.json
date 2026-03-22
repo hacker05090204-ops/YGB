@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP Commerce Cloud SAP Commerce Cloud (formerly known as Hybris) contains a deserialization of untrusted data vulnerability within the mediaconversion and virtualjdbc extension that allows for code injection.",
+  "token_count": 28
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in xlnt-community xlnt up to 1.6.1. The affected element is the function xlnt::detail::xlsx_consumer::read_office_document of the file source/detail/serialization/xlsx_consumer.cpp of the component XLSX File Parser. The manipulation leads to null pointer dereference. The attack must be carried out locally. The exploit is publicly available and might be used.",
+  "token_count": 50
+}

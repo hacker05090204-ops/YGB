@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28103",
+  "ingested_at": "2026-03-22T07:54:40.622708+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in LambertGroup LBG Zoominoutslider lbg_zoominoutslider allows Reflected XSS.This issue affects LBG Zoominoutslider: from n/a through < = 5.4.5.",
+  "severity": "HIGH",
+  "sha256_hash": "095259b9b1cd4a3e5e7855f5210a3ce3673fbb3b6bd3b0046d5d339be425f15b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28103"
+}

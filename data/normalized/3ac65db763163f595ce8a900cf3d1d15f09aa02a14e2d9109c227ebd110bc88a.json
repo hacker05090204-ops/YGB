@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "@langchain/langgraph-checkpoint-redis is the Redis checkpoint and store implementation for LangGraph. A query injection vulnerability exists in the @langchain/langgraph-checkpoint-redis package's filter handling. The RedisSaver and ShallowRedisSaver classes construct RediSearch queries by directly interpolating user-provided filter keys and values without proper escaping. RediSearch has special syntax characters that can modify query behavior, and when user-controlled data contains these characters, the query logic can be manipulated to bypass intended access controls. This vulnerability is fixed in 1.0.2.",
+  "token_count": 74
+}

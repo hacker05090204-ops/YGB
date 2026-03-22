@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-39935",
+  "ingested_at": "2026-03-22T07:45:15.936926+00:00",
+  "lang": "en",
+  "raw_text": "GitLab Community and Enterprise Editions GitLab Community and Enterprise Editions contain a server-side request forgery vulnerability which could allow unauthorized external users to perform Server Side Requests via the CI Lint API.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9fc0aa8ac7b66d09ae50bea4267764b3b885ad1dcefbf774d45f7a00d3862e4d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

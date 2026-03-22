@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30884",
+  "ingested_at": "2026-03-22T07:54:47.335207+00:00",
+  "lang": "en",
+  "raw_text": "mdjnelson/moodle-mod_customcert is a Moodle plugin for creating dynamically generated certificates with complete customization via the web browser. Prior to versions 4.4.9 and 5.0.3, a teacher who holds `mod/customcert:manage` in any single course can read and silently overwrite certificate elements belonging to any other course in the Moodle installation. The `core_get_fragment` callback `editelement` and the `mod_customcert_save_element` web service both fail to verify that the supplied `elementid` belongs to the authorized context, enabling cross-course information disclosure and data tampering. Versions 4.4.9 and 5.0.3 fix the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6b73ca119274241a2afaa8f20bbbc511c1fc4983ca406ed05728ffb651fc2748",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30884"
+}

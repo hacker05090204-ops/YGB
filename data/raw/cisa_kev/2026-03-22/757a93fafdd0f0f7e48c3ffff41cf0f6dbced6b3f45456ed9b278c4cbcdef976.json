@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-2861",
+  "ingested_at": "2026-03-22T07:45:18.419196+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion A directory traversal vulnerability exists in the administrator console in Adobe ColdFusion which allows remote attackers to read arbitrary files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "757a93fafdd0f0f7e48c3ffff41cf0f6dbced6b3f45456ed9b278c4cbcdef976",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

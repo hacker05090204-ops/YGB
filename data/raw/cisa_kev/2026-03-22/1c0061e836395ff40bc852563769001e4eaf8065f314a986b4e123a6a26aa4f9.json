@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21513",
+  "ingested_at": "2026-03-22T07:45:15.921362+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft MSHTML Framework contains a protection mechanism failure vulnerability that could allow an unauthorized attacker to bypass a security feature over a network.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1c0061e836395ff40bc852563769001e4eaf8065f314a986b4e123a6a26aa4f9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1713",
+  "ingested_at": "2026-03-22T07:54:34.265616+00:00",
+  "lang": "en",
+  "raw_text": "IBM MQ 9.1.0.0 through 9.1.0.33 LTS, 9.2.0.0 through 9.2.0.40 LTS, 9.3.0.0 through 9.3.0.36 LTS, 9.30.0 through 9.3.5.1 CD, 9.4.0.0 through 9.4.0.17 LTS, and 9.4.0.0 through 9.4.4.1 CD",
+  "severity": "MEDIUM",
+  "sha256_hash": "c47c931df4b45b395465f485b90694806e3274ccbb4a89c9ff87cf3dad2f1faa",
+  "source": "nvd",
+  "tags": [
+    "CWE-305"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1713"
+}

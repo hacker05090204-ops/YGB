@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27824",
+  "ingested_at": "2026-03-22T07:54:33.288557+00:00",
+  "lang": "en",
+  "raw_text": "calibre is a cross-platform e-book manager for viewing, converting, editing, and cataloging e-books. Prior to version 9.4.0, the calibre Content Server's brute-force protection mechanism uses a ban key derived from both `remote_addr` and the `X-Forwarded-For` header. Since the `X-Forwarded-For` header is read directly from the HTTP request without any validation or trusted-proxy configuration, an attacker can bypass IP-based bans by simply changing or adding this header, rendering the brute-force protection completely ineffective. This is particularly dangerous for calibre servers exposed to the internet, where brute-force protection is the primary defense against credential stuffing and password guessing attacks. Version 9.4.0 contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "dfc746ae10a67a1fe112b252be9b0c1e63b92b8b5b73bcf63a764f7cfc60aedf",
+  "source": "nvd",
+  "tags": [
+    "CWE-307",
+    "CWE-346"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27824"
+}

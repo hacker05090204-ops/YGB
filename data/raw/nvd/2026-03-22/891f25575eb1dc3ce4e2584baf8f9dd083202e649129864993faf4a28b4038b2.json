@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32061",
+  "ingested_at": "2026-03-22T07:54:43.571966+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.17 contain a path traversal vulnerability in the $include directive resolution that allows reading arbitrary local files outside the config directory boundary. Attackers with config modification capabilities can exploit this by specifying absolute paths, traversal sequences, or symlinks to access sensitive files readable by the OpenClaw process user, including API keys and credentials.",
+  "severity": "MEDIUM",
+  "sha256_hash": "891f25575eb1dc3ce4e2584baf8f9dd083202e649129864993faf4a28b4038b2",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32061"
+}

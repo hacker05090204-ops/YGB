@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Concurrent execution using shared resource with improper synchronization ('race condition') in Windows Bluetooth RFCOM Protocol Driver allows an authorized attacker to elevate privileges locally.",
+  "token_count": 24
+}

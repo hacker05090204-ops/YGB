@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-30711",
+  "ingested_at": "2026-03-22T07:54:47.963381+00:00",
+  "lang": "en",
+  "raw_text": "Devome GRR v4.5.0 was discovered to contain multiple authenticated SQL injection vulnerabilities in the include/session.inc.php file via the referer and user-agent.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0f94543157365d38d2953ed9b70ae5d4d857639f07e8ba49798d94a00964b730",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30711"
+}

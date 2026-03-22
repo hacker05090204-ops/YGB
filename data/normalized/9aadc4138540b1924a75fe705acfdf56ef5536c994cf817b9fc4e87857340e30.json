@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A command injection vulnerability in the minimal_wrapper.py component of kubectl-mcp-server v1.2.0 allows attackers to execute arbitrary commands via injecting arbitrary shell metacharacters.",
+  "token_count": 22
+}

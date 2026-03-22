@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1789",
+  "ingested_at": "2026-03-22T07:45:18.040622+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products A type confusion issue affecting multiple Apple products allows processing of maliciously crafted web content, leading to arbitrary code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e488dc33b672ebf216478aa8369d9fd3dab45bbaf54a79ec79374e49ddc2db58",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

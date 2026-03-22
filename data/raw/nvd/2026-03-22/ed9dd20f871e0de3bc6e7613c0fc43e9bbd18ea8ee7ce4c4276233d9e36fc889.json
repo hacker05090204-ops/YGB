@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2584",
+  "ingested_at": "2026-03-22T07:54:33.553591+00:00",
+  "lang": "en",
+  "raw_text": "A critical SQL Injection (SQLi) vulnerability has been identified in the authentication module of the system. An unauthenticated, remote attacker (AV:N/PR:N) can exploit this flaw by sending specially crafted SQL queries through the login interface. Due to low attack complexity (AC:L) and the absence of specific requirements (AT:N), the vulnerability allows for a total compromise of the system's configuration data (VC:H/VI:H). While the availability of the service remains unaffected (VA:N), the breach may lead to a limited exposure of sensitive information regarding subsequent or interconnected systems (SC:L).",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ed9dd20f871e0de3bc6e7613c0fc43e9bbd18ea8ee7ce4c4276233d9e36fc889",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2584"
+}

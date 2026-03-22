@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2491",
+  "ingested_at": "2026-03-22T07:54:46.467064+00:00",
+  "lang": "en",
+  "raw_text": "Socomec DIRIS A-40 HTTP API Authentication Bypass Vulnerability. This vulnerability allows network-adjacent attackers to bypass authentication on affected installations of Socomec DIRIS A-40 power monitoring devices. Authentication is not required to exploit this vulnerability. The specific flaw exists within the web API implementation, which listens on TCP port 80 by default. The issue results from the lack of authentication prior to allowing access to functionality. An attacker can leverage this vulnerability to bypass authentication on the system. Was ZDI-CAN-23993.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f4e876a03185ff57c3201dd51fe21709145da08953d36e0dd7266469d6908b32",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2491"
+}

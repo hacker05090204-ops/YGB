@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in Linksys MR9600, Linksys MX4200 allows that contents of a USB drive partition can be mounted in an arbitrary location of the file system. This may result in the execution of shell scripts in the context of a root user.This issue affects MR9600: 1.0.4.205530; MX4200: 1.0.13.210200.",
+  "token_count": 58
+}

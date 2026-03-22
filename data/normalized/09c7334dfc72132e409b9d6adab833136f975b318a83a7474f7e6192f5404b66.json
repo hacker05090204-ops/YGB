@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "External initialization of trusted variables or data stores in Azure Entra ID allows an unauthorized attacker to elevate privileges locally.",
+  "token_count": 20
+}

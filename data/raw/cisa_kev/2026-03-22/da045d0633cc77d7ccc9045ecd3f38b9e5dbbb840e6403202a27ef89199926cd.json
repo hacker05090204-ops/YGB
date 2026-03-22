@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-6277",
+  "ingested_at": "2026-03-22T07:45:18.487369+00:00",
+  "lang": "en",
+  "raw_text": "NETGEAR Multiple Routers NETGEAR confirmed multiple routers allow unauthenticated web pages to pass form input directly to the command-line interface, permitting remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "da045d0633cc77d7ccc9045ecd3f38b9e5dbbb840e6403202a27ef89199926cd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-27926",
+  "ingested_at": "2026-03-22T07:45:17.465800+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting vulnerability by allowing an endpoint URL to accept parameters without sanitizing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "760a3884682172e257cc0f03930e3d87c271de7109d10cee2f1f21adde18752e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

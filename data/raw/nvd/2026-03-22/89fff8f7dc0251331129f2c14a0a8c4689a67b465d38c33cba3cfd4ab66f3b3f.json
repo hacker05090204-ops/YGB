@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29121",
+  "ingested_at": "2026-03-22T07:54:39.924400+00:00",
+  "lang": "en",
+  "raw_text": "International Data Casting (IDC) SFX2100 satellite receiver comes with the `/sbin/ip` utility installed with the setuid bit set. This configuration grants elevated privileges to any local user who can execute the binary. A local actor is able to use the GTFObins resource to preform privileged file reads as the root user on the local file system and may potentially lead to other avenues for preforming privileged actions.",
+  "severity": "HIGH",
+  "sha256_hash": "89fff8f7dc0251331129f2c14a0a8c4689a67b465d38c33cba3cfd4ab66f3b3f",
+  "source": "nvd",
+  "tags": [
+    "CWE-269",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29121"
+}

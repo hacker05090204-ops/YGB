@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An Incorrect Permission Assignment vulnerability exists in the ASUS Business System Control Interface driver. This vulnerability can be triggered by an unprivileged local user sending a specially crafted IOCTL request, potentially leading to unauthorized access to sensitive hardware resources and kernel information disclosure. Refer to the \"ASUS Business System Control Interface\" section on the ASUS Security Advisory for more information.",
+  "token_count": 60
+}

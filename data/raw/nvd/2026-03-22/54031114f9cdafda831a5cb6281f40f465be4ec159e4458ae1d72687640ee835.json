@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25588",
+  "ingested_at": "2026-03-22T07:54:49.587998+00:00",
+  "lang": "en",
+  "raw_text": "BulletProof FTP Server 2019.0.0.50 contains a denial of service vulnerability in the DNS Address field that allows local attackers to crash the application by supplying an excessively long string. Attackers can enable the DNS Address option in the Firewall settings and paste a buffer of 700 bytes to trigger a crash when the Test function is invoked.",
+  "severity": "MEDIUM",
+  "sha256_hash": "54031114f9cdafda831a5cb6281f40f465be4ec159e4458ae1d72687640ee835",
+  "source": "nvd",
+  "tags": [
+    "CWE-1282"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25588"
+}

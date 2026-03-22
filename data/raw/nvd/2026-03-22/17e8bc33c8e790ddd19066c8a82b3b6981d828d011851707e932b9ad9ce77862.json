@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27821",
+  "ingested_at": "2026-03-22T07:54:32.450903+00:00",
+  "lang": "en",
+  "raw_text": "GPAC is an open-source multimedia framework. In versions up to and including 26.02.0, a stack buffer overflow occurs during NHML file parsing in `src/filters/dmx_nhml.c`. The value of the xmlHeaderEnd XML attribute is copied from att->value into szXmlHeaderEnd[1000] using strcpy() without any length validation. If the input exceeds 1000 bytes, it overwrites beyond the stack buffer boundary. Commit 9bd7137fded2db40de61a2cf3045812c8741ec52 patches the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "17e8bc33c8e790ddd19066c8a82b3b6981d828d011851707e932b9ad9ce77862",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27821"
+}

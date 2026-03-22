@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-5638",
+  "ingested_at": "2026-03-22T07:45:19.007924+00:00",
+  "lang": "en",
+  "raw_text": "Apache Struts Apache Struts Jakarta Multipart parser allows for malicious file upload using the Content-Type value, leading to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c24ec80622b54178266da93e0220e783a4e562011eb9492c3603a79c9788975d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

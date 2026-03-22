@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-20423",
+  "ingested_at": "2026-03-22T07:54:33.511787+00:00",
+  "lang": "en",
+  "raw_text": "In wlan STA driver, there is a possible out of bounds write due to a missing bounds check. This could lead to local escalation of privilege with User execution privileges needed. User interaction is not needed for exploitation. Patch ID: WCNCR00465314; Issue ID: MSV-4956.",
+  "severity": "HIGH",
+  "sha256_hash": "3d6c856dc2eb65825f60e1aa2d9e3a12b9766a3c46e2e07b3803d7210452fff3",
+  "source": "nvd",
+  "tags": [
+    "CWE-749",
+    "CWE-787"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20423"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists when Microsoft Windows MSDT is called using the URL protocol from a calling application.",
+  "token_count": 22
+}

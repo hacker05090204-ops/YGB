@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28448",
+  "ingested_at": "2026-03-22T07:54:41.027060+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.1.29 prior to 2026.2.1 contain a vulnerability in the Twitch plugin (must be installed and enabled) in which it fails to enforce the allowFrom allowlist when allowedRoles is unset or empty, allowing unauthorized Twitch users to trigger agent dispatch. Remote attackers can mention the bot in Twitch chat to bypass access control and invoke the agent pipeline, potentially causing unintended actions or resource exhaustion.",
+  "severity": "HIGH",
+  "sha256_hash": "f687ec67b7115078a77b84766d1fac91315f43cdd60a69ed53cc5da0a965c55b",
+  "source": "nvd",
+  "tags": [
+    "CWE-285"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28448"
+}

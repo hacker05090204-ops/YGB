@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3337",
+  "ingested_at": "2026-03-22T07:54:33.990222+00:00",
+  "lang": "en",
+  "raw_text": "Observable timing discrepancy in AES-CCM decryption in AWS-LC allows an unauthenticated user to potentially determine authentication tag validity via timing analysis. The impacted implementations are through the EVP CIPHER API: EVP_aes_128_ccm, EVP_aes_192_ccm, and EVP_aes_256_ccm. Customers of AWS services do not need to take action. Applications using AWS-LC should upgrade to AWS-LC version 1.69.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3c7f53be73ed7f2c59b6f4a73b225562e22a594fce011720303cf5d18fe0b06e",
+  "source": "nvd",
+  "tags": [
+    "CWE-208"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3337"
+}

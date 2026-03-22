@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25477",
+  "ingested_at": "2026-03-22T07:54:33.970171+00:00",
+  "lang": "en",
+  "raw_text": "AFFiNE is an open-source, all-in-one workspace and an operating system. Prior to version 0.26.0, there is an Open Redirect vulnerability located at the /redirect-proxy endpoint. The flaw exists in the domain validation logic, where an improperly anchored Regular Expression allows an attacker to bypass the whitelist by using malicious domains that end with a trusted string. This issue has been patched in version 0.26.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8da53d8abd82b7dd417b00fe9c8bf3f24af0d3b7f15970889357f4faf7ac0fcc",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25477"
+}

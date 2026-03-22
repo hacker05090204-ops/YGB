@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27849",
+  "ingested_at": "2026-03-22T07:54:32.191221+00:00",
+  "lang": "en",
+  "raw_text": "Due to missing neutralization of special elements, OS commands can be injected via the update functionality of a TLS-SRP connection, which is normally used for configuring devices inside the mesh network. This issue affects MR9600: 1.0.4.205530; MX4200: 1.0.13.210200.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa7c54c38c84c0e8648a3ce9cff717315aa075f05aa1121363a8fd57a37f95b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27849"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2970",
+  "ingested_at": "2026-03-22T07:54:31.059061+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in datapizza-labs datapizza-ai 0.0.2. Affected by this vulnerability is the function RedisCache of the file datapizza-ai-cache/redis/datapizza/cache/redis/cache.py. Such manipulation leads to deserialization. The attack requires being on the local network. A high complexity level is associated with this attack. The exploitation appears to be difficult. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ef83ab843878506761e1cab829a3449dafd3bbaadc06e63142bc6c8278f11c55",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-502",
+    "CWE-502"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2970"
+}

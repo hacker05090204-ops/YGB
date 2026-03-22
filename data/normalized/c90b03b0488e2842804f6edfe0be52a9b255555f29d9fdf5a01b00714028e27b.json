@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Android Kernel Android kernel contains a race condition, which allows for a use-after-free vulnerability. Exploitation can allow for privilege escalation.",
+  "token_count": 20
+}

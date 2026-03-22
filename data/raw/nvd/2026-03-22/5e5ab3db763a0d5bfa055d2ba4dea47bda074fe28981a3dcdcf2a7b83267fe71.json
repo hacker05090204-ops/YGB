@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28801",
+  "ingested_at": "2026-03-22T07:54:41.327351+00:00",
+  "lang": "en",
+  "raw_text": "Natro Macro is an open-source Bee Swarm Simulator macro written in AutoHotkey. Prior to version 1.1.0, any ahk code contained inside of a pattern or path file is executed by the macro. Since users commonly share path/pattern files, an attacker could share a file containing malicious code, which is then executed by the program. This code can operate in silence alongside the pattern, running in the background to do whatever the attacker pleases. This issue has been patched in version 1.1.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5e5ab3db763a0d5bfa055d2ba4dea47bda074fe28981a3dcdcf2a7b83267fe71",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28801"
+}

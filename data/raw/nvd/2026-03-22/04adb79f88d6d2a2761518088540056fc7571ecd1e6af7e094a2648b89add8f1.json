@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47371",
+  "ingested_at": "2026-03-22T07:54:33.737938+00:00",
+  "lang": "en",
+  "raw_text": "Transient DOS when an LTE RLC packet with invalid TB is received by UE.",
+  "severity": "MEDIUM",
+  "sha256_hash": "04adb79f88d6d2a2761518088540056fc7571ecd1e6af7e094a2648b89add8f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-617"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47371"
+}

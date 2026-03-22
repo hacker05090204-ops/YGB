@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-8361",
+  "ingested_at": "2026-03-22T07:45:17.242340+00:00",
+  "lang": "en",
+  "raw_text": "Realtek SDK Realtek SDK contains an improper input validation vulnerability in the miniigd SOAP service that allows remote attackers to execute malicious code via a crafted NewInternalClient request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cb2ff79962fe6c3b148dea3ce696c43827b233bbf0495bec56df619d5c22bc89",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

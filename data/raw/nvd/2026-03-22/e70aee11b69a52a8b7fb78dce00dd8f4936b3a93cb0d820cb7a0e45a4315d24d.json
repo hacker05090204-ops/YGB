@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2023-27573",
+  "ingested_at": "2026-03-22T07:54:43.475474+00:00",
+  "lang": "en",
+  "raw_text": "netbox-docker before 2.5.0 has a superuser account with default credentials (admin password for the admin account, and 0123456789abcdef0123456789abcdef01234567 value for SUPERUSER_API_TOKEN). In practice on the public Internet, almost all users changed the password but only about 90% changed the token. Having a default token value was intentional and was valuable for the main intended use case of the netbox-docker product (isolated development networks). Some users engaged in an effort to repurpose netbox-docker for production. The documentation for this effort stated that the defaults must not be used. However, installation did not ensure non-default values. The Supplier was aware of the CVE ID assignment and did not object to the assignment.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e70aee11b69a52a8b7fb78dce00dd8f4936b3a93cb0d820cb7a0e45a4315d24d",
+  "source": "nvd",
+  "tags": [
+    "CWE-1392"
+  ],
+  "token_count": 110,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-27573"
+}

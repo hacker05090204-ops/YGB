@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-24816",
+  "ingested_at": "2026-03-22T07:45:16.935455+00:00",
+  "lang": "en",
+  "raw_text": "OSGeo JAI-EXT OSGeo GeoServer JAI-EXT contains a code injection vulnerability that, when programs use jt-jiffle and allow Jiffle script to be provided via network request, could allow remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b5219a14d6dc821662ed4d9af9f899d2822451f3afc7581cae1c46177805c9d7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

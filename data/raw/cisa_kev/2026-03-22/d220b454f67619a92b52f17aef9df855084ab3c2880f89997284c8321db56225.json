@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2546",
+  "ingested_at": "2026-03-22T07:45:18.465800+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k The kernel-mode driver in Microsoft Windows OS and Server allows local users to gain privileges via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d220b454f67619a92b52f17aef9df855084ab3c2880f89997284c8321db56225",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

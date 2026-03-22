@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2753",
+  "ingested_at": "2026-03-22T07:54:41.497970+00:00",
+  "lang": "en",
+  "raw_text": "An Absolute Path Traversal vulnerability exists in Navtor NavBox. The application exposes an HTTP service that fails to properly sanitize user-supplied path input. Unauthenticated remote attackers can exploit this issue by submitting requests containing absolute filesystem paths. Successful exploitation allows the attacker to retrieve arbitrary files from the underlying filesystem, limited only by the privileges of the service process. This can lead to the exposure of sensitive configuration files and system information.",
+  "severity": "HIGH",
+  "sha256_hash": "215dbec31c27e17a98066edfce0f8f5b59b1519074bbd4567c3e2ca694911421",
+  "source": "nvd",
+  "tags": [
+    "CWE-36"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2753"
+}

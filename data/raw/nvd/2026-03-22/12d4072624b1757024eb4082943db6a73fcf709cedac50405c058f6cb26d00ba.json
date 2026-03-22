@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-0035",
+  "ingested_at": "2026-03-22T07:54:33.947525+00:00",
+  "lang": "en",
+  "raw_text": "In createRequest of MediaProvider.java, there is a possible way for an app to gain read/write access to non-existing files due to a logic error in the code. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "12d4072624b1757024eb4082943db6a73fcf709cedac50405c058f6cb26d00ba",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-787"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0035"
+}

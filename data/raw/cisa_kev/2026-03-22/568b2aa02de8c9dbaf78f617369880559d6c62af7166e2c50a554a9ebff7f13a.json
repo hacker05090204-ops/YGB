@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-13379",
+  "ingested_at": "2026-03-22T07:45:19.185206+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Fortinet FortiOS SSL VPN web portal contains a path traversal vulnerability that may allow an unauthenticated attacker to download FortiOS system files through specially crafted HTTP resource requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "568b2aa02de8c9dbaf78f617369880559d6c62af7166e2c50a554a9ebff7f13a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

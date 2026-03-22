@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4466",
+  "ingested_at": "2026-03-22T07:54:48.497492+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Comfast CF-AC100 2.6.0.8. This affects an unknown function of the file /cgi-bin/mbox-config?method=SET\u00a7ion=ntp_timezone. The manipulation leads to command injection. Remote exploitation of the attack is possible. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "85299ede50d6d5018fab8c4e25c2abdc5871dabfd1f68c7703a486558de26271",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4466"
+}

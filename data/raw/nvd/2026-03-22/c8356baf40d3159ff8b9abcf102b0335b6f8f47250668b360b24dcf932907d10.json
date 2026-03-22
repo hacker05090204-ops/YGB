@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28674",
+  "ingested_at": "2026-03-22T07:54:47.260116+00:00",
+  "lang": "en",
+  "raw_text": "xiaoheiFS is a self-hosted financial and operational system for cloud service businesses. In versions up to and including 0.3.15, the `AdminPaymentPluginUpload` endpoint lets admins upload any file to `plugins/payment/`. It only checks a hardcoded password (`qweasd123456`) and ignores file content. A background watcher (`StartWatcher`) then scans this folder every 5 seconds. If it finds a new executable, it runs it immediately, resulting in RCE. Version 4.0.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "c8356baf40d3159ff8b9abcf102b0335b6f8f47250668b360b24dcf932907d10",
+  "source": "nvd",
+  "tags": [
+    "CWE-434",
+    "CWE-798"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28674"
+}

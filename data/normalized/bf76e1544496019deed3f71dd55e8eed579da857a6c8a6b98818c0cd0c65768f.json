@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "File Thingie 2.5.7 is vulnerable to Cross Site Scripting (XSS). A malicious user can leverage the \"upload file\" functionality to upload a file with a crafted file name used to trigger a Javascript payload.",
+  "token_count": 34
+}

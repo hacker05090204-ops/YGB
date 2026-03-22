@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper handling of direct memory writes in the input-output memory management unit could allow a malicious guest virtual machine (VM) to flood a host with writes, potentially causing a fatal machine check error resulting in denial of service.",
+  "token_count": 38
+}

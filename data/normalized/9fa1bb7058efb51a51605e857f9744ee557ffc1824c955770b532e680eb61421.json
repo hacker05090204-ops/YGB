@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in go2ismail Asp.Net-Core-Inventory-Order-Management-System up to 9.20250118. Affected by this vulnerability is an unknown functionality of the file /api/Security/ of the component Security API. Performing a manipulation results in improper authorization. Remote exploitation of the attack is possible. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 56
+}

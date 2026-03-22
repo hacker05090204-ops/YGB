@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-64736",
+  "ingested_at": "2026-03-22T07:54:34.073002+00:00",
+  "lang": "en",
+  "raw_text": "An out-of-bounds read vulnerability exists in the ABF parsing functionality of The Biosig Project libbiosig 3.9.2 and Master Branch (5462afb0). A specially crafted .abf file can lead to an information leak. An attacker can provide a malicious file to trigger this vulnerability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "164d39816c2210d196125d42abc8e79a248e7aa1c05ebb4994ee8450ef26ade5",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-64736"
+}

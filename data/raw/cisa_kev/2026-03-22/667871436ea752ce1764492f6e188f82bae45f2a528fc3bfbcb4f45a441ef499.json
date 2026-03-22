@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-28799",
+  "ingested_at": "2026-03-22T07:45:18.182213+00:00",
+  "lang": "en",
+  "raw_text": "QNAP Network Attached Storage (NAS) QNAP NAS running HBS 3 contains an improper authorization vulnerability which can allow remote attackers to log in to a device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "667871436ea752ce1764492f6e188f82bae45f2a528fc3bfbcb4f45a441ef499",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

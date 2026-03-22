@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29516",
+  "ingested_at": "2026-03-22T07:54:46.941244+00:00",
+  "lang": "en",
+  "raw_text": "Buffalo TeraStation NAS TS5400R firmware version 4.02-0.06 and prior contain an excessive file permissions vulnerability that allows authenticated attackers to read the /etc/shadow file by uploading and executing a PHP file through the webserver. Attackers can exploit world-readable permissions on /etc/shadow to retrieve hashed passwords for all configured accounts including root.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5921f6fad3dfd8a249e0ca2bf92d641e050ae1a8a2e1b23d3acd3b135cda7c77",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29516"
+}

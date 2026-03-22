@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Buffer Overflow vulnerability in Uderzo Software SpaceSniffer v.2.0.5.18 allows a remote attacker to execute arbitrary code via a crafted .sns snapshot file.",
+  "token_count": 22
+}

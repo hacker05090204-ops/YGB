@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1336",
+  "ingested_at": "2026-03-22T07:54:33.996126+00:00",
+  "lang": "en",
+  "raw_text": "The AI ChatBot with ChatGPT and Content Generator by AYS plugin for WordPress is vulnerable to unauthorized access and modification of data due to missing capability checks on the store_data() and get_chatgpt_api_key() functions in all versions up to, and including, 2.7.5. This makes it possible for unauthenticated attackers to view, modify or delete the plugin's ChatGPT API key. The vulnerability was partially fixed in version 2.7.5 and fully fixed in version 2.7.6",
+  "severity": "MEDIUM",
+  "sha256_hash": "73476d389991a21f201ff391f979d650d9ca5232c79d36831db9f0bbf294cac6",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1336"
+}

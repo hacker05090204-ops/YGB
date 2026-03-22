@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2251",
+  "ingested_at": "2026-03-22T07:54:33.118422+00:00",
+  "lang": "en",
+  "raw_text": "Improper limitation of a pathname to a restricted directory (Path Traversal) vulnerability in Xerox FreeFlow Core allows unauthorized path traversal leading to RCE. This issue affects Xerox FreeFlow Core versions up to and including 8.0.7. Please consider upgrading to FreeFlow Core version 8.1.0 via the software available on - https://www.support.xerox.com/en-us/product/core/downloads https://www.support.xerox.com/en-us/product/core/downloads",
+  "severity": "CRITICAL",
+  "sha256_hash": "5ca37182c863ddcdb47966ec89534688daa175405fad4bf23047c36912e217e2",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2251"
+}

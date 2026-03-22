@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30244",
+  "ingested_at": "2026-03-22T07:54:41.674185+00:00",
+  "lang": "en",
+  "raw_text": "Plane is an an open-source project management tool. Prior to version 1.2.2, unauthenticated attackers can enumerate workspace members and extract sensitive information including email addresses, user roles, and internal identifiers. The vulnerability stems from Django REST Framework permission classes being incorrectly configured to allow anonymous access to protected endpoints. This issue has been patched in version 1.2.2.",
+  "severity": "HIGH",
+  "sha256_hash": "b3f95698dbe53dd950d57c3aed3d5c6bda4c3b5010af8630cae1985a89367dbf",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-284"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30244"
+}

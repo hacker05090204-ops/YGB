@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Kernel - Registry Hive Loading 'nt!RtlEqualSid' Out-of-Bounds Read (MS16-138)",
+  "token_count": 11
+}

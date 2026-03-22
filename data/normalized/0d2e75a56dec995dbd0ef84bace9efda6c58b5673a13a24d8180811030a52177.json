@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in FascinatedBox lily up to 2.3. Impacted is the function clear_storages of the file src/lily_emitter.c. The manipulation results in out-of-bounds read. The attack is only possible with local access. The exploit has been released to the public and may be used for attacks. The project was informed of the problem early through an issue report but has not responded yet.",
+  "token_count": 66
+}

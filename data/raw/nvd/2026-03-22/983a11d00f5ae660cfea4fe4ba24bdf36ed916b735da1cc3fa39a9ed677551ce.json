@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25200",
+  "ingested_at": "2026-03-22T07:54:41.483042+00:00",
+  "lang": "en",
+  "raw_text": "OOP CMS BLOG 1.0 contains a cross-site request forgery vulnerability that allows unauthenticated attackers to create administrative user accounts by crafting malicious POST requests. Attackers can submit forms to the addUser.php endpoint with parameters including userName, password, email, and role set to administrative privileges to gain unauthorized access.",
+  "severity": "MEDIUM",
+  "sha256_hash": "983a11d00f5ae660cfea4fe4ba24bdf36ed916b735da1cc3fa39a9ed677551ce",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25200"
+}

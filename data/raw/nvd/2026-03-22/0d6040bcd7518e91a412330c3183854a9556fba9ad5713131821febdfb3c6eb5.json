@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3976",
+  "ingested_at": "2026-03-22T07:54:44.164775+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Tenda W3 1.0.0.3(2204). Impacted is the function formWifiMacFilterSet of the file /goform/WifiMacFilterSet of the component POST Parameter Handler. Executing a manipulation of the argument index/GO can lead to stack-based buffer overflow. It is possible to launch the attack remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "0d6040bcd7518e91a412330c3183854a9556fba9ad5713131821febdfb3c6eb5",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3976"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30240",
+  "ingested_at": "2026-03-22T07:54:42.384244+00:00",
+  "lang": "en",
+  "raw_text": "Budibase is a low code platform for creating internal tools, workflows, and admin panels. In 3.31.5 and earlier, a path traversal vulnerability in the PWA (Progressive Web App) ZIP processing endpoint (POST /api/pwa/process-zip) allows an authenticated user with builder privileges to read arbitrary files from the server filesystem, including /proc/1/environ which contains all environment variables \u2014 JWT secrets, database credentials, encryption keys, and API tokens. The server reads attacker-specified files via unsanitized path.join() with user-controlled input from icons.json inside the uploaded ZIP, then uploads the file contents to the object store (MinIO/S3) where they can be retrieved through signed URLs. This results in complete platform compromise as all cryptographic secrets and service credentials are exfiltrated in a single request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9ff4a240070f36cdf9ea541c9cf29692531f0af19bb1a3fe52430722e8df06d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-73"
+  ],
+  "token_count": 119,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30240"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3873",
+  "ingested_at": "2026-03-22T07:54:46.181126+00:00",
+  "lang": "en",
+  "raw_text": "Use of Hard-coded Credentials vulnerability in Avantra allows Accessing Functionality Not Properly Constrained by ACLs. This issue affects Avantra: before 25.3.0.",
+  "severity": "HIGH",
+  "sha256_hash": "d807cdefaebe7f73d3db63d3eb5420b4af371605edef07af8ea2239531db484c",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3873"
+}

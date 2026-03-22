@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24017",
+  "ingested_at": "2026-03-22T07:54:42.684020+00:00",
+  "lang": "en",
+  "raw_text": "An Improper Control of Interaction Frequency vulnerability [CWE-799] vulnerability in Fortinet FortiWeb 8.0.0 through 8.0.2, FortiWeb 7.6.0 through 7.6.5, FortiWeb 7.4.0 through 7.4.10, FortiWeb 7.2.0 through 7.2.11, FortiWeb 7.0.0 through 7.0.11 may allow a remote unauthenticated attacker to bypass the authentication rate-limit via crafted requests. The success of the attack depends on the attacker's resources and the password target complexity.",
+  "severity": "HIGH",
+  "sha256_hash": "e8f9dc6a70ae0b3b2828c8aff67e053b733694e578e203156b5774b18d91309b",
+  "source": "nvd",
+  "tags": [
+    "CWE-799"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24017"
+}

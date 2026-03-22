@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-14667",
+  "ingested_at": "2026-03-22T07:45:17.222787+00:00",
+  "lang": "en",
+  "raw_text": "Red Hat JBoss RichFaces Framework Red Hat JBoss RichFaces Framework contains an expression language injection vulnerability via the UserResource resource. A remote, unauthenticated attacker could exploit this vulnerability to execute malicious code using a chain of Java serialized objects via org.ajax4jsf.resource.UserResource$UriData.",
+  "severity": "CRITICAL",
+  "sha256_hash": "579df055123627a11807b4e9fb7754b232527f9995cdce7b178d51f1dd1e4053",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

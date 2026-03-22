@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27902",
+  "ingested_at": "2026-03-22T07:54:32.507925+00:00",
+  "lang": "en",
+  "raw_text": "Svelte performance oriented web framework. Prior to version 5.53.5, errors from `transformError` were not correctly escaped prior to being embedded in the HTML output, causing potential HTML injection and XSS if attacker-controlled content is returned from `transformError`. Version 5.53.5 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7eaaf1305ea00d0555aae13883004fe88e201207a7ec8d9c5f2318fad5945f38",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27902"
+}

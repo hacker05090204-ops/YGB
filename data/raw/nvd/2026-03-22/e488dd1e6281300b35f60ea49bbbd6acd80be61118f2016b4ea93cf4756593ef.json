@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33058",
+  "ingested_at": "2026-03-22T07:54:47.362415+00:00",
+  "lang": "en",
+  "raw_text": "Kanboard is project management software focused on Kanban methodology. Versions prior to 1.2.51 have an authenticated SQL injection vulnerability. Attackers with the permission to add users to a project can leverage this vulnerability to dump the entirety of the kanboard database. Version 1.2.51 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e488dd1e6281300b35f60ea49bbbd6acd80be61118f2016b4ea93cf4756593ef",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33058"
+}

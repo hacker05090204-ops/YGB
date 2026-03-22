@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3964",
+  "ingested_at": "2026-03-22T07:54:44.120165+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in OpenAkita up to 1.24.3. This impacts the function run of the file src/openakita/tools/shell.py of the component Chat API Endpoint. Executing a manipulation of the argument Message can lead to os command injection. The attack is restricted to local execution. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "40fa7e038fd1b50e70c46fbadf182538d18058afe2586dea3a2261f14d05fefa",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3964"
+}

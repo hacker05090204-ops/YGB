@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ForgeRock Access Management (AM) ForgeRock Access Management (AM) Core Server allows an attacker who sends a specially crafted HTTP request to one of three endpoints (/ccversion/Version, /ccversion/Masthead, or /ccversion/ButtonFrame) to execute code in the context of the current user (unless ForgeRock AM is running as root user, which the vendor does not recommend).",
+  "token_count": 53
+}

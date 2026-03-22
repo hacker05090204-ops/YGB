@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25178",
+  "ingested_at": "2026-03-22T07:54:41.432656+00:00",
+  "lang": "en",
+  "raw_text": "Easyndexer 1.0 contains an arbitrary file download vulnerability that allows unauthenticated attackers to download sensitive files by manipulating the file parameter. Attackers can send POST requests to showtif.php with arbitrary file paths in the file parameter to retrieve system files like configuration and initialization files.",
+  "severity": "HIGH",
+  "sha256_hash": "91cd00fbdbbb8835c6a2e0bdd4052b4ab8294f2f1ca247fcc223d3cc6165d674",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25178"
+}

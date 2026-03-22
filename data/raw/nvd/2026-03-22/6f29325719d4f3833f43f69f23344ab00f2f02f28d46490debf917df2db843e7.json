@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59543",
+  "ingested_at": "2026-03-22T07:54:41.227336+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.34, there is a stored cross-site scripting (XSS) vulnerability. By injecting malicious JavaScript into the course description field, an attacker with a low-privileged account (e.g., trainer) can execute arbitrary JavaScript code in the context of any other user viewing the course information page, including administrators. This allows an attacker to exfiltrate sensitive session cookies or tokens, resulting in account takeover (ATO) of higher-privileged users. This issue has been patched in version 1.11.34.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6f29325719d4f3833f43f69f23344ab00f2f02f28d46490debf917df2db843e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59543"
+}

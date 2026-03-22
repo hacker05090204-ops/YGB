@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29778",
+  "ingested_at": "2026-03-22T07:54:41.865905+00:00",
+  "lang": "en",
+  "raw_text": "pyLoad is a free and open-source download manager written in Python. From version 0.5.0b3.dev13 to 0.5.0b3.dev96, the edit_package() function implements insufficient sanitization for the pack_folder parameter. The current protection relies on a single-pass string replacement of \"../\", which can be bypassed using crafted recursive traversal sequences. This issue has been patched in version 0.5.0b3.dev97.",
+  "severity": "HIGH",
+  "sha256_hash": "df0c45a98655ec872cbea3b34b2c3da39e23d90ace96bdbde528436c9519ad74",
+  "source": "nvd",
+  "tags": [
+    "CWE-23"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29778"
+}

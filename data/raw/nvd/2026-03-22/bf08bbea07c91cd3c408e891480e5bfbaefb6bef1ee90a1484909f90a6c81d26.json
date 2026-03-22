@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-70327",
+  "ingested_at": "2026-03-22T07:54:31.185527+00:00",
+  "lang": "en",
+  "raw_text": "TOTOLINK X5000R v9.1.0cu_2415_B20250515 contains an argument injection vulnerability in the setDiagnosisCfg handler of the /usr/sbin/lighttpd executable. The ip parameter is retrieved via websGetVar and passed to a ping command through CsteSystem without validating if the input starts with a hyphen (-). This allows remote authenticated attackers to inject arbitrary command-line options into the ping utility, potentially leading to a Denial of Service (DoS) by causing excessive resource consumption or prolonged execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bf08bbea07c91cd3c408e891480e5bfbaefb6bef1ee90a1484909f90a6c81d26",
+  "source": "nvd",
+  "tags": [
+    "CWE-88",
+    "CWE-400"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70327"
+}

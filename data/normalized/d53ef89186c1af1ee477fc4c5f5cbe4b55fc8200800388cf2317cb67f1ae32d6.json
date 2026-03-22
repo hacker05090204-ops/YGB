@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chromium Intents Google Chromium Intents contains an insufficient validation of untrusted input vulnerability that allows a remote attacker to browse to a malicious website via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "token_count": 51
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1805",
+  "ingested_at": "2026-03-22T07:54:41.797273+00:00",
+  "lang": "en",
+  "raw_text": "The DA Media GigList plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's damedia_giglist shortcode in all versions up to, and including, 1.9.0 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4d35591adaea86f3f45268f6afcf79ca34c370d7dc19c9545b414b088e5b513d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1805"
+}

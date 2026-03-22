@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe ColdFusion contains a deserialization vulnerability in the Apache BlazeDS library that allows for arbitrary code execution.",
+  "token_count": 19
+}

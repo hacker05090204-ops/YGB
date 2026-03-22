@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware versions prior to V300SP10260209 store a user password in a client-side cookie as a Base64-encoded value accessible via the web interface. Because Base64 is reversible and provides no confidentiality, an attacker who can access the cookie value can recover the plaintext password.",
+  "token_count": 47
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67829",
+  "ingested_at": "2026-03-22T07:54:47.498388+00:00",
+  "lang": "en",
+  "raw_text": "Mura before 10.1.14 allows beanFeed.cfc getQuery sortDirection SQL injection.",
+  "severity": "CRITICAL",
+  "sha256_hash": "81dea486791bf689d68451c0bd9b046ae96ce5c62d401a47acdc0b3d65ae53cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 9,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67829"
+}

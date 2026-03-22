@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8298",
+  "ingested_at": "2026-03-22T07:45:18.525866+00:00",
+  "lang": "en",
+  "raw_text": "ChakraCore ChakraCore scripting engine The ChakraCore scripting engine contains a type confusion vulnerability which can allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b26fd9fbdb0988464b8ec1e34c2ab458d69e70a845445ad68a45d757c7d2c165",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

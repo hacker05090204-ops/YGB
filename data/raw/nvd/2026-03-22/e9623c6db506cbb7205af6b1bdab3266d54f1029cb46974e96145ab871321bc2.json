@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68515",
+  "ingested_at": "2026-03-22T07:54:39.971214+00:00",
+  "lang": "en",
+  "raw_text": "Insertion of Sensitive Information Into Sent Data vulnerability in Roland Murg WP Booking System wp-booking-system allows Retrieve Embedded Sensitive Data.This issue affects WP Booking System: from n/a through < = 2.0.19.12.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e9623c6db506cbb7205af6b1bdab3266d54f1029cb46974e96145ab871321bc2",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68515"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-2094",
+  "ingested_at": "2026-03-22T07:45:17.643066+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel fails to check all 64 bits of attr.config passed by user space, resulting to out-of-bounds access of the perf_swevent_enabled array in sw_perf_event_destroy(). Explotation allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "09f380bbdf1f54cbcfe1b9cff9073e694d6c88e39196c53dbbecb695a474beaa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

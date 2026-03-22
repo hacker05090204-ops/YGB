@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0159",
+  "ingested_at": "2026-03-22T07:45:18.544252+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS Software and Cisco IOS XE Software A vulnerability in the implementation of Internet Key Exchange Version 1 (IKEv1) functionality in Cisco IOS Software and Cisco IOS XE Software could allow an unauthenticated, remote attacker to cause an affected device to reload, resulting in a denial-of-service (DoS) condition.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f1dc7332b81af3fd415207cdde1c376ae48e3d2ba8a00bc64c10549c3d3d1f26",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

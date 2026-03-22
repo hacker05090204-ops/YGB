@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-0282",
+  "ingested_at": "2026-03-22T07:45:16.648763+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Connect Secure, Policy Secure, and ZTA Gateways Ivanti Connect Secure, Policy Secure, and ZTA Gateways contain a stack-based buffer overflow which can lead to unauthenticated remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "35a75541a05720b6c89ff49269b61d752832b6550bd793721e1bdbf1d2aedb63",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

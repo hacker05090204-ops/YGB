@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-37042",
+  "ingested_at": "2026-03-22T07:45:17.722841+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains an authentication bypass vulnerability in MailboxImportServlet. This vulnerability was chained with CVE-2022-27925 which allows for unauthenticated remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c30805660c73c33791b91ffd44a694a03920cd4b41612e271dde01aa69c56f64",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

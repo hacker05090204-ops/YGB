@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25578",
+  "ingested_at": "2026-03-22T07:54:49.554814+00:00",
+  "lang": "en",
+  "raw_text": "phpTransformer 2016.9 contains an SQL injection vulnerability that allows remote attackers to execute arbitrary SQL queries by injecting malicious code through the idnews parameter. Attackers can send crafted GET requests to GeneratePDF.php with SQL payloads in the idnews parameter to extract sensitive database information or manipulate queries.",
+  "severity": "HIGH",
+  "sha256_hash": "fd347381ff4f72d42cd0e0df5e6efba5b28253e0040d1cd5ed2a828155cbc4f0",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25578"
+}

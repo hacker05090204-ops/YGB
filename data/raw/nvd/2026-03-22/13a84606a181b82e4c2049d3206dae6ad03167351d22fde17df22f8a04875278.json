@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3439",
+  "ingested_at": "2026-03-22T07:54:34.440372+00:00",
+  "lang": "en",
+  "raw_text": "A post-authentication Stack-based Buffer Overflow vulnerability in SonicOS certificate handling allows a remote attacker to crash a firewall.",
+  "severity": "MEDIUM",
+  "sha256_hash": "13a84606a181b82e4c2049d3206dae6ad03167351d22fde17df22f8a04875278",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3439"
+}

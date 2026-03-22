@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4239",
+  "ingested_at": "2026-03-22T07:54:46.799643+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Lagom WHMCS Template up to 2.3.7. Impacted is an unknown function of the component Datatables. The manipulation results in improperly controlled modification of object prototype attributes. It is possible to launch the attack remotely. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "c87aed63bbc0ae61749024b8028cad90d80be62cf1f4e4f1a8a817341ad6dcc1",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-1321"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4239"
+}

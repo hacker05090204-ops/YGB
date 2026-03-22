@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-28205",
+  "ingested_at": "2026-03-22T07:45:17.446945+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and Safari WebKit contain a use-after-free vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ab59385f2094c3d82cea55df5c4d8e57ab06aa1b849ca02f0325dc1f6f27334d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 51,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

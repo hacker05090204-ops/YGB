@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Social Icons Widget & Block by WPZOOM plugin for WordPress is vulnerable to unauthorized data modification due to a missing capability check in the add_menu_item() method hooked to admin_menu in all versions up to, and including, 4.5.8. This is due to the method performing wp_insert_post() and update_post_meta() calls to create a sharing configuration without verifying the current user has administrator-level capabilities. This makes it possible for authenticated attackers, with Subscriber-level access and above, to trigger the creation of a published wpzoom-sharing configuration post with default sharing button settings, which causes social sharing buttons to be automatically injected into all post content on the frontend via the the_content filter.",
+  "token_count": 109
+}

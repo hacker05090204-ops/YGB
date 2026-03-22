@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50857",
+  "ingested_at": "2026-03-22T07:54:32.687887+00:00",
+  "lang": "en",
+  "raw_text": "ZenTaoPMS v18.11 through v21.6.beta is vulnerable to Directory Traversal in /module/ai/control.php. This allows attackers to execute arbitrary code via a crafted file upload",
+  "severity": "CRITICAL",
+  "sha256_hash": "135f3788e2a26f12918e2c452d36591f3cffa475bb2f081bdbd3901756d20281",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50857"
+}

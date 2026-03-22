@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28711",
+  "ingested_at": "2026-03-22T07:54:41.170149+00:00",
+  "lang": "en",
+  "raw_text": "Local privilege escalation due to DLL hijacking vulnerability. The following products are affected: Acronis Cyber Protect 17 (Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "94e5b597e6c4d3484075fe8f402bcc0c881f3558bc56dcb9632d9a102627d144",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28711"
+}

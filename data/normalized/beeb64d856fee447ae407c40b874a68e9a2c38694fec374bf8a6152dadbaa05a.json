@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 7.0.4, OpenEMR's HTTP client wrapper (`oeHttp`/`oeHttpRequest`) disables SSL/TLS certificate verification by default (`verify: false`), making all external HTTPS connections vulnerable to man-in-the-middle (MITM) attacks. This affects communication with government healthcare APIs and user-configurable external services, potentially exposing Protected Health Information (PHI). Version 7.0.4 fixes the issue.",
+  "token_count": 64
+}

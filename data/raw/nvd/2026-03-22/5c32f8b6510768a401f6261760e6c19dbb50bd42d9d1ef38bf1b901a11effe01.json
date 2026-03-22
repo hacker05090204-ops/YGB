@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32313",
+  "ingested_at": "2026-03-22T07:54:46.486664+00:00",
+  "lang": "en",
+  "raw_text": "xmlseclibs is a library written in PHP for working with XML Encryption and Signatures. Prior to 3.1.5, XML nodes encrypted with either aes-128-gcm, aes-192-gcm, or aes-256-gcm lack validation of the authentication tag length. An attacker can use this to brute-force an authentication tag, recover the GHASH key, and decrypt the encrypted nodes. It also allows to forge arbitrary ciphertexts without knowing the encryption key. This vulnerability is fixed in 3.1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "5c32f8b6510768a401f6261760e6c19dbb50bd42d9d1ef38bf1b901a11effe01",
+  "source": "nvd",
+  "tags": [
+    "CWE-354"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32313"
+}

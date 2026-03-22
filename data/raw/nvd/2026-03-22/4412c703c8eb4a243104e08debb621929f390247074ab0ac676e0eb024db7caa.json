@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27638",
+  "ingested_at": "2026-03-22T07:54:32.816204+00:00",
+  "lang": "en",
+  "raw_text": "Actual is a local-first personal finance tool. Prior to version 26.2.1, in multi-user mode (OpenID), the sync API endpoints (`/sync/*`) don't verify that the authenticated user owns or has access to the file being operated on. Any authenticated user can read, modify, and overwrite any other user's budget files by providing their file ID. Version 26.2.1 patches the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "4412c703c8eb4a243104e08debb621929f390247074ab0ac676e0eb024db7caa",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27638"
+}

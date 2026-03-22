@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25164",
+  "ingested_at": "2026-03-22T07:54:41.396864+00:00",
+  "lang": "en",
+  "raw_text": "EverSync 0.5 contains an arbitrary file download vulnerability that allows unauthenticated attackers to access sensitive files by requesting them directly from the files directory. Attackers can send GET requests to the files directory to download database files like db.sq3 containing application data and credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "6586469a066dfeb67b15da3df76fb1c817efe31ffe6a065668271f3ea6159b84",
+  "source": "nvd",
+  "tags": [
+    "CWE-552"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25164"
+}

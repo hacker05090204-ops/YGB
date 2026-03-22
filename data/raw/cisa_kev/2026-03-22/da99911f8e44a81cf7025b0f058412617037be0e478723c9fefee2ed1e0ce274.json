@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8243",
+  "ingested_at": "2026-03-22T07:45:19.504361+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure contains an unspecified vulnerability in the admin web interface that could allow an authenticated attacker to upload a custom template to perform code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "da99911f8e44a81cf7025b0f058412617037be0e478723c9fefee2ed1e0ce274",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31897",
+  "ingested_at": "2026-03-22T07:54:44.734406+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to 3.24.0, there is an out-of-bounds read in freerdp_bitmap_decompress_planar when SrcSize is 0. The function dereferences *srcp (which points to pSrcData) without first verifying that SrcSize >= 1. When SrcSize is 0 and pSrcData is non-NULL, this reads one byte past the end of the source buffer. This vulnerability is fixed in 3.24.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "baa959cd787784761585d0d513e3fec607ca9f558f604b2181dd9f7e59e97574",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31897"
+}

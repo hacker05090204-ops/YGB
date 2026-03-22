@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-29336",
+  "ingested_at": "2026-03-22T07:45:17.418107+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Microsoft Win32k contains an unspecified vulnerability that allows for privilege escalation up to SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c1a2c1ed1db1c41070f849358b62f89074c03cf9448ac28a357fad2ef5416917",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

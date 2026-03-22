@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23270",
+  "ingested_at": "2026-03-22T07:54:47.608707+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: net/sched: Only allow act_ct to bind to clsact/ingress qdiscs and shared blocks As Paolo said earlier [1]: \"Since the blamed commit below, classify can return TC_ACT_CONSUMED while the current skb being held by the defragmentation engine. As reported by GangMin Kim, if such packet is that may cause a UaF when the defrag engine later on tries to tuch again such packet.\" act_ct was never meant to be used in the egress path, however some users are attaching it to egress today [2]. Attempting to reach a middle ground, we noticed that, while most qdiscs are not handling TC_ACT_CONSUMED, clsact/ingress qdiscs are. With that in mind, we address the issue by only allowing act_ct to bind to clsact/ingress qdiscs and shared blocks. That way it's still possible to attach act_ct to egress (albeit only with clsact). [1] https://lore.kernel.org/netdev/674b8cbfc385c6f37fb29a1de08d8fe5c2b0fbee.1771321118.git.pabeni@redhat.com/ [2] https://lore.kernel.org/netdev/cc6bfb4a-4a2b-42d8-b9ce-7ef6644fb22b@ovn.org/",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c8befd9c1a3a962d475172aaff981e322222ab8b9baf7b6d67fbf4464352cfb5",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 150,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23270"
+}

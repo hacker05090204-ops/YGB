@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32127",
+  "ingested_at": "2026-03-22T07:54:44.015913+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, OpenEMR contains a SQL injection vulnerability in the ajax graphs library that can be exploited by authenticated attackers. The vulnerability exists due to insufficient input validation in the ajax graphs library. This vulnerability is fixed in 8.0.0.1.",
+  "severity": "HIGH",
+  "sha256_hash": "128b6b74de8dcacaaf88a94a4f25dfa7eaaeaf2318c75468792abaf2878b9081",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32127"
+}

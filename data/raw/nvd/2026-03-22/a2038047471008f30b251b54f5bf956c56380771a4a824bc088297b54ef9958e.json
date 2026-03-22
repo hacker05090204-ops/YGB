@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14142",
+  "ingested_at": "2026-03-22T07:54:33.131424+00:00",
+  "lang": "en",
+  "raw_text": "The Electric Enquiries plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'button' parameter of the electric-enquiry shortcode in all versions up to, and including, 1.1 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a2038047471008f30b251b54f5bf956c56380771a4a824bc088297b54ef9958e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14142"
+}

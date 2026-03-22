@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28256",
+  "ingested_at": "2026-03-22T07:54:44.414451+00:00",
+  "lang": "en",
+  "raw_text": "A Use of Hard-coded, Security-relevant Constants vulnerability in Trane Tracer SC, Tracer SC+, and Tracer Concierge could allow an attacker to disclose sensitive information and take over accounts.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0ec3022333bc76abba0b49f8fa7863cfb14da3270f3d055e4097d845e5e02c45",
+  "source": "nvd",
+  "tags": [
+    "CWE-547"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28256"
+}

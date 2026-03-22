@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27485",
+  "ingested_at": "2026-03-22T07:54:30.838280+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw is a personal AI assistant. In versions 2026.2.17 and below, skills/skill-creator/scripts/package_skill.py (a local helper script used when authors package skills) previously followed symlinks while building .skill archives. If an author runs this script on a crafted local skill directory containing symlinks to files outside the skill root, the resulting archive can include unintended file contents. If exploited, this vulnerability can lead to potential unintentional disclosure of local files from the packaging machine into a generated .skill artifact, but requires local execution of the packaging script on attacker-controlled skill contents. This issue has been fixed in version 2026.2.18.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2b363d6e36570f1b4d06b96ae48724b8b1e53ab968778f4242f558f5c24f8f9c",
+  "source": "nvd",
+  "tags": [
+    "CWE-61"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27485"
+}

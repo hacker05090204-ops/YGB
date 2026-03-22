@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-36584",
+  "ingested_at": "2026-03-22T07:45:17.144194+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Mark of the Web (MOTW) contains a security feature bypass vulnerability resulting in a limited loss of integrity and availability of security features.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0801c3b3cf5544ca1799b2bbbb59d086e3756ba4db2c73cb82b4b1fe356fcf1f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

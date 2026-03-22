@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2856",
+  "ingested_at": "2026-03-22T07:54:30.580126+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in D-Link DWR-M960 1.01.07. Affected by this vulnerability is the function sub_424AFC of the file /boafrm/formFilter of the component Filter Configuration Endpoint. The manipulation of the argument submit-url results in stack-based buffer overflow. The attack may be launched remotely. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "947cb10fcf0ff22ca6e64e4f7e6c0b4a1c2e0f5d40ba9993564039975ba2c022",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2856"
+}

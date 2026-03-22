@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Aspera Console 3.3.0 through 3.4.8 could allow an authenticated user to cause a denial of service in the email service due to improper control of interaction frequency.",
+  "token_count": 28
+}

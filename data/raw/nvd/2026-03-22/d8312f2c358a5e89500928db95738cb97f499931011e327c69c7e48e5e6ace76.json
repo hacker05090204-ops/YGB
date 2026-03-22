@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3172",
+  "ingested_at": "2026-03-22T07:54:32.339065+00:00",
+  "lang": "en",
+  "raw_text": "Buffer overflow in parallel HNSW index build in pgvector 0.6.0 through 0.8.1 allows a database user to leak sensitive data from other relations or crash the database server.",
+  "severity": "HIGH",
+  "sha256_hash": "d8312f2c358a5e89500928db95738cb97f499931011e327c69c7e48e5e6ace76",
+  "source": "nvd",
+  "tags": [
+    "CWE-191",
+    "CWE-787"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3172"
+}

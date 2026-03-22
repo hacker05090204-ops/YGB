@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26227",
+  "ingested_at": "2026-03-22T07:54:32.699887+00:00",
+  "lang": "en",
+  "raw_text": "VideoLAN VLC for Android prior to version 3.7.0 contains an authentication bypass in the Remote Access Server feature due to missing or insufficient rate limiting on one-time password (OTP) verification. The Remote Access Server uses a 4-digit OTP and does not enforce effective throttling or lockout within the OTP validity window, allowing an attacker with network reachability to the server to repeatedly attempt OTP verification until a valid user_session cookie is issued. Successful exploitation results in unauthorized access to the Remote Access interface, limited to media files explicitly shared by the VLC for Android user.",
+  "severity": "LOW",
+  "sha256_hash": "2d53a17e4e0dcab69a614818f04946042f42e229036f63fd1a9e867fbe831de0",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26227"
+}

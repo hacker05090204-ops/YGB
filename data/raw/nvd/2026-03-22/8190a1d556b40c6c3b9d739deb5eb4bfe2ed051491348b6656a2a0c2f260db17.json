@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31894",
+  "ingested_at": "2026-03-22T07:54:43.879975+00:00",
+  "lang": "en",
+  "raw_text": "WeGIA is a web manager for charitable institutions. In 3.6.5, The patched loadBackupDB() extracts tar.gz archives to a temporary directory using PHP's PharData class, then uses glob() and file_get_contents() to read SQL files from the extracted contents. Neither the extraction nor the file reading validates whether archive members are symbolic links. This vulnerability is fixed in 3.6.6.",
+  "severity": "HIGH",
+  "sha256_hash": "8190a1d556b40c6c3b9d739deb5eb4bfe2ed051491348b6656a2a0c2f260db17",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31894"
+}

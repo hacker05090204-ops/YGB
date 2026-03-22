@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32033",
+  "ingested_at": "2026-03-22T07:54:48.231728+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.24 contain a path traversal vulnerability where @-prefixed absolute paths bypass workspace-only file-system boundary validation due to canonicalization mismatch. Attackers can exploit this by crafting @-prefixed paths like @/etc/passwd to read files outside the intended workspace boundary when tools.fs.workspaceOnly is enabled.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a4866124e069da849f8386de6534670004de6faec073952d9f775518ad0550f8",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32033"
+}

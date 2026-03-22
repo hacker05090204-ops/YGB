@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27571",
+  "ingested_at": "2026-03-22T07:54:31.688043+00:00",
+  "lang": "en",
+  "raw_text": "NATS-Server is a High-Performance server for NATS.io, a cloud and edge native messaging system. The WebSockets handling of NATS messages handles compressed messages via the WebSockets negotiated compression. Prior to versions 2.11.2 and 2.12.3, the implementation bound the memory size of a NATS message but did not independently bound the memory consumption of the memory stream when constructing a NATS message which might then fail validation for size reasons. An attacker can use a compression bomb to cause excessive memory consumption, often resulting in the operating system terminating the server process. The use of compression is negotiated before authentication, so this does not require valid NATS credentials to exploit. The fix, present in versions 2.11.2 and 2.12.3, was to bounds the decompression to fail once the message was too large, instead of continuing on. The vulnerability only affects deployments which use WebSockets and which expose the network port to untrusted end-points.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0315751ecfd7ffc24792f2862ca715172d2e6aaefc79ae21c7b5e5bcfc0e527c",
+  "source": "nvd",
+  "tags": [
+    "CWE-409",
+    "CWE-770"
+  ],
+  "token_count": 151,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27571"
+}

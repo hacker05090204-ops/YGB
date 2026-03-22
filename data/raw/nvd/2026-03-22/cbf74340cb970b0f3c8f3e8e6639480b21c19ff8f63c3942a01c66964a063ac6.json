@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15363",
+  "ingested_at": "2026-03-22T07:54:47.381659+00:00",
+  "lang": "en",
+  "raw_text": "The Get Use APIs WordPress plugin before 2.0.10 executes imported JSON, which could allow users with a role as low as contributor to perform Cross-Site Scripting attacks under certain server configurations.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cbf74340cb970b0f3c8f3e8e6639480b21c19ff8f63c3942a01c66964a063ac6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15363"
+}

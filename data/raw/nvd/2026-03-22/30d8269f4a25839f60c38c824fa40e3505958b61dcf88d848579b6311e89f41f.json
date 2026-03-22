@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68026",
+  "ingested_at": "2026-03-22T07:54:30.078880+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Niaj Morshed LC Wizard ghl-wizard allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects LC Wizard: from n/a through < = 2.1.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "30d8269f4a25839f60c38c824fa40e3505958b61dcf88d848579b6311e89f41f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68026"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Listee theme for WordPress is vulnerable to privilege escalation in all versions up to, and including, 1.1.6. This is due to a broken validation check in the bundled listee-core plugin's user registration function that fails to properly sanitize the user_role parameter. This makes it possible for unauthenticated attackers to register as Administrator by manipulating the user_role parameter during registration.",
+  "token_count": 60
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-18935",
+  "ingested_at": "2026-03-22T07:45:19.496600+00:00",
+  "lang": "en",
+  "raw_text": "Progress Telerik UI for ASP.NET AJAX Progress Telerik UI for ASP.NET AJAX contains a deserialization of untrusted data vulnerability through RadAsyncUpload which leads to code execution on the server in the context of the w3wp.exe process.",
+  "severity": "CRITICAL",
+  "sha256_hash": "331d78d88e42e3ba7f45d9322316af86ac8f3c8e2ee96ca465c469c12f300be8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

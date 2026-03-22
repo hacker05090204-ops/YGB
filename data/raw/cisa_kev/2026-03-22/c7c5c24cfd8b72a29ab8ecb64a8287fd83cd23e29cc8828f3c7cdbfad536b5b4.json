@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-49113",
+  "ingested_at": "2026-03-22T07:45:15.886955+00:00",
+  "lang": "en",
+  "raw_text": "Roundcube Webmail RoundCube Webmail contains a deserialization of untrusted data vulnerability that allows remote code execution by authenticated users because the _from parameter in a URL is not validated in program/actions/settings/upload.php.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7c5c24cfd8b72a29ab8ecb64a8287fd83cd23e29cc8828f3c7cdbfad536b5b4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-45727",
+  "ingested_at": "2026-03-22T07:45:16.694350+00:00",
+  "lang": "en",
+  "raw_text": "North Grid Proself North Grid Proself Enterprise/Standard, Gateway, and Mail Sanitize contain an improper restriction of XML External Entity (XXE) reference vulnerability, which could allow a remote, unauthenticated attacker to conduct an XXE attack.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5ef09593d83a939badcd866f4bb86ef30c39aaa0e29e4f97ca4263a9a90dcb3d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-1273",
+  "ingested_at": "2026-03-22T07:45:18.341237+00:00",
+  "lang": "en",
+  "raw_text": "VMware Tanzu Spring Data Commons Spring Data Commons contains a property binder vulnerability which can allow an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fb422a1716ff909903d843eae199cfb8cd82ad0555c891e4aba5bced5d990df1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

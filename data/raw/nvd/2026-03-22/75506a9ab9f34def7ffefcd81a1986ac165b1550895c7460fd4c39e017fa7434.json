@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32121",
+  "ingested_at": "2026-03-22T07:54:43.998911+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, Stored XSS in prescription CSS/HTML print view via patient demographics. That finding involves server-side rendering of patient names via raw PHP echo. This finding involves client-side DOM-based rendering via jQuery .html() in a completely different component (portal/sign/assets/signer_api.js). The two share the same root cause (unsanitized patient names in patient_data), but they have different sinks, different affected components, different trigger actions, and require independent fixes. This vulnerability is fixed in 8.0.0.1.",
+  "severity": "HIGH",
+  "sha256_hash": "75506a9ab9f34def7ffefcd81a1986ac165b1550895c7460fd4c39e017fa7434",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32121"
+}

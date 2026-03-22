@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Tenda A21 1.0.0.0. This affects the function fromSetIpMacBind of the file /goform/SetIpMacBind. This manipulation of the argument list causes stack-based buffer overflow. The attack is possible to be carried out remotely. The exploit has been made available to the public and could be used for attacks.",
+  "token_count": 52
+}

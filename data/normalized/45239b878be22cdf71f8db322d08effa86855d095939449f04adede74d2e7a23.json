@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An out-of-bounds memory access (OOB) in p2r3 Bareiron commit 8e4d40 allows unauthenticated attackers to access sensitive information and cause a Denial of Service (DoS) via supplying a crafted packet.",
+  "token_count": 29
+}

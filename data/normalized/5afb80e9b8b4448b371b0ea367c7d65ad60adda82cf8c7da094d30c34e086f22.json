@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Mall 4.1 contains multiple SQL injection vulnerabilities that allow unauthenticated attackers to manipulate database queries through unvalidated parameters. Attackers can inject time-based blind SQL payloads via the 'id' parameter in index.php or the 'Email' parameter in loginaction.php to extract sensitive database information.",
+  "token_count": 44
+}

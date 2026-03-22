@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2121",
+  "ingested_at": "2026-03-22T07:54:49.327085+00:00",
+  "lang": "en",
+  "raw_text": "The Weaver Show Posts plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'add_class' parameter in all versions up to, and including, 1.8.1. This is due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with Administrator-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. This primarily affects multisite installations where Administrators do not have the unfiltered_html capability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6d8eae06fc60bac73a256991d37c05e5be3d8a7b03009317b931fd77de6ac51e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2121"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Aviatrix Controllers Aviatrix Controllers contain an OS command injection vulnerability that could allow an unauthenticated attacker to execute arbitrary code. Shell metacharacters can be sent to /v1/api in cloud_type for list_flightpath_destination_instances, or src_cloud_type for flightpath_connection_test.",
+  "token_count": 35
+}

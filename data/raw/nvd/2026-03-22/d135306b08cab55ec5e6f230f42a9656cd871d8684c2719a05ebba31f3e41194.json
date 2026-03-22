@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26478",
+  "ingested_at": "2026-03-22T07:54:34.540706+00:00",
+  "lang": "en",
+  "raw_text": "A shell command injection vulnerability in Mobvoi Tichome Mini smart speaker 012-18853 and 027-58389 allows remote attackers to send a specially crafted UDP datagram and execute arbitrary shell code as the root account.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d135306b08cab55ec5e6f230f42a9656cd871d8684c2719a05ebba31f3e41194",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26478"
+}

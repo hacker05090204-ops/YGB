@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47373",
+  "ingested_at": "2026-03-22T07:54:33.739933+00:00",
+  "lang": "en",
+  "raw_text": "Memory Corruption when accessing buffers with invalid length during TA invocation.",
+  "severity": "HIGH",
+  "sha256_hash": "eac6505b24c1bbad402686389b22750fa0ce5d983aa9076a609339cc8ed9c848",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47373"
+}

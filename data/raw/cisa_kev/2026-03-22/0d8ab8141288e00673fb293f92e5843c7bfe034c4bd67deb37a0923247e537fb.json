@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-9822",
+  "ingested_at": "2026-03-22T07:45:19.146034+00:00",
+  "lang": "en",
+  "raw_text": "DotNetNuke (DNN) DotNetNuke (DNN) DotNetNuke (DNN) contains a vulnerability that may allow for remote code execution via cookie deserialization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0d8ab8141288e00673fb293f92e5843c7bfe034c4bd67deb37a0923247e537fb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

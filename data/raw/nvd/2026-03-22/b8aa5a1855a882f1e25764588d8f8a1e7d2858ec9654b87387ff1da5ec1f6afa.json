@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2943",
+  "ingested_at": "2026-03-22T07:54:30.956195+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in SapneshNaik Student Management System up to f4b4f0928f0b5551a28ee81ae7e7fe47d9345318. This impacts an unknown function of the file index.php. Such manipulation of the argument Error leads to cross site scripting. The attack can be launched remotely. The exploit is publicly available and might be used. This product does not use versioning. This is why information about affected and unaffected releases are unavailable. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b8aa5a1855a882f1e25764588d8f8a1e7d2858ec9654b87387ff1da5ec1f6afa",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2943"
+}

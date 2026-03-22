@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2440",
+  "ingested_at": "2026-03-22T07:54:49.348802+00:00",
+  "lang": "en",
+  "raw_text": "The SurveyJS plugin for WordPress is vulnerable to Stored Cross-Site Scripting in all versions up to, and including, 2.5.3 via survey result submissions. This is due to insufficient input sanitization and output escaping. The public survey page exposes the nonce required for submission, allowing unauthenticated attackers to submit HTML-encoded payloads that are decoded and rendered as executable HTML when an administrator views survey results, leading to stored XSS in the admin context.",
+  "severity": "HIGH",
+  "sha256_hash": "78ce25d8fc86b945b200edfdf33a7ae69294f65b0217e1d5986f5a1bfbc5e0ef",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2440"
+}

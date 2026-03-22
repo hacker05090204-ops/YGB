@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59785",
+  "ingested_at": "2026-03-22T07:54:34.529302+00:00",
+  "lang": "en",
+  "raw_text": "Improper validation of API end-point in 2N Access Commander version 3.4.2 and prior allows attacker to bypass password policy for backup file encryption. This vulnerability can only be exploited after authenticating with administrator privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "1e706cf5337e7c631b1c4661e7e418e4300b9dd9b428d6c4409d626dbf9f7772",
+  "source": "nvd",
+  "tags": [
+    "CWE-1286"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59785"
+}

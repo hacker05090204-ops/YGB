@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-32046",
+  "ingested_at": "2026-03-22T07:45:17.314846+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows MSHTML Platform contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff4d1cad25435b28950233b697aa4863d12fa67042387c73f4a93820abfe1d17",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

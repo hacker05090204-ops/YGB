@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-8720",
+  "ingested_at": "2026-03-22T07:45:18.021828+00:00",
+  "lang": "en",
+  "raw_text": "WebKitGTK WebKitGTK WebKitGTK contains a memory corruption vulnerability which can allow an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "08e7cdf41d348f8a527c83d8a3a42dabcc5d735e6530b3e897f3203eabbef3d6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Aimogen Pro plugin for WordPress is vulnerable to Arbitrary Function Call that can lead to privilege escalation due to a missing capability check on the 'aiomatic_call_ai_function_realtime' function in all versions up to, and including, 2.7.5. This makes it possible for unauthenticated attackers to call arbitrary WordPress functions such as 'update_option' to update the default role for registration to administrator and enable user registration for attackers to gain administrative user access to a vulnerable site.",
+  "token_count": 75
+}

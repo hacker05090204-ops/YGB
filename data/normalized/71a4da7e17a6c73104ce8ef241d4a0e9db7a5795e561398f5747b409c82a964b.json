@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 24.0, the official docker-compose.yml publishes the memcached service on host port 11211 (0.0.0.0:11211) with no authentication, while the Dockerfile configures PHP to store all user sessions in that memcached instance. An attacker who can reach port 11211 can read, modify, or flush session data \u2014 enabling session hijacking, admin impersonation, and mass session destruction without any application-level authentication. This issue has been patched in version 24.0.",
+  "token_count": 77
+}

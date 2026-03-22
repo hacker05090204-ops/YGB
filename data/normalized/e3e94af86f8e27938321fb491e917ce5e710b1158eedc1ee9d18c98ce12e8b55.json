@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell Device Management Agent (DDMA), versions prior to 26.02, contain an Improper Check for Unusual or Exceptional Conditions vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Denial of Service.",
+  "token_count": 36
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32010",
+  "ingested_at": "2026-03-22T07:54:48.179959+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an allowlist bypass vulnerability in the safe-bin configuration when sort is manually added to tools.exec.safeBins. Attackers can invoke sort with the --compress-program flag to execute arbitrary external programs without operator approval in allowlist mode with ask=on-miss enabled.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6a097853dec053c613600d3f4ff7a0bdc0a93cdd838b1ac74876a2e62a3eb9dd",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32010"
+}

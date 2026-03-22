@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24288",
+  "ingested_at": "2026-03-22T07:54:42.696144+00:00",
+  "lang": "en",
+  "raw_text": "Heap-based buffer overflow in Windows Mobile Broadband allows an unauthorized attacker to execute code with a physical attack.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4fb531ef53c503f8b06dbe741eec9b9faccad002706d110ff6c93904132045b0",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24288"
+}

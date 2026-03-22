@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1388",
+  "ingested_at": "2026-03-22T07:45:17.460777+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Certificate Dialog contains a privilege escalation vulnerability, allowing attackers to run processes in an elevated context.",
+  "severity": "CRITICAL",
+  "sha256_hash": "afb11a99c92b9933acecc00789e0692da4776833c95faa2b10d9ee27b6c0017e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

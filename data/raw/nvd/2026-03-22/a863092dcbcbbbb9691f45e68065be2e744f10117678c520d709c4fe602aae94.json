@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28352",
+  "ingested_at": "2026-03-22T07:54:33.326119+00:00",
+  "lang": "en",
+  "raw_text": "Indico is an event management system that uses Flask-Multipass, a multi-backend authentication system for Flask. In versions prior to 3.3.11, the API endpoint used to manage event series is missing an access check, allowing unauthenticated/unauthorized access to this endpoint. The impact of this is limited to getting the metadata (title, category chain, start/end date) for events in an existing series, deleting an existing event series, and modifying an existing event series. This vulnerability does NOT allow unauthorized access to events (beyond the basic metadata mentioned above), nor any kind of tampering with user-visible data in events. Version 3.3.11 fixes the issue. As a workaround, use the webserver to restrict access to the series management API endpoint.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a863092dcbcbbbb9691f45e68065be2e744f10117678c520d709c4fe602aae94",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 116,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28352"
+}

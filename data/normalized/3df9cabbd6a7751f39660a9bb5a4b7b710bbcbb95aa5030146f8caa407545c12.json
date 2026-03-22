@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Advanced Woo Labels plugin for WordPress is vulnerable to Remote Code Execution in all versions up to, and including, 2.37. This is due to the use of `call_user_func_array()` with user-controlled callback and parameters in the `get_select_option_values()` AJAX handler without an allowlist of permitted callbacks or a capability check. This makes it possible for authenticated attackers, with Contributor-level access and above, to execute arbitrary PHP functions and operating system commands on the server via the 'callback' parameter.",
+  "token_count": 77
+}

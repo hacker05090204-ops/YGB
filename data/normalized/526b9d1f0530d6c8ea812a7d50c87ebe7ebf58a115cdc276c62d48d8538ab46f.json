@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Permission control vulnerability in the resource scheduling module. Impact: Successful exploitation of this vulnerability may affect service integrity.",
+  "token_count": 18
+}

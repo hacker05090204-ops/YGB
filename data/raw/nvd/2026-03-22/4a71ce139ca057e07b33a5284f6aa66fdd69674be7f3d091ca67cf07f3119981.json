@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22390",
+  "ingested_at": "2026-03-22T07:54:40.004573+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Generation of Code ('Code Injection') vulnerability in Builderall Builderall Builder for WordPress builderall-cheetah-for-wp allows Code Injection.This issue affects Builderall Builder for WordPress: from n/a through < = 3.0.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4a71ce139ca057e07b33a5284f6aa66fdd69674be7f3d091ca67cf07f3119981",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22390"
+}

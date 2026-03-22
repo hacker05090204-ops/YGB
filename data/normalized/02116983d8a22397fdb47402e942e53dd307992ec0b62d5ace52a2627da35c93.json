@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Barracuda Networks Email Security Gateway (ESG) Appliance Barracuda Email Security Gateway (ESG) appliance contains an improper input validation vulnerability of a user-supplied .tar file, leading to remote command injection.",
+  "token_count": 29
+}

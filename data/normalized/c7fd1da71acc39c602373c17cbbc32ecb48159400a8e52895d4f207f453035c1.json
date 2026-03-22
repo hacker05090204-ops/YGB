@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DIR-820 Router D-Link DIR-820 routers contain an OS command injection vulnerability that allows a remote, unauthenticated attacker to escalate privileges to root via a crafted payload with the ping_addr parameter to ping.ccp.",
+  "token_count": 33
+}

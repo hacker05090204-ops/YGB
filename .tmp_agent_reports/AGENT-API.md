@@ -1,0 +1,5 @@
+# AGENT-API Report
+- startup: {'ok': True, 'last': (200, '{"status":"alive","uptime_s":0.7,"boot_time":1774103489.5425174}')}
+- auth: {'no_jwt_g38': 401, 'expired_jwt_g38': 401, 'csrf_missing_approval': 403, 'valid_jwt_g38': 200, 'no_jwt_profile': 401, 'no_jwt_target_start': 401, 'no_jwt_scope_validate': 401}
+- http keys: ['/api/health', '/api/g38/status', 'seed_target', 'discover_targets', 'execution_transitions', 'approval_approve', 'approval_reject', 'voice_parse_english', 'voice_parse_hindi', 'autonomy_READ_ONLY', 'autonomy_AUTONOMOUS_FIND']
+- ws: {'ws_voice': {'status': 'failed', 'error': "WebSocketBadStatusException: Handshake status 403 Forbidden -+-+- {'date': 'Sat, 21 Mar 2026 14:31:30 GMT', 'content-length': '0', 'content-type': 'text/plain', 'connection': 'close'} -+-+- b''"}, 'ws_voice_stream': {'status': 'failed', 'error': 'WebSocketException: Invalid WebSocket Header'}}

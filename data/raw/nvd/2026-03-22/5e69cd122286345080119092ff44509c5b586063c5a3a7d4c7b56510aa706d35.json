@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1575",
+  "ingested_at": "2026-03-22T07:54:49.288594+00:00",
+  "lang": "en",
+  "raw_text": "The Schema Shortcode plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's `itemscope` shortcode in all versions up to, and including, 1.0 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5e69cd122286345080119092ff44509c5b586063c5a3a7d4c7b56510aa706d35",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1575"
+}

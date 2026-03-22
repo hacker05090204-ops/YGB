@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28724",
+  "ingested_at": "2026-03-22T07:54:41.195837+00:00",
+  "lang": "en",
+  "raw_text": "Unauthorized data access due to insufficient access control validation. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e84fe9e2d4372e566a2372b533f3fa5522127375d7a288cb38a4a5906b675461",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28724"
+}

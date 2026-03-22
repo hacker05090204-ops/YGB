@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28519",
+  "ingested_at": "2026-03-22T07:54:46.432151+00:00",
+  "lang": "en",
+  "raw_text": "arduino-TuyaOpen before version 1.2.1 contains a heap-based buffer overflow vulnerability in the DnsServer component. An attacker on the same local area network who controls the LAN DNS server can send malicious DNS responses to overflow the heap buffer, potentially allowing execution of arbitrary code on affected embedded devices.",
+  "severity": "HIGH",
+  "sha256_hash": "548be995a49e503c86059ffde5218c3d87a47066cf431875c33a4832b7718f4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28519"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20797",
+  "ingested_at": "2026-03-22T07:54:32.995562+00:00",
+  "lang": "en",
+  "raw_text": "A stack based buffer overflow exists in an API route of XWEB Pro version 1.12.1 and prior, enabling unauthenticated attackers to cause stack corruption and a termination of the program.",
+  "severity": "MEDIUM",
+  "sha256_hash": "94600c8e7974c19186e6741e98b120c3b9c8f245b84c9b2461819bb895f2c516",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20797"
+}

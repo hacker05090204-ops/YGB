@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27842",
+  "ingested_at": "2026-03-22T07:54:43.486485+00:00",
+  "lang": "en",
+  "raw_text": "Authentication bypass issue exists in MR-GM5L-S1 and MR-GM5A-L1, which may allow an attacker to bypass authentication and change the device configuration.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f013d703cb6d9b32f7aeb56f386f6abe26971a6d5ff3c1c394ccd084bbd0a828",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27842"
+}

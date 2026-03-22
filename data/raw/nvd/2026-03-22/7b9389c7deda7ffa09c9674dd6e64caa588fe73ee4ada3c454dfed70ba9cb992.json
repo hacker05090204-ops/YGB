@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30977",
+  "ingested_at": "2026-03-22T07:54:42.917041+00:00",
+  "lang": "en",
+  "raw_text": "RenderBlocking is a MediaWiki extension that allows interface administrators to specify render-blocking CSS and JavaScript. Prior to 0.1.1, there is Stored XSS in renderblocking-css with Inline Assets mode. $wgRenderBlockingInlineAssets = true and editsitecss user rights are required. This vulnerability is fixed in 0.1.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "7b9389c7deda7ffa09c9674dd6e64caa588fe73ee4ada3c454dfed70ba9cb992",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30977"
+}

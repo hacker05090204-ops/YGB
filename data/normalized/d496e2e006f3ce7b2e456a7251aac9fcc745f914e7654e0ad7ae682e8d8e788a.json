@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Notepad++ Notepad++ Notepad++ when using the WinGUp updater, contains a download of code without integrity check vulnerability that could allow an attacker to intercept or redirect update traffic to download and execute an attacker-controlled installer. This could lead to arbitrary code execution with the privileges of the user.",
+  "token_count": 48
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3287",
+  "ingested_at": "2026-03-22T07:54:33.053462+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in youlaitech youlai-mall 2.0.0. This affects the function listPagedSpuForApp of the file mall-pms/pms-boot/src/main/java/com/youlai/mall/pms/controller/app/SpuController.java of the component App-side Product Pagination Endpoint. Performing a manipulation of the argument sortField/sort results in sql injection. Remote exploitation of the attack is possible. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "052d1a693322c796c8d99a393c179a4fdcfaa68deb59a86971a787e4bbb5791a",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3287"
+}

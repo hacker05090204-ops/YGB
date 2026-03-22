@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Fusion Middleware Oracle Fusion Middleware contains a missing authentication for critical function vulnerability, allowing unauthenticated remote attackers to take over Identity Manager.",
+  "token_count": 23
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2352",
+  "ingested_at": "2026-03-22T07:54:49.134739+00:00",
+  "lang": "en",
+  "raw_text": "The Autoptimize plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'ao_post_preload' meta value in all versions up to, and including, 3.1.14. This is due to insufficient input sanitization in the `ao_metabox_save()` function and missing output escaping when the value is rendered into a ` ` tag in `autoptimizeImages.php`. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page, granted the \"Image optimization\" or \"Lazy-load images\" setting is enabled in the plugin configuration.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a282ab0b26947b4ff1805b4261879c94a38c4a16cdc2d57b264b6086ff4cdbaa",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2352"
+}

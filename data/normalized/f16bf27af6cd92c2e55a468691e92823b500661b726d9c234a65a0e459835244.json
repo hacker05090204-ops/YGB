@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Belkin F9K1122 1.00.33. This affects the function formReboot of the file /goform/formReboot. This manipulation of the argument webpage causes stack-based buffer overflow. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 58
+}

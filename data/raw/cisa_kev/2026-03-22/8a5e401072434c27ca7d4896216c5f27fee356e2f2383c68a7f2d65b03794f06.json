@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-0752",
+  "ingested_at": "2026-03-22T07:45:18.376127+00:00",
+  "lang": "en",
+  "raw_text": "Rails Ruby on Rails Directory traversal vulnerability in Action View in Ruby on Rails allows remote attackers to read arbitrary files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8a5e401072434c27ca7d4896216c5f27fee356e2f2383c68a7f2d65b03794f06",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

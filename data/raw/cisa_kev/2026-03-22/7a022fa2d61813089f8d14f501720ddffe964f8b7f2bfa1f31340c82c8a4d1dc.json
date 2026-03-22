@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-22226",
+  "ingested_at": "2026-03-22T07:45:16.540276+00:00",
+  "lang": "en",
+  "raw_text": "VMware ESXi, Workstation, and Fusion VMware ESXi, Workstation, and Fusion contain an information disclosure vulnerability due to an out-of-bounds read in HGFS. Successful exploitation allows an attacker with administrative privileges to a virtual machine to leak memory from the vmx process.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7a022fa2d61813089f8d14f501720ddffe964f8b7f2bfa1f31340c82c8a4d1dc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

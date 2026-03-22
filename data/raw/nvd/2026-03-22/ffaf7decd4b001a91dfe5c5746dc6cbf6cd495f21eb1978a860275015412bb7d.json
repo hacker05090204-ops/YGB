@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31814",
+  "ingested_at": "2026-03-22T07:54:44.716410+00:00",
+  "lang": "en",
+  "raw_text": "Yamux is a stream multiplexer over reliable, ordered connections such as TCP/IP. From 0.13.0 to before 0.13.9, a specially crafted WindowUpdate can cause arithmetic overflow in send-window accounting, which triggers a panic in the connection state machine. This is remotely reachable over a normal network connection and does not require authentication. This vulnerability is fixed in 0.13.9.",
+  "severity": "HIGH",
+  "sha256_hash": "ffaf7decd4b001a91dfe5c5746dc6cbf6cd495f21eb1978a860275015412bb7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-190"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31814"
+}

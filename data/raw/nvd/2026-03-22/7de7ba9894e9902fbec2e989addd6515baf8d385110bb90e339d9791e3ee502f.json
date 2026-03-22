@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25566",
+  "ingested_at": "2026-03-22T07:54:49.525746+00:00",
+  "lang": "en",
+  "raw_text": "TransMac 12.3 contains a buffer overflow vulnerability in the volume name field that allows local attackers to crash the application by supplying an excessively long string. Attackers can create a malicious file with 1000 repeated characters, paste the content into the volume name field during disk image creation, and trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7de7ba9894e9902fbec2e989addd6515baf8d385110bb90e339d9791e3ee502f",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25566"
+}

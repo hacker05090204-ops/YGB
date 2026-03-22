@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The WPBookit plugin for WordPress is vulnerable to unauthorized data disclosure due to a missing authorization check on the 'get_customer_list' route in all versions up to, and including, 1.0.8. This makes it possible for unauthenticated attackers to retrieve sensitive customer information including names, emails, phone numbers, dates of birth, and gender.",
+  "token_count": 51
+}

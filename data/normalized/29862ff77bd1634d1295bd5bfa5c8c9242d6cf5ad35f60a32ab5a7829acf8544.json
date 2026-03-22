@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in code-projects Online Reviewer System 1.0. Impacted is an unknown function of the file /system/system/students/assessments/results/studentresult-view.php. The manipulation of the argument test_id results in sql injection. It is possible to launch the attack remotely. The exploit has been made public and could be used.",
+  "token_count": 47
+}

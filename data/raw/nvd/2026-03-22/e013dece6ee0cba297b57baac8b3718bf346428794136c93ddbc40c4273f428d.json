@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32349",
+  "ingested_at": "2026-03-22T07:54:45.907881+00:00",
+  "lang": "en",
+  "raw_text": "Server-Side Request Forgery (SSRF) vulnerability in Andy Fragen Embed PDF Viewer embed-pdf-viewer allows Server Side Request Forgery.This issue affects Embed PDF Viewer: from n/a through < = 2.4.7.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e013dece6ee0cba297b57baac8b3718bf346428794136c93ddbc40c4273f428d",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32349"
+}

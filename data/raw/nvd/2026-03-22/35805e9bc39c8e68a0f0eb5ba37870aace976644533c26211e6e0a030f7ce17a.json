@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27452",
+  "ingested_at": "2026-03-22T07:54:30.800123+00:00",
+  "lang": "en",
+  "raw_text": "ASN.1 TypeScript ESM library, including codecs for Basic Encoding Rules (BER) and Distinguished Encoding Rules (DER). In versions 11.0.5 and below, in some cases, decoding an INTEGER could leak the underlying ArrayBuffer. This issue is expected to be fixed in version 11.0.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "35805e9bc39c8e68a0f0eb5ba37870aace976644533c26211e6e0a030f7ce17a",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27452"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41765",
+  "ingested_at": "2026-03-22T07:54:42.209240+00:00",
+  "lang": "en",
+  "raw_text": "Due to insufficient authorization enforcement, an unauthorized remote attacker can exploit the wwwupload.cgi endpoint to upload and apply arbitrary data. This includes, but is not limited to, contact images, HTTPS certificates, system backups for restoration, server peer configurations, and BACnet/SC server certificates and keys.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6259c75e466a42ef5f94bf5b6a340af33ec1752ccf186148285cf5312bc49d73",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41765"
+}

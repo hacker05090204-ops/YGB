@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4111",
+  "ingested_at": "2026-03-22T07:54:46.203212+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was identified in the RAR5 archive decompression logic of the libarchive library, specifically within the archive_read_data() processing path. When a specially crafted RAR5 archive is processed, the decompression routine may enter a state where internal logic prevents forward progress. This condition results in an infinite loop that continuously consumes CPU resources. Because the archive passes checksum validation and appears structurally valid, affected applications cannot detect the issue before processing. This can allow attackers to cause persistent denial-of-service conditions in services that automatically process archives.",
+  "severity": "HIGH",
+  "sha256_hash": "8b8071eb20f11d996f01516983163b39d1e188d659681d99b56e745b7ff31fa5",
+  "source": "nvd",
+  "tags": [
+    "CWE-835"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4111"
+}

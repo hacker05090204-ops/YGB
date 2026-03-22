@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24908",
+  "ingested_at": "2026-03-22T07:54:32.235089+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, an SQL injection vulnerability in the Patient REST API endpoint allows authenticated users with API access to execute arbitrary SQL queries through the `_sort` parameter. This could potentially lead to database access, PHI (Protected Health Information) exposure, and credential compromise. The issue occurs when user-supplied sort field names are used in ORDER BY clauses without proper validation or identifier escaping. Version 8.0.0 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "92178147b52269da6e7a133ed564dd4b23051effdde61ace5eea584b9b078135",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24908"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28216",
+  "ingested_at": "2026-03-22T07:54:32.838394+00:00",
+  "lang": "en",
+  "raw_text": "hoppscotch is an open source API development ecosystem. Prior to version 2026.2.0, any logged-in user can read, modify or delete another user's personal environment by ID. `user-environments.resolver.ts:82-109`, `updateUserEnvironment` mutation uses `@UseGuards(GqlAuthGuard)` but is missing the `@GqlUser()` decorator entirely. The user's identity is never extracted, so the service receives only the environment ID and performs a `prisma.userEnvironment.update({ where: { id } })` without any ownership filter. `deleteUserEnvironment` does extract the user but the service only uses the UID to check if the target is a global environment. Actual delete query uses WHERE { id } without AND userUid. hoppscotch environments store API keys, auth tokens and secrets used in API requests. An authenticated attacker who obtains another user's environment ID can read their secrets, replace them with malicious values or delete them entirely. The environment ID format is CUID, which limits mass exploitation but insider threat and combined info leak scenarios are realistic. Version 2026.2.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "ced4b3a18f55e0ead4d4da464f2b7d8399a6d70e35332fa3af1e8b2bc668a35e",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 157,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28216"
+}

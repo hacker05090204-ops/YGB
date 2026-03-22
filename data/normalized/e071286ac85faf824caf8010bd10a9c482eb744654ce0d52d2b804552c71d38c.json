@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in wren-lang wren up to 0.4.0. Affected is the function resolveLocal of the file src/vm/wren_compiler.c. The manipulation results in uncontrolled recursion. Attacking locally is a requirement. The exploit is now public and may be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "token_count": 56
+}

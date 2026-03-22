@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains a use-after-free vulnerability that allows for privilege escalation to gain ring0 access from the system user.",
+  "token_count": 21
+}

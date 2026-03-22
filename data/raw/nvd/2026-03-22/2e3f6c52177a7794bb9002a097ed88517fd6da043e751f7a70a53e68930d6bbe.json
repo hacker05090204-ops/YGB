@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28680",
+  "ingested_at": "2026-03-22T07:54:41.288761+00:00",
+  "lang": "en",
+  "raw_text": "Ghostfolio is an open source wealth management software. Prior to version 2.245.0, an attacker can exploit the manual asset import feature to perform a full-read SSRF, allowing them to exfiltrate sensitive cloud metadata (IMDS) or probe internal network services. This issue has been patched in version 2.245.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2e3f6c52177a7794bb9002a097ed88517fd6da043e751f7a70a53e68930d6bbe",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28680"
+}

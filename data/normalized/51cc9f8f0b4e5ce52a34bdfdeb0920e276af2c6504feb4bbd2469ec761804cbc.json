@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mura before 10.1.14 allows beanFeed.cfc getQuery sortby SQL injection.",
+  "token_count": 9
+}

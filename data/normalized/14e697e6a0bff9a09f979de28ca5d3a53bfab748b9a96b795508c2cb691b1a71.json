@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a use-after-free vulnerability. This vulnerability allows for memory corruption while rendering graphics using Adreno GPU drivers in Chrome.",
+  "token_count": 25
+}

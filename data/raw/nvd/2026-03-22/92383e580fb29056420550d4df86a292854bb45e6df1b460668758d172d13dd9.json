@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28408",
+  "ingested_at": "2026-03-22T07:54:33.347863+00:00",
+  "lang": "en",
+  "raw_text": "WeGIA is a web manager for charitable institutions. Prior to version 3.6.5, the script in adicionar_tipo_docs_atendido.php does not go through the project's central controller and does not have its own authentication and permission checks. A malicious user could make a request through tools like Postman or the file's URL on the web to access features exclusive to employees. The vulnerability allows external parties to inject unauthorized data in massive quantities into the application server's storage. Version 3.6.5 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "92383e580fb29056420550d4df86a292854bb45e6df1b460668758d172d13dd9",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-862"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28408"
+}

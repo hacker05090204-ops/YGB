@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Seerr is an open-source media request and discovery manager for Jellyfin, Plex, and Emby. A missing authorization vulnerability has been identified in the application starting in version 2.7.0 and prior to version 3.1.0. It allows authenticated users to access and modify data belonging to other users. This issue is due to the absence of the `isOwnProfileOrAdmin()` middleware on several push subscription API routes. Version 3.1.0 fixes the issue.",
+  "token_count": 68
+}

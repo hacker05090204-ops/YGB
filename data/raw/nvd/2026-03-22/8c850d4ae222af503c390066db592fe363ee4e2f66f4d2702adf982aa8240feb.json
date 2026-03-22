@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27513",
+  "ingested_at": "2026-03-22T07:54:31.142944+00:00",
+  "lang": "en",
+  "raw_text": "Shenzhen Tenda F3 Wireless Router firmware V12.01.01.55_multi contains a cross-site request forgery (CSRF) vulnerability in the web-based administrative interface. The interface does not implement anti-CSRF protections, allowing an attacker to induce an authenticated administrator to submit state-changing requests, which can result in unauthorized configuration changes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8c850d4ae222af503c390066db592fe363ee4e2f66f4d2702adf982aa8240feb",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27513"
+}

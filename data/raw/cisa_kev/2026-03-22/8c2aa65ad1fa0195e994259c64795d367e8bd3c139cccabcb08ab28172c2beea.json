@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-33044",
+  "ingested_at": "2026-03-22T07:45:16.865188+00:00",
+  "lang": "en",
+  "raw_text": "Dahua IP Camera Firmware Dahua IP cameras and related products contain an authentication bypass vulnerability when the NetKeyboard type argument is specified by the client during authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8c2aa65ad1fa0195e994259c64795d367e8bd3c139cccabcb08ab28172c2beea",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The OpenID Connect (OIDC) authentication configuration in PowerShell Universal before 2026.1.3 stores the OIDC client secret in cleartext in the .universal/authentication.ps1 script, which allows an attacker with read access to that file to obtain the OIDC client credentials",
+  "token_count": 38
+}

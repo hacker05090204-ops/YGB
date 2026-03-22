@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Freedom Factory dGEN1 up to 20260221. Affected is an unknown function of the component com.dgen.alarm. Performing a manipulation results in improper authorization. The attack requires a local approach. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 57
+}

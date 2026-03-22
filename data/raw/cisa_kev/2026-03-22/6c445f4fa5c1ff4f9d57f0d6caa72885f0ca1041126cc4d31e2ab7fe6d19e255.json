@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-38000",
+  "ingested_at": "2026-03-22T07:45:19.225274+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Intents Google Chromium Intents contains an improper input validation vulnerability that allows a remote attacker to arbitrarily browser to a malicious URL via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6c445f4fa5c1ff4f9d57f0d6caa72885f0ca1041126cc4d31e2ab7fe6d19e255",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A heap-based buffer overflow vulnerability exists in the Intan CLP parsing functionality of The Biosig Project libbiosig 3.9.2 and Master Branch (db9a9a63). A specially crafted Intan CLP file can lead to arbitrary code execution. An attacker can provide a malicious file to trigger this vulnerability.",
+  "token_count": 45
+}

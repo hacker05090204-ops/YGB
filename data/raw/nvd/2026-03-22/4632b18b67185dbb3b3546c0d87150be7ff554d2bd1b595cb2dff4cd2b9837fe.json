@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28562",
+  "ingested_at": "2026-03-22T07:54:33.426495+00:00",
+  "lang": "en",
+  "raw_text": "wpForo 2.4.14 contains an unauthenticated SQL injection vulnerability in Topics::get_topics() where the ORDER BY clause relies on ineffective esc_sql() sanitization on unquoted identifiers. Attackers exploit the wpfob parameter with CASE WHEN payloads to perform blind boolean extraction of credentials from the WordPress database.",
+  "severity": "HIGH",
+  "sha256_hash": "4632b18b67185dbb3b3546c0d87150be7ff554d2bd1b595cb2dff4cd2b9837fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28562"
+}

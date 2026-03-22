@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The TP2WP Importer plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'Watched domains' textarea on the attachment importer settings page in all versions up to, and including, 1.1. This is due to insufficient input sanitization and output escaping when domains are saved via AJAX and rendered with echo implode() without esc_textarea(). This makes it possible for authenticated attackers, with Administrator-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses the attachment importer settings page.",
+  "token_count": 85
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50191",
+  "ingested_at": "2026-03-22T07:54:33.611974+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, there is an error-based SQL Injection via POST userFile with the /main/exercise/hotpotatoes.php script. This issue has been patched in version 1.11.30.",
+  "severity": "HIGH",
+  "sha256_hash": "2f76f9f69d76d791fdbef40431f0286438b9928c4fc173e342d93671a193aa7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50191"
+}

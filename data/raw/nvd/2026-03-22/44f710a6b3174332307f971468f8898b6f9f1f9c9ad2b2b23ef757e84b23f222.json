@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69379",
+  "ingested_at": "2026-03-22T07:54:30.262175+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in vanquish Upload Files Anywhere wp-upload-files-anywhere allows Path Traversal.This issue affects Upload Files Anywhere: from n/a through < = 2.8.",
+  "severity": "HIGH",
+  "sha256_hash": "44f710a6b3174332307f971468f8898b6f9f1f9c9ad2b2b23ef757e84b23f222",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69379"
+}

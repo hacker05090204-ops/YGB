@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29608",
+  "ingested_at": "2026-03-22T07:54:47.804883+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw 2026.3.1 contains an approval integrity vulnerability in system.run node-host execution where argv rewriting changes command semantics. Attackers can place malicious local scripts in the working directory to execute unintended code despite operator approval of different command text.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aa66539da8f65062e7b45137ff2414835eea47913b7a4a0464d9921956bd1b9c",
+  "source": "nvd",
+  "tags": [
+    "CWE-88"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29608"
+}

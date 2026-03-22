@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ERP is a free and open source Enterprise Resource Planning tool. In versions prior to 16.8.0 and 15.100.0, certain endpoints were vulnerable to time-based and boolean-based blind SQL injection due to insufficient parameter validation, allowing attackers to infer database information. This issue has been fixed in versions 15.100.0 and 16.8.0.",
+  "token_count": 50
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Same-origin policy bypass in the CSS Parsing and Computation component. This vulnerability affects Firefox < 148.0.2.",
+  "token_count": 16
+}

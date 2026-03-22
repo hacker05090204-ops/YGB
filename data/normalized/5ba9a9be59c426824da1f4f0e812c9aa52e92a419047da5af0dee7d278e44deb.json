@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Local privilege escalation due to insecure Unix socket permissions. The following products are affected: Acronis Cyber Protect 17 (macOS) before build 41186, Acronis Cyber Protect Cloud Agent (macOS) before build 41124.",
+  "token_count": 31
+}

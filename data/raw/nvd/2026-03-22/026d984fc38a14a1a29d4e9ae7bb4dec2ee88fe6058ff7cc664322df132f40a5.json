@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3192",
+  "ingested_at": "2026-03-22T07:54:32.196226+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Chia Blockchain 2.1.0. This issue affects the function _authenticate of the file rpc_server_base.py of the component RPC Credential Handler. The manipulation leads to improper authentication. The attack is possible to be carried out remotely. The attack is considered to have high complexity. The exploitability is assessed as difficult. The exploit has been disclosed publicly and may be used. The vendor was informed early via email. A separate report via bugbounty was rejected with the reason \"This is by design. The user is responsible for host security\".",
+  "severity": "MEDIUM",
+  "sha256_hash": "026d984fc38a14a1a29d4e9ae7bb4dec2ee88fe6058ff7cc664322df132f40a5",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-306"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3192"
+}

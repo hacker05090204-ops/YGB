@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1074",
+  "ingested_at": "2026-03-22T07:54:41.782757+00:00",
+  "lang": "en",
+  "raw_text": "The WP App Bar plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'app-bar-features' parameter in all versions up to, and including, 1.5. This is due to insufficient input sanitization and output escaping combined with a missing authorization check in the `App_Bar_Settings` class constructor. This makes it possible for unauthenticated attackers to inject arbitrary web scripts into multiple plugin settings that will execute whenever a user accesses the admin settings page.",
+  "severity": "HIGH",
+  "sha256_hash": "414c18f24e5ace89665d9fa76e60c3eff3014e60d0cd92223c7fd5686c4223b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1074"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33427",
+  "ingested_at": "2026-03-22T07:54:49.154790+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, an unauthenticated attacker can cause a legitimate Discourse authorization page to display an attacker-controlled domain, facilitating social engineering attacks against users. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0d2c9e0d7767b967641b8afe6857602ee24a3a09a61ba8feb28270d6affa0995",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33427"
+}

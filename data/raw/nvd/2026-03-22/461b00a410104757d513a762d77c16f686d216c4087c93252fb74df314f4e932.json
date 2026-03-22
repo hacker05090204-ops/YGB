@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25131",
+  "ingested_at": "2026-03-22T07:54:31.850321+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, a Broken Access Control vulnerability exists in the OpenEMR order types management system, allowing low-privilege users (such as Receptionist) to add and modify procedure types without proper authorization. This vulnerability is present in the /openemr/interface/orders/types_edit.php endpoint. Version 8.0.0 contains a patch.",
+  "severity": "HIGH",
+  "sha256_hash": "461b00a410104757d513a762d77c16f686d216c4087c93252fb74df314f4e932",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25131"
+}

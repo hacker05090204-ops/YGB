@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell ThinOS 10 versions prior to ThinOS 2602_10.0573, contain an Improper Neutralization of Special Elements used in a Command ('Command Injection') vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Elevation of Privileges.",
+  "token_count": 39
+}

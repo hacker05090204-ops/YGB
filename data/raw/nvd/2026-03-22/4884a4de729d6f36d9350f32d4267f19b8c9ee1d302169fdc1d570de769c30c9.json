@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25485",
+  "ingested_at": "2026-03-22T07:54:43.837216+00:00",
+  "lang": "en",
+  "raw_text": "R 3.4.4 on Windows x64 contains a buffer overflow vulnerability in the GUI Preferences language menu field that allows local attackers to bypass DEP and ASLR protections. Attackers can inject a crafted payload through the Language for menus preference to trigger a structured exception handler chain pivot and execute arbitrary shellcode with application privileges.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4884a4de729d6f36d9350f32d4267f19b8c9ee1d302169fdc1d570de769c30c9",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25485"
+}

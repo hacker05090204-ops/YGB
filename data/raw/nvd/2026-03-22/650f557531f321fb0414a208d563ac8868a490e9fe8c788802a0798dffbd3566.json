@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25540",
+  "ingested_at": "2026-03-22T07:54:44.350027+00:00",
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Mall 4.1 contains multiple SQL injection vulnerabilities that allow unauthenticated attackers to manipulate database queries by injecting SQL code through various parameters. Attackers can craft malicious requests with SQL payloads to extract sensitive database information including user credentials and system data.",
+  "severity": "HIGH",
+  "sha256_hash": "650f557531f321fb0414a208d563ac8868a490e9fe8c788802a0798dffbd3566",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25540"
+}

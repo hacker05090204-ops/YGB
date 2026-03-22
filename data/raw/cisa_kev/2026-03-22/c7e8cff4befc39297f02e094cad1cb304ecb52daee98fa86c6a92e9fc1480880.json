@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-7201",
+  "ingested_at": "2026-03-22T07:45:18.220127+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Edge The Chakra JavaScript scripting engine in Microsoft Edge allows remote attackers to execute remote code or cause a denial of service (memory corruption) via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7e8cff4befc39297f02e094cad1cb304ecb52daee98fa86c6a92e9fc1480880",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

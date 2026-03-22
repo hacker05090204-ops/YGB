@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain an integer overflow vulnerability due to memory corruption in Graphics Linux while assigning shared virtual memory region during IOCTL call.",
+  "token_count": 27
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30972",
+  "ingested_at": "2026-03-22T07:54:43.202337+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior o 9.5.2-alpha.10 and 8.6.23, Parse Server's rate limiting middleware is applied at the Express middleware layer, but the batch request endpoint (/batch) processes sub-requests internally by routing them directly through the Promise router, bypassing Express middleware including rate limiting. An attacker can bundle multiple requests targeting a rate-limited endpoint into a single batch request to circumvent the configured rate limit. Any Parse Server deployment that relies on the built-in rate limiting feature is affected. This vulnerability is fixed in 9.5.2-alpha.10 and 8.6.23.",
+  "severity": "HIGH",
+  "sha256_hash": "0b56f6d9f4d2b7a866aed51f81634472df9e12e82cff972d1de3669d5b5df9dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-799"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30972"
+}

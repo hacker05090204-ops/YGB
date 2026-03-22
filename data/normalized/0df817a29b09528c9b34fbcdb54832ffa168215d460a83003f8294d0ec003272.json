@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Java SE The default Java security properties configuration did not restrict access to the com.sun.org.glassfish.external and com.sun.org.glassfish.gmbal packages. An untrusted Java application or applet could use these flaws to bypass Java sandbox restrictions.",
+  "token_count": 34
+}

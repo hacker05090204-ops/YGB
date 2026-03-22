@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32890",
+  "ingested_at": "2026-03-22T07:54:48.521546+00:00",
+  "lang": "en",
+  "raw_text": "Anchorr is a Discord bot for requesting movies and TV shows and receiving notifications when items are added to a media server. In versions 1.4.1 and below, a stored Cross-site Scripting (XSS) vulnerability in the web dashboard's User Mapping dropdown allows any unprivileged Discord user in the configured guild to execute arbitrary JavaScript in the Anchorr admin's browser. By chaining this with the GET /api/config endpoint (which returns all secrets in plaintext), an attacker can exfiltrate every credential stored in Anchorr which includes DISCORD_TOKEN, JELLYFIN_API_KEY, JELLYSEERR_API_KEY, JWT_SECRET, WEBHOOK_SECRET, and bcrypt password hashes without any authentication to Anchorr itself. This issue has been fixed in version 1.4.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "968d4499ca33c43b48620e1a2299d90a3f0bb08355a85120ffa0d707cab35de6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-200"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32890"
+}

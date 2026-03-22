@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GNU Bourne-Again Shell (Bash) GNU Bash through 4.3 processes trailing strings after function definitions in the values of environment variables, which allows remote attackers to execute code. This CVE correctly remediates the vulnerability in CVE-2014-6271.",
+  "token_count": 35
+}

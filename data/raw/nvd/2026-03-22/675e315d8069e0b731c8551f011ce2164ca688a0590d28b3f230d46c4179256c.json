@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3693",
+  "ingested_at": "2026-03-22T07:54:41.970115+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Shy2593666979 AgentChat up to 2.3.0. This issue affects the function get_user_info/update_user_info of the file /src/backend/agentchat/api/v1/user.py of the component User Endpoint. This manipulation of the argument user_id causes improper control of resource identifiers. It is possible to initiate the attack remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "675e315d8069e0b731c8551f011ce2164ca688a0590d28b3f230d46c4179256c",
+  "source": "nvd",
+  "tags": [
+    "CWE-99"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3693"
+}

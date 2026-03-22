@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2454",
+  "ingested_at": "2026-03-22T07:54:46.981247+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to handle incorrectly reported array lengths which allows malicious user to cause OOM errors and crash the server via sending corrupted msgpack frames within websocket messages to calls plugin. Mattermost Advisory ID: MMSA-2025-00537",
+  "severity": "MEDIUM",
+  "sha256_hash": "1df4ea2eeb9523b9a05b0e8a37f4e37b53021f4c1a7d76de622f85e9e386dfdf",
+  "source": "nvd",
+  "tags": [
+    "CWE-1287"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2454"
+}

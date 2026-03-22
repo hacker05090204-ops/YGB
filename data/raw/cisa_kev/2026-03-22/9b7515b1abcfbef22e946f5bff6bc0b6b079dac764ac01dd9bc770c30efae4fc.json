@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1048",
+  "ingested_at": "2026-03-22T07:45:17.987811+00:00",
+  "lang": "en",
+  "raw_text": "Android Kernel Android kernel contains a use-after-free vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9b7515b1abcfbef22e946f5bff6bc0b6b079dac764ac01dd9bc770c30efae4fc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 13,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

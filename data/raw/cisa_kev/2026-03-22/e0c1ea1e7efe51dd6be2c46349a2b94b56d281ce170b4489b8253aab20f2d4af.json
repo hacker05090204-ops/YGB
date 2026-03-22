@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-0984",
+  "ingested_at": "2026-03-22T07:45:17.866342+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player and AIR Use-after-free vulnerability in Adobe Flash Player and Adobe AIR allows attackers to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e0c1ea1e7efe51dd6be2c46349a2b94b56d281ce170b4489b8253aab20f2d4af",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

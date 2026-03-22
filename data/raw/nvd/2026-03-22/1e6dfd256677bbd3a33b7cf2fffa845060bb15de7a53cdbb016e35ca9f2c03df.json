@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29060",
+  "ingested_at": "2026-03-22T07:54:41.305820+00:00",
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to version 2.2.3, a registered user without privileges to create or modify file requests is able to create a short-lived API key that has the permission to do so. The user must be registered with Gokapi. If there are no users with access to the admin/upload menu, there is no impact. This issue has been patched in version 2.2.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1e6dfd256677bbd3a33b7cf2fffa845060bb15de7a53cdbb016e35ca9f2c03df",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29060"
+}

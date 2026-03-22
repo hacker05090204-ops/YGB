@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28395",
+  "ingested_at": "2026-03-22T07:54:41.019804+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw version 2026.1.14-1 prior to 2026.2.12 contain an improper network binding vulnerability in the Chrome extension (must be installed and enabled) relay server that treats wildcard hosts as loopback addresses, allowing the relay HTTP/WS server to bind to all interfaces when a wildcard cdpUrl is configured. Remote attackers can access relay HTTP endpoints off-host to leak service presence and port information, or conduct denial-of-service and brute-force attacks against the relay token header.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d8ba8f80eeb52bac53b7bd0b37b99e6132814d4647c23478a8fd442b3980063d",
+  "source": "nvd",
+  "tags": [
+    "CWE-1327"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28395"
+}

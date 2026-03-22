@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jenkins LoadNinja Plugin 2.1 and earlier stores LoadNinja API keys unencrypted in job config.xml files on the Jenkins controller where they can be viewed by users with Item/Extended Read permission or access to the Jenkins controller file system.",
+  "token_count": 38
+}

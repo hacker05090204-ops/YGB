@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Mall 4.1 contains multiple SQL injection vulnerabilities that allow unauthenticated attackers to manipulate database queries by injecting SQL code through various parameters. Attackers can craft malicious requests with SQL payloads to extract sensitive database information including user credentials and system data.",
+  "token_count": 43
+}

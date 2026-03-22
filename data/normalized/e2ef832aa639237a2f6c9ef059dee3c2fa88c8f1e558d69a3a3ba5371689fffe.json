@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Incorrect access control in the VNC component of Weintek cMT-3072XH2 easyweb v2.1.53, OS v20231011 allows unauthorized attackers to access the HMI system.",
+  "token_count": 22
+}

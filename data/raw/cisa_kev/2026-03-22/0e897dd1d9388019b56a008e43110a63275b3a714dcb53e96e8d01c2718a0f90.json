@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-2506",
+  "ingested_at": "2026-03-22T07:45:18.297826+00:00",
+  "lang": "en",
+  "raw_text": "QNAP Systems Helpdesk QNAP Helpdesk contains an improper access control vulnerability which could allow an attacker to gain privileges or to read sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e897dd1d9388019b56a008e43110a63275b3a714dcb53e96e8d01c2718a0f90",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

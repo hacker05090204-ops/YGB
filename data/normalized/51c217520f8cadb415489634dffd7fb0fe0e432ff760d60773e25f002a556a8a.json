@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Color Management Module 'icm32.dll' - 'icm32!Fill_ushort_ELUTs_from_lut16Tag' Out-of-Bounds Read (MS17-013)",
+  "token_count": 10
+}

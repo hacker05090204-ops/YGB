@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0542",
+  "ingested_at": "2026-03-22T07:54:32.290263+00:00",
+  "lang": "en",
+  "raw_text": "ServiceNow has addressed a remote code execution vulnerability that was identified in the ServiceNow AI platform. This vulnerability could enable an unauthenticated user, in certain circumstances, to execute code within the ServiceNow Sandbox. ServiceNow addressed this vulnerability by deploying a security update to hosted instances. Relevant security updates also have been provided to ServiceNow self-hosted customers and partners. Further, the vulnerability is addressed in the listed patches and hot fixes. While we are not currently aware of exploitation against customer instances, we recommend customers promptly apply appropriate updates or upgrade if they have not already done so.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "3f3dcfccda698ea170bda8fff96b51fe9b04ba9d68774284d9d4c9921a1a4deb",
+  "source": "nvd",
+  "tags": [
+    "CWE-653"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0542"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4478",
+  "ingested_at": "2026-03-22T07:54:48.659982+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Yi Technology YI Home Camera 2 2.1.1_20171024151200. This impacts an unknown function of the file home/web/ipc of the component HTTP Firmware Update Handler. The manipulation leads to improper verification of cryptographic signature. The attack is possible to be carried out remotely. The complexity of an attack is rather high. The exploitability is said to be difficult. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "11fb4f8a8fc7063e85cde4a9abc01213a740ca2e7bde5ba743bfce1c102fc18e",
+  "source": "nvd",
+  "tags": [
+    "CWE-345",
+    "CWE-347"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4478"
+}

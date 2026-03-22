@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Exchange Server Microsoft Exchange Server Validation Key fails to properly create unique keys at install time, allowing for remote code execution.",
+  "token_count": 22
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Sensitive Data Exposure vulnerability exists in Apache Superset allowing authenticated users to retrieve sensitive user information. The Tag endpoint (disabled by default) allows users to retrieve a list of objects associated with a specific tag. When these associated objects include Users, the API response improperly serializes and returns sensitive fields, including password hashes (pbkdf2), email addresses, and login statistics. This vulnerability allows authenticated users with low privileges (e.g., Gamma role) to view sensitive authentication data This issue affects Apache Superset: before 6.0.0. Users are recommended to upgrade to version 6.0.0, which fixes the issue or make sure TAGGING_SYSTEM is False (Apache Superset current default)",
+  "token_count": 105
+}

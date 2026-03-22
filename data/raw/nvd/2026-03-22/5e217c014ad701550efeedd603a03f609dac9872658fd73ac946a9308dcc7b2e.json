@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1935",
+  "ingested_at": "2026-03-22T07:54:49.324082+00:00",
+  "lang": "en",
+  "raw_text": "The Company Posts for LinkedIn plugin for WordPress is vulnerable to Missing Authorization in all versions up to, and including, 1.0.0. This is due to a missing capability check on the `linkedin_company_post_reset_handler()` function hooked to `admin_post_reset_linkedin_company_post`. This makes it possible for authenticated attackers, with Subscriber-level access and above, to delete LinkedIn post data stored in the site's options table.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5e217c014ad701550efeedd603a03f609dac9872658fd73ac946a9308dcc7b2e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1935"
+}

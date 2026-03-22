@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL Sametime for iOS is impacted by a sensitive information disclosure. Hostnames information is written in application logs and certain URLs.",
+  "token_count": 21
+}

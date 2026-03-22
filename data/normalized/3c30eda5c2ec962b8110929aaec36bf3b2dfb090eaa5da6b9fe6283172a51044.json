@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SaltStack Salt SaltStack Salt contains an authentication bypass vulnerability in the salt-master process ClearFuncs due to improperly validating method calls. The vulnerability allows a remote user to access some methods without authentication, which can be used to retrieve user tokens from the salt master and/or run commands on salt minions. Salt users who follow fundamental internet security guidelines and best practices are not affected by this vulnerability.",
+  "token_count": 67
+}

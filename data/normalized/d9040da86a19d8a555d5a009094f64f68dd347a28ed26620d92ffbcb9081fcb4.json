@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Booking Calendar for Appointments and Service Businesses \u2013 Booktics plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the 'Extension_Controller::update_item_permissions_check' function in all versions up to, and including, 1.0.16. This makes it possible for unauthenticated attackers to install addon plugins.",
+  "token_count": 49
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-20085",
+  "ingested_at": "2026-03-22T07:45:19.620198+00:00",
+  "lang": "en",
+  "raw_text": "TVT NVMS-1000 TVT devices utilizing NVMS-1000 software contain a directory traversal vulnerability via GET /.. requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "edb01c00f8a12e255e6f0752ee81cfcd61e6c888ec4c3b1581fe5b723a19cc2f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

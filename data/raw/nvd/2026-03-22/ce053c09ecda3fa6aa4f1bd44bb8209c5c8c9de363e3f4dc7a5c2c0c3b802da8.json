@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-63910",
+  "ingested_at": "2026-03-22T07:54:34.157955+00:00",
+  "lang": "en",
+  "raw_text": "An authenticated arbitrary file upload vulnerability in Cohesity TranZman Migration Appliance Release 4.0 Build 14614 allows attackers with Administrator privileges to execute arbitrary code via uploading a crafted patch file.",
+  "severity": "HIGH",
+  "sha256_hash": "ce053c09ecda3fa6aa4f1bd44bb8209c5c8c9de363e3f4dc7a5c2c0c3b802da8",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-63910"
+}

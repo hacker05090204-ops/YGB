@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32438",
+  "ingested_at": "2026-03-22T07:54:46.108653+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in vowelweb VW School Education vw-school-education allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects VW School Education: from n/a through < = 1.4.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "55297764cbbe85641e78388b217dfc0582ded5a5d75fe99e4295f084b69f7704",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32438"
+}

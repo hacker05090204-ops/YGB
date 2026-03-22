@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32065",
+  "ingested_at": "2026-03-22T07:54:49.228991+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 contain an approval-integrity bypass vulnerability in system.run where rendered command text is used as approval identity while trimming argv token whitespace, but runtime execution uses raw argv. An attacker can craft a trailing-space executable token to execute a different binary than what the approver displayed, allowing unexpected command execution under the OpenClaw runtime user when they can influence command argv and reuse an approval context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ad8cf8906c983617c8aaaa4857d89737b265840c0d0d78adb7827464f3892988",
+  "source": "nvd",
+  "tags": [
+    "CWE-436"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32065"
+}

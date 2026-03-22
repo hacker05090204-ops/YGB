@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4241",
+  "ingested_at": "2026-03-22T07:54:46.803149+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in itsourcecode College Management System 1.0. The impacted element is an unknown function of the file /admin/time-table.php. Such manipulation of the argument course_code leads to sql injection. The attack can be launched remotely. The exploit is publicly available and might be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8c27b92ac802e8dfe1d717b6e8e327be8f22d403ae85c4c697131baf0c0b4913",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4241"
+}

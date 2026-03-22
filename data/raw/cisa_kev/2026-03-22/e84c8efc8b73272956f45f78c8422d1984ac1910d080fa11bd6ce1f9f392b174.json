@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-10174",
+  "ingested_at": "2026-03-22T07:45:18.373124+00:00",
+  "lang": "en",
+  "raw_text": "NETGEAR WNR2000v5 Router The NETGEAR WNR2000v5 router contains a buffer overflow which can be exploited to achieve remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e84c8efc8b73272956f45f78c8422d1984ac1910d080fa11bd6ce1f9f392b174",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

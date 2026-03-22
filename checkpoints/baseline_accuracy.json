@@ -1,0 +1,9 @@
+{
+  "baseline_accuracy": 1.0,
+  "checkpoint_accuracy": 1.0,
+  "checkpoint_f1": 1.0,
+  "checkpoint_precision": 1.0,
+  "checkpoint_recall": 1.0,
+  "positive_threshold": 0.499886843,
+  "updated_at": "2026-03-22T07:38:39.563017+00:00"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-43770",
+  "ingested_at": "2026-03-22T07:45:17.054461+00:00",
+  "lang": "en",
+  "raw_text": "Roundcube Webmail Roundcube Webmail contains a persistent cross-site scripting (XSS) vulnerability that can lead to information disclosure via malicious link references in plain/text messages.",
+  "severity": "CRITICAL",
+  "sha256_hash": "34beedd17cc4088fe85a862c016f894fcef382a7c090c8f8c5a2cffc74e0b9b4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68553",
+  "ingested_at": "2026-03-22T07:54:39.974232+00:00",
+  "lang": "en",
+  "raw_text": "Unrestricted Upload of File with Dangerous Type vulnerability in zozothemes Lendiz lendiz allows Upload a Web Shell to a Web Server.This issue affects Lendiz: from n/a through < 2.0.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5b9a4d273c5d671e0c451c5d76f0b17e2b81953674af56b55b3685e64b7f11a0",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68553"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "sourcecodester Personnel Property Equipment System v1.0 is vulnerable to SQL Injection in /ppes/admin/edit_tecnical_user.php.",
+  "token_count": 13
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2269",
+  "ingested_at": "2026-03-22T07:54:34.005542+00:00",
+  "lang": "en",
+  "raw_text": "The Uncanny Automator \u2013 Easy Automation, Integration, Webhooks & Workflow Builder Plugin plugin for WordPress is vulnerable to Server-Side Request Forgery in all versions up to, and including, 7.0.0.3 via the download_url() function. This makes it possible for authenticated attackers, with Administrator-level access and above, to make web requests to arbitrary locations originating from the web application and can be used to query and modify information from internal services. Additionally, the plugin stores the contents of the remote files on the server, which can be leveraged to upload arbitrary files on the affected site's server which may make remote code execution possible.",
+  "severity": "HIGH",
+  "sha256_hash": "b545855f56c96dd206feea0c9f8199111c6ff94308590d068b4b7d1d13ccf931",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2269"
+}

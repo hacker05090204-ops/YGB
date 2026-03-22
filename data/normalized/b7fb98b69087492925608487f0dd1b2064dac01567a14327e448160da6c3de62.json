@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Delta Electronics DOPSoft 2 Delta Electronics DOPSoft 2 lacks proper validation of user-supplied data when parsing specific project files (improper input validation) resulting in an out-of-bounds write that allows for code execution.",
+  "token_count": 32
+}

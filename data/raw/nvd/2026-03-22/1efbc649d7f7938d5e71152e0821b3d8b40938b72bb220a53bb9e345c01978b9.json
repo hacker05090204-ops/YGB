@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-55208",
+  "ingested_at": "2026-03-22T07:54:40.966165+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Versions prior to 1.11.34 have a Stored XSS through insecure file uploads in `Social Networks`. Through it, a low-privilege user can execute arbitrary code in the admin user inbox, allowing takeover of the admin account. Version 1.11.34 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1efbc649d7f7938d5e71152e0821b3d8b40938b72bb220a53bb9e345c01978b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-55208"
+}

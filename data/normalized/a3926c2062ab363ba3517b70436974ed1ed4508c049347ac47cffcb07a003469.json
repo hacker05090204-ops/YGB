@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL Connections is vulnerable to information disclosure. In a very specific user navigation scenario, this could allow a user to obtain limited information when a single piece of internal metadata is returned in the browser.",
+  "token_count": 35
+}

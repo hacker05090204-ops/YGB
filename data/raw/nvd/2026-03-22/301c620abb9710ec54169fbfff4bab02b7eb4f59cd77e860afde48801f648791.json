@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30794",
+  "ingested_at": "2026-03-22T07:54:40.828559+00:00",
+  "lang": "en",
+  "raw_text": "Improper Certificate Validation vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android (HTTP API client, TLS transport modules) allows Adversary in the Middle (AiTM). This vulnerability is associated with program files src/hbbs_http/http_client.Rs and program routines TLS retry with danger_accept_invalid_certs(true). This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "301c620abb9710ec54169fbfff4bab02b7eb4f59cd77e860afde48801f648791",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30794"
+}

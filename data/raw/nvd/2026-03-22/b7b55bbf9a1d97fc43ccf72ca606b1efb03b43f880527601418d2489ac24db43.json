@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3738",
+  "ingested_at": "2026-03-22T07:54:42.054157+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in SourceCodester Pet Grooming Management Software 1.0. This vulnerability affects unknown code of the component Financial Report Page. The manipulation leads to improper authorization. Remote exploitation of the attack is possible. The exploit is publicly available and might be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b7b55bbf9a1d97fc43ccf72ca606b1efb03b43f880527601418d2489ac24db43",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3738"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows win32k - Using SetClassLong to Switch Between CS_CLASSDC and CS_OWNDC Corrupts DC Cache",
+  "token_count": 15
+}

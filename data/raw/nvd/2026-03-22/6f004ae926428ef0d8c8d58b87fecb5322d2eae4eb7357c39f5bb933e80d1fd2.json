@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28196",
+  "ingested_at": "2026-03-22T07:54:32.059645+00:00",
+  "lang": "en",
+  "raw_text": "In JetBrains TeamCity before 2025.11.3 disabling versioned settings left a credentials config on disk",
+  "severity": "LOW",
+  "sha256_hash": "6f004ae926428ef0d8c8d58b87fecb5322d2eae4eb7357c39f5bb933e80d1fd2",
+  "source": "nvd",
+  "tags": [
+    "CWE-459"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28196"
+}

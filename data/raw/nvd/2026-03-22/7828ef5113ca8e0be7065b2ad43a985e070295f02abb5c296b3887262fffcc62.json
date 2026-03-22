@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2992",
+  "ingested_at": "2026-03-22T07:54:47.512986+00:00",
+  "lang": "en",
+  "raw_text": "The KiviCare \u2013 Clinic & Patient Management System (EHR) plugin for WordPress is vulnerable to Privilege Escalation due to missing authorization on the `/wp-json/kivicare/v1/setup-wizard/clinic` REST API endpoint in all versions up to, and including, 4.1.2. This makes it possible for unauthenticated attackers to create a new clinic and a WordPress user with clinic admin privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "7828ef5113ca8e0be7065b2ad43a985e070295f02abb5c296b3887262fffcc62",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2992"
+}

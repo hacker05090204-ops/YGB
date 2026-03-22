@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27838",
+  "ingested_at": "2026-03-22T07:54:32.818208+00:00",
+  "lang": "en",
+  "raw_text": "wger is a free, open-source workout and fitness manager. Five routine detail action endpoints check a cache before calling `self.get_object()`. In versions up to and including 2.4, ache keys are scoped only by `pk` \u2014 no user ID is included. When a victim has previously accessed their routine via the API, an attacker can retrieve the cached response for the same PK without any ownership check. Commit e964328784e2ee2830a1991d69fadbce86ac9fbf contains a patch for the issue.",
+  "severity": "LOW",
+  "sha256_hash": "16ff667325de51811fa7b03f7bee28f594541078c5e5165a6b7b9b47f270f614",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27838"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67438",
+  "ingested_at": "2026-03-22T07:54:29.998833+00:00",
+  "lang": "en",
+  "raw_text": "A Stored Cross-Site Scripting (XSS) vulnerability in Sync-in Server before 1.9.3 allows an authenticated attacker to execute arbitrary JavaScript in a victim's browser. By uploading a crafted SVG file containing a malicious payload, an attacker can access and exfiltrate sensitive information, including the user's session cookies.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d23a7b9d8241e99e874fe4b210c65b7dbf603dae4d45641682e82028799e594",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67438"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "eToolz 3.4.8.0 contains a denial of service vulnerability that allows local attackers to crash the application by supplying oversized input buffers. Attackers can create a payload file containing 255 bytes of data that triggers a buffer overflow condition when processed by the application.",
+  "token_count": 43
+}

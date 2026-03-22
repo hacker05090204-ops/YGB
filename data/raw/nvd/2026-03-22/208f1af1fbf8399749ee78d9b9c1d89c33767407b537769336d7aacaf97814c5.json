@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27166",
+  "ingested_at": "2026-03-22T07:54:48.067421+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1 and 2026.1.2, insufficient cleanup in the default Codepen allowed iframes value allows an attacker to trick a user into changing the URL of the main page. This issue has been fixed in versions 2026.3.0-latest.1, 2026.2.1 and 2026.1.2. To workaround this issue, remove Codepen from the list of allowed iframes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "208f1af1fbf8399749ee78d9b9c1d89c33767407b537769336d7aacaf97814c5",
+  "source": "nvd",
+  "tags": [
+    "CWE-80"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27166"
+}

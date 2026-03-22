@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32396",
+  "ingested_at": "2026-03-22T07:54:46.013376+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in RadiusTheme Team tlp-team allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Team: from n/a through < = 5.0.13.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f2d893f95e72e22343a24f7c1e266d5a2168e84a21c2010e3b09304cf0d01c68",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32396"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2896",
+  "ingested_at": "2026-03-22T07:54:30.898560+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in funadmin up to 7.1.0-rc4. This affects the function setConfig of the file app/backend/controller/Ajax.php of the component Configuration Handler. Executing a manipulation can lead to improper authorization. The attack can be executed remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "bdc6c7bcf41a2897bb80a2d6aab271b22e84f216468acecbcba45e4ae8491a89",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2896"
+}

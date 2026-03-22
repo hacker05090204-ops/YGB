@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SolarView Compact SolarView Compact contains a command injection vulnerability due to improper validation of input values on the send test mail console of the product's web server.",
+  "token_count": 27
+}

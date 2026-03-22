@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-53608",
+  "ingested_at": "2026-03-22T07:54:42.585168+00:00",
+  "lang": "en",
+  "raw_text": "An Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability [CWE-79] vulnerability in Fortinet FortiSandbox 5.0.0 through 5.0.2, FortiSandbox 4.4.0 through 4.4.7, FortiSandbox 4.2 all versions, FortiSandbox 4.0 all versions may allow an authenticated privileged attacker to execute code via crafted requests.",
+  "severity": "MEDIUM",
+  "sha256_hash": "69a2282435d327d4c3636adf2898153250fe8e3948ca9753866caae34192c3c4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53608"
+}

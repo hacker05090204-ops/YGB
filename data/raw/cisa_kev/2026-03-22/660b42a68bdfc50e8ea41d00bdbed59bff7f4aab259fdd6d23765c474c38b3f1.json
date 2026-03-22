@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27085",
+  "ingested_at": "2026-03-22T07:45:19.391847+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "660b42a68bdfc50e8ea41d00bdbed59bff7f4aab259fdd6d23765c474c38b3f1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

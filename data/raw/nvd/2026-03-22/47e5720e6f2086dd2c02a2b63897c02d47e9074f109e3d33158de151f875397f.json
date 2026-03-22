@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3286",
+  "ingested_at": "2026-03-22T07:54:33.044461+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in itwanger paicoding 1.0.0/1.0.1/1.0.2/1.0.3. The impacted element is the function Save of the file paicoding-web/src/main/java/com/github/paicoding/forum/web/common/image/rest/ImageRestController.java of the component Image Save Endpoint. Such manipulation of the argument img leads to server-side request forgery. The attack may be launched remotely. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "47e5720e6f2086dd2c02a2b63897c02d47e9074f109e3d33158de151f875397f",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3286"
+}

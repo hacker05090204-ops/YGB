@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An observable timing discrepancy in @perfood/couch-auth v0.26.0 allows attackers to access sensitive information via a timing side-channel.",
+  "token_count": 17
+}

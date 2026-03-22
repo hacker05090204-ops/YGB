@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3103",
+  "ingested_at": "2026-03-22T07:54:34.485603+00:00",
+  "lang": "en",
+  "raw_text": "A logic error in the remove_password() function in Checkmk GmbH's Checkmk versions < 2.4.0p23, < 2.3.0p43, and 2.2.0 (EOL) allows a low-privileged user to cause data loss.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c0d5b022150025212cd31408476bfcea87729146685d22fbb1f50b19aa6acd4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3103"
+}

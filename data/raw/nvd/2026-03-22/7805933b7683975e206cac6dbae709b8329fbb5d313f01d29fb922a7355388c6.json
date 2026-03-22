@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2880",
+  "ingested_at": "2026-03-22T07:54:33.249875+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in @fastify/middie versions < 9.2.0 can result in authentication/authorization bypass when using path-scoped middleware (for example, app.use('/secret', auth)). When Fastify router normalization options are enabled (such as ignoreDuplicateSlashes, useSemicolonDelimiter, and related trailing-slash behavior), crafted request paths may bypass middleware checks while still being routed to protected handlers.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7805933b7683975e206cac6dbae709b8329fbb5d313f01d29fb922a7355388c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2880"
+}

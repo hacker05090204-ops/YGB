@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The GL-iNet Comet (GL-RM1) KVM does not require authentication on the UART serial console. This attack requires physically opening the device and connecting to the UART pins.",
+  "token_count": 27
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29510",
+  "ingested_at": "2026-03-22T07:54:46.898072+00:00",
+  "lang": "en",
+  "raw_text": "Hereta ETH-IMC408M firmware version 1.0.15 and prior contain a stored cross-site scripting vulnerability that allows authenticated attackers to inject arbitrary JavaScript by manipulating the Device Name field. Attackers can inject malicious scripts through the System Status interface that execute in browsers of users viewing the status page without input sanitation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d98b5f176a378404f88b8a849c1c064ea1597f4fd94480a4bec28aeb35c9cb79",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29510"
+}

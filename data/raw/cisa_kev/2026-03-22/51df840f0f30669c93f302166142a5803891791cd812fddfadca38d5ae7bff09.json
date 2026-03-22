@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-17621",
+  "ingested_at": "2026-03-22T07:45:17.326234+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DIR-859 Router D-Link DIR-859 router contains a command execution vulnerability in the UPnP endpoint URL, /gena.cgi. Exploitation allows an unauthenticated remote attacker to execute system commands as root by sending a specially crafted HTTP SUBSCRIBE request to the UPnP service when connecting to the local network.",
+  "severity": "CRITICAL",
+  "sha256_hash": "51df840f0f30669c93f302166142a5803891791cd812fddfadca38d5ae7bff09",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

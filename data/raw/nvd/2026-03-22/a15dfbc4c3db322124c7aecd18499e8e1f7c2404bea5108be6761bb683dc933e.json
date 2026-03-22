@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3460",
+  "ingested_at": "2026-03-22T07:54:49.393244+00:00",
+  "lang": "en",
+  "raw_text": "The REST API TO MiniProgram plugin for WordPress is vulnerable to Insecure Direct Object Reference in all versions up to, and including, 5.1.2. This is due to the permission callback (update_user_wechatshop_info_permissions_check) only validating that the supplied 'openid' parameter corresponds to an existing WordPress user, while the callback function (update_user_wechatshop_info) uses a separate, attacker-controlled 'userid' parameter to determine which user's metadata gets modified, with no verification that the 'openid' and 'userid' belong to the same user. This makes it possible for authenticated attackers, with Subscriber-level access and above, to modify arbitrary users' store-related metadata (storeinfo, storeappid, storename) via the 'userid' REST API parameter.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a15dfbc4c3db322124c7aecd18499e8e1f7c2404bea5108be6761bb683dc933e",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3460"
+}

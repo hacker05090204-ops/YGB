@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4172",
+  "ingested_at": "2026-03-22T07:54:46.661492+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in TRENDnet TEW-632BRP 1.010B32. This affects an unknown part of the file /ping_response.cgi of the component HTTP POST Request Handler. The manipulation of the argument ping_ipaddr results in stack-based buffer overflow. The attack may be performed from remote. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "8422408227ba99ed689a97fea4399d735b2fbaecd8022bc62434511df650fe80",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4172"
+}

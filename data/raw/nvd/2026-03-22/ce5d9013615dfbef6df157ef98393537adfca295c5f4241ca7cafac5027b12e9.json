@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-60233",
+  "ingested_at": "2026-03-22T07:54:47.895016+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Themeton Zuut allows Object Injection.This issue affects Zuut: from n/a through 1.4.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ce5d9013615dfbef6df157ef98393537adfca295c5f4241ca7cafac5027b12e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-60233"
+}

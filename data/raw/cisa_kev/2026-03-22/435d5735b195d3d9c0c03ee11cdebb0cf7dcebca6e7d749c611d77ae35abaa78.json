@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-4068",
+  "ingested_at": "2026-03-22T07:45:18.378122+00:00",
+  "lang": "en",
+  "raw_text": "Arcserve Unified Data Protection (UDP) Directory traversal vulnerability in Arcserve UDP allows remote attackers to obtain sensitive information or cause a denial of service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "435d5735b195d3d9c0c03ee11cdebb0cf7dcebca6e7d749c611d77ae35abaa78",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

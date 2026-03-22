@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2626",
+  "ingested_at": "2026-03-22T07:54:43.491986+00:00",
+  "lang": "en",
+  "raw_text": "The divi-booster WordPress plugin before 5.0.2 does not have authorization and CSRF checks in one of its fixing function, allowing unauthenticated users to modify stored divi-booster WordPress plugin before 5.0.2 options. Furthermore, due to the use of unserialize() on the data, this could be further exploited when combined with a PHP gadget chain to achieve PHP Object Injection",
+  "severity": "HIGH",
+  "sha256_hash": "a2db44f0b7cec9df1d36480c5b6c32e7a99e59975188554f11b9c5e71a0184a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-352",
+    "CWE-502"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2626"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SGLang' encoder parallel disaggregation system is vulnerable to unauthenticated remote code execution through the disaggregation module, which deserializes untrusted data using pickle.loads() without authentication.",
+  "token_count": 24
+}

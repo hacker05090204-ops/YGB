@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33288",
+  "ingested_at": "2026-03-22T07:54:48.392752+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, a SQL Injection vulnerability exists in the SuiteCRM authentication mechanisms when directory support is enabled. The application fails to properly sanitize the user-supplied username before using it in a local database query. An attacker with valid, low-privilege directory credentials can exploit this to execute arbitrary SQL commands, leading to complete privilege escalation (e.g., logging in as the CRM Administrator). Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "54234a30712c41a9ab80f32b16ff5885e0449fc3022e4b1d6c933a394f275028",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33288"
+}

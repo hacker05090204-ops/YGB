@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and watchOS Apple iOS, iPadOS, and watchOS contain an unspecified vulnerability due to a validation issue affecting Wallet in which a maliciously crafted attachment may result in code execution. This vulnerability was chained with CVE-2023-41064.",
+  "token_count": 38
+}

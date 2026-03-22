@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26934",
+  "ingested_at": "2026-03-22T07:54:32.709889+00:00",
+  "lang": "en",
+  "raw_text": "Improper Validation of Specified Quantity in Input (CWE-1284) in Kibana can allow an authenticated attacker with view-only privileges to cause a Denial of Service via Input Data Manipulation (CAPEC-153). An attacker can send a specially crafted, malformed payload causing excessive resource consumption and resulting in Kibana becoming unresponsive or crashing.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8822ad5c85529a4d5e6b8971bcb954d44aa7fddc43f1e8869e7c1381942ec192",
+  "source": "nvd",
+  "tags": [
+    "CWE-1284"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26934"
+}

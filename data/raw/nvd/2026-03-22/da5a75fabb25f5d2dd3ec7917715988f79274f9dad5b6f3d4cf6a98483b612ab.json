@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-20993",
+  "ingested_at": "2026-03-22T07:54:46.390811+00:00",
+  "lang": "en",
+  "raw_text": "Improper export of android application components in Samsung Assistant prior to version 9.3.10.7 allows local attacker to access saved information.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "da5a75fabb25f5d2dd3ec7917715988f79274f9dad5b6f3d4cf6a98483b612ab",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20993"
+}

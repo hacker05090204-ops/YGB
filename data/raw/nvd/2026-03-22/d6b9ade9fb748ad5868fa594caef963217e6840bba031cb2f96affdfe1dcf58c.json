@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68000",
+  "ingested_at": "2026-03-22T07:54:30.060555+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in PickPlugins Testimonial Slider testimonial allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Testimonial Slider: from n/a through < = 2.0.15.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d6b9ade9fb748ad5868fa594caef963217e6840bba031cb2f96affdfe1dcf58c",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68000"
+}

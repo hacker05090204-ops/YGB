@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32194",
+  "ingested_at": "2026-03-22T07:54:48.256157+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of special elements used in a command ('command injection') in Microsoft Bing Images allows an unauthorized attacker to execute code over a network.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9ecefa62e733da78dd6aec7b6c1248db2d9af11fea8c3d8e8b9134c834e2dea7",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32194"
+}

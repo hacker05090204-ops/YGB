@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-6282",
+  "ingested_at": "2026-03-22T07:45:17.634059+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel The get_user and put_user API functions of the Linux kernel fail to validate the target address when being used on ARM v6k/v7 platforms. This allows an application to read and write kernel memory which could lead to privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a881a0d6f0aba9cad6b60085336cf9eacd8331cbf22981269aeb3075716f8560",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

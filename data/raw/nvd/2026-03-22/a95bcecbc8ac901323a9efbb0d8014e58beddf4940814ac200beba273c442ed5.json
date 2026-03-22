@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70047",
+  "ingested_at": "2026-03-22T07:54:42.312599+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-400: Uncontrolled Resource Consumption was discovered in Nexusoft NexusInterface v3.2.0-beta.2.",
+  "severity": "HIGH",
+  "sha256_hash": "a95bcecbc8ac901323a9efbb0d8014e58beddf4940814ac200beba273c442ed5",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70047"
+}

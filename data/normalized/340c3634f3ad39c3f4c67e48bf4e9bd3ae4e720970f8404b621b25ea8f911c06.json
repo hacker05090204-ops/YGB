@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in GNU Binutils. This heap-based buffer overflow vulnerability, specifically an out-of-bounds read in the bfd linker, allows an attacker to gain access to sensitive information. By convincing a user to process a specially crafted XCOFF object file, an attacker can trigger this flaw, potentially leading to information disclosure or an application level denial of service.",
+  "token_count": 59
+}

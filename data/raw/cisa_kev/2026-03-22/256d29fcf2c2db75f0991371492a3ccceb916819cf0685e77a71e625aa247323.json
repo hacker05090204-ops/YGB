@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-28995",
+  "ingested_at": "2026-03-22T07:45:16.910285+00:00",
+  "lang": "en",
+  "raw_text": "SolarWinds Serv-U SolarWinds Serv-U contains a path traversal vulnerability that allows an attacker access to read sensitive files on the host machine.",
+  "severity": "CRITICAL",
+  "sha256_hash": "256d29fcf2c2db75f0991371492a3ccceb916819cf0685e77a71e625aa247323",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

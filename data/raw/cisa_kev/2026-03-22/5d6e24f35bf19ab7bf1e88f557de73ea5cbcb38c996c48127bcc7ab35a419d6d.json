@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-2725",
+  "ingested_at": "2026-03-22T07:45:18.867272+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Injection vulnerability in the Oracle WebLogic Server component of Oracle Fusion Middleware (subcomponent: Web Services).",
+  "severity": "CRITICAL",
+  "sha256_hash": "5d6e24f35bf19ab7bf1e88f557de73ea5cbcb38c996c48127bcc7ab35a419d6d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

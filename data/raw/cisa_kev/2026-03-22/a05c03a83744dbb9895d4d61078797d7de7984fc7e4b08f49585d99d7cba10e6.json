@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-2055",
+  "ingested_at": "2026-03-22T07:45:18.421365+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS XR Cisco IOS XR,when BGP is the configured routing feature, allows remote attackers to cause a denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "a05c03a83744dbb9895d4d61078797d7de7984fc7e4b08f49585d99d7cba10e6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

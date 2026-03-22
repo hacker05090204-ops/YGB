@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "JumpServer is an open source bastion host and an operation and maintenance security audit system. Prior to v4.10.16-lts, JumpServer improperly validates certificates in the Custom SMS API Client. When JumpServer sends MFA/OTP codes via Custom SMS API, an attacker can intercept the request and capture the verification code BEFORE it reaches the user's phone. This vulnerability is fixed in v4.10.16-lts.",
+  "token_count": 60
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2023-31044",
+  "ingested_at": "2026-03-22T07:54:34.148959+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Nokia Impact before Mobile 23_FP1. In Impact DM 19.11 onwards, a remote authenticated user, using the Add Campaign functionality, can inject a malicious payload within the Campaign Name. This data can be exported to a CSV file. Attackers can populate data fields that may attempt data exfiltration or other malicious activity when automatically executed by the spreadsheet software.",
+  "severity": "LOW",
+  "sha256_hash": "63ba9b966a938db78feb420ce81db57d8c010de4eb21994969e476200ad83769",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-31044"
+}

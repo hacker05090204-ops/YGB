@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-34362",
+  "ingested_at": "2026-03-22T07:45:17.381535+00:00",
+  "lang": "en",
+  "raw_text": "Progress MOVEit Transfer Progress MOVEit Transfer contains a SQL injection vulnerability that could allow an unauthenticated attacker to gain unauthorized access to MOVEit Transfer's database. Depending on the database engine being used (MySQL, Microsoft SQL Server, or Azure SQL), an attacker may be able to infer information about the structure and contents of the database in addition to executing SQL statements that alter or delete database elements.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5515f55ce5590c90d8fe66c15f7a0826d94098c1a157f603208ffac53fdd5f62",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 67,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

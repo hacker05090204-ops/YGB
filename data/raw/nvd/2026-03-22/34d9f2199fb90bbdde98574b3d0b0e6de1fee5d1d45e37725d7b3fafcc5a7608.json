@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-31795",
+  "ingested_at": "2026-03-22T07:54:42.944238+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a stack buffer overflow write in CIccXform3DLut::Apply() corrupting stack memory or crash. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "34d9f2199fb90bbdde98574b3d0b0e6de1fee5d1d45e37725d7b3fafcc5a7608",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31795"
+}

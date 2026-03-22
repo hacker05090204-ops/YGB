@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "phpMoAdmin 1.1.5 contains a cross-site request forgery vulnerability that allows attackers to perform unauthorized database operations by crafting malicious requests. Attackers can trick authenticated users into submitting GET requests to moadmin.php with parameters like action, db, and collection to create, drop, or repair databases and collections without user consent.",
+  "token_count": 49
+}

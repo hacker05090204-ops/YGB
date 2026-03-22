@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-41244",
+  "ingested_at": "2026-03-22T07:45:16.069604+00:00",
+  "lang": "en",
+  "raw_text": "Broadcom VMware Aria Operations and VMware Tools Broadcom VMware Aria Operations and VMware Tools contain a privilege defined with unsafe actions vulnerability. A malicious local actor with non-administrative privileges having access to a VM with VMware Tools installed and managed by Aria Operations with SDMP enabled may exploit this vulnerability to escalate privileges to root on the same VM.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dbf7160b06661e61a84a55c9774c7fcd3ccffb1f0609f23179ecf46e6779b829",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 59,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

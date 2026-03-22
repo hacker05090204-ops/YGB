@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28509",
+  "ingested_at": "2026-03-22T07:54:41.275244+00:00",
+  "lang": "en",
+  "raw_text": "LangBot is a global IM bot platform designed for LLMs. Prior to version 4.8.7, LangBot\u2019s web UI renders user-supplied raw HTML using rehypeRaw, which can lead to a cross-site scripting (XSS) vulnerability. This issue has been patched in version 4.8.7.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bc1e2c7125fa27481feee4a3bf615f41f3de4c13b5cffc756c353225e8406fa6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28509"
+}

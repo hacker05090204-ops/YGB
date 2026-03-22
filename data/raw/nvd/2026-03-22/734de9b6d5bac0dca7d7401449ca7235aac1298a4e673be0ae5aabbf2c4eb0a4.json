@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4148",
+  "ingested_at": "2026-03-22T07:54:47.078210+00:00",
+  "lang": "en",
+  "raw_text": "A use-after-free vulnerability can be triggered in sharded clusters by an authenticated user with the read role who issues a specially crafted $lookup or $graphLookup aggregation pipeline.",
+  "severity": "HIGH",
+  "sha256_hash": "734de9b6d5bac0dca7d7401449ca7235aac1298a4e673be0ae5aabbf2c4eb0a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4148"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple kernel, which is included in iOS, iPadOS, and macOS, contains an unspecified vulnerability where an application may be able to execute code with kernel privileges.",
+  "token_count": 31
+}

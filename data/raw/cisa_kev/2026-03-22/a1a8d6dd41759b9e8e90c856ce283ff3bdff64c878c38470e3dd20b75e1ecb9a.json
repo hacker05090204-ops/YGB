@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-6175",
+  "ingested_at": "2026-03-22T07:45:17.888800+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows The kernel in Microsoft Windows contains a vulnerability that allows local users to gain privileges via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a1a8d6dd41759b9e8e90c856ce283ff3bdff64c878c38470e3dd20b75e1ecb9a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

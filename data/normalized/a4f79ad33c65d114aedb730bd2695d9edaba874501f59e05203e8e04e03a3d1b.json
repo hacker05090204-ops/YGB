@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ChurchCRM is an open-source church management system. Versions prior to 7.0.2 allow an admin user to edit JSON type system settings to store a JavaScript payload that can execute when any admin views the system settings. The JSON input is left unescaped/unsanitized in SystemSettings.php, leading to XSS. This issue has been fixed in version 7.0.2.",
+  "token_count": 55
+}

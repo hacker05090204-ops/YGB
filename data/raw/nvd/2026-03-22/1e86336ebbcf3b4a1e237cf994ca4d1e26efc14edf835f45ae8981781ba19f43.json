@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20100",
+  "ingested_at": "2026-03-22T07:54:34.712243+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the LUA interperter of the Remote Access SSL VPN feature of Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Secure Firewall Threat Defense (FTD) Software could allow an authenticated, remote attacker with a valid VPN connection to cause the device to reload unexpectedly, resulting in a denial of service (DoS) condition. This does not affect the management or MUS interfaces. This vulnerability is due to trusting user input without validation in the LUA interprerter. An attacker could exploit this vulnerability by sending crafted HTTP packets to the Remote Access SSL VPN server. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "severity": "HIGH",
+  "sha256_hash": "1e86336ebbcf3b4a1e237cf994ca4d1e26efc14edf835f45ae8981781ba19f43",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 114,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20100"
+}

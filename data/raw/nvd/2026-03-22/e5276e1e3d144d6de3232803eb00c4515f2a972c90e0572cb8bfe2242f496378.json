@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32446",
+  "ingested_at": "2026-03-22T07:54:46.121887+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Syed Balkhi Contact Form by WPForms wpforms-lite allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Contact Form by WPForms: from n/a through < = 1.9.9.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e5276e1e3d144d6de3232803eb00c4515f2a972c90e0572cb8bfe2242f496378",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32446"
+}

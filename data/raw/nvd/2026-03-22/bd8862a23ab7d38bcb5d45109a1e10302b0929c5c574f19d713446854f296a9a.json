@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30863",
+  "ingested_at": "2026-03-22T07:54:41.938513+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to versions 8.6.10 and 9.5.0-alpha.11, the Google, Apple, and Facebook authentication adapters use JWT verification to validate identity tokens. When the adapter's audience configuration option is not set (clientId for Google/Apple, appIds for Facebook), JWT verification silently skips audience claim validation. This allows an attacker to use a validly signed JWT issued for a different application to authenticate as any user on the target Parse Server. This issue has been patched in versions 8.6.10 and 9.5.0-alpha.11.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bd8862a23ab7d38bcb5d45109a1e10302b0929c5c574f19d713446854f296a9a",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-863"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30863"
+}

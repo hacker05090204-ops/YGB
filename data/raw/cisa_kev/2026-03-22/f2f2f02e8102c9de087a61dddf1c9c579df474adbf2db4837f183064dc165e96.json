@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-44698",
+  "ingested_at": "2026-03-22T07:45:17.562650+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Defender Microsoft Defender SmartScreen contains a security feature bypass vulnerability that could allow an attacker to evade Mark of the Web (MOTW) defenses via a specially crafted malicious file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f2f2f02e8102c9de087a61dddf1c9c579df474adbf2db4837f183064dc165e96",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

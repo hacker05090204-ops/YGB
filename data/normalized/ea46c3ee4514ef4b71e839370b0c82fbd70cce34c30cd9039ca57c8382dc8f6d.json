@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in SourceCodester Student Result Management System 1.0. This affects an unknown function of the file /admin/core/drop_user.php. Such manipulation of the argument ID leads to denial of service. The attack can be executed remotely. The exploit is publicly available and might be used.",
+  "token_count": 46
+}

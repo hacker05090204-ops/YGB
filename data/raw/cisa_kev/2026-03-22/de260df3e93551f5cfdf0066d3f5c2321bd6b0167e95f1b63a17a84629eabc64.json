@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-59689",
+  "ingested_at": "2026-03-22T07:45:16.154103+00:00",
+  "lang": "en",
+  "raw_text": "Libraesva Email Security Gateway Libraesva Email Security Gateway (ESG) contains a command injection vulnerability which allows command injection via a compressed e-mail attachment.",
+  "severity": "CRITICAL",
+  "sha256_hash": "de260df3e93551f5cfdf0066d3f5c2321bd6b0167e95f1b63a17a84629eabc64",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

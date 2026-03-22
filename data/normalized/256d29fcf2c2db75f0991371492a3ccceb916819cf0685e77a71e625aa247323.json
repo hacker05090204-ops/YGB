@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SolarWinds Serv-U SolarWinds Serv-U contains a path traversal vulnerability that allows an attacker access to read sensitive files on the host machine.",
+  "token_count": 22
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-6554",
+  "ingested_at": "2026-03-22T07:45:16.332392+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 contains a type confusion vulnerability that could allow a remote attacker to perform arbitrary read/write via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9d7601023e5727317ba34c75837e9bdda5c785744381cad963208da89b7e46ca",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

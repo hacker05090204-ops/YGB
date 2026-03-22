@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "URLs containing percent-encoded slashes (`/` or `\\`) can trick wcurl into saving the output file outside of the current directory without the user explicitly asking for it. This flaw only affects the wcurl command line tool.",
+  "token_count": 36
+}

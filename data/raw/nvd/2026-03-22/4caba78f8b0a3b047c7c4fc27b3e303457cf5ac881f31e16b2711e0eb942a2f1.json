@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24015",
+  "ingested_at": "2026-03-22T07:54:42.233414+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in Apache IoTDB. This issue affects Apache IoTDB: from 1.0.0 before 1.3.7, from 2.0.0 before 2.0.7. Users are recommended to upgrade to version 1.3.7 or 2.0.7, which fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4caba78f8b0a3b047c7c4fc27b3e303457cf5ac881f31e16b2711e0eb942a2f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-1327",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24015"
+}

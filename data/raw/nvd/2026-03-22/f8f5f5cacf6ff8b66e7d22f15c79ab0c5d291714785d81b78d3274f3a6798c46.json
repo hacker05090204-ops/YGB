@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28781",
+  "ingested_at": "2026-03-22T07:54:34.587271+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 4.17.0-beta.1 and 5.9.0-beta.1, the entry creation process allows for Mass Assignment of the authorId attribute. A user with \"Create Entries\" permission can inject the authorIds[] (or authorId) parameter into the POST request, which the backend processes without verifying if the current user is authorized to assign authorship to others. Normally, this field is not present in the request for users without the necessary permissions. By manually adding this parameter, an attacker can attribute the new entry to any user, including Admins. This effectively \"spoofs\" the authorship. This vulnerability is fixed in 4.17.0-beta.1 and 5.9.0-beta.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f8f5f5cacf6ff8b66e7d22f15c79ab0c5d291714785d81b78d3274f3a6798c46",
+  "source": "nvd",
+  "tags": [
+    "CWE-639",
+    "CWE-915"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28781"
+}

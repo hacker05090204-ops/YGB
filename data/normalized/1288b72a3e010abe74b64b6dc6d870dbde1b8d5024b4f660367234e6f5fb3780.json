@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Drupal Core A remote code execution vulnerability exists within multiple subsystems of Drupal that can allow attackers to exploit multiple attack vectors on a Drupal site.",
+  "token_count": 26
+}

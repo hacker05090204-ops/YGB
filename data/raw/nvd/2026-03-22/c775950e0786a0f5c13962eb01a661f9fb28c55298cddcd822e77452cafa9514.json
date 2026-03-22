@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2578",
+  "ingested_at": "2026-03-22T07:54:46.472063+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0 fail to preserve the redacted state of burn-on-read posts during deletion which allows channel members to access unrevealed burn-on-read message contents via the WebSocket post deletion event.. Mattermost Advisory ID: MMSA-2026-00579",
+  "severity": "MEDIUM",
+  "sha256_hash": "c775950e0786a0f5c13962eb01a661f9fb28c55298cddcd822e77452cafa9514",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2578"
+}

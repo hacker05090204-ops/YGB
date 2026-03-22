@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An authentication bypass by spoofing vulnerability in Fortinet FortiWeb 7.6.0 through 7.6.3, FortiWeb 7.4.0 through 7.4.8, FortiWeb 7.2 all versions, FortiWeb 7.0 all versions may allow a remote unauthenticated attacker to bypass hostname restrictions via a specially crafted request.",
+  "token_count": 39
+}

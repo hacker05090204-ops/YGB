@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28288",
+  "ingested_at": "2026-03-22T07:54:33.318276+00:00",
+  "lang": "en",
+  "raw_text": "Dify is an open-source LLM app development platform. Prior to 1.9.0, responses from the Dify API to existing and non-existent accounts differ, allowing an attacker to enumerate email addresses registered with Dify. Version 1.9.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3ba8cd4e2de7b326bb37c2fc3d692b5cc7ec74e35a09ac0059abb29264b01833",
+  "source": "nvd",
+  "tags": [
+    "CWE-204"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28288"
+}

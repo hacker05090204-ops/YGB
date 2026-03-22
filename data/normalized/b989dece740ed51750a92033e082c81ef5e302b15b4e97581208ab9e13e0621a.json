@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Office A remote code execution vulnerability exists in Microsoft Office software when it fails to properly handle objects in memory.",
+  "token_count": 21
+}

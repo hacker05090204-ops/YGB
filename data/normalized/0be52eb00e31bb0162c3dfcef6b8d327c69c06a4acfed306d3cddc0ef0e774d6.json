@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One Trend Micro Apex One Management Console (on-premise) contains an OS command injection vulnerability that could allow a pre-authenticated remote attacker to upload malicious code and execute commands on affected installations.",
+  "token_count": 34
+}

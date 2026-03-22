@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Null pointer dereference in Windows Performance Counters allows an authorized attacker to elevate privileges locally.",
+  "token_count": 15
+}

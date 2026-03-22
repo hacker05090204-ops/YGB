@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3714",
+  "ingested_at": "2026-03-22T07:54:42.012049+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in OpenCart 4.0.2.3. Affected by this issue is the function Save of the file admin/controller/design/template.php of the component Incomplete Fix CVE-2024-36694. Such manipulation leads to improper neutralization of special elements used in a template engine. The attack may be performed from remote. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "33439029c61843132a27637b194ffb928df67905984bda40faa414e4bc1dfecc",
+  "source": "nvd",
+  "tags": [
+    "CWE-791",
+    "CWE-1336"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3714"
+}

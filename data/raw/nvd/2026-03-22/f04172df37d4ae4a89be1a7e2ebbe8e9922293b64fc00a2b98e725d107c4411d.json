@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28074",
+  "ingested_at": "2026-03-22T07:54:40.553308+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Pizza House pizzahouse allows Object Injection.This issue affects Pizza House: from n/a through < = 1.4.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f04172df37d4ae4a89be1a7e2ebbe8e9922293b64fc00a2b98e725d107c4411d",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28074"
+}

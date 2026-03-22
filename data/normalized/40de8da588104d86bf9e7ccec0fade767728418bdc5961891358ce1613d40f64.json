@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache OFBiz Apache OFBiz contains a path traversal vulnerability that could allow for remote code execution.",
+  "token_count": 16
+}

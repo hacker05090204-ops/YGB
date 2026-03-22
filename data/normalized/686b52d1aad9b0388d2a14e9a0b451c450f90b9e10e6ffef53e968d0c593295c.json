@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "n8n n8n n8n contains an improper control of dynamically managed code resources vulnerability in its workflow expression evaluation system that allows for remote code execution.",
+  "token_count": 25
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20052",
+  "ingested_at": "2026-03-22T07:54:34.674455+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the memory management handling for the Snort 3 Detection Engine of Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to cause the Snort 3 Detection Engine to restart. This vulnerability is due to a logic error in memory management when a device is performing Snort 3 SSL packet inspection. An attacker could exploit this vulnerability by sending crafted SSL packets through an established connection to be parsed by the Snort 3 Detection Engine. A successful exploit could allow the attacker to cause a denial of service (DoS) condition when the Snort 3 Detection Engine unexpectedly restarts.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ce76095a145993aa65f2c0326aa01ff5373f6824216b97762cc001897b964aed",
+  "source": "nvd",
+  "tags": [
+    "CWE-788"
+  ],
+  "token_count": 104,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20052"
+}

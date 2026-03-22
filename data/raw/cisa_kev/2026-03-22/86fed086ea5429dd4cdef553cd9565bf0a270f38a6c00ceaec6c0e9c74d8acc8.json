@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-53150",
+  "ingested_at": "2026-03-22T07:45:16.469559+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains an out-of-bounds read vulnerability in the USB-audio driver that allows a local, privileged attacker to obtain potentially sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "86fed086ea5429dd4cdef553cd9565bf0a270f38a6c00ceaec6c0e9c74d8acc8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

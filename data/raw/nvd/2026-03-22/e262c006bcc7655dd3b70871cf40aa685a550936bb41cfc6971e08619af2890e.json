@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3550",
+  "ingested_at": "2026-03-22T07:54:48.762362+00:00",
+  "lang": "en",
+  "raw_text": "The RockPress plugin for WordPress is vulnerable to Missing Authorization in all versions up to, and including, 1.0.17. This is due to missing capability checks on multiple AJAX actions (rockpress_import, rockpress_import_status, rockpress_last_import, rockpress_reset_import, and rockpress_check_services) combined with the plugin's nonce being exposed to all authenticated users via an unconditionally enqueued admin script. The plugin enqueues the 'rockpress-admin' script on all admin pages (including profile.php) without any page or capability restrictions, and the nonce for the 'rockpress-nonce' action is passed to this script via wp_localize_script. Since the AJAX handlers only verify this nonce and do not check current_user_can(), any authenticated user, including Subscribers, can extract the nonce from any admin page's HTML source and use it to trigger imports, reset import data (deleting options), check service connectivity, and read import status information. This makes it possible for authenticated attackers, with Subscriber-level access and above, to trigger resource-intensive import operations, reset import tracking data, and perform system connection checks that should be restricted to administrators.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e262c006bcc7655dd3b70871cf40aa685a550936bb41cfc6971e08619af2890e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 163,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3550"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32063",
+  "ingested_at": "2026-03-22T07:54:43.577973+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw version 2026.2.19-2 prior to 2026.2.21 contains a command injection vulnerability in systemd unit file generation where attacker-controlled environment values are not validated for CR/LF characters, allowing newline injection to break out of Environment= lines and inject arbitrary systemd directives. An attacker who can influence config.env.vars and trigger service install or restart can execute arbitrary commands with the privileges of the OpenClaw gateway service user.",
+  "severity": "HIGH",
+  "sha256_hash": "ae35f56e0a413035b064a1cfd5c0dbdeb6f5086e00b36f0a526eb694e8c33338",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32063"
+}

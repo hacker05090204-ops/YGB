@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Statmatic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.11 and 6.4.0, stored XSS vulnerability in svg and icon related components allow authenticated users with appropriate permissions to inject malicious JavaScript that executes when viewed by higher-privileged users. This has been fixed in 5.73.11 and 6.4.0.",
+  "token_count": 51
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-4034",
+  "ingested_at": "2026-03-22T07:45:17.745960+00:00",
+  "lang": "en",
+  "raw_text": "Red Hat Polkit The Red Hat polkit pkexec utility contains an out-of-bounds read and write vulnerability that allows for privilege escalation with administrative rights.",
+  "severity": "CRITICAL",
+  "sha256_hash": "efd2d72954747f82694631b0b35a2b399ae40d9eb578331240e480b98b98e159",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28792",
+  "ingested_at": "2026-03-22T07:54:44.383698+00:00",
+  "lang": "en",
+  "raw_text": "Tina is a headless content management system. Prior to 2.1.8 , the TinaCMS CLI dev server combines a permissive CORS configuration (Access-Control-Allow-Origin: *) with the path traversal vulnerability (previously reported) to enable a browser-based drive-by attack. A remote attacker can enumerate the filesystem, write arbitrary files, and delete arbitrary files on developer's machines by simply tricking them into visiting a malicious website while tinacms dev is running. This vulnerability is fixed in 2.1.8.",
+  "severity": "CRITICAL",
+  "sha256_hash": "408100e1c0ea220f79dae0bf9caaf9cddf7f5e09b9a186d262f3e9307a5538c3",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-942"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28792"
+}

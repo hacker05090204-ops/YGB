@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3088",
+  "ingested_at": "2026-03-22T07:45:18.782038+00:00",
+  "lang": "en",
+  "raw_text": "Apache ActiveMQ The Fileserver web application in Apache ActiveMQ allows remote attackers to upload and execute arbitrary files via an HTTP PUT followed by an HTTP MOVE request",
+  "severity": "CRITICAL",
+  "sha256_hash": "bfb6d9287f90281306459232be55a165e5bd2153c1c26acb75d24b5efd1bab9d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

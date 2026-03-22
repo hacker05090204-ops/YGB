@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1027",
+  "ingested_at": "2026-03-22T07:45:17.995245+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows An elevation of privilege vulnerability exists in the way that the Windows Kernel handles objects in memory. An attacker who successfully exploited the vulnerability could execute code with elevated permissions.",
+  "severity": "CRITICAL",
+  "sha256_hash": "75dad714b0040cff6a750a2bb6b1f6dabfbb9522f00954ef1fa29371a0065d1f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-27850",
+  "ingested_at": "2026-03-22T07:54:32.218165+00:00",
+  "lang": "en",
+  "raw_text": "Due to an improperly configured firewall rule, the router will accept any connection on the WAN port with the source port 5222, exposing all services which are normally only accessible through the local network. This issue affects MR9600: 1.0.4.205530; MX4200: 1.0.13.210200.",
+  "severity": "HIGH",
+  "sha256_hash": "593e3aa981c9eb7714b40e45dda9172e0ab8fe7c93008859a5ebecdd5de4245b",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27850"
+}

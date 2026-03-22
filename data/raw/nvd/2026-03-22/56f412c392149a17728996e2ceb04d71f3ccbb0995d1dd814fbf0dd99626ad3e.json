@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32697",
+  "ingested_at": "2026-03-22T07:54:48.360720+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 8.9.3, the `RecordHandler::getRecord()` method retrieves any record by module and ID without checking the current user's ACL view permission. The companion `saveRecord()` method correctly checks `$bean->ACLAccess('save')`, but `getRecord()` skips the equivalent `ACLAccess('view')` check. Version 8.9.3 patches the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "56f412c392149a17728996e2ceb04d71f3ccbb0995d1dd814fbf0dd99626ad3e",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32697"
+}

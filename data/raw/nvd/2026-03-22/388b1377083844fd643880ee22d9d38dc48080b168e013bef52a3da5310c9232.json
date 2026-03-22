@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28458",
+  "ingested_at": "2026-03-22T07:54:41.046051+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw version 2026.1.20 prior to 2026.2.1 contains a vulnerability in the Browser Relay (extension must be installed and enabled) /cdp WebSocket endpoint in which it does not require authentication tokens, allowing websites to connect via loopback and access sensitive data. Attackers can exploit this by connecting to ws://127.0.0.1:18792/cdp to steal session cookies and execute JavaScript in other browser tabs.",
+  "severity": "HIGH",
+  "sha256_hash": "388b1377083844fd643880ee22d9d38dc48080b168e013bef52a3da5310c9232",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28458"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25048",
+  "ingested_at": "2026-03-22T07:54:40.799408+00:00",
+  "lang": "en",
+  "raw_text": "xgrammar is an open-source library for efficient, flexible, and portable structured generation. Prior to version 0.1.32, the multi-level nested syntax caused a segmentation fault (core dumped). This issue has been patched in version 0.1.32.",
+  "severity": "HIGH",
+  "sha256_hash": "c30dff4fb119e2d000da9c60ffb128eb5e682a96602c4f3b0498ea2fc24e5e20",
+  "source": "nvd",
+  "tags": [
+    "CWE-674"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25048"
+}

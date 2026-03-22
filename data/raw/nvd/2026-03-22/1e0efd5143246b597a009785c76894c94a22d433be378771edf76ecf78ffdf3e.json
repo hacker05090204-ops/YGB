@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32711",
+  "ingested_at": "2026-03-22T07:54:48.412966+00:00",
+  "lang": "en",
+  "raw_text": "pydicom is a pure Python package for working with DICOM files. Versions 2.0.0-rc.1 through 3.0.1 are vulnerable to Path Traversal through a maliciously crafted DICOMDIR ReferencedFileID when it is set to a path outside the File-set root. pydicom resolves the path only to confirm that it exists, but does not verify that the resolved path remains under the File-set root. Subsequent public FileSet operations such as copy(), write(), and remove()+write(use_existing=True) use that unchecked path in file I/O operations. This allows arbitrary file read/copy and, in some flows, move/delete outside the File-set root. This issue has been fixed in version 3.0.2.",
+  "severity": "HIGH",
+  "sha256_hash": "1e0efd5143246b597a009785c76894c94a22d433be378771edf76ecf78ffdf3e",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 100,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32711"
+}

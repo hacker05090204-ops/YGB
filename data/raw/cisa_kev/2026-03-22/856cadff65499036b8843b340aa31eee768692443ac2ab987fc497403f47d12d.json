@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-33045",
+  "ingested_at": "2026-03-22T07:45:16.863192+00:00",
+  "lang": "en",
+  "raw_text": "Dahua IP Camera Firmware Dahua IP cameras and related products contain an authentication bypass vulnerability when the loopback device is specified by the client during authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "856cadff65499036b8843b340aa31eee768692443ac2ab987fc497403f47d12d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30896",
+  "ingested_at": "2026-03-22T07:54:42.167630+00:00",
+  "lang": "en",
+  "raw_text": "The installer for Qsee Client versions 1.0.1 and prior insecurely load Dynamic Link Libraries (DLLs). When a user is directed to place some malicious DLL to the same directory and execute the affected installer, then arbitrary code may be executed with the administrative privilege.",
+  "severity": "HIGH",
+  "sha256_hash": "efed4a0db1ed4d5c75bf51d56139eec8d500be6b95dfcb8b1ad3f89533c61a19",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30896"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32382",
+  "ingested_at": "2026-03-22T07:54:45.985679+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Digital Download digital-download allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Digital Download: from n/a through < = 1.1.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c70114d3384cfcf18d4c7e71d49204ff37e9aed503a3b3b6f1adbf7fa8cae725",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32382"
+}

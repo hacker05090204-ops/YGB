@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70059",
+  "ingested_at": "2026-03-22T07:54:42.293233+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-400: Uncontrolled Resource Consumption was discovered in YMFE yapi v1.12.0 and allows attackers to cause a denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "f1124f032dd0b1d7dcee313b21bba4c4566d7ed2250d455c253cb5e70c4b59b4",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70059"
+}

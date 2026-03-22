@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An authentication bypass vulnerability exists in Copeland XWEB Pro version 1.12.1 and prior, enabling any attackers to bypass the authentication requirement and achieve pre-authenticated code execution on the system.",
+  "token_count": 29
+}

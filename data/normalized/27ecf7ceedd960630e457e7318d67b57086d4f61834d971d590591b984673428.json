@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A privileged Ignition user, intentionally or otherwise, imports an external file with a specially crafted payload, which executes embedded malicious code.",
+  "token_count": 21
+}

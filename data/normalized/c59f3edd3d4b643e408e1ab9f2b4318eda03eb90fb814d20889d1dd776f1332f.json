@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in frdel/agent0ai agent-zero 0.9.7-10. The impacted element is the function get_abs_path of the file python/helpers/files.py. The manipulation results in path traversal. The attack can be executed remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 62
+}

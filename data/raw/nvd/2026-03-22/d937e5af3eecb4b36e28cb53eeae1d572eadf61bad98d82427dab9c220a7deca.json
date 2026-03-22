@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25170",
+  "ingested_at": "2026-03-22T07:54:41.412389+00:00",
+  "lang": "en",
+  "raw_text": "DoceboLMS 1.2 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the id, idC, and idU parameters. Attackers can send GET requests to the lesson.php endpoint with malicious SQL payloads to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "d937e5af3eecb4b36e28cb53eeae1d572eadf61bad98d82427dab9c220a7deca",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25170"
+}

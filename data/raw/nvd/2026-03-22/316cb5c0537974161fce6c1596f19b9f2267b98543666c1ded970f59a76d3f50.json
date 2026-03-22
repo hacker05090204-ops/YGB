@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27212",
+  "ingested_at": "2026-03-22T07:54:30.789825+00:00",
+  "lang": "en",
+  "raw_text": "Swiper is a free and mobile touch slider with hardware accelerated transitions and native behavior. Versions 6.5.1 through 12.1.1 have a Prototype pollution vulnerability. The vulnerability resides in line 94 of shared/utils.mjs, where the indexOf() function is used to check whether user provided input contain forbidden strings. Despite a previous fix that attempted to mitigate prototype pollution by checking whether user input contained a forbidden key, it is still possible to pollute Object.prototype via a crafted input using Array.prototype. The exploit works across Windows and Linux and on Node and Bun runtimes. Any application that processes attacker-controlled input using this package may be affected by the following: Authentication Bypass, Denial of Service and RCE. This issue is fixed in version 12.1.2.",
+  "severity": "HIGH",
+  "sha256_hash": "316cb5c0537974161fce6c1596f19b9f2267b98543666c1ded970f59a76d3f50",
+  "source": "nvd",
+  "tags": [
+    "CWE-1321"
+  ],
+  "token_count": 121,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27212"
+}

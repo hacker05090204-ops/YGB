@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25573",
+  "ingested_at": "2026-03-22T07:54:49.543749+00:00",
+  "lang": "en",
+  "raw_text": "Green CMS 2.x contains an SQL injection vulnerability that allows authenticated attackers to execute arbitrary SQL queries by injecting malicious code through the cat parameter. Attackers can send GET requests to index.php with m=admin, c=posts, a=index parameters and inject SQL code in the cat parameter to manipulate database queries and extract sensitive information.",
+  "severity": "HIGH",
+  "sha256_hash": "d45a565abd06451809d3ef73ba4ddcabd8530264e094bf80f7a9a31c744cf00b",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25573"
+}

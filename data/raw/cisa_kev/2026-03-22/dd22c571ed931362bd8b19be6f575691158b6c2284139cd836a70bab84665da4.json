@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4040",
+  "ingested_at": "2026-03-22T07:45:16.990685+00:00",
+  "lang": "en",
+  "raw_text": "CrushFTP CrushFTP CrushFTP contains an unspecified sandbox escape vulnerability that allows a remote attacker to escape the CrushFTP virtual file system (VFS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "dd22c571ed931362bd8b19be6f575691158b6c2284139cd836a70bab84665da4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

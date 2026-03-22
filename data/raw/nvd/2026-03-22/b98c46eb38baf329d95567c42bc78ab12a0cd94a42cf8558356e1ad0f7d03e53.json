@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26936",
+  "ingested_at": "2026-03-22T07:54:32.715887+00:00",
+  "lang": "en",
+  "raw_text": "Inefficient Regular Expression Complexity (CWE-1333) in the AI Inference Anonymization Engine in Kibana can lead Denial of Service via Regular Expression Exponential Blowup (CAPEC-492).",
+  "severity": "MEDIUM",
+  "sha256_hash": "b98c46eb38baf329d95567c42bc78ab12a0cd94a42cf8558356e1ad0f7d03e53",
+  "source": "nvd",
+  "tags": [
+    "CWE-1333"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26936"
+}

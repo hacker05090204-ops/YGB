@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "JQuery JQuery JQuery contains a persistent cross-site scripting (XSS) vulnerability. When passing maliciously formed, untrusted input enclosed in HTML tags, JQuery's DOM manipulators can execute untrusted code in the context of the user's browser.",
+  "token_count": 34
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Incorrect access control in the component download_wb.cgi of Weintek cMT-3072XH2 easyweb Web Version v2.1.53, OS v20231011 allows unauthenticated attack to download arbitrary files.",
+  "token_count": 23
+}

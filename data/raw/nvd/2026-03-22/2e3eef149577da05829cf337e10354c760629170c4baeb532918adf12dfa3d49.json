@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28778",
+  "ingested_at": "2026-03-22T07:54:34.396947+00:00",
+  "lang": "en",
+  "raw_text": "International Datacasting Corporation (IDC) SFX Series SuperFlex Satellite Receiver contains undocumented, hardcoded/insecure credentials for the `xd` user account. A remote unauthenticated attacker can log in via FTP using these credentials. Because the `xd` user has write permissions to their home directory where root-executed binaries and symlinks (such as those invoked by `xdstartstop`) are stored, the attacker can overwrite these files or manipulate symlinks to achieve arbitrary code execution as the root user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2e3eef149577da05829cf337e10354c760629170c4baeb532918adf12dfa3d49",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28778"
+}

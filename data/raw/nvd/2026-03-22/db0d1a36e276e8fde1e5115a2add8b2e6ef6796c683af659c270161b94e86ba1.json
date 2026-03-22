@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26310",
+  "ingested_at": "2026-03-22T07:54:43.073753+00:00",
+  "lang": "en",
+  "raw_text": "Envoy is a high-performance edge/middle/service proxy. Prior to 1.37.1, 1.36.5, 1.35.8, and 1.34.13, calling Utility::getAddressWithPort with a scoped IPv6 addresses causes a crash. This utility is called in the data plane from the original_src filter and the dns filter. This vulnerability is fixed in 1.37.1, 1.36.5, 1.35.8, and 1.34.13.",
+  "severity": "MEDIUM",
+  "sha256_hash": "db0d1a36e276e8fde1e5115a2add8b2e6ef6796c683af659c270161b94e86ba1",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26310"
+}

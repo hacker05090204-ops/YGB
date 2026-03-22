@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4511",
+  "ingested_at": "2026-03-22T07:54:49.471341+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in vanna-ai vanna up to 2.0.2. Affected is the function exec of the file /src/vanna/legacy. Such manipulation leads to injection. The attack can be executed remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0363514c5c20367a4a7564af7626d9ceab1d81ba105875b18f0970bf977e9ba6",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-707"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4511"
+}

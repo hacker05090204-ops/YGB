@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47873",
+  "ingested_at": "2026-03-22T07:54:47.117374+00:00",
+  "lang": "en",
+  "raw_text": "An out-of-bounds read vulnerability exists in the EMF functionality of Canva Affinity. By using a specially crafted EMF file, an attacker could exploit this vulnerability to perform an out-of-bounds read, potentially leading to the disclosure of sensitive information.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b793512e17227f5164ac03d957514f978e8bb96ae483eeb42d23cd1a88da6f9a",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47873"
+}

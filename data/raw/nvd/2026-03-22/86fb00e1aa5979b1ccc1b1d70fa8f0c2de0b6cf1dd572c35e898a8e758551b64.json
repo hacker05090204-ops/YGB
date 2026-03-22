@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22323",
+  "ingested_at": "2026-03-22T07:54:47.406505+00:00",
+  "lang": "en",
+  "raw_text": "A CSRF vulnerability in the Link Aggregation configuration interface allows an unauthenticated remote attacker to trick authenticated users into sending unauthorized POST requests to the device by luring them to a malicious webpage. This can silently alter the device\u2019s configuration without the victim\u2019s knowledge or consent. Availability impact was set to low because after a successful attack the device will automatically recover without external intervention.",
+  "severity": "HIGH",
+  "sha256_hash": "86fb00e1aa5979b1ccc1b1d70fa8f0c2de0b6cf1dd572c35e898a8e758551b64",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22323"
+}

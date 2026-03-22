@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-52163",
+  "ingested_at": "2026-03-22T07:45:15.993890+00:00",
+  "lang": "en",
+  "raw_text": "Digiever DS-2105 Pro Digiever DS-2105 Pro contains a missing authorization vulnerability which could allow for command injection via time_tzsetup.cgi.",
+  "severity": "CRITICAL",
+  "sha256_hash": "77f7cc2c8c1cbbd8c13a1ea7709b739eb677f3ccc58ed2c18c72055f590b3f10",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

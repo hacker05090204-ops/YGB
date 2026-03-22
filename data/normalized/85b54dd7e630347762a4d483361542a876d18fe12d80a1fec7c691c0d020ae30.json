@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In Microsoft Exchange through 2019, Exchange ActiveSync (EAS) configurations on on-premises servers may transmit sensitive data from Samsung mobile devices in cleartext, including the user's name, e-mail address, device ID, bearer token, and base64-encoded password.",
+  "token_count": 35
+}

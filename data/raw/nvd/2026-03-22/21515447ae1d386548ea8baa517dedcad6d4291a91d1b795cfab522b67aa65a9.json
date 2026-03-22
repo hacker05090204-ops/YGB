@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4222",
+  "ingested_at": "2026-03-22T07:54:46.768768+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in SSCMS up to 7.4.0. This vulnerability affects the function PathUtils.RemoveParentPath of the file /api/admin/plugins/install/actions/download. This manipulation of the argument path causes path traversal. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "21515447ae1d386548ea8baa517dedcad6d4291a91d1b795cfab522b67aa65a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4222"
+}

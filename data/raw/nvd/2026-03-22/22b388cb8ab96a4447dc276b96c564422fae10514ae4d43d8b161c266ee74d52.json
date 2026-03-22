@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32368",
+  "ingested_at": "2026-03-22T07:54:45.953150+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in delphiknight Geo to Lat geo-to-lat allows Blind SQL Injection.This issue affects Geo to Lat: from n/a through < = 1.0.19.",
+  "severity": "HIGH",
+  "sha256_hash": "22b388cb8ab96a4447dc276b96c564422fae10514ae4d43d8b161c266ee74d52",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32368"
+}

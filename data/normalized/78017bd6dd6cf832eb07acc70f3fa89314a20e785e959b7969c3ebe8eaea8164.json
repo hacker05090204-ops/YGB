@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GIGABYTE Multiple Products The GDrv low-level driver in GIGABYTE App Center, AORUS Graphics Engine, XTREME Gaming Engine, and OC GURU II exposes ring0 memcpy-like functionality that could allow a local attacker to take complete control of the affected system.",
+  "token_count": 39
+}

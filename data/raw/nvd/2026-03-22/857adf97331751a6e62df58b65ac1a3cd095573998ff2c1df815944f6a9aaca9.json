@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3681",
+  "ingested_at": "2026-03-22T07:54:41.962017+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in welovemedia FFmate up to 2.0.15. This affects the function fireWebhook of the file /internal/service/webhook/webhook.go. Executing a manipulation can lead to server-side request forgery. The attack can be launched remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "857adf97331751a6e62df58b65ac1a3cd095573998ff2c1df815944f6a9aaca9",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3681"
+}

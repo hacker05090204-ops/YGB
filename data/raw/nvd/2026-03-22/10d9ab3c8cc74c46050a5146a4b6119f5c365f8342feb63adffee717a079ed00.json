@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26112",
+  "ingested_at": "2026-03-22T07:54:42.799347+00:00",
+  "lang": "en",
+  "raw_text": "Untrusted pointer dereference in Microsoft Office Excel allows an unauthorized attacker to execute code locally.",
+  "severity": "HIGH",
+  "sha256_hash": "10d9ab3c8cc74c46050a5146a4b6119f5c365f8342feb63adffee717a079ed00",
+  "source": "nvd",
+  "tags": [
+    "CWE-822",
+    "NVD-CWE-Other"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26112"
+}

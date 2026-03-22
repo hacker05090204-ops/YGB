@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25199",
+  "ingested_at": "2026-03-22T07:54:41.480043+00:00",
+  "lang": "en",
+  "raw_text": "OOP CMS BLOG 1.0 contains SQL injection vulnerabilities that allow unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through multiple parameters. Attackers can inject SQL commands via the search parameter in search.php, pageid parameter in page.php, and id parameter in posts.php to extract database information including table names, schema names, and database credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "111264d5a73cafd668a28a5b8e531c06f2fbd8c7e29e1130f9e8958d78236ec4",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25199"
+}

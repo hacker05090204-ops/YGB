@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-9474",
+  "ingested_at": "2026-03-22T07:45:16.710223+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS Palo Alto Networks PAN-OS contains an OS command injection vulnerability that allows for privilege escalation through the web-based management interface for several PAN products, including firewalls and VPN concentrators.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5edb34ce00bb0b998a0f7408ed4601f604f170f1a421c0238650eb23ddce321a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27839",
+  "ingested_at": "2026-03-22T07:54:32.821154+00:00",
+  "lang": "en",
+  "raw_text": "wger is a free, open-source workout and fitness manager. In versions up to and including 2.4, three `nutritional_values` action endpoints fetch objects via `Model.objects.get(pk=pk)` \u2014 a raw ORM call that bypasses the user-scoped queryset. Any authenticated user can read another user's private nutrition plan data, including caloric intake and full macro breakdown, by supplying an arbitrary PK. Commit 29876a1954fe959e4b58ef070170e81703dab60e contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a8ca11f0e023d5e025ea330f5af3800778ef15af3a4138e36c55f56b7e2a7aba",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27839"
+}

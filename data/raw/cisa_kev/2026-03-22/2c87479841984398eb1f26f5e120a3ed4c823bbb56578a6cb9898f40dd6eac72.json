@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0780",
+  "ingested_at": "2026-03-22T07:45:18.096509+00:00",
+  "lang": "en",
+  "raw_text": "InduSoft Web Studio InduSoft Web Studio NTWebServer contains a directory traversal vulnerability that allows remote attackers to read administrative passwords in APP files, allowing for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2c87479841984398eb1f26f5e120a3ed4c823bbb56578a6cb9898f40dd6eac72",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

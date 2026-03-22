@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-21975",
+  "ingested_at": "2026-03-22T07:45:18.837540+00:00",
+  "lang": "en",
+  "raw_text": "VMware vRealize Operations Manager API Server Side Request Forgery (SSRF) in vRealize Operations Manager API prior to 8.4 may allow a malicious actor with network access to the vRealize Operations Manager API to perform a SSRF attack to steal administrative credentials.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e86807f5540d205f9257dd7cd5b87578e8b25dd80dbfb7ffa526dca35597dc47",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

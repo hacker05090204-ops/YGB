@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25604",
+  "ingested_at": "2026-03-22T07:54:42.252928+00:00",
+  "lang": "en",
+  "raw_text": "In AWS Auth manager, the origin of the SAML authentication has been used as provided by the client and not verified against the actual instance URL. This allowed to gain access to different instances with potentially different access controls by reusing SAML response from other instances. You should upgrade to 9.22.0 version of provider if you use AWS Auth Manager.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a30e58359bd9b9f2b689d6648cf50ba661f361f6ae0339f916a6b3adb97c16b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-346"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25604"
+}

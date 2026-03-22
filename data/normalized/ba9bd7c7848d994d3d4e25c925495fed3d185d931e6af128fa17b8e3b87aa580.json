@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Incorrect access control in the REST API of Ibexa & Ciril GROUP eZ Platform / Ciril Platform 2.x allows unauthenticated attackers to access sensitive data via enumerating object IDs.",
+  "token_count": 29
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Inefficient Regular Expression Complexity (CWE-1333) in the AI Inference Anonymization Engine in Kibana can lead Denial of Service via Regular Expression Exponential Blowup (CAPEC-492).",
+  "token_count": 24
+}

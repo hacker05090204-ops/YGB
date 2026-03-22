@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28222",
+  "ingested_at": "2026-03-22T07:54:40.941163+00:00",
+  "lang": "en",
+  "raw_text": "Wagtail is an open source content management system built on Django. Prior to versions 6.3.8, 7.0.6, 7.2.3, and 7.3.1, a stored cross-site scripting (XSS) vulnerability exists on rendering TableBlock blocks within a StreamField. A user with access to create or edit pages containing TableBlock StreamField blocks is able to set specially-crafted class attributes on the block which run arbitrary JavaScript code when the page is viewed. When viewed by a user with higher privileges, this could lead to performing actions with that user's credentials. The vulnerability is not exploitable by an ordinary site visitor without access to the Wagtail admin, and only affects sites using TableBlock. This issue has been patched in versions 6.3.8, 7.0.6, 7.2.3, and 7.3.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b71c102a0aa3635cf942a94f158c2c1c6f370282ac57a4e8e23610833f31b6af",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 118,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28222"
+}

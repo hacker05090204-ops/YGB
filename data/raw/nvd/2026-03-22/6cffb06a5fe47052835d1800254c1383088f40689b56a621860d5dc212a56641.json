@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26342",
+  "ingested_at": "2026-03-22T07:54:31.760614+00:00",
+  "lang": "en",
+  "raw_text": "Tattile Smart+, Vega, and Basic device families firmware versions 1.181.5 and prior implement an authentication token (X-User-Token) with insufficient expiration. An attacker who obtains a valid token (for example via interception, log exposure, or token reuse on a shared system) can continue to authenticate to the management interface until the token is revoked, enabling unauthorized access to device functions and data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6cffb06a5fe47052835d1800254c1383088f40689b56a621860d5dc212a56641",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26342"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2590",
+  "ingested_at": "2026-03-22T07:54:34.292707+00:00",
+  "lang": "en",
+  "raw_text": "Improper enforcement of the Disable password saving in vaults setting in the connection entry component in Devolutions Remote Desktop Manager 2025.3.30 and earlier allows an authenticated user to persist credentials in vault entries, potentially exposing sensitive information to other users, by creating or editing certain connection types while password saving is disabled.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f4a51124e78a3dd3c1e3b292caeb36f454946580777e193f6992b6d9c1264bcc",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2590"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32691",
+  "ingested_at": "2026-03-22T07:54:47.461886+00:00",
+  "lang": "en",
+  "raw_text": "A race condition in the secrets management subsystem of Juju versions 3.0.0 through 3.6.18 allows an authenticated unit agent to claim ownership of a newly initialized secret. Between generating a Juju Secret ID and creating the secret's first revision, an attacker authenticated as another unit agent can claim ownership of a known secret. This leads to the attacking unit being able to read the content of the initial secret revision.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9c51991ac39cd84c495a0685ce492883023f24ebfa877b009caa006a7448d3dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-708"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32691"
+}

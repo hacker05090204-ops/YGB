@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-12149",
+  "ingested_at": "2026-03-22T07:45:18.919352+00:00",
+  "lang": "en",
+  "raw_text": "Red Hat JBoss Application Server The JBoss Application Server, shipped with Red Hat Enterprise Application Platform 5.2, allows an attacker to execute arbitrary code via crafted serialized data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8588a3da72cae05e89dcac79a5a02c2ae6912c0ca58bce7e5e8ea22bbcf5bb77",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

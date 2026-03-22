@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30798",
+  "ingested_at": "2026-03-22T07:54:40.842688+00:00",
+  "lang": "en",
+  "raw_text": "Insufficient Verification of Data Authenticity, Improper Handling of Exceptional Conditions vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android (Heartbeat sync loop, strategy processing modules) allows Protocol Manipulation. This vulnerability is associated with program files src/hbbs_http/sync.Rs and program routines stop-service handler in heartbeat loop. This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "HIGH",
+  "sha256_hash": "3dd46459a247e6c1b0cf18c0b7eafe66fd87b1ac93991e88cdf0eabe252548fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-345",
+    "CWE-755"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30798"
+}

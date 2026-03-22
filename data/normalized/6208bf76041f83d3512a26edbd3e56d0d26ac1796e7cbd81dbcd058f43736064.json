@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows kernel fails to properly handle objects in memory.",
+  "token_count": 18
+}

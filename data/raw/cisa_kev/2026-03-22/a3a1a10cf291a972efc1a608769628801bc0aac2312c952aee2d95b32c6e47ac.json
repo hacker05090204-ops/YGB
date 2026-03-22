@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-9805",
+  "ingested_at": "2026-03-22T07:45:18.991308+00:00",
+  "lang": "en",
+  "raw_text": "Apache Struts Apache Struts REST Plugin uses an XStreamHandler with an instance of XStream for deserialization without any type filtering, which can lead to remote code execution when deserializing XML payloads.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a3a1a10cf291a972efc1a608769628801bc0aac2312c952aee2d95b32c6e47ac",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

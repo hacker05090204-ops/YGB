@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28464",
+  "ingested_at": "2026-03-22T07:54:41.055052+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.12 use non-constant-time string comparison for hook token validation, allowing attackers to infer tokens through timing measurements. Remote attackers with network access to the hooks endpoint can exploit timing side-channels across multiple requests to gradually determine the authentication token.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fffe61711c222d686d85a34f8f516f3aa92058a1390c12ecd6b152eaa60958d9",
+  "source": "nvd",
+  "tags": [
+    "CWE-208"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28464"
+}

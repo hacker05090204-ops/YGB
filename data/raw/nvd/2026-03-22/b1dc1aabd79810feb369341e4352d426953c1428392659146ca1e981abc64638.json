@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28685",
+  "ingested_at": "2026-03-22T07:54:41.297211+00:00",
+  "lang": "en",
+  "raw_text": "Kimai is a web-based multi-user time-tracking application. Prior to version 2.51.0, \"GET /api/invoices/{id}\" only checks the role-based view_invoice permission but does not verify the requesting user has access to the invoice's customer. Any user with ROLE_TEAMLEAD (which grants view_invoice) can read all invoices in the system, including those belonging to customers assigned to other teams. This issue has been patched in version 2.51.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b1dc1aabd79810feb369341e4352d426953c1428392659146ca1e981abc64638",
+  "source": "nvd",
+  "tags": [
+    "CWE-285"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28685"
+}

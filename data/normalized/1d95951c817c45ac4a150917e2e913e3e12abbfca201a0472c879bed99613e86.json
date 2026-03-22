@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An information disclosure vulnerability in Palo Alto Networks Cortex XDR\u00ae Broker VM allows an authenticated user to obtain and modify sensitive information by triggering live terminal session via Cortex UI and modifying any configuration setting. The attacker must have network access to the Broker VM to exploit this issue.",
+  "token_count": 49
+}

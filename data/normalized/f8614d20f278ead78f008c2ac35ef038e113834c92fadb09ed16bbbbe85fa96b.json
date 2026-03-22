@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Seraphinite Accelerator plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the `seraph_accel_api` AJAX action with `fn=LogClear` in all versions up to, and including, 2.28.14. This makes it possible for authenticated attackers, with Subscriber-level access and above, to clear the plugin's debug/operational logs.",
+  "token_count": 52
+}

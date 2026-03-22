@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-44529",
+  "ingested_at": "2026-03-22T07:45:17.019911+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager Cloud Service Appliance (EPM CSA) Ivanti Endpoint Manager Cloud Service Appliance (EPM CSA) contains a code injection vulnerability that allows an unauthenticated user to execute malicious code with limited permissions (nobody).",
+  "severity": "CRITICAL",
+  "sha256_hash": "fd206839ba54bfe74877b6344c8d680b2d39a3a7017b4aa0fd6c9fd8eceb13b3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

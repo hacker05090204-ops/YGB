@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in code-projects Simple Food Ordering System up to 1.0. Affected by this vulnerability is an unknown functionality of the file /food/sql/food.sql of the component Database Backup Handler. The manipulation leads to files or directories accessible. It is possible to initiate the attack remotely. The exploit has been disclosed publicly and may be used. It is recommended to change the configuration settings.",
+  "token_count": 67
+}

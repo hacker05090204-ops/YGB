@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24732",
+  "ingested_at": "2026-03-22T07:54:34.473165+00:00",
+  "lang": "en",
+  "raw_text": "Files or Directories Accessible to External Parties, Incorrect Permission Assignment for Critical Resource vulnerability in Hallo Welt! GmbH BlueSpice (Extension:NSFileRepo modules) allows Accessing Functionality Not Properly Constrained by ACLs, Bypassing Electronic Locks and Access Controls.This issue affects BlueSpice: from 5.1 through 5.1.3, from 5.2 through 5.2.0. HINT: Versions provided apply to BlueSpice MediaWiki releases. For Extension:NSFileRepo the affected versions are 3.0 < 3.0.5",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c106e273789741609f5d3f0e0aa6866239c3376b5caeca80bd42fe3faf17ea61",
+  "source": "nvd",
+  "tags": [
+    "CWE-552",
+    "CWE-732"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24732"
+}

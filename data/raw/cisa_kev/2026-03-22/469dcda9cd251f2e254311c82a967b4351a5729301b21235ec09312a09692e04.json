@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-19323",
+  "ingested_at": "2026-03-22T07:45:17.603680+00:00",
+  "lang": "en",
+  "raw_text": "GIGABYTE Multiple Products The GPCIDrv and GDrv low-level drivers in GIGABYTE App Center, AORUS Graphics Engine, XTREME Gaming Engine, and OC GURU expose functionality to read and write arbitrary physical memory. This could be leveraged by a local attacker to elevate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "469dcda9cd251f2e254311c82a967b4351a5729301b21235ec09312a09692e04",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

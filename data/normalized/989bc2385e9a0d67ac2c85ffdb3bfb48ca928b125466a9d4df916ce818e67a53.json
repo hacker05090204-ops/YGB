@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ServiceNow Utah, Vancouver, and Washington DC Now Platform ServiceNow Washington DC, Vancouver, and earlier Now Platform releases contain an incomplete list of disallowed inputs vulnerability in the GlideExpression script. An unauthenticated user could exploit this vulnerability to execute code remotely.",
+  "token_count": 40
+}

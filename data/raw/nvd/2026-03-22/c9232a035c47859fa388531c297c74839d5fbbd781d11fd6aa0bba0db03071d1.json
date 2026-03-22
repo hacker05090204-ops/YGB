@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28356",
+  "ingested_at": "2026-03-22T07:54:44.378693+00:00",
+  "lang": "en",
+  "raw_text": "multipart is a fast multipart/form-data parser for python. Prior to 1.2.2, 1.3.1 and 1.4.0-dev, the parse_options_header() function in multipart.py uses a regular expression with an ambiguous alternation, which can cause exponential backtracking (ReDoS) when parsing maliciously crafted HTTP or multipart segment headers. This can be abused for denial of service (DoS) attacks against web applications using this library to parse request headers or multipart/form-data streams. The issue is fixed in 1.2.2, 1.3.1 and 1.4.0-dev.",
+  "severity": "HIGH",
+  "sha256_hash": "c9232a035c47859fa388531c297c74839d5fbbd781d11fd6aa0bba0db03071d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-1333"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28356"
+}

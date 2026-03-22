@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3152",
+  "ingested_at": "2026-03-22T07:54:31.976261+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in itsourcecode College Management System 1.0. This issue affects some unknown processing of the file /admin/teacher-salary.php. This manipulation of the argument teacher_id causes sql injection. It is possible to initiate the attack remotely. The exploit has been published and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "1686b713d9111cd4c88a44a114e8830c923cc17aacabea491f6f316d45713f31",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3152"
+}

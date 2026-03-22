@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Kiteworks is a private data network (PDN). Prior to version 9.2.0, avulnerability in Kiteworks command execution functionality allows authenticated users to redirect command output to arbitrary file locations. This could be exploited to overwrite critical system files and gain elevated access. Version 9.2.0 contains a patch.",
+  "token_count": 46
+}

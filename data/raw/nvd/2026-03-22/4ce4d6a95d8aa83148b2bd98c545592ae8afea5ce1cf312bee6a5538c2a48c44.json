@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0230",
+  "ingested_at": "2026-03-22T07:54:43.748600+00:00",
+  "lang": "en",
+  "raw_text": "A problem with a protection mechanism in the Palo Alto Networks Cortex XDR agent on macOS allows a local administrator to disable the agent. This issue could be leveraged by malware to perform malicious activity without detection.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "4ce4d6a95d8aa83148b2bd98c545592ae8afea5ce1cf312bee6a5538c2a48c44",
+  "source": "nvd",
+  "tags": [
+    "CWE-754"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0230"
+}

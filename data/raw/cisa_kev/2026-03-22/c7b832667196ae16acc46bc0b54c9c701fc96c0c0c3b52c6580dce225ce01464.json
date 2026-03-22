@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-23176",
+  "ingested_at": "2026-03-22T07:45:18.133817+00:00",
+  "lang": "en",
+  "raw_text": "WatchGuard Firebox and XTM WatchGuard Firebox and XTM appliances allow a remote attacker with unprivileged credentials to access the system with a privileged management session via exposed management access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7b832667196ae16acc46bc0b54c9c701fc96c0c0c3b52c6580dce225ce01464",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

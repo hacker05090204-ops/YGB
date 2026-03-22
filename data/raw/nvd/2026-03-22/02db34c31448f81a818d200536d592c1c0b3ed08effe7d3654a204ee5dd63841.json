@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2036",
+  "ingested_at": "2026-03-22T07:54:30.672978+00:00",
+  "lang": "en",
+  "raw_text": "GFI Archiver MArc.Store Deserialization of Untrusted Data Remote Code Execution Vulnerability. This vulnerability allows remote attackers to execute arbitrary code on affected installations of GFI Archiver. Although authentication is required to exploit this vulnerability, the existing authentication mechanism can be bypassed. The specific flaw exists within the configuration of the MArc.Store.Remoting.exe process. The issue results from the lack of proper validation of user-supplied data, which can result in deserialization of untrusted data. An attacker can leverage this vulnerability to execute code in the context of SYSTEM. Was ZDI-CAN-27936.",
+  "severity": "HIGH",
+  "sha256_hash": "02db34c31448f81a818d200536d592c1c0b3ed08effe7d3654a204ee5dd63841",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2036"
+}

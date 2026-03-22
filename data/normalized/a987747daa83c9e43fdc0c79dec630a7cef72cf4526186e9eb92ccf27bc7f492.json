@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Missing authentication and authorization in the web API of Tata Consultancy Services Cognix Recon Client v3.0 allows remote attackers to access application functionality without restriction via the network.",
+  "token_count": 28
+}

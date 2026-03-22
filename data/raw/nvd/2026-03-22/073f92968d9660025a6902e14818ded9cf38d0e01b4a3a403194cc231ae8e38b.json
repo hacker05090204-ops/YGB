@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1068",
+  "ingested_at": "2026-03-22T07:54:43.953515+00:00",
+  "lang": "en",
+  "raw_text": "An improper certificate validation vulnerability was reported in the Lenovo Filez application that could allow a user capable of intercepting network traffic to obtain sensitive user data from the application.",
+  "severity": "MEDIUM",
+  "sha256_hash": "073f92968d9660025a6902e14818ded9cf38d0e01b4a3a403194cc231ae8e38b",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1068"
+}

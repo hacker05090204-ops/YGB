@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An integer underflow vulnerability in Silicon Labs Secure NCP host implementation allows a buffer overread via a specially crafted packet.",
+  "token_count": 20
+}

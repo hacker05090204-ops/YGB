@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper restriction of communication channel to intended endpoints in Azure IoT Explorer allows an unauthorized attacker to disclose information over a network.",
+  "token_count": 22
+}

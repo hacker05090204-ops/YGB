@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70046",
+  "ingested_at": "2026-03-22T07:54:42.310594+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-829: Inclusion of Functionality from Untrusted Control Sphere was discovered in Miazzy oa-front-service master.",
+  "severity": "CRITICAL",
+  "sha256_hash": "763207989fa4332cca7ea2eba72e32e9ead47abb1f46fe2a43f68a42b00b87be",
+  "source": "nvd",
+  "tags": [
+    "CWE-829"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70046"
+}

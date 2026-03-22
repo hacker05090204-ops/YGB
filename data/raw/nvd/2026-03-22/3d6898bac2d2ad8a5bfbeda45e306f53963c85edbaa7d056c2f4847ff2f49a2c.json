@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20091",
+  "ingested_at": "2026-03-22T07:54:32.149754+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the web-based management interface of Cisco FXOS Software and Cisco UCS Manager Software could allow an authenticated, remote attacker to conduct a stored cross-site scripting (XSS) attack against a user of the interface. This vulnerability is due to insufficient validation of user-supplied input by the web-based management interface of an affected system. An attacker could exploit this vulnerability by injecting malicious data into specific pages of the interface. A successful exploit could allow the attacker to execute arbitrary script code in the context of the affected interface or access sensitive, browser-based information. To exploit this vulnerability, the attacker must have valid credentials for a user account with the role of Administrator or AAA Administrator.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3d6898bac2d2ad8a5bfbeda45e306f53963c85edbaa7d056c2f4847ff2f49a2c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 117,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20091"
+}

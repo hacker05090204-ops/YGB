@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "theshit is a command-line utility that automatically detects and fixes common mistakes in shell commands. Prior to version 0.2.0, improper privilege dropping allows local privilege escalation via command re-execution. This issue has been patched in version 0.2.0.",
+  "token_count": 37
+}

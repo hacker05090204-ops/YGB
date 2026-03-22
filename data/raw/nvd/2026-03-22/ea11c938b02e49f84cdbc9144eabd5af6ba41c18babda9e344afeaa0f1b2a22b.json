@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69305",
+  "ingested_at": "2026-03-22T07:54:30.202322+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Crete Core crete-core allows Blind SQL Injection.This issue affects Crete Core: from n/a through < = 1.4.3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ea11c938b02e49f84cdbc9144eabd5af6ba41c18babda9e344afeaa0f1b2a22b",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69305"
+}

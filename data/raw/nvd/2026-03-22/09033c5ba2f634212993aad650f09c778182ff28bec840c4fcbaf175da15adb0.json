@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28559",
+  "ingested_at": "2026-03-22T07:54:33.420481+00:00",
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains an information disclosure vulnerability that allows unauthenticated users to retrieve private and unapproved forum topics via the global RSS feed endpoint. Attackers request the RSS feed without a forum ID parameter, bypassing the privacy and status WHERE clauses that are only applied when a specific forum ID is present in the query.",
+  "severity": "MEDIUM",
+  "sha256_hash": "09033c5ba2f634212993aad650f09c778182ff28bec840c4fcbaf175da15adb0",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28559"
+}

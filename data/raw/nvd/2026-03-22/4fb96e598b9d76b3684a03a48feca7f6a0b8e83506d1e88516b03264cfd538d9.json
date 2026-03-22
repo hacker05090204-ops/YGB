@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25513",
+  "ingested_at": "2026-03-22T07:54:44.281578+00:00",
+  "lang": "en",
+  "raw_text": "Jettweb PHP Hazir Haber Sitesi Scripti V3 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'q' parameter. Attackers can send GET requests to datagetir.php with malicious 'q' values using time-based blind SQL injection techniques to extract sensitive database information or bypass authentication.",
+  "severity": "HIGH",
+  "sha256_hash": "4fb96e598b9d76b3684a03a48feca7f6a0b8e83506d1e88516b03264cfd538d9",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25513"
+}

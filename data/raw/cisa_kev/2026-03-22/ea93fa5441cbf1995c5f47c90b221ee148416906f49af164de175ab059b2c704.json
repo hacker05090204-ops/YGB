@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4610",
+  "ingested_at": "2026-03-22T07:45:16.947027+00:00",
+  "lang": "en",
+  "raw_text": "Arm Mali GPU Kernel Driver Arm Bifrost and Valhall GPU kernel drivers contain a use-after-free vulnerability that allows a local, non-privileged user to make improper GPU memory processing operations to gain access to already freed memory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ea93fa5441cbf1995c5f47c90b221ee148416906f49af164de175ab059b2c704",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

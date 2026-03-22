@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in tagDiv tagDiv Composer allows Reflected XSS.This issue affects tagDiv Composer: from n/a through 5.4.2.",
+  "token_count": 26
+}

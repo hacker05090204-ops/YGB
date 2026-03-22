@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-48503",
+  "ingested_at": "2026-03-22T07:45:16.087584+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple macOS, iOS, tvOS, Safari, and watchOS contain an unspecified vulnerability in JavaScriptCore that when processing web content may lead to arbitrary code execution. The impacted product could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bdd4185099219c154ef4db5a5f9ad90bbe506c2481939a01bc913e0408e6c0e0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

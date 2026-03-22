@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25220",
+  "ingested_at": "2026-03-22T07:54:32.241081+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the Message Center accepts the URL parameter `show_all=yes` and passes it to `getPnotesByUser()`, which returns all internal messages (all users\u2019 notes). The backend does not verify that the requesting user is an administrator before honoring `show_all=yes`. The \"Show All\" link is also visible to non-admin users. As a result, any authenticated user can view the entire internal message list by requesting `messages.php?show_all=yes`. Version 8.0.0 patches the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "07290ef3651642b13cf312e600bc2f3dc9b51835c9a65a4db99a9a7d22c90b95",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25220"
+}

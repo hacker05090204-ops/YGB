@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26795",
+  "ingested_at": "2026-03-22T07:54:44.405451+00:00",
+  "lang": "en",
+  "raw_text": "GL-iNet GL-AR300M16 v4.3.11 was discovered to contain a command injection vulnerability via the module parameter in the M.get_system_log function. This vulnerability allows attackers to execute arbitrary commands via a crafted input.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e0643747904f861308ff4e4a54c11b7969f88072c15e03174d76a37454a5d483",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-77"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26795"
+}

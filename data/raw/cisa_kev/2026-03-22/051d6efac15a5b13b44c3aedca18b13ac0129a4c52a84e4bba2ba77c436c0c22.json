@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38106",
+  "ingested_at": "2026-03-22T07:45:16.874833+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Kernel contains an unspecified vulnerability that allows for privilege escalation, enabling a local attacker to gain SYSTEM privileges. Successful exploitation of this vulnerability requires an attacker to win a race condition.",
+  "severity": "CRITICAL",
+  "sha256_hash": "051d6efac15a5b13b44c3aedca18b13ac0129a4c52a84e4bba2ba77c436c0c22",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

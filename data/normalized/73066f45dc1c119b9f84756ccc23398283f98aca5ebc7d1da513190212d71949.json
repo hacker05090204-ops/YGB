@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Vulnerability of improper verification in the email application. Impact: Successful exploitation of this vulnerability may affect service confidentiality.",
+  "token_count": 18
+}

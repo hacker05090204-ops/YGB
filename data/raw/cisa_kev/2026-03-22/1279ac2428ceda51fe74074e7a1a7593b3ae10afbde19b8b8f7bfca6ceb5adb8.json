@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1906",
+  "ingested_at": "2026-03-22T07:45:19.525034+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a detection of error condition without action vulnerability when improper handling of address deregistration on failure can lead to new GPU address allocation failure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1279ac2428ceda51fe74074e7a1a7593b3ae10afbde19b8b8f7bfca6ceb5adb8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

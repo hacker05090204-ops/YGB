@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-3493",
+  "ingested_at": "2026-03-22T07:45:17.613195+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel The overlayfs stacking file system in Linux kernel does not properly validate the application of file capabilities against user namespaces, which could lead to privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d28d955b6cd682a45646464b4dd101652102d75a1119aa91fe29e8c397570782",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-47729",
+  "ingested_at": "2026-03-22T07:45:16.427741+00:00",
+  "lang": "en",
+  "raw_text": "TeleMessage TM SGNL TeleMessage TM SGNL contains a hidden functionality vulnerability in which the archiving backend holds cleartext copies of messages from TM SGNL application users.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1714c910cb9a9be77646f80277746c4a4877f938fa5139a8ceeed276e48002ff",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

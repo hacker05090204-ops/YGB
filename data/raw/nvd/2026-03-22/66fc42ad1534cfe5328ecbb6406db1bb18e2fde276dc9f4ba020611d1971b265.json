@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-63909",
+  "ingested_at": "2026-03-22T07:54:34.154957+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect access control in the component /opt/SRLtzm/bin/TapeDumper of Cohesity TranZman Migration Appliance Release 4.0 Build 14614 allows attackers to escalate privileges to root and read and write arbitrary files.",
+  "severity": "HIGH",
+  "sha256_hash": "66fc42ad1534cfe5328ecbb6406db1bb18e2fde276dc9f4ba020611d1971b265",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-63909"
+}

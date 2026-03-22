@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28695",
+  "ingested_at": "2026-03-22T07:54:34.581216+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). There is an authenticated admin RCE in Craft CMS 5.8.21 via Server-Side Template Injection using the create() Twig function combined with a Symfony Process gadget chain. The create() Twig function exposes Craft::createObject(), which allows instantiation of arbitrary PHP classes with constructor arguments. Combined with the bundled symfony/process dependency, this enables RCE. This bypasses the fix implemented for CVE-2025-57811 (patched in 5.8.7). This vulnerability is fixed in 5.9.0-beta.1 and 4.17.0-beta.1.",
+  "severity": "HIGH",
+  "sha256_hash": "18682ab0d6079822c2fe31e39416506f57131c9c43e3cf3f4738ee4d6a0574cf",
+  "source": "nvd",
+  "tags": [
+    "CWE-1336"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28695"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27202",
+  "ingested_at": "2026-03-22T07:54:30.731659+00:00",
+  "lang": "en",
+  "raw_text": "GetSimple CMS is a content management system. All versions of GetSimple CMS have a flaw in the Uploaded Files feature that allows for arbitrary file reads. This issue has not been fixed at the time of publication.",
+  "severity": "HIGH",
+  "sha256_hash": "d81b2cb62eaac1af55913dc3d03385d2e85034641f40abf730fca3fd113c4cc5",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-23"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27202"
+}

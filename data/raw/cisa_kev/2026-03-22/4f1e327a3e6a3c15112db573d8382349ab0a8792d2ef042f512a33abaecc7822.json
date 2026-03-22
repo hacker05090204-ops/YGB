@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22674",
+  "ingested_at": "2026-03-22T07:45:18.168896+00:00",
+  "lang": "en",
+  "raw_text": "Apple macOS macOS Monterey contains an out-of-bounds read vulnerability that could allow an application to read kernel memory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4f1e327a3e6a3c15112db573d8382349ab0a8792d2ef042f512a33abaecc7822",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

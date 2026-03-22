@@ -1,0 +1,120 @@
+{
+  "agent_id": "AGENT-DATA",
+  "scope": "data/",
+  "counts": {
+    "files": 6,
+    "directories": 5,
+    "json_files": 4,
+    "jsonl_files": 2,
+    "jsonl_lines": {
+      "approval_ledger.jsonl": 105,
+      "host_action_ledger.jsonl": 211
+    }
+  },
+  "checks": {
+    "json_parse_sweep": {
+      "status": "pass",
+      "files": [
+        "data/field_state.json",
+        "data/runtime_status.json",
+        "data/scan_state.json",
+        "data/db/targets/27660a49-57b4-4fff-9e11-f8161dd06e33.json"
+      ]
+    },
+    "jsonl_parse_sweep": {
+      "status": "pass",
+      "files": [
+        "data/approval_ledger.jsonl",
+        "data/host_action_ledger.jsonl"
+      ]
+    },
+    "hash_chain": {
+      "status": "pass",
+      "files": [
+        "data/approval_ledger.jsonl",
+        "data/host_action_ledger.jsonl"
+      ]
+    },
+    "target_schema": {
+      "status": "pass",
+      "file": "data/db/targets/27660a49-57b4-4fff-9e11-f8161dd06e33.json",
+      "keys": [
+        "id",
+        "program_name",
+        "scope",
+        "link",
+        "platform",
+        "payout_tier",
+        "status",
+        "created_at"
+      ]
+    },
+    "storage_layout": {
+      "status": "warn",
+      "empty_dirs": [
+        "data/db/activity_log",
+        "data/db/bounties",
+        "data/db/sessions",
+        "data/db/users"
+      ],
+      "target_records": 1
+    },
+    "secret_sweep": {
+      "status": "pass",
+      "notes": [
+        "No obvious credentials or private keys detected with literal pattern sweep.",
+        "Generic token terms were present in ledger/state schema fields."
+      ]
+    },
+    "runtime_status": {
+      "status": "warn",
+      "values": {
+        "data_freshness": "fresh",
+        "determinism_pass": true,
+        "freeze_valid": true,
+        "precision_breach": true
+      }
+    }
+  },
+  "category_scores": {
+    "1": {
+      "name": "Existence & Completeness",
+      "score": 10.0,
+      "weight": 5
+    },
+    "5": {
+      "name": "Data Quality & Accuracy",
+      "score": 8.5,
+      "weight": 20
+    },
+    "8": {
+      "name": "Scalability & Storage",
+      "score": 7.5,
+      "weight": 10
+    },
+    "9": {
+      "name": "Governance & Security",
+      "score": 7.5,
+      "weight": 5
+    }
+  },
+  "weighted_score": 8.4,
+  "tag": "🟡 YELLOW",
+  "sub_tags": [],
+  "findings": [
+    {
+      "severity": "HIGH",
+      "file": "data/runtime_status.json",
+      "detail": "The current runtime snapshot reports precision_breach=true."
+    },
+    {
+      "severity": "MEDIUM",
+      "file": "data/db/",
+      "detail": "Storage layout is valid but shallow; most db subdirectories are empty and there is no sharding by source/date."
+    }
+  ],
+  "blockers": [
+    "Dedicated secret-scanning tools were not executed in this pass."
+  ],
+  "tests_run": 7
+}

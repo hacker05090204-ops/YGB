@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell RecoverPoint for Virtual Machines (RP4VMs) Dell RecoverPoint for Virtual Machines (RP4VMs) contains an use of hard-coded credentials vulnerability that could allow an unauthenticated remote attacker to gain unauthorized access to the underlying operating system and root-level persistence.",
+  "token_count": 38
+}

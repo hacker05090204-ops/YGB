@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A time-of-create-to-time-of-use (TOCTOU) vulnerability lets recently deleted-then-recreated data sources be re-deleted without permission to do so. This requires several very stringent conditions to be met: - The attacker must have admin access to the specific datasource prior to its first deletion. - Upon deletion, all steps within the attack must happen within the next 30 seconds and on the same pod of Grafana. - The attacker must delete the datasource, then someone must recreate it. - The new datasource must not have the attacker as an admin. - The new datasource must have the same UID as the prior datasource. These are randomised by default. - The datasource can now be re-deleted by the attacker. - Once 30 seconds are up, the attack is spent and cannot be repeated. - No datasource with any other UID can be attacked.",
+  "token_count": 139
+}

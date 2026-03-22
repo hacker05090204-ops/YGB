@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Use-after-free vulnerability in Microsoft Internet Explorer allows remote attackers to execute remote code via a crafted web site that triggers access to a deleted object.",
+  "token_count": 28
+}

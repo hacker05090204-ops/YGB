@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw has been found in Freedom Factory dGEN1 up to 20260221. Affected by this vulnerability is the function TokenBalanceContentProvider of the component org.ethereumphone.walletmanager.testing123. Executing a manipulation can lead to improper authorization. The attack requires local access. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 61
+}

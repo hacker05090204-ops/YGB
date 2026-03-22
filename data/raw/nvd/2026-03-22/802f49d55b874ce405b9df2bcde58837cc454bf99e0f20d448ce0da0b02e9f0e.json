@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27125",
+  "ingested_at": "2026-03-22T07:54:30.659976+00:00",
+  "lang": "en",
+  "raw_text": "svelte performance oriented web framework. Prior to 5.51.5, in server-side rendering, attribute spreading on elements (e.g. ) enumerates inherited properties from the object's prototype chain rather than only own properties. In environments where Object.prototype has already been polluted \u2014 a precondition outside of Svelte's control \u2014 this can cause unexpected attributes to appear in SSR output or cause SSR to throw errors. Client-side rendering is not affected. This vulnerability is fixed in 5.51.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "802f49d55b874ce405b9df2bcde58837cc454bf99e0f20d448ce0da0b02e9f0e",
+  "source": "nvd",
+  "tags": [
+    "CWE-915"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27125"
+}

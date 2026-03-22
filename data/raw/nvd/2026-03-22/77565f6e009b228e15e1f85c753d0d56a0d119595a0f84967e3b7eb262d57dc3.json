@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31892",
+  "ingested_at": "2026-03-22T07:54:43.661886+00:00",
+  "lang": "en",
+  "raw_text": "Argo Workflows is an open source container-native workflow engine for orchestrating parallel jobs on Kubernetes. From 2.9.0 to before 4.0.2 and 3.7.11, A user who can submit Workflows can completely bypass all security settings defined in a WorkflowTemplate by including a podSpecPatch field in their Workflow submission. This works even when the controller is configured with templateReferencing: Strict, which is specifically documented as a mechanism to restrict users to admin-approved templates. The podSpecPatch field on a submitted Workflow takes precedence over the referenced WorkflowTemplate during spec merging and is applied directly to the pod spec at creation time with no security validation. This vulnerability is fixed in 4.0.2 and 3.7.11.",
+  "severity": "HIGH",
+  "sha256_hash": "77565f6e009b228e15e1f85c753d0d56a0d119595a0f84967e3b7eb262d57dc3",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 110,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31892"
+}

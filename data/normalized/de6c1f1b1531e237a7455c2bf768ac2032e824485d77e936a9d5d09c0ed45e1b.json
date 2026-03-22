@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TP-Link Multiple Archer Devices Directory traversal vulnerability in multiple TP-Link Archer devices allows remote attackers to read arbitrary files via a .. (dot dot) in the PATH_INFO to login/.",
+  "token_count": 29
+}

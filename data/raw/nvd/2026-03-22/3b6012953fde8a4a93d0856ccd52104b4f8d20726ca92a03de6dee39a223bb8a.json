@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15554",
+  "ingested_at": "2026-03-22T07:54:46.316752+00:00",
+  "lang": "en",
+  "raw_text": "Browser caching of LAPS passwords in Truesec\u2019s LAPSWebUI before version 2.4 allows an attacker with access to a workstation to escalate their privileges via disclosure of local admin passwords.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "3b6012953fde8a4a93d0856ccd52104b4f8d20726ca92a03de6dee39a223bb8a",
+  "source": "nvd",
+  "tags": [
+    "CWE-525"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15554"
+}

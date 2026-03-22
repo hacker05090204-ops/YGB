@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29119",
+  "ingested_at": "2026-03-22T07:54:34.398946+00:00",
+  "lang": "en",
+  "raw_text": "International Datacasting Corporation (IDC) SFX Series SuperFlex(SFX2100) SatelliteReceiver contains hardcoded and insecure credentials for the `admin` account. A remote unauthenticated attacker can use these undocumented credentials to access the satellite system directly via the Telnet service, leading to potential system compromise.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa160c7311b7c7f865a923146e2ec1fda96b53137c8f779d6ae95a8baf4ea68b",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29119"
+}

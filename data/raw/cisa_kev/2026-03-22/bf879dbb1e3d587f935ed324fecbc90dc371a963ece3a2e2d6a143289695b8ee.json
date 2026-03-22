@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-1671",
+  "ingested_at": "2026-03-22T07:45:17.890800+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists when components of Windows, .NET Framework, Office, Lync, and Silverlight fail to properly handle TrueType fonts.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bf879dbb1e3d587f935ed324fecbc90dc371a963ece3a2e2d6a143289695b8ee",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

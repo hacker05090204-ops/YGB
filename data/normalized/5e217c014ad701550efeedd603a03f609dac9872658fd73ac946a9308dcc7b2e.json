@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Company Posts for LinkedIn plugin for WordPress is vulnerable to Missing Authorization in all versions up to, and including, 1.0.0. This is due to a missing capability check on the `linkedin_company_post_reset_handler()` function hooked to `admin_post_reset_linkedin_company_post`. This makes it possible for authenticated attackers, with Subscriber-level access and above, to delete LinkedIn post data stored in the site's options table.",
+  "token_count": 59
+}

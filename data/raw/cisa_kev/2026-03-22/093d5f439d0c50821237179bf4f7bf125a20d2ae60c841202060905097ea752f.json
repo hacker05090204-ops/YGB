@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-0986",
+  "ingested_at": "2026-03-22T07:45:19.315226+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows kernel contains an unspecified vulnerability when handling objects in memory that allows attackers to escalate privileges and execute code in kernel mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "093d5f439d0c50821237179bf4f7bf125a20d2ae60c841202060905097ea752f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

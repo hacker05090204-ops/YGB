@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows SmartScreen contains a security feature bypass vulnerability that allows an attacker to bypass the SmartScreen user experience and inject code to potentially gain code execution, which could lead to some data exposure, lack of system availability, or both.",
+  "token_count": 42
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a use of out-of-range pointer offset vulnerability due to memory corruption in Graphics while submitting a large list of sync points in an AUX command to the IOCTL_KGSL_GPU_AUX_COMMAND.",
+  "token_count": 35
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25181",
+  "ingested_at": "2026-03-22T07:54:42.749052+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bounds read in Windows GDI+ allows an unauthorized attacker to disclose information over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "4def85b8aaab0928ec54d998647e20c00cd4b0c20ce8e223a0da361113dd8d3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25181"
+}

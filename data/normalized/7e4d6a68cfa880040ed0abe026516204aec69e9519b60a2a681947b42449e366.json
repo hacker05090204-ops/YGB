@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in SICAM SIAPP SDK (All versions < V2.1.7). An out-of-bounds write vulnerability exists in SICAM SIAPP SDK. This could allow an attacker to write data beyond the intended buffer, potentially leading to denial of service, or arbitrary code execution.",
+  "token_count": 44
+}

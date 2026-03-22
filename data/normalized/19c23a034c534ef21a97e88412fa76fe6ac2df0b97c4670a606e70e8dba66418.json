@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WordPress File Manager Plugin WordPress File Manager plugin contains a remote code execution vulnerability that allows unauthenticated users to execute PHP code and upload malicious files on a target site.",
+  "token_count": 30
+}

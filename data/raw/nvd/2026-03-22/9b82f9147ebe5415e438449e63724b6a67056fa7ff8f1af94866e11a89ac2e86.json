@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4127",
+  "ingested_at": "2026-03-22T07:54:49.455344+00:00",
+  "lang": "en",
+  "raw_text": "The Speedup Optimization plugin for WordPress is vulnerable to Missing Authorization in all versions up to and including 1.5.9. The `speedup01_ajax_enabled()` function, which handles the `wp_ajax_speedup01_enabled` AJAX action, does not perform any capability check via `current_user_can()` and also lacks nonce verification. This is in contrast to other AJAX handlers in the same plugin (e.g., `speedup01_ajax_install_iox` and `speedup01_ajax_delete_cache_file`) which properly check for `install_plugins` and `manage_options` capabilities respectively. This makes it possible for authenticated attackers, with Subscriber-level access and above, to enable or disable the site's optimization module by sending a POST request to admin-ajax.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9b82f9147ebe5415e438449e63724b6a67056fa7ff8f1af94866e11a89ac2e86",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4127"
+}

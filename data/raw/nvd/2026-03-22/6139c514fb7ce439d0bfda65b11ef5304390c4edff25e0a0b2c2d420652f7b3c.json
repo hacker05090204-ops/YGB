@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-57622",
+  "ingested_at": "2026-03-22T07:54:34.068004+00:00",
+  "lang": "en",
+  "raw_text": "An issue in Step-Video-T2V allows a remote attacker to execute arbitrary code via the /vae-api , /caption-api , feature = pickle.loads(request.get_data()) component",
+  "severity": "CRITICAL",
+  "sha256_hash": "6139c514fb7ce439d0bfda65b11ef5304390c4edff25e0a0b2c2d420652f7b3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-57622"
+}

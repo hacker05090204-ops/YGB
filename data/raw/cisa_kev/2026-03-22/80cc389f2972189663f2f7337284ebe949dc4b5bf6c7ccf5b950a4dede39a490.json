@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21510",
+  "ingested_at": "2026-03-22T07:45:15.925159+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Shell contains a protection mechanism failure vulnerability that could allow an unauthorized attacker to bypass a security feature over a network.",
+  "severity": "CRITICAL",
+  "sha256_hash": "80cc389f2972189663f2f7337284ebe949dc4b5bf6c7ccf5b950a4dede39a490",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

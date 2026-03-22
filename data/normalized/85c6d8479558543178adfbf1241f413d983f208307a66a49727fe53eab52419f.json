@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper signature validation in PKCS7_verify() in AWS-LC allows an unauthenticated user to bypass signature verification when processing PKCS7 objects with Authenticated Attributes. Customers of AWS services do not need to take action. Applications using AWS-LC should upgrade to AWS-LC version 1.69.0.",
+  "token_count": 41
+}

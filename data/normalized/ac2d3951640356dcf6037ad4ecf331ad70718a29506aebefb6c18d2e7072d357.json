@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sitecore CMS and Experience Platform (XP) Sitecore CMS and Experience Platform (XP) contain a deserialization vulnerability in the Sitecore.Security.AntiCSRF module that allows an unauthenticated attacker to execute arbitrary code by sending a serialized .NET object in the HTTP POST parameter __CSRFTOKEN.",
+  "token_count": 41
+}

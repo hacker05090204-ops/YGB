@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27135",
+  "ingested_at": "2026-03-22T07:54:47.620079+00:00",
+  "lang": "en",
+  "raw_text": "nghttp2 is an implementation of the Hypertext Transfer Protocol version 2 in C. Prior to version 1.68.1, the nghttp2 library stops reading the incoming data when user facing public API `nghttp2_session_terminate_session` or `nghttp2_session_terminate_session2` is called by the application. They might be called internally by the library when it detects the situation that is subject to connection error. Due to the missing internal state validation, the library keeps reading the rest of the data after one of those APIs is called. Then receiving a malformed frame that causes FRAME_SIZE_ERROR causes assertion failure. nghttp2 v1.68.1 adds missing state validation to avoid assertion failure. No known workarounds are available.",
+  "severity": "HIGH",
+  "sha256_hash": "24741f996f001a4fd58593bb8fa118f10cb1a39fdba0012064ab04d0a95eddc4",
+  "source": "nvd",
+  "tags": [
+    "CWE-617"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27135"
+}

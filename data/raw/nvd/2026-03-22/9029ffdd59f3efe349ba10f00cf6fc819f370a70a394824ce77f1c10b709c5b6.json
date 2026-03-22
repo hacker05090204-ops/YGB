@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3209",
+  "ingested_at": "2026-03-22T07:54:32.401445+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in fosrl Pangolin up to 1.15.4-s.3. This affects the function verifyRoleAccess/verifyApiKeyRoleAccess of the component Role Handler. The manipulation leads to improper access controls. Remote exploitation of the attack is possible. The exploit has been disclosed to the public and may be used. Upgrading to version 1.15.4-s.4 mitigates this issue. The identifier of the patch is 5e37c4e85fae68e756be5019a28ca903b161fdd5. Upgrading the affected component is advised.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9029ffdd59f3efe349ba10f00cf6fc819f370a70a394824ce77f1c10b709c5b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3209"
+}

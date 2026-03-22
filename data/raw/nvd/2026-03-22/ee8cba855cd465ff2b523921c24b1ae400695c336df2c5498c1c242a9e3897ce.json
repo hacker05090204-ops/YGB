@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26034",
+  "ingested_at": "2026-03-22T07:54:39.950519+00:00",
+  "lang": "en",
+  "raw_text": "UPS Multi-UPS Management Console (MUMC) version 01.06.0001 (A03) contains an Incorrect Default Permissions (CWE-276) vulnerability that allows an attacker to execute arbitrary code with SYSTEM privileges by causing the application to load a specially crafted DLL.",
+  "severity": "HIGH",
+  "sha256_hash": "ee8cba855cd465ff2b523921c24b1ae400695c336df2c5498c1c242a9e3897ce",
+  "source": "nvd",
+  "tags": [
+    "CWE-276",
+    "CWE-428"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26034"
+}

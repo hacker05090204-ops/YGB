@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM i 7.6 could allow a remote attacker to cause a denial of service using failed authentication connections due to improper allocation of resources.",
+  "token_count": 24
+}

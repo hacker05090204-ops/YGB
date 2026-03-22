@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Broadcom VMware Aria Operations Broadcom VMware Aria Operations formerly known as vRealize Operations (vROps) contains a command injection vulnerability that allows an unauthenticated attacker to execute arbitrary commands, potentially leading to remote code execution during support\u2010assisted product migration.",
+  "token_count": 38
+}

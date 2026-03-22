@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27898",
+  "ingested_at": "2026-03-22T07:54:34.830402+00:00",
+  "lang": "en",
+  "raw_text": "Vaultwarden is an unofficial Bitwarden compatible server written in Rust, formerly known as bitwarden_rs. Prior to version 1.35.4, an authenticated regular user can specify another user\u2019s cipher_id and call \"PUT /api/ciphers/{id}/partial\" Even though the standard retrieval API correctly denies access to that cipher, the partial update endpoint returns 200 OK and exposes cipherDetails (including name, notes, data, secureNote, etc.). This issue has been patched in version 1.35.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ea5dcb8d94ef5b9f1d7cef843bcd377e9d845d4b862340f6f7332b2c4ed5f61a",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27898"
+}

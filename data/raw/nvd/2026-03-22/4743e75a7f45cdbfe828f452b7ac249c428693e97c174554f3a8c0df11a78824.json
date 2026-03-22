@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25190",
+  "ingested_at": "2026-03-22T07:54:41.460029+00:00",
+  "lang": "en",
+  "raw_text": "Easyndexer 1.0 contains a cross-site request forgery vulnerability that allows unauthenticated attackers to create administrative accounts by submitting forged POST requests. Attackers can craft malicious web pages that submit POST requests to createuser.php with parameters including username, password, name, surname, and privileges set to 1 for administrator access.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4743e75a7f45cdbfe828f452b7ac249c428693e97c174554f3a8c0df11a78824",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25190"
+}

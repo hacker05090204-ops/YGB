@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Erlang Erlang/OTP Erlang Erlang/OTP SSH server contains a missing authentication for critical function vulnerability. This could allow an attacker to execute arbitrary commands without valid credentials, potentially leading to unauthenticated remote code execution (RCE). By exploiting a flaw in how SSH protocol messages are handled, a malicious actor could gain unauthorized access to affected systems. This vulnerability could affect various products that implement Erlang/OTP SSH server, including\u2014but not limited to\u2014Cisco, NetApp, and SUSE.",
+  "token_count": 73
+}

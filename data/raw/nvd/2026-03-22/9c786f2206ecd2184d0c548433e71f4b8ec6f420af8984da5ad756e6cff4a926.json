@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-12981",
+  "ingested_at": "2026-03-22T07:54:33.070776+00:00",
+  "lang": "en",
+  "raw_text": "The Listee theme for WordPress is vulnerable to privilege escalation in all versions up to, and including, 1.1.6. This is due to a broken validation check in the bundled listee-core plugin's user registration function that fails to properly sanitize the user_role parameter. This makes it possible for unauthenticated attackers to register as Administrator by manipulating the user_role parameter during registration.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9c786f2206ecd2184d0c548433e71f4b8ec6f420af8984da5ad756e6cff4a926",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12981"
+}

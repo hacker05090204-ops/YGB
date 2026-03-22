@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32041",
+  "ingested_at": "2026-03-22T07:54:48.252032+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.3.1 fail to properly handle authentication bootstrap errors during startup, allowing browser-control routes to remain accessible without authentication. Local processes or loopback-reachable SSRF paths can exploit this to access browser-control routes including evaluate-capable actions without valid credentials.",
+  "severity": "MEDIUM",
+  "sha256_hash": "89d6cb0581111a3844f0e1606258edfd2afdad5988c918d5c520c84a1f4d28a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32041"
+}

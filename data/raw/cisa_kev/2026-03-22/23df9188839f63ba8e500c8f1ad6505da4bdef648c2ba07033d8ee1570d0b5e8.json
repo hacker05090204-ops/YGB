@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-1603",
+  "ingested_at": "2026-03-22T07:45:15.857983+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager (EPM) Ivanti Endpoint Manager (EPM) contains an authentication bypass using an alternate path or channel vulnerability that could allow a remote unauthenticated attacker to leak specific stored credential data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "23df9188839f63ba8e500c8f1ad6505da4bdef648c2ba07033d8ee1570d0b5e8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

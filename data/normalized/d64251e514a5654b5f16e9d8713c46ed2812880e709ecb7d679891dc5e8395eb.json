@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains a use-after-free vulnerability in the nft_object, allowing local attackers to escalate privileges.",
+  "token_count": 17
+}

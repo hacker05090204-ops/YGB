@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2029",
+  "ingested_at": "2026-03-22T07:54:32.563138+00:00",
+  "lang": "en",
+  "raw_text": "The Livemesh Addons for Beaver Builder plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the `[labb_pricing_item]` shortcode's `title` and `value` attributes in all versions up to, and including, 3.9.2 due to insufficient input sanitization and output escaping. Specifically, the plugin uses `htmlspecialchars_decode()` after `wp_kses_post()`, which decodes HTML entities back into executable code after sanitization has occurred. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a0b1480a7943f87451c53ad99f7e9e07e5076da8017332fa52fe3a07c24c30b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2029"
+}

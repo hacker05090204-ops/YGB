@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32811",
+  "ingested_at": "2026-03-22T07:54:48.418310+00:00",
+  "lang": "en",
+  "raw_text": "Heimdall is a cloud native Identity Aware Proxy and Access Control Decision service. When using Heimdall in envoy gRPC decision API mode with versions 0.7.0-alpha through 0.17.10, wrong encoding of the query URL string allows rules with non-wildcard path expressions to be bypassed. Envoy splits the requested URL into parts, and sends the parts individually to Heimdall. Although query and path are present in the API, the query field is documented to be always empty and the URL query is included in the path field. The implementation uses go's url library to reconstruct the url which automatically encodes special characters in the path. As a consequence, a parameter like /mypath?foo=bar to Path is escaped into /mypath%3Ffoo=bar. Subsequently, a rule matching /mypath no longer matches and is bypassed. The issue can only lead to unintended access if Heimdall is configured with an \"allow all\" default rule. Since v0.16.0, Heimdall enforces secure defaults and refuses to start with such a configuration unless this enforcement is explicitly disabled, e.g. via --insecure-skip-secure-default-rule-enforcement or the broader --insecure flag. This issue has been fixed in version 0.17.11.",
+  "severity": "HIGH",
+  "sha256_hash": "622548de19b1196b2a0eeea44906cd6dc66d5b75aa40f2a7488289ab34cf223d",
+  "source": "nvd",
+  "tags": [
+    "CWE-116",
+    "CWE-863"
+  ],
+  "token_count": 181,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32811"
+}

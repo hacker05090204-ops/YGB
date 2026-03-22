@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68541",
+  "ingested_at": "2026-03-22T07:54:30.118029+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in BoldThemes Ippsum ippsum allows Object Injection.This issue affects Ippsum: from n/a through < = 1.2.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a1cad9fe59c91adffecc3c1424b64d6c4f91863d68ae8f41e85d3d9177c5edfb",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68541"
+}

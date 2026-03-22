@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-23225",
+  "ingested_at": "2026-03-22T07:45:17.027002+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, watchOS, and visionOS kernel contain a memory corruption vulnerability that allows an attacker with arbitrary kernel read and write capability to bypass kernel memory protections.",
+  "severity": "CRITICAL",
+  "sha256_hash": "df5fdb156ec67cb7ca598e9b08d79c93943210d28f0d94366438628782783b86",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2017-20217",
+  "ingested_at": "2026-03-22T07:54:46.268973+00:00",
+  "lang": "en",
+  "raw_text": "Serviio PRO 1.8 contains an information disclosure vulnerability due to improper access control enforcement in the Configuration REST API that allows unauthenticated attackers to access sensitive information. Remote attackers can send specially crafted requests to the REST API endpoints to retrieve potentially sensitive configuration data without authentication.",
+  "severity": "HIGH",
+  "sha256_hash": "a0dcdfa9847275db41a806d16f20a523ae1dfa179fcd22f919670112a792adae",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2017-20217"
+}

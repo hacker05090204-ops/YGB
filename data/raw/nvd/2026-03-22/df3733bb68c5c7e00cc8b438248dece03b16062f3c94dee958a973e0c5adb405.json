@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32054",
+  "ingested_at": "2026-03-22T07:54:49.216831+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 contain a symlink traversal vulnerability in browser trace and download output path handling that allows local attackers to escape the managed temp root directory. An attacker with local access can create symlinks to route file writes outside the intended temp directory, enabling arbitrary file overwrite on the affected system.",
+  "severity": "MEDIUM",
+  "sha256_hash": "df3733bb68c5c7e00cc8b438248dece03b16062f3c94dee958a973e0c5adb405",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32054"
+}

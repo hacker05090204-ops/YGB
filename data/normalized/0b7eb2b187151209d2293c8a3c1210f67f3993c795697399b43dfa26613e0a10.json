@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker can perform a command injection via Modbus-TCP or Modbus-RTU to gain read and write access on the affected device.",
+  "token_count": 23
+}

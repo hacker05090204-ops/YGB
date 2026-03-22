@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Tenda FH1203 V2.0.1.6 contains a stack-based buffer overflow vulnerability in the modify_add_client_prio function, which is reachable via the formSetClientPrio CGI handler.",
+  "token_count": 21
+}

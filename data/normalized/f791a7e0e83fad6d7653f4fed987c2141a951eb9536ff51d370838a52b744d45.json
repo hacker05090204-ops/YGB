@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was discovered in the Kubernetes CSI Driver for NFS where the subDir parameter in volume identifiers was insufficiently validated. Attackers with the ability to create PersistentVolumes referencing the NFS CSI driver could craft volume identifiers containing path traversal sequences (../). During volume deletion or cleanup operations, the driver could operate on unintended directories outside the intended managed path within the NFS export. This may lead to deletion or modification of directories on the NFS server.",
+  "token_count": 77
+}

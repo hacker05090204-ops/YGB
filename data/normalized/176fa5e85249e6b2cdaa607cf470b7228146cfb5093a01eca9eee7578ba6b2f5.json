@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS A Palo Alto Networks PAN-OS URL filtering policy misconfiguration could allow a network-based attacker to conduct reflected and amplified TCP denial-of-service (RDoS) attacks.",
+  "token_count": 27
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25109",
+  "ingested_at": "2026-03-22T07:54:32.970111+00:00",
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an authenticated attacker to achieve remote code execution on the system by injecting malicious input into the devices field when accessing the get setup route, leading to remote code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "178ed76ce905d4285c9be08fab9b431f60a8831d31a876489f0d3906867750d5",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25109"
+}

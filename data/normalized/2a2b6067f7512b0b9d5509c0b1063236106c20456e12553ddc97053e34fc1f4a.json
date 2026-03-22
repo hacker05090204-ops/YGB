@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Cozmoslabs Profile Builder Pro allows Blind SQL Injection.This issue affects Profile Builder Pro: from n/a through 3.13.9.",
+  "token_count": 31
+}

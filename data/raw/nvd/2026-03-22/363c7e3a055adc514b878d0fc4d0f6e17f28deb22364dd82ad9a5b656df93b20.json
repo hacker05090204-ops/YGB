@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24110",
+  "ingested_at": "2026-03-22T07:54:33.715870+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Attackers may send overly long `addDhcpRules` data. When these rules enter the `addDhcpRule` function and are processed by `ret = sscanf(pRule, \" %d\\t%[^\\t]\\t%[^\\n\\r\\t]\", &dhcpsIndex, dhcpsIP, dhcpsMac);`, the lack of size validation for the rules could lead to buffer overflows in `dhcpsIndex`, `dhcpsIP`, and `dhcpsMac`.",
+  "severity": "CRITICAL",
+  "sha256_hash": "363c7e3a055adc514b878d0fc4d0f6e17f28deb22364dd82ad9a5b656df93b20",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24110"
+}

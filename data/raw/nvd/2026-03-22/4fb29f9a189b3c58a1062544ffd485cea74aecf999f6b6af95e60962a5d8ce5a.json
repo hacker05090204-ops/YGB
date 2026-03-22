@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3052",
+  "ingested_at": "2026-03-22T07:54:31.379080+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in DataLinkDC dinky up to 1.2.5. The impacted element is the function proxyUba of the file dinky-admin/src/main/java/org/dinky/controller/FlinkProxyController.java of the component Flink Proxy Controller. Performing a manipulation results in server-side request forgery. It is possible to initiate the attack remotely. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4fb29f9a189b3c58a1062544ffd485cea74aecf999f6b6af95e60962a5d8ce5a",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3052"
+}

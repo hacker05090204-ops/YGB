@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32705",
+  "ingested_at": "2026-03-22T07:54:46.529562+00:00",
+  "lang": "en",
+  "raw_text": "PX4 autopilot is a flight control solution for drones. Prior to 1.17.0-rc2, the BST telemetry probe writes a string terminator using a device-provided length without bounds. A malicious BST device can report an oversized dev_name_len, causing a stack overflow in the driver and crashing the task (or enabling code execution). This vulnerability is fixed in 1.17.0-rc2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "28bf80d686abd9e9cdd5efc9046a1ef9c25683990bacbb6bdc6a501e03545a1f",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32705"
+}

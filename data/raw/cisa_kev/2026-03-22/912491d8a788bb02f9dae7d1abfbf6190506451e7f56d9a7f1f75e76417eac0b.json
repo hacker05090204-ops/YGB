@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-12991",
+  "ingested_at": "2026-03-22T07:45:18.315377+00:00",
+  "lang": "en",
+  "raw_text": "Citrix SD-WAN and NetScaler Authenticated Command Injection in Citrix SD-WAN Appliance and NetScaler SD-WAN Appliance.",
+  "severity": "CRITICAL",
+  "sha256_hash": "912491d8a788bb02f9dae7d1abfbf6190506451e7f56d9a7f1f75e76417eac0b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

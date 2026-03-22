@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2365",
+  "ingested_at": "2026-03-22T07:54:39.954686+00:00",
+  "lang": "en",
+  "raw_text": "The Fluent Forms Pro plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the `fluentform_step_form_save_data` AJAX action in all versions up to, and including, 6.1.17. This is due to the draft form submission endpoint being publicly accessible without authentication or nonce verification, combined with insufficient input sanitization and output escaping of form field data. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever an administrator views a partial form entry.",
+  "severity": "HIGH",
+  "sha256_hash": "69ea791412f380f924cd08d249a22da414c445884bcb23e2d393a98414ed27c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2365"
+}

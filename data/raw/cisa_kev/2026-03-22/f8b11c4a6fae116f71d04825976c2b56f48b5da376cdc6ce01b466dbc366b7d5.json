@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-54236",
+  "ingested_at": "2026-03-22T07:45:16.080678+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Commerce and Magento Adobe Commerce and Magento Open Source contain an improper input validation vulnerability that could allow an attacker to take over customer accounts through the Commerce REST API.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f8b11c4a6fae116f71d04825976c2b56f48b5da376cdc6ce01b466dbc366b7d5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

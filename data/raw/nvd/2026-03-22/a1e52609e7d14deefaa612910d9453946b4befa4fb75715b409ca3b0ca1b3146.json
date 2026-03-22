@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20126",
+  "ingested_at": "2026-03-22T07:54:32.159777+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in Cisco Catalyst SD-WAN Manager could allow an authenticated, local attacker with low privileges to gain root privileges on the underlying operating system. This vulnerability is due to an insufficient user authentication mechanism in the REST API. An attacker could exploit this vulnerability by sending a request to the REST API of the affected system. A successful exploit could allow the attacker to gain root privileges on the underlying operating system.",
+  "severity": "HIGH",
+  "sha256_hash": "a1e52609e7d14deefaa612910d9453946b4befa4fb75715b409ca3b0ca1b3146",
+  "source": "nvd",
+  "tags": [
+    "CWE-648"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20126"
+}

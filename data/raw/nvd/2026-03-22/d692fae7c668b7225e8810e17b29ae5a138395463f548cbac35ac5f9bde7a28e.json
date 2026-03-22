@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2420",
+  "ingested_at": "2026-03-22T07:54:41.810683+00:00",
+  "lang": "en",
+  "raw_text": "The LotekMedia Popup Form plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin settings in all versions up to, and including, 1.0.6 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Administrator-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses the frontend of the site where the popup is displayed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d692fae7c668b7225e8810e17b29ae5a138395463f548cbac35ac5f9bde7a28e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2420"
+}

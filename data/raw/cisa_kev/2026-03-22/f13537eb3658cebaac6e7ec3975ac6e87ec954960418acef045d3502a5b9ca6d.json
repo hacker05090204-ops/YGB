@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-20021",
+  "ingested_at": "2026-03-22T07:45:19.569873+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SonicWall Email Security SonicWall Email Security contains an improper privilege management vulnerability that allows an attacker to create an administrative account by sending a crafted HTTP request to the remote host. This vulnerability has known usage in a SonicWall Email Security exploit chain along with CVE-2021-20022 and CVE-2021-20023 to achieve privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f13537eb3658cebaac6e7ec3975ac6e87ec954960418acef045d3502a5b9ca6d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

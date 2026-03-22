@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25448",
+  "ingested_at": "2026-03-22T07:54:30.637843+00:00",
+  "lang": "en",
+  "raw_text": "OrientDB 3.0.17 contains a stored cross-site scripting vulnerability that allows authenticated attackers to inject malicious scripts by creating users with script payloads in the name parameter. Attackers can send POST requests to the document endpoint with JavaScript code in the name field to execute arbitrary scripts when users view the application.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2297b5708f8bfee3041ea4c897a3eb117df791f4b5ee8f1635ec13f205e2033f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25448"
+}

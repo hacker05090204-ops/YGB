@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32610",
+  "ingested_at": "2026-03-22T07:54:47.535503+00:00",
+  "lang": "en",
+  "raw_text": "Glances is an open-source system cross-platform monitoring tool. Prior to version 4.5.2, the Glances REST API web server ships with a default CORS configuration that sets `allow_origins=[\"*\"]` combined with `allow_credentials=True`. When both of these options are enabled together, Starlette's `CORSMiddleware` reflects the requesting `Origin` header value in the `Access-Control-Allow-Origin` response header instead of returning the literal `*` wildcard. This effectively grants any website the ability to make credentialed cross-origin API requests to the Glances server, enabling cross-site data theft of system monitoring information, configuration secrets, and command line arguments from any user who has an active browser session with a Glances instance. Version 4.5.2 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "310ae9e65330a6d94f40ee2817a0245fb635395407ed1d3c2c7e417d515fc8d4",
+  "source": "nvd",
+  "tags": [
+    "CWE-942"
+  ],
+  "token_count": 107,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32610"
+}

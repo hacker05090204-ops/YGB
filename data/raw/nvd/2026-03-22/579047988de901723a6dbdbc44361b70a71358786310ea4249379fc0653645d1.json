@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41772",
+  "ingested_at": "2026-03-22T07:54:42.215290+00:00",
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker can obtain valid session tokens because they are exposed in plaintext within the URL parameters of the wwwupdate.cgi endpoint in UBR.",
+  "severity": "HIGH",
+  "sha256_hash": "579047988de901723a6dbdbc44361b70a71358786310ea4249379fc0653645d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-598"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41772"
+}

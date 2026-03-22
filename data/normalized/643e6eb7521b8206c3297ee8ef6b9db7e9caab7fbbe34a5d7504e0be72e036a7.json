@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Android Pixel Android Pixel contains a vulnerability in the Framework component, where the UI may be misleading or insufficient, providing a means to hide a foreground service notification. This could enable a local attacker to disclose sensitive information.",
+  "token_count": 38
+}

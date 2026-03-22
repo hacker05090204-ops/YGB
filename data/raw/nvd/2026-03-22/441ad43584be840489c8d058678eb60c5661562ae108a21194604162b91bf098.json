@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0124",
+  "ingested_at": "2026-03-22T07:54:43.167815+00:00",
+  "lang": "en",
+  "raw_text": "There is a possible out of bounds write due to a missing bounds check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "441ad43584be840489c8d058678eb60c5661562ae108a21194604162b91bf098",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0124"
+}

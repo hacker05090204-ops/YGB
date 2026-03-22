@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the IKEv2 feature of Cisco Secure Firewall ASA Software and Cisco Secure FTD Software could allow an authenticated, remote attacker with valid VPN user credentials to cause a DoS condition on an affected device that may also impact the availability of services to devices elsewhere in the network. This vulnerability is due to the improper processing of IKEv2 packets. An attacker could exploit this vulnerability by sending crafted, authenticated IKEv2 packets to an affected device. A successful exploit could allow the attacker to exhaust memory, causing the device to reload.",
+  "token_count": 93
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL Sametime is vulnerable to broken server-side validation. While the application performs client-side input checks, these are not enforced by the web server. An attacker can bypass these restrictions by sending manipulated HTTP requests directly to the server.",
+  "token_count": 38
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25178",
+  "ingested_at": "2026-03-22T07:54:42.744056+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Windows Ancillary Function Driver for WinSock allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "b6a68cb22f49107245b6696d4fee8e2b09084131129f8a4fcd9fa35d2ceb64b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25178"
+}

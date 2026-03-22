@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-28783",
+  "ingested_at": "2026-03-22T07:54:34.593820+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 5.9.0-beta.1 and 4.17.0-beta.1, Craft CMS implements a blocklist to prevent potentially dangerous PHP functions from being called via Twig non-Closure arrow functions. In order to be able to successfully execute this attack, you need to either have allowAdminChanges enabled on production, or a compromised admin account, or an account with access to the System Messages utility. Several PHP functions are not included in the blocklist, which could allow malicious actors with the required permissions to execute various types of payloads, including RCEs, arbitrary file reads, SSRFs, and SSTIs. This vulnerability is fixed in 5.9.0-beta.1 and 4.17.0-beta.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3a95b0d60c979a995386929c7eeea827fd60cf4c6327ba286bdf9af707f6f3d2",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-184",
+    "CWE-1336"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28783"
+}

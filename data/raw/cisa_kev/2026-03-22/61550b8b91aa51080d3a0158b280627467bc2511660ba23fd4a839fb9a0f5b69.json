@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8414",
+  "ingested_at": "2026-03-22T07:45:18.330647+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists when the Windows Shell does not properly validate file paths.",
+  "severity": "CRITICAL",
+  "sha256_hash": "61550b8b91aa51080d3a0158b280627467bc2511660ba23fd4a839fb9a0f5b69",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

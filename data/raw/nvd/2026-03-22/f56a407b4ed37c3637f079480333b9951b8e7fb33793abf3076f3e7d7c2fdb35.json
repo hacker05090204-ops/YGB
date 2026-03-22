@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59786",
+  "ingested_at": "2026-03-22T07:54:34.532325+00:00",
+  "lang": "en",
+  "raw_text": "2N Access Commander version 3.4.2 and prior improperly invalidates session tokens, allowing multiple session cookies to remain active after logout in web application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f56a407b4ed37c3637f079480333b9951b8e7fb33793abf3076f3e7d7c2fdb35",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59786"
+}

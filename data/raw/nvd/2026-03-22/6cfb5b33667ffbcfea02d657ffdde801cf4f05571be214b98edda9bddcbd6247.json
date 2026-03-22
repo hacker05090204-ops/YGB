@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27519",
+  "ingested_at": "2026-03-22T07:54:31.673528+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior use RC4 with a hard-coded key embedded in client-side JavaScript. Because the key is static and exposed, an attacker can decrypt protected values and defeat confidentiality protections.",
+  "severity": "HIGH",
+  "sha256_hash": "6cfb5b33667ffbcfea02d657ffdde801cf4f05571be214b98edda9bddcbd6247",
+  "source": "nvd",
+  "tags": [
+    "CWE-321",
+    "CWE-327"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27519"
+}

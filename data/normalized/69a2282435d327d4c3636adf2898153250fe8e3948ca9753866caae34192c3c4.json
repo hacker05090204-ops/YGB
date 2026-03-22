@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability [CWE-79] vulnerability in Fortinet FortiSandbox 5.0.0 through 5.0.2, FortiSandbox 4.4.0 through 4.4.7, FortiSandbox 4.2 all versions, FortiSandbox 4.0 all versions may allow an authenticated privileged attacker to execute code via crafted requests.",
+  "token_count": 44
+}

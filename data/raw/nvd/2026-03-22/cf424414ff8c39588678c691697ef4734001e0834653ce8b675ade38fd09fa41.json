@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69381",
+  "ingested_at": "2026-03-22T07:54:30.265351+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in vanquish WooCommerce Bulk Product Editor woocommerce-quick-product-editor allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WooCommerce Bulk Product Editor: from n/a through < = 3.0.",
+  "severity": "HIGH",
+  "sha256_hash": "cf424414ff8c39588678c691697ef4734001e0834653ce8b675ade38fd09fa41",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69381"
+}

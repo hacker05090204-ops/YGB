@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28550",
+  "ingested_at": "2026-03-22T07:54:40.745165+00:00",
+  "lang": "en",
+  "raw_text": "Race condition vulnerability in the security control module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0ddda6975ad4bdc0dec66da1521cbe7d9a34c52d99719a5f49f7d8d33f9990a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-840",
+    "CWE-362"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28550"
+}

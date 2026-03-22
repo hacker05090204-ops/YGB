@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28442",
+  "ingested_at": "2026-03-22T07:54:40.991804+00:00",
+  "lang": "en",
+  "raw_text": "ZimaOS is a fork of CasaOS, an operating system for Zima devices and x86-64 systems with UEFI. In version 1.5.2-beta3, users are restricted from deleting internal system files or folders through the application interface. However, when interacting directly with the API, these restrictions can be bypassed. By altering the path parameter in the delete request, internal OS files and directories can be removed successfully. The backend processes these manipulated requests without validating whether the targeted path belongs to restricted system locations. This demonstrates improper input validation and broken access control on sensitive filesystem operations. No known public patch is available.",
+  "severity": "HIGH",
+  "sha256_hash": "09c8588068769083d9acb17043f5a058a981b3e84f2f7d05869f56c196be9371",
+  "source": "nvd",
+  "tags": [
+    "CWE-73"
+  ],
+  "token_count": 100,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28442"
+}

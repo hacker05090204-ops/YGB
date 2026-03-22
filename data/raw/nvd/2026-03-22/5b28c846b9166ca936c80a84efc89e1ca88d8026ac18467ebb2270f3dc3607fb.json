@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2998",
+  "ingested_at": "2026-03-22T07:54:31.055064+00:00",
+  "lang": "en",
+  "raw_text": "ERP developed by eAI Technologies has a DLL Hijacking vulnerability, allowing authenticated local attackers to place a crafted DLL file in the same directory as the program, thereby executing arbitrary code.",
+  "severity": "HIGH",
+  "sha256_hash": "5b28c846b9166ca936c80a84efc89e1ca88d8026ac18467ebb2270f3dc3607fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-426"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2998"
+}

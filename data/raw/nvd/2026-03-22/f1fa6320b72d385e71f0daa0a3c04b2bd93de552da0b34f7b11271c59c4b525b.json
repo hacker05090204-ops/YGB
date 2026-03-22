@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-54659",
+  "ingested_at": "2026-03-22T07:54:42.589458+00:00",
+  "lang": "en",
+  "raw_text": "An Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability [CWE-22] vulnerability in Fortinet FortiSOAR Agent Communication Bridge 1.1.0, FortiSOAR Agent Communication Bridge 1.0 all versions may allow an unauthenticated attacker to read files accessible to the fortisoar user on a system where the agent is deployed, via sending a crafted request to the agent port.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f1fa6320b72d385e71f0daa0a3c04b2bd93de552da0b34f7b11271c59c4b525b",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-54659"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior reflect unsanitized user input in the web interface, allowing an attacker to inject and execute arbitrary JavaScript in the context of an authenticated user.",
+  "token_count": 33
+}

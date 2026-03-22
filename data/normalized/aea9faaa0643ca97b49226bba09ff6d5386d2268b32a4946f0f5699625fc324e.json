@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GitLab Community and Enterprise Editions GitHub Community and Enterprise Editions that utilize the ability to upload images through GitLab Workhorse are vulnerable to remote code execution. Workhorse passes image file extensions through ExifTool, which improperly validates the image files.",
+  "token_count": 39
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1678",
+  "ingested_at": "2026-03-22T07:54:40.708868+00:00",
+  "lang": "en",
+  "raw_text": "dns_unpack_name() caches the buffer tailroom once and reuses it while appending DNS labels. As the buffer grows, the cached size becomes incorrect, and the final null terminator can be written past the buffer. With assertions disabled (default), a malicious DNS response can trigger an out-of-bounds write when CONFIG_DNS_RESOLVER is enabled.",
+  "severity": "CRITICAL",
+  "sha256_hash": "02b20b1bc498aac6474409ac0ae13c79ce17422633a8e17841c2bed74390f961",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1678"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-20131",
+  "ingested_at": "2026-03-22T07:45:15.834962+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Secure Firewall Management Center (FMC) Cisco Secure Firewall Management Center (FMC) Software and Cisco Security Cloud Control (SCC) Firewall Management contain a deserialization of untrusted data vulnerability in the web-based management interface that could allow an unauthenticated, remote attacker to execute arbitrary Java code as root on an affected device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "97a7f19e8989565ebc86a5344112ecb62a10032d1911c2557b5460138b6e4aa5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 51,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

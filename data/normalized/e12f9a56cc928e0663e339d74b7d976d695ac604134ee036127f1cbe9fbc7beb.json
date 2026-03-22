@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL Nomad server on Domino did not configure the frame-ancestors directive in the Content-Security-Policy header by default which could allow an attacker to obtain sensitive information via unspecified vectors.",
+  "token_count": 29
+}

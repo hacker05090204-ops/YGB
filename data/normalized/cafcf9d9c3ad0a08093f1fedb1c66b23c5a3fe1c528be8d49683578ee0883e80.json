@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Android Runtime Android Runtime contains a use-after-free vulnerability potentially allowing a chrome sandbox escape leading to local privilege escalation.",
+  "token_count": 19
+}

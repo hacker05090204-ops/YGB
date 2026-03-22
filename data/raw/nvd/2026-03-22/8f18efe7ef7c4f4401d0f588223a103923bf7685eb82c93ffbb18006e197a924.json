@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27736",
+  "ingested_at": "2026-03-22T07:54:32.185190+00:00",
+  "lang": "en",
+  "raw_text": "BigBlueButton is an open-source virtual classroom. In versions on the 3.x branch prior to 3.0.20, the string received with errorRedirectUrl lacks validation, using it directly in the respondWithRedirect function leads to an Open Redirect vulnerability. BigBlueButton 3.0.20 patches the issue. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8f18efe7ef7c4f4401d0f588223a103923bf7685eb82c93ffbb18006e197a924",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27736"
+}

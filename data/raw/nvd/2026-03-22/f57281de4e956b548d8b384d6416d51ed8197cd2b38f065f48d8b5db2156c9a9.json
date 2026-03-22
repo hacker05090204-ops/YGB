@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28413",
+  "ingested_at": "2026-03-22T07:54:40.988701+00:00",
+  "lang": "en",
+  "raw_text": "Products.isurlinportal is a replacement for isURLInPortal method in Plone. Prior to versions 2.1.0, 3.1.0, and 4.0.0, a url /login?came_from=////evil.example may redirect to an external website after login. This issue has been patched in versions 2.1.0, 3.1.0, and 4.0.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f57281de4e956b548d8b384d6416d51ed8197cd2b38f065f48d8b5db2156c9a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28413"
+}

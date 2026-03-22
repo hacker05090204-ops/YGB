@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32775",
+  "ingested_at": "2026-03-22T07:54:46.567409+00:00",
+  "lang": "en",
+  "raw_text": "libexif through 0.6.25 has a flaw in decoding MakerNotes. If the exif_mnote_data_get_value function gets passed in a 0 size, the passed in-buffer would be overwritten due to an integer underflow.",
+  "severity": "HIGH",
+  "sha256_hash": "5779e1fd7573d1b3ebf0accccb8385841040b7fd65831ce15cf3e4cb3361bb54",
+  "source": "nvd",
+  "tags": [
+    "CWE-191"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32775"
+}

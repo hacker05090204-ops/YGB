@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Exim Exim Internet Mailer Exim contains an out-of-bounds write vulnerability which can allow for remote code execution.",
+  "token_count": 17
+}

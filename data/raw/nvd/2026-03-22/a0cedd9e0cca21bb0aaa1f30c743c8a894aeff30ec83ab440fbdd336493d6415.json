@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1980",
+  "ingested_at": "2026-03-22T07:54:34.347754+00:00",
+  "lang": "en",
+  "raw_text": "The WPBookit plugin for WordPress is vulnerable to unauthorized data disclosure due to a missing authorization check on the 'get_customer_list' route in all versions up to, and including, 1.0.8. This makes it possible for unauthenticated attackers to retrieve sensitive customer information including names, emails, phone numbers, dates of birth, and gender.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a0cedd9e0cca21bb0aaa1f30c743c8a894aeff30ec83ab440fbdd336493d6415",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1980"
+}

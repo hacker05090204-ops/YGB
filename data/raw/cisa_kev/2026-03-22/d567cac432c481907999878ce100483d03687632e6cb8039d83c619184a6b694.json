@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-40449",
+  "ingested_at": "2026-03-22T07:45:18.949109+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Unspecified vulnerability allows for an authenticated user to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d567cac432c481907999878ce100483d03687632e6cb8039d83c619184a6b694",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 12,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

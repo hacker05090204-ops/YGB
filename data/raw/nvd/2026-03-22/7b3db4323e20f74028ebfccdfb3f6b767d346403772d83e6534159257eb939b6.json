@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4476",
+  "ingested_at": "2026-03-22T07:54:48.655981+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Yi Technology YI Home Camera 2 2.1.1_20171024151200. The impacted element is an unknown function of the file home/web/ipc of the component CGI Endpoint. Performing a manipulation results in missing authentication. Access to the local network is required for this attack. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7b3db4323e20f74028ebfccdfb3f6b767d346403772d83e6534159257eb939b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-306"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4476"
+}

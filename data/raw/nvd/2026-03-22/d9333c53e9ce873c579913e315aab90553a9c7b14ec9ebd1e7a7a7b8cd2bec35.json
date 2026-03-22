@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33303",
+  "ingested_at": "2026-03-22T07:54:48.108179+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Versions prior to 8.0.0.2 are vulnerable to stored cross-site scripting (XSS) via unescaped `portal_login_username` in the portal credential print view. A patient portal user can set their login username to an XSS payload, which then executes in a clinic staff member's browser when they open the \"Create Portal Login\" page for that patient. This crosses from the patient session context into the staff/admin session context. Version 8.0.0.2 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d9333c53e9ce873c579913e315aab90553a9c7b14ec9ebd1e7a7a7b8cd2bec35",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33303"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-0167",
+  "ingested_at": "2026-03-22T07:45:19.279885+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Microsoft Win32k contains an unspecified vulnerability that allows for privilege escalation via a crafted application",
+  "severity": "CRITICAL",
+  "sha256_hash": "12cab3eada98b44e0e71d5833c8b7f1a35a572ceda5beb3263259e890d2fe149",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

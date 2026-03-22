@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PHP PHP sapi/cgi/cgi_main.c in PHP, when configured as a CGI script, does not properly handle query strings, which allows remote attackers to execute arbitrary code.",
+  "token_count": 25
+}

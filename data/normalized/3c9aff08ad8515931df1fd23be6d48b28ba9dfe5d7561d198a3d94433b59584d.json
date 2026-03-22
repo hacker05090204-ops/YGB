@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cryptographic Issue when a shared VM reference allows HLOS to boot loader and access cert chain.",
+  "token_count": 16
+}

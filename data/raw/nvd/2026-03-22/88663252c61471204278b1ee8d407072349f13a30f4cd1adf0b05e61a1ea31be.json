@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2867",
+  "ingested_at": "2026-03-22T07:54:30.861625+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in itsourcecode Vehicle Management System 1.0. Affected is an unknown function of the file /billaction.php. Executing a manipulation of the argument ID can lead to sql injection. The attack may be launched remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "88663252c61471204278b1ee8d407072349f13a30f4cd1adf0b05e61a1ea31be",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2867"
+}

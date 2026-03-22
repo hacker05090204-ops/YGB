@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28427",
+  "ingested_at": "2026-03-22T07:54:34.771494+00:00",
+  "lang": "en",
+  "raw_text": "OpenDeck is Linux software for your Elgato Stream Deck. Prior to 2.8.1, the service listening on port 57118 serves static files for installed plugins but does not properly sanitize path components. By including ../ sequences in the request path, an attacker can traverse outside the intended directory and read any file OpenDeck can access. This vulnerability is fixed in 2.8.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e3a5a35216f49f92fe16914afdbb62b7acf990a77765cd918075d14ca2c5557a",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-24"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28427"
+}

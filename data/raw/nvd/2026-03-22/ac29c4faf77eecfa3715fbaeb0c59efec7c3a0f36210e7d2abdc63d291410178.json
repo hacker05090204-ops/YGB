@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24484",
+  "ingested_at": "2026-03-22T07:54:31.273277+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, Magick fails to check for multi-layer nested mvg conversions to svg, leading to DoS. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ac29c4faf77eecfa3715fbaeb0c59efec7c3a0f36210e7d2abdc63d291410178",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24484"
+}

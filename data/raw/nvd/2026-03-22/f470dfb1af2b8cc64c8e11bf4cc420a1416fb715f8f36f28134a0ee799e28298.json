@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25896",
+  "ingested_at": "2026-03-22T07:54:30.573490+00:00",
+  "lang": "en",
+  "raw_text": "fast-xml-parser allows users to validate XML, parse XML to JS object, or build XML from JS object without C/C++ based libraries and no callback. From 4.1.3to before 5.3.5, a dot (.) in a DOCTYPE entity name is treated as a regex wildcard during entity replacement, allowing an attacker to shadow built-in XML entities (<, >, &, \", ') with arbitrary values. This bypasses entity encoding and leads to XSS when parsed output is rendered. This vulnerability is fixed in 5.3.5.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f470dfb1af2b8cc64c8e11bf4cc420a1416fb715f8f36f28134a0ee799e28298",
+  "source": "nvd",
+  "tags": [
+    "CWE-185"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25896"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-9908",
+  "ingested_at": "2026-03-22T07:54:33.090348+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in the Red Hat Ansible Automation Platform, Event-Driven Ansible (EDA) Event Streams. This vulnerability allows an authenticated user to gain access to sensitive internal infrastructure headers (such as X-Trusted-Proxy and X-Envoy-*) and event stream URLs via crafted requests and job templates. By exfiltrating these headers, an attacker could spoof trusted requests, escalate privileges, or perform malicious event injection.",
+  "severity": "MEDIUM",
+  "sha256_hash": "40ccf14b0fad884797a5faefbad4a42278eb6ad3420e2fc0d3253e0f6f0b1a40",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-9908"
+}

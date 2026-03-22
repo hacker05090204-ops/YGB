@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Service information is not encrypted when transmitted as BACnet packets over the wire, and can be sniffed, intercepted, and modified by an attacker. Valuable information such as the File Start Position and File Data can be sniffed from network traffic using Wireshark's BACnet dissector filter. The proprietary format used by WebCTRL to receive updates from the PLC can also be sniffed and reverse engineered.",
+  "token_count": 64
+}

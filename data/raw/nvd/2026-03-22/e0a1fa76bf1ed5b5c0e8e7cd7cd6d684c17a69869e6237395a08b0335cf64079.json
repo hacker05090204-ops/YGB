@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-21670",
+  "ingested_at": "2026-03-22T07:54:44.247441+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability allowing a low-privileged user to extract saved SSH credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "e0a1fa76bf1ed5b5c0e8e7cd7cd6d684c17a69869e6237395a08b0335cf64079",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21670"
+}

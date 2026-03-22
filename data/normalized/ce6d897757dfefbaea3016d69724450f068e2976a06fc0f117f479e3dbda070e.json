@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The CGM CLININET application does not implement any mechanisms that prevent clickjacking attacks, neither HTTP security headers nor HTML-based frame\u2010busting protections were detected. As a result, an attacker can embed the application inside a maliciously crafted IFRAME and trick users into performing unintended actions, including potentially bypassing CSRF/XSRF defenses.",
+  "token_count": 49
+}

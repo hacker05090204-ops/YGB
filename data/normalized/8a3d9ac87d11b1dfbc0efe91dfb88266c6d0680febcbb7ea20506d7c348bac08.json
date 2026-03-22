@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The extension fails to properly reset the generated MFA code after successful authentication. This leads to a possible MFA bypass for future login attempts by providing an empty string as MFA code to the extensions MFA provider.",
+  "token_count": 37
+}

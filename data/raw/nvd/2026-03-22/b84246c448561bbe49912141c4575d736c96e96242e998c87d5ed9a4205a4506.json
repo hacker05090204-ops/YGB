@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28229",
+  "ingested_at": "2026-03-22T07:54:43.647441+00:00",
+  "lang": "en",
+  "raw_text": "Argo Workflows is an open source container-native workflow engine for orchestrating parallel jobs on Kubernetes. Prior to 4.0.2 and 3.7.11, Workflow templates endpoints allow any client to retrieve WorkflowTemplates (and ClusterWorkflowTemplates). Any request with a Authorization: Bearer nothing token can leak sensitive template content, including embedded Secret manifests. This vulnerability is fixed in 4.0.2 and 3.7.11.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b84246c448561bbe49912141c4575d736c96e96242e998c87d5ed9a4205a4506",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28229"
+}

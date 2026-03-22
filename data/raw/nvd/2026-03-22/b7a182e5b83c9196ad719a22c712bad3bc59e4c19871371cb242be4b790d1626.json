@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1217",
+  "ingested_at": "2026-03-22T07:54:47.416520+00:00",
+  "lang": "en",
+  "raw_text": "The Yoast Duplicate Post plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the clone_bulk_action_handler() and republish_request() functions in all versions up to, and including, 4.5. This makes it possible for authenticated attackers, with Contributor-level access and above, to duplicate any post on the site including private, draft, and trashed posts they shouldn't have access to. Additionally, attackers with Author-level access and above can use the Rewrite & Republish feature to overwrite any published post with their own content.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b7a182e5b83c9196ad719a22c712bad3bc59e4c19871371cb242be4b790d1626",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1217"
+}

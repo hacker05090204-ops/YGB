@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "InSAT MasterSCADA BUK-TS is susceptible to SQL Injection through its main web interface. Malicious users that use the vulnerable endpoint are potentially able to cause remote code execution.",
+  "token_count": 28
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27894",
+  "ingested_at": "2026-03-22T07:54:47.234005+00:00",
+  "lang": "en",
+  "raw_text": "LDAP Account Manager (LAM) is a webfrontend for managing entries (e.g. users, groups, DHCP settings) stored in an LDAP directory. Prior to version 9.5, a local file inclusion was detected in the PDF export that allows users to include local PHP files and this way execute code. In combination with GHSA-88hf-2cjm-m9g8 this allows to execute arbitrary code. Users need to login to LAM to exploit this vulnerability. Version 9.5 fixes the issue. Although upgrading is recommended, a workaround would be to make /var/lib/ldap-account-manager/config read-only for the web-server user and delete the PDF profile files (making PDF exports impossible).",
+  "severity": "HIGH",
+  "sha256_hash": "407508ab4db68b4d4d81f04b11967960e0a8c4df052cc372999a4c0ed96ce293",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27894"
+}

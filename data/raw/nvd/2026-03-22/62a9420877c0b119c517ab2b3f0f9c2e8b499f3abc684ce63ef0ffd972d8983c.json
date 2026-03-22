@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32023",
+  "ingested_at": "2026-03-22T07:54:48.209583+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.24 contain an approval gating bypass vulnerability in system.run allowlist mode where nested transparent dispatch wrappers can suppress shell-wrapper detection. Attackers can exploit this by chaining multiple dispatch wrappers like /usr/bin/env to execute /bin/sh -c commands without triggering the expected approval prompt in allowlist plus ask=on-miss configurations.",
+  "severity": "MEDIUM",
+  "sha256_hash": "62a9420877c0b119c517ab2b3f0f9c2e8b499f3abc684ce63ef0ffd972d8983c",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32023"
+}

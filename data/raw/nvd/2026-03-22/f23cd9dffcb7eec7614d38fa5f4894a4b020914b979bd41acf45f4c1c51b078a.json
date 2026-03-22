@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28114",
+  "ingested_at": "2026-03-22T07:54:40.643336+00:00",
+  "lang": "en",
+  "raw_text": "Unrestricted Upload of File with Dangerous Type vulnerability in firassaidi WooCommerce License Manager fs-license-manager allows Upload a Web Shell to a Web Server.This issue affects WooCommerce License Manager: from n/a through < = 7.0.6.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f23cd9dffcb7eec7614d38fa5f4894a4b020914b979bd41acf45f4c1c51b078a",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28114"
+}

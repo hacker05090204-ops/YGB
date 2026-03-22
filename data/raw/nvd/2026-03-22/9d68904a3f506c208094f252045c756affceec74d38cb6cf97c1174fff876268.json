@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4072",
+  "ingested_at": "2026-03-22T07:54:49.440221+00:00",
+  "lang": "en",
+  "raw_text": "The WordPress PayPal Donation plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'donate' shortcode in all versions up to, and including, 1.01. This is due to insufficient input sanitization and output escaping on user-supplied shortcode attributes such as 'amount', 'email', 'title', 'return_url', 'cancel_url', 'ccode', and 'image'. The wordpress_paypal_donation_create() function uses extract(shortcode_atts(...)) to process shortcode attributes and then directly interpolates these values into HTML output within single-quoted attribute values without any escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d68904a3f506c208094f252045c756affceec74d38cb6cf97c1174fff876268",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4072"
+}

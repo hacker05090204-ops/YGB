@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deno is a JavaScript, TypeScript, and WebAssembly runtime. Prior to 2.6.8, a command injection vulnerability exists in Deno's node:child_process implementation. This vulnerability is fixed in 2.6.8.",
+  "token_count": 26
+}

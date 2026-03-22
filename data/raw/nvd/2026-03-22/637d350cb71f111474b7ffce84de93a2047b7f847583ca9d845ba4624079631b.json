@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33237",
+  "ingested_at": "2026-03-22T07:54:49.141737+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 26.0, the Scheduler plugin's `run()` function in `plugin/Scheduler/Scheduler.php` calls `url_get_contents()` with an admin-configurable `callbackURL` that is validated only by `isValidURL()` (URL format check). Unlike other AVideo endpoints that were recently patched for SSRF (GHSA-9x67-f2v7-63rw, GHSA-h39h-7cvg-q7j6), the Scheduler's callback URL is never passed through `isSSRFSafeURL()`, which blocks requests to RFC-1918 private addresses, loopback, and cloud metadata endpoints. An admin can configure a scheduled task with an internal network `callbackURL` to perform SSRF against cloud infrastructure metadata services or internal APIs not otherwise reachable from the internet. Version 26.0 contains a patch for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "637d350cb71f111474b7ffce84de93a2047b7f847583ca9d845ba4624079631b",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 104,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33237"
+}

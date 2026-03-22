@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24640",
+  "ingested_at": "2026-03-22T07:54:42.715378+00:00",
+  "lang": "en",
+  "raw_text": "A Stack-based Buffer Overflow vulnerability [CWE-121] vulnerability in Fortinet FortiWeb 8.0.0 through 8.0.2, FortiWeb 7.6.0 through 7.6.6, FortiWeb 7.4 all versions, FortiWeb 7.2 all versions, FortiWeb 7.0.2 through 7.0.12 may allow a remote authenticated attacker who can bypass stack protection and ASLR to execute arbitrary code or commands via crafted HTTP requests.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2ac6ee8df9e8fdeb12a22b68191314ee31d60c482d6e6f626bf3d21d41aa5752",
+  "source": "nvd",
+  "tags": [
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24640"
+}

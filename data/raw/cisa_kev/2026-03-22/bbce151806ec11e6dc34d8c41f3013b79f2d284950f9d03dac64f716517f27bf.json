@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-21335",
+  "ingested_at": "2026-03-22T07:45:16.637126+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Hyper-V NT Kernel Integration VSP contains a use-after-free vulnerability that allows a local attacker to gain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bbce151806ec11e6dc34d8c41f3013b79f2d284950f9d03dac64f716517f27bf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

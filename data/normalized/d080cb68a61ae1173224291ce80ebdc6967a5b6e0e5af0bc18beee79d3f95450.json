@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) Cisco Adaptive Security Appliance (ASA) contains an improper input validation vulnerability with HTTP URLs. Exploitation could allow an attacker to cause a denial-of-service (DoS) condition or information disclosure.",
+  "token_count": 33
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32443",
+  "ingested_at": "2026-03-22T07:54:46.116424+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in Josh Kohlbach Product Feed PRO for WooCommerce woo-product-feed-pro allows Cross Site Request Forgery.This issue affects Product Feed PRO for WooCommerce: from n/a through < = 13.5.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d6d4f2851af33685f2b551fb6ea4156733ecfbd5d315439aea7bafa1390828c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32443"
+}

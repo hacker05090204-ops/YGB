@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25873",
+  "ingested_at": "2026-03-22T07:54:47.699290+00:00",
+  "lang": "en",
+  "raw_text": "OmniGen2-RL contains an unauthenticated remote code execution vulnerability in the reward server component that allows remote attackers to execute arbitrary commands by sending malicious HTTP POST requests. Attackers can exploit insecure pickle deserialization of request bodies to achieve code execution on the host system running the exposed service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4f6361391af0bed5c39d93fdebed3b7e79bf19a96f3deb2b80c3c8712b7631b2",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25873"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Chamilo LMS 1.11.8 contains an arbitrary file upload vulnerability that allows authenticated users to upload and execute PHP files through the elfinder filemanager module. Attackers can upload files with image headers in the social myfiles section, rename them to PHP extensions, and execute arbitrary code by accessing the uploaded files.",
+  "token_count": 50
+}

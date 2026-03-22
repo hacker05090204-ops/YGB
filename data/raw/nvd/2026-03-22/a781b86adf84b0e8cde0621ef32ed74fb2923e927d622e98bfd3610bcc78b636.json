@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27734",
+  "ingested_at": "2026-03-22T07:54:33.277025+00:00",
+  "lang": "en",
+  "raw_text": "Beszel is a server monitoring platform. Prior to version 0.18.2, the hub's authenticated API endpoints GET /api/beszel/containers/logs and GET /api/beszel/containers/info pass the user-supplied \"container\" query parameter to the agent without validation. The agent constructs Docker Engine API URLs using fmt.Sprintf with the raw value instead of url.PathEscape(). Since Go's http.Client does not sanitize `../` sequences from URL paths sent over unix sockets, an authenticated user (including readonly role) can traverse to arbitrary Docker API endpoints on agent hosts, exposing sensitive infrastructure details. Version 0.18.4 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a781b86adf84b0e8cde0621ef32ed74fb2923e927d622e98bfd3610bcc78b636",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27734"
+}

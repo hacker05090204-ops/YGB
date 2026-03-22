@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An improper certificate validation vulnerability was reported in the Lenovo Filez application that could allow a user capable of intercepting network traffic to obtain sensitive user data from the application.",
+  "token_count": 30
+}

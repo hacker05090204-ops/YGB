@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Manyfold is an open source, self-hosted web application for managing a collection of 3d models, particularly focused on 3d printing. Prior to version 0.133.1, the `get_model` method in `ModelFilesController` (line 158-160) loads models using `Model.find_param(params[:model_id])` without `policy_scope()`, bypassing Pundit authorization. All other controllers correctly use `policy_scope(Model).find_param()` (e.g., `ModelsController` line 263). Version 0.133.1 fixes the issue.",
+  "token_count": 55
+}

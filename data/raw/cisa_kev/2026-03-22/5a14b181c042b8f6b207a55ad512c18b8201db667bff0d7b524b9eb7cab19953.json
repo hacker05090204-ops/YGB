@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-0796",
+  "ingested_at": "2026-03-22T07:45:18.759093+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SMBv3 A remote code execution vulnerability exists in the way that the Microsoft Server Message Block 3.1.1 (SMBv3) protocol handles certain requests. An attacker who successfully exploited the vulnerability could gain the ability to execute code on the target server or client.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5a14b181c042b8f6b207a55ad512c18b8201db667bff0d7b524b9eb7cab19953",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 43,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

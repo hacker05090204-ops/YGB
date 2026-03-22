@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-8110",
+  "ingested_at": "2026-03-22T07:45:15.981873+00:00",
+  "lang": "en",
+  "raw_text": "Gogs Gogs Gogs contains a path traversal vulnerability affecting improper Symbolic link handling in the PutContents API that could allow for code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e1b17a30493833c31f87042c892c873b2e1e24a3a0af0423f60a73d5f6395ae3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

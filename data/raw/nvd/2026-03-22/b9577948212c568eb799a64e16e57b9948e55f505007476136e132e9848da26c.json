@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-12801",
+  "ingested_at": "2026-03-22T07:54:34.522846+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was recently discovered in the rpc.mountd daemon in the nfs-utils package for Linux, that allows a NFSv3 client to escalate the privileges assigned to it in the /etc/exports file at mount time. In particular, it allows the client to access any subdirectory or subtree of an exported directory, regardless of the set file permissions, and regardless of any 'root_squash' or 'all_squash' attributes that would normally be expected to apply to that client.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b9577948212c568eb799a64e16e57b9948e55f505007476136e132e9848da26c",
+  "source": "nvd",
+  "tags": [
+    "CWE-279",
+    "CWE-732"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12801"
+}

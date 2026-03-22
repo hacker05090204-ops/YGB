@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2920",
+  "ingested_at": "2026-03-22T07:54:46.474078+00:00",
+  "lang": "en",
+  "raw_text": "GStreamer ASF Demuxer Heap-based Buffer Overflow Remote Code Execution Vulnerability. This vulnerability allows remote attackers to execute arbitrary code on affected installations of GStreamer. Interaction with this library is required to exploit this vulnerability but attack vectors may vary depending on the implementation. The specific flaw exists within the processing of stream headers within ASF files. The issue results from the lack of proper validation of the length of user-supplied data prior to copying it to a fixed-length heap-based buffer. An attacker can leverage this vulnerability to execute code in the context of the current process. Was ZDI-CAN-28843.",
+  "severity": "HIGH",
+  "sha256_hash": "5a3f449f215a9b5b47f4065e4fb2ee6a5dd6ca6b203eea63ab765579ca773bed",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2920"
+}

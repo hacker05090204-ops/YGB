@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle ADF Faces Oracle ADF Faces library, included with Oracle JDeveloper Distribution, contains a deserialization of untrusted data vulnerability leading to unauthenticated remote code execution.",
+  "token_count": 25
+}

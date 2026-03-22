@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32123",
+  "ingested_at": "2026-03-22T07:54:44.004911+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, sensitivity checks for group encounters are broken because the code only consults form_encounter for sensitivity, while group encounters store sensitivity in form_groups_encounter. As a result, sensitivity is never correctly applied to group encounters, and users who should be restricted from viewing sensitive (e.g. mental health) encounters can view them. This vulnerability is fixed in 8.0.0.1.",
+  "severity": "HIGH",
+  "sha256_hash": "19177ee81aa32e433b787301b8e7af66e1661b7c4087f8f77c5861052f554cac",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32123"
+}

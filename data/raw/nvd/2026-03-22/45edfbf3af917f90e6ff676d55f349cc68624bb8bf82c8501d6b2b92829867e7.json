@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33134",
+  "ingested_at": "2026-03-22T07:54:48.811928+00:00",
+  "lang": "en",
+  "raw_text": "WeGIA is a web manager for charitable institutions. Versions 3.6.5 and below contain an authenticated SQL Injection vulnerability in the html/matPat/restaurar_produto.php endpoint. The vulnerability allows an authenticated attacker to inject arbitrary SQL commands via the id_produto GET parameter, leading to full database compromise. In the script /html/matPat/restaurar_produto.php, the application retrieves the id_produto parameter directly from the $_GET global array and interpolates it directly into two SQL query strings without any sanitization, type-casting (e.g., (int)), or using parameterized (prepare/execute) statements. This issue has been fixed in version 3.6.6.",
+  "severity": "CRITICAL",
+  "sha256_hash": "45edfbf3af917f90e6ff676d55f349cc68624bb8bf82c8501d6b2b92829867e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33134"
+}

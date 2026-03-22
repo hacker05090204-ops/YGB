@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2011-0609",
+  "ingested_at": "2026-03-22T07:45:17.825521+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains an unspecified vulnerability that allows remote attackers to execute code or cause denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "55300ecdee8f8084826299fffc78b07ebd15f3f5b91b0079d815609271fd2e79",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

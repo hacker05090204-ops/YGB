@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-54948",
+  "ingested_at": "2026-03-22T07:45:16.241102+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One Trend Micro Apex One Management Console (on-premise) contains an OS command injection vulnerability that could allow a pre-authenticated remote attacker to upload malicious code and execute commands on affected installations.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0be52eb00e31bb0162c3dfcef6b8d327c69c06a4acfed306d3cddc0ef0e774d6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

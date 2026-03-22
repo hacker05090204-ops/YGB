@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14040",
+  "ingested_at": "2026-03-22T07:54:33.072774+00:00",
+  "lang": "en",
+  "raw_text": "The Automotive Car Dealership Business WordPress Theme for WordPress is vulnerable to Stored Cross-Site Scripting via the 'Call to Action' custom fields in all versions up to, and including, 13.4. This is due to insufficient input sanitization and output escaping on user-supplied attributes in the 'action_text', 'action_button_text', 'action_link', and 'action_class' custom fields. This makes it possible for authenticated attackers, with contributor-level permissions and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1add88ca0d9badfdf2e6d2e29ba3eb7e6d657d3e367c3317a823e5d4d1639df4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14040"
+}

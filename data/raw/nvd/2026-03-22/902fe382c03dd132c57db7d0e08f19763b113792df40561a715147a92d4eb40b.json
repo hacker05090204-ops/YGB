@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3629",
+  "ingested_at": "2026-03-22T07:54:49.571840+00:00",
+  "lang": "en",
+  "raw_text": "The Import and export users and customers plugin for WordPress is vulnerable to privilege escalation in all versions up to, and including, 1.29.7. This is due to the 'save_extra_user_profile_fields' function not properly restricting which user meta keys can be updated via profile fields. The 'get_restricted_fields' method does not include sensitive meta keys such as 'wp_capabilities'. This makes it possible for unauthenticated attackers to escalate their privileges to Administrator by submitting a crafted registration request that sets the 'wp_capabilities' meta key. The vulnerability can only be exploited if the \"Show fields in profile\" setting is enabled and a CSV with a wp_capabilities column header has been previously imported.",
+  "severity": "HIGH",
+  "sha256_hash": "902fe382c03dd132c57db7d0e08f19763b113792df40561a715147a92d4eb40b",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 107,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3629"
+}

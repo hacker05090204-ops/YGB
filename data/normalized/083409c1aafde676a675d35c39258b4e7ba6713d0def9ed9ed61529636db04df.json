@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Smarter Analytics plugin for WordPress is vulnerable to unauthorized access in all versions up to, and including, 2.0. This is due to missing authentication and capability checks on the configuration reset functionality in the global scope of smarter-analytics.php. This makes it possible for unauthenticated attackers to reset all plugin configuration and delete all per-page/per-post analytics settings via the 'reset' parameter.",
+  "token_count": 61
+}

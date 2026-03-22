@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32935",
+  "ingested_at": "2026-03-22T07:54:48.530293+00:00",
+  "lang": "en",
+  "raw_text": "phpseclib is a PHP secure communications library. Projects using versions 1.0.26 and below, 2.0.0 through 2.0.51, and 3.0.0 through 3.0.49 are vulnerable to a to padding oracle timing attack when using AES in CBC mode. This issue has been fixed in versions 1.0.27, 2.0.52 and 3.0.50.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b324cc9050d6a4e64f1ca7cd62fad9299b8be31136f5fe1ff9b250db05714f02",
+  "source": "nvd",
+  "tags": [
+    "CWE-208"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32935"
+}

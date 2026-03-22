@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-11120",
+  "ingested_at": "2026-03-22T07:45:16.430115+00:00",
+  "lang": "en",
+  "raw_text": "GeoVision Multiple Devices Multiple GeoVision devices contain an OS command injection vulnerability that allows a remote, unauthenticated attacker to inject and execute arbitrary system commands. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "98e4c5c9e7413ff02b970e33c198057d40f0525b61c2bb19700d95fc82ca8fda",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

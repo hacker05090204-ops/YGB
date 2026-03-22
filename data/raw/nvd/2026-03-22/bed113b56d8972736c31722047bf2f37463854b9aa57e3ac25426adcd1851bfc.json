@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4500",
+  "ingested_at": "2026-03-22T07:54:48.968933+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in bagofwords1 bagofwords up to 0.0.297. This impacts the function generate_df of the file backend/app/ai/code_execution/code_execution.py. Such manipulation leads to injection. The attack may be launched remotely. The exploit is publicly available and might be used. Upgrading to version 0.0.298 will fix this issue. The name of the patch is 47b20bcda31264635faff7f6b1c8095abe1861c6. It is recommended to upgrade the affected component.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bed113b56d8972736c31722047bf2f37463854b9aa57e3ac25426adcd1851bfc",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-707"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4500"
+}

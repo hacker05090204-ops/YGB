@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1508",
+  "ingested_at": "2026-03-22T07:54:42.460371+00:00",
+  "lang": "en",
+  "raw_text": "The Court Reservation WordPress plugin before 1.10.9 does not have CSRF check in place when deleting events, which could allow attackers to make a logged in admin delete them via a CSRF attack",
+  "severity": "MEDIUM",
+  "sha256_hash": "2b1c4b3877c8d7f765e6586afd4e97797bdcd7a08241192a0fe8f355471daf8b",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1508"
+}

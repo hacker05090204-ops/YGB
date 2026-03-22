@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-51378",
+  "ingested_at": "2026-03-22T07:45:16.687347+00:00",
+  "lang": "en",
+  "raw_text": "CyberPersons CyberPanel CyberPanel contains an incorrect default permissions vulnerability that allows for authentication bypass and the execution of arbitrary commands using shell metacharacters in the statusfile property.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5058f7fc4d60ca87aee99704111081cc48af9dc4a057cf0a98108fba9b261078",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

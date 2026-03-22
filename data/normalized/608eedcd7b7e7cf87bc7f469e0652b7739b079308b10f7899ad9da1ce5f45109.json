@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw has been found in Tenda F453 1.0.0.3. This affects the function fromqossetting of the file /goform/qossetting. Executing a manipulation of the argument qos can lead to buffer overflow. The attack can be launched remotely. The exploit has been published and may be used.",
+  "token_count": 45
+}

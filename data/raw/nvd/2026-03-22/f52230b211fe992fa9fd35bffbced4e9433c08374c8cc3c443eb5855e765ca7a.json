@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30922",
+  "ingested_at": "2026-03-22T07:54:47.337205+00:00",
+  "lang": "en",
+  "raw_text": "pyasn1 is a generic ASN.1 library for Python. Prior to 0.6.3, the `pyasn1` library is vulnerable to a Denial of Service (DoS) attack caused by uncontrolled recursion when decoding ASN.1 data with deeply nested structures. An attacker can supply a crafted payload containing thousands of nested `SEQUENCE` (`0x30`) or `SET` (`0x31`) tags with \"Indefinite Length\" (`0x80`) markers. This forces the decoder to recursively call itself until the Python interpreter crashes with a `RecursionError` or consumes all available memory (OOM), crashing the host application. This is a distinct vulnerability from CVE-2026-23490 (which addressed integer overflows in OID decoding). The fix for CVE-2026-23490 (`MAX_OID_ARC_CONTINUATION_OCTETS`) does not mitigate this recursion issue. Version 0.6.3 fixes this specific issue.",
+  "severity": "HIGH",
+  "sha256_hash": "f52230b211fe992fa9fd35bffbced4e9433c08374c8cc3c443eb5855e765ca7a",
+  "source": "nvd",
+  "tags": [
+    "CWE-674"
+  ],
+  "token_count": 114,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30922"
+}

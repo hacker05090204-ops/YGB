@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69649",
+  "ingested_at": "2026-03-22T07:54:41.579774+00:00",
+  "lang": "en",
+  "raw_text": "GNU Binutils thru 2.46 readelf contains a null pointer dereference vulnerability when processing a crafted ELF binary with malformed header fields. During relocation processing, an invalid or null section pointer may be passed into display_relocations(), resulting in a segmentation fault (SIGSEGV) and abrupt termination. No evidence of memory corruption beyond the null pointer dereference, nor any possibility of code execution, was observed.",
+  "severity": "HIGH",
+  "sha256_hash": "7fe0f9ecce3a6802922894afa167baa1fab43cb344891daeb0aa2caa71fe003b",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69649"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cross-site Scripting (XSS) allows an attacker to submit specially crafted data to the application which is returned unaltered in the resulting web page.",
+  "token_count": 23
+}

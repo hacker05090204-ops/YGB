@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-21287",
+  "ingested_at": "2026-03-22T07:45:16.698512+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Agile Product Lifecycle Management (PLM) Oracle Agile Product Lifecycle Management (PLM) contains an incorrect authorization vulnerability in the Process Extension component of the Software Development Kit. Successful exploitation of this vulnerability may result in unauthenticated file disclosure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4c3f39b38dce156cc75d2fc4a4d91d1970f42b1e33128e54bb4fb964331102c8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

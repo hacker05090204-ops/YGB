@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25899",
+  "ingested_at": "2026-03-22T07:54:31.790487+00:00",
+  "lang": "en",
+  "raw_text": "Fiber is an Express inspired web framework written in Go. In versions on the v3 branch prior to 3.1.0, the use of the `fiber_flash` cookie can force an unbounded allocation on any server. A crafted 10-character cookie value triggers an attempt to allocate up to 85GB of memory via unvalidated msgpack deserialization. No authentication is required. Every GoFiber v3 endpoint is affected regardless of whether the application uses flash messages. Version 3.1.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "9ec83612d57cccc73c4d4458a7289b4de136b91249013aa13c73f5c144cbcbed",
+  "source": "nvd",
+  "tags": [
+    "CWE-789",
+    "CWE-770"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25899"
+}

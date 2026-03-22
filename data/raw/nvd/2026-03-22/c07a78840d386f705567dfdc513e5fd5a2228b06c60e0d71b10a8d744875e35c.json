@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20424",
+  "ingested_at": "2026-03-22T07:54:33.512788+00:00",
+  "lang": "en",
+  "raw_text": "In display, there is a possible out of bounds read due to a missing bounds check. This could lead to local information disclosure if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: ALPS10320471; Issue ID: MSV-5540.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c07a78840d386f705567dfdc513e5fd5a2228b06c60e0d71b10a8d744875e35c",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20424"
+}

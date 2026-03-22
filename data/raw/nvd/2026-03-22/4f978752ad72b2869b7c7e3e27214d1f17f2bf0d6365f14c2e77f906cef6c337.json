@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33395",
+  "ingested_at": "2026-03-22T07:54:48.339388+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the discourse-graphviz plugin contains a stored cross-site scripting (XSS) vulnerability that allows authenticated users to inject malicious JavaScript code through DOT graph definitions. For instances with CSP disabled only. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. As a workaround, disable the graphviz plugin, upgrade to a patched version, or enable a content security policy.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4f978752ad72b2869b7c7e3e27214d1f17f2bf0d6365f14c2e77f906cef6c337",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33395"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains an out-of-bounds read vulnerability in the USB-audio driver that allows a local, privileged attacker to obtain potentially sensitive information.",
+  "token_count": 24
+}

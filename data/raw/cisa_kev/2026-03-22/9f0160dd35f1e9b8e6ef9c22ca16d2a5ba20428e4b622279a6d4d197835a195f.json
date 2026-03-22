@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-2555",
+  "ingested_at": "2026-03-22T07:45:19.479504+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Multiple Products Multiple Oracle products contain a remote code execution vulnerability that allows an unauthenticated attacker with network access via T3 or HTTP to takeover the affected system. Impacted Oracle products: Oracle Coherence in Fusion Middleware, Oracle Utilities Framework, Oracle Retail Assortment Planning, Oracle Commerce, Oracle Communications Diameter Signaling Router (DSR).",
+  "severity": "CRITICAL",
+  "sha256_hash": "9f0160dd35f1e9b8e6ef9c22ca16d2a5ba20428e4b622279a6d4d197835a195f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 52,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

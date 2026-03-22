@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25441",
+  "ingested_at": "2026-03-22T07:54:30.632841+00:00",
+  "lang": "en",
+  "raw_text": "thesystem 1.0 contains a command injection vulnerability that allows unauthenticated attackers to execute arbitrary system commands by submitting malicious input to the run_command endpoint. Attackers can send POST requests with shell commands in the command parameter to execute arbitrary code on the server without authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "648e2783cfa4ad29fb2fd44613a5b78e8ac33d67572e512436cf30fc075c42e8",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25441"
+}

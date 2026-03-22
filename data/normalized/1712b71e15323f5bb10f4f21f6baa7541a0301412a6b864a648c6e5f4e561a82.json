@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenSift is an AI study tool that sifts through large datasets using semantic search and generative AI. Prior to version 1.6.3-alpha, the URL ingest pipeline accepted user-controlled remote URLs with incomplete destination restrictions. Although private/local host checks existed, missing restrictions for credentialed URLs, non-standard ports, and cross-host redirects left SSRF-class abuse paths in non-localhost deployments. This issue has been patched in version 1.6.3-alpha.",
+  "token_count": 63
+}

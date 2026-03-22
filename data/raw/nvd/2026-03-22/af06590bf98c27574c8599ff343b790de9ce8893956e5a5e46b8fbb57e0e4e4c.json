@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32867",
+  "ingested_at": "2026-03-22T07:54:47.981361+00:00",
+  "lang": "en",
+  "raw_text": "OPEXUS eComplaint before version 10.1.0.0 allows an unauthenticated attacker to obtain or guess an existing case number and upload arbitrary files via 'Portal/EEOC/DocumentUploadPub.aspx'. Users would see these unexpected files in cases. Uploading a large number of files could consume storage.",
+  "severity": "MEDIUM",
+  "sha256_hash": "af06590bf98c27574c8599ff343b790de9ce8893956e5a5e46b8fbb57e0e4e4c",
+  "source": "nvd",
+  "tags": [
+    "CWE-425",
+    "CWE-639"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32867"
+}

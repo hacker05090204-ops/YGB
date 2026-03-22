@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25196",
+  "ingested_at": "2026-03-22T07:54:33.013662+00:00",
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an authenticated attacker to achieve remote code execution on the system by injecting malicious input into the Wi-Fi SSID and/or password fields can lead to remote code execution when the configuration is processed.",
+  "severity": "HIGH",
+  "sha256_hash": "8271295163fc698374968dc9a85f0ab34a7d314b9564826542512ee387885645",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25196"
+}

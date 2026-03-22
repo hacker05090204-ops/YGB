@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TwistedBrush Pro Studio 24.06 contains a denial of service vulnerability in the Script Recorder component that allows local attackers to crash the application by supplying an excessively large buffer. Attackers can paste a malicious string containing 500,000 characters into the Description field of the Script Recorder dialog to trigger an application crash.",
+  "token_count": 52
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An open redirect vulnerability exists in django-allauth versions prior to 65.14.1 when SAML IdP initiated SSO is enabled (it is disabled by default), which may allow an attacker to redirect users to an arbitrary external website via a crafted URL.",
+  "token_count": 40
+}

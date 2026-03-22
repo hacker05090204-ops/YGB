@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-25213",
+  "ingested_at": "2026-03-22T07:45:19.652301+00:00",
+  "lang": "en",
+  "raw_text": "WordPress File Manager Plugin WordPress File Manager plugin contains a remote code execution vulnerability that allows unauthenticated users to execute PHP code and upload malicious files on a target site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "19c23a034c534ef21a97e88412fa76fe6ac2df0b97c4670a606e70e8dba66418",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

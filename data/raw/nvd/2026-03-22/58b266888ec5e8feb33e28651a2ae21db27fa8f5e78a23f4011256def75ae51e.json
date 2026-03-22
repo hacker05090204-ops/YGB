@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1781",
+  "ingested_at": "2026-03-22T07:54:43.404849+00:00",
+  "lang": "en",
+  "raw_text": "The MC4WP: Mailchimp for WordPress plugin for WordPress is vulnerable to Missing Authorization in all versions up to, and including, 4.11.1. This is due to the plugin trusting the `_mc4wp_action` POST parameter without validation, allowing unauthenticated attackers to force the form to process unsubscribe actions instead of subscribe actions. This makes it possible for unauthenticated attackers to arbitrarily unsubscribe any email address from the connected Mailchimp audience via the `_mc4wp_action` parameter, granted they can obtain the form ID (which is publicly exposed in the HTML source).",
+  "severity": "MEDIUM",
+  "sha256_hash": "58b266888ec5e8feb33e28651a2ae21db27fa8f5e78a23f4011256def75ae51e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1781"
+}

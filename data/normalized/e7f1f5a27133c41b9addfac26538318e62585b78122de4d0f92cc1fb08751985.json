@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In JetBrains TeamCity before 2025.11.3 missing authorization allowed project developers to add parameters to build configurations",
+  "token_count": 16
+}

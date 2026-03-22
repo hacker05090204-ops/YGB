@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-32409",
+  "ingested_at": "2026-03-22T07:45:17.387774+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, watchOS, and Safari WebKit contain an unspecified vulnerability that can allow a remote attacker to break out of the Web Content sandbox. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2a631c1734bc852fe6abb62474f88bce21b71acdea126911e3356ca536c2a483",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 56,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25836",
+  "ingested_at": "2026-03-22T07:54:42.779063+00:00",
+  "lang": "en",
+  "raw_text": "An improper neutralization of special elements used in an os command ('os command injection') vulnerability in Fortinet FortiSandbox Cloud 5.0.4 may allow a privileged attacker with super-admin profile and CLI access to execute unauthorized code or commands via crafted HTTP requests.",
+  "severity": "HIGH",
+  "sha256_hash": "cd3bd1735bbb2e7f682cabe3f691cf33f7ae644861a1b0b7143d73d5f9fa4371",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25836"
+}

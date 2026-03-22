@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-22568",
+  "ingested_at": "2026-03-22T07:54:31.135632+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of special elements in user-supplied input within the ZIA Admin UI could allow an authenticated administrator to access or retrieve unauthorized internal information in rare conditions.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f45e686017d53e087b21e9286d01c465e5e9519c1a0171d2383af49a481177d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22568"
+}

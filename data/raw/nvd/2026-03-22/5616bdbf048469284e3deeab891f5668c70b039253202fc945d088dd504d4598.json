@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69247",
+  "ingested_at": "2026-03-22T07:54:31.217160+00:00",
+  "lang": "en",
+  "raw_text": "free5GC go-upf is the User Plane Function (UPF) implementation for 5G networks that is part of the free5GC project. Versions prior to 1.2.8 have a Heap-based Buffer Overflow (CWE-122) vulnerability leading to Denial of Service. Remote attackers can crash the UPF network element by sending a specially crafted PFCP Session Modification Request with an invalid SDF Filter length field. This causes a heap buffer overflow, resulting in complete service disruption for all connected UEs and potential cascading failures affecting the SMF. All deployments of free5GC using the UPF component may be affected. Version 1.2.8 of go-upf contains a fix.",
+  "severity": "HIGH",
+  "sha256_hash": "5616bdbf048469284e3deeab891f5668c70b039253202fc945d088dd504d4598",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69247"
+}

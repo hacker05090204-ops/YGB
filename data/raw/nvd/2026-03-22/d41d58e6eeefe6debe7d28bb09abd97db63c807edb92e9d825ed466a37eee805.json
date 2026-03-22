@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4235",
+  "ingested_at": "2026-03-22T07:54:46.790742+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in itsourcecode Online Enrollment System 1.0. This issue affects some unknown processing of the file /sms/login.php. This manipulation of the argument user_email causes sql injection. The attack is possible to be carried out remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "d41d58e6eeefe6debe7d28bb09abd97db63c807edb92e9d825ed466a37eee805",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4235"
+}

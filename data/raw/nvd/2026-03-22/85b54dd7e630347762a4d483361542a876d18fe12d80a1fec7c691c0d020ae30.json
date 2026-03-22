@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-58107",
+  "ingested_at": "2026-03-22T07:54:33.620420+00:00",
+  "lang": "en",
+  "raw_text": "In Microsoft Exchange through 2019, Exchange ActiveSync (EAS) configurations on on-premises servers may transmit sensitive data from Samsung mobile devices in cleartext, including the user's name, e-mail address, device ID, bearer token, and base64-encoded password.",
+  "severity": "HIGH",
+  "sha256_hash": "85b54dd7e630347762a4d483361542a876d18fe12d80a1fec7c691c0d020ae30",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-58107"
+}

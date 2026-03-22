@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-4345",
+  "ingested_at": "2026-03-22T07:45:18.413198+00:00",
+  "lang": "en",
+  "raw_text": "Exim Exim Exim allows local users to gain privileges by leveraging the ability of the exim user account to specify an alternate configuration file with a directive that contains arbitrary commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "392f9b0edcca3c606ec86479a9c0ab55488294378f5fd13f92f7163a5b372c1f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

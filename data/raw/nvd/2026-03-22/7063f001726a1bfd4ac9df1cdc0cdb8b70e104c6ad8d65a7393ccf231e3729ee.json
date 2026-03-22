@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29059",
+  "ingested_at": "2026-03-22T07:54:41.354489+00:00",
+  "lang": "en",
+  "raw_text": "Windmill is an open-source developer platform for internal code: APIs, background jobs, workflows and UIs. Prior to version 1.603.3, an unauthenticated path traversal vulnerability exists in Windmill's get_log_file endpoint \"(/api/w/{workspace}/jobs_u/get_log_file/{filename})\". The filename parameter is concatenated into a file path without sanitization, allowing an attacker to read arbitrary files on the server using ../ sequences. This issue has been patched in version 1.603.3.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "7063f001726a1bfd4ac9df1cdc0cdb8b70e104c6ad8d65a7393ccf231e3729ee",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29059"
+}

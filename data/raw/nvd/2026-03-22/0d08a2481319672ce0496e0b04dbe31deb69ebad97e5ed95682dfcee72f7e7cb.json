@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-71268",
+  "ingested_at": "2026-03-22T07:54:47.537955+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: btrfs: fix reservation leak in some error paths when inserting inline extent If we fail to allocate a path or join a transaction, we return from __cow_file_range_inline() without freeing the reserved qgroup data, resulting in a leak. Fix this by ensuring we call btrfs_qgroup_free_data() in such cases.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0d08a2481319672ce0496e0b04dbe31deb69ebad97e5ed95682dfcee72f7e7cb",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-71268"
+}

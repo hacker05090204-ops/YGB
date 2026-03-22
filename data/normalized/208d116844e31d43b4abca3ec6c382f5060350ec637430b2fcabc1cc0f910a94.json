@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tenda F453 1.0.0.3. This affects the function strcpy of the file /goform/exeCommand. The manipulation of the argument cmdinput leads to stack-based buffer overflow. It is possible to initiate the attack remotely. The exploit has been disclosed publicly and may be used.",
+  "token_count": 48
+}

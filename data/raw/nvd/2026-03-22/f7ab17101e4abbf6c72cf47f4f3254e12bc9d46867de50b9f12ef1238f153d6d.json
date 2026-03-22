@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28026",
+  "ingested_at": "2026-03-22T07:54:40.381655+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Motorix motorix allows PHP Local File Inclusion.This issue affects Motorix: from n/a through < = 1.6.",
+  "severity": "HIGH",
+  "sha256_hash": "f7ab17101e4abbf6c72cf47f4f3254e12bc9d46867de50b9f12ef1238f153d6d",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28026"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3516",
+  "ingested_at": "2026-03-22T07:54:49.172890+00:00",
+  "lang": "en",
+  "raw_text": "The Contact List plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the '_cl_map_iframe' parameter in all versions up to, and including, 3.0.18. This is due to insufficient input sanitization and output escaping when handling the Google Maps iframe custom field. The saveCustomFields() function in class-contact-list-custom-fields.php uses a regex to extract tags from user input but does not validate or sanitize the iframe's attributes, allowing event handlers like 'onload' to be included. The extracted iframe HTML is stored via update_post_meta() and later rendered on the front-end in class-cl-public-card.php without any escaping or wp_kses filtering. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f185fcff5f3c8839393e61045bb91af950c2edabbb3574afea6e051315e08c4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 124,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3516"
+}

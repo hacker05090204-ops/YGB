@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70031",
+  "ingested_at": "2026-03-22T07:54:42.362935+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-352: Cross-Site Request Forgery was discovered in Sunbird-Ed SunbirdEd-portal v1.13.4.",
+  "severity": "HIGH",
+  "sha256_hash": "e5c93f76e55fdc643d1cd829c9496561d546fca4f5b84293acdfb771659b1e7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70031"
+}

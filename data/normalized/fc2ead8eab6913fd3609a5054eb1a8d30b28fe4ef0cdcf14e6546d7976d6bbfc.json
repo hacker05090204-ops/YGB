@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use after free in Windows Print Spooler Components allows an authorized attacker to execute code over a network.",
+  "token_count": 18
+}

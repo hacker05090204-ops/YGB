@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2375",
+  "ingested_at": "2026-03-22T07:54:49.341453+00:00",
+  "lang": "en",
+  "raw_text": "The App Builder \u2013 Create Native Android & iOS Apps On The Flight plugin for WordPress is vulnerable to Privilege Escalation in all versions up to, and including, 5.5.10. This is due to the `verify_role()` function in `AuthTrails.php` explicitly whitelisting the `wcfm_vendor` role alongside `subscriber` and `customer`, and assigning it directly via `wp_insert_user()` without integrating with WCFM Marketplace's vendor approval workflow. This makes it possible for unauthenticated attackers to register an account with the `wcfm_vendor` role by supplying the `role` parameter in the `/wp-json/app-builder/v1/register` REST API endpoint, bypassing the standard WCFM vendor approval process and immediately gaining vendor-level privileges (product management, order access, store management) on sites where WCFM Marketplace is active.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fa5e163b3b680d6a67ee03e251b669bb8df48011e51609b74d65a4dfee6e8e2c",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 112,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2375"
+}

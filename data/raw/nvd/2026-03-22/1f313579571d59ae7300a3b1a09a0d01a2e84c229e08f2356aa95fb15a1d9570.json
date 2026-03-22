@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1569",
+  "ingested_at": "2026-03-22T07:54:41.792285+00:00",
+  "lang": "en",
+  "raw_text": "The Wueen plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's `wueen-blocket` shortcode in all versions up to, and including, 0.2.0 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1f313579571d59ae7300a3b1a09a0d01a2e84c229e08f2356aa95fb15a1d9570",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1569"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30836",
+  "ingested_at": "2026-03-22T07:54:48.083227+00:00",
+  "lang": "en",
+  "raw_text": "Step CA is an online certificate authority for secure, automated certificate management for DevOps. Versions 0.30.0-rc6 and below do not safeguard against unauthenticated certificate issuance through the SCEP UpdateReq. This issue has been fixed in version 0.30.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f8503504b2996ed5e1d199237673b87c41b665eca00f77e29f60451aa3f0b091",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-295"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30836"
+}

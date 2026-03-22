@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco RV Series Routers A deserialization of untrusted data vulnerability in the web-based management interface of certain Cisco Small Business RV Series Routers could allow an attacker to execute code with root privileges.",
+  "token_count": 33
+}

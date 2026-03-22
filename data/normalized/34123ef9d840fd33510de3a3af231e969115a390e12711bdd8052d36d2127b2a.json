@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM DataStage on Cloud Pak for Data 5.1.2 through 5.3.0 returns sensitive information in an HTTP response that could be used in further attacks against the system.",
+  "token_count": 27
+}

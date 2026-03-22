@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mattermost versions 10.11.x < = 10.11.10 Fail to invalidate cached permalink preview data when a user loses channel access which allows the user to continue viewing private channel content via previously cached permalink previews until cache reset or relogin.. Mattermost Advisory ID: MMSA-2026-00580",
+  "token_count": 43
+}

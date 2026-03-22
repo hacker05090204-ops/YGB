@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An information exposure vulnerability exists in Vulnerability in HCL Software ZIE for Web. The application transmits sensitive session tokens and authentication identifiers within the URL query parameters . An attacker who gains access to any network log or operates a site linked from the application can hijack user sessions This issue affects ZIE for Web: v16.",
+  "token_count": 56
+}

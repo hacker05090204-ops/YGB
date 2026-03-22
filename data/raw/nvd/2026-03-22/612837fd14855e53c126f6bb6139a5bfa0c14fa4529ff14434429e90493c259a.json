@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20064",
+  "ingested_at": "2026-03-22T07:54:34.762085+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in of Cisco Secure Firewall Threat Defense (FTD) Software could allow an authenticated, local attacker to cause the device to unexpectedly reload, causing a denial of service (DoS) condition. This vulnerability is due to improper validation of user-supplied input. An attacker with a low-privileged account could exploit this vulnerability by using crafted commands at the CLI prompt. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "612837fd14855e53c126f6bb6139a5bfa0c14fa4529ff14434429e90493c259a",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20064"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32486",
+  "ingested_at": "2026-03-22T07:54:46.160384+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in wptravelengine Travel Booking travel-booking allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Travel Booking: from n/a through < = 1.3.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6e2c85473ec483e5a86ddefb12ed86ed625c6d9591285b4ed4247665d19cec18",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32486"
+}

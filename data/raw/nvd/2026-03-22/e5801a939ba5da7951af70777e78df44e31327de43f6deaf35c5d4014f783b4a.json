@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28521",
+  "ingested_at": "2026-03-22T07:54:46.436604+00:00",
+  "lang": "en",
+  "raw_text": "arduino-TuyaOpen before version 1.2.1 contains an out-of-bounds memory read vulnerability in the TuyaIoT component. An attacker who hijacks or controls the Tuya cloud service can issue malicious DP event data to victim devices, causing out-of-bounds memory access that may result in information disclosure or a denial-of-service condition.",
+  "severity": "HIGH",
+  "sha256_hash": "e5801a939ba5da7951af70777e78df44e31327de43f6deaf35c5d4014f783b4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28521"
+}

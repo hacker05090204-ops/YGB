@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4469",
+  "ingested_at": "2026-03-22T07:54:48.605750+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in itsourcecode Online Frozen Foods Ordering System 1.0. Affected by this vulnerability is an unknown functionality of the file /admin/admin_edit_menu_action.php. Such manipulation of the argument product_name leads to sql injection. The attack may be performed from remote. The exploit is publicly available and might be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c0b298ba4ba836826fd11e230b844a67d9ef7cd5142091da75130ef865b4f18d",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4469"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25138",
+  "ingested_at": "2026-03-22T07:54:32.272616+00:00",
+  "lang": "en",
+  "raw_text": "Rucio is a software framework that provides functionality to organize, manage, and access large volumes of scientific data using customizable policies. Prior to versions 35.8.3, 38.5.4, and 39.3.1, the WebUI login endpoint returns distinct error messages depending on whether a supplied username exists, allowing unauthenticated attackers to enumerate valid usernames. Versions 35.8.3, 38.5.4, and 39.3.1 fix the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "191ccbf0ffbccb3059b7b3700f1dd1aec22d001555a203e2e72106de28102e8d",
+  "source": "nvd",
+  "tags": [
+    "CWE-204"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25138"
+}

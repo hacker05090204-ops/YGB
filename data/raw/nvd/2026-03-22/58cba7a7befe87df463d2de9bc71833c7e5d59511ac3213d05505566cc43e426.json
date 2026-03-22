@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23969",
+  "ingested_at": "2026-03-22T07:54:31.481730+00:00",
+  "lang": "en",
+  "raw_text": "Apache Superset utilizes a configurable dictionary, DISALLOWED_SQL_FUNCTIONS, to restrict the execution of potentially sensitive SQL functions within SQL Lab and charts. While this feature included restrictions for engines like PostgreSQL, a vulnerability was reported where the default list for the ClickHouse engine was incomplete. This issue affects Apache Superset: before 4.1.2. Users are recommended to upgrade to version 4.1.2, which fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "58cba7a7befe87df463d2de9bc71833c7e5d59511ac3213d05505566cc43e426",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23969"
+}

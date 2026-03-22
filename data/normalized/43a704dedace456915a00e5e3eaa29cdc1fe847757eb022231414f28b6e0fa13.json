@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SimpleHelp SimpleHelp SimpleHelp remote support software contains multiple path traversal vulnerabilities that allow unauthenticated remote attackers to download arbitrary files from the SimpleHelp host via crafted HTTP requests. These files may include server configuration files and hashed user passwords.",
+  "token_count": 39
+}

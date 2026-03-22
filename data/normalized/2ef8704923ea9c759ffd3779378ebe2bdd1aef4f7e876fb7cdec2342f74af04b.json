@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Solr The Apache Solr VelocityResponseWriter plug-in contains an unspecified vulnerability which can allow for remote code execution.",
+  "token_count": 18
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists due to the way the Windows GDI component handles objects in the memory. An attacker who successfully exploits this vulnerability could take control of the affected system.",
+  "token_count": 35
+}

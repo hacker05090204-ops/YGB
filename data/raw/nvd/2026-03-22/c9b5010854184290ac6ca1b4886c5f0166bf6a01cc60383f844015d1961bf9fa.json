@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33040",
+  "ingested_at": "2026-03-22T07:54:48.631693+00:00",
+  "lang": "en",
+  "raw_text": "libp2p-rust is the official rust language Implementation of the libp2p networking stack. In versions prior to 0.49.3, the Gossipsub implementation accepts attacker-controlled PRUNE backoff values and may perform unchecked time arithmetic when storing backoff state. A specially crafted PRUNE control message with an extremely large backoff (e.g. u64::MAX) can lead to Duration/Instant overflow during backoff update logic, triggering a panic in the networking state machine. This is remotely reachable over a normal libp2p connection and does not require authentication. Any application exposing a libp2p Gossipsub listener and using the affected backoff-handling path can be crashed by a network attacker that can reach the service port. The attack can be repeated by reconnecting and replaying the crafted control message. This issue has been fixed in version 0.49.3.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c9b5010854184290ac6ca1b4886c5f0166bf6a01cc60383f844015d1961bf9fa",
+  "source": "nvd",
+  "tags": [
+    "CWE-190"
+  ],
+  "token_count": 126,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33040"
+}

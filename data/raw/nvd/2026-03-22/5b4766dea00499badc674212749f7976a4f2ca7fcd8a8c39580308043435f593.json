@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-28276",
+  "ingested_at": "2026-03-22T07:54:32.861394+00:00",
+  "lang": "en",
+  "raw_text": "Initiative is a self-hosted project management platform. An access control vulnerability exists in Initiative versions prior to 0.32.2 where uploaded documents are served from a publicly accessible /uploads/ directory without any authentication or authorization checks. Any uploaded file can be accessed directly via its URL by unauthenticated users (e.g., in an incognito browser session), leading to potential disclosure of sensitive documents. The problem was patched in v0.32.2, and the patch was further improved on in 032.4.",
+  "severity": "HIGH",
+  "sha256_hash": "5b4766dea00499badc674212749f7976a4f2ca7fcd8a8c39580308043435f593",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-284",
+    "CWE-862"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28276"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "BigBlueButton is an open-source virtual classroom. In versions on the 3.x branch prior to 3.0.20, the string received with errorRedirectUrl lacks validation, using it directly in the respondWithRedirect function leads to an Open Redirect vulnerability. BigBlueButton 3.0.20 patches the issue. No known workarounds are available.",
+  "token_count": 45
+}

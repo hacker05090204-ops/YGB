@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A condition in ScreenConnect may allow an actor with access to server-level cryptographic material used for authentication to obtain unauthorized access, including elevated privileges, in certain scenarios.",
+  "token_count": 27
+}

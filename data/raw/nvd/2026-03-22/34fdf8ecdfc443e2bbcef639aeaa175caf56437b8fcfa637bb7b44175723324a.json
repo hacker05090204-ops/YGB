@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3189",
+  "ingested_at": "2026-03-22T07:54:32.193230+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in feiyuchuixue sz-boot-parent up to 1.3.2-beta. This vulnerability affects unknown code of the file /api/admin/common/files/download. Executing a manipulation of the argument url can lead to server-side request forgery. The attack can be executed remotely. Attacks of this nature are highly complex. It is stated that the exploitability is difficult. Upgrading to version 1.3.3-beta is able to resolve this issue. This patch is called aefaabfd7527188bfba3c8c9eee17c316d094802. Upgrading the affected component is advised. The project was informed beforehand and acted very professional: \"We have added a URL protocol whitelist validation to the file download interface, allowing only http and https protocols.\"",
+  "severity": "LOW",
+  "sha256_hash": "34fdf8ecdfc443e2bbcef639aeaa175caf56437b8fcfa637bb7b44175723324a",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3189"
+}

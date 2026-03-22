@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-43226",
+  "ingested_at": "2026-03-22T07:45:16.128602+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Common Log File System Driver contains a privilege escalation vulnerability that could allow a local, privileged attacker to bypass certain security mechanisms.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cbb2a9833d323e82a8b502f7c842be2ec26f149ac21a631c033bb42dab3b52d5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

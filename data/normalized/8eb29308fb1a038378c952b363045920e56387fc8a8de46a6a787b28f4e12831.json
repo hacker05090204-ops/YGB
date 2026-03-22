@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in berry-lang berry up to 1.1.0. The affected element is the function scan_string of the file src/be_lexer.c. This manipulation causes out-of-bounds read. The attack requires local access. The exploit has been publicly disclosed and may be utilized. Patch name: 7149c59a39ba44feca261b12f06089f265fec176. Applying a patch is the recommended action to fix this issue.",
+  "token_count": 55
+}

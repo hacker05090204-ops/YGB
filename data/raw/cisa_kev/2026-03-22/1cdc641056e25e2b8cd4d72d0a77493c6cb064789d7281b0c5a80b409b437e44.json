@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-20352",
+  "ingested_at": "2026-03-22T07:45:16.158096+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Cisco IOS and IOS XE contains a stack-based buffer overflow vulnerability in the Simple Network Management Protocol (SNMP) subsystem that could allow for denial of service or remote code execution. A successful exploit could allow a low-privileged attacker to cause the affected system to reload, resulting in a DoS condition, or allow a high-privileged attacker to execute arbitrary code as the root user and obtain full control of the affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1cdc641056e25e2b8cd4d72d0a77493c6cb064789d7281b0c5a80b409b437e44",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 76,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

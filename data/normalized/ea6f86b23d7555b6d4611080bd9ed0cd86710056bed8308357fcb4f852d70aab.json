@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Roundcube Roundcube Webmail Roundcube Webmail contains a file disclosure vulnerability caused by insufficient input validation in conjunction with file-based attachment plugins, which are used by default.",
+  "token_count": 26
+}

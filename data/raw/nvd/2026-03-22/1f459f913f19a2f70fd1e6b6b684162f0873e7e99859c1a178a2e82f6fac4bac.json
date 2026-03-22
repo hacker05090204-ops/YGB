@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25431",
+  "ingested_at": "2026-03-22T07:54:30.616840+00:00",
+  "lang": "en",
+  "raw_text": "delpino73 Blue-Smiley-Organizer 1.32 contains an SQL injection vulnerability in the datetime parameter that allows unauthenticated attackers to manipulate database queries. Attackers can inject SQL code through POST requests to extract sensitive data using boolean-based blind and time-based blind techniques, or write files to the server using INTO OUTFILE statements.",
+  "severity": "HIGH",
+  "sha256_hash": "1f459f913f19a2f70fd1e6b6b684162f0873e7e99859c1a178a2e82f6fac4bac",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25431"
+}

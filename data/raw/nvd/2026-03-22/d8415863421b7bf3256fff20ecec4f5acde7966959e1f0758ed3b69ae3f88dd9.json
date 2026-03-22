@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27941",
+  "ingested_at": "2026-03-22T07:54:32.521520+00:00",
+  "lang": "en",
+  "raw_text": "OpenLIT is an open source platform for AI engineering. Prior to version 1.37.1, several GitHub Actions workflows in OpenLIT's GitHub repository use the `pull_request_target` event while checking out and executing untrusted code from forked pull requests. These workflows run with the security context of the base repository, including a write-privileged `GITHUB_TOKEN` and numerous sensitive secrets (API keys, database/vector store tokens, and a Google Cloud service account key). Version 1.37.1 contains a fix.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d8415863421b7bf3256fff20ecec4f5acde7966959e1f0758ed3b69ae3f88dd9",
+  "source": "nvd",
+  "tags": [
+    "CWE-829"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27941"
+}

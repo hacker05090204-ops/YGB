@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-22224",
+  "ingested_at": "2026-03-22T07:45:16.545273+00:00",
+  "lang": "en",
+  "raw_text": "VMware ESXi and Workstation VMware ESXi and Workstation contain a time-of-check time-of-use (TOCTOU) race condition vulnerability that leads to an out-of-bounds write. Successful exploitation enables an attacker with local administrative privileges on a virtual machine to execute code as the virtual machine's VMX process running on the host.",
+  "severity": "CRITICAL",
+  "sha256_hash": "625b0ff9040081ee0e9f5cbf247a95187a1d0c6d7b558595923564f06ae59410",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 48,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

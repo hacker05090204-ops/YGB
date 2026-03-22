@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An administrator may attempt to block all networks by specifying \"\\*\" or \"all\" as the network identifier. However, these values are not supported and do not trigger any validation error. Instead, they are silently interpreted as network 0 which results in no networks being blocked at all.",
+  "token_count": 47
+}

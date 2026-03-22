@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-27803",
+  "ingested_at": "2026-03-22T07:54:34.828362+00:00",
+  "lang": "en",
+  "raw_text": "Vaultwarden is an unofficial Bitwarden compatible server written in Rust, formerly known as bitwarden_rs. Prior to version 1.35.4, when a Manager has manage=false for a given collection, they can still perform several management operations as long as they have access to the collection. This issue has been patched in version 1.35.4.",
+  "severity": "HIGH",
+  "sha256_hash": "2c5fd68797117fa2516fa6e37a133ad7c01817bc7ddf62a103575ef081b4a71a",
+  "source": "nvd",
+  "tags": [
+    "CWE-269",
+    "CWE-285",
+    "CWE-863"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27803"
+}

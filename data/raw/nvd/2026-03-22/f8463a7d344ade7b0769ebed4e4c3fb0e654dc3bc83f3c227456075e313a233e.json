@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22217",
+  "ingested_at": "2026-03-22T07:54:47.293355+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw version 2026.2.22 prior to 2026.2.23 contain an arbitrary code execution vulnerability in shell-env that allows attackers to execute attacker-controlled binaries by exploiting trusted-prefix fallback logic for the $SHELL variable. An attacker can influence the $SHELL environment variable on systems with writable trusted-prefix directories such as /opt/homebrew/bin to execute arbitrary binaries in the OpenClaw process context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f8463a7d344ade7b0769ebed4e4c3fb0e654dc3bc83f3c227456075e313a233e",
+  "source": "nvd",
+  "tags": [
+    "CWE-829"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22217"
+}

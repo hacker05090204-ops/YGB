@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29779",
+  "ingested_at": "2026-03-22T07:54:41.868920+00:00",
+  "lang": "en",
+  "raw_text": "UptimeFlare is a serverless uptime monitoring & status page solution, powered by Cloudflare Workers. Prior to commit 377a596, configuration file uptime.config.ts exports both pageConfig (safe for client use) and workerConfig (server-only, contains sensitive data) from the same module. Due to pages/incidents.tsx importing and using workerConfig directly inside client-side component code, the entire workerConfig object was included in the client-side JavaScript bundle served to all visitors. This issue has been patched via commit 377a596.",
+  "severity": "HIGH",
+  "sha256_hash": "3ae3e965318d92182253c3e974ab5449f15a2048c96ac92cf1b8782027dd1c35",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29779"
+}

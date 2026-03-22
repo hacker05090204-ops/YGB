@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Alive Parish 2.0.4 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the key parameter in the search endpoint. Attackers can also upload arbitrary files via the person photo upload functionality to the images/uploaded directory for remote code execution.",
+  "token_count": 49
+}

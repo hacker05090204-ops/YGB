@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Android Framework Android Framework contains an unspecified vulnerability that allows for privilege escalation after updating an app to a higher Target SDK with no additional execution privileges needed.",
+  "token_count": 28
+}

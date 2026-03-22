@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4474",
+  "ingested_at": "2026-03-22T07:54:48.651982+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in itsourcecode University Management System 1.0. Impacted is an unknown function of the file /admin_single_student_update.php. This manipulation of the argument st_name causes cross site scripting. The attack may be initiated remotely. The exploit has been published and may be used.",
+  "severity": "LOW",
+  "sha256_hash": "acff99487e3842fd3abd95fbdb7de29167657c26a7c130ba64e66b1759dda040",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4474"
+}

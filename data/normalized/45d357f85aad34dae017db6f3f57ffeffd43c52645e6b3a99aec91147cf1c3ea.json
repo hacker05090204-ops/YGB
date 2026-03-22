@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mozilla Firefox and Thunderbird Mozilla Firefox and Thunderbird do not properly handle onreadystatechange events in conjunction with page reloading, which allows remote attackers to cause a denial-of-service (DoS) or possibly execute malicious code via a crafted web site.",
+  "token_count": 38
+}

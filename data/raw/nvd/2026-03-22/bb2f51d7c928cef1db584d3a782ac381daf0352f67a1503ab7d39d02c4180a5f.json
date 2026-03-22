@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20015",
+  "ingested_at": "2026-03-22T07:54:34.655740+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the IKEv2 feature of Cisco Secure Firewall ASA Software and Cisco Secure FTD Software could allow an unauthenticated, remote attacker to cause a DoS condition on an affected device that may impact the availability of services to devices elsewhere in the network. This vulnerability is due to a memory leak when parsing IKEv2 packets. An attacker could exploit this vulnerability by sending crafted IKEv2 packets to an affected device. A successful exploit could allow the attacker to exhaust resources, causing a DoS condition that will eventually require the device to be manually reloaded.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bb2f51d7c928cef1db584d3a782ac381daf0352f67a1503ab7d39d02c4180a5f",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 96,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20015"
+}

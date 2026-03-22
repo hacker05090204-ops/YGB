@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "International Datacasting Corporation (IDC) SFX2100 Satellite Receiver, trivial password for the `user` (usr) account. A remote unauthenticated attacker can exploit this to gain unauthorized SSH access to the system, while intially dropped into a restricted shell, an attacker can trivially spawn a complete pty to gain an appropriately interactive shell.",
+  "token_count": 50
+}

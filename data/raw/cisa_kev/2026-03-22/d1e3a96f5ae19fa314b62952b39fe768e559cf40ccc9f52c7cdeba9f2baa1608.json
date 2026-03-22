@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-2021",
+  "ingested_at": "2026-03-22T07:45:18.300839+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS Palo Alto Networks PAN-OS contains a vulnerability in SAML which allows an attacker to bypass authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d1e3a96f5ae19fa314b62952b39fe768e559cf40ccc9f52c7cdeba9f2baa1608",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

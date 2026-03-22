@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26108",
+  "ingested_at": "2026-03-22T07:54:42.791200+00:00",
+  "lang": "en",
+  "raw_text": "Heap-based buffer overflow in Microsoft Office Excel allows an unauthorized attacker to execute code locally.",
+  "severity": "HIGH",
+  "sha256_hash": "d04521da094ad4f008c19ca0cb66bd3cb34f7cdba4280940ff0a4b4038b06195",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-787"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26108"
+}

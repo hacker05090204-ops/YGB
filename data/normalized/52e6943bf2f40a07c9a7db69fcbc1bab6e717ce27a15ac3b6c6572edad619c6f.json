@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Kernel - 'nt!NtSetIoCompletion / nt!NtRemoveIoCompletion' Pool Memory Disclosure",
+  "token_count": 10
+}

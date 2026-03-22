@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server (AS) Java contains a directory traversal vulnerability in scheduler/ui/js/ffffffffbca41eb4/UIUtilJavaScriptJS that allows a remote attacker to read arbitrary files via a .. (dot dot) in the query string.",
+  "token_count": 33
+}

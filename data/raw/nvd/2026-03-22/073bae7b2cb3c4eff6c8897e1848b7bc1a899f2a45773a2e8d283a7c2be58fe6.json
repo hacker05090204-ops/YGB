@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32051",
+  "ingested_at": "2026-03-22T07:54:49.208843+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.3.1 contain an authorization mismatch vulnerability that allows authenticated callers with operator.write scope to invoke owner-only tool surfaces including gateway and cron through agent runs in scoped-token deployments. Attackers with write-scope access can perform control-plane actions beyond their intended authorization level by exploiting inconsistent owner-only gating during agent execution.",
+  "severity": "HIGH",
+  "sha256_hash": "073bae7b2cb3c4eff6c8897e1848b7bc1a899f2a45773a2e8d283a7c2be58fe6",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32051"
+}

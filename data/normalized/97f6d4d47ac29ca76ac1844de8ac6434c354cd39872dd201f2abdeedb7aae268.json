@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Comfast CF-AC100 2.6.0.8. This affects the function sub_44AC14 of the file /cgi-bin/mbox-config?method=SET\u00a7ion=ping_config of the component Request Path Handler. The manipulation results in command injection. The attack may be launched remotely. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 59
+}

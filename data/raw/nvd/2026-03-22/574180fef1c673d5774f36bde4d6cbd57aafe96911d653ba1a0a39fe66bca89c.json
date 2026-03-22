@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67990",
+  "ingested_at": "2026-03-22T07:54:30.041576+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in RealMag777 GMap Targeting gmap-targeting allows Reflected XSS.This issue affects GMap Targeting: from n/a through < = 1.1.7.",
+  "severity": "HIGH",
+  "sha256_hash": "574180fef1c673d5774f36bde4d6cbd57aafe96911d653ba1a0a39fe66bca89c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67990"
+}

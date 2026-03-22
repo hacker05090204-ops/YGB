@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "DIGIT CENTRIS ERP contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the datum1, datum2, KID, and PID parameters. Attackers can send POST requests to /korisnikinfo.php with malicious SQL syntax in these parameters to extract or modify sensitive database information.",
+  "token_count": 49
+}

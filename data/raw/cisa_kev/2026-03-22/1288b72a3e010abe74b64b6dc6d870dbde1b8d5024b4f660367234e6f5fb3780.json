@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-7602",
+  "ingested_at": "2026-03-22T07:45:18.114005+00:00",
+  "lang": "en",
+  "raw_text": "Drupal Core A remote code execution vulnerability exists within multiple subsystems of Drupal that can allow attackers to exploit multiple attack vectors on a Drupal site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1288b72a3e010abe74b64b6dc6d870dbde1b8d5024b4f660367234e6f5fb3780",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

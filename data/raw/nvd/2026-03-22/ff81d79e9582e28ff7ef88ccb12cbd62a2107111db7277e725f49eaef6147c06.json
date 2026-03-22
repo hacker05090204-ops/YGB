@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3075",
+  "ingested_at": "2026-03-22T07:54:31.209803+00:00",
+  "lang": "en",
+  "raw_text": "Exposure of Sensitive System Information to an Unauthorized Control Sphere vulnerability in Jeff Starr Simple Ajax Chat simple-ajax-chat allows Retrieve Embedded Sensitive Data.This issue affects Simple Ajax Chat: from n/a through < = 20251121.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ff81d79e9582e28ff7ef88ccb12cbd62a2107111db7277e725f49eaef6147c06",
+  "source": "nvd",
+  "tags": [
+    "CWE-497"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3075"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP Solution Manager SAP Solution Manager User Experience Monitoring contains a missing authentication for critical function vulnerability which results in complete compromise of all SMDAgents connected to the Solution Manager.",
+  "token_count": 30
+}

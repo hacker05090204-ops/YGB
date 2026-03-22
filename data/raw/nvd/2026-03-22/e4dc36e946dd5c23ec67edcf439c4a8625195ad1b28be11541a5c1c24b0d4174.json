@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25085",
+  "ingested_at": "2026-03-22T07:54:32.969101+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability exists in Copeland XWEB Pro version 1.12.1 and prior, in which an unexpected return value from the authentication routine is later on processed as a legitimate value, resulting in an authentication bypass.",
+  "severity": "HIGH",
+  "sha256_hash": "e4dc36e946dd5c23ec67edcf439c4a8625195ad1b28be11541a5c1c24b0d4174",
+  "source": "nvd",
+  "tags": [
+    "CWE-394"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25085"
+}

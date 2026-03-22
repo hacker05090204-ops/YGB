@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Products Zyxel firewalls (ATP, USG, VM) and AP Controllers (NXC2500 and NXC5500) contain a use of hard-coded credentials vulnerability in an undocumented account (\"zyfwp\") with an unchangeable password.",
+  "token_count": 30
+}

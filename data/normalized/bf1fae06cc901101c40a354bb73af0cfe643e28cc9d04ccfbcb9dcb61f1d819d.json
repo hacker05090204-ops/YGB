@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "renren-secuity before v5.5.0 is vulnerable to SQL Injection in the BaseServiceImpl.java component",
+  "token_count": 12
+}

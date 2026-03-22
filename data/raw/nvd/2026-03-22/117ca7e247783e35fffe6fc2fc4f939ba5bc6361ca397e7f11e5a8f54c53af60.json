@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33312",
+  "ingested_at": "2026-03-22T07:54:48.854287+00:00",
+  "lang": "en",
+  "raw_text": "Vikunja is an open-source self-hosted task management platform. Starting in version 0.20.2 and prior to version 2.2.0, the `DELETE /api/v1/projects/:project/background` endpoint checks `CanRead` permission instead of `CanUpdate`, allowing any user with read-only access to a project to permanently delete its background image. Version 2.2.0 fixes the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "117ca7e247783e35fffe6fc2fc4f939ba5bc6361ca397e7f11e5a8f54c53af60",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33312"
+}

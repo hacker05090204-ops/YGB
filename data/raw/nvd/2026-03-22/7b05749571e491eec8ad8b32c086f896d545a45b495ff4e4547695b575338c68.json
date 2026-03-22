@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3511",
+  "ingested_at": "2026-03-22T07:54:47.934274+00:00",
+  "lang": "en",
+  "raw_text": "Improper Restriction of XML External Entity Reference vulnerability in XMLUtils.java in Slovensko.Digital Autogram allows remote unauthenticated attacker to conduct SSRF (Server Side Request Forgery) attacks and obtain unauthorized access to local files on filesystems running the vulnerable application. Successful exploitation requires the victim to visit a specially crafted website that sends request containing a specially crafted XML document to /sign endpoint of the local HTTP server run by the application.",
+  "severity": "HIGH",
+  "sha256_hash": "7b05749571e491eec8ad8b32c086f896d545a45b495ff4e4547695b575338c68",
+  "source": "nvd",
+  "tags": [
+    "CWE-611"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3511"
+}

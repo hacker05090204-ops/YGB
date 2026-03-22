@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28795",
+  "ingested_at": "2026-03-22T07:54:41.321354+00:00",
+  "lang": "en",
+  "raw_text": "OpenChatBI is an intelligent chat-based BI tool powered by large language models, designed to help users query, analyze, and visualize data through natural language conversations. Prior to version 0.2.2, the save_report tool in openchatbi/tool/save_report.py suffers from a critical path traversal vulnerability due to insufficient input sanitization of the file_format parameter. This issue has been patched in version 0.2.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "422867e983408fb652673d2c3f28be509d6d0a35e3660d1f548858c01886e378",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28795"
+}

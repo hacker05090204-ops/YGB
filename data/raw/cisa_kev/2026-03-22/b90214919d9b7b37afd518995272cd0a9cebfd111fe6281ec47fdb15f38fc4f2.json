@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-24112",
+  "ingested_at": "2026-03-22T07:45:17.685197+00:00",
+  "lang": "en",
+  "raw_text": "Apache APISIX Apache APISIX contains an authentication bypass vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b90214919d9b7b37afd518995272cd0a9cebfd111fe6281ec47fdb15f38fc4f2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Meta Platforms WhatsApp A buffer overflow vulnerability in WhatsApp VOIP stack allowed remote code execution via specially crafted series of RTCP packets sent to a target phone number.",
+  "token_count": 28
+}

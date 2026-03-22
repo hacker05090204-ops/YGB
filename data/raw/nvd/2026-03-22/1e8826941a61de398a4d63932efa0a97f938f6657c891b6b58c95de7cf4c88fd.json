@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3728",
+  "ingested_at": "2026-03-22T07:54:42.036162+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Tenda F453 1.0.0.3/1.If. This issue affects the function fromSetCfm of the file /goform/setcfm. This manipulation of the argument funcname/funcpara1 causes stack-based buffer overflow. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "1e8826941a61de398a4d63932efa0a97f938f6657c891b6b58c95de7cf4c88fd",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3728"
+}

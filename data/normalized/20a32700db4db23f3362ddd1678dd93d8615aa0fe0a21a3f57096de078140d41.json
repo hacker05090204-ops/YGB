@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In multiple functions of MmsProvider.java, there is a possible way to arbitrarily delete files which affect telephony, SMS, and MMS functionalities due to a path traversal error. This could lead to local denial of service with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "token_count": 48
+}

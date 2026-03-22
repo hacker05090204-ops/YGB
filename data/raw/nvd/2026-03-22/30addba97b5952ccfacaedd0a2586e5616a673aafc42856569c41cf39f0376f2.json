@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1626",
+  "ingested_at": "2026-03-22T07:54:33.104838+00:00",
+  "lang": "en",
+  "raw_text": "An attacker may exploit the use of weak CBC-based cipher suites in the device\u2019s SSH service to potentially observe or manipulate parts of the encrypted SSH communication, if they are able to intercept or interact with the network traffic.",
+  "severity": "MEDIUM",
+  "sha256_hash": "30addba97b5952ccfacaedd0a2586e5616a673aafc42856569c41cf39f0376f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1626"
+}

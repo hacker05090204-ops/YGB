@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-1787",
+  "ingested_at": "2026-03-22T07:54:31.727215+00:00",
+  "lang": "en",
+  "raw_text": "Local admin could to leak information from the Genetec Update Service configuration web page. An authenticated, admin privileged, Windows user could exploit this vulnerability to gain elevated privileges in the Genetec Update Service. Could be combined with CVE-2025-1789 to achieve low privilege escalation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7736856dbc08d6345b2d6447e3b67dd3865833aa55b385b38495cbebb5a3f084",
+  "source": "nvd",
+  "tags": [
+    "CWE-346"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-1787"
+}

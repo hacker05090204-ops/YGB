@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1472",
+  "ingested_at": "2026-03-22T07:45:19.418961+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Netlogon Microsoft's Netlogon Remote Protocol (MS-NRPC) contains a privilege escalation vulnerability when an attacker establishes a vulnerable Netlogon secure channel connection to a domain controller. An attacker who successfully exploits the vulnerability could run a specially crafted application on a device on the network. The vulnerability is also known under the moniker of Zerologon.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1f5f628ba4ccaae04bdba24b0552e0da80486050fad806e649703e8512445a74",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 55,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2677",
+  "ingested_at": "2026-03-22T07:54:32.648865+00:00",
+  "lang": "en",
+  "raw_text": "Reflected Cross-Site Scripting (XSS) on the A3factura web platform, in parameter 'name', in 'a3factura-app.wolterskluwer.es/#/incomes/representatives-management' endpoint, which could allow an attacker to execute arbitrary code in the victim's browser.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b884f3396542fd505155b3e30942a503fb13f995c3c55f6a36e4c021c9bfa2f9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2677"
+}

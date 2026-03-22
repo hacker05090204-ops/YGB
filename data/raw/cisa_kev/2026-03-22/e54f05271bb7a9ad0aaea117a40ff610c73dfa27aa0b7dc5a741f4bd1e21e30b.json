@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-22947",
+  "ingested_at": "2026-03-22T07:45:18.035702+00:00",
+  "lang": "en",
+  "raw_text": "VMware Spring Cloud Gateway Spring Cloud Gateway applications are vulnerable to a code injection attack when the Gateway Actuator endpoint is enabled, exposed and unsecured.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e54f05271bb7a9ad0aaea117a40ff610c73dfa27aa0b7dc5a741f4bd1e21e30b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20434",
+  "ingested_at": "2026-03-22T07:54:33.531027+00:00",
+  "lang": "en",
+  "raw_text": "In Modem, there is a possible out of bounds write due to a missing bounds check. This could lead to remote escalation of privilege, if a UE has connected to a rogue base station controlled by the attacker, with no additional execution privileges needed. User interaction is needed for exploitation. Patch ID: MOLY00782946; Issue ID: MSV-4135.",
+  "severity": "HIGH",
+  "sha256_hash": "8c7cc2db25db5a95c54b5a9a286621e1feb611d25283f0549f2dae46b3d5b721",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20434"
+}

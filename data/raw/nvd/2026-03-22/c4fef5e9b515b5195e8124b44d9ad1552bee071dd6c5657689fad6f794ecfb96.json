@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30850",
+  "ingested_at": "2026-03-22T07:54:41.907999+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to versions 8.6.9 and 9.5.0-alpha.9, the file metadata endpoint (GET /files/:appId/metadata/:filename) does not enforce beforeFind / afterFind file triggers. When these triggers are used as access-control gates, the metadata endpoint bypasses them entirely, allowing unauthorized access to file metadata. This issue has been patched in versions 8.6.9 and 9.5.0-alpha.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c4fef5e9b515b5195e8124b44d9ad1552bee071dd6c5657689fad6f794ecfb96",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30850"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-27443",
+  "ingested_at": "2026-03-22T07:45:16.393931+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Zimbra Collaboration contains a cross-site scripting (XSS) vulnerability in the CalendarInvite feature of the Zimbra webmail classic user interface. An attacker can exploit this vulnerability via an email message containing a crafted calendar header, leading to the execution of arbitrary JavaScript code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ecfcde4539081f531231ed8fa90ea7579b9a3395c23873f78ddcc63043e0debf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

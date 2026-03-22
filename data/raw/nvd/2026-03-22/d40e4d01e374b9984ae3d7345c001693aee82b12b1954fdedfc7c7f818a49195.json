@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4424",
+  "ingested_at": "2026-03-22T07:54:47.968586+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in libarchive. This heap out-of-bounds read vulnerability exists in the RAR archive processing logic due to improper validation of the LZSS sliding window size after transitions between compression methods. A remote attacker can exploit this by providing a specially crafted RAR archive, leading to the disclosure of sensitive heap memory information without requiring authentication or user interaction.",
+  "severity": "HIGH",
+  "sha256_hash": "d40e4d01e374b9984ae3d7345c001693aee82b12b1954fdedfc7c7f818a49195",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4424"
+}

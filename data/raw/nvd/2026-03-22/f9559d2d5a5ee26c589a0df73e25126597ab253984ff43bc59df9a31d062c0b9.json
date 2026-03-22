@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2664",
+  "ingested_at": "2026-03-22T07:54:31.472703+00:00",
+  "lang": "en",
+  "raw_text": "An out of bounds read vulnerability in the grpcfuse kernel module present in the Linux VM in Docker Desktop for Windows, Linux and macOS up to version 4.61.0 could allow a local attacker to cause an unspecified impact by writing to /proc/docker entries. The issue has been fixed in Docker Desktop 4.62.0 .",
+  "severity": "HIGH",
+  "sha256_hash": "f9559d2d5a5ee26c589a0df73e25126597ab253984ff43bc59df9a31d062c0b9",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2664"
+}

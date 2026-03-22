@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Umbraco is an ASP.NET CMS. From 16.2.0 to before 16.5.1 and 17.2.2, An authenticated backoffice user with access to Settings can inject malicious HTML into property type descriptions. Due to an overly permissive attributeNameCheck configuration (/.+/) in the UFM DOMPurify instance, event handler attributes such as onclick and onload, when used within Umbraco web components (umb-*, uui-*, ufm-*) were not filtered. This vulnerability is fixed in 16.5.1 and 17.2.2.",
+  "token_count": 69
+}

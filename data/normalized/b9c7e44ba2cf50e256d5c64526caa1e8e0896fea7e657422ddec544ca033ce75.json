@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A buffer copy without checking size of input ('classic buffer overflow') vulnerability in Fortinet FortiSwitchAXFixed 1.0.0 through 1.0.1 may allow an unauthenticated attacker within the same adjacent network to execute unauthorized code or commands on the device via sending a crafted LLDP packet.",
+  "token_count": 43
+}

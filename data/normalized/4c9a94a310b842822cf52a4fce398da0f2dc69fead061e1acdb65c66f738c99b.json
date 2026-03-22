@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP Customer Relationship Management (CRM) SAP Customer Relationship Management (CRM) contains a path traversal vulnerability that allows an attacker to exploit insufficient validation of path information provided by users.",
+  "token_count": 29
+}

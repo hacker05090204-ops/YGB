@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2590",
+  "ingested_at": "2026-03-22T07:45:18.634568+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE An unspecified vulnerability exists within Oracle Java Runtime Environment that allows an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cc70956f1407df5269db5f6a3ce68690bee354cab326875acdeef8fee2c51846",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

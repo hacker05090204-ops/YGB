@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The NEX-Forms \u2013 Ultimate Forms Plugin for WordPress plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the deactivate_license() function in all versions up to, and including, 9.1.9. This makes it possible for authenticated attackers, with Subscriber-level access and above, to to deactivate the plugin license.",
+  "token_count": 54
+}

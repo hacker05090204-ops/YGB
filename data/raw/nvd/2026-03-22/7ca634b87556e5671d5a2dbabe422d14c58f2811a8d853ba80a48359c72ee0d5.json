@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67975",
+  "ingested_at": "2026-03-22T07:54:30.018763+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in aDirectory aDirectory adirectory allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects aDirectory: from n/a through < = 3.0.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7ca634b87556e5671d5a2dbabe422d14c58f2811a8d853ba80a48359c72ee0d5",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67975"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1773",
+  "ingested_at": "2026-03-22T07:54:31.479738+00:00",
+  "lang": "en",
+  "raw_text": "IEC 60870-5-104: Potential Denial of Service impact on reception of invalid U-format frame. Product is only affected if IEC 60870-5-104 bi-directional functionality is configured. Enabling secure communication following IEC 62351-3 does not remediate the vulnerability but mitigates the risk of exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "c24f8e236aba9da6ce623c753bc481aa0e36160458cabe2a80edc5e0db6aeff1",
+  "source": "nvd",
+  "tags": [
+    "CWE-184"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1773"
+}

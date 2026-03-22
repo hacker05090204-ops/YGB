@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-42599",
+  "ingested_at": "2026-03-22T07:45:16.455516+00:00",
+  "lang": "en",
+  "raw_text": "Qualitia Active! Mail Qualitia Active! Mail contains a stack-based buffer overflow vulnerability that allows a remote, unauthenticated attacker to execute arbitrary or trigger a denial-of-service via a specially crafted request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "628dbdea0a3d633a3f2467483c7c21e1e9281b7a568f57912f13a9b7836e96be",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

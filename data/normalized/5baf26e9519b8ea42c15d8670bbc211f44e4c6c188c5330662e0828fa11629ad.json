@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Edimax GS-5008PL firmware version 1.00.54 and prior contain an authentication bypass vulnerability that allows unauthenticated attackers to access the management interface. Attackers can exploit the global authentication flag mechanism to gain administrative access without credentials after any user authenticates, enabling unauthorized password changes, firmware uploads, and configuration modifications.",
+  "token_count": 48
+}

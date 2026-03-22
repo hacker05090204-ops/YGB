@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cleartext Transmission of Sensitive Information (CWE-319) in a component used in the Gallagher Hanwha VMS and Gallagher NxWitness VMS integrations allows unprivileged users with local network access to view live video streams. This issue affects all versions of Gallagher NxWitness VMS integration prior to 9.10.017 and Gallagher Hanwha VMS integration prior to 9.10.025.",
+  "token_count": 53
+}

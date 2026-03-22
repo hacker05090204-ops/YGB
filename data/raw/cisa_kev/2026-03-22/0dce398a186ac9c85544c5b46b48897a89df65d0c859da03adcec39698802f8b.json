@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38217",
+  "ingested_at": "2026-03-22T07:45:16.828207+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Mark of the Web (MOTW) contains a protection mechanism failure vulnerability that allows an attacker to bypass MOTW-based defenses. This can result in a limited loss of integrity and availability of security features such as Protected View in Microsoft Office, which rely on MOTW tagging.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0dce398a186ac9c85544c5b46b48897a89df65d0c859da03adcec39698802f8b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

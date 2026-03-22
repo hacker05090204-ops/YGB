@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22455",
+  "ingested_at": "2026-03-22T07:54:40.122113+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in foreverpinetree Thebe thebe allows Reflected XSS.This issue affects Thebe: from n/a through < = 1.3.0.",
+  "severity": "HIGH",
+  "sha256_hash": "54415550b4b022b996c0cfeeac8b016cb2d8ff8a5b4773ed52220f742db0d0f0",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22455"
+}

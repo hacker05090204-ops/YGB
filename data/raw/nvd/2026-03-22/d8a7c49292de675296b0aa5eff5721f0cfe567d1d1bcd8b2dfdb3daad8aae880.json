@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32837",
+  "ingested_at": "2026-03-22T07:54:47.169282+00:00",
+  "lang": "en",
+  "raw_text": "miniaudio version 0.11.25 and earlier contain a heap out-of-bounds read vulnerability in the WAV BEXT metadata parser that allows attackers to trigger memory access violations by processing crafted WAV files. Attackers can exploit improper null-termination handling in the coding history field to cause out-of-bounds reads past the allocated metadata pool, resulting in application crashes or denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d8a7c49292de675296b0aa5eff5721f0cfe567d1d1bcd8b2dfdb3daad8aae880",
+  "source": "nvd",
+  "tags": [
+    "CWE-170"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32837"
+}

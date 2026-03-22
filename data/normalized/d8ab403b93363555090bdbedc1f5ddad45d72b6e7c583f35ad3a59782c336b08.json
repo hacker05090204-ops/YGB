@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Catalyst 6800 Series Switches A vulnerability in the Virtual Private LAN Service (VPLS) code of Cisco IOS for Cisco Catalyst 6800 Series Switches could allow an unauthenticated, adjacent attacker to cause a denial of service.",
+  "token_count": 36
+}

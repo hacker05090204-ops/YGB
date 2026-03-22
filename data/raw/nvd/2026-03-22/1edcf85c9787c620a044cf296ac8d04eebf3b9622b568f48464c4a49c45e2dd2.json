@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3797",
+  "ingested_at": "2026-03-22T07:54:42.154630+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tiandy Video Surveillance System \u89c6\u9891\u76d1\u63a7\u5e73\u53f0 7.17.0. The impacted element is the function uploadFile of the file /src/com/tiandy/easy7/core/rest/CLS_REST_File.java. The manipulation of the argument fileName leads to unrestricted upload. The attack may be initiated remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1edcf85c9787c620a044cf296ac8d04eebf3b9622b568f48464c4a49c45e2dd2",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434",
+    "CWE-434"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3797"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4349",
+  "ingested_at": "2026-03-22T07:54:47.206331+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Duende IdentityServer 4. The affected element is an unknown function of the file /connect/authorize of the component Token Renewal Endpoint. This manipulation of the argument id_token_hint causes improper authentication. It is possible to initiate the attack remotely. The attack is considered to have high complexity. The exploitability is described as difficult. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2e0c8806096dcf5c689a952505a47ff8923bccbb89af26a75461f4fbadb659a0",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4349"
+}

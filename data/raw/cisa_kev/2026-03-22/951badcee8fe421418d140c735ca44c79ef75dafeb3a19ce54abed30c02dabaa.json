@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-24472",
+  "ingested_at": "2026-03-22T07:45:16.508105+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS and FortiProxy Fortinet FortiOS and FortiProxy contain an authentication bypass vulnerability that allows a remote attacker to gain super-admin privileges via crafted CSF proxy requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "951badcee8fe421418d140c735ca44c79ef75dafeb3a19ce54abed30c02dabaa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

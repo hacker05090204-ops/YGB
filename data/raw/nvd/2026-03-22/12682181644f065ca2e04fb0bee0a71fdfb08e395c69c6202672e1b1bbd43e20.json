@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26046",
+  "ingested_at": "2026-03-22T07:54:30.770644+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in a Moodle TeX filter administrative setting where insufficient sanitization of configuration input could allow command injection. On sites where the TeX filter is enabled and ImageMagick is installed, a maliciously crafted setting value entered by an administrator could result in unintended system command execution. While exploitation requires administrative privileges, successful compromise could affect the entire Moodle server.",
+  "severity": "HIGH",
+  "sha256_hash": "12682181644f065ca2e04fb0bee0a71fdfb08e395c69c6202672e1b1bbd43e20",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26046"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33228",
+  "ingested_at": "2026-03-22T07:54:49.094244+00:00",
+  "lang": "en",
+  "raw_text": "flatted is a circular JSON parser. Prior to version 3.4.2, the parse() function in flatted can use attacker-controlled string values from the parsed JSON as direct array index keys, without validating that they are numeric. Since the internal input buffer is a JavaScript Array, accessing it with the key \"__proto__\" returns Array.prototype via the inherited getter. This object is then treated as a legitimate parsed value and assigned as a property of the output object, effectively leaking a live reference to Array.prototype to the consumer. Any code that subsequently writes to that property will pollute the global prototype. This issue has been patched in version 3.4.2.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a63f436a30c7450950b454892791781395b9b08c5ee917689db6634caacf40d4",
+  "source": "nvd",
+  "tags": [
+    "CWE-1321"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33228"
+}

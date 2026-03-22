@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32950",
+  "ingested_at": "2026-03-22T07:54:48.578112+00:00",
+  "lang": "en",
+  "raw_text": "SQLBot is an intelligent data query system based on a large language model and RAG. Versions prior to 1.7.0 contain a critical SQL Injection vulnerability in the /api/v1/datasource/uploadExcel endpoint that enables Remote Code Execution (RCE), allowing any authenticated user (even the lowest-privileged) to fully compromise the backend server. The root cause is twofold: Excel Sheet names are concatenated directly into PostgreSQL table names without sanitization (datasource.py#L351), and those table names are embedded into COPY SQL statements via f-strings instead of parameterized queries (datasource.py#L385-L388). An attacker can bypass the 31-character Sheet name limit using a two-stage technique\u2014first uploading a normal file whose data rows contain shell commands, then uploading an XML-tampered file whose Sheet name injects a TO PROGRAM 'sh' clause into the SQL. Confirmed impacts include arbitrary command execution as the postgres user (uid=999), sensitive file exfiltration (e.g., /etc/passwd, /etc/shadow), and complete PostgreSQL database takeover. This issue has been fixed in version 1.7.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a00c5e9d32e3d717eaf74684f4bf39ac4a1808f69c5cd35b7faf8f7154cb4ba4",
+  "source": "nvd",
+  "tags": [
+    "CWE-78",
+    "CWE-89"
+  ],
+  "token_count": 153,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32950"
+}

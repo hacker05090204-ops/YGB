@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23668",
+  "ingested_at": "2026-03-22T07:54:42.667436+00:00",
+  "lang": "en",
+  "raw_text": "Concurrent execution using shared resource with improper synchronization ('race condition') in Microsoft Graphics Component allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "f377ba4da9dc1e0b87ebb380260bc8ac20e071bb0526bf60fe1c8428a36385a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23668"
+}

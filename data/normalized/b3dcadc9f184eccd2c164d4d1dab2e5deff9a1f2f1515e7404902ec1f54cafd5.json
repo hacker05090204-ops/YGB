@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an improper boundary check vulnerability within DSP driver that allows for out-of-bounds memory access.",
+  "token_count": 21
+}

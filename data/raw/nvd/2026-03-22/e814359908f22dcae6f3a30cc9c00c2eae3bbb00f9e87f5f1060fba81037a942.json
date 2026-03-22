@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41002",
+  "ingested_at": "2026-03-22T07:54:31.093032+00:00",
+  "lang": "en",
+  "raw_text": "SQL injection vulnerability in Infoticketing. This vulnerability allows an unauthenticated attacker to retrieve, create, update, and delete the database by sending a POST request using the 'code' parameter in '/components/cart/cartApplyDiscount.php'.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e814359908f22dcae6f3a30cc9c00c2eae3bbb00f9e87f5f1060fba81037a942",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41002"
+}

@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23272",
+  "ingested_at": "2026-03-22T07:54:48.690847+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: netfilter: nf_tables: unconditionally bump set->nelems before insertion In case that the set is full, a new element gets published then removed without waiting for the RCU grace period, while RCU reader can be walking over it already. To address this issue, add the element transaction even if set is full, but toggle the set_full flag to report -ENFILE so the abort path safely unwinds the set to its previous state. As for element updates, decrement set->nelems to restore it. A simpler fix is to call synchronize_rcu() in the error path. However, with a large batch adding elements to already maxed-out set, this could cause noticeable slowdown of such batches.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f6da96ae0b42c33dec157c5f5dbf77907629f9d4d1ee1b09bc9d5a388d57ed7b",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 119,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23272"
+}

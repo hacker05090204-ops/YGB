@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48567",
+  "ingested_at": "2026-03-22T07:54:33.837100+00:00",
+  "lang": "en",
+  "raw_text": "In multiple locations, there is a possible bypass of a file path filter designed to prevent access to sensitive directories due to incorrect unicode normalization. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "d849fd1d790b2efe5d00e885c56f33b90a9896e30f33f2e235ec5fa53062edda",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48567"
+}

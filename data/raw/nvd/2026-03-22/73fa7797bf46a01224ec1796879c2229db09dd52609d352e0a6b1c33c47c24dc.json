@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28396",
+  "ingested_at": "2026-03-22T07:54:33.797311+00:00",
+  "lang": "en",
+  "raw_text": "NocoDB is software for building databases as spreadsheets. Prior to version 0.301.3, the password reset flow did not revoke existing refresh tokens, allowing an attacker with a previously stolen refresh token to continue minting valid JWTs after the victim resets their password. This issue has been patched in version 0.301.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "73fa7797bf46a01224ec1796879c2229db09dd52609d352e0a6b1c33c47c24dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28396"
+}

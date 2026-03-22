@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Advantive VeraCore Advantive VeraCore contains a SQL injection vulnerability in timeoutWarning.asp that allows a remote attacker to execute arbitrary SQL commands via the PmSess1 parameter.",
+  "token_count": 25
+}

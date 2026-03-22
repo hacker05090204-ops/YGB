@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Atlassian Jira Server and Data Center Atlassian Jira Server and Data Center contain a server-side template injection vulnerability which can allow for remote code execution.",
+  "token_count": 25
+}

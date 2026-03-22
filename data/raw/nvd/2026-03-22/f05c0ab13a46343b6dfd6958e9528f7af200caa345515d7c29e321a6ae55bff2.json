@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27755",
+  "ingested_at": "2026-03-22T07:54:33.241844+00:00",
+  "lang": "en",
+  "raw_text": "SODOLA SL902-SWTGW124AS firmware versions through 200.1.20 contain a weak session identifier generation vulnerability that allows attackers to forge authenticated sessions by computing predictable MD5-based cookies. Attackers who know or guess valid credentials can calculate the session identifier offline and bypass authentication without completing the login flow, gaining unauthorized access to the device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f05c0ab13a46343b6dfd6958e9528f7af200caa345515d7c29e321a6ae55bff2",
+  "source": "nvd",
+  "tags": [
+    "CWE-330"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27755"
+}

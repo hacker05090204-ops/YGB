@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chrome Google Chrome contains a use-after-free vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page.",
+  "token_count": 30
+}

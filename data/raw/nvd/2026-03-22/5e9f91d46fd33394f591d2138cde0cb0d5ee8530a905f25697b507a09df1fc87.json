@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2479",
+  "ingested_at": "2026-03-22T07:54:32.011722+00:00",
+  "lang": "en",
+  "raw_text": "The Responsive Lightbox & Gallery plugin for WordPress is vulnerable to Server-Side Request Forgery in all versions up to, and including, 2.7.1. This is due to the use of `strpos()` for substring-based hostname validation instead of strict host comparison in the `ajax_upload_image()` function. This makes it possible for authenticated attackers, with Author-level access and above, to make web requests to arbitrary locations originating from the web application, which can be used to query and modify information from internal services.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5e9f91d46fd33394f591d2138cde0cb0d5ee8530a905f25697b507a09df1fc87",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2479"
+}

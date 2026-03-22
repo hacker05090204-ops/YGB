@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28502",
+  "ingested_at": "2026-03-22T07:54:41.242336+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 24.0, an authenticated Remote Code Execution (RCE) vulnerability was identified in AVideo related to the plugin upload/import functionality. The issue allowed an authenticated administrator to upload a specially crafted ZIP archive containing executable server-side files. Due to insufficient validation of extracted file contents, the archive was extracted directly into a web-accessible plugin directory, allowing arbitrary PHP code execution. This issue has been patched in version 24.0.",
+  "severity": "HIGH",
+  "sha256_hash": "629417e5b39c518c289dd12dc463904ee8d8df3480f48252ad0433148deb811f",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28502"
+}

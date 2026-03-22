@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25511",
+  "ingested_at": "2026-03-22T07:54:44.275441+00:00",
+  "lang": "en",
+  "raw_text": "Jettweb PHP Hazir Haber Sitesi Scripti V3 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the videoid parameter. Attackers can send GET requests to fonksiyonlar.php with malicious videoid values using UNION-based injection to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "68f68520a070c8719887699a04489a9a6bb8f4d43bcb432762fe6885c310e9e1",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25511"
+}

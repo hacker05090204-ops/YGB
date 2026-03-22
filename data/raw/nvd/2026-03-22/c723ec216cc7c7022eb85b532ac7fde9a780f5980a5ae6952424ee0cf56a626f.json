@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32026",
+  "ingested_at": "2026-03-22T07:54:48.215640+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.24 contain an improper path validation vulnerability in sandbox media handling that allows absolute paths under the host temporary directory outside the active sandbox root. Attackers can exploit this by providing malicious media references to read and exfiltrate arbitrary files from the host temporary directory through attachment delivery mechanisms.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c723ec216cc7c7022eb85b532ac7fde9a780f5980a5ae6952424ee0cf56a626f",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32026"
+}

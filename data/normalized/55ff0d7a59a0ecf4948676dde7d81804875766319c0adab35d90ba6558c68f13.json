@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jenkins Jenkins User Interface (UI) Jenkins User Interface (UI) contains an information disclosure vulnerability that allows users to see the names of jobs and builds otherwise inaccessible to them on the \"Fingerprints\" pages.",
+  "token_count": 33
+}

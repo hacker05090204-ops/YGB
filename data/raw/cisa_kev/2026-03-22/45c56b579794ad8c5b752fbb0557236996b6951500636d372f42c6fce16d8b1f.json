@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-26143",
+  "ingested_at": "2026-03-22T07:45:18.273064+00:00",
+  "lang": "en",
+  "raw_text": "Mitel MiCollab, MiVoice Business Express A vulnerability has been identified in MiCollab and MiVoice Business Express that may allow a malicious actor to gain unauthorized access to sensitive information and services, cause performance degradations or a denial of service condition on the affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "45c56b579794ad8c5b752fbb0557236996b6951500636d372f42c6fce16d8b1f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3758",
+  "ingested_at": "2026-03-22T07:54:42.094798+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in projectworlds Online Art Gallery Shop 1.0. Affected by this issue is some unknown functionality of the file /admin/adminHome.php. This manipulation of the argument Info causes sql injection. Remote exploitation of the attack is possible. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "4eef2b3480ba65b3a7cd34ae972f8e133e5aa88f3d9fd65224e656c6053ff335",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3758"
+}

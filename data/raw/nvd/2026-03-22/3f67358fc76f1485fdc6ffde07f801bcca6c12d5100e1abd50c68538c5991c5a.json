@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4202",
+  "ingested_at": "2026-03-22T07:54:47.025109+00:00",
+  "lang": "en",
+  "raw_text": "The extension fails to verify, if an authenticated user has permissions to access to redirects resulting in exposure of redirect records when editing a page.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "3f67358fc76f1485fdc6ffde07f801bcca6c12d5100e1abd50c68538c5991c5a",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-862"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4202"
+}

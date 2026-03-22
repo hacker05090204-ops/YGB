@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3277",
+  "ingested_at": "2026-03-22T07:54:33.183350+00:00",
+  "lang": "en",
+  "raw_text": "The OpenID Connect (OIDC) authentication configuration in PowerShell Universal before 2026.1.3 stores the OIDC client secret in cleartext in the .universal/authentication.ps1 script, which allows an attacker with read access to that file to obtain the OIDC client credentials",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f82026750cd88afcbdd89c1a779fa0676b3d45e3583b6407f73cafe06121a155",
+  "source": "nvd",
+  "tags": [
+    "CWE-312"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3277"
+}

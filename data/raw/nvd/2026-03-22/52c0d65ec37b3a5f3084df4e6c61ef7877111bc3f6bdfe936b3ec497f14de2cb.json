@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14577",
+  "ingested_at": "2026-03-22T07:54:31.474698+00:00",
+  "lang": "en",
+  "raw_text": "Slican NCP/IPL/IPM/IPU devices are vulnerable to PHP Function Injection. An unauthenticated remote attacker is able to execute arbitrary PHP commands by sending specially crafted requests to /webcti/session_ajax.php endpoint. This issue was fixed in version 1.24.0190 (Slican NCP) and 6.61.0010 (Slican IPL/IPM/IPU).",
+  "severity": "CRITICAL",
+  "sha256_hash": "52c0d65ec37b3a5f3084df4e6c61ef7877111bc3f6bdfe936b3ec497f14de2cb",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14577"
+}

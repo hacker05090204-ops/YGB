@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-9841",
+  "ingested_at": "2026-03-22T07:45:18.748140+00:00",
+  "lang": "en",
+  "raw_text": "PHPUnit PHPUnit PHPUnit allows remote attackers to execute arbitrary PHP code via HTTP POST data beginning with a \"",
+  "severity": "CRITICAL",
+  "sha256_hash": "a12c46a444b300748a3d45fa9b6e717690e33b2cfd2fc990b627c3efc9823420",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

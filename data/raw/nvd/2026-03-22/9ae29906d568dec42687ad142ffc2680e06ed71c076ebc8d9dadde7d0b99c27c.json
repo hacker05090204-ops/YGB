@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32451",
+  "ingested_at": "2026-03-22T07:54:46.134384+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in ThemeFusion Fusion Builder fusion-builder allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Fusion Builder: from n/a through < 3.15.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9ae29906d568dec42687ad142ffc2680e06ed71c076ebc8d9dadde7d0b99c27c",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32451"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Rejetto HTTP File Server Rejetto HTTP File Server contains an improper neutralization of special elements used in a template engine vulnerability. This allows a remote, unauthenticated attacker to execute commands on the affected system by sending a specially crafted HTTP request.",
+  "token_count": 41
+}

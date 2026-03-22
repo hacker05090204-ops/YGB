@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29042",
+  "ingested_at": "2026-03-22T07:54:41.338483+00:00",
+  "lang": "en",
+  "raw_text": "Nuclio is a \"Serverless\" framework for Real-Time Events and Data Processing. Prior to version 1.15.20, the Nuclio Shell Runtime component contains a command injection vulnerability in how it processes user-supplied arguments. When a function is invoked via HTTP, the runtime reads the X-Nuclio-Arguments header and directly incorporates its value into shell commands without any validation or sanitization. This issue has been patched in version 1.15.20.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1d8217a979da86c17eba1057b717d108962cdaf3d02670eac6d55f1632986550",
+  "source": "nvd",
+  "tags": [
+    "CWE-75"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29042"
+}

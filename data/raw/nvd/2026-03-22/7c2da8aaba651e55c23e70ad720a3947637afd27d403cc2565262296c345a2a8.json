@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23248",
+  "ingested_at": "2026-03-22T07:54:47.455036+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: perf/core: Fix refcount bug and potential UAF in perf_mmap Syzkaller reported a refcount_t: addition on 0; use-after-free warning in perf_mmap. The issue is caused by a race condition between a failing mmap() setup and a concurrent mmap() on a dependent event (e.g., using output redirection). In perf_mmap(), the ring_buffer (rb) is allocated and assigned to event->rb with the mmap_mutex held. The mutex is then released to perform map_range(). If map_range() fails, perf_mmap_close() is called to clean up. However, since the mutex was dropped, another thread attaching to this event (via inherited events or output redirection) can acquire the mutex, observe the valid event->rb pointer, and attempt to increment its reference count. If the cleanup path has already dropped the reference count to zero, this results in a use-after-free or refcount saturation warning. Fix this by extending the scope of mmap_mutex to cover the map_range() call. This ensures that the ring buffer initialization and mapping (or cleanup on failure) happens atomically effectively, preventing other threads from accessing a half-initialized or dying ring buffer.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "7c2da8aaba651e55c23e70ad720a3947637afd27d403cc2565262296c345a2a8",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 182,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23248"
+}

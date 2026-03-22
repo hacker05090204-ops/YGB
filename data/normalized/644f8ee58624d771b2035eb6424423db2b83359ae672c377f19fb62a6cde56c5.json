@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Arm Mali Graphics Processing Unit (GPU) Arm Mali GPU Kernel Driver contains an unspecified vulnerability that allows a non-privileged user to achieve write access to read-only memory pages.",
+  "token_count": 28
+}

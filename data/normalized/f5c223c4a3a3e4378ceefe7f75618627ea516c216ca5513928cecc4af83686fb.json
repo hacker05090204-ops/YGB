@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Stack buffer overflow vulnerability in D-Link DIR-513 v1.10 via the curTime parameter to goform/formSetWAN_Wizard55.",
+  "token_count": 14
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30891",
+  "ingested_at": "2026-03-22T07:54:48.508553+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, a user could access another user's private activity due to insufficient authorization checks in the user actions endpoint. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0ab678406ecc1a9691648c2b03bf01295e812707cf0fd480e6d5f21a6c5be1b8",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30891"
+}

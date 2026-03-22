@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26722",
+  "ingested_at": "2026-03-22T07:54:30.492784+00:00",
+  "lang": "en",
+  "raw_text": "An issue in Key Systems Inc Global Facilities Management Software v.20230721a allows a remote attacker to escalate privileges via PIN component of the login functionality.",
+  "severity": "CRITICAL",
+  "sha256_hash": "50ab1b4828d889bf1c4b949113509a116b1c86c9cefb67552cb4316213a8a9ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26722"
+}

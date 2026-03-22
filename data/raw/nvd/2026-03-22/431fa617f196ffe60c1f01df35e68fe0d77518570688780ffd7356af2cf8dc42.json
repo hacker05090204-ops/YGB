@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25176",
+  "ingested_at": "2026-03-22T07:54:42.740051+00:00",
+  "lang": "en",
+  "raw_text": "Improper access control in Windows Ancillary Function Driver for WinSock allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "431fa617f196ffe60c1f01df35e68fe0d77518570688780ffd7356af2cf8dc42",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25176"
+}

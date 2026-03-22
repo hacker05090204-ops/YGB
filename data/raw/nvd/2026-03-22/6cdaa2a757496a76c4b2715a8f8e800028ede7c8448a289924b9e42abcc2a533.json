@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2430",
+  "ingested_at": "2026-03-22T07:54:49.136733+00:00",
+  "lang": "en",
+  "raw_text": "The Autoptimize plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the lazy-loading image processing in all versions up to, and including, 3.1.14. This is due to the use of an overly permissive regular expression in the `add_lazyload` function that replaces all occurrences of `\\ssrc=` in image tags without limiting to the actual attribute. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page by crafting an image tag where the `src` URL contains a space followed by `src=`, causing the regex to break the HTML structure and promote text inside attribute values into executable HTML attributes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6cdaa2a757496a76c4b2715a8f8e800028ede7c8448a289924b9e42abcc2a533",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 117,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2430"
+}

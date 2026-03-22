@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30829",
+  "ingested_at": "2026-03-22T07:54:41.759740+00:00",
+  "lang": "en",
+  "raw_text": "Checkmate is an open-source, self-hosted tool designed to track and monitor server hardware, uptime, response times, and incidents in real-time with beautiful visualizations. Prior to version 3.4.0, an unauthenticated information disclosure vulnerability exists in the GET /api/v1/status-page/:url endpoint. The endpoint does not enforce authentication or verify whether a status page is published before returning full status page details. As a result, unpublished status pages and their associated internal data are accessible to any unauthenticated user via direct API requests. This issue has been patched in version 3.4.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e46627a1d5eddad9a19666a1d16c9be256b33d7a7648b20be0116e1172bf5145",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30829"
+}

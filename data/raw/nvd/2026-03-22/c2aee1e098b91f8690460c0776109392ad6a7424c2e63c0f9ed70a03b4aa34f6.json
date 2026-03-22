@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-22182",
+  "ingested_at": "2026-03-22T07:54:44.605161+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an unauthenticated denial of service vulnerability that allows anonymous users to trigger mass notification emails by exploiting the checkNotificationType() function. Attackers can repeatedly call the wpdiscuz-ajax.php endpoint with arbitrary postId and comment_id parameters to flood subscribers with notifications, as the handler lacks nonce verification, authentication checks, and rate limiting.",
+  "severity": "HIGH",
+  "sha256_hash": "c2aee1e098b91f8690460c0776109392ad6a7424c2e63c0f9ed70a03b4aa34f6",
+  "source": "nvd",
+  "tags": [
+    "CWE-862",
+    "CWE-770",
+    "CWE-862"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22182"
+}

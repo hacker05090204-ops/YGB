@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22040",
+  "ingested_at": "2026-03-22T07:54:34.817235+00:00",
+  "lang": "en",
+  "raw_text": "NanoMQ MQTT Broker (NanoMQ) is an all-around Edge Messaging Platform. In version 0.24.6, by generating a combined traffic pattern of high-frequency publishes and rapid reconnect/kick-out using the same ClientID and massive subscribe/unsubscribe jitter, it is possible to reliably trigger heap memory corruption in the Broker process, causing it to exit immediately with SIGABRT due to free(): invalid pointer. As of time of publication, no known patched versions are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b27e96e59b229b5a1ca4be4c74814de234bfe55333a5d276ee207fba0121f295",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22040"
+}

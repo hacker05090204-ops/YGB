@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23984",
+  "ingested_at": "2026-03-22T07:54:31.491914+00:00",
+  "lang": "en",
+  "raw_text": "An Improper Input Validation vulnerability exists in Apache Superset that allows an authenticated user with SQLLab access to bypass the read-only verification check when using a PostgreSQL database connection. While the system effectively blocks standard Data Manipulation Language (DML) statements (e.g., INSERT, UPDATE, DELETE) on read-only connections, it fails to detect them in specially crafted SQL statements. This issue affects Apache Superset: before 6.0.0. Users are recommended to upgrade to version 6.0.0, which fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a9a8bea74e7ec7f51073fe18c24b47576243791bbf273af8afa045908513d95a",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23984"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP Solution Tools Plug-In (ST-PI) contains a function module that does not perform the necessary authorization checks for authenticated users, allowing system information to be disclosed. This vulnerability has a low impact on confidentiality and does not affect integrity or availability.",
+  "token_count": 41
+}

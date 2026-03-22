@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25460",
+  "ingested_at": "2026-03-22T07:54:31.009629+00:00",
+  "lang": "en",
+  "raw_text": "Web Ofisi Platinum E-Ticaret v5 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'q' GET parameter. Attackers can send requests to the arama endpoint with malicious 'q' values using time-based SQL injection techniques to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "9127eb0c3fa0c62fe809735053c9a3c845a59272e17ccce7678bf4ca3730f9d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25460"
+}

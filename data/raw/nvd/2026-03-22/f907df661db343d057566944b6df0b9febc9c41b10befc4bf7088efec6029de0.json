@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30889",
+  "ingested_at": "2026-03-22T07:54:48.505545+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, a moderator could exploit insufficient authorization checks to access metadata of posts they should not have permission to view. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f907df661db343d057566944b6df0b9febc9c41b10befc4bf7088efec6029de0",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30889"
+}

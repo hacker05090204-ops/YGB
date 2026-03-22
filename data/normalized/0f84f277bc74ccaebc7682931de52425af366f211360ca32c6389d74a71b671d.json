@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "NUUO NVRmini2 Devices NUUO NVRmini2 devices contain a missing authentication vulnerability that allows an unauthenticated attacker to upload an encrypted TAR archive, which can be abused to add arbitrary users.",
+  "token_count": 30
+}

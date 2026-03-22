@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1585",
+  "ingested_at": "2026-03-22T07:54:32.880913+00:00",
+  "lang": "en",
+  "raw_text": "An unquoted Windows service executable path vulnerability in IJ Scan Utility for Windows versions 1.1.2 through 1.5.0 may allow a local attacker to execute a malicious file with the privileges of the affected service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3dbe35cf9418e20ff07ee4640f3a89480553cdd35db70de7de873b48bbc672da",
+  "source": "nvd",
+  "tags": [
+    "CWE-428"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1585"
+}

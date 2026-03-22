@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28044",
+  "ingested_at": "2026-03-22T07:54:47.859075+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in WP Media WP Rocket allows Stored XSS.This issue affects WP Rocket: from n/a through 3.19.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "59aeb677cf62d495c3adf45e1c840629aea54cec7a7de1310fe79599db193daa",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28044"
+}

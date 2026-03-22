@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-25737",
+  "ingested_at": "2026-03-22T07:54:42.379247+00:00",
+  "lang": "en",
+  "raw_text": "Budibase is a low code platform for creating internal tools, workflows, and admin panels. In 3.24.0 and earlier, an arbitrary file upload vulnerability exists even though file extension restrictions are configured. The restriction is enforced only at the UI level. An attacker can bypass these restrictions and upload malicious files.",
+  "severity": "HIGH",
+  "sha256_hash": "4dfcbf9c269fbc3177e8d33fb1cd0da3902cd2357df88f04ed6b13456c674716",
+  "source": "nvd",
+  "tags": [
+    "CWE-602",
+    "CWE-79",
+    "CWE-918"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25737"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4193",
+  "ingested_at": "2026-03-22T07:54:46.698711+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in D-Link DIR-823G 1.0.2B05. The affected element is the function GetDDNSSettings/GetDeviceDomainName/GetDeviceSettings/GetDMZSettings/GetFirewallSettings/GetGuestNetworkSettings/GetLanWanConflictInfo/GetLocalMacAddress/GetNetworkSettings/GetQoSSettings/GetRouterInformationSettings/GetRouterLanSettings/GetWanSettings/SetAccessCtlList/SetAccessCtlSwitch/SetDeviceSettings/SetGuestWLanSettings/SetIPv4FirewallSettings/SetNetworkSettings/SetNetworkTomographySettings/SetNTPServerSettings/SetRouterLanSettings/SetStaticClientInfo/SetStaticRouteSettings/SetWLanRadioSecurity/SetWPSSettings/UpdateClientInfo of the component goahead. Such manipulation leads to improper access controls. The attack may be launched remotely. The exploit has been disclosed publicly and may be used. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "severity": "HIGH",
+  "sha256_hash": "1c4bc04d0efb0640176c3e104a60fc2385abbe31272261f89b0b54cd9fff3041",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4193"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32432",
+  "ingested_at": "2026-03-22T07:54:46.096107+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in codepeople WP Time Slots Booking Form wp-time-slots-booking-form allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WP Time Slots Booking Form: from n/a through < = 1.2.42.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5ae3d16456831fb861fd526127c99388daaf41c17dca3122a19d9dc7c44ea7e4",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32432"
+}

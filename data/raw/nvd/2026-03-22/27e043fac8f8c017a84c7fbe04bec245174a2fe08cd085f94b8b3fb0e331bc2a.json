@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32119",
+  "ingested_at": "2026-03-22T07:54:48.038987+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.2, DOM-based stored XSS in the jQuery SearchHighlight plugin (`library/js/SearchHighlight.js`) allows an authenticated user with encounter form write access to inject arbitrary JavaScript that executes in another clinician's browser session when they use the search/find feature on the Custom Report page. The plugin reverses server-side HTML entity encoding by reading decoded text from DOM text nodes, concatenating it into a raw HTML string, and passing it to jQuery's `$()` constructor for HTML parsing. Version 8.0.0.2 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "27e043fac8f8c017a84c7fbe04bec245174a2fe08cd085f94b8b3fb0e331bc2a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32119"
+}

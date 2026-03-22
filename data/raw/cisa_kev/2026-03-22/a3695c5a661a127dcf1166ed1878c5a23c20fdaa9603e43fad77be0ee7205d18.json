@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-29492",
+  "ingested_at": "2026-03-22T07:45:17.442945+00:00",
+  "lang": "en",
+  "raw_text": "Novi Survey Novi Survey Novi Survey contains an insecure deserialization vulnerability that allows remote attackers to execute code on the server in the context of the service account.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a3695c5a661a127dcf1166ed1878c5a23c20fdaa9603e43fad77be0ee7205d18",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

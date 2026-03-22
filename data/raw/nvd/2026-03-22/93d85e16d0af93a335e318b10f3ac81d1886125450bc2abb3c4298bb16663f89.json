@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41257",
+  "ingested_at": "2026-03-22T07:54:34.834415+00:00",
+  "lang": "en",
+  "raw_text": "Suprema\u2019s BioStar 2 in version 2.9.11.6 allows users to set new password without providing the current one. Exploiting this flaw combined with other vulnerabilities can lead to unauthorized account access and potential system compromise.",
+  "severity": "MEDIUM",
+  "sha256_hash": "93d85e16d0af93a335e318b10f3ac81d1886125450bc2abb3c4298bb16663f89",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41257"
+}

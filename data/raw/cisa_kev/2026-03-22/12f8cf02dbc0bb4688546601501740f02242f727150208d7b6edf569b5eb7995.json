@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8195",
+  "ingested_at": "2026-03-22T07:45:19.120265+00:00",
+  "lang": "en",
+  "raw_text": "Citrix Application Delivery Controller (ADC), Gateway, and SD-WAN WANOP Appliance Citrix ADC, Citrix Gateway, and multiple Citrix SD-WAN WANOP appliance models contain an information disclosure vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "12f8cf02dbc0bb4688546601501740f02242f727150208d7b6edf569b5eb7995",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

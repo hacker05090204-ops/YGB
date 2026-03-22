@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in flycart UpsellWP checkout-upsell-and-order-bumps allows Blind SQL Injection.This issue affects UpsellWP: from n/a through < = 2.2.4.",
+  "token_count": 30
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-27992",
+  "ingested_at": "2026-03-22T07:45:17.354822+00:00",
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Network-Attached Storage (NAS) Devices Multiple Zyxel network-attached storage (NAS) devices contain a pre-authentication command injection vulnerability that could allow an unauthenticated attacker to execute commands remotely via a crafted HTTP request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "89e4cea1e8ea396288889c698b324206d772a01652bf0b9c314071882a893d58",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

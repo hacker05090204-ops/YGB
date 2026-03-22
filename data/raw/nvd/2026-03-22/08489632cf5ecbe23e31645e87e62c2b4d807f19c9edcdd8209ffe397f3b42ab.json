@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2025-15582",
+  "ingested_at": "2026-03-22T07:54:30.456147+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in detronetdip E-commerce 1.0.0. The impacted element is the function Delete/Update of the component Product Management Module. Performing a manipulation of the argument ID results in authorization bypass. Remote exploitation of the attack is possible. The exploit has been released to the public and may be used for attacks. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "08489632cf5ecbe23e31645e87e62c2b4d807f19c9edcdd8209ffe397f3b42ab",
+  "source": "nvd",
+  "tags": [
+    "CWE-285",
+    "CWE-639",
+    "CWE-639"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15582"
+}

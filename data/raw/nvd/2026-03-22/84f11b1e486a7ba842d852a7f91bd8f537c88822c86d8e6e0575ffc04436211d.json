@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29107",
+  "ingested_at": "2026-03-22T07:54:48.322212+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, it is possible to create PDF templates with ` ` tags. When a PDF is exported using this template, the content (for example, ` ` is rendered server side, and thus a request is issued from the server, resulting in Server-Side Request Forgery. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "84f11b1e486a7ba842d852a7f91bd8f537c88822c86d8e6e0575ffc04436211d",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29107"
+}

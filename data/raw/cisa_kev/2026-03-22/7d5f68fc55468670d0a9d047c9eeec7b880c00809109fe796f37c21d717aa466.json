@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30900",
+  "ingested_at": "2026-03-22T07:45:17.478955+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple GPU drivers, included in iOS, iPadOS, and macOS, contain an out-of-bounds write vulnerability that may allow a malicious application to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7d5f68fc55468670d0a9d047c9eeec7b880c00809109fe796f37c21d717aa466",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

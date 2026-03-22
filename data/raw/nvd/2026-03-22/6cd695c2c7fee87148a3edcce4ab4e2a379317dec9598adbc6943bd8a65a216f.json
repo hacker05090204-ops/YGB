@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1565",
+  "ingested_at": "2026-03-22T07:54:32.738142+00:00",
+  "lang": "en",
+  "raw_text": "The User Frontend: AI Powered Frontend Posting, User Directory, Profile, Membership & User Registration plugin for WordPress is vulnerable to arbitrary file uploads due to incorrect file type validation in the 'WPUF_Admin_Settings::check_filetype_and_ext' function and in the 'Admin_Tools::check_filetype_and_ext' function in all versions up to, and including, 4.2.8. This makes it possible for authenticated attackers, with Author-level access and above, to upload arbitrary files on the affected site's server which may make remote code execution possible.",
+  "severity": "HIGH",
+  "sha256_hash": "6cd695c2c7fee87148a3edcce4ab4e2a379317dec9598adbc6943bd8a65a216f",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1565"
+}

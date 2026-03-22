@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28355",
+  "ingested_at": "2026-03-22T07:54:33.329122+00:00",
+  "lang": "en",
+  "raw_text": "Canarytokens help track activity and actions on a network. Versions prior to `sha-7ff0e12` have a Self Cross-Site Scripting vulnerability in the \"PWA\" Canarytoken, whereby the Canarytoken's creator can attack themselves or someone they share the link with. The creator of a PWA Canarytoken can insert Javascript into the title field of their PWA token. When the creator later browses the installation page for their own Canarytoken, the Javascript executes. This is a self-XSS. An attacker could create a Canarytoken with this self-XSS, and send the install link to a victim. When they click on it, the Javascript would execute. However, no sensitive information (ex. session information) will be disclosed to the malicious actor. This issue is now patched on Canarytokens.org. Users of self-hosted Canarytokens installations can update by pulling the latest Docker image, or any Docker image after sha-7ff0e12.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "1cb976b3afa4314fa6a72c541368a49348eb806a12874c304f5731fd61dd07ca",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 139,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28355"
+}

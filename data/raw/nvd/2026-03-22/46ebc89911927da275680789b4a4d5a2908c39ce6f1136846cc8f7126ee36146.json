@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15608",
+  "ingested_at": "2026-03-22T07:54:48.875314+00:00",
+  "lang": "en",
+  "raw_text": "This vulnerability in AX53 v1 results from insufficient input sanitization in the device\u2019s probe handling logic, where unvalidated parameters can trigger a stack-based buffer overflow that causes the affected service to crash and, under specific conditions, may enable remote code execution through complex heap-spray techniques. Successful exploitation may result in repeated service unavailability and, in certain scenarios, allow an attacker to gain control of the device.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "46ebc89911927da275680789b4a4d5a2908c39ce6f1136846cc8f7126ee36146",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15608"
+}

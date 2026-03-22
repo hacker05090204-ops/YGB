@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25530",
+  "ingested_at": "2026-03-22T07:54:44.327520+00:00",
+  "lang": "en",
+  "raw_text": "uHotelBooking System contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the system_page GET parameter. Attackers can send crafted requests to index.php with malicious system_page values using time-based blind SQL injection techniques to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "9b5494f71b175c9e45f13ec2a018d6a4b38944c2300233bc9093d89c87f35c5c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25530"
+}

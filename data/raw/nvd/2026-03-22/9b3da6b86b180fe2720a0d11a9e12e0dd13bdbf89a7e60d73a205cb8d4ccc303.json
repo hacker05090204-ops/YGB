@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59060",
+  "ingested_at": "2026-03-22T07:54:34.054704+00:00",
+  "lang": "en",
+  "raw_text": "Hostname verification bypass issue in Apache Ranger NiFiRegistryClient/NiFiClient is reported in Apache Ranger versions < = 2.7.0. Users are recommended to upgrade to version 2.8.0, which fixes this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9b3da6b86b180fe2720a0d11a9e12e0dd13bdbf89a7e60d73a205cb8d4ccc303",
+  "source": "nvd",
+  "tags": [
+    "CWE-297"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59060"
+}

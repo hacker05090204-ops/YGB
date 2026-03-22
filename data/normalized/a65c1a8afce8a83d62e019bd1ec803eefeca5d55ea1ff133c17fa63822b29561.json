@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows AppX Deployment Server improperly handles junctions.",
+  "token_count": 16
+}

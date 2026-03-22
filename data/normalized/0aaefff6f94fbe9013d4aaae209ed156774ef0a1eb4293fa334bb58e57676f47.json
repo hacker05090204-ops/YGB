@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Alinto SOGo 5.12.3/5.12.4. This impacts an unknown function. The manipulation of the argument hint leads to cross site scripting. The attack can be initiated remotely. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 54
+}

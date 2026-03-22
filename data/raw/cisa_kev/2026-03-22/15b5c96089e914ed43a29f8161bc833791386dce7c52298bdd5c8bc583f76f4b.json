@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-20393",
+  "ingested_at": "2026-03-22T07:45:16.005312+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Multiple Products Cisco Secure Email Gateway, Secure Email, AsyncOS Software, and Web Manager appliances contains an improper input validation vulnerability that allows threat actors to execute arbitrary commands with root privileges on the underlying operating system of an affected appliance.",
+  "severity": "CRITICAL",
+  "sha256_hash": "15b5c96089e914ed43a29f8161bc833791386dce7c52298bdd5c8bc583f76f4b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

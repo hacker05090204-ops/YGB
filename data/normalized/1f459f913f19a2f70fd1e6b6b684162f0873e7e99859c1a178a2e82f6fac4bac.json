@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "delpino73 Blue-Smiley-Organizer 1.32 contains an SQL injection vulnerability in the datetime parameter that allows unauthenticated attackers to manipulate database queries. Attackers can inject SQL code through POST requests to extract sensitive data using boolean-based blind and time-based blind techniques, or write files to the server using INTO OUTFILE statements.",
+  "token_count": 49
+}

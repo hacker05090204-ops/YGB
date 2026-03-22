@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1883",
+  "ingested_at": "2026-03-22T07:54:46.371686+00:00",
+  "lang": "en",
+  "raw_text": "The Wicked Folders \u2013 Folder Organizer for Pages, Posts, and Custom Post Types plugin for WordPress is vulnerable to Insecure Direct Object Reference in all versions up to, and including, 4.1.0 via the delete_folders() function due to missing validation on a user controlled key. This makes it possible for authenticated attackers, with Contributor-level access and above, to delete arbitrary folders created by other users.",
+  "severity": "MEDIUM",
+  "sha256_hash": "55e58a211775f7d95cb1e041d3815a3220391654db6300a2bd18742973a44a32",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1883"
+}

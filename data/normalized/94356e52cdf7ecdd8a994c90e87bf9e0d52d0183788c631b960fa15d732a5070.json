@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a heap information disclosure vulnerability exists in ImageMagick's PSD (Adobe Photoshop) format handler. When processing a maliciously crafted PSD file containing ZIP-compressed layer data that decompresses to less than the expected size, uninitialized heap memory is leaked into the output image. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "token_count": 67
+}

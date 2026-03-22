@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32294",
+  "ingested_at": "2026-03-22T07:54:47.100327+00:00",
+  "lang": "en",
+  "raw_text": "JetKVM prior to 0.5.4 does not verify the authenticity of downloaded firmware files. An attacker-in-the-middle or a compromised update server could modify the firmware and the corresponding SHA256 hash to pass verification.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d697e539ec50449e9aa126624b2b0f73b4baac5890fa9589c4ecadf3ad27aeb4",
+  "source": "nvd",
+  "tags": [
+    "CWE-345",
+    "CWE-347"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32294"
+}

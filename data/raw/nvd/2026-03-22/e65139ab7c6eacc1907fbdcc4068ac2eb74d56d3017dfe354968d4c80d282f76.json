@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24107",
+  "ingested_at": "2026-03-22T07:54:33.628786+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Failure to validate the value of `usbPartitionName`, which is directly used in `doSystemCmd`, may lead to critical command injection vulnerabilities.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e65139ab7c6eacc1907fbdcc4068ac2eb74d56d3017dfe354968d4c80d282f76",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24107"
+}

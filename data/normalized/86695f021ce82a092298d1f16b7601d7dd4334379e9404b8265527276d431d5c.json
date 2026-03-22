@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Veeam Backup & Replication The Veeam Distribution Service in the Backup & Replication application allows unauthenticated users to access internal API functions. A remote attacker can send input to the internal API which may lead to uploading and executing of malicious code.",
+  "token_count": 42
+}

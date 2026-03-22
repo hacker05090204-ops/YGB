@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32231",
+  "ingested_at": "2026-03-22T07:54:44.471161+00:00",
+  "lang": "en",
+  "raw_text": "ZeptoClaw is a personal AI assistant. Prior to 0.7.6, the generic webhook channel trusts caller-supplied identity fields (sender, chat_id) from the request body and applies authorization checks to those untrusted values. Because authentication is optional and defaults to disabled (auth_token: None), an attacker who can reach POST /webhook can spoof an allowlisted sender and choose arbitrary chat_id values, enabling high-risk message spoofing and potential IDOR-style session/chat routing abuse. This vulnerability is fixed in 0.7.6.",
+  "severity": "HIGH",
+  "sha256_hash": "dfe9bee0665e7d3d2075e76b3d277f3a9187d166f79a5a25dbe0a1c6a537a645",
+  "source": "nvd",
+  "tags": [
+    "CWE-306",
+    "CWE-345"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32231"
+}

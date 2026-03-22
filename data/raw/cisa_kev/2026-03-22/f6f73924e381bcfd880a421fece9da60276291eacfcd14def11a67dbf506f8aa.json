@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-19953",
+  "ingested_at": "2026-03-22T07:45:17.939874+00:00",
+  "lang": "en",
+  "raw_text": "QNAP Network Attached Storage (NAS) A cross-site scripting vulnerability affecting QNAP NAS File Station could allow remote attackers to inject malicious code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f6f73924e381bcfd880a421fece9da60276291eacfcd14def11a67dbf506f8aa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

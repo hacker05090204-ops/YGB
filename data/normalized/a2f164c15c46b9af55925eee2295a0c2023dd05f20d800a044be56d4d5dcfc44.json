@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jettweb PHP Hazir Haber Sitesi Scripti V1 contains an SQL injection vulnerability that allows attackers to manipulate database queries by injecting malicious SQL code through the option parameter. Attackers can send POST requests to uyelik.php with crafted payloads in the option parameter to execute time-based SQL injection attacks and extract sensitive database information.",
+  "token_count": 53
+}

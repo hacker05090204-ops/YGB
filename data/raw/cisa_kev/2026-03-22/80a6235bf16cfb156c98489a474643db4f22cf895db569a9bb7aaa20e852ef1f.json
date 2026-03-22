@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-35914",
+  "ingested_at": "2026-03-22T07:45:17.509009+00:00",
+  "lang": "en",
+  "raw_text": "Teclib GLPI Teclib GLPI contains a remote code execution vulnerability in the third-party library, htmlawed.",
+  "severity": "CRITICAL",
+  "sha256_hash": "80a6235bf16cfb156c98489a474643db4f22cf895db569a9bb7aaa20e852ef1f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

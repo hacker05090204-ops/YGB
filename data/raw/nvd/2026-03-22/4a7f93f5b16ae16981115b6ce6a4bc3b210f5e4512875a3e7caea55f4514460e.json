@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32122",
+  "ingested_at": "2026-03-22T07:54:44.002913+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, the Claim File Tracker feature exposes an AJAX endpoint that returns billing claim metadata (claim IDs, payer info, transmission logs). The endpoint does not enforce the same ACL as the main billing/claims workflow, so authenticated users without appropriate billing permissions can access this data. This vulnerability is fixed in 8.0.0.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4a7f93f5b16ae16981115b6ce6a4bc3b210f5e4512875a3e7caea55f4514460e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32122"
+}

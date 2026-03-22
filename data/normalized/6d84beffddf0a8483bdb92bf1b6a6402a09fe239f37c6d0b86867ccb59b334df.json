@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Control of Generation of Code ('Code Injection') vulnerability in ILLID Advanced Woo Labels advanced-woo-labels allows Remote Code Inclusion.This issue affects Advanced Woo Labels: from n/a through < = 2.36.",
+  "token_count": 30
+}

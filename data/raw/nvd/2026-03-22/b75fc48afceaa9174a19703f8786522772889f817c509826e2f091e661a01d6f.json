@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41763",
+  "ingested_at": "2026-03-22T07:54:42.204086+00:00",
+  "lang": "en",
+  "raw_text": "A low\u2010privileged remote attacker can directly interact with the wwwdnload.cgi endpoint to download any resource available to administrators, including system backups and certificate request files.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b75fc48afceaa9174a19703f8786522772889f817c509826e2f091e661a01d6f",
+  "source": "nvd",
+  "tags": [
+    "CWE-497"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41763"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3704",
+  "ingested_at": "2026-03-22T07:54:41.987549+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Wavlink NU516U1 251208. This vulnerability affects the function sub_405B2C of the file /cgi-bin/firewall.cgi of the component Incomplete Fix CVE-2025-10959. The manipulation leads to command injection. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used. It is recommended to upgrade the affected component. The vendor was contacted early, responded in a very professional manner and quickly released a fixed version of the affected product.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f973abfeaa1a5fb21561937c07a7bfa636b65134a486483dc25d691f490ce693",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77",
+    "CWE-77"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3704"
+}

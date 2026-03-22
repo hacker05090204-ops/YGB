@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Shenzhen Tenda F3 Wireless Router firmware V12.01.01.55_multi contains a clickjacking vulnerability in the web-based administrative interface. The interface does not set the X-Frame-Options header, allowing attacker-controlled sites to embed administrative pages in an iframe and trick an authenticated administrator into unintended interactions that may result in unauthorized configuration changes.",
+  "token_count": 49
+}

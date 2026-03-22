@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-59374",
+  "ingested_at": "2026-03-22T07:45:15.998891+00:00",
+  "lang": "en",
+  "raw_text": "ASUS Live Update ASUS Live Update contains an embedded malicious code vulnerability client were distributed with unauthorized modifications introduced through a supply chain compromise. The modified builds could cause devices meeting specific targeting conditions to perform unintended actions. The impacted product could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8e7541f225bfdde29699d1012ea8d75ca6e201cdde19d8d656e0a5b05dd06e43",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

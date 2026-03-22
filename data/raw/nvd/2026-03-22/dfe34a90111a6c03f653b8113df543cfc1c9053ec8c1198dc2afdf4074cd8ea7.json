@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4045",
+  "ingested_at": "2026-03-22T07:54:44.393351+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in projectsend up to r1945. This impacts an unknown function of the file includes/Classes/Auth.php. Executing a manipulation of the argument ldap_email can lead to observable response discrepancy. The attack can be executed remotely. A high complexity level is associated with this attack. The exploitability is said to be difficult. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "dfe34a90111a6c03f653b8113df543cfc1c9053ec8c1198dc2afdf4074cd8ea7",
+  "source": "nvd",
+  "tags": [
+    "CWE-203",
+    "CWE-204"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4045"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists when components of Windows, .NET Framework, Office, Lync, and Silverlight fail to properly handle TrueType fonts.",
+  "token_count": 24
+}

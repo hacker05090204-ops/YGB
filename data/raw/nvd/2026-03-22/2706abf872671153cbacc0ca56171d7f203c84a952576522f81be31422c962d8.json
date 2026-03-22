@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32117",
+  "ingested_at": "2026-03-22T07:54:44.029921+00:00",
+  "lang": "en",
+  "raw_text": "The grafanacubism-panel plugin allows use of cubism.js in Grafana. In 0.1.2 and earlier, the panel's zoom-link handler passes a dashboard-editor-supplied URL directly to window.location.assign() / window.open() with no scheme validation. An attacker with dashboard Editor privileges can set the link to a javascript: URI; when any Viewer drag-zooms on the panel, the payload executes in the Grafana origin.",
+  "severity": "HIGH",
+  "sha256_hash": "2706abf872671153cbacc0ca56171d7f203c84a952576522f81be31422c962d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32117"
+}

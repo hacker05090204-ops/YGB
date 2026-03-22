@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker who tricks a user to upload a manipulated HTML file can get access to sensitive information on the device. This is a result of incorrect permission assignment for the web server.",
+  "token_count": 35
+}

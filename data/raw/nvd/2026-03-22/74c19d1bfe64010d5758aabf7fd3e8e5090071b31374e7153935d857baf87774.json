@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-0704",
+  "ingested_at": "2026-03-22T07:54:32.045630+00:00",
+  "lang": "en",
+  "raw_text": "In affected version of Octopus Deploy it was possible to remove files and/or contents of files on the host using an API endpoint. The field lacked validation which could potentially result in ways to circumvent expected workflows.",
+  "severity": "CRITICAL",
+  "sha256_hash": "74c19d1bfe64010d5758aabf7fd3e8e5090071b31374e7153935d857baf87774",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-22"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0704"
+}

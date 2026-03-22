@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11165",
+  "ingested_at": "2026-03-22T07:54:31.464999+00:00",
+  "lang": "en",
+  "raw_text": "A sandbox escape vulnerability exists in dotCMS\u2019s Velocity scripting engine (VTools) that allows authenticated users with scripting privileges to bypass class and package restrictions enforced by SecureUberspectorImpl. By dynamically modifying the Velocity engine\u2019s runtime configuration and reinitializing its Uberspect, a malicious actor can remove the introspector.restrict.classes and introspector.restrict.packages protections. Once these restrictions are cleared, the attacker can access arbitrary Java classes, including java.lang.Runtime, and execute arbitrary system commands under the privileges of the application process (e.g. dotCMS or Tomcat user).",
+  "severity": "CRITICAL",
+  "sha256_hash": "df1158af9d8c0dafcfd0894b5286aefdaa977f765381ca8463e8b26899f40eb9",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11165"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where internal filesystem paths may be exposed through application responses or system behaviour. Exposure of internal paths may reveal environment structure details which could potentially aid in further targeted attacks or information disclosure.",
+  "token_count": 40
+}

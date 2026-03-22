@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23255",
+  "ingested_at": "2026-03-22T07:54:47.560995+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: net: add proper RCU protection to /proc/net/ptype Yin Fengwei reported an RCU stall in ptype_seq_show() and provided a patch. Real issue is that ptype_seq_next() and ptype_seq_show() violate RCU rules. ptype_seq_show() runs under rcu_read_lock(), and reads pt->dev to get device name without any barrier. At the same time, concurrent writers can remove a packet_type structure (which is correctly freed after an RCU grace period) and clear pt->dev without an RCU grace period. Define ptype_iter_state to carry a dev pointer along seq_net_private: struct ptype_iter_state { struct seq_net_private p; struct net_device *dev; // added in this patch }; We need to record the device pointer in ptype_get_idx() and ptype_seq_next() so that ptype_seq_show() is safe against concurrent pt->dev changes. We also need to add full RCU protection in ptype_seq_next(). (Missing READ_ONCE() when reading list.next values) Many thanks to Dong Chenchen for providing a repro.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "efc3d1ceeea397d937430aa4e6a59307fc55f123b83effa0c21093913d4a4119",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 150,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23255"
+}

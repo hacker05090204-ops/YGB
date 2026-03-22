@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-21412",
+  "ingested_at": "2026-03-22T07:45:17.050987+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Internet Shortcut Files contains an unspecified vulnerability that allows for a security feature bypass.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e51b41f3129614d10afbb9eeb6c5d69b9f7913f77ae0306057d337ae2d7c88e9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

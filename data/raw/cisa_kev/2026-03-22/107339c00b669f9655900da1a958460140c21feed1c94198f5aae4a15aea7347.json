@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0147",
+  "ingested_at": "2026-03-22T07:45:17.946872+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SMBv1 server The SMBv1 server in Microsoft Windows allows remote attackers to obtain sensitive information from process memory via a crafted packet.",
+  "severity": "CRITICAL",
+  "sha256_hash": "107339c00b669f9655900da1a958460140c21feed1c94198f5aae4a15aea7347",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

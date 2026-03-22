@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-1605",
+  "ingested_at": "2026-03-22T07:54:40.768259+00:00",
+  "lang": "en",
+  "raw_text": "In Eclipse Jetty, versions 12.0.0-12.0.31 and 12.1.0-12.0.5, class GzipHandler exposes a vulnerability when a compressed HTTP request, with Content-Encoding: gzip, is processed and the corresponding response is not compressed. This happens because the JDK Inflater is allocated for decompressing the request, but it is not released because the release mechanism is tied to the compressed response. In this case, since the response is not compressed, the release mechanism does not trigger, causing the leak.",
+  "severity": "HIGH",
+  "sha256_hash": "285ff06bf3a39020b7a6bebd22f516a5d90cfcff7e10fff36ef19f0849aa9f71",
+  "source": "nvd",
+  "tags": [
+    "CWE-400",
+    "CWE-401",
+    "CWE-401"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1605"
+}

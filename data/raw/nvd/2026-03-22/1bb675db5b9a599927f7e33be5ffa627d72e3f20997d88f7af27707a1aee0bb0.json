@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20022",
+  "ingested_at": "2026-03-22T07:54:34.752993+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the OSPF protocol of Cisco Secure Firewall ASA Software and Cisco Secure FTD Software could allow an unauthenticated, adjacent attacker to cause an affected device to reload unexpectedly, resulting in a DoS condition when OSPF canonicalization debug is enabled by using the command debug ip ospf canon. This vulnerability is due to insufficient input validation when processing OSPF LSU packets. An attacker could exploit this vulnerability by sending crafted unauthenticated OSPF packets. A successful exploit could allow the attacker to write to memory outside of the packet data, causing the device to reload, resulting in a DoS condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1bb675db5b9a599927f7e33be5ffa627d72e3f20997d88f7af27707a1aee0bb0",
+  "source": "nvd",
+  "tags": [
+    "CWE-823"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20022"
+}

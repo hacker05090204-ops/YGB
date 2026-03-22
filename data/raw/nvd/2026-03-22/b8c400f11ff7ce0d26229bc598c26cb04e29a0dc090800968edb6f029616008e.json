@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2359",
+  "ingested_at": "2026-03-22T07:54:33.172723+00:00",
+  "lang": "en",
+  "raw_text": "Multer is a node.js middleware for handling `multipart/form-data`. A vulnerability in Multer prior to version 2.1.0 allows an attacker to trigger a Denial of Service (DoS) by dropping connection during file upload, potentially causing resource exhaustion. Users should upgrade to version 2.1.0 to receive a patch. No known workarounds are available.",
+  "severity": "HIGH",
+  "sha256_hash": "b8c400f11ff7ce0d26229bc598c26cb04e29a0dc090800968edb6f029616008e",
+  "source": "nvd",
+  "tags": [
+    "CWE-772"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2359"
+}

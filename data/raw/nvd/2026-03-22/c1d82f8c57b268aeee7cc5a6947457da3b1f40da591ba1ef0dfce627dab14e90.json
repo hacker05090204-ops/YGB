@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32369",
+  "ingested_at": "2026-03-22T07:54:45.956437+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in RadiusTheme Medilink-Core medilink-core allows PHP Local File Inclusion.This issue affects Medilink-Core: from n/a through < 2.0.7.",
+  "severity": "HIGH",
+  "sha256_hash": "c1d82f8c57b268aeee7cc5a6947457da3b1f40da591ba1ef0dfce627dab14e90",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32369"
+}

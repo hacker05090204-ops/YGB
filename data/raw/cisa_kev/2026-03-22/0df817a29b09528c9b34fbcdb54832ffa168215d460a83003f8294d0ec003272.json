@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-5076",
+  "ingested_at": "2026-03-22T07:45:18.255485+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE The default Java security properties configuration did not restrict access to the com.sun.org.glassfish.external and com.sun.org.glassfish.gmbal packages. An untrusted Java application or applet could use these flaws to bypass Java sandbox restrictions.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0df817a29b09528c9b34fbcdb54832ffa168215d460a83003f8294d0ec003272",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

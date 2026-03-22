@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26138",
+  "ingested_at": "2026-03-22T07:54:48.061996+00:00",
+  "lang": "en",
+  "raw_text": "Server-side request forgery (ssrf) in Microsoft Purview allows an unauthorized attacker to elevate privileges over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "35e9a89f25cb95cf6e61657dab5077543cd83cedbf83169615d4e4e9c7882ac9",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26138"
+}

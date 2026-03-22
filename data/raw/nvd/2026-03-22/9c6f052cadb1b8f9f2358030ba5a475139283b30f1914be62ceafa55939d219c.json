@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30233",
+  "ingested_at": "2026-03-22T07:54:41.647181+00:00",
+  "lang": "en",
+  "raw_text": "OliveTin gives access to predefined shell commands from a web interface. Prior to version 3000.11.1, an authorization flaw in OliveTin allows authenticated users with view: false permission to enumerate action bindings and metadata via dashboard and API endpoints. Although execution (exec) may be correctly denied, the backend does not enforce IsAllowedView() when constructing dashboard and action binding responses. As a result, restricted users can retrieve action titles, IDs, icons, and argument metadata. This issue has been patched in version 3000.11.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9c6f052cadb1b8f9f2358030ba5a475139283b30f1914be62ceafa55939d219c",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-862",
+    "CWE-862"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30233"
+}

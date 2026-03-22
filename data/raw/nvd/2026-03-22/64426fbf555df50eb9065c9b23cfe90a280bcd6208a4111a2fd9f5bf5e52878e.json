@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22175",
+  "ingested_at": "2026-03-22T07:54:47.276275+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.23 contain an exec approval bypass vulnerability in allowlist mode where allow-always grants could be circumvented through unrecognized multiplexer shell wrappers like busybox and toybox sh -c commands. Attackers can exploit this by invoking arbitrary payloads under the same multiplexer wrapper to satisfy stored allowlist rules, bypassing intended execution restrictions.",
+  "severity": "HIGH",
+  "sha256_hash": "64426fbf555df50eb9065c9b23cfe90a280bcd6208a4111a2fd9f5bf5e52878e",
+  "source": "nvd",
+  "tags": [
+    "CWE-184"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22175"
+}

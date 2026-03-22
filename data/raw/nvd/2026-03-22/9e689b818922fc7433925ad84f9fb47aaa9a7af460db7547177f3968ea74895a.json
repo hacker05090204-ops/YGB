@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22403",
+  "ingested_at": "2026-03-22T07:54:40.021622+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Mikado-Themes Innovio innovio allows PHP Local File Inclusion.This issue affects Innovio: from n/a through < = 1.7.",
+  "severity": "HIGH",
+  "sha256_hash": "9e689b818922fc7433925ad84f9fb47aaa9a7af460db7547177f3968ea74895a",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22403"
+}

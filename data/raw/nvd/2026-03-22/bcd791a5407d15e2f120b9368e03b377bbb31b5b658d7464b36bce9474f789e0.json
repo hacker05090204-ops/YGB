@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33036",
+  "ingested_at": "2026-03-22T07:54:48.618999+00:00",
+  "lang": "en",
+  "raw_text": "fast-xml-parser allows users to process XML from JS object without C/C++ based libraries or callbacks. Versions 4.0.0-beta.3 through 5.5.5 contain a bypass vulnerability where numeric character references (&#NNN;, &#xHH;) and standard XML entities completely evade the entity expansion limits (e.g., maxTotalExpansions, maxExpandedLength) added to fix CVE-2026-26278, enabling XML entity expansion Denial of Service. The root cause is that replaceEntitiesValue() in OrderedObjParser.js only enforces expansion counting on DOCTYPE-defined entities while the lastEntities loop handling numeric/standard entities performs no counting at all. An attacker supplying 1M numeric entity references like A can force ~147MB of memory allocation and heavy CPU usage, potentially crashing the process\u2014even when developers have configured strict limits. This issue has been fixed in version 5.5.6.",
+  "severity": "HIGH",
+  "sha256_hash": "bcd791a5407d15e2f120b9368e03b377bbb31b5b658d7464b36bce9474f789e0",
+  "source": "nvd",
+  "tags": [
+    "CWE-776"
+  ],
+  "token_count": 117,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33036"
+}

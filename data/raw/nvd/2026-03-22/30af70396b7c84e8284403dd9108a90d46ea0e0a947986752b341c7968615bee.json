@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-28800",
+  "ingested_at": "2026-03-22T07:54:41.325348+00:00",
+  "lang": "en",
+  "raw_text": "Natro Macro is an open-source Bee Swarm Simulator macro written in AutoHotkey. Prior to version 1.1.0, anyone with Discord Remote Control set up in a non-private channel gives access to any user with the permission to send message in said channel access to do anything on their computer. This includes keyboard and mouse inputs and full file access. This issue has been patched in version 1.1.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "30af70396b7c84e8284403dd9108a90d46ea0e0a947986752b341c7968615bee",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-287",
+    "CWE-434"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28800"
+}

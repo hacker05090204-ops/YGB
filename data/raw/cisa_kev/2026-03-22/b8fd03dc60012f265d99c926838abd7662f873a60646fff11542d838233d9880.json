@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41991",
+  "ingested_at": "2026-03-22T07:45:17.225994+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and watchOS contain an improper certificate validation vulnerability that can allow a malicious app to bypass signature validation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b8fd03dc60012f265d99c926838abd7662f873a60646fff11542d838233d9880",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

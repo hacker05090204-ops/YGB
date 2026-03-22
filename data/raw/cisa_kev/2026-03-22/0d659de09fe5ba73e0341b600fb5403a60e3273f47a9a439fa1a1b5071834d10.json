@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22893",
+  "ingested_at": "2026-03-22T07:45:19.498616+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure contains a use-after-free vulnerability that allow a remote, unauthenticated attacker to execute code via license services.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0d659de09fe5ba73e0341b600fb5403a60e3273f47a9a439fa1a1b5071834d10",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

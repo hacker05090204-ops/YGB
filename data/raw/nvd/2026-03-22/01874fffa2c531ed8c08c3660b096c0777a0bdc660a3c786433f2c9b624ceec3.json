@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-31793",
+  "ingested_at": "2026-03-22T07:54:42.940234+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a segmentation fault due to invalid/wild pointer read in CIccCalculatorFunc::ApplySequence() causing denial of service. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "01874fffa2c531ed8c08c3660b096c0777a0bdc660a3c786433f2c9b624ceec3",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-703"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31793"
+}

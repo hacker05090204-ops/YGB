@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2960",
+  "ingested_at": "2026-03-22T07:54:31.030716+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in D-Link DWR-M960 1.01.07. Affected by this issue is the function sub_468D64 of the file /boafrm/formDhcpv6s. Executing a manipulation of the argument submit-url can lead to stack-based buffer overflow. The attack can be executed remotely. The exploit has been published and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "0ca8c68a600e71504dc43f183d7bcec46be43e40e9c3d738791c41e220cfe18a",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2960"
+}

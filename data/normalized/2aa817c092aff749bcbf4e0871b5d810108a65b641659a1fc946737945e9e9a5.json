@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft SharePoint Microsoft SharePoint fails to check the source markup of an application package. An attacker who successfully exploits the vulnerability could run remote code in the context of the SharePoint application pool and the SharePoint server farm account.",
+  "token_count": 39
+}

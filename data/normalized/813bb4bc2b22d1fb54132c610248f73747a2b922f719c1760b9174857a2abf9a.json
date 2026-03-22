@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Citrix NetScaler ADC and NetScaler Gateway Citrix NetScaler ADC and NetScaler Gateway contain a buffer overflow vulnerability that allows for a denial-of-service when configured as a Gateway (VPN virtual server, ICA Proxy, CVPN, RDP Proxy) or AAA virtual server.",
+  "token_count": 39
+}

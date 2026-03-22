@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-41277",
+  "ingested_at": "2026-03-22T07:45:16.728470+00:00",
+  "lang": "en",
+  "raw_text": "Metabase Metabase Metabase contains a local file inclusion vulnerability in the custom map support in the API to read GeoJSON formatted data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c856a3dddd4855b59a95f7a81eb2be407ec077acf6969014510c5e2fc5bc5320",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

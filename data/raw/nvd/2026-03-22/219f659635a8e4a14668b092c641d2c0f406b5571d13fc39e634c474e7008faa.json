@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27982",
+  "ingested_at": "2026-03-22T07:54:40.288874+00:00",
+  "lang": "en",
+  "raw_text": "An open redirect vulnerability exists in django-allauth versions prior to 65.14.1 when SAML IdP initiated SSO is enabled (it is disabled by default), which may allow an attacker to redirect users to an arbitrary external website via a crafted URL.",
+  "severity": "MEDIUM",
+  "sha256_hash": "219f659635a8e4a14668b092c641d2c0f406b5571d13fc39e634c474e7008faa",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27982"
+}

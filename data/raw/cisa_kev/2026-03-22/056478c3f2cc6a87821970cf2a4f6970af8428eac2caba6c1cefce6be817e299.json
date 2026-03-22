@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-0311",
+  "ingested_at": "2026-03-22T07:45:18.130813+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Unspecified vulnerability in Adobe Flash Player allows remote attackers to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "056478c3f2cc6a87821970cf2a4f6970af8428eac2caba6c1cefce6be817e299",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

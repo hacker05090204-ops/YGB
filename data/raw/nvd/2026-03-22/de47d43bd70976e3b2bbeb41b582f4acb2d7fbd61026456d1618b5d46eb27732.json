@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3750",
+  "ingested_at": "2026-03-22T07:54:42.080282+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in ContiNew Admin up to 4.2.0. This issue affects the function URI.create of the file continew-system/src/main/java/top/continew/admin/system/factory/S3ClientFactory.java of the component Storage Management Module. The manipulation leads to server-side request forgery. The attack is possible to be carried out remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "de47d43bd70976e3b2bbeb41b582f4acb2d7fbd61026456d1618b5d46eb27732",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3750"
+}

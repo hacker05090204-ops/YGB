@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a memory corruption vulnerability which can allow for remote code execution in the context of the current user.",
+  "token_count": 25
+}

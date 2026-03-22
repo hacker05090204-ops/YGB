@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11001",
+  "ingested_at": "2026-03-22T07:45:16.668338+00:00",
+  "lang": "en",
+  "raw_text": "Reolink Multiple IP Cameras Reolink RLC-410W, C1 Pro, C2 Pro, RLC-422W, and RLC-511W IP cameras contain an authenticated OS command injection vulnerability. This vulnerability allows an authenticated admin to use the \"TestEmail\" functionality to inject and run OS commands as root.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6d1071fd8eb0b4cec8eee84cf2e1ef732eb5c73412f6a286afc2b5bc3072b6da",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

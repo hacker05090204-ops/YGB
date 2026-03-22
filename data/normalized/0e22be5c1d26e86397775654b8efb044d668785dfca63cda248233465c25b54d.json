@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A potential divide by zero vulnerability was reported in the Lenovo Virtual Bus driver used in Smart Connect that could allow a local authenticated user to cause a Windows blue screen error.",
+  "token_count": 32
+}

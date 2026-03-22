@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2471",
+  "ingested_at": "2026-03-22T07:54:33.398724+00:00",
+  "lang": "en",
+  "raw_text": "The WP Mail Logging plugin for WordPress is vulnerable to PHP Object Injection in all versions up to, and including, 1.15.0 via deserialization of untrusted input from the email log message field. This is due to the `BaseModel` class constructor calling `maybe_unserialize()` on all properties retrieved from the database without validation. This makes it possible for unauthenticated attackers to inject a PHP Object by submitting a double-serialized payload through any public-facing form that sends email (e.g., Contact Form 7). When the email is logged and subsequently viewed by an administrator, the malicious payload is deserialized into an arbitrary PHP object. No known POP chain is present in the vulnerable software, which means this vulnerability has no impact unless another plugin or theme containing a POP chain is installed on the site. If a POP chain is present via an additional plugin or theme installed on the target system, it may allow the attacker to perform actions like delete arbitrary files, retrieve sensitive data, or execute code depending on the POP chain present.",
+  "severity": "HIGH",
+  "sha256_hash": "2ed0170e39bb42edaafb7bee188c31c03fd2da6a803ae9bad7c169f63e6ea756",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 172,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2471"
+}

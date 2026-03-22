@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Doom Launcher 3.8.1.0 is vulnerable to Directory Traversal due to missing file path validation during the extraction of game files",
+  "token_count": 20
+}

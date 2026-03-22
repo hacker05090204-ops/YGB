@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple macOS/iOS - NSUnarchiver Heap Corruption Due to Lack of Bounds Checking in [NSBuiltinCharacterSet initWithCoder:]",
+  "token_count": 15
+}

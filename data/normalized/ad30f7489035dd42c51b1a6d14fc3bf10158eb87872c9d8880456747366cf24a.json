@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A server-side request forgery (SSRF) vulnerability in IKEA Dirigera v2.866.4 allows an attacker to exfiltrate private keys by sending a crafted request.",
+  "token_count": 22
+}

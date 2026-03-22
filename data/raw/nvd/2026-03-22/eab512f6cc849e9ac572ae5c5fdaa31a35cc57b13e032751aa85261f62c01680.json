@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3582",
+  "ingested_at": "2026-03-22T07:54:43.115810+00:00",
+  "lang": "en",
+  "raw_text": "An Incorrect Authorization vulnerability was identified in GitHub Enterprise Server that allowed an authenticated user with a classic personal access token (PAT) lacking the repo scope to retrieve issues and commits from private and internal repositories via the search REST API endpoints. The user must have had existing access to the repository through organization membership or as a collaborator for the vulnerability to be exploitable. This vulnerability affected all versions of GitHub Enterprise Server prior to 3.20 and was fixed in versions 3.16.15, 3.17.12, 3.18.6 and 3.19.3. This vulnerability was reported via the GitHub Bug Bounty program.",
+  "severity": "MEDIUM",
+  "sha256_hash": "eab512f6cc849e9ac572ae5c5fdaa31a35cc57b13e032751aa85261f62c01680",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3582"
+}

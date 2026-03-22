@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4092",
+  "ingested_at": "2026-03-22T07:54:46.196693+00:00",
+  "lang": "en",
+  "raw_text": "Path Traversal in Clasp impacting versions < 3.2.0 allows a remote attacker to perform remote code execution via a malicious Google Apps Script project containing specially crafted filenames with directory traversal sequences.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d2486096caacd720d47c57f676c161585ef01f400d414105e65790d3c3123b0c",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4092"
+}

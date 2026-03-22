@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27492",
+  "ingested_at": "2026-03-22T07:54:30.851203+00:00",
+  "lang": "en",
+  "raw_text": "Lettermint Node.js SDK is the official Node.js SDK for Lettermint. In versions 1.5.0 and below, email properties (such as to, subject, html, text, and attachments) are not reset between sends when a single client instance is reused across multiple .send() calls. This can cause properties from a previous send to leak into a subsequent one, potentially delivering content or recipient addresses to unintended parties. Applications sending emails to different recipients in sequence \u2014 such as transactional flows like password resets or notifications \u2014 are affected. This issue has been fixed in version 1.5.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e8acdc51b76f8021814b7549330224e88a8a8d92245cf533912b69d5f50fec17",
+  "source": "nvd",
+  "tags": [
+    "CWE-488"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27492"
+}

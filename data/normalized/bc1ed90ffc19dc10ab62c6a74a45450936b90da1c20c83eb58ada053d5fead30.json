@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Citrix Session Recording Citrix Session Recording contains an improper privilege management vulnerability that could allow for privilege escalation to NetworkService Account access. An attacker must be an authenticated user in the same Windows Active Directory domain as the session recording server domain.",
+  "token_count": 42
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67491",
+  "ingested_at": "2026-03-22T07:54:31.815960+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Versions 5.0.0.5 through 7.0.3.4 have a stored cross-site scripting vulnerability in the ub04 helper of the billing interface. The variable `$data` is passed in a click event handler enclosed in single quotes without proper sanitization. Thus, despite `json_encode` a malicious user can still inject a payload such as ` ac' > ` to trigger the bug. This vulnerability allows low privileged users to embed malicious JS payloads on the server and perform stored XSS attack. This, in turn makes it possible for malicious users to steal the session cookies and perform unauthorized actions impersonating administrators. Version 7.0.4 patches the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "edf22a9919182cd504ff12446c201068b3a16e938db5ba26be2d3bfb6131c2cb",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 115,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67491"
+}

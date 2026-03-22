@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22171",
+  "ingested_at": "2026-03-22T07:54:47.272605+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 contain a path traversal vulnerability in the Feishu media download flow where untrusted media keys are interpolated directly into temporary file paths in extensions/feishu/src/media.ts. An attacker who can control Feishu media key values returned to the client can use traversal segments to escape os.tmpdir() and write arbitrary files within the OpenClaw process permissions.",
+  "severity": "HIGH",
+  "sha256_hash": "3423d1eb3c4b9b6f3c04001da6aef458ed4dd1b179f1a49dbbf94835a3ec2c14",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22171"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft .NET Framework Microsoft .NET Framework contains an improper input validation vulnerability that allows for remote code execution.",
+  "token_count": 18
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26115",
+  "ingested_at": "2026-03-22T07:54:42.808343+00:00",
+  "lang": "en",
+  "raw_text": "Improper validation of specified type of input in SQL Server allows an authorized attacker to elevate privileges over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "50134341343dcaa8b82386574aba89075ac35703c2e083c6ba6471e610ebc8f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-1287"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26115"
+}

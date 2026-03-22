@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-36363",
+  "ingested_at": "2026-03-22T07:54:34.207739+00:00",
+  "lang": "en",
+  "raw_text": "IBM DevOps Plan 3.0.0 through 3.0.5 uses an inadequate account lockout setting that could allow a remote attacker to brute force account credentials.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e84be230333db386782a99b7c57c42120e9f94c346e3a2c38853bd6c428d5efb",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-36363"
+}

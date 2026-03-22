@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-53706",
+  "ingested_at": "2026-03-22T07:54:42.587458+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: ** REJECT ** DO NOT USE THIS CANDIDATE NUMBER. ConsultIDs: none. Reason: The CNA or individual who requested this candidate did not associate it with any vulnerability during 2025. Notes: none.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "dbb8a0891275602ac173d07d3ddaac6f00bebc3a78f24e0c8d0abc019343c4a1",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-53706"
+}

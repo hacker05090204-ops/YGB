@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OPEXUS eComplaint before version 10.1.0.0 allows an unauthenticated attacker to obtain or guess an existing case number and upload arbitrary files via 'Portal/EEOC/DocumentUploadPub.aspx'. Users would see these unexpected files in cases. Uploading a large number of files could consume storage.",
+  "token_count": 40
+}

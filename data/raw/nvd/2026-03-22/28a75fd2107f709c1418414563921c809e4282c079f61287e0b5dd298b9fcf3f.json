@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3344",
+  "ingested_at": "2026-03-22T07:54:34.063996+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in WatchGuard Fireware OS may allow an attacker to bypass the Fireware OS filesystem integrity check and maintain limited persistence via a maliciously-crafted firmware update package.This issue affects Fireware OS 12.0 up to and including 12.11.7, 12.5.9 up to and including 12.5.16, and 2025.1 up to and including 2026.1.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "28a75fd2107f709c1418414563921c809e4282c079f61287e0b5dd298b9fcf3f",
+  "source": "nvd",
+  "tags": [
+    "CWE-440"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3344"
+}

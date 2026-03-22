@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32309",
+  "ingested_at": "2026-03-22T07:54:48.930112+00:00",
+  "lang": "en",
+  "raw_text": "Cryptomator encrypts data being stored on cloud infrastructure. Prior to version 1.19.1, the Hub-based unlock flow explicitly supports hub+http and consumes Hub endpoints from vault metadata without enforcing HTTPS. As a result, a vault configuration can drive OAuth and key-loading traffic over plaintext HTTP or other insecure endpoint combinations. An active network attacker can tamper with or observe this traffic. Even when the vault key is encrypted for the device, bearer tokens and endpoint-level trust decisions are still exposed to downgrade and interception. This issue has been patched in version 1.19.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "af5957358f26debba02c9752223d39ade53e534a4b293ba592da4746362503ec",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32309"
+}

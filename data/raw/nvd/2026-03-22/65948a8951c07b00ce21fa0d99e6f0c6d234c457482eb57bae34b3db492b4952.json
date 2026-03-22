@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-3062",
+  "ingested_at": "2026-03-22T07:54:31.243950+00:00",
+  "lang": "en",
+  "raw_text": "Out of bounds read and write in Tint in Google Chrome on Mac prior to 145.0.7632.116 allowed a remote attacker to perform out of bounds memory access via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "CRITICAL",
+  "sha256_hash": "65948a8951c07b00ce21fa0d99e6f0c6d234c457482eb57bae34b3db492b4952",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-787",
+    "CWE-125",
+    "CWE-787"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3062"
+}

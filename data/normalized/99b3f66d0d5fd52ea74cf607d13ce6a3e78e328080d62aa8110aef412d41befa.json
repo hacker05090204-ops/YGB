@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Dayneks Software Industry and Trade Inc. E-Commerce Platform allows SQL Injection.This issue affects E-Commerce Platform: through 27022026. NOTE: The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 47
+}

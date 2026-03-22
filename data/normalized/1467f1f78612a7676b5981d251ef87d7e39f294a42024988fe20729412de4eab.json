@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Web Ofisi Firma v13 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'oz' array parameter. Attackers can send GET requests to category pages with malicious 'oz[]' values using time-based blind SQL injection payloads to extract sensitive database information.",
+  "token_count": 49
+}

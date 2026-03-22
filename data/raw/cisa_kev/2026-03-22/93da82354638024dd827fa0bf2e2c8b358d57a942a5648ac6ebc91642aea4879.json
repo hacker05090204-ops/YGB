@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-5910",
+  "ingested_at": "2026-03-22T07:45:16.743358+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks Expedition Palo Alto Networks Expedition contains a missing authentication vulnerability that allows an attacker with network access to takeover an Expedition admin account and potentially access configuration secrets, credentials, and other data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "93da82354638024dd827fa0bf2e2c8b358d57a942a5648ac6ebc91642aea4879",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

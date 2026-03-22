@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-36804",
+  "ingested_at": "2026-03-22T07:45:17.624248+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Bitbucket Server and Data Center Multiple API endpoints of Atlassian Bitbucket Server and Data Center contain a command injection vulnerability where an attacker with access to a public Bitbucket repository, or with read permissions to a private one, can execute code by sending a malicious HTTP request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6c3e9e84a294c0f9fcf29755da7459105d3355e9ec6af7387b38c807d91df480",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 48,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-0767",
+  "ingested_at": "2026-03-22T07:45:17.816401+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains a XSS vulnerability that allows remote attackers to inject web script or HTML.",
+  "severity": "CRITICAL",
+  "sha256_hash": "181156d9bfc4c65c15bf2885d2a2648a8259ff40f910caeb7183ebfac6bcbd18",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

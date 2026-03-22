@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Out-of-bounds array write in Xpdf 4.06 and earlier, due to incorrect validation of the \"N\" field in ICCBased color spaces.",
+  "token_count": 20
+}

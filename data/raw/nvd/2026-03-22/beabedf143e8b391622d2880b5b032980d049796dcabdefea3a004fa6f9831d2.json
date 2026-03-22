@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24314",
+  "ingested_at": "2026-03-22T07:54:31.450407+00:00",
+  "lang": "en",
+  "raw_text": "Under certain conditions SAP S/4HANA (Manage Payment Media) allows an authenticated attacker to access information which would otherwise be restricted. This could cause low impact on confidentiality of the application while integrity and availability are not impacted.",
+  "severity": "MEDIUM",
+  "sha256_hash": "beabedf143e8b391622d2880b5b032980d049796dcabdefea3a004fa6f9831d2",
+  "source": "nvd",
+  "tags": [
+    "CWE-497",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24314"
+}

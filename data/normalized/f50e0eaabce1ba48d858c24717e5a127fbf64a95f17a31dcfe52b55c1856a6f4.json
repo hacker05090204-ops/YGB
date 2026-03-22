@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fields is a GLPI plugin that allows users to add custom fields on GLPI items forms. Prior to version 1.23.3, it is possible to execute arbitrary PHP code from users that are allowed to create dropdowns. This issue has been patched in version 1.23.3.",
+  "token_count": 44
+}

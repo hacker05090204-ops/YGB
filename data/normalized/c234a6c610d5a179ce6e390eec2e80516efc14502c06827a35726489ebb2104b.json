@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Trend Micro OfficeScan Trend Micro OfficeScan contains a directory traversal vulnerability by extracting files from a zip file to a specific folder on the OfficeScan server, leading to remote code execution.",
+  "token_count": 31
+}

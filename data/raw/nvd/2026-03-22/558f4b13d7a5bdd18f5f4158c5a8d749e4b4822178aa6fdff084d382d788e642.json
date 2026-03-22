@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0030",
+  "ingested_at": "2026-03-22T07:54:33.939518+00:00",
+  "lang": "en",
+  "raw_text": "In __host_check_page_state_range of mem_protect.c, there is a possible out of bounds write due to an incorrect bounds check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "558f4b13d7a5bdd18f5f4158c5a8d749e4b4822178aa6fdff084d382d788e642",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0030"
+}

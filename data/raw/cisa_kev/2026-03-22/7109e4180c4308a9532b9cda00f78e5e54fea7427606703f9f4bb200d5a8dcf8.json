@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-9082",
+  "ingested_at": "2026-03-22T07:45:19.601874+00:00",
+  "lang": "en",
+  "raw_text": "ThinkPHP ThinkPHP ThinkPHP contains an unspecified vulnerability that allows for remote code execution via public//?s=index/\\think\\app/invokefunction&function=call_user_func_array&vars[0]=system&vars[1][]= followed by the command.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7109e4180c4308a9532b9cda00f78e5e54fea7427606703f9f4bb200d5a8dcf8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-66880",
+  "ingested_at": "2026-03-22T07:54:33.708597+00:00",
+  "lang": "en",
+  "raw_text": "Cross Site Scripting vulnerability in Wethink Technology Inc 720yun pano-sdk 0.5.877 allows a remote attacker to execute arbitrary code via the LoginComp (Module 2093) and SignupComp (Module 2094) modules.",
+  "severity": "MEDIUM",
+  "sha256_hash": "21aa10a8cce2ab59b714ab6c2598caacd26c272b73e69ca857f01e2337c3f93f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66880"
+}

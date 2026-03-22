@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. Prior to 10.0.21, an unauthenticated path traversal in the /workflow/docs/:componentName endpoint allows reading arbitrary files from the server filesystem. The componentName route parameter is concatenated directly into a file path passed to res.sendFile() in orker/FeatureSet/Workflow/Index.ts with no sanitization or authentication middleware. This vulnerability is fixed in 10.0.21.",
+  "token_count": 57
+}

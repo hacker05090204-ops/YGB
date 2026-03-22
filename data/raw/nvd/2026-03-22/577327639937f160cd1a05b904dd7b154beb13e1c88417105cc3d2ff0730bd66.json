@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20039",
+  "ingested_at": "2026-03-22T07:54:34.664768+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the VPN web server of Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an unauthenticated, remote attacker to cause a denial of service (DoS) condition on an affected device. This vulnerability is due to ineffective memory management of the VPN web server. An attacker could exploit this vulnerability by sending a large number of crafted HTTP requests to an affected device. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "severity": "HIGH",
+  "sha256_hash": "577327639937f160cd1a05b904dd7b154beb13e1c88417105cc3d2ff0730bd66",
+  "source": "nvd",
+  "tags": [
+    "CWE-244"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20039"
+}

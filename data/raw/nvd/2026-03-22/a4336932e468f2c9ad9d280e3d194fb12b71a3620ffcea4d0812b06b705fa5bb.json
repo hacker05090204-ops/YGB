@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-32761",
+  "ingested_at": "2026-03-22T07:54:48.378619+00:00",
+  "lang": "en",
+  "raw_text": "File Browser is a file managing interface for uploading, deleting, previewing, renaming, and editing files within a specified directory. Versions 2.61.0 and below contain a permission enforcement bypass which allows users who are denied download privileges (perm.download = false) but granted share privileges (perm.share = true) to exfiltrate file content by creating public share links. While the direct raw download endpoint (/api/raw/) correctly enforces the download permission, the share creation endpoint only checks Perm.Share, and the public download handler (/api/public/dl/ ) serves file content without verifying that the original file owner has download permission. This means any authenticated user with share access can circumvent download restrictions by sharing a file and then retrieving it via the unauthenticated public download URL. The vulnerability undermines data-loss prevention and role-separation policies, as restricted users can publicly distribute files they are explicitly blocked from downloading directly. This issue has been fixed in version 2.62.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a4336932e468f2c9ad9d280e3d194fb12b71a3620ffcea4d0812b06b705fa5bb",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-639",
+    "CWE-863"
+  ],
+  "token_count": 150,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32761"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1498",
+  "ingested_at": "2026-03-22T07:45:19.095720+00:00",
+  "lang": "en",
+  "raw_text": "Cisco HyperFlex HX Cisco HyperFlex HX Installer Virtual Machine contains an insufficient input validation vulnerability which could allow an attacker to execute commands on an affected device as the tomcat8 user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9da2955661e519976f479b8cb941f712c857cf65abe230f846b06a59d6f71534",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

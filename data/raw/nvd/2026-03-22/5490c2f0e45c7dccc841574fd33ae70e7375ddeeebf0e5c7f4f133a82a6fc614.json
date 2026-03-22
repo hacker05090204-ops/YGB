@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32359",
+  "ingested_at": "2026-03-22T07:54:45.932329+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in bPlugins Icon List Block icon-list-block allows Stored XSS.This issue affects Icon List Block: from n/a through < = 1.2.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5490c2f0e45c7dccc841574fd33ae70e7375ddeeebf0e5c7f4f133a82a6fc614",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32359"
+}

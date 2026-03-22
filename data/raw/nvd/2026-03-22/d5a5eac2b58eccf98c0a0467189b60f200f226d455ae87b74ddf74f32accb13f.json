@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3769",
+  "ingested_at": "2026-03-22T07:54:42.116795+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Tenda F453 1.0.0.3. Affected by this issue is the function WrlclientSet of the file /goform/WrlclientSet. The manipulation of the argument GO results in stack-based buffer overflow. The attack can be executed remotely. The exploit is now public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "d5a5eac2b58eccf98c0a0467189b60f200f226d455ae87b74ddf74f32accb13f",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3769"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Themeton Finag allows Object Injection.This issue affects Finag: from n/a through 1.5.0.",
+  "token_count": 18
+}

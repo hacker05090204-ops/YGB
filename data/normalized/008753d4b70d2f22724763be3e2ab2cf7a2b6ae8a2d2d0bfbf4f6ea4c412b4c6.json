@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM QRadar SIEM 7.5.0 through 7.5.0 Update Package 14 stores potentially sensitive information in configuration files that could be read by a local user.",
+  "token_count": 24
+}

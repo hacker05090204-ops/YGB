@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27484",
+  "ingested_at": "2026-03-22T07:54:30.836261+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw is a personal AI assistant. In versions 2026.2.17 and below, the Discord moderation action handling (timeout, kick, ban) uses sender identity from request parameters in tool-driven flows, instead of trusted runtime sender context. In setups where Discord moderation actions are enabled and the bot has the necessary guild permissions, a non-admin user can request moderation actions by spoofing sender identity fields. This issue has been fixed in version 2026.2.18.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b68c469c1594e9ae4f9bd7734a9cd7c809c965367798a735d2896dd2efba3014",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27484"
+}

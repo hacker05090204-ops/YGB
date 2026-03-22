@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23907",
+  "ingested_at": "2026-03-22T07:54:42.681435+00:00",
+  "lang": "en",
+  "raw_text": "This issue affects the ExtractEmbeddedFiles example in Apache PDFBox: from 2.0.24 through 2.0.35, from 3.0.0 through 3.0.6. The ExtractEmbeddedFiles example contains a path traversal vulnerability (CWE-22) because the filename that is obtained from PDComplexFileSpecification.getFilename() is appended to the extraction path. Users who have copied this example into their production code should review it to ensure that the extraction path is acceptable. The example has been changed accordingly, now the initial path and the extraction paths are converted into canonical paths and it is verified that extraction path contains the initial path. The documentation has also been adjusted.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c2531b41d845ef8808ea95a6482b5059a40b8cb432d013182f2804e836d10f5a",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23907"
+}

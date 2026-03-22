@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27070",
+  "ingested_at": "2026-03-22T07:54:47.926370+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in WPEverest Everest Forms Pro allows Stored XSS.This issue affects Everest Forms Pro: from n/a through 1.9.10.",
+  "severity": "HIGH",
+  "sha256_hash": "99b455f326785363bacefcfb5bfa9400b7d2deedea76b7602c7638c0692d8166",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27070"
+}

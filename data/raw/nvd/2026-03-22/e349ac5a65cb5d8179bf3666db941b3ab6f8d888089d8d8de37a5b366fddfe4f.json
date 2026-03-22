@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50186",
+  "ingested_at": "2026-03-22T07:54:33.598920+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, a stored cross-site scripting (XSS) vulnerability exists due to insufficient sanitization of CSV filenames. An attacker can upload a maliciously named CSV file (e.g., .csv) that leads to JavaScript execution when viewed by administrators or users with access to import logs or file views. This issue has been patched in version 1.11.30.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e349ac5a65cb5d8179bf3666db941b3ab6f8d888089d8d8de37a5b366fddfe4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50186"
+}

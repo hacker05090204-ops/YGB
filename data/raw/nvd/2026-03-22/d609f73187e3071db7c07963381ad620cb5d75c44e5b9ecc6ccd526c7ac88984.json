@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32844",
+  "ingested_at": "2026-03-22T07:54:48.919963+00:00",
+  "lang": "en",
+  "raw_text": "XinLiangCoder php_api_doc through commit 1ce5bbf contains a reflected cross-site scripting vulnerability in list_method.php that allows remote attackers to execute arbitrary JavaScript in a victim's browser by injecting malicious code through the f parameter. Attackers can craft a malicious URL with unsanitized input in the GET request parameter that is output directly to the page without proper neutralization, enabling session hijacking, credential theft, or malware distribution within the application context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d609f73187e3071db7c07963381ad620cb5d75c44e5b9ecc6ccd526c7ac88984",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32844"
+}

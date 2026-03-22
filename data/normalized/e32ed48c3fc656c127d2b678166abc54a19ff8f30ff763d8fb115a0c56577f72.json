@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified within Rancher Manager, where using self-signed CA certificates and passing the -skip-verify flag to the Rancher CLI login command without also passing the \u2013cacert flag results in the CLI attempting to fetch CA certificates stored in Rancher\u2019s setting cacerts.",
+  "token_count": 44
+}

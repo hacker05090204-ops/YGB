@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30851",
+  "ingested_at": "2026-03-22T07:54:41.911998+00:00",
+  "lang": "en",
+  "raw_text": "Caddy is an extensible server platform that uses TLS by default. From version 2.10.0 to before version 2.11.2, forward_auth copy_headers does not strip client-supplied headers, allowing identity injection and privilege escalation. This issue has been patched in version 2.11.2.",
+  "severity": "HIGH",
+  "sha256_hash": "00ad5e8f1146a2b73ee40f425b2b349b8b3891aaac51d367d72efad0ae142371",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-345"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30851"
+}

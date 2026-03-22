@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67752",
+  "ingested_at": "2026-03-22T07:54:31.825960+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 7.0.4, OpenEMR's HTTP client wrapper (`oeHttp`/`oeHttpRequest`) disables SSL/TLS certificate verification by default (`verify: false`), making all external HTTPS connections vulnerable to man-in-the-middle (MITM) attacks. This affects communication with government healthcare APIs and user-configurable external services, potentially exposing Protected Health Information (PHI). Version 7.0.4 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "beeb64d856fee447ae407c40b874a68e9a2c38694fec374bf8a6152dadbaa05a",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67752"
+}

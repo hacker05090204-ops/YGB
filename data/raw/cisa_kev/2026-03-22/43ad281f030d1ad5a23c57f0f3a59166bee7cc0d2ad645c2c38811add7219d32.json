@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-2386",
+  "ingested_at": "2026-03-22T07:45:17.763608+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SQL injection vulnerability in the UDDI server in SAP NetWeaver J2EE Engine 7.40 allows remote attackers to execute arbitrary SQL commands via unspecified vectors.",
+  "severity": "CRITICAL",
+  "sha256_hash": "43ad281f030d1ad5a23c57f0f3a59166bee7cc0d2ad645c2c38811add7219d32",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33408",
+  "ingested_at": "2026-03-22T07:54:48.342848+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, moderators were able to see the first 40 characters of post edits in PMs and private categories. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "LOW",
+  "sha256_hash": "08cd286c4284292d8afe99dd7fe83366f36742912b3d016b373a9bbe11bf27be",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33408"
+}

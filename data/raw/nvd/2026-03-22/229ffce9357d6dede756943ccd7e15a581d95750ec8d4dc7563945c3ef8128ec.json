@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26717",
+  "ingested_at": "2026-03-22T07:54:32.172707+00:00",
+  "lang": "en",
+  "raw_text": "An issue in OpenFUN Richie (LMS) in src/richie/apps/courses/api.py. The application used the non-constant time == operator for HMAC signature verification in the sync_course_run_from_request function. This allows remote attackers to forge valid signatures and bypass authentication by measuring response time discrepancies",
+  "severity": "MEDIUM",
+  "sha256_hash": "229ffce9357d6dede756943ccd7e15a581d95750ec8d4dc7563945c3ef8128ec",
+  "source": "nvd",
+  "tags": [
+    "CWE-208"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26717"
+}

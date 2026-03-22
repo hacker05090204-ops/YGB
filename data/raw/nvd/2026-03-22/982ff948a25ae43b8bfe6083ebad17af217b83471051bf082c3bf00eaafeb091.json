@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-32891",
+  "ingested_at": "2026-03-22T07:54:48.524573+00:00",
+  "lang": "en",
+  "raw_text": "Anchorr is a Discord bot for requesting movies and TV shows and receiving notifications when items are added to a media server. Versions 1.4.1 and below contain a stored XSS vulnerability in the Jellyseerr user selector. Jellyseerr allows any account holder to execute arbitrary JavaScript in the Anchorr admin's browser session. The injected script calls the authenticated /api/config endpoint - which returns the full application configuration in plaintext. This allows the attacker to forge a valid Anchorr session token and gain full admin access to the dashboard with no knowledge of the admin password. The same response also exposes the API keys and tokens for every integrated service, resulting in simultaneous account takeover of the Jellyfin media server (via JELLYFIN_API_KEY), the Jellyseerr request manager (via JELLYSEERR_API_KEY), and the Discord bot (via DISCORD_TOKEN). This issue has been fixed in version 1.4.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "982ff948a25ae43b8bfe6083ebad17af217b83471051bf082c3bf00eaafeb091",
+  "source": "nvd",
+  "tags": [
+    "CWE-80",
+    "CWE-212",
+    "CWE-311"
+  ],
+  "token_count": 140,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32891"
+}

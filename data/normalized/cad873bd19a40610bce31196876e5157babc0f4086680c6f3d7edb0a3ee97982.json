@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A weakness has been identified in phpipam up to 1.7.4. The impacted element is an unknown function of the file app/admin/sections/edit-result.php of the component Section Handler. Executing a manipulation of the argument subnetOrdering can lead to sql injection. The attack may be launched remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 74
+}

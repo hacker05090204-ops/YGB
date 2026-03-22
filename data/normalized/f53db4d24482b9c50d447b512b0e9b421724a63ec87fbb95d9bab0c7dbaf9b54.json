@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Raytha CMS is vulnerable to reflected XSS via the backToListUrl parameter. An attacker can craft a malicious URL which, when opened by authenticated victim, results in arbitrary JavaScript execution in the victim\u2019s browser. This issue was fixed in version 1.4.6.",
+  "token_count": 40
+}

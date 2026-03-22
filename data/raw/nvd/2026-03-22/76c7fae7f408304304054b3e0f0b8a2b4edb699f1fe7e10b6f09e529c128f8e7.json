@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28714",
+  "ingested_at": "2026-03-22T07:54:41.176151+00:00",
+  "lang": "en",
+  "raw_text": "Unnecessary transmission of sensitive cryptographic material. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "76c7fae7f408304304054b3e0f0b8a2b4edb699f1fe7e10b6f09e529c128f8e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-522"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28714"
+}

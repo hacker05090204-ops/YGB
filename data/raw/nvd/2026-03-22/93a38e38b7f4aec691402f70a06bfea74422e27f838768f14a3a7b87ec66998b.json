@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-10938",
+  "ingested_at": "2026-03-22T07:54:33.129420+00:00",
+  "lang": "en",
+  "raw_text": "The OVRI Payment plugin for WordPress contains malicious .htaccess files in version 1.7.0. The files contain directives to prevent the execution of certain scripts while allowing execution of known malicious PHP files. If moved outside of the plugin's directory, they may interfere with the proper function of a site.",
+  "severity": "MEDIUM",
+  "sha256_hash": "93a38e38b7f4aec691402f70a06bfea74422e27f838768f14a3a7b87ec66998b",
+  "source": "nvd",
+  "tags": [
+    "CWE-506"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-10938"
+}

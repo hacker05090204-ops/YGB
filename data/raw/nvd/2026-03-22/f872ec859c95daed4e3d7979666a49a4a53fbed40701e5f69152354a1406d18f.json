@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2646",
+  "ingested_at": "2026-03-22T07:54:48.019582+00:00",
+  "lang": "en",
+  "raw_text": "A heap-buffer-overflow vulnerability exists in wolfSSL's wolfSSL_d2i_SSL_SESSION() function. When deserializing session data with SESSION_CERTS enabled, certificate and session id lengths are read from an untrusted input without bounds validation, allowing an attacker to overflow fixed-size buffers and corrupt heap memory. A maliciously crafted session would need to be loaded from an external source to trigger this vulnerability. Internal sessions were not vulnerable.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f872ec859c95daed4e3d7979666a49a4a53fbed40701e5f69152354a1406d18f",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2646"
+}

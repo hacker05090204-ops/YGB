@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32838",
+  "ingested_at": "2026-03-22T07:54:47.193103+00:00",
+  "lang": "en",
+  "raw_text": "Edimax GS-5008PL firmware version 1.00.54 and prior use cleartext HTTP for the web management interface without implementing TLS or SSL encryption. Attackers on the same network can intercept management traffic to capture administrator credentials and sensitive configuration data.",
+  "severity": "HIGH",
+  "sha256_hash": "c9ce08a264f058db5397d7d41edba01b39cfb6ae46f68354440612a0dda3abee",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32838"
+}

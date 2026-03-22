@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-66945",
+  "ingested_at": "2026-03-22T07:54:34.211012+00:00",
+  "lang": "en",
+  "raw_text": "A path traversal vulnerability exists in the ZIP extraction API of Zdir Pro 4.x. When a crafted ZIP archive is processed by the backend at /api/extract, files may be written outside the intended directory, leading to arbitrary file overwrite and potentially remote code execution",
+  "severity": "CRITICAL",
+  "sha256_hash": "f08feac5cb0523a73219489a99ea0beb0d973d1f83a5aa9d37285e37b908c775",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66945"
+}

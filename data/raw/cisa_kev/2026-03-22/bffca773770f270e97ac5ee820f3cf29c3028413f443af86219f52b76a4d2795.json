@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-0543",
+  "ingested_at": "2026-03-22T07:45:18.193491+00:00",
+  "lang": "en",
+  "raw_text": "Redis Debian-specific Redis Servers Redis is prone to a (Debian-specific) Lua sandbox escape, which could result in remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bffca773770f270e97ac5ee820f3cf29c3028413f443af86219f52b76a4d2795",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

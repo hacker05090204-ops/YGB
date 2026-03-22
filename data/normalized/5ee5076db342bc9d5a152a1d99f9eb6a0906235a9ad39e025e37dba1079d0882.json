@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper input validation in System Center Operations Manager allows an authorized attacker to elevate privileges over a network.",
+  "token_count": 18
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32256",
+  "ingested_at": "2026-03-22T07:54:47.354019+00:00",
+  "lang": "en",
+  "raw_text": "music-metadata is a metadata parser for audio and video media files. Prior to version 11.12.3, music-metadata's ASF parser (`parseExtensionObject()` in `lib/asf/AsfParser.ts:112-158`) enters an infinite loop when a sub-object inside the ASF Header Extension Object has `objectSize = 0`. Version 11.12.3 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "9b8f0e6cca9742ac00509d9d3619a0744ad2dac6adbe73a74f90b67477534b51",
+  "source": "nvd",
+  "tags": [
+    "CWE-835"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32256"
+}

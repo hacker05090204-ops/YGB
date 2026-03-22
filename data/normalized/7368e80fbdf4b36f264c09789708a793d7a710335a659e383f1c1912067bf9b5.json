@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Raytha CMS does not have any brute force protection mechanism implemented. It allows an attacker to send multiple automated logon requests without triggering lockout, throttling, or step-up challenges. This issue was fixed in version 1.4.6.",
+  "token_count": 35
+}

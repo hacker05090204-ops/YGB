@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-36380",
+  "ingested_at": "2026-03-22T07:45:17.034416+00:00",
+  "lang": "en",
+  "raw_text": "Sunhillo SureLine Sunhillo SureLine contains an OS command injection vulnerability that allows an attacker to cause a denial-of-service or utilize the device for persistence on the network via shell metacharacters in ipAddr or dnsAddr in /cgi/networkDiag.cgi.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ae815fe10e443da75204fc0a62c48fd6f7cce6c1d55d3f92363e2f86aca30f9e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

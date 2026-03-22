@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-25136",
+  "ingested_at": "2026-03-22T07:54:32.269603+00:00",
+  "lang": "en",
+  "raw_text": "Rucio is a software framework that provides functionality to organize, manage, and access large volumes of scientific data using customizable policies. A reflected Cross-site Scripting vulnerability was located in versions prior to 35.8.3, 38.5.4, and 39.3.1 in the rendering of the ExceptionMessage of the WebUI 500 error which could allow attackers to steal login session tokens of users who navigate to a specially crafted URL. Versions 35.8.3, 38.5.4, and 39.3.1 fix the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "fd5b0c80b1d59cc68181315cc3ce22c9b9b79d320d2b15c2816a60db554e6085",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-1004",
+    "CWE-79"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25136"
+}

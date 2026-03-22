@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32002",
+  "ingested_at": "2026-03-22T07:54:48.162343+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.23 contain a sandbox bypass vulnerability in the sandboxed image tool that fails to enforce tools.fs.workspaceOnly restrictions on mounted sandbox paths, allowing attackers to read out-of-workspace files. Attackers can load restricted mounted images and exfiltrate them through vision model provider requests to bypass sandbox confidentiality controls.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d2781c9d2af77381f230b4a2ecfda14036abcd2dc7aede4067f59a9bdd1965f",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32002"
+}

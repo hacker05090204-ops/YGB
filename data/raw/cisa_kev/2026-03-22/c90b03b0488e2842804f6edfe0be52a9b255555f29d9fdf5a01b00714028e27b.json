@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-0920",
+  "ingested_at": "2026-03-22T07:45:17.991232+00:00",
+  "lang": "en",
+  "raw_text": "Android Kernel Android kernel contains a race condition, which allows for a use-after-free vulnerability. Exploitation can allow for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c90b03b0488e2842804f6edfe0be52a9b255555f29d9fdf5a01b00714028e27b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortra GoAnywhere MFT Fortra GoAnywhere MFT contains a deserialization of untrusted data vulnerability allows an actor with a validly forged license response signature to deserialize an arbitrary actor-controlled object, possibly leading to command injection.",
+  "token_count": 34
+}

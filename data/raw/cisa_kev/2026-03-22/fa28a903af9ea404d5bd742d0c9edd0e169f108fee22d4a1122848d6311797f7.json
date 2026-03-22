@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-1347",
+  "ingested_at": "2026-03-22T07:45:18.664826+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer This vulnerability may corrupt memory in a way that could allow an attacker to execute arbitrary code in the context of the current user within Internet Explorer.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa28a903af9ea404d5bd742d0c9edd0e169f108fee22d4a1122848d6311797f7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

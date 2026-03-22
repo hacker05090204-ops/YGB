@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28476",
+  "ingested_at": "2026-03-22T07:54:41.084065+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a server-side request forgery vulnerability in the optional Tlon Urbit extension that accepts user-provided base URLs for authentication without proper validation. Attackers who can influence the configured Urbit URL can induce the gateway to make HTTP requests to arbitrary hosts including internal addresses.",
+  "severity": "HIGH",
+  "sha256_hash": "0647517b47622c471f0ea61a4b02708ee5df4a063dffb6bdaf63303823849ef9",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28476"
+}

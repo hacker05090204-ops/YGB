@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27504",
+  "ingested_at": "2026-03-22T07:54:30.513932+00:00",
+  "lang": "en",
+  "raw_text": "SVXportal version 2.5 and prior contain a reflected cross-site scripting vulnerability in radiomobile_front.php via the stationid query parameter. When an authenticated administrator views a crafted URL, the application embeds the unsanitized parameter value into a hidden input value field, allowing attacker-supplied script injection and execution in the administrator's browser. This can be used to compromise admin sessions or perform unauthorized actions via the administrator's authenticated context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5aa28be110b068de4a90e89145808811cee14b3c88c2ec86d3ba061d3d857893",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27504"
+}

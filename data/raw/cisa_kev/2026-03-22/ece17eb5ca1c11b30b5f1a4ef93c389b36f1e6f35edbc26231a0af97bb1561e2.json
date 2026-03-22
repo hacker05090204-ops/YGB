@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-0391",
+  "ingested_at": "2026-03-22T07:45:18.816116+00:00",
+  "lang": "en",
+  "raw_text": "Apache Struts 2 The ExceptionDelegator component in Apache Struts 2 before 2.2.3.1 contains an improper input validation vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ece17eb5ca1c11b30b5f1a4ef93c389b36f1e6f35edbc26231a0af97bb1561e2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

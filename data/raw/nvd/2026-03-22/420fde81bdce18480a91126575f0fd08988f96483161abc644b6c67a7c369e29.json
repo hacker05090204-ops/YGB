@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2015-20115",
+  "ingested_at": "2026-03-22T07:54:46.217084+00:00",
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 fails to properly sanitize file uploads, allowing attackers to store malicious scripts through the file POST parameter in admin/tools.php. Attackers can upload files containing JavaScript code that executes in the context of admin/tools.php when accessed by other users.",
+  "severity": "HIGH",
+  "sha256_hash": "420fde81bdce18480a91126575f0fd08988f96483161abc644b6c67a7c369e29",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2015-20115"
+}

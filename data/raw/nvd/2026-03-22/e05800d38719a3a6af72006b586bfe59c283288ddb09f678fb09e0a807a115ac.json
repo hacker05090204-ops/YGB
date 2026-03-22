@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-27259",
+  "ingested_at": "2026-03-22T07:54:43.390111+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: This CVE ID was issued in error by its CVE Numbering Authority.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e05800d38719a3a6af72006b586bfe59c283288ddb09f678fb09e0a807a115ac",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27259"
+}

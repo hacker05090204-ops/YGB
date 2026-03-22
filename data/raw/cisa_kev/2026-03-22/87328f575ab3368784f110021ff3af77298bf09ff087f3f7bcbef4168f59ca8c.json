@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-3765",
+  "ingested_at": "2026-03-22T07:45:16.135930+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Multiple Products Mozilla Firefox, SeaMonkey, and Thunderbird contain an unspecified vulnerability when JavaScript is enabled. This allows remote attackers to execute arbitrary code via vectors related to nsCSSFrameConstructor::ContentAppended, the appendChild method, incorrect index tracking, and the creation of multiple frames, which triggers memory corruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "87328f575ab3368784f110021ff3af77298bf09ff087f3f7bcbef4168f59ca8c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

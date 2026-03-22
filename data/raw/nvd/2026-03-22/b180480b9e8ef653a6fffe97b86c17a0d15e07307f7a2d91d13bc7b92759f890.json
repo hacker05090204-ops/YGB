@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15567",
+  "ingested_at": "2026-03-22T07:54:33.079281+00:00",
+  "lang": "en",
+  "raw_text": "Insufficient protection mechanisms in the Health Module may lead to partial information disclosure.",
+  "severity": "LOW",
+  "sha256_hash": "b180480b9e8ef653a6fffe97b86c17a0d15e07307f7a2d91d13bc7b92759f890",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15567"
+}

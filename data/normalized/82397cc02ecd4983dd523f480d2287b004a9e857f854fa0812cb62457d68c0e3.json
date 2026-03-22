@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache CouchDB Apache CouchDB contains an insecure default initialization of resource vulnerability which can allow an attacker to escalate to administrative privileges.",
+  "token_count": 22
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33002",
+  "ingested_at": "2026-03-22T07:54:47.517851+00:00",
+  "lang": "en",
+  "raw_text": "Jenkins 2.442 through 2.554 (both inclusive), LTS 2.426.3 through LTS 2.541.2 (both inclusive) performs origin validation of requests made through the CLI WebSocket endpoint by computing the expected origin for comparison using the Host or X-Forwarded-Host HTTP request headers, making it vulnerable to DNS rebinding attacks that allow bypassing origin validation.",
+  "severity": "HIGH",
+  "sha256_hash": "8c1601574616fda3667813d27760b53f2576af49e2f0ee3942e3076dadf5e8ab",
+  "source": "nvd",
+  "tags": [
+    "CWE-350"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33002"
+}

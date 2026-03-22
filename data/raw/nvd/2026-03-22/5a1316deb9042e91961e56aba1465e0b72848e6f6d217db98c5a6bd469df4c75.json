@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-66944",
+  "ingested_at": "2026-03-22T07:54:34.553459+00:00",
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in vran-dev databaseir v.1.0.7 and before allows a remote attacker to execute arbitrary code via the query parameter in the search API endpoint",
+  "severity": "CRITICAL",
+  "sha256_hash": "5a1316deb9042e91961e56aba1465e0b72848e6f6d217db98c5a6bd469df4c75",
+  "source": "nvd",
+  "tags": [
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66944"
+}

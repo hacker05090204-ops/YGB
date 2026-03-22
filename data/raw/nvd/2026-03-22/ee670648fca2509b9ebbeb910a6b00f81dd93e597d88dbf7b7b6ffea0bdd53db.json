@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30859",
+  "ingested_at": "2026-03-22T07:54:41.929511+00:00",
+  "lang": "en",
+  "raw_text": "WeKnora is an LLM-powered framework designed for deep document understanding and semantic retrieval. Prior to version 0.2.12, a broken access control vulnerability in the database query tool allows any authenticated tenant to read sensitive data belonging to other tenants, including API keys, model configurations, and private messages. The application fails to enforce tenant isolation on critical tables (models, messages, embeddings), enabling unauthorized cross-tenant data access with user-level authentication privileges. This issue has been patched in version 0.2.12.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ee670648fca2509b9ebbeb910a6b00f81dd93e597d88dbf7b7b6ffea0bdd53db",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30859"
+}

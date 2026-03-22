@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3453",
+  "ingested_at": "2026-03-22T07:54:43.456136+00:00",
+  "lang": "en",
+  "raw_text": "The ProfilePress plugin for WordPress is vulnerable to Insecure Direct Object Reference in all versions up to, and including, 4.16.11. This is due to missing ownership validation on the change_plan_sub_id parameter in the process_checkout() function. The ppress_process_checkout AJAX handler accepts a user-controlled subscription ID intended for plan upgrades, loads the subscription record, and cancels/expires it without verifying the subscription belongs to the requesting user. This makes it possible for authenticated attackers, with Subscriber-level access and above, to cancel and expire any other user's active subscription via the change_plan_sub_id parameter during checkout, causing immediate loss of paid access for victims.",
+  "severity": "HIGH",
+  "sha256_hash": "154d2c24704acd6c3bc4d270f1925518773160fd7aaec54335c4bb7a9e4a6f37",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3453"
+}

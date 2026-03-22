@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An Authenticated NoSQL Injection vulnerability found in UniFi Network Application could allow a malicious actor with authenticated access to the network to escalate privileges.",
+  "token_count": 24
+}

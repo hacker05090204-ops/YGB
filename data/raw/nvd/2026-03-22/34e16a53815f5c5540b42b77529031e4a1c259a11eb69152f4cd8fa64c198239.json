@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25823",
+  "ingested_at": "2026-03-22T07:54:44.661804+00:00",
+  "lang": "en",
+  "raw_text": "HMS Networks Ewon Flexy with firmware before 15.0s4, Cosy+ with firmware 22.xx before 22.1s6, and Cosy+ with firmware 23.xx before 23.0s3 have a stack buffer overflow that leads to a Denial of Service, which can also be exploited to achieve Unauthenticated Remote Code Execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "34e16a53815f5c5540b42b77529031e4a1c259a11eb69152f4cd8fa64c198239",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25823"
+}

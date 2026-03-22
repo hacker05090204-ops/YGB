@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-2294",
+  "ingested_at": "2026-03-22T07:45:17.689200+00:00",
+  "lang": "en",
+  "raw_text": "WebRTC WebRTC WebRTC, an open-source project providing web browsers with real-time communication, contains a heap buffer overflow vulnerability that allows an attacker to perform shellcode execution. This vulnerability impacts web browsers using WebRTC including but not limited to Google Chrome.",
+  "severity": "CRITICAL",
+  "sha256_hash": "511409d32bad8691f0fe76155039a1c7b7b9c7bf29ebeb7ddb89fe690724c88b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

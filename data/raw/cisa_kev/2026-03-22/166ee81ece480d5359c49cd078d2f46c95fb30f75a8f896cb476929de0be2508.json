@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22894",
+  "ingested_at": "2026-03-22T07:45:19.510360+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure Collaboration Suite contains a buffer overflow vulnerabilities that allows a remote authenticated users to execute code as the root user via maliciously crafted meeting room.",
+  "severity": "CRITICAL",
+  "sha256_hash": "166ee81ece480d5359c49cd078d2f46c95fb30f75a8f896cb476929de0be2508",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

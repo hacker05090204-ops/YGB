@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30883",
+  "ingested_at": "2026-03-22T07:45:17.993246+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, macOS, watchOS, and tvOS contain a memory corruption vulnerability that could allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bb5b51f94e2d2a4e5d1a433d082aa1a53179c71a31e2f036bfa19a2438610242",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

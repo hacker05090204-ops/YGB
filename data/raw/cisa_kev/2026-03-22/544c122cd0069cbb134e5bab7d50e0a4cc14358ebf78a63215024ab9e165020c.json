@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-55591",
+  "ingested_at": "2026-03-22T07:45:16.642128+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS and FortiProxy Fortinet FortiOS and FortiProxy contain an authentication bypass vulnerability that may allow an unauthenticated, remote attacker to gain super-admin privileges via crafted requests to Node.js websocket module.",
+  "severity": "CRITICAL",
+  "sha256_hash": "544c122cd0069cbb134e5bab7d50e0a4cc14358ebf78a63215024ab9e165020c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

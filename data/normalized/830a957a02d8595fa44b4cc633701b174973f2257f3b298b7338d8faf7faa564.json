@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Roundcube Webmail Roundcube Webmail contains a cross-site scripting (XSS) vulnerability that allows a remote attacker to manipulate data via a malicious XML attachment.",
+  "token_count": 23
+}

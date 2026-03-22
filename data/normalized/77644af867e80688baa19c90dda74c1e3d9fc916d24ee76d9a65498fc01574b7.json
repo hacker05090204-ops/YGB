@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "QNAP VioStor NVR QNAP VioStar NVR contains an OS command injection vulnerability that allows authenticated users to execute commands via a network.",
+  "token_count": 22
+}

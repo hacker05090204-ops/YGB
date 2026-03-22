@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-50224",
+  "ingested_at": "2026-03-22T07:45:16.184153+00:00",
+  "lang": "en",
+  "raw_text": "TP-Link TL-WR841N TP-Link TL-WR841N contains an authentication bypass by spoofing vulnerability within the httpd service, which listens on TCP port 80 by default, leading to the disclose of stored credentials. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "382705457ffb808d8d3c13efa68b3c3cdbeb1dee62a10c45be0f9d6aed83e03d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

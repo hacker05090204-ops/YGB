@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security issue was discovered in the Feast Feature Server's `/read-document` endpoint that allows an unauthenticated remote attacker to read any file accessible to the server process. By sending a specially crafted HTTP POST request, an attacker can bypass intended access restrictions to potentially retrieve sensitive system files, application configurations, and credentials.",
+  "token_count": 52
+}

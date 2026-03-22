@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-71264",
+  "ingested_at": "2026-03-22T07:54:46.359892+00:00",
+  "lang": "en",
+  "raw_text": "Mumble before 1.6.870 is prone to an out-of-bounds array access, which may result in denial of service (client crash).",
+  "severity": "LOW",
+  "sha256_hash": "7c1202382c7279e9febb0a7d063fc20a60443bb08e53ef8e3ebc2057fb66d48a",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-71264"
+}

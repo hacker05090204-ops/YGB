@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-20753",
+  "ingested_at": "2026-03-22T07:45:18.117010+00:00",
+  "lang": "en",
+  "raw_text": "Kaseya Virtual System/Server Administrator (VSA) Kaseya VSA RMM allows unprivileged remote attackers to execute PowerShell payloads on all managed devices.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a60b20287a57f4491be70f0a867880e9b6679413716b208f9f30c3953039ed87",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

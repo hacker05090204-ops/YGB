@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2290",
+  "ingested_at": "2026-03-22T07:54:49.334456+00:00",
+  "lang": "en",
+  "raw_text": "The Post Affiliate Pro plugin for WordPress is vulnerable to Server-Side Request Forgery in all versions up to, and including, 1.28.0. This makes it possible for authenticated attackers, with Administrator-level access, to make web requests to initiate arbitrary outbound requests from the application and read the returned response content. Successful exploitation was confirmed by receiving and observing response data from an external Collaborator endpoint.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ec1327102cbb9115f5da7fbc593b8fb885fc3f05c3a9f70fc7bd67d3ec77f982",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2290"
+}

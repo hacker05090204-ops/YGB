@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3546",
+  "ingested_at": "2026-03-22T07:54:49.401768+00:00",
+  "lang": "en",
+  "raw_text": "The e-shot form builder plugin for WordPress is vulnerable to Sensitive Information Exposure in all versions up to, and including, 1.0.2. The eshot_form_builder_get_account_data() function is registered as a wp_ajax_ AJAX handler accessible to all authenticated users. The function lacks any capability check (e.g., current_user_can('manage_options')) and does not verify a nonce. It directly queries the database for the e-shot API token stored in the eshotformbuilder_control table and returns it along with all subaccount data as a JSON response. This makes it possible for authenticated attackers, with Subscriber-level access and above, to extract the e-shot API token and subaccount information, which could then be used to access the victim's e-shot platform account.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a6d84221df53325e52e94561fb441891885d7ee9b6d45853c6ab3bb707f7241e",
+  "source": "nvd",
+  "tags": [
+    "CWE-202"
+  ],
+  "token_count": 110,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3546"
+}

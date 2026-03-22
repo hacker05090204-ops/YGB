@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-0040",
+  "ingested_at": "2026-03-22T07:45:18.231506+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows The kernel in Microsoft Windows allows local users to gain privileges via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d91fe62b11bc96787cfc49668ee5828eaddb5c7b8712f086a8be8bc6f680f0c1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

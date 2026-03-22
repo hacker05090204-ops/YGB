@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Inappropriate implementation in WebAudio in Google Chrome prior to 145.0.7632.159 allowed a remote attacker to perform out of bounds memory access via a crafted HTML page. (Chromium security severity: High)",
+  "token_count": 30
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-20359",
+  "ingested_at": "2026-03-22T07:45:16.992697+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) contain a privilege escalation vulnerability that can allow local privilege escalation from Administrator to root.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff3939880453f81160e19d7dd5e8c0aaaec3f74dabfe463f2a3a0b53a1b9a354",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-2746",
+  "ingested_at": "2026-03-22T07:45:16.090591+00:00",
+  "lang": "en",
+  "raw_text": "Kentico Xperience CMS Kentico Xperience CMS contains an authentication bypass using an alternate path or channel vulnerability that could allow an attacker to control administrative objects.",
+  "severity": "CRITICAL",
+  "sha256_hash": "300b8cfd27e38fff06d546a2cc0b6d37bac22fd12e427f69a92d45dc908965cf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

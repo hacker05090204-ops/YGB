@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Kernel - 'win32k.sys' '.TTF' Font Processing Out-of-Bounds Reads/Writes with Malformed 'fpgm' table 'win32k!bGeneratePath' (Denial of Service)",
+  "token_count": 18
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0151",
+  "ingested_at": "2026-03-22T07:45:18.556647+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Software A vulnerability in the quality of service (QoS) subsystem of Cisco IOS Software and Cisco IOS XE Software could allow an unauthenticated, remote attacker to cause a denial of service (DoS) condition or execute arbitrary code with elevated privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a7eaa48416aa270277b10cdc0e43b7a418239df6df88c356ddfa85924b0d6afa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

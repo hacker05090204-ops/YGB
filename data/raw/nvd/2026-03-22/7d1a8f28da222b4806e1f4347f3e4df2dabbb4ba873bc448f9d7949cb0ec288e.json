@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28563",
+  "ingested_at": "2026-03-22T07:54:47.043323+00:00",
+  "lang": "en",
+  "raw_text": "Apache Airflow versions 3.1.0 through 3.1.7 /ui/dependencies endpoint returns the full DAG dependency graph without filtering by authorized DAG IDs. This allows an authenticated user with only DAG Dependencies permission to enumerate DAGs they are not authorized to view. Users are recommended to upgrade to Apache Airflow 3.1.8 or later, which resolves this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7d1a8f28da222b4806e1f4347f3e4df2dabbb4ba873bc448f9d7949cb0ec288e",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28563"
+}

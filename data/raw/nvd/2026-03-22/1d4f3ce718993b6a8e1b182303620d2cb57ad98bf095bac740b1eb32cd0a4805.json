@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25575",
+  "ingested_at": "2026-03-22T07:54:49.548751+00:00",
+  "lang": "en",
+  "raw_text": "SimplePress CMS 1.0.7 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the 'p' and 's' parameters. Attackers can send GET requests with crafted SQL payloads to extract sensitive database information including usernames, database names, and version details.",
+  "severity": "HIGH",
+  "sha256_hash": "1d4f3ce718993b6a8e1b182303620d2cb57ad98bf095bac740b1eb32cd0a4805",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25575"
+}

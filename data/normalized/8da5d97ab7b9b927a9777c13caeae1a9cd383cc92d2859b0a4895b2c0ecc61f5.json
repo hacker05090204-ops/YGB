@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Task Scheduler A privilege escalation vulnerability exists in the way the Task Scheduler Service validates certain file operations.",
+  "token_count": 19
+}

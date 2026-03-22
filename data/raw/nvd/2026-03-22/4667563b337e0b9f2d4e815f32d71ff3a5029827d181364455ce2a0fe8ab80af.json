@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25565",
+  "ingested_at": "2026-03-22T07:54:49.522744+00:00",
+  "lang": "en",
+  "raw_text": "Magic Iso Maker 5.5 build 281 contains a buffer overflow vulnerability in the Serial Code registration field that allows local attackers to crash the application by submitting an oversized input. Attackers can generate a file containing 5000 bytes of data, paste it into the Serial Code field during registration, and trigger a denial of service condition that crashes the application.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4667563b337e0b9f2d4e815f32d71ff3a5029827d181364455ce2a0fe8ab80af",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25565"
+}

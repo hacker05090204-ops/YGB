@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22506",
+  "ingested_at": "2026-03-22T07:45:19.267336+00:00",
+  "lang": "en",
+  "raw_text": "Micro Focus Micro Focus Access Manager Micro Focus Access Manager contains an information leakage vulnerability resulting from a SAML service provider redirection issue when the Assertion Consumer Service URL is used.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6206ce0d3838e9294b9a8ea902ccc160e559012b9eb5e13e6f81553056de0a86",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

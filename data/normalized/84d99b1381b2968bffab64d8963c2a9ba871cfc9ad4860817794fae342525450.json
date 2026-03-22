@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Tradebox 5.4 contains an SQL injection vulnerability that allows authenticated attackers to manipulate database queries by injecting SQL code through the symbol parameter. Attackers can send POST requests to the monthly_deposit endpoint with malicious symbol values using boolean-based blind, time-based blind, error-based, or union-based SQL injection techniques to extract sensitive database information.",
+  "token_count": 52
+}

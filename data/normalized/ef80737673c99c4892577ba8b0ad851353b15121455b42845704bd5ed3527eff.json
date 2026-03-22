@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Kentico Xperience Kentico contains a failure to validate security headers. This deserialization can led to unauthenticated remote code execution.",
+  "token_count": 19
+}

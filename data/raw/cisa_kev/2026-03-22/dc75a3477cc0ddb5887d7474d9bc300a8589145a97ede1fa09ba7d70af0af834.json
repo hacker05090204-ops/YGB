@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-2136",
+  "ingested_at": "2026-03-22T07:45:17.431471+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Skia Google Chromium Skia contains an integer overflow vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page. This vulnerability affects Google Chrome and ChromeOS, Android, Flutter, and possibly other products.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dc75a3477cc0ddb5887d7474d9bc300a8589145a97ede1fa09ba7d70af0af834",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

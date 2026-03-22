@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28407",
+  "ingested_at": "2026-03-22T07:54:33.345771+00:00",
+  "lang": "en",
+  "raw_text": "malcontent is software for discovering supply-chain compromises through context, differential analysis, and YARA. Prior to version 1.21.0, malcontent would remove nested archives which failed to extract which could potentially leave malicious content. A better approach is to preserve these archives so that malcontent can attempt a best-effort scan of the archive bytes. Version 1.21.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6d94393987288b21b619b2a003e8f3833c8e3ecffaeded9417926f1ba7c16364",
+  "source": "nvd",
+  "tags": [
+    "CWE-703"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28407"
+}

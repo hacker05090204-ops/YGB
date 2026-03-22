@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft WININET.dll - 'CHttp\u00adHeader\u00adParser::Parse\u00adStatus\u00adLine' Out-of-Bounds Read (MS16-104/MS16-105)",
+  "token_count": 7
+}

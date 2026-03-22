@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2887",
+  "ingested_at": "2026-03-22T07:54:30.890352+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in aardappel lobster up to 2025.4. This impacts the function lobster::TypeName in the library dev/src/lobster/idents.h. Such manipulation leads to uncontrolled recursion. The attack can only be performed from a local environment. The exploit has been disclosed publicly and may be used. Upgrading to version 2026.1 will fix this issue. The name of the patch is 8ba49f98ccfc9734ef352146806433a41d9f9aa6. It is advisable to upgrade the affected component.",
+  "severity": "LOW",
+  "sha256_hash": "245bef2ccd7990f59d6996ddddde33f386b781c20c099f78dec82ccabd2ac253",
+  "source": "nvd",
+  "tags": [
+    "CWE-404",
+    "CWE-674",
+    "CWE-674"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2887"
+}

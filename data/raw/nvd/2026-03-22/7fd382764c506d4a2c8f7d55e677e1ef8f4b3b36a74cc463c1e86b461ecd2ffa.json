@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27129",
+  "ingested_at": "2026-03-22T07:54:31.421384+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). In versions 4.5.0-RC1 through 4.16.18 and 5.0.0-RC1 through 5.8.22, the SSRF validation in Craft CMS\u2019s GraphQL Asset mutation uses `gethostbyname()`, which only resolves IPv4 addresses. When a hostname has only AAAA (IPv6) records, the function returns the hostname string itself, causing the blocklist comparison to always fail and completely bypassing SSRF protection. This is a bypass of the security fix for CVE-2025-68437. Exploitation requires GraphQL schema permissions for editing assets in the ` ` volume and creating assets in the ` ` volume. These permissions may be granted to authenticated users with appropriate GraphQL schema access and/or Public Schema (if misconfigured with write permissions). Versions 4.16.19 and 5.8.23 patch the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7fd382764c506d4a2c8f7d55e677e1ef8f4b3b36a74cc463c1e86b461ecd2ffa",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 118,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27129"
+}

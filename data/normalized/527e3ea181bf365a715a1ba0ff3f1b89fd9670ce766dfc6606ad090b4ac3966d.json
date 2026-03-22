@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Raytha CMS allows an attacker to spoof `X-Forwarded-Host` or `Host` headers to attacker controlled domain. The attacker (who knows the victim's email address) can force the server to send an email with password reset link pointing to the domain from spoofed header. When victim clicks the link, browser sends request to the attacker\u2019s domain with the token in the path allowing the attacker to capture the token. This allows the attacker to reset victim's password and take over the victim's account. This issue was fixed in version 1.4.6.",
+  "token_count": 88
+}

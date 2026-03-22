@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3486",
+  "ingested_at": "2026-03-22T07:54:34.273516+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in itsourcecode College Management System 1.0. This vulnerability affects unknown code of the file /admin/student-fee.php. Such manipulation of the argument roll_no leads to sql injection. It is possible to launch the attack remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "091c9a87031ee74d37cf09a9cd687a360d7e1bc3673fd189695789530d6ce573",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3486"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27396",
+  "ingested_at": "2026-03-22T07:54:40.271354+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in e-plugins Directory Pro directory-pro allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Directory Pro: from n/a through < = 2.5.6.",
+  "severity": "HIGH",
+  "sha256_hash": "3198af9b2f837d402df3e4978ecef5f96fc222a2cebc5763166fd58d90cc895f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27396"
+}

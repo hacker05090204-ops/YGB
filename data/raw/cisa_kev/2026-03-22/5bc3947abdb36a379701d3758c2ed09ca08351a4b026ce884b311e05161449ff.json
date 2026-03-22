@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27103",
+  "ingested_at": "2026-03-22T07:45:18.967589+00:00",
+  "lang": "en",
+  "raw_text": "Accellion FTA Accellion FTA contains a server-side request forgery (SSRF) vulnerability exploited via a crafted POST request to wmProgressstat.html.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5bc3947abdb36a379701d3758c2ed09ca08351a4b026ce884b311e05161449ff",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

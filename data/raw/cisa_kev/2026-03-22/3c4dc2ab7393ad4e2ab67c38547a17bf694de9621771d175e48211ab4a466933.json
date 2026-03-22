@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0880",
+  "ingested_at": "2026-03-22T07:45:18.010216+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A local elevation of privilege vulnerability exists in how splwow64.exe handles certain calls. An attacker who successfully exploited the vulnerability could elevate privileges on an affected system from low-integrity to medium-integrity.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3c4dc2ab7393ad4e2ab67c38547a17bf694de9621771d175e48211ab4a466933",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

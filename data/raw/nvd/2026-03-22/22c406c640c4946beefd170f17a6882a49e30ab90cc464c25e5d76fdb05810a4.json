@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32100",
+  "ingested_at": "2026-03-22T07:54:44.424746+00:00",
+  "lang": "en",
+  "raw_text": "Shopware is an open commerce platform. /api/_info/config route exposes information about active security fixes. This vulnerability is fixed in 2.0.16, 3.0.12, and 4.0.7.",
+  "severity": "MEDIUM",
+  "sha256_hash": "22c406c640c4946beefd170f17a6882a49e30ab90cc464c25e5d76fdb05810a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32100"
+}

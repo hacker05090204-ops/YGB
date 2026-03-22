@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0502",
+  "ingested_at": "2026-03-22T07:45:16.814765+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains a double free vulnerability that allows a remote attacker to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8b110d2212e9d6c60abd15cab038a6666c64147372c3fea297878707b6151df4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33289",
+  "ingested_at": "2026-03-22T07:54:48.396273+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, an LDAP Injection vulnerability exists in the SuiteCRM authentication flow. The application fails to properly sanitize user-supplied input before embedding it into the LDAP search filter. By injecting LDAP control characters, an unauthenticated attacker can manipulate the query logic, which can lead to authentication bypass or information disclosure. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "ba7cc5c2114c58889a053f277e868985d8be44fb3cedba7fbb011fca49aaacbc",
+  "source": "nvd",
+  "tags": [
+    "CWE-90"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33289"
+}

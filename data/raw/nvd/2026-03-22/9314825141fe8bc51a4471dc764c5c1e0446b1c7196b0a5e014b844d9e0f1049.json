@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70039",
+  "ingested_at": "2026-03-22T07:54:42.341820+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-78: Improper Neutralization of Special Elements used in an OS Command was discovered in linagora Twake v2023.Q1.1223.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9314825141fe8bc51a4471dc764c5c1e0446b1c7196b0a5e014b844d9e0f1049",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70039"
+}

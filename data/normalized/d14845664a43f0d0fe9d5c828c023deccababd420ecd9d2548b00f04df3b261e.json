@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The All-in-One Microsoft 365 & Entra ID / Azure AD SSO Login plugin for WordPress is vulnerable to authentication bypass in all versions up to, and including, 2.2.5. This makes it possible for unauthenticated attackers to bypass authentication and log in as other users, including administrators.",
+  "token_count": 46
+}

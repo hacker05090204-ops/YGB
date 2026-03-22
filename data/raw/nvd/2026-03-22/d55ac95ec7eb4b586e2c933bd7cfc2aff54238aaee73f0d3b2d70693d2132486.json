@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2603",
+  "ingested_at": "2026-03-22T07:54:47.317157+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in Keycloak. A remote attacker could bypass security controls by sending a valid SAML response from an external Identity Provider (IdP) to the Keycloak SAML endpoint for IdP-initiated broker logins. This allows the attacker to complete broker logins even when the SAML Identity Provider is disabled, leading to unauthorized authentication.",
+  "severity": "HIGH",
+  "sha256_hash": "d55ac95ec7eb4b586e2c933bd7cfc2aff54238aaee73f0d3b2d70693d2132486",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2603"
+}

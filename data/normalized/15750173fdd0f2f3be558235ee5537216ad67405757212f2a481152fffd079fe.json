@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains a use-after-free vulnerability which can allow for remote code execution.",
+  "token_count": 15
+}

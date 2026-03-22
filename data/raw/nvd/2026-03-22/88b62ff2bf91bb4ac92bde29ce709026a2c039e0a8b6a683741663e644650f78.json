@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29061",
+  "ingested_at": "2026-03-22T07:54:41.308814+00:00",
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to version 2.2.3, a privilege escalation vulnerability in the user rank demotion logic allows a demoted user's existing API keys to retain ApiPermManageFileRequests and ApiPermManageLogs permissions, enabling continued access to upload-request management and log viewing endpoints after the user has been stripped of all privileges. This issue has been patched in version 2.2.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "88b62ff2bf91bb4ac92bde29ce709026a2c039e0a8b6a683741663e644650f78",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29061"
+}

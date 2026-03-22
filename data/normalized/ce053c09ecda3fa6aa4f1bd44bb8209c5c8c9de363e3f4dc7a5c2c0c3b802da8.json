@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An authenticated arbitrary file upload vulnerability in Cohesity TranZman Migration Appliance Release 4.0 Build 14614 allows attackers with Administrator privileges to execute arbitrary code via uploading a crafted patch file.",
+  "token_count": 30
+}

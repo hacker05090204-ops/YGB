@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22177",
+  "ingested_at": "2026-03-22T07:54:47.279715+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.21 fail to filter dangerous process-control environment variables from config env.vars, allowing startup-time code execution. Attackers can inject variables like NODE_OPTIONS or LD_* through configuration to execute arbitrary code in the OpenClaw gateway service runtime context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ef63d65f7a98df499b2b02b65e80ac1ae4a435f1750b873476f10504c0e7b377",
+  "source": "nvd",
+  "tags": [
+    "CWE-15"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22177"
+}

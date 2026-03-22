@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3644",
+  "ingested_at": "2026-03-22T07:54:46.908665+00:00",
+  "lang": "en",
+  "raw_text": "The fix for CVE-2026-0672, which rejected control characters in http.cookies.Morsel, was incomplete. The Morsel.update(), |= operator, and unpickling paths were not patched, allowing control characters to bypass input validation. Additionally, BaseCookie.js_output() lacked the output validation applied to BaseCookie.output().",
+  "severity": "UNKNOWN",
+  "sha256_hash": "55d956890b20b1e342c743853a9597ae7bac13add799a01e77ce620a72938043",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-116"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3644"
+}

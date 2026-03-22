@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25582",
+  "ingested_at": "2026-03-22T07:54:49.564566+00:00",
+  "lang": "en",
+  "raw_text": "i-doit CMDB 1.12 contains an arbitrary file download vulnerability that allows authenticated attackers to download sensitive files by manipulating the file parameter in index.php. Attackers can send GET requests to index.php with file_manager=image and supply arbitrary file paths like src/config.inc.php to retrieve configuration files and sensitive system data.",
+  "severity": "MEDIUM",
+  "sha256_hash": "82edcc86249cad1c662174fbed9958b6dcc70873627f85b928098a3fbf916149",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25582"
+}

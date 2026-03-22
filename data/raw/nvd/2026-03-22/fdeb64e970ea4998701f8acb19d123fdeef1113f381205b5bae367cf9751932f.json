@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33140",
+  "ingested_at": "2026-03-22T07:54:48.959936+00:00",
+  "lang": "en",
+  "raw_text": "PySpector is a static analysis security testing (SAST) Framework engineered for modern Python development workflows. PySpector versions 0.1.6 and prior are affected by a stored Cross-Site Scripting (XSS) vulnerability in the HTML report generator. When PySpector scans a Python file containing JavaScript payloads (i.e. inside a string passed to eval() ), the flagged code snippet is interpolated into the HTML report without sanitization. Opening the generated report in a browser causes the embedded JavaScript to execute in the browser's local file context. This issue has been patched in version 0.1.7.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "fdeb64e970ea4998701f8acb19d123fdeef1113f381205b5bae367cf9751932f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33140"
+}

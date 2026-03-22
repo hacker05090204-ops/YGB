@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.28, parameter from SOAP request is evaluated without filtering which leads to Remote Code Execution. This issue has been patched in version 1.11.28.",
+  "token_count": 32
+}

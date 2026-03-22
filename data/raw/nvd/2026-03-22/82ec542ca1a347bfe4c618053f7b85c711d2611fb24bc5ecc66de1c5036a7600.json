@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70227",
+  "ingested_at": "2026-03-22T07:54:43.045331+00:00",
+  "lang": "en",
+  "raw_text": "Stack buffer overflow vulnerability in D-Link DIR-513 v1.10 via the nextPage parameter to goform/formLanguageChange.",
+  "severity": "HIGH",
+  "sha256_hash": "82ec542ca1a347bfe4c618053f7b85c711d2611fb24bc5ecc66de1c5036a7600",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70227"
+}

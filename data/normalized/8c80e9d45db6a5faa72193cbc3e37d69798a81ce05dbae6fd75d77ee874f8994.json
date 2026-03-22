@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "EyesOfNetwork EyesOfNetwork EyesOfNetwork contains a use of hard-coded credentials vulnerability, as it uses the same API key by default. Exploitation allows an attacker to calculate or guess the admin access token.",
+  "token_count": 31
+}

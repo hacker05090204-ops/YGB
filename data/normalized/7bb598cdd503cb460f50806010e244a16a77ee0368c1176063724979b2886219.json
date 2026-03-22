@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Veritas Backup Exec Agent Veritas Backup Exec (BE) Agent contains a command execution vulnerability that could allow an attacker to use a data management protocol command to execute a command on the BE Agent machine.",
+  "token_count": 35
+}

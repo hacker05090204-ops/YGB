@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4170",
+  "ingested_at": "2026-03-22T07:54:46.657435+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Topsec TopACM 3.0. Affected by this vulnerability is an unknown functionality of the file /view/systemConfig/management/nmc_sync.php of the component HTTP Request Handler. Executing a manipulation of the argument template_path can lead to os command injection. The attack can be executed remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "CRITICAL",
+  "sha256_hash": "981fb9e7f350d16d1ad25a8f3417c8446480c23b1d510813663d48b2a6b3bf68",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4170"
+}

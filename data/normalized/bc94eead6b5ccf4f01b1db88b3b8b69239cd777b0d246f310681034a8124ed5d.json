@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Statamic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.14 and 6.7.0, low-privileged Control Panel users could create taxonomy terms by submitting requests to the field action processing endpoint with attacker-controlled field definitions. This bypasses the authorization checks enforced on the standard taxonomy term creation endpoint. This has been fixed in 5.73.14 and 6.7.0.",
+  "token_count": 59
+}

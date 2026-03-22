@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27104",
+  "ingested_at": "2026-03-22T07:45:18.956473+00:00",
+  "lang": "en",
+  "raw_text": "Accellion FTA Accellion FTA contains an OS command injection vulnerability exploited via a crafted POST request to various admin endpoints.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9f8fc777e36ed9cd8c708bd125937dd6f8f001274c69d04ff21f4fa7527ab885",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

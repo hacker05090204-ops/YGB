@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8453",
+  "ingested_at": "2026-03-22T07:45:18.818177+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Microsoft Windows Win32k contains a vulnerability that allows an attacker to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ebbcfed73b0b7ccb74d4fdaca8b2701f7089577a5ba7af4b2109e025a4354db8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

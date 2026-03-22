@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32017",
+  "ingested_at": "2026-03-22T07:54:48.193912+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 contain an allowlist bypass vulnerability in the exec safeBins policy that allows attackers to write arbitrary files using short-option payloads. Attackers can bypass argument validation by attaching short options like -o to whitelisted binaries, enabling unauthorized file-write operations that should be denied by safeBins checks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "35046c821256d15568721db1723ec2dcdbbea3a15616d69817b713459fb2c330",
+  "source": "nvd",
+  "tags": [
+    "CWE-184"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32017"
+}

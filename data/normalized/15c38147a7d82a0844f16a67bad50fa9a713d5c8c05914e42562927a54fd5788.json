@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Wi-Fi router is vulnerable to de-authentication attacks due to the absence of management frame protection, allowing forged deauthentication and disassociation frames to be broadcast without authentication or encryption. An attacker can use this to cause unauthorized disruptions and create a denial-of-service condition.",
+  "token_count": 43
+}

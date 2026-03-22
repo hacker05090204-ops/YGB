@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69298",
+  "ingested_at": "2026-03-22T07:54:30.188235+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in GhostPool Gauge gauge allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Gauge: from n/a through < = 6.56.4.",
+  "severity": "HIGH",
+  "sha256_hash": "01cd2acbb33664e1fd79ca46d94495c234a75d25089265f1bb66b7441b4847f8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69298"
+}

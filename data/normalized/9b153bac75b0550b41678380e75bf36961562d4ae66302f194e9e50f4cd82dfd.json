@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Tenda AC7, AC9, and AC10 Routers Tenda AC7, AC9, and AC10 devices contain a command injection vulnerability due to the \"formsetUsbUnload\" function executes a dosystemCmd function with untrusted input. Successful exploitation allows an attacker to execute OS commands via a crafted goform/setUsbUnload request.",
+  "token_count": 43
+}

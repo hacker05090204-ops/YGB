@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3315",
+  "ingested_at": "2026-03-22T07:54:42.954236+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect Default Permissions, : Execution with Unnecessary Privileges, : Incorrect Permission Assignment for Critical Resource vulnerability in ASSA ABLOY Visionline on Windows allows Configuration/Environment Manipulation.This issue affects Visionline: from 1.0 before 1.33.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "34578964b5a445c0c2d5e6ee5ac672b7b949d5806887d51daca989a2950e34d4",
+  "source": "nvd",
+  "tags": [
+    "CWE-250",
+    "CWE-276",
+    "CWE-732"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3315"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32749",
+  "ingested_at": "2026-03-22T07:54:48.099178+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. In versions 3.6.0 and below, POST /api/import/importSY and POST /api/import/importZipMd write uploaded archives to a path derived from the multipart filename field without sanitization, allowing an admin to write files to arbitrary locations outside the temp directory - including system paths that enable RCE. This can lead to aata destruction by overwriting workspace or application files, and for Docker containers running as root (common default), this grants full container compromise. This issue has been fixed in version 3.6.1.",
+  "severity": "HIGH",
+  "sha256_hash": "5e52476d29724c992abc64e3ef2aa57398c005405d6ceac4e4119cec181bf2b2",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-73"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32749"
+}

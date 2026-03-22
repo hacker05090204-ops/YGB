@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The administrative credentials can be extracted through application API responses, mobile application reverse engineering, and device firmware reverse engineering. The exposure may result in an attacker gaining full administrative access to the Gardyn IoT Hub exposing connected devices to malicious control.",
+  "token_count": 41
+}

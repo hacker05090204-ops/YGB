@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-24993",
+  "ingested_at": "2026-03-22T07:45:16.514902+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows New Technology File System (NTFS) contains a heap-based buffer overflow vulnerability that allows an unauthorized attacker to execute code locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "87ae634734135b8c8075ab0f1a00c6e03ea00a5c840423ca0b81f3b8ea801fff",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

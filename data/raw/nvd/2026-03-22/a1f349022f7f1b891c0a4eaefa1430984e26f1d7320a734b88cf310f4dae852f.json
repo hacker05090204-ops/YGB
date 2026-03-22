@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-55988",
+  "ingested_at": "2026-03-22T07:54:48.975972+00:00",
+  "lang": "en",
+  "raw_text": "An issue in the component /Controllers/RestController.php of DreamFactory Core v1.0.3 allows attackers to execute a directory traversal via an unsanitized URI path.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a1f349022f7f1b891c0a4eaefa1430984e26f1d7320a734b88cf310f4dae852f",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-55988"
+}

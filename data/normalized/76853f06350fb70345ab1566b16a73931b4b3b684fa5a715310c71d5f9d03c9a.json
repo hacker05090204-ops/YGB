@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Predictable bucket naming in Vertex AI Experiments in Google Cloud Vertex AI from version 1.21.0 up to (but not including) 1.133.0 on Google Cloud Platform allows an unauthenticated remote attacker to achieve cross-tenant remote code execution, model theft, and poisoning via pre-creating predictably named Cloud Storage buckets (Bucket Squatting). This vulnerability was patched and no customer action is needed.",
+  "token_count": 59
+}

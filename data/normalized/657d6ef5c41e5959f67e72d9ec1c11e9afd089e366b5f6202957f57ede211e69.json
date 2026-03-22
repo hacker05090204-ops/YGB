@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SonicWall SonicOS SonicWall SonicOS contains an improper access control vulnerability that could lead to unauthorized resource access and, under certain conditions, may cause the firewall to crash.",
+  "token_count": 27
+}

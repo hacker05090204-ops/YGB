@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-5223",
+  "ingested_at": "2026-03-22T07:45:18.401669+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DSL-2760U A cross-site scripting (XSS) vulnerability exists in the D-Link DSL-2760U gateway, allowing remote authenticated users to inject arbitrary web script or HTML.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aa9b53ae773d3c60bc52b78cca5cb5c1379a1343b744d05e0c05202b35e1ce6e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

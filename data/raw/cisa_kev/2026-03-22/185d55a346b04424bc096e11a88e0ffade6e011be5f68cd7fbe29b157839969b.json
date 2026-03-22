@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30633",
+  "ingested_at": "2026-03-22T07:45:19.205266+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Indexed DB API Google Chromium Indexed DB API contains a use-after-free vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "185d55a346b04424bc096e11a88e0ffade6e011be5f68cd7fbe29b157839969b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 57,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

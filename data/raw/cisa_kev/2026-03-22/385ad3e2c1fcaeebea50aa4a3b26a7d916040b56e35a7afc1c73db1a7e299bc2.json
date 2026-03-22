@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0074",
+  "ingested_at": "2026-03-22T07:45:17.925492+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Silverlight Microsoft Silverlight does not properly validate pointers during HTML object rendering, which allows remote attackers to execute code via a crafted Silverlight application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "385ad3e2c1fcaeebea50aa4a3b26a7d916040b56e35a7afc1c73db1a7e299bc2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

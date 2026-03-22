@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ZK Framework AuUploader ZK Framework AuUploader servlets contain an unspecified vulnerability that could allow an attacker to retrieve the content of a file located in the web context. The ZK Framework is an open-source Java framework. This vulnerability can impact multiple products, including but not limited to ConnectWise R1Soft Server Backup Manager.",
+  "token_count": 52
+}

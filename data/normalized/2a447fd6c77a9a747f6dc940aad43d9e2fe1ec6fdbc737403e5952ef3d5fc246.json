@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Edimax GS-5008PL firmware version 1.00.54 and prior contain a stored cross-site scripting vulnerability in the system_name_set.cgi script that allows attackers to inject arbitrary script code by manipulating the sysName parameter. Attackers can send a crafted POST request with malicious script payload that executes when management pages including system_data.js are viewed by administrators.",
+  "token_count": 52
+}

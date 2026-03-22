@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-5786",
+  "ingested_at": "2026-03-22T07:45:18.006212+00:00",
+  "lang": "en",
+  "raw_text": "Google Chrome Blink Google Chrome Blink contains a heap use-after-free vulnerability that allows an attacker to potentially perform out of bounds memory access via a crafted HTML page.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fb06eb3e748a251c26418fcfc087668f27753e1e99a919bac14a3dc17963eea6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

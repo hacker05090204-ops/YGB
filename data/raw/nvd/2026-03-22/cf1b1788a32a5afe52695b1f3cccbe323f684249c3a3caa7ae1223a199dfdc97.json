@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29784",
+  "ingested_at": "2026-03-22T07:54:41.877925+00:00",
+  "lang": "en",
+  "raw_text": "Ghost is a Node.js content management system. From version 5.101.6 to 6.19.2, incomplete CSRF protections around /session/verify made it possible to use OTCs in login sessions different from the requesting session. In some scenarios this might have made it easier for phishers to take over a Ghost site. This issue has been patched in version 6.19.3.",
+  "severity": "HIGH",
+  "sha256_hash": "cf1b1788a32a5afe52695b1f3cccbe323f684249c3a3caa7ae1223a199dfdc97",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29784"
+}

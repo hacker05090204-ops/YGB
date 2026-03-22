@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3579",
+  "ingested_at": "2026-03-22T07:54:48.043250+00:00",
+  "lang": "en",
+  "raw_text": "wolfSSL 5.8.4 on RISC-V RV32I architectures lacks a constant-time software implementation for 64-bit multiplication. The compiler-inserted __muldi3 subroutine executes in variable time based on operand values. This affects multiple SP math functions (sp_256_mul_9, sp_256_sqr_9, etc.), leading to a timing side-channel that may expose sensitive cryptographic data.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "272c7c500a102bb7e8651d2cba894c0d42de1709f73e773bacf80fe23d1ab2bb",
+  "source": "nvd",
+  "tags": [
+    "CWE-203"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3579"
+}

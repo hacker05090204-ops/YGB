@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22555",
+  "ingested_at": "2026-03-22T07:45:16.123594+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains a heap out-of-bounds write vulnerability that could allow an attacker to gain privileges or cause a DoS (via heap memory corruption) through user name space.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d16dc7b6aa9ac234b04b85aa8cf72433349ec2399ef1ebca99940f3167b8184f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

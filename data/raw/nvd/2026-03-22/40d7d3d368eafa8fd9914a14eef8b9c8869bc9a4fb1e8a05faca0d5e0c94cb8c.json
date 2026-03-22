@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27600",
+  "ingested_at": "2026-03-22T07:54:34.311475+00:00",
+  "lang": "en",
+  "raw_text": "HomeBox is a home inventory and organization system. Prior to 0.24.0-rc.1, the notifier functionality allows authenticated users to specify arbitrary URLs to which the application sends HTTP POST requests. No validation or restriction is applied to the supplied host, IP address, or port. Although the application does not return the response body from the target service, its UI behavior differs depending on the network state of the destination. This creates a behavioral side-channel that enables internal service enumeration. This vulnerability is fixed in 0.24.0-rc.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "40d7d3d368eafa8fd9914a14eef8b9c8869bc9a4fb1e8a05faca0d5e0c94cb8c",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27600"
+}

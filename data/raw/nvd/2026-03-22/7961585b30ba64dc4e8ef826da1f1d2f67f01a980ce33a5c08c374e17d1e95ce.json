@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28359",
+  "ingested_at": "2026-03-22T07:54:33.791243+00:00",
+  "lang": "en",
+  "raw_text": "NocoDB is software for building databases as spreadsheets. Prior to version 0.301.3, an authenticated user with Editor role can inject arbitrary HTML into Rich Text cells by bypassing the TipTap editor and sending raw HTML via the API. This issue has been patched in version 0.301.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7961585b30ba64dc4e8ef826da1f1d2f67f01a980ce33a5c08c374e17d1e95ce",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28359"
+}

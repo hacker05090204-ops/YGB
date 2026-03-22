@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-36563",
+  "ingested_at": "2026-03-22T07:45:17.200975+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft WordPad Microsoft WordPad contains an unspecified vulnerability that allows for information disclosure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "656657ffd3dd3908ecb2301f4716c888366f4bfb97e33ea83164e05358e8a10b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 13,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

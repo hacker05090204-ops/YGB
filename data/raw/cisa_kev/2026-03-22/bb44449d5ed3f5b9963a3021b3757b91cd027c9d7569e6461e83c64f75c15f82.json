@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-38950",
+  "ingested_at": "2026-03-22T07:45:16.391919+00:00",
+  "lang": "en",
+  "raw_text": "ZKTeco BioTime ZKTeco BioTime contains a path traversal vulnerability in the iclock API that allows an unauthenticated attacker to read arbitrary files via supplying a crafted payload.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bb44449d5ed3f5b9963a3021b3757b91cd027c9d7569e6461e83c64f75c15f82",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

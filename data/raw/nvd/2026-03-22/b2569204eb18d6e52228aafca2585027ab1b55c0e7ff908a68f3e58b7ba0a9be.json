@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48577",
+  "ingested_at": "2026-03-22T07:54:33.844099+00:00",
+  "lang": "en",
+  "raw_text": "In multiple functions of KeyguardViewMediator.java, there is a possible lockscreen bypass due to a race condition. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "b2569204eb18d6e52228aafca2585027ab1b55c0e7ff908a68f3e58b7ba0a9be",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48577"
+}

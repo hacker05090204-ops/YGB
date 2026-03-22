@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3768",
+  "ingested_at": "2026-03-22T07:54:42.115794+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tenda F453 1.0.0.3. Affected by this vulnerability is the function formWrlExtraSet of the file /goform/WrlExtraSet. The manipulation of the argument GO leads to stack-based buffer overflow. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "e5b40d546c77506d7d63bd10d83f0015a3d62b15467c7e760f9669e7b253ba36",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3768"
+}

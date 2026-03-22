@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-38180",
+  "ingested_at": "2026-03-22T07:45:17.286564+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft .NET Core and Visual Studio Microsoft .NET Core and Visual Studio contain an unspecified vulnerability that allows for denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "35960619e5a13c8111b1fcd5d5507d20bc97ee1d2f35b643190a13b83067b72e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

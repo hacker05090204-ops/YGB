@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23667",
+  "ingested_at": "2026-03-22T07:54:42.665429+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Broadcast DVR allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "0e45753efac38b521f9ee81a757aa16b2e0a7c03a907ca01e3ff63d9f470e394",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23667"
+}

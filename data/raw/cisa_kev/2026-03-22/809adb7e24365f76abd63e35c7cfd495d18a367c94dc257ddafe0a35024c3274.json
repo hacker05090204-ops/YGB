@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-38163",
+  "ingested_at": "2026-03-22T07:45:17.761551+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver contains a vulnerability that allows unrestricted file upload.",
+  "severity": "CRITICAL",
+  "sha256_hash": "809adb7e24365f76abd63e35c7cfd495d18a367c94dc257ddafe0a35024c3274",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 12,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

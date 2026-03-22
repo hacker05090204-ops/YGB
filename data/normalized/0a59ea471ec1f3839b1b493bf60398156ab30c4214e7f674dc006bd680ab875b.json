@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "F5 BIG-IP and BIG-IQ Centralized Management F5 BIG-IP and BIG-IQ Centralized Management contain a remote code execution vulnerability in the iControl REST interface that allows unauthenticated attackers with network access to execute system commands, create or delete files, and disable services.",
+  "token_count": 41
+}

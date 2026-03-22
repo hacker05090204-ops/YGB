@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability exists in EnOcean SmartServer IoT version 4.60.009 and prior, which would allow remote attackers, in the LON IP-852 management messages, to send specially crafted IP-852 messages resulting in a memory leak from the program's memory.",
+  "token_count": 37
+}

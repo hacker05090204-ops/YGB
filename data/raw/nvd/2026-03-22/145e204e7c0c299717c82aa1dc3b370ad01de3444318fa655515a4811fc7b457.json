@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27193",
+  "ingested_at": "2026-03-22T07:54:30.744881+00:00",
+  "lang": "en",
+  "raw_text": "Feathersjs is a framework for creating web APIs and real-time applications with TypeScript or JavaScript. In versions 5.0.39 and below, all HTTP request headers are stored in the session cookie, which is signed but not encrypted, exposing internal proxy/gateway headers to clients. The OAuth service stores the complete headers object in the session, then the session is persisted using cookie-session, which base64-encodes the data. While the cookie is signed to prevent tampering, the contents are readable by anyone by simply decoding the base64 value. Under specific deployment configurations (e.g., behind reverse proxies or API gateways), this can lead to exposure of sensitive internal infrastructure details such as API keys, service tokens, and internal IP addresses. This issue has been fixed in version 5.0.40.",
+  "severity": "MEDIUM",
+  "sha256_hash": "145e204e7c0c299717c82aa1dc3b370ad01de3444318fa655515a4811fc7b457",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 123,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27193"
+}

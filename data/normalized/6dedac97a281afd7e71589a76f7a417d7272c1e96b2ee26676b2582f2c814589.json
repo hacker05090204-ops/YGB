@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "RARLAB WinRAR RARLAB WinRAR contains a path traversal vulnerability allowing an attacker to execute code in the context of the current user.",
+  "token_count": 22
+}

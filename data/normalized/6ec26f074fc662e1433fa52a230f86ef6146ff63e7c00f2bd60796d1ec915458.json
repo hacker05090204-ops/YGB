@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Crocoblock JetEngine jet-engine allows Object Injection.This issue affects JetEngine: from n/a through < 3.8.4.1.",
+  "token_count": 20
+}

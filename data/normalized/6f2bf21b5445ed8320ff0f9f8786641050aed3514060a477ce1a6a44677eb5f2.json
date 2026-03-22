@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Progress Kemp LoadMaster Progress Kemp LoadMaster contains an OS command injection vulnerability that allows an unauthenticated, remote attacker to access the system through the LoadMaster management interface, enabling arbitrary system command execution.",
+  "token_count": 32
+}

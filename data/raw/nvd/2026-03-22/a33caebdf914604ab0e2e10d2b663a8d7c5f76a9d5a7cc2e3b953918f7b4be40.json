@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24485",
+  "ingested_at": "2026-03-22T07:54:31.275474+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, when a PCD file does not contain a valid Sync marker, the DecodeImage() function becomes trapped in an infinite loop while searching for the Sync marker, causing the program to become unresponsive and continuously consume CPU resources, ultimately leading to system resource exhaustion and denial of service. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "HIGH",
+  "sha256_hash": "a33caebdf914604ab0e2e10d2b663a8d7c5f76a9d5a7cc2e3b953918f7b4be40",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24485"
+}

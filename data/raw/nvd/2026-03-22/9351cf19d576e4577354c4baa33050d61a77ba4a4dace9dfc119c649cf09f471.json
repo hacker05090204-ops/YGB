@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3100",
+  "ingested_at": "2026-03-22T07:54:31.972266+00:00",
+  "lang": "en",
+  "raw_text": "The FTP Backup on the ADM will not properly strictly enforce TLS certificate verification while connecting to an FTP server using FTPES/FTPS. An improper validated TLS/SSL certificates allows a remote attacker can intercept network traffic to perform a Man-in-the-Middle (MitM) attack, which may intercept, modify, or obtain sensitive information such as authentication credentials and backup data. Affected products and versions include: from ADM 4.1.0 through ADM 4.3.3.ROF1 as well as from ADM 5.0.0 through ADM 5.1.2.RE51.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9351cf19d576e4577354c4baa33050d61a77ba4a4dace9dfc119c649cf09f471",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3100"
+}

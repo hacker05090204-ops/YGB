@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-67115",
+  "ingested_at": "2026-03-22T07:54:48.006776+00:00",
+  "lang": "en",
+  "raw_text": "A path traversal vulnerability in /ftl/web/setup.cgi in Small Cell Sercomm SCE4255W (FreedomFi Englewood) firmware before DG3934v3@2308041842 allows remote authenticated users to read arbitrary files from the filesystem via crafted values in the log_type parameter to /logsave.htm.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "408131c063fe8f2d3a6c851152a37f4807f583dfa23b9b49f7dcf1671a8b9b21",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67115"
+}

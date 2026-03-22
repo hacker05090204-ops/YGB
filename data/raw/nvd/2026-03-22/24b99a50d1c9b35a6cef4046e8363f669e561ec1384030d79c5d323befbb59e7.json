@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27568",
+  "ingested_at": "2026-03-22T07:54:31.638142+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 21.0, AVideo allows Markdown in video comments and uses Parsedown (v1.7.4) without Safe Mode enabled. Markdown links are not sufficiently sanitized, allowing `javascript:` URIs to be rendered as clickable links. An authenticated low-privilege attacker can post a malicious comment that injects persistent JavaScript. When another user clicks the link, the attacker can perform actions such as session hijacking, privilege escalation (including admin takeover), and data exfiltration. Version 21.0 contains a fix. As a workaround, validate and block unsafe URI schemes (e.g., `javascript:`) before rendering Markdown, and enable Parsedown Safe Mode.",
+  "severity": "MEDIUM",
+  "sha256_hash": "24b99a50d1c9b35a6cef4046e8363f669e561ec1384030d79c5d323befbb59e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27568"
+}

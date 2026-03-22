@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3683",
+  "ingested_at": "2026-03-22T07:54:41.966019+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in bufanyun HotGo up to 2.0. This issue affects the function ImageTransferStorage of the file /server/internal/logic/common/upload.go of the component Endpoint. The manipulation results in server-side request forgery. The attack may be launched remotely. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b25e3928b3ea08b8d55598fcb68b36642c8ad3e4b278f01d3792799061447d9f",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3683"
+}

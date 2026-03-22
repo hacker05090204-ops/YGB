@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25955",
+  "ingested_at": "2026-03-22T07:54:32.317463+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, `xf_AppUpdateWindowFromSurface` reuses a cached `XImage` whose `data` pointer references a freed RDPGFX surface buffer, because `gdi_DeleteSurface` frees `surface->data` without invalidating the `appWindow->image` that aliases it. Version 3.23.0 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8867532242009b5d2474f239253636b84fdb4c6b5578545a456c7af10b82963f",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25955"
+}

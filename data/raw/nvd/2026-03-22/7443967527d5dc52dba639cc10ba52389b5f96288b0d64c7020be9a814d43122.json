@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3824",
+  "ingested_at": "2026-03-22T07:54:43.511829+00:00",
+  "lang": "en",
+  "raw_text": "IFTOP developed by WellChoose has an Open redirect vulnerability, allowing authenticated remote attackers to craft a URL that tricks users into visiting malicious website.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7443967527d5dc52dba639cc10ba52389b5f96288b0d64c7020be9a814d43122",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3824"
+}

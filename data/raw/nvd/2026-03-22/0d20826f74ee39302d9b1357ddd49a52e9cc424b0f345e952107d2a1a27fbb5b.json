@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24062",
+  "ingested_at": "2026-03-22T07:54:47.499500+00:00",
+  "lang": "en",
+  "raw_text": "The \"Privileged Helper\" component of the Arturia Software Center (MacOS) does not perform sufficient client code signature validation when a client connects. This leads to an attacker being able to connect to the helper and execute privileged actions leading to local privilege escalation.",
+  "severity": "HIGH",
+  "sha256_hash": "0d20826f74ee39302d9b1357ddd49a52e9cc424b0f345e952107d2a1a27fbb5b",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24062"
+}

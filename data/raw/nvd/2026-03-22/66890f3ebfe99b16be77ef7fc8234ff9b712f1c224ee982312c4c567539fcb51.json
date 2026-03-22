@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3671",
+  "ingested_at": "2026-03-22T07:54:41.948018+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Freedom Factory dGEN1 up to 20260221. Affected by this vulnerability is the function TokenBalanceContentProvider of the component org.ethereumphone.walletmanager.testing123. Executing a manipulation can lead to improper authorization. The attack requires local access. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "66890f3ebfe99b16be77ef7fc8234ff9b712f1c224ee982312c4c567539fcb51",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3671"
+}

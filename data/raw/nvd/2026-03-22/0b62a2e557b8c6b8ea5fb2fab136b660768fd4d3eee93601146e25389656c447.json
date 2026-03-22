@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33179",
+  "ingested_at": "2026-03-22T07:54:49.013487+00:00",
+  "lang": "en",
+  "raw_text": "libfuse is the reference implementation of the Linux FUSE. From version 3.18.0 to before version 3.18.2, a NULL pointer dereference and memory leak in fuse_uring_init_queue allows a local user to crash the FUSE daemon or cause resource exhaustion. When numa_alloc_local fails during io_uring queue entry setup, the code proceeds with NULL pointers. When fuse_uring_register_queue fails, NUMA allocations are leaked and the function incorrectly returns success. Only the io_uring transport is affected; the traditional /dev/fuse path is not affected. PoC confirmed with AddressSanitizer/LeakSanitizer. This issue has been patched in version 3.18.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0b62a2e557b8c6b8ea5fb2fab136b660768fd4d3eee93601146e25389656c447",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33179"
+}

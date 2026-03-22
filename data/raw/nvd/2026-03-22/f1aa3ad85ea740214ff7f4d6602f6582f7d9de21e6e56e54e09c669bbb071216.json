@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3585",
+  "ingested_at": "2026-03-22T07:54:42.547833+00:00",
+  "lang": "en",
+  "raw_text": "The The Events Calendar plugin for WordPress is vulnerable to Path Traversal in all versions up to, and including, 6.15.17 via the 'ajax_create_import' function. This makes it possible for authenticated attackers, with Author-level access and above, to read the contents of arbitrary files on the server, which can contain sensitive information.",
+  "severity": "HIGH",
+  "sha256_hash": "f1aa3ad85ea740214ff7f4d6602f6582f7d9de21e6e56e54e09c669bbb071216",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3585"
+}

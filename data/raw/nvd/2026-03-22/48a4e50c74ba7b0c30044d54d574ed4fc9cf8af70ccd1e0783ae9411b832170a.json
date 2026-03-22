@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27943",
+  "ingested_at": "2026-03-22T07:54:32.527096+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. In versions up to and including 8.0.0, the eye exam (eye_mag) view loads data by `form_id` (or equivalent) without verifying that the form belongs to the current user\u2019s patient/encounter context. An authenticated user can access or edit any patient\u2019s eye exam by supplying another form ID; in some flows the session\u2019s active patient may also be switched. A fix is available on the `main` branch of the OpenEMR GitHub repository.",
+  "severity": "MEDIUM",
+  "sha256_hash": "48a4e50c74ba7b0c30044d54d574ed4fc9cf8af70ccd1e0783ae9411b832170a",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27943"
+}

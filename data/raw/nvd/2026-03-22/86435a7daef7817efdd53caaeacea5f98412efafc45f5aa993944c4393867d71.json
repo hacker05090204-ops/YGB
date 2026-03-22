@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13942",
+  "ingested_at": "2026-03-22T07:54:31.387565+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability in the UPnP function of the Zyxel EX3510-B0 firmware versions through 5.17(ABUP.15.1)C0 could allow a remote attacker to execute operating system (OS) commands on an affected device by sending specially crafted UPnP SOAP requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "86435a7daef7817efdd53caaeacea5f98412efafc45f5aa993944c4393867d71",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13942"
+}

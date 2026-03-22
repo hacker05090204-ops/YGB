@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel DSL CPE Devices Multiple Zyxel DSL CPE devices contain a post-authentication command injection vulnerability in the CGI program that could allow an authenticated attacker to execute OS commands via a crafted HTTP request.",
+  "token_count": 34
+}

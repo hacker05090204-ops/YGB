@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A logic error in CRL distribution point validation in AWS-LC before 1.71.0 causes partitioned CRLs to be incorrectly rejected as out of scope, which allows a revoked certificate to bypass certificate revocation checks. To remediate this issue, users should upgrade to AWS-LC 1.71.0 or AWS-LC-FIPS-3.3.0.",
+  "token_count": 45
+}

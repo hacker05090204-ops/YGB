@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25452",
+  "ingested_at": "2026-03-22T07:54:30.988013+00:00",
+  "lang": "en",
+  "raw_text": "Dolibarr ERP/CRM 10.0.1 contains an SQL injection vulnerability in the elemid POST parameter of the viewcat.php endpoint that allows unauthenticated attackers to execute arbitrary SQL queries. Attackers can submit crafted POST requests with malicious SQL payloads in the elemid parameter to extract sensitive database information using error-based or time-based blind SQL injection techniques.",
+  "severity": "HIGH",
+  "sha256_hash": "456005543a101a82d927f9feb94d63c20f6dffd99813890b042a31330cbd8af1",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25452"
+}

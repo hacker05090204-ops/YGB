@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8589",
+  "ingested_at": "2026-03-22T07:45:18.031112+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k A privilege escalation vulnerability exists when Windows improperly handles calls to Win32k.sys. An attacker who successfully exploited this vulnerability could run remote code in the security context of the local system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "37242a49024ec0c850990e661ea14d5cb1222629ea6b84904d0a82e65914ea06",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

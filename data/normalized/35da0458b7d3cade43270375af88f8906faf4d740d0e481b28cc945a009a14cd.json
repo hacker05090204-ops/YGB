@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Arcadyan Buffalo Firmware Arcadyan Buffalo firmware contains a path traversal vulnerability that could allow unauthenticated, remote attackers to bypass authentication and access sensitive information. This vulnerability affects multiple routers across several different vendors.",
+  "token_count": 33
+}

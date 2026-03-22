@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8644",
+  "ingested_at": "2026-03-22T07:45:19.494510+00:00",
+  "lang": "en",
+  "raw_text": "PlaySMS PlaySMS PlaySMS contains a server-side template injection vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3b073b4b846a079d318d2a1bec12d1ef82c66a91efa5935d615c2ca3600de588",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

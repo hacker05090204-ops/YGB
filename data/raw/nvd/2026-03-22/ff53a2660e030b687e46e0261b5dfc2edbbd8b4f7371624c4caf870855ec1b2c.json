@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30239",
+  "ingested_at": "2026-03-22T07:54:43.727898+00:00",
+  "lang": "en",
+  "raw_text": "OpenProject is an open-source, web-based project management software. Prior to 17.2.0, when budgets are deleted, the work packages that were assigned to this budget need to be moved to a different budget. This action was performed before the permission check on the delete action was executed. This allowed all users in the application to delete work package budget assignments. This vulnerability is fixed in 17.2.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ff53a2660e030b687e46e0261b5dfc2edbbd8b4f7371624c4caf870855ec1b2c",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30239"
+}

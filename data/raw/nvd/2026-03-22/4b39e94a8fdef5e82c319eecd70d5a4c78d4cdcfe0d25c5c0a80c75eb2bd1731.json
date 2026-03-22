@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4534",
+  "ingested_at": "2026-03-22T07:54:49.609266+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Tenda FH451 1.0.0.9. This affects the function formWrlExtraSet of the file /goform/WrlExtraSet. This manipulation of the argument GO causes stack-based buffer overflow. The attack can be initiated remotely. The exploit has been published and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "4b39e94a8fdef5e82c319eecd70d5a4c78d4cdcfe0d25c5c0a80c75eb2bd1731",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4534"
+}

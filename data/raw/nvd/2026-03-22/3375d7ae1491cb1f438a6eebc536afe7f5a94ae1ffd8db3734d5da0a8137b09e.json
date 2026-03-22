@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1981",
+  "ingested_at": "2026-03-22T07:54:41.681191+00:00",
+  "lang": "en",
+  "raw_text": "The HUMN-1 AI Website Scanner & Human Certification by Winston AI plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the winston_disconnect() function in all versions up to, and including, 0.0.3. This makes it possible for authenticated attackers, with Subscriber-level access and above, to reset the plugin's API connection settings via the 'winston_disconnect' AJAX action.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3375d7ae1491cb1f438a6eebc536afe7f5a94ae1ffd8db3734d5da0a8137b09e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1981"
+}

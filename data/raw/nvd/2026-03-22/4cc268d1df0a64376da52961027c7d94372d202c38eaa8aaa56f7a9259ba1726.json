@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2468",
+  "ingested_at": "2026-03-22T07:54:49.350800+00:00",
+  "lang": "en",
+  "raw_text": "The Quentn WP plugin for WordPress is vulnerable to SQL Injection via the 'qntn_wp_access' cookie in all versions up to, and including, 1.2.12. This is due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query in the `get_user_access()` method. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "HIGH",
+  "sha256_hash": "4cc268d1df0a64376da52961027c7d94372d202c38eaa8aaa56f7a9259ba1726",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2468"
+}

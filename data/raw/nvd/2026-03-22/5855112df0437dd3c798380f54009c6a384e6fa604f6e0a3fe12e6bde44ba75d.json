@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-23671",
+  "ingested_at": "2026-03-22T07:54:42.670429+00:00",
+  "lang": "en",
+  "raw_text": "Concurrent execution using shared resource with improper synchronization ('race condition') in Windows Bluetooth RFCOM Protocol Driver allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "5855112df0437dd3c798380f54009c6a384e6fa604f6e0a3fe12e6bde44ba75d",
+  "source": "nvd",
+  "tags": [
+    "CWE-362",
+    "CWE-416"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23671"
+}

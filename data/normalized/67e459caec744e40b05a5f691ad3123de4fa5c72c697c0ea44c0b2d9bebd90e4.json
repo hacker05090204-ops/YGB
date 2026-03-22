@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Technologies Integrated Management Platform 7.17.0. Affected by this issue is some unknown functionality of the file /SetWebpagePic.jsp. The manipulation of the argument targetPath/Suffix leads to unrestricted upload. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 66
+}

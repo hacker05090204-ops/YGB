@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "macOS XNU - Missing Locking in checkdirs_callback() Enables Race with fchdir_common()",
+  "token_count": 11
+}

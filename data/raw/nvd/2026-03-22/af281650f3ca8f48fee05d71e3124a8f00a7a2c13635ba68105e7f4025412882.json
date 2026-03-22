@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32778",
+  "ingested_at": "2026-03-22T07:54:46.574275+00:00",
+  "lang": "en",
+  "raw_text": "libexpat before 2.7.5 allows a NULL pointer dereference in the function setContext on retry after an earlier ouf-of-memory condition.",
+  "severity": "LOW",
+  "sha256_hash": "af281650f3ca8f48fee05d71e3124a8f00a7a2c13635ba68105e7f4025412882",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32778"
+}

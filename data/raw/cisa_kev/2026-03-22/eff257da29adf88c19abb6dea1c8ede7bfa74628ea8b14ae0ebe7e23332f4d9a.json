@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-23752",
+  "ingested_at": "2026-03-22T07:45:17.091655+00:00",
+  "lang": "en",
+  "raw_text": "Joomla! Joomla! Joomla! contains an improper access control vulnerability that allows unauthorized access to webservice endpoints.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eff257da29adf88c19abb6dea1c8ede7bfa74628ea8b14ae0ebe7e23332f4d9a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

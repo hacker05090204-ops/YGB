@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2894",
+  "ingested_at": "2026-03-22T07:54:30.894532+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in funadmin up to 7.1.0-rc4. Affected by this vulnerability is the function getMember of the file app/frontend/view/login/forget.html. Such manipulation leads to information disclosure. The attack may be launched remotely. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a4eebd4a20310bddee1841ade7f46b1cb9d1cd3ef971333dfecbc44ea4188685",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-284",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2894"
+}

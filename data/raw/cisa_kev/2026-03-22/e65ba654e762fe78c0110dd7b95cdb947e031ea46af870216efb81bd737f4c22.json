@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27877",
+  "ingested_at": "2026-03-22T07:45:17.455028+00:00",
+  "lang": "en",
+  "raw_text": "Veritas Backup Exec Agent Veritas Backup Exec (BE) Agent contains an improper authentication vulnerability that could allow an attacker unauthorized access to the BE Agent via SHA authentication scheme.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e65ba654e762fe78c0110dd7b95cdb947e031ea46af870216efb81bd737f4c22",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

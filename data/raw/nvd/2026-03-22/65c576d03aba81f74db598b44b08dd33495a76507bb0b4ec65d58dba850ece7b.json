@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4358",
+  "ingested_at": "2026-03-22T07:54:47.178812+00:00",
+  "lang": "en",
+  "raw_text": "A specially crafted aggregation query with $lookup by an authenticated user with write privileges can cause a double-free or use-after-free memory issue in the slot-based execution (SBE) engine when an in-memory hash table is spilled to disk.",
+  "severity": "MEDIUM",
+  "sha256_hash": "65c576d03aba81f74db598b44b08dd33495a76507bb0b4ec65d58dba850ece7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-415"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4358"
+}

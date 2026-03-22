@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4238",
+  "ingested_at": "2026-03-22T07:54:46.797638+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in itsourcecode College Management System 1.0. This issue affects some unknown processing of the file /admin/courses.php. The manipulation of the argument course_code leads to sql injection. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ee3f9af959f20cb4c68aa67434b3689bff16f1dc5be0bf16df8a04aa1a939c69",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4238"
+}

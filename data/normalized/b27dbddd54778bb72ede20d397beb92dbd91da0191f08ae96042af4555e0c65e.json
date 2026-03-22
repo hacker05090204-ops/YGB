@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One and OfficeScan Trend Micro Apex One and OfficeScan server contain a vulnerable EXE file that could allow a remote attacker to write data to a path on affected installations and bypass root login.",
+  "token_count": 37
+}

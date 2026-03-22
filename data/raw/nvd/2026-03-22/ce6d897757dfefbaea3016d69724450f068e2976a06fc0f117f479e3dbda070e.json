@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-58405",
+  "ingested_at": "2026-03-22T07:54:33.570604+00:00",
+  "lang": "en",
+  "raw_text": "The CGM CLININET application does not implement any mechanisms that prevent clickjacking attacks, neither HTTP security headers nor HTML-based frame\u2010busting protections were detected. As a result, an attacker can embed the application inside a maliciously crafted IFRAME and trick users into performing unintended actions, including potentially bypassing CSRF/XSRF defenses.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ce6d897757dfefbaea3016d69724450f068e2976a06fc0f117f479e3dbda070e",
+  "source": "nvd",
+  "tags": [
+    "CWE-1021"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-58405"
+}

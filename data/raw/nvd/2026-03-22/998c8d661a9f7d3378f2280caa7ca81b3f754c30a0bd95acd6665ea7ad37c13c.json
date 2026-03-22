@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27631",
+  "ingested_at": "2026-03-22T07:54:33.981713+00:00",
+  "lang": "en",
+  "raw_text": "Exiv2 is a C++ library and a command-line utility to read, write, delete and modify Exif, IPTC, XMP and ICC image metadata. Prior to version 0.28.8, an uncaught exception was found in Exiv2. The vulnerability is in the preview component, which is only triggered when running Exiv2 with an extra command line argument, like -pp. Due to an integer overflow, the code attempts to create a huge std::vector, which causes Exiv2 to crash with an uncaught exception. This issue has been patched in version 0.28.8.",
+  "severity": "MEDIUM",
+  "sha256_hash": "998c8d661a9f7d3378f2280caa7ca81b3f754c30a0bd95acd6665ea7ad37c13c",
+  "source": "nvd",
+  "tags": [
+    "CWE-248"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27631"
+}

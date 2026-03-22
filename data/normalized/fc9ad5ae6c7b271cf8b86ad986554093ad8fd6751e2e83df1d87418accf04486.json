@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IntelBras Telefone IP TIP200 and 200 LITE contain an unauthenticated arbitrary file read vulnerability in the dumpConfigFile function accessible via the cgiServer.exx endpoint. Attackers can send GET requests to /cgi-bin/cgiServer.exx with the command parameter containing dumpConfigFile() to read sensitive files including /etc/shadow and configuration files without proper authorization.",
+  "token_count": 48
+}

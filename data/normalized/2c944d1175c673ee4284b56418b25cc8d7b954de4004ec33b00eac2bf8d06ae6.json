@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in itsourcecode Agri-Trading Online Shopping System 1.0. This impacts an unknown function of the file admin/productcontroller.php of the component HTTP POST Request Handler. Performing a manipulation of the argument Product results in sql injection. The attack may be initiated remotely. The exploit has been made public and could be used.",
+  "token_count": 54
+}

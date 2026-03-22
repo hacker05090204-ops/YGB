@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Name Directory plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'name_directory_name' parameter in all versions up to, and including, 1.32.1 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. The vulnerability was partially patched in versions 1.30.3 and 1.32.1.",
+  "token_count": 66
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-35250",
+  "ingested_at": "2026-03-22T07:45:16.675642+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Kernel-Mode Driver contains an untrusted pointer dereference vulnerability that allows a local attacker to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fc4029727376407899e5a9efa3fbb13db86f6c7a2f49806041703dc50da6af76",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

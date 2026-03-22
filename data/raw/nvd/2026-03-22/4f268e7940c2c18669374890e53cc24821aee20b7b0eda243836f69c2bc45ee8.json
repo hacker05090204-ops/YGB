@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32356",
+  "ingested_at": "2026-03-22T07:54:45.926188+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in robosoft Robo Gallery robo-gallery allows DOM-Based XSS.This issue affects Robo Gallery: from n/a through < = 5.1.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4f268e7940c2c18669374890e53cc24821aee20b7b0eda243836f69c2bc45ee8",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32356"
+}

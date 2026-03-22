@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "n authorization flaw in Foreman's GraphQL API allows low-privileged users to access metadata beyond their assigned permissions. Unlike the REST API, which correctly enforces access controls, the GraphQL endpoint does not apply proper filtering, leading to an authorization bypass.",
+  "token_count": 39
+}

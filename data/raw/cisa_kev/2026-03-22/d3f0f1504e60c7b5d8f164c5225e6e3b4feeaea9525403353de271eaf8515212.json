@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-7755",
+  "ingested_at": "2026-03-22T07:45:16.144096+00:00",
+  "lang": "en",
+  "raw_text": "Juniper ScreenOS Juniper ScreenOS contains an improper authentication vulnerability that could allow unauthorized remote administrative access to the device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d3f0f1504e60c7b5d8f164c5225e6e3b4feeaea9525403353de271eaf8515212",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

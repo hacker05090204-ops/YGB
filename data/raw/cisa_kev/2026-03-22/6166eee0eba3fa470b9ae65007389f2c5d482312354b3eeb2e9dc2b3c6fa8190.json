@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-22518",
+  "ingested_at": "2026-03-22T07:45:17.174259+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Data Center and Server Atlassian Confluence Data Center and Server contain an improper authorization vulnerability that can result in significant data loss when exploited by an unauthenticated attacker. There is no impact on confidentiality since the attacker cannot exfiltrate any data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6166eee0eba3fa470b9ae65007389f2c5d482312354b3eeb2e9dc2b3c6fa8190",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 43,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

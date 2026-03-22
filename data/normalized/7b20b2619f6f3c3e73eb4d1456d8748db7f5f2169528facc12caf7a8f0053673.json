@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. The resend-verification-code endpoint allows any authenticated user to trigger a verification code resend for any UserWhatsApp record by ID. Ownership is not validated (unlike the verify endpoint). This affects the UserWhatsAppAPI.ts endpoint and the UserWhatsAppService.ts service.",
+  "token_count": 46
+}

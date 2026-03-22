@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28068",
+  "ingested_at": "2026-03-22T07:54:40.544314+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Rhythmo rhythmo allows PHP Local File Inclusion.This issue affects Rhythmo: from n/a through < = 1.3.4.",
+  "severity": "HIGH",
+  "sha256_hash": "1714884c221513e010f959dd42f017375a273c57ccd80dc668b16e6a19aba768",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28068"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25159",
+  "ingested_at": "2026-03-22T07:54:43.797048+00:00",
+  "lang": "en",
+  "raw_text": "Epross AVCON6 systems management platform contains an object-graph navigation language (OGNL) injection vulnerability that allows unauthenticated attackers to execute arbitrary commands by injecting malicious OGNL expressions. Attackers can send crafted requests to the login.action endpoint with OGNL payloads in the redirect parameter to instantiate ProcessBuilder objects and execute system commands with root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ac14ce65932c9088c6150e3906728f111cc4e1d1fa788884b33e442bec203cf7",
+  "source": "nvd",
+  "tags": [
+    "CWE-1334"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25159"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26103",
+  "ingested_at": "2026-03-22T07:54:32.034751+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in the udisks storage management daemon that exposes a privileged D-Bus API for restoring LUKS encryption headers without proper authorization checks. The issue allows a local unprivileged user to instruct the root-owned udisks daemon to overwrite encryption metadata on block devices. This can permanently invalidate encryption keys and render encrypted volumes inaccessible. Successful exploitation results in a denial-of-service condition through irreversible data loss.",
+  "severity": "HIGH",
+  "sha256_hash": "ff5c11384e13af89a04d5ef025d53f5c4b63e08ffdf27e0a651a1010b632f1c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26103"
+}

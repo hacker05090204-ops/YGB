@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30845",
+  "ingested_at": "2026-03-22T07:54:41.604324+00:00",
+  "lang": "en",
+  "raw_text": "Wekan is an open source kanban tool built with Meteor. In versions 8.31.0 through 8.33, the board composite publication in Wekan publishes all integration data for a board without any field filtering, exposing sensitive fields including webhook URLs and authentication tokens to any subscriber. Since board publications are accessible to all board members regardless of their role (including read-only and comment-only users), and even to unauthenticated DDP clients for public boards, any user who can access a board can retrieve its webhook credentials. This token leak allows attackers to make unauthenticated requests to the exposed webhooks, potentially triggering unauthorized actions in connected external services. This issue has been fixed in version 8.34.",
+  "severity": "HIGH",
+  "sha256_hash": "e51e685e86f3376fa258e17071c54cddb03a1e3d5cc1b083a0e6334e64808f7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-862",
+    "CWE-862"
+  ],
+  "token_count": 112,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30845"
+}

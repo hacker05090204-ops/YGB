@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Tenda AC8 up to 16.03.50.11. This vulnerability affects the function doSystemCmd of the file /goform/SysToolChangePwd of the component HTTP Endpoint. This manipulation of the argument local_2c causes stack-based buffer overflow. The attack can be initiated remotely. The exploit has been made available to the public and could be used for attacks.",
+  "token_count": 57
+}

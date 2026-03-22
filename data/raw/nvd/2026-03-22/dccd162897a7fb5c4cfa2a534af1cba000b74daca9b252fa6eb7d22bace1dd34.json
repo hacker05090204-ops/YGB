@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3761",
+  "ingested_at": "2026-03-22T07:54:42.100793+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in SourceCodester Client Database Management System 1.0. This issue affects some unknown processing of the file /superadmin_user_delete.php of the component Endpoint. Executing a manipulation of the argument user_id can lead to improper authorization. The attack may be performed from remote. The exploit has been published and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "dccd162897a7fb5c4cfa2a534af1cba000b74daca9b252fa6eb7d22bace1dd34",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3761"
+}

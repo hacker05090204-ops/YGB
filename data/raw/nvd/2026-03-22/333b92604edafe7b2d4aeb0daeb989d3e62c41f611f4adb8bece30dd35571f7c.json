@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30789",
+  "ingested_at": "2026-03-22T07:54:40.814306+00:00",
+  "lang": "en",
+  "raw_text": "Authentication Bypass by Capture-replay, Use of Password Hash With Insufficient Computational Effort vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android (Client login, peer authentication modules) allows Reusing Session IDs (aka Session Replay). This vulnerability is associated with program files src/client.Rs and program routines hash_password(), login proof construction. This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "333b92604edafe7b2d4aeb0daeb989d3e62c41f611f4adb8bece30dd35571f7c",
+  "source": "nvd",
+  "tags": [
+    "CWE-294",
+    "CWE-916"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30789"
+}

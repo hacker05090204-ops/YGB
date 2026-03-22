@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an authenticated attacker to achieve remote code execution on the system by providing malicious input via the device hostname configuration which is later processed during system setup, resulting in remote code execution.",
+  "token_count": 46
+}

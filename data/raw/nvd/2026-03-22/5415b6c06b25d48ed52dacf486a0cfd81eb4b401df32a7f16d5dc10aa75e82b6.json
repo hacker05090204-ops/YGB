@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2363",
+  "ingested_at": "2026-03-22T07:54:34.376358+00:00",
+  "lang": "en",
+  "raw_text": "The WP-Members Membership Plugin plugin for WordPress is vulnerable to SQL Injection via the 'order_by' attribute of the [wpmem_user_membership_posts] shortcode in all versions up to, and including, 3.5.5.1. This is due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for authenticated attackers, with Contributor-level access and above, to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5415b6c06b25d48ed52dacf486a0cfd81eb4b401df32a7f16d5dc10aa75e82b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2363"
+}

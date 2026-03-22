@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8581",
+  "ingested_at": "2026-03-22T07:45:18.523810+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Exchange Server A privilege escalation vulnerability exists in Microsoft Exchange Server. An attacker who successfully exploited this vulnerability could attempt to impersonate any other user of the Exchange server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7ff3a6c74d8ebd4974fc45d62d62a0ddb170c03720d07f17a2a6c823e8fe5f9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69614",
+  "ingested_at": "2026-03-22T07:54:42.610306+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect Access Control via activation token reuse on the password-reset endpoint allowing unauthorized password resets and full account takeover. Affected Product: Deutsche Telekom AG Telekom Account Management Portal, versions before 2025-10-27, fixed 2025-10-31.",
+  "severity": "CRITICAL",
+  "sha256_hash": "28289f00258ff73451690504d13d95ce13993b749729b3b3f24db23881c01ce2",
+  "source": "nvd",
+  "tags": [
+    "CWE-640"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69614"
+}

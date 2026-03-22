@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4486",
+  "ingested_at": "2026-03-22T07:54:48.845268+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in D-Link DIR-513 1.10. This affects the function formEasySetPassword of the file /goform/formEasySetPassword of the component Web Service. The manipulation of the argument curTime results in stack-based buffer overflow. The attack may be performed from remote. The exploit has been made public and could be used. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "severity": "HIGH",
+  "sha256_hash": "fd456b448bbb47270ef9cf209fc1e2d348c24cb19e9dc88f4f5dd45423fffe4e",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4486"
+}

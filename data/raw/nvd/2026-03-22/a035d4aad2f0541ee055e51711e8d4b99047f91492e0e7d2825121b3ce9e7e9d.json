@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3854",
+  "ingested_at": "2026-03-22T07:54:42.968235+00:00",
+  "lang": "en",
+  "raw_text": "An improper neutralization of special elements vulnerability was identified in GitHub Enterprise Server that allowed an attacker with push access to a repository to achieve remote code execution on the instance. During a git push operation, user-supplied push option values were not properly sanitized before being included in internal service headers. Because the internal header format used a delimiter character that could also appear in user input, an attacker could inject additional metadata fields through crafted push option values. This vulnerability was reported via the GitHub Bug Bounty program and has been fixed in GitHub Enterprise Server versions 3.14.24, 3.15.19, 3.16.15, 3.17.12, 3.18.6 and 3.19.3.",
+  "severity": "HIGH",
+  "sha256_hash": "a035d4aad2f0541ee055e51711e8d4b99047f91492e0e7d2825121b3ce9e7e9d",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3854"
+}

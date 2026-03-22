@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21654",
+  "ingested_at": "2026-03-22T07:54:33.107841+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection') vulnerability in Johnson Controls Frick Controls Quantum HD allows OS Command Injection. Insufficient validation of input in certain parameters may permit unexpected actions, which could impact the security of the device before authentication occurs.This issue affects Frick Controls Quantum HD version 10.22 and prior.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4b3046a7973e978d68a185ac1f77adbadcb7c20d0246d6a84f5b95622bb45b7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21654"
+}

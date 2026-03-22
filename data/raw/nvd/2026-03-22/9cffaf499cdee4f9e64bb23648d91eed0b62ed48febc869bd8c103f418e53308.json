@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28717",
+  "ingested_at": "2026-03-22T07:54:41.181320+00:00",
+  "lang": "en",
+  "raw_text": "Local privilege escalation due to improper directory permissions. The following products are affected: Acronis Cyber Protect 17 (Windows) before build 41186.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9cffaf499cdee4f9e64bb23648d91eed0b62ed48febc869bd8c103f418e53308",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28717"
+}

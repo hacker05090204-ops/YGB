@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68834",
+  "ingested_at": "2026-03-22T07:54:30.133030+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Saiful Islam Sync Master Sheet \u2013 Product Sync with Google Sheet for WooCommerce product-sync-master-sheet allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Sync Master Sheet \u2013 Product Sync with Google Sheet for WooCommerce: from n/a through < = 1.1.3.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "5cbde574fd412a8a787aadc9114fd7f044c765ec7beb0cfab91b8cc0cc5f7852",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68834"
+}

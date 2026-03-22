@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 contains cross-site request forgery and persistent cross-site scripting vulnerabilities that allow attackers to perform administrative actions and inject malicious scripts. Attackers can craft malicious web pages that execute unauthorized actions when logged-in users visit them, or inject persistent scripts that execute in the application context.",
+  "token_count": 50
+}

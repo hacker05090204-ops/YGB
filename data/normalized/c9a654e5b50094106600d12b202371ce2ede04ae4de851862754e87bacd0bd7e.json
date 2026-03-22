@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM InfoSphere BigInsights Certain APIs within BigInsights can take invalid input that might allow attackers unauthorized access to read, write, modify, or delete data.",
+  "token_count": 24
+}

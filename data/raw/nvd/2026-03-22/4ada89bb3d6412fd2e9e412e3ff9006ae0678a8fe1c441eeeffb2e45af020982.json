@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30918",
+  "ingested_at": "2026-03-22T07:54:42.532579+00:00",
+  "lang": "en",
+  "raw_text": "facileManager is a modular suite of web apps built with the sysadmin in mind. Prior to 6.0.4 , a reflected XSS occurs when an application receives data from an untrusted source and uses it in its HTTP responses in a way that could lead to vulnerabilities. It is possible to inject malicious JavaScript code into a URL by adding a script in a parameter. This vulnerability was found in the fmDNS module. The parameter that is vulnerable to an XSS attack is log_search_query. This vulnerability is fixed in 6.0.4.",
+  "severity": "HIGH",
+  "sha256_hash": "4ada89bb3d6412fd2e9e412e3ff9006ae0678a8fe1c441eeeffb2e45af020982",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30918"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in CMS Made Simple up to 2.2.21. Impacted is an unknown function of the file admin/listusers.php of the component User Management Module. Performing a manipulation of the argument Message results in cross site scripting. The attack is possible to be carried out remotely. The exploit has been released to the public and may be used for attacks.",
+  "token_count": 63
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28542",
+  "ingested_at": "2026-03-22T07:54:40.752160+00:00",
+  "lang": "en",
+  "raw_text": "Permission bypass vulnerability in the system service framework. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "HIGH",
+  "sha256_hash": "f87be740ab63714f497c4cdd15f503ad313fecb031f6fcdf6051fe410169f859",
+  "source": "nvd",
+  "tags": [
+    "CWE-755",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28542"
+}

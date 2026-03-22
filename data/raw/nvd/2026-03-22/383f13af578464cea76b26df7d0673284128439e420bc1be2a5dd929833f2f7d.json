@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2805",
+  "ingested_at": "2026-03-22T07:54:31.609014+00:00",
+  "lang": "en",
+  "raw_text": "Invalid pointer in the DOM: Core & HTML component. This vulnerability affects Firefox < 148 and Thunderbird < 148.",
+  "severity": "CRITICAL",
+  "sha256_hash": "383f13af578464cea76b26df7d0673284128439e420bc1be2a5dd929833f2f7d",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-824"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2805"
+}

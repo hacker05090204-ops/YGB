@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Reader and Acrobat Adobe Reader and Acrobat on Windows allow attackers to bypass a sandbox protection mechanism, and consequently execute native code in a privileged context.",
+  "token_count": 27
+}

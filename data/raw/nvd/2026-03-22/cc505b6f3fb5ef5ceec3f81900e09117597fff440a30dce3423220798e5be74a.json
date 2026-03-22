@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2944",
+  "ingested_at": "2026-03-22T07:54:30.958240+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Tosei Online Store Management System \u30cd\u30c3\u30c8\u5e97\u8217\u7ba1\u7406\u30b7\u30b9\u30c6\u30e0 1.01. Affected is the function system of the file /cgi-bin/monitor.php of the component HTTP POST Request Handler. Performing a manipulation of the argument DevId results in os command injection. The attack may be initiated remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "cc505b6f3fb5ef5ceec3f81900e09117597fff440a30dce3423220798e5be74a",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2944"
+}

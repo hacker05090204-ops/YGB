@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4307",
+  "ingested_at": "2026-03-22T07:54:47.009836+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in frdel/agent0ai agent-zero 0.9.7-10. The impacted element is the function get_abs_path of the file python/helpers/files.py. The manipulation results in path traversal. The attack can be executed remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c59f3edd3d4b643e408e1ab9f2b4318eda03eb90fb814d20889d1dd776f1332f",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4307"
+}

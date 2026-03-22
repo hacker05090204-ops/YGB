@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25590",
+  "ingested_at": "2026-03-22T07:54:34.302472+00:00",
+  "lang": "en",
+  "raw_text": "The GLPI Inventory Plugin handles network discovery, inventory, software deployment, and data collection for GLPI agents. Prior to 1.6.6, there is a reflected XSS vulnerability in task jobs. This vulnerability is fixed in 1.6.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ffa36bc8fc1a5d9195bea11b0027206a662c1b974df972949dcb83211bf1f0c2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25590"
+}

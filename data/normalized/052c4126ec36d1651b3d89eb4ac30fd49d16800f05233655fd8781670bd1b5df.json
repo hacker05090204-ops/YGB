@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TIBCO JasperReports TIBCO JasperReports Library contains a directory-traversal vulnerability that may allow web server users to access contents of the host system.",
+  "token_count": 22
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24111",
+  "ingested_at": "2026-03-22T07:54:33.634797+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Attackers may exploit the vulnerability by specifying the value of `userInfo`. When `userInfo` is passed into the `addAuthUser` function and processed by `sscanf` without size validation, it could lead to buffer overflow.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a82a80adcd0a00fbc31941bafecffdc41f253069f024c8a8b889710e354b06f6",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-120"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24111"
+}

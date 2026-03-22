@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28785",
+  "ingested_at": "2026-03-22T07:54:41.299214+00:00",
+  "lang": "en",
+  "raw_text": "Ghostfolio is an open source wealth management software. Prior to version 2.244.0, by bypassing symbol validation, an attacker can execute arbitrary SQL commands via the getHistorical() method, potentially allowing them to read, modify, or delete sensitive financial data for all users in the database. This issue has been patched in version 2.244.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "37c9825e5d0a0be26d50803eb88360940c6e88ffc5769bc5bb4f679bf8f0b6ac",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28785"
+}

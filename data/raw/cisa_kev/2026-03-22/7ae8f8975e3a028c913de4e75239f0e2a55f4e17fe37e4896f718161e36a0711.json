@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2008-0655",
+  "ingested_at": "2026-03-22T07:45:17.847020+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contains an unespecified vulnerability described as a design flaw which could allow a specially crafted file to be printed silently an arbitrary number of times.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7ae8f8975e3a028c913de4e75239f0e2a55f4e17fe37e4896f718161e36a0711",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

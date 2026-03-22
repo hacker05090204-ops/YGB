@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62512",
+  "ingested_at": "2026-03-22T07:54:31.713215+00:00",
+  "lang": "en",
+  "raw_text": "Piwigo is an open source photo gallery application for the web. In version 15.5.0 and likely earlier 15.x releases, the password reset functionality in Piwigo allows an unauthenticated attacker to determine whether a given username or email address exists in the system. The endpoint at password.php?action=lost returns distinct messages for valid vs. invalid accounts, enabling user enumeration. As of time of publication, no known patches are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "452fb5afa884a0e61811fc032f227a6f696c11a0eccd5d064e095b0ab43b7900",
+  "source": "nvd",
+  "tags": [
+    "CWE-204"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62512"
+}

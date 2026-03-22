@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1938",
+  "ingested_at": "2026-03-22T07:45:18.513795+00:00",
+  "lang": "en",
+  "raw_text": "Apache Tomcat Apache Tomcat treats Apache JServ Protocol (AJP) connections as having higher trust than, for example, a similar HTTP connection. If such connections are available to an attacker, they can be exploited.",
+  "severity": "CRITICAL",
+  "sha256_hash": "37795707e07f9e962d5d0a9c8d318213fa9ff28c4217e4db53f0afc10abd9bc2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

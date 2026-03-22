@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13776",
+  "ingested_at": "2026-03-22T07:54:31.685037+00:00",
+  "lang": "en",
+  "raw_text": "Multiple Finka programs use hard-coded Firebird database credentials (shared across all instances of this software). A malicious attacker in local network who knows default credentials is able to read and edit database content. This vulnerability has been fixed in version: Finka-FK 18.5, Finka-KPR 16.6, Finka-P\u0142ace 13.4, Finka-Faktura 18.3, Finka-Magazyn 8.3, Finka-STW 12.3",
+  "severity": "HIGH",
+  "sha256_hash": "fec4fff9877b1b54d2b354b3df7517339bb572428b305601633c4897dacacf33",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13776"
+}

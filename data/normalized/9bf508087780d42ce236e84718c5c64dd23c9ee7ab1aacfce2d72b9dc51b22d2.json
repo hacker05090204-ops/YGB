@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux < 4.16.9 / < 4.14.41 - 4-byte Infoleak via Uninitialized Struct Field in compat adjtimex Syscall",
+  "token_count": 17
+}

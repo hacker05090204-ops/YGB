@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-12240",
+  "ingested_at": "2026-03-22T07:45:18.579881+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Software The Dynamic Host Configuration Protocol (DHCP) relay subsystem of Cisco IOS and Cisco IOS XE Software contains a vulnerability that could allow an unauthenticated, remote attacker to execute arbitrary code and gain full control of an affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8c03e34500696e98e01607eeb909033c26c431fd51be98bd5db9a7f24c8b9023",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

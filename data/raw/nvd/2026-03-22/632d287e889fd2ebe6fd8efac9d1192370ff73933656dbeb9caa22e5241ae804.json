@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33043",
+  "ingested_at": "2026-03-22T07:54:48.637164+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. In versions 25.0 and below, /objects/phpsessionid.json.php exposes the current PHP session ID to any unauthenticated request. The allowOrigin() function reflects any Origin header back in Access-Control-Allow-Origin with Access-Control-Allow-Credentials: true, enabling cross-origin session theft and full account takeover. This issue has been fixed in version 26.0.",
+  "severity": "HIGH",
+  "sha256_hash": "632d287e889fd2ebe6fd8efac9d1192370ff73933656dbeb9caa22e5241ae804",
+  "source": "nvd",
+  "tags": [
+    "CWE-942"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33043"
+}

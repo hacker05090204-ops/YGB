@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3993",
+  "ingested_at": "2026-03-22T07:54:44.191316+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode Payroll Management System 1.0. This vulnerability affects unknown code of the file /manage_employee_deductions.php. Such manipulation of the argument ID leads to cross site scripting. The attack may be launched remotely. The exploit has been disclosed publicly and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cd05444828407acf5bb2e34c0f821bf40378cefccf1e752e63c1041cbcd68983",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3993"
+}

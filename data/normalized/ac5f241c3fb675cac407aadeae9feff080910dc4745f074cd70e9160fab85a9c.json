@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Code Injection vulnerability affecting SOLIDWORKS Desktop from Release 2025 through Release 2026 could allow an attacker to execute arbitrary code on the user's machine while opening a specially crafted file.",
+  "token_count": 31
+}

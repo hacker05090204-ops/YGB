@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69302",
+  "ingested_at": "2026-03-22T07:54:30.196236+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in designthemes DesignThemes Core Features designthemes-core-features allows Reflected XSS.This issue affects DesignThemes Core Features: from n/a through < = 2.3.",
+  "severity": "HIGH",
+  "sha256_hash": "9160a60c7e35bd4c36debd840abddd237992cb7b80e6f07d1d72028b4d493eba",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69302"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to version 2.2.3, the login flow accepts credential-bearing requests without CSRF protection mechanisms tied to the browser session context. The handler parses form values directly and creates a session on successful credential validation. This issue has been patched in version 2.2.3.",
+  "token_count": 55
+}

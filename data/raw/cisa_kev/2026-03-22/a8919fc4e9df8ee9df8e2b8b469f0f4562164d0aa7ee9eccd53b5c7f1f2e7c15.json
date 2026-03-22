@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-36742",
+  "ingested_at": "2026-03-22T07:45:19.616191+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One, Apex One as a Service, and Worry-Free Business Security Trend Micro Apex One, Apex One as a Service, and Worry-Free Business Security contain an improper input validation vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a8919fc4e9df8ee9df8e2b8b469f0f4562164d0aa7ee9eccd53b5c7f1f2e7c15",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

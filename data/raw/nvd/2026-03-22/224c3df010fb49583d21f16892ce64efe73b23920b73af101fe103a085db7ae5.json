@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14716",
+  "ingested_at": "2026-03-22T07:54:47.928903+00:00",
+  "lang": "en",
+  "raw_text": "Improper Authentication vulnerability in Secomea GateManager (webserver modules) allows Authentication Bypass.This issue affects GateManager: 11.4;0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "224c3df010fb49583d21f16892ce64efe73b23920b73af101fe103a085db7ae5",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14716"
+}

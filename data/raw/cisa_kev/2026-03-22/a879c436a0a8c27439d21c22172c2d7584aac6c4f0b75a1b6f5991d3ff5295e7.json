@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-7262",
+  "ingested_at": "2026-03-22T07:45:16.842343+00:00",
+  "lang": "en",
+  "raw_text": "Kingsoft WPS Office Kingsoft WPS Office contains a path traversal vulnerability in promecefpluginhost.exe on Windows that allows an attacker to load an arbitrary Windows library.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a879c436a0a8c27439d21c22172c2d7584aac6c4f0b75a1b6f5991d3ff5295e7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

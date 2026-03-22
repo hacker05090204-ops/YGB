@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27448",
+  "ingested_at": "2026-03-22T07:54:47.226753+00:00",
+  "lang": "en",
+  "raw_text": "pyOpenSSL is a Python wrapper around the OpenSSL library. Starting in version 0.14.0 and prior to version 26.0.0, if a user provided callback to `set_tlsext_servername_callback` raised an unhandled exception, this would result in a connection being accepted. If a user was relying on this callback for any security-sensitive behavior, this could allow bypassing it. Starting in version 26.0.0, unhandled exceptions now result in rejecting the connection.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d4ac6231a6bde896a8b276277bb28ce761eb9954cb0e0fc35dd00e31bc4321b3",
+  "source": "nvd",
+  "tags": [
+    "CWE-636"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27448"
+}

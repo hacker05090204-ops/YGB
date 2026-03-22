@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3169",
+  "ingested_at": "2026-03-22T07:54:31.998702+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tenda F453 1.0.0.3. This impacts the function fromSafeEmailFilter of the file /goform/SafeEmailFilter of the component httpd. The manipulation of the argument page leads to buffer overflow. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "5a917b4b738946760200e1d27f479762b26ae5b719f24781d49c2fb30817a0a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3169"
+}

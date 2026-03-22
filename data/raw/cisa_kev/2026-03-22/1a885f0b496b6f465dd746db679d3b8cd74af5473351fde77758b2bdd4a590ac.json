@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38080",
+  "ingested_at": "2026-03-22T07:45:16.921445+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Hyper-V contains a privilege escalation vulnerability that allows a local attacker with user permissions to gain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1a885f0b496b6f465dd746db679d3b8cd74af5473351fde77758b2bdd4a590ac",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

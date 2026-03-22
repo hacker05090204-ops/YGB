@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20036",
+  "ingested_at": "2026-03-22T07:54:46.265964+00:00",
+  "lang": "en",
+  "raw_text": "Wowza Streaming Engine 4.5.0 contains multiple reflected cross-site scripting vulnerabilities in the enginemanager interface where input passed through various parameters is not properly sanitized before being returned to users. Attackers can inject malicious script code through parameters like appName, vhost, uiAppType, and wowzaCloudDestinationType in multiple endpoints to execute arbitrary HTML and JavaScript in a user's browser session.",
+  "severity": "MEDIUM",
+  "sha256_hash": "02e67507cdcfef236335fb05404cf20054f30174cd4782e416796cdc13622100",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20036"
+}

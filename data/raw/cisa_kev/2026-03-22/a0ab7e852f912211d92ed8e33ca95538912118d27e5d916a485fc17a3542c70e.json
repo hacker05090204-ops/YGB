@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0156",
+  "ingested_at": "2026-03-22T07:45:18.550254+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS Software and Cisco IOS XE Software A vulnerability in the Smart Install feature of Cisco IOS Software and Cisco IOS XE Software could allow an unauthenticated, remote attacker to trigger a reload of an affected device, resulting in a denial-of-service (DoS) condition.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a0ab7e852f912211d92ed8e33ca95538912118d27e5d916a485fc17a3542c70e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

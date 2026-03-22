@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to version 3.1.4, a malicious scaffolder template can bypass the log redaction mechanism to exfiltrate secrets provided run through task event logs. This issue has been patched in version 3.1.4.",
+  "token_count": 40
+}

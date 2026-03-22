@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28403",
+  "ingested_at": "2026-03-22T07:54:33.732937+00:00",
+  "lang": "en",
+  "raw_text": "Textream is a free macOS teleprompter app. Prior to version 1.5.1, the `DirectorServer` WebSocket server (`ws://127.0.0.1: `) accepts connections from any origin without validating the HTTP `Origin` header during the WebSocket handshake. A malicious web page visited in the same browser session can silently connect to the local WebSocket server and send arbitrary `DirectorCommand` payloads, allowing full remote control of the teleprompter content. Version 1.5.1 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "29d190c93b41866632125a1cf806fbb782663aaeb87efdb4864512bc75498025",
+  "source": "nvd",
+  "tags": [
+    "CWE-346"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28403"
+}

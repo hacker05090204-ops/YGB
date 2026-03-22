@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-41073",
+  "ingested_at": "2026-03-22T07:45:17.580810+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Print Spooler contains an unspecified vulnerability that allows an attacker to gain SYSTEM-level privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "86510c54313cf2bd57d650ef913a7f47ad0ad017b210dd6f5967cbd3a154c1a6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

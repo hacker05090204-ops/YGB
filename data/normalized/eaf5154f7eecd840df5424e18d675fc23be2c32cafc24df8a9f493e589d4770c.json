@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains a buffer overflow vulnerability that allows remote attackers to execute code via crafted PNG data in an Office document.",
+  "token_count": 24
+}

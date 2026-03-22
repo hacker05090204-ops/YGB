@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-27925",
+  "ingested_at": "2026-03-22T07:45:17.719830+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains flaw in the mboximport functionality, allowing an authenticated attacker to upload arbitrary files to perform remote code execution. This vulnerability was chained with CVE-2022-37042 which allows for unauthenticated remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dba4736c4c55b3a5db5f7559575bcdd596bf009f38b96369236d53f9bbc57bad",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

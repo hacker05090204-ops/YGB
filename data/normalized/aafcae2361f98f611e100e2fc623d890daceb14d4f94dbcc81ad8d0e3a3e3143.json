@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ArcSearch for Android versions prior to 1.12.7 could display a different domain in the address bar than the content being shown, enabling address bar spoofing after user interaction via crafted web content.",
+  "token_count": 32
+}

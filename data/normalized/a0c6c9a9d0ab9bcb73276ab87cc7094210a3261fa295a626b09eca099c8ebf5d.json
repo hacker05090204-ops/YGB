@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cross Site Scripting vulnerability in Koha 25.11 and before allows a remote attacker to execute arbitrary code via the News function.",
+  "token_count": 21
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2376",
+  "ingested_at": "2026-03-22T07:54:44.461164+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in mirror-registry where an authenticated user can trick the system into accessing unintended internal or restricted systems by providing malicious web addresses. When the application processes these addresses, it automatically follows redirects without verifying the final destination, allowing attackers to route requests to systems they should not have access to.",
+  "severity": "MEDIUM",
+  "sha256_hash": "76c6e5e1a600adecc7f3021257cd2d0614c8ce5c30ff918611a934a927a3d445",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2376"
+}

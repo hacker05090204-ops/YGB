@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32067",
+  "ingested_at": "2026-03-22T07:54:49.231985+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.26 contains an authorization bypass vulnerability in the pairing-store access control for direct message pairing policy that allows attackers to reuse pairing approvals across multiple accounts. An attacker approved as a sender in one account can be automatically accepted in another account in multi-account deployments without explicit approval, bypassing authorization boundaries.",
+  "severity": "LOW",
+  "sha256_hash": "b5092b9df6eb4b7dfb5c823b9f3138b5e4c7af944256db35e2fc847c4ebca708",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32067"
+}

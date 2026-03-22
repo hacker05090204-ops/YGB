@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server, a product within the Fusion Middleware suite, contains a deserialization vulnerability. Unauthenticated attackers with network access via T3 or IIOP can exploit this vulnerability to achieve remote code execution.",
+  "token_count": 35
+}

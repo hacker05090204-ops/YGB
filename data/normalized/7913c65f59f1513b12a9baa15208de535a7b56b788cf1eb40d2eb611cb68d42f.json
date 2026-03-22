@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Struts Forced Object-Graph Navigation Language (OGNL) evaluation in Apache Struts, when evaluated on raw user input in tag attributes, can lead to remote code execution.",
+  "token_count": 26
+}

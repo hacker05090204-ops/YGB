@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1945",
+  "ingested_at": "2026-03-22T07:54:34.345280+00:00",
+  "lang": "en",
+  "raw_text": "The WPBookit plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'wpb_user_name' and 'wpb_user_email' parameters in all versions up to, and including, 1.0.8 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "HIGH",
+  "sha256_hash": "cf2ccc2a0cb9e1580fc1dfb6ffc28f4dc5adb0e60db363960425c562911fe0f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1945"
+}

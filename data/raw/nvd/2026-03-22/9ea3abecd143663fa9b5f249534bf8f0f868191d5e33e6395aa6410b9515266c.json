@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-3076",
+  "ingested_at": "2026-03-22T07:54:34.336220+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: ** REJECT ** DO NOT USE THIS CANDIDATE NUMBER. ConsultIDs: CVE-2026-2363. Reason: This candidate is a reservation duplicate of CVE-2026-2363. Notes: All CVE users should reference CVE-2026-2363 instead of this candidate. All references and descriptions in this candidate have been removed to prevent accidental usage.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9ea3abecd143663fa9b5f249534bf8f0f868191d5e33e6395aa6410b9515266c",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3076"
+}

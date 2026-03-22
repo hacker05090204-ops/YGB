@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-29298",
+  "ingested_at": "2026-03-22T07:45:17.300586+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe ColdFusion contains an improper access control vulnerability that allows for a security feature bypass.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c518e3cb4d3fcc6163dd852938293e526e171f308b6d89d2d0bba793f31c41c7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

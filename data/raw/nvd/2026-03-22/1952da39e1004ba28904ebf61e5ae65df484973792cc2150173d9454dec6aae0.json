@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59600",
+  "ingested_at": "2026-03-22T07:54:33.758935+00:00",
+  "lang": "en",
+  "raw_text": "Memory Corruption when adding user-supplied data without checking available buffer space.",
+  "severity": "HIGH",
+  "sha256_hash": "1952da39e1004ba28904ebf61e5ae65df484973792cc2150173d9454dec6aae0",
+  "source": "nvd",
+  "tags": [
+    "CWE-126"
+  ],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59600"
+}

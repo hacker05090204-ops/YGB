@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28540",
+  "ingested_at": "2026-03-22T07:54:40.731160+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bounds character read vulnerability in Bluetooth. Impact: Successful exploitation of this vulnerability may affect service confidentiality.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a9fe12034dd8795a7a3ab904ac3eefe60e9e2abd9379b7305ef26f1b49602816",
+  "source": "nvd",
+  "tags": [
+    "CWE-158",
+    "CWE-125"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28540"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3000",
+  "ingested_at": "2026-03-22T07:54:33.501952+00:00",
+  "lang": "en",
+  "raw_text": "IDExpert Windows Logon Agent developed by Changing has a Remote Code Execution vulnerability, allowing unauthenticated remote attackers to force the system to download arbitrary DLL files from a remote source and execute them.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b6cfe5502ad6f5a1a05cae9e2e8ed1a88f80605cff2c46c2a89b3266c9cbec27",
+  "source": "nvd",
+  "tags": [
+    "CWE-494"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3000"
+}

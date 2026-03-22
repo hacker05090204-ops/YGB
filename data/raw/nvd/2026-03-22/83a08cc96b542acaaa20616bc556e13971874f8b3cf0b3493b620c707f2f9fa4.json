@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-27457",
+  "ingested_at": "2026-03-22T07:54:32.795203+00:00",
+  "lang": "en",
+  "raw_text": "Weblate is a web based localization tool. Prior to version 5.16.1, the REST API's `AddonViewSet` (`weblate/api/views.py`, line 2831) uses `queryset = Addon.objects.all()` without overriding `get_queryset()` to scope results by user permissions. This allows any authenticated user (or anonymous users if `REQUIRE_LOGIN` is not set) to list and retrieve ALL addons across all projects and components via `GET /api/addons/` and `GET /api/addons/{id}/`. Version 5.16.1 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "83a08cc96b542acaaa20616bc556e13971874f8b3cf0b3493b620c707f2f9fa4",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-862",
+    "CWE-862"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27457"
+}

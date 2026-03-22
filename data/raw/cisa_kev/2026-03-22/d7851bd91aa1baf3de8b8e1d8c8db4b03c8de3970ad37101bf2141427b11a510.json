@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-28810",
+  "ingested_at": "2026-03-22T07:45:17.504490+00:00",
+  "lang": "en",
+  "raw_text": "Zoho ManageEngine Zoho ManageEngine ADSelfService Plus contains an unspecified vulnerability allowing for remote code execution when performing a password change or reset.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d7851bd91aa1baf3de8b8e1d8c8db4b03c8de3970ad37101bf2141427b11a510",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

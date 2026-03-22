@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33355",
+  "ingested_at": "2026-03-22T07:54:48.274595+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the `/private-posts` endpoint did not apply post-type visibility filtering, allowing regular PM participants to see whisper posts in PM topics they had access to. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "666e54355559a98c61753f7d1421a8b25323ec2d6acf8c6b90f12364d0be7b41",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33355"
+}

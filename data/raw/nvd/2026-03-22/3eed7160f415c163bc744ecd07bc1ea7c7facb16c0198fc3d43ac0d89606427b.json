@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27621",
+  "ingested_at": "2026-03-22T07:54:31.893579+00:00",
+  "lang": "en",
+  "raw_text": "TypiCMS is a multilingual content management system based on the Laravel framework. A Stored Cross-Site Scripting (XSS) vulnerability exists in the file upload module of TypiCMS prior to version 16.1.7. The application allows users with file upload permissions to upload SVG files. While there is a MIME type validation, the content of the SVG file is not sanitized. An attacker can upload a specially crafted SVG file containing malicious JavaScript code. When another user (such as an administrator) views or accesses this file through the application, the script executes in their browser, leading to a compromise of that user's session. The issue is exacerbated by a bug in the SVG parsing logic, which can cause a 500 error if the uploaded SVG does not contain a `viewBox` attribute. However, this does not mitigate the XSS vulnerability, as an attacker can easily include a valid `viewBox` attribute in their malicious payload. Version 16.1.7 of TypiCMS Core fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3eed7160f415c163bc744ecd07bc1ea7c7facb16c0198fc3d43ac0d89606427b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 158,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27621"
+}

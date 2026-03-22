@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Android Kernel Android kernel contains a use-after-free vulnerability that allows for privilege escalation.",
+  "token_count": 13
+}

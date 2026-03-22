@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-21672",
+  "ingested_at": "2026-03-22T07:54:44.366023+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability allowing local privilege escalation on Windows-based Veeam Backup & Replication servers.",
+  "severity": "HIGH",
+  "sha256_hash": "4b24e7899e5094caabc68c1a59f33f7e2cac8a2474a1f11c96a4709c3d5b328d",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21672"
+}

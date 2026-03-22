@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27510",
+  "ingested_at": "2026-03-22T07:54:32.753142+00:00",
+  "lang": "en",
+  "raw_text": "Unitree Go2 firmware versions 1.1.7 through 1.1.11, when used with the Unitree Go2 Android application (com.unitree.doggo2), are vulnerable to remote code execution due to missing integrity protection and validation of user-created programmes. The Android application stores programs in a local SQLite database (unitree_go2.db, table dog_programme) and transmits the programme_text content, including the pyCode field, to the robot. The robot's actuator_manager.py executes the supplied Python as root without integrity verification or content validation. An attacker with local access to the Android device can tamper with the stored programme record to inject arbitrary Python that executes when the user triggers the program via a controller keybinding, and the malicious binding persists across reboots. Additionally, a malicious program shared through the application's community marketplace can result in arbitrary code execution on any robot that imports and runs it.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f666918f73219a6f21092fe322ceb052e1da365274170f36b54f82a5de740af2",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 135,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27510"
+}

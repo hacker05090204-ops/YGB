@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A specially crafted aggregation query with $lookup by an authenticated user with write privileges can cause a double-free or use-after-free memory issue in the slot-based execution (SBE) engine when an in-memory hash table is spilled to disk.",
+  "token_count": 37
+}

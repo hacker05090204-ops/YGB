@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23674",
+  "ingested_at": "2026-03-22T07:54:42.680432+00:00",
+  "lang": "en",
+  "raw_text": "Improper resolution of path equivalence in Windows MapUrlToZone allows an unauthorized attacker to bypass a security feature over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "9aed2c10504638a8fa74adb93e2fae6531124d9900eaa283dff68ea944ba17ec",
+  "source": "nvd",
+  "tags": [
+    "CWE-41"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23674"
+}

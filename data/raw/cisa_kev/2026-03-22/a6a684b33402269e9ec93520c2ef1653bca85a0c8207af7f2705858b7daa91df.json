@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1464",
+  "ingested_at": "2026-03-22T07:45:19.346702+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows contains a spoofing vulnerability when Windows incorrectly validates file signatures, allowing an attacker to bypass security features and load improperly signed files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a6a684b33402269e9ec93520c2ef1653bca85a0c8207af7f2705858b7daa91df",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

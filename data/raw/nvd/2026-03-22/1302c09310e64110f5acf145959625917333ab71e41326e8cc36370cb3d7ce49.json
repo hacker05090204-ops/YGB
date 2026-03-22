@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25518",
+  "ingested_at": "2026-03-22T07:54:44.294098+00:00",
+  "lang": "en",
+  "raw_text": "Jettweb PHP Hazir Haber Sitesi Scripti V1 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the poll parameter. Attackers can send POST requests to arama.php with malicious SQL payloads in the poll parameter to extract sensitive data or modify database contents.",
+  "severity": "HIGH",
+  "sha256_hash": "1302c09310e64110f5acf145959625917333ab71e41326e8cc36370cb3d7ce49",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25518"
+}

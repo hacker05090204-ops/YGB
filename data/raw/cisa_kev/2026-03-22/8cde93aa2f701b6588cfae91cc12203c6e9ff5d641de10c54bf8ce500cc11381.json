@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-21148",
+  "ingested_at": "2026-03-22T07:45:19.207267+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 Engine contains a heap buffer overflow vulnerability that allows a remote attacker to potentially exploit heap corruption via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8cde93aa2f701b6588cfae91cc12203c6e9ff5d641de10c54bf8ce500cc11381",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

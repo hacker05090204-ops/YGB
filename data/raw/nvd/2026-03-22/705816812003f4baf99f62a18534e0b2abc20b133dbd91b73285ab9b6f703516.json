@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29791",
+  "ingested_at": "2026-03-22T07:54:41.622787+00:00",
+  "lang": "en",
+  "raw_text": "Agentgateway is an open source data plane for agentic AI connectivity within or across any agent framework or environment. Prior to version 0.12.0, when converting MCP tools/call request to OpenAPI request, input path, query, and header values are not sanitized. This issue has been patched in version 0.12.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "705816812003f4baf99f62a18534e0b2abc20b133dbd91b73285ab9b6f703516",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29791"
+}

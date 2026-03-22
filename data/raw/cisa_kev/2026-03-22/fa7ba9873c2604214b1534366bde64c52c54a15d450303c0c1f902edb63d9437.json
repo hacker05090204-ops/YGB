@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24061",
+  "ingested_at": "2026-03-22T07:45:15.956741+00:00",
+  "lang": "en",
+  "raw_text": "GNU InetUtils GNU InetUtils contains an argument injection vulnerability in telnetd that could allow for remote authentication bypass via a \"-f root\" value for the USER environment variable.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa7ba9873c2604214b1534366bde64c52c54a15d450303c0c1f902edb63d9437",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

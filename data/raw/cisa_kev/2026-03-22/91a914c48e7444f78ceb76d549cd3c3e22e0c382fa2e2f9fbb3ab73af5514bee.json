@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-7836",
+  "ingested_at": "2026-03-22T07:45:16.111590+00:00",
+  "lang": "en",
+  "raw_text": "SKYSEA Client View SKYSEA Client View contains an improper authentication vulnerability that allows remote code execution via a flaw in processing authentication on the TCP connection with the management console program.",
+  "severity": "CRITICAL",
+  "sha256_hash": "91a914c48e7444f78ceb76d549cd3c3e22e0c382fa2e2f9fbb3ab73af5514bee",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

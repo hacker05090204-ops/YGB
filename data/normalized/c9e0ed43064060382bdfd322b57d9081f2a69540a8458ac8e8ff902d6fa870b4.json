@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Wowza Streaming Engine 4.5.0 contains a privilege escalation vulnerability that allows authenticated read-only users to elevate privileges to administrator by manipulating POST parameters. Attackers can send POST requests to the user edit endpoint with accessLevel set to 'admin' and advUser parameters set to 'true' and 'on' to gain administrative access.",
+  "token_count": 50
+}

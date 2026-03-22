@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3976",
+  "ingested_at": "2026-03-22T07:45:19.556680+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server Java Platforms contains a directory traversal vulnerability via a ..\\ (dot dot backslash) in the fileName parameter to CrashFileDownloadServlet. This allows remote attackers to read files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d5d28e241d06f185c5fe67089cb1c1dc3f989c0296f73cb462f1f753d5287c60",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

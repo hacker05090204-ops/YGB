@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in BoldThemes Nestin nestin allows Object Injection.This issue affects Nestin: from n/a through < 1.2.6.",
+  "token_count": 20
+}

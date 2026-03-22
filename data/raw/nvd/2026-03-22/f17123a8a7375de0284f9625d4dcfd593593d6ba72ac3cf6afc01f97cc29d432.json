@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27710",
+  "ingested_at": "2026-03-22T07:54:32.420547+00:00",
+  "lang": "en",
+  "raw_text": "NanaZip is an open source file archive. Starting in version 5.0.1252.0 and prior to versions 6.0.1638.0 and 6.5.1638.0, a denial-of-service vulnerability exists in NanaZip\u2019s `.NET Single File Application` parser. A crafted bundle can force an integer underflow in header-size calculation and trigger an unbounded memory allocation attempt during archive open. Versions 6.0.1638.0 and 6.5.1638.0 fix the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f17123a8a7375de0284f9625d4dcfd593593d6ba72ac3cf6afc01f97cc29d432",
+  "source": "nvd",
+  "tags": [
+    "CWE-191"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27710"
+}

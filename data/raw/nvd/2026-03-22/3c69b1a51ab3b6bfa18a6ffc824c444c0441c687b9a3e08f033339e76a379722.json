@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27167",
+  "ingested_at": "2026-03-22T07:54:33.331117+00:00",
+  "lang": "en",
+  "raw_text": "Gradio is an open-source Python package designed for quick prototyping. Starting in version 4.16.0 and prior to version 6.6.0, Gradio applications running outside of Hugging Face Spaces automatically enable \"mocked\" OAuth routes when OAuth components (e.g. `gr.LoginButton`) are used. When a user visits `/login/huggingface`, the server retrieves its own Hugging Face access token via `huggingface_hub.get_token()` and stores it in the visitor's session cookie. If the application is network-accessible, any remote attacker can trigger this flow to steal the server owner's HF token. The session cookie is signed with a hardcoded secret derived from the string `\"-v4\"`, making the payload trivially decodable. Version 6.6.0 fixes the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "3c69b1a51ab3b6bfa18a6ffc824c444c0441c687b9a3e08f033339e76a379722",
+  "source": "nvd",
+  "tags": [
+    "CWE-522",
+    "CWE-798"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27167"
+}

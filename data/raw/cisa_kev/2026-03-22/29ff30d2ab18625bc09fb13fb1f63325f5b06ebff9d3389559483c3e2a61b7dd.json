@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-26871",
+  "ingested_at": "2026-03-22T07:45:18.174124+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex Central An arbitrary file upload vulnerability in Trend Micro Apex Central could allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "29ff30d2ab18625bc09fb13fb1f63325f5b06ebff9d3389559483c3e2a61b7dd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

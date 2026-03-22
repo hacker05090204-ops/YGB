@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27616",
+  "ingested_at": "2026-03-22T07:54:32.359673+00:00",
+  "lang": "en",
+  "raw_text": "Vikunja is an open-source self-hosted task management platform. Prior to version 2.0.0, the application allows users to upload SVG files as task attachments. SVG is an XML-based format that supports JavaScript execution through elements such as",
+  "severity": "HIGH",
+  "sha256_hash": "b60f69e68610956c9bacd17394c851cdd3a56bfea93120ad27225bc516d9b576",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27616"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Tenda A18 Pro 02.03.02.28. The affected element is the function set_qosMib_list of the file /goform/formSetQosBand. Performing a manipulation of the argument list results in stack-based buffer overflow. The attack is possible to be carried out remotely. The exploit has been made public and could be used.",
+  "token_count": 51
+}

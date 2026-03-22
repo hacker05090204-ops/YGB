@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a crafted profile contain invalid IPTC data may cause an infinite loop when writing it with `IPTCTEXT`. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "token_count": 43
+}

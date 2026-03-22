@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-1770",
+  "ingested_at": "2026-03-22T07:45:18.238670+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office allows remote attackers to execute arbitrary code via a crafted Office document.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bdd7e421e43f00200b70d48689ea1ea33149b47a32bbb0b7bb932a1bee68b9c4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

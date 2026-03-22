@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33171",
+  "ingested_at": "2026-03-22T07:54:49.025752+00:00",
+  "lang": "en",
+  "raw_text": "Statamic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.14 and 6.7.0, authenticated Control Panel users could read arbitrary `.json`, `.yaml`, and `.csv` files from the server by manipulating the file dictionary's `filename` configuration parameter in the fieldtype's endpoint. This has been fixed in 5.73.14 and 6.7.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "65cac55c5405e447ffcea76c0c1dbaad3054c81a0d8215d80e0da8fe642c014e",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33171"
+}

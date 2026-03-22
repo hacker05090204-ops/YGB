@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2015-20116",
+  "ingested_at": "2026-03-22T07:54:46.218333+00:00",
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 fails to properly sanitize CSV file uploads, allowing attackers to inject malicious scripts through filename parameters in multipart form data. Attackers can upload files with XSS payloads in the filename field to execute arbitrary JavaScript in users' browsers when the file is processed or displayed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "beccc78ed1b16525c8abd538e566b4de790cd1ec51573cbc5b3876669f21595c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2015-20116"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-16759",
+  "ingested_at": "2026-03-22T07:45:19.628664+00:00",
+  "lang": "en",
+  "raw_text": "vBulletin vBulletin The PHP module within vBulletin contains an unspecified vulnerability that allows for remote code execution via the widgetConfig[code] parameter in an ajax/render/widget_php routestring request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "27fc66b029c98cee740c819c87c226cd7cd23c1c160f5cb975d105d69107add0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

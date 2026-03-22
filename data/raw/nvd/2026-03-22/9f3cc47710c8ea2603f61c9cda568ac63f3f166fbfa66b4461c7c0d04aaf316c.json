@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-31796",
+  "ingested_at": "2026-03-22T07:54:42.946235+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a heap-based buffer overflow in icCurvesFromXml() causing heap memory corruption or crash. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "9f3cc47710c8ea2603f61c9cda568ac63f3f166fbfa66b4461c7c0d04aaf316c",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-787"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31796"
+}

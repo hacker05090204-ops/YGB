@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Power Dependency Coordinator contains an unspecified vulnerability that allows for privilege escalation, enabling a local attacker to obtain SYSTEM privileges.",
+  "token_count": 24
+}

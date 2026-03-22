@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2008-2992",
+  "ingested_at": "2026-03-22T07:45:18.710930+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contain an input validation issue in a JavaScript method that could potentially lead to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "767646c14e91fbb456c6fdb9a11e539d0961269f0e7335c747e2c2e3c0def39c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

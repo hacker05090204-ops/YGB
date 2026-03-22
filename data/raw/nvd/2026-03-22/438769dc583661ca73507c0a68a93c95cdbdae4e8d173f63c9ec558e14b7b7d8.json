@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69303",
+  "ingested_at": "2026-03-22T07:54:30.198235+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in modeltheme ModelTheme Framework modeltheme-framework allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects ModelTheme Framework: from n/a through < = 1.9.2.",
+  "severity": "HIGH",
+  "sha256_hash": "438769dc583661ca73507c0a68a93c95cdbdae4e8d173f63c9ec558e14b7b7d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69303"
+}

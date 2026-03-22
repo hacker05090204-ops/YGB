@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an authenticated attacker to achieve remote code execution on the system by supplying a crafted firmware update file via the firmware update route.",
+  "token_count": 37
+}

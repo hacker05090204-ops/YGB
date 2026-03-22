@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-45691",
+  "ingested_at": "2026-03-22T07:54:40.848690+00:00",
+  "lang": "en",
+  "raw_text": "An Arbitrary File Read vulnerability exists in the ImageTextPromptValue class in Exploding Gradients RAGAS v0.2.3 to v0.2.14. The vulnerability stems from improper validation and sanitization of URLs supplied in the retrieved_contexts parameter when handling multimodal inputs.",
+  "severity": "HIGH",
+  "sha256_hash": "b95a41bacfe408d29b6f4774e41267f2ad64b2ea2f11654eae201c9439f134a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-45691"
+}

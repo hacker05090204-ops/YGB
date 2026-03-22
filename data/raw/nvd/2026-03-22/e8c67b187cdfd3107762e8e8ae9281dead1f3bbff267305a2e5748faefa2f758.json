@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-26133",
+  "ingested_at": "2026-03-22T07:54:46.428400+00:00",
+  "lang": "en",
+  "raw_text": "AI command injection in M365 Copilot allows an unauthorized attacker to disclose information over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "e8c67b187cdfd3107762e8e8ae9281dead1f3bbff267305a2e5748faefa2f758",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26133"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-7921",
+  "ingested_at": "2026-03-22T07:45:15.861019+00:00",
+  "lang": "en",
+  "raw_text": "Hikvision Multiple Products Multiple Hikvision products contain an improper authentication vulnerability that could allow a malicious user to escalate privileges on the system and gain access to sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b3a75ee03faacd65f12f955c1ccf05792f5080aadbc76c19dc24cc2d52447afb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

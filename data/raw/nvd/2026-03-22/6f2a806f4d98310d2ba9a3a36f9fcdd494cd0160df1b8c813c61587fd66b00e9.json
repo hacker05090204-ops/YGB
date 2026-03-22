@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20118",
+  "ingested_at": "2026-03-22T07:54:43.707897+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the handling of an Egress Packet Network Interface (EPNI) Aligner interrupt in Cisco IOS XR Software for Cisco Network Convergence System (NCS) 5500 Series with NC57 line cards and Cisco NCS 5700 Routers and Cisco IOS XR Software for Third Party Software could allow an unauthenticated, remote attacker to cause the network processing unit (NPU) and ASIC to stop processing, preventing traffic from traversing the interface. This vulnerability is due to the corruption of packets in specific cases when an EPNI Aligner interrupt is triggered while an affected device is experiencing heavy transit traffic. An attacker could exploit this vulnerability by sending a continuous flow of crafted packets to an interface of the affected device. A successful exploit could allow the attacker to cause persistent, heavy packet loss, resulting in a denial of service (DoS) condition. Note: If active exploitation of this vulnerability is suspected, contact the Cisco Technical Assistance Center (TAC) or your contracted maintenance provider. Cisco has assigned this security advisory a Security Impact Rating (SIR) of High rather than Medium as the score indicates. This change was made because the affected device operates within a critical network segment where compromise could lead to significant disruption or exposure, thereby elevating the overall risk beyond the base technical severity.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6f2a806f4d98310d2ba9a3a36f9fcdd494cd0160df1b8c813c61587fd66b00e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-460"
+  ],
+  "token_count": 213,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20118"
+}

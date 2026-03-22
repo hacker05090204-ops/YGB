@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3695",
+  "ingested_at": "2026-03-22T07:54:41.973542+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in SourceCodester Modern Image Gallery App 1.0. Impacted is an unknown function of the file /delete.php. Such manipulation of the argument filename leads to path traversal. It is possible to launch the attack remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "74389ebfbcdda228ad26dbda19a777f1f07d05c88318cefd4fe3f279151f326a",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3695"
+}

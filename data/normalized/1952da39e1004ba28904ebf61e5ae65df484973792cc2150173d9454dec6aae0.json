@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Memory Corruption when adding user-supplied data without checking available buffer space.",
+  "token_count": 11
+}

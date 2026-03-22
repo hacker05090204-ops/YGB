@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-0016",
+  "ingested_at": "2026-03-22T07:45:17.872344+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Directory traversal vulnerability in the TS WebProxy (TSWbPrxy) component in Microsoft Windows allows remote attackers to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "79e0c33c4d2b66caa18a986905bdef7639d22642fb6cb981060467dd5b4b9c8b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

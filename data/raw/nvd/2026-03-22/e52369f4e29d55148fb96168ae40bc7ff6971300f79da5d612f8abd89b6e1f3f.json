@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27385",
+  "ingested_at": "2026-03-22T07:54:40.259584+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in designthemes DesignThemes Portfolio designthemes-portfolio allows Reflected XSS.This issue affects DesignThemes Portfolio: from n/a through < = 1.3.",
+  "severity": "HIGH",
+  "sha256_hash": "e52369f4e29d55148fb96168ae40bc7ff6971300f79da5d612f8abd89b6e1f3f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27385"
+}

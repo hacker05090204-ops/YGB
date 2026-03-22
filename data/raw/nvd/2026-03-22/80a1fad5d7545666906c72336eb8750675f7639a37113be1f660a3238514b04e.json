@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2789",
+  "ingested_at": "2026-03-22T07:54:31.575133+00:00",
+  "lang": "en",
+  "raw_text": "Use-after-free in the Graphics: ImageLib component. This vulnerability affects Firefox < 148, Firefox ESR < 115.33, Firefox ESR < 140.8, Thunderbird < 148, and Thunderbird < 140.8.",
+  "severity": "CRITICAL",
+  "sha256_hash": "80a1fad5d7545666906c72336eb8750675f7639a37113be1f660a3238514b04e",
+  "source": "nvd",
+  "tags": [
+    "CWE-416",
+    "CWE-416"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2789"
+}

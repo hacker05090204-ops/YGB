@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-22952",
+  "ingested_at": "2026-03-22T07:45:17.538277+00:00",
+  "lang": "en",
+  "raw_text": "SugarCRM Multiple Products Multiple SugarCRM products contain a remote code execution vulnerability in the EmailTemplates. Using a specially crafted request, custom PHP code can be injected through the EmailTemplates.",
+  "severity": "CRITICAL",
+  "sha256_hash": "74b6e4c8cd52d6bab0173d26e0bb934916eeb8aea58010eee1a2de4fef73eba1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

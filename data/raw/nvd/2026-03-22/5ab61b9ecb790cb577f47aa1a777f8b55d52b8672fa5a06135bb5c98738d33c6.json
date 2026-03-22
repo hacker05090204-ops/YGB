@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2006-10003",
+  "ingested_at": "2026-03-22T07:54:47.932080+00:00",
+  "lang": "en",
+  "raw_text": "XML::Parser versions through 2.47 for Perl has an off-by-one heap buffer overflow in st_serial_stack. In the case (stackptr == stacksize - 1), the stack will NOT be expanded. Then the new value will be written at location (++stackptr), which equals stacksize and therefore falls just outside the allocated buffer. The bug can be observed when parsing an XML file with very deep element nesting",
+  "severity": "CRITICAL",
+  "sha256_hash": "5ab61b9ecb790cb577f47aa1a777f8b55d52b8672fa5a06135bb5c98738d33c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-193"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2006-10003"
+}

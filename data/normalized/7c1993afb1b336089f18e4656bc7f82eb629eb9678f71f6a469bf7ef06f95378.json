@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Nostromo nhttpd Nostromo nhttpd contains a directory traversal vulnerability in the http_verify() function in a non-chrooted nhttpd server allowing for remote code execution.",
+  "token_count": 23
+}

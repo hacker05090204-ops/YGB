@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28348",
+  "ingested_at": "2026-03-22T07:54:40.955164+00:00",
+  "lang": "en",
+  "raw_text": "lxml_html_clean is a project for HTML cleaning functionalities copied from `lxml.html.clean`. Prior to version 0.4.4, the _has_sneaky_javascript() method strips backslashes before checking for dangerous CSS keywords. This causes CSS Unicode escape sequences to bypass the @import and expression() filters, allowing external CSS loading or XSS in older browsers. This issue has been patched in version 0.4.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1b5cbbea4a6b8e8d13e78fdd3d4f92e6f095f8860c5a11c9bd1708db58a3816c",
+  "source": "nvd",
+  "tags": [
+    "CWE-116"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28348"
+}

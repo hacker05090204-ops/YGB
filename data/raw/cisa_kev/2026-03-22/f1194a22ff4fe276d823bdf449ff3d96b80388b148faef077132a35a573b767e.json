@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3309",
+  "ingested_at": "2026-03-22T07:45:18.463315+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows kernel fails to properly handle objects in memory. An attacker who successfully exploited this vulnerability could run arbitrary code in kernel mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f1194a22ff4fe276d823bdf449ff3d96b80388b148faef077132a35a573b767e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

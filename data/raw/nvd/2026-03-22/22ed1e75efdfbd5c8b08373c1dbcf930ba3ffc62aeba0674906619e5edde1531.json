@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3226",
+  "ingested_at": "2026-03-22T07:54:44.154777+00:00",
+  "lang": "en",
+  "raw_text": "The LearnPress \u2013 WordPress LMS Plugin plugin for WordPress is vulnerable to unauthorized email notification triggering due to missing capability checks on all 10 functions in the SendEmailAjax class in all versions up to, and including, 4.3.2.8. The AbstractAjax::catch_lp_ajax() dispatcher verifies a wp_rest nonce but performs no current_user_can() check before dispatching to handler functions. The wp_rest nonce is embedded in the frontend JavaScript for all authenticated users. This makes it possible for authenticated attackers, with Subscriber-level access and above, to trigger arbitrary email notifications to admins, instructors, and users, enabling email flooding, social engineering, and impersonation of admin decisions regarding instructor requests.",
+  "severity": "MEDIUM",
+  "sha256_hash": "22ed1e75efdfbd5c8b08373c1dbcf930ba3ffc62aeba0674906619e5edde1531",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3226"
+}

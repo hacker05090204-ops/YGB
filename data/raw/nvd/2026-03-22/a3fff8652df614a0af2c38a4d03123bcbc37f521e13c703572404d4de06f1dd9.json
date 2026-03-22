@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3951",
+  "ingested_at": "2026-03-22T07:54:43.936513+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in LockerProject Locker 0.0.0/0.0.1/0.1.0. Affected is the function authIsAwesome of the file source-code/Locker-master/Ops/registry.js of the component Error Response Handler. The manipulation of the argument ID results in cross site scripting. The attack can be launched remotely. The exploit has been released to the public and may be used for attacks. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a3fff8652df614a0af2c38a4d03123bcbc37f521e13c703572404d4de06f1dd9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3951"
+}

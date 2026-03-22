@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache ActiveMQ The Fileserver web application in Apache ActiveMQ allows remote attackers to upload and execute arbitrary files via an HTTP PUT followed by an HTTP MOVE request",
+  "token_count": 28
+}

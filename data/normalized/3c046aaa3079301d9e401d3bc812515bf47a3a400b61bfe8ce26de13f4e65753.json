@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "API endpoint for user synchronization in 2N Access Commander version 3.4.1 did not have a sufficient input validation allowing for OS command injection. This vulnerability can only be exploited after authenticating with administrator privileges.",
+  "token_count": 34
+}

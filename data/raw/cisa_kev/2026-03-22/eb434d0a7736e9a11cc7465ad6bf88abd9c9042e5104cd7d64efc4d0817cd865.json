@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-33107",
+  "ingested_at": "2026-03-22T07:45:17.121074+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain an integer overflow vulnerability due to memory corruption in Graphics Linux while assigning shared virtual memory region during IOCTL call.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eb434d0a7736e9a11cc7465ad6bf88abd9c9042e5104cd7d64efc4d0817cd865",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

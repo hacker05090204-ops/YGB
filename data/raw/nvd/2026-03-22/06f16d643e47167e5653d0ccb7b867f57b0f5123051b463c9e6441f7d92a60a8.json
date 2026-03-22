@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32255",
+  "ingested_at": "2026-03-22T07:54:47.781975+00:00",
+  "lang": "en",
+  "raw_text": "Kan is an open-source project management tool. In versions 0.5.4 and below, the /api/download/attatchment endpoint has no authentication and no URL validation. The Attachment Download endpoint accepts a user-supplied URL query parameter and passes it directly to fetch() server-side, and returns the full response body. An unauthenticated attacker can use this to make HTTP requests from the server to internal services, cloud metadata endpoints, or private network resources. This issue has been fixed in version 0.5.5. To workaround this issue, block or restrict access to /api/download/attatchment at the reverse proxy level (nginx, Cloudflare, etc.).",
+  "severity": "HIGH",
+  "sha256_hash": "06f16d643e47167e5653d0ccb7b867f57b0f5123051b463c9e6441f7d92a60a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32255"
+}

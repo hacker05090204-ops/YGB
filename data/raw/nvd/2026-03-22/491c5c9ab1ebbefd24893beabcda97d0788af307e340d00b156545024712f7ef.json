@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69239",
+  "ingested_at": "2026-03-22T07:54:46.344934+00:00",
+  "lang": "en",
+  "raw_text": "Raytha CMS is vulnerable to Server-Side Request Forgery in the \u201cThemes - Import from URL\u201d feature. It allows an attacker with high privileges to provide the URL for redirecting server-side HTTP request. This issue was fixed in version 1.4.6.",
+  "severity": "LOW",
+  "sha256_hash": "491c5c9ab1ebbefd24893beabcda97d0788af307e340d00b156545024712f7ef",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69239"
+}

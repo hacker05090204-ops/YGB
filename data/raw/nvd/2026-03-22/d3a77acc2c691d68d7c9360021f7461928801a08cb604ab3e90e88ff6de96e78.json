@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1323",
+  "ingested_at": "2026-03-22T07:54:47.020104+00:00",
+  "lang": "en",
+  "raw_text": "The extension fails to properly define allowed classes used when deserializing transport failure metadata. An attacker may exploit this to execute untrusted serialized code. Note that an active exploit requires write access to the directory configured at $GLOBALS['TYPO3_CONF_VARS']['MAIL']['transport_spool_filepath'].",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d3a77acc2c691d68d7c9360021f7461928801a08cb604ab3e90e88ff6de96e78",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1323"
+}

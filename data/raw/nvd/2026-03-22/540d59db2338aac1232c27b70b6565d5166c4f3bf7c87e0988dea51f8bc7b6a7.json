@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2455",
+  "ingested_at": "2026-03-22T07:54:46.839389+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to canonicalize IPv4-mapped IPv6 addresses before reserved IP validation which allows an attacker to perform SSRF attacks against internal services via IPv4-mapped IPv6 literals (e.g., [::ffff:127.0.0.1]).. Mattermost Advisory ID: MMSA-2026-00585",
+  "severity": "MEDIUM",
+  "sha256_hash": "540d59db2338aac1232c27b70b6565d5166c4f3bf7c87e0988dea51f8bc7b6a7",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2455"
+}

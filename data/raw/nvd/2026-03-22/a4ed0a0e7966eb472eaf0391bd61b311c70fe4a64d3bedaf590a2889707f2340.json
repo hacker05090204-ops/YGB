@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25436",
+  "ingested_at": "2026-03-22T07:54:30.626843+00:00",
+  "lang": "en",
+  "raw_text": "Sricam DeviceViewer 3.12.0.1 contains a password change security bypass vulnerability that allows authenticated users to change passwords without proper validation of the old password field. Attackers can inject a large payload into the old password parameter during the change password process to bypass validation and set an arbitrary new password.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a4ed0a0e7966eb472eaf0391bd61b311c70fe4a64d3bedaf590a2889707f2340",
+  "source": "nvd",
+  "tags": [
+    "CWE-303"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25436"
+}

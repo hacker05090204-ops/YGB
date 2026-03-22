@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3146",
+  "ingested_at": "2026-03-22T07:54:31.913765+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in libvips up to 8.18.0. The impacted element is the function vips_foreign_load_matrix_header of the file libvips/foreign/matrixload.c. The manipulation leads to null pointer dereference. The attack needs to be performed locally. The identifier of the patch is d4ce337c76bff1b278d7085c3c4f4725e3aa6ece. To fix this issue, it is recommended to deploy a patch.",
+  "severity": "LOW",
+  "sha256_hash": "24a265248d1c6199b91f304d25f8a403927aa64e9992adaa9e942822263419a3",
+  "source": "nvd",
+  "tags": [
+    "CWE-404",
+    "CWE-476"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3146"
+}

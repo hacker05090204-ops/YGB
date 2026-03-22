@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "EverShop is a TypeScript-first eCommerce platform. Versions prior to 2.1.1 have a vulnerability in the \"Forgot Password\" functionality. When specifying a target email address, the API response returns the password reset token. This allows an attacker to take over the associated account. Version 2.1.1 fixes the issue.",
+  "token_count": 47
+}

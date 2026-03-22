@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4978",
+  "ingested_at": "2026-03-22T07:45:16.958070+00:00",
+  "lang": "en",
+  "raw_text": "Justice AV Solutions Viewer Justice AV Solutions (JAVS) Viewer installer contains a malicious version of ffmpeg.exe, named fffmpeg.exe (SHA256: 421a4ad2615941b177b6ec4ab5e239c14e62af2ab07c6df1741e2a62223223c4). When run, this creates a backdoor connection to a malicious C2 server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1ecc159b5a2e38a87961ceb051de3ee901415d54d2ad850a551b6bc46e2c1413",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

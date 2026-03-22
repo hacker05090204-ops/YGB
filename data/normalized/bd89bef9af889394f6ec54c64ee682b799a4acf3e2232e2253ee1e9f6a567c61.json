@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "lxml_html_clean is a project for HTML cleaning functionalities copied from `lxml.html.clean`. Prior to version 0.4.4, the tag passes through the default Cleaner configuration. While page_structure=True removes html, head, and title tags, there is no specific handling for , allowing an attacker to inject it and hijack relative links on the page. This issue has been patched in version 0.4.4.",
+  "token_count": 59
+}

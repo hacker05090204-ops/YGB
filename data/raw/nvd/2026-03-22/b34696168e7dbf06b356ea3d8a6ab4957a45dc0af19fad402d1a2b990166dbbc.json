@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25442",
+  "ingested_at": "2026-03-22T07:54:47.912401+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in QantumThemes Kentha allows Reflected XSS.This issue affects Kentha: from n/a through 4.7.2.",
+  "severity": "HIGH",
+  "sha256_hash": "b34696168e7dbf06b356ea3d8a6ab4957a45dc0af19fad402d1a2b990166dbbc",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25442"
+}

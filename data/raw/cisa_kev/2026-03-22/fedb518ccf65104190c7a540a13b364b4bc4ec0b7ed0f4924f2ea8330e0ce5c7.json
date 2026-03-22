@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22054",
+  "ingested_at": "2026-03-22T07:45:15.853711+00:00",
+  "lang": "en",
+  "raw_text": "Omnissa Workspace One UEM Omnissa Workspace One UEM formerly known as VMware Workspace One UEM contains a server-side request forgery (SSRF) vulnerability that could allow a malicious actor with network access to UEM to send their requests without authentication and to gain access to sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fedb518ccf65104190c7a540a13b364b4bc4ec0b7ed0f4924f2ea8330e0ce5c7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

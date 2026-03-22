@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in LockerProject Locker 0.0.0/0.0.1/0.1.0. Affected is the function authIsAwesome of the file source-code/Locker-master/Ops/registry.js of the component Error Response Handler. The manipulation of the argument ID results in cross site scripting. The attack can be launched remotely. The exploit has been released to the public and may be used for attacks. The project was informed of the problem early through an issue report but has not responded yet.",
+  "token_count": 73
+}

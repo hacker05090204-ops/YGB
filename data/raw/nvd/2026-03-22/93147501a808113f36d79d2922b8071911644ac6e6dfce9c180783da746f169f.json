@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28775",
+  "ingested_at": "2026-03-22T07:54:34.389937+00:00",
+  "lang": "en",
+  "raw_text": "An unauthenticated Remote Code Execution (RCE) vulnerability exists in the SNMP service of International Datacasting Corporation (IDC) SFX Series SuperFlex SatelliteReceiver. The deployment insecurely provisions the `private` SNMP community string with read/write access by default. Because the SNMP agent runs as root, an unauthenticated remote attacker can utilize `NET-SNMP-EXTEND-MIB` directives, abusing the fact that the system runs a vulnerable version of net-snmp pre 5.8, to execute arbitrary operating system commands with root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "93147501a808113f36d79d2922b8071911644ac6e6dfce9c180783da746f169f",
+  "source": "nvd",
+  "tags": [
+    "CWE-1188",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28775"
+}

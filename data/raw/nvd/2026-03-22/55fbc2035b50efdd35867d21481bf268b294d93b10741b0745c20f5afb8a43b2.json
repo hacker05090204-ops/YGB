@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22316",
+  "ingested_at": "2026-03-22T07:54:47.390835+00:00",
+  "lang": "en",
+  "raw_text": "A remote attacker with user privileges for the webUI can use the setting of the TFTP Filename with a POST Request to trigger a stack-based Buffer Overflow, resulting in a DoS attack.",
+  "severity": "MEDIUM",
+  "sha256_hash": "55fbc2035b50efdd35867d21481bf268b294d93b10741b0745c20f5afb8a43b2",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22316"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Palo Alto Networks Expedition Palo Alto Networks Expedition contains an OS command injection vulnerability that allows an unauthenticated attacker to run arbitrary OS commands as root in Expedition, resulting in disclosure of usernames, cleartext passwords, device configurations, and device API keys of PAN-OS firewalls.",
+  "token_count": 44
+}

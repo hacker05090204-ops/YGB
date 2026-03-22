@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24858",
+  "ingested_at": "2026-03-22T07:45:15.948424+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiAnalyzer, FortiManager, FortiOS, and FortiProxy contain an authentication bypass using an alternate path or channel that could allow an attacker with a FortiCloud account and a registered device to log into other devices registered to other accounts, if FortiCloud SSO authentication is enabled on those devices.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4c016b582d7ffdf664f3cfa8847cff27cc8603d6dba211573a80756758f0ba02",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

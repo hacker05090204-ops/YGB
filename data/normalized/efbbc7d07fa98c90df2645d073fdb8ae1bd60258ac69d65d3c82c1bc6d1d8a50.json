@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Tenda F453 1.0.0.3. Affected by this vulnerability is the function fromGstDhcpSetSer of the file /goform/GstDhcpSetSer of the component httpd. The manipulation of the argument dips leads to buffer overflow. The attack may be initiated remotely. The exploit is publicly available and might be used.",
+  "token_count": 49
+}

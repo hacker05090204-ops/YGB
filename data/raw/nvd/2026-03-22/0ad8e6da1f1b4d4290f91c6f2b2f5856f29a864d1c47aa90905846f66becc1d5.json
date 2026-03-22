@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4485",
+  "ingested_at": "2026-03-22T07:54:48.844268+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in itsourcecode College Management System 1.0. The impacted element is an unknown function of the file /admin/search_student.php. The manipulation of the argument Search leads to sql injection. The attack is possible to be carried out remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0ad8e6da1f1b4d4290f91c6f2b2f5856f29a864d1c47aa90905846f66becc1d5",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4485"
+}

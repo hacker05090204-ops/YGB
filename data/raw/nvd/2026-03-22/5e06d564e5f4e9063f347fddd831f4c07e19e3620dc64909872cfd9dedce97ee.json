@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22721",
+  "ingested_at": "2026-03-22T07:54:32.304289+00:00",
+  "lang": "en",
+  "raw_text": "VMware Aria Operations contains a privilege escalation vulnerability. A malicious actor with privileges in vCenter to access Aria Operations may leverage this vulnerability to obtain administrative access in VMware Aria Operations. To remediate CVE-2026-22721, apply the patches listed in the 'Fixed Version' column of the 'Response Matrix' found in VMSA-2026-0001 https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/SecurityAdvisories/0/36947 .",
+  "severity": "MEDIUM",
+  "sha256_hash": "5e06d564e5f4e9063f347fddd831f4c07e19e3620dc64909872cfd9dedce97ee",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22721"
+}

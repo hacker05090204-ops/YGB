@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) A vulnerability in the command-line interface (CLI) parser of Cisco ASA software could allow an authenticated, local attacker to create a denial-of-service (DoS) condition or potentially execute code.",
+  "token_count": 33
+}

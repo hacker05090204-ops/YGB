@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32750",
+  "ingested_at": "2026-03-22T07:54:48.258480+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. In versions 3.6.0 and below, POST /api/import/importStdMd passes the localPath parameter directly to model.ImportFromLocalPath with zero path validation. The function recursively reads every file under the given path and permanently stores their content as SiYuan note documents in the workspace database, making them searchable and accessible to all workspace users. Data persists in the workspace database across restarts and is accessible to Publish Service Reader accounts. Combined with the renderSprig SQL injection ( separate advisory ), a non-admin user can then read all imported secrets without any additional privileges. This issue has been fixed in version 3.6.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a6fd07017b6599b2e4afc8362ac896db337ac3134e5781e566614d6fb8c6fef1",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-552"
+  ],
+  "token_count": 104,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32750"
+}

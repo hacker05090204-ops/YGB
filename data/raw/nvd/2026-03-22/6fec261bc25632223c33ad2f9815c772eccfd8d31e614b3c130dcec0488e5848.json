@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25494",
+  "ingested_at": "2026-03-22T07:54:33.213893+00:00",
+  "lang": "en",
+  "raw_text": "Homey BNB V4 contains an SQL injection vulnerability in the administration panel login that allows unauthenticated attackers to bypass authentication by injecting SQL syntax into username and password fields. Attackers can submit SQL operators like '=' 'or' in both credentials to manipulate the authentication query and gain unauthorized access to the admin panel.",
+  "severity": "HIGH",
+  "sha256_hash": "6fec261bc25632223c33ad2f9815c772eccfd8d31e614b3c130dcec0488e5848",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25494"
+}

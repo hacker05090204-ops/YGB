@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Log4j2 Apache Log4j2 contains a deserialization of untrusted data vulnerability due to the incomplete fix of CVE-2021-44228, where the Thread Context Lookup Pattern is vulnerable to remote code execution in certain non-default configurations.",
+  "token_count": 34
+}

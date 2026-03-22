@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-1776",
+  "ingested_at": "2026-03-22T07:45:18.808402+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a memory corruption vulnerability that allows remote attackers to execute code in the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "92d539de88b5fd2b4a241cf487f65df620c481826e32ab89429cd71351b184da",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

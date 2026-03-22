@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "LibreChat RAG API, version 0.7.0, contains a log-injection vulnerability that allows attackers to forge log entries.",
+  "token_count": 16
+}

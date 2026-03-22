@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26417",
+  "ingested_at": "2026-03-22T07:54:40.891005+00:00",
+  "lang": "en",
+  "raw_text": "A broken access control vulnerability in the password reset functionality of Tata Consultancy Services Cognix Recon Client v3.0 allows authenticated users to reset passwords of arbitrary user accounts via crafted requests.",
+  "severity": "HIGH",
+  "sha256_hash": "c8d654418858d3f312dc1e15d086341c89d12cbced46171c14fc9d6eb04f8f8b",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26417"
+}

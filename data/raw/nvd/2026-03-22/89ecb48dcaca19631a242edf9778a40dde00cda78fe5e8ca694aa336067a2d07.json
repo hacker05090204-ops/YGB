@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28804",
+  "ingested_at": "2026-03-22T07:54:41.332487+00:00",
+  "lang": "en",
+  "raw_text": "pypdf is a free and open-source pure-python PDF library. Prior to version 6.7.5, an attacker who uses this vulnerability can craft a PDF which leads to long runtimes. This requires accessing a stream which uses the /ASCIIHexDecode filter. This issue has been patched in version 6.7.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "89ecb48dcaca19631a242edf9778a40dde00cda78fe5e8ca694aa336067a2d07",
+  "source": "nvd",
+  "tags": [
+    "CWE-407"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28804"
+}

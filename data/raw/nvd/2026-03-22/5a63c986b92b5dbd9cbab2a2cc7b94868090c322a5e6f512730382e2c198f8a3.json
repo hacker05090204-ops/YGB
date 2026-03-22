@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25490",
+  "ingested_at": "2026-03-22T07:54:33.202095+00:00",
+  "lang": "en",
+  "raw_text": "Homey BNB V4 contains a SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'id' parameter. Attackers can send GET requests to the admin/edit.php endpoint with time-based SQL injection payloads to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "5a63c986b92b5dbd9cbab2a2cc7b94868090c322a5e6f512730382e2c198f8a3",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25490"
+}

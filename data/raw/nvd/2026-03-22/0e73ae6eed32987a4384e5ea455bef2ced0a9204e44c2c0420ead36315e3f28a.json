@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0034",
+  "ingested_at": "2026-03-22T07:54:33.945527+00:00",
+  "lang": "en",
+  "raw_text": "In setPackageOrComponentEnabled of ManagedServices.java, there is a possible notification policy desync due to improper input validation. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "0e73ae6eed32987a4384e5ea455bef2ced0a9204e44c2c0420ead36315e3f28a",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0034"
+}

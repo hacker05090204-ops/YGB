@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1775",
+  "ingested_at": "2026-03-22T07:54:34.274520+00:00",
+  "lang": "en",
+  "raw_text": "The Labkotec LID-3300IP has an existing vulnerability in the ice detector software that enables an unauthenticated attacker to alter device parameters and run operational commands when specially crafted packets are sent to the device.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "7ac351ecc3e25d1056a83fb528dded31091c16a4f8d6f2e9cb949cee93d0247c",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1775"
+}

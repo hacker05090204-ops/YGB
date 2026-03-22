@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-1871",
+  "ingested_at": "2026-03-22T07:45:18.921600+00:00",
+  "lang": "en",
+  "raw_text": "Red Hat JBoss Seam 2 JBoss Seam 2 (jboss-seam2), as used in JBoss Enterprise Application Platform 4.3.0 for Red Hat Linux, allows attackers to perform remote code execution. This vulnerability can only be exploited when the Java Security Manager is not properly configured.",
+  "severity": "CRITICAL",
+  "sha256_hash": "99d0c75acd39d8ee156742a1c4e66230e5a4e42ebfc8a473d4cc9043ad459a46",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 43,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

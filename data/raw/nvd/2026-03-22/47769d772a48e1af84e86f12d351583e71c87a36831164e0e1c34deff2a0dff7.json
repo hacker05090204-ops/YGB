@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20025",
+  "ingested_at": "2026-03-22T07:54:46.238638+00:00",
+  "lang": "en",
+  "raw_text": "ZKTeco ZKAccess Professional 3.5.3 contains an insecure file permissions vulnerability that allows authenticated users to escalate privileges by modifying executable files. Attackers can leverage the Modify permission granted to the Authenticated Users group to replace executable binaries with malicious code for privilege escalation.",
+  "severity": "HIGH",
+  "sha256_hash": "47769d772a48e1af84e86f12d351583e71c87a36831164e0e1c34deff2a0dff7",
+  "source": "nvd",
+  "tags": [
+    "CWE-552"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20025"
+}

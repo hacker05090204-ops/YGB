@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22385",
+  "ingested_at": "2026-03-22T07:54:39.996079+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in don-themes Wolmart wolmart allows PHP Local File Inclusion.This issue affects Wolmart: from n/a through < = 1.9.6.",
+  "severity": "HIGH",
+  "sha256_hash": "fcf343fdb6176caff5eb331ac713a7d3b92dfb03e717d49890d70c4be5128b32",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22385"
+}

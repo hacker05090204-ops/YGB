@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-7247",
+  "ingested_at": "2026-03-22T07:45:18.288684+00:00",
+  "lang": "en",
+  "raw_text": "OpenBSD OpenSMTPD smtp_mailaddr in smtp_session.c in OpenSMTPD, as used in OpenBSD and other products, allows remote attackers to execute arbitrary commands as root via a crafted SMTP session.",
+  "severity": "CRITICAL",
+  "sha256_hash": "41e32c3a9ecce1efdeb3ce52578d22b21d163aed6e9067194ab99abaae51258f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Android Android OS The vold volume manager daemon in Android kernel trusts messages from a PF_NETLINK socket, which allows an attacker to execute code and gain root privileges. This vulnerability is associated with GingerBreak and Exploit.AndroidOS.Lotoor.",
+  "token_count": 36
+}

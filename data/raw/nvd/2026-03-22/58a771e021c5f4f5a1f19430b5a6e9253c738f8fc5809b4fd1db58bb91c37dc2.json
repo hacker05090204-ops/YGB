@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27358",
+  "ingested_at": "2026-03-22T07:54:40.220853+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in ThemeGoods Architecturer architecturer allows Reflected XSS.This issue affects Architecturer: from n/a through < = 3.8.8.",
+  "severity": "HIGH",
+  "sha256_hash": "58a771e021c5f4f5a1f19430b5a6e9253c738f8fc5809b4fd1db58bb91c37dc2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27358"
+}

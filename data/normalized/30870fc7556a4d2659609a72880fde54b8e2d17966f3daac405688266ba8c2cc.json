@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in fuelthemes PeakShops peakshops allows Object Injection.This issue affects PeakShops: from n/a through < = 1.5.9.",
+  "token_count": 21
+}

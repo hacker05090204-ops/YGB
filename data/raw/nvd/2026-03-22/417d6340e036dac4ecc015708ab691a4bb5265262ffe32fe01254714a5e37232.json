@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0708",
+  "ingested_at": "2026-03-22T07:54:47.004834+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in libucl. A remote attacker could exploit this by providing a specially crafted Universal Configuration Language (UCL) input that contains a key with an embedded null byte. This can cause a segmentation fault (SEGV fault) in the `ucl_object_emit` function when parsing and emitting the object, leading to a Denial of Service (DoS) for the affected system.",
+  "severity": "HIGH",
+  "sha256_hash": "417d6340e036dac4ecc015708ab691a4bb5265262ffe32fe01254714a5e37232",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0708"
+}

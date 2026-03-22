@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-21839",
+  "ingested_at": "2026-03-22T07:45:17.425099+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server contains an unspecified vulnerability that allows an unauthenticated attacker with network access via T3, IIOP, to compromise Oracle WebLogic Server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e92d2ce84f95fc8a4f3118086b11dc13191cad13bdb0d4bad0f341ba5fe938f3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

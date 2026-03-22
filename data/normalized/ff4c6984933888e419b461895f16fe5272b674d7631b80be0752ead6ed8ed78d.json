@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An SQL injection vulnerability has been reported to affect QHora. If a local attacker gains an administrator account, they can then exploit the vulnerability to execute unauthorized code or commands. We have already fixed the vulnerability in the following version: QuRouter 2.6.2.007 and later",
+  "token_count": 44
+}

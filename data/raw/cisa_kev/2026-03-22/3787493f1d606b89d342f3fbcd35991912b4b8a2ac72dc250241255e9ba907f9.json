@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-6670",
+  "ingested_at": "2026-03-22T07:45:16.822764+00:00",
+  "lang": "en",
+  "raw_text": "Progress WhatsUp Gold Progress WhatsUp Gold contains a SQL injection vulnerability that allows an unauthenticated attacker to retrieve the user's encrypted password if the application is configured with only a single user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3787493f1d606b89d342f3fbcd35991912b4b8a2ac72dc250241255e9ba907f9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

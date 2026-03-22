@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23678",
+  "ingested_at": "2026-03-22T07:54:31.658495+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior contain a command injection vulnerability in the traceroute diagnostic function of the affected device web management interface. By injecting the %1a character into the hostname parameter, an authenticated attacker with access to the web interface can execute arbitrary CLI commands on the device.",
+  "severity": "HIGH",
+  "sha256_hash": "964f9c23ef83c75b54a9faed2c96281532c387faeadb5985f808d8becbc965cb",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23678"
+}

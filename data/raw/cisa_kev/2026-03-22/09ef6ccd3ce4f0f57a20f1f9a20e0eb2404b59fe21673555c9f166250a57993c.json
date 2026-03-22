@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2011-1823",
+  "ingested_at": "2026-03-22T07:45:17.677764+00:00",
+  "lang": "en",
+  "raw_text": "Android Android OS The vold volume manager daemon in Android kernel trusts messages from a PF_NETLINK socket, which allows an attacker to execute code and gain root privileges. This vulnerability is associated with GingerBreak and Exploit.AndroidOS.Lotoor.",
+  "severity": "CRITICAL",
+  "sha256_hash": "09ef6ccd3ce4f0f57a20f1f9a20e0eb2404b59fe21673555c9f166250a57993c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

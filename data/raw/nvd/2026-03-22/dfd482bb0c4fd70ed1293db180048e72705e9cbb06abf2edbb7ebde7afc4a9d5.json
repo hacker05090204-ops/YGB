@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27020",
+  "ingested_at": "2026-03-22T07:54:30.575487+00:00",
+  "lang": "en",
+  "raw_text": "Photobooth prior to 1.0.1 has a cross-site scripting (XSS) vulnerability in user input fields. Malicious users could inject scripts through unvalidated form inputs. This vulnerability is fixed in 1.0.1.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "dfd482bb0c4fd70ed1293db180048e72705e9cbb06abf2edbb7ebde7afc4a9d5",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27020"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4188",
+  "ingested_at": "2026-03-22T07:54:46.688225+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in D-Link DIR-619L 2.06B01. The affected element is the function formSchedule of the file /goform/formSchedule of the component boa. Performing a manipulation of the argument curTime results in stack-based buffer overflow. The attack may be initiated remotely. The exploit has been released to the public and may be used for attacks. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "severity": "HIGH",
+  "sha256_hash": "8bc5fc899722fd4d845f52449a29226c7fc9e399dc50800d4a2c101baf86cee5",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4188"
+}

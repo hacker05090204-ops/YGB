@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-36401",
+  "ingested_at": "2026-03-22T07:45:16.915448+00:00",
+  "lang": "en",
+  "raw_text": "OSGeo GeoServer OSGeo GeoServer GeoTools contains an improper neutralization of directives in dynamically evaluated code vulnerability due to unsafely evaluating property names as XPath expressions. This allows unauthenticated attackers to conduct remote code execution via specially crafted input.",
+  "severity": "CRITICAL",
+  "sha256_hash": "94f0664114b808650c443b49e6601191d95ced3c9ab9dd2b9f8910afb6818a3e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

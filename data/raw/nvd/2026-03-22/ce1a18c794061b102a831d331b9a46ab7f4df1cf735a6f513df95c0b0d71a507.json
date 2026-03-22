@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28354",
+  "ingested_at": "2026-03-22T07:54:33.301177+00:00",
+  "lang": "en",
+  "raw_text": "ClipBucket v5 is an open source video sharing platform. Prior to version 5.5.3 #59, collection item operations are vulnerable to authorization flaws, allowing a normal authenticated user to modify another user\u2019s collection items. This affects both add item (/actions/add_to_collection.php) due to missing authorization checks and delete item (/manage_collections.php?mode=manage_items...) due to a broken ownership check in removeItemFromCollection(). As a result, attackers can insert and remove items from collections they do not own. Version 5.5.3 #59 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ce1a18c794061b102a831d331b9a46ab7f4df1cf735a6f513df95c0b0d71a507",
+  "source": "nvd",
+  "tags": [
+    "CWE-639",
+    "CWE-863"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28354"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Citrix Workspace Application and Receiver for Windows Citrix Workspace Application and Receiver for Windows contains remote code execution vulnerability resulting from local drive access preferences not being enforced into the clients' local drives.",
+  "token_count": 33
+}

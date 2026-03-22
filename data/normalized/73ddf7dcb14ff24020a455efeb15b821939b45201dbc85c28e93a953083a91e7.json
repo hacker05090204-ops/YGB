@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Flowise is a drag & drop user interface to build a customized large language model flow. Prior to version 3.0.13, there is an IDOR vulnerability, leading to account takeover and enterprise feature bypass via SSO configuration. This issue has been patched in version 3.0.13.",
+  "token_count": 44
+}

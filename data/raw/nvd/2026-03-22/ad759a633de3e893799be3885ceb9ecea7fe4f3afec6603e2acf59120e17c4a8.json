@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30970",
+  "ingested_at": "2026-03-22T07:54:42.909031+00:00",
+  "lang": "en",
+  "raw_text": "Coral Server is open collaboration infrastructure that enables communication, coordination, trust and payments for The Internet of Agents. Prior to 1.1.0, Coral Server allowed the creation of agent sessions through the /api/v1/sessions endpoint without strong authentication. This endpoint performs resource-intensive initialization operations including container spawning and memory context creation. An attacker capable of accessing the endpoint could create sessions or consume system resources without proper authorization. This vulnerability is fixed in 1.1.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ad759a633de3e893799be3885ceb9ecea7fe4f3afec6603e2acf59120e17c4a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30970"
+}

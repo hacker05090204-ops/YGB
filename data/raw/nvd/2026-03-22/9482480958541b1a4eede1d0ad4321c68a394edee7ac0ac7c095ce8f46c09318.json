@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30792",
+  "ingested_at": "2026-03-22T07:54:40.820561+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android, WebClient (Strategy sync, HTTP API client, config options engine modules) allows Application API Message Manipulation via Man-in-the-Middle. This vulnerability is associated with program files src/hbbs_http/sync.Rs, hbb_common/src/config.Rs and program routines Strategy merge loop in sync.Rs, Config::set_options(). This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9482480958541b1a4eede1d0ad4321c68a394edee7ac0ac7c095ce8f46c09318",
+  "source": "nvd",
+  "tags": [
+    "CWE-657"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30792"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-31199",
+  "ingested_at": "2026-03-22T07:45:19.301728+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Enhanced Cryptographic Provider Microsoft Enhanced Cryptographic Provider contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "de6443e2919833ac51735179710a39a3e81e47328432b1e9f9119ac00d6c6893",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

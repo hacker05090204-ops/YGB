@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32732",
+  "ingested_at": "2026-03-22T07:54:46.558250+00:00",
+  "lang": "en",
+  "raw_text": "Lean 4 VS Code Extension is a Visual Studio Code extension for the Lean 4 proof assistant. Projects that use @leanprover/unicode-input-component are vulnerable to an XSS exploit in 0.1.9 of the package and lower. The component re-inserted text in the input element back into the input element as unescaped HTML. The issue has been resolved in 0.2.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "2e87789b0f3989348853e0444744d0dd3f81392bbdb2f81fe0b6fd13af93db4b",
+  "source": "nvd",
+  "tags": [
+    "CWE-80"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32732"
+}

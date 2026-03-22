@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Tenda A21 1.0.0.0. Affected by this issue is the function set_qosMib_list of the file /goform/formSetQosBand. The manipulation of the argument list results in stack-based buffer overflow. The attack can be executed remotely. The exploit has been released to the public and may be used for attacks.",
+  "token_count": 53
+}

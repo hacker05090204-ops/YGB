@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28036",
+  "ingested_at": "2026-03-22T07:54:40.421056+00:00",
+  "lang": "en",
+  "raw_text": "Server-Side Request Forgery (SSRF) vulnerability in SkatDesign Ratatouille ratatouille allows Server Side Request Forgery.This issue affects Ratatouille: from n/a through < = 1.2.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5686e71160d15915c9ccce11367403b8ee72e67dc3a7ce77fd30bcb167843b5c",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28036"
+}

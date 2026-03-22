@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Boolean-Based SQL Injection is a type of blind SQL injection where an attacker manipulates SQL queries by injecting Boolean conditions (TRUE or FALSE) into application input fields. Instead of returning database errors or visible data, the application responds differently depending on whether the injected condition evaluates to true or false. This allows an attacker to inject arbitrary SQL into backend configuration queries executed within the application.",
+  "token_count": 66
+}

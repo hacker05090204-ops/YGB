@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32329",
+  "ingested_at": "2026-03-22T07:54:44.779049+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Ays Pro Advanced Related Posts advanced-related-posts allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Advanced Related Posts: from n/a through < = 1.9.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4c7e3bdf2b66ea09545c180cd9ccbad16d90dc199a72582326b24c40e9a3ca68",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32329"
+}

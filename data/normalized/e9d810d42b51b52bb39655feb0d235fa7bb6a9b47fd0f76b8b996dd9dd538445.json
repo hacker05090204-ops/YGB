@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An Insecure Temporary File vulnerability in openSUSE sdbootutil allows local users to pre-create a directory to achieve various effects like: * gain access to possible private information found in /var/lib/pcrlock.d * manipulate the data backed up in /tmp/pcrlock.d.bak, therefore violating the integrity of the data should it be restored. * overwrite protected system files with data from /var/lib/pcrlock.d by placing symlinks to existing files in the directory tree in /tmp/pcrlock.d.bak. This issue affects sdbootutil: from ? before 5880246d3a02642dc68f5c8cb474bf63cdb56bca.",
+  "token_count": 78
+}

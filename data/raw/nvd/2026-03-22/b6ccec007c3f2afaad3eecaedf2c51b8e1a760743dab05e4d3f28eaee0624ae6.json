@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-31971",
+  "ingested_at": "2026-03-22T07:54:47.691034+00:00",
+  "lang": "en",
+  "raw_text": "HTSlib is a library for reading and writing bioinformatics file formats. CRAM is a compressed format which stores DNA sequence alignment data using a variety of encodings and compression methods. When reading data encoded using the `BYTE_ARRAY_LEN` method, the `cram_byte_array_len_decode()` failed to validate that the amount of data being unpacked matched the size of the output buffer where it was to be stored. Depending on the data series being read, this could result either in a heap or a stack overflow with attacker-controlled bytes. Depending on the data stream this could result either in a heap buffer overflow or a stack overflow. If a user opens a file crafted to exploit this issue it could lead to the program crashing, overwriting of data structures on the heap or stack in ways not expected by the program, or changing the control flow of the program. It may be possible to use this to obtain arbitrary code execution. Versions 1.23.1, 1.22.2 and 1.21.1 include fixes for this issue. There is no workaround for this issue.",
+  "severity": "HIGH",
+  "sha256_hash": "b6ccec007c3f2afaad3eecaedf2c51b8e1a760743dab05e4d3f28eaee0624ae6",
+  "source": "nvd",
+  "tags": [
+    "CWE-121",
+    "CWE-122",
+    "CWE-787",
+    "CWE-1284"
+  ],
+  "token_count": 173,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31971"
+}

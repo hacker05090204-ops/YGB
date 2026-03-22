@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Tenda A21 1.0.0.0. This issue affects the function setSchedWifi of the file /goform/openSchedWifi. Performing a manipulation of the argument schedStartTime/schedEndTime results in stack-based buffer overflow. It is possible to initiate the attack remotely. The exploit is now public and may be used.",
+  "token_count": 47
+}

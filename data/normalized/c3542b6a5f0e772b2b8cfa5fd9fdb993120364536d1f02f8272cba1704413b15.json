@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SolarWinds Web Help Desk SolarWinds Web Help Desk contains a hardcoded credential vulnerability that could allow a remote, unauthenticated user to access internal functionality and modify data.",
+  "token_count": 27
+}

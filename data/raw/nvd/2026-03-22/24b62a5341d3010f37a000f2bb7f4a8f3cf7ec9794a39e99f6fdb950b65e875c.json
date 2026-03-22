@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25158",
+  "ingested_at": "2026-03-22T07:54:30.615840+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo LMS 1.11.8 contains an arbitrary file upload vulnerability that allows authenticated users to upload and execute PHP files through the elfinder filemanager module. Attackers can upload files with image headers in the social myfiles section, rename them to PHP extensions, and execute arbitrary code by accessing the uploaded files.",
+  "severity": "HIGH",
+  "sha256_hash": "24b62a5341d3010f37a000f2bb7f4a8f3cf7ec9794a39e99f6fdb950b65e875c",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25158"
+}

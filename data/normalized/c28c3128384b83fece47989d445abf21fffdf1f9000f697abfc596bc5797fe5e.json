@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in a Command ('Command Injection') in Owl opds 2.2.0.4 allows Command Injection via a crafted network request.",
+  "token_count": 23
+}

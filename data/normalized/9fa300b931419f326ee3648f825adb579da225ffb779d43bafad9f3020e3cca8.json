@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CairoSVG is an SVG converter based on Cairo, a 2D graphics library. Prior to Kozea/CairoSVG has exponential denial of service via recursive element amplification in cairosvg/defs.py. This causes CPU exhaustion from a small input.",
+  "token_count": 34
+}

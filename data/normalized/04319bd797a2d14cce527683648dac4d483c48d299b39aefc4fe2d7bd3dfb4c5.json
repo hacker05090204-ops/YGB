@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In wlan STA driver, there is a possible escalation of privilege due to a missing bounds check. This could lead to local escalation of privilege if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: WCNCR00473802; Issue ID: MSV-5970.",
+  "token_count": 48
+}

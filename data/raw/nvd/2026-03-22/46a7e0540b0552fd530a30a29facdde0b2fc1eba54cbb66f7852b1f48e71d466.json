@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28710",
+  "ingested_at": "2026-03-22T07:54:41.168151+00:00",
+  "lang": "en",
+  "raw_text": "Sensitive information disclosure and manipulation due to improper authentication. The following products are affected: Acronis Cyber Protect 17 (Linux, Windows) before build 41186.",
+  "severity": "CRITICAL",
+  "sha256_hash": "46a7e0540b0552fd530a30a29facdde0b2fc1eba54cbb66f7852b1f48e71d466",
+  "source": "nvd",
+  "tags": [
+    "CWE-1390"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28710"
+}

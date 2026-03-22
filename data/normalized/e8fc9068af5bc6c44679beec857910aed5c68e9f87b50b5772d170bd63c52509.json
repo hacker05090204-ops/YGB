@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GROWI OpenAI thread/message API endpoints do not perform authorization. Affected are v7.4.5 and earlier versions. A logged-in user who knows a shared AI assistant's identifier may view and/or tamper the other user's threads/messages.",
+  "token_count": 33
+}

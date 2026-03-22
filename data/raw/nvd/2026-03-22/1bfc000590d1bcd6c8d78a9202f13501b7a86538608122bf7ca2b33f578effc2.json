@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26883",
+  "ingested_at": "2026-03-22T07:54:34.114328+00:00",
+  "lang": "en",
+  "raw_text": "Sourcecodester Online Men's Salon Management System v1.0 is vulnerable to SQL Injection in /msms/classes/Master.php?f=delete_appointment.",
+  "severity": "LOW",
+  "sha256_hash": "1bfc000590d1bcd6c8d78a9202f13501b7a86538608122bf7ca2b33f578effc2",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26883"
+}

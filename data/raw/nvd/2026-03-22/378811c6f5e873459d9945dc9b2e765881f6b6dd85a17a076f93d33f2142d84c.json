@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40538",
+  "ingested_at": "2026-03-22T07:54:31.452899+00:00",
+  "lang": "en",
+  "raw_text": "A broken access control vulnerability exists in Serv-U which when exploited, gives a malicious actor the ability to create a system admin user and execute arbitrary code as a privileged account via domain admin or group admin privileges. This issue requires administrative privileges to abuse. On Windows deployments, the risk is scored as a medium because services frequently run under less-privileged service accounts by default.",
+  "severity": "CRITICAL",
+  "sha256_hash": "378811c6f5e873459d9945dc9b2e765881f6b6dd85a17a076f93d33f2142d84c",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40538"
+}

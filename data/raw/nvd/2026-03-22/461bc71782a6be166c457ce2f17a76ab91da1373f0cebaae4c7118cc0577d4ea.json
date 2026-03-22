@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27015",
+  "ingested_at": "2026-03-22T07:54:32.333814+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, a missing bounds check in `smartcard_unpack_read_size_align()` (`libfreerdp/utils/smartcard_pack.c:1703`) allows a malicious RDP server to crash the FreeRDP client via a reachable `WINPR_ASSERT` \u2192 `abort()`. The crash occurs in upstream builds where `WITH_VERBOSE_WINPR_ASSERT=ON` (default in FreeRDP 3.22.0 / current WinPR CMake defaults). Smartcard redirection must be explicitly enabled by the user (e.g., `xfreerdp /smartcard`; `/smartcard-logon` implies `/smartcard`). Version 3.23.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "461bc71782a6be166c457ce2f17a76ab91da1373f0cebaae4c7118cc0577d4ea",
+  "source": "nvd",
+  "tags": [
+    "CWE-617"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27015"
+}

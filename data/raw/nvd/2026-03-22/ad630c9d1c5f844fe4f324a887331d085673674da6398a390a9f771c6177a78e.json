@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2369",
+  "ingested_at": "2026-03-22T07:54:47.959141+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in libsoup. An integer underflow vulnerability occurs when processing content with a zero-length resource, leading to a buffer overread. This can allow an attacker to potentially access sensitive information or cause an application level denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ad630c9d1c5f844fe4f324a887331d085673674da6398a390a9f771c6177a78e",
+  "source": "nvd",
+  "tags": [
+    "CWE-191"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2369"
+}

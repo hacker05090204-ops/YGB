@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30869",
+  "ingested_at": "2026-03-22T07:54:42.515413+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to 3.5.10, a path traversal vulnerability in the /export endpoint allows an attacker to read arbitrary files from the server filesystem. By exploiting double\u2010encoded traversal sequences, an attacker can access sensitive files such as conf/conf.json, which contains secrets including the API token, cookie signing key, and workspace access authentication code. Leaking these secrets may enable administrative access to the SiYuan kernel API, and in certain deployment scenarios could potentially be chained into remote code execution (RCE). This vulnerability is fixed in 3.5.10.",
+  "severity": "CRITICAL",
+  "sha256_hash": "35a05815ddff81645f2f0940aa08be91129afa183df359f3da82ccaa588c06b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30869"
+}

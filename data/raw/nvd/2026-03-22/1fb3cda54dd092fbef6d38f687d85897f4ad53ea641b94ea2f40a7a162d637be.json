@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3752",
+  "ingested_at": "2026-03-22T07:54:42.084285+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in SourceCodester Employee Task Management System up to 1.0. The affected element is an unknown function of the file /daily-task-report.php of the component GET Parameter Handler. This manipulation of the argument Date causes sql injection. It is possible to initiate the attack remotely. The exploit has been published and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1fb3cda54dd092fbef6d38f687d85897f4ad53ea641b94ea2f40a7a162d637be",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3752"
+}

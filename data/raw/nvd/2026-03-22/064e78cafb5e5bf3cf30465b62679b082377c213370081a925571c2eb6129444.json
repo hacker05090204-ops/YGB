@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27645",
+  "ingested_at": "2026-03-22T07:54:31.957949+00:00",
+  "lang": "en",
+  "raw_text": "changedetection.io is a free open source web page change detection tool. In versions prior to 0.54.1, the RSS single-watch endpoint reflects the UUID path parameter directly in the HTTP response body without HTML escaping. Since Flask returns text/html by default for plain string responses, the browser parses and executes injected JavaScript. Version 0.54.1 contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "064e78cafb5e5bf3cf30465b62679b082377c213370081a925571c2eb6129444",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27645"
+}

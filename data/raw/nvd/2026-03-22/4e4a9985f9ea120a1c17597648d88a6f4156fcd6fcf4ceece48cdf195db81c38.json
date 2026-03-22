@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30237",
+  "ingested_at": "2026-03-22T07:54:41.664177+00:00",
+  "lang": "en",
+  "raw_text": "Group-Office is an enterprise customer relationship management and groupware tool. Prior to versions 6.8.155, 25.0.88, and 26.0.10, there is a reflected XSS vulnerability in the GroupOffice installer, endpoint install/license.php. The POST field license is rendered without escaping inside a , allowing a ... breakout.. This issue has been patched in versions 6.8.155, 25.0.88, and 26.0.10.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4e4a9985f9ea120a1c17597648d88a6f4156fcd6fcf4ceece48cdf195db81c38",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30237"
+}

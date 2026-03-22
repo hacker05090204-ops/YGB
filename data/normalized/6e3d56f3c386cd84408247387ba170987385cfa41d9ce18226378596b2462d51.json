@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Control of Generation of Code ('Code Injection') vulnerability in Crocoblock JetEngine jet-engine allows Remote Code Inclusion.This issue affects JetEngine: from n/a through < = 3.7.2.",
+  "token_count": 26
+}

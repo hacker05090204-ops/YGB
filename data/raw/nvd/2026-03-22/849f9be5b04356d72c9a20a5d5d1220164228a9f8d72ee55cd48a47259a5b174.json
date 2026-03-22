@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-33180",
+  "ingested_at": "2026-03-22T07:54:31.733502+00:00",
+  "lang": "en",
+  "raw_text": "NVIDIA Cumulus Linux and NVOS products contain a vulnerability in the NVUE interface, where a low-privileged user could inject a command. A successful exploit of this vulnerability might lead to escalation of privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "849f9be5b04356d72c9a20a5d5d1220164228a9f8d72ee55cd48a47259a5b174",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-33180"
+}

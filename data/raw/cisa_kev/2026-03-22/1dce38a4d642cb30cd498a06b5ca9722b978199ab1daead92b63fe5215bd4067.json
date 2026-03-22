@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-44515",
+  "ingested_at": "2026-03-22T07:45:18.900377+00:00",
+  "lang": "en",
+  "raw_text": "Zoho Desktop Central Zoho Desktop Central contains an authentication bypass vulnerability that could allow an attacker to execute arbitrary code in the Desktop Central MSP server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1dce38a4d642cb30cd498a06b5ca9722b978199ab1daead92b63fe5215bd4067",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

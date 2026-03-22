@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3057",
+  "ingested_at": "2026-03-22T07:54:31.425399+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in a54552239 pearProjectApi up to 2.8.10. Affected is the function dateTotalForProject of the file application/common/Model/Task.php of the component Backend Interface. The manipulation of the argument projectCode results in sql injection. The attack can be launched remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1c4f4052db4695875446fa1b132fa5f58e5fbf75e4c072956974cba56014218b",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3057"
+}

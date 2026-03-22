@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3382",
+  "ingested_at": "2026-03-22T07:54:33.437728+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in ChaiScript up to 6.1.0. The impacted element is the function chaiscript::Boxed_Number::get_as of the file include/chaiscript/dispatchkit/boxed_number.hpp. Performing a manipulation results in memory corruption. The attack requires a local approach. The exploit has been released to the public and may be used for attacks. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "967efc1a9d28339cbb55e8dde42e8fb71846d2e4266e4a386d04054071c2f563",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-787"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3382"
+}

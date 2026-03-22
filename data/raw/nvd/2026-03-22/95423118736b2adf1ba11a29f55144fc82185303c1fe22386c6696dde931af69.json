@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32304",
+  "ingested_at": "2026-03-22T07:54:44.761029+00:00",
+  "lang": "en",
+  "raw_text": "Locutus brings stdlibs of other programming languages to JavaScript for educational purposes. Prior to 3.0.14, the create_function(args, code) function passes both parameters directly to the Function constructor without any sanitization, allowing arbitrary code execution. This is distinct from CVE-2026-29091 which was call_user_func_array using eval() in v2.x. This finding affects create_function using new Function() in v3.x. This vulnerability is fixed in 3.0.14.",
+  "severity": "CRITICAL",
+  "sha256_hash": "95423118736b2adf1ba11a29f55144fc82185303c1fe22386c6696dde931af69",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32304"
+}

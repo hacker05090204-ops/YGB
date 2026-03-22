@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-20062",
+  "ingested_at": "2026-03-22T07:45:19.600853+00:00",
+  "lang": "en",
+  "raw_text": "ThinkPHP noneCms ThinkPHP \"noneCms\" contains an unspecified vulnerability that allows for remote code execution through crafted use of the filter parameter.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d6a77ede15c6ddffd05565172ae8fef0ebe75f428b1f98e4d0412bea3497a19c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

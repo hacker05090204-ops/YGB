@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-26085",
+  "ingested_at": "2026-03-22T07:45:18.200514+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Server Affected versions of Atlassian Confluence Server allow remote attackers to view restricted resources via a pre-authorization arbitrary file read vulnerability in the /s/ endpoint.",
+  "severity": "CRITICAL",
+  "sha256_hash": "afb99f479954e0d0a5a5af4002c84ee17f26224f05f6d3645efd95743d98f03e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

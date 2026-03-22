@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Angeet ES3 KVM does not properly sanitize user-supplied variables parsed by the 'cfg.lua' script, allowing an authenticated attacker to execute OS-level commands.",
+  "token_count": 23
+}

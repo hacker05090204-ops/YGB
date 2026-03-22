@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27523",
+  "ingested_at": "2026-03-22T07:54:47.298104+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.24 contain a sandbox bind validation vulnerability allowing attackers to bypass allowed-root and blocked-path checks via symlinked parent directories with non-existent leaf paths. Attackers can craft bind source paths that appear within allowed roots but resolve outside sandbox boundaries once missing leaf components are created, weakening bind-source isolation enforcement.",
+  "severity": "MEDIUM",
+  "sha256_hash": "313d7672d0ff7405e3183db35eaafbca22a06fc9c9af3829f34eaa7d3ab1ba7e",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27523"
+}

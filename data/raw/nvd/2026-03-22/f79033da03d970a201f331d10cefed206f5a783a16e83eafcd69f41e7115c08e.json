@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28543",
+  "ingested_at": "2026-03-22T07:54:40.736171+00:00",
+  "lang": "en",
+  "raw_text": "Race condition vulnerability in the maintenance and diagnostics module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f79033da03d970a201f331d10cefed206f5a783a16e83eafcd69f41e7115c08e",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28543"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26746",
+  "ingested_at": "2026-03-22T07:54:30.503917+00:00",
+  "lang": "en",
+  "raw_text": "OpenSourcePOS 3.4.1 contains a Local File Inclusion (LFI) vulnerability in the Sales.php::getInvoice() function. An attacker can read arbitrary files on the web server by manipulating the Invoice Type configuration. This issue can be chained with the file upload functionality to achieve Remote Code Execution (RCE).",
+  "severity": "HIGH",
+  "sha256_hash": "b7cc93b37c1dd9c49f085081d6631b7c95df67c162dcf1e00a09bd3a132757cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26746"
+}

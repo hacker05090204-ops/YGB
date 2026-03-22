@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4171",
+  "ingested_at": "2026-03-22T07:54:46.659490+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in CodeGenieApp serverless-express up to 4.17.1. Affected by this issue is some unknown functionality of the file examples/lambda-function-url/packages/api/models/TodoList.ts of the component API Endpoint. The manipulation of the argument userId leads to authorization bypass. The attack is possible to be carried out remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "010fd7ff0429b2d599d81faf4af3b92c6a8cef0677ceb0dc9a3d3fc21cf2f8f0",
+  "source": "nvd",
+  "tags": [
+    "CWE-285",
+    "CWE-639"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4171"
+}

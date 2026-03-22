@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to version 1.20.1, a vulnerability in the SCM URL parsing used by Backstage integrations allowed path traversal sequences in encoded form to be included in file paths. When these URLs were processed by integration functions that construct API URLs, the traversal segments could redirect requests to unintended SCM provider API endpoints using the configured server-side integration credentials. This issue has been patched in version 1.20.1.",
+  "token_count": 75
+}

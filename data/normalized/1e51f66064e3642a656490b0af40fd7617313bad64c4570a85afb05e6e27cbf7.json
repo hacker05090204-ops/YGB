@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware versions prior to V300SP10260209 generate predictable numeric session identifiers in the web management interface. An attacker can guess valid session IDs and hijack authenticated sessions.",
+  "token_count": 30
+}

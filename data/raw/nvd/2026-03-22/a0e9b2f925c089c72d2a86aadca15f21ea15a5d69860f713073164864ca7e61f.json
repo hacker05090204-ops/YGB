@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2869",
+  "ingested_at": "2026-03-22T07:54:30.863635+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in janet-lang janet up to 1.40.1. Affected by this vulnerability is the function janetc_varset of the file src/core/specials.c of the component handleattr Handler. The manipulation leads to out-of-bounds read. The attack can only be performed from a local environment. The exploit is publicly available and might be used. Upgrading to version 1.41.0 addresses this issue. The identifier of the patch is 2fabc80151a2b8834ee59cda8a70453f848b40e5. The affected component should be upgraded.",
+  "severity": "LOW",
+  "sha256_hash": "a0e9b2f925c089c72d2a86aadca15f21ea15a5d69860f713073164864ca7e61f",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125",
+    "CWE-125"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2869"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1275",
+  "ingested_at": "2026-03-22T07:54:49.267112+00:00",
+  "lang": "en",
+  "raw_text": "The Multi Post Carousel by Category plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'slides' shortcode attribute in all versions up to, and including, 1.4. This is due to insufficient input sanitization and output escaping on the user-supplied 'slides' parameter in the post_slides_shortcode function. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "34bdbca40730c8cd1f7ef61143335e19edfbd459c98f7db57869f35eca2f1708",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1275"
+}

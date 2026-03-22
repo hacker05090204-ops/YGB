@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32102",
+  "ingested_at": "2026-03-22T07:54:43.972907+00:00",
+  "lang": "en",
+  "raw_text": "OliveTin gives access to predefined shell commands from a web interface. In 3000.10.2 and earlier, OliveTin\u2019s live EventStream broadcasts execution events and action output to authenticated dashboard subscribers without enforcing per-action authorization. A low-privileged authenticated user can receive output from actions they are not allowed to view, resulting in broken access control and sensitive information disclosure.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6620dc9e92f26dbf9fbf3dc144abe5c4a1eed29cdaa985d88fd910f507a4c940",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-863"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32102"
+}

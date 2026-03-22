@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27589",
+  "ingested_at": "2026-03-22T07:54:31.704221+00:00",
+  "lang": "en",
+  "raw_text": "Caddy is an extensible server platform that uses TLS by default. Prior to version 2.11.1, the local caddy admin API (default listen `127.0.0.1:2019`) exposes a state-changing `POST /load` endpoint that replaces the entire running configuration. When origin enforcement is not enabled (`enforce_origin` not configured), the admin endpoint accepts cross-origin requests (e.g., from attacker-controlled web content in a victim browser) and applies an attacker-supplied JSON config. This can change the admin listener settings and alter HTTP server behavior without user intent. Version 2.11.1 contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed7ba632ed34b0079a5d7492082eed454dbf92d88ce1a8cd89c64e3d858369bd",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27589"
+}

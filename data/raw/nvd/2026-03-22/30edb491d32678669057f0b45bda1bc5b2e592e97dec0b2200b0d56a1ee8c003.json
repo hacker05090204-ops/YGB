@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-36364",
+  "ingested_at": "2026-03-22T07:54:34.210013+00:00",
+  "lang": "en",
+  "raw_text": "IBM DevOps Plan 3.0.0 through 3.0.5 allows web page cache to be stored locally which can be read by another user on the system.",
+  "severity": "MEDIUM",
+  "sha256_hash": "30edb491d32678669057f0b45bda1bc5b2e592e97dec0b2200b0d56a1ee8c003",
+  "source": "nvd",
+  "tags": [
+    "CWE-525",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-36364"
+}

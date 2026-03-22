@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28457",
+  "ingested_at": "2026-03-22T07:54:41.044054+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a path traversal vulnerability in sandbox skill mirroring (must be enabled) that uses the skill frontmatter name parameter unsanitized when copying skills into the sandbox workspace. Attackers who provide a crafted skill package with traversal sequences like ../ or absolute paths in the name field can write files outside the sandbox workspace root directory.",
+  "severity": "MEDIUM",
+  "sha256_hash": "89e03269c3e00911cf00fa78ddd6ae0ce01cdad1f7ef9bef989ac46a16469fad",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28457"
+}

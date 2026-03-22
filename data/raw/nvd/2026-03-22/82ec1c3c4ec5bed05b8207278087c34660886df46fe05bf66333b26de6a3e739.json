@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1525",
+  "ingested_at": "2026-03-22T07:54:44.498283+00:00",
+  "lang": "en",
+  "raw_text": "Undici allows duplicate HTTP Content-Length headers when they are provided in an array with case-variant names (e.g., Content-Length and content-length). This produces malformed HTTP/1.1 requests with multiple conflicting Content-Length values on the wire. Who is impacted: * Applications using undici.request(), undici.Client, or similar low-level APIs with headers passed as flat arrays * Applications that accept user-controlled header names without case-normalization Potential consequences: * Denial of Service: Strict HTTP parsers (proxies, servers) will reject requests with duplicate Content-Length headers (400 Bad Request) * HTTP Request Smuggling: In deployments where an intermediary and backend interpret duplicate headers inconsistently (e.g., one uses the first value, the other uses the last), this can enable request smuggling attacks leading to ACL bypass, cache poisoning, or credential hijacking",
+  "severity": "MEDIUM",
+  "sha256_hash": "82ec1c3c4ec5bed05b8207278087c34660886df46fe05bf66333b26de6a3e739",
+  "source": "nvd",
+  "tags": [
+    "CWE-444"
+  ],
+  "token_count": 122,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1525"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper validation of specified type of input in SQL Server allows an authorized attacker to elevate privileges over a network.",
+  "token_count": 20
+}

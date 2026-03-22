@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Twilio Authy Twilio Authy contains an information disclosure vulnerability in its API that allows an unauthenticated endpoint to accept a request containing a phone number and respond with information about whether the phone number was registered with Authy.",
+  "token_count": 38
+}

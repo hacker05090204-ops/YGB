@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28121",
+  "ingested_at": "2026-03-22T07:54:40.659705+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in AncoraThemes Anderson andersonclinic allows PHP Local File Inclusion.This issue affects Anderson: from n/a through < = 1.4.2.",
+  "severity": "HIGH",
+  "sha256_hash": "71174ce695cc03c71b929cd4ab6679e8f780fe3ddd7dd33c42942bdc8393982f",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28121"
+}

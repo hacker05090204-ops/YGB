@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Broadcom Brocade Fabric OS Broadcom Brocade Fabric OS contains a code injection vulnerability that allows a local user with administrative privileges to execute arbitrary code with full root privileges.",
+  "token_count": 29
+}

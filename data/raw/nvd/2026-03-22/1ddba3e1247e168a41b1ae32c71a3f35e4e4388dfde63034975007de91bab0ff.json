@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-0011",
+  "ingested_at": "2026-03-22T07:54:33.905903+00:00",
+  "lang": "en",
+  "raw_text": "In enableSystemPackageLPw of Settings.java, there is a possible way to prevent location access from working due to a logic error in the code. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "1ddba3e1247e168a41b1ae32c71a3f35e4e4388dfde63034975007de91bab0ff",
+  "source": "nvd",
+  "tags": [
+    "CWE-693",
+    "CWE-703"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0011"
+}

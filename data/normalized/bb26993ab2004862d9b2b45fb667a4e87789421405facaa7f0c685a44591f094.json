@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "N-able N-Central N-able N-Central contains a command injection vulnerability via improper sanitization of user input.",
+  "token_count": 15
+}

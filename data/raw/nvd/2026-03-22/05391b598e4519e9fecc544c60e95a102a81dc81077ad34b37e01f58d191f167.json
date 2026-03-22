@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25970",
+  "ingested_at": "2026-03-22T07:54:31.360062+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a signed integer overflow vulnerability in ImageMagick's SIXEL decoder allows an attacker to trigger memory corruption and denial of service when processing a maliciously crafted SIXEL image file. The vulnerability occurs during buffer reallocation operations where pointer arithmetic using signed 32-bit integers overflows. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "05391b598e4519e9fecc544c60e95a102a81dc81077ad34b37e01f58d191f167",
+  "source": "nvd",
+  "tags": [
+    "CWE-190"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25970"
+}

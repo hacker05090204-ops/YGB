@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in of Cisco Secure Firewall Threat Defense (FTD) Software could allow an authenticated, local attacker to cause the device to unexpectedly reload, causing a denial of service (DoS) condition. This vulnerability is due to improper validation of user-supplied input. An attacker with a low-privileged account could exploit this vulnerability by using crafted commands at the CLI prompt. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "token_count": 77
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: io_uring/rw: free potentially allocated iovec on cache put failure If a read/write request goes through io_req_rw_cleanup() and has an allocated iovec attached and fails to put to the rw_cache, then it may end up with an unaccounted iovec pointer. Have io_rw_recycle() return whether it recycled the request or not, and use that to gauge whether to free a potential iovec or not.",
+  "token_count": 72
+}

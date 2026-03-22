@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-25989",
+  "ingested_at": "2026-03-22T07:54:31.393393+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a crafted SVG file can cause a denial of service. An off-by-one boundary check (`>` instead of `>=`) that allows bypass the guard and reach an undefined `(size_t)` cast. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "HIGH",
+  "sha256_hash": "a6ac3914fc3839098ec791dda5bb5bcdf02dd0a37668802410541e42048257d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-190",
+    "CWE-681",
+    "CWE-193"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25989"
+}

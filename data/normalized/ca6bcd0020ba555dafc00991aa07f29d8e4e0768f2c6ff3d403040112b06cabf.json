@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GPAC is an open-source multimedia framework. Prior to commit 86b0e36, a heap-based buffer overflow (write) vulnerability was discovered in GPAC MP4Box. The vulnerability exists in the gf_xml_parse_bit_sequence_bs function in utils/xml_bin_custom.c when processing a crafted NHML file containing malicious (BitSequence) elements. An attacker can exploit this by providing a specially crafted NHML file, causing an out-of-bounds write on the heap. This issue has been via commit 86b0e36.",
+  "token_count": 66
+}

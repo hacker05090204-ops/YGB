@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33064",
+  "ingested_at": "2026-03-22T07:54:48.679489+00:00",
+  "lang": "en",
+  "raw_text": "Free5GC is an open-source Linux Foundation project for 5th generation (5G) mobile core networks. Versions prior to 1.4.2 are vulnerable to procedure panic caused by Nil Pointer Dereference in the /sdm-subscriptions endpoint. A remote attacker can cause the UDM service to panic and crash by sending a crafted POST request to the /sdm-subscriptions endpoint with a malformed URL path containing path traversal sequences (../) and a large JSON payload. The DataChangeNotificationProcedure function in notifier.go attempts to access a nil pointer without proper validation, causing a complete service crash with \"runtime error: invalid memory address or nil pointer dereference\". Exploitation would result in UDM functionality disruption until recovery by restart. This issue has been fixed in version 1.4.2.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c9e53fb13b7dc9305f46908c12e78fe96ce952e8cf28055e7f9d1335b70fb243",
+  "source": "nvd",
+  "tags": [
+    "CWE-478"
+  ],
+  "token_count": 117,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33064"
+}

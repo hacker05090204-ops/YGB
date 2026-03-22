@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27730",
+  "ingested_at": "2026-03-22T07:54:32.116432+00:00",
+  "lang": "en",
+  "raw_text": "esm.sh is a no-build content delivery network (CDN) for web development. Versions up to and including 137 have an SSRF vulnerability (CWE-918) in esm.sh\u2019s `/http(s)` fetch route. The service tries to block localhost/internal targets, but the validation is based on hostname string checks and can be bypassed using DNS alias domains. This allows an external requester to make the esm.sh server fetch internal localhost services. As of time of publication, no known patched versions exist.",
+  "severity": "HIGH",
+  "sha256_hash": "fa1d22dd50fe769752809147a97c2275b2011f842e1feca785c7534a243e51a5",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27730"
+}

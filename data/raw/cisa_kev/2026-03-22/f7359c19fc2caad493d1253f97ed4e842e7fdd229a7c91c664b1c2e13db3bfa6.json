@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24423",
+  "ingested_at": "2026-03-22T07:45:15.934928+00:00",
+  "lang": "en",
+  "raw_text": "SmarterTools SmarterMail SmarterTools SmarterMail contains a missing authentication for critical function vulnerability in the ConnectToHub API method. This could allow the attacker to point the SmarterMail instance to a malicious HTTP server which serves the malicious OS command and could lead to command execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f7359c19fc2caad493d1253f97ed4e842e7fdd229a7c91c664b1c2e13db3bfa6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

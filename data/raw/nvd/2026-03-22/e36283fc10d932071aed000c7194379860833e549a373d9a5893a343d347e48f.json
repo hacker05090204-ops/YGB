@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3432",
+  "ingested_at": "2026-03-22T07:54:33.581976+00:00",
+  "lang": "en",
+  "raw_text": "On SimStudio version below to 0.5.74, the `/api/auth/oauth/token` endpoint contains a code path that bypasses all authorization checks when provided with `credentialAccountUserId` and `providerId` parameters. An unauthenticated attacker can retrieve OAuth access tokens for any user by supplying their user ID and a provider name, effectively stealing credentials to third-party services.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e36283fc10d932071aed000c7194379860833e549a373d9a5893a343d347e48f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3432"
+}

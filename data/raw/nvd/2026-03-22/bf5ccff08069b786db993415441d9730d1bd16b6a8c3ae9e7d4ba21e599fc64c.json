@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22183",
+  "ingested_at": "2026-03-22T07:54:44.607158+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a stored cross-site scripting vulnerability in the inline comment preview functionality that allows authenticated users to inject malicious scripts by submitting comments with unescaped content. Attackers with unfiltered_html capabilities can inject JavaScript directly through comment content rendered in the AJAX response from the getLastInlineComments() function in class.WpdiscuzHelperAjax.php without proper HTML escaping.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bf5ccff08069b786db993415441d9730d1bd16b6a8c3ae9e7d4ba21e599fc64c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22183"
+}

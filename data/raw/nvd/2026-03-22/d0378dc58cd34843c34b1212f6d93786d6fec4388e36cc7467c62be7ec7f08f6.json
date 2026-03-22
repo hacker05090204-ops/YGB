@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20443",
+  "ingested_at": "2026-03-22T07:54:33.547335+00:00",
+  "lang": "en",
+  "raw_text": "In display, there is a possible memory corruption due to use after free. This could lead to local escalation of privilege if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: ALPS10436998; Issue ID: MSV-5722.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d0378dc58cd34843c34b1212f6d93786d6fec4388e36cc7467c62be7ec7f08f6",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20443"
+}

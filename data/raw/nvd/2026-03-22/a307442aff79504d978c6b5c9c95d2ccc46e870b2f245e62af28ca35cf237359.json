@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29058",
+  "ingested_at": "2026-03-22T07:54:41.346489+00:00",
+  "lang": "en",
+  "raw_text": "AVideo is a video-sharing Platform software. Prior to version 7.0, an unauthenticated attacker can execute arbitrary OS commands on the server by injecting shell command substitution into the base64Url GET parameter. This can lead to full server compromise, data exfiltration (e.g., configuration secrets, internal keys, credentials), and service disruption. This issue has been patched in version 7.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a307442aff79504d978c6b5c9c95d2ccc46e870b2f245e62af28ca35cf237359",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29058"
+}

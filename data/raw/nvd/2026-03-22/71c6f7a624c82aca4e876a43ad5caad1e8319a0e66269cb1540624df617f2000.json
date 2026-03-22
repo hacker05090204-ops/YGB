@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32140",
+  "ingested_at": "2026-03-22T07:54:44.436799+00:00",
+  "lang": "en",
+  "raw_text": "Dataease is an open source data visualization analysis tool. Prior to 2.10.20, By controlling the IniFile parameter, an attacker can force the JDBC driver to load an attacker-controlled configuration file. This configuration file can inject dangerous JDBC properties, leading to remote code execution. The Redshift JDBC driver execution flow reaches a method named getJdbcIniFile. The getJdbcIniFile method implements an aggressive automatic configuration file discovery mechanism. If not explicitly restricted, it searches for a file named rsjdbc.ini. In a JDBC URL context, users can explicitly specify the configuration file via URL parameters, which allows arbitrary files on the server to be loaded as JDBC configuration files. Within the Redshift JDBC driver properties, the parameter IniFile is explicitly supported and used to load an external configuration file. This vulnerability is fixed in 2.10.20.",
+  "severity": "HIGH",
+  "sha256_hash": "71c6f7a624c82aca4e876a43ad5caad1e8319a0e66269cb1540624df617f2000",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 131,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32140"
+}

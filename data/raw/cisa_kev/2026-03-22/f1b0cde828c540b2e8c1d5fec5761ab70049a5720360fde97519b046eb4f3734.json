@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-59718",
+  "ingested_at": "2026-03-22T07:45:16.007325+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiOS, FortiSwitchMaster, FortiProxy, and FortiWeb contain an improper verification of cryptographic signature vulnerability that may allow an unauthenticated attacker to bypass the FortiCloud SSO login authentication via a crafted SAML message. Please be aware that CVE-2025-59719 pertains to the same problem and is mentioned in the same vendor advisory. Ensure to apply all patches mentioned in the advisory.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f1b0cde828c540b2e8c1d5fec5761ab70049a5720360fde97519b046eb4f3734",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 62,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

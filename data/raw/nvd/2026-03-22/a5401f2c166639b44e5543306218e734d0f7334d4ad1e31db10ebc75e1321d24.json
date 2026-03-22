@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68564",
+  "ingested_at": "2026-03-22T07:54:30.131027+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in sendy Sendy sendy allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Sendy: from n/a through < = 3.4.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a5401f2c166639b44e5543306218e734d0f7334d4ad1e31db10ebc75e1321d24",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68564"
+}

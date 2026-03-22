@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2809",
+  "ingested_at": "2026-03-22T07:54:47.183919+00:00",
+  "lang": "en",
+  "raw_text": "Netskope was notified about a potential gap in its Endpoint DLP Module for Netskope Client on Windows systems. The successful exploitation of the gap can potentially allow a privileged user to trigger an integer overflow within the DLL Injector, leading to a Blue-Screen-of-Death (BSOD). Successful exploitation would require the Endpoint DLP module to be enabled in the client configuration. A successful exploit can potentially result in a denial-of-service for the local machine.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9ab8c8985bf74861b3b9f172420806f29b10b0e616ae66caaa945305b6dda4c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-190"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2809"
+}

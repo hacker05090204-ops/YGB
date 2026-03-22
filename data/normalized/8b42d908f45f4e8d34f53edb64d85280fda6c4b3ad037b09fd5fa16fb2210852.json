@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Hitachi Vantara Pentaho Business Analytics (BA) Server Hitachi Vantara Pentaho BA Server contains a special element injection vulnerability that allows an attacker to inject Spring templates into properties files, allowing for arbitrary command execution.",
+  "token_count": 34
+}

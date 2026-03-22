@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24297",
+  "ingested_at": "2026-03-22T07:54:42.713366+00:00",
+  "lang": "en",
+  "raw_text": "Concurrent execution using shared resource with improper synchronization ('race condition') in Windows Kerberos allows an unauthorized attacker to bypass a security feature over a network.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bdd15b7cafb633d09c475ab3c326d5b979c1826227183d48511ba26bfefa0c5a",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24297"
+}

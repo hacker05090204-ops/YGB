@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-1187",
+  "ingested_at": "2026-03-22T07:45:18.384250+00:00",
+  "lang": "en",
+  "raw_text": "D-Link and TRENDnet Multiple Devices The ping tool in multiple D-Link and TRENDnet devices allow remote attackers to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b2ba3d157b160dda05573f50ea6b147e3dc5b6f5cadab16ce9bba97860eb7459",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

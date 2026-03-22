@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Paessler PRTG Network Monitor Paessler PRTG Network Monitor contains a local file inclusion vulnerability that allows a remote, unauthenticated attacker to create users with read-write privileges (including administrator).",
+  "token_count": 28
+}

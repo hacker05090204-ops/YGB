@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25508",
+  "ingested_at": "2026-03-22T07:54:44.268444+00:00",
+  "lang": "en",
+  "raw_text": "Jettweb Php Hazir Ilan Sitesi Scripti V2 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'kat' parameter. Attackers can send GET requests to the katgetir.php endpoint with malicious 'kat' values to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "03ab5e5ea290a878cae1403cc4b57b3d72da4078f9ba83d86087fc9bd1a232c4",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25508"
+}

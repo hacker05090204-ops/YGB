@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23243",
+  "ingested_at": "2026-03-22T07:54:47.436591+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: RDMA/umad: Reject negative data_len in ib_umad_write ib_umad_write computes data_len from user-controlled count and the MAD header sizes. With a mismatched user MAD header size and RMPP header length, data_len can become negative and reach ib_create_send_mad(). This can make the padding calculation exceed the segment size and trigger an out-of-bounds memset in alloc_send_rmpp_list(). Add an explicit check to reject negative data_len before creating the send buffer. KASAN splat: [ 211.363464] BUG: KASAN: slab-out-of-bounds in ib_create_send_mad+0xa01/0x11b0 [ 211.364077] Write of size 220 at addr ffff88800c3fa1f8 by task spray_thread/102 [ 211.365867] ib_create_send_mad+0xa01/0x11b0 [ 211.365887] ib_umad_write+0x853/0x1c80",
+  "severity": "UNKNOWN",
+  "sha256_hash": "01b38cba544499bbc3f5cb2dbc2b1792848fdbb59ea84046444a8912a8c0d7d1",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23243"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31798",
+  "ingested_at": "2026-03-22T07:54:44.711404+00:00",
+  "lang": "en",
+  "raw_text": "JumpServer is an open source bastion host and an operation and maintenance security audit system. Prior to v4.10.16-lts, JumpServer improperly validates certificates in the Custom SMS API Client. When JumpServer sends MFA/OTP codes via Custom SMS API, an attacker can intercept the request and capture the verification code BEFORE it reaches the user's phone. This vulnerability is fixed in v4.10.16-lts.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6fafc029604bfc0be894090e53fb193f42bc3e2e5311d65d2d81907dc5a51fdf",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31798"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WordPress Social Warfare Plugin WordPress Social Warfare plugin contains a cross-site scripting (XSS) vulnerability that allows for remote code execution. This vulnerability affects Social Warfare and Social Warfare Pro.",
+  "token_count": 29
+}

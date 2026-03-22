@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-27555",
+  "ingested_at": "2026-03-22T07:54:31.471378+00:00",
+  "lang": "en",
+  "raw_text": "Airflow versions before 2.11.1 have a vulnerability that allows authenticated users with audit log access to see sensitive values in audit logs which they should not see. When sensitive connection parameters were set via airflow CLI, values of those variables appeared in the audit log and were stored unencrypted in the Airflow database. While this risk is limited to users with audit log access, it is recommended to upgrade to Airflow 2.11.1 or a later version, which addresses this issue. Users who previously used the CLI to set connections should manually delete entries with those connection sensitive values from the log table. This is similar but not the same issue as CVE-2024-50378",
+  "severity": "MEDIUM",
+  "sha256_hash": "af44564bed830381353b757fd8a2726306dcc5ebe38e257ee7dbab0578aa09f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-532",
+    "CWE-532"
+  ],
+  "token_count": 112,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-27555"
+}

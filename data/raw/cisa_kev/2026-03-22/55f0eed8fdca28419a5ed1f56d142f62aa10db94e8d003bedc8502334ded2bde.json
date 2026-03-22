@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-1889",
+  "ingested_at": "2026-03-22T07:45:17.813555+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft XML Core Services Microsoft XML Core Services contains a memory corruption vulnerability which could allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "55f0eed8fdca28419a5ed1f56d142f62aa10db94e8d003bedc8502334ded2bde",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

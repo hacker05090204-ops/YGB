@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25605",
+  "ingested_at": "2026-03-22T07:54:42.772053+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in SICAM SIAPP SDK (All versions < V2.1.7). The affected application performs file deletion without properly validating the file path or target. An attacker could delete files or sockets that the affected process has permission to remove, potentially resulting in denial of service or service disruption.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c4a35be22f1dd5a9b9a5927bcd07c8639b02c238d74b9586800974137912f04f",
+  "source": "nvd",
+  "tags": [
+    "CWE-73"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25605"
+}

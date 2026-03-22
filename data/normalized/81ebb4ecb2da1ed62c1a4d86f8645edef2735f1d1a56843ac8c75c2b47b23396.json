@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Kernel - 'win32k.sys' '.TTF' Font Processing Out-of-Bounds Read with Malformed 'glyf' Table 'win32k!fsc_CalcGrayRow' (Denial of Service)",
+  "token_count": 18
+}

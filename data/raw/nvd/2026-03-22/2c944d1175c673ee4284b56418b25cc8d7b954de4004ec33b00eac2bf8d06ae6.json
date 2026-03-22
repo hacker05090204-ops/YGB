@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2865",
+  "ingested_at": "2026-03-22T07:54:30.823214+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in itsourcecode Agri-Trading Online Shopping System 1.0. This impacts an unknown function of the file admin/productcontroller.php of the component HTTP POST Request Handler. Performing a manipulation of the argument Product results in sql injection. The attack may be initiated remotely. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "2c944d1175c673ee4284b56418b25cc8d7b954de4004ec33b00eac2bf8d06ae6",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2865"
+}

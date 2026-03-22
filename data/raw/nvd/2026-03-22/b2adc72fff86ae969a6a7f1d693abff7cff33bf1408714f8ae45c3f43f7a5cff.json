@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29073",
+  "ingested_at": "2026-03-22T07:54:41.359489+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to version 3.6.0, the /api/query/sql lets a user run sql directly, but it only checks basic auth, not admin rights, any logged-in user, even readers, can run any sql query on the database. This issue has been patched in version 3.6.0.",
+  "severity": "HIGH",
+  "sha256_hash": "b2adc72fff86ae969a6a7f1d693abff7cff33bf1408714f8ae45c3f43f7a5cff",
+  "source": "nvd",
+  "tags": [
+    "CWE-89",
+    "CWE-862"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29073"
+}

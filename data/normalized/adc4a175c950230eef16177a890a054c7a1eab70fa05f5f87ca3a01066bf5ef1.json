@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer A use-after-free vulnerability exists within CDisplayPointer in Microsoft Internet Explorer that allows an attacker to remotely execute arbitrary code.",
+  "token_count": 22
+}

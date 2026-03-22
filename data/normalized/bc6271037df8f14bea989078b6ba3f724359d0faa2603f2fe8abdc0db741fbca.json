@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in a small subset of CLI commands that are used on Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an authenticated, local attacker to craft Lua code that could be used on the underlying operating system as root. This vulnerability exists because user-provided input is not properly sanitized. An attacker could exploit this vulnerability by crafting valid Lua code and submitting it as a malicious parameter for a CLI command. A successful exploit could allow the attacker to inject Lua code, which could lead to arbitrary code execution as the root user. To exploit this vulnerability, an attacker must have valid Administrator credentials.",
+  "token_count": 115
+}

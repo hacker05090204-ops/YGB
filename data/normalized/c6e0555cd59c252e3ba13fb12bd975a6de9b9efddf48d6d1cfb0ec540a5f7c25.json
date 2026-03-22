@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Storage Scale IBM S through rage Scale 5.2.3.0 - 5.2.3.5, and IBM S through rage Scale 6.0.0.0 - 6.0.0.1 could allow a local user to unintentionally trigger additional permissions for resources in a way that allows that resource to be executed by unintended actors.",
+  "token_count": 45
+}

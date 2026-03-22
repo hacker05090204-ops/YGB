@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33051",
+  "ingested_at": "2026-03-22T07:54:48.639169+00:00",
+  "lang": "en",
+  "raw_text": "Craft CMS is a content management system (CMS). In versions 5.9.0-beta.1 through 5.9.10, the revision/draft context menu in the element editor renders the creator\u2019s fullName as raw HTML due to the use of Template::raw() combined with Craft::t() string interpolation. A low-privileged control panel user (e.g., Author) can set their fullName to an XSS payload via the profile editor, then create an entry with two saves. If an administrator is logged in and executes a specifically crafted payload while an elevated session is active, the attacker\u2019s account can be elevated to administrator. This issue has been fixed in version 5.9.11.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a801ea4d1e750f0bd9784f1ad426cd97146e43d3d17cdf637ac2a0d69c697cd9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33051"
+}

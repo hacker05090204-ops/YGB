@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25929",
+  "ingested_at": "2026-03-22T07:54:32.254334+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the document controller\u2019s `patient_picture` context serves the patient\u2019s photo by document ID or patient ID without verifying that the current user is authorized to access that patient. An authenticated user with document ACL can supply another patient\u2019s ID and retrieve their photo. Version 8.0.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "107c5a3914f5434aa5154b192d0752f9f3b1c29d0daf2867b3a5057bf9c58b11",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25929"
+}

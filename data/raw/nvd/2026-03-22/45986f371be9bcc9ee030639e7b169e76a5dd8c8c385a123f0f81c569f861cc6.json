@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32628",
+  "ingested_at": "2026-03-22T07:54:46.513156+00:00",
+  "lang": "en",
+  "raw_text": "AnythingLLM is an application that turns pieces of content into context that any LLM can use as references during chatting. In 1.11.1 and earlier, a SQL injection vulnerability in the built-in SQL Agent plugin allows any user who can invoke the agent to execute arbitrary SQL commands on connected databases. The getTableSchemaSql() method in all three database connectors (MySQL, PostgreSQL, MSSQL) constructs SQL queries using direct string concatenation of the table_name parameter without sanitization or parameterization.",
+  "severity": "HIGH",
+  "sha256_hash": "45986f371be9bcc9ee030639e7b169e76a5dd8c8c385a123f0f81c569f861cc6",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32628"
+}

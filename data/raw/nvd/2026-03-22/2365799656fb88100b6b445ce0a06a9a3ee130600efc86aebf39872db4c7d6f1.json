@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22202",
+  "ingested_at": "2026-03-22T07:54:44.622154+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a cross-site request forgery vulnerability that allows attackers to delete all comments associated with an email address by crafting a malicious GET request with a valid HMAC key. Attackers can embed the deletecomments action URL in image tags or other resources to trigger permanent deletion of comments without user confirmation or POST-based CSRF protection.",
+  "severity": "HIGH",
+  "sha256_hash": "2365799656fb88100b6b445ce0a06a9a3ee130600efc86aebf39872db4c7d6f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22202"
+}

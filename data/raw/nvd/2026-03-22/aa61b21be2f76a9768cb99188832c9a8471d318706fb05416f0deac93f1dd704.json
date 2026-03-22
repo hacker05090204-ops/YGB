@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31802",
+  "ingested_at": "2026-03-22T07:54:42.444375+00:00",
+  "lang": "en",
+  "raw_text": "node-tar is a full-featured Tar for Node.js. Prior to version 7.5.11, tar (npm) can be tricked into creating a symlink that points outside the extraction directory by using a drive-relative symlink target such as C:../../../target.txt, which enables file overwrite outside cwd during normal tar.x() extraction. This vulnerability is fixed in 7.5.11.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aa61b21be2f76a9768cb99188832c9a8471d318706fb05416f0deac93f1dd704",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31802"
+}

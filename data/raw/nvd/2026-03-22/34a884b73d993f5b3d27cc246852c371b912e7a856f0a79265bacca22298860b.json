@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25165",
+  "ingested_at": "2026-03-22T07:54:42.719736+00:00",
+  "lang": "en",
+  "raw_text": "Null pointer dereference in Windows Performance Counters allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "34a884b73d993f5b3d27cc246852c371b912e7a856f0a79265bacca22298860b",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25165"
+}

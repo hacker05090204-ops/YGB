@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2997",
+  "ingested_at": "2026-03-22T07:54:31.047786+00:00",
+  "lang": "en",
+  "raw_text": "Tronclass developed by WisdomGarden has a Insecure Direct Object Reference vulnerability. After obtaining a course ID, authenticated remote attackers to modify a specific parameter to obtain a course invitation code, thereby joining any course.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3ce1c0901759ac37736dfb807393d062f0b81e7cebc73114b81618680f24bde1",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2997"
+}

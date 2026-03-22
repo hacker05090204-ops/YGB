@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3038",
+  "ingested_at": "2026-03-22T07:54:42.280165+00:00",
+  "lang": "en",
+  "raw_text": "The rtsock_msg_buffer() function serializes routing information into a buffer. As a part of this, it copies sockaddr structures into a sockaddr_storage structure on the stack. It assumes that the source sockaddr length field had already been validated, but this is not necessarily the case, and it's possible for a malicious userspace program to craft a request which triggers a 127-byte overflow. In practice, this overflow immediately overwrites the canary for the rtsock_msg_buffer() stack frame, resulting in a panic once the function returns. The bug allows an unprivileged user to crash the kernel by triggering a stack buffer overflow in rtsock_msg_buffer(). In particular, the overflow will corrupt a stack canary value that is verified when the function returns; this mitigates the impact of the stack overflow by triggering a kernel panic. Other kernel bugs may exist which allow userspace to find the canary value and thus defeat the mitigation, at which point local privilege escalation may be possible.",
+  "severity": "HIGH",
+  "sha256_hash": "564cb5992aaf297b525f7abf101668d7f62280da2e317408c4158cd583f3bdff",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 157,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3038"
+}

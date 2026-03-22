@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24293",
+  "ingested_at": "2026-03-22T07:54:42.706368+00:00",
+  "lang": "en",
+  "raw_text": "Null pointer dereference in Windows Ancillary Function Driver for WinSock allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "40ef4cf89ad04bb43068b0f4a7091a984f2364d68c1ca878b683d0d2f033fc48",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24293"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21902",
+  "ingested_at": "2026-03-22T07:54:32.201222+00:00",
+  "lang": "en",
+  "raw_text": "An Incorrect Permission Assignment for Critical Resource vulnerability in the On-Box Anomaly detection framework of Juniper Networks Junos OS Evolved on PTX Series allows an unauthenticated, network-based attacker to execute code as root. The On-Box Anomaly detection framework should only be reachable by other internal processes over the internal routing instance, but not over an externally exposed port. With the ability to access and manipulate the service to execute code as root a remote attacker can take complete control of the device. Please note that this service is enabled by default as no specific configuration is required. This issue affects Junos OS Evolved on PTX Series: * 25.4 versions before 25.4R1-S1-EVO, 25.4R2-EVO. This issue does not affect Junos OS Evolved versions before 25.4R1-EVO. This issue does not affect Junos OS.",
+  "severity": "CRITICAL",
+  "sha256_hash": "038a26cb2cf0fefa958002f759b6b717c38586b8d87035500e0c983c72feb108",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 130,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21902"
+}

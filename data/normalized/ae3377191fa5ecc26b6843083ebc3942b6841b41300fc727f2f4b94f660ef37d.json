@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mattermost Desktop App versions < =5.13.3 fail to attach listeners restricting navigation to external sites within the Mattermost app which allows a malicious server to expose preload script functionality to untrusted servers via having a user open an external link in their Mattermost server. Mattermost Advisory ID: MMSA-2026-00596",
+  "token_count": 48
+}

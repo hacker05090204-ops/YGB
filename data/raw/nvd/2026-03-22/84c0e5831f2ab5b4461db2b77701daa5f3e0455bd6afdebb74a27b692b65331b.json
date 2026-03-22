@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-43035",
+  "ingested_at": "2026-03-22T07:54:40.928165+00:00",
+  "lang": "en",
+  "raw_text": "Fonoster 0.5.5 before 0.6.1 allows ../ directory traversal to read arbitrary files via the /sounds/:file or /tts/:file VoiceServer endpoint. This occurs in serveFiles in mods/voice/src/utils.ts. NOTE: serveFiles exists in 0.5.5 but not in the next release, 0.6.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "84c0e5831f2ab5b4461db2b77701daa5f3e0455bd6afdebb74a27b692b65331b",
+  "source": "nvd",
+  "tags": [
+    "CWE-24"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-43035"
+}

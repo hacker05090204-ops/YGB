@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to 2.2.4, An insufficient authorization check in the file replace API allows a user with only list visibility permission (UserPermListOtherUploads) to delete another user's file by abusing the deleteNewFile flag, bypassing the requirement for UserPermDeleteOtherUploads. This vulnerability is fixed in 2.2.4.",
+  "token_count": 55
+}

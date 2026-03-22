@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28522",
+  "ingested_at": "2026-03-22T07:54:46.439085+00:00",
+  "lang": "en",
+  "raw_text": "arduino-TuyaOpen before version 1.2.1 contains a null pointer dereference vulnerability in the WiFiUDP component. An attacker on the same local area network can send a large volume of malicious UDP packets to cause memory exhaustion on the device, triggering a null pointer dereference and resulting in a denial-of-service condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e7049a56cf3f8ec7961c5cb27eef18ad1814ab1768ebfa401c8a17c659b03239",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28522"
+}

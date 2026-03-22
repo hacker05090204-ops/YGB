@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-25487",
+  "ingested_at": "2026-03-22T07:45:17.330635+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an out-of-bounds read vulnerability within the modem interface driver due to a lack of boundary checking of a buffer in set_skb_priv(), leading to remote code execution by dereference of an invalid function pointer.",
+  "severity": "CRITICAL",
+  "sha256_hash": "45a56db9d82714e77b1ff452473040136ff2c4c6ed2f86f629aa8c389840d10c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

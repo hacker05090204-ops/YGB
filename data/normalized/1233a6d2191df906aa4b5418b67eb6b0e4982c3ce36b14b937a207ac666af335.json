@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An uncontrolled search path element vulnerability in Synology Presto Client before 2.1.3-0672 allows local users to read or write arbitrary files during installation by placing a malicious DLL in advance in the same directory as the installer.",
+  "token_count": 37
+}

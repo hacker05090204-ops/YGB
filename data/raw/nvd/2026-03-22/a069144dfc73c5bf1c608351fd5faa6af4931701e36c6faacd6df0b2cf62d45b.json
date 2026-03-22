@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32031",
+  "ingested_at": "2026-03-22T07:54:48.227307+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.26 server-http contains an authentication bypass vulnerability in gateway authentication for plugin channel endpoints due to path canonicalization mismatch between the gateway guard and plugin handler routing. Attackers can bypass authentication by sending requests with alternative path encodings to access protected plugin channel APIs without proper gateway authentication.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a069144dfc73c5bf1c608351fd5faa6af4931701e36c6faacd6df0b2cf62d45b",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32031"
+}

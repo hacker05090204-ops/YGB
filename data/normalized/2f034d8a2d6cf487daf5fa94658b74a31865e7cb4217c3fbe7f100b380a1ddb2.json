@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS) vulnerability in villatheme WooCommerce Photo Reviews woocommerce-photo-reviews allows Code Injection.This issue affects WooCommerce Photo Reviews: from n/a through < = 1.4.4.",
+  "token_count": 33
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1905",
+  "ingested_at": "2026-03-22T07:45:19.527034+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm Chipsets contain a use after free vulnerability due to improper handling of memory mapping of multiple processes simultaneously.",
+  "severity": "CRITICAL",
+  "sha256_hash": "daf66bf40bc22cc4a92694325a1b8eac7884c8789d1a5c7dc4189fd91a20cfd2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

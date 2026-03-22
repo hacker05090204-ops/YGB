@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1627",
+  "ingested_at": "2026-03-22T07:54:33.105838+00:00",
+  "lang": "en",
+  "raw_text": "An attacker may exploit the use of outdated and weak MAC algorithms in the device\u2019s SSH service to potentially compromise the integrity of the SSH session, allowing manipulation of transmitted data if the attacker can interact with the network traffic.",
+  "severity": "MEDIUM",
+  "sha256_hash": "97434d1566ecf0e52a7cf288045e1ce638e850f243f0cf4545d10f32ea311239",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1627"
+}

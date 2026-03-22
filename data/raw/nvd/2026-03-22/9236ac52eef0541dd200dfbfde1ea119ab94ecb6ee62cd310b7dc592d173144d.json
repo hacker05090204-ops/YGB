@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69343",
+  "ingested_at": "2026-03-22T07:54:39.992078+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Jeroen Schmit Theater for WordPress theatre allows Stored XSS.This issue affects Theater for WordPress: from n/a through < = 0.19.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9236ac52eef0541dd200dfbfde1ea119ab94ecb6ee62cd310b7dc592d173144d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69343"
+}

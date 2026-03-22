@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-47565",
+  "ingested_at": "2026-03-22T07:45:17.112604+00:00",
+  "lang": "en",
+  "raw_text": "QNAP VioStor NVR QNAP VioStar NVR contains an OS command injection vulnerability that allows authenticated users to execute commands via a network.",
+  "severity": "CRITICAL",
+  "sha256_hash": "77644af867e80688baa19c90dda74c1e3d9fc916d24ee76d9a65498fc01574b7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

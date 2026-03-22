@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41711",
+  "ingested_at": "2026-03-22T07:54:42.573158+00:00",
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker can use firmware images to extract password hashes and brute force plaintext passwords of accounts with limited access.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5a3bfbd1bfccaeb12c19960d0cb60f9b07bbf8f44d4d078a9d8f6301c4dd1122",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41711"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41709",
+  "ingested_at": "2026-03-22T07:54:42.569162+00:00",
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker can perform a command injection via Modbus-TCP or Modbus-RTU to gain read and write access on the affected device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0b7eb2b187151209d2293c8a3c1210f67f3993c795697399b43dfa26613e0a10",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41709"
+}

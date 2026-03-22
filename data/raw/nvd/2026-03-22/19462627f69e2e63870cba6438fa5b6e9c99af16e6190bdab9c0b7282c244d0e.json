@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13901",
+  "ingested_at": "2026-03-22T07:54:42.554833+00:00",
+  "lang": "en",
+  "raw_text": "CWE-404 Improper Resource Shutdown or Release vulnerability exists that could cause partial Denial of Service on Machine Expert protocol when an unauthenticated attacker sends malicious payload to occupy active communication channels.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "19462627f69e2e63870cba6438fa5b6e9c99af16e6190bdab9c0b7282c244d0e",
+  "source": "nvd",
+  "tags": [
+    "CWE-404"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13901"
+}

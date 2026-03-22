@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-41223",
+  "ingested_at": "2026-03-22T07:45:17.515849+00:00",
+  "lang": "en",
+  "raw_text": "Mitel MiVoice Connect The Director component in Mitel MiVoice Connect allows an authenticated attacker with internal network access to execute code within the context of the application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d67501ce501c2945b55d5f7fd237150f4c53e769c747cf66f83dd6472da6641d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

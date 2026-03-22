@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-15133",
+  "ingested_at": "2026-03-22T07:45:17.081546+00:00",
+  "lang": "en",
+  "raw_text": "Laravel Laravel Framework Laravel Framework contains a deserialization of untrusted data vulnerability, allowing for remote command execution. This vulnerability may only be exploited if a malicious user has accessed the application encryption key (APP_KEY environment variable).",
+  "severity": "CRITICAL",
+  "sha256_hash": "80a465549764251fa7e3cbf511c27f4415f8bf718ecbb4d461889a3db7b82c53",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

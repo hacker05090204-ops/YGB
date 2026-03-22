@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2 fail to verify run_create permission for empty playbookId, which allows team members to create unauthorized runs via the playbook run API. Mattermost Advisory ID: MMSA-2025-00542",
+  "token_count": 35
+}

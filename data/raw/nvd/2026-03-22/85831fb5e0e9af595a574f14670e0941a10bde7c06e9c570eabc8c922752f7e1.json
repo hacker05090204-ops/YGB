@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3412",
+  "ingested_at": "2026-03-22T07:54:33.494925+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in itsourcecode University Management System 1.0. This affects an unknown part of the file /att_single_view.php. The manipulation of the argument dt results in cross site scripting. The attack can be executed remotely. The exploit is now public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "85831fb5e0e9af595a574f14670e0941a10bde7c06e9c570eabc8c922752f7e1",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3412"
+}

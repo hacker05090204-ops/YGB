@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28471",
+  "ingested_at": "2026-03-22T07:54:41.073061+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw version 2026.1.14-1 prior to 2026.2.2, with the Matrix plugin installed and enabled, contain a vulnerability in which DM allowlist matching could be bypassed by exact-matching against sender display names and localparts without homeserver validation. Remote Matrix users can impersonate allowed identities by using attacker-controlled display names or matching localparts from different homeservers to reach the routing and agent pipeline.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c715487148bb95a5290dea11ad7e32994df9c924ec83512675cc48667dd23fc2",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28471"
+}

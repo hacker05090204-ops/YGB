@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15038",
+  "ingested_at": "2026-03-22T07:54:44.149275+00:00",
+  "lang": "en",
+  "raw_text": "An Out-of-Bounds Read vulnerability exists in the ASUS Business System Control Interface driver. This vulnerability can be triggered by an unprivileged local user sending a specially crafted IOCTL request, potentially leading to a disclosure of kernel information or a system crash. Refer to the \"Security Update for ASUS Business System Control Interface\" section on the ASUS Security Advisory for more information.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "3baf50b3fb98490085a85df414a53f9fc8ed1d0fdd6cf5b7e52d490106e0421b",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15038"
+}

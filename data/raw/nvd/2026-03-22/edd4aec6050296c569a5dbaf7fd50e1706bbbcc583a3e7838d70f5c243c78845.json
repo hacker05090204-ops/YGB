@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4453",
+  "ingested_at": "2026-03-22T07:54:48.472934+00:00",
+  "lang": "en",
+  "raw_text": "Integer overflow in Dawn in Google Chrome on Mac prior to 146.0.7680.153 allowed a remote attacker to leak cross-origin data via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "MEDIUM",
+  "sha256_hash": "edd4aec6050296c569a5dbaf7fd50e1706bbbcc583a3e7838d70f5c243c78845",
+  "source": "nvd",
+  "tags": [
+    "CWE-472",
+    "CWE-190"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4453"
+}

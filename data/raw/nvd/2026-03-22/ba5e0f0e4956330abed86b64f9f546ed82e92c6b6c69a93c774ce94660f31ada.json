@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27628",
+  "ingested_at": "2026-03-22T07:54:31.899632+00:00",
+  "lang": "en",
+  "raw_text": "pypdf is a free and open-source pure-python PDF library. Prior to 6.7.2, an attacker who uses this vulnerability can craft a PDF which leads to an infinite loop. This requires reading the file. This has been fixed in pypdf 6.7.2. As a workaround, one may apply the patch manually.",
+  "severity": "HIGH",
+  "sha256_hash": "ba5e0f0e4956330abed86b64f9f546ed82e92c6b6c69a93c774ce94660f31ada",
+  "source": "nvd",
+  "tags": [
+    "CWE-835"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27628"
+}

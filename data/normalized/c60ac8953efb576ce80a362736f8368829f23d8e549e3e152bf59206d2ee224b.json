@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "LabCollector 5.423 contains multiple SQL injection vulnerabilities that allow unauthenticated attackers to execute arbitrary SQL commands by injecting malicious code through POST parameters. Attackers can submit crafted SQL payloads in the login parameter of login.php or the user_name parameter of retrieve_password.php to extract sensitive database information without authentication.",
+  "token_count": 48
+}

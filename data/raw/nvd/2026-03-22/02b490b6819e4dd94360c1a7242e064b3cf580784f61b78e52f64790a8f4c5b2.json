@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52469",
+  "ingested_at": "2026-03-22T07:54:33.692137+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, a logic vulnerability in the friend request workflow of Chamilo\u2019s social network module allows an authenticated user to forcibly add any user as a friend by directly calling the AJAX endpoint. The attacker can bypass the normal flow of sending and accepting friend requests, and even add non-existent users. This breaks access control and social interaction logic, with potential privacy implications. This issue has been patched in version 1.11.30.",
+  "severity": "HIGH",
+  "sha256_hash": "02b490b6819e4dd94360c1a7242e064b3cf580784f61b78e52f64790a8f4c5b2",
+  "source": "nvd",
+  "tags": [
+    "CWE-841"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52469"
+}

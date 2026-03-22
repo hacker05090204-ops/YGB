@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Server-Side Request Forgery (SSRF) vulnerability in SkatDesign Ratatouille ratatouille allows Server Side Request Forgery.This issue affects Ratatouille: from n/a through < = 1.2.6.",
+  "token_count": 23
+}

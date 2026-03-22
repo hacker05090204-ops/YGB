@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4208",
+  "ingested_at": "2026-03-22T07:54:47.026108+00:00",
+  "lang": "en",
+  "raw_text": "The extension fails to properly reset the generated MFA code after successful authentication. This leads to a possible MFA bypass for future login attempts by providing an empty string as MFA code to the extensions MFA provider.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8a3d9ac87d11b1dfbc0efe91dfb88266c6d0680febcbb7ea20506d7c348bac08",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4208"
+}

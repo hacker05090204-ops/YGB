@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-31119",
+  "ingested_at": "2026-03-22T07:54:48.765363+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of input during web page generation ('cross-site scripting') vulnerability in Vasilis Triantafyllou Special Box for Content allows DOM-Based XSS.This issue affects Special Box for Content: from n/a through 1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b0542ef85ce21b28f53ea0930e2c48a81bf08006fc45b50cfe44761e912c78e5",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-31119"
+}

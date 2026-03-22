@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-24990",
+  "ingested_at": "2026-03-22T07:45:16.106070+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Agere Modem Driver contains an untrusted pointer dereference vulnerability that allows for privilege escalation. An attacker who successfully exploited this vulnerability could gain administrator privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "05496433b6420756ee6f1b3a8ed3f2c77287959ac6a1447e0a25c76c55407e74",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

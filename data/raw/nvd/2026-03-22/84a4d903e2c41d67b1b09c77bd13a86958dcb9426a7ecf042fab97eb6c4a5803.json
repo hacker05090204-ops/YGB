@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3171",
+  "ingested_at": "2026-03-22T07:54:32.013719+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in SourceCodester/Patrick Mvuma Patients Waiting Area Queue Management System 1.0. Affected by this vulnerability is an unknown functionality of the file /queue.php. This manipulation of the argument firstname/lastname causes cross site scripting. The attack is possible to be carried out remotely. The exploit has been published and may be used.",
+  "severity": "LOW",
+  "sha256_hash": "84a4d903e2c41d67b1b09c77bd13a86958dcb9426a7ecf042fab97eb6c4a5803",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3171"
+}

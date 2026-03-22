@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2496",
+  "ingested_at": "2026-03-22T07:54:49.352810+00:00",
+  "lang": "en",
+  "raw_text": "The Ed's Font Awesome plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's `eds_font_awesome` shortcode in all versions up to, and including, 2.0. This is due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ec6406ccae71d5ed6868c673bee41ee63236a176da4eb887a2814fa2bbbd9dcf",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2496"
+}

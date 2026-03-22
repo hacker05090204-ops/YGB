@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A use of hard-coded password vulnerability has been reported to affect Hyper Data Protector. The remote attackers can then exploit the vulnerability to gain unauthorized access. We have already fixed the vulnerability in the following version: Hyper Data Protector 2.3.1.455 and later",
+  "token_count": 42
+}

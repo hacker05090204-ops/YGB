@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4475",
+  "ingested_at": "2026-03-22T07:54:48.653988+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Yi Technology YI Home Camera 2 2.1.1_20171024151200. The affected element is an unknown function of the file home/web/ipc. Such manipulation leads to hard-coded credentials. Access to the local network is required for this attack to succeed. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "6b4610c67d39f159d5c3244c886f859f6246dcf557fe1549386d747c7bed18d0",
+  "source": "nvd",
+  "tags": [
+    "CWE-259",
+    "CWE-798"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4475"
+}

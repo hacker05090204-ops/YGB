@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper access control in user and role restore API endpoints in Devolutions Server 2025.3.11.0 and earlier allows a low-privileged authenticated user to restore deleted users and roles via crafted API requests.",
+  "token_count": 31
+}

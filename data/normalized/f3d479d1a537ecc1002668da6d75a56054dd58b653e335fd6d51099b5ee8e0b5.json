@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the handling of the embryonic connection limits in Cisco Secure Firewall Adaptive Security Appliance (ASA) Software could allow an unauthenticated, remote attacker to cause incoming TCP SYN packets to be dropped incorrectly. This vulnerability is due to improper handling of new, incoming TCP connections that are destined to management or data interfaces when the device is under a TCP SYN flood attack. An attacker could exploit this vulnerability by sending a crafted stream of traffic to an affected device. A successful exploit could allow the attacker to prevent all incoming TCP connections to the device from being established, including remote management access, Remote Access VPN (RAVPN) connections, and all network protocols that are TCP-based. This results in a denial of service (DoS) condition for affected features.",
+  "token_count": 129
+}

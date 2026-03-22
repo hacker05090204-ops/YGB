@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Enclave is a secure JavaScript sandbox designed for safe AI agent code execution. Prior to version 2.11.1, it is possible to escape the security boundraries set by `@enclave-vm/core`, which can be used to achieve remote code execution (RCE). The issue has been fixed in version 2.11.1.",
+  "token_count": 46
+}

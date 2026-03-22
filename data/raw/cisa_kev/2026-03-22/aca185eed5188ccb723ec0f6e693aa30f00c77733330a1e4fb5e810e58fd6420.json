@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-8069",
+  "ingested_at": "2026-03-22T07:45:16.234101+00:00",
+  "lang": "en",
+  "raw_text": "Citrix Session Recording Citrix Session Recording contains a deserialization of untrusted data vulnerability that allows limited remote code execution with privilege of a NetworkService Account access. Attacker must be an authenticated user on the same intranet as the session recording server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aca185eed5188ccb723ec0f6e693aa30f00c77733330a1e4fb5e810e58fd6420",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

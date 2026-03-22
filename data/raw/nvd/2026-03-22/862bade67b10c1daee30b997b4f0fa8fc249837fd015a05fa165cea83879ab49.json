@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32361",
+  "ingested_at": "2026-03-22T07:54:45.935559+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Marketing Fire Editorial Calendar editorial-calendar allows DOM-Based XSS.This issue affects Editorial Calendar: from n/a through < = 3.9.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "862bade67b10c1daee30b997b4f0fa8fc249837fd015a05fa165cea83879ab49",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32361"
+}

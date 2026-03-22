@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-29464",
+  "ingested_at": "2026-03-22T07:45:18.051828+00:00",
+  "lang": "en",
+  "raw_text": "WSO2 Multiple Products Multiple WSO2 products allow for unrestricted file upload, resulting in remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "86cfc47ae177433e4b35ca7e97f919d8b1ce8be03db3f294b93fab91b30eec24",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

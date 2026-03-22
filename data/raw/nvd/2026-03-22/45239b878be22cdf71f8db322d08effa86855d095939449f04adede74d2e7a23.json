@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69808",
+  "ingested_at": "2026-03-22T07:54:46.923817+00:00",
+  "lang": "en",
+  "raw_text": "An out-of-bounds memory access (OOB) in p2r3 Bareiron commit 8e4d40 allows unauthenticated attackers to access sensitive information and cause a Denial of Service (DoS) via supplying a crafted packet.",
+  "severity": "CRITICAL",
+  "sha256_hash": "45239b878be22cdf71f8db322d08effa86855d095939449f04adede74d2e7a23",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69808"
+}

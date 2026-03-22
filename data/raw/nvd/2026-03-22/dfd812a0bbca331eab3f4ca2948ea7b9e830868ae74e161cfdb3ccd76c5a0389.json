@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27635",
+  "ingested_at": "2026-03-22T07:54:32.414441+00:00",
+  "lang": "en",
+  "raw_text": "Manyfold is an open source, self-hosted web application for managing a collection of 3d models, particularly focused on 3d printing. Prior to version 0.133.0, when model render generation is enabled, a logged-in user can achieve RCE by uploading a ZIP containing a file with a shell metacharacter in its name. The filename reaches a Ruby backtick call unsanitized. Version 0.133.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "dfd812a0bbca331eab3f4ca2948ea7b9e830868ae74e161cfdb3ccd76c5a0389",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27635"
+}

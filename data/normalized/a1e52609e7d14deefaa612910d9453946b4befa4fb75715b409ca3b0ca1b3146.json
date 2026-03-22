@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in Cisco Catalyst SD-WAN Manager could allow an authenticated, local attacker with low privileges to gain root privileges on the underlying operating system. This vulnerability is due to an insufficient user authentication mechanism in the REST API. An attacker could exploit this vulnerability by sending a request to the REST API of the affected system. A successful exploit could allow the attacker to gain root privileges on the underlying operating system.",
+  "token_count": 73
+}

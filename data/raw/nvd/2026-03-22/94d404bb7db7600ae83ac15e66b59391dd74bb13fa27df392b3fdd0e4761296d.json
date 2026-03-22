@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70973",
+  "ingested_at": "2026-03-22T07:54:42.373240+00:00",
+  "lang": "en",
+  "raw_text": "ScadaBR 1.12.4 is vulnerable to Session Fixation. The application assigns a JSESSIONID session cookie to unauthenticated users and does not regenerate the session identifier after successful authentication. As a result, a session created prior to login becomes authenticated once the victim logs in, allowing an attacker who knows the session ID to hijack an authenticated session.",
+  "severity": "MEDIUM",
+  "sha256_hash": "94d404bb7db7600ae83ac15e66b59391dd74bb13fa27df392b3fdd0e4761296d",
+  "source": "nvd",
+  "tags": [
+    "CWE-384"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70973"
+}

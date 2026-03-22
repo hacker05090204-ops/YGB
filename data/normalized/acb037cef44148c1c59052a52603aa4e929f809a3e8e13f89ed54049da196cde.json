@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Arm Mali Graphics Processing Unit (GPU) Arm Mali GPU Kernel Driver contains an information disclosure vulnerability that allows a non-privileged user to make valid GPU processing operations that expose sensitive kernel metadata.",
+  "token_count": 32
+}

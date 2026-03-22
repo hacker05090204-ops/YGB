@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24941",
+  "ingested_at": "2026-03-22T07:54:30.426291+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in wpjobportal WP Job Portal wp-job-portal allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects WP Job Portal: from n/a through < = 2.4.4.",
+  "severity": "HIGH",
+  "sha256_hash": "ce2d4641d6b0300eb7d0affff6ab6920a6590d8efd69efb7027469a800ee2370",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24941"
+}

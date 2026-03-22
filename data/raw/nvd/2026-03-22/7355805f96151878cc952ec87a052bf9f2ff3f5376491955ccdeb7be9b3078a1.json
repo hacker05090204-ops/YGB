@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28770",
+  "ingested_at": "2026-03-22T07:54:34.374149+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of special elements in the /IDC_Logging/checkifdone.cgi script in International Datacasting Corporation (IDC) SFX Series SuperFlex Satellite Receiver Web management Interface version 101 allows for XML Injection. The application reflects un-sanitized user input from the `file` parameter directly into a CDATA block, allowing an authenticated attacker to break out of the tags and inject arbitrary XML elements. An actor is confirmed to be able to turn this into an reflected XSS but further abuse such as XXE may be possible",
+  "severity": "HIGH",
+  "sha256_hash": "7355805f96151878cc952ec87a052bf9f2ff3f5376491955ccdeb7be9b3078a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-91",
+    "CWE-91"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28770"
+}

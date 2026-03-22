@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ruckus Wireless Multiple Products Ruckus Wireless Access Point (AP) software contains an unspecified vulnerability in the web services component. If the web services component is enabled on the AP, an attacker can perform cross-site request forgery (CSRF) or remote code execution (RCE). This vulnerability impacts Ruckus ZoneDirector, SmartZone, and Solo APs.",
+  "token_count": 51
+}

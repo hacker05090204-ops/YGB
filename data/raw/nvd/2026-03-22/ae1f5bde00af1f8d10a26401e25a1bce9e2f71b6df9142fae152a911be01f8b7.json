@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27905",
+  "ingested_at": "2026-03-22T07:54:34.323220+00:00",
+  "lang": "en",
+  "raw_text": "BentoML is a Python library for building online serving systems optimized for AI apps and model inference. Prior to 1.4.36, the safe_extract_tarfile() function validates that each tar member's path is within the destination directory, but for symlink members it only validates the symlink's own path, not the symlink's target. An attacker can create a malicious bento/model tar file containing a symlink pointing outside the extraction directory, followed by a regular file that writes through the symlink, achieving arbitrary file write on the host filesystem. This vulnerability is fixed in 1.4.36.",
+  "severity": "HIGH",
+  "sha256_hash": "ae1f5bde00af1f8d10a26401e25a1bce9e2f71b6df9142fae152a911be01f8b7",
+  "source": "nvd",
+  "tags": [
+    "CWE-59"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27905"
+}

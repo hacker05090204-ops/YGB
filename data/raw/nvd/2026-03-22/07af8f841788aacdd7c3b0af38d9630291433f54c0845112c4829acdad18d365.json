@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33428",
+  "ingested_at": "2026-03-22T07:54:49.158786+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, a non-staff user with elevated group membership could access deleted posts belonging to any user due to an overly broad authorization check on the deleted posts index endpoint. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "07af8f841788aacdd7c3b0af38d9630291433f54c0845112c4829acdad18d365",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33428"
+}

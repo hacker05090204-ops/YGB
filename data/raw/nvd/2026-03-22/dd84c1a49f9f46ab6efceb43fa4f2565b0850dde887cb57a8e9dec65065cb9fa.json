@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-25667",
+  "ingested_at": "2026-03-22T07:54:48.027754+00:00",
+  "lang": "en",
+  "raw_text": "ASP.NET Core Kestrel in Microsoft .NET 8.0 before 8.0.22 and .NET 9.0 before 9.0.11 allows a remote attacker to cause excessive CPU consumption by sending a crafted QUIC packet, because of an incorrect exit condition for HTTP/3 Encoder/Decoder stream processing.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "dd84c1a49f9f46ab6efceb43fa4f2565b0850dde887cb57a8e9dec65065cb9fa",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25667"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24415",
+  "ingested_at": "2026-03-22T07:54:34.279517+00:00",
+  "lang": "en",
+  "raw_text": "OpenSTAManager is an open source management software for technical assistance and invoicing. OpenSTAManager v2.9.8 and earlier contains Reflected XSS vulnerabilities in invoice/order/contract modification modals. The application fails to properly sanitize user-supplied input from the righe GET parameter before reflecting it in HTML output.The $_GET['righe'] parameter is directly echoed into the HTML value attribute without any sanitization using htmlspecialchars() or equivalent functions. This allows an attacker to break out of the attribute context and inject arbitrary HTML/JavaScript.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3402220bf7543cfbc56184cc56f82fbddf47c5e54339875505e15ff91da7b003",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24415"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In Forgejo through 13.0.3, the attachment component allows a denial of service by uploading a multi-gigabyte file attachment (e.g., to be associated with an issue or a release).",
+  "token_count": 28
+}

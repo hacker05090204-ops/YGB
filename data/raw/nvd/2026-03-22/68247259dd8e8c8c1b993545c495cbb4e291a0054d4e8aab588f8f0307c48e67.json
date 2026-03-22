@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27112",
+  "ingested_at": "2026-03-22T07:54:30.600364+00:00",
+  "lang": "en",
+  "raw_text": "Kargo manages and automates the promotion of software artifacts. From 1.7.0 to before v1.7.8, v1.8.11, and v1.9.3, the batch resource creation endpoints of both Kargo's legacy gRPC API and newer REST API accept multi-document YAML payloads. Specially crafted payloads can manifest a bug present in the logic of both endpoints to inject arbitrary resources (of specific types only) into the underlying namespace of an existing Project using the API server's own permissions when that behavior was not intended. Critically, an attacker may exploit this as a vector for elevating their own permissions, which can then be leveraged to achieve remote code execution or secret exfiltration. Exfiltrated artifact repository credentials can be leveraged, in turn, to execute further attacks. In some configurations of the Kargo control plane's underlying Kubernetes cluster, elevated permissions may additionally be leveraged to achieve remote code execution or secret exfiltration using kubectl. This can reduce the complexity of the attack, however, worst case scenarios remain entirely achievable even without this. This vulnerability is fixed in v1.7.8, v1.8.11, and v1.9.3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "68247259dd8e8c8c1b993545c495cbb4e291a0054d4e8aab588f8f0307c48e67",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 172,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27112"
+}

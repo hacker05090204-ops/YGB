@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29610",
+  "ingested_at": "2026-03-22T07:54:41.117058+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a command hijacking vulnerability that allows attackers to execute unintended binaries by manipulating PATH environment variables through node-host execution or project-local bootstrapping. Attackers with authenticated access to node-host execution surfaces or those running OpenClaw in attacker-controlled directories can place malicious executables in PATH to override allowlisted safe-bin commands and achieve arbitrary command execution.",
+  "severity": "HIGH",
+  "sha256_hash": "3f981b0f073b71640c776d165eb54de224a3300e0450156011de9b7c23fd9c1e",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29610"
+}

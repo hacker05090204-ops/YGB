@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32261",
+  "ingested_at": "2026-03-22T07:54:46.928197+00:00",
+  "lang": "en",
+  "raw_text": "Webhooks for Craft CMS plugin adds the ability to manage \u201cwebhooks\u201d in Craft CMS, which will send GET or POST requests when certain events occur. From version 3.0.0 to before version 3.2.0, the Webhooks plugin renders user-supplied template content through Twig\u2019s renderString() function without sandbox protection. This allows an authenticated user with access to the Craft control panel and permissions to access the Webhooks plugin to inject Twig template code that calls arbitrary PHP functions. This is possible even if allowAdminChanges is set to false. This issue has been patched in version 3.2.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "6bda7160811d290e34784d26762f2027308d8af73800e550797d94fc1ca334bf",
+  "source": "nvd",
+  "tags": [
+    "CWE-1336"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32261"
+}

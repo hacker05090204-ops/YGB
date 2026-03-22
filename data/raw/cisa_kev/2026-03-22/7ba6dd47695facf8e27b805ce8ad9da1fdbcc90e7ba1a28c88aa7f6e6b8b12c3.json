@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-20481",
+  "ingested_at": "2026-03-22T07:45:16.753365+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) Cisco Adaptive Security Appliance (ASA) and Firepower Threat Defense (FTD) contain a missing release of resource after effective lifetime vulnerability that could allow an unauthenticated, remote attacker to cause a denial-of-service (DoS) of the RAVPN service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7ba6dd47695facf8e27b805ce8ad9da1fdbcc90e7ba1a28c88aa7f6e6b8b12c3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

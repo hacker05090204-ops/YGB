@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-36105",
+  "ingested_at": "2026-03-22T07:54:42.452374+00:00",
+  "lang": "en",
+  "raw_text": "IBM Planning Analytics Advanced Certified Containers 3.1.0 through 3.1.4 could allow a local privileged user to obtain sensitive information from environment variables.",
+  "severity": "MEDIUM",
+  "sha256_hash": "eca6520831556ce0ebd0881e90832585f7c4378246c5671360ce6bd138c99692",
+  "source": "nvd",
+  "tags": [
+    "CWE-526"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-36105"
+}

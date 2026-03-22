@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32246",
+  "ingested_at": "2026-03-22T07:54:44.490867+00:00",
+  "lang": "en",
+  "raw_text": "Tinyauth is an authentication and authorization server. Prior to 5.0.3, the OIDC authorization endpoint allows users with a TOTP-pending session (password verified, TOTP not yet completed) to obtain authorization codes. An attacker who knows a user's password but not their TOTP secret can obtain valid OIDC tokens, completely bypassing the second factor. This vulnerability is fixed in 5.0.3.",
+  "severity": "HIGH",
+  "sha256_hash": "19f2ec20407602a395a5d39747ad8e4dd5adf02b2dd44b957f305de9ca248faa",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32246"
+}

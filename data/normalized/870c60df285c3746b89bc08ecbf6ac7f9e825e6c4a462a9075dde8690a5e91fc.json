@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The CGM CLININET application respond without essential security HTTP headers, exposing users to client\u2010side attacks such as clickjacking, MIME sniffing, unsafe caching, weak cross\u2010origin isolation, and missing transport security controls.",
+  "token_count": 30
+}

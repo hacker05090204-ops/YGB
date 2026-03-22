@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-26829",
+  "ingested_at": "2026-03-22T07:45:16.039706+00:00",
+  "lang": "en",
+  "raw_text": "OpenPLC ScadaBR OpenPLC ScadaBR contains a cross-site scripting vulnerability via system_settings.shtm.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fda82f258c5096dea325141bee426884f1d1cc7b2c6a3e3484b0b74b4223c5ae",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 11,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

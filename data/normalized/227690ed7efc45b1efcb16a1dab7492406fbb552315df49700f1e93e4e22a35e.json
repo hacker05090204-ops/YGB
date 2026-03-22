@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "DotNetNuke (DNN) DotNetNuke (DNN) DotNetNuke (DNN) contains an inadequate encryption strength vulnerability resulting from the use of a weak encryption algorithm to protect input parameters.",
+  "token_count": 25
+}

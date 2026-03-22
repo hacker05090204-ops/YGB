@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-532: Insertion of Sensitive Information into Log File was discovered in LupinLin1 jimeng-web-mcp v2.1.2. This allows an attacker to obtain sensitive information.",
+  "token_count": 26
+}

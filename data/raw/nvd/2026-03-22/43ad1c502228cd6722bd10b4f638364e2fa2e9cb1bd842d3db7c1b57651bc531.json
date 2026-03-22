@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28227",
+  "ingested_at": "2026-03-22T07:54:32.807204+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, TL4 users can publish topics into staff-only categories via the `publish_to_category` topic timer, bypassing authorization checks. Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. No known workarounds are available.",
+  "severity": "LOW",
+  "sha256_hash": "43ad1c502228cd6722bd10b4f638364e2fa2e9cb1bd842d3db7c1b57651bc531",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28227"
+}

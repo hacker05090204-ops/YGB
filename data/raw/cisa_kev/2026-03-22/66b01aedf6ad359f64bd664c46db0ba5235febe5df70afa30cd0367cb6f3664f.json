@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0322",
+  "ingested_at": "2026-03-22T07:45:18.047827+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Use-after-free vulnerability in Microsoft Internet Explorer allows remote attackers to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "66b01aedf6ad359f64bd664c46db0ba5235febe5df70afa30cd0367cb6f3664f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

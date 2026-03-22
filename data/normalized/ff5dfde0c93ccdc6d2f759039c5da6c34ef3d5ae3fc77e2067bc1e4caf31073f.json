@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Craft CMS Craft CMS Craft CMS contains a code injection vulnerability. Users with affected versions are vulnerable to remote code execution if their php.ini configuration has `register_argc_argv` enabled.",
+  "token_count": 28
+}

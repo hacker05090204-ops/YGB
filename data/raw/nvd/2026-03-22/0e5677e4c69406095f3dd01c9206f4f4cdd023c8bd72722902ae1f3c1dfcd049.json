@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27520",
+  "ingested_at": "2026-03-22T07:54:31.676526+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware versions prior to V300SP10260209 store a user password in a client-side cookie as a Base64-encoded value accessible via the web interface. Because Base64 is reversible and provides no confidentiality, an attacker who can access the cookie value can recover the plaintext password.",
+  "severity": "HIGH",
+  "sha256_hash": "0e5677e4c69406095f3dd01c9206f4f4cdd023c8bd72722902ae1f3c1dfcd049",
+  "source": "nvd",
+  "tags": [
+    "CWE-312"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27520"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-10271",
+  "ingested_at": "2026-03-22T07:45:18.770017+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle Corporation WebLogic Server contains a vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7a2b9796342d6af4798cbff525602c1f8c4bef619644559a34c9d5c01c6c087c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-10221",
+  "ingested_at": "2026-03-22T07:45:19.530042+00:00",
+  "lang": "en",
+  "raw_text": "rConfig rConfig rConfig lib/ajaxHandlers/ajaxAddTemplate.php contains an OS command injection vulnerability that allows remote attackers to execute OS commands via shell metacharacters in the fileName POST parameter.",
+  "severity": "CRITICAL",
+  "sha256_hash": "20cf96a0d79198b031aa44e676169e3ef5b0f2724a8dc8f0ca6a522cb63eb72a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

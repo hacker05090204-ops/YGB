@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69652",
+  "ingested_at": "2026-03-22T07:54:41.585778+00:00",
+  "lang": "en",
+  "raw_text": "GNU Binutils thru 2.46 readelf contains a vulnerability that leads to an abort (SIGABRT) when processing a crafted ELF binary with malformed DWARF abbrev or debug information. Due to incomplete state cleanup in process_debug_info(), an invalid debug_info_p state may propagate into DWARF attribute parsing routines. When certain malformed attributes result in an unexpected data length of zero, byte_get_little_endian() triggers a fatal abort. No evidence of memory corruption or code execution was observed; the impact is limited to denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e43f80326b0741d0476011b8ac25d98708fcf41dc30740d0f9091d12a04b24e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-460"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69652"
+}

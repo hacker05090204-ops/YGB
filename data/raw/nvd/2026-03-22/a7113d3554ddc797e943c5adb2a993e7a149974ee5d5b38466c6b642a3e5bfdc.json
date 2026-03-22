@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69409",
+  "ingested_at": "2026-03-22T07:54:30.327122+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in axiomthemes PJ | Life & Business Coaching pj allows PHP Local File Inclusion.This issue affects PJ | Life & Business Coaching: from n/a through < = 3.0.0.",
+  "severity": "HIGH",
+  "sha256_hash": "a7113d3554ddc797e943c5adb2a993e7a149974ee5d5b38466c6b642a3e5bfdc",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69409"
+}

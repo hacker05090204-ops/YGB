@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27626",
+  "ingested_at": "2026-03-22T07:54:31.895633+00:00",
+  "lang": "en",
+  "raw_text": "OliveTin gives access to predefined shell commands from a web interface. In versions up to and including 3000.10.0, OliveTin's shell mode safety check (`checkShellArgumentSafety`) blocks several dangerous argument types but not `password`. A user supplying a `password`-typed argument can inject shell metacharacters that execute arbitrary OS commands. A second independent vector allows unauthenticated RCE via webhook-extracted JSON values that skip type safety checks entirely before reaching `sh -c`. When exploiting vector 1, any authenticated user (registration enabled by default, `authType: none` by default) can execute arbitrary OS commands on the OliveTin host with the permissions of the OliveTin process. When exploiting vector 2, an unauthenticated attacker can achieve the same if the instance receives webhooks from external sources, which is a primary OliveTin use case. When an attacker exploits both vectors, this results in unauthenticated RCE on any OliveTin instance using Shell mode with webhook-triggered actions. As of time of publication, a patched version is not available.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f49cc8a7ef96f9199a716ad8182a8523474ec34d6ab09ca00c4b5d9e86bac562",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 157,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27626"
+}

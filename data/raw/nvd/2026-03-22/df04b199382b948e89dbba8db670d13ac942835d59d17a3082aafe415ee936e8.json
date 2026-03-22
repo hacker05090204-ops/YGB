@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4230",
+  "ingested_at": "2026-03-22T07:54:46.781733+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in vanna-ai vanna up to 2.0.2. Affected is the function update_sql of the file src/vanna/legacy/flask/__init__.py of the component Endpoint. Such manipulation leads to sql injection. The attack can be launched remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "df04b199382b948e89dbba8db670d13ac942835d59d17a3082aafe415ee936e8",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4230"
+}

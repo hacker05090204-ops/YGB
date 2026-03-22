@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to properly validate team membership when searching channels which allows a removed team member to enumerate all public channels within a private team via the channel search API endpoint.. Mattermost Advisory ID: MMSA-2025-00568",
+  "token_count": 48
+}

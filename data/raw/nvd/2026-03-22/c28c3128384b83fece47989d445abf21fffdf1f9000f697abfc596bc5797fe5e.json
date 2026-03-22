@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26093",
+  "ingested_at": "2026-03-22T07:54:30.474181+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in a Command ('Command Injection') in Owl opds 2.2.0.4 allows Command Injection via a crafted network request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c28c3128384b83fece47989d445abf21fffdf1f9000f697abfc596bc5797fe5e",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26093"
+}

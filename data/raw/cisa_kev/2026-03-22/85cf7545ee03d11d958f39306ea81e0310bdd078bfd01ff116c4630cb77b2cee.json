@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-11021",
+  "ingested_at": "2026-03-22T07:45:18.369800+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DCS-930L Devices setSystemCommand on D-Link DCS-930L devices allows a remote attacker to execute code via an OS command.",
+  "severity": "CRITICAL",
+  "sha256_hash": "85cf7545ee03d11d958f39306ea81e0310bdd078bfd01ff116c4630cb77b2cee",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

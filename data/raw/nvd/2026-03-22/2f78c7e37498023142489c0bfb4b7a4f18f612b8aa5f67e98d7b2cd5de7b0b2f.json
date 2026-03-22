@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4219",
+  "ingested_at": "2026-03-22T07:54:46.762773+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in INDEX Conferences & Exhibitions Organization YWF BPOF APGCS App up to 1.0.2 on Android. Affected by this vulnerability is an unknown functionality of the file com/index/event/BuildConfig.java of the component ae.index.apgcs. Executing a manipulation of the argument ACCESS_KEY/HASH_KEY can lead to hard-coded credentials. The attack is restricted to local execution. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "2f78c7e37498023142489c0bfb4b7a4f18f612b8aa5f67e98d7b2cd5de7b0b2f",
+  "source": "nvd",
+  "tags": [
+    "CWE-259",
+    "CWE-798"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4219"
+}

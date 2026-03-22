@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-14733",
+  "ingested_at": "2026-03-22T07:45:15.997893+00:00",
+  "lang": "en",
+  "raw_text": "WatchGuard Firebox WatchGuard Fireware OS iked process contains an out of bounds write vulnerability in the OS iked process. This vulnerability may allow a remote unauthenticated attacker to execute arbitrary code and affects both the mobile user VPN with IKEv2 and the branch office VPN using IKEv2 when configured with a dynamic gateway peer.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e35a2c6109beda47612777c5fd0ea3a0ed9562b48b51eaac5b80e05d16f8effe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 54,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3643",
+  "ingested_at": "2026-03-22T07:45:19.564871+00:00",
+  "lang": "en",
+  "raw_text": "SolarWinds Virtualization Manager SolarWinds Virtualization Manager allows for privilege escalation through leveraging a misconfiguration of sudo.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2e1bdbdd878964b4ce62cb21c984bb70259f264c0e5d4a46c8413e59c2423fc0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

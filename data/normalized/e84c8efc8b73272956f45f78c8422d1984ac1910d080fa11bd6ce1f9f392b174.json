@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "NETGEAR WNR2000v5 Router The NETGEAR WNR2000v5 router contains a buffer overflow which can be exploited to achieve remote code execution.",
+  "token_count": 20
+}

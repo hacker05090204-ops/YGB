@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26791",
+  "ingested_at": "2026-03-22T07:54:44.397454+00:00",
+  "lang": "en",
+  "raw_text": "GL-iNet GL-AR300M16 v4.3.11 was discovered to contain a command injection vulnerability via the string port parameter in the enable_echo_server function. This vulnerability allows attackers to execute arbitrary commands via a crafted input.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4ebde0d7f13aff677804b71f93d26eca9afd73032c4ad9247ea488fae9801bd8",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-77"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26791"
+}

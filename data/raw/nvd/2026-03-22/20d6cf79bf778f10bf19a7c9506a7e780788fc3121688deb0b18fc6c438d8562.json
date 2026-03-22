@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28295",
+  "ingested_at": "2026-03-22T07:54:32.682886+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in the FTP GVfs backend. A malicious FTP server can exploit this vulnerability by providing an arbitrary IP address and port in its passive mode (PASV) response. The client unconditionally trusts this information and attempts to connect to the specified endpoint, allowing the malicious server to probe for open ports accessible from the client's network.",
+  "severity": "MEDIUM",
+  "sha256_hash": "20d6cf79bf778f10bf19a7c9506a7e780788fc3121688deb0b18fc6c438d8562",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28295"
+}

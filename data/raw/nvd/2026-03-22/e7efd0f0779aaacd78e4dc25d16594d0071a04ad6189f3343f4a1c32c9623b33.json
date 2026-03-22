@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3783",
+  "ingested_at": "2026-03-22T07:54:43.554838+00:00",
+  "lang": "en",
+  "raw_text": "When an OAuth2 bearer token is used for an HTTP(S) transfer, and that transfer performs a redirect to a second URL, curl could leak that token to the second hostname under some circumstances. If the hostname that the first request is redirected to has information in the used .netrc file, with either of the `machine` or `default` keywords, curl would pass on the bearer token set for the first host also to the second one.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e7efd0f0779aaacd78e4dc25d16594d0071a04ad6189f3343f4a1c32c9623b33",
+  "source": "nvd",
+  "tags": [
+    "CWE-522"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3783"
+}

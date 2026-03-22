@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sonatype Nexus Repository Manager Sonatype Nexus Repository Manager before 3.15.0 has an incorrect access control vulnerability. Exploitation allows for remote code execution.",
+  "token_count": 22
+}

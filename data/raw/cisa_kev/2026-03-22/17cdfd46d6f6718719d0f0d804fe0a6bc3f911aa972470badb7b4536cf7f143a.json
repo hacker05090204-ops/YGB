@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11510",
+  "ingested_at": "2026-03-22T07:45:19.519914+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Pulse Connect Secure Ivanti Pulse Connect Secure contains an arbitrary file read vulnerability that allows an unauthenticated remote attacker with network access via HTTPS to send a specially crafted URI.",
+  "severity": "CRITICAL",
+  "sha256_hash": "17cdfd46d6f6718719d0f0d804fe0a6bc3f911aa972470badb7b4536cf7f143a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

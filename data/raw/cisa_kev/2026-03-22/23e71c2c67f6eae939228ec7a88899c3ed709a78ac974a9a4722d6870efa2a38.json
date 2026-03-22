@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-29745",
+  "ingested_at": "2026-03-22T07:45:17.012907+00:00",
+  "lang": "en",
+  "raw_text": "Android Pixel Android Pixel contains an information disclosure vulnerability in the fastboot firmware used to support unlocking, flashing, and locking affected devices.",
+  "severity": "CRITICAL",
+  "sha256_hash": "23e71c2c67f6eae939228ec7a88899c3ed709a78ac974a9a4722d6870efa2a38",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

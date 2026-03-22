@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26117",
+  "ingested_at": "2026-03-22T07:54:42.812348+00:00",
+  "lang": "en",
+  "raw_text": "Authentication bypass using an alternate path or channel in Azure Windows Virtual Machine Agent allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "6f98df36a58cd885e27a0aa9e1557e9deb2842e3f086ead291e281b7d75d7295",
+  "source": "nvd",
+  "tags": [
+    "CWE-288",
+    "NVD-CWE-Other"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26117"
+}

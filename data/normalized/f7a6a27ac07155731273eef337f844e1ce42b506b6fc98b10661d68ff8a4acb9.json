@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in LambertGroup UberSlider PerpetuumMobile uberSlider_perpetuummobile allows Reflected XSS.This issue affects UberSlider PerpetuumMobile: from n/a through < = 2.3.",
+  "token_count": 29
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70949",
+  "ingested_at": "2026-03-22T07:54:40.972169+00:00",
+  "lang": "en",
+  "raw_text": "An observable timing discrepancy in @perfood/couch-auth v0.26.0 allows attackers to access sensitive information via a timing side-channel.",
+  "severity": "HIGH",
+  "sha256_hash": "02d3c0c931c64163fd7e0b0fdf8bc2977a65a9b3761adf7230a46ba855a4a1f9",
+  "source": "nvd",
+  "tags": [
+    "CWE-208"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70949"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3714",
+  "ingested_at": "2026-03-22T07:45:16.840344+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick ImageMagick ImageMagick contains an improper input validation vulnerability that affects the EPHEMERAL, HTTPS, MVG, MSL, TEXT, SHOW, WIN, and PLT coders. This allows a remote attacker to execute arbitrary code via shell metacharacters in a crafted image.",
+  "severity": "CRITICAL",
+  "sha256_hash": "04cc33419302789a944701dcb81b9c822c476ccf2795ed98ef6040c85abccec5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

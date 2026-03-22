@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-3129",
+  "ingested_at": "2026-03-22T07:45:18.703451+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Excel Microsoft Office Excel allows remote attackers to execute arbitrary code via a spreadsheet with a FEATHEADER record containing an invalid cbHdrData size element that affects a pointer offset.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bff5b53dbc4bb20f9e6040344b0a4b1845222e325123a59f70b01c570be5523b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

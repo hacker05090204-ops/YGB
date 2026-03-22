@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SQL Server Password Changer 1.90 contains a buffer overflow vulnerability that allows local attackers to crash the application by supplying an oversized payload. Attackers can inject 6000 bytes of data into the User Name and Registration Code field to trigger a denial of service condition.",
+  "token_count": 45
+}

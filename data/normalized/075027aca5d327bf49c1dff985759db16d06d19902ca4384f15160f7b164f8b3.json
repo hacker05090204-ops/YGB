@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ASUS RT-AX55 Routers ASUS RT-AX55 devices contain an OS command injection vulnerability that could allow a remote, authenticated attacker to execute arbitrary commands. As represented by CVE-2023-41346.",
+  "token_count": 27
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27576",
+  "ingested_at": "2026-03-22T07:54:30.847022+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw is a personal AI assistant. In versions 2026.2.17 and below, the ACP bridge accepts very large prompt text blocks and can assemble oversized prompt payloads before forwarding them to chat.send. Because ACP runs over local stdio, this mainly affects local ACP clients (for example IDE integrations) that send unusually large inputs. This issue has been fixed in version 2026.2.19.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4293920a10316889f1562cefebfe47442c67e8692e089d83065cd9f616f65065",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27576"
+}

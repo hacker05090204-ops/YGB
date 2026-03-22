@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-28432",
+  "ingested_at": "2026-03-22T07:45:17.427471+00:00",
+  "lang": "en",
+  "raw_text": "MinIO MinIO MinIO contains a vulnerability in a cluster deployment where MinIO returns all environment variables, which allows for information disclosure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9d9c566b93cc17505966d649516026a15659d475101c336850498b42dd2d7b24",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

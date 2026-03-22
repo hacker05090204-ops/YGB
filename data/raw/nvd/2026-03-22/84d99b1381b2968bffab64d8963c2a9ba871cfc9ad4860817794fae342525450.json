@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25505",
+  "ingested_at": "2026-03-22T07:54:34.622871+00:00",
+  "lang": "en",
+  "raw_text": "Tradebox 5.4 contains an SQL injection vulnerability that allows authenticated attackers to manipulate database queries by injecting SQL code through the symbol parameter. Attackers can send POST requests to the monthly_deposit endpoint with malicious symbol values using boolean-based blind, time-based blind, error-based, or union-based SQL injection techniques to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "84d99b1381b2968bffab64d8963c2a9ba871cfc9ad4860817794fae342525450",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25505"
+}

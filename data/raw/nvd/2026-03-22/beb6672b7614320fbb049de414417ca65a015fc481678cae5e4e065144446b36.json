@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2798",
+  "ingested_at": "2026-03-22T07:54:31.594939+00:00",
+  "lang": "en",
+  "raw_text": "Use-after-free in the DOM: Core & HTML component. This vulnerability affects Firefox < 148 and Thunderbird < 148.",
+  "severity": "HIGH",
+  "sha256_hash": "beb6672b7614320fbb049de414417ca65a015fc481678cae5e4e065144446b36",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2798"
+}

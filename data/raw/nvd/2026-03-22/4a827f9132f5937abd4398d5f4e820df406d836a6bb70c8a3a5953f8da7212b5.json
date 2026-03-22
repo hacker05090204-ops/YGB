@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32746",
+  "ingested_at": "2026-03-22T07:54:46.176559+00:00",
+  "lang": "en",
+  "raw_text": "telnetd in GNU inetutils through 2.7 allows an out-of-bounds write in the LINEMODE SLC (Set Local Characters) suboption handler because add_slc does not check whether the buffer is full.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4a827f9132f5937abd4398d5f4e820df406d836a6bb70c8a3a5953f8da7212b5",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32746"
+}

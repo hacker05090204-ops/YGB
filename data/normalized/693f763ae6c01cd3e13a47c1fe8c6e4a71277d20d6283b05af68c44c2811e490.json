@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple macOS Kernel 10.12.3 (16D32) - Use-After-Free Due to Double-Release in posix_spawn",
+  "token_count": 12
+}

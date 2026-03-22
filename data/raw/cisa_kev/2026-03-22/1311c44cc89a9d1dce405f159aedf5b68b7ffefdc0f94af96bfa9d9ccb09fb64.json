@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-50302",
+  "ingested_at": "2026-03-22T07:45:16.547268+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel The Linux kernel contains a use of uninitialized resource vulnerability that allows an attacker to leak kernel memory via a specially crafted HID report.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1311c44cc89a9d1dce405f159aedf5b68b7ffefdc0f94af96bfa9d9ccb09fb64",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

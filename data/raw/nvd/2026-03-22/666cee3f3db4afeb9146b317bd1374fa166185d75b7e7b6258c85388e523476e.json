@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25746",
+  "ingested_at": "2026-03-22T07:54:32.249081+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Versions prior to 8.0.0 contain a SQL injection vulnerability in prescription that can be exploited by authenticated attackers. The vulnerability exists due to insufficient input validation in the prescription listing functionality. Version 8.0.0 fixes the vulnerability.",
+  "severity": "HIGH",
+  "sha256_hash": "666cee3f3db4afeb9146b317bd1374fa166185d75b7e7b6258c85388e523476e",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25746"
+}

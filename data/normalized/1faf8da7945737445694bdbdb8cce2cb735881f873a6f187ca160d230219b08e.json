@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Advantive VeraCore Advantive VeraCore contains an unrestricted file upload vulnerability that allows a remote unauthenticated attacker to upload files to unintended folders via upload.apsx.",
+  "token_count": 24
+}

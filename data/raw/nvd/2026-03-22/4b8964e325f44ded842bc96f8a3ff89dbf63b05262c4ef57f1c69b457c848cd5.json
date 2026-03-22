@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-27968",
+  "ingested_at": "2026-03-22T07:54:32.550610+00:00",
+  "lang": "en",
+  "raw_text": "Packistry is a self-hosted Composer repository designed to handle PHP package distribution. Prior to version 0.13.0, RepositoryAwareController::authorize() verified token presence and ability, but did not enforce token expiration. As a result, an expired deploy token with the correct ability could still access repository endpoints (e.g., Composer metadata/download APIs). The fix in version 0.13.0 adds an explicit expiration check, and tests now test expired deploy tokens to ensure they are rejected.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4b8964e325f44ded842bc96f8a3ff89dbf63b05262c4ef57f1c69b457c848cd5",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-613",
+    "CWE-613"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27968"
+}

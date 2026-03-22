@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-67114",
+  "ingested_at": "2026-03-22T07:54:48.003670+00:00",
+  "lang": "en",
+  "raw_text": "Use of a deterministic credential generation algorithm in /ftl/bin/calc_f2 in Small Cell Sercomm SCE4255W (FreedomFi Englewood) firmware before DG3934v3@2308041842 allows remote attackers to derive valid administrative/root credentials from the device's MAC address, enabling authentication bypass and full device access.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c01452dca0e2749a39c59d4e01b1221ff7f626bfb5046799019edb8e02c67c76",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67114"
+}

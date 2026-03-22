@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28210",
+  "ingested_at": "2026-03-22T07:54:40.910008+00:00",
+  "lang": "en",
+  "raw_text": "FreePBX is an open source IP PBX. Prior to versions 16.0.49 and 17.0.7, FreePBX module cdr (Call Data Record) is vulnerable to SQL query injection. This issue has been patched in versions 16.0.49 and 17.0.7.",
+  "severity": "HIGH",
+  "sha256_hash": "ac00fb916e82c679c1e3f4ce52dd7be26946065840f76023bcf5cf6b23fdd8fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28210"
+}

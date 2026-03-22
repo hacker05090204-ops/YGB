@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2707",
+  "ingested_at": "2026-03-22T07:54:43.495987+00:00",
+  "lang": "en",
+  "raw_text": "The weForms plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the REST API entry submission endpoint in all versions up to, and including, 1.6.27. This is due to inconsistent input sanitization between the frontend AJAX handler and the REST API endpoint. When entries are submitted via the REST API (`/wp-json/weforms/v1/forms/{id}/entries/`), the `prepare_entry()` method in `class-abstract-fields.php` receives the WP_REST_Request object as `$args`, bypassing the `weforms_clean()` fallback that sanitizes `$_POST` data for frontend submissions. The base field handler only applies `trim()` to the value. This makes it possible for authenticated attackers, with Subscriber-level access and above, to inject arbitrary web scripts into form entry hidden field values via the REST API that execute when an administrator views the form entries page, where data is rendered using a Vue.js `v-html` directive without escaping.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2f21b45cd8e2e3a1d6ec8947ab4e0f4d6dce680d078c80124fb5ee3763b134c9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 132,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2707"
+}

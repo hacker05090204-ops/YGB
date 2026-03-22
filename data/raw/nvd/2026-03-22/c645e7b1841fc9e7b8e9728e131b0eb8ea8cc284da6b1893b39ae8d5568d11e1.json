@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27695",
+  "ingested_at": "2026-03-22T07:54:32.073655+00:00",
+  "lang": "en",
+  "raw_text": "zae-limiter is a rate limiting library using the token bucket algorithm. Prior to version 0.10.1, all rate limit buckets for a single entity share the same DynamoDB partition key (`namespace/ENTITY#{id}`). A high-traffic entity can exceed DynamoDB's per-partition throughput limits (~1,000 WCU/sec), causing throttling that degrades service for that entity \u2014 and potentially co-located entities in the same partition. Version 0.10.1 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c645e7b1841fc9e7b8e9728e131b0eb8ea8cc284da6b1893b39ae8d5568d11e1",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27695"
+}

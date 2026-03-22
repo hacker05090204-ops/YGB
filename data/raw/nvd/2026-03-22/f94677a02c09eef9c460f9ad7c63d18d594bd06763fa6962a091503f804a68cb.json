@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3713",
+  "ingested_at": "2026-03-22T07:54:42.010053+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in pnggroup libpng up to 1.6.55. Affected by this vulnerability is the function do_pnm2png of the file contrib/pngminus/pnm2png.c of the component pnm2png. This manipulation of the argument width/height causes heap-based buffer overflow. The attack is restricted to local execution. The exploit has been published and may be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f94677a02c09eef9c460f9ad7c63d18d594bd06763fa6962a091503f804a68cb",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-122"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3713"
+}

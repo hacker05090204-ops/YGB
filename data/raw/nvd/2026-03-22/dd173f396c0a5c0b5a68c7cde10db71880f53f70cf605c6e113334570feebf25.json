@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2876",
+  "ingested_at": "2026-03-22T07:54:30.874072+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Tenda A18 15.13.07.13. This affects the function parse_macfilter_rule of the file /goform/setBlackRule. This manipulation of the argument deviceList causes stack-based buffer overflow. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "dd173f396c0a5c0b5a68c7cde10db71880f53f70cf605c6e113334570feebf25",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2876"
+}

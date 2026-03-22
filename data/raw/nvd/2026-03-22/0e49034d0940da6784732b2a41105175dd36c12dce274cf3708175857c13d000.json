@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30926",
+  "ingested_at": "2026-03-22T07:54:42.428280+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to 3.5.10, a privilege escalation vulnerability exists in the publish service of SiYuan Note that allows low-privilege publish accounts (RoleReader) to modify notebook content via the /api/block/appendHeadingChildren API endpoint. The endpoint requires only the model.CheckAuth role, which accepts RoleReader sessions, but it does not enforce stricter checks, such as CheckAdminRole or CheckReadonly. This allows remote authenticated publish users with read-only privileges to append new blocks to existing documents, compromising the integrity of stored notes.",
+  "severity": "HIGH",
+  "sha256_hash": "0e49034d0940da6784732b2a41105175dd36c12dce274cf3708175857c13d000",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-862",
+    "CWE-862"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30926"
+}

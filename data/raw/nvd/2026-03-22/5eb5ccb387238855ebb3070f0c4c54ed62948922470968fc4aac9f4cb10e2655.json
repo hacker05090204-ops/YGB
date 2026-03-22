@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27376",
+  "ingested_at": "2026-03-22T07:54:40.245065+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in JanStudio Claue - Clean, Minimal Elementor WooCommerce Theme claue allows Reflected XSS.This issue affects Claue - Clean, Minimal Elementor WooCommerce Theme: from n/a through < = 2.2.7.",
+  "severity": "HIGH",
+  "sha256_hash": "5eb5ccb387238855ebb3070f0c4c54ed62948922470968fc4aac9f4cb10e2655",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27376"
+}

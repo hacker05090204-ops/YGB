@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27759",
+  "ingested_at": "2026-03-22T07:54:33.374257+00:00",
+  "lang": "en",
+  "raw_text": "Featured Image from Content (featured-image-from-content) WordPress plugin versions prior to 1.7 contain an authenticated server-side request forgery vulnerability that allows Author-level users to fetch internal HTTP resources. Attackers can exploit insecure URL fetching and file write operations to retrieve sensitive internal data and store it in web-accessible upload directories.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "6b1c852d7e53c7b188c9a734e2d2d49a881372a9865c4e33ce51a93161196dd9",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27759"
+}

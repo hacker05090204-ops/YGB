@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-65995",
+  "ingested_at": "2026-03-22T07:54:30.736884+00:00",
+  "lang": "en",
+  "raw_text": "When a DAG failed during parsing, Airflow\u2019s error-reporting in the UI could include the full kwargs passed to the operators. If those kwargs contained sensitive values (such as secrets), they might be exposed in the UI tracebacks to authenticated users who had permission to view that DAG. The issue has been fixed in Airflow 3.1.4 and 2.11.1, and users are strongly advised to upgrade to prevent potential disclosure of sensitive information.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4674fd2c1852caf1174ab147c1dd7b16f44379d8a332f70cd678218a5c8be1b7",
+  "source": "nvd",
+  "tags": [
+    "CWE-209"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-65995"
+}

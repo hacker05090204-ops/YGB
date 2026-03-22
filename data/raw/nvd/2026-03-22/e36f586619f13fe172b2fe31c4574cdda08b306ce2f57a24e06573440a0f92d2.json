@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27661",
+  "ingested_at": "2026-03-22T07:54:42.843699+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in SINEC Security Monitor (All versions < V4.9.0). The affected application leaks confidential information in metadata, and files such as information on contributors and email address, on `SSM Server`.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e36f586619f13fe172b2fe31c4574cdda08b306ce2f57a24e06573440a0f92d2",
+  "source": "nvd",
+  "tags": [
+    "CWE-1230"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27661"
+}

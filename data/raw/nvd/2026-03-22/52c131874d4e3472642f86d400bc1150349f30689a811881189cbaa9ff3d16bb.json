@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27735",
+  "ingested_at": "2026-03-22T07:54:32.426549+00:00",
+  "lang": "en",
+  "raw_text": "Model Context Protocol Servers is a collection of reference implementations for the model context protocol (MCP). In mcp-server-git versions prior to 2026.1.14, the git_add tool did not validate that file paths provided in the files argument were within the repository boundaries. Because the tool used GitPython's repo.index.add() rather than the Git CLI, relative paths containing `../` sequences that resolve outside the repository were accepted and staged into the Git index. Users are advised to upgrade to 2026.1.14 or newer to remediate this issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "52c131874d4e3472642f86d400bc1150349f30689a811881189cbaa9ff3d16bb",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27735"
+}

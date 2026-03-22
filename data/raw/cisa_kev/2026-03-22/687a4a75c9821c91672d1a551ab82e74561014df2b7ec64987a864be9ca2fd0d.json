@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-0189",
+  "ingested_at": "2026-03-22T07:45:18.226507+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer The Microsoft JScript nd VBScript engines, as used in Internet Explorer and other products, allow attackers to execute remote code or cause a denial of service (memory corruption) via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "687a4a75c9821c91672d1a551ab82e74561014df2b7ec64987a864be9ca2fd0d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

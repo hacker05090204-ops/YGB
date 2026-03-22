@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-45249",
+  "ingested_at": "2026-03-22T07:45:16.896515+00:00",
+  "lang": "en",
+  "raw_text": "Acronis Cyber Infrastructure (ACI) Acronis Cyber Infrastructure (ACI) allows an unauthenticated user to execute commands remotely due to the use of default passwords.",
+  "severity": "CRITICAL",
+  "sha256_hash": "63ed85a1f84ab25e5c3a199ae005564a36228fb3be9a35e5391a73a95e5afee9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

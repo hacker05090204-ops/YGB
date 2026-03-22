@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25942",
+  "ingested_at": "2026-03-22T07:54:32.307301+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, `xf_rail_server_execute_result` indexes the global `error_code_names[]` array (7 elements, indices 0\u20136) with an unchecked `execResult->execResult` value received from the server, allowing an out-of-bounds read when the server sends an `execResult` value of 7 or greater. Version 3.23.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "b4df667ee48164e421488287c90739b2e300703a9cff4906817ddf364c6cc560",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25942"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-18368",
+  "ingested_at": "2026-03-22T07:45:17.288560+00:00",
+  "lang": "en",
+  "raw_text": "Zyxel P660HN-T1A Routers Zyxel P660HN-T1A routers contain a command injection vulnerability in the Remote System Log forwarding function, which is accessible by an unauthenticated user and exploited via the remote_host parameter of the ViewLog.asp page.",
+  "severity": "CRITICAL",
+  "sha256_hash": "158910a505692aac14896033ad63e8508b067fa7c0a0f777b319c802d274412f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

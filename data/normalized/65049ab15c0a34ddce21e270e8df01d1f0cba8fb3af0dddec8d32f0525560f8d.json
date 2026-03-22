@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in GT3themes Oyster - Photography WordPress Theme oyster allows DOM-Based XSS.This issue affects Oyster - Photography WordPress Theme: from n/a through < = 4.4.3.",
+  "token_count": 35
+}

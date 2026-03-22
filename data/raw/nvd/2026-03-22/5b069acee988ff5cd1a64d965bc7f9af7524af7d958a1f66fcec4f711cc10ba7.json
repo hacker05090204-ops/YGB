@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-27527",
+  "ingested_at": "2026-03-22T07:54:30.756387+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: Not used",
+  "severity": "UNKNOWN",
+  "sha256_hash": "5b069acee988ff5cd1a64d965bc7f9af7524af7d958a1f66fcec4f711cc10ba7",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 4,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27527"
+}

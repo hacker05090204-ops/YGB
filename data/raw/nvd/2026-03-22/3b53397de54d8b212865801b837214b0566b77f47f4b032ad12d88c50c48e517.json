@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3935",
+  "ingested_at": "2026-03-22T07:54:44.088156+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect security UI in WebAppInstalls in Google Chrome prior to 146.0.7680.71 allowed a remote attacker to perform UI spoofing via a crafted HTML page. (Chromium security severity: Medium)",
+  "severity": "MEDIUM",
+  "sha256_hash": "3b53397de54d8b212865801b837214b0566b77f47f4b032ad12d88c50c48e517",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-451"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3935"
+}

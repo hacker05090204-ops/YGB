@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GitLab Community and Enterprise Editions GitLab Community and Enterprise Editions contain a server-side request forgery vulnerability which could allow unauthorized external users to perform Server Side Requests via the CI Lint API.",
+  "token_count": 32
+}

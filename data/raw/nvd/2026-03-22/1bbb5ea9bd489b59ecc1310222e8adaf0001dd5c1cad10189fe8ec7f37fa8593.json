@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3386",
+  "ingested_at": "2026-03-22T07:54:33.445727+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in wren-lang wren up to 0.4.0. Affected by this vulnerability is the function emitOp of the file src/vm/wren_compiler.c. This manipulation causes out-of-bounds read. It is possible to launch the attack on the local host. The exploit has been published and may be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "1bbb5ea9bd489b59ecc1310222e8adaf0001dd5c1cad10189fe8ec7f37fa8593",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125",
+    "CWE-125"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3386"
+}

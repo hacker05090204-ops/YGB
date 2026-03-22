@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27811",
+  "ingested_at": "2026-03-22T07:54:47.230895+00:00",
+  "lang": "en",
+  "raw_text": "Roxy-WI is a web interface for managing Haproxy, Nginx, Apache and Keepalived servers. Prior to version 8.2.6.3, a command injection vulnerability exists in the `/config/compare/ / /show` endpoint, allowed authenticated users to execute arbitrary system commands on the app host. The vulnerability exists in `app/modules/config/config.py` on line 362, where user input is directly formatted in the template string that is eventually executed. Version 8.2.6.3 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "135b92904c38c2033ccc39103ff86f08fcca5e2bddb3e67a52776e1faa71237b",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27811"
+}

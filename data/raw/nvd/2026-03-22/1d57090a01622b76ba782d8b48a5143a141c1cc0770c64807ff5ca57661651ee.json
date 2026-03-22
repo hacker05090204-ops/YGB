@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3549",
+  "ingested_at": "2026-03-22T07:54:48.128942+00:00",
+  "lang": "en",
+  "raw_text": "Heap Overflow in TLS 1.3 ECH parsing. An integer underflow existed in ECH extension parsing logic when calculating a buffer length, which resulted in writing beyond the bounds of an allocated buffer. Note that in wolfSSL, ECH is off by default, and the ECH standard is still evolving.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "1d57090a01622b76ba782d8b48a5143a141c1cc0770c64807ff5ca57661651ee",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3549"
+}

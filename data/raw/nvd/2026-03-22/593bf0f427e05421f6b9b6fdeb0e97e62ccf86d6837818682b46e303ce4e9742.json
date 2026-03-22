@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27632",
+  "ingested_at": "2026-03-22T07:54:31.906050+00:00",
+  "lang": "en",
+  "raw_text": "Talishar is a fan-made Flesh and Blood project. Prior to commit 6be3871a14c192d1fb8146cdbc76f29f27c1cf48, the Talishar application lacks Cross-Site Request Forgery (CSRF) protections on critical state-changing endpoints, specifically within `SubmitChat.php` and other game interaction handlers. By failing to require unique, unpredictable session tokens, the application allows third-party malicious websites to forge requests on behalf of authenticated users, leading to unauthorized actions within active game sessions. The attacker would need to know both the proper gameName and playerID for the player. The player would also need to be browsing and interact with the infected website while playing a game. The vulnerability is fixed in commit 6be3871a14c192d1fb8146cdbc76f29f27c1cf48.",
+  "severity": "LOW",
+  "sha256_hash": "593bf0f427e05421f6b9b6fdeb0e97e62ccf86d6837818682b46e303ce4e9742",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 103,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27632"
+}

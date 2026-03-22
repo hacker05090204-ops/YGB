@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: fbdev: smscufx: properly copy ioctl memory to kernelspace The UFX_IOCTL_REPORT_DAMAGE ioctl does not properly copy data from userspace to kernelspace, and instead directly references the memory, which can cause problems if invalid data is passed from userspace. Fix this all up by correctly copying the memory before accessing it within the kernel.",
+  "token_count": 62
+}

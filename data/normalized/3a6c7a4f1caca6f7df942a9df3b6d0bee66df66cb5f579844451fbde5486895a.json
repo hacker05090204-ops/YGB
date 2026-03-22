@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability exists in REB500 for an authenticated user with low-level privileges to access and alter the content of directories by using the DAC protocol that the user is not authorized to do so.",
+  "token_count": 34
+}

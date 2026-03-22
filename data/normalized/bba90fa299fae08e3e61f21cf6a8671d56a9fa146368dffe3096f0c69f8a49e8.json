@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability related to the handling of upload size limits. Improper control or validation of upload sizes may allow excessive resource consumption, which could potentially lead to service degradation or denial-of-service conditions under certain scenarios.",
+  "token_count": 40
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Log4j2 Apache Log4j2 contains a vulnerability where JNDI features do not protect against attacker-controlled JNDI-related endpoints, allowing for remote code execution.",
+  "token_count": 22
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27502",
+  "ingested_at": "2026-03-22T07:54:30.508936+00:00",
+  "lang": "en",
+  "raw_text": "SVXportal version 2.5 and prior contain a reflected cross-site scripting vulnerability in log.php via the search query parameter. The application embeds the unsanitized parameter value directly into an HTML input value attribute, allowing an unauthenticated remote attacker to inject and execute arbitrary JavaScript in a victim's browser if the victim visits a crafted URL. This can be used to steal session data, perform actions as the victim, or modify displayed content.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d8b3cd0426a0419a22a5412efd47456aaaa856b84895f3ff2869f536009435ed",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27502"
+}

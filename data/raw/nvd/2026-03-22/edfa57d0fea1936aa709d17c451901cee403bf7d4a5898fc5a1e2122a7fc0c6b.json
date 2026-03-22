@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2928",
+  "ingested_at": "2026-03-22T07:54:30.931560+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in D-Link DWR-M960 1.01.07. This issue affects the function sub_452CCC of the file /boafrm/formWlEncrypt of the component WLAN Encryption Configuration Endpoint. The manipulation of the argument submit-url results in stack-based buffer overflow. The attack may be launched remotely. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "edfa57d0fea1936aa709d17c451901cee403bf7d4a5898fc5a1e2122a7fc0c6b",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2928"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27152",
+  "ingested_at": "2026-03-22T07:54:32.777682+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, DM communication-preference bypass when adding members via `Chat::AddUsersToChannel` \u2014 a user could add targets who have blocked/ignored/muted them to an existing DM channel, bypassing per-recipient PM restrictions that are enforced during DM channel creation. Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. No known workarounds are available.",
+  "severity": "LOW",
+  "sha256_hash": "d2a33ee056aeec0865ab780e91178b47c89cf3b8d2229166fe521e6177a0482e",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27152"
+}

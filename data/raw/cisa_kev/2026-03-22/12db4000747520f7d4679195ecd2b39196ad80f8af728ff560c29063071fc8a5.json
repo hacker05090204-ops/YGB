@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-3896",
+  "ingested_at": "2026-03-22T07:45:17.914385+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Silverlight Microsoft Silverlight does not properly validate pointers during access to Silverlight elements, which allows remote attackers to obtain sensitive information via a crafted Silverlight application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "12db4000747520f7d4679195ecd2b39196ad80f8af728ff560c29063071fc8a5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

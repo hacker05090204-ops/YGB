@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue in Twenty CRM v1.15.0 and before allows a remote attacker to execute arbitrary code via the local.driver.ts module.",
+  "token_count": 20
+}

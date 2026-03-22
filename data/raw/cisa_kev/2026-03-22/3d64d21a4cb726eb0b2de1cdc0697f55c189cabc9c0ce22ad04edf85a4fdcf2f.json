@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-6789",
+  "ingested_at": "2026-03-22T07:45:19.165113+00:00",
+  "lang": "en",
+  "raw_text": "Exim Exim Exim contains a buffer overflow vulnerability in the base64d function part of the SMTP listener that may allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3d64d21a4cb726eb0b2de1cdc0697f55c189cabc9c0ce22ad04edf85a4fdcf2f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

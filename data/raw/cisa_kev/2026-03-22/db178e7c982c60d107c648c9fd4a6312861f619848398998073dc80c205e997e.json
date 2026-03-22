@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-43208",
+  "ingested_at": "2026-03-22T07:45:16.968758+00:00",
+  "lang": "en",
+  "raw_text": "NextGen Healthcare Mirth Connect NextGen Healthcare Mirth Connect contains a deserialization of untrusted data vulnerability that allows for unauthenticated remote code execution via a specially crafted request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "db178e7c982c60d107c648c9fd4a6312861f619848398998073dc80c205e997e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

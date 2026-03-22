@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4577",
+  "ingested_at": "2026-03-22T07:45:16.946030+00:00",
+  "lang": "en",
+  "raw_text": "PHP Group PHP PHP, specifically Windows-based PHP used in CGI mode, contains an OS command injection vulnerability that allows for arbitrary code execution. This vulnerability is a patch bypass for CVE-2012-1823.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4f2e5cf01558e4c1437f74ec78e2e618c42e50963e1076b6a1a2601b39ab7934",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

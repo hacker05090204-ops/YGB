@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25570",
+  "ingested_at": "2026-03-22T07:54:42.763051+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in SICAM SIAPP SDK (All versions < V2.1.7). The SICAM SIAPP SDK does not perform checks on input values potentially resulting in stack overflow. This could allow an attacker to perform code execution and denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "92f722cc5dcfe1735cf2d654432b5dce38062d6191b37a8d69797124b96c588f",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25570"
+}

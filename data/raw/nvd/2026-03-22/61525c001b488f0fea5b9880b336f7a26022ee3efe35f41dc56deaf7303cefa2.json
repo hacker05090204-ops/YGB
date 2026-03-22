@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20037",
+  "ingested_at": "2026-03-22T07:54:32.141522+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the NX-OS CLI privilege levels of Cisco UCS Manager Software could allow an authenticated, local attacker with read-only privileges to modify files and perform unauthorized actions on an affected system. This vulnerability exists because unnecessary privileges are given to the user. An attacker could exploit this vulnerability by authenticating to a device as a read-only user and connecting to the NX-OS CLI. A successful exploit could allow the attacker to create or overwrite files in the file system or perform limited privileged actions on an affected device.",
+  "severity": "MEDIUM",
+  "sha256_hash": "61525c001b488f0fea5b9880b336f7a26022ee3efe35f41dc56deaf7303cefa2",
+  "source": "nvd",
+  "tags": [
+    "CWE-250"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20037"
+}

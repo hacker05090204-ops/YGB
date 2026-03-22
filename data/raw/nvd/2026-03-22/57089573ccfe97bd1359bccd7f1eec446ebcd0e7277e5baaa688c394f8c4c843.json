@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25462",
+  "ingested_at": "2026-03-22T07:54:31.015630+00:00",
+  "lang": "en",
+  "raw_text": "Web Ofisi Rent a Car v3 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'klima' parameter. Attackers can send GET requests to with malicious 'klima' values to extract sensitive database information or cause denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "57089573ccfe97bd1359bccd7f1eec446ebcd0e7277e5baaa688c394f8c4c843",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25462"
+}

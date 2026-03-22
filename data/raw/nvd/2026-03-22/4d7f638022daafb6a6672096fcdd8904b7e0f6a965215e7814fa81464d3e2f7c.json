@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31957",
+  "ingested_at": "2026-03-22T07:54:43.895495+00:00",
+  "lang": "en",
+  "raw_text": "Himmelblau is an interoperability suite for Microsoft Azure Entra ID and Intune. From 3.0.0 to before 3.1.0, if Himmelblau is deployed without a configured tenant domain in himmelblau.conf, authentication is not tenant-scoped. In this mode, Himmelblau can accept authentication attempts for arbitrary Entra ID domains by dynamically registering providers at runtime. This behavior is intended for initial/local bootstrap scenarios, but it can create risk in remote authentication environments. This vulnerability is fixed in 3.1.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4d7f638022daafb6a6672096fcdd8904b7e0f6a965215e7814fa81464d3e2f7c",
+  "source": "nvd",
+  "tags": [
+    "CWE-1188"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31957"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-12319",
+  "ingested_at": "2026-03-22T07:45:18.577399+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS XE Software A vulnerability in the Border Gateway Protocol (BGP) over an Ethernet Virtual Private Network (EVPN) for Cisco IOS XE Software could allow an unauthenticated, remote attacker to cause the device to reload, resulting in a denial of service (DoS) condition, or potentially corrupt the BGP routing table, which could result in network instability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2eea900f98a6d1780deb943ce9ae818fd84546112a4a910d18077b4acafed5a0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 57,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

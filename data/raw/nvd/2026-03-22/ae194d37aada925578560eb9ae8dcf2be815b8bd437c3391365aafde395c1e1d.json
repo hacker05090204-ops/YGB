@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-28678",
+  "ingested_at": "2026-03-22T07:54:41.852533+00:00",
+  "lang": "en",
+  "raw_text": "DSA Study Hub is an interactive educational web application. Prior to commit d527fba, the user authentication system in server/routes/auth.js was found to be vulnerable to Insufficiently Protected Credentials. Authentication tokens (JWTs) were stored in HTTP cookies without cryptographic protection of the payload. This issue has been patched via commit d527fba.",
+  "severity": "HIGH",
+  "sha256_hash": "ae194d37aada925578560eb9ae8dcf2be815b8bd437c3391365aafde395c1e1d",
+  "source": "nvd",
+  "tags": [
+    "CWE-311",
+    "CWE-522",
+    "CWE-522"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28678"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The extension fails to verify, if an authenticated user has permissions to access to redirects resulting in exposure of redirect records when editing a page.",
+  "token_count": 25
+}

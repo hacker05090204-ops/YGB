@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21866",
+  "ingested_at": "2026-03-22T07:54:34.276520+00:00",
+  "lang": "en",
+  "raw_text": "Dify is an open-source LLM app development platform. Prior to 1.11.2, Dify is vulnerable to a stored XSS issue when rendering Mermaid diagrams within chats. This occurs because Dify\u2019s default Mermaid configuration uses securityLevel: loose, which allows potentially unsafe content to execute. This vulnerability is fixed in 1.11.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "22a9b03718be20a0d202b377c068b34e96566eede9cbc953f37890c00d63a1a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21866"
+}

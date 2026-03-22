@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 26.0, the `listFiles.json.php` endpoint accepts a `path` POST parameter and passes it directly to `glob()` without restricting the path to an allowed base directory. An authenticated uploader can traverse the entire server filesystem by supplying arbitrary absolute paths, enumerating `.mp4` filenames and their full absolute filesystem paths wherever they exist on the server \u2014 including locations outside the web root, such as private or premium media directories. Version 26.0 contains a patch for the issue.",
+  "token_count": 86
+}

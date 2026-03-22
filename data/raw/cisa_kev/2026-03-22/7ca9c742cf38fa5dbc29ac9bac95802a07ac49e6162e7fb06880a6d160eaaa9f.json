@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-40438",
+  "ingested_at": "2026-03-22T07:45:18.941751+00:00",
+  "lang": "en",
+  "raw_text": "Apache Apache A crafted request uri-path can cause mod_proxy to forward the request to an origin server choosen by the remote user. This issue affects Apache HTTP Server 2.4.48 and earlier.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7ca9c742cf38fa5dbc29ac9bac95802a07ac49e6162e7fb06880a6d160eaaa9f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

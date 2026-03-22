@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OPEXUS eComplaint and eCASE before 10.2.0.0 do not correctly sanitize the contents of the \"Name of Organization\" field when filling out case information. An authenticated attacker can inject an XSS payload which is executed in the context of a victim's session when they visit the case information page.",
+  "token_count": 48
+}

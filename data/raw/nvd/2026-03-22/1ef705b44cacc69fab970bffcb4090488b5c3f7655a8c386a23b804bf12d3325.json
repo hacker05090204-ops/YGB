@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4250",
+  "ingested_at": "2026-03-22T07:54:46.859958+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Albert Sa\u011fl\u0131k Hizmetleri ve Ticaret Albert Health up to 1.7.3 on Android. Affected is an unknown function of the file resources/assets/service-account.json of the component Google Cloud Service Account Key Handler. Performing a manipulation results in unprotected storage of credentials. The attack requires a local approach. The complexity of an attack is rather high. The exploitability is told to be difficult. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "1ef705b44cacc69fab970bffcb4090488b5c3f7655a8c386a23b804bf12d3325",
+  "source": "nvd",
+  "tags": [
+    "CWE-255",
+    "CWE-256"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4250"
+}

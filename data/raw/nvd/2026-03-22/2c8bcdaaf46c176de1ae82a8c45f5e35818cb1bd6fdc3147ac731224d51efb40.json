@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30913",
+  "ingested_at": "2026-03-22T07:54:42.526580+00:00",
+  "lang": "en",
+  "raw_text": "Flarum is open-source forum software. When the flarum/nicknames extension is enabled, a registered user can set their nickname to a string that email clients interpret as a hyperlink. The nickname is inserted verbatim into plain-text notification emails, and recipients may be misled into visiting attacker-controlled domains.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2c8bcdaaf46c176de1ae82a8c45f5e35818cb1bd6fdc3147ac731224d51efb40",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30913"
+}

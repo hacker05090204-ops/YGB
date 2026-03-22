@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft .NET Framework Microsoft .NET Framework contains a remote code execution vulnerability when processing untrusted input that could allow an attacker to take control of an affected system.",
+  "token_count": 28
+}

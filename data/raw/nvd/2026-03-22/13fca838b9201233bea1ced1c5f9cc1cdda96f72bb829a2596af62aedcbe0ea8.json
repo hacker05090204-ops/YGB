@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27203",
+  "ingested_at": "2026-03-22T07:54:30.733869+00:00",
+  "lang": "en",
+  "raw_text": "eBay API MCP Server is an open source local MCP server providing AI assistants with comprehensive access to eBay's Sell APIs. All versions are vulnerable to Environment Variable Injection through the updateEnvFile function. The ebay_set_user_tokens tool allows updating the .env file with new tokens. The updateEnvFile function in src/auth/oauth.ts blindly appends or replaces values without validating them for newlines or quotes. This allows an attacker to inject arbitrary environment variables into the configuration file. An attacker can inject arbitrary environment variables into the .env file. This could lead to configuration overwrites, Denial of Service, and potential RCE. There was no fix for this issue at the time of publication.",
+  "severity": "HIGH",
+  "sha256_hash": "13fca838b9201233bea1ced1c5f9cc1cdda96f72bb829a2596af62aedcbe0ea8",
+  "source": "nvd",
+  "tags": [
+    "CWE-15",
+    "CWE-74"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27203"
+}

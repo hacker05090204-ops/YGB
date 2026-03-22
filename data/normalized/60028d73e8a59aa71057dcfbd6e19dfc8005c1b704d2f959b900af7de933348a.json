@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "libexpat before 2.7.5 allows a NULL pointer dereference with empty external parameter entity content.",
+  "token_count": 14
+}

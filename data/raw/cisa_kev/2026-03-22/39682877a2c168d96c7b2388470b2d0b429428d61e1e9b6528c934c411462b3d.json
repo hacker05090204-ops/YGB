@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-10758",
+  "ingested_at": "2026-03-22T07:45:18.929056+00:00",
+  "lang": "en",
+  "raw_text": "MongoDB mongo-express mongo-express before 0.54.0 is vulnerable to Remote Code Execution via endpoints that uses the `toBSON` method.",
+  "severity": "CRITICAL",
+  "sha256_hash": "39682877a2c168d96c7b2388470b2d0b429428d61e1e9b6528c934c411462b3d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

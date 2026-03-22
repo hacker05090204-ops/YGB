@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-37976",
+  "ingested_at": "2026-03-22T07:45:19.195205+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Google Chromium contains an information disclosure vulnerability within the core memory component that allows a remote attacker to obtain potentially sensitive information from process memory via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7c743225524741cf09f6131cb80c9092337ee450280a7878451f6fd902fa163",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

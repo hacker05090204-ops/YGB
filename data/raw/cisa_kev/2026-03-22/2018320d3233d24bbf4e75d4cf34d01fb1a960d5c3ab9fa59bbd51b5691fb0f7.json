@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-6366",
+  "ingested_at": "2026-03-22T07:45:17.979645+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) A buffer overflow vulnerability in the Simple Network Management Protocol (SNMP) code of Cisco ASA software could allow an attacker to cause a reload of the affected system or to remotely execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2018320d3233d24bbf4e75d4cf34d01fb1a960d5c3ab9fa59bbd51b5691fb0f7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

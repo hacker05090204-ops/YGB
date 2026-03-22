@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link Routers D-Link Routers contains a buffer overflow vulnerability that has a high impact on confidentiality, integrity, and availability. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "token_count": 34
+}

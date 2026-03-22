@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25921",
+  "ingested_at": "2026-03-22T07:54:40.873494+00:00",
+  "lang": "en",
+  "raw_text": "Gogs is an open source self-hosted Git service. Prior to version 0.14.2, overwritable LFS object across different repos leads to supply-chain attack, all LFS objects are vulnerable to be maliciously overwritten by malicious attackers. This issue has been patched in version 0.14.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8ea1ad212be88bc39fe7098f76f26e6f6d566facb5acf605cc9a116a2f16ec69",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25921"
+}

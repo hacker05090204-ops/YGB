@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4236",
+  "ingested_at": "2026-03-22T07:54:46.792750+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode Online Enrollment System 1.0. Impacted is an unknown function of the file /enrollment/index.php?view=add. Such manipulation of the argument txtsearch/deptname/name leads to sql injection. The attack may be performed from remote. The exploit has been disclosed publicly and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "e30cd9480f0348c1b8f91226ad8ce0306ade7e2f031497e5b409b251e2c6de12",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4236"
+}

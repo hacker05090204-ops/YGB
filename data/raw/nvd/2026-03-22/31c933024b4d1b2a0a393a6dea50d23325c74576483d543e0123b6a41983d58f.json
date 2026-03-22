@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-66678",
+  "ingested_at": "2026-03-22T07:54:34.551463+00:00",
+  "lang": "en",
+  "raw_text": "An issue in the HwRwDrv.sys component of Nil Hardware Editor Hardware Read & Write Utility v1.25.11.26 and earlier allows attackers to execute arbitrary read and write operations via a crafted request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "31c933024b4d1b2a0a393a6dea50d23325c74576483d543e0123b6a41983d58f",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-89"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66678"
+}

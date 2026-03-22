@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2754",
+  "ingested_at": "2026-03-22T07:54:41.500976+00:00",
+  "lang": "en",
+  "raw_text": "Navtor NavBox exposes sensitive configuration and operational data due to missing authentication on HTTP API endpoints. An unauthenticated remote attacker with network access to the device can execute HTTP GET requests to TCP port 8080 to retrieve internal network parameters including ECDIS & OT Information, device identifiers, and service status logs.",
+  "severity": "HIGH",
+  "sha256_hash": "f9e328132dc35ef5d6bd6f3dd287c349142f0878b3a5c4f27a844328eb819ef4",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2754"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0125",
+  "ingested_at": "2026-03-22T07:45:18.349237+00:00",
+  "lang": "en",
+  "raw_text": "Cisco VPN Routers A vulnerability in the web interface of the Cisco VPN Routers could allow an unauthenticated, remote attacker to execute arbitrary code as root and gain full control of an affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "281f355b525aed7bd23c27c0cbfcb30e83d827d12a89969d0691b9e10264bce7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-41128",
+  "ingested_at": "2026-03-22T07:45:17.584810+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows contains an unspecified vulnerability in the JScript9 scripting language which allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e4808bc434051904c581277c2a03423fc25a0aa4ad1fe33e5b09f58fe29094f6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

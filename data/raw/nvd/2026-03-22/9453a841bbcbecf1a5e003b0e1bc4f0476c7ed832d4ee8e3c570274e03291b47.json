@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32028",
+  "ingested_at": "2026-03-22T07:54:48.219835+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 fail to enforce dmPolicy and allowFrom authorization checks on Discord direct-message reaction notifications, allowing non-allowlisted users to enqueue reaction-derived system events. Attackers can exploit this inconsistency by reacting to bot-authored DM messages to bypass DM authorization restrictions and trigger downstream automation or tool policies.",
+  "severity": "LOW",
+  "sha256_hash": "9453a841bbcbecf1a5e003b0e1bc4f0476c7ed832d4ee8e3c570274e03291b47",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32028"
+}

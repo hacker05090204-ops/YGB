@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3541",
+  "ingested_at": "2026-03-22T07:54:34.789516+00:00",
+  "lang": "en",
+  "raw_text": "Inappropriate implementation in CSS in Google Chrome prior to 145.0.7632.159 allowed a remote attacker to perform an out of bounds memory read via a crafted HTML page. (Chromium security severity: High)",
+  "severity": "HIGH",
+  "sha256_hash": "fce86df8a2d44343721a2b99a20ce74bb2c3430e469ef4e57320d191830e9e9f",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3541"
+}

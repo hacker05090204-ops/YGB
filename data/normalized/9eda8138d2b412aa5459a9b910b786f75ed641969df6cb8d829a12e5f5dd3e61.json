@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TeamT5 ThreatSonar Anti-Ransomware TeamT5 ThreatSonar Anti-Ransomware contains an unrestricted upload of file with dangerous type vulnerability. ThreatSonar Anti-Ransomware does not properly validate the content of uploaded files. Remote attackers with administrator privileges on the product platform can upload malicious files, which can be used to execute arbitrary system commands on the server.",
+  "token_count": 52
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2233",
+  "ingested_at": "2026-03-22T07:54:46.442082+00:00",
+  "lang": "en",
+  "raw_text": "The User Frontend: AI Powered Frontend Posting, User Directory, Profile, Membership & User Registration plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the draft_post() function in all versions up to, and including, 4.2.8. This makes it possible for unauthenticated attackers to modify arbitrary posts (e.g. unpublish published posts and overwrite the contents) via the 'post_id' parameter.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f4f00d07d75e23d028733de9d8393636a318f39b3d8b692e1a28200f2495e31f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2233"
+}

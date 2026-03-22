@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2008-0015",
+  "ingested_at": "2026-03-22T07:45:15.903076+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Video ActiveX Control contains a remote code execution vulnerability. An attacker could exploit the vulnerability by constructing a specially crafted Web page. When a user views the Web page, the vulnerability could allow remote code execution. An attacker who successfully exploited this vulnerability could gain the same user rights as the logged-on user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "91d5d5f92f2976662c44a4f71d421fe224e17fdc7cf2e56ade9874cef601bfb9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 57,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

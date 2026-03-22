@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30795",
+  "ingested_at": "2026-03-22T07:54:40.831558+00:00",
+  "lang": "en",
+  "raw_text": "Cleartext Transmission of Sensitive Information vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android (Heartbeat sync loop modules) allows Sniffing Attacks. This vulnerability is associated with program files src/hbbs_http/sync.Rs and program routines Heartbeat JSON payload construction (preset-address-book-password). This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b26f51086831a71c8012077a965de126555dd6946d64cb54e97dc6f0c460e7d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30795"
+}

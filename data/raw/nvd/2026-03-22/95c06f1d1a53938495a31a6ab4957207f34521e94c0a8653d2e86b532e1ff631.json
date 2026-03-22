@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13673",
+  "ingested_at": "2026-03-22T07:54:33.401730+00:00",
+  "lang": "en",
+  "raw_text": "The Tutor LMS \u2013 eLearning and online course solution plugin for WordPress is vulnerable to SQL Injection via the 'coupon_code' parameter in all versions up to, and including, 3.9.6 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database. NOTE: This vulnerability was partially mitigated in versions 3.9.4 and 3.9.6.",
+  "severity": "HIGH",
+  "sha256_hash": "95c06f1d1a53938495a31a6ab4957207f34521e94c0a8653d2e86b532e1ff631",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13673"
+}

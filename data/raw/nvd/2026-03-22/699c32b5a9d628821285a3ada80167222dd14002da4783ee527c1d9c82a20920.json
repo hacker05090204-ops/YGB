@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52643",
+  "ingested_at": "2026-03-22T07:54:46.819608+00:00",
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where untrusted file parsing operations are not executed within a properly isolated sandbox environment. This may expose the application to potential security risks, including unintended behaviour or integrity impact when processing specially crafted files.",
+  "severity": "MEDIUM",
+  "sha256_hash": "699c32b5a9d628821285a3ada80167222dd14002da4783ee527c1d9c82a20920",
+  "source": "nvd",
+  "tags": [
+    "CWE-693"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52643"
+}

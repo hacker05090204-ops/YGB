@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-6884",
+  "ingested_at": "2026-03-22T07:45:17.245343+00:00",
+  "lang": "en",
+  "raw_text": "Zyxel EMG2926 Routers Zyxel EMG2926 routers contain a command injection vulnerability located in the diagnostic tools, specifically the nslookup function. A malicious user may exploit numerous vectors to execute malicious commands on the router, such as the ping_ip parameter to the expert/maintenance/diagnostic/nslookup URI.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2c9af0bc9bba833b1343738d4781fa11ff845ca0537df213c4064e510927cb5b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 43,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

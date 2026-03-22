@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3193",
+  "ingested_at": "2026-03-22T07:54:32.198225+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Chia Blockchain 2.1.0. Impacted is an unknown function of the file /send_transaction. The manipulation results in cross-site request forgery. The attack may be performed from remote. The attack requires a high level of complexity. The exploitability is considered difficult. The exploit is now public and may be used. The vendor was informed early via email. A separate report via bugbounty was rejected with the reason \"This is by design. The user is responsible for host security\".",
+  "severity": "LOW",
+  "sha256_hash": "bc9095ff3541f3ca7ab21629143dfec7c449e0dcac7b2f187682bfc0dcd95310",
+  "source": "nvd",
+  "tags": [
+    "CWE-352",
+    "CWE-862",
+    "CWE-352"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3193"
+}

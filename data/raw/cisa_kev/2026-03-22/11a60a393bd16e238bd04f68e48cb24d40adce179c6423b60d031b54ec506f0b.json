@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-8540",
+  "ingested_at": "2026-03-22T07:45:18.557648+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Malware Protection Engine The Microsoft Malware Protection Engine running on Microsoft Forefront and Microsoft Defender on Microsoft Windows Server 2008 SP2 and R2 SP1, Windows 7 SP1, Windows 8.1, Windows Server 2012 Gold and R2, Windows RT 8.1, Windows 10 Gold, 1511, 1607, and 1703, and Windows Server 2016, Microsoft Exchange Server 2013 and 2016, does not properly scan a specially crafted file leading to memory corruption. aka \"Microsoft Malware Protection Engine Remote Code Execution Vulnerability\".",
+  "severity": "CRITICAL",
+  "sha256_hash": "11a60a393bd16e238bd04f68e48cb24d40adce179c6423b60d031b54ec506f0b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 77,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

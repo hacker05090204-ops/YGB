@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-21338",
+  "ingested_at": "2026-03-22T07:45:17.038415+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Kernel contains an exposed IOCTL with insufficient access control vulnerability within the IOCTL (input and output control) dispatcher in appid.sys that allows a local attacker to achieve privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "12f9ae3751b75b92b1225f776325b26659326b52df0e00b51ec1a7bce3bb7eb4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

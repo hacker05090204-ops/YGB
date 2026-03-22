@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40638",
+  "ingested_at": "2026-03-22T07:54:42.242927+00:00",
+  "lang": "en",
+  "raw_text": "A reflected Cross-Site Scripting (XSS) vulnerability has been found in Eventobot. This vulnerability allows an attacker to execute JavaScript code in the victim's browser by sending him/her a malicious URL using the 'name' parameter in '/search-results'. This vulnerability can be exploited to steal sensitive user data, such as session cookies, or to perform actions on behalf of the user.",
+  "severity": "MEDIUM",
+  "sha256_hash": "dbed3dd41c349bdaf9794d46aea06b0a46b53976baede856e49196f67a957eea",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40638"
+}

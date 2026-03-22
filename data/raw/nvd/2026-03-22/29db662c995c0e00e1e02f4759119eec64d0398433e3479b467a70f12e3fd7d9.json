@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3577",
+  "ingested_at": "2026-03-22T07:54:49.181921+00:00",
+  "lang": "en",
+  "raw_text": "The Keep Backup Daily plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the backup title alias (`val` parameter) in the `update_kbd_bkup_alias` AJAX action in all versions up to, and including, 2.1.2. This is due to insufficient input sanitization and output escaping. While `sanitize_text_field()` strips HTML tags on save, it does not encode double quotes. The backup titles are output in HTML attribute contexts without `esc_attr()`. This makes it possible for authenticated attackers, with Administrator-level access and above, to inject arbitrary web scripts via attribute injection that will execute whenever another administrator views the backup list page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "29db662c995c0e00e1e02f4759119eec64d0398433e3479b467a70f12e3fd7d9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3577"
+}

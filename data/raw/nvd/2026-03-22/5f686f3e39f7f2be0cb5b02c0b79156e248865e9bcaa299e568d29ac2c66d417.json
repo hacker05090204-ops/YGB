@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32411",
+  "ingested_at": "2026-03-22T07:54:46.047038+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Simpma Embed Calendly embed-calendly-scheduling allows Stored XSS.This issue affects Embed Calendly: from n/a through < = 4.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5f686f3e39f7f2be0cb5b02c0b79156e248865e9bcaa299e568d29ac2c66d417",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32411"
+}

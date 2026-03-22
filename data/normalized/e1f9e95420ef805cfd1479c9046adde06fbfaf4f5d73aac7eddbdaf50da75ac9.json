@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Tenda F453 1.0.0.3. This issue affects the function frmL7ImForm of the file /goform/L7Im. The manipulation of the argument page results in buffer overflow. The attack may be launched remotely. The exploit has been made public and could be used.",
+  "token_count": 44
+}

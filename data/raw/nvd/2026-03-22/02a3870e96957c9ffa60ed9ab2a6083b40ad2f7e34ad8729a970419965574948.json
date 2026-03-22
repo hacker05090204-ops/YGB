@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25799",
+  "ingested_at": "2026-03-22T07:54:31.305740+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a logic error in YUV sampling factor validation allows an invalid sampling factor to bypass checks and trigger a division-by-zero during image loading, resulting in a reliable denial-of-service. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "02a3870e96957c9ffa60ed9ab2a6083b40ad2f7e34ad8729a970419965574948",
+  "source": "nvd",
+  "tags": [
+    "CWE-369"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25799"
+}

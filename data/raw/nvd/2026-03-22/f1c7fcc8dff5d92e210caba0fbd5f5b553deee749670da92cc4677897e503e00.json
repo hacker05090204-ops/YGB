@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41761",
+  "ingested_at": "2026-03-22T07:54:42.200084+00:00",
+  "lang": "en",
+  "raw_text": "A low\u2010privileged local attacker who gains access to the UBR service account (e.g., via SSH) can escalate privileges to obtain full system access. This is due to the service account being permitted to execute certain binaries (e.g., tcpdump and ip) with sudo.",
+  "severity": "HIGH",
+  "sha256_hash": "f1c7fcc8dff5d92e210caba0fbd5f5b553deee749670da92cc4677897e503e00",
+  "source": "nvd",
+  "tags": [
+    "CWE-88"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41761"
+}

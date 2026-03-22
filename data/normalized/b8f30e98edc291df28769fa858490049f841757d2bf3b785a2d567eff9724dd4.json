@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Tenda AC8 16.03.34.06. This affects the function webCgiGetUploadFile of the file /cgi-bin/UploadCfg of the component Httpd Service. The manipulation of the argument boundary leads to stack-based buffer overflow. It is possible to initiate the attack remotely. The exploit has been disclosed to the public and may be used.",
+  "token_count": 54
+}

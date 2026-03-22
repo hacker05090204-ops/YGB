@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27154",
+  "ingested_at": "2026-03-22T07:54:32.788205+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, a user full name can be evaluated as raw HTML when the following settings are set: `display_name_on_posts` => true; and `prioritize_username_in_ux` => false. Editing a post of a malicious user would trigger an XSS. Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a08642ceb155f968b8cf8bd26c7d3252b5feacb75bc51ce211373c237d9190b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27154"
+}

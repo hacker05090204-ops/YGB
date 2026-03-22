@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In multiple functions of KeyguardViewMediator.java, there is a possible lockscreen bypass due to a race condition. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "token_count": 37
+}

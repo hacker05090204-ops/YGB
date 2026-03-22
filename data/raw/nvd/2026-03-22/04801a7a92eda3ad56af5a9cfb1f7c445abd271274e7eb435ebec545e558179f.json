@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27141",
+  "ingested_at": "2026-03-22T07:54:32.748140+00:00",
+  "lang": "en",
+  "raw_text": "Due to missing nil check, sending 0x0a-0x0f HTTP/2 frames will cause a running server to panic",
+  "severity": "HIGH",
+  "sha256_hash": "04801a7a92eda3ad56af5a9cfb1f7c445abd271274e7eb435ebec545e558179f",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27141"
+}

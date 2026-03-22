@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-3992",
+  "ingested_at": "2026-03-22T07:45:19.637019+00:00",
+  "lang": "en",
+  "raw_text": "VMware ESXi VMware ESXi OpenSLP contains a use-after-free vulnerability that allows an attacker residing in the management network with access to port 427 to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "224a3aab08713a77d9affc4f0c2bd7241ecc3f87baa6ef79e706c3b046bf9eec",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

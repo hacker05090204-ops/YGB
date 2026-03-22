@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24105",
+  "ingested_at": "2026-03-22T07:54:33.770331+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in goform/formsetUsbUnload in Tenda AC15V1.0 V15.03.05.18_multi. The value of `v1` was not checked, potentially leading to a command injection vulnerability if injected into doSystemCmd.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9e8d9051c84c3fd726cd48a3970e7f1c0889c462de2294146c6f3df36416e84f",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24105"
+}

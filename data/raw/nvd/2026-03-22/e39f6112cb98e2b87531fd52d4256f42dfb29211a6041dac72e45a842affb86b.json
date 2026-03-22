@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31974",
+  "ingested_at": "2026-03-22T07:54:43.910619+00:00",
+  "lang": "en",
+  "raw_text": "OpenProject is an open-source, web-based project management software. Prior to 17.2.0, OpenProject SMTP test endpoint (POST /admin/settings/mail_notifications) accepts arbitrary host and port values and exhibits measurable differences in response behaviour depending on whether the target IP exists and whether the port is open. An attacker with access can use these timing and error distinctions to map internal hosts and identify which services/ports are reachable. Similarly, you can create webhooks in OpenProject and point them to arbitrary IPs, resulting in the same kind of SSRF issue which allows attackers to scan the internal network. This vulnerability is fixed in 17.2.0.",
+  "severity": "LOW",
+  "sha256_hash": "e39f6112cb98e2b87531fd52d4256f42dfb29211a6041dac72e45a842affb86b",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31974"
+}

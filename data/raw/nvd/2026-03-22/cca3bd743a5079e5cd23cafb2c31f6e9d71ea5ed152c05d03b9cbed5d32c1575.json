@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23813",
+  "ingested_at": "2026-03-22T07:54:43.458142+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in the web-based management interface of AOS-CX switches that could potentially allow an unauthenticated remote actor to circumvent existing authentication controls. In some cases this could enable resetting the admin password.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cca3bd743a5079e5cd23cafb2c31f6e9d71ea5ed152c05d03b9cbed5d32c1575",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23813"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in AndonDesign UDesign u-design allows Reflected XSS.This issue affects UDesign: from n/a through < = 4.14.0.",
+  "token_count": 27
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle E-Business Suite Oracle E-Business Suite contains an unspecified vulnerability in the BI Publisher Integration component. The vulnerability allows unauthenticated attacker with network access via HTTP to compromise Oracle Concurrent Processing. Successful attacks can result in takeover of Oracle Concurrent Processing.",
+  "token_count": 41
+}

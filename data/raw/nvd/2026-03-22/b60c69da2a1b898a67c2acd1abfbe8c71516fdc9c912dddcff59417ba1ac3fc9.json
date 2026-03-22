@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33010",
+  "ingested_at": "2026-03-22T07:54:48.944595+00:00",
+  "lang": "en",
+  "raw_text": "mcp-memory-service is an open-source memory backend for multi-agent systems. Prior to version 10.25.1, when the HTTP server is enabled (MCP_HTTP_ENABLED=true), the application configures FastAPI's CORSMiddleware with allow_origins=['*'], allow_credentials=True, allow_methods=[\"*\"], and allow_headers=[\"*\"]. The wildcard Access-Control-Allow-Origin: * header permits any website to read API responses cross-origin. When combined with anonymous access (MCP_ALLOW_ANONYMOUS_ACCESS=true) - the simplest way to get the HTTP dashboard working without OAuth - no credentials are needed, so any malicious website can silently read, modify, and delete all stored memories. This issue has been patched in version 10.25.1.",
+  "severity": "HIGH",
+  "sha256_hash": "b60c69da2a1b898a67c2acd1abfbe8c71516fdc9c912dddcff59417ba1ac3fc9",
+  "source": "nvd",
+  "tags": [
+    "CWE-942"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33010"
+}

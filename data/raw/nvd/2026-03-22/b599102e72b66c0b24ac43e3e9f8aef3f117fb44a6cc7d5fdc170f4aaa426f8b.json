@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27935",
+  "ingested_at": "2026-03-22T07:54:48.140949+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Versions prior to 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 have a vulnerability in an API endpoint that discloses private topic metadata of admin users to moderator users even if the moderators do not have access to the private topics. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b599102e72b66c0b24ac43e3e9f8aef3f117fb44a6cc7d5fdc170f4aaa426f8b",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27935"
+}

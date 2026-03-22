@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An input validation vulnerability was reported in the DeviceSettingsSystemAddin used in Lenovo Vantage and Lenovo Baiying that could allow a local authenticated user to delete arbitrary registry keys with elevated privileges.",
+  "token_count": 31
+}

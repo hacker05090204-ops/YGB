@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28394",
+  "ingested_at": "2026-03-22T07:54:41.017805+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.15 contain a denial of service vulnerability in the web_fetch tool that allows attackers to crash the Gateway process through memory exhaustion by parsing oversized or deeply nested HTML responses. Remote attackers can social-engineer users into fetching malicious URLs with pathological HTML structures to exhaust server memory and cause service unavailability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b46737c782c50af614654de8f05830a84ba331adb5abf1cda2273bff72f89ebc",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28394"
+}

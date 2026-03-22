@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25471",
+  "ingested_at": "2026-03-22T07:54:47.884515+00:00",
+  "lang": "en",
+  "raw_text": "Authentication Bypass Using an Alternate Path or Channel vulnerability in Themepaste Admin Safety Guard allows Password Recovery Exploitation.This issue affects Admin Safety Guard: from n/a through 1.2.6.",
+  "severity": "HIGH",
+  "sha256_hash": "d5eeeef327dd4e4c618e0fe080dbd7a18752cf70017e1b63790384d76961c1ba",
+  "source": "nvd",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25471"
+}

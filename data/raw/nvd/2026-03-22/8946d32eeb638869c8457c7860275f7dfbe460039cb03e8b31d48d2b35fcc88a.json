@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1772",
+  "ingested_at": "2026-03-22T07:54:31.477711+00:00",
+  "lang": "en",
+  "raw_text": "RTU500 web interface: An unprivileged user can read user management information. The information cannot be accessed via the RTU500 web user interface but requires further tools like browser development utilities to access them without required privileges.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8946d32eeb638869c8457c7860275f7dfbe460039cb03e8b31d48d2b35fcc88a",
+  "source": "nvd",
+  "tags": [
+    "CWE-280"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1772"
+}

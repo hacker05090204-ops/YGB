@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware SD-WAN Edge VMware SD-WAN Edge by VeloCloud contains a command injection vulnerability in the local web UI component. Successful exploitation of this issue could result in remote code execution.",
+  "token_count": 30
+}

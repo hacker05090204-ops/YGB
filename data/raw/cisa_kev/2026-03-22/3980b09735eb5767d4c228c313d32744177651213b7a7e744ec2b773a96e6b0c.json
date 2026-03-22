@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1315",
+  "ingested_at": "2026-03-22T07:45:18.440802+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when Windows Error Reporting manager improperly handles hard links. An attacker who successfully exploited this vulnerability could overwrite a targeted file leading to an elevated status.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3980b09735eb5767d4c228c313d32744177651213b7a7e744ec2b773a96e6b0c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

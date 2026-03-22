@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27503",
+  "ingested_at": "2026-03-22T07:54:30.510926+00:00",
+  "lang": "en",
+  "raw_text": "SVXportal version 2.5 and prior contain a reflected cross-site scripting vulnerability in admin/log.php via the search query parameter. When an authenticated administrator views a crafted URL, the application embeds the unsanitized parameter value directly into an HTML input value attribute, allowing attacker-supplied JavaScript to execute in the administrator's browser. This can enable session theft, administrative action forgery, or other browser-based compromise in the context of an admin user.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b242c58067b78f6fabda4488a3678d6f8f8556f2ad88226a35fd30a7acd135bf",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27503"
+}

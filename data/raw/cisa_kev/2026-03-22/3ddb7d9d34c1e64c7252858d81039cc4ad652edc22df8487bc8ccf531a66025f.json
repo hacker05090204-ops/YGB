@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-42287",
+  "ingested_at": "2026-03-22T07:45:18.136160+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Active Directory Microsoft Active Directory Domain Services contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3ddb7d9d34c1e64c7252858d81039cc4ad652edc22df8487bc8ccf531a66025f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

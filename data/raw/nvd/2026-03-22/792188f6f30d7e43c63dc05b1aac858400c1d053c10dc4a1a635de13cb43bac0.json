@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32869",
+  "ingested_at": "2026-03-22T07:54:47.986570+00:00",
+  "lang": "en",
+  "raw_text": "OPEXUS eComplaint and eCASE before 10.2.0.0 do not correctly sanitize the contents of the \"Name of Organization\" field when filling out case information. An authenticated attacker can inject an XSS payload which is executed in the context of a victim's session when they visit the case information page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "792188f6f30d7e43c63dc05b1aac858400c1d053c10dc4a1a635de13cb43bac0",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32869"
+}

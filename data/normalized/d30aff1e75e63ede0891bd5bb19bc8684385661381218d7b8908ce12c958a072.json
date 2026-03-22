@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SmarterTools SmarterMail SmarterTools SmarterMail contains an unrestricted upload of file with dangerous type vulnerability that could allow an unauthenticated attacker to upload arbitrary files to any location on the mail server, potentially enabling remote code execution.",
+  "token_count": 36
+}

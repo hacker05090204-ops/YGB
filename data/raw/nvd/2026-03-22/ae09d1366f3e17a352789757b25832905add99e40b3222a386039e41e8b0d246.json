@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3264",
+  "ingested_at": "2026-03-22T07:54:32.871400+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in go2ismail Free-CRM up to b83c40a90726d5e58f0cc680ffdcaa28a03fb5d1. Affected by this issue is some unknown functionality of the component Administrative Interface. Executing a manipulation can lead to execution after redirect. The attack can be executed remotely. The exploit has been publicly disclosed and may be utilized. This product implements a rolling release for ongoing delivery, which means version information for affected or updated releases is unavailable. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ae09d1366f3e17a352789757b25832905add99e40b3222a386039e41e8b0d246",
+  "source": "nvd",
+  "tags": [
+    "CWE-698",
+    "CWE-705"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3264"
+}

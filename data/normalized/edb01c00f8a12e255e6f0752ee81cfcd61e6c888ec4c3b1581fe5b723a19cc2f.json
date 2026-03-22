@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TVT NVMS-1000 TVT devices utilizing NVMS-1000 software contain a directory traversal vulnerability via GET /.. requests.",
+  "token_count": 16
+}

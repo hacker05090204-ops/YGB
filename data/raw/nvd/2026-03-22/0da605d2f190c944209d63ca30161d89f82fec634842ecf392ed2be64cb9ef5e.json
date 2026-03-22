@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-31869",
+  "ingested_at": "2026-03-22T07:54:48.514865+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the ComposerController#mentions endpoint reveals hidden group membership to any authenticated user who can message the group. By supplying allowed_names referencing a hidden-membership group and probing arbitrary usernames, an attacker can infer membership based on whether user_reasons returns \"private\" for a given user. This bypasses group member-visibility controls. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. To work around this issue, restrict the messageable policy of any hidden-membership group to staff or group members only, so untrusted users cannot reach the vulnerable code path.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0da605d2f190c944209d63ca30161d89f82fec634842ecf392ed2be64cb9ef5e",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-285",
+    "CWE-639"
+  ],
+  "token_count": 96,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31869"
+}

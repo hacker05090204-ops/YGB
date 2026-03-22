@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Red Hat Polkit Red Hat Polkit contains an incorrect authorization vulnerability through the bypassing of credential checks for D-Bus requests, allowing for privilege escalation.",
+  "token_count": 24
+}

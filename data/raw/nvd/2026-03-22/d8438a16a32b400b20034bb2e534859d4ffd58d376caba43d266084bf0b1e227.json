@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4434",
+  "ingested_at": "2026-03-22T07:54:48.821928+00:00",
+  "lang": "en",
+  "raw_text": "Improper certificate validation in the PAM propagation WinRM connections allows a network attacker to perform a man-in-the-middle attack via disabled TLS certificate verification.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d8438a16a32b400b20034bb2e534859d4ffd58d376caba43d266084bf0b1e227",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4434"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15552",
+  "ingested_at": "2026-03-22T07:54:46.311604+00:00",
+  "lang": "en",
+  "raw_text": "Insufficient Session Expiration in Truesec\u2019s LAPSWebUI before version 2.4 allows an attacker with access to a workstation to escalate their privileges via disclosure of local admin password.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "874f653174763ec95f6aa639d1c4ba85490ec8f1fd09af21f1243526a2b4db50",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15552"
+}

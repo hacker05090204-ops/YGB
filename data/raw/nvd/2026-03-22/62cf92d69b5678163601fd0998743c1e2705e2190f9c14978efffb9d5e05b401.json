@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27812",
+  "ingested_at": "2026-03-22T07:54:32.444549+00:00",
+  "lang": "en",
+  "raw_text": "Sub2API is an AI API gateway platform designed to distribute and manage API quotas from AI product subscriptions. A vulnerability in versions prior to 0.1.85 is a Password Reset Poisoning (Host Header / Forwarded Header trust issue), which allows attackers to manipulate the password reset link. Attackers can exploit this flaw to inject their own domain into the password reset link, leading to the potential for account takeover. The vulnerability has been fixed in version v0.1.85. If upgrading is not immediately possible, users can mitigate the vulnerability by disabling the \"forgot password\" feature until an upgrade to a patched version can be performed. This will prevent attackers from exploiting the vulnerability via the affected endpoint.",
+  "severity": "CRITICAL",
+  "sha256_hash": "62cf92d69b5678163601fd0998743c1e2705e2190f9c14978efffb9d5e05b401",
+  "source": "nvd",
+  "tags": [
+    "CWE-116"
+  ],
+  "token_count": 115,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27812"
+}

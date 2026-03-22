@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-40139",
+  "ingested_at": "2026-03-22T07:45:17.631056+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One and Apex One as a Service Trend Micro Apex One and Apex One as a Service contain an improper validation of rollback mechanism components that could lead to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3186b6d9a64f5ce48ee585779131f1df1b091bcb530446f979cd9051e1263f34",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

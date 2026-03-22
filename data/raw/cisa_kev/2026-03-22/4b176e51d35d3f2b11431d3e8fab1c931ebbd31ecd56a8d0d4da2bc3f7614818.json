@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-45195",
+  "ingested_at": "2026-03-22T07:45:16.624131+00:00",
+  "lang": "en",
+  "raw_text": "Apache OFBiz Apache OFBiz contains a forced browsing vulnerability that allows a remote attacker to obtain unauthorized access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4b176e51d35d3f2b11431d3e8fab1c931ebbd31ecd56a8d0d4da2bc3f7614818",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

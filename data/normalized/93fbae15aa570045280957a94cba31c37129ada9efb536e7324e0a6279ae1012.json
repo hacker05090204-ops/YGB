@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Veeam Backup & Replication Veeam Backup & Replication Cloud Connect component contains a missing authentication for critical function vulnerability that allows an unauthenticated user operating within the backup infrastructure network perimeter to obtain encrypted credentials stored in the configuration database. This may lead to an attacker gaining access to the backup infrastructure hosts.",
+  "token_count": 53
+}

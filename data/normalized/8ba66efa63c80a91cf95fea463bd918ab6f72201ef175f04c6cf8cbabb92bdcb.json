@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A weak authentication vulnerability has been reported to affect QHora. If an attacker gains local network access, they can then exploit the vulnerability to gain sensitive information. We have already fixed the vulnerability in the following version: QuRouter 2.6.2.007 and later",
+  "token_count": 41
+}

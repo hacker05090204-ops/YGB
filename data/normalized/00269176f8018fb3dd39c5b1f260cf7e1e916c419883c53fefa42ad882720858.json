@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PROLiNK PRC2402M 20190909 before 2021-06-13 allows live_api.cgi?page=satellite_list OS command injection via shell metacharacters in the ip parameter (for satellite_status).",
+  "token_count": 19
+}

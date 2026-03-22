@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "JetBrains TeamCity JetBrains TeamCity contains an authentication bypass vulnerability that allows for remote code execution on TeamCity Server.",
+  "token_count": 18
+}

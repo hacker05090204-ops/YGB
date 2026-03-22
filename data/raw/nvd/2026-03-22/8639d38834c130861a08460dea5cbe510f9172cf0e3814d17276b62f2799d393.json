@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69231",
+  "ingested_at": "2026-03-22T07:54:31.830958+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, a stored cross-site scripting vulnerability in the GAD-7 anxiety assessment form allows authenticated users with clinician privileges to inject malicious JavaScript that executes when other users view the form. This enables session hijacking, account takeover, and privilege escalation from clinician to administrator. Version 8.0.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "8639d38834c130861a08460dea5cbe510f9172cf0e3814d17276b62f2799d393",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69231"
+}

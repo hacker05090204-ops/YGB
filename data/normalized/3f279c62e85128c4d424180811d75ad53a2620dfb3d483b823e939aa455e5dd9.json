@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zohocorp ManageEngine ADSelfService Plus versions 6522 and below are vulnerable to authenticated SQL Injection in the search report option.",
+  "token_count": 19
+}

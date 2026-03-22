@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-23113",
+  "ingested_at": "2026-03-22T07:45:16.778431+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiOS, FortiPAM, FortiProxy, and FortiWeb contain a format string vulnerability that allows a remote, unauthenticated attacker to execute arbitrary code or commands via specially crafted requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3d9cd7694a6e09ef28c23de639b7a913c3f89556d834fe56a05c4005a63367fe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

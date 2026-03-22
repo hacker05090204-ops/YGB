@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4040",
+  "ingested_at": "2026-03-22T07:54:44.227423+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in OpenClaw up to 2026.2.17. This issue affects the function tools.exec.safeBins of the component File Existence Handler. The manipulation leads to information exposure through discrepancy. The attack needs to be performed locally. Upgrading to version 2026.2.19-beta.1 is capable of addressing this issue. The identifier of the patch is bafdbb6f112409a65decd3d4e7350fbd637c7754. Upgrading the affected component is advised.",
+  "severity": "LOW",
+  "sha256_hash": "36e8fdf76822cfabaa3029ef4862740099f53745bc0585903235d01ce10af253",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-203"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4040"
+}

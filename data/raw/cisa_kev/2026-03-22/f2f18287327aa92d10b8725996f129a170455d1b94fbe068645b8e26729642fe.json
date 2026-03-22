@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0211",
+  "ingested_at": "2026-03-22T07:45:18.999786+00:00",
+  "lang": "en",
+  "raw_text": "Apache HTTP Server Apache HTTP Server, with MPM event, worker or prefork, code executing in less-privileged child processes or threads (including scripts executed by an in-process scripting interpreter) could execute code with the privileges of the parent process (usually root) by manipulating the scoreboard.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f2f18287327aa92d10b8725996f129a170455d1b94fbe068645b8e26729642fe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

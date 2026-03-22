@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a cross-site request forgery vulnerability in the getFollowsPage() function that allows attackers to trigger unauthorized actions without nonce validation. Attackers can craft malicious requests to enumerate follow relationships and manipulate user follow data by exploiting the missing CSRF protection in the follows page handler.",
+  "token_count": 48
+}

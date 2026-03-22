@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-24016",
+  "ingested_at": "2026-03-22T07:45:16.358237+00:00",
+  "lang": "en",
+  "raw_text": "Wazuh Wazuh Server Wazuh contains a deserialization of untrusted data vulnerability that allows for remote code execution on Wazuh servers.",
+  "severity": "CRITICAL",
+  "sha256_hash": "567807e3d1bbec8ca2e6ab61c141feec856ed11509090f84832c5c326cfdda0b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

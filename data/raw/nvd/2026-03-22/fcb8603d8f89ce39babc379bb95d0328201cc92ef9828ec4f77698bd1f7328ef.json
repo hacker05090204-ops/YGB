@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27980",
+  "ingested_at": "2026-03-22T07:54:47.253606+00:00",
+  "lang": "en",
+  "raw_text": "Next.js is a React framework for building full-stack web applications. Starting in version 10.0.0 and prior to version 16.1.7, the default Next.js image optimization disk cache (`/_next/image`) did not have a configurable upper bound, allowing unbounded cache growth. An attacker could generate many unique image-optimization variants and exhaust disk space, causing denial of service. This is fixed in version 16.1.7 by adding an LRU-backed disk cache with `images.maximumDiskCacheSize`, including eviction of least-recently-used entries when the limit is exceeded. Setting `maximumDiskCacheSize: 0` disables disk caching. If upgrading is not immediately possible, periodically clean `.next/cache/images` and/or reduce variant cardinality (e.g., tighten values for `images.localPatterns`, `images.remotePatterns`, and `images.qualities`).",
+  "severity": "HIGH",
+  "sha256_hash": "fcb8603d8f89ce39babc379bb95d0328201cc92ef9828ec4f77698bd1f7328ef",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27980"
+}

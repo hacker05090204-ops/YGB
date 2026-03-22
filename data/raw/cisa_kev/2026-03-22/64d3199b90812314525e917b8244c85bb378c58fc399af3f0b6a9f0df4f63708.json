@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-6334",
+  "ingested_at": "2026-03-22T07:45:18.350458+00:00",
+  "lang": "en",
+  "raw_text": "NETGEAR DGN2200 Devices dnslookup.cgi on NETGEAR DGN2200 devices with firmware through 10.0.0.50 allows remote authenticated users to execute arbitrary OS commands",
+  "severity": "CRITICAL",
+  "sha256_hash": "64d3199b90812314525e917b8244c85bb378c58fc399af3f0b6a9f0df4f63708",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

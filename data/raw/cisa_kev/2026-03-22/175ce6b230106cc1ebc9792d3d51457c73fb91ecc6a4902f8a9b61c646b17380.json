@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0496",
+  "ingested_at": "2026-03-22T07:45:18.653021+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Reader and Acrobat Adobe Reader and Acrobat contain a use-after-free vulnerability which can allow for code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "175ce6b230106cc1ebc9792d3d51457c73fb91ecc6a4902f8a9b61c646b17380",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

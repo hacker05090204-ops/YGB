@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28289",
+  "ingested_at": "2026-03-22T07:54:34.333221+00:00",
+  "lang": "en",
+  "raw_text": "FreeScout is a free help desk and shared inbox built with PHP's Laravel framework. A patch bypass vulnerability for CVE-2026-27636 in FreeScout 1.8.206 and earlier allows any authenticated user with file upload permissions to achieve Remote Code Execution (RCE) on the server by uploading a malicious .htaccess file using a zero-width space character prefix to bypass the security check. The vulnerability exists in the sanitizeUploadedFileName() function in app/Http/Helper.php. The function contains a Time-of-Check to Time-of-Use (TOCTOU) flaw where the dot-prefix check occurs before sanitization removes invisible characters. This vulnerability is fixed in 1.8.207.",
+  "severity": "CRITICAL",
+  "sha256_hash": "32c8ded4093cc6afe4d70c7f1371933fb420f1137330ede449d208866572a7d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28289"
+}

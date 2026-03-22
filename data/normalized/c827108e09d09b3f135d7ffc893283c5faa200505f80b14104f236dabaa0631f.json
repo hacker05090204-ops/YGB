@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sophos XG Firewall Sophos XG Firewall contains a buffer overflow vulnerability that allows for remote code execution via the \"HTTP/S bookmark\" feature.",
+  "token_count": 22
+}

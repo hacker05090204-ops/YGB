@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-31703",
+  "ingested_at": "2026-03-22T07:54:47.389222+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability found in Dahua NVR/XVR device. A third-party malicious attacker with physical access to the device may gain access to a restricted shell via the serial port, and bypasses the shell's authentication mechanism to escalate privileges.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e63faa360b3bd505dcda3daeb7c570f4dfa2e606c8230fbe9addcb2de519e5bc",
+  "source": "nvd",
+  "tags": [
+    "CWE-305"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-31703"
+}

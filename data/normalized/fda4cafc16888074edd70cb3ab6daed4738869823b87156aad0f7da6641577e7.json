@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in totalbounty Widget Logic Visual widget-logic-visual allows Reflected XSS.This issue affects Widget Logic Visual: from n/a through < = 1.52.",
+  "token_count": 31
+}

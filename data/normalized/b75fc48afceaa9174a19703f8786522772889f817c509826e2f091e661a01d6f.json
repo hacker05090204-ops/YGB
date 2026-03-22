@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A low\u2010privileged remote attacker can directly interact with the wwwdnload.cgi endpoint to download any resource available to administrators, including system backups and certificate request files.",
+  "token_count": 25
+}

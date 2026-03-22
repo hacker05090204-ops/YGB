@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8467",
+  "ingested_at": "2026-03-22T07:45:19.606875+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One and OfficeScan Trend Micro Apex One and OfficeScan contain an unspecified vulnerability within a migration tool component that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "38a113e275d4bc6bef42b6186c72cf14cfff5181e7cab11d0d5d2b8070a50075",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

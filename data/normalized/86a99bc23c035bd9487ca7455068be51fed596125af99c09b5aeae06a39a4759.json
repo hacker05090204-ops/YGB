@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Task Manager plugin for WordPress is vulnerable to Arbitrary File Read in all versions up to, and including, 3.0.2 via the callback_get_text_from_url() function. This makes it possible for authenticated attackers, with Subscriber-level access and above, to read the contents of arbitrary files on the server, which can contain sensitive information.",
+  "token_count": 51
+}

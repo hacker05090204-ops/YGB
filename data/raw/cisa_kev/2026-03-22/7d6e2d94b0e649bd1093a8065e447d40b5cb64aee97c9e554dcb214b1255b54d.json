@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22941",
+  "ingested_at": "2026-03-22T07:45:18.282056+00:00",
+  "lang": "en",
+  "raw_text": "Citrix ShareFile Improper Access Control in Citrix ShareFile storage zones controller may allow an unauthenticated attacker to remotely compromise the storage zones controller.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7d6e2d94b0e649bd1093a8065e447d40b5cb64aee97c9e554dcb214b1255b54d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

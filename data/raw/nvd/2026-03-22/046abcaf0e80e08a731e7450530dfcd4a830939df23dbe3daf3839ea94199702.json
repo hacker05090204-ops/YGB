@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52637",
+  "ingested_at": "2026-03-22T07:54:46.328104+00:00",
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where certain offering configurations may permit execution of potentially harmful SQL queries. Improper validation or restrictions on query execution could expose the system to unintended database interactions or limited information exposure under specific conditions.",
+  "severity": "MEDIUM",
+  "sha256_hash": "046abcaf0e80e08a731e7450530dfcd4a830939df23dbe3daf3839ea94199702",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52637"
+}

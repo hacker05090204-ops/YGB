@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-4716",
+  "ingested_at": "2026-03-22T07:45:19.245902+00:00",
+  "lang": "en",
+  "raw_text": "IBM Planning Analytics IBM Planning Analytics is vulnerable to a configuration overwrite that allows an unauthenticated user to login as \"admin\", and then execute code as root or SYSTEM via TM1 scripting.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bab1ab24c30349bfcfaf3e363060f4049f4fae5547a207e074e6c0adb9a3f6a6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

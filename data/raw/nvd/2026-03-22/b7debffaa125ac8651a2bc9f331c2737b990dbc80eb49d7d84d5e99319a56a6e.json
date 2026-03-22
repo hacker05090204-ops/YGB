@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3957",
+  "ingested_at": "2026-03-22T07:54:44.021921+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in xierongwkhd weimai-wetapp up to 5fe9e8225be4f73f2c5087f134aff657bdf1c6f2. This vulnerability affects the function getLikeMovieList of the file source-code/src/main/java/com/moke/wp/wx_weimai/controller/HomeController.java of the component Endpoint. Executing a manipulation of the argument cat can lead to sql injection. The attack can be executed remotely. The exploit has been published and may be used. This product implements a rolling release for ongoing delivery, which means version information for affected or updated releases is unavailable. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b7debffaa125ac8651a2bc9f331c2737b990dbc80eb49d7d84d5e99319a56a6e",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3957"
+}

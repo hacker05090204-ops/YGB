@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-12480",
+  "ingested_at": "2026-03-22T07:45:16.053331+00:00",
+  "lang": "en",
+  "raw_text": "Gladinet Triofox Gladinet Triofox contains an improper access control vulnerability that allows access to initial setup pages even after setup is complete.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d552561b4cba094212d6864300350d15b091a5665830e1ae529fc7c669c1f64b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

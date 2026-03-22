@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24385",
+  "ingested_at": "2026-03-22T07:54:40.172774+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in gerritvanaaken Podlove Web Player podlove-web-player allows Object Injection.This issue affects Podlove Web Player: from n/a through < = 5.9.1.",
+  "severity": "HIGH",
+  "sha256_hash": "0abad009a5f6768d3a7f5d0ca6ad7f2c9158f9932d02c12ff9cff14188094f8a",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24385"
+}

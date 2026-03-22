@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14480",
+  "ingested_at": "2026-03-22T07:54:34.255028+00:00",
+  "lang": "en",
+  "raw_text": "IBM Aspera faspio Gateway 1.3.6 uses weaker than expected cryptographic algorithms that could allow an attacker to decrypt highly sensitive information",
+  "severity": "MEDIUM",
+  "sha256_hash": "ce2ecec93b2f5e20fa4a21b3253a745433cd030c399ffddabc20690f451a78ee",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14480"
+}

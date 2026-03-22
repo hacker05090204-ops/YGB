@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27169",
+  "ingested_at": "2026-03-22T07:54:30.724646+00:00",
+  "lang": "en",
+  "raw_text": "OpenSift is an AI study tool that sifts through large datasets using semantic search and generative AI. Versions 1.1.2-alpha and below render untrusted user/model content in chat tool UI surfaces using unsafe HTML interpolation patterns, leading to XSS. Stored content can execute JavaScript when later viewed in authenticated sessions. An attacker who can influence stored study/quiz/flashcard content could trigger script execution in a victim\u2019s browser, potentially performing actions as that user in the local app session. This issue has been fixed in version 1.1.3-alpha.",
+  "severity": "HIGH",
+  "sha256_hash": "db5f72759d29d796ce9cce5ede791e02f48033a05029db44bfbba5da9957df92",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-116"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27169"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32339",
+  "ingested_at": "2026-03-22T07:54:45.883290+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Bakes And Cakes bakes-and-cakes allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Bakes And Cakes: from n/a through < = 1.2.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b72ccac4da0ff1549e54dc68c4245b11f60872896ebfec6d97cf75bb9503b397",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32339"
+}

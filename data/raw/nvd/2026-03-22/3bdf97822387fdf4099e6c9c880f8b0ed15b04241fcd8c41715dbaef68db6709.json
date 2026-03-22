@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3523",
+  "ingested_at": "2026-03-22T07:54:39.963180+00:00",
+  "lang": "en",
+  "raw_text": "The Apocalypse Meow plugin for WordPress is vulnerable to SQL Injection via the 'type' parameter in all versions up to, and including, 22.1.0. This is due to a flawed logical operator in the type validation check on line 261 of ajax.php \u2014 the condition uses `&&` (AND) instead of `||` (OR), causing the `in_array()` validation to be short-circuited and never evaluated for any non-empty type value. Combined with `stripslashes_deep()` being called on line 101 which removes `wp_magic_quotes()` protection, attacker-controlled single quotes pass through unescaped into the SQL query on line 298. This makes it possible for authenticated attackers, with Administrator-level access and above, to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3bdf97822387fdf4099e6c9c880f8b0ed15b04241fcd8c41715dbaef68db6709",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 123,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3523"
+}

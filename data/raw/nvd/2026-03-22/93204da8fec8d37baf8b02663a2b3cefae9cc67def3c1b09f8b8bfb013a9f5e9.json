@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32416",
+  "ingested_at": "2026-03-22T07:54:46.059113+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in bPlugins PDF Poster pdf-poster allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects PDF Poster: from n/a through < = 2.4.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "93204da8fec8d37baf8b02663a2b3cefae9cc67def3c1b09f8b8bfb013a9f5e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32416"
+}

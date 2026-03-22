@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-2388",
+  "ingested_at": "2026-03-22T07:45:17.765612+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver The Universal Worklist Configuration in SAP NetWeaver AS JAVA 7.4 allows remote attackers to obtain sensitive user information via a crafted HTTP request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "afb7be5a77512f83478c48135448e11bcf5fb97c07bbdcc009954955bc424e3f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

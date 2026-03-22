@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "osCommerce 2.3.4.1 contains a SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the products_id parameter. Attackers can modify the products_id value in product_info.php requests and append boolean-based SQL injection payloads to extract sensitive database information.",
+  "token_count": 43
+}

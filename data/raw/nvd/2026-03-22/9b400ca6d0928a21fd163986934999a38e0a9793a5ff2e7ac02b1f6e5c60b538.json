@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69368",
+  "ingested_at": "2026-03-22T07:54:30.238581+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in GT3themes SOHO - Photography WordPress Theme soho allows DOM-Based XSS.This issue affects SOHO - Photography WordPress Theme: from n/a through < = 3.0.3.",
+  "severity": "HIGH",
+  "sha256_hash": "9b400ca6d0928a21fd163986934999a38e0a9793a5ff2e7ac02b1f6e5c60b538",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69368"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32430",
+  "ingested_at": "2026-03-22T07:54:46.091154+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in IdeaBox Creations PowerPack Addons for Elementor powerpack-lite-for-elementor allows Stored XSS.This issue affects PowerPack Addons for Elementor: from n/a through < = 2.9.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed9f1b715f67d48cd27b7e32c02d1892babdff24686f83abe34d88bd716f1da7",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32430"
+}

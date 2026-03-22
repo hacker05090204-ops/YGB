@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28787",
+  "ingested_at": "2026-03-22T07:54:41.301456+00:00",
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. In version 10.0.11 and prior, the WebAuthn authentication implementation does not store the challenge on the server side. Instead, the challenge is returned to the client and accepted back from the client request body during verification. This violates the WebAuthn specification (W3C Web Authentication Level 2, \u00a713.4.3) and allows an attacker who has obtained a valid WebAuthn assertion (e.g., via XSS, MitM, or log exposure) to replay it indefinitely, completely bypassing the second-factor authentication. No known patches are available.",
+  "severity": "HIGH",
+  "sha256_hash": "d82385dd54e6c9de0b2e56157b4cfee99b4d9c9e851d1e3dc2ad7b333685043c",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-294"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28787"
+}

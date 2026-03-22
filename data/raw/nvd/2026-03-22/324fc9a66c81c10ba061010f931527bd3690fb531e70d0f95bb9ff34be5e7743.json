@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20033",
+  "ingested_at": "2026-03-22T07:54:46.257835+00:00",
+  "lang": "en",
+  "raw_text": "Wowza Streaming Engine 4.5.0 contains a local privilege escalation vulnerability that allows authenticated users to escalate privileges by replacing executable files due to improper file permissions granting full access to the Everyone group. Attackers can replace the nssm_x64.exe binary in the manager and engine service directories with malicious executables to execute code with LocalSystem privileges when services restart.",
+  "severity": "HIGH",
+  "sha256_hash": "324fc9a66c81c10ba061010f931527bd3690fb531e70d0f95bb9ff34be5e7743",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20033"
+}

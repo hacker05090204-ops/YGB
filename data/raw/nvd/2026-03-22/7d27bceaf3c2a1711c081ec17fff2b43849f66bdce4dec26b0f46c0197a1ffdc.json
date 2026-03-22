@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28193",
+  "ingested_at": "2026-03-22T07:54:32.052639+00:00",
+  "lang": "en",
+  "raw_text": "In JetBrains YouTrack before 2025.3.121962 apps were able to send requests to the app permissions endpoint",
+  "severity": "HIGH",
+  "sha256_hash": "7d27bceaf3c2a1711c081ec17fff2b43849f66bdce4dec26b0f46c0197a1ffdc",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28193"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70798",
+  "ingested_at": "2026-03-22T07:54:43.127813+00:00",
+  "lang": "en",
+  "raw_text": "Tenda i24V3.0si V3.0.0.5 Firmware V3.0.0.5 was discovered to contain a hardcoded password vulnerability in /etc_ro/shadow, which allows attackers to log in as root.",
+  "severity": "HIGH",
+  "sha256_hash": "3248b329c7a33e79472c1ff8d9a0c77c7b4745facab41cf5bc2441e3f4529e57",
+  "source": "nvd",
+  "tags": [
+    "CWE-259"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70798"
+}

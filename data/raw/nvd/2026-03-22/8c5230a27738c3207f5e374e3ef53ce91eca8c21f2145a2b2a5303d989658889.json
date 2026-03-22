@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4504",
+  "ingested_at": "2026-03-22T07:54:48.970621+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in eosphoros-ai db-gpt up to 0.7.5. This vulnerability affects unknown code of the file /api/v1/editor/ of the component Incomplete Fix. This manipulation causes sql injection. It is possible to initiate the attack remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "8c5230a27738c3207f5e374e3ef53ce91eca8c21f2145a2b2a5303d989658889",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4504"
+}

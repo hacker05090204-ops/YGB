@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-4519",
+  "ingested_at": "2026-03-22T07:54:48.858287+00:00",
+  "lang": "en",
+  "raw_text": "The webbrowser.open() API would accept leading dashes in the URL which could be handled as command line options for certain web browsers. New behavior rejects leading dashes. Users are recommended to sanitize URLs prior to passing to webbrowser.open().",
+  "severity": "UNKNOWN",
+  "sha256_hash": "076c1a1560d3e05f24c52e6529ba42f098186aa57b6d92dee3ee4f1933263397",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4519"
+}

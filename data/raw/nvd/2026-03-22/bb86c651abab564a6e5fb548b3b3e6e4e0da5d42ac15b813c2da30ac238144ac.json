@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32769",
+  "ingested_at": "2026-03-22T07:54:48.401267+00:00",
+  "lang": "en",
+  "raw_text": "Fullchain is an umbrella project for deploying a ready-to-use CTF platform. In versions prior to 0.1.1, due to a mis-written NetworkPolicy, a malicious actor can pivot from a subverted application to any Pod out of the origin namespace. The flawed inter-ns NetworkPolicy breaks the security-by-default property expected as part of the deployment program, leading to a potential lateral movement. This issue has been fixed in version 0.1.1. To workaround, delete the failing network policy that should be prefixed by inter-ns- in the target namespace.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "bb86c651abab564a6e5fb548b3b3e6e4e0da5d42ac15b813c2da30ac238144ac",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32769"
+}

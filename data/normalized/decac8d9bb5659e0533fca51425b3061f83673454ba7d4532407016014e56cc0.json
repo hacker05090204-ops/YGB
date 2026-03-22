@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Part-DB 0.4 contains an authentication bypass vulnerability that allows unauthenticated attackers to login by injecting SQL syntax into authentication parameters. Attackers can submit a single quote followed by 'or' in the login form to bypass credential validation and gain unauthorized access to the application.",
+  "token_count": 44
+}

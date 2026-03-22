@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 contains a stored cross-site scripting vulnerability in the location_name parameter of the admin locations interface. Attackers can submit POST requests to the locations.php endpoint with JavaScript payloads in the location_name field to execute arbitrary code in administrator browsers.",
+  "token_count": 43
+}

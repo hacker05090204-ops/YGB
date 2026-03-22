@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27623",
+  "ingested_at": "2026-03-22T07:54:31.181517+00:00",
+  "lang": "en",
+  "raw_text": "Valkey is a distributed key-value database. Starting in version 9.0.0 and prior to version 9.0.3, a malicious actor with network access to Valkey can cause the system to abort by triggering an assertion. When processing incoming requests, the Valkey system does not properly reset the networking state after processing an empty request. A malicious actor can then send a request that the server incorrectly identifies as breaking server side invariants, which results in the server shutting down. Version 9.0.3 fixes the issue. As an additional mitigation, properly isolate Valkey deployments so that only trusted users have access.",
+  "severity": "HIGH",
+  "sha256_hash": "133fdaea2e7f86e21c1d6ad2b86f0f6d786107a4a5ac5392bdc6e0717833408e",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27623"
+}

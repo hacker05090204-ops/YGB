@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-32463",
+  "ingested_at": "2026-03-22T07:45:16.151096+00:00",
+  "lang": "en",
+  "raw_text": "Sudo Sudo Sudo contains an inclusion of functionality from untrusted control sphere vulnerability. This vulnerability could allow local attacker to leverage sudo\u2019s -R (--chroot) option to run arbitrary commands as root, even if they are not listed in the sudoers file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "42c9a186e10ceaa8a647305dcfd9cb16d8922f4af55efa394342aa1f40ca1298",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

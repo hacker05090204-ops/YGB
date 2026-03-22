@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OOP CMS BLOG 1.0 contains a cross-site request forgery vulnerability that allows unauthenticated attackers to create administrative user accounts by crafting malicious POST requests. Attackers can submit forms to the addUser.php endpoint with parameters including userName, password, email, and role set to administrative privileges to gain unauthorized access.",
+  "token_count": 48
+}

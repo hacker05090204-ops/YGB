@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33549",
+  "ingested_at": "2026-03-22T07:54:49.598570+00:00",
+  "lang": "en",
+  "raw_text": "SPIP 4.4.10 through 4.4.12 before 4.4.13 allows unintended privilege assignment (of administrator privileges) during the editing of an author data structure because of STATUT mishandling.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ee6dc84e8f0e6f19ce6688133cd50b1ce43493f3e8fcd12cd8308896580713bd",
+  "source": "nvd",
+  "tags": [
+    "CWE-688"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33549"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27572",
+  "ingested_at": "2026-03-22T07:54:31.803479+00:00",
+  "lang": "en",
+  "raw_text": "Wasmtime is a runtime for WebAssembly. Prior to versions 24.0.6, 36.0.6, 4.0.04, 41.0.4, and 42.0.0, Wasmtime's implementation of the `wasi:http/types.fields` resource is susceptible to panics when too many fields are added to the set of headers. Wasmtime's implementation in the `wasmtime-wasi-http` crate is backed by a data structure which panics when it reaches excessive capacity and this condition was not handled gracefully in Wasmtime. Panicking in a WASI implementation is a Denial of Service vector for embedders and is treated as a security vulnerability in Wasmtime. Wasmtime 24.0.6, 36.0.6, 40.0.4, 41.0.4, and 42.0.0 patch this vulnerability and return a trap to the guest instead of panicking. There are no known workarounds at this time. Embedders are encouraged to update to a patched version of Wasmtime.",
+  "severity": "HIGH",
+  "sha256_hash": "9ae48b07b343420fac8d082321cf90a1fb8db82c6b1b532ac5426d009571b8dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 125,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27572"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Wazuh Wazuh Server Wazuh contains a deserialization of untrusted data vulnerability that allows for remote code execution on Wazuh servers.",
+  "token_count": 20
+}

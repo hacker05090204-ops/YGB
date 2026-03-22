@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25366",
+  "ingested_at": "2026-03-22T07:54:30.964240+00:00",
+  "lang": "en",
+  "raw_text": "microASP Portal+ CMS contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code into the explode_tree parameter. Attackers can send crafted requests to pagina.phtml with SQL injection payloads using extractvalue and concat functions to extract sensitive database information like the current database name.",
+  "severity": "HIGH",
+  "sha256_hash": "e1d912c737ff0452807dcc859c3faab3f9bbcf105d52825dc2d14159c41cad10",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25366"
+}

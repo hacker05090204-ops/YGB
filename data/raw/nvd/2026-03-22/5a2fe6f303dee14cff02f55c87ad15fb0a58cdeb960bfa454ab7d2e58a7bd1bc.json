@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28351",
+  "ingested_at": "2026-03-22T07:54:33.324604+00:00",
+  "lang": "en",
+  "raw_text": "pypdf is a free and open-source pure-python PDF library. Prior to version 6.7.4, an attacker who uses this vulnerability can craft a PDF which leads to large memory usage. This requires parsing the content stream using the RunLengthDecode filter. This has been fixed in pypdf 6.7.4. As a workaround, consider applying the changes from PR #3664.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5a2fe6f303dee14cff02f55c87ad15fb0a58cdeb960bfa454ab7d2e58a7bd1bc",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28351"
+}

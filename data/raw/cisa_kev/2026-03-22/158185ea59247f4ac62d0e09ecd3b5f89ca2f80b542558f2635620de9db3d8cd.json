@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-27924",
+  "ingested_at": "2026-03-22T07:45:17.727958+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) allows an attacker to inject memcache commands into a targeted instance which causes an overwrite of arbitrary cached entries.",
+  "severity": "CRITICAL",
+  "sha256_hash": "158185ea59247f4ac62d0e09ecd3b5f89ca2f80b542558f2635620de9db3d8cd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70948",
+  "ingested_at": "2026-03-22T07:54:40.970161+00:00",
+  "lang": "en",
+  "raw_text": "A host header injection vulnerability in the mailer component of @perfood/couch-auth v0.26.0 allows attackers to obtain reset tokens and execute an account takeover via spoofing the HTTP Host header.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c911f89ac3b496383d70d8a3436a44163dc3451adfb9cd0c2f7b0be38474a74f",
+  "source": "nvd",
+  "tags": [
+    "CWE-644"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70948"
+}

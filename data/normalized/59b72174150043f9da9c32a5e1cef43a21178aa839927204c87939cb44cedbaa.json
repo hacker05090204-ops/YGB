@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in doramart DoraCMS 3.0.x. Impacted is the function createFileBypath of the file /DoraCMS/server/app/router/api/v1.js. Performing a manipulation results in path traversal. The attack can be initiated remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 61
+}

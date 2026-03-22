@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Due to insufficient authorization enforcement, an unauthorized remote attacker can exploit the wwwupload.cgi endpoint to upload and apply arbitrary data. This includes, but is not limited to, contact images, HTTPS certificates, system backups for restoration, server peer configurations, and BACnet/SC server certificates and keys.",
+  "token_count": 44
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0001",
+  "ingested_at": "2026-03-22T07:45:18.606081+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Graphics Device Interface (GDI) The Graphics Device Interface (GDI) in Microsoft Windows Vista SP2; Windows Server 2008 SP2 and R2 SP1; Windows 7 SP1; Windows 8.1; Windows Server 2012 Gold and R2; Windows RT 8.1; and Windows 10 Gold, 1511, and 1607 allows local users to gain privileges",
+  "severity": "CRITICAL",
+  "sha256_hash": "25eb54efc9b1bf4cec0d6cd99bf87cd37abf5506072e01f16a6b25dda7fe96a2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

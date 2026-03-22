@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel - VMA Use-After-Free via Buggy vmacache_flush_all() Fastpath Local Privilege Escalation",
+  "token_count": 12
+}

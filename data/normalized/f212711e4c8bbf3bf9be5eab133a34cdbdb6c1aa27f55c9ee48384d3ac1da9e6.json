@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in SourceCodester Web-based Pharmacy Product Management System 1.0. This impacts an unknown function of the file edit-profile.php. Performing a manipulation of the argument fullname results in cross site scripting. The attack may be initiated remotely. The exploit has been released to the public and may be used for attacks.",
+  "token_count": 55
+}

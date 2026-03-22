@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper certificate validation in the PAM propagation WinRM connections allows a network attacker to perform a man-in-the-middle attack via disabled TLS certificate verification.",
+  "token_count": 23
+}

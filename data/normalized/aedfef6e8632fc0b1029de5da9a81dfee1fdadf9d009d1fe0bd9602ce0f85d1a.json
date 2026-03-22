@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A low-privileged remote attacker can exploit an arbitrary file write vulnerability in the wwupload.cgi endpoint. Due to path traversal this can lead to overwriting arbitrary files on the device and achieving a full system compromise.",
+  "token_count": 35
+}

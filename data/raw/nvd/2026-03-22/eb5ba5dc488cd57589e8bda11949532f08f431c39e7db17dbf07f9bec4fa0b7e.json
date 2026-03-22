@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29124",
+  "ingested_at": "2026-03-22T07:54:39.935410+00:00",
+  "lang": "en",
+  "raw_text": "Multiple SUID root-owned binaries are found in /home/monitor/terminal, /home/monitor/kore-terminal, /home/monitor/IDE-DPack/terminal-dpack, and /home/monitor/IDE-DPack/terminal-dpack2 in International Data Casting (IDC) SFX2100 Satellite Receiver, which may lead to local privlidge escalation from the `monitor` user to root",
+  "severity": "HIGH",
+  "sha256_hash": "eb5ba5dc488cd57589e8bda11949532f08f431c39e7db17dbf07f9bec4fa0b7e",
+  "source": "nvd",
+  "tags": [
+    "CWE-269",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29124"
+}

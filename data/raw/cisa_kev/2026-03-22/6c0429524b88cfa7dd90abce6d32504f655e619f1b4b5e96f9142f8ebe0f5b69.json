@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-42475",
+  "ingested_at": "2026-03-22T07:45:17.559646+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Multiple versions of Fortinet FortiOS SSL-VPN contain a heap-based buffer overflow vulnerability which can allow an unauthenticated, remote attacker to execute arbitrary code or commands via specifically crafted requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6c0429524b88cfa7dd90abce6d32504f655e619f1b4b5e96f9142f8ebe0f5b69",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

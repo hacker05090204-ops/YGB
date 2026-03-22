@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22557",
+  "ingested_at": "2026-03-22T07:54:47.953185+00:00",
+  "lang": "en",
+  "raw_text": "A malicious actor with access to the network could exploit a Path Traversal vulnerability found in the UniFi Network Application to access files on the underlying system that could be manipulated to access an underlying account.",
+  "severity": "CRITICAL",
+  "sha256_hash": "629faa5f9216b574f717c9a4c4be6b1e02347c5df9d183abf451b11d96767456",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22557"
+}

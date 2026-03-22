@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in gerritvanaaken Podlove Web Player podlove-web-player allows Object Injection.This issue affects Podlove Web Player: from n/a through < = 5.9.1.",
+  "token_count": 25
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26721",
+  "ingested_at": "2026-03-22T07:54:30.490783+00:00",
+  "lang": "en",
+  "raw_text": "An issue in Key Systems Inc Global Facilities Management Software v.20230721a allows a remote attacker to obtain sensitive information via the sid query parameter.",
+  "severity": "HIGH",
+  "sha256_hash": "2aeaef3e3125c0e807f4c7b128cbd34e8851c35d195970356fb3bdb31d8521f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-598"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26721"
+}

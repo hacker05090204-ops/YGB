@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31958",
+  "ingested_at": "2026-03-22T07:54:43.898507+00:00",
+  "lang": "en",
+  "raw_text": "Tornado is a Python web framework and asynchronous networking library. In versions of Tornado prior to 6.5.5, the only limit on the number of parts in multipart/form-data is the max_body_size setting (default 100MB). Since parsing occurs synchronously on the main thread, this creates the possibility of denial-of-service due to the cost of parsing very large multipart bodies with many parts. This vulnerability is fixed in 6.5.5.",
+  "severity": "HIGH",
+  "sha256_hash": "893a397aa2adad1e5a6ec4a030d732b168e8bd275a9be9807482a9d96fe833d0",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31958"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15587",
+  "ingested_at": "2026-03-22T07:54:46.317751+00:00",
+  "lang": "en",
+  "raw_text": "Tinycontrol devices such as tcPDU and LAN Controllers LK3.5, LK3.9 and LK4 allow a low privileged user to read an administrator's password by directly accessing a specific resource inaccessible via a graphical interface. This issue has been fixed in firmware versions: 1.36 (for tcPDU), 1.67 (for LK3.5 - hardware versions: 3.5, 3.6, 3.7 and 3.8), 1.75 (for LK3.9 - hardware version 3.9) and 1.38 (for LK4 - hardware version 4.0).",
+  "severity": "UNKNOWN",
+  "sha256_hash": "34aac159fd8b63225d330d9ec3360e2c93f44576fe40675ba148fdd0c145bbb3",
+  "source": "nvd",
+  "tags": [
+    "CWE-425"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15587"
+}

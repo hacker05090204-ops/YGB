@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31873",
+  "ingested_at": "2026-03-22T07:54:44.418746+00:00",
+  "lang": "en",
+  "raw_text": "Unhead is a document head and template manager. Prior to 2.1.11, The link.href check in makeTagSafe (safe.ts) uses String.includes(), which is case-sensitive. Browsers treat URI schemes case-insensitively. DATA:text/css,... is the same as data:text/css,... to the browser, but 'DATA:...'.includes('data:') returns false. An attacker can inject arbitrary CSS for UI redressing or data exfiltration via CSS attribute selectors with background-image callbacks. This vulnerability is fixed in 2.1.11.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8cd5162a54b928c0e81addca24c8535f07acd1b282918172e7d2a277a3b890a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31873"
+}

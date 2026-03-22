@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3891",
+  "ingested_at": "2026-03-22T07:54:46.183124+00:00",
+  "lang": "en",
+  "raw_text": "The Pix for WooCommerce plugin for WordPress is vulnerable to arbitrary file uploads due to missing capability check and missing file type validation in the 'lkn_pix_for_woocommerce_c6_save_settings' function in all versions up to, and including, 1.5.0. This makes it possible for unauthenticated attackers to upload arbitrary files on the affected site's server which may make remote code execution possible.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b3cdecf5ad57b7845f0514ccd26fce8ea5817a4f6f74331059fac4bf133d4af3",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3891"
+}

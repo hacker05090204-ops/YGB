@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28456",
+  "ingested_at": "2026-03-22T07:54:41.041052+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.1.5 prior to 2026.2.14 contain a vulnerability in the Gateway in which it does not sufficiently constrain configured hook module paths before passing them to dynamic import(), allowing code execution. An attacker with gateway configuration modification access can load and execute unintended local modules in the Node.js process.",
+  "severity": "HIGH",
+  "sha256_hash": "ffa33130b1f175f1f4438e6820486ae6cb134275cd9ff2c30f7a4acbcc2efae6",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28456"
+}

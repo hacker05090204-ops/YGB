@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-44877",
+  "ingested_at": "2026-03-22T07:45:17.547909+00:00",
+  "lang": "en",
+  "raw_text": "CWP Control Web Panel CWP Control Web Panel (formerly CentOS Web Panel) contains an OS command injection vulnerability that allows remote attackers to execute commands via shell metacharacters in the login parameter.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9f441836d5ecee7589c5802ce4f2c58e80637ff4b6c9d38bf1dd56c76a984804",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

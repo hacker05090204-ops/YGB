@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26266",
+  "ingested_at": "2026-03-22T07:54:34.304471+00:00",
+  "lang": "en",
+  "raw_text": "AliasVault is a privacy-first password manager with built-in email aliasing. A stored cross-site scripting (XSS) vulnerability was identified in the email rendering feature of AliasVault Web Client versions 0.25.3 and lower. When viewing received emails on an alias, the HTML content is rendered in an iframe using srcdoc, which does not provide origin isolation. An attacker can send a crafted email containing malicious JavaScript to any AliasVault email alias. When the victim views the email in the web client, the script executes in the same origin as the application. No sanitization or sandboxing was applied to email HTML content before rendering. This vulnerability is fixed in 0.26.0.[",
+  "severity": "CRITICAL",
+  "sha256_hash": "7d30bce8b4080e8de6903e35c2b60ee72fe06f85fa341968e24eabd1c30667f9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 107,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26266"
+}

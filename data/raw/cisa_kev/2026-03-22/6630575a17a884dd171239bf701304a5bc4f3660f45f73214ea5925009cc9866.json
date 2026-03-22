@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2424",
+  "ingested_at": "2026-03-22T07:45:18.638674+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft PowerPoint Microsoft PowerPoint allows remote attackers to execute arbitrary code or cause a denial of service (memory corruption) via a crafted Office document.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6630575a17a884dd171239bf701304a5bc4f3660f45f73214ea5925009cc9866",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

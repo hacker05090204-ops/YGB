@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Data Risk Manager IBM Data Risk Manager contains a directory traversal vulnerability that could allow a remote authenticated attacker to traverse directories and send a specially crafted URL request to download arbitrary files from the system.",
+  "token_count": 37
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A HTTP Host header attack vulnerability affects WebClient and the WebScheduler web apps of PcVue in version 15.0.0 through 16.3.3 included, allowing a remote attacker to inject harmful payloads that manipulate server-side behavior. This vulnerability only affects the endpoints /Authentication/ExternalLogin, /Authentication/AuthorizationCodeCallback and /Authentication/Logout of the WebClient and WebScheduler web apps.",
+  "token_count": 50
+}

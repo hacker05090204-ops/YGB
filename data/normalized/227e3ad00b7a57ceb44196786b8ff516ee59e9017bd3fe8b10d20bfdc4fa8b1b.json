@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GitLab GitLab CE/EE GitLab Community and Enterprise Editions contain an improper access control vulnerability. This allows an attacker to trigger password reset emails to be sent to an unverified email address to ultimately facilitate an account takeover.",
+  "token_count": 37
+}

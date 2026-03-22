@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70218",
+  "ingested_at": "2026-03-22T07:54:34.628869+00:00",
+  "lang": "en",
+  "raw_text": "Stack buffer overflow vulnerability in D-Link DIR-513 v1.10 via POST to the goform/formAdvFirewall component.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c2fe7a344db81302b5ce54acd2c787b53eca5c8bed5572f393dd07d66d0576e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70218"
+}

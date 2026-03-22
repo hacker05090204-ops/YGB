@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27271",
+  "ingested_at": "2026-03-22T07:54:43.322006+00:00",
+  "lang": "en",
+  "raw_text": "Illustrator versions 29.8.4, 30.1 and earlier are affected by a Heap-based Buffer Overflow vulnerability that could result in arbitrary code execution in the context of the current user. Exploitation of this issue requires user interaction in that a victim must open a malicious file.",
+  "severity": "HIGH",
+  "sha256_hash": "6c1d78312daa2b2704f040c1ef700bf8ff791f5ee5ea87e9a07780bc45cdaade",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27271"
+}

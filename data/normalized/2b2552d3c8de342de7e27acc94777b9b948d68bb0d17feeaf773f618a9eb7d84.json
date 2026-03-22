@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Network-Attached Storage (NAS) Devices Multiple Zyxel network-attached storage (NAS) devices contain a pre-authentication command injection vulnerability, which may allow a remote, unauthenticated attacker to execute arbitrary code.",
+  "token_count": 29
+}

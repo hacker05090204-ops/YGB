@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29076",
+  "ingested_at": "2026-03-22T07:54:41.855565+00:00",
+  "lang": "en",
+  "raw_text": "cpp-httplib is a C++11 single-file header-only cross platform HTTP/HTTPS library. Prior to version 0.37.0, cpp-httplib uses std::regex (libstdc++) to parse RFC 5987 encoded filename* values in multipart Content-Disposition headers. The regex engine in libstdc++ implements backtracking via deep recursion, consuming one stack frame per input character. An attacker can send a single HTTP POST request with a crafted filename* parameter that causes uncontrolled stack growth, resulting in a stack overflow (SIGSEGV) that crashes the server process. This issue has been patched in version 0.37.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "74e768afee7c3c2b3fab355aef5a6744a7e3a89b86861cc0241b1ba6329be0a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-674",
+    "CWE-1333"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29076"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-44309",
+  "ingested_at": "2026-03-22T07:45:16.701636+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, macOS, and other Apple products contain an unspecified vulnerability when processing maliciously crafted web content that may lead to a cross-site scripting (XSS) attack.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6476b764e8e902daa3c2dd50a363ce6b604ed6f7153f375548dd312204d8f4f4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

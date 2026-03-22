@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-5902",
+  "ingested_at": "2026-03-22T07:45:19.171374+00:00",
+  "lang": "en",
+  "raw_text": "F5 BIG-IP F5 BIG-IP Traffic Management User Interface (TMUI) contains a remote code execution vulnerability in undisclosed pages.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3dc2cafd0bb243e6b5e58b7d0233dff9f539c31e00457c0655e3ed66826eb161",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

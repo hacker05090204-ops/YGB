@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25181",
+  "ingested_at": "2026-03-22T07:54:41.439653+00:00",
+  "lang": "en",
+  "raw_text": "Musicco 2.0.0 contains a path traversal vulnerability that allows unauthenticated attackers to download arbitrary directories by manipulating the parent parameter. Attackers can supply directory traversal sequences in the parent parameter of the getAlbum endpoint to access sensitive system directories and download them as ZIP files.",
+  "severity": "HIGH",
+  "sha256_hash": "4b8869fe54ef6994e8eaa575bfa326f672f8aa55614a0e720b2e8dba7c320149",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25181"
+}

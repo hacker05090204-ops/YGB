@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28133",
+  "ingested_at": "2026-03-22T07:54:40.685912+00:00",
+  "lang": "en",
+  "raw_text": "Unrestricted Upload of File with Dangerous Type vulnerability in WP Chill Filr filr-protection allows Upload a Web Shell to a Web Server.This issue affects Filr: from n/a through < = 1.2.12.",
+  "severity": "HIGH",
+  "sha256_hash": "fefbee6da5fde69c6218b6b4cb4b14f230234c658925e7b6b8c8799e7f0f0876",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28133"
+}

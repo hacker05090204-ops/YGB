@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "JetKVM before 0.5.4 does not rate limit login requests, enabling brute-force attempts to guess credentials.",
+  "token_count": 15
+}

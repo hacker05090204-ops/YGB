@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager (EPM) Ivanti Endpoint Manager (EPM) contains a SQL injection vulnerability in Core server that allows an unauthenticated attacker within the same network to execute arbitrary code.",
+  "token_count": 29
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41766",
+  "ingested_at": "2026-03-22T07:54:42.211251+00:00",
+  "lang": "en",
+  "raw_text": "A low-privileged remote attacker can trigger a stack-based buffer overflow via a crafted HTTP POST request using the ubr-network method resulting in full device compromise.",
+  "severity": "HIGH",
+  "sha256_hash": "432bd43eafc25a54302da9b61f1af38bd8fab83ed28f6aeaff0903951e1cdad9",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41766"
+}

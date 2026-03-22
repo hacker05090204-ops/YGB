@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-37055",
+  "ingested_at": "2026-03-22T07:45:16.025055+00:00",
+  "lang": "en",
+  "raw_text": "D-Link Routers D-Link Routers contains a buffer overflow vulnerability that has a high impact on confidentiality, integrity, and availability. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0bf19af406762d7350885e7187550b1274dc6cb2ed1c21f98a3aeb5bccba9eaa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

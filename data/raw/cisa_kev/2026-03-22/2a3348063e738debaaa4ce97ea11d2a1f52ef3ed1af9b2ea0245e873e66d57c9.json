@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2011-3544",
+  "ingested_at": "2026-03-22T07:45:18.689989+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE JDK and JRE An access control vulnerability exists in the Applet Rhino Script Engine component of Oracle's Java Runtime Environment allows an attacker to remotely execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2a3348063e738debaaa4ce97ea11d2a1f52ef3ed1af9b2ea0245e873e66d57c9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

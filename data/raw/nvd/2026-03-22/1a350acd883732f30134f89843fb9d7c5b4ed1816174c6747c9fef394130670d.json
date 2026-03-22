@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13067",
+  "ingested_at": "2026-03-22T07:54:43.469458+00:00",
+  "lang": "en",
+  "raw_text": "The Royal Addons for Elementor plugin for WordPress is vulnerable to arbitrary file upload in all versions up to, and including, 1.7.1049. This is due to insufficient file type validation detecting files named main.php, allowing a file with such a name to bypass sanitization. This makes it possible for authenticated attackers, with author-level access and above, to upload arbitrary files on the affected site's server which may make remote code execution possible.",
+  "severity": "HIGH",
+  "sha256_hash": "1a350acd883732f30134f89843fb9d7c5b4ed1816174c6747c9fef394130670d",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13067"
+}

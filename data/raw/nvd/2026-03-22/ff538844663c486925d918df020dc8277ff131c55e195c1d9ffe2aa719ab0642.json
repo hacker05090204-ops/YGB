@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32731",
+  "ingested_at": "2026-03-22T07:54:47.764791+00:00",
+  "lang": "en",
+  "raw_text": "ApostropheCMS is an open-source content management framework. Prior to version 3.5.3 of `@apostrophecms/import-export`, The `extract()` function in `gzip.js` constructs file-write paths using `fs.createWriteStream(path.join(exportPath, header.name))`. `path.join()` does not resolve or sanitise traversal segments such as `../`. It concatenates them as-is, meaning a tar entry named `../../evil.js` resolves to a path outside the intended extraction directory. No canonical-path check is performed before the write stream is opened. This is a textbook Zip Slip vulnerability. Any user who has been granted the Global Content Modify permission \u2014 a role routinely assigned to content editors and site managers \u2014 can upload a crafted `.tar.gz` file through the standard CMS import UI and write attacker-controlled content to any path the Node.js process can reach on the host filesystem. Version 3.5.3 of `@apostrophecms/import-export` fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff538844663c486925d918df020dc8277ff131c55e195c1d9ffe2aa719ab0642",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 130,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32731"
+}

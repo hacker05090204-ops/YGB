@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In parsePermissionGroup of ParsedPermissionUtils.java, there is a possible way to bypass a consent dialog to obtain permissions due to a permissions bypass. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "token_count": 43
+}

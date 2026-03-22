@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode Payroll Management System 1.0. This vulnerability affects unknown code of the file /manage_employee_deductions.php. Such manipulation of the argument ID leads to cross site scripting. The attack may be launched remotely. The exploit has been disclosed publicly and may be used.",
+  "token_count": 48
+}

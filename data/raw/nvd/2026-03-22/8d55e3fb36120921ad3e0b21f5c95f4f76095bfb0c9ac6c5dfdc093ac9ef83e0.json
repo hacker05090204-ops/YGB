@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27406",
+  "ingested_at": "2026-03-22T07:54:40.273362+00:00",
+  "lang": "en",
+  "raw_text": "Insertion of Sensitive Information Into Sent Data vulnerability in Joe Dolson My Tickets my-tickets allows Retrieve Embedded Sensitive Data.This issue affects My Tickets: from n/a through < = 2.1.0.",
+  "severity": "HIGH",
+  "sha256_hash": "8d55e3fb36120921ad3e0b21f5c95f4f76095bfb0c9ac6c5dfdc093ac9ef83e0",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27406"
+}

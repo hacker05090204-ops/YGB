@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A post-authentication Format String vulnerability in SonicOS allows a remote attacker to crash a firewall.",
+  "token_count": 15
+}

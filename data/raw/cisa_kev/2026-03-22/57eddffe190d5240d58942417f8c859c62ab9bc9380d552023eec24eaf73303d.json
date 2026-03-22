@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-13383",
+  "ingested_at": "2026-03-22T07:45:18.877179+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS and FortiProxy A heap buffer overflow in Fortinet FortiOS and FortiProxy may cause the SSL VPN web service termination for logged in users.",
+  "severity": "CRITICAL",
+  "sha256_hash": "57eddffe190d5240d58942417f8c859c62ab9bc9380d552023eec24eaf73303d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

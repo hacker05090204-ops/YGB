@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48636",
+  "ingested_at": "2026-03-22T07:54:33.874674+00:00",
+  "lang": "en",
+  "raw_text": "In openFile of BugreportContentProvider.java, there is a possible way to read and write unauthorized files due to a path traversal error. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "f2208a893e224a5e228676b79e801f57c15aab81009f6110dbcab758bc45b2d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48636"
+}

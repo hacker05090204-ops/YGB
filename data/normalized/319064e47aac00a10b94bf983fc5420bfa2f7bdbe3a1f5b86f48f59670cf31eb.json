@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use of a Broken or Risky Cryptographic Algorithm vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android, WebClient (Config import, URI scheme handler, CLI --config modules) allows Retrieve Embedded Sensitive Data. This vulnerability is associated with program files flutter/lib/common.Dart, hbb_common/src/config.Rs and program routines parseRustdeskUri(), importConfig(). This issue affects RustDesk Client: through 1.4.5.",
+  "token_count": 55
+}

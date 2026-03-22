@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70330",
+  "ingested_at": "2026-03-22T07:54:43.592496+00:00",
+  "lang": "en",
+  "raw_text": "Easy Grade Pro 4.1.0.2 contains a file parsing logic flaw in the handling of proprietary .EGP gradebook files. By modifying specific fields at precise offsets within an otherwise valid .EGP file, an attacker can trigger an out-of-bounds memory read during parsing. This results in an unhandled access violation and application crash, leading to a local denial-of-service condition when the crafted file is opened by a user.",
+  "severity": "LOW",
+  "sha256_hash": "c462343fd9067cce42755af40cd3521d7bcaebdd83029da9907c5475b24e3732",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70330"
+}

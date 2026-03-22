@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33071",
+  "ingested_at": "2026-03-22T07:54:48.748362+00:00",
+  "lang": "en",
+  "raw_text": "FileRise is a self-hosted web file manager / WebDAV server. In versions prior to 3.8.0, the WebDAV upload endpoint accepts any file extension including .phtml, .php5, .htaccess, and other server-side executable types, bypassing the filename validation enforced by the regular upload path. In non-default deployments lacking Apache's LocationMatch protection, this leads to remote code execution. When files are uploaded via WebDAV, the createFile() method in FileRiseDirectory.php and the put() method in FileRiseFile.php accept the filename directly from the WebDAV client without any validation. In contrast, the regular upload endpoint in UploadModel::upload() validates filenames against REGEX_FILE_NAME. This issue is fixed in version 3.8.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a88367512d8845ee6841ebee468578ceddd4b373334819c8e63db88b108c7e7e",
+  "source": "nvd",
+  "tags": [
+    "CWE-434",
+    "CWE-552"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33071"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25952",
+  "ingested_at": "2026-03-22T07:54:32.309483+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, `xf_SetWindowMinMaxInfo` dereferences a freed `xfAppWindow` pointer because `xf_rail_get_window` in `xf_rail_server_min_max_info` returns an unprotected pointer from the `railWindows` hash table, and the main thread can concurrently delete the window (via a window delete order) while the RAIL channel thread is still using the pointer. Version 3.23.0 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8818f1466659d23e4fc195c7ab345a638a943663812c542dbc1ec03cffafb33e",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25952"
+}

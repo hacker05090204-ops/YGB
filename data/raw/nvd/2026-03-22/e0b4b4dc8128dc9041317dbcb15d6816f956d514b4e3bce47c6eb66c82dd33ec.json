@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32040",
+  "ingested_at": "2026-03-22T07:54:48.249029+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.23 contain an html injection vulnerability in the HTML session exporter that allows attackers to execute arbitrary javascript by injecting malicious mimeType values in image content blocks. Attackers can craft session entries with specially crafted mimeType attributes that break out of the img src data-URL context to achieve cross-site scripting when exported HTML is opened.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e0b4b4dc8128dc9041317dbcb15d6816f956d514b4e3bce47c6eb66c82dd33ec",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32040"
+}

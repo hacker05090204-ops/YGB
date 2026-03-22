@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple macOS < 10.14.5 / iOS < 12.3 JavaScriptCore - Loop-Invariant Code Motion (LICM) in DFG JIT Leaves Stack Variable Uninitialized",
+  "token_count": 21
+}

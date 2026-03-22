@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Vim is an open source, command line text editor. Prior to version 9.2.0076, a heap-based buffer overflow WRITE and an out-of-bounds READ exist in Vim's terminal emulator when processing maximum combining characters from Unicode supplementary planes. Version 9.2.0076 fixes the issue.",
+  "token_count": 41
+}

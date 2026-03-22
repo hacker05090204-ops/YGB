@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22168",
+  "ingested_at": "2026-03-22T07:54:47.266426+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.21 contain an approval-integrity mismatch vulnerability in system.run that allows authenticated operators to execute arbitrary trailing arguments after cmd.exe /c while approval text reflects only a benign command. Attackers can smuggle malicious arguments through cmd.exe /c to achieve local command execution on trusted Windows nodes with mismatched audit logs.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c966cb81269150cd6de9d2cc4c8bd7975b251448fc44f199310b8f51266b3132",
+  "source": "nvd",
+  "tags": [
+    "CWE-88"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22168"
+}

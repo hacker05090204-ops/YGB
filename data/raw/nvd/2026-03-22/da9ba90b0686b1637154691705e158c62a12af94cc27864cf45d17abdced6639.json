@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28127",
+  "ingested_at": "2026-03-22T07:54:40.675716+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in e-plugins Lawyer Directory lawyer-directory allows Reflected XSS.This issue affects Lawyer Directory: from n/a through < = 1.3.2.",
+  "severity": "HIGH",
+  "sha256_hash": "da9ba90b0686b1637154691705e158c62a12af94cc27864cf45d17abdced6639",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28127"
+}

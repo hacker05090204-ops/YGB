@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Path Traversal: '.../...//' vulnerability in Bogdan Bendziukov Squeeze squeeze allows Path Traversal.This issue affects Squeeze: from n/a through < = 1.7.7.",
+  "token_count": 21
+}

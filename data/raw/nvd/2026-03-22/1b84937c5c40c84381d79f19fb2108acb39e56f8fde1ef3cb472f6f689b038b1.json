@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27810",
+  "ingested_at": "2026-03-22T07:54:33.285213+00:00",
+  "lang": "en",
+  "raw_text": "calibre is a cross-platform e-book manager for viewing, converting, editing, and cataloging e-books. Prior to version 9.4.0, an HTTP Response Header Injection vulnerability in the calibre Content Server allows any authenticated user to inject arbitrary HTTP headers into server responses via an unsanitized `content_disposition` query parameter in the `/get/` and `/data-files/get/` endpoints. All users running the calibre Content Server with authentication enabled are affected. The vulnerability is exploitable by any authenticated user and can also be triggered by tricking an authenticated victim into clicking a crafted link. Version 9.4.0 contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1b84937c5c40c84381d79f19fb2108acb39e56f8fde1ef3cb472f6f689b038b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-113"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27810"
+}

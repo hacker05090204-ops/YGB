@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62320",
+  "ingested_at": "2026-03-22T07:54:47.052583+00:00",
+  "lang": "en",
+  "raw_text": "HTML Injection can be carried out in Product when a web application does not properly check or clean user input before showing it on a webpage. Because of this, an attacker may insert unwanted HTML code into the page. When the browser loads the page, it may automatically interact with external resources included in that HTML, which can cause unexpected requests from the user\u2019s browser.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ab472b3aa38e6e4f0781b100930c4b4ddebf637615cec3aaf22b8c7555052b4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62320"
+}

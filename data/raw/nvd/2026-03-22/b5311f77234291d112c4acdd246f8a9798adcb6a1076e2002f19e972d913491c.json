@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32259",
+  "ingested_at": "2026-03-22T07:54:44.515288+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to 7.1.2-16 and 6.9.13-41, when a memory allocation fails in the sixel encoder it would be possible to write past the end of a buffer on the stack. This vulnerability is fixed in 7.1.2-16 and 6.9.13-41.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b5311f77234291d112c4acdd246f8a9798adcb6a1076e2002f19e972d913491c",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32259"
+}

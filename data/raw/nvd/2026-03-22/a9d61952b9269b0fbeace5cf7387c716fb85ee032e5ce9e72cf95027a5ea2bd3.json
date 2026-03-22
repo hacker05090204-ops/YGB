@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25987",
+  "ingested_at": "2026-03-22T07:54:31.374070+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a heap buffer over-read vulnerability exists in the MAP image decoder when processing crafted MAP files, potentially leading to crashes or unintended memory disclosure during image decoding. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a9d61952b9269b0fbeace5cf7387c716fb85ee032e5ce9e72cf95027a5ea2bd3",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25987"
+}

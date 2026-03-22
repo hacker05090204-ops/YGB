@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-30960",
+  "ingested_at": "2026-03-22T07:54:42.899028+00:00",
+  "lang": "en",
+  "raw_text": "rssn is a scientific computing library for Rust, combining a high-performance symbolic computation engine with numerical methods support and physics simulations functionalities. The vulnerability exists in the JIT (Just-In-Time) compilation engine, which is fully exposed via the CFFI (Foreign Function Interface). Due to Improper Input Validation and External Control of Code Generation, an attacker can supply malicious parameters or instruction sequences through the CFFI layer. Since the library often operates with elevated privileges or within high-performance computing contexts, this allows for Arbitrary Code Execution (ACE) at the privilege level of the host process.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b7c746e7d053a374c1f8527acfaf283b90537f1dcbf2c39d1e6f4a8e4214c84a",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-269",
+    "CWE-695",
+    "CWE-754"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30960"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-1389",
+  "ingested_at": "2026-03-22T07:45:17.420095+00:00",
+  "lang": "en",
+  "raw_text": "TP-Link Archer AX21 TP-Link Archer AX-21 contains a command injection vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c03c9247ae6bca38c6f8339d37096a73317824b178b6a7eaa4f3e6c988a880dd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22898",
+  "ingested_at": "2026-03-22T07:54:48.893706+00:00",
+  "lang": "en",
+  "raw_text": "A missing authentication for critical function vulnerability has been reported to affect QVR Pro. The remote attackers can then exploit the vulnerability to gain access to the system. We have already fixed the vulnerability in the following version: QVR Pro 2.7.4.14 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "6d186b73c9faed4e214c8be5e7120da80bf3f02555f0897459866add0f57c9a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22898"
+}

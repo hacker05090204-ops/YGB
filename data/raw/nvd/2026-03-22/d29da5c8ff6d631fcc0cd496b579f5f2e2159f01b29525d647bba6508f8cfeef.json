@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69654",
+  "ingested_at": "2026-03-22T07:54:41.596321+00:00",
+  "lang": "en",
+  "raw_text": "A crafted JavaScript input executed with the QuickJS release 2025-09-13, fixed in commit fcd33c1afa7b3028531f53cd1190a3877454f6b3 (2025-12-11),`qjs` interpreter using the `-m` option and a low memory limit can cause an out-of-memory condition followed by an assertion failure in JS_FreeRuntime (list_empty(&rt->gc_obj_list)) during runtime cleanup. Although the engine reports an OOM error, it subsequently aborts with SIGABRT because the GC object list is not fully released. This results in a denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "d29da5c8ff6d631fcc0cd496b579f5f2e2159f01b29525d647bba6508f8cfeef",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69654"
+}

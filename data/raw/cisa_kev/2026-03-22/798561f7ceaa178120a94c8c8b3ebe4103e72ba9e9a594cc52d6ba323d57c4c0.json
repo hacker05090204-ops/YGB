@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-68461",
+  "ingested_at": "2026-03-22T07:45:15.890074+00:00",
+  "lang": "en",
+  "raw_text": "Roundcube Webmail RoundCube Webmail contains a cross-site scripting vulnerability via the animate tag in an SVG document.",
+  "severity": "CRITICAL",
+  "sha256_hash": "798561f7ceaa178120a94c8c8b3ebe4103e72ba9e9a594cc52d6ba323d57c4c0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

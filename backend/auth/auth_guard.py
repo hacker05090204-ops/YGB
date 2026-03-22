@@ -98,6 +98,11 @@ def _allowed_origins() -> Set[str]:
     return origins
 
 
+def get_allowed_origins() -> Set[str]:
+    """Expose the normalized allowlist for callers outside this module."""
+    return set(_allowed_origins())
+
+
 def _extract_cookie_token(request: Request) -> Optional[str]:
     return request.cookies.get(AUTH_COOKIE_NAME) or request.cookies.get(LEGACY_AUTH_COOKIE_NAME)
 
@@ -107,6 +112,12 @@ def _normalize_origin(origin: str) -> str:
     if not parsed.scheme or not parsed.netloc:
         return ""
     return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
+
+
+def is_allowed_origin(origin: str) -> bool:
+    """Return True when the supplied origin matches the configured allowlist."""
+    normalized = _normalize_origin(origin or "")
+    return bool(normalized and normalized in _allowed_origins())
 
 
 def _enforce_cookie_csrf(request: Request) -> None:
@@ -334,6 +345,20 @@ _PLACEHOLDER_PATTERNS = [
 ]
 
 
+def get_required_secret(env_name: str, min_length: int = 32) -> str:
+    """Return a required secret env var or raise a fail-closed runtime error."""
+    value = os.getenv(env_name, "").strip()
+    if value.lower() in _PLACEHOLDER_SECRETS:
+        raise RuntimeError(f"{env_name} must be set before startup")
+    if any(pattern in value for pattern in _PLACEHOLDER_PATTERNS):
+        raise RuntimeError(f"{env_name} contains a placeholder value")
+    if len(value) < min_length:
+        raise RuntimeError(
+            f"{env_name} must be at least {min_length} characters long"
+        )
+    return value
+
+
 def preflight_check_secrets() -> None:
     """
     Verify all required secrets are present and not placeholders.
@@ -366,6 +391,11 @@ def preflight_check_secrets() -> None:
     _check_secret("JWT_SECRET", 32)
     _check_secret("YGB_HMAC_SECRET", 32)
     _check_secret("YGB_VIDEO_JWT_SECRET", 32)
+    if is_temporary_auth_bypass_enabled():
+        errors.append(
+            "YGB_TEMP_AUTH_BYPASS=true is not allowed in hardened mode. "
+            "Set YGB_TEMP_AUTH_BYPASS=false before startup."
+        )
 
     if errors:
         msg = "\n".join(f"  ✗ {e}" for e in errors)

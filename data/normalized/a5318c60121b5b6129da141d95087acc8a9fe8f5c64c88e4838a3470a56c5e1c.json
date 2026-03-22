@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in wpWax FormGent formgent allows Path Traversal.This issue affects FormGent: from n/a through < = 1.4.2.",
+  "token_count": 28
+}

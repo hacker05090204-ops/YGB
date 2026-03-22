@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32290",
+  "ingested_at": "2026-03-22T07:54:47.090949+00:00",
+  "lang": "en",
+  "raw_text": "The GL-iNet Comet (GL-RM1) KVM does not sufficiently verify the authenticity of uploaded firmware files. An attacker-in-the-middle or a compromised update server could modify the firmware and the corresponding MD5 hash to pass verification.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f9e69cd3a55d6e6c9ca2dde2d078193f0b955eeab00e0436308fb79a4f16412a",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32290"
+}

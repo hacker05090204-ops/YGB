@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-20250",
+  "ingested_at": "2026-03-22T07:45:18.741110+00:00",
+  "lang": "en",
+  "raw_text": "RARLAB WinRAR WinRAR Absolute Path Traversal vulnerability leads to Remote Code Execution",
+  "severity": "CRITICAL",
+  "sha256_hash": "b7844a0a7a9a596c976891f220b1ef500cb5656eb689fc4a4b42b5278377dbde",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 12,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

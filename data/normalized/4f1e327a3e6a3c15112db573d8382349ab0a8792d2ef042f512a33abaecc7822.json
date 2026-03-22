@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple macOS macOS Monterey contains an out-of-bounds read vulnerability that could allow an application to read kernel memory.",
+  "token_count": 18
+}

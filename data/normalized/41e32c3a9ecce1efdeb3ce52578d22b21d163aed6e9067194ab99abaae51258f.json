@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenBSD OpenSMTPD smtp_mailaddr in smtp_session.c in OpenSMTPD, as used in OpenBSD and other products, allows remote attackers to execute arbitrary commands as root via a crafted SMTP session.",
+  "token_count": 28
+}

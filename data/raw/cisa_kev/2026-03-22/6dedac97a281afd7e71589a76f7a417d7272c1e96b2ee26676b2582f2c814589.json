@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-6218",
+  "ingested_at": "2026-03-22T07:45:16.022058+00:00",
+  "lang": "en",
+  "raw_text": "RARLAB WinRAR RARLAB WinRAR contains a path traversal vulnerability allowing an attacker to execute code in the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6dedac97a281afd7e71589a76f7a417d7272c1e96b2ee26676b2582f2c814589",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

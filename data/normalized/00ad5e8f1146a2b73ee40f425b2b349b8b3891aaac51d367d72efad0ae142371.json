@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Caddy is an extensible server platform that uses TLS by default. From version 2.10.0 to before version 2.11.2, forward_auth copy_headers does not strip client-supplied headers, allowing identity injection and privilege escalation. This issue has been patched in version 2.11.2.",
+  "token_count": 39
+}

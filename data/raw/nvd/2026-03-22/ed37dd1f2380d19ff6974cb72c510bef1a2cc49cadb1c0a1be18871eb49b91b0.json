@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32409",
+  "ingested_at": "2026-03-22T07:54:46.042507+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in WPMU DEV - Your All-in-One WordPress Platform Forminator forminator allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Forminator: from n/a through < = 1.50.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed37dd1f2380d19ff6974cb72c510bef1a2cc49cadb1c0a1be18871eb49b91b0",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32409"
+}

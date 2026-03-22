@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2888",
+  "ingested_at": "2026-03-22T07:54:44.690993+00:00",
+  "lang": "en",
+  "raw_text": "The Formidable Forms plugin for WordPress is vulnerable to an authorization bypass through user-controlled key in all versions up to, and including, 6.28. This is due to the `frm_strp_amount` AJAX handler (`update_intent_ajax`) overwriting the global `$_POST` data with attacker-controlled JSON input and then using those values to recalculate payment amounts via field shortcode resolution in `generate_false_entry()`. The handler relies on a nonce that is publicly exposed in the page's JavaScript (`frm_stripe_vars.nonce`), which provides CSRF protection but not authorization. This makes it possible for unauthenticated attackers to manipulate PaymentIntent amounts before payment completion on forms using dynamic pricing with field shortcodes, effectively paying a reduced amount for goods or services.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cd1917b758bd879480209a1a8501cdd7e4e09857575c0ec70236a1d575597fff",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2888"
+}

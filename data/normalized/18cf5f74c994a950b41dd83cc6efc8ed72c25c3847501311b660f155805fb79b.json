@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability allowing an authenticated domain user to bypass restrictions and manipulate arbitrary files on a Backup Repository.",
+  "token_count": 18
+}

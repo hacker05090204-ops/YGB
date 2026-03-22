@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Paessler PRTG Network Monitor Paessler PRTG Network Monitor contains an OS command injection vulnerability that allows an attacker with administrative privileges to execute commands via the PRTG System Administrator web console.",
+  "token_count": 31
+}

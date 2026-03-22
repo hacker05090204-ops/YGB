@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1696",
+  "ingested_at": "2026-03-22T07:54:32.623620+00:00",
+  "lang": "en",
+  "raw_text": "Some HTTP security headers are not properly set by the web server when sending responses to the client application.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9e300cad250c82daa75d93dd7ba694496ff86e63e3ffc7d6501530a90a87d59d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1696"
+}

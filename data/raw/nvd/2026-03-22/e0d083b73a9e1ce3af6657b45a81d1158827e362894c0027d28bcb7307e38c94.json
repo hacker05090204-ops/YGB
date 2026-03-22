@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26095",
+  "ingested_at": "2026-03-22T07:54:30.475178+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect Permission Assignment for Critical Resource in Owl opds 2.2.0.4 allows File Manipulation via a crafted network request.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e0d083b73a9e1ce3af6657b45a81d1158827e362894c0027d28bcb7307e38c94",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26095"
+}

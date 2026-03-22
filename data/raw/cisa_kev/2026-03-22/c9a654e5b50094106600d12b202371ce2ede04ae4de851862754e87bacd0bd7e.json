@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-3993",
+  "ingested_at": "2026-03-22T07:45:17.912382+00:00",
+  "lang": "en",
+  "raw_text": "IBM InfoSphere BigInsights Certain APIs within BigInsights can take invalid input that might allow attackers unauthorized access to read, write, modify, or delete data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c9a654e5b50094106600d12b202371ce2ede04ae4de851862754e87bacd0bd7e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

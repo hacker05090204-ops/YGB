@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "DooTask v1.6.27 has a Cross-Site Scripting (XSS) vulnerability in the /manage/project/ page via the input field projectDesc.",
+  "token_count": 17
+}

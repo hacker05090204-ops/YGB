@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29056",
+  "ingested_at": "2026-03-22T07:54:47.311877+00:00",
+  "lang": "en",
+  "raw_text": "Kanboard is project management software focused on Kanban methodology. Prior to 1.2.51, Kanboard's user invite registration endpoint (`UserInviteController::register()`) accepts all POST parameters and passes them to `UserModel::create()` without filtering out the `role` field. An attacker who receives an invite link can inject `role=app-admin` in the registration form to create an administrator account. Version 1.2.51 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "27745f8097555af7eb1f717317165b292865726d0d4a172a2098d2f9dd59ed0f",
+  "source": "nvd",
+  "tags": [
+    "CWE-915"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29056"
+}

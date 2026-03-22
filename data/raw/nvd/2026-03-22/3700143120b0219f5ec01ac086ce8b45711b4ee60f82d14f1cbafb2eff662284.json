@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2757",
+  "ingested_at": "2026-03-22T07:54:31.499158+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect boundary conditions in the WebRTC: Audio/Video component. This vulnerability affects Firefox < 148, Firefox ESR < 115.33, Firefox ESR < 140.8, Thunderbird < 148, and Thunderbird < 140.8.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3700143120b0219f5ec01ac086ce8b45711b4ee60f82d14f1cbafb2eff662284",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-1384"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2757"
+}

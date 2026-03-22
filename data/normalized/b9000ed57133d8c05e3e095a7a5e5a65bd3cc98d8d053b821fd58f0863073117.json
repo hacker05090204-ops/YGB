@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper export of android application components in Secure Folder prior to SMR Mar-2026 Release 1 allows local attackers to launch arbitrary activity with Secure Folder privilege.",
+  "token_count": 26
+}

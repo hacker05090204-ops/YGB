@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31922",
+  "ingested_at": "2026-03-22T07:54:44.749402+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Ays Pro Fox LMS fox-lms allows Blind SQL Injection.This issue affects Fox LMS: from n/a through < = 1.0.6.3.",
+  "severity": "HIGH",
+  "sha256_hash": "0f0211a6b270b62813d39d5cf3b1dc77cc636553bc5e9c7432abbc3c5ab91754",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31922"
+}

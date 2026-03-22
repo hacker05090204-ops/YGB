@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32005",
+  "ingested_at": "2026-03-22T07:54:48.169219+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.25 fail to enforce sender authorization checks for interactive callbacks including block_action, view_submission, and view_closed in shared workspace deployments. Unauthorized workspace members can bypass allowFrom restrictions and channel user allowlists to enqueue system-event text into active sessions.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4a8a3196022ad119d2d1a30046b04be54a3f51674c160049c00521699ca17bee",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32005"
+}

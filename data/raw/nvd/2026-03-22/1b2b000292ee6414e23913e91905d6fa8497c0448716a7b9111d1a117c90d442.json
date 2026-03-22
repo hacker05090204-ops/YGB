@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68852",
+  "ingested_at": "2026-03-22T07:54:30.155450+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in webmuehle Court Reservation court-reservation allows Reflected XSS.This issue affects Court Reservation: from n/a through < = 1.10.9.",
+  "severity": "HIGH",
+  "sha256_hash": "1b2b000292ee6414e23913e91905d6fa8497c0448716a7b9111d1a117c90d442",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68852"
+}

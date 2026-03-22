@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2492",
+  "ingested_at": "2026-03-22T07:54:30.707853+00:00",
+  "lang": "en",
+  "raw_text": "TensorFlow HDF5 Library Uncontrolled Search Path Element Local Privilege Escalation Vulnerability. This vulnerability allows local attackers to escalate privileges on affected installations of TensorFlow. An attacker must first obtain the ability to execute low-privileged code on the target system in order to exploit this vulnerability. The specific flaw exists within the handling of plugins. The application loads plugins from an unsecured location. An attacker can leverage this vulnerability to escalate privileges and execute arbitrary code in the context of a target user. Was ZDI-CAN-25480.",
+  "severity": "HIGH",
+  "sha256_hash": "756e5f8e9f5cdb750cb7ceb0a84e7bfc606a6b8f171da18b8ade59189af058c0",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2492"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-59540",
+  "ingested_at": "2026-03-22T07:54:41.219343+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.34, a stored XSS vulnerability exists in Chamilo LMS that allows a staff account to execute arbitrary JavaScript in the browser of higher-privileged admin users. The issue arises because feedback input in the exercise history page is not properly encoded before rendering, allowing malicious scripts to persist in the database and execute on view. This issue has been patched in version 1.11.34.",
+  "severity": "MEDIUM",
+  "sha256_hash": "292ad590bc398e5de87edbdc8cdcd4c54e42dd8b6189fc3f9bca57a5fb9113da",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-80"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59540"
+}

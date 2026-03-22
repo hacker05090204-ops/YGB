@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Statmatic is a Laravel and Git powered content management system (CMS). Versions 5.73.8 and below in addition to 6.0.0-alpha.1 through 6.3.1 have a Stored XSS vulnerability in html fieldtypes which allows authenticated users with field management permissions to inject malicious JavaScript that executes when viewed by higher-privileged users. This issue has been fixed in 6.3.2 and 5.73.9.",
+  "token_count": 57
+}

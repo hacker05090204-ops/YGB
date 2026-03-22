@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3485",
+  "ingested_at": "2026-03-22T07:54:34.271517+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in D-Link DIR-868L 110b03. This affects the function sub_1BF84 of the component SSDP Service. This manipulation of the argument ST causes os command injection. It is possible to initiate the attack remotely. The exploit has been published and may be used. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "severity": "CRITICAL",
+  "sha256_hash": "998d97531bae230f079e6bf5b4aad3fbb4d999c6248e9424f8de8f762d493b2d",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78",
+    "CWE-78"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3485"
+}

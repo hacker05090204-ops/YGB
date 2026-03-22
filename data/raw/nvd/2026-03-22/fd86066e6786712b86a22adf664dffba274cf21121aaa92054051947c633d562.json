@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3442",
+  "ingested_at": "2026-03-22T07:54:46.614599+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in GNU Binutils. This vulnerability, a heap-based buffer overflow, specifically an out-of-bounds read, exists in the bfd linker component. An attacker could exploit this by convincing a user to process a specially crafted malicious XCOFF object file. Successful exploitation may lead to the disclosure of sensitive information or cause the application to crash, resulting in an application level denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fd86066e6786712b86a22adf664dffba274cf21121aaa92054051947c633d562",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3442"
+}

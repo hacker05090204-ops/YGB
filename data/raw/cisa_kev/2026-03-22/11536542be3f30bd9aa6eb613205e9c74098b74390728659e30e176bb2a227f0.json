@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0546",
+  "ingested_at": "2026-03-22T07:45:17.899088+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Reader and Acrobat Adobe Reader and Acrobat on Windows allow attackers to bypass a sandbox protection mechanism, and consequently execute native code in a privileged context.",
+  "severity": "CRITICAL",
+  "sha256_hash": "11536542be3f30bd9aa6eb613205e9c74098b74390728659e30e176bb2a227f0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

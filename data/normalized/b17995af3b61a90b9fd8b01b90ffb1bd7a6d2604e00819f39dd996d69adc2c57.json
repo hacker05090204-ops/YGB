@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Cisco IOS XE Web UI Cisco IOS XE contains a command injection vulnerability in the web user interface. When chained with CVE-2023-20198, the attacker can leverage the new local user to elevate privilege to root and write the implant to the file system. Cisco identified CVE-2023-20273 as the vulnerability exploited to deploy the implant. CVE-2021-1435, previously associated with the exploitation events, is no longer believed to be related to this activity.",
+  "token_count": 72
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A JSONPath injection vulnerability in Spring AI's AbstractFilterExpressionConverter allows authenticated users to bypass metadata-based access controls through crafted filter expressions. User-controlled input passed to FilterExpressionBuilder is concatenated into JSONPath queries without proper escaping, enabling attackers to inject arbitrary JSONPath logic and access unauthorized documents. This vulnerability affects applications using vector stores that extend AbstractFilterExpressionConverter for multi-tenant isolation, role-based access control, or document filtering based on metadata. The vulnerability occurs when user-supplied values in filter expressions are not escaped before being inserted into JSONPath queries. Special characters like \", ||, and && are passed through unescaped, allowing injection of arbitrary JSONPath logic that can alter the intended query semantics.",
+  "token_count": 108
+}

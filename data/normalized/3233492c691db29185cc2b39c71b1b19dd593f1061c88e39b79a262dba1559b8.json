@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Omega-PSIR is vulnerable to Reflected XSS via the lang parameter. An attacker can craft a malicious URL that, when opened, causes arbitrary JavaScript to execute in the victim\u2019s browser. This issue was fixed in 4.6.7.",
+  "token_count": 35
+}

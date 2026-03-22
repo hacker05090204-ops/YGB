@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32337",
+  "ingested_at": "2026-03-22T07:54:45.879284+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Preschool and Kindergarten preschool-and-kindergarten allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Preschool and Kindergarten: from n/a through < = 1.2.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "54af4adf515da24bc54351c576331590ba26b646e245e179b6b4c4f42be4665f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32337"
+}

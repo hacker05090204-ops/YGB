@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in the udisks storage management daemon that exposes a privileged D-Bus API for restoring LUKS encryption headers without proper authorization checks. The issue allows a local unprivileged user to instruct the root-owned udisks daemon to overwrite encryption metadata on block devices. This can permanently invalidate encryption keys and render encrypted volumes inaccessible. Successful exploitation results in a denial-of-service condition through irreversible data loss.",
+  "token_count": 67
+}

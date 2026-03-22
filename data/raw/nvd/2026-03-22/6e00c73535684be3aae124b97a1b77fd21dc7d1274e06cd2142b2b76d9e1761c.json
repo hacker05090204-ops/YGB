@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69437",
+  "ingested_at": "2026-03-22T07:54:33.188372+00:00",
+  "lang": "en",
+  "raw_text": "PublicCMS v5.202506.d and earlier is vulnerable to stored XSS. Uploaded PDFs can contain JavaScript payloads and bypass PDF security checks in the backend CmsFileUtils.java. If a user uploads a PDF file containing a malicious payload to the system and views it, the embedded JavaScript payload can be triggered, resulting in issues such as credential theft, arbitrary API execution, and other security concerns. This vulnerability affects all file upload endpoint, including /cmsTemplate/save, /file/doUpload, /cmsTemplate/doUpload, /file/doBatchUpload, /cmsWebFile/doUpload, etc.",
+  "severity": "HIGH",
+  "sha256_hash": "6e00c73535684be3aae124b97a1b77fd21dc7d1274e06cd2142b2b76d9e1761c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69437"
+}

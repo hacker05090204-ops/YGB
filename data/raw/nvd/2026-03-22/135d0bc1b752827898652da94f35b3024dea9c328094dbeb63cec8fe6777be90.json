@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22052",
+  "ingested_at": "2026-03-22T07:54:34.846943+00:00",
+  "lang": "en",
+  "raw_text": "ONTAP versions 9.12.1 and higher with S3 NAS buckets are susceptible to an information disclosure vulnerability. Successful exploit could allow an authenticated attacker to view a listing of the contents in a directory for which they lack permission.",
+  "severity": "MEDIUM",
+  "sha256_hash": "135d0bc1b752827898652da94f35b3024dea9c328094dbeb63cec8fe6777be90",
+  "source": "nvd",
+  "tags": [
+    "CWE-209"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22052"
+}

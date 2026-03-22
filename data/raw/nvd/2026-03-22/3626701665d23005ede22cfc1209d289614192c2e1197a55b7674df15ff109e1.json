@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28342",
+  "ingested_at": "2026-03-22T07:54:40.949162+00:00",
+  "lang": "en",
+  "raw_text": "OliveTin gives access to predefined shell commands from a web interface. Prior to version 3000.10.2, the PasswordHash API endpoint allows unauthenticated users to trigger excessive memory allocation by sending concurrent password hashing requests. By issuing multiple parallel requests, an attacker can exhaust available container memory, leading to service degradation or complete denial of service (DoS). The issue occurs because the endpoint performs computationally and memory-intensive hashing operations without request throttling, authentication requirements, or resource limits. This issue has been patched in version 3000.10.2.",
+  "severity": "HIGH",
+  "sha256_hash": "3626701665d23005ede22cfc1209d289614192c2e1197a55b7674df15ff109e1",
+  "source": "nvd",
+  "tags": [
+    "CWE-400",
+    "CWE-770"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28342"
+}

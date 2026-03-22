@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2979",
+  "ingested_at": "2026-03-22T07:54:31.088021+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in FastApiAdmin up to 2.2.0. This issue affects the function user_avatar_upload_controller of the file /backend/app/api/v1/module_system/user/controller.py of the component Scheduled Task API. Executing a manipulation can lead to unrestricted upload. The attack can be launched remotely. The exploit has been published and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9ee4aa4ae4ab4e9a0f3784e34045cfad02517139bfa6af9cfbe7ed473f3cbbbf",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2979"
+}

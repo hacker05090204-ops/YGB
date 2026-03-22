@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3810",
+  "ingested_at": "2026-03-22T07:54:42.182980+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Tenda FH1202 1.2.0.14(408). This affects the function fromDhcpListClient of the file /goform/DhcpListClient. The manipulation of the argument page leads to stack-based buffer overflow. Remote exploitation of the attack is possible. The exploit has been disclosed to the public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "f069f4c36e5a7a327b51efe8bbf0418e4ece9ee0619ada5265569d4a38686045",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3810"
+}

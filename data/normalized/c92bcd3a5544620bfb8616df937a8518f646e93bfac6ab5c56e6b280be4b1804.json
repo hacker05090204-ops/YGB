@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Tiandy Easy7 Integrated Management Platform 7.17.0. This affects an unknown part of the file /rest/file/uploadLedImage of the component Endpoint. The manipulation of the argument File results in unrestricted upload. The attack may be launched remotely. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 65
+}

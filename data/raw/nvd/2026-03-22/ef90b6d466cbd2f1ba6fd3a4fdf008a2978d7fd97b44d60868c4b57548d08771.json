@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28030",
+  "ingested_at": "2026-03-22T07:54:40.391180+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Bonbon bonbon allows PHP Local File Inclusion.This issue affects Bonbon: from n/a through < = 1.6.",
+  "severity": "HIGH",
+  "sha256_hash": "ef90b6d466cbd2f1ba6fd3a4fdf008a2978d7fd97b44d60868c4b57548d08771",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28030"
+}

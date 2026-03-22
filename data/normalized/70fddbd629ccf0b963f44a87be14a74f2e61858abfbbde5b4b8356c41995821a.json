@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Win32k The EPATHOBJ::pprFlattenRec function in win32k.sys in the kernel-mode drivers in Microsoft does not properly initialize a pointer for the next object in a certain list, which allows local users to gain privileges.",
+  "token_count": 34
+}

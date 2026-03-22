@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SIMalliance Toolbox Browser SIMalliance Toolbox Browser contains an command injection vulnerability that could allow remote attackers to retrieve location and IMEI information or execute a range of other attacks by modifying the attack message.",
+  "token_count": 34
+}

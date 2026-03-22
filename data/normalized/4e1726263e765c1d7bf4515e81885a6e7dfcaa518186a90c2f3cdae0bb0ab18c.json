@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WebIncorp ERP contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the prod_id parameter. Attackers can send GET requests to product_detail.php with malicious prod_id values to extract sensitive database information.",
+  "token_count": 39
+}

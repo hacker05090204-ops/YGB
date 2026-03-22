@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1265",
+  "ingested_at": "2026-03-22T07:54:34.223389+00:00",
+  "lang": "en",
+  "raw_text": "IBM InfoSphere Information Server 11.7.0.0 through 11.7.1.6 is vulnerable to writing of sensitive Information in a log file.",
+  "severity": "MEDIUM",
+  "sha256_hash": "17896cbabf801d3212099ee7b22cb87fcb663dbe533b69f5affe5378dc8b59b4",
+  "source": "nvd",
+  "tags": [
+    "CWE-532"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1265"
+}

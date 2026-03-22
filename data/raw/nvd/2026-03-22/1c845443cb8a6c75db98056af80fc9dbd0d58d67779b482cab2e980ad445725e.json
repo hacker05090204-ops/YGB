@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32055",
+  "ingested_at": "2026-03-22T07:54:49.218961+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.26 contain a path traversal vulnerability in workspace boundary validation that allows attackers to write files outside the workspace through in-workspace symlinks pointing to non-existent out-of-root targets. The vulnerability exists because the boundary check improperly resolves aliases, permitting the first write operation to escape the workspace boundary and create files in arbitrary locations.",
+  "severity": "HIGH",
+  "sha256_hash": "1c845443cb8a6c75db98056af80fc9dbd0d58d67779b482cab2e980ad445725e",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32055"
+}

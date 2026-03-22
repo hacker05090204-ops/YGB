@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29066",
+  "ingested_at": "2026-03-22T07:54:44.388835+00:00",
+  "lang": "en",
+  "raw_text": "Tina is a headless content management system. Prior to 2.1.8, the TinaCMS CLI dev server configures Vite with server.fs.strict: false, which disables Vite's built-in filesystem access restriction. This allows any unauthenticated attacker who can reach the dev server to read arbitrary files on the host system. This vulnerability is fixed in 2.1.8.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b5d907f88ec5acfe45af2c90de2185347a9b160717cc63566e8ce75048c43ecf",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-552"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29066"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Craft CMS Craft CMS Craft CMS contains an external control of assumed-immutable web parameter vulnerability. This vulnerability could allow an unauthenticated client to introduce arbitrary values, such as PHP code, to a known local file location on the server. This vulnerability could be chained with CVE-2024-58136 as represented by CVE-2025-32432.",
+  "token_count": 50
+}

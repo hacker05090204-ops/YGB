@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32314",
+  "ingested_at": "2026-03-22T07:54:46.489775+00:00",
+  "lang": "en",
+  "raw_text": "Yamux is a stream multiplexer over reliable, ordered connections such as TCP/IP. Prior to 0.13.10, the Rust implementation of Yamux can panic when processing a crafted inbound Data frame that sets SYN and uses a body length greater than DEFAULT_CREDIT (e.g. 262145). On the first packet of a new inbound stream, stream state is created and a receiver is queued before oversized-body validation completes. When validation fails, the temporary stream is dropped and cleanup may call remove(...).expect(\"stream not found\"), triggering a panic in the connection state machine. This is remotely reachable over a normal Yamux session and does not require authentication. This vulnerability is fixed in 0.13.10.",
+  "severity": "HIGH",
+  "sha256_hash": "adbe37762ae80c0927a5148c361362b9abca3575ac14f0fbd8f0ad4a0ece0f49",
+  "source": "nvd",
+  "tags": [
+    "CWE-248"
+  ],
+  "token_count": 107,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32314"
+}

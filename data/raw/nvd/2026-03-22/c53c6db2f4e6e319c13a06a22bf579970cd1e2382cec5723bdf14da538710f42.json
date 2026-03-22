@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27649",
+  "ingested_at": "2026-03-22T07:54:49.047953+00:00",
+  "lang": "en",
+  "raw_text": "The WebSocket backend uses charging station identifiers to uniquely associate sessions but allows multiple endpoints to connect using the same session identifier. This implementation results in predictable session identifiers and enables session hijacking or shadowing, where the most recent connection displaces the legitimate charging station and receives backend commands intended for that station. This vulnerability may allow unauthorized users to authenticate as other users or enable a malicious actor to cause a denial-of-service condition by overwhelming the backend with valid session requests.",
+  "severity": "HIGH",
+  "sha256_hash": "c53c6db2f4e6e319c13a06a22bf579970cd1e2382cec5723bdf14da538710f42",
+  "source": "nvd",
+  "tags": [
+    "CWE-613"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27649"
+}

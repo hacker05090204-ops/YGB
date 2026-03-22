@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-48634",
+  "ingested_at": "2026-03-22T07:54:33.870582+00:00",
+  "lang": "en",
+  "raw_text": "In relayoutWindow of WindowManagerService.java, there is a possible tapjack attack due to a missing permission check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "a16b66de767351ca2539efa27beb86a9ac0cb5eefe8718e5781644699896e51a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48634"
+}

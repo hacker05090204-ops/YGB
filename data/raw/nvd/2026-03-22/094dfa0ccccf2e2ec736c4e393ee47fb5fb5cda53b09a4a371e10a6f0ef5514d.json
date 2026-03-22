@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32038",
+  "ingested_at": "2026-03-22T07:54:48.245018+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw before 2026.2.24 contains a sandbox network isolation bypass vulnerability that allows trusted operators to join another container's network namespace. Attackers can configure the docker.network parameter with container: values to reach services in target container namespaces and bypass network hardening controls.",
+  "severity": "CRITICAL",
+  "sha256_hash": "094dfa0ccccf2e2ec736c4e393ee47fb5fb5cda53b09a4a371e10a6f0ef5514d",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32038"
+}

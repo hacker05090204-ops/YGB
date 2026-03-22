@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in SapneshNaik Student Management System up to f4b4f0928f0b5551a28ee81ae7e7fe47d9345318. This impacts an unknown function of the file index.php. Such manipulation of the argument Error leads to cross site scripting. The attack can be launched remotely. The exploit is publicly available and might be used. This product does not use versioning. This is why information about affected and unaffected releases are unavailable. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 79
+}

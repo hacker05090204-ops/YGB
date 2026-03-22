@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in open-webui up to 0.6.16. Affected is an unknown function of the file backend/start_windows.bat of the component JWT Key Handler. Such manipulation of the argument WEBUI_SECRET_KEY leads to insufficiently random values. It is possible to launch the attack remotely. The attack requires a high level of complexity. The exploitability is told to be difficult. The exploit has been disclosed publicly and may be used.",
+  "token_count": 70
+}

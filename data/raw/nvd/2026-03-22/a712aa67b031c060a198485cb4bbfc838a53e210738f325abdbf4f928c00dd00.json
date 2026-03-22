@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1085",
+  "ingested_at": "2026-03-22T07:54:41.785756+00:00",
+  "lang": "en",
+  "raw_text": "The True Ranker plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 2.2.9. This is due to missing nonce validation on the seolocalrank-signout action. This makes it possible for unauthenticated attackers to disconnect the administrator's True Ranker account via a forged request granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a712aa67b031c060a198485cb4bbfc838a53e210738f325abdbf4f928c00dd00",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1085"
+}

@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-30933",
+  "ingested_at": "2026-03-22T07:54:42.866943+00:00",
+  "lang": "en",
+  "raw_text": "FileBrowser Quantum is a free, self-hosted, web-based file manager. Prior to 1.3.1-beta and 1.2.2-stable, the remediation for CVE-2026-27611 is incomplete. Password protected shares still disclose tokenized downloadURL via /public/api/share/info. This vulnerability is fixed in 1.3.1-beta and 1.2.2-stable.",
+  "severity": "HIGH",
+  "sha256_hash": "1f4d969c18d7d1672532e6469d0d5e0ad0808cb227bcd91d09e9454227c789d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-306",
+    "CWE-602",
+    "CWE-306"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30933"
+}

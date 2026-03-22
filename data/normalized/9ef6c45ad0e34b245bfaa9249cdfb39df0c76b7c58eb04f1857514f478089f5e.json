@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware Multiple Products VMware Workspace ONE Access, Identity Manager and vRealize Automation contain a privilege escalation vulnerability due to improper permissions in support scripts.",
+  "token_count": 24
+}

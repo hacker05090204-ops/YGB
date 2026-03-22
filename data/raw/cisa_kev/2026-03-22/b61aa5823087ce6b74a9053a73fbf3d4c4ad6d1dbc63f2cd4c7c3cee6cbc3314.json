@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-11371",
+  "ingested_at": "2026-03-22T07:45:16.066599+00:00",
+  "lang": "en",
+  "raw_text": "Gladinet CentreStack and Triofox Gladinet CentreStack and Triofox contains a files or directories accessible to external parties vulnerability that allows unintended disclosure of system files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b61aa5823087ce6b74a9053a73fbf3d4c4ad6d1dbc63f2cd4c7c3cee6cbc3314",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

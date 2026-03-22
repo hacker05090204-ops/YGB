@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23799",
+  "ingested_at": "2026-03-22T07:54:40.166766+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Themeum Tutor LMS tutor allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Tutor LMS: from n/a through < = 3.9.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "60b073fed776c6b2c01c23a5adbfafebfafc506ed983a855dfec02a79794f886",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23799"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3770",
+  "ingested_at": "2026-03-22T07:54:42.119794+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in SourceCodester Computer Laboratory Management System 1.0. This affects an unknown part. This manipulation causes cross-site request forgery. The attack is possible to be carried out remotely. The exploit has been published and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "25a5260c66dba92153f15e98757e0a0197a8c427a60c4df9258e8f1d9549a9c1",
+  "source": "nvd",
+  "tags": [
+    "CWE-352",
+    "CWE-862"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3770"
+}

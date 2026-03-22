@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22732",
+  "ingested_at": "2026-03-22T07:54:48.292672+00:00",
+  "lang": "en",
+  "raw_text": "When applications specify HTTP response headers for servlet applications using Spring Security, there is the possibility that the HTTP Headers will not be written. This issue affects Spring Security: from 5.7.0 through 5.7.21, from 5.8.0 through 5.8.23, from 6.3.0 through 6.3.14, from 6.4.0 through 6.4.14, from 6.5.0 through 6.5.8, from 7.0.0 through 7.0.3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "23af1b452172241f924efae55da1cd6f64522273956c52431432ea99d2486c52",
+  "source": "nvd",
+  "tags": [
+    "CWE-425"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22732"
+}

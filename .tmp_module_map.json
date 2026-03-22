@@ -1,0 +1,320 @@
+{
+  "api": {
+    "roots": [
+      "api"
+    ],
+    "exists": true,
+    "files": 108643,
+    "python_files": 9,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 915552,
+    "test_files": 2,
+    "source_files": 7,
+    "test_ratio": 0.2222,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {
+      "backend": 66,
+      "impl_v1": 21,
+      "api": 6,
+      "governance": 2
+    }
+  },
+  "backend": {
+    "roots": [
+      "backend"
+    ],
+    "exists": true,
+    "files": 245,
+    "python_files": 245,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 57550,
+    "test_files": 100,
+    "source_files": 145,
+    "test_ratio": 0.4082,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [
+      "backend/tests/test_system_status.py"
+    ],
+    "imports_to_project_roots": {
+      "backend": 1199,
+      "governance": 25,
+      "impl_v1": 18,
+      "native": 13,
+      "scripts": 8,
+      "api": 3,
+      "training": 1
+    }
+  },
+  "backend/ingestion": {
+    "roots": [
+      "backend/ingestion"
+    ],
+    "exists": true,
+    "files": 14,
+    "python_files": 14,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 960,
+    "test_files": 0,
+    "source_files": 14,
+    "test_ratio": 0.0,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {
+      "backend": 41,
+      "impl_v1": 2
+    }
+  },
+  "frontend": {
+    "roots": [
+      "frontend"
+    ],
+    "exists": true,
+    "files": 3056,
+    "python_files": 0,
+    "ts_files": 99,
+    "cpp_files": 0,
+    "loc": 33740,
+    "test_files": 8,
+    "source_files": 91,
+    "test_ratio": 0.0808,
+    "readmes": [
+      "frontend/README.md"
+    ],
+    "empty_files_sample": [
+      "frontend/.next/turbopack"
+    ],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {}
+  },
+  "python": {
+    "roots": [
+      "python"
+    ],
+    "exists": true,
+    "files": 189,
+    "python_files": 186,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 21820,
+    "test_files": 103,
+    "source_files": 83,
+    "test_ratio": 0.5538,
+    "readmes": [
+      "python/phase01_core/README.md",
+      "python/phase02_actors/README.md",
+      "python/phase03_trust/README.md"
+    ],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {
+      "python": 1874
+    }
+  },
+  "impl_v1": {
+    "roots": [
+      "impl_v1"
+    ],
+    "exists": true,
+    "files": 674,
+    "python_files": 633,
+    "ts_files": 0,
+    "cpp_files": 20,
+    "loc": 143579,
+    "test_files": 231,
+    "source_files": 422,
+    "test_ratio": 0.3538,
+    "readmes": [],
+    "empty_files_sample": [
+      "impl_v1/training/distributed/__init__.py",
+      "impl_v1/training/distributed/tests/__init__.py",
+      "impl_v1/training/optimizers/__init__.py",
+      "impl_v1/training/safety/__init__.py",
+      "impl_v1/training/telemetry/__init__.py",
+      "impl_v1/training/validation/__init__.py"
+    ],
+    "stub_hits_sample": [
+      "impl_v1/phase49/governors/g29_voice_stt.py",
+      "impl_v1/training/voice/stt_adapter.py"
+    ],
+    "imports_to_project_roots": {
+      "impl_v1": 1231,
+      "backend": 21,
+      "training": 6
+    }
+  },
+  "HUMANOID_HUNTER": {
+    "roots": [
+      "HUMANOID_HUNTER"
+    ],
+    "exists": true,
+    "files": 154,
+    "python_files": 152,
+    "ts_files": 0,
+    "cpp_files": 1,
+    "loc": 19637,
+    "test_files": 91,
+    "source_files": 62,
+    "test_ratio": 0.5948,
+    "readmes": [
+      "HUMANOID_HUNTER/README.md"
+    ],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {
+      "HUMANOID_HUNTER": 918
+    }
+  },
+  "training": {
+    "roots": [
+      "training"
+    ],
+    "exists": true,
+    "files": 4738,
+    "python_files": 22,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 123532,
+    "test_files": 1,
+    "source_files": 21,
+    "test_ratio": 0.0455,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {
+      "impl_v1": 38,
+      "training": 15,
+      "backend": 13
+    }
+  },
+  "scripts": {
+    "roots": [
+      "scripts"
+    ],
+    "exists": true,
+    "files": 23,
+    "python_files": 14,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 4144,
+    "test_files": 0,
+    "source_files": 14,
+    "test_ratio": 0.0,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [
+      "scripts/ci_banned_tokens.py",
+      "scripts/remediation_scan.py"
+    ],
+    "imports_to_project_roots": {
+      "backend": 7,
+      "impl_v1": 2,
+      "scripts": 1
+    }
+  },
+  "native+edge": {
+    "roots": [
+      "native",
+      "edge"
+    ],
+    "exists": true,
+    "files": 246,
+    "python_files": 9,
+    "ts_files": 0,
+    "cpp_files": 223,
+    "loc": 51549,
+    "test_files": 5,
+    "source_files": 227,
+    "test_ratio": 0.0216,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {}
+  },
+  "data": {
+    "roots": [
+      "data"
+    ],
+    "exists": true,
+    "files": 6,
+    "python_files": 0,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 517,
+    "test_files": 0,
+    "source_files": 0,
+    "test_ratio": 0.0,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {}
+  },
+  "config+.github+.vscode": {
+    "roots": [
+      "config",
+      ".github",
+      ".vscode"
+    ],
+    "exists": true,
+    "files": 12,
+    "python_files": 0,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 572,
+    "test_files": 0,
+    "source_files": 0,
+    "test_ratio": 0.0,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {}
+  },
+  "voice_mode": {
+    "roots": [
+      "voice_mode"
+    ],
+    "exists": true,
+    "files": 1,
+    "python_files": 1,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 45,
+    "test_files": 0,
+    "source_files": 1,
+    "test_ratio": 0.0,
+    "readmes": [],
+    "empty_files_sample": [],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {}
+  },
+  "reports+ai_report_generator": {
+    "roots": [
+      "reports",
+      "ai_report_generator"
+    ],
+    "exists": true,
+    "files": 1819,
+    "python_files": 1,
+    "ts_files": 0,
+    "cpp_files": 0,
+    "loc": 18216,
+    "test_files": 0,
+    "source_files": 1,
+    "test_ratio": 0.0,
+    "readmes": [],
+    "empty_files_sample": [
+      "reports/backend_api.out.log",
+      "reports/frontend_3001.log",
+      "reports/sync_engine.out.log",
+      "reports/g38_training/phase1_data_audit.txt"
+    ],
+    "stub_hits_sample": [],
+    "imports_to_project_roots": {}
+  }
+}

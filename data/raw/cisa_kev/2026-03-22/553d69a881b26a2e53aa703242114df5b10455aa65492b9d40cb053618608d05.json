@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-36036",
+  "ingested_at": "2026-03-22T07:45:17.154206+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Cloud Files Mini Filter Driver contains a privilege escalation vulnerability that could allow an attacker to gain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "553d69a881b26a2e53aa703242114df5b10455aa65492b9d40cb053618608d05",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

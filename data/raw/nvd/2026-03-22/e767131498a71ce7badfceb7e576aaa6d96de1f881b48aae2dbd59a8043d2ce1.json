@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31865",
+  "ingested_at": "2026-03-22T07:54:47.340620+00:00",
+  "lang": "en",
+  "raw_text": "Elysia is a Typescript framework for request validation, type inference, OpenAPI documentation, and client-server communication. Prior to version 1.4.27, an Elysia cookie can be overridden by prototype pollution , eg. `__proto__`. This issue is patched in 1.4.27. As a workaround, use t.Cookie validation to enforce validation value and/or prevent iterable over cookie if possible.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e767131498a71ce7badfceb7e576aaa6d96de1f881b48aae2dbd59a8043d2ce1",
+  "source": "nvd",
+  "tags": [
+    "CWE-1321"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31865"
+}

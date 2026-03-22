@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-7269",
+  "ingested_at": "2026-03-22T07:45:19.326631+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Information Services (IIS) Microsoft Windows Server 2003 R2 contains a buffer overflow vulnerability in Internet Information Services (IIS) 6.0 which allows remote attackers to execute code via a long header beginning with \"If:",
+  "severity": "CRITICAL",
+  "sha256_hash": "1a0531943d8b42aaed3d74791b60ebfffae50f47a9f2351f2eb8b57c9ae93f6d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

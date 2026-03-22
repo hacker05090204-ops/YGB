@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28364",
+  "ingested_at": "2026-03-22T07:54:33.038460+00:00",
+  "lang": "en",
+  "raw_text": "In OCaml before 4.14.3 and 5.x before 5.4.1, a buffer over-read in Marshal deserialization (runtime/intern.c) enables remote code execution through a multi-phase attack chain. The vulnerability stems from missing bounds validation in the readblock() function, which performs unbounded memcpy() operations using attacker-controlled lengths from crafted Marshal data.",
+  "severity": "HIGH",
+  "sha256_hash": "40c107e85b86e1641bb7b19a5f4d2c3c470aae304201133ea08fe06ad96ad842",
+  "source": "nvd",
+  "tags": [
+    "CWE-126"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28364"
+}

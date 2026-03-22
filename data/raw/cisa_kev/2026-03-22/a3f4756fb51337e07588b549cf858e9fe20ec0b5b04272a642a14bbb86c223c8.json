@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-43300",
+  "ingested_at": "2026-03-22T07:45:16.238105+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple iOS, iPadOS, and macOS contain an out-of-bounds write vulnerability in the Image I/O framework.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a3f4756fb51337e07588b549cf858e9fe20ec0b5b04272a642a14bbb86c223c8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

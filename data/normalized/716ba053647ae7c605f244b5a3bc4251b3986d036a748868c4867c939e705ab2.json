@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenSSL - 'ssl3_get_key_exchange()' Use-After-Free Memory Corruption",
+  "token_count": 6
+}

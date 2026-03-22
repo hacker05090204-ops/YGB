@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the `ip_address` of a flagged user is exposed to any user who can access the review queue, including users who should not be able to see IP addresses. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "token_count": 54
+}

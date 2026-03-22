@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22727",
+  "ingested_at": "2026-03-22T07:54:47.217328+00:00",
+  "lang": "en",
+  "raw_text": "Unprotected internal endpoints in Cloud Foundry Capi Release 1.226.0 and below, and CF Deployment v54.9.0 and below on all platforms allows any user who has bypassed the firewall to potentially replace droplets and therefore applications allowing them to access secure application information.",
+  "severity": "HIGH",
+  "sha256_hash": "bbb3448250a96535c7d40f88542bfbc8a35434c9ef838d9e78b16cee49b966a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22727"
+}

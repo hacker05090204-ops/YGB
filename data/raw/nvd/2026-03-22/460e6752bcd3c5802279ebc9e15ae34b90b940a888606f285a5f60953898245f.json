@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25495",
+  "ingested_at": "2026-03-22T07:54:33.215936+00:00",
+  "lang": "en",
+  "raw_text": "osCommerce 2.3.4.1 contains a SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the reviews_id parameter. Attackers can send GET requests to product_reviews_write.php with malicious reviews_id values using boolean-based SQL injection payloads to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "460e6752bcd3c5802279ebc9e15ae34b90b940a888606f285a5f60953898245f",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25495"
+}

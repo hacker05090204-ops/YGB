@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30935",
+  "ingested_at": "2026-03-22T07:54:42.435859+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-16, BilateralBlurImage contains a heap buffer over-read caused by an incorrect conversion. When processing a crafted image with the -bilateral-blur operation an out of bounds read can occur. This vulnerability is fixed in 7.1.2-16.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1d47f279adf4deec36f102e037c827651025914956d0baced397b99cb3d63c43",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-190"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30935"
+}

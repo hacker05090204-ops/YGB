@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-20109",
+  "ingested_at": "2026-03-22T07:45:17.195983+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Cisco IOS and IOS XE contain an out-of-bounds write vulnerability in the Group Encrypted Transport VPN (GET VPN) feature that could allow an authenticated, remote attacker who has administrative control of either a group member or a key server to execute malicious code or cause a device to crash.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d6090ec6958a4a8056cfd2f9ec56381539ff25c6698d46bbe6d7e09cf7fdf042",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 54,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

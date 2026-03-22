@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3956",
+  "ingested_at": "2026-03-22T07:54:44.019919+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in xierongwkhd weimai-wetapp up to 5fe9e8225be4f73f2c5087f134aff657bdf1c6f2. This affects the function getAdmins of the file source-code/src/main/java/com/moke/wp/wx_weimai/controller/admin/Admin_AdminUserController.java. Performing a manipulation of the argument keyword results in sql injection. Remote exploitation of the attack is possible. The exploit is now public and may be used. This product follows a rolling release approach for continuous delivery, so version details for affected or updated releases are not provided. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ddf3de9bbd106305cc3aeeec5977069fec21544e6acaa64b8b5532e7ffa0eeec",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3956"
+}

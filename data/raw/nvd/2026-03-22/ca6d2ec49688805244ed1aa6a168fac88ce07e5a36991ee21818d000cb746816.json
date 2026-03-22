@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28479",
+  "ingested_at": "2026-03-22T07:54:41.092577+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.15 use SHA-1 to hash sandbox identifier cache keys for Docker and browser sandbox configurations, which is deprecated and vulnerable to collision attacks. An attacker can exploit SHA-1 collisions to cause cache poisoning, allowing one sandbox configuration to be misinterpreted as another and enabling unsafe sandbox state reuse.",
+  "severity": "HIGH",
+  "sha256_hash": "ca6d2ec49688805244ed1aa6a168fac88ce07e5a36991ee21818d000cb746816",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28479"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4507",
+  "ingested_at": "2026-03-22T07:54:49.039257+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Mindinventory MindSQL up to 0.2.1. The affected element is the function ask_db of the file mindsql/core/mindsql_core.py. Executing a manipulation can lead to sql injection. The attack can be launched remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "54c4101da3e41ae65a542cbdef307e275479d277d3883f666a41d78665015077",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4507"
+}

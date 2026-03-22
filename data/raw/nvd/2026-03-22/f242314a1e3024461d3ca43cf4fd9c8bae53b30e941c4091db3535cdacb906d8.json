@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62879",
+  "ingested_at": "2026-03-22T07:54:34.537410+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified within the Rancher Backup Operator, resulting in the leakage of S3 tokens (both accessKey and secretKey) into the rancher-backup-operator pod's logs.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f242314a1e3024461d3ca43cf4fd9c8bae53b30e941c4091db3535cdacb906d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-532"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62879"
+}

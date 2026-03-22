@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32459",
+  "ingested_at": "2026-03-22T07:54:46.151186+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in flycart UpsellWP checkout-upsell-and-order-bumps allows Blind SQL Injection.This issue affects UpsellWP: from n/a through < = 2.2.4.",
+  "severity": "HIGH",
+  "sha256_hash": "49e73d57f474da37a2b7da2384898a005ff1d7fe9c200cb3c0e71ff3a97ac2fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32459"
+}

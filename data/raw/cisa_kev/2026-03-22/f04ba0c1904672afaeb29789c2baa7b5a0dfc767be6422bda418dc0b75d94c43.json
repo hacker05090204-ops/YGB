@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-17463",
+  "ingested_at": "2026-03-22T07:45:17.789699+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 Engine contains an unspecified vulnerability that allows a remote attacker to execute code inside a sandbox via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f04ba0c1904672afaeb29789c2baa7b5a0dfc767be6422bda418dc0b75d94c43",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 48,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

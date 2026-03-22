@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1899",
+  "ingested_at": "2026-03-22T07:54:49.314627+00:00",
+  "lang": "en",
+  "raw_text": "The Any Post Slider plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's aps_slider shortcode in all versions up to, and including, 1.0.4 due to insufficient input sanitization and output escaping on the 'post_type' attribute. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5fd259a8358d34cd4679578a934bd42c428ea5b5dbba58984b747ebb3130c6c0",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1899"
+}

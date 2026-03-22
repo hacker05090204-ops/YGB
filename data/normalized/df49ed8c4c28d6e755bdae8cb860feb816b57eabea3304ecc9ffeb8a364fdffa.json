@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "reviewdog action-setup GitHub Action reviewdog action-setup GitHub Action contains an embedded malicious code vulnerability that dumps exposed secrets to Github Actions Workflow Logs.",
+  "token_count": 23
+}

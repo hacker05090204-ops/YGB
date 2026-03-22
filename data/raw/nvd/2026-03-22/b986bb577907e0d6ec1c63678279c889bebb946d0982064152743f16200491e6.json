@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3944",
+  "ingested_at": "2026-03-22T07:54:43.563968+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in itsourcecode University Management System 1.0. This vulnerability affects unknown code of the file /att_add.php. This manipulation of the argument Name causes sql injection. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "b986bb577907e0d6ec1c63678279c889bebb946d0982064152743f16200491e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3944"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-64999",
+  "ingested_at": "2026-03-22T07:54:32.642861+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of input in Checkmk versions 2.4.0 before 2.4.0p22, and 2.3.0 before 2.3.0p43 allows an attacker that can manipulate a host's check output to inject malicious JavaScript into the Synthetic Monitoring HTML logs, which can then be accessed via a crafted phishing link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "56099d137c50eb485423928045aaf32fd1f671765c33ffeaac71594d9be17623",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-64999"
+}

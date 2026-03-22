@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Red Hat JBoss Application Server The JBoss Application Server, shipped with Red Hat Enterprise Application Platform 5.2, allows an attacker to execute arbitrary code via crafted serialized data.",
+  "token_count": 28
+}

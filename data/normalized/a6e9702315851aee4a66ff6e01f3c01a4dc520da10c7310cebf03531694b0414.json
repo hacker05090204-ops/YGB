@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel Kernel/ptrace.c in Linux kernel mishandles contains an improper privilege management vulnerability that allows local users to obtain root access.",
+  "token_count": 21
+}

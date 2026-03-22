@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0654",
+  "ingested_at": "2026-03-22T07:54:33.808322+00:00",
+  "lang": "en",
+  "raw_text": "Improper input handling in the administration web interface on TP-Link Deco BE25 v1.0 allows crafted input to be executed as part of an OS command. An authenticated adjacent attacker may execute arbitrary commands via crafted configuration file, impacting confidentiality, integrity and availability of the device. This issue affects Deco BE25 v1.0: through 1.1.1 Build 20250822.",
+  "severity": "HIGH",
+  "sha256_hash": "269f48050d45a2a6f1eb77b90087e73c913701be65084daae6743b17f1d424d7",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0654"
+}

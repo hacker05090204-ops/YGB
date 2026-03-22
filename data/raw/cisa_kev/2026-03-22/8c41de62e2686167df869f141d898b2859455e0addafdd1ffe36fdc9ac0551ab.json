@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-47246",
+  "ingested_at": "2026-03-22T07:45:17.156561+00:00",
+  "lang": "en",
+  "raw_text": "SysAid SysAid Server SysAid Server (on-premises version) contains a path traversal vulnerability that leads to code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8c41de62e2686167df869f141d898b2859455e0addafdd1ffe36fdc9ac0551ab",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

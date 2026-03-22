@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32810",
+  "ingested_at": "2026-03-22T07:54:49.068241+00:00",
+  "lang": "en",
+  "raw_text": "Halloy is an IRC application written in Rust. In versions on \\*nix and macOS prior to commit f180e41061db393acf65bc99f5c5e7397586d9cb, halloy creates its config directory and files using default umask permissions, which typically results in `0644` on files and `0755` on directories. This allows any local user on the system to read plaintext credentials stored in `config.toml` or referenced `password_file` paths. Commit f180e41061db393acf65bc99f5c5e7397586d9cb patches the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "1b825be541894da11b507d1788bb12403f8216db3f4798ef5f5cb49e3c0f0e87",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32810"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28459",
+  "ingested_at": "2026-03-22T07:54:41.048051+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.12 fail to validate the sessionFile path parameter, allowing authenticated gateway clients to write transcript data to arbitrary locations on the host filesystem. Attackers can supply a sessionFile path outside the sessions directory to create files and append data repeatedly, potentially causing configuration corruption or denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "2f57e97d19c0b57bf37b55516d68a9f0cc0424d866e780d5d66ad351f8cb583f",
+  "source": "nvd",
+  "tags": [
+    "CWE-73"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28459"
+}

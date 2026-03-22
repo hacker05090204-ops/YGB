@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-7024",
+  "ingested_at": "2026-03-22T07:45:17.108595+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium WebRTC Google Chromium WebRTC, an open-source project providing web browsers with real-time communication, contains a heap buffer overflow vulnerability that allows a remote attacker to potentially exploit heap corruption via a crafted HTML page. This vulnerability could impact web browsers using WebRTC, including but not limited to Google Chrome.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6fef67d67a9ac63f7d55fc8335027c6d61de26482eee21bebb7701b2ee7099d8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 51,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

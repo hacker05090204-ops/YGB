@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-0507",
+  "ingested_at": "2026-03-22T07:45:18.685603+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE An incorrect type vulnerability exists in the Concurrency component of Oracle's Java Runtime Environment allows an attacker to remotely execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4da5aa5665eb2c50b5125f3072d6ff21cd9cba62b0d4341c24bb326045a9c823",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

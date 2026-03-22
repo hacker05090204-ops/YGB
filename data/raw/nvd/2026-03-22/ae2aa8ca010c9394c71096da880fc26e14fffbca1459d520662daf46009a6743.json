@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21536",
+  "ingested_at": "2026-03-22T07:54:41.133074+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Devices Pricing Program Remote Code Execution Vulnerability",
+  "severity": "CRITICAL",
+  "sha256_hash": "ae2aa8ca010c9394c71096da880fc26e14fffbca1459d520662daf46009a6743",
+  "source": "nvd",
+  "tags": [
+    "CWE-434",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 8,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21536"
+}

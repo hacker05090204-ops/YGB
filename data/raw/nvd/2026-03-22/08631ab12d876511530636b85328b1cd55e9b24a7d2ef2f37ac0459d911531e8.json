@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-25984",
+  "ingested_at": "2026-03-22T07:54:31.223712+00:00",
+  "lang": "en",
+  "raw_text": "Rejected reason: This CVE was assigned in error.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "08631ab12d876511530636b85328b1cd55e9b24a7d2ef2f37ac0459d911531e8",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 8,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25984"
+}

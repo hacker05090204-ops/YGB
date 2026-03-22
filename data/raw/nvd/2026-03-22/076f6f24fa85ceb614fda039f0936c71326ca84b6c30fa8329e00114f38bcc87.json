@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-30703",
+  "ingested_at": "2026-03-22T07:54:47.637588+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability exists in the web management interface of the WiFi Extender WDR201A (HW V2.1, FW LFMZX28040922V1.02). The adm.cgi endpoint improperly sanitizes user-supplied input provided to a command-related parameter in the sysCMD functionality.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "076f6f24fa85ceb614fda039f0936c71326ca84b6c30fa8329e00114f38bcc87",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30703"
+}

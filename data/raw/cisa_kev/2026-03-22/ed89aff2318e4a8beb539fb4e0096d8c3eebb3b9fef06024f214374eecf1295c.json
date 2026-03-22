@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-12271",
+  "ingested_at": "2026-03-22T07:45:19.581154+00:00",
+  "lang": "en",
+  "raw_text": "Sophos SFOS Sophos Firewall operating system (SFOS) firmware contains a SQL injection vulnerability when configured with either the administration (HTTPS) service or the User Portal is exposed on the WAN zone. Successful exploitation may cause remote code execution to exfiltrate usernames and hashed passwords for the local device admin(s), portal admins, and user accounts used for remote access (but not external Active Directory or LDAP passwords).",
+  "severity": "CRITICAL",
+  "sha256_hash": "ed89aff2318e4a8beb539fb4e0096d8c3eebb3b9fef06024f214374eecf1295c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 66,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

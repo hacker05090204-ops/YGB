@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-28204",
+  "ingested_at": "2026-03-22T07:45:17.390779+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, watchOS, and Safari WebKit contain an out-of-bounds read vulnerability that may disclose sensitive information when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "521281e8856787a5ccf00f39da5e0f4544e5204c19125ac7346c671d041a729f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 54,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

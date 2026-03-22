@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40986",
+  "ingested_at": "2026-03-22T07:54:31.100224+00:00",
+  "lang": "en",
+  "raw_text": "Reflected Cross-Site Scripting (XSS) vulnerability in PideTuCita. This vulnerability allows an attacker to execute JavaScript code in the victim's browser by sending him/her a malicious URL using the endpoint 'cookies/indes.php/ '. This vulnerability can be exploited to steal confidential user data, such as session cookies or to perform actions on behalf of the user.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "614f58327f3fd414bed3a6f710681c46612827edd4e2a404b3a7ef1a22e1709e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40986"
+}

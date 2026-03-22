@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1916",
+  "ingested_at": "2026-03-22T07:54:32.003717+00:00",
+  "lang": "en",
+  "raw_text": "The WPGSI: Spreadsheet Integration plugin for WordPress is vulnerable to unauthorized modification and loss of data due to missing capability checks and an insecure authentication mechanism on the `wpgsi_callBackFuncAccept` and `wpgsi_callBackFuncUpdate` REST API functions in all versions up to, and including, 3.8.3. Both REST endpoints use `permission_callback => '__return_true'`, allowing unauthenticated access. The plugin's custom token-based validation relies on a Base64-encoded JSON object containing the user ID and email address, but is not cryptographically signed. This makes it possible for unauthenticated attackers to forge tokens using publicly enumerable information (admin user ID and email) to create, modify, and delete arbitrary WordPress posts and pages, granted they know the administrator's email address and an active integration ID with remote updates enabled.",
+  "severity": "HIGH",
+  "sha256_hash": "7734c282b73b8a063ab1b9ef6bf3664f34bd1e3740cd8c9935897a3ce1b5f6a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 120,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1916"
+}

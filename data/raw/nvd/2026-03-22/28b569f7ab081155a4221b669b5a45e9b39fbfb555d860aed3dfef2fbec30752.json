@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3207",
+  "ingested_at": "2026-03-22T07:54:47.155599+00:00",
+  "lang": "en",
+  "raw_text": "Configuration issue in Java Management Extensions (JMX) in TIBCO BPM Enterprise version 4.x allows unauthorised access.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "28b569f7ab081155a4221b669b5a45e9b39fbfb555d860aed3dfef2fbec30752",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3207"
+}

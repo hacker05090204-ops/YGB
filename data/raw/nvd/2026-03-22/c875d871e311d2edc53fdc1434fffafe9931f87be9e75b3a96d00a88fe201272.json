@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27439",
+  "ingested_at": "2026-03-22T07:54:40.285362+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Dentario dentario allows Object Injection.This issue affects Dentario: from n/a through < = 1.5.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c875d871e311d2edc53fdc1434fffafe9931f87be9e75b3a96d00a88fe201272",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27439"
+}

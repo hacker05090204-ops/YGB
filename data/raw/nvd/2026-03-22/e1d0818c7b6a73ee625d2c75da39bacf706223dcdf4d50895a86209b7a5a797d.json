@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24291",
+  "ingested_at": "2026-03-22T07:54:42.702506+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect permission assignment for critical resource in Windows Accessibility Infrastructure (ATBroker.exe) allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "e1d0818c7b6a73ee625d2c75da39bacf706223dcdf4d50895a86209b7a5a797d",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24291"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4488",
+  "ingested_at": "2026-03-22T07:54:48.869294+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in UTT HiPER 1250GW up to 3.2.7-210907-180535. Affected is the function strcpy of the file /goform/setSysAdm. Such manipulation of the argument GroupName leads to buffer overflow. It is possible to launch the attack remotely. The exploit is publicly available and might be used.",
+  "severity": "HIGH",
+  "sha256_hash": "b7f6f234ffcee60e14aece9227f2b1261e971b41039fc8d45a4829b2da0ae0a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4488"
+}

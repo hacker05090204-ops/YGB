@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL Digital Experience is susceptible to stored cross-site scripting (XSS) in the administrative user interface which would require elevated privileges to exploit.",
+  "token_count": 22
+}

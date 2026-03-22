@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Valentina Studio 9.0.5 Linux contains a buffer overflow vulnerability in the Host field of the connection dialog that allows local attackers to crash the application by supplying an oversized input string. Attackers can trigger the vulnerability by pasting a crafted buffer exceeding 264 bytes into the Host field during server connection attempts, causing a denial of service.",
+  "token_count": 57
+}

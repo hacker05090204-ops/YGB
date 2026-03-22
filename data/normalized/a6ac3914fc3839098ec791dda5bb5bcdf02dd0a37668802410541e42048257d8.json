@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a crafted SVG file can cause a denial of service. An off-by-one boundary check (`>` instead of `>=`) that allows bypass the guard and reach an undefined `(size_t)` cast. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "token_count": 55
+}

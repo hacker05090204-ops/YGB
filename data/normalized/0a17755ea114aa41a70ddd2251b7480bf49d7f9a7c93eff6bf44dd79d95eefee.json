@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue in D-Link DIR-1253 MESH V1.6.1684 allows an attacker to escalate privileges via the etc/shadow.sample component",
+  "token_count": 17
+}

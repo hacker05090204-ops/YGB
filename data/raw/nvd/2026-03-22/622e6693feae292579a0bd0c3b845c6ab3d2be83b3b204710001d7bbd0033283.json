@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33155",
+  "ingested_at": "2026-03-22T07:54:49.001160+00:00",
+  "lang": "en",
+  "raw_text": "DeepDiff is a project focused on Deep Difference and search of any Python data. From version 5.0.0 to before version 8.6.2, the pickle unpickler _RestrictedUnpickler validates which classes can be loaded but does not limit their constructor arguments. A few of the types in SAFE_TO_IMPORT have constructors that allocate memory proportional to their input (builtins.bytes, builtins.list, builtins.range). A 40-byte pickle payload can force 10+ GB of memory, which crashes applications that load delta objects or call pickle_load with untrusted data. This issue has been patched in version 8.6.2.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "622e6693feae292579a0bd0c3b845c6ab3d2be83b3b204710001d7bbd0033283",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33155"
+}

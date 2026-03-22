@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11252",
+  "ingested_at": "2026-03-22T07:54:33.156060+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Signum Technology Promotion and Training Inc. Windesk.Fm allows SQL Injection.This issue affects windesk.Fm: through 27022026. NOTE: The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7e24c7c133066d8467c6708f7fc9763a2b856ec1249df8df3d824c46b41e16a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11252"
+}

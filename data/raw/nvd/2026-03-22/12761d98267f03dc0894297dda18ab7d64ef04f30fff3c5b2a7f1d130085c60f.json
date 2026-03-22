@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2428",
+  "ingested_at": "2026-03-22T07:54:33.041459+00:00",
+  "lang": "en",
+  "raw_text": "The Fluent Forms Pro Add On Pack plugin for WordPress is vulnerable to Insufficient Verification of Data Authenticity in all versions up to, and including, 6.1.17. This is due to the PayPal IPN (Instant Payment Notification) verification being disabled by default (`disable_ipn_verification` defaults to `'yes'` in `PayPalSettings.php`). This makes it possible for unauthenticated attackers to send forged PayPal IPN notifications to the publicly accessible IPN endpoint, marking unpaid form submissions as \"paid\" and triggering post-payment automation (emails, access grants, digital product delivery).",
+  "severity": "HIGH",
+  "sha256_hash": "12761d98267f03dc0894297dda18ab7d64ef04f30fff3c5b2a7f1d130085c60f",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2428"
+}

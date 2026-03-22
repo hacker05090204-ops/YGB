@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27728",
+  "ingested_at": "2026-03-22T07:54:32.183066+00:00",
+  "lang": "en",
+  "raw_text": "OneUptime is a solution for monitoring and managing online services. Prior to version 10.0.7, an OS command injection vulnerability in `NetworkPathMonitor.performTraceroute()` allows any authenticated project user to execute arbitrary operating system commands on the Probe server by injecting shell metacharacters into a monitor's destination field. Version 10.0.7 fixes the vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f76ff035270e27a7167da6a956412814eb1b86333dc1248d2339a35e5d167af3",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27728"
+}

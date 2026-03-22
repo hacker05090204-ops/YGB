@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29185",
+  "ingested_at": "2026-03-22T07:54:41.834039+00:00",
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to version 1.20.1, a vulnerability in the SCM URL parsing used by Backstage integrations allowed path traversal sequences in encoded form to be included in file paths. When these URLs were processed by integration functions that construct API URLs, the traversal segments could redirect requests to unintended SCM provider API endpoints using the configured server-side integration credentials. This issue has been patched in version 1.20.1.",
+  "severity": "LOW",
+  "sha256_hash": "26be0d2dcf410a62ac996c24b9f1b22336d901402d54db537ffc1f1c69118fe8",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29185"
+}

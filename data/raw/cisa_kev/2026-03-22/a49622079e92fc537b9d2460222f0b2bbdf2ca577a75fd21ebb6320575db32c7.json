@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-33742",
+  "ingested_at": "2026-03-22T07:45:19.299673+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows MSHTML Platform contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a49622079e92fc537b9d2460222f0b2bbdf2ca577a75fd21ebb6320575db32c7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

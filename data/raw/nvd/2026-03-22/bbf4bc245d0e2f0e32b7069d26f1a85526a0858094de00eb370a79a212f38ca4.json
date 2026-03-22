@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30944",
+  "ingested_at": "2026-03-22T07:54:42.883949+00:00",
+  "lang": "en",
+  "raw_text": "StudioCMS is a server-side-rendered, Astro native, headless content management system. Prior to 0.4.0, the /studiocms_api/dashboard/api-tokens endpoint allows any authenticated user (at least Editor) to generate API tokens for any other user, including owner and admin accounts. The endpoint fails to validate whether the requesting user is authorized to create tokens on behalf of the target user ID, resulting in a full privilege escalation. This vulnerability is fixed in 0.4.0.",
+  "severity": "HIGH",
+  "sha256_hash": "bbf4bc245d0e2f0e32b7069d26f1a85526a0858094de00eb370a79a212f38ca4",
+  "source": "nvd",
+  "tags": [
+    "CWE-639",
+    "CWE-863"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30944"
+}

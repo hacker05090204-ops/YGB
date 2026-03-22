@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, the Claim File Tracker feature exposes an AJAX endpoint that returns billing claim metadata (claim IDs, payer info, transmission logs). The endpoint does not enforce the same ACL as the main billing/claims workflow, so authenticated users without appropriate billing permissions can access this data. This vulnerability is fixed in 8.0.0.1.",
+  "token_count": 68
+}

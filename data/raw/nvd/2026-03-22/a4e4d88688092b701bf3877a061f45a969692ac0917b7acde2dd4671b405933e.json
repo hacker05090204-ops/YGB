@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27577",
+  "ingested_at": "2026-03-22T07:54:32.391444+00:00",
+  "lang": "en",
+  "raw_text": "n8n is an open source workflow automation platform. Prior to versions 2.10.1, 2.9.3, and 1.123.22, additional exploits in the expression evaluation of n8n have been identified and patched following CVE-2025-68613. An authenticated user with permission to create or modify workflows could abuse crafted expressions in workflow parameters to trigger unintended system command execution on the host running n8n. The issues have been fixed in n8n versions 2.10.1, 2.9.3, and 1.123.22. Users should upgrade to one of these versions or later to remediate all known vulnerabilities. If upgrading is not immediately possible, administrators should consider the following temporary mitigations. Limit workflow creation and editing permissions to fully trusted users only, and/or deploy n8n in a hardened environment with restricted operating system privileges and network access to reduce the impact of potential exploitation. These workarounds do not fully remediate the risk and should only be used as short-term mitigation measures.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a4e4d88688092b701bf3877a061f45a969692ac0917b7acde2dd4671b405933e",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 148,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27577"
+}

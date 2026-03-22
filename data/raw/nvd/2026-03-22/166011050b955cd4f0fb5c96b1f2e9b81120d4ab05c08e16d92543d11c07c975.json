@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25517",
+  "ingested_at": "2026-03-22T07:54:44.290578+00:00",
+  "lang": "en",
+  "raw_text": "Jettweb PHP Hazir Haber Sitesi Scripti V1 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the cid parameter. Attackers can send requests to haberarsiv.php with malicious cid values using UNION-based injection to extract sensitive database information or modify database contents.",
+  "severity": "HIGH",
+  "sha256_hash": "166011050b955cd4f0fb5c96b1f2e9b81120d4ab05c08e16d92543d11c07c975",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25517"
+}

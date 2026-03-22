@@ -1,0 +1,74 @@
+[
+  {
+    "module": "api",
+    "ok": true
+  },
+  {
+    "module": "api.server",
+    "ok": true
+  },
+  {
+    "module": "api.voice_routes",
+    "ok": true
+  },
+  {
+    "module": "backend",
+    "ok": true
+  },
+  {
+    "module": "backend.errors",
+    "ok": true
+  },
+  {
+    "module": "backend.ingestion.async_ingestor",
+    "ok": true
+  },
+  {
+    "module": "backend.reliability.health_endpoints",
+    "ok": true
+  },
+  {
+    "module": "python",
+    "ok": true
+  },
+  {
+    "module": "python.phase01_core.constants",
+    "ok": true
+  },
+  {
+    "module": "impl_v1",
+    "ok": true
+  },
+  {
+    "module": "impl_v1.agents.orchestrator",
+    "ok": true
+  },
+  {
+    "module": "impl_v1.training.data.real_dataset_loader",
+    "ok": true
+  },
+  {
+    "module": "HUMANOID_HUNTER",
+    "ok": true
+  },
+  {
+    "module": "HUMANOID_HUNTER.decision.decision_engine",
+    "ok": true
+  },
+  {
+    "module": "training",
+    "ok": true
+  },
+  {
+    "module": "training.safetensors_io",
+    "ok": true
+  },
+  {
+    "module": "scripts.coverage_gate",
+    "ok": true
+  },
+  {
+    "module": "voice_mode",
+    "ok": true
+  }
+]

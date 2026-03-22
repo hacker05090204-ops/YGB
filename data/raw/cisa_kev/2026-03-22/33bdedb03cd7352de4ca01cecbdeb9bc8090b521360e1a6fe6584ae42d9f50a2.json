@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-11826",
+  "ingested_at": "2026-03-22T07:45:18.600086+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office A remote code execution vulnerability exists in Microsoft Office software when the software fails to properly handle objects in memory. An attacker who successfully exploited the vulnerability could run arbitrary code in the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "33bdedb03cd7352de4ca01cecbdeb9bc8090b521360e1a6fe6584ae42d9f50a2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

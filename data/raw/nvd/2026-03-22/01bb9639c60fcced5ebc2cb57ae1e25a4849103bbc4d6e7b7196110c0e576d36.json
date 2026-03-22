@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25189",
+  "ingested_at": "2026-03-22T07:54:41.458028+00:00",
+  "lang": "en",
+  "raw_text": "Data Center Audit 2.6.2 contains an SQL injection vulnerability in the username parameter of dca_login.php that allows unauthenticated attackers to execute arbitrary SQL queries. Attackers can submit crafted SQL payloads through POST requests to extract sensitive database information including usernames, database names, and version details.",
+  "severity": "HIGH",
+  "sha256_hash": "01bb9639c60fcced5ebc2cb57ae1e25a4849103bbc4d6e7b7196110c0e576d36",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25189"
+}

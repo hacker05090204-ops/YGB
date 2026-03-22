@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3056",
+  "ingested_at": "2026-03-22T07:54:34.448995+00:00",
+  "lang": "en",
+  "raw_text": "The Seraphinite Accelerator plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the `seraph_accel_api` AJAX action with `fn=LogClear` in all versions up to, and including, 2.28.14. This makes it possible for authenticated attackers, with Subscriber-level access and above, to clear the plugin's debug/operational logs.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f8614d20f278ead78f008c2ac35ef038e113834c92fadb09ed16bbbbe85fa96b",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3056"
+}

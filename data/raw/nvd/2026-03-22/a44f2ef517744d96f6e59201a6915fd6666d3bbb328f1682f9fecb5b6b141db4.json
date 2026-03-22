@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2427",
+  "ingested_at": "2026-03-22T07:54:49.346446+00:00",
+  "lang": "en",
+  "raw_text": "The itsukaita plugin for WordPress is vulnerable to Reflected Cross-Site Scripting via the 'day_from' and 'day_to' parameters in all versions up to, and including, 0.1.2 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that execute if they can successfully trick an administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a44f2ef517744d96f6e59201a6915fd6666d3bbb328f1682f9fecb5b6b141db4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2427"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-4495",
+  "ingested_at": "2026-03-22T07:45:17.884799+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox Moxilla Firefox allows remote attackers to bypass the Same Origin Policy to read arbitrary files or gain privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7993ad816e64f55fc877a0f1c52585b392ca5779bc3eacc61659e4000646ce00",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

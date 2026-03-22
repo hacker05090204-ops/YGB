@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70042",
+  "ingested_at": "2026-03-22T07:54:42.307238+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-918: Server-Side Request Forgery was discovered in oslabs-beta ThermaKube master.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bcb378bee4b8edf2de0a9beb19c6f0d909593a21cccb1f77fe5d9220333cb920",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70042"
+}

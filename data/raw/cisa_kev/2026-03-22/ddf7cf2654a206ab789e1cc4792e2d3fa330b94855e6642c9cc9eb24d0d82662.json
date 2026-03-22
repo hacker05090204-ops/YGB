@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-7645",
+  "ingested_at": "2026-03-22T07:45:18.627567+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player allows remote attackers to execute arbitrary code via a crafted SWF file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ddf7cf2654a206ab789e1cc4792e2d3fa330b94855e6642c9cc9eb24d0d82662",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

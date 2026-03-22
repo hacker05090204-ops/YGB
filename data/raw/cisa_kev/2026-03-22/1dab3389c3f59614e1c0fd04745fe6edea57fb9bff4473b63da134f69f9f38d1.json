@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-5722",
+  "ingested_at": "2026-03-22T07:45:18.800352+00:00",
+  "lang": "en",
+  "raw_text": "Grandstream UCM6200 Grandstream UCM6200 series is vulnerable to an unauthenticated remote SQL injection via crafted HTTP request. Exploitation can allow for code execution as root.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1dab3389c3f59614e1c0fd04745fe6edea57fb9bff4473b63da134f69f9f38d1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

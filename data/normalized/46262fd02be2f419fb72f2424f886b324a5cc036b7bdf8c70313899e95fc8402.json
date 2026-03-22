@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "DotNetNuke (DNN) DotNetNuke (DNN) DotNetNuke (DNN) contains an inadequate encryption strength vulnerability resulting from the use of a weak encryption algorithm to protect input parameters. This CVE ID resolves an incomplete patch for CVE-2018-15811.",
+  "token_count": 34
+}

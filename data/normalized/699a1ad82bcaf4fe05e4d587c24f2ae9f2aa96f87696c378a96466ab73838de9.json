@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Open Journal Systems (OJS) 2.3.6 - '/lib/pkp/classes/core/String.inc.php?String::stripUnsafeHtml()' Method Cross-Site Scripting",
+  "token_count": 10
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-36260",
+  "ingested_at": "2026-03-22T07:45:18.859263+00:00",
+  "lang": "en",
+  "raw_text": "Hikvision Security cameras web server A command injection vulnerability in the web server of some Hikvision product. Due to the insufficient input validation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff1288fe8d5a2dee1cd418778496da0d39aa1a99f0609fb6196a360e2a54bbe1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

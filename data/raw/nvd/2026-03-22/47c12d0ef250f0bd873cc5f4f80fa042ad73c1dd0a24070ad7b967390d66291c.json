@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3465",
+  "ingested_at": "2026-03-22T07:54:34.094905+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Tuya App and SDK 24.07.11 on Android. Affected by this vulnerability is an unknown functionality of the component JSON Data Point Handler. This manipulation of the argument cruise_time causes denial of service. Remote exploitation of the attack is possible. The complexity of an attack is rather high. The exploitation appears to be difficult. The exploit has been publicly disclosed and may be utilized. There is ongoing doubt regarding the real existence of this vulnerability. The vendor disagrees with the conclusion of the finding: \"The described vulnerability fails to prove its feasibility or exploitability by attackers. The issue essentially does not constitute a security vulnerability, aligning more closely with abnormal product functionality.\" These considerations are properly reflected within the CVSS vector.",
+  "severity": "LOW",
+  "sha256_hash": "47c12d0ef250f0bd873cc5f4f80fa042ad73c1dd0a24070ad7b967390d66291c",
+  "source": "nvd",
+  "tags": [
+    "CWE-404"
+  ],
+  "token_count": 125,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3465"
+}

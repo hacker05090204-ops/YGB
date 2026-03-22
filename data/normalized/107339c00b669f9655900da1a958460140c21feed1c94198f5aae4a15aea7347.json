@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft SMBv1 server The SMBv1 server in Microsoft Windows allows remote attackers to obtain sensitive information from process memory via a crafted packet.",
+  "token_count": 23
+}

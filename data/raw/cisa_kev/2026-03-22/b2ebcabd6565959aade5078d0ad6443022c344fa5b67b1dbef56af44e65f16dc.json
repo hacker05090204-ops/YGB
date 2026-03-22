@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-7481",
+  "ingested_at": "2026-03-22T07:45:19.571870+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SMA100 SonicWall SMA100 contains a SQL injection vulnerability allowing an unauthenticated user to gain read-only access to unauthorized resources.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b2ebcabd6565959aade5078d0ad6443022c344fa5b67b1dbef56af44e65f16dc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26703",
+  "ingested_at": "2026-03-22T07:54:33.666434+00:00",
+  "lang": "en",
+  "raw_text": "sourcecodester Personnel Property Equipment System v1.0 is vulnerable to SQL Injection in /ppes/admin/advance_search.php.",
+  "severity": "CRITICAL",
+  "sha256_hash": "943010f505dbbc9ef710c7e97d0f72aa90d53a954376bd32f68d0ec56cfec231",
+  "source": "nvd",
+  "tags": [
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26703"
+}

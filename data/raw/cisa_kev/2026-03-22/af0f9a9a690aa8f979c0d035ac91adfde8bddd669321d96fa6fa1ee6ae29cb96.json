@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1380",
+  "ingested_at": "2026-03-22T07:45:19.410443+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a memory corruption vulnerability which can allow for remote code execution in the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "af0f9a9a690aa8f979c0d035ac91adfde8bddd669321d96fa6fa1ee6ae29cb96",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

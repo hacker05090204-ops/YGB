@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28399",
+  "ingested_at": "2026-03-22T07:54:33.804311+00:00",
+  "lang": "en",
+  "raw_text": "NocoDB is software for building databases as spreadsheets. Prior to version 0.301.3, an authenticated user with Creator role can inject arbitrary SQL via the DATEADD formula's unit parameter. This issue has been patched in version 0.301.3.",
+  "severity": "HIGH",
+  "sha256_hash": "10d0edcfe5c6289c361ce62184ddc031c432c788eab8ecdf913eb6502c748678",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28399"
+}

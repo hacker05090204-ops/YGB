@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Saasplate Core saasplate-core allows Blind SQL Injection.This issue affects Saasplate Core: from n/a through < = 1.2.8.",
+  "token_count": 32
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-26919",
+  "ingested_at": "2026-03-22T07:45:19.474125+00:00",
+  "lang": "en",
+  "raw_text": "NETGEAR JGS516PE Devices Netgear JGS516PE devices contain a missing function level access control vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "43b5637752274f6477e59338b6327ede43b05d1a2639af1236d0aad99030982e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 14,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

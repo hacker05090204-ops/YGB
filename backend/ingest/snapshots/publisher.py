@@ -85,10 +85,12 @@ class SnapshotPublisher:
         env_key = os.environ.get("YGB_SNAPSHOT_SIGNING_KEY", "").strip()
         if env_key:
             return env_key.encode("utf-8")
-        config_path = Path("config/hmac_secret.key")
-        if config_path.exists():
-            return config_path.read_text(encoding="utf-8").strip().encode("utf-8")
-        return b"ygb-local-snapshot-signing-key"
+        shared_hmac = os.environ.get("YGB_HMAC_SECRET", "").strip()
+        if shared_hmac:
+            return shared_hmac.encode("utf-8")
+        raise RuntimeError(
+            "Snapshot signing requires YGB_SNAPSHOT_SIGNING_KEY or YGB_HMAC_SECRET"
+        )
 
     def exact_hashes(self) -> Dict[str, str]:
         if not self.index_path.exists():

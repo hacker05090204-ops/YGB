@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-49897",
+  "ingested_at": "2026-03-22T07:45:17.110600+00:00",
+  "lang": "en",
+  "raw_text": "FXC AE1021, AE1021PE FXC AE1021 and AE1021PE contain an OS command injection vulnerability that allows authenticated users to execute commands via a network.",
+  "severity": "CRITICAL",
+  "sha256_hash": "115cd205cac531e8077a191bcf52985acbc461a3b11c46347df72af74eccf052",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-12704",
+  "ingested_at": "2026-03-22T07:54:43.614958+00:00",
+  "lang": "en",
+  "raw_text": "GitLab has remediated an issue in GitLab EE affecting all versions from 18.2 before 18.7.6, 18.8 before 18.8.6, and 18.9 before 18.9.2 that could have allowed an authenticated user to access Virtual Registry data in groups where they are not members due to improper authorization under certain conditions.",
+  "severity": "LOW",
+  "sha256_hash": "20e058bb5733feea30b93270c9ee9a621f815b96fd0915308e7987b538a9706d",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12704"
+}

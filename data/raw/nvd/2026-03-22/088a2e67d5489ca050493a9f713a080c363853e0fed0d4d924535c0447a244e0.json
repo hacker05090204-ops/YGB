@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27751",
+  "ingested_at": "2026-03-22T07:54:33.230679+00:00",
+  "lang": "en",
+  "raw_text": "SODOLA SL902-SWTGW124AS firmware versions through 200.1.20 contain a default credentials vulnerability that allows remote attackers to obtain administrative access to the management interface. Attackers can authenticate using the hardcoded default credentials without password change enforcement to gain full administrative control of the device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "088a2e67d5489ca050493a9f713a080c363853e0fed0d4d924535c0447a244e0",
+  "source": "nvd",
+  "tags": [
+    "CWE-1392"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27751"
+}

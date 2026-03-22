@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "esm.sh is a no-build content delivery network (CDN) for web development. Versions up to and including 137 have an SSRF vulnerability (CWE-918) in esm.sh\u2019s `/http(s)` fetch route. The service tries to block localhost/internal targets, but the validation is based on hostname string checks and can be bypassed using DNS alias domains. This allows an external requester to make the esm.sh server fetch internal localhost services. As of time of publication, no known patched versions exist.",
+  "token_count": 75
+}

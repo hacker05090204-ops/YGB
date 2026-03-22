@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25570",
+  "ingested_at": "2026-03-22T07:54:49.536751+00:00",
+  "lang": "en",
+  "raw_text": "RealTerm Serial Terminal 2.0.0.70 contains a denial of service vulnerability that allows local attackers to crash the application by supplying an excessively long string in the Port field. Attackers can paste a buffer of 1000 characters into the Port input field and click the open button to trigger a crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a2d8e7b61ea5d798e06d41f50584e4f96432ffbac51691f3428bd7b6261a037d",
+  "source": "nvd",
+  "tags": [
+    "CWE-1260"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25570"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28469",
+  "ingested_at": "2026-03-22T07:54:41.067059+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a webhook routing vulnerability in the Google Chat monitor component that allows cross-account policy context misrouting when multiple webhook targets share the same HTTP path. Attackers can exploit first-match request verification semantics to process inbound webhook events under incorrect account contexts, bypassing intended allowlists and session policies.",
+  "severity": "HIGH",
+  "sha256_hash": "a626a85f96cfc3f24e2b985480db147cc0f916373368ee671186582d32f25b97",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28469"
+}

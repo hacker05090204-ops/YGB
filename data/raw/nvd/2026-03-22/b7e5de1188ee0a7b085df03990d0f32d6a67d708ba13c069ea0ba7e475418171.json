@@ -1,0 +1,18 @@
+{
+  "cve_id": "CVE-2026-28415",
+  "ingested_at": "2026-03-22T07:54:33.357110+00:00",
+  "lang": "en",
+  "raw_text": "Gradio is an open-source Python package designed for quick prototyping. Prior to version 6.6.0, the _redirect_to_target() function in Gradio's OAuth flow accepts an unvalidated _target_url query parameter, allowing redirection to arbitrary external URLs. This affects the /logout and /login/callback endpoints on Gradio apps with OAuth enabled (i.e. apps running on Hugging Face Spaces with gr.LoginButton). Starting in version 6.6.0, the _target_url parameter is sanitized to only use the path, query, and fragment, stripping any scheme or host.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b7e5de1188ee0a7b085df03990d0f32d6a67d708ba13c069ea0ba7e475418171",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-284",
+    "CWE-330",
+    "CWE-601",
+    "CWE-601"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28415"
+}

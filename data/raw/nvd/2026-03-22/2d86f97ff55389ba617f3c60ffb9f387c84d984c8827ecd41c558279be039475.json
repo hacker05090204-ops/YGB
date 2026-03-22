@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26017",
+  "ingested_at": "2026-03-22T07:54:41.510663+00:00",
+  "lang": "en",
+  "raw_text": "CoreDNS is a DNS server that chains plugins. Prior to version 1.14.2, a logical vulnerability in CoreDNS allows DNS access controls to be bypassed due to the default execution order of plugins. Security plugins such as acl are evaluated before the rewrite plugin, resulting in a Time-of-Check Time-of-Use (TOCTOU) flaw. This issue has been patched in version 1.14.2.",
+  "severity": "HIGH",
+  "sha256_hash": "2d86f97ff55389ba617f3c60ffb9f387c84d984c8827ecd41c558279be039475",
+  "source": "nvd",
+  "tags": [
+    "CWE-367"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26017"
+}

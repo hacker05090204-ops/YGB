@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-20963",
+  "ingested_at": "2026-03-22T07:45:15.841302+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SharePoint Microsoft SharePoint contains a deserialization of untrusted data vulnerability that allows an unauthorized attacker to execute code over a network.",
+  "severity": "CRITICAL",
+  "sha256_hash": "af369b2fa815d3c0264aeb17a8678221ef84d1503ec6b70539caf0939314da7f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

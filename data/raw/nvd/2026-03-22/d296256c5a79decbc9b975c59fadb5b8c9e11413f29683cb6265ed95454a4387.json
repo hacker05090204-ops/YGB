@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27119",
+  "ingested_at": "2026-03-22T07:54:30.650351+00:00",
+  "lang": "en",
+  "raw_text": "svelte performance oriented web framework. From 5.39.3, < =5.51.4, in certain circumstances, the server-side rendering output of an element does not properly escape its content, potentially allowing HTML injection in the SSR output. Client-side rendering is not affected. This vulnerability is fixed in 5.51.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d296256c5a79decbc9b975c59fadb5b8c9e11413f29683cb6265ed95454a4387",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27119"
+}

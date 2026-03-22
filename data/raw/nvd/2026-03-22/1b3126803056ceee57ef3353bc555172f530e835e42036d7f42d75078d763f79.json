@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33204",
+  "ingested_at": "2026-03-22T07:54:49.083252+00:00",
+  "lang": "en",
+  "raw_text": "SimpleJWT is a simple JSON web token library written in PHP. Prior to version 1.1.1, an unauthenticated attacker can perform a Denial of Service via JWE header tampering when PBES2 algorithms are used. Applications that call JWE::decrypt() on attacker-controlled JWEs using PBES2 algorithms are affected. This issue has been patched in version 1.1.1.",
+  "severity": "HIGH",
+  "sha256_hash": "1b3126803056ceee57ef3353bc555172f530e835e42036d7f42d75078d763f79",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33204"
+}

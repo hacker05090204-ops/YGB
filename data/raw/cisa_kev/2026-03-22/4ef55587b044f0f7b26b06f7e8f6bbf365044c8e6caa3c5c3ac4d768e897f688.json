@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-20045",
+  "ingested_at": "2026-03-22T07:45:15.976869+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Unified Communications Manager Cisco Unified Communications Manager (Unified CM), Cisco Unified Communications Manager Session Management Edition (Unified CM SME), Cisco Unified Communications Manager IM & Presence Service (Unified CM IM&P), Cisco Unity Connection, and Cisco Webex Calling Dedicated Instance contain a code injection vulnerability that could allow the attacker to obtain user-level access to the underlying operating system and then elevate privileges to root.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4ef55587b044f0f7b26b06f7e8f6bbf365044c8e6caa3c5c3ac4d768e897f688",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 65,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

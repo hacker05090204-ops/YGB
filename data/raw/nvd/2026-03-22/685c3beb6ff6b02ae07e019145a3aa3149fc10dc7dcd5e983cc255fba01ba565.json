@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3589",
+  "ingested_at": "2026-03-22T07:54:41.378606+00:00",
+  "lang": "en",
+  "raw_text": "The WooCommerce WordPress plugin from versions 5.4.0 to 10.5.2 does not properly handle batch requests, which could allow unauthenticated users to make a logged in admin call non store/WC REST endpoints, and create arbitrary admin users via a CSRF attack for example.",
+  "severity": "HIGH",
+  "sha256_hash": "685c3beb6ff6b02ae07e019145a3aa3149fc10dc7dcd5e983cc255fba01ba565",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3589"
+}

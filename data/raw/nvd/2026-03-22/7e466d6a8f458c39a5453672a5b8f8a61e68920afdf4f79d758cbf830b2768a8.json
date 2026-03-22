@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-32313",
+  "ingested_at": "2026-03-22T07:54:33.834098+00:00",
+  "lang": "en",
+  "raw_text": "In UsageEvents of UsageEvents.java, there is a possible out of bounds write due to an incorrect bounds check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "7e466d6a8f458c39a5453672a5b8f8a61e68920afdf4f79d758cbf830b2768a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-32313"
+}

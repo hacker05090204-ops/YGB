@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62043",
+  "ingested_at": "2026-03-22T07:54:47.897515+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of input during web page generation ('cross-site scripting') vulnerability in WPSight WPCasa allows DOM-Based XSS.This issue affects WPCasa: from n/a through 1.4.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b778e54312e03c314a8cbb3e1db4f11a4dc97765e2208b48d10d50e2059a07a0",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62043"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-4427",
+  "ingested_at": "2026-03-22T07:45:16.406009+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Endpoint Manager Mobile (EPMM) Ivanti Endpoint Manager Mobile (EPMM) contains an authentication bypass vulnerability in the API component that allows an attacker to access protected resources without proper credentials via crafted API requests. This vulnerability results from an insecure implementation of the Spring Framework open-source library.",
+  "severity": "CRITICAL",
+  "sha256_hash": "599ad95d0f673e6b64498b9433c2d64a3832630a0afc33c6fe4469542543eb35",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

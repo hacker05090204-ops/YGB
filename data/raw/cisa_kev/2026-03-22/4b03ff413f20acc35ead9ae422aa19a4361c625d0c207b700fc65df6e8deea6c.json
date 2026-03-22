@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-4990",
+  "ingested_at": "2026-03-22T07:45:17.783703+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader have a double free vulnerability that could lead to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4b03ff413f20acc35ead9ae422aa19a4361c625d0c207b700fc65df6e8deea6c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

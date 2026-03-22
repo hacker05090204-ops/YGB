@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Git for Windows is the Windows port of Git. Prior to 2.53.0(2), it is possible to obtain a user's NTLM hash by tricking them into cloning from a malicious server. Since NTLM hashing is weak, it is possible for the attacker to brute-force the user's account name and password. This vulnerability is fixed in 2.53.0(2).",
+  "token_count": 55
+}

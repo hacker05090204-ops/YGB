@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-24200",
+  "ingested_at": "2026-03-22T07:45:16.588941+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and iPadOS Apple iOS and iPadOS contains an incorrect authorization vulnerability that allows a physical attacker to disable USB Restricted Mode on a locked device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "031f304fe79bf3f3b759882352359dbd0e8a86b43ded03c69980cd9ccdd2f6e0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

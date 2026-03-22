@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel P660HN-T1A Routers Zyxel P660HN-T1A routers contain a command injection vulnerability in the Remote System Log forwarding function, which is accessible by an unauthenticated user and exploited via the remote_host parameter of the ViewLog.asp page.",
+  "token_count": 35
+}

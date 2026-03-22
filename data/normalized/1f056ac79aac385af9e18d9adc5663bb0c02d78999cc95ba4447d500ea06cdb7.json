@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Cisco IP Phones Cisco IP Phones contain an improper input validation vulnerability for HTTP requests. Exploitation could allow an attacker to execute code remotely with root privileges or cause a denial-of-service (DoS) condition.",
+  "token_count": 34
+}

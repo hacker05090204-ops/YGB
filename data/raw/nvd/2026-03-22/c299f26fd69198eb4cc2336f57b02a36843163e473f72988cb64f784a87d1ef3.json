@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2416",
+  "ingested_at": "2026-03-22T07:54:32.008718+00:00",
+  "lang": "en",
+  "raw_text": "The Geo Mashup plugin for WordPress is vulnerable to SQL Injection via the 'sort' parameter in all versions up to, and including, 1.13.17. This is due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for unauthenticated attackers to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "HIGH",
+  "sha256_hash": "c299f26fd69198eb4cc2336f57b02a36843163e473f72988cb64f784a87d1ef3",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2416"
+}

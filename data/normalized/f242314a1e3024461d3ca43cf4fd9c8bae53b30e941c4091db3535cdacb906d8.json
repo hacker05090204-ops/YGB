@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified within the Rancher Backup Operator, resulting in the leakage of S3 tokens (both accessKey and secretKey) into the rancher-backup-operator pod's logs.",
+  "token_count": 26
+}

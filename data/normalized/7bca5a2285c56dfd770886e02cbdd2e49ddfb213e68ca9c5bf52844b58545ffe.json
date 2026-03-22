@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP NetWeaver Enterprise Portal Administration is vulnerable if a privileged user uploads untrusted or malicious content that, upon deserialization, could result in a high impact on the confidentiality, integrity, and availability of the host system.",
+  "token_count": 35
+}

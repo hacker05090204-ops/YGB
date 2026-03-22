@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and watchOS FontParser contain a memory corruption vulnerability which may allow for code execution when processing maliciously crafted front.",
+  "token_count": 26
+}

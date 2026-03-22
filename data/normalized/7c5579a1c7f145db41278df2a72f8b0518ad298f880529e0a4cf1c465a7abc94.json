@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Tenda F453 1.0.0.3. Affected is the function fromDhcpListClient of the file /goform/DhcpListClient of the component httpd. This manipulation of the argument page causes buffer overflow. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized.",
+  "token_count": 47
+}

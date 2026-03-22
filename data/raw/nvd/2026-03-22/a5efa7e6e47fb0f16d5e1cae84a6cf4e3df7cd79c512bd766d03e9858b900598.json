@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-31797",
+  "ingested_at": "2026-03-22T07:54:42.948232+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a heap out-of-bounds read in CTiffImg::ReadLine() when iccApplyProfiles processes a crafted TIFF image, causing memory disclosure or crash. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a5efa7e6e47fb0f16d5e1cae84a6cf4e3df7cd79c512bd766d03e9858b900598",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-787"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31797"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27689",
+  "ingested_at": "2026-03-22T07:54:42.494644+00:00",
+  "lang": "en",
+  "raw_text": "Due to an uncontrolled resource consumption (Denial of Service) vulnerability, an authenticated attacker with regular user privileges and network access can repeatedly invoke a remote-enabled function module with an excessively large loop-control parameter. This triggers prolonged loop execution that consumes excessive system resources, potentially rendering the system unavailable. Successful exploitation results in a denial-of-service condition that impacts availability, while confidentiality and integrity remain unaffected.",
+  "severity": "HIGH",
+  "sha256_hash": "aa837b118a2ed6dbf632cd28177542a6a2e908a8afd13c1c56c8debb6f9685fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-606"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27689"
+}

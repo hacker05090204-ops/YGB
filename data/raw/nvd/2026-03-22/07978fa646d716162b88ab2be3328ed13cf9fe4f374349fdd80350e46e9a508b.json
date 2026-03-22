@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22415",
+  "ingested_at": "2026-03-22T07:54:40.043585+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in AncoraThemes The Mounty the-mounty allows PHP Local File Inclusion.This issue affects The Mounty: from n/a through < = 1.1.",
+  "severity": "HIGH",
+  "sha256_hash": "07978fa646d716162b88ab2be3328ed13cf9fe4f374349fdd80350e46e9a508b",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 35,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22415"
+}

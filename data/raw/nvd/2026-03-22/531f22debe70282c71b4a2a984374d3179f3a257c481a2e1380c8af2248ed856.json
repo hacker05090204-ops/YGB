@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2748",
+  "ingested_at": "2026-03-22T07:54:34.431224+00:00",
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 improperly validates S/MIME certificates issued for email addresses containing whitespaces, allowing signature spoofing.",
+  "severity": "MEDIUM",
+  "sha256_hash": "531f22debe70282c71b4a2a984374d3179f3a257c481a2e1380c8af2248ed856",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2748"
+}

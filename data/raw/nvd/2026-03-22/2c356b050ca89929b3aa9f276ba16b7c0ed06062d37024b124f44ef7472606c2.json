@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27977",
+  "ingested_at": "2026-03-22T07:54:47.238769+00:00",
+  "lang": "en",
+  "raw_text": "Next.js is a React framework for building full-stack web applications. Starting in version 16.0.1 and prior to version 16.1.7, in `next dev`, cross-site protection for internal websocket endpoints could treat `Origin: null` as a bypass case even if `allowedDevOrigins` is configured, allowing privacy-sensitive/opaque contexts (for example sandboxed documents) to connect unexpectedly. If a dev server is reachable from attacker-controlled content, an attacker may be able to connect to the HMR websocket channel and interact with dev websocket traffic. This affects development mode only. Apps without a configured `allowedDevOrigins` still allow connections from any origin. The issue is fixed in version 16.1.7 by validating `Origin: null` through the same cross-site origin-allowance checks used for other origins. If upgrading is not immediately possible, do not expose `next dev` to untrusted networks and/or block websocket upgrades to `/_next/webpack-hmr` when `Origin` is `null` at the proxy.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2c356b050ca89929b3aa9f276ba16b7c0ed06062d37024b124f44ef7472606c2",
+  "source": "nvd",
+  "tags": [
+    "CWE-1385"
+  ],
+  "token_count": 142,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27977"
+}

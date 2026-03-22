@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32719",
+  "ingested_at": "2026-03-22T07:54:46.548444+00:00",
+  "lang": "en",
+  "raw_text": "AnythingLLM is an application that turns pieces of content into context that any LLM can use as references during chatting. In 1.11.1 and earlier, The ImportedPlugin.importCommunityItemFromUrl() function in server/utils/agents/imported.js downloads a ZIP file from a community hub URL and extracts it using AdmZip.extractAllTo() without validating file paths within the archive. This enables a Zip Slip path traversal attack that can lead to arbitrary code execution.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d9d59676457d0e914fefd5abd02e9019844cb11e248cba007bce2cdbaecebdd3",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-94"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32719"
+}

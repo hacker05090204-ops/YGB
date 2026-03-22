@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29126",
+  "ingested_at": "2026-03-22T07:54:39.939520+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect permission assignment (world-writable file) in /etc/udhcpc/default.script in International Data Casting (IDC) SFX2100 Satellite Receiver allows a local unprivileged attacker to potentially execute arbitrary commands with root privileges (local privilege escalation and persistence) via modification of a root-owned, world-writable BusyBox udhcpc DHCP event script, which is executed when a DHCP lease is obtained, renewed, or lost.",
+  "severity": "HIGH",
+  "sha256_hash": "341ccec51b4cae93dcbfd5d3727afc3278832222255e7eeb4f39159b8f91892b",
+  "source": "nvd",
+  "tags": [
+    "CWE-732",
+    "CWE-863"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29126"
+}

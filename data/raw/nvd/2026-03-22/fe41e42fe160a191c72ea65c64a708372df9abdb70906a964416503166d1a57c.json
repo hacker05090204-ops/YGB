@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1720",
+  "ingested_at": "2026-03-22T07:54:40.777556+00:00",
+  "lang": "en",
+  "raw_text": "The WowOptin: Next-Gen Popup Maker \u2013 Create Stunning Popups and Optins for Lead Generation plugin for WordPress is vulnerable to unauthorized arbitrary plugin installation due to a missing capability check on the 'install_and_active_plugin' function in all versions up to, and including, 1.4.24. This makes it possible for authenticated attackers, with Subscriber-level access and above, to install and activate arbitrary plugins.",
+  "severity": "HIGH",
+  "sha256_hash": "fe41e42fe160a191c72ea65c64a708372df9abdb70906a964416503166d1a57c",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1720"
+}

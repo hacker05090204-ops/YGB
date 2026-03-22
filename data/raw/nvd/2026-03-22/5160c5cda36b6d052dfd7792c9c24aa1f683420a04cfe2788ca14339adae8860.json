@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69295",
+  "ingested_at": "2026-03-22T07:54:30.181238+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Coven Core coven-core allows Blind SQL Injection.This issue affects Coven Core: from n/a through < = 1.3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5160c5cda36b6d052dfd7792c9c24aa1f683420a04cfe2788ca14339adae8860",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69295"
+}

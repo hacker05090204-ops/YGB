@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3110",
+  "ingested_at": "2026-03-22T07:54:46.602065+00:00",
+  "lang": "en",
+  "raw_text": "Insecure Direct Object Reference (IDOR) vulnerability in Campus Educativa specifically at the endpoint '/administracion/admin_usuarios.cgi?filtro_estado=T&wAccion=listado_xlsx&wBuscar=&wFiltrar=&wOrden=alta_usuario&wid_cursoActual=[ID]' where the data of users enrolled in the course is exported. Successful exploitation of this vulnerability could allow an unauthenticated attacker to access user data (e.g., usernames, first and last names, email addresses, and phone numbers) and retrieve the data of all users enrolled in courses by performing a brute-force attack on the course ID via a manipulated URL.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "e00f8f022fef52d4947b38ecff329e832d99dffbaf4879b554269087bfaedaaa",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3110"
+}

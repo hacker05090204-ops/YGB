@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-1641",
+  "ingested_at": "2026-03-22T07:45:19.389848+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains a memory corruption vulnerability due to failure to properly handle rich text format files in memory. Successful exploitation allows for remote code execution in the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "88b705f5285837b525ecac1f18677b6f7bd23b90172ebd714daa7e298bcfb71a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

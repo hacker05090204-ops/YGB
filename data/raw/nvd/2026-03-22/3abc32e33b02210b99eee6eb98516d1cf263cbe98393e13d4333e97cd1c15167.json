@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31841",
+  "ingested_at": "2026-03-22T07:54:44.391339+00:00",
+  "lang": "en",
+  "raw_text": "Hyperterse is a tool-first MCP framework for building AI-ready backend surfaces from declarative config. Prior to v2.2.0, the search tool allows LLMs to search for tools using natural language. While returning results, Hyperterse also returned the raw SQL queries, exposing statements which were supposed to be executed under the hood, and protected from being displayed publicly. This issue has been fixed as of v2.2.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3abc32e33b02210b99eee6eb98516d1cf263cbe98393e13d4333e97cd1c15167",
+  "source": "nvd",
+  "tags": [
+    "CWE-433"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31841"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "If a legitimate user confirms a self-update prompt or initiate an installation of a CODESYS Development System, a low privileged local attacker can gain elevated rights due to a TOCTOU vulnerability in the CODESYS installer.",
+  "token_count": 35
+}

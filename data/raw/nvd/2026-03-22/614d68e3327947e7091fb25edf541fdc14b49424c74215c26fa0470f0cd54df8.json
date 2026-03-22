@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26931",
+  "ingested_at": "2026-03-22T07:54:47.995187+00:00",
+  "lang": "en",
+  "raw_text": "Memory Allocation with Excessive Size Value (CWE-789) in the Prometheus remote_write HTTP handler in Metricbeat can lead Denial of Service via Excessive Allocation (CAPEC-130).",
+  "severity": "MEDIUM",
+  "sha256_hash": "614d68e3327947e7091fb25edf541fdc14b49424c74215c26fa0470f0cd54df8",
+  "source": "nvd",
+  "tags": [
+    "CWE-789"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26931"
+}

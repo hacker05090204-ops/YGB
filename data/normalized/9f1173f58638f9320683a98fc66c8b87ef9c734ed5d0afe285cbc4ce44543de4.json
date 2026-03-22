@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in code-projects Student Web Portal 1.0. This impacts the function valreg_passwdation of the file signup.php. The manipulation of the argument reg_passwd leads to sql injection. The attack can be initiated remotely. The exploit has been disclosed to the public and may be used.",
+  "token_count": 48
+}

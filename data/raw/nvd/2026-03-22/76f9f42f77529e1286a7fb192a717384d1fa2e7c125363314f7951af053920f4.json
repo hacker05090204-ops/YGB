@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4038",
+  "ingested_at": "2026-03-22T07:54:48.565484+00:00",
+  "lang": "en",
+  "raw_text": "The Aimogen Pro plugin for WordPress is vulnerable to Arbitrary Function Call that can lead to privilege escalation due to a missing capability check on the 'aiomatic_call_ai_function_realtime' function in all versions up to, and including, 2.7.5. This makes it possible for unauthenticated attackers to call arbitrary WordPress functions such as 'update_option' to update the default role for registration to administrator and enable user registration for attackers to gain administrative user access to a vulnerable site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "76f9f42f77529e1286a7fb192a717384d1fa2e7c125363314f7951af053920f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4038"
+}

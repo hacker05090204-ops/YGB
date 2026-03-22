@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28494",
+  "ingested_at": "2026-03-22T07:54:42.408260+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-16 and 6.9.13-41, a stack buffer overflow exists in ImageMagick's morphology kernel parsing functions. User-controlled kernel strings exceeding a buffer are copied into fixed-size stack buffers via memcpy without bounds checking, resulting in stack corruption. This vulnerability is fixed in 7.1.2-16 and 6.9.13-41.",
+  "severity": "HIGH",
+  "sha256_hash": "c7dac629e109c16acc979543aaba4ba8a3b4bd04bfbbb6d9c0bcd2b7d5714c5a",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28494"
+}

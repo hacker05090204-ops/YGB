@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "strukturag libde265 commit d9fea9d wa discovered to contain a segmentation fault via the component decoder_context::compute_framedrop_table().",
+  "token_count": 15
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-15069",
+  "ingested_at": "2026-03-22T07:45:16.604155+00:00",
+  "lang": "en",
+  "raw_text": "Sophos XG Firewall Sophos XG Firewall contains a buffer overflow vulnerability that allows for remote code execution via the \"HTTP/S bookmark\" feature.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c827108e09d09b3f135d7ffc893283c5faa200505f80b14104f236dabaa0631f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

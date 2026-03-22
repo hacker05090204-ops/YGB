@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-14558",
+  "ingested_at": "2026-03-22T07:45:19.597393+00:00",
+  "lang": "en",
+  "raw_text": "Tenda AC7, AC9, and AC10 Routers Tenda AC7, AC9, and AC10 devices contain a command injection vulnerability due to the \"formsetUsbUnload\" function executes a dosystemCmd function with untrusted input. Successful exploitation allows an attacker to execute OS commands via a crafted goform/setUsbUnload request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9b153bac75b0550b41678380e75bf36961562d4ae66302f194e9e50f4cd82dfd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 43,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

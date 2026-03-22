@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-21708",
+  "ingested_at": "2026-03-22T07:54:44.367023+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability allowing a Backup Viewer to perform remote code execution (RCE) as the postgres user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "384afc93a8dd21b2b31d3f45b586b08b6fa715b0d6f98fe7320c81bf96c96d0d",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21708"
+}

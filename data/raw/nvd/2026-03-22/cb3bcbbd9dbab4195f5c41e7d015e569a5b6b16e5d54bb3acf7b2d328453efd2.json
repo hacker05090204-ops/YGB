@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24896",
+  "ingested_at": "2026-03-22T07:54:31.841322+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, a Broken Access Control vulnerability exists in OpenEMR\u2019s edih_main.php endpoint, which allows any authenticated user\u2014including low-privilege roles like Receptionist\u2014to access EDI log files by manipulating the log_select parameter in a GET request. The back-end fails to enforce role-based access control (RBAC), allowing sensitive system logs to be accessed outside the GUI-enforced permission boundaries. Version 8.0.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cb3bcbbd9dbab4195f5c41e7d015e569a5b6b16e5d54bb3acf7b2d328453efd2",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24896"
+}

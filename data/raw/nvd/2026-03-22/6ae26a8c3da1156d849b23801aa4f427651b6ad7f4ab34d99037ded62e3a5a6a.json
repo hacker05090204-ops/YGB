@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-66249",
+  "ingested_at": "2026-03-22T07:54:44.580642+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in Apache Livy. This issue affects Apache Livy: from 0.3.0 before 0.9.0. The vulnerability can only be exploited with non-default Apache Livy Server settings. If the configuration value \"livy.file.local-dir-whitelist\" is set to a non-default value, the directory checking can be bypassed. Users are recommended to upgrade to version 0.9.0, which fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6ae26a8c3da1156d849b23801aa4f427651b6ad7f4ab34d99037ded62e3a5a6a",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66249"
+}

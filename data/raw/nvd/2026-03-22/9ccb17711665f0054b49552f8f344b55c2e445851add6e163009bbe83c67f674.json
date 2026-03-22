@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30888",
+  "ingested_at": "2026-03-22T07:54:48.502493+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Versions prior to 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 allow a moderator to edit site policy documents (ToS, guidelines, privacy policy) that they are explicitly prohibited from modifying. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "LOW",
+  "sha256_hash": "9ccb17711665f0054b49552f8f344b55c2e445851add6e163009bbe83c67f674",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30888"
+}

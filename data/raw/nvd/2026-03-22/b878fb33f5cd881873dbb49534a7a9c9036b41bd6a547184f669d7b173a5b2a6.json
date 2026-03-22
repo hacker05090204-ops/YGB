@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26724",
+  "ingested_at": "2026-03-22T07:54:30.497780+00:00",
+  "lang": "en",
+  "raw_text": "Cross Site Scripting vulnerability in Key Systems Inc Global Facilities Management Software v. 20230721a allows a remote attacker to execute arbitrary code via the selectgroup and gn parameters on the /?Function=Groups endpoint.",
+  "severity": "HIGH",
+  "sha256_hash": "b878fb33f5cd881873dbb49534a7a9c9036b41bd6a547184f669d7b173a5b2a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-79"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26724"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-48618",
+  "ingested_at": "2026-03-22T07:45:17.062519+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and watchOS contain a time-of-check/time-of-use (TOCTOU) memory corruption vulnerability that allows an attacker with read and write capabilities to bypass Pointer Authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2a9b0c5ac4eff1e92ce9b18f44a4a7c211c2f657ce79febbb8db63ace540ce59",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

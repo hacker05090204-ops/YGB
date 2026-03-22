@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-0266",
+  "ingested_at": "2026-03-22T07:45:17.484085+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains a use-after-free vulnerability that allows for privilege escalation to gain ring0 access from the system user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0a22948689d469378b07590a4a9be4807432b39b0b1afd609955ec910b49a7b7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

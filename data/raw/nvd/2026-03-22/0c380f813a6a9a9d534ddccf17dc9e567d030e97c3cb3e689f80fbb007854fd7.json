@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3381",
+  "ingested_at": "2026-03-22T07:54:39.943525+00:00",
+  "lang": "en",
+  "raw_text": "Compress::Raw::Zlib versions through 2.219 for Perl use potentially insecure versions of zlib. Compress::Raw::Zlib includes a copy of the zlib library. Compress::Raw::Zlib version 2.220 includes zlib 1.3.2, which addresses findings fron the 7ASecurity audit of zlib. The includes fixs for CVE-2026-27171.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0c380f813a6a9a9d534ddccf17dc9e567d030e97c3cb3e689f80fbb007854fd7",
+  "source": "nvd",
+  "tags": [
+    "CWE-1284"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3381"
+}

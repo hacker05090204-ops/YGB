@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server contains a deserialization of untrusted data vulnerability within Apache Commons, which can allow for for remote code execution.",
+  "token_count": 24
+}

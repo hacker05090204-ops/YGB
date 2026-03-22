@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Novi Survey Novi Survey Novi Survey contains an insecure deserialization vulnerability that allows remote attackers to execute code on the server in the context of the service account.",
+  "token_count": 28
+}

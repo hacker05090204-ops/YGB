@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4004",
+  "ingested_at": "2026-03-22T07:54:49.429920+00:00",
+  "lang": "en",
+  "raw_text": "The Task Manager plugin for WordPress is vulnerable to arbitrary shortcode execution via the 'search' AJAX action in all versions up to, and including, 3.0.2. This is due to missing capability checks in the callback_search() function and insufficient input validation that allows shortcode syntax (square brackets) to pass through sanitize_text_field() and be concatenated into a do_shortcode() call. This makes it possible for authenticated attackers, with Subscriber-level access and above, to execute arbitrary shortcodes on the site by injecting shortcode syntax into parameters like 'task_id', 'point_id', 'categories_id', or 'term'.",
+  "severity": "MEDIUM",
+  "sha256_hash": "30a68e2f10ab9fa89ca3e850efbf92d9ff2351b0e56dac3425d16d88f98a6651",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4004"
+}

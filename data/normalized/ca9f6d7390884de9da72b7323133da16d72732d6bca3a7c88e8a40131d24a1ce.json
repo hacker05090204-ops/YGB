@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Markbeljaars Table of Contents Creator allows Reflected XSS.This issue affects Table of Contents Creator: from n/a through 1.6.4.1.",
+  "token_count": 30
+}

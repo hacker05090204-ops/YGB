@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-20999",
+  "ingested_at": "2026-03-22T07:54:46.402477+00:00",
+  "lang": "en",
+  "raw_text": "Authentication bypass by replay in Smart Switch prior to version 3.7.69.15 allows remote attackers to trigger privileged functions.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "dbb7045198b812b25224ea502f99f8007223ed3befb283888cc606af20d4ec3b",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20999"
+}

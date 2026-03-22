@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30983",
+  "ingested_at": "2026-03-22T07:45:17.747960+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and iPadOS Apple iOS and iPadOS contain a buffer overflow vulnerability that could allow an application to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3791929920582a21b671532617eecfd0c3e04636eeaf86d36bfe9a4af289f18b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

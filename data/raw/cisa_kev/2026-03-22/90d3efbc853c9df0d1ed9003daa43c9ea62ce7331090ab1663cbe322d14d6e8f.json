@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-4077",
+  "ingested_at": "2026-03-22T07:45:17.903764+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Input Method Editor (IME) Japanese Microsoft Input Method Editor (IME) Japanese is a keyboard with Japanese characters that can be enabled on Windows systems as it is included by default (with the default set as disabled). IME Japanese contains an unspecified vulnerability when IMJPDCT.EXE (IME for Japanese) is installed which allows attackers to bypass a sandbox and perform privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "90d3efbc853c9df0d1ed9003daa43c9ea62ce7331090ab1663cbe322d14d6e8f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 61,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

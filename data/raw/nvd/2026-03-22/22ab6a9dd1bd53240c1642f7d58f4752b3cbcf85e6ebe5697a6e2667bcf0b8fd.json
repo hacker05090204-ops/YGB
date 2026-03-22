@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26118",
+  "ingested_at": "2026-03-22T07:54:42.814346+00:00",
+  "lang": "en",
+  "raw_text": "Server-side request forgery (ssrf) in Azure MCP Server allows an authorized attacker to elevate privileges over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "22ab6a9dd1bd53240c1642f7d58f4752b3cbcf85e6ebe5697a6e2667bcf0b8fd",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26118"
+}

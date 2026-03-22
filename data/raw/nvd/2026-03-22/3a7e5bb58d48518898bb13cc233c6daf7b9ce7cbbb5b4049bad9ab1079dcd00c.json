@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25467",
+  "ingested_at": "2026-03-22T07:54:43.808048+00:00",
+  "lang": "en",
+  "raw_text": "Verypdf docPrint Pro 8.0 contains a structured exception handling buffer overflow vulnerability that allows local attackers to execute arbitrary code by supplying an oversized alphanumeric encoded payload in the User Password or Master Password fields. Attackers can craft a malicious payload with encoded shellcode and SEH chain manipulation to bypass protections and execute a MessageBox proof-of-concept when the password fields are processed during PDF encryption.",
+  "severity": "HIGH",
+  "sha256_hash": "3a7e5bb58d48518898bb13cc233c6daf7b9ce7cbbb5b4049bad9ab1079dcd00c",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25467"
+}

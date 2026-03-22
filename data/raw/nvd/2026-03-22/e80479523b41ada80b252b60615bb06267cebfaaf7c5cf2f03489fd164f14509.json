@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27606",
+  "ingested_at": "2026-03-22T07:54:31.868334+00:00",
+  "lang": "en",
+  "raw_text": "Rollup is a module bundler for JavaScript. Versions prior to 2.80.0, 3.30.0, and 4.59.0 of the Rollup module bundler (specifically v4.x and present in current source) is vulnerable to an Arbitrary File Write via Path Traversal. Insecure file name sanitization in the core engine allows an attacker to control output filenames (e.g., via CLI named inputs, manual chunk aliases, or malicious plugins) and use traversal sequences (`../`) to overwrite files anywhere on the host filesystem that the build process has permissions for. This can lead to persistent Remote Code Execution (RCE) by overwriting critical system or user configuration files. Versions 2.80.0, 3.30.0, and 4.59.0 contain a patch for the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e80479523b41ada80b252b60615bb06267cebfaaf7c5cf2f03489fd164f14509",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 110,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27606"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26144",
+  "ingested_at": "2026-03-22T07:54:42.835697+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of input during web page generation ('cross-site scripting') in Microsoft Office Excel allows an unauthorized attacker to disclose information over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "6f257fda9560010954a9d84f82e555ca7403b7e203d6694d63d39ec65cc50a0c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26144"
+}

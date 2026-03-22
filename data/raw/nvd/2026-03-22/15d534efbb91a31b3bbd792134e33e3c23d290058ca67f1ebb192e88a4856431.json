@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4147",
+  "ingested_at": "2026-03-22T07:54:47.076210+00:00",
+  "lang": "en",
+  "raw_text": "An authenticated user with the read role may read limited amounts of uninitialized stack memory via specially-crafted issuances of the filemd5 command.",
+  "severity": "MEDIUM",
+  "sha256_hash": "15d534efbb91a31b3bbd792134e33e3c23d290058ca67f1ebb192e88a4856431",
+  "source": "nvd",
+  "tags": [
+    "CWE-457"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4147"
+}

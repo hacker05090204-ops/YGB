@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25741",
+  "ingested_at": "2026-03-22T07:54:32.782202+00:00",
+  "lang": "en",
+  "raw_text": "Zulip is an open-source team collaboration tool. Prior to commit bf28c82dc9b1f630fa8e9106358771b20a0040f7, the API endpoint for creating a card update session during an upgrade flow was accessible to users with only organization member privileges. When the associated Stripe Checkout session is completed, the Stripe webhook updates the organization\u2019s default payment method. Because no billing-specific authorization check is enforced, a regular (non-billing) member can change the organization\u2019s payment method. This vulnerability affected the Zulip Cloud payment processing system, and has been patched as of commit bf28c82dc9b1f630fa8e9106358771b20a0040f7. Self-hosted deploys are no longer affected and no patch or upgrade is required for them.",
+  "severity": "HIGH",
+  "sha256_hash": "1ac631e6dac2da892b72c8a33ae905121e7e3cdf32172d2039c9d37e093d6653",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25741"
+}

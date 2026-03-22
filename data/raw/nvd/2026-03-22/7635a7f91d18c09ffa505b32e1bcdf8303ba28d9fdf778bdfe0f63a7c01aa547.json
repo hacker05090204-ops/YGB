@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30822",
+  "ingested_at": "2026-03-22T07:54:41.737378+00:00",
+  "lang": "en",
+  "raw_text": "Flowise is a drag & drop user interface to build a customized large language model flow. Prior to version 3.0.13, unauthenticated users can inject arbitrary values into internal database fields when creating leads. This issue has been patched in version 3.0.13.",
+  "severity": "HIGH",
+  "sha256_hash": "7635a7f91d18c09ffa505b32e1bcdf8303ba28d9fdf778bdfe0f63a7c01aa547",
+  "source": "nvd",
+  "tags": [
+    "CWE-915"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30822"
+}

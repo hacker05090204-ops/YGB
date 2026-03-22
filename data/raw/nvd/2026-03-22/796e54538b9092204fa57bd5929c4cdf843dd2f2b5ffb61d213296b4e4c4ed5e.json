@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2023-31364",
+  "ingested_at": "2026-03-22T07:54:32.757148+00:00",
+  "lang": "en",
+  "raw_text": "Improper handling of direct memory writes in the input-output memory management unit could allow a malicious guest virtual machine (VM) to flood a host with writes, potentially causing a fatal machine check error resulting in denial of service.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "796e54538b9092204fa57bd5929c4cdf843dd2f2b5ffb61d213296b4e4c4ed5e",
+  "source": "nvd",
+  "tags": [
+    "CWE-119"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-31364"
+}

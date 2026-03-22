@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2912",
+  "ingested_at": "2026-03-22T07:54:30.921557+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in code-projects Online Reviewer System 1.0. Impacted is an unknown function of the file /system/system/students/assessments/results/studentresult-view.php. The manipulation of the argument test_id results in sql injection. It is possible to launch the attack remotely. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "29862ff77bd1634d1295bd5bfa5c8c9242d6cf5ad35f60a32ab5a7829acf8544",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2912"
+}

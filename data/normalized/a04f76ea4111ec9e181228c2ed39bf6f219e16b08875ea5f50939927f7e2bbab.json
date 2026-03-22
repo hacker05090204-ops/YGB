@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) Cisco Adaptive Security Appliance (ASA) contains a cross-site scripting (XSS) vulnerability in the WebVPN login page. This vulnerability allows remote attackers to inject arbitrary web script or HTML via an unspecified parameter.",
+  "token_count": 37
+}

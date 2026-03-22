@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27609",
+  "ingested_at": "2026-03-22T07:54:31.876749+00:00",
+  "lang": "en",
+  "raw_text": "Parse Dashboard is a standalone dashboard for managing Parse Server apps. In versions 7.3.0-alpha.42 through 9.0.0-alpha.7, the AI Agent API endpoint (`POST /apps/:appId/agent`) lacks CSRF protection. An attacker can craft a malicious page that, when visited by an authenticated dashboard user, submits requests to the agent endpoint using the victim's session. The fix in version 9.0.0-alpha.8 adds CSRF middleware to the agent endpoint and embeds a CSRF token in the dashboard page. As a workaround, remove the `agent` configuration block from your dashboard configuration. Dashboards without an `agent` config are not affected.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ee0b9b3a2f2cc73bc624bf9f4356e256acfd448eb9a5a717d0c4f9b3bbb377c0",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27609"
+}

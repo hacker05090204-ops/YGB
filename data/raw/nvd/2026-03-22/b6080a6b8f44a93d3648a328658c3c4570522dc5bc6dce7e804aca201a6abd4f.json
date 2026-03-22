@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4373",
+  "ingested_at": "2026-03-22T07:54:49.466349+00:00",
+  "lang": "en",
+  "raw_text": "The JetFormBuilder plugin for WordPress is vulnerable to arbitrary file read via path traversal in all versions up to, and including, 3.5.6.2. This is due to the 'Uploaded_File::set_from_array' method accepting user-supplied file paths from the Media Field preset JSON payload without validating that the path belongs to the WordPress uploads directory. Combined with an insufficient same-file check in 'File_Tools::is_same_file' that only compares basenames, this makes it possible for unauthenticated attackers to exfiltrate arbitrary local files as email attachments by submitting a crafted form request when the form is configured with a Media Field and a Send Email action with file attachment.",
+  "severity": "HIGH",
+  "sha256_hash": "b6080a6b8f44a93d3648a328658c3c4570522dc5bc6dce7e804aca201a6abd4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-36"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4373"
+}

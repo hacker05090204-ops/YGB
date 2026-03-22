@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-1212",
+  "ingested_at": "2026-03-22T07:45:16.715221+00:00",
+  "lang": "en",
+  "raw_text": "Progress Kemp LoadMaster Progress Kemp LoadMaster contains an OS command injection vulnerability that allows an unauthenticated, remote attacker to access the system through the LoadMaster management interface, enabling arbitrary system command execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6f2bf21b5445ed8320ff0f9f8786641050aed3514060a477ce1a6a44677eb5f2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

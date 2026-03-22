@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-26369",
+  "ingested_at": "2026-03-22T07:45:17.252341+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contains an out-of-bounds write vulnerability that allows for code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fc8882bcdc599ec571a1abca8e7980c29b485f4de1fb99cf86b90ff9c191d06f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

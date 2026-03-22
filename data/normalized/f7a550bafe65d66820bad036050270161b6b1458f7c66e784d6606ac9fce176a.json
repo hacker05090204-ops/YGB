@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "XWiki Platform XWiki Platform contains an eval injection vulnerability that could allow any guest to perform arbitrary remote code execution through a request to SolrSearch.",
+  "token_count": 25
+}

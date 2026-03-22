@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-36761",
+  "ingested_at": "2026-03-22T07:45:17.260732+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Word Microsoft Word contains an unspecified vulnerability that allows for information disclosure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9ad6a5c3cfea4c790419325d2a68cfdc234ab068ba5e3d2f354b0a9de0f32349",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 13,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

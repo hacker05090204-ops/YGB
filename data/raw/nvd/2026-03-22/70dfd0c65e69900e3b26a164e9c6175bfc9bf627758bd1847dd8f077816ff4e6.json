@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22901",
+  "ingested_at": "2026-03-22T07:54:48.897237+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability has been reported to affect QuNetSwitch. If a remote attacker gains a user account, they can then exploit the vulnerability to execute arbitrary commands. We have already fixed the vulnerability in the following version: QuNetSwitch 2.0.5.0906 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "70dfd0c65e69900e3b26a164e9c6175bfc9bf627758bd1847dd8f077816ff4e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22901"
+}

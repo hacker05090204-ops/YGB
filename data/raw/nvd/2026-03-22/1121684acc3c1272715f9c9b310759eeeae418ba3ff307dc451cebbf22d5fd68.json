@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-55027",
+  "ingested_at": "2026-03-22T07:54:34.194462+00:00",
+  "lang": "en",
+  "raw_text": "Weintek cMT-3072XH2 easyweb v2.1.53, OS v20231011 was discovered to stroe credentials in plaintext in the component uac_temp.db.",
+  "severity": "HIGH",
+  "sha256_hash": "1121684acc3c1272715f9c9b310759eeeae418ba3ff307dc451cebbf22d5fd68",
+  "source": "nvd",
+  "tags": [
+    "CWE-312",
+    "CWE-798"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-55027"
+}

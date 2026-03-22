@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows smss.exe debugging subsystem in Microsoft Windows does not properly authenticate programs that connect to other programs, which allows local users to gain administrator or SYSTEM privileges.",
+  "token_count": 28
+}

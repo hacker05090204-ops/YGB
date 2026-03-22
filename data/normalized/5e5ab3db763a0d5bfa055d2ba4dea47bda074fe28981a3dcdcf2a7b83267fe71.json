@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Natro Macro is an open-source Bee Swarm Simulator macro written in AutoHotkey. Prior to version 1.1.0, any ahk code contained inside of a pattern or path file is executed by the macro. Since users commonly share path/pattern files, an attacker could share a file containing malicious code, which is then executed by the program. This code can operate in silence alongside the pattern, running in the background to do whatever the attacker pleases. This issue has been patched in version 1.1.0.",
+  "token_count": 81
+}

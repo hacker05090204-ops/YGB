@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4201",
+  "ingested_at": "2026-03-22T07:54:46.720168+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in glowxq glowxq-oj up to 6f7c723090472057252040fd2bbbdaa1b5ed2393. This vulnerability affects the function Upload of the file business/business-system/src/main/java/com/glowxq/system/admin/controller/SysFileController.java. Executing a manipulation can lead to unrestricted upload. The attack can be launched remotely. The exploit has been made available to the public and could be used for attacks. This product does not use versioning. This is why information about affected and unaffected releases are unavailable. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "973cd07ffb47cd3466d2bca7813f95351e356514adacb2e72291c57265fb0beb",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4201"
+}

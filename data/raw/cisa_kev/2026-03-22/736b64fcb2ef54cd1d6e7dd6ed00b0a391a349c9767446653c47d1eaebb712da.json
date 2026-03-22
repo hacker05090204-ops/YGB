@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-45046",
+  "ingested_at": "2026-03-22T07:45:17.422095+00:00",
+  "lang": "en",
+  "raw_text": "Apache Log4j2 Apache Log4j2 contains a deserialization of untrusted data vulnerability due to the incomplete fix of CVE-2021-44228, where the Thread Context Lookup Pattern is vulnerable to remote code execution in certain non-default configurations.",
+  "severity": "CRITICAL",
+  "sha256_hash": "736b64fcb2ef54cd1d6e7dd6ed00b0a391a349c9767446653c47d1eaebb712da",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

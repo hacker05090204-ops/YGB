@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26707",
+  "ingested_at": "2026-03-22T07:54:33.821099+00:00",
+  "lang": "en",
+  "raw_text": "sourcecodester Pharmacy Point of Sale System v1.0 is vulnerable to SQL Injection in /pharmacy/view_supplier.php.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7dacc764ab5ece09244538253a3e368019020b9446cda31f0468acea7fc7c55d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26707"
+}

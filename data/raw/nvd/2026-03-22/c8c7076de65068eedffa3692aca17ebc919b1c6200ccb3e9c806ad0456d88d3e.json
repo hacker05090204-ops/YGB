@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24960",
+  "ingested_at": "2026-03-22T07:54:40.174771+00:00",
+  "lang": "en",
+  "raw_text": "Unrestricted Upload of File with Dangerous Type vulnerability in zozothemes Charety charety allows Using Malicious Files.This issue affects Charety: from n/a through < 2.0.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c8c7076de65068eedffa3692aca17ebc919b1c6200ccb3e9c806ad0456d88d3e",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24960"
+}

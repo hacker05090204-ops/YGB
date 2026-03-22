@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper validation of specified type of input in Windows Ancillary Function Driver for WinSock allows an authorized attacker to elevate privileges locally.",
+  "token_count": 22
+}

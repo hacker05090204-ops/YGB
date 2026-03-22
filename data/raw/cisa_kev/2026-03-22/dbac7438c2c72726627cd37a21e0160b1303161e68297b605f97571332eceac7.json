@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-23692",
+  "ingested_at": "2026-03-22T07:45:16.918448+00:00",
+  "lang": "en",
+  "raw_text": "Rejetto HTTP File Server Rejetto HTTP File Server contains an improper neutralization of special elements used in a template engine vulnerability. This allows a remote, unauthenticated attacker to execute commands on the affected system by sending a specially crafted HTTP request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dbac7438c2c72726627cd37a21e0160b1303161e68297b605f97571332eceac7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

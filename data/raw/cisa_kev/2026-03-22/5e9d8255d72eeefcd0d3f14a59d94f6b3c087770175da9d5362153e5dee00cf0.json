@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-0099",
+  "ingested_at": "2026-03-22T07:45:18.624559+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists in Microsoft Windows if the Windows Secondary Logon Service fails to properly manage request handles in memory. An attacker who successfully exploited this vulnerability could run arbitrary code as an administrator.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5e9d8255d72eeefcd0d3f14a59d94f6b3c087770175da9d5362153e5dee00cf0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

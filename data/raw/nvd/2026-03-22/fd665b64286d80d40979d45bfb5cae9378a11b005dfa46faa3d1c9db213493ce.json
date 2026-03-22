@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13406",
+  "ingested_at": "2026-03-22T07:54:47.059583+00:00",
+  "lang": "en",
+  "raw_text": "NULL Pointer Dereference vulnerability in Softing Industrial Automation GmbH smartLink SW-HT (Webserver modules) allows HTTP DoS.This issue affects smartLink SW-HT: 1.43.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "fd665b64286d80d40979d45bfb5cae9378a11b005dfa46faa3d1c9db213493ce",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13406"
+}

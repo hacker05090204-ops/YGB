@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62845",
+  "ingested_at": "2026-03-22T07:54:48.885488+00:00",
+  "lang": "en",
+  "raw_text": "An improper neutralization of escape, meta, or control sequences vulnerability has been reported to affect QHora. If a local attacker gains an administrator account, they can then exploit the vulnerability to cause unexpected behavior. We have already fixed the vulnerability in the following version: QuRouter 2.6.3.009 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "a58976a6b209660cfc7aff1775e5fe9d698b306b859985606eb9f686454c2240",
+  "source": "nvd",
+  "tags": [
+    "CWE-150"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62845"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3351",
+  "ingested_at": "2026-03-22T07:54:34.058704+00:00",
+  "lang": "en",
+  "raw_text": "Improper authorization in the API endpoint GET /1.0/certificates in Canonical LXD 6.6 on Linux allows an authenticated, restricted user to enumerate all certificate fingerprints trusted by the lxd server.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c3c05210dc44a5d160e2e16e000ac80f5a9866b60bffb1448b83322c75ca1798",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3351"
+}

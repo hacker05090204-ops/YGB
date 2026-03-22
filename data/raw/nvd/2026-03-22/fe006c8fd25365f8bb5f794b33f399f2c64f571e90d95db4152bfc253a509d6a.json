@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-20165",
+  "ingested_at": "2026-03-22T07:54:43.717898+00:00",
+  "lang": "en",
+  "raw_text": "In Splunk Enterprise versions below 10.2.1, 10.0.4, 9.4.9, and 9.3.10, and Splunk Cloud Platform versions below 10.2.2510.7, 10.1.2507.17, 10.0.2503.12, and 9.3.2411.124, a low-privileged user that does not hold the \"admin\" or \"power\" Splunk roles could retrieve sensitive information by inspecting the job's search log due to improper access control in the MongoClient logging channel.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fe006c8fd25365f8bb5f794b33f399f2c64f571e90d95db4152bfc253a509d6a",
+  "source": "nvd",
+  "tags": [
+    "CWE-532",
+    "CWE-532"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20165"
+}

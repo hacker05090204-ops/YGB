@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-49035",
+  "ingested_at": "2026-03-22T07:45:16.564517+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Partner Center Microsoft Partner Center contains an improper access control vulnerability that allows an attacker to escalate privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3c6f187ee63f68247ba5c07a27bdedd2485dade4e5d38913e13f22203997875a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

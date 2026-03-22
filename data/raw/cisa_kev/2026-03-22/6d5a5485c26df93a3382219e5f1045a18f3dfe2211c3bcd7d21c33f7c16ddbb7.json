@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-49706",
+  "ingested_at": "2026-03-22T07:45:16.306511+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SharePoint Microsoft SharePoint contains an improper authentication vulnerability that allows an authorized attacker to perform spoofing over a network. Successfully exploitation could allow an attacker to view sensitive information and make some changes to disclosed information. This vulnerability could be chained with CVE-2025-49704. CVE-2025-53771 is a patch bypass for CVE-2025-49706, and the updates for CVE-2025-53771 include more robust protection than those for CVE-2025-49706.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6d5a5485c26df93a3382219e5f1045a18f3dfe2211c3bcd7d21c33f7c16ddbb7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 64,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

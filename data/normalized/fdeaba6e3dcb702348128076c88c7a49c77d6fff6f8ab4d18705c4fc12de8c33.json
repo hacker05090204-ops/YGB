@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Tina4 Stack 1.0.3 contains multiple vulnerabilities allowing unauthenticated attackers to access sensitive database files and execute SQL injection attacks. Attackers can directly request the kim.db database file to retrieve user credentials and password hashes, or inject SQL code through the menu endpoint to manipulate database queries.",
+  "token_count": 46
+}

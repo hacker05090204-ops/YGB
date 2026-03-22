@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25180",
+  "ingested_at": "2026-03-22T07:54:41.437658+00:00",
+  "lang": "en",
+  "raw_text": "Maitra 1.7.2 contains an sql injection vulnerability that allows authenticated attackers to execute arbitrary SQL queries by injecting malicious code through the mailid parameter in outmail and inmail modules. Attackers can also download the SQLite database file directly from the application directory to extract sensitive mail tracking data and credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "c901a3742494386a3c90994b84d10dedfb6fadb6a6b2338730b070123cd197ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25180"
+}

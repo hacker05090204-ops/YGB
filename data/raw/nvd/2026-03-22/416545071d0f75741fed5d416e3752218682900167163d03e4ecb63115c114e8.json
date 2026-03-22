@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28277",
+  "ingested_at": "2026-03-22T07:54:40.947164+00:00",
+  "lang": "en",
+  "raw_text": "LangGraph SQLite Checkpoint is an implementation of LangGraph CheckpointSaver that uses SQLite DB (both sync and async, via aiosqlite). In version 1.0.9 and prior, LangGraph checkpointers can load msgpack-encoded checkpoints that reconstruct Python objects during deserialization. If an attacker can modify checkpoint data in the backing store (for example, after a database compromise or other privileged write access to the persistence layer), they can potentially supply a crafted payload that triggers unsafe object reconstruction when the checkpoint is loaded. No known patch is public.",
+  "severity": "MEDIUM",
+  "sha256_hash": "416545071d0f75741fed5d416e3752218682900167163d03e4ecb63115c114e8",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28277"
+}

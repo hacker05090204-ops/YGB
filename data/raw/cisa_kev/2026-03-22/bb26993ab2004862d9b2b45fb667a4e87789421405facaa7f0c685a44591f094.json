@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-8876",
+  "ingested_at": "2026-03-22T07:45:16.244913+00:00",
+  "lang": "en",
+  "raw_text": "N-able N-Central N-able N-Central contains a command injection vulnerability via improper sanitization of user input.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bb26993ab2004862d9b2b45fb667a4e87789421405facaa7f0c685a44591f094",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

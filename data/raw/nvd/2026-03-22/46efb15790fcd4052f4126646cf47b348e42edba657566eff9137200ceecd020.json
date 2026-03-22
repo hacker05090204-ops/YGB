@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32000",
+  "ingested_at": "2026-03-22T07:54:47.835173+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 contain a command injection vulnerability in the Lobster extension tool execution that uses Windows shell fallback with shell: true after spawn failures. Attackers can inject shell metacharacters in command arguments to execute arbitrary commands when subprocess launch fails with EINVAL or ENOENT errors.",
+  "severity": "MEDIUM",
+  "sha256_hash": "46efb15790fcd4052f4126646cf47b348e42edba657566eff9137200ceecd020",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32000"
+}

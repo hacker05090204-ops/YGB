@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22986",
+  "ingested_at": "2026-03-22T07:45:19.176801+00:00",
+  "lang": "en",
+  "raw_text": "F5 BIG-IP and BIG-IQ Centralized Management F5 BIG-IP and BIG-IQ Centralized Management contain a remote code execution vulnerability in the iControl REST interface that allows unauthenticated attackers with network access to execute system commands, create or delete files, and disable services.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0a59ea471ec1f3839b1b493bf60398156ab30c4214e7f674dc006bd680ab875b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

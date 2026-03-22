@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23748",
+  "ingested_at": "2026-03-22T07:54:32.691887+00:00",
+  "lang": "en",
+  "raw_text": "Golioth Firmware SDK version 0.10.0 prior to 0.22.0, fixed in commit d7f55b38, contain an out-of-bounds read in LightDB State string parsing. When processing a string payload, a payload_size value less than 2 can cause a size_t underflow when computing the number of bytes to copy (nbytes). The subsequent memcpy() reads past the end of the network buffer, which can crash the device. The condition is reachable from on_payload, and golioth_payload_is_null() does not block payload_size==1. A malicious server or MITM can trigger a denial of service.",
+  "severity": "LOW",
+  "sha256_hash": "f5b0096e120f09426b85505258e8479ba3b9da6fd5aa0e28ab58c1f8370c1e46",
+  "source": "nvd",
+  "tags": [
+    "CWE-191"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23748"
+}

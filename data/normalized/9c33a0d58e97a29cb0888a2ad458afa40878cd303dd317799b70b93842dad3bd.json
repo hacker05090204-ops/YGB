@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in themesflat Themesflat Elementor themesflat-elementor allows Object Injection.This issue affects Themesflat Elementor: from n/a through < = 1.0.1.",
+  "token_count": 23
+}

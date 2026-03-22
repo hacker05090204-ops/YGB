@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28363",
+  "ingested_at": "2026-03-22T07:54:33.036460+00:00",
+  "lang": "en",
+  "raw_text": "In OpenClaw before 2026.2.23, tools.exec.safeBins validation for sort could be bypassed via GNU long-option abbreviations (such as --compress-prog) in allowlist mode, leading to approval-free execution paths that were intended to require approval. Only an exact string such as --compress-program was denied.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7f12b77fc6708e5333775667a78d08fda8371283bcb31d7865f927cd0d7ce24c",
+  "source": "nvd",
+  "tags": [
+    "CWE-184"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28363"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4528",
+  "ingested_at": "2026-03-22T07:54:49.569567+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in trueleaf ApiFlow 0.9.7. The impacted element is the function validateUrlSecurity of the file packages/server/src/service/proxy/http_proxy.service.ts of the component URL Validation Handler. This manipulation causes server-side request forgery. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "275dfce82707d35065df82090a959f12939354b4c35a2b031e3c09ec9407e83d",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4528"
+}

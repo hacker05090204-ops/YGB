@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32267",
+  "ingested_at": "2026-03-22T07:54:46.963225+00:00",
+  "lang": "en",
+  "raw_text": "Craft CMS is a content management system (CMS). From version 4.0.0-RC1 to before version 4.17.6 and from version 5.0.0-RC1 to before version 5.9.12, a low-privilege user (or an unauthenticated user who has been sent a shared URL) can escalate their privileges to admin by abusing UsersController->actionImpersonateWithToken. This issue has been patched in versions 4.17.6 and 5.9.12.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4f6271739f9f89b89229a968ec97ac01cb3eaca58ec22c7c24b4ebdf6fdefc43",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32267"
+}

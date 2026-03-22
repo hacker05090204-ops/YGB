@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27627",
+  "ingested_at": "2026-03-22T07:54:31.918148+00:00",
+  "lang": "en",
+  "raw_text": "Karakeep is a elf-hostable bookmark-everything app. In version 0.30.0, when the Reddit metascraper plugin returns `readableContentHtml`, the HTML parsing subprocess uses it directly without running it through DOMPurify. Every other content source in the crawler goes through Readability + DOMPurify, but the Reddit path skips both. Since this content ends up in `dangerouslySetInnerHTML` in the reader view, any malicious HTML in the Reddit response gets executed in the user's browser. Version 0.31.0 contains a patch for this issue.",
+  "severity": "HIGH",
+  "sha256_hash": "66da7700d625351c7db5de0c1d2c1b53141612fd31e43dc0944c35563863bf27",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27627"
+}

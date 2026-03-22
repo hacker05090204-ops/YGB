@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in SINEC Security Monitor (All versions < V4.9.0). The affected application leaks confidential information in metadata, and files such as information on contributors and email address, on `SSM Server`.",
+  "token_count": 34
+}

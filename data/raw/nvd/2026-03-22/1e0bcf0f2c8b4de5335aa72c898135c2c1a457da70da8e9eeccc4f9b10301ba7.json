@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24299",
+  "ingested_at": "2026-03-22T07:54:48.052455+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of special elements used in a command ('command injection') in M365 Copilot allows an unauthorized attacker to disclose information over a network.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1e0bcf0f2c8b4de5335aa72c898135c2c1a457da70da8e9eeccc4f9b10301ba7",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24299"
+}

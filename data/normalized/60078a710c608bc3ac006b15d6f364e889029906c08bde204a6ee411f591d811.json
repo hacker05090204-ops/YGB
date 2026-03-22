@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "NocoDB is software for building databases as spreadsheets. Prior to version 0.301.3, the password forgot endpoint returned different responses for registered and unregistered emails, allowing user enumeration. This issue has been patched in version 0.301.3.",
+  "token_count": 35
+}

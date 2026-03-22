@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22181",
+  "ingested_at": "2026-03-22T07:54:47.290791+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.3.2 contain a DNS pinning bypass vulnerability in strict URL fetch paths that allows attackers to circumvent SSRF guards when environment proxy variables are configured. When HTTP_PROXY, HTTPS_PROXY, or ALL_PROXY environment variables are present, attacker-influenced URLs can be routed through proxy behavior instead of pinned-destination routing, enabling access to internal targets reachable from the proxy environment.",
+  "severity": "MEDIUM",
+  "sha256_hash": "56ca6fc805372054046262352f04b40d1fb3c7a9ca7b3d2f2723a33eb3e7f9c3",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22181"
+}

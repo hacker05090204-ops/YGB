@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Lyric Video Creator 2.1 contains a denial of service vulnerability that allows attackers to crash the application by processing malformed MP3 files. Attackers can create a crafted MP3 file with an oversized buffer and trigger the crash by opening the file through the Browse song functionality.",
+  "token_count": 46
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32366",
+  "ingested_at": "2026-03-22T07:54:45.948074+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in robfelty Collapsing Categories collapsing-categories allows Blind SQL Injection.This issue affects Collapsing Categories: from n/a through < = 3.0.9.",
+  "severity": "HIGH",
+  "sha256_hash": "e4fe0f674450f4222aedd3b568dceba70d972666cdb491afd2715b34fcc62bfa",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32366"
+}

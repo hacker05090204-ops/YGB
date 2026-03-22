@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Substance3D - Painter versions 11.1.2 and earlier are affected by an Out-of-bounds Read vulnerability that could lead to memory exposure. An attacker could leverage this vulnerability to access sensitive information stored in memory. Exploitation of this issue requires user interaction in that a victim must open a malicious file.",
+  "token_count": 49
+}

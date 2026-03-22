@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel EMG2926 Routers Zyxel EMG2926 routers contain a command injection vulnerability located in the diagnostic tools, specifically the nslookup function. A malicious user may exploit numerous vectors to execute malicious commands on the router, such as the ping_ip parameter to the expert/maintenance/diagnostic/nslookup URI.",
+  "token_count": 43
+}

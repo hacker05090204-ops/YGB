@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8599",
+  "ingested_at": "2026-03-22T07:45:19.614197+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One and OfficeScan Trend Micro Apex One and OfficeScan server contain a vulnerable EXE file that could allow a remote attacker to write data to a path on affected installations and bypass root login.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b27dbddd54778bb72ede20d397beb92dbd91da0191f08ae96042af4555e0c65e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

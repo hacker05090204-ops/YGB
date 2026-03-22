@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jenkins LoadNinja Plugin 2.1 and earlier does not mask LoadNinja API keys displayed on the job configuration form, increasing the potential for attackers to observe and capture them.",
+  "token_count": 28
+}

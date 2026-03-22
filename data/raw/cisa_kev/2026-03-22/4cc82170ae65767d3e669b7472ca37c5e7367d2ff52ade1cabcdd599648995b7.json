@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41763",
+  "ingested_at": "2026-03-22T07:45:17.197976+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Skype for Business Microsoft Skype for Business contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4cc82170ae65767d3e669b7472ca37c5e7367d2ff52ade1cabcdd599648995b7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An Indirect Object Reference (IDOR) in Security Center allows an authenticated remote attacker to escalate privileges via the 'owner' parameter.",
+  "token_count": 20
+}

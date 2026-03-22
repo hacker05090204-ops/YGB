@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-27615",
+  "ingested_at": "2026-03-22T07:54:31.889581+00:00",
+  "lang": "en",
+  "raw_text": "ADB Explorer is a fluent UI for ADB on Windows. In versions prior to Beta 0.9.26022, ADB-Explorer allows the `ManualAdbPath` settings variable, which determines the path of the ADB binary to be executed, to be set to a Universal Naming Convention (UNC) path in the application's settings file. This allows an attacker to set the binary's path to point to a remote network resource, hosted on an attacker-controlled network share, thus granting the attacker full control over the binary being executed by the app. An attacker may leverage this vulnerability to execute code remotely on a victim's machine with the privileges of the user running the app. Exploitation is made possible by convincing a victim to run a shortcut of the app that points to a custom `App.txt` settings file, which sets `ManualAdbPath` (for example, when downloaded in an archive file). Version Beta 0.9.26022 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "5571dfbdacc1ad37f24d013b3efc72e0c3840b958dc4cc4a930f51367ed99815",
+  "source": "nvd",
+  "tags": [
+    "CWE-40",
+    "CWE-829",
+    "CWE-829"
+  ],
+  "token_count": 147,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27615"
+}

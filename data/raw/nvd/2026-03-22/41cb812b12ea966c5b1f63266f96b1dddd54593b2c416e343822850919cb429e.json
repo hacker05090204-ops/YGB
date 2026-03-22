@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25576",
+  "ingested_at": "2026-03-22T07:54:31.283993+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a heap buffer over-read vulnerability exists in multiple raw image format handles. The vulnerability occurs when processing images with -extract dimensions larger than -size dimensions, causing out-of-bounds memory reads from a heap-allocated buffer. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "41cb812b12ea966c5b1f63266f96b1dddd54593b2c416e343822850919cb429e",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25576"
+}

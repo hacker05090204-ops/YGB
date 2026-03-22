@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-68613",
+  "ingested_at": "2026-03-22T07:45:15.850712+00:00",
+  "lang": "en",
+  "raw_text": "n8n n8n n8n contains an improper control of dynamically managed code resources vulnerability in its workflow expression evaluation system that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "686b52d1aad9b0388d2a14e9a0b451c450f90b9e10e6ffef53e968d0c593295c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2947",
+  "ingested_at": "2026-03-22T07:54:30.990746+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in rymcu forest up to 0.0.5. This affects the function updateUserInfo of the file - src/main/java/com/rymcu/forest/web/api/user/UserInfoController.java of the component User Profile Handler. The manipulation results in cross site scripting. The attack can be executed remotely. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "dec765d2586252b8b4be40e77d6c400499f98ff8e9e363b23a15e3d26163b4b8",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2947"
+}

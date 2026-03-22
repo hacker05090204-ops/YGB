@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4252",
+  "ingested_at": "2026-03-22T07:54:46.878443+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Tenda AC8 16.03.50.11. Affected by this issue is the function check_is_ipv6 of the component IPv6 Handler. The manipulation leads to reliance on ip address for authentication. It is possible to initiate the attack remotely. The exploit is publicly available and might be used.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c55cec4e090615b0393de13a040073a6a9a9a6a37a8ce9164b3df3bc956e282a",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-291"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4252"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A high-privileged remote attacker can fully compromise the device by abusing an update signature bypass vulnerability in the wwwupdate.cgi method in the web interface of UBR.",
+  "token_count": 26
+}

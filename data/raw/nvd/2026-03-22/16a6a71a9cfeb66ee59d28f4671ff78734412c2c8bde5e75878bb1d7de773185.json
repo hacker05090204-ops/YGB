@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32596",
+  "ingested_at": "2026-03-22T07:54:47.374953+00:00",
+  "lang": "en",
+  "raw_text": "Glances is an open-source system cross-platform monitoring tool. Prior to 4.5.2, Glances web server runs without authentication by default when started with `glances -w`, exposing REST API with sensitive system information including process command-lines containing credentials (passwords, API keys, tokens) to any network client. Version 4.5.2 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "16a6a71a9cfeb66ee59d28f4671ff78734412c2c8bde5e75878bb1d7de773185",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32596"
+}

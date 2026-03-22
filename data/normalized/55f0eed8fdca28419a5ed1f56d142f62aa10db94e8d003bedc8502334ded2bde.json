@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft XML Core Services Microsoft XML Core Services contains a memory corruption vulnerability which could allow for remote code execution.",
+  "token_count": 20
+}

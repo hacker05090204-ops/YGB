@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Exim Exim Heap-based buffer overflow in the string_vformat function in string.c in Exim before 4.70 allows remote attackers to execute arbitrary code via an SMTP session.",
+  "token_count": 26
+}

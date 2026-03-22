@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-64328",
+  "ingested_at": "2026-03-22T07:45:15.939927+00:00",
+  "lang": "en",
+  "raw_text": "Sangoma FreePBX Sangoma FreePBX Endpoint Manager contains an OS command injection vulnerability that could allow for a post-authentication command injection by an authenticated known user via the testconnection -> check_ssh_connect() function. An attacker can leverage this vulnerability to potentially obtain remote access to the system as an asterisk user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "07eeeaec50b41ef8e4bfb8921815879b9c5b0025c23ae40c017f41bbb68aaa0b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 49,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

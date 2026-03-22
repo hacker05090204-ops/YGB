@@ -1,0 +1,118 @@
+{
+  "agent_id": "AGENT-INGESTION",
+  "scope": "backend/ingestion/",
+  "counts": {
+    "code_files": 14,
+    "python_files": 14,
+    "test_files": 0,
+    "source_files": 14,
+    "loc": 960
+  },
+  "categories": [
+    {
+      "id": 1,
+      "name": "Existence & Completeness",
+      "score": 10.0,
+      "status": "PASS",
+      "evidence": [
+        "14 Python code files present; no empty code files or stub-only files found; all modules imported successfully."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Static Analysis",
+      "score": 0.0,
+      "status": "BLOCKED",
+      "evidence": [
+        "ruff, flake8, pylint, mypy, pyright, radon, vulture, bandit, semgrep, locust, and memory-profiler were not installed in the venv."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Unit Tests",
+      "score": 0.0,
+      "status": "UNVERIFIED",
+      "evidence": [
+        "pytest backend/ingestion -v --tb=long -q collected 0 items."
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Integration Tests",
+      "score": 0.0,
+      "status": "BLOCKED",
+      "evidence": [
+        "Real HTTP probes to all adapters failed with ClientConnectorError / Access is denied on outbound HTTPS."
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Data Quality & Accuracy",
+      "score": 0.0,
+      "status": "BLOCKED",
+      "evidence": [
+        "No real checkpoint or ground-truth model pipeline exists in this folder scope; real-data criteria could not be completed."
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Performance & Load",
+      "score": 4.0,
+      "status": "PARTIAL",
+      "evidence": [
+        "Synthetic dedup benchmark: 10k save in 0.0172s and 10k lookups at 0.000379 ms each.",
+        "Synthetic concurrent ingestion: 10 cycles completed in 5.3971s with 1000 new samples and 5000 duplicates."
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Stability & Resilience",
+      "score": 4.0,
+      "status": "PARTIAL",
+      "evidence": [
+        "Malformed input probe passed across empty, HTML, Unicode, binary-like, traversal-like, and 100K-token samples.",
+        "Synthetic concurrent write test passed with 10 parallel ingestion cycles."
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Scalability",
+      "score": 4.0,
+      "status": "PARTIAL",
+      "evidence": [
+        "Dedup store handled 10k entries with fast lookup and save in the local temp harness.",
+        "Parallel synthetic ingestion remained stable under 10 concurrent cycles."
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Governance & Security",
+      "score": 5.0,
+      "status": "PARTIAL",
+      "evidence": [
+        "can_ai_use_network(), can_ai_execute(), and can_ai_verify_bug() all returned False.",
+        "No real secrets scan was run because trufflehog and gitleaks were not installed."
+      ]
+    }
+  ],
+  "tests_run": {
+    "pytests_collected": 0,
+    "import_smoke_modules": 14,
+    "real_http_probes": 6,
+    "synthetic_probes": 5,
+    "concurrent_cycles": 10
+  },
+  "score": {
+    "weighted_total": 1.95,
+    "final_score": 2.0,
+    "tag": "RED",
+    "sub_tags": [
+      "NO-DATA"
+    ]
+  },
+  "blockers": [
+    "Outward HTTPS access denied for all six live adapters.",
+    "No folder-local tests exist to run.",
+    "Static-analysis and load-test tools missing from the venv."
+  ]
+}

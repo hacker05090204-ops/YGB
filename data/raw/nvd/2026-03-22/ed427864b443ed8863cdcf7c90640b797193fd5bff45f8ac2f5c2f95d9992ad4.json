@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1820",
+  "ingested_at": "2026-03-22T07:54:41.800275+00:00",
+  "lang": "en",
+  "raw_text": "The Media Library Alt Text Editor plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's 'bvmalt_sc_div_update_alt_text' shortcode in all versions up to, and including, 1.0.0 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ed427864b443ed8863cdcf7c90640b797193fd5bff45f8ac2f5c2f95d9992ad4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1820"
+}

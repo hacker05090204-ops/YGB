@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2459",
+  "ingested_at": "2026-03-22T07:54:31.493918+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability exists in REB500 for an authenticated user with Installer role to access and alter the contents of directories that the role is not authorized to do so.",
+  "severity": "HIGH",
+  "sha256_hash": "fa9a5f0a8c5f365a36744263fd58747a4702e9c032001c0f3a11d4d10be5631e",
+  "source": "nvd",
+  "tags": [
+    "CWE-267"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2459"
+}

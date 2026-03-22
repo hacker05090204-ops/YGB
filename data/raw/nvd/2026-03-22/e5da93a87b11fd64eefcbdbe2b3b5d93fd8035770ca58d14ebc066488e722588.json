@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3234",
+  "ingested_at": "2026-03-22T07:54:44.216426+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in mod_proxy_cluster. This vulnerability, a Carriage Return Line Feed (CRLF) injection in the decodeenc() function, allows a remote attacker to bypass input validation. By injecting CRLF sequences into the cluster configuration, an attacker can corrupt the response body of INFO endpoint responses. Exploitation requires network access to the MCMP protocol port, but no authentication is needed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e5da93a87b11fd64eefcbdbe2b3b5d93fd8035770ca58d14ebc066488e722588",
+  "source": "nvd",
+  "tags": [
+    "CWE-93"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3234"
+}

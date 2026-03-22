@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the Link Layer Discovery Protocol (LLDP) feature of Cisco NX-OS Software could allow an unauthenticated, adjacent attacker to cause the LLDP process to restart, which could cause an affected device to reload unexpectedly. This vulnerability is due to improper handling of specific fields in an LLDP frame. An attacker could exploit this vulnerability by sending a crafted LLDP packet to an interface of an affected device. A successful exploit could allow the attacker to cause the device to reload, resulting in a denial of service (DoS) condition. Note: LLDP is a Layer 2 link protocol. To exploit this vulnerability, an attacker would need to be directly connected to an interface of an affected device, either physically or logically (for example, through a Layer 2 Tunnel configured to transport the LLDP protocol).",
+  "token_count": 134
+}

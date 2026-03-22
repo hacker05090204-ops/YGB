@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0849",
+  "ingested_at": "2026-03-22T07:54:46.364889+00:00",
+  "lang": "en",
+  "raw_text": "Malformed ATAES132A responses with an oversized length field overflow a 52-byte stack buffer in the Zephyr crypto driver, allowing a compromised device or bus attacker to corrupt kernel memory and potentially hijack execution.",
+  "severity": "LOW",
+  "sha256_hash": "0dea3ac3aedb10d7268aeb6261d802e2beaa0bc165885bafad262312fc2b2c48",
+  "source": "nvd",
+  "tags": [
+    "CWE-120"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0849"
+}

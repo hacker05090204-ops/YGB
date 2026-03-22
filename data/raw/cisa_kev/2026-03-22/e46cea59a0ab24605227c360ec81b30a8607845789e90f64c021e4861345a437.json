@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-26633",
+  "ingested_at": "2026-03-22T07:45:16.523459+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Management Console (MMC) contains an improper neutralization vulnerability that allows an unauthorized attacker to bypass a security feature locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e46cea59a0ab24605227c360ec81b30a8607845789e90f64c021e4861345a437",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

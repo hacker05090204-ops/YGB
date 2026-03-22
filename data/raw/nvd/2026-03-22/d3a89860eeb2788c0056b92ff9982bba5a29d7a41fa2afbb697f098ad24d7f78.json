@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69372",
+  "ingested_at": "2026-03-22T07:54:30.244582+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in AncoraThemes SevenHills sevenhills allows Object Injection.This issue affects SevenHills: from n/a through < = 1.6.2.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d3a89860eeb2788c0056b92ff9982bba5a29d7a41fa2afbb697f098ad24d7f78",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69372"
+}

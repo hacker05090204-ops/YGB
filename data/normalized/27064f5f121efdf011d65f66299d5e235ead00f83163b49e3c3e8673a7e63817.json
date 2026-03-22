@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Validation of Specified Quantity in Input (CWE-1284) in the Timelion visualization plugin in Kibana can lead Denial of Service via Excessive Allocation (CAPEC-130). The vulnerability allows an authenticated user to send a specially crafted Timelion expression that overwrites internal series data properties with an excessively large quantity value.",
+  "token_count": 49
+}

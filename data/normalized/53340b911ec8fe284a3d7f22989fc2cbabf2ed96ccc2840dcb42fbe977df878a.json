@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in VeronaLabs WP SMS wp-sms allows SQL Injection.This issue affects WP SMS: from n/a through < = 6.9.12.",
+  "token_count": 31
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DSL-2750B Devices D-Link DSL-2750B devices contain a command injection vulnerability that allows remote, unauthenticated command injection via the login.cgi cli parameter.",
+  "token_count": 22
+}

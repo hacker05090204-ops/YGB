@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-3396",
+  "ingested_at": "2026-03-22T07:45:19.081724+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Server and Data Server Atlassian Confluence Server and Data Center contain a server-side template injection vulnerability that may allow an attacker to achieve path traversal and remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c0679bb11221b6d17573c01c498dd0b8fca5911d756680696d127c5c1d19eb70",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

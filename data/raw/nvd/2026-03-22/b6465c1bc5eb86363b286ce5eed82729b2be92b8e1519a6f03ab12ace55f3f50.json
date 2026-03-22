@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3721",
+  "ingested_at": "2026-03-22T07:54:42.022161+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in 1024-lab/lab1024 SmartAdmin up to 3.29. The affected element is an unknown function of the file sa-base/src/main/java/net/lab1024/sa/base/module/support/helpdoc/domain/form/HelpDocAddForm.java of the component Help Documentation Module. This manipulation causes cross site scripting. The attack may be initiated remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "b6465c1bc5eb86363b286ce5eed82729b2be92b8e1519a6f03ab12ace55f3f50",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3721"
+}

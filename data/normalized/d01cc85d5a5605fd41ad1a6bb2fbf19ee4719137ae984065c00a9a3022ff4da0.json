@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Vulnogram 1.0.0 contains a stored cross-site scripting vulnerability in comment hypertext handling that allows attackers to inject malicious scripts. Remote attackers can inject XSS payloads through comments to execute arbitrary JavaScript in victims' browsers.",
+  "token_count": 34
+}

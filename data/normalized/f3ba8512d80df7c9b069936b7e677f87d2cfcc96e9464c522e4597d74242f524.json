@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Airflow's Experimental API The previous default setting for Airflow's Experimental API was to allow all API requests without authentication.",
+  "token_count": 20
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24311",
+  "ingested_at": "2026-03-22T07:54:42.472375+00:00",
+  "lang": "en",
+  "raw_text": "The SAP Customer Checkout application exhibits certain design characteristics that involve locally storing operational data using reversible protection mechanisms. Access to this data, combined with user?initiated interaction, may allow modifications to occur without validation. Such changes could affect system behaviour during startup, resulting in a high impact on the application's confidentiality and integrity, with a low impact on availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e54d74d2ce060c2d5f47d7dbccb94fb18c54db1aab8cdbf00d81e1e76b8419ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-312"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24311"
+}

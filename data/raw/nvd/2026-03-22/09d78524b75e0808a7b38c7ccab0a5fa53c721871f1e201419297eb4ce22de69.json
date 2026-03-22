@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2025-52563",
+  "ingested_at": "2026-03-22T07:54:33.701134+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, there is a reflected cross-site scripting (XSS) vulnerability due to insufficient sanitization of the page parameter in the session/add_users_to_session.php endpoint. This issue has been patched in version 1.11.30.",
+  "severity": "MEDIUM",
+  "sha256_hash": "09d78524b75e0808a7b38c7ccab0a5fa53c721871f1e201419297eb4ce22de69",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-80",
+    "CWE-87"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52563"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-31836",
+  "ingested_at": "2026-03-22T07:54:48.914960+00:00",
+  "lang": "en",
+  "raw_text": "Checkmate is an open-source, self-hosted tool designed to track and monitor server hardware, uptime, response times, and incidents in real-time with beautiful visualizations. In versions from 3.5.1 and prior, a mass assignment vulnerability in Checkmate's user profile update endpoint allows any authenticated user to escalate their privileges to superadmin, bypassing all role-based access controls. An attacker can modify their user role to gain complete administrative access to the application, including the ability to view all users, modify critical configurations, and access sensitive system data. At time of publication, there are no publicly available patches.",
+  "severity": "HIGH",
+  "sha256_hash": "955fb4423c4ea31fd7aa6ec19c0e218f5bd711d195b1922a55b168c5d3a466ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-269",
+    "CWE-285"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31836"
+}

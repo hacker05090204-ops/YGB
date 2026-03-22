@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, sometimes msl.c fails to update the stack index, so an image is stored in the wrong slot and never freed on error, causing leaks. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "token_count": 50
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25086",
+  "ingested_at": "2026-03-22T07:54:49.132744+00:00",
+  "lang": "en",
+  "raw_text": "Under certain conditions, an attacker could bind to the same port used by WebCTRL. This could allow the attacker to craft and send malicious packets and impersonate the WebCTRL service without requiring code injection into the WebCTRL software.",
+  "severity": "HIGH",
+  "sha256_hash": "5a9a1d6bbbbfdc3e4e30752a4846195c472d4da3efb6dc14d9907a2c7f7937c7",
+  "source": "nvd",
+  "tags": [
+    "CWE-605"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25086"
+}

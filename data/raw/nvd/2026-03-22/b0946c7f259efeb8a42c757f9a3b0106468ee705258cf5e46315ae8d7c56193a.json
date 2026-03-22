@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22728",
+  "ingested_at": "2026-03-22T07:54:32.491906+00:00",
+  "lang": "en",
+  "raw_text": "Bitnami Sealed Secrets is vulnerable to a scope-widening attack during the secret rotation (/v1/rotate) flow. The rotation handler derives the sealing scope for the newly encrypted output from untrusted spec.template.metadata.annotations present in the input SealedSecret. By submitting a victim SealedSecret to the rotate endpoint with the annotation sealedsecrets.bitnami.com/cluster-wide=true injected into the template metadata, a remote attacker can obtain a rotated version of the secret that is cluster-wide. This bypasses original \"strict\" or \"namespace-wide\" constraints, allowing the attacker to retarget and unseal the secret in any namespace or under any name to recover the plaintext credentials.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b0946c7f259efeb8a42c757f9a3b0106468ee705258cf5e46315ae8d7c56193a",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22728"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-38646",
+  "ingested_at": "2026-03-22T07:45:18.196502+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office Access Connectivity Engine contains an unspecified vulnerability which can allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3071096e21fcb2e175257f4467bd08c5d24ace27b016c5e706f709d9a91f7866",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

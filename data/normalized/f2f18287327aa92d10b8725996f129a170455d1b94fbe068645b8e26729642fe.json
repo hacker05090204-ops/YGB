@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache HTTP Server Apache HTTP Server, with MPM event, worker or prefork, code executing in less-privileged child processes or threads (including scripts executed by an in-process scripting interpreter) could execute code with the privileges of the parent process (usually root) by manipulating the scoreboard.",
+  "token_count": 44
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Heap-based buffer overflow in Azure Linux Virtual Machines allows an authorized attacker to elevate privileges locally.",
+  "token_count": 16
+}

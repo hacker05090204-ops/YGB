@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-4226",
+  "ingested_at": "2026-03-22T07:54:46.774218+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in LB-LINK BL-WR9000 2.4.9. The affected element is the function sub_44E8D0 of the file /goform/get_virtual_cfg. Executing a manipulation can lead to stack-based buffer overflow. The attack may be performed from remote. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "4cc0827fd53485aaea774aa56aa37ef41e27bc3151b3a4c71046a0ef578f252a",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4226"
+}

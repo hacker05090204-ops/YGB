@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21423",
+  "ingested_at": "2026-03-22T07:54:34.458502+00:00",
+  "lang": "en",
+  "raw_text": "Dell PowerScale OneFS, versions prior to 9.10.1.6 and versions 9.11.0.0 through 9.12.0.1, contains an incorrect default permissions vulnerability. A high privileged attacker with local access could potentially exploit this vulnerability, leading to code execution, denial of service, elevation of privileges, and information disclosure.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6b1dba3fe869395f1109443caff269989aa58b24bbc68681ba45e248428acefd",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21423"
+}

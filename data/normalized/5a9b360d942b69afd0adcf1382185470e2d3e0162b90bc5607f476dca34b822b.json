@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WatchGuard Firebox WatchGuard Firebox contains an out-of-bounds write vulnerability in the OS iked process that may allow a remote unauthenticated attacker to execute arbitrary code.",
+  "token_count": 25
+}

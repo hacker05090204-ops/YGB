@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-47812",
+  "ingested_at": "2026-03-22T07:45:16.317308+00:00",
+  "lang": "en",
+  "raw_text": "Wing FTP Server Wing FTP Server Wing FTP Server contains an improper neutralization of null byte or NUL character vulnerability that can allow injection of arbitrary Lua code into user session files. This can be used to execute arbitrary system commands with the privileges of the FTP service (root or SYSTEM by default).",
+  "severity": "CRITICAL",
+  "sha256_hash": "a2d1cf16e479ff51ff2eda7480839d1ea5be6d1640305a7c2556948abc694f23",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

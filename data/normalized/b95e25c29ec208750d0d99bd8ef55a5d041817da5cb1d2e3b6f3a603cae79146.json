@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in Ruben Garcia GamiPress gamipress allows Cross Site Request Forgery.This issue affects GamiPress: from n/a through < = 7.6.6.",
+  "token_count": 24
+}

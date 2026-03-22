@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70028",
+  "ingested_at": "2026-03-22T07:54:42.371240+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') was discovered in Sunbird-Ed SunbirdEd-portal v1.13.4.",
+  "severity": "HIGH",
+  "sha256_hash": "a1517f11cc48831f0f128d25b4c0b8bde4a11a588ac5925000094d2c0b9ff674",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70028"
+}

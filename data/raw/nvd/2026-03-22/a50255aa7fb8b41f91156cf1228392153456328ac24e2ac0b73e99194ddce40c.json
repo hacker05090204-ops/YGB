@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69373",
+  "ingested_at": "2026-03-22T07:54:30.246582+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in beeteam368 VidoRev vidorev allows PHP Local File Inclusion.This issue affects VidoRev: from n/a through < = 2.9.9.9.9.9.7.",
+  "severity": "HIGH",
+  "sha256_hash": "a50255aa7fb8b41f91156cf1228392153456328ac24e2ac0b73e99194ddce40c",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69373"
+}

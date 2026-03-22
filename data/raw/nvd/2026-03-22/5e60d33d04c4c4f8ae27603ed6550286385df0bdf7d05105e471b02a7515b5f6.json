@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25953",
+  "ingested_at": "2026-03-22T07:54:32.311693+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, `xf_AppUpdateWindowFromSurface` reads from a freed `xfAppWindow` because the RDPGFX DVC thread obtains a bare pointer via `xf_rail_get_window` without any lifetime protection, while the main thread can concurrently delete the window through a fastpath window-delete order. Version 3.23.0 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5e60d33d04c4c4f8ae27603ed6550286385df0bdf7d05105e471b02a7515b5f6",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25953"
+}

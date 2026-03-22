@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24955",
+  "ingested_at": "2026-03-22T07:54:30.443531+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in fox-themes Whizz Plugins whizz-plugins allows Reflected XSS.This issue affects Whizz Plugins: from n/a through < = 1.9.",
+  "severity": "HIGH",
+  "sha256_hash": "bc52e125a2cdd80326a2c559e1871f8df19a4ced8611be13cbdeee0eacf9a3dc",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24955"
+}

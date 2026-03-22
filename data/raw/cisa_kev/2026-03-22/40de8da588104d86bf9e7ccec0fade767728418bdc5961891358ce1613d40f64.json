@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-32113",
+  "ingested_at": "2026-03-22T07:45:16.886924+00:00",
+  "lang": "en",
+  "raw_text": "Apache OFBiz Apache OFBiz contains a path traversal vulnerability that could allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "40de8da588104d86bf9e7ccec0fade767728418bdc5961891358ce1613d40f64",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

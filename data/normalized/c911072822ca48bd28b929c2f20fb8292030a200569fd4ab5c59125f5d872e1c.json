@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel 2.6.x - 'net/ipv6/ip6_output.c' Null Pointer Dereference Denial of Service",
+  "token_count": 11
+}

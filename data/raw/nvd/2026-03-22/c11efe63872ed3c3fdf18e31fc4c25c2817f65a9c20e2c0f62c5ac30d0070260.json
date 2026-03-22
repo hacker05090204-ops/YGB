@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26891",
+  "ingested_at": "2026-03-22T07:54:34.231741+00:00",
+  "lang": "en",
+  "raw_text": "Sourcecodester Logistic Hub Parcel's Management System v1.0 is vulnerable to SQL Injection in /manage_parcel_type.php.",
+  "severity": "LOW",
+  "sha256_hash": "c11efe63872ed3c3fdf18e31fc4c25c2817f65a9c20e2c0f62c5ac30d0070260",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26891"
+}

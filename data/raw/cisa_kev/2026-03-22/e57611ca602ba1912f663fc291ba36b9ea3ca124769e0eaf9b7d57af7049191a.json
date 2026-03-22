@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-1671",
+  "ingested_at": "2026-03-22T07:45:17.146207+00:00",
+  "lang": "en",
+  "raw_text": "Sophos Web Appliance Sophos Web Appliance contains a command injection vulnerability in the warn-proceed handler that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e57611ca602ba1912f663fc291ba36b9ea3ca124769e0eaf9b7d57af7049191a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

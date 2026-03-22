@@ -49,6 +49,9 @@ Thumbs.db
 *.key
 *.pem
 *.p12
+config/*.key
+config/*.pem
+config/*.secret
 obj/
 run_cpp_tests.exe
 run_cpp_tests

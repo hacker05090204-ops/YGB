@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Non-relational SQL injection vulnerability (NoSQLi) in the Wakyma web application, specifically in the endpoint 'vets.wakyma.com/pets/print-tags'. This vulnerability could allow an authenticated user to alter a POST request to the affected endpoint for the purpose of injecting NoSQL commands, allowing them to list both pets and owner names.",
+  "token_count": 47
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32346",
+  "ingested_at": "2026-03-22T07:54:45.899321+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Travel Agency travel-agency allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Travel Agency: from n/a through < = 1.5.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "88f04addbe7cd6b46f42626b98e3b264bc3a83d88546eb333d877556c2d00c9c",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32346"
+}

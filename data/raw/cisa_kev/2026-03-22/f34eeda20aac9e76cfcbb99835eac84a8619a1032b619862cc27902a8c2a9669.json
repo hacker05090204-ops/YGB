@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-11357",
+  "ingested_at": "2026-03-22T07:45:17.539857+00:00",
+  "lang": "en",
+  "raw_text": "Telerik User Interface (UI) for ASP.NET AJAX Telerik UI for ASP.NET AJAX contains an insecure direct object reference vulnerability in RadAsyncUpload that can result in file uploads in a limited location and/or remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f34eeda20aac9e76cfcbb99835eac84a8619a1032b619862cc27902a8c2a9669",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

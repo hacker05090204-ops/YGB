@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0809",
+  "ingested_at": "2026-03-22T07:54:44.230423+00:00",
+  "lang": "en",
+  "raw_text": "Use of a custom token encoding algorithm in Streamsoft Presti\u017c software allows the value of the KSeF (Krajowy System e-Faktur) token to be guessed after analyzing how tokens with know values are encoded. This issue was fixed in version 20.0.380.92.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "32f60d89b163b89a28546c5a1507545110114ee7d2eca607fffb08a538c3413a",
+  "source": "nvd",
+  "tags": [
+    "CWE-261"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0809"
+}

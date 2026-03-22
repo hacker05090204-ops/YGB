@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Input Validation (CWE-20) in the internal Content Connectors search endpoint in Kibana can lead Denial of Service via Input Data Manipulation (CAPEC-153)",
+  "token_count": 23
+}

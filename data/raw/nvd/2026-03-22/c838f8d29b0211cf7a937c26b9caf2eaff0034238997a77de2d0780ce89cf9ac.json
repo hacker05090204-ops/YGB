@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3841",
+  "ingested_at": "2026-03-22T07:54:44.442802+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability has been identified in the Telnet command-line interface (CLI) of TP-Link TL-MR6400 v5.3. This issue is caused by insufficient sanitization of data processed during specific CLI operations. An authenticated attacker with elevated privileges may be able to execute arbitrary system commands. Successful exploitation may lead to full device compromise, including potential loss of confidentiality, integrity, and availability.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c838f8d29b0211cf7a937c26b9caf2eaff0034238997a77de2d0780ce89cf9ac",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3841"
+}

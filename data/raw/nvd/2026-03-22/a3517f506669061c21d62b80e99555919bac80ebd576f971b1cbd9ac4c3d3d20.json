@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24115",
+  "ingested_at": "2026-03-22T07:54:33.640808+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Failure to validate the sizes of `gstup` and `gstdwn` before concatenating them into `gstruleQos` may lead to buffer overflow.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a3517f506669061c21d62b80e99555919bac80ebd576f971b1cbd9ac4c3d3d20",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-120"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24115"
+}

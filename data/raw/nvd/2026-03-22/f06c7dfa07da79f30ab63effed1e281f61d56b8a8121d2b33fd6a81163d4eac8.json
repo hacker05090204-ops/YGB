@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24502",
+  "ingested_at": "2026-03-22T07:54:34.266718+00:00",
+  "lang": "en",
+  "raw_text": "Dell Command | Intel vPro Out of Band, versions prior to 4.7.0, contain an Uncontrolled Search Path Element vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to Elevation of privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "f06c7dfa07da79f30ab63effed1e281f61d56b8a8121d2b33fd6a81163d4eac8",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24502"
+}

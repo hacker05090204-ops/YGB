@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Out-of-bounds read in Windows Extensible File Allocation allows an authorized attacker to elevate privileges locally.",
+  "token_count": 15
+}

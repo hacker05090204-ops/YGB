@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70038",
+  "ingested_at": "2026-03-22T07:54:42.339818+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-79: Improper Neutralization of Input During Web Page Generation was discovered in linagora Twake v2023.Q1.1223. This allows attackers to execute arbitrary code.",
+  "severity": "HIGH",
+  "sha256_hash": "d7e480a8ed9d17f846b5d5293bd010817e45dd44080d89fc9a9842776cec2139",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70038"
+}

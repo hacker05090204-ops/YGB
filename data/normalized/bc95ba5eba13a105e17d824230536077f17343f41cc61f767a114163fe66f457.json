@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "iOS/macOS 10.13.6 - 'if_ports_used_update_wakeuuid()' 16-byte Uninitialized Kernel Stack Disclosure",
+  "token_count": 9
+}

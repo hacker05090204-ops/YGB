@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2514",
+  "ingested_at": "2026-03-22T07:54:44.234443+00:00",
+  "lang": "en",
+  "raw_text": "In Progress Flowmon ADS versions prior to 12.5.5 and 13.0.3, a vulnerability exists whereby an adversary with access to Flowmon monitoring ports may craft malicious network data that, when processed by Flowmon ADS and viewed by an authenticated user, could result in unintended actions being executed in the user's browser context.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ee6958137c8d976edec1dbb9a972a6fa039db7c432ab52bc610916135ac04837",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2514"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3968",
+  "ingested_at": "2026-03-22T07:54:44.133166+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in AutohomeCorp frostmourne up to 1.0. This affects the function scriptEngine.eval of the file ExpressionRule.java of the component Oracle Nashorn JavaScript Engine. Such manipulation of the argument EXPRESSION leads to code injection. The attack can be executed remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f9bc11ee8c30419c735199635ae0785e66c531f4c1dbf2f90642aeb3b2f2e7cd",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-94"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3968"
+}

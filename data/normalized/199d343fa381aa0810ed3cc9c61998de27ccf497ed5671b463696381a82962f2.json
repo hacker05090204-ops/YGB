@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware Spring Framework Spring MVC or Spring WebFlux application running on JDK 9+ may be vulnerable to remote code execution (RCE) via data binding.",
+  "token_count": 24
+}

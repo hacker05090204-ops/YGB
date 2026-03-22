@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-5330",
+  "ingested_at": "2026-03-22T07:45:18.099508+00:00",
+  "lang": "fr",
+  "raw_text": "Ubiquiti AirOS Certain Ubiquiti devices contain a command injection vulnerability via a GET request to stainfo.cgi.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1de08faced6b9930ac03811f4deca9f1b8a45bf370d0dc9336071405e7589149",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

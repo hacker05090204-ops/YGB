@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28430",
+  "ingested_at": "2026-03-22T07:54:46.939221+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo LMS is a learning management system. Prior to version 1.11.34, there is an unauthenticated SQL injection vulnerability which allows remote attackers to execute arbitrary SQL commands via the custom_dates parameter. By chaining this with a predictable legacy password reset mechanism, an attacker can achieve full administrative account takeover without any prior credentials. The vulnerability also exposes the entire database, including PII and system configurations. This issue has been patched in version 1.11.34.",
+  "severity": "CRITICAL",
+  "sha256_hash": "01e0f4e49a57f01b75676a2d9d5312c7ceea8d5e912c0bd27148e78939ab3594",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28430"
+}

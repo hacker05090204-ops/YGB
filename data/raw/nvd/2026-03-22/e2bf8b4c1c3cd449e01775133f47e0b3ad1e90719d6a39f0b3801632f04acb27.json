@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3459",
+  "ingested_at": "2026-03-22T07:54:40.926165+00:00",
+  "lang": "en",
+  "raw_text": "The Drag and Drop Multiple File Upload - Contact Form 7 plugin for WordPress is vulnerable to arbitrary file uploads due to insufficient file type validation in the 'dnd_upload_cf7_upload' function in versions up to, and including, 1.3.7.3. This makes it possible for unauthenticated attackers to upload arbitrary files on the affected site's server which may make remote code execution possible. This can be exploited if the form includes a multiple file upload field with \u2018*\u2019 as the accepted file type.",
+  "severity": "HIGH",
+  "sha256_hash": "e2bf8b4c1c3cd449e01775133f47e0b3ad1e90719d6a39f0b3801632f04acb27",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3459"
+}

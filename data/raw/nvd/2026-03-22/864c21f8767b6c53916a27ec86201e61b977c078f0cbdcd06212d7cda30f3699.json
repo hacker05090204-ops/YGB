@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3028",
+  "ingested_at": "2026-03-22T07:54:31.231826+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in erzhongxmu JEEWMS up to 3.7. This vulnerability affects the function doAdd of the file src/main/java/com/jeecg/demo/controller/JeecgListDemoController.java. This manipulation of the argument Name causes cross site scripting. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "864c21f8767b6c53916a27ec86201e61b977c078f0cbdcd06212d7cda30f3699",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3028"
+}

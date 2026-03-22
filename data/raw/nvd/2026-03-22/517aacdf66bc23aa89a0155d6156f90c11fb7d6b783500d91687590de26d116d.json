@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-23246",
+  "ingested_at": "2026-03-22T07:54:47.449522+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: wifi: mac80211: bounds-check link_id in ieee80211_ml_reconfiguration link_id is taken from the ML Reconfiguration element (control & 0x000f), so it can be 0..15. link_removal_timeout[] has IEEE80211_MLD_MAX_NUM_LINKS (15) elements, so index 15 is out-of-bounds. Skip subelements with link_id >= IEEE80211_MLD_MAX_NUM_LINKS to avoid a stack out-of-bounds write.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "517aacdf66bc23aa89a0155d6156f90c11fb7d6b783500d91687590de26d116d",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23246"
+}

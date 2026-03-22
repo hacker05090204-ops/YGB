@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-6340",
+  "ingested_at": "2026-03-22T07:45:18.306192+00:00",
+  "lang": "en",
+  "raw_text": "Drupal Core In Drupal Core, some field types do not properly sanitize data from non-form sources. This can lead to arbitrary PHP code execution in some cases.",
+  "severity": "CRITICAL",
+  "sha256_hash": "212076be9d266576b2826cc75e1c748726784c084c77b95bcdea150704a2f93e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

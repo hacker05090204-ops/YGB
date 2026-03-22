@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1651",
+  "ingested_at": "2026-03-22T07:54:34.343222+00:00",
+  "lang": "en",
+  "raw_text": "The Email Subscribers by Icegram Express plugin for WordPress is vulnerable to SQL Injection via the 'workflow_ids' parameter in all versions up to, and including, 5.9.16 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for authenticated attackers, with administrator-level access and above, to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "MEDIUM",
+  "sha256_hash": "19d027eaeb20a3905c99c3466fdc9d7acc7b7900ae01a28775d43b633eb2c115",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1651"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DWL-2600AP Access Point D-Link DWL-2600AP access point contains an authenticated command injection vulnerability via the Save Configuration functionality in the Web interface, using shell metacharacters in the admin.cgi?action=config_save configBackup or downloadServerip parameter.",
+  "token_count": 33
+}

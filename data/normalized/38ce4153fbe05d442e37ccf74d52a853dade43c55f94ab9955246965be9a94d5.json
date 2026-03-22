@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the Intermediate System-to-Intermediate System (IS-IS) multi-instance routing feature of Cisco IOS XR Software could allow an unauthenticated, adjacent attacker to cause the IS-IS process to restart unexpectedly. This vulnerability is due to insufficient input validation of ingress IS-IS packets. An attacker could exploit this vulnerability by sending crafted IS-IS packets to an affected device after forming an adjacency. A successful exploit could allow the attacker to cause the IS-IS process to restart unexpectedly, resulting in a temporary loss of connectivity to advertised networks and a denial of service (DoS) condition. Note: The IS-IS protocol is a routing protocol. To exploit this vulnerability, an attacker must be Layer 2-adjacent to the affected device and must have formed an adjacency.",
+  "token_count": 121
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25478",
+  "ingested_at": "2026-03-22T07:54:43.829221+00:00",
+  "lang": "en",
+  "raw_text": "GetGo Download Manager 6.2.2.3300 contains a buffer overflow vulnerability that allows remote attackers to cause denial of service by sending HTTP responses with excessively long headers. Attackers can craft malicious HTTP responses with oversized header values to crash the application and make it unavailable.",
+  "severity": "HIGH",
+  "sha256_hash": "b4f520a2c6ac13374897e061eff1de4a5155aae61e57407ef21b18d669564118",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25478"
+}

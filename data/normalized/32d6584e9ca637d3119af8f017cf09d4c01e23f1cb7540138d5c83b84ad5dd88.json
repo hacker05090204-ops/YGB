@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to 0.27.1, a Server-Side Request Forgery (SSRF) vulnerability exists in @backstage/plugin-auth-backend when auth.experimentalClientIdMetadataDocuments.enabled is set to true. The CIMD metadata fetch validates the initial client_id hostname against private IP ranges but does not apply the same validation after HTTP redirects. The practical impact is limited. The attacker cannot read the response body from the internal request, cannot control request headers or method, and the feature must be explicitly enabled via an experimental flag that is off by default. Deployments that restrict allowedClientIdPatterns to specific trusted domains are not affected. Patched in @backstage/plugin-auth-backend version 0.27.1.",
+  "token_count": 104
+}

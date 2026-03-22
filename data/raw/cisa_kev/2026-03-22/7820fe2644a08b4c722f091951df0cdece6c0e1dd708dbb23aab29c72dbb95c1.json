@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-0108",
+  "ingested_at": "2026-03-22T07:45:16.580638+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS Palo Alto Networks PAN-OS contains an authentication bypass vulnerability in its management web interface. This vulnerability allows an unauthenticated attacker with network access to the management web interface to bypass the authentication normally required and invoke certain PHP scripts.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7820fe2644a08b4c722f091951df0cdece6c0e1dd708dbb23aab29c72dbb95c1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 43,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

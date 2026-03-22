@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26365",
+  "ingested_at": "2026-03-22T07:54:31.085025+00:00",
+  "lang": "en",
+  "raw_text": "Akamai Ghost on Akamai CDN edge servers before 2026-02-06 mishandles processing of custom hop-by-hop HTTP headers, where an incoming request containing the header \"Connection: Transfer-Encoding\" could result in a forward request with invalid message framing, depending on the Akamai processing path. This could result in the origin server parsing the request body incorrectly, leading to HTTP request smuggling.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bf8ed5a4c11b0e49bb9eaea1fe2c74d9962fc31ad04c0092d21720e31168a7e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-444"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26365"
+}

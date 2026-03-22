@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-26411",
+  "ingested_at": "2026-03-22T07:45:19.365569+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains an unspecified vulnerability that allows for memory corruption.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4735c3084a84727deec0e018fd4ddf3649561836a32a859f33c054c3c78c3a92",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

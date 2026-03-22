@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in D-Link DHP-1320 1.00WWB04. This affects the function redirect_count_down_page of the component SOAP Handler. Such manipulation leads to stack-based buffer overflow. The attack can be executed remotely. The exploit is publicly available and might be used. This vulnerability only affects products that are no longer supported by the maintainer.",
+  "token_count": 53
+}

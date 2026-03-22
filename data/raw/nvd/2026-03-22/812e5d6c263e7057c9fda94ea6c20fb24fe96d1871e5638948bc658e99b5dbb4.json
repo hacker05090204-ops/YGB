@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28436",
+  "ingested_at": "2026-03-22T07:54:40.990810+00:00",
+  "lang": "en",
+  "raw_text": "Frappe is a full-stack web application framework. Prior to versions 16.11.0 and 15.102.0, an attacker can set a crafted image URL that results in XSS when the avatar is displayed, and it can be triggered for other users via website page comments. This issue has been patched in versions 16.11.0 and 15.102.0.",
+  "severity": "HIGH",
+  "sha256_hash": "812e5d6c263e7057c9fda94ea6c20fb24fe96d1871e5638948bc658e99b5dbb4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28436"
+}

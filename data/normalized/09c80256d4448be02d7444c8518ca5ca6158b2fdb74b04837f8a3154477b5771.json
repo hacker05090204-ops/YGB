@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Vulnerability of uninitialized pointer access in the scanning module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "token_count": 18
+}

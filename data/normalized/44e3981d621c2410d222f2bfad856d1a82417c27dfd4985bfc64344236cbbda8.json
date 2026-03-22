@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Firewalls Zyxel ATP, USG FLEX, VPN, and ZyWALL/USG firewalls allow for improper error message handling which could allow an unauthenticated attacker to execute OS commands remotely by sending crafted packets to an affected device.",
+  "token_count": 36
+}

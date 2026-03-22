@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26125",
+  "ingested_at": "2026-03-22T07:54:41.144066+00:00",
+  "lang": "en",
+  "raw_text": "Payment Orchestrator Service Elevation of Privilege Vulnerability",
+  "severity": "HIGH",
+  "sha256_hash": "4e9b1157853a954d25a3c85b3aa45555a3362ce55d48f810addccea1923be99c",
+  "source": "nvd",
+  "tags": [
+    "CWE-306",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 7,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26125"
+}

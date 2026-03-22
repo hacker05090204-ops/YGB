@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3682",
+  "ingested_at": "2026-03-22T07:54:41.964017+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in welovemedia FFmate up to 2.0.15. This vulnerability affects the function Execute of the file /internal/service/ffmpeg/ffmpeg.go. The manipulation leads to argument injection. The attack may be initiated remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f5e5ea168acdccfd391f796b73c81938fe0dec3704cdd6889efc35c76add69b7",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-88"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3682"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2048",
+  "ingested_at": "2026-03-22T07:54:30.702852+00:00",
+  "lang": "en",
+  "raw_text": "GIMP XWD File Parsing Out-Of-Bounds Write Remote Code Execution Vulnerability. This vulnerability allows remote attackers to execute arbitrary code on affected installations of GIMP. User interaction is required to exploit this vulnerability in that the target must visit a malicious page or open a malicious file. The specific flaw exists within the parsing of XWD files. The issue results from the lack of proper validation of user-supplied data, which can result in a write past the end of an allocated buffer. An attacker can leverage this vulnerability to execute code in the context of the current process. Was ZDI-CAN-28591.",
+  "severity": "HIGH",
+  "sha256_hash": "286aa79ace256b1fff56bdbaae1cf50a859039898a314a9eecca0c7b4c844e44",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2048"
+}

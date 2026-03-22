@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25535",
+  "ingested_at": "2026-03-22T07:54:44.339519+00:00",
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Dating Site contains a SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the Email parameter. Attackers can send POST requests to loginaction.php with time-based SQL injection payloads in the Email field to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "c6b7f951f30dfb7e24ae1ef1da0f509be43c6809f94e5cab5316395e4f6b6eed",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25535"
+}

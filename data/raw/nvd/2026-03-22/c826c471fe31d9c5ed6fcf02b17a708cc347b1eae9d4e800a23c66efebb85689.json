@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3236",
+  "ingested_at": "2026-03-22T07:54:40.772283+00:00",
+  "lang": "en",
+  "raw_text": "In affected versions of Octopus Server it was possible to create a new API key from an existing access token resulting in the new API key having a lifetime exceeding the original API key used to mint the access token.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c826c471fe31d9c5ed6fcf02b17a708cc347b1eae9d4e800a23c66efebb85689",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3236"
+}

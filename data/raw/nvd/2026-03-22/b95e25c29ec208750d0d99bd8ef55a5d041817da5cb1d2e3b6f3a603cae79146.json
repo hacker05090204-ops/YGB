@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32420",
+  "ingested_at": "2026-03-22T07:54:46.068128+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in Ruben Garcia GamiPress gamipress allows Cross Site Request Forgery.This issue affects GamiPress: from n/a through < = 7.6.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b95e25c29ec208750d0d99bd8ef55a5d041817da5cb1d2e3b6f3a603cae79146",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32420"
+}

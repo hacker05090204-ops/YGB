@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IDExpert Windows Logon Agent developed by Changing has a Remote Code Execution vulnerability, allowing unauthenticated remote attackers to force the system to download arbitrary executable files from a remote source and execute them.",
+  "token_count": 33
+}

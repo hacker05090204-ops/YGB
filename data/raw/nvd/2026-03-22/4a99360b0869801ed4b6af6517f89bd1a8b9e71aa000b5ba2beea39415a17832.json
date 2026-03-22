@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31864",
+  "ingested_at": "2026-03-22T07:54:44.718401+00:00",
+  "lang": "en",
+  "raw_text": "JumpServer is an open source bastion host and an operation and maintenance security audit system. a Server-Side Template Injection (SSTI) vulnerability exists in JumpServer's Applet and VirtualApp upload functionality. This vulnerability can only be exploited by users with administrative privileges (Application Applet Management or Virtual Application Management permissions). Attackers can exploit this vulnerability to execute arbitrary code within the JumpServer Core container. The vulnerability arises from unsafe use of Jinja2 template rendering when processing user-uploaded YAML configuration files. When a user uploads an Applet or VirtualApp ZIP package, the manifest.yml file is rendered through Jinja2 without sandbox restrictions, allowing template injection attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4a99360b0869801ed4b6af6517f89bd1a8b9e71aa000b5ba2beea39415a17832",
+  "source": "nvd",
+  "tags": [
+    "CWE-1336"
+  ],
+  "token_count": 102,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31864"
+}

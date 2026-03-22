@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper neutralization of special elements used in a command ('command injection') in Microsoft Copilot allows an unauthorized attacker to disclose information over a network.",
+  "token_count": 24
+}

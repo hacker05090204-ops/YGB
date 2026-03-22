@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The GLPI Inventory Plugin handles network discovery, inventory, software deployment, and data collection for GLPI agents. Prior to 1.6.6, non sanitized user input can lend to an SQL injection from reports, with adequate rights. This vulnerability is fixed in 1.6.6.",
+  "token_count": 40
+}

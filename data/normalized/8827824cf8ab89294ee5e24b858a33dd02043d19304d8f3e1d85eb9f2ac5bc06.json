@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the Object Model CLI component of Cisco Application Policy Infrastructure Controller (APIC) could allow an authenticated, local attacker to cause an affected device to reload unexpectedly, resulting in a denial of service (DoS) condition. To exploit this vulnerability, the attacker must have valid user credentials and any role that includes CLI access. This vulnerability is due to insufficient input validation. An attacker could exploit this vulnerability by issuing crafted commands at the CLI prompt. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "token_count": 95
+}

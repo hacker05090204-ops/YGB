@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-22877",
+  "ingested_at": "2026-03-22T07:54:32.996832+00:00",
+  "lang": "en",
+  "raw_text": "An arbitrary file-read vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling unauthenticated attackers to read arbitrary files on the system, and potentially causing a denial-of-service attack.",
+  "severity": "LOW",
+  "sha256_hash": "15d2e5c2fc9eb385035712444ae7677613bc1814cb2d890892ba8b71127df8ee",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22877"
+}

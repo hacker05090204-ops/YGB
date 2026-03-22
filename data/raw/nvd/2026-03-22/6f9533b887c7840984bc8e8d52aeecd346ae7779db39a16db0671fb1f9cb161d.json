@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32710",
+  "ingested_at": "2026-03-22T07:54:48.942593+00:00",
+  "lang": "en",
+  "raw_text": "MariaDB server is a community developed fork of MySQL server. An authenticated user can crash MariaDB versions 11.4 before 11.4.10 and 11.8 before 11.8.6 via a bug in JSON_SCHEMA_VALID() function. Under certain conditions it might be possible to turn the crash into a remote code execution. These conditions require tight control over memory layout which is generally only attainable in a lab environment. This issue is fixed in MariaDB 11.4.10, MariaDB 11.8.6, and MariaDB 12.2.2.",
+  "severity": "HIGH",
+  "sha256_hash": "6f9533b887c7840984bc8e8d52aeecd346ae7779db39a16db0671fb1f9cb161d",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32710"
+}

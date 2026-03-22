@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13219",
+  "ingested_at": "2026-03-22T07:54:43.029914+00:00",
+  "lang": "en",
+  "raw_text": "IBM Aspera Orchestrator 3.0.0 through 4.1.2 stores sensitive information in URL parameters. This may lead to information disclosure if unauthorized parties have access to the URLs via server logs, referrer header or browser history.",
+  "severity": "MEDIUM",
+  "sha256_hash": "391078373dfefea4456e6e4a43e911a9c26291b8d7839725001bf66989bb0f88",
+  "source": "nvd",
+  "tags": [
+    "CWE-598"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13219"
+}

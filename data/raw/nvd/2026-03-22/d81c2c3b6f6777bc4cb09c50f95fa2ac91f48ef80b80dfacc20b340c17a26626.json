@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28468",
+  "ingested_at": "2026-03-22T07:54:41.064055+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.1.29-beta.1 prior to 2026.2.14 contain a vulnerability in the sandbox browser bridge server in which it accepts requests without requiring gateway authentication, allowing local attackers to access browser control endpoints. A local attacker can enumerate tabs, retrieve WebSocket URLs, execute JavaScript, and exfiltrate cookies and session data from authenticated browser contexts.",
+  "severity": "HIGH",
+  "sha256_hash": "d81c2c3b6f6777bc4cb09c50f95fa2ac91f48ef80b80dfacc20b340c17a26626",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28468"
+}

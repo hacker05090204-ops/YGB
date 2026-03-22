@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-66342",
+  "ingested_at": "2026-03-22T07:54:47.137567+00:00",
+  "lang": "en",
+  "raw_text": "A type confusion vulnerability exists in the EMF functionality of Canva Affinity. A specially crafted EMF file can trigger this vulnerability, which can lead to memory corruption and result in arbitrary code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "0f695b3088c503b7362433cf6da4323d7fdf39debfc9ac6727e5b56807820804",
+  "source": "nvd",
+  "tags": [
+    "CWE-843"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66342"
+}

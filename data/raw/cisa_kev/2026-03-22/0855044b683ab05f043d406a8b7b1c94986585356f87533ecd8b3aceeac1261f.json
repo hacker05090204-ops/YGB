@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-41266",
+  "ingested_at": "2026-03-22T07:45:17.115951+00:00",
+  "lang": "en",
+  "raw_text": "Qlik Sense Qlik Sense contains a path traversal vulnerability that allows a remote, unauthenticated attacker to create an anonymous session by sending maliciously crafted HTTP requests. This anonymous session could allow the attacker to send further requests to unauthorized endpoints.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0855044b683ab05f043d406a8b7b1c94986585356f87533ecd8b3aceeac1261f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

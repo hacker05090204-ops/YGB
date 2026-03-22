@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29053",
+  "ingested_at": "2026-03-22T07:54:40.697430+00:00",
+  "lang": "en",
+  "raw_text": "Ghost is a Node.js content management system. From version 0.7.2 to 6.19.0, specifically crafted malicious themes can execute arbitrary code on the server running Ghost. This issue has been patched in version 6.19.1.",
+  "severity": "HIGH",
+  "sha256_hash": "d46dc8b178b2d9d645af613b6e11bef2ffdfc4ebd46ae597dec4736ceb2c53c7",
+  "source": "nvd",
+  "tags": [
+    "CWE-74"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29053"
+}

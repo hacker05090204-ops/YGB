@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28420",
+  "ingested_at": "2026-03-22T07:54:33.369127+00:00",
+  "lang": "en",
+  "raw_text": "Vim is an open source, command line text editor. Prior to version 9.2.0076, a heap-based buffer overflow WRITE and an out-of-bounds READ exist in Vim's terminal emulator when processing maximum combining characters from Unicode supplementary planes. Version 9.2.0076 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ab59900381e742121f5c2d4c6114fadedb73ee008732acba42cd50e1eb7e033a",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-125"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28420"
+}

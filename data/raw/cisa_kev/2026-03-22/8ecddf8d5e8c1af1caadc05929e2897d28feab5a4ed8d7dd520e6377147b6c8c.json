@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-21985",
+  "ingested_at": "2026-03-22T07:45:19.647022+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vSphere Client contains an improper input validation vulnerability in the Virtual SAN Health Check plug-in, which is enabled by default in vCenter Server, which allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8ecddf8d5e8c1af1caadc05929e2897d28feab5a4ed8d7dd520e6377147b6c8c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

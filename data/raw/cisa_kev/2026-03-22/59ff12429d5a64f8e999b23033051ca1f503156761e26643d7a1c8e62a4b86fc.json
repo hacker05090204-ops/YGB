@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-21971",
+  "ingested_at": "2026-03-22T07:45:17.716830+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Runtime contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "59ff12429d5a64f8e999b23033051ca1f503156761e26643d7a1c8e62a4b86fc",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 15,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

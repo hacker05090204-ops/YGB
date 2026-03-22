@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-48644",
+  "ingested_at": "2026-03-22T07:54:33.881729+00:00",
+  "lang": "en",
+  "raw_text": "In multiple locations, there is a possible persistent denial of service due to improper input validation. This could lead to local denial of service with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "010f35a2c93d8213fe0825d8f4a0cebac9a9b9683ce47ae88517726f966d163d",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-20"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-48644"
+}

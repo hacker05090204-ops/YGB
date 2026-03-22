@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28727",
+  "ingested_at": "2026-03-22T07:54:41.202835+00:00",
+  "lang": "en",
+  "raw_text": "Local privilege escalation due to insecure Unix socket permissions. The following products are affected: Acronis Cyber Protect 17 (macOS) before build 41186, Acronis Cyber Protect Cloud Agent (macOS) before build 41124.",
+  "severity": "HIGH",
+  "sha256_hash": "5ba9a9be59c426824da1f4f0e812c9aa52e92a419047da5af0dee7d278e44deb",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28727"
+}

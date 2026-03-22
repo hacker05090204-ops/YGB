@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PluXml CMS is vulnerable to Stored XSS in Static Pages editing functionality. Attacker with editing privileges can inject arbitrary HTML and JS into website, which will be rendered/executed when visiting edited page. The vendor was notified early about this vulnerability, but didn't respond with the details of vulnerability or vulnerable version range. Only versions 5.8.21 and 5.9.0-rc7 were tested and confirmed as vulnerable, other versions were not tested and might also be vulnerable.",
+  "token_count": 73
+}

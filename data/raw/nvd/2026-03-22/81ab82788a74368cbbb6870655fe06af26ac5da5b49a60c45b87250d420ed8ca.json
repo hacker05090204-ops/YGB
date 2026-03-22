@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23673",
+  "ingested_at": "2026-03-22T07:54:42.677921+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bounds read in Windows Resilient File System (ReFS) allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "81ab82788a74368cbbb6870655fe06af26ac5da5b49a60c45b87250d420ed8ca",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23673"
+}

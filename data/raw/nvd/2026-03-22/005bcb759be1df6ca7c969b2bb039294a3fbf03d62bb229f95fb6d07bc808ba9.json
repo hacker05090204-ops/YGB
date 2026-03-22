@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23232",
+  "ingested_at": "2026-03-22T07:54:34.498303+00:00",
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: Revert \"f2fs: block cache/dio write during f2fs_enable_checkpoint()\" This reverts commit 196c81fdd438f7ac429d5639090a9816abb9760a. Original patch may cause below deadlock, revert it. write remount - write_begin - lock_page --- lock A - prepare_write_begin - f2fs_map_lock - f2fs_enable_checkpoint - down_write(cp_enable_rwsem) --- lock B - sync_inode_sb - writepages - lock_page --- lock A - down_read(cp_enable_rwsem) --- lock A",
+  "severity": "MEDIUM",
+  "sha256_hash": "005bcb759be1df6ca7c969b2bb039294a3fbf03d62bb229f95fb6d07bc808ba9",
+  "source": "nvd",
+  "tags": [
+    "CWE-667"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23232"
+}

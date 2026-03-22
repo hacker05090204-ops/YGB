@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Happy Baby happy-baby allows PHP Local File Inclusion.This issue affects Happy Baby: from n/a through < = 1.2.12.",
+  "token_count": 35
+}

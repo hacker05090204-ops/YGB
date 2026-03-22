@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Tenda AC11 Router Tenda AC11 devices contain a stack buffer overflow vulnerability in /goform/setmac which allows attackers to execute code via a crafted post request.",
+  "token_count": 25
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25449",
+  "ingested_at": "2026-03-22T07:54:47.468518+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Shinetheme Traveler allows Object Injection.This issue affects Traveler: from n/a before 3.2.8.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "200dcabde178e21ccb93d1617bd7307e04b230deb6a50bab48091b48e4239d4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25449"
+}

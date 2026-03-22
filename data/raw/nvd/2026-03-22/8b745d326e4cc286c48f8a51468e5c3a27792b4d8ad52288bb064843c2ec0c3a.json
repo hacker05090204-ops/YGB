@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3304",
+  "ingested_at": "2026-03-22T07:54:33.185368+00:00",
+  "lang": "en",
+  "raw_text": "Multer is a node.js middleware for handling `multipart/form-data`. A vulnerability in Multer prior to version 2.1.0 allows an attacker to trigger a Denial of Service (DoS) by sending malformed requests, potentially causing resource exhaustion. Users should upgrade to version 2.1.0 to receive a patch. No known workarounds are available.",
+  "severity": "HIGH",
+  "sha256_hash": "8b745d326e4cc286c48f8a51468e5c3a27792b4d8ad52288bb064843c2ec0c3a",
+  "source": "nvd",
+  "tags": [
+    "CWE-459"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3304"
+}

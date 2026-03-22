@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-7193",
+  "ingested_at": "2026-03-22T07:45:18.614761+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office contains a memory corruption vulnerability which can allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "161d8a8026b181573c30957c3c229e3bc7df082d7fe19ef5b212a95634bb615d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

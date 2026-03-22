@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-40684",
+  "ingested_at": "2026-03-22T07:45:17.616243+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet Multiple Products Fortinet FortiOS, FortiProxy, and FortiSwitchManager contain an authentication bypass vulnerability that could allow an unauthenticated attacker to perform operations on the administrative interface via specially crafted HTTP or HTTPS requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a5f5e97e369a5e546f99764b50194518d1de5a87be65d60c167f8b6cfb055384",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

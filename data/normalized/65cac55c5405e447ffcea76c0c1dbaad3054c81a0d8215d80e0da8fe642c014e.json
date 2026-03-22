@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Statamic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.14 and 6.7.0, authenticated Control Panel users could read arbitrary `.json`, `.yaml`, and `.csv` files from the server by manipulating the file dictionary's `filename` configuration parameter in the fieldtype's endpoint. This has been fixed in 5.73.14 and 6.7.0.",
+  "token_count": 52
+}

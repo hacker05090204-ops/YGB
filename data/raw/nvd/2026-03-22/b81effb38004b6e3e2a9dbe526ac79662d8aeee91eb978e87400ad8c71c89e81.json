@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30853",
+  "ingested_at": "2026-03-22T07:54:44.697234+00:00",
+  "lang": "en",
+  "raw_text": "calibre is a cross-platform e-book manager for viewing, converting, editing, and cataloging e-books. Prior to 9.5.0, a path traversal vulnerability in the RocketBook (.rb) input plugin (src/calibre/ebooks/rb/reader.py) allows an attacker to write arbitrary files to any path writable by the calibre process when a user opens or converts a crafted .rb file. This is the same bug class fixed in CVE-2026-26065 for the PDB readers, but the fix was never applied to the RB reader. This vulnerability is fixed in 9.5.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b81effb38004b6e3e2a9dbe526ac79662d8aeee91eb978e87400ad8c71c89e81",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30853"
+}

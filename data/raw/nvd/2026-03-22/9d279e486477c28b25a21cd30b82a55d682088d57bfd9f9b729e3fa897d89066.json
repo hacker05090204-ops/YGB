@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30235",
+  "ingested_at": "2026-03-22T07:54:43.722900+00:00",
+  "lang": "en",
+  "raw_text": "OpenProject is an open-source, web-based project management software. Prior to 17.2.0, this vulnerability occurs due to improper validation of OpenProject\u2019s Markdown rendering, specifically in the hyperlink handling. This allows an attacker to inject malicious hyperlink payloads that perform DOM clobbering. DOM clobbering can crash or blank the entire page by overwriting native DOM functions with HTML elements, causing critical JavaScript calls to throw runtime errors during application initialization and halt further execution. This vulnerability is fixed in 17.2.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d279e486477c28b25a21cd30b82a55d682088d57bfd9f9b729e3fa897d89066",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30235"
+}

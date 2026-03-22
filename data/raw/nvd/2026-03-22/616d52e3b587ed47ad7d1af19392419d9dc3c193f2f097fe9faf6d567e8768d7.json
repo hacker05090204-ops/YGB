@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3950",
+  "ingested_at": "2026-03-22T07:54:43.934505+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in strukturag libheif up to 1.21.2. This impacts the function Track::load of the file libheif/sequences/track.cc of the component stsz/stts. The manipulation leads to out-of-bounds read. The attack needs to be performed locally. The exploit is publicly available and might be used. Applying a patch is the recommended action to fix this issue. The patch available is inofficial and not approved yet.",
+  "severity": "LOW",
+  "sha256_hash": "616d52e3b587ed47ad7d1af19392419d9dc3c193f2f097fe9faf6d567e8768d7",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3950"
+}

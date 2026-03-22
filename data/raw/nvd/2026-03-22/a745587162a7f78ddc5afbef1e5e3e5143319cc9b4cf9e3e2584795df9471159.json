@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29041",
+  "ingested_at": "2026-03-22T07:54:41.245337+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.34, Chamilo LMS is affected by an authenticated remote code execution vulnerability caused by improper validation of uploaded files. The application relies solely on MIME-type verification when handling file uploads and does not adequately validate file extensions or enforce safe server-side storage restrictions. As a result, an authenticated low-privileged user can upload a crafted file containing executable code and subsequently execute arbitrary commands on the server. This issue has been patched in version 1.11.34.",
+  "severity": "HIGH",
+  "sha256_hash": "a745587162a7f78ddc5afbef1e5e3e5143319cc9b4cf9e3e2584795df9471159",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29041"
+}

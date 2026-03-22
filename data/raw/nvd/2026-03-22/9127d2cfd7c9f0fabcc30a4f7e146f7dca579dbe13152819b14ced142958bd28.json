@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2962",
+  "ingested_at": "2026-03-22T07:54:31.034870+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in D-Link DWR-M960 1.01.07. This vulnerability affects the function sub_460F30 of the file /boafrm/formDateReboot of the component Scheduled Reboot Configuration Endpoint. The manipulation of the argument submit-url results in stack-based buffer overflow. The attack may be performed from remote. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "9127d2cfd7c9f0fabcc30a4f7e146f7dca579dbe13152819b14ced142958bd28",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2962"
+}

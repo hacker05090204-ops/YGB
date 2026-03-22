@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3262",
+  "ingested_at": "2026-03-22T07:54:32.811202+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in go2ismail Asp.Net-Core-Inventory-Order-Management-System up to 9.20250118. Affected is an unknown function of the component Administrative Interface. Such manipulation leads to execution after redirect. The attack may be launched remotely. The exploit has been disclosed to the public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "873f635d2e85411e50c19dfa1d77eb5013daa80602c0e619b3b1dc5bf5286450",
+  "source": "nvd",
+  "tags": [
+    "CWE-698",
+    "CWE-705"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3262"
+}

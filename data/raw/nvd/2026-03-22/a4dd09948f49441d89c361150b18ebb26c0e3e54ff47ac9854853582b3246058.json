@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33136",
+  "ingested_at": "2026-03-22T07:54:48.817934+00:00",
+  "lang": "en",
+  "raw_text": "WeGIA is a web manager for charitable institutions. Versions 3.6.6 and below have a Reflected Cross-Site Scripting (XSS) vulnerability in the listar_memorandos_ativos.php endpoint. An attacker can inject arbitrary JavaScript or HTML tags into the sccd GET parameter, which is then directly echoed into the HTML response without any sanitization or encoding. The script /html/memorando/listar_memorandos_ativos.php handles dynamic success messages to users using query string parameters. Similar to other endpoints in the Memorando module, it checks if $_GET['msg'] equals 'success'. If this condition is met, it directly concatenates and reflects $_GET['sccd'] into an HTML alert . This issue is resolved in version 3.6.7.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a4dd09948f49441d89c361150b18ebb26c0e3e54ff47ac9854853582b3246058",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33136"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle Java SE An incorrect type vulnerability exists in the Concurrency component of Oracle's Java Runtime Environment allows an attacker to remotely execute arbitrary code.",
+  "token_count": 25
+}

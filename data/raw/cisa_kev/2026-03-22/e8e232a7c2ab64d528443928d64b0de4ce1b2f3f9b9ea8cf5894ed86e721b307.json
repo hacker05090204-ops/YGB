@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-10987",
+  "ingested_at": "2026-03-22T07:45:19.595767+00:00",
+  "lang": "en",
+  "raw_text": "Tenda AC1900 Router AC15 Model Tenda AC1900 Router AC15 Model contains an unspecified vulnerability that allows remote attackers to execute system commands via the deviceName POST parameter.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e8e232a7c2ab64d528443928d64b0de4ce1b2f3f9b9ea8cf5894ed86e721b307",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

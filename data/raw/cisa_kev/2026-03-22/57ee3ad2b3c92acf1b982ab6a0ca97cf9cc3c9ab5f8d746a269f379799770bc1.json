@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-24363",
+  "ingested_at": "2026-03-22T07:45:16.189152+00:00",
+  "lang": "en",
+  "raw_text": "TP-Link TL-WA855RE TP-link TL-WA855RE contains a missing authentication for critical function vulnerability. This vulnerability could allow an unauthenticated attacker (on the same network) to submit a TDDP_RESET POST request for a factory reset and reboot. The attacker can then obtain incorrect access control by setting a new administrative password. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "57ee3ad2b3c92acf1b982ab6a0ca97cf9cc3c9ab5f8d746a269f379799770bc1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 64,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

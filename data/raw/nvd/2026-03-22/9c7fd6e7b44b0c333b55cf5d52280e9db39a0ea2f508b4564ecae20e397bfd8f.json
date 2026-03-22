@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27570",
+  "ingested_at": "2026-03-22T07:54:48.075074+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the onebox method in the SharedAiConversation model renders the conversation title directly into HTML without proper sanitization. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. As a workaround, tighten access by changing the `ai_bot_public_sharing_allowed_groups` site setting.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9c7fd6e7b44b0c333b55cf5d52280e9db39a0ea2f508b4564ecae20e397bfd8f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27570"
+}

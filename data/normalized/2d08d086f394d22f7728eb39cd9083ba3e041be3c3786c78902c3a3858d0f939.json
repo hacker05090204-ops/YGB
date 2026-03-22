@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OSGeo GeoServer OSGeo GeoServer contains an improper restriction of XML external entity reference vulnerability that occurs when the application accepts XML input through a specific endpoint /geoserver/wms operation GetMap and could allow an attacker to define external entities within the XML request.",
+  "token_count": 42
+}

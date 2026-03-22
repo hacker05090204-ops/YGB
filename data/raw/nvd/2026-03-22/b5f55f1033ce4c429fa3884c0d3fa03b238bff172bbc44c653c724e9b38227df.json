@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30927",
+  "ingested_at": "2026-03-22T07:54:42.545833+00:00",
+  "lang": "en",
+  "raw_text": "Admidio is an open-source user management solution. Prior to 5.0.6, in modules/events/events_function.php, the event participation logic allows any user who can participate in an event to register OTHER users by manipulating the user_uuid GET parameter. The condition uses || (OR), meaning if possibleToParticipate() returns true (event is open for participation), ANY user - not just leaders - can specify a different user_uuid and register/cancel participation for that user. The code then operates on $user->getValue('usr_id') (the target user from user_uuid) rather than the current user. This vulnerability is fixed in 5.0.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b5f55f1033ce4c429fa3884c0d3fa03b238bff172bbc44c653c724e9b38227df",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30927"
+}

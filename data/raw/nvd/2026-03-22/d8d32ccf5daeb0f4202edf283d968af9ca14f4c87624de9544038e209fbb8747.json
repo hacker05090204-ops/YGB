@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2339",
+  "ingested_at": "2026-03-22T07:54:42.848704+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authentication for Critical Function vulnerability in TUBITAK BILGEM Software Technologies Research Institute Liderahenk allows Remote Code Inclusion, Privilege Abuse, Command Injection.This issue affects Liderahenk: before v3.4.0.",
+  "severity": "HIGH",
+  "sha256_hash": "d8d32ccf5daeb0f4202edf283d968af9ca14f4c87624de9544038e209fbb8747",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2339"
+}

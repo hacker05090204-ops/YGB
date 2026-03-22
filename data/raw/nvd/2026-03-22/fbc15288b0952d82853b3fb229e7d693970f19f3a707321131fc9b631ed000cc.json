@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28501",
+  "ingested_at": "2026-03-22T07:54:41.240340+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 24.0, an unauthenticated SQL Injection vulnerability exists in AVideo within the objects/videos.json.php and objects/video.php components. The application fails to properly sanitize the catName parameter when it is supplied via a JSON-formatted POST request body. Because JSON input is parsed and merged into $_REQUEST after global security checks are executed, the payload bypasses the existing sanitization mechanisms. This issue has been patched in version 24.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fbc15288b0952d82853b3fb229e7d693970f19f3a707321131fc9b631ed000cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28501"
+}

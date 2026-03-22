@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CrushFTP CrushFTP CrushFTP contains an unprotected alternate channel vulnerability. When the DMZ proxy feature is not used, mishandles AS2 validation and consequently allows remote attackers to obtain admin access via HTTPS.",
+  "token_count": 31
+}

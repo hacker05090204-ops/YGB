@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qualitia Active! Mail Qualitia Active! Mail contains a stack-based buffer overflow vulnerability that allows a remote, unauthenticated attacker to execute arbitrary or trigger a denial-of-service via a specially crafted request.",
+  "token_count": 30
+}

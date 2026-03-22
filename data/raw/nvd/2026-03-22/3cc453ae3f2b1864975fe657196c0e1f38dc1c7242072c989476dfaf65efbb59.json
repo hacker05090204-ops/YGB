@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3703",
+  "ingested_at": "2026-03-22T07:54:41.992836+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Wavlink NU516U1 251208. This affects the function sub_401A10 of the file /cgi-bin/login.cgi. Executing a manipulation of the argument ipaddr can lead to out-of-bounds write. The attack may be performed from remote. The exploit has been published and may be used. Upgrading the affected component is recommended. The vendor was contacted early, responded in a very professional manner and quickly released a fixed version of the affected product.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3cc453ae3f2b1864975fe657196c0e1f38dc1c7242072c989476dfaf65efbb59",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-787"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3703"
+}

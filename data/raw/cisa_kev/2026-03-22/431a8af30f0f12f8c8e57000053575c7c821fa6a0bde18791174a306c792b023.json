@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-0927",
+  "ingested_at": "2026-03-22T07:45:18.428790+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Reader and Acrobat Stack-based buffer overflow in Adobe Reader and Adobe Acrobat allows remote attackers to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "431a8af30f0f12f8c8e57000053575c7c821fa6a0bde18791174a306c792b023",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30983",
+  "ingested_at": "2026-03-22T07:54:42.928231+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a stack buffer overflow in icFixXml() (strcpy) causing stack memory corruption or crash. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "acf2dca7184dd782abb8aaf5137a2a28b44ae9b23ba218fdaa9e0dd021f4f6a2",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-121",
+    "CWE-787"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30983"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32434",
+  "ingested_at": "2026-03-22T07:54:46.100110+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in vowelweb VW Fitness vw-fitness allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects VW Fitness: from n/a through < = 4.3.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "47f2f4252c1719d0cfa8426ace11abcc3947b363e6ac1fd4d286c11ad40cd788",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32434"
+}

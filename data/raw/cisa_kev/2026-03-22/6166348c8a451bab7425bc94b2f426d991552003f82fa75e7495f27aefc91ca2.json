@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-6862",
+  "ingested_at": "2026-03-22T07:45:17.791701+00:00",
+  "lang": "en",
+  "raw_text": "NETGEAR Multiple Devices Multiple NETGEAR devices contain a buffer overflow vulnerability that allows for authentication bypass and remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6166348c8a451bab7425bc94b2f426d991552003f82fa75e7495f27aefc91ca2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

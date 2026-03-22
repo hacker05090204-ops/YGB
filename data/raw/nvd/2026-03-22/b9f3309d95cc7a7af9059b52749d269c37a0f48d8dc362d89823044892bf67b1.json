@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-7375",
+  "ingested_at": "2026-03-22T07:54:40.869302+00:00",
+  "lang": "en",
+  "raw_text": "A denial-of-service (DoS) vulnerability was identified in Omada EAP610 v3. An attacker with adjacent network access can send crafted requests to cause the device\u2019s HTTP service to crash. This results in temporary service unavailability until the device is rebooted. This issue affects Omada EAP610 firmware versions prior to 1.6.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b9f3309d95cc7a7af9059b52749d269c37a0f48d8dc362d89823044892bf67b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-7375"
+}

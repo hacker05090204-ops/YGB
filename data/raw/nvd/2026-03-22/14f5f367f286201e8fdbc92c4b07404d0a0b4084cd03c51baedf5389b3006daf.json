@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25928",
+  "ingested_at": "2026-03-22T07:54:48.035916+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.2, the DICOM zip/export feature uses a user-supplied destination or path component when creating the zip file, without sanitizing path traversal sequences (e.g. `../`). An attacker with DICOM upload/export permission can write files outside the intended directory, potentially under the web root, leading to arbitrary file write and possibly remote code execution if PHP or other executable files can be written. Version 8.0.0.2 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "14f5f367f286201e8fdbc92c4b07404d0a0b4084cd03c51baedf5389b3006daf",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25928"
+}

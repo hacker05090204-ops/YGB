@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2017-20221",
+  "ingested_at": "2026-03-22T07:54:46.278634+00:00",
+  "lang": "en",
+  "raw_text": "Telesquare SKT LTE Router SDT-CS3B1 version 1.2.0 contains a cross-site request forgery vulnerability that allows authenticated attackers to execute arbitrary system commands by exploiting missing request validation. Attackers can craft malicious web pages that perform administrative actions when visited by logged-in users, enabling command execution with router privileges.",
+  "severity": "MEDIUM",
+  "sha256_hash": "53de6f5cd309d52d34e8cbfbbbb94880d7bdd5b6f99e119d95015d7e14021676",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2017-20221"
+}

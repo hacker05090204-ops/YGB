@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38193",
+  "ingested_at": "2026-03-22T07:45:16.877926+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Ancillary Function Driver for WinSock contains an unspecified vulnerability that allows for privilege escalation, enabling a local attacker to gain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa333f25573f3299061c8bd704a62f3144920187770c61ffe8b196b86561e5f1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25496",
+  "ingested_at": "2026-03-22T07:54:33.217936+00:00",
+  "lang": "en",
+  "raw_text": "osCommerce 2.3.4.1 contains a SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the products_id parameter. Attackers can modify the products_id value in product_info.php requests and append boolean-based SQL injection payloads to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "d82839017b911f6185c96e41d2da62dab6ca606e2a02c1488115796d48a1d70d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25496"
+}

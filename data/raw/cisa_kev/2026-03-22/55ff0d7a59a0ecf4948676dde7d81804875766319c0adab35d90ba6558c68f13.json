@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-5317",
+  "ingested_at": "2026-03-22T07:45:17.409781+00:00",
+  "lang": "en",
+  "raw_text": "Jenkins Jenkins User Interface (UI) Jenkins User Interface (UI) contains an information disclosure vulnerability that allows users to see the names of jobs and builds otherwise inaccessible to them on the \"Fingerprints\" pages.",
+  "severity": "CRITICAL",
+  "sha256_hash": "55ff0d7a59a0ecf4948676dde7d81804875766319c0adab35d90ba6558c68f13",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

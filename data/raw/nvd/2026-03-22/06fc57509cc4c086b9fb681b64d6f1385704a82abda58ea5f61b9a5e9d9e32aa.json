@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3071",
+  "ingested_at": "2026-03-22T07:54:32.662862+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of untrusted data in the LanguageModel class of Flair from versions 0.4.1 to latest are vulnerable to arbitrary code execution when loading a malicious model.",
+  "severity": "HIGH",
+  "sha256_hash": "06fc57509cc4c086b9fb681b64d6f1385704a82abda58ea5f61b9a5e9d9e32aa",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3071"
+}

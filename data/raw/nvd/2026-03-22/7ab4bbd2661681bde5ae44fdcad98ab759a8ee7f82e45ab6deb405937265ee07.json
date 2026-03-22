@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3720",
+  "ingested_at": "2026-03-22T07:54:42.020158+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in 1024-lab/lab1024 SmartAdmin up to 3.29. Impacted is an unknown function of the file smart-admin-web-javascript/src/views/business/oa/notice/components/notice-form-drawer.vue of the component Notice Module. The manipulation results in cross site scripting. The attack can be launched remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "7ab4bbd2661681bde5ae44fdcad98ab759a8ee7f82e45ab6deb405937265ee07",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3720"
+}

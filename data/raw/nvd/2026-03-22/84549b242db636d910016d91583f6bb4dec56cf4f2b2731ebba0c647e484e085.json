@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30985",
+  "ingested_at": "2026-03-22T07:54:42.931387+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. Prior to 2.3.1.5, there is a heap-based buffer overflow write in CIccMatrixMath::SetRange() causing memory corruption or crash. This vulnerability is fixed in 2.3.1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "84549b242db636d910016d91583f6bb4dec56cf4f2b2731ebba0c647e484e085",
+  "source": "nvd",
+  "tags": [
+    "CWE-120",
+    "CWE-122",
+    "CWE-787"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30985"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47375",
+  "ingested_at": "2026-03-22T07:54:33.740933+00:00",
+  "lang": "en",
+  "raw_text": "Memory corruption while handling different IOCTL calls from the user-space simultaneously.",
+  "severity": "HIGH",
+  "sha256_hash": "7b9a0a4832a2af03a43f560a9071a96460812e609e13c6261c3c352c0f793980",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47375"
+}

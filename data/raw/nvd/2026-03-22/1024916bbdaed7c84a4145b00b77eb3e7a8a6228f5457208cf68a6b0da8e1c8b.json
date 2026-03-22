@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25071",
+  "ingested_at": "2026-03-22T07:54:41.688310+00:00",
+  "lang": "en",
+  "raw_text": "XikeStor SKS8310-8X Network Switch firmware versions 1.04.B07 and prior contain a missing authentication vulnerability in the /switch_config.src endpoint that allows unauthenticated remote attackers to download device configuration files. Attackers can access this endpoint without credentials to retrieve sensitive configuration information including VLAN settings and IP addressing details.",
+  "severity": "HIGH",
+  "sha256_hash": "1024916bbdaed7c84a4145b00b77eb3e7a8a6228f5457208cf68a6b0da8e1c8b",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25071"
+}

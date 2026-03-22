@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32265",
+  "ingested_at": "2026-03-22T07:54:47.358374+00:00",
+  "lang": "en",
+  "raw_text": "The Amazon S3 for Craft CMS plugin provides an Amazon S3 integration for Craft CMS. In versions 2.0.2 through 2.2.4, unauthenticated users can view a list of buckets the plugin has access to. The `BucketsController->actionLoadBucketData()` endpoint allows unauthenticated users with a valid CSRF token to view a list of buckets that the plugin is allowed to see. Users should update to version 2.2.5 of the plugin to mitigate the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9aa4564e548626900cdd6e32f51d4b3647dd1c0ce7ce811a761156bc915c6cac",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32265"
+}

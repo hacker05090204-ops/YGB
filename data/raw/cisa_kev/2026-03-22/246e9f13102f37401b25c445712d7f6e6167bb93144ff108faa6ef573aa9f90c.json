@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0648",
+  "ingested_at": "2026-03-22T07:45:16.816762+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains an unspecified vulnerability in the ExternalInterface ActionScript functionality that allows a remote attacker to execute arbitrary code via crafted SWF content.",
+  "severity": "CRITICAL",
+  "sha256_hash": "246e9f13102f37401b25c445712d7f6e6167bb93144ff108faa6ef573aa9f90c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

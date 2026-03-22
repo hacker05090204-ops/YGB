@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32297",
+  "ingested_at": "2026-03-22T07:54:47.109823+00:00",
+  "lang": "en",
+  "raw_text": "The Angeet ES3 KVM allows a remote, unauthenticated attacker to write arbitrary files, including configuration files or system binaries. Modified configuration files or system binaries could allow an attacker to take complete control of a vulnerable system.",
+  "severity": "HIGH",
+  "sha256_hash": "ee8c96a1cfe19d55732127813a036129b85635b87f0ffae4bf047a288bd972c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32297"
+}

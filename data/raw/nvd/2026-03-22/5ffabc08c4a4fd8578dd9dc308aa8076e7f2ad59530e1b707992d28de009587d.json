@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27603",
+  "ingested_at": "2026-03-22T07:54:41.261071+00:00",
+  "lang": "en",
+  "raw_text": "Chartbrew is an open-source web application that can connect directly to databases and APIs and use the data to create charts. Prior to version 4.8.4, the chart filter endpoint POST /project/:project_id/chart/:chart_id/filter is missing both verifyToken and checkPermissions middleware, allowing unauthenticated users to access chart data from any team/project. This issue has been patched in version 4.8.4.",
+  "severity": "HIGH",
+  "sha256_hash": "5ffabc08c4a4fd8578dd9dc308aa8076e7f2ad59530e1b707992d28de009587d",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27603"
+}

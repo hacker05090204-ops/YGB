@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25045",
+  "ingested_at": "2026-03-22T07:54:42.376255+00:00",
+  "lang": "en",
+  "raw_text": "Budibase is a low code platform for creating internal tools, workflows, and admin panels. This issue is a combination of Vertical Privilege Escalation and IDOR (Insecure Direct Object Reference) due to missing server-side RBAC checks in the /api/global/users endpoints. A Creator-level user, who should have no permissions to manage users or organizational roles, can instead promote an App Viewer to Tenant Admin, demote a Tenant Admin to App Viewer, or modify the Owner\u2019s account details and all orders (e.g., change name). This is because the API accepts these actions without validating the requesting role, a Creator can replay Owner-only requests using their own session tokens. This leads to full tenant compromise.",
+  "severity": "HIGH",
+  "sha256_hash": "61597856035df3fa4fd5e3eb8619ebf5e7b5e8a7caf8abd51a48207a04ad7507",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 111,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25045"
+}

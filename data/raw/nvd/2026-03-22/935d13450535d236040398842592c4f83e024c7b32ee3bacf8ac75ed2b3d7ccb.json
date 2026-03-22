@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0401",
+  "ingested_at": "2026-03-22T07:54:31.625027+00:00",
+  "lang": "en",
+  "raw_text": "A post-authentication NULL Pointer Dereference vulnerability in SonicOS allows a remote attacker to crash a firewall.",
+  "severity": "MEDIUM",
+  "sha256_hash": "935d13450535d236040398842592c4f83e024c7b32ee3bacf8ac75ed2b3d7ccb",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0401"
+}

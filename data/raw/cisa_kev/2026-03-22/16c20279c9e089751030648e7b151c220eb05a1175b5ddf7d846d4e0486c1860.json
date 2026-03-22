@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-33106",
+  "ingested_at": "2026-03-22T07:45:17.124091+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a use of out-of-range pointer offset vulnerability due to memory corruption in Graphics while submitting a large list of sync points in an AUX command to the IOCTL_KGSL_GPU_AUX_COMMAND.",
+  "severity": "CRITICAL",
+  "sha256_hash": "16c20279c9e089751030648e7b151c220eb05a1175b5ddf7d846d4e0486c1860",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Fortinet FortiOS \"execute restore src-vis\" downloads code without integrity checking, allowing an attacker to arbitrarily download files.",
+  "token_count": 19
+}

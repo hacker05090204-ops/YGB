@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3822",
+  "ingested_at": "2026-03-22T07:54:42.163631+00:00",
+  "lang": "en",
+  "raw_text": "Taipower APP for Andorid developed by Taipower has an Improper Certificate Validation vulnerability. When establishing an HTTPS connection with the server, the application fails to verify the server-side TLS/SSL certificate. This flaw allows an unauthenticated remote attackers to exploit the vulnerability to perform a Man-in-the-Middle (MITM) attack to read and tamper with network packets.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cb66ce404cfad218b8f380ae5cf38d7733a552a9b9f27e5c53fd5a5cdd8b2d69",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3822"
+}

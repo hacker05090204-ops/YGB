@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22352",
+  "ingested_at": "2026-03-22T07:54:30.351138+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in PersianScript Persian Woocommerce SMS persian-woocommerce-sms allows Reflected XSS.This issue affects Persian Woocommerce SMS: from n/a through < = 7.1.1.",
+  "severity": "HIGH",
+  "sha256_hash": "e0afac5defbc60735a526d0433ff594f6045dc2b70e61b65f976c6b30de1bc8d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22352"
+}

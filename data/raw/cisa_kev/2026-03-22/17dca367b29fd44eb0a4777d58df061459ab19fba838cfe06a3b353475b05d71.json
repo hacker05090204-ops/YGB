@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-22515",
+  "ingested_at": "2026-03-22T07:45:17.204976+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Data Center and Server Atlassian Confluence Data Center and Server contains a broken access control vulnerability that allows an attacker to create unauthorized Confluence administrator accounts and access Confluence.",
+  "severity": "CRITICAL",
+  "sha256_hash": "17dca367b29fd44eb0a4777d58df061459ab19fba838cfe06a3b353475b05d71",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

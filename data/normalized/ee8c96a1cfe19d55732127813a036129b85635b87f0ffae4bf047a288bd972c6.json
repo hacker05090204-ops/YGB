@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Angeet ES3 KVM allows a remote, unauthenticated attacker to write arbitrary files, including configuration files or system binaries. Modified configuration files or system binaries could allow an attacker to take complete control of a vulnerable system.",
+  "token_count": 37
+}

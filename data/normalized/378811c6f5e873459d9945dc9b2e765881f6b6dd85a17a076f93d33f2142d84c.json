@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A broken access control vulnerability exists in Serv-U which when exploited, gives a malicious actor the ability to create a system admin user and execute arbitrary code as a privileged account via domain admin or group admin privileges. This issue requires administrative privileges to abuse. On Windows deployments, the risk is scored as a medium because services frequently run under less-privileged service accounts by default.",
+  "token_count": 65
+}

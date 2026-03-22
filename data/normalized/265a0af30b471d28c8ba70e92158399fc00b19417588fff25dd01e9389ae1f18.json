@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sensitive user account information is not encrypted in the database in Devolutions Server 2025.3.14 and earlier, which allows an attacker with access to the database to obtain sensitive user information via direct database access.",
+  "token_count": 34
+}

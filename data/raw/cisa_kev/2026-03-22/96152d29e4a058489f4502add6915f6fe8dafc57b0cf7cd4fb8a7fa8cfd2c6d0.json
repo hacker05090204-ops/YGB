@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-26360",
+  "ingested_at": "2026-03-22T07:45:17.490738+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe ColdFusion contains a deserialization of untrusted data vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "96152d29e4a058489f4502add6915f6fe8dafc57b0cf7cd4fb8a7fa8cfd2c6d0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

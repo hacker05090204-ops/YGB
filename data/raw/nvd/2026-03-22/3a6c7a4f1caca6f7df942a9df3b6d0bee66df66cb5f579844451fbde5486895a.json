@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2460",
+  "ingested_at": "2026-03-22T07:54:31.495917+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability exists in REB500 for an authenticated user with low-level privileges to access and alter the content of directories by using the DAC protocol that the user is not authorized to do so.",
+  "severity": "HIGH",
+  "sha256_hash": "3a6c7a4f1caca6f7df942a9df3b6d0bee66df66cb5f579844451fbde5486895a",
+  "source": "nvd",
+  "tags": [
+    "CWE-267"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2460"
+}

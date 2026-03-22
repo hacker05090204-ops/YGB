@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28073",
+  "ingested_at": "2026-03-22T07:54:47.863074+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Tips and Tricks HQ WP eMember allows Reflected XSS.This issue affects WP eMember: from n/a through v10.2.2.",
+  "severity": "HIGH",
+  "sha256_hash": "3f706f2f18a73074a6e3d2bf36e50d9f3bfec5c037b7d798dcc7b14bb20c5a52",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28073"
+}

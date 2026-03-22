@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2293",
+  "ingested_at": "2026-03-22T07:54:33.196858+00:00",
+  "lang": "en",
+  "raw_text": "A NestJS application using @nestjs/platform-fastify can allow bypass of authentication/authorization middleware when Fastify path-normalization options are enabled. This issue affects nest.Js: 11.1.13.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "62bd12377fb14936740cf7fa3f897f3c0baef85b3dfbc62f2d20aad57ef567b5",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2293"
+}

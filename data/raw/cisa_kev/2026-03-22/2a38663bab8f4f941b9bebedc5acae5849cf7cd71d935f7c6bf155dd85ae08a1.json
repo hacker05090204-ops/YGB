@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-12615",
+  "ingested_at": "2026-03-22T07:45:18.360341+00:00",
+  "lang": "en",
+  "raw_text": "Apache Tomcat When running Apache Tomcat on Windows with HTTP PUTs enabled, it is possible to upload a JSP file to the server via a specially crafted request. This JSP could then be requested and any code it contained would be executed by the server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2a38663bab8f4f941b9bebedc5acae5849cf7cd71d935f7c6bf155dd85ae08a1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

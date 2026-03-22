@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in SolverWp Portfolio Builder swp-portfolio allows PHP Local File Inclusion.This issue affects Portfolio Builder: from n/a through < = 1.2.5.",
+  "token_count": 35
+}

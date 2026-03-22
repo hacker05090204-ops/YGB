@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-7255",
+  "ingested_at": "2026-03-22T07:45:19.339627+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Microsoft Win32k kernel-mode driver fails to properly handle objects in memory which allows for privilege escalation. Successful exploitation allows an attacker to run code in kernel mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5dbe597c94429ed6f089300082cf8261667240bbfbe8b44c8ea7db8ec19fb28f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

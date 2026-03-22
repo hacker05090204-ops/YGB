@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68028",
+  "ingested_at": "2026-03-22T07:54:30.080881+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Passionate Brains GA4WP: Google Analytics for WordPress ga-for-wp allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects GA4WP: Google Analytics for WordPress: from n/a through < = 2.10.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5793845281433ce71319d32df44a03ee92f197ded08c5109e66f7beafcd8cb0e",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68028"
+}

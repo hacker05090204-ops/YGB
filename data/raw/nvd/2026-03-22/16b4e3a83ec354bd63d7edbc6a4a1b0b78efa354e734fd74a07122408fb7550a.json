@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52638",
+  "ingested_at": "2026-03-22T07:54:46.330099+00:00",
+  "lang": "en",
+  "raw_text": "HCL AION is affected by a vulnerability where generated containers may execute binaries with root-level privileges. Running containers with root privileges may increase the potential security risk, as it grants elevated permissions within the container environment. Aligning container configurations with security best practices requires minimizing privileges and avoiding root-level execution wherever possible.",
+  "severity": "MEDIUM",
+  "sha256_hash": "16b4e3a83ec354bd63d7edbc6a4a1b0b78efa354e734fd74a07122408fb7550a",
+  "source": "nvd",
+  "tags": [
+    "CWE-345"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52638"
+}

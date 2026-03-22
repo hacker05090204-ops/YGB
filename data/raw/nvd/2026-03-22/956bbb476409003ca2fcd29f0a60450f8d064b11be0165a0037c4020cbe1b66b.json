@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2498",
+  "ingested_at": "2026-03-22T07:54:32.568173+00:00",
+  "lang": "en",
+  "raw_text": "The WP Social Meta plugin for WordPress is vulnerable to Stored Cross-Site Scripting via admin settings in all versions up to, and including, 1.0.1 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with administrator-level permissions and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. This only affects multi-site installations and installations where unfiltered_html has been disabled.",
+  "severity": "MEDIUM",
+  "sha256_hash": "956bbb476409003ca2fcd29f0a60450f8d064b11be0165a0037c4020cbe1b66b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2498"
+}

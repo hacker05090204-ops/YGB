@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41759",
+  "ingested_at": "2026-03-22T07:54:42.196088+00:00",
+  "lang": "en",
+  "raw_text": "An administrator may attempt to block all networks by specifying \"\\*\" or \"all\" as the network identifier. However, these values are not supported and do not trigger any validation error. Instead, they are silently interpreted as network 0 which results in no networks being blocked at all.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2fec80a2a52d6b7d1f481c1c7fe10db4debed7d18480dbd87f6d619fcbba1eac",
+  "source": "nvd",
+  "tags": [
+    "CWE-636"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41759"
+}

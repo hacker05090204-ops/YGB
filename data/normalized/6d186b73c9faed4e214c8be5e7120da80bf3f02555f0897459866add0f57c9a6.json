@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A missing authentication for critical function vulnerability has been reported to affect QVR Pro. The remote attackers can then exploit the vulnerability to gain access to the system. We have already fixed the vulnerability in the following version: QVR Pro 2.7.4.14 and later",
+  "token_count": 43
+}

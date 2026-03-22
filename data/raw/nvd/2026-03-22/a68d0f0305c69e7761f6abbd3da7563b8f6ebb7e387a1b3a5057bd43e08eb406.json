@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2025",
+  "ingested_at": "2026-03-22T07:54:34.369654+00:00",
+  "lang": "en",
+  "raw_text": "The Mail Mint WordPress plugin before 1.19.5 does not have authorization in one of its REST API endpoint, allowing unauthenticated users to call it and retrieve the email addresses of users on the blog",
+  "severity": "HIGH",
+  "sha256_hash": "a68d0f0305c69e7761f6abbd3da7563b8f6ebb7e387a1b3a5057bd43e08eb406",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2025"
+}

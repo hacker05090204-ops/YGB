@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-32648",
+  "ingested_at": "2026-03-22T07:45:18.822178+00:00",
+  "lang": "en",
+  "raw_text": "October CMS October CMS In affected versions of the october/system package an attacker can request an account password reset and then gain access to the account using a specially crafted request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "45c144f3a3200b131442889155b960c05b118589d1016df4c7a94b1b03fffd80",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The error_description parameter is vulnerable to Reflected XSS. An attacker can bypass the domain's WAF using a Safari-specific onpagereveal payload.",
+  "token_count": 20
+}

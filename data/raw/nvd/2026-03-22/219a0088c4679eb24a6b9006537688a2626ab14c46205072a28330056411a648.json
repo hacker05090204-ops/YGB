@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-1242",
+  "ingested_at": "2026-03-22T07:54:32.093398+00:00",
+  "lang": "en",
+  "raw_text": "The administrative credentials can be extracted through application API responses, mobile application reverse engineering, and device firmware reverse engineering. The exposure may result in an attacker gaining full administrative access to the Gardyn IoT Hub exposing connected devices to malicious control.",
+  "severity": "CRITICAL",
+  "sha256_hash": "219a0088c4679eb24a6b9006537688a2626ab14c46205072a28330056411a648",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-1242"
+}

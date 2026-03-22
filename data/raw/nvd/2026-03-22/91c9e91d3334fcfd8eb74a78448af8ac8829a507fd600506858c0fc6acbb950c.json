@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0120",
+  "ingested_at": "2026-03-22T07:54:43.159814+00:00",
+  "lang": "en",
+  "raw_text": "In modem, there is a possible out of bounds write due to an incorrect bounds check. This could lead to remote code execution with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "91c9e91d3334fcfd8eb74a78448af8ac8829a507fd600506858c0fc6acbb950c",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0120"
+}

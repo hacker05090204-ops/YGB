@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28071",
+  "ingested_at": "2026-03-22T07:54:40.549314+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in PixFort pixfort Core pixfort-core allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects pixfort Core: from n/a through < = 3.2.22.",
+  "severity": "MEDIUM",
+  "sha256_hash": "829a7bdf0a3fccd63ec4f7b2f59f960783648a39e38ddde2019efe2ded677a5c",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28071"
+}

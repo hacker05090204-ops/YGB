@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1376",
+  "ingested_at": "2026-03-22T07:54:47.190040+00:00",
+  "lang": "en",
+  "raw_text": "IBM i 7.6 could allow a remote attacker to cause a denial of service using failed authentication connections due to improper allocation of resources.",
+  "severity": "HIGH",
+  "sha256_hash": "5b4fa6d8845b5c8cd312b78c693df6c3cf6a6477fadfe9be5122a17359e8cb42",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1376"
+}

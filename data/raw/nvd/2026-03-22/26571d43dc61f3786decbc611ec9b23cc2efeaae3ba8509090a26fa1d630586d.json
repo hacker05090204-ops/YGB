@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33302",
+  "ingested_at": "2026-03-22T07:54:48.106187+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.2, the module ACL function `AclMain::zhAclCheck()` only checks for the presence of any \"allow\" (user or group). It never checks for explicit \"deny\" (allowed=0). As a result, administrators cannot revoke access by setting a user or group to \"deny\"; if the user is in a group that has \"allow,\" access is granted regardless of explicit denies. Version 8.0.0.2 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "26571d43dc61f3786decbc611ec9b23cc2efeaae3ba8509090a26fa1d630586d",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33302"
+}

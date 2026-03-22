@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3135",
+  "ingested_at": "2026-03-22T07:54:31.821959+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in itsourcecode News Portal Project 1.0. The impacted element is an unknown function of the file /admin/add-category.php. This manipulation of the argument Category causes sql injection. It is possible to initiate the attack remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "21dc1a574a484e360250b57ea24ac831b782980b84e60e7d0c27fcf50656e6b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3135"
+}

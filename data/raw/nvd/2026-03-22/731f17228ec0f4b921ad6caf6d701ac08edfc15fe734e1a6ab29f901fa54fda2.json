@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29771",
+  "ingested_at": "2026-03-22T07:54:41.864906+00:00",
+  "lang": "en",
+  "raw_text": "Netmaker makes networks with WireGuard. Prior to version 1.2.0, the /api/server/shutdown endpoint allows termination of the Netmaker server process via syscall.SIGINT. This allows any user to repeatedly shut down the server, causing cyclic denial of service with approximately 3-second restart intervals. This issue has been patched in version 1.2.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "731f17228ec0f4b921ad6caf6d701ac08edfc15fe734e1a6ab29f901fa54fda2",
+  "source": "nvd",
+  "tags": [
+    "CWE-404"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29771"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue in Lantronix EDS3000PS v.3.1.0.0R2 allows an attacker to execute arbitrary code and obtain sensitive information via the ltrx_evo component",
+  "token_count": 21
+}

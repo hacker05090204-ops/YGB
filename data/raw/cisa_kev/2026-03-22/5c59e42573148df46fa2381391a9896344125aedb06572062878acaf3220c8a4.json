@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-0669",
+  "ingested_at": "2026-03-22T07:45:17.531982+00:00",
+  "lang": "en",
+  "raw_text": "Fortra GoAnywhere MFT Fortra (formerly, HelpSystems) GoAnywhere MFT contains a pre-authentication remote code execution vulnerability in the License Response Servlet due to deserializing an attacker-controlled object.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5c59e42573148df46fa2381391a9896344125aedb06572062878acaf3220c8a4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

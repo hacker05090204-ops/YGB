@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Shenzhen Tenda F3 Wireless Router firmware V12.01.01.55_multi contains a cross-site request forgery (CSRF) vulnerability in the web-based administrative interface. The interface does not implement anti-CSRF protections, allowing an attacker to induce an authenticated administrator to submit state-changing requests, which can result in unauthorized configuration changes.",
+  "token_count": 45
+}

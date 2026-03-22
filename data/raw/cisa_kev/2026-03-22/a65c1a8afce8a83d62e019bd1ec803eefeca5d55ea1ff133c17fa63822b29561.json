@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1253",
+  "ingested_at": "2026-03-22T07:45:18.442801+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows AppX Deployment Server improperly handles junctions.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a65c1a8afce8a83d62e019bd1ec803eefeca5d55ea1ff133c17fa63822b29561",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-66644",
+  "ingested_at": "2026-03-22T07:45:16.027063+00:00",
+  "lang": "en",
+  "raw_text": "Array Networks ArrayOS AG Array Networks ArrayOS AG contains an OS command injection vulnerability that could allow an attacker to execute arbitrary commands.",
+  "severity": "CRITICAL",
+  "sha256_hash": "14cb1ff2ebc38ba826aca51d3989ac0caf9409843e9f3b52e61245518cce3aef",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

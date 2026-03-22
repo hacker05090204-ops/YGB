@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple iOS, iPadOS, and macOS Apple GPU drivers, included in iOS, iPadOS, and macOS, contain an out-of-bounds write vulnerability that may allow a malicious application to execute code with kernel privileges.",
+  "token_count": 31
+}

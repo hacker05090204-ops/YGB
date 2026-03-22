@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25569",
+  "ingested_at": "2026-03-22T07:54:49.533741+00:00",
+  "lang": "en",
+  "raw_text": "RealTerm Serial Terminal 2.0.0.70 contains a stack-based buffer overflow vulnerability in the Echo Port field that allows local attackers to crash the application by triggering a structured exception handler (SEH) chain corruption. Attackers can craft a malicious input string with 268 bytes of padding followed by SEH overwrite values and paste it into the Port field to cause denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "75347aa6d52de8b3118e7d4bfb921b5bdde3c6ec48ba859259fef59c4be2eee3",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25569"
+}

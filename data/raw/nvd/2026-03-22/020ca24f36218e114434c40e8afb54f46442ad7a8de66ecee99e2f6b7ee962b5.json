@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27966",
+  "ingested_at": "2026-03-22T07:54:32.547607+00:00",
+  "lang": "en",
+  "raw_text": "Langflow is a tool for building and deploying AI-powered agents and workflows. Prior to version 1.8.0, the CSV Agent node in Langflow hardcodes `allow_dangerous_code=True`, which automatically exposes LangChain\u2019s Python REPL tool (`python_repl_ast`). As a result, an attacker can execute arbitrary Python and OS commands on the server via prompt injection, leading to full Remote Code Execution (RCE). Version 1.8.0 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "020ca24f36218e114434c40e8afb54f46442ad7a8de66ecee99e2f6b7ee962b5",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27966"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25434",
+  "ingested_at": "2026-03-22T07:54:30.621839+00:00",
+  "lang": "en",
+  "raw_text": "SpotAuditor 5.3.1.0 contains a denial of service vulnerability that allows unauthenticated attackers to crash the application by submitting excessive data in the registration name field. Attackers can enter a large string of characters (5000 bytes or more) in the name field during registration to trigger an unhandled exception that crashes the application.",
+  "severity": "HIGH",
+  "sha256_hash": "f0ba7f621dc245a454cbb138ad39d5981d9a27756a1aca587cc3ff2863dc7208",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25434"
+}

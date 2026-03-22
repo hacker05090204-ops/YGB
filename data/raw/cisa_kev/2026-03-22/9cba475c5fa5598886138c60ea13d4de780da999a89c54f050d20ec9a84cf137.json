@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0629",
+  "ingested_at": "2026-03-22T07:45:18.491721+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe Coldfusion contains a directory traversal vulnerability, which could permit an unauthorized user access to restricted directories.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9cba475c5fa5598886138c60ea13d4de780da999a89c54f050d20ec9a84cf137",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

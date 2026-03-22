@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-11317",
+  "ingested_at": "2026-03-22T07:45:18.150805+00:00",
+  "lang": "en",
+  "raw_text": "Telerik User Interface (UI) for ASP.NET AJAX Telerik.Web.UI in Progress Telerik UI for ASP.NET AJAX allows remote attackers to perform arbitrary file uploads or execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9fb7714f55dae839b8077276b0e0c5b457832b1f2f193b322d3b705b2d5529ec",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

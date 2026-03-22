@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WebKit JSC - 'JSArray::shiftCountWithArrayStorage' Out-of-Bounds Read/Write",
+  "token_count": 6
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3484",
+  "ingested_at": "2026-03-22T07:54:34.244795+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in PhialsBasement nmap-mcp-server up to bee6d23547d57ae02460022f7c78ac0893092e38. Affected by this issue is the function child_process.exec of the file src/index.ts of the component Nmap CLI Command Handler. The manipulation results in command injection. The attack may be performed from remote. This product utilizes a rolling release system for continuous delivery, and as such, version information for affected or updated releases is not disclosed. The patch is identified as 30a6b9e1c7fa6146f51e28d6ab83a2568d9a3488. It is best practice to apply a patch to resolve this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0fa9ef5969b595d2a0684b250fa21d2bdaa92d3dea9af8c0267483ed4b9c043f",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77",
+    "CWE-77"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3484"
+}

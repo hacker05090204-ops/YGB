@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-30042",
+  "ingested_at": "2026-03-22T07:54:33.560589+00:00",
+  "lang": "en",
+  "raw_text": "The CGM CLININET system provides smart card authentication; however, authentication is conducted locally on the client device, and, in reality, only the certificate number is used for access verification. As a result, possession of the certificate number alone is sufficient for authentication, regardless of the actual presence of the smart card or ownership of the private key.",
+  "severity": "HIGH",
+  "sha256_hash": "a4cee08ae689d4cee5fe24da65e73997c39c23464aa87a065e8c6576df6f5f5c",
+  "source": "nvd",
+  "tags": [
+    "CWE-603"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30042"
+}

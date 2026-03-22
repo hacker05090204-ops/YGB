@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27752",
+  "ingested_at": "2026-03-22T07:54:33.232846+00:00",
+  "lang": "en",
+  "raw_text": "SODOLA SL902-SWTGW124AS firmware versions through 200.1.20 transmit authentication credentials over unencrypted HTTP, allowing attackers to capture credentials. An attacker positioned to observe network traffic between a user and the device can intercept credentials and reuse them to gain administrative access to the gateway.",
+  "severity": "MEDIUM",
+  "sha256_hash": "72ebd963fb1f2f07adabc43960aa1553e6ef570f035f480dcfecc5298db85f53",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27752"
+}

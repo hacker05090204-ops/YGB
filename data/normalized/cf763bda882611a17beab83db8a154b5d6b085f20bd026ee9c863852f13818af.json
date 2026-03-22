@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Edge Decor edge-decor allows PHP Local File Inclusion.This issue affects Edge Decor: from n/a through < = 2.2.",
+  "token_count": 35
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0148",
+  "ingested_at": "2026-03-22T07:45:18.158880+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft SMBv1 server The SMBv1 server in Microsoft allows remote attackers to execute arbitrary code via crafted packets.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c28a7d044cce348616d3bec8ec4ad7cdbdcaa34c7f2427f6c094368679b91434",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

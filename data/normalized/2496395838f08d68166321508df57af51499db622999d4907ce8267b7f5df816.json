@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "EdTv 2 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the 'id' parameter. Attackers can send GET requests to the admin/edit_source endpoint with crafted SQL UNION statements to extract database information including schema names, user credentials, and version details.",
+  "token_count": 50
+}

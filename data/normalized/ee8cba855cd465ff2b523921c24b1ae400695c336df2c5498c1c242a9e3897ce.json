@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "UPS Multi-UPS Management Console (MUMC) version 01.06.0001 (A03) contains an Incorrect Default Permissions (CWE-276) vulnerability that allows an attacker to execute arbitrary code with SYSTEM privileges by causing the application to load a specially crafted DLL.",
+  "token_count": 36
+}

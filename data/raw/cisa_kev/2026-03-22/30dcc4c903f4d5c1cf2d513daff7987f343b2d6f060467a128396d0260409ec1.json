@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38812",
+  "ingested_at": "2026-03-22T07:45:16.706635+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server VMware vCenter Server contains a heap-based buffer overflow vulnerability in the implementation of the DCERPC protocol. This vulnerability could allow an attacker with network access to the vCenter Server to execute remote code by sending a specially crafted packet.",
+  "severity": "CRITICAL",
+  "sha256_hash": "30dcc4c903f4d5c1cf2d513daff7987f343b2d6f060467a128396d0260409ec1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

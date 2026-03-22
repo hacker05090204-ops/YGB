@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Perl Exiftool Improper neutralization of user data in the DjVu file format in Exiftool versions 7.44 and up allows arbitrary code execution when parsing the malicious image",
+  "token_count": 27
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-23397",
+  "ingested_at": "2026-03-22T07:45:17.492747+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office Outlook contains a privilege escalation vulnerability that allows for a NTLM Relay attack against another service to authenticate as the user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "042a91b45d447f8ee6abe1a482ac8508780c0df9d7cbc515c6a4d60bc40d2e5b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

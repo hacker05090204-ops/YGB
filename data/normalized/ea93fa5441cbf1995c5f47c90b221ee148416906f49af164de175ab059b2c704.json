@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Arm Mali GPU Kernel Driver Arm Bifrost and Valhall GPU kernel drivers contain a use-after-free vulnerability that allows a local, non-privileged user to make improper GPU memory processing operations to gain access to already freed memory.",
+  "token_count": 36
+}

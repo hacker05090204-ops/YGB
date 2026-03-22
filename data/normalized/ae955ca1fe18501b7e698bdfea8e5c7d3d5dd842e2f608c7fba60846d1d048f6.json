@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper neutralization of special elements used in an os command ('os command injection') in Microsoft Bing Images allows an unauthorized attacker to execute code over a network.",
+  "token_count": 27
+}

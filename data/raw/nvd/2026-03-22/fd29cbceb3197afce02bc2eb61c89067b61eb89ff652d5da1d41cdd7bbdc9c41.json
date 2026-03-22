@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20777",
+  "ingested_at": "2026-03-22T07:54:34.078089+00:00",
+  "lang": "en",
+  "raw_text": "A heap-based buffer overflow vulnerability exists in the Nicolet WFT parsing functionality of The Biosig Project libbiosig 3.9.2 and Master Branch (db9a9a63). A specially crafted .wft file can lead to arbitrary code execution. An attacker can provide a malicious file to trigger this vulnerability.",
+  "severity": "HIGH",
+  "sha256_hash": "fd29cbceb3197afce02bc2eb61c89067b61eb89ff652d5da1d41cdd7bbdc9c41",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20777"
+}

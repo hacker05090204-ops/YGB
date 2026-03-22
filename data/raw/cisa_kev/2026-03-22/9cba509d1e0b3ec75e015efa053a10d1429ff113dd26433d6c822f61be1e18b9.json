@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0147",
+  "ingested_at": "2026-03-22T07:45:18.346231+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Secure Access Control System (ACS) A vulnerability in Java deserialization used by Cisco Secure Access Control System (ACS) could allow an unauthenticated, remote attacker to execute arbitrary commands on an affected device. The vulnerability is due to insecure deserialization of user-supplied content by the affected software.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9cba509d1e0b3ec75e015efa053a10d1429ff113dd26433d6c822f61be1e18b9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

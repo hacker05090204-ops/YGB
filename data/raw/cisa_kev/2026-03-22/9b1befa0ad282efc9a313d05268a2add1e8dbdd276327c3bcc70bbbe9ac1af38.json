@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-26084",
+  "ingested_at": "2026-03-22T07:45:19.076727+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Server and Data Center Atlassian Confluence Server and Data Server contain an Object-Graph Navigation Language (OGNL) injection vulnerability that may allow an unauthenticated attacker to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9b1befa0ad282efc9a313d05268a2add1e8dbdd276327c3bcc70bbbe9ac1af38",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

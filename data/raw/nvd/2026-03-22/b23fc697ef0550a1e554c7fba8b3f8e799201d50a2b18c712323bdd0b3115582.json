@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2593",
+  "ingested_at": "2026-03-22T07:54:41.128072+00:00",
+  "lang": "en",
+  "raw_text": "The Greenshift \u2013 animation and page builder blocks plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the `_gspb_post_css` post meta value and the `dynamicAttributes` block attribute in all versions up to, and including, 12.8.5 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b23fc697ef0550a1e554c7fba8b3f8e799201d50a2b18c712323bdd0b3115582",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2593"
+}

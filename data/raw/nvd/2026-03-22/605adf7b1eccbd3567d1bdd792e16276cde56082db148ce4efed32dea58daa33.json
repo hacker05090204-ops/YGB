@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26141",
+  "ingested_at": "2026-03-22T07:54:42.832695+00:00",
+  "lang": "en",
+  "raw_text": "Improper authentication in Azure Arc allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "605adf7b1eccbd3567d1bdd792e16276cde56082db148ce4efed32dea58daa33",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-863"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26141"
+}

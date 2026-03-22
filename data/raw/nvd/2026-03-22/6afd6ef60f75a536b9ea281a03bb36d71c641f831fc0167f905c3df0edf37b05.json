@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59059",
+  "ingested_at": "2026-03-22T07:54:34.051709+00:00",
+  "lang": "en",
+  "raw_text": "Remote Code Execution Vulnerability in NashornScriptEngineCreator is reported in Apache Ranger versions < = 2.7.0. Users are recommended to upgrade to version 2.8.0, which fixes this issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6afd6ef60f75a536b9ea281a03bb36d71c641f831fc0167f905c3df0edf37b05",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59059"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28274",
+  "ingested_at": "2026-03-22T07:54:32.856393+00:00",
+  "lang": "en",
+  "raw_text": "Initiative is a self-hosted project management platform. Versions of the application prior to 0.32.4 are vulnerable to Stored Cross-Site Scripting (XSS) in the document upload functionality. Any user with upload permissions within the \"Initiatives\" section can upload a malicious `.html` or `.htm` file as a document. Because the uploaded HTML file is served under the application's origin without proper sandboxing, the embedded JavaScript executes in the context of the application. As a result, authentication tokens, session cookies, or other sensitive data can be exfiltrated to an attacker-controlled server. Additionally, since the uploaded file is hosted under the application's domain, simply sharing the direct file link may result in execution of the malicious script when accessed. Version 0.32.4 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "56868882abcf318b3a9ac9794257bf620f02bd57a5e3d595221f22ef17129465",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-434"
+  ],
+  "token_count": 120,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28274"
+}

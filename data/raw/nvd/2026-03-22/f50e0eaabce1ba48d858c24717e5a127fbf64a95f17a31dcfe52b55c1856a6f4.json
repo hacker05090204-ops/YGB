@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23489",
+  "ingested_at": "2026-03-22T07:54:46.886714+00:00",
+  "lang": "en",
+  "raw_text": "Fields is a GLPI plugin that allows users to add custom fields on GLPI items forms. Prior to version 1.23.3, it is possible to execute arbitrary PHP code from users that are allowed to create dropdowns. This issue has been patched in version 1.23.3.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f50e0eaabce1ba48d858c24717e5a127fbf64a95f17a31dcfe52b55c1856a6f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23489"
+}

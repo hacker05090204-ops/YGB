@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32341",
+  "ingested_at": "2026-03-22T07:54:45.887564+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Benevolent benevolent allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Benevolent: from n/a through < = 1.3.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0db36ce73fed7427f2b5282531a51f7bd64313ae352588a76e250d400fffb0d0",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32341"
+}

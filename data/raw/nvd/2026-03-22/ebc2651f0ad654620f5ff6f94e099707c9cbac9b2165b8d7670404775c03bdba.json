@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32694",
+  "ingested_at": "2026-03-22T07:54:47.469637+00:00",
+  "lang": "en",
+  "raw_text": "In Juju from version 3.0.0 through 3.6.18, when a secret owner grants permissions to a secret to a grantee, the secret owner relies exclusively on a predictable XID of the secret to verify ownership. This allows a malicious grantee which can request secrets to predict past secrets granted by the same secret owner to different grantees, allowing them to use the resources granted by those past secrets. Successful exploitation relies on a very specific configuration, specific data semantic, and the administrator having the need to deploy at least two different applications, one of them controlled by the attacker.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ebc2651f0ad654620f5ff6f94e099707c9cbac9b2165b8d7670404775c03bdba",
+  "source": "nvd",
+  "tags": [
+    "CWE-343",
+    "CWE-639"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32694"
+}

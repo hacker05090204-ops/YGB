@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28194",
+  "ingested_at": "2026-03-22T07:54:32.055648+00:00",
+  "lang": "en",
+  "raw_text": "In JetBrains TeamCity before 2025.11.3 open redirect was possible in the React project creation flow",
+  "severity": "MEDIUM",
+  "sha256_hash": "5197be3dedcc3f073a272f992e1d84becf433fa67fb630532a7f3dc6ba93f2d8",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28194"
+}

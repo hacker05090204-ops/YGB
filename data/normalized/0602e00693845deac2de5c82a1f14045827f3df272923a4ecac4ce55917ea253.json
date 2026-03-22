@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "DobryCMS's upload file functionality allows an unauthenticated remote attacker to upload files of any type and extension without restriction, which can result in Remote Code Execution. This issue was fixed in versions above 5.0.",
+  "token_count": 34
+}

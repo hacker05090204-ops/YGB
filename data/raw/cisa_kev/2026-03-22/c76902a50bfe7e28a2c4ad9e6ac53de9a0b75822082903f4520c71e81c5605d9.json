@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-8605",
+  "ingested_at": "2026-03-22T07:45:17.755536+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products A use-after-free vulnerability in Apple iOS, macOS, tvOS, and watchOS could allow a malicious application to execute code with system privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c76902a50bfe7e28a2c4ad9e6ac53de9a0b75822082903f4520c71e81c5605d9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

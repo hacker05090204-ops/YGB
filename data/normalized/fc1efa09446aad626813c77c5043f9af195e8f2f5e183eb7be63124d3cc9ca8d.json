@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: net/sched: act_gate: snapshot parameters with RCU on replace The gate action can be replaced while the hrtimer callback or dump path is walking the schedule list. Convert the parameters to an RCU-protected snapshot and swap updates under tcf_lock, freeing the previous snapshot via call_rcu(). When REPLACE omits the entry list, preserve the existing schedule so the effective state is unchanged.",
+  "token_count": 70
+}

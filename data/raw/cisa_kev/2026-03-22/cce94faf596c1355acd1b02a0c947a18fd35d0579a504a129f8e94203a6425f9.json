@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-3038",
+  "ingested_at": "2026-03-22T07:45:17.486265+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium Network Service Google Chromium Network Service contains a use-after-free vulnerability that allows a remote attacker to potentially exploit heap corruption via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cce94faf596c1355acd1b02a0c947a18fd35d0579a504a129f8e94203a6425f9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 48,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-4008",
+  "ingested_at": "2026-03-22T07:45:16.149097+00:00",
+  "lang": "en",
+  "raw_text": "Smartbedded Meteobridge Smartbedded Meteobridge contains a command injection vulnerability that could allow remote unauthenticated attackers to gain arbitrary command execution with elevated privileges (root) on affected devices.",
+  "severity": "CRITICAL",
+  "sha256_hash": "72a1c0147fcdf421c0e8ce95a86148ab7e3521889fa7621a58bd3dff751205b3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26725",
+  "ingested_at": "2026-03-22T07:54:30.499785+00:00",
+  "lang": "en",
+  "raw_text": "An issue in edu Business Solutions Print Shop Pro WebDesk v.18.34 allows a remote attacker to escalate privileges via the AccessID parameter.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eb00ea88cab3e7b604955256e3ef405e4b422f5046f6c72a8ee99fb3d0ac8d85",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26725"
+}

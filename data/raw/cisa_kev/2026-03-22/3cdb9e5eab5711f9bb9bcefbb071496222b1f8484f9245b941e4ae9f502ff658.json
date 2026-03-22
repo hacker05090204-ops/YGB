@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-32894",
+  "ingested_at": "2026-03-22T07:45:17.707819+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and macOS Apple iOS and macOS contain an out-of-bounds write vulnerability that could allow an application to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3cdb9e5eab5711f9bb9bcefbb071496222b1f8484f9245b941e4ae9f502ff658",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

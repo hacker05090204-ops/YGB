@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2366",
+  "ingested_at": "2026-03-22T07:54:44.213423+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in Keycloak. An authorization bypass vulnerability in the Keycloak Admin API allows any authenticated user, even those without administrative privileges, to enumerate the organization memberships of other users. This information disclosure occurs if the attacker knows the victim's unique identifier (UUID) and the Organizations feature is enabled.",
+  "severity": "LOW",
+  "sha256_hash": "287f68e6a053173f42b812b800f8ed981006c9f3885361df6ee6d4df0c4c6094",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2366"
+}

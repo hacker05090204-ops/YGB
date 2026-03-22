@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use of Hard-coded Credentials vulnerability in Avantra allows Accessing Functionality Not Properly Constrained by ACLs. This issue affects Avantra: before 25.3.0.",
+  "token_count": 21
+}

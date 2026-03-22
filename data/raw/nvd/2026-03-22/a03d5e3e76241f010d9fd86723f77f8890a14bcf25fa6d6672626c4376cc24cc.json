@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2040",
+  "ingested_at": "2026-03-22T07:54:30.684492+00:00",
+  "lang": "en",
+  "raw_text": "PDF-XChange Editor TrackerUpdate Uncontrolled Search Path Element Local Privilege Escalation Vulnerability. This vulnerability allows local attackers to escalate privileges on affected installations of PDF-XChange Editor. An attacker must first obtain the ability to execute low-privileged code on the target system in order to exploit this vulnerability. The specific flaw exists within the TrackerUpdate process. The product loads a library from an unsecured location. An attacker can leverage this vulnerability to escalate privileges and execute code in the context of a target user. Was ZDI-CAN-27788.",
+  "severity": "HIGH",
+  "sha256_hash": "a03d5e3e76241f010d9fd86723f77f8890a14bcf25fa6d6672626c4376cc24cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2040"
+}

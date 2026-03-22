@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-18809",
+  "ingested_at": "2026-03-22T07:45:17.555477+00:00",
+  "lang": "en",
+  "raw_text": "TIBCO JasperReports TIBCO JasperReports Library contains a directory-traversal vulnerability that may allow web server users to access contents of the host system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "052c4126ec36d1651b3d89eb4ac30fd49d16800f05233655fd8781670bd1b5df",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

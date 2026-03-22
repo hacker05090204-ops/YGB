@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-5135",
+  "ingested_at": "2026-03-22T07:45:18.433802+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SonicOS A buffer overflow vulnerability in SonicOS allows a remote attacker to cause Denial of Service (DoS) and potentially execute arbitrary code by sending a malicious request to the firewall.",
+  "severity": "CRITICAL",
+  "sha256_hash": "923bd6ff40b880706054079278f4756dfc164c1bd3d4d1a3702423a68a6231f2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

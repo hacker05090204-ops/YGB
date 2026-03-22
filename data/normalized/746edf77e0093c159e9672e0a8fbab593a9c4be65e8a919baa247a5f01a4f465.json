@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 7.0.4, the `disposeDocument()` method in `EtherFaxActions.php` allows authenticated users to read arbitrary files from the server filesystem. Any authenticated user (regardless of privilege level) can exploit this vulnerability to read sensitive files. Version 7.0.4 patches the issue.",
+  "token_count": 55
+}

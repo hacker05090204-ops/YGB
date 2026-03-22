@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68402",
+  "ingested_at": "2026-03-22T07:54:42.356821+00:00",
+  "lang": "en",
+  "raw_text": "FreshRSS is a free, self-hostable RSS aggregator. From 57e1a37 - 00f2f04, the lengths of the nonce was changed from 40 chars to 64. password_verify() is currently being called with a constructed string (SHA-256 nonce + part of a bcrypt hash) instead of the raw user password. Due to bcrypt\u2019s 72-byte input truncation, this causes password verification to succeed even when the user enters an incorrect password. This vulnerability is fixed in 1.27.2-dev (476e57b). The issue was only present in the edge branch and never in a stable release.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "4778ec5b8ac4419454e6db6b7c6c9996659cb45fe4fd3c24b5a4df47dab6a7f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68402"
+}

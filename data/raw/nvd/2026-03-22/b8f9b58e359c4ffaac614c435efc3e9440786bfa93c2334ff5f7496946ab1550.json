@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27332",
+  "ingested_at": "2026-03-22T07:54:40.184196+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Skygroup Agrofood allows Reflected XSS.This issue affects Agrofood: from n/a before 1.4.0.",
+  "severity": "HIGH",
+  "sha256_hash": "b8f9b58e359c4ffaac614c435efc3e9440786bfa93c2334ff5f7496946ab1550",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27332"
+}

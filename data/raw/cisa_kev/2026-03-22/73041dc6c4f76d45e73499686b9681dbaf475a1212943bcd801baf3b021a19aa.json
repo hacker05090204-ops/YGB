@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2011-2005",
+  "ingested_at": "2026-03-22T07:45:18.266066+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Ancillary Function Driver (afd.sys) afd.sys in the Ancillary Function Driver in Microsoft Windows does not properly validate user-mode input passed to kernel mode, which allows local users to gain privileges via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "73041dc6c4f76d45e73499686b9681dbaf475a1212943bcd801baf3b021a19aa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

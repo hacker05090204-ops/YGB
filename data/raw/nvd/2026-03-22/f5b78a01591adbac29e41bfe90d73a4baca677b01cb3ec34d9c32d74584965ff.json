@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4271",
+  "ingested_at": "2026-03-22T07:54:47.050375+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in libsoup, a library for handling HTTP requests. This vulnerability, known as a Use-After-Free, occurs in the HTTP/2 server implementation. A remote attacker can exploit this by sending specially crafted HTTP/2 requests that cause authentication failures. This can lead to the application attempting to access memory that has already been freed, potentially causing application instability or crashes, resulting in a Denial of Service (DoS).",
+  "severity": "MEDIUM",
+  "sha256_hash": "f5b78a01591adbac29e41bfe90d73a4baca677b01cb3ec34d9c32d74584965ff",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4271"
+}

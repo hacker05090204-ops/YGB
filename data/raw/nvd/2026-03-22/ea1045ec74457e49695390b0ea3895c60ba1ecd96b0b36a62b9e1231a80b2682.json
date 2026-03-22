@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27836",
+  "ingested_at": "2026-03-22T07:54:33.293628+00:00",
+  "lang": "en",
+  "raw_text": "phpMyFAQ is an open source FAQ web application. Prior to version 4.0.18, the WebAuthn prepare endpoint (`/api/webauthn/prepare`) creates new active user accounts without any authentication, CSRF protection, captcha, or configuration checks. This allows unauthenticated attackers to create unlimited user accounts even when registration is disabled. Version 4.0.18 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "ea1045ec74457e49695390b0ea3895c60ba1ecd96b0b36a62b9e1231a80b2682",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27836"
+}

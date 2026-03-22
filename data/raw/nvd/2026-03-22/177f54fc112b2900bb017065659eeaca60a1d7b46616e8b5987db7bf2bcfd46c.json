@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28281",
+  "ingested_at": "2026-03-22T07:54:42.498639+00:00",
+  "lang": "en",
+  "raw_text": "InstantCMS is a free and open source content management system. Prior to 2.18.1, InstantCMS does not validate CSRF tokens, which allows attackers grant moderator privileges to users, execute scheduled tasks, move posts to trash, and accept friend requests on behalf of the user. This vulnerability is fixed in 2.18.1.",
+  "severity": "HIGH",
+  "sha256_hash": "177f54fc112b2900bb017065659eeaca60a1d7b46616e8b5987db7bf2bcfd46c",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28281"
+}

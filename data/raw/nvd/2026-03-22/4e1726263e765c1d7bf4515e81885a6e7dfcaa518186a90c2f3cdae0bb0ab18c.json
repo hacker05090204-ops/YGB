@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25440",
+  "ingested_at": "2026-03-22T07:54:30.973679+00:00",
+  "lang": "en",
+  "raw_text": "WebIncorp ERP contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the prod_id parameter. Attackers can send GET requests to product_detail.php with malicious prod_id values to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "4e1726263e765c1d7bf4515e81885a6e7dfcaa518186a90c2f3cdae0bb0ab18c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25440"
+}

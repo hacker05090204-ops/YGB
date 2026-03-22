@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2775",
+  "ingested_at": "2026-03-22T07:54:31.543266+00:00",
+  "lang": "en",
+  "raw_text": "Mitigation bypass in the DOM: HTML Parser component. This vulnerability affects Firefox < 148, Firefox ESR < 115.33, Firefox ESR < 140.8, Thunderbird < 148, and Thunderbird < 140.8.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ba5bf730fae65009b4fcd9f26fffdafde05a123c9464ecca85fbaa860f5cb376",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-288"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2775"
+}

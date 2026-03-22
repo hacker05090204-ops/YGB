@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-1123",
+  "ingested_at": "2026-03-22T07:45:18.706449+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows The kernel in Microsoft Windows does not properly validate changes to unspecified kernel objects, which allows local users to gain privileges via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9ff04a58d71dbfeef4d486791fcc67101c700caab01dd27aeeee6add4ca33f71",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

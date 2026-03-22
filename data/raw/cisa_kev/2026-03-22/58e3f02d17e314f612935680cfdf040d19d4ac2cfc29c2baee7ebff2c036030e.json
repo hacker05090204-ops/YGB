@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-25078",
+  "ingested_at": "2026-03-22T07:45:16.266421+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DCS-2530L and DCS-2670L Devices D-Link DCS-2530L and DCS-2670L devices contains an unspecified vulnerability that could allow for remote administrator password disclosure. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "58e3f02d17e314f612935680cfdf040d19d4ac2cfc29c2baee7ebff2c036030e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

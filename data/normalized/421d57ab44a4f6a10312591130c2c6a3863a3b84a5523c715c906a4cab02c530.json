@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell Repository Manager (DRM), versions prior to 3.4.8, contains an Uncontrolled Search Path Element vulnerability. A low privileged attacker with local access could potentially exploit this vulnerability, leading to arbitrary code execution and escalation of privileges.",
+  "token_count": 36
+}

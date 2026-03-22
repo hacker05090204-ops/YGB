@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69243",
+  "ingested_at": "2026-03-22T07:54:46.352408+00:00",
+  "lang": "en",
+  "raw_text": "Raytha CMS is vulnerable to User Enumeration in password reset functionality. Difference in messages could allow an attacker to determine if the login is valid or not, enabling a brute force attack with valid logins. This issue was fixed in version 1.5.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f8b8988d0b55449f61c1412812118373af46658b61a974d66fe46c5d838c5c2e",
+  "source": "nvd",
+  "tags": [
+    "CWE-204"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69243"
+}

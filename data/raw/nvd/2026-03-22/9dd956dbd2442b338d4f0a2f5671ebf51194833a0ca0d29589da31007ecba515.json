@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2568",
+  "ingested_at": "2026-03-22T07:54:34.048712+00:00",
+  "lang": "en",
+  "raw_text": "The WP Zendesk for Contact Form 7, WPForms, Elementor, Formidable and Ninja Forms plugin for WordPress is vulnerable to Stored Cross-Site Scripting via form submission data in all versions up to, and including, 1.1.5 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "HIGH",
+  "sha256_hash": "9dd956dbd2442b338d4f0a2f5671ebf51194833a0ca0d29589da31007ecba515",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2568"
+}

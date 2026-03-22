@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A command injection vulnerability has been reported to affect several QNAP operating system versions. If an attacker gains local network access who have also gained a user account, they can then exploit the vulnerability to execute arbitrary commands. We have already fixed the vulnerability in the following versions: QTS 5.1.9.2954 build 20241120 and later QTS 5.2.3.3006 build 20250108 and later QuTS hero h5.1.9.2954 build 20241120 and later QuTS hero h5.2.3.3006 build 20250108 and later",
+  "token_count": 74
+}

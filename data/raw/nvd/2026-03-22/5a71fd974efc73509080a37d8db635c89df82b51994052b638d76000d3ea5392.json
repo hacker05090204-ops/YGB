@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29177",
+  "ingested_at": "2026-03-22T07:54:43.101728+00:00",
+  "lang": "en",
+  "raw_text": "Craft Commerce is an ecommerce platform for Craft CMS. Prior to 4.10.2 and 5.5.3, a Stored Cross-Site Scripting (XSS) vulnerability exists in the Craft Commerce Order details. Malicious JavaScript can be injected via the Shipping Method Name, Order Reference, or Site Name. When a user opens the order details slideout via a double-click on the order index page, the injected payload executes. This vulnerability is fixed in 4.10.2 and 5.5.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5a71fd974efc73509080a37d8db635c89df82b51994052b638d76000d3ea5392",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29177"
+}

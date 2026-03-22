@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-34713",
+  "ingested_at": "2026-03-22T07:45:17.723834+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A remote code execution vulnerability exists when Microsoft Windows MSDT is called using the URL protocol from a calling application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3f91ecec4a75376a404773a1f25da8b2b85099a4c3de0781d8fcbeec1473ec5d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

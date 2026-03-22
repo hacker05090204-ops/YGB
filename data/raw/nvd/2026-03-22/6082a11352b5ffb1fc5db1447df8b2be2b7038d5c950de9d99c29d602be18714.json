@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2488",
+  "ingested_at": "2026-03-22T07:54:41.712515+00:00",
+  "lang": "en",
+  "raw_text": "The ProfileGrid \u2013 User Profiles, Groups and Communities plugin for WordPress is vulnerable to unauthorized message deletion due to a missing capability check on the pg_delete_msg() function in all versions up to, and including, 5.9.8.1. This is due to the function not verifying that the requesting user has permission to delete the targeted message. This makes it possible for authenticated attackers, with Subscriber-level access and above, to delete arbitrary messages belonging to any user by sending a direct request with a valid message ID (mid parameter).",
+  "severity": "MEDIUM",
+  "sha256_hash": "6082a11352b5ffb1fc5db1447df8b2be2b7038d5c950de9d99c29d602be18714",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2488"
+}

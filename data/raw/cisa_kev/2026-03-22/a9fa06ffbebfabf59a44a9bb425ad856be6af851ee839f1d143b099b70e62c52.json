@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-1675",
+  "ingested_at": "2026-03-22T07:45:18.662832+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox Mozilla Firefox does not properly initialize data structures for the nsDOMSVGZoomEvent::mPreviousScale and nsDOMSVGZoomEvent::mNewScale functions, which allows remote attackers to obtain sensitive information from process memory via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a9fa06ffbebfabf59a44a9bb425ad856be6af851ee839f1d143b099b70e62c52",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

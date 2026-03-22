@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2457",
+  "ingested_at": "2026-03-22T07:54:46.451403+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to sanitize client-supplied post metadata which allows an authenticated attacker to spoof permalink embeds impersonating other users via crafted PUT requests to the post update API endpoint.. Mattermost Advisory ID: MMSA-2025-00569",
+  "severity": "MEDIUM",
+  "sha256_hash": "b38945212445064736ba7d6cbf041aadc1ed91f17daedf1397c80fc5ce5d30ef",
+  "source": "nvd",
+  "tags": [
+    "CWE-346"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2457"
+}

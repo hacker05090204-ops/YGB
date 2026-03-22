@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70034",
+  "ingested_at": "2026-03-22T07:54:42.337818+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-1333: Inefficient Regular Expression Complexity (4.19) was discovered in mscdex ssh2 v1.17.0.",
+  "severity": "HIGH",
+  "sha256_hash": "e3ee0d7d3007b670cfacbb471fc10a6f952341979fb7c644d9dc404efcd32f34",
+  "source": "nvd",
+  "tags": [
+    "CWE-1333"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70034"
+}

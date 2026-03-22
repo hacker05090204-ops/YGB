@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-30035",
+  "ingested_at": "2026-03-22T07:54:33.558592+00:00",
+  "lang": "en",
+  "raw_text": "The vulnerability enables an attacker to fully bypass authentication in CGM CLININET and gain access to any active user account by supplying only the username, without requiring a password or any other credentials. Obtaining a session ID is sufficient for session takeover and grants access to the system with the privileges of the targeted user.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "5c5e3cbc246130f62a0a9a27c5f7370324de3e34bf467432c1785830cd29fa33",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30035"
+}

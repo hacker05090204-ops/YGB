@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Docker Desktop Community Edition Docker Desktop Community Edition contains a vulnerability that may allow local users to escalate privileges by placing a trojan horse docker-credential-wincred.exe file in %PROGRAMDATA%\\DockerDesktop\\version-bin\\.",
+  "token_count": 28
+}

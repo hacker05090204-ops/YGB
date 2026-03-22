@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11707",
+  "ingested_at": "2026-03-22T07:45:18.014271+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox and Thunderbird Mozilla Firefox and Thunderbird contain a type confusion vulnerability that can occur when manipulating JavaScript objects due to issues in Array.pop, allowing for an exploitable crash.",
+  "severity": "CRITICAL",
+  "sha256_hash": "faedd4d4e5f6618c1c80757262c8ecc4b6a8eb7f383a46240bb7bac763358b90",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

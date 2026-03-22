@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Citrix Application Delivery Controller (ADC) and Gateway Citrix Application Delivery Controller (ADC) and Gateway, when configured with SAML SP or IdP configuration, contain an authentication bypass vulnerability that allows an attacker to execute code as administrator.",
+  "token_count": 36
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32142",
+  "ingested_at": "2026-03-22T07:54:44.466165+00:00",
+  "lang": "en",
+  "raw_text": "Shopware is an open commerce platform. /api/_info/config route exposes information about licenses. This vulnerability is fixed in 7.8.1 and 6.10.15.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f42e4c31a9b85c907040759fb325d8e4bf21b4bbc9d5f29ac63253d15d3f18eb",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32142"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59783",
+  "ingested_at": "2026-03-22T07:54:34.524847+00:00",
+  "lang": "en",
+  "raw_text": "API endpoint for user synchronization in 2N Access Commander version 3.4.1 did not have a sufficient input validation allowing for OS command injection. This vulnerability can only be exploited after authenticating with administrator privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "3c046aaa3079301d9e401d3bc812515bf47a3a400b61bfe8ce26de13f4e65753",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59783"
+}

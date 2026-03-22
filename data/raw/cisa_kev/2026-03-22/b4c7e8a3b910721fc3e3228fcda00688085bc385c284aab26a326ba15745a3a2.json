@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-9163",
+  "ingested_at": "2026-03-22T07:45:18.132816+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Stack-based buffer overflow in Adobe Flash Player allows attackers to execute code remotely.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b4c7e8a3b910721fc3e3228fcda00688085bc385c284aab26a326ba15745a3a2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

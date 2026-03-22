@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22416",
+  "ingested_at": "2026-03-22T07:54:40.045586+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in AncoraThemes FixTeam fixteam allows PHP Local File Inclusion.This issue affects FixTeam: from n/a through < = 1.4.",
+  "severity": "HIGH",
+  "sha256_hash": "d786f7753035a88504c25593d64cabddd8c19cbec440305e27891623d9a53584",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22416"
+}

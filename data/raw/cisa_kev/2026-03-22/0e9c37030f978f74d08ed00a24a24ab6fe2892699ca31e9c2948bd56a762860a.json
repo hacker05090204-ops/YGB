@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-3568",
+  "ingested_at": "2026-03-22T07:45:18.074194+00:00",
+  "lang": "en",
+  "raw_text": "Meta Platforms WhatsApp A buffer overflow vulnerability in WhatsApp VOIP stack allowed remote code execution via specially crafted series of RTCP packets sent to a target phone number.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e9c37030f978f74d08ed00a24a24ab6fe2892699ca31e9c2948bd56a762860a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

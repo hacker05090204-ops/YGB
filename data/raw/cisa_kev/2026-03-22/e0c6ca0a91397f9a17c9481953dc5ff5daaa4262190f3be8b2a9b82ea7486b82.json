@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-17026",
+  "ingested_at": "2026-03-22T07:45:19.468114+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox and Thunderbird Mozilla Firefox and Thunderbird contain a type confusion vulnerability due to incorrect alias information in the IonMonkey JIT compiler when setting array elements.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e0c6ca0a91397f9a17c9481953dc5ff5daaa4262190f3be8b2a9b82ea7486b82",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

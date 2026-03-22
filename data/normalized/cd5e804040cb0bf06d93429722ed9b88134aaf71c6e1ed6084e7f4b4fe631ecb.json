@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DNS-320 Storage Device The login_mgr.cgi script in D-Link DNS-320 is vulnerable to remote code execution.",
+  "token_count": 16
+}

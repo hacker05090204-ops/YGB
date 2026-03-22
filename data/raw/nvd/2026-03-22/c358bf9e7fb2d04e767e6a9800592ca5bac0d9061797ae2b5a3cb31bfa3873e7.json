@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62319",
+  "ingested_at": "2026-03-22T07:54:46.848776+00:00",
+  "lang": "en",
+  "raw_text": "Boolean-Based SQL Injection is a type of blind SQL injection where an attacker manipulates SQL queries by injecting Boolean conditions (TRUE or FALSE) into application input fields. Instead of returning database errors or visible data, the application responds differently depending on whether the injected condition evaluates to true or false. This allows an attacker to inject arbitrary SQL into backend configuration queries executed within the application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c358bf9e7fb2d04e767e6a9800592ca5bac0d9061797ae2b5a3cb31bfa3873e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62319"
+}

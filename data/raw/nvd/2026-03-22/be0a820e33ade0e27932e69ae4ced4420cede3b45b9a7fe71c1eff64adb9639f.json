@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22716",
+  "ingested_at": "2026-03-22T07:54:33.238849+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bound write vulnerability in VMware Workstation 25H1 and below on any platform allows an actor with non-administrative privileges on a guest VM to terminate certain Workstation processes.",
+  "severity": "MEDIUM",
+  "sha256_hash": "be0a820e33ade0e27932e69ae4ced4420cede3b45b9a7fe71c1eff64adb9639f",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22716"
+}

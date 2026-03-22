@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A critical SQL injection vulnerability in Spring AI's MariaDBFilterExpressionConverter allows attackers to bypass metadata-based access controls and execute arbitrary SQL commands. The vulnerability exists due to missing input sanitization.",
+  "token_count": 29
+}

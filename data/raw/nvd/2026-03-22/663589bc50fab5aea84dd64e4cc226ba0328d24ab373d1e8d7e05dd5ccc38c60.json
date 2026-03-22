@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2919",
+  "ingested_at": "2026-03-22T07:54:42.285176+00:00",
+  "lang": "en",
+  "raw_text": "Malicious scripts could display attacker-controlled web content under spoofed domains in Focus for iOS by stalling a _self navigation to an invalid port and triggering an iframe redirect, causing the UI to display a trusted domain without user interaction. This vulnerability affects Focus for iOS < 148.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "663589bc50fab5aea84dd64e4cc226ba0328d24ab373d1e8d7e05dd5ccc38c60",
+  "source": "nvd",
+  "tags": [
+    "CWE-451"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2919"
+}

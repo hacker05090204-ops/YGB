@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4191",
+  "ingested_at": "2026-03-22T07:54:46.694224+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in JawherKl node-api-postgres up to 2.5. Affected is the function path.extname of the file index.js of the component Profile Picture Handler. This manipulation causes unrestricted upload. The attack is possible to be carried out remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "5b216cd68bce985be1a0e977f3186d7962d2cd4556c09af9678b6757241feed3",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4191"
+}

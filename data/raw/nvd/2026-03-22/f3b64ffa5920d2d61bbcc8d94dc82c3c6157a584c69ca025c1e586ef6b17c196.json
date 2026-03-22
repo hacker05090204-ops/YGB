@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31992",
+  "ingested_at": "2026-03-22T07:54:47.814180+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.23 contain an allowlist bypass vulnerability in system.run guardrails that allows authenticated operators to execute unintended commands. When /usr/bin/env is allowlisted, attackers can use env -S to bypass policy analysis and execute shell wrapper payloads at runtime.",
+  "severity": "HIGH",
+  "sha256_hash": "f3b64ffa5920d2d61bbcc8d94dc82c3c6157a584c69ca025c1e586ef6b17c196",
+  "source": "nvd",
+  "tags": [
+    "CWE-184"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31992"
+}

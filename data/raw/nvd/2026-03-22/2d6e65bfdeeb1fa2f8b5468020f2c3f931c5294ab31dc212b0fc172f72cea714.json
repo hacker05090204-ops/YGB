@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32330",
+  "ingested_at": "2026-03-22T07:54:44.781043+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in 10Web Photo Gallery by 10Web photo-gallery allows Cross Site Request Forgery.This issue affects Photo Gallery by 10Web: from n/a through < = 1.8.37.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2d6e65bfdeeb1fa2f8b5468020f2c3f931c5294ab31dc212b0fc172f72cea714",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32330"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-11708",
+  "ingested_at": "2026-03-22T07:45:18.017264+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox and Thunderbird Mozilla Firefox and Thunderbird contain a sandbox escape vulnerability that could result in remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "deb31e669aa8a80a0e8e58a243da0711919a7f316dbb4c6d7027df7885c920dd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

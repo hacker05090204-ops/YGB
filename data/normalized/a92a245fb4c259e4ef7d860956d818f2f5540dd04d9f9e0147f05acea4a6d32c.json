@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "libtiff up to v4.7.1 was discovered to contain a stack overflow via the readSeparateStripsIntoBuffer function.",
+  "token_count": 15
+}

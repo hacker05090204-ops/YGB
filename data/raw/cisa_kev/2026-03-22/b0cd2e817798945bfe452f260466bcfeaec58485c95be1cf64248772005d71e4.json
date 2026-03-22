@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-22204",
+  "ingested_at": "2026-03-22T07:45:18.946750+00:00",
+  "lang": "en",
+  "raw_text": "Perl Exiftool Improper neutralization of user data in the DjVu file format in Exiftool versions 7.44 and up allows arbitrary code execution when parsing the malicious image",
+  "severity": "CRITICAL",
+  "sha256_hash": "b0cd2e817798945bfe452f260466bcfeaec58485c95be1cf64248772005d71e4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

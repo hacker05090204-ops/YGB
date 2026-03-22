@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28498",
+  "ingested_at": "2026-03-22T07:54:46.895645+00:00",
+  "lang": "en",
+  "raw_text": "Authlib is a Python library which builds OAuth and OpenID Connect servers. Prior to version 1.6.9, a library-level vulnerability was identified in the Authlib Python library concerning the validation of OpenID Connect (OIDC) ID Tokens. Specifically, the internal hash verification logic (_verify_hash) responsible for validating the at_hash (Access Token Hash) and c_hash (Authorization Code Hash) claims exhibits a fail-open behavior when encountering an unsupported or unknown cryptographic algorithm. This flaw allows an attacker to bypass mandatory integrity protections by supplying a forged ID Token with a deliberately unrecognized alg header parameter. The library intercepts the unsupported state and silently returns True (validation passed), inherently violating fundamental cryptographic design principles and direct OIDC specifications. This issue has been patched in version 1.6.9.",
+  "severity": "HIGH",
+  "sha256_hash": "ab3ffe36ab80a7f77a5d69081a9b03f3e1788c53f85f38fbef8cd9b6bee676e3",
+  "source": "nvd",
+  "tags": [
+    "CWE-354",
+    "CWE-573"
+  ],
+  "token_count": 121,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28498"
+}

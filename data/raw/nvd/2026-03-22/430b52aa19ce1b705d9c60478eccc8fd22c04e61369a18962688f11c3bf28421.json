@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69238",
+  "ingested_at": "2026-03-22T07:54:46.342935+00:00",
+  "lang": "en",
+  "raw_text": "Raytha CMS is vulnerable to Cross-Site Request Forgery across multiple endpoints. Attacker can craft special website, which when visited by the authenticated victim, will automatically send POST request to the endpoint (e. x. deletion of the data) without enforcing token verification. This issue was fixed in version 1.4.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "430b52aa19ce1b705d9c60478eccc8fd22c04e61369a18962688f11c3bf28421",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69238"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft SMBv1 The SMBv1 server in multiple Microsoft Windows versions allows remote attackers to execute arbitrary code via crafted packets.",
+  "token_count": 20
+}

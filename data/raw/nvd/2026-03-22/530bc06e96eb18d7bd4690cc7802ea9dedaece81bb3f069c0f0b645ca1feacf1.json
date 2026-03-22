@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25480",
+  "ingested_at": "2026-03-22T07:54:43.831215+00:00",
+  "lang": "en",
+  "raw_text": "ARMBot contains an unrestricted file upload vulnerability in upload.php that allows unauthenticated attackers to upload arbitrary files by manipulating the file parameter with path traversal sequences. Attackers can upload PHP files with traversal payloads ../public_html/ to write executable code to the web root and achieve remote code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "530bc06e96eb18d7bd4690cc7802ea9dedaece81bb3f069c0f0b645ca1feacf1",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25480"
+}

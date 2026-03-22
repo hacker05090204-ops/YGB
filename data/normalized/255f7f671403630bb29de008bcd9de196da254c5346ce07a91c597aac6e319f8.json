@@ -1,0 +1,5 @@
+{
+  "lang": "it",
+  "raw_text": "glibc < 2.26 - 'getcwd()' Local Privilege Escalation",
+  "token_count": 8
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67987",
+  "ingested_at": "2026-03-22T07:54:30.037187+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in ExpressTech Systems Quiz And Survey Master quiz-master-next allows SQL Injection.This issue affects Quiz And Survey Master: from n/a through < = 10.3.1.",
+  "severity": "HIGH",
+  "sha256_hash": "54bc7a99ec3a309af3599c433ce1111ced9ba437df621f84c13b5d9afffddc9a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67987"
+}

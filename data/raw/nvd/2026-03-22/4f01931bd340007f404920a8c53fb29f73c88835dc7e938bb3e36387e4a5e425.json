@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2956",
+  "ingested_at": "2026-03-22T07:54:31.019657+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in qinming99 dst-admin up to 1.5.0. This affects the function revertBackup of the file /home/restore. The manipulation of the argument Name results in command injection. The attack can be launched remotely. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4f01931bd340007f404920a8c53fb29f73c88835dc7e938bb3e36387e4a5e425",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77",
+    "CWE-77"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2956"
+}

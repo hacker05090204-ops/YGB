@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Enforcement of Behavioral Controls in Devolutions Server 2025.3.15 and earlier allows an authenticated attacker with the delete permission to delete a PAM account that is currently checked out by selecting it alongside at least one non-checked-out account and performing a bulk deletion.",
+  "token_count": 43
+}

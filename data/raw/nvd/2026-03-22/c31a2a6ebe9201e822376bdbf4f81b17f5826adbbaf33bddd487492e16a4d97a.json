@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28370",
+  "ingested_at": "2026-03-22T07:54:33.051459+00:00",
+  "lang": "en",
+  "raw_text": "In the query parser in OpenStack Vitrage before 12.0.1, 13.0.0, 14.0.0, and 15.0.0, a user allowed to access the Vitrage API may trigger code execution on the Vitrage service host as the user the Vitrage service runs under. This may result in unauthorized access to the host and further compromise of the Vitrage service. All deployments exposing the Vitrage API are affected. This occurs in _create_query_function in vitrage/graph/query.py.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c31a2a6ebe9201e822376bdbf4f81b17f5826adbbaf33bddd487492e16a4d97a",
+  "source": "nvd",
+  "tags": [
+    "CWE-95"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28370"
+}

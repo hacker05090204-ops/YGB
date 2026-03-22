@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32408",
+  "ingested_at": "2026-03-22T07:54:46.040505+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in themefusecom Brizy brizy allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Brizy: from n/a through < = 2.7.23.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9a3765baa913a3c283dbac6060dca039a4b19ecdad6aeb5ab136ea47574131d7",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32408"
+}

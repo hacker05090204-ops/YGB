@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28372",
+  "ingested_at": "2026-03-22T07:54:33.062769+00:00",
+  "lang": "en",
+  "raw_text": "telnetd in GNU inetutils through 2.7 allows privilege escalation that can be exploited by abusing systemd service credentials support added to the login(1) implementation of util-linux in release 2.40. This is related to client control over the CREDENTIALS_DIRECTORY environment variable, and requires an unprivileged local user to create a login.noauth file.",
+  "severity": "HIGH",
+  "sha256_hash": "3f8c65742dba8c95cd0012c8c1cf378338da78977293bb14058cf20d5240c329",
+  "source": "nvd",
+  "tags": [
+    "CWE-829"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28372"
+}

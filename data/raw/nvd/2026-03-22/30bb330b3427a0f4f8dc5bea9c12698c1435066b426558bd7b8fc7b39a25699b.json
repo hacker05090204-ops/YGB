@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27711",
+  "ingested_at": "2026-03-22T07:54:32.423548+00:00",
+  "lang": "en",
+  "raw_text": "NanaZip is an open source file archive. Starting in version 5.0.1252.0 and prior to versions 6.0.1638.0 and 6.5.1638.0, a memory corruption vulnerability in NanaZip\u2019s UFS parser allows a crafted `.ufs/.ufs2/.img` file to trigger out-of-bounds memory access during archive open/listing. The bug is reachable via normal user file-open flow and can cause process crash, hang, and potentially exploitable heap corruption. Versions 6.0.1638.0 and 6.5.1638.0 fix the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "30bb330b3427a0f4f8dc5bea9c12698c1435066b426558bd7b8fc7b39a25699b",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27711"
+}

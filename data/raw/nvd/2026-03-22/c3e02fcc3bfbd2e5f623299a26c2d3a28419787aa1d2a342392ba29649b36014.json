@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32447",
+  "ingested_at": "2026-03-22T07:54:46.124376+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Vito Peleg Atarim atarim-visual-collaboration allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Atarim: from n/a through < = 4.3.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c3e02fcc3bfbd2e5f623299a26c2d3a28419787aa1d2a342392ba29649b36014",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32447"
+}

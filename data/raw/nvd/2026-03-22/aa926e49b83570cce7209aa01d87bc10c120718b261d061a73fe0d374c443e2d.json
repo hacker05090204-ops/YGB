@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25574",
+  "ingested_at": "2026-03-22T07:54:49.546749+00:00",
+  "lang": "en",
+  "raw_text": "Green CMS 2.x contains a path traversal vulnerability that allows authenticated attackers to download arbitrary files and directories by injecting directory traversal sequences. Attackers can manipulate the theme_name parameter in the themeexporthandle action or supply base64-encoded file paths to the downfile action to retrieve sensitive files outside intended directories.",
+  "severity": "MEDIUM",
+  "sha256_hash": "aa926e49b83570cce7209aa01d87bc10c120718b261d061a73fe0d374c443e2d",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25574"
+}

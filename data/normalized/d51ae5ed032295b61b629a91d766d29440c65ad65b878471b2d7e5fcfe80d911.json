@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Looking Glass Multi-Router Looking Glass (MRLG) Multi-Router Looking Glass (MRLG) contains a buffer overflow vulnerability that could allow remote attackers to cause an arbitrary memory write and memory corruption.",
+  "token_count": 29
+}

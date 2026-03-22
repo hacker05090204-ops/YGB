@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33172",
+  "ingested_at": "2026-03-22T07:54:49.028762+00:00",
+  "lang": "en",
+  "raw_text": "Statamic is a Laravel and Git powered content management system (CMS). Prior to versions 5.73.14 and 6.7.0, a stored XSS vulnerability in SVG asset reuploads allows authenticated users with asset upload permissions to bypass SVG sanitization and inject malicious JavaScript that executes when the asset is viewed. This has been fixed in 5.73.14 and 6.7.0.",
+  "severity": "HIGH",
+  "sha256_hash": "4321ee8ae9007ce3d1eeaea7c1f03b3c362a5ad518233035ac3098df9b3b9d1a",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33172"
+}

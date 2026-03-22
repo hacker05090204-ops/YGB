@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An authenticated user with the read role may read limited amounts of uninitialized stack memory via specially-crafted issuances of the filemd5 command.",
+  "token_count": 22
+}

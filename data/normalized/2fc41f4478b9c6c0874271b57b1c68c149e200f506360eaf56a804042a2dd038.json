@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in UTT HiPER 810G up to 1.7.7-171114. This impacts the function strcpy of the file /goform/formRemoteControl. The manipulation results in buffer overflow. The attack may be launched remotely. The exploit has been released to the public and may be used for attacks.",
+  "token_count": 48
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0210",
+  "ingested_at": "2026-03-22T07:45:17.957496+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer A privilege escalation vulnerability exists when Internet Explorer does not properly enforce cross-domain policies, which could allow an attacker to access information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "553de4a96c99cd5b9d6f4e212a14f6b3ab305a750cd61ead0dd2061568368161",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

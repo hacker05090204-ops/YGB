@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3368",
+  "ingested_at": "2026-03-22T07:54:49.165786+00:00",
+  "lang": "en",
+  "raw_text": "The Injection Guard plugin for WordPress is vulnerable to Stored Cross-Site Scripting via malicious query parameter names in all versions up to and including 1.2.9. This is due to insufficient input sanitization in the sanitize_ig_data() function which only sanitizes array values but not array keys, combined with missing output escaping in the ig_settings.php template where stored parameter keys are echoed directly into HTML. When a request is made to the site, the plugin captures the query string via $_SERVER['QUERY_STRING'], applies esc_url_raw() (which preserves URL-encoded special characters like %22, %3E, %3C), then passes it to parse_str() which URL-decodes the string, resulting in decoded HTML/JavaScript in the array keys. These keys are stored via update_option('ig_requests_log') and later rendered without esc_html() or esc_attr() on the admin log page. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in the admin log page that execute whenever an administrator views the Injection Guard log interface.",
+  "severity": "HIGH",
+  "sha256_hash": "032df354c158b7652642f7e20fa417d27864c50a44c8f0055f5a116e4fe39580",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 153,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3368"
+}

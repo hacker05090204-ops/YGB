@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-1000353",
+  "ingested_at": "2026-03-22T07:45:16.143100+00:00",
+  "lang": "en",
+  "raw_text": "Jenkins Jenkins Jenkins contains a remote code execution vulnerability. This vulnerability that could allowed attackers to transfer a serialized Java SignedObject object to the remoting-based Jenkins CLI, that would be deserialized using a new ObjectInputStream, bypassing the existing blocklist-based protection mechanism.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9fdb5aee0f0a113276cf7ad6d0877795372482561cecbb8bd9c4dfda2d91c598",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 41,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

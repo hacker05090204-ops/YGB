@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27904",
+  "ingested_at": "2026-03-22T07:54:32.515474+00:00",
+  "lang": "en",
+  "raw_text": "minimatch is a minimal matching utility for converting glob expressions into JavaScript RegExp objects. Prior to version 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.4, nested `*()` extglobs produce regexps with nested unbounded quantifiers (e.g. `(?:(?:a|b)*)*`), which exhibit catastrophic backtracking in V8. With a 12-byte pattern `*(*(*(a|b)))` and an 18-byte non-matching input, `minimatch()` stalls for over 7 seconds. Adding a single nesting level or a few input characters pushes this to minutes. This is the most severe finding: it is triggered by the default `minimatch()` API with no special options, and the minimum viable pattern is only 12 bytes. The same issue affects `+()` extglobs equally. Versions 10.2.3, 9.0.7, 8.0.6, 7.4.8, 6.2.2, 5.1.8, 4.2.5, and 3.1.4 fix the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "a9a323f9244b5c496f7a68c8c7f1cc0bf737f15c19060a8f681f1972eeaa3e15",
+  "source": "nvd",
+  "tags": [
+    "CWE-1333"
+  ],
+  "token_count": 120,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27904"
+}

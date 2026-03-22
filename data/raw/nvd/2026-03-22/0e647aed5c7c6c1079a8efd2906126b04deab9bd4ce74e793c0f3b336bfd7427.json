@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20003",
+  "ingested_at": "2026-03-22T07:54:34.638070+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the REST API of Cisco Secure FMC Software could allow an authenticated, remote attacker to conduct SQL injection attacks on an affected system. This vulnerability is due to inadequate validation of user-supplied input. An attacker could exploit this vulnerability by sending crafted requests to an affected device. A successful exploit could allow the attacker to obtain read access to the database and read certain files on the underlying operating system. To exploit this vulnerability, the attacker would need valid user credentials with any of the following roles: Administrator Security approver Intrusion admin Access admin Network admin",
+  "severity": "MEDIUM",
+  "sha256_hash": "0e647aed5c7c6c1079a8efd2906126b04deab9bd4ce74e793c0f3b336bfd7427",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20003"
+}

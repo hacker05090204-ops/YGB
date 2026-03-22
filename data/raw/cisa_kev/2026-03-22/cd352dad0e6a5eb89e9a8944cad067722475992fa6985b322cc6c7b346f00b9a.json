@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1647",
+  "ingested_at": "2026-03-22T07:45:19.286067+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Defender Microsoft Defender contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cd352dad0e6a5eb89e9a8944cad067722475992fa6985b322cc6c7b346f00b9a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 14,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

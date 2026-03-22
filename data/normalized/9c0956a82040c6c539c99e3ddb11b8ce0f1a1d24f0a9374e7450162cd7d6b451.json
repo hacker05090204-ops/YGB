@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 contains a type confusion vulnerability that allows a remote attacker to execute code via a crafted HTML page.",
+  "token_count": 24
+}

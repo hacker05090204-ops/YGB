@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-1789",
+  "ingested_at": "2026-03-22T07:54:31.729220+00:00",
+  "lang": "en",
+  "raw_text": "Local privilege escalation in Genetec Update Service. An authenticated, low-privileged, Windows user could exploit this vulnerability to gain elevated privileges on the affected system.",
+  "severity": "HIGH",
+  "sha256_hash": "f6030bb27cfd7873030c85853d510dc0c2ff28d0463fc388fe4072ae95aa5690",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-1789"
+}

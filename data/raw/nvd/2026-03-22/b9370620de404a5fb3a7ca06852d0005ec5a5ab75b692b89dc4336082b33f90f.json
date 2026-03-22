@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25527",
+  "ingested_at": "2026-03-22T07:54:44.319527+00:00",
+  "lang": "en",
+  "raw_text": "Inout EasyRooms Ultimate Edition v1.0 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the numguest parameter. Attackers can send POST requests to the search/searchdetailed endpoint with malicious SQL payloads to bypass authentication, extract sensitive data, or modify database contents.",
+  "severity": "HIGH",
+  "sha256_hash": "b9370620de404a5fb3a7ca06852d0005ec5a5ab75b692b89dc4336082b33f90f",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25527"
+}

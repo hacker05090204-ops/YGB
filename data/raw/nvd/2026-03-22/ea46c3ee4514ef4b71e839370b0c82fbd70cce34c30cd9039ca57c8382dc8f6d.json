@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2984",
+  "ingested_at": "2026-03-22T07:54:31.104663+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in SourceCodester Student Result Management System 1.0. This affects an unknown function of the file /admin/core/drop_user.php. Such manipulation of the argument ID leads to denial of service. The attack can be executed remotely. The exploit is publicly available and might be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ea46c3ee4514ef4b71e839370b0c82fbd70cce34c30cd9039ca57c8382dc8f6d",
+  "source": "nvd",
+  "tags": [
+    "CWE-404"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2984"
+}

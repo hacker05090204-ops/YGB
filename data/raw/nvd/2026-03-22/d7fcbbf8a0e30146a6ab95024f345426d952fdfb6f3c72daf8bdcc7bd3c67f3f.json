@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70050",
+  "ingested_at": "2026-03-22T07:54:42.318667+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-312: Cleartext Storage of Sensitive Information was discovered in lesspass lesspass v9.6.9 which allows attackers to obtain sensitive information.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d7fcbbf8a0e30146a6ab95024f345426d952fdfb6f3c72daf8bdcc7bd3c67f3f",
+  "source": "nvd",
+  "tags": [
+    "CWE-312"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70050"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27961",
+  "ingested_at": "2026-03-22T07:54:32.542249+00:00",
+  "lang": "en",
+  "raw_text": "Agenta is an open-source LLMOps platform. A Server-Side Template Injection (SSTI) vulnerability exists in versions prior to 0.86.8 in Agenta's API server evaluator template rendering. Although the vulnerable code lives in the SDK package, it is executed server-side within the API process when running evaluators. This does not affect standalone SDK usage \u2014 it only impacts self-hosted or managed Agenta platform deployments. Version 0.86.8 contains a fix for the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "08c8d63168acedb13a8a946f6e0caec87cbaaec919257eb1c8673eafe3ec2021",
+  "source": "nvd",
+  "tags": [
+    "CWE-1336"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27961"
+}

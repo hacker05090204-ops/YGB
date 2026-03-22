@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2004-0210",
+  "ingested_at": "2026-03-22T07:45:18.713306+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege elevation vulnerability exists in the POSIX subsystem. This vulnerability could allow a logged on user to take complete control of the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c2d0e694bc55823589b75305d064281fcd0201ebd56aa1222a60618dd59cf27e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32354",
+  "ingested_at": "2026-03-22T07:54:45.921867+00:00",
+  "lang": "en",
+  "raw_text": "Insertion of Sensitive Information Into Sent Data vulnerability in magepeopleteam WpEvently mage-eventpress allows Retrieve Embedded Sensitive Data.This issue affects WpEvently: from n/a through < 5.1.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "40d50c45cfbb2bd4788bec00f473d2a1c2513b1c3c11b4538d127af6fc480338",
+  "source": "nvd",
+  "tags": [
+    "CWE-201"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32354"
+}

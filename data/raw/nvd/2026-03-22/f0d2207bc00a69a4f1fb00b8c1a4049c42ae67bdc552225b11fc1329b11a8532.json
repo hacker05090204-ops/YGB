@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2983",
+  "ingested_at": "2026-03-22T07:54:31.095223+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in SourceCodester Student Result Management System 1.0. The impacted element is an unknown function of the file /admin/core/import_users.php of the component Bulk Import. This manipulation of the argument File causes improper access controls. Remote exploitation of the attack is possible. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "f0d2207bc00a69a4f1fb00b8c1a4049c42ae67bdc552225b11fc1329b11a8532",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2983"
+}

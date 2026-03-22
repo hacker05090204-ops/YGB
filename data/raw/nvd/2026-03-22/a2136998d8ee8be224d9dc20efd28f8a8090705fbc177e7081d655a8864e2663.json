@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27687",
+  "ingested_at": "2026-03-22T07:54:42.490641+00:00",
+  "lang": "en",
+  "raw_text": "Due to missing authorization check in SAP S/4HANA HCM Portugal and SAP ERP HCM Portugal, a user with high privileges could access sensitive data belonging to another company. This vulnerability has a high impact on confidentiality and does not affect integrity and availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a2136998d8ee8be224d9dc20efd28f8a8090705fbc177e7081d655a8864e2663",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27687"
+}

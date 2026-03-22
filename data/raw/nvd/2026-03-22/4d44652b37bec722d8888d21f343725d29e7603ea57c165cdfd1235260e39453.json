@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4242",
+  "ingested_at": "2026-03-22T07:54:46.842307+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in BabyChakra Pregnancy & Parenting App up to 5.4.3.0 on Android. This affects an unknown function of the file file app/babychakra/babychakra/Configuration.java of the component app.babychakra.babychakra. Performing a manipulation of the argument SEGMENT_WRITE_KEY results in unprotected storage of credentials. The attack needs to be approached locally. The complexity of an attack is rather high. The exploitability is reported as difficult. The exploit has been released to the public and may be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "4d44652b37bec722d8888d21f343725d29e7603ea57c165cdfd1235260e39453",
+  "source": "nvd",
+  "tags": [
+    "CWE-255",
+    "CWE-256"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4242"
+}

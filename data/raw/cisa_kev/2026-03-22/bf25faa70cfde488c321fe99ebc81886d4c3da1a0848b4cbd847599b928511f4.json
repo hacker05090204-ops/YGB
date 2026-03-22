@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-28434",
+  "ingested_at": "2026-03-22T07:45:17.238343+00:00",
+  "lang": "en",
+  "raw_text": "MinIO MinIO MinIO contains a security feature bypass vulnerability that allows an attacker to use crafted requests to bypass metadata bucket name checking and put an object into any bucket while processing `PostPolicyBucket` to conduct privilege escalation. To carry out this attack, the attacker requires credentials with `arn:aws:s3:::*` permission, as well as enabled Console API access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bf25faa70cfde488c321fe99ebc81886d4c3da1a0848b4cbd847599b928511f4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 56,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

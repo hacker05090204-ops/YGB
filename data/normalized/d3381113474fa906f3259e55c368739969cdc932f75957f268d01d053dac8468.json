@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Linux Kernel 2.6.x - 'drivers/char/tty_ldisc.c' Null Pointer Dereference Denial of Service",
+  "token_count": 11
+}

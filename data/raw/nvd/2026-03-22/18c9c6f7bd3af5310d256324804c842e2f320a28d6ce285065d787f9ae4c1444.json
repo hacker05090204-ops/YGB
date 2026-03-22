@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25124",
+  "ingested_at": "2026-03-22T07:54:31.844321+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the OpenEMR application is vulnerable to an access control flaw that allows low-privileged users, such as receptionists, to export the entire message list containing sensitive patient and user data. The vulnerability lies in the message_list.php report export functionality, where there is no permission check before executing sensitive database queries. The only control in place is CSRF token verification, which does not prevent unauthorized data access if the token is acquired through other means. Version 8.0.0 fixes the vulnerability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "18c9c6f7bd3af5310d256324804c842e2f320a28d6ce285065d787f9ae4c1444",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25124"
+}

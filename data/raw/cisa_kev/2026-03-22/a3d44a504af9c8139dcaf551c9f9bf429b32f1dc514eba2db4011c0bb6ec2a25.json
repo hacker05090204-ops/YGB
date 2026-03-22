@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-7169",
+  "ingested_at": "2026-03-22T07:45:18.811916+00:00",
+  "lang": "en",
+  "raw_text": "GNU Bourne-Again Shell (Bash) GNU Bash through 4.3 processes trailing strings after function definitions in the values of environment variables, which allows remote attackers to execute code. This CVE correctly remediates the vulnerability in CVE-2014-6271.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a3d44a504af9c8139dcaf551c9f9bf429b32f1dc514eba2db4011c0bb6ec2a25",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

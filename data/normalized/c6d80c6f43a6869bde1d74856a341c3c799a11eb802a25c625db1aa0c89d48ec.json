@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "url.Parse insufficiently validated the host/authority component and accepted some invalid URLs.",
+  "token_count": 11
+}

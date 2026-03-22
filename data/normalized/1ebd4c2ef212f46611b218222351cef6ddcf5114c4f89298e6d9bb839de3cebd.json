@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Langflow Langflow Langflow contains a missing authentication vulnerability in the /api/v1/validate/code endpoint that allows a remote, unauthenticated attacker to execute arbitrary code via crafted HTTP requests.",
+  "token_count": 26
+}

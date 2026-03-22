@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30223",
+  "ingested_at": "2026-03-22T07:54:41.628787+00:00",
+  "lang": "en",
+  "raw_text": "OliveTin gives access to predefined shell commands from a web interface. Prior to version 3000.11.1, when JWT authentication is configured using either \"authJwtPubKeyPath\" (local RSA public key) or \"authJwtHmacSecret\" (HMAC secret), the configured audience value (authJwtAud) is not enforced during token parsing. As a result, validly signed JWT tokens with an incorrect aud claim are accepted for authentication. This allows authentication using tokens intended for a different audience/service. This issue has been patched in version 3000.11.1.",
+  "severity": "HIGH",
+  "sha256_hash": "bb9b20caec674bb0983fa113039b1c7518d9ee8aecb682461be4162ccc6d4b3d",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-345",
+    "CWE-345"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30223"
+}

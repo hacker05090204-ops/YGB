@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "in OpenHarmony v5.1.0 and prior versions allow a local attacker arbitrary code execution in pre-installed apps through using incompatible type. This vulnerability can be exploited only in restricted scenarios.",
+  "token_count": 29
+}

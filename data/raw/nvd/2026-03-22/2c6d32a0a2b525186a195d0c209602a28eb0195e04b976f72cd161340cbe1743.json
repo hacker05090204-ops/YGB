@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29098",
+  "ingested_at": "2026-03-22T07:54:48.298277+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, the `action_exportCustom` function in `modules/ModuleBuilder/controller.php` fails to properly neutralize path traversal sequences in the `$modules` and `$name` parameters. Both parameters later reach the `exportCustom` function in `modules/ModuleBuilder/MB/MBPackage.php` where they are both utilized in constructing s paths for file reading and writing. As such, it is possible for a user with access to the ModuleBuilder module, generally an administrator, to craft a request that can copy the content of any readable directory on the underlying host into the web root, making them readable. As the `ModuleBuilder` module is part of both major versions 7 and 8, both current major versions are affected. This vulnerability allows an attacker to copy any readable directory into the web root. This includes system files like the content of `/etc, or the root directory of the web server, potentially exposing secrets and environment variables. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2c6d32a0a2b525186a195d0c209602a28eb0195e04b976f72cd161340cbe1743",
+  "source": "nvd",
+  "tags": [
+    "CWE-23"
+  ],
+  "token_count": 162,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29098"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29520",
+  "ingested_at": "2026-03-22T07:54:46.904182+00:00",
+  "lang": "en",
+  "raw_text": "Hereta ETH-IMC408M firmware version 1.0.15 and prior contain a reflected cross-site scripting vulnerability in the Network Diagnosis ping function that allows attackers to execute arbitrary JavaScript. Attackers can craft malicious links with injected script payloads in the ping_ipaddr parameter to compromise authenticated administrator sessions when the links are visited.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8be72c1bf59500f61bb8e7ba07c48aeb901dd9d1129ac56b45c6fafac0c483ae",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29520"
+}

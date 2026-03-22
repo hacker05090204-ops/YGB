@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Metabase Metabase Metabase contains a local file inclusion vulnerability in the custom map support in the API to read GeoJSON formatted data.",
+  "token_count": 22
+}

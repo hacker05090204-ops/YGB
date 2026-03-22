@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw has been found in SourceCodester Sales and Inventory System 1.0. Affected by this vulnerability is an unknown functionality of the file check_supplier_details.php of the component POST Parameter Handler. Executing a manipulation of the argument stock_name1 can lead to sql injection. The attack can be executed remotely. The exploit has been published and may be used.",
+  "token_count": 57
+}

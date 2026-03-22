@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache ActiveMQ Apache ActiveMQ contains a deserialization of untrusted data vulnerability that may allow a remote attacker with network access to a broker to run shell commands by manipulating serialized class types in the OpenWire protocol to cause the broker to instantiate any class on the classpath.",
+  "token_count": 47
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70231",
+  "ingested_at": "2026-03-22T07:54:40.856981+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DIR-513 version 1.10 contains a critical-level vulnerability. When processing POST requests related to verification codes in /goform/formLogin, it enters /goform/getAuthCode but fails to filter the value of the FILECODE parameter, resulting in a path traversal vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c0693e4e6a67dd9a6b4bd2f30b29f74d9694bf15f5d16da030d7ceebab335997",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70231"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33301",
+  "ingested_at": "2026-03-22T07:54:48.103177+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.2, users with the `Notes - my encounters` role can fill Eye Exam forms in patient encounters. The answers to the form can be printed out in PDF form. An arbitrary file read vulnerability was identified in the PDF creation function where the form answers are parsed as unescaped HTML, allowing an attacker to include arbitrary image files from the server in the generated PDF. Version 8.0.0.2 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "5da3e6b828353a63b4bb3ef96dc0eb6195ec0bb7302382d6c6cf88159e9fada0",
+  "source": "nvd",
+  "tags": [
+    "CWE-116"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33301"
+}

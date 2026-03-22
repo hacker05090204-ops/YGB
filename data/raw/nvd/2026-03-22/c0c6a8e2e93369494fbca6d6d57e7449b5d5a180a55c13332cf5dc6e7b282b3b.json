@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24892",
+  "ingested_at": "2026-03-22T07:54:30.570497+00:00",
+  "lang": "en",
+  "raw_text": "openITCOCKPIT is an open source monitoring tool built for different monitoring engines like Nagios, Naemon and Prometheus. openITCOCKPIT Community Edition 5.3.1 and earlier contains an unsafe PHP deserialization pattern in the processing of changelog entries. Serialized changelog data derived from attacker-influenced application state is unserialized without restricting allowed classes. Although no current application endpoint was found to introduce PHP objects into this data path, the presence of an unrestricted unserialize() call constitutes a latent PHP object injection vulnerability. If future code changes, plugins, or refactors introduce object values into this path, the vulnerability could become immediately exploitable with severe impact, including potential remote code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "c0c6a8e2e93369494fbca6d6d57e7449b5d5a180a55c13332cf5dc6e7b282b3b",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 105,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24892"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Samba Samba Samba contains a remote code execution vulnerability, allowing a malicious client to upload a shared library to a writable share and then cause the server to load and execute it.",
+  "token_count": 32
+}

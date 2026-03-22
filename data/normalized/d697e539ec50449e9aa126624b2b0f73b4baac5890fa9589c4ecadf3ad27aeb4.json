@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "JetKVM prior to 0.5.4 does not verify the authenticity of downloaded firmware files. An attacker-in-the-middle or a compromised update server could modify the firmware and the corresponding SHA256 hash to pass verification.",
+  "token_count": 32
+}

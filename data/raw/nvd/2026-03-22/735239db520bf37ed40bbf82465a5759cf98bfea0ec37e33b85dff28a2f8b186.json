@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30793",
+  "ingested_at": "2026-03-22T07:54:40.824560+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android (Flutter URI scheme handler, FFI bridge modules) allows Privilege Escalation. This vulnerability is associated with program files flutter/lib/common.Dart, src/flutter_ffi.Rs and program routines URI handler for rustdesk://password/, bind.MainSetPermanentPassword(). This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "735239db520bf37ed40bbf82465a5759cf98bfea0ec37e33b85dff28a2f8b186",
+  "source": "nvd",
+  "tags": [
+    "CWE-285",
+    "CWE-352"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30793"
+}

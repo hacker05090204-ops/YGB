@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2720",
+  "ingested_at": "2026-03-22T07:54:49.359814+00:00",
+  "lang": "en",
+  "raw_text": "The Hr Press Lite plugin for WordPress is vulnerable to unauthorized access of sensitive employee data due to a missing capability check on the `hrp-fetch-employees` AJAX action in all versions up to, and including, 1.0.2. This makes it possible for authenticated attackers, with Subscriber-level access and above, to retrieve sensitive employee information including names, email addresses, phone numbers, salary/pay rates, employment dates, and employment status.",
+  "severity": "MEDIUM",
+  "sha256_hash": "091d1f012533008b0249f0d07b5cf683a71fac6341b557a1540053e6c28a221d",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2720"
+}

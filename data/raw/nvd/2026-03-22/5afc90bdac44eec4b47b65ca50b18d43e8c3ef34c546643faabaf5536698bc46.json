@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22206",
+  "ingested_at": "2026-03-22T07:54:32.761671+00:00",
+  "lang": "en",
+  "raw_text": "SPIP versions prior to 4.4.10 contain a SQL injection vulnerability that allows authenticated low-privilege users to execute arbitrary SQL queries by manipulating union-based injection techniques. Attackers can exploit this SQL injection flaw combined with PHP tag processing to achieve remote code execution on the server.",
+  "severity": "HIGH",
+  "sha256_hash": "5afc90bdac44eec4b47b65ca50b18d43e8c3ef34c546643faabaf5536698bc46",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22206"
+}

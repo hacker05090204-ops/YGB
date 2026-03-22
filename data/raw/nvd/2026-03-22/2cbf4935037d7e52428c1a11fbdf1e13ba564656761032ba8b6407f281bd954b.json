@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25501",
+  "ingested_at": "2026-03-22T07:54:34.612679+00:00",
+  "lang": "en",
+  "raw_text": "Simple Job Script contains an SQL injection vulnerability that allows attackers to manipulate database queries by injecting malicious SQL code through the app_id parameter. Attackers can send POST requests to delete_application_ajax.php with crafted payloads to extract sensitive data, bypass authentication, or modify database contents.",
+  "severity": "HIGH",
+  "sha256_hash": "2cbf4935037d7e52428c1a11fbdf1e13ba564656761032ba8b6407f281bd954b",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25501"
+}

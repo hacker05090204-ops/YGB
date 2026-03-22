@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4288",
+  "ingested_at": "2026-03-22T07:54:46.996441+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Tiandy Easy7 Integrated Management Platform 7.17.0. The impacted element is an unknown function of the file /rest/devStatus/getDevDetailedInfo of the component Endpoint. Executing a manipulation of the argument ID can lead to sql injection. The attack can be launched remotely. The exploit has been made available to the public and could be used for attacks. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "053d1ec7c52d04ae136ac6f0649efb1e3a015899ea6233d82f4a0061f5f8d248",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4288"
+}

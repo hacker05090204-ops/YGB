@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28338",
+  "ingested_at": "2026-03-22T07:54:33.320661+00:00",
+  "lang": "en",
+  "raw_text": "PMD is an extensible multilanguage static code analyzer. Prior to version 7.22.0, PMD's `vbhtml` and `yahtml` report formats insert rule violation messages into HTML output without escaping. When PMD analyzes untrusted source code containing crafted string literals, the generated HTML report contains executable JavaScript that runs when opened in a browser. Practical impact is limited because `vbhtml` and `yahtml` are legacy formats rarely used in practice. The default `html` format is properly escaped and not affected. Version 7.22.0 contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b584a1863fbacfecb0c3ba35c3124c2ef31845164f1c7779fb2ccc13231192d4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28338"
+}

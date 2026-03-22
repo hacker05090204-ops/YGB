@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fortra GoAnywhere MFT Fortra (formerly, HelpSystems) GoAnywhere MFT contains a pre-authentication remote code execution vulnerability in the License Response Servlet due to deserializing an attacker-controlled object.",
+  "token_count": 26
+}

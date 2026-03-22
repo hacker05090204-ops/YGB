@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28514",
+  "ingested_at": "2026-03-22T07:54:41.553762+00:00",
+  "lang": "en",
+  "raw_text": "Rocket.Chat is an open-source, secure, fully customizable communications platform. Prior to versions 7.8.6, 7.9.8, 7.10.7, 7.11.4, 7.12.4, 7.13.3, and 8.0.0, a critical authentication bypass vulnerability exists in Rocket.Chat's account service used in the ddp-streamer micro service that allows an attacker to log in to the service as any user with a password set, using any arbitrary password. The vulnerability stems from a missing await keyword when calling an asynchronous password validation function, causing a Promise object (which is always truthy) to be evaluated instead of the actual boolean validation result. This may lead to account takeover of any user whose username is known or guessable. This issue has been patched in versions 7.8.6, 7.9.8, 7.10.7, 7.11.4, 7.12.4, 7.13.3, and 8.0.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "82e33e182defd7ebbc92616ab8ab43ffccafcca0606b41a6f7ec189cea9b74b8",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 120,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28514"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-1054",
+  "ingested_at": "2026-03-22T07:45:19.426768+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Microsoft Win32k contains a privilege escalation vulnerability when the Windows kernel-mode driver fails to properly handle objects in memory. Successful exploitation allows an attacker to execute code in kernel mode.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a115f722c725d3903ab46daa9e012581f07fc8385f275e5383a112a188aa7cfa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

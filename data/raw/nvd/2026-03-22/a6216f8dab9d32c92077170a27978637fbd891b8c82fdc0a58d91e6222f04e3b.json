@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33422",
+  "ingested_at": "2026-03-22T07:54:49.117242+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, the `ip_address` of a flagged user is exposed to any user who can access the review queue, including users who should not be able to see IP addresses. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "LOW",
+  "sha256_hash": "a6216f8dab9d32c92077170a27978637fbd891b8c82fdc0a58d91e6222f04e3b",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33422"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15584",
+  "ingested_at": "2026-03-22T07:54:47.159627+00:00",
+  "lang": "en",
+  "raw_text": "Netskope was notified about a potential gap in its Endpoint DLP Module for Netskope Client on Windows systems. The successful exploitation of the gap can potentially allow an unprivileged user to trigger an integer overflow within the filter communication port, leading to a Blue-Screen-of-Death (BSOD). Successful exploitation would require the Endpoint DLP module to be enabled in the client configuration. A successful exploit can potentially result in a denial-of-service for the local machine.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "05903e78ae68b639d14a0fd8c92b44302e76e4d5b883fb190ebfe3f0d219876b",
+  "source": "nvd",
+  "tags": [
+    "CWE-190"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15584"
+}

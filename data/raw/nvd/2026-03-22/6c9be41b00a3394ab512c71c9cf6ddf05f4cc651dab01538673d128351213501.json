@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3025",
+  "ingested_at": "2026-03-22T07:54:31.203250+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in ShuoRen Smart Heating Integrated Management Platform 1.0.0. Affected by this vulnerability is an unknown functionality of the file /MP/Service/Webservice/ExampleNodeService.asmx. Executing a manipulation of the argument File can lead to unrestricted upload. It is possible to launch the attack remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "6c9be41b00a3394ab512c71c9cf6ddf05f4cc651dab01538673d128351213501",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434",
+    "CWE-434"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3025"
+}

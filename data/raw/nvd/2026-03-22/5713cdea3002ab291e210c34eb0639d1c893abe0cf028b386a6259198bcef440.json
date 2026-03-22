@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69306",
+  "ingested_at": "2026-03-22T07:54:30.204324+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Electio Core electio-core allows Blind SQL Injection.This issue affects Electio Core: from n/a through < = 1.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5713cdea3002ab291e210c34eb0639d1c893abe0cf028b386a6259198bcef440",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69306"
+}

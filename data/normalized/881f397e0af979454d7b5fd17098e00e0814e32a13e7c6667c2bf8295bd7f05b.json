@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "curl would wrongly reuse an existing HTTP proxy connection doing CONNECT to a server, even if the new request uses different credentials for the HTTP proxy. The proper behavior is to create or use a separate connection.",
+  "token_count": 37
+}

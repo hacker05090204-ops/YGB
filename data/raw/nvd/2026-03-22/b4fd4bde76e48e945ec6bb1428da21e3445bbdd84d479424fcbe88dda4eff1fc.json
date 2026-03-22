@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32264",
+  "ingested_at": "2026-03-22T07:54:46.959895+00:00",
+  "lang": "en",
+  "raw_text": "Craft CMS is a content management system (CMS). From version 4.0.0-RC1 to before version 4.17.5 and from version 5.0.0-RC1 to before version 5.9.11, there is a Behavior injection RCE vulnerability in ElementIndexesController and FieldsController. Craft control panel administrator permissions and allowAdminChanges must be enabled for this to work. This issue has been patched in versions 4.17.5 and 5.9.11.",
+  "severity": "HIGH",
+  "sha256_hash": "b4fd4bde76e48e945ec6bb1428da21e3445bbdd84d479424fcbe88dda4eff1fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-470"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32264"
+}

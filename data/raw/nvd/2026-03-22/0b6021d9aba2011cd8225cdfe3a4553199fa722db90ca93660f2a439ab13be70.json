@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20761",
+  "ingested_at": "2026-03-22T07:54:30.335124+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability exists in EnOcean SmartServer IoT version 4.60.009 and prior, which would allow remote attackers, in the LON IP-852 management messages, to send specially crafted IP-852 messages resulting in arbitrary OS command execution on the device.",
+  "severity": "HIGH",
+  "sha256_hash": "0b6021d9aba2011cd8225cdfe3a4553199fa722db90ca93660f2a439ab13be70",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20761"
+}

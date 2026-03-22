@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25442",
+  "ingested_at": "2026-03-22T07:54:30.976101+00:00",
+  "lang": "en",
+  "raw_text": "Web Wiz Forums 12.01 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the PF parameter. Attackers can send GET requests to member_profile.asp with malicious PF values to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "dcc468ab5df51c7aeba89b51fa988aed9e1c9adc085d0a1fdc13f1ea17b83e53",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25442"
+}

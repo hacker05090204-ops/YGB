@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27194",
+  "ingested_at": "2026-03-22T07:54:30.747879+00:00",
+  "lang": "en",
+  "raw_text": "D-Tale is a visualizer for pandas data structures. Versions prior to 3.20.0 are vulnerable to Remote Code Execution through the /save-column-filter endpoint. Users hosting D-Tale publicly can be vulnerable to remote code execution allowing attackers to run malicious code on the server. This issue has been fixed in version 3.20.0.",
+  "severity": "CRITICAL",
+  "sha256_hash": "65fac2341dcec21d61040038227c4994a50d4b7ee6d3a92346c34656c081853b",
+  "source": "nvd",
+  "tags": [
+    "CWE-74"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27194"
+}

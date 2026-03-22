@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25638",
+  "ingested_at": "2026-03-22T07:54:31.291390+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, memory leak exists in `coders/msl.c`. In the `WriteMSLImage` function of the `msl.c` file, resources are allocated. But the function returns early without releasing these allocated resources. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3a713d60b2c9742bdbcfce1dd46201be8a9d981870d8843e231301050ebd4ccc",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25638"
+}

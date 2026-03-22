@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41767",
+  "ingested_at": "2026-03-22T07:54:42.213253+00:00",
+  "lang": "en",
+  "raw_text": "A high-privileged remote attacker can fully compromise the device by abusing an update signature bypass vulnerability in the wwwupdate.cgi method in the web interface of UBR.",
+  "severity": "HIGH",
+  "sha256_hash": "13fad5789760c5260cd14d799e3275fc9cfb7e5840f9190e62fd68e506a4be02",
+  "source": "nvd",
+  "tags": [
+    "CWE-347"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41767"
+}

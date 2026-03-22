@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67624",
+  "ingested_at": "2026-03-22T07:54:30.001834+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Arya Dhiratara Optimize More! \u2013 Images optimize-more-images allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Optimize More! \u2013 Images: from n/a through < = 1.1.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "55b97e99670e3b9e62c9b14e1078511cb4f574ff9a5693041c95dd373da5451f",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67624"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32707",
+  "ingested_at": "2026-03-22T07:54:46.534188+00:00",
+  "lang": "en",
+  "raw_text": "PX4 autopilot is a flight control solution for drones. Prior to 1.17.0-rc2, tattu_can contains an unbounded memcpy in its multi-frame assembly loop, allowing stack memory overwrite when crafted CAN frames are processed. In deployments where tattu_can is enabled and running, a CAN-injection-capable attacker can trigger a crash (DoS) and memory corruption. This vulnerability is fixed in 1.17.0-rc2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7ea17a5be0d4a7dd7c9d5bc0fee21f98c7538cdc877c20119541c549e7b4a6db",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32707"
+}

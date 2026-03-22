@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows - 'ndis.sys' IOCTL 0x170034 (ndis!ndisNsiGetIfNameForIfIndex) Pool Buffer Overflow (MS15-117)",
+  "token_count": 11
+}

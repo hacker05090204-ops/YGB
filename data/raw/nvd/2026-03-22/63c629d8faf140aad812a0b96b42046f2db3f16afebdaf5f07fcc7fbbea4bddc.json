@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3999",
+  "ingested_at": "2026-03-22T07:54:46.192236+00:00",
+  "lang": "en",
+  "raw_text": "A broken access control may allow an authenticated user to perform a horizontal privilege escalation. The vulnerability only impacts specific configurations.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "63c629d8faf140aad812a0b96b42046f2db3f16afebdaf5f07fcc7fbbea4bddc",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3999"
+}

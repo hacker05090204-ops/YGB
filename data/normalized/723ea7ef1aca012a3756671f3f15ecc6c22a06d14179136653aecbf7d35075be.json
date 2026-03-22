@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in TotalSuite TotalContest Lite allows Object Injection.This issue affects TotalContest Lite: from n/a through 2.9.1.",
+  "token_count": 20
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29048",
+  "ingested_at": "2026-03-22T07:54:41.341483+00:00",
+  "lang": "en",
+  "raw_text": "HumHub is an Open Source Enterprise Social Network. In version 1.18.0, a cross-site scripting vulnerability was identified in the Button component of version 1.18.0. Due to inconsistent output encoding at several points within the software, malicious scripts could be injected and executed in the context of the user's browser. This issue has been patched in version 1.18.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8b84f6d88a9b7815db60a4edafb3a6141f90599d793eb8b864465d554eadd5a2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29048"
+}

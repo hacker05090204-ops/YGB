@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-46747",
+  "ingested_at": "2026-03-22T07:45:17.180701+00:00",
+  "lang": "en",
+  "raw_text": "F5 BIG-IP Configuration Utility F5 BIG-IP Configuration utility contains an authentication bypass using an alternate path or channel vulnerability due to undisclosed requests that may allow an unauthenticated attacker with network access to the BIG-IP system through the management port and/or self IP addresses to execute system commands. This vulnerability can be used in conjunction with CVE-2023-46748.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6d2fbe4d7a66130712dab17f6fd71ef7a17d1c89e24c96ab6e0afd269afd598b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 57,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

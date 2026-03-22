@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Missing Authentication for Critical Function vulnerability in TUBITAK BILGEM Software Technologies Research Institute Liderahenk allows Remote Code Inclusion, Privilege Abuse, Command Injection.This issue affects Liderahenk: before v3.4.0.",
+  "token_count": 27
+}

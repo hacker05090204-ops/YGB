@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-25280",
+  "ingested_at": "2026-03-22T07:45:16.797216+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DIR-820 Router D-Link DIR-820 routers contain an OS command injection vulnerability that allows a remote, unauthenticated attacker to escalate privileges to root via a crafted payload with the ping_addr parameter to ping.ccp.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c7fd1da71acc39c602373c17cbbc32ecb48159400a8e52895d4f207f453035c1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

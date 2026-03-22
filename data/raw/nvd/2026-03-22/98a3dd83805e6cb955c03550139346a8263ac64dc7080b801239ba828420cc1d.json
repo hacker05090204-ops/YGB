@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32422",
+  "ingested_at": "2026-03-22T07:54:46.073393+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in levelfourdevelopment WP EasyCart wp-easycart allows Blind SQL Injection.This issue affects WP EasyCart: from n/a through < = 5.8.13.",
+  "severity": "HIGH",
+  "sha256_hash": "98a3dd83805e6cb955c03550139346a8263ac64dc7080b801239ba828420cc1d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32422"
+}

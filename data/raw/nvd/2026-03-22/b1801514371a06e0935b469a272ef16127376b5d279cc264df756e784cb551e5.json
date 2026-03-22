@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3746",
+  "ingested_at": "2026-03-22T07:54:42.071286+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in SourceCodester Simple Responsive Tourism Website 1.0. Affected by this vulnerability is an unknown functionality of the file /tourism/classes/Login.php?f=login of the component Login. This manipulation of the argument Username causes sql injection. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "b1801514371a06e0935b469a272ef16127376b5d279cc264df756e784cb551e5",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3746"
+}

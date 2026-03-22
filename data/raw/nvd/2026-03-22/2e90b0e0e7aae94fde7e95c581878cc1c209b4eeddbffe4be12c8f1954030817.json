@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-62326",
+  "ingested_at": "2026-03-22T07:54:30.556372+00:00",
+  "lang": "en",
+  "raw_text": "HCL Digital Experience is susceptible to stored cross-site scripting (XSS) in the administrative user interface which would require elevated privileges to exploit.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2e90b0e0e7aae94fde7e95c581878cc1c209b4eeddbffe4be12c8f1954030817",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-62326"
+}

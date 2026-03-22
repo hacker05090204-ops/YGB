@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69310",
+  "ingested_at": "2026-03-22T07:54:30.212620+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Woodly Core woodly-core allows Blind SQL Injection.This issue affects Woodly Core: from n/a through < = 1.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "350b4fa7a3ca124db83aca69248275aacb2b1d64bfc55891c576c798087bfcc2",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69310"
+}

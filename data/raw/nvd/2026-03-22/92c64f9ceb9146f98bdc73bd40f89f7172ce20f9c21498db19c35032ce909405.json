@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3547",
+  "ingested_at": "2026-03-22T07:54:48.125946+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bounds read in ALPN parsing due to incomplete validation. wolfSSL 5.8.4 and earlier contained an out-of-bounds read in ALPN handling when built with ALPN enabled (HAVE_ALPN / --enable-alpn). A crafted ALPN protocol list could trigger an out-of-bounds read, leading to a potential process crash (denial of service). Note that ALPN is disabled by default, but is enabled for these 3rd party compatibility features: enable-apachehttpd, enable-bind, enable-curl, enable-haproxy, enable-hitch, enable-lighty, enable-jni, enable-nginx, enable-quic.",
+  "severity": "HIGH",
+  "sha256_hash": "92c64f9ceb9146f98bdc73bd40f89f7172ce20f9c21498db19c35032ce909405",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3547"
+}

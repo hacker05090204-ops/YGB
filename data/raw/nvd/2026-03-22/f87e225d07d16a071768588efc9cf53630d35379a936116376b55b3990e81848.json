@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22423",
+  "ingested_at": "2026-03-22T07:54:40.060585+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Select-Themes SetSail setsail allows PHP Local File Inclusion.This issue affects SetSail: from n/a through < = 1.8.",
+  "severity": "HIGH",
+  "sha256_hash": "f87e225d07d16a071768588efc9cf53630d35379a936116376b55b3990e81848",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22423"
+}

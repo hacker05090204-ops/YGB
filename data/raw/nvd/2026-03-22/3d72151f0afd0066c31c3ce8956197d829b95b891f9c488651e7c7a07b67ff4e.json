@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68037",
+  "ingested_at": "2026-03-22T07:54:30.087031+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Atlas Gondal Export Media URLs export-media-urls allows Reflected XSS.This issue affects Export Media URLs: from n/a through < = 2.2.",
+  "severity": "HIGH",
+  "sha256_hash": "3d72151f0afd0066c31c3ce8956197d829b95b891f9c488651e7c7a07b67ff4e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68037"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4289",
+  "ingested_at": "2026-03-22T07:54:46.998657+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in Tiandy Easy7 Integrated Management Platform up to 7.17.0. This affects an unknown function of the file /rest/preSetTemplate/getRecByTemplateId. The manipulation of the argument ID leads to sql injection. The attack may be initiated remotely. The exploit has been disclosed publicly and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "4d26caba66abbb1b02f69ce7db3b20c11cb18c745dcd495340f6d8be1ff63c6c",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4289"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2850",
+  "ingested_at": "2026-03-22T07:54:30.539340+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in yeqifu warehouse up to aaf29962ba407d22d991781de28796ee7b4670e4. This affects the function addCustomer/updateCustomer/deleteCustomer of the file dataset\\repos\\warehouse\\src\\main\\java\\com\\yeqifu\\bus\\controller\\CustomerController.java of the component Customer Endpoint. Performing a manipulation results in improper access controls. Remote exploitation of the attack is possible. The exploit has been made public and could be used. This product follows a rolling release approach for continuous delivery, so version details for affected or updated releases are not provided. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ee0d543fe00ff64d9946268ce6f2bbc2c857d7f5f85cd3742b29bcaafca62d57",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2850"
+}

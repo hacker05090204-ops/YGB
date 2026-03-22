@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4069",
+  "ingested_at": "2026-03-22T07:54:49.438228+00:00",
+  "lang": "en",
+  "raw_text": "The Alfie \u2013 Feed Plugin plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'naam' parameter in all versions up to, and including, 1.2.1. This is due to missing nonce validation on the alfie_option_page() function combined with insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject malicious web scripts that will be stored in the plugin's database and execute whenever a user accesses the page displaying the injected data, granted they can trick a site administrator into performing an action such as clicking on a link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "43893e6e267315a04e74de573328a2956fe66615cdf1ff93217a6389ef3b2cbf",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4069"
+}

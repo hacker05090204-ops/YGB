@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An authenticated arbitrary file upload vulnerability in the Courses/Work Assignments module of gunet Open eClass v3.11, and fixed in v3.13, allows attackers to execute arbitrary code via uploading a crafted SVG file.",
+  "token_count": 32
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69370",
+  "ingested_at": "2026-03-22T07:54:30.240582+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeGoods Capella capella allows Object Injection.This issue affects Capella: from n/a through < = 2.5.5.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ae4cd7cc59cb4cb1145750a7ef8ebcc856227721b60f571415ef5a3d2e3fb4b8",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69370"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2005-2773",
+  "ingested_at": "2026-03-22T07:45:18.430806+00:00",
+  "lang": "en",
+  "raw_text": "Hewlett Packard (HP) OpenView Network Node Manager HP OpenView Network Node Manager could allow a remote attacker to execute arbitrary commands on the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1e51f14a5ba9602c39ff1fff5e99fefe0935bd090c1cf8d4a5dd27fc62a813ca",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

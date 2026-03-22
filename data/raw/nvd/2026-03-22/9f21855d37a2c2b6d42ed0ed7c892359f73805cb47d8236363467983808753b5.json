@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4355",
+  "ingested_at": "2026-03-22T07:54:47.248155+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in Portabilis i-Educar 2.11. This impacts an unknown function of the file /intranet/educar_servidor_curso_lst.php of the component Endpoint. Performing a manipulation of the argument Name results in cross site scripting. The attack may be initiated remotely. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "9f21855d37a2c2b6d42ed0ed7c892359f73805cb47d8236363467983808753b5",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4355"
+}

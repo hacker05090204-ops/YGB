@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-30874",
+  "ingested_at": "2026-03-22T07:54:48.324248+00:00",
+  "lang": "en",
+  "raw_text": "OpenWrt Project is a Linux operating system targeting embedded devices. In versions prior to 24.10.6, a vulnerability in the hotplug_call function allows an attacker to bypass environment variable filtering and inject an arbitrary PATH variable, potentially leading to privilege escalation. The function is intended to filter out sensitive environment variables like PATH when executing hotplug scripts in /etc/hotplug.d, but a bug using strcmp instead of strncmp causes the filter to compare the full environment string (e.g., PATH=/some/value) against the literal \"PATH\", so the match always fails. As a result, the PATH variable is never excluded, enabling an attacker to control which binaries are executed by procd-invoked scripts running with elevated privileges. This issue has been fixed in version 24.10.6.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "719162e61632ac2f7046b9714c60083a38f5f372926466a46678b8da1eb04f14",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-187",
+    "CWE-269"
+  ],
+  "token_count": 119,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30874"
+}

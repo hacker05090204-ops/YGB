@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59383",
+  "ingested_at": "2026-03-22T07:54:48.878445+00:00",
+  "lang": "en",
+  "raw_text": "A buffer overflow vulnerability has been reported to affect Media Streaming Add-On. The remote attackers can then exploit the vulnerability to modify memory or crash processes. We have already fixed the vulnerability in the following version: Media Streaming Add-on 500.1.1 and later",
+  "severity": "UNKNOWN",
+  "sha256_hash": "50dba5a953841d27710f21beff259b577be3092179193ce92dad0d2999143328",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59383"
+}

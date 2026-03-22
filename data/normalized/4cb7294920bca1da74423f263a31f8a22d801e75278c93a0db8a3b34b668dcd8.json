@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Craft CMS Craft CMS Craft CMS contains a code injection vulnerability caused by improper validation of the database backup path, ultimately enabling remote code execution.",
+  "token_count": 25
+}

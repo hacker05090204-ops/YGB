@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware Tanzu Spring Cloud Configuration (Config) Server Spring, by VMware Tanzu, Cloud Config contains a path traversal vulnerability that allows applications to serve arbitrary configuration files.",
+  "token_count": 26
+}

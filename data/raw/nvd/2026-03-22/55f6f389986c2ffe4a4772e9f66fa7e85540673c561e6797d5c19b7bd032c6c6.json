@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29606",
+  "ingested_at": "2026-03-22T07:54:41.111584+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain a webhook signature-verification bypass in the voice-call extension that allows unauthenticated requests when the tunnel.allowNgrokFreeTierLoopbackBypass option is explicitly enabled. An external attacker can send forged requests to the publicly reachable webhook endpoint without a valid X-Twilio-Signature header, resulting in unauthorized webhook event handling and potential request flooding attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "55f6f389986c2ffe4a4772e9f66fa7e85540673c561e6797d5c19b7bd032c6c6",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29606"
+}

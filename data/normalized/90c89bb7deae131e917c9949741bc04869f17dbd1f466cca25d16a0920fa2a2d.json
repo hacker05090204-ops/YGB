@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Embedthis GoAhead Embedthis GoAhead before 3.6.5 allows remote code execution if CGI is enabled and a CGI program is dynamically linked.",
+  "token_count": 21
+}

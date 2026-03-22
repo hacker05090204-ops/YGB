@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft SQL Server Microsoft SQL Server Reporting Services contains a deserialization vulnerability when handling page requests incorrectly. An authenticated attacker can exploit this vulnerability to execute code in the context of the Report Server service account.",
+  "token_count": 36
+}

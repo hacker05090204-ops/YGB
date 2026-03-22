@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25076",
+  "ingested_at": "2026-03-22T07:54:44.655252+00:00",
+  "lang": "en",
+  "raw_text": "Anchore Enterprise versions before 5.25.1 contain an SQL injection vulnerability in the GraphQL Reports API. An authenticated attacker that is able to access the GraphQL API could execute arbitrary SQL instructions resulting in modifications to the data contained in the Anchore Enterprise database.",
+  "severity": "HIGH",
+  "sha256_hash": "7cac6540e829ed9f1d92eb9fa3d16ed24c1d9c98e656ca19ac38291627229431",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25076"
+}

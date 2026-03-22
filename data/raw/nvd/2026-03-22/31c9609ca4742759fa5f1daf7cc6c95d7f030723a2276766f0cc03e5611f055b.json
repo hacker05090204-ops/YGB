@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32344",
+  "ingested_at": "2026-03-22T07:54:45.894075+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Request Forgery (CSRF) vulnerability in desertthemes Corpiva corpiva allows Cross Site Request Forgery.This issue affects Corpiva: from n/a through < = 1.0.96.",
+  "severity": "MEDIUM",
+  "sha256_hash": "31c9609ca4742759fa5f1daf7cc6c95d7f030723a2276766f0cc03e5611f055b",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32344"
+}

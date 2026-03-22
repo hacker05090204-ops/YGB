@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-53104",
+  "ingested_at": "2026-03-22T07:45:16.615127+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux kernel contains an out-of-bounds write vulnerability in the uvc_parse_streaming component of the USB Video Class (UVC) driver that could allow for physical escalation of privilege.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fad6575c83aa5b4dab01730cd95d2c52cd0a0147a4b42c79b844dda47c82078b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

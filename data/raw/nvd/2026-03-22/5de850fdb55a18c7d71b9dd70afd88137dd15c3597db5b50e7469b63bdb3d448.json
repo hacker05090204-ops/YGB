@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28541",
+  "ingested_at": "2026-03-22T07:54:40.733161+00:00",
+  "lang": "en",
+  "raw_text": "Permission control vulnerability in the cellular_data module. Impact: Successful exploitation of this vulnerability may affect availability.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5de850fdb55a18c7d71b9dd70afd88137dd15c3597db5b50e7469b63bdb3d448",
+  "source": "nvd",
+  "tags": [
+    "CWE-264",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28541"
+}

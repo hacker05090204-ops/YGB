@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-50337",
+  "ingested_at": "2026-03-22T07:54:33.595916+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.28, the OpenId function allows anyone to send requests to any URL on server's behalf, which results in unauthenticated blind SSRF. This issue has been patched in version 1.11.28.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a394cf510a40dec09d909949b2afd7b0c712533c6863454b5cc21b014ce113c1",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-50337"
+}

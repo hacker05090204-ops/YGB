@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-4228",
+  "ingested_at": "2026-03-22T07:54:46.778236+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in LB-LINK BL-WR9000 2.4.9. This affects the function sub_458754 of the file /goform/set_wifi. The manipulation results in command injection. It is possible to launch the attack remotely. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f253b0dab48ed2b2f7c9089d54b23a5907c3144060d396e538a50f17d39db868",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77",
+    "CWE-77"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4228"
+}

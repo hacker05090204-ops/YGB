@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27706",
+  "ingested_at": "2026-03-22T07:54:32.178009+00:00",
+  "lang": "en",
+  "raw_text": "Plane is an an open-source project management tool. Prior to version 1.2.2, a Full Read Server-Side Request Forgery (SSRF) vulnerability has been identified in the \"Add Link\" feature. This flaw allows an authenticated attacker with general user privileges to send arbitrary GET requests to the internal network and exfiltrate the full response body. By exploiting this vulnerability, an attacker can steal sensitive data from internal services and cloud metadata endpoints. Version 1.2.2 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "53466c9aefd7594fbebebd78191cd1582d6476e7281753b892400b46a002f0f7",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27706"
+}

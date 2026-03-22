@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-8468",
+  "ingested_at": "2026-03-22T07:45:19.609205+00:00",
+  "lang": "en",
+  "raw_text": "Trend Micro Apex One, OfficeScan and Worry-Free Business Security Agents Trend Micro Apex One, OfficeScan, and Worry-Free Business Security agents contain a content validation escape vulnerability that could allow an attacker to manipulate certain agent client components.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f1781fd4c27692bc733e31b39f3df8c042dfba84bc7613e23417a1ce8a0013ae",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

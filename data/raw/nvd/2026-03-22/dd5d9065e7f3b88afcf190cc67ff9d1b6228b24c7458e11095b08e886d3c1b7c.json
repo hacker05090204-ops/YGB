@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32701",
+  "ingested_at": "2026-03-22T07:54:48.731362+00:00",
+  "lang": "en",
+  "raw_text": "Qwik is a performance-focused JavaScript framework. Versions prior to 1.19.2 improperly inferred arrays from dotted form field names during FormData parsing. By submitting mixed array-index and object-property keys for the same path, an attacker could cause user-controlled properties to be written onto values that application code expected to be arrays. When processing application/x-www-form-urlencoded or multipart/form-data requests, Qwik City converted dotted field names (e.g., items.0, items.1) into nested structures. If a path was interpreted as an array, additional attacker-supplied keys on that path\u2014such as items.toString, items.push, items.valueOf, or items.length\u2014could alter the resulting server-side value in unexpected ways, potentially leading to request handling failures, denial of service through malformed array state or oversized lengths, and type confusion in downstream code. This issue was fixed in version 1.19.2.",
+  "severity": "HIGH",
+  "sha256_hash": "dd5d9065e7f3b88afcf190cc67ff9d1b6228b24c7458e11095b08e886d3c1b7c",
+  "source": "nvd",
+  "tags": [
+    "CWE-843",
+    "CWE-1321"
+  ],
+  "token_count": 125,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32701"
+}

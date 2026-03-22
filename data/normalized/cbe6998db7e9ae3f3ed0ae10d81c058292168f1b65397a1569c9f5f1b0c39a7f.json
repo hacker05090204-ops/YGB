@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior lack CSRF protections for state-changing actions in the administrative interface. An attacker can trick an authenticated administrator into performing unauthorized configuration changes.",
+  "token_count": 31
+}

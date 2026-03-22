@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-4878",
+  "ingested_at": "2026-03-22T07:45:18.981074+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains a use-after-free vulnerability that could allow for code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "07433a69b1265771dbe4c137a9666fddebccd2cef60bb400ad786823789849ad",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

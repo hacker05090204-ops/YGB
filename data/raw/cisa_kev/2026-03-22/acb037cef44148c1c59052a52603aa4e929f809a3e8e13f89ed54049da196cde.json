@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-26083",
+  "ingested_at": "2026-03-22T07:45:17.462778+00:00",
+  "lang": "en",
+  "raw_text": "Arm Mali Graphics Processing Unit (GPU) Arm Mali GPU Kernel Driver contains an information disclosure vulnerability that allows a non-privileged user to make valid GPU processing operations that expose sensitive kernel metadata.",
+  "severity": "CRITICAL",
+  "sha256_hash": "acb037cef44148c1c59052a52603aa4e929f809a3e8e13f89ed54049da196cde",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Aureus ERP up to 1.3.0-BETA2. The affected element is an unknown function of the file plugins/webkul/chatter/resources/views/filament/infolists/components/messages/content-text-entry.blade.php of the component Chatter Message Handler. Executing a manipulation of the argument subject/body can lead to cross site scripting. The attack can be launched remotely. Upgrading to version 1.3.0-BETA1 is sufficient to fix this issue. This patch is called 2135ee7efff4090e70050b63015ab5e268760ec8. It is suggested to upgrade the affected component.",
+  "token_count": 69
+}

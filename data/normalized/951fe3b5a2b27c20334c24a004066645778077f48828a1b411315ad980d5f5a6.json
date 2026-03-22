@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple macOS macOS Monterey contains an out-of-bounds write vulnerability that could allow an application to execute arbitrary code with kernel privileges.",
+  "token_count": 21
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-8963",
+  "ingested_at": "2026-03-22T07:45:16.802387+00:00",
+  "lang": "en",
+  "raw_text": "Ivanti Cloud Services Appliance (CSA) Ivanti Cloud Services Appliance (CSA) contains a path traversal vulnerability that could allow a remote, unauthenticated attacker to access restricted functionality. If CVE-2024-8963 is used in conjunction with CVE-2024-8190, an attacker could bypass admin authentication and execute arbitrary commands on the appliance.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dbfc068232f76b1f48cd63787d48db5053e07c2a5d9ba4972ec1885881a1590d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 47,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

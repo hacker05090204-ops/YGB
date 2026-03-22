@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Attackers may exploit the vulnerability by controlling the value of `picName`. When this value is used in `sprintf` without validating variable sizes, it could lead to a buffer overflow vulnerability.",
+  "token_count": 38
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26105",
+  "ingested_at": "2026-03-22T07:54:42.785692+00:00",
+  "lang": "en",
+  "raw_text": "Improper neutralization of input during web page generation ('cross-site scripting') in Microsoft Office SharePoint allows an unauthorized attacker to perform spoofing over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "011859cb34e85ef1556b13c01134d6b43feda4f94a2220ddcde572ac7e8b4b85",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26105"
+}

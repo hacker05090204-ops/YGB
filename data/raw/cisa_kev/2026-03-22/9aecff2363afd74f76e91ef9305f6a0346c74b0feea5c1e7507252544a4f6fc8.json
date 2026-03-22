@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-20399",
+  "ingested_at": "2026-03-22T07:45:16.924461+00:00",
+  "lang": "en",
+  "raw_text": "Cisco NX-OS Cisco NX-OS contains a command injection vulnerability in the command line interface (CLI) that could allow an authenticated, local attacker to execute commands as root on the underlying operating system of an affected device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9aecff2363afd74f76e91ef9305f6a0346c74b0feea5c1e7507252544a4f6fc8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

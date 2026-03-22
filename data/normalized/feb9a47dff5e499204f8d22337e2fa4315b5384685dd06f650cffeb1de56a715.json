@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The User Registration & Membership \u2013 Custom Registration Form Builder, Custom Login Form, User Profile, Content Restriction & Membership Plugin plugin for WordPress is vulnerable to improper privilege management in all versions up to, and including, 5.1.2. This is due to the plugin accepting a user-supplied role during membership registration without properly enforcing a server-side allowlist. This makes it possible for unauthenticated attackers to create administrator accounts by supplying a role value during membership registration.",
+  "token_count": 75
+}

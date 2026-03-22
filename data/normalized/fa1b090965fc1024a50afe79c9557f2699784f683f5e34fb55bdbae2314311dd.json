@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware vCenter Server Rhttproxy as used in vCenter Server contains a vulnerability due to improper implementation of URI normalization.",
+  "token_count": 19
+}

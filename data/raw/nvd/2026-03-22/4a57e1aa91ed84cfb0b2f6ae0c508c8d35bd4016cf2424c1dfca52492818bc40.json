@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22719",
+  "ingested_at": "2026-03-22T07:54:32.265573+00:00",
+  "lang": "en",
+  "raw_text": "VMware Aria Operations contains a command injection vulnerability. A malicious unauthenticated actor may exploit this issue to execute arbitrary commands which may lead to remote code execution in VMware Aria Operations while support-assisted product migration is in progress. To remediate CVE-2026-22719, apply the patches listed in the 'Fixed Version' column of the ' Response Matrix https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/SecurityAdvisories/0/36947 ' in VMSA-2026-0001 Workarounds for CVE-2026-22719 are documented in the 'Workarounds' column of the ' Response Matrix https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/SecurityAdvisories/0/36947 ' in VMSA-2026-0001",
+  "severity": "HIGH",
+  "sha256_hash": "4a57e1aa91ed84cfb0b2f6ae0c508c8d35bd4016cf2424c1dfca52492818bc40",
+  "source": "nvd",
+  "tags": [
+    "CWE-77"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22719"
+}

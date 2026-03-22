@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SAP GUI for Windows allows DLL files to be loaded from arbitrary directories within the application. An unauthenticated attacker could exploit this vulnerability by persuading a victim to place a malicious DLL within one of these directories. The malicious command is executed in the victim user's context provided GuiXT is enabled. This vulnerability has a low impact on confidentiality, integrity, and availability.",
+  "token_count": 62
+}

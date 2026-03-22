@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-41080",
+  "ingested_at": "2026-03-22T07:45:17.551055+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Exchange Server Microsoft Exchange Server contains an unspecified vulnerability that allows for privilege escalation. This vulnerability is chainable with CVE-2022-41082, which allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a3e1170070833c367bfcbeeace58dcbc60947dc05e76c36eb649ae282b4cbe9a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

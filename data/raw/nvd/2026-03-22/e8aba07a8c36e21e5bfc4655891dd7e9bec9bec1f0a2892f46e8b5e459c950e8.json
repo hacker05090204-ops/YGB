@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25447",
+  "ingested_at": "2026-03-22T07:54:30.634839+00:00",
+  "lang": "en",
+  "raw_text": "OrientDB 3.0.17 GA Community Edition contains cross-site request forgery vulnerabilities that allow attackers to perform unauthorized actions by crafting malicious requests to endpoints like /database/, /command/, and /document/. Attackers can create or delete databases, modify schema classes, manage users, and create functions by sending authenticated requests without token validation, combined with reflected and stored cross-site scripting vulnerabilities in the web interface.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e8aba07a8c36e21e5bfc4655891dd7e9bec9bec1f0a2892f46e8b5e459c950e8",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25447"
+}

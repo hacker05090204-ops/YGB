@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft SharePoint Server Microsoft SharePoint Server contains a code injection vulnerability that allows an authenticated attacker with Site Owner privileges to execute code remotely.",
+  "token_count": 24
+}

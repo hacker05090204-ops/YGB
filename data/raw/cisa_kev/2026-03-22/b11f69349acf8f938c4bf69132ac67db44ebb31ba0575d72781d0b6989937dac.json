@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-1215",
+  "ingested_at": "2026-03-22T07:45:19.381598+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows contains an unspecified vulnerability due to the way ws2ifsl.sys (Winsock) handles objects in memory, allowing for privilege escalation. Successful exploitation allows an attacker to execute code with elevated privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b11f69349acf8f938c4bf69132ac67db44ebb31ba0575d72781d0b6989937dac",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

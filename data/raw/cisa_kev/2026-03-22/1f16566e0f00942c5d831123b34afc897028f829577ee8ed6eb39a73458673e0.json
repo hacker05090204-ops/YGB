@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-31755",
+  "ingested_at": "2026-03-22T07:45:19.592767+00:00",
+  "lang": "en",
+  "raw_text": "Tenda AC11 Router Tenda AC11 devices contain a stack buffer overflow vulnerability in /goform/setmac which allows attackers to execute code via a crafted post request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1f16566e0f00942c5d831123b34afc897028f829577ee8ed6eb39a73458673e0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

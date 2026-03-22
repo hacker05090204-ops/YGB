@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1198",
+  "ingested_at": "2026-03-22T07:54:32.644861+00:00",
+  "lang": "en",
+  "raw_text": "SIMPLE.ERP is vulnerable to the SQL Injection in search functionality in \"Obroty na kontach\" window. Lack of input validation allows an authenticated attacker to prepare a malicious query to the database that will be executed. This issue was fixed in 6.30@A04.4_u06.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9fcd10062ac93220de2989601bafe0ed1ba0ee723d04d5c8cd516b6b0c3c5d18",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1198"
+}

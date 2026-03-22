@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32442",
+  "ingested_at": "2026-03-22T07:54:46.114426+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in E2Pdf e2pdf e2pdf allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects e2pdf: from n/a through < = 1.28.15.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e292e401a2793b4a033d521a2c2a00dbb35c938ef8bdc576337d76c3d0749b87",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32442"
+}

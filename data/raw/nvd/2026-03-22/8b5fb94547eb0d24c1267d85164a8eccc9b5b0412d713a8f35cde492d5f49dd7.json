@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-15603",
+  "ingested_at": "2026-03-22T07:54:42.369249+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in open-webui up to 0.6.16. Affected is an unknown function of the file backend/start_windows.bat of the component JWT Key Handler. Such manipulation of the argument WEBUI_SECRET_KEY leads to insufficiently random values. It is possible to launch the attack remotely. The attack requires a high level of complexity. The exploitability is told to be difficult. The exploit has been disclosed publicly and may be used.",
+  "severity": "LOW",
+  "sha256_hash": "8b5fb94547eb0d24c1267d85164a8eccc9b5b0412d713a8f35cde492d5f49dd7",
+  "source": "nvd",
+  "tags": [
+    "CWE-310",
+    "CWE-330"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15603"
+}

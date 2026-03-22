@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28691",
+  "ingested_at": "2026-03-22T07:54:42.421280+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-16 and 6.9.13-41, an uninitialized pointer dereference vulnerability exists in the JBIG decoder due to a missing check. This vulnerability is fixed in 7.1.2-16 and 6.9.13-41.",
+  "severity": "HIGH",
+  "sha256_hash": "ca4d8a64ea98b35d19a39d0a9ab877c5beba09ccbc26e444346369b86ece9cfe",
+  "source": "nvd",
+  "tags": [
+    "CWE-252",
+    "CWE-824"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28691"
+}

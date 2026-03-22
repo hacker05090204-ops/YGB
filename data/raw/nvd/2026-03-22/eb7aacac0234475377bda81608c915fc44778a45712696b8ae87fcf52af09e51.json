@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32293",
+  "ingested_at": "2026-03-22T07:54:47.097197+00:00",
+  "lang": "en",
+  "raw_text": "The GL-iNet Comet (GL-RM1) KVM connects to a GL-iNet site during boot-up to provision client and CA certificates. The GL-RM1 does not verify certificates used for this connection, allowing an attacker-in-the-middle to serve invalid client and CA certificates. The GL-RM1 will attempt to use the invalid certificates and fail to connect to the legitimate GL-iNet KVM cloud service.",
+  "severity": "LOW",
+  "sha256_hash": "eb7aacac0234475377bda81608c915fc44778a45712696b8ae87fcf52af09e51",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32293"
+}

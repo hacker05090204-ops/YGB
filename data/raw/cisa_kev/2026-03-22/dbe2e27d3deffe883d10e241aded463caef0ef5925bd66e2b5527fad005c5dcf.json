@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-8956",
+  "ingested_at": "2026-03-22T07:45:16.745357+00:00",
+  "lang": "en",
+  "raw_text": "PTZOptics PT30X-SDI/NDI Cameras PTZOptics PT30X-SDI/NDI cameras contain an insecure direct object reference (IDOR) vulnerability that allows a remote, attacker to bypass authentication for the /cgi-bin/param.cgi CGI script. If combined with CVE-2024-8957, this can lead to remote code execution as root.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dbe2e27d3deffe883d10e241aded463caef0ef5925bd66e2b5527fad005c5dcf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

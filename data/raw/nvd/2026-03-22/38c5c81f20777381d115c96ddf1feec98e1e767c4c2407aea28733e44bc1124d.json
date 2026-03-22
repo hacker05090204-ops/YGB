@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70048",
+  "ingested_at": "2026-03-22T07:54:42.315666+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-319: Cleartext Transmission of Sensitive Information was discovered in Nexusoft NexusInterface v3.2.0-beta.2.",
+  "severity": "HIGH",
+  "sha256_hash": "38c5c81f20777381d115c96ddf1feec98e1e767c4c2407aea28733e44bc1124d",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70048"
+}

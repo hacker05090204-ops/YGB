@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32037",
+  "ingested_at": "2026-03-22T07:54:48.242991+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 fail to consistently validate redirect chains against configured mediaAllowHosts allowlists during MSTeams media downloads. Attackers can supply or influence attachment URLs to force redirects to non-allowlisted targets, bypassing SSRF boundary controls.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9be7115f2c5697def1f525f8b6f04a90355c7a7da4900c51a95b70cc2afdb38a",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32037"
+}

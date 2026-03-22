@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-21492",
+  "ingested_at": "2026-03-22T07:45:17.398037+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices running Android 11, 12, and 13 contain an insertion of sensitive information into log file vulnerability that allows a privileged, local attacker to conduct an address space layout randomization (ASLR) bypass.",
+  "severity": "CRITICAL",
+  "sha256_hash": "674444c16ea6d7cb516cd44989ab1a81aea4524df07ebbb5d98950458be61e38",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

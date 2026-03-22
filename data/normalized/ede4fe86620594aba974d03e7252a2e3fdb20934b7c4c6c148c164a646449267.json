@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An Insecure Direct Object Reference (IDOR) vulnerability exists in Serv-U, which when exploited, gives a malicious actor the ability to execute native code as a privileged account. This issue requires administrative privileges to abuse. On Windows deployments, the risk is scored as a medium because services frequently run under less-privileged service accounts by default.",
+  "token_count": 54
+}

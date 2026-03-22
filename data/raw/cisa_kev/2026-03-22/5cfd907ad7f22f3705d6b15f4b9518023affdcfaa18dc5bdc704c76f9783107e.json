@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-53690",
+  "ingested_at": "2026-03-22T07:45:16.181154+00:00",
+  "lang": "en",
+  "raw_text": "Sitecore Multiple Products Sitecore Experience Manager (XM), Experience Platform (XP), Experience Commerce (XC), and Managed Cloud contain a deserialization of untrusted data vulnerability involving the use of default machine keys. This flaw allows attackers to exploit exposed ASP.NET machine keys to achieve remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5cfd907ad7f22f3705d6b15f4b9518023affdcfaa18dc5bdc704c76f9783107e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

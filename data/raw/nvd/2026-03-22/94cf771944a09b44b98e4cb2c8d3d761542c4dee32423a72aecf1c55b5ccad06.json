@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26308",
+  "ingested_at": "2026-03-22T07:54:43.068761+00:00",
+  "lang": "en",
+  "raw_text": "Envoy is a high-performance edge/middle/service proxy. Prior to 1.37.1, 1.36.5, 1.35.8, and 1.34.13, the Envoy RBAC (Role-Based Access Control) filter contains a logic vulnerability in how it validates HTTP headers when multiple values are present for the same header name. Instead of validating each header value individually, Envoy concatenates all values into a single comma-separated string. This behavior allows attackers to bypass RBAC policies\u2014specifically \"Deny\" rules\u2014by sending duplicate headers, effectively obscuring the malicious value from exact-match mechanisms. This vulnerability is fixed in 1.37.1, 1.36.5, 1.35.8, and 1.34.13.",
+  "severity": "HIGH",
+  "sha256_hash": "94cf771944a09b44b98e4cb2c8d3d761542c4dee32423a72aecf1c55b5ccad06",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26308"
+}

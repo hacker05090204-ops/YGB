@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue was discovered in Tenda W20E V4.0br_V15.11.0.6. Attackers may send overly long `addDhcpRules` data. When these rules enter the `addDhcpRule` function and are processed by `ret = sscanf(pRule, \" %d\\t%[^\\t]\\t%[^\\n\\r\\t]\", &dhcpsIndex, dhcpsIP, dhcpsMac);`, the lack of size validation for the rules could lead to buffer overflows in `dhcpsIndex`, `dhcpsIP`, and `dhcpsMac`.",
+  "token_count": 52
+}

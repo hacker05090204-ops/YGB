@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32865",
+  "ingested_at": "2026-03-22T07:54:47.977207+00:00",
+  "lang": "en",
+  "raw_text": "OPEXUS eComplaint and eCASE before version 10.1.0.0 include the secret verification code in the HTTP response when requesting a password reset via 'ForcePasswordReset.aspx'. An attacker who knows an existing user's email address can reset the user's password and security questions. Existing security questions are not asked during the process.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e81f3028492e0960a01812a1304bd2fbe89140e2e443b7ba715ab42454fc0268",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-640"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32865"
+}

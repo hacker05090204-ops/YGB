@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Use-after-free vulnerability in the BitmapData class in the ActionScript 3 (AS3) implementation in Adobe Flash Player allows remote attackers to execute code or cause a denial-of-service (DoS).",
+  "token_count": 30
+}

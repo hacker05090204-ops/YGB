@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The SmartRemote module has insufficient restrictions on loading URLs, which may lead to some information leakage.",
+  "token_count": 16
+}

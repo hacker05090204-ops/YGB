@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27831",
+  "ingested_at": "2026-03-22T07:54:32.469388+00:00",
+  "lang": "en",
+  "raw_text": "rldns is an open source DNS server. Version 1.3 has a heap-based out-of-bounds read that leads to denial of service. Version 1.4 contains a patch for the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "2274ba1159600a1c20eab5898ee607dfbf3e82f175f8ae2574a4705d4bec104d",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27831"
+}

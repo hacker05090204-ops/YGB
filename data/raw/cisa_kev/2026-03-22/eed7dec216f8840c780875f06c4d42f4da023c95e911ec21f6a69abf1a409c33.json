@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-20124",
+  "ingested_at": "2026-03-22T07:45:16.844514+00:00",
+  "lang": "en",
+  "raw_text": "DrayTek VigorConnect Draytek VigorConnect contains a path traversal vulnerability in the file download functionality of the WebServlet endpoint. An unauthenticated attacker could leverage this vulnerability to download arbitrary files from the underlying operating system with root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eed7dec216f8840c780875f06c4d42f4da023c95e911ec21f6a69abf1a409c33",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 37,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

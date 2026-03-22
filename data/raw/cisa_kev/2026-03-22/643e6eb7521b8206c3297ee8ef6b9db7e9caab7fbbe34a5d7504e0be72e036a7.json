@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-21237",
+  "ingested_at": "2026-03-22T07:45:17.031420+00:00",
+  "lang": "en",
+  "raw_text": "Android Pixel Android Pixel contains a vulnerability in the Framework component, where the UI may be misleading or insufficient, providing a means to hide a foreground service notification. This could enable a local attacker to disclose sensitive information.",
+  "severity": "CRITICAL",
+  "sha256_hash": "643e6eb7521b8206c3297ee8ef6b9db7e9caab7fbbe34a5d7504e0be72e036a7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

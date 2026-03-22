@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-17519",
+  "ingested_at": "2026-03-22T07:45:16.963386+00:00",
+  "lang": "en",
+  "raw_text": "Apache Flink Apache Flink contains an improper access control vulnerability that allows an attacker to read any file on the local filesystem of the JobManager through its REST interface.",
+  "severity": "CRITICAL",
+  "sha256_hash": "79dbf179e1c5aeb77ea2d00fa70b1b36735f8bb4badc54b2ba7f8235b17ce492",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

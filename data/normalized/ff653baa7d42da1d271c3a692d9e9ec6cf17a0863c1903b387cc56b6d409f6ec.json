@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use of a hard-coded AES-256-CBC key in the configuration backup/restore implementation of Small Cell Sercomm SCE4255W (FreedomFi Englewood) firmware before DG3934v3@2308041842 allows remote authenticated users to decrypt, modify, and re-encrypt device configurations, enabling credential manipulation and privilege escalation via the GUI import/export functions.",
+  "token_count": 43
+}

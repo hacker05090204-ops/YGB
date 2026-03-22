@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The GL-iNet Comet (GL-RM1) KVM web interface does not limit login requests, enabling brute-force attempts to guess credentials.",
+  "token_count": 18
+}

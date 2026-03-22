@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28106",
+  "ingested_at": "2026-03-22T07:54:41.386730+00:00",
+  "lang": "en",
+  "raw_text": "URL Redirection to Untrusted Site ('Open Redirect') vulnerability in Kings Plugins B2BKing Premium allows Phishing.This issue affects B2BKing Premium: from n/a before 5.4.20.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a9d14fe25713f9b98e5361b29ecabf6ccf28f7bdaf40dcf30956c0138e5f5ebc",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28106"
+}

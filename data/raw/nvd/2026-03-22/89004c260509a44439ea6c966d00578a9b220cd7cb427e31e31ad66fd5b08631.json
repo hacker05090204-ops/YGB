@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25127",
+  "ingested_at": "2026-03-22T07:54:31.847326+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the server does not properly validate user permission. Unauthorized users can view the information of authorized users. Version 8.0.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "89004c260509a44439ea6c966d00578a9b220cd7cb427e31e31ad66fd5b08631",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25127"
+}

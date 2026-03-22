@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability in the SAML 2.0 single sign-on (SSO) feature of Cisco Secure Firewall ASA Software and Secure FTD Software could allow an unauthenticated, remote attacker to cause the device to reload unexpectedly, resulting in a DoS condition. This vulnerability is due to insufficient error checking when processing SAML messages. An attacker could exploit this vulnerability by sending crafted SAML messages to the SAML service. A successful exploit could allow the attacker to cause the device to reload, resulting in a DoS condition.",
+  "token_count": 83
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4270",
+  "ingested_at": "2026-03-22T07:54:46.879682+00:00",
+  "lang": "en",
+  "raw_text": "Improper Protection of Alternate Path exists in the no-access and workdir feature of the AWS API MCP Server versions >= 0.2.14 and < 1.3.9 on all platforms may allow the bypass of intended file access restriction and expose arbitrary local file contents in the MCP client application context. To remediate this issue, users should upgrade to version 1.3.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a2d3fb12fdf8a95bdb4ef621c428ca60a6c1316968253ecbda46378703c72ad9",
+  "source": "nvd",
+  "tags": [
+    "CWE-424"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4270"
+}

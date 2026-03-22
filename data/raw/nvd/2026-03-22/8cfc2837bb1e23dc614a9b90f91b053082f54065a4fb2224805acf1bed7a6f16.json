@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27822",
+  "ingested_at": "2026-03-22T07:54:31.908042+00:00",
+  "lang": "en",
+  "raw_text": "RustFS is a distributed object storage system built in Rust. Prior to version 1.0.0-alpha.83, a Stored Cross-Site Scripting (XSS) vulnerability in the RustFS Console allows an attacker to execute arbitrary JavaScript in the context of the management console. By bypassing the PDF preview logic, an attacker can steal administrator credentials from `localStorage`, leading to full account takeover and system compromise. Version 1.0.0-alpha.83 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8cfc2837bb1e23dc614a9b90f91b053082f54065a4fb2224805acf1bed7a6f16",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27822"
+}

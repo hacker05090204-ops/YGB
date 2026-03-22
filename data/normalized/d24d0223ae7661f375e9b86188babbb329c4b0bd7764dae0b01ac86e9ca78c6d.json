@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Fuel CMS Fuel CMS FUEL CMS 1.4.7 allows SQL Injection via the col parameter to /pages/items, /permissions/items, or /navigation/items.",
+  "token_count": 19
+}

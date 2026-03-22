@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33410",
+  "ingested_at": "2026-03-22T07:54:48.282597+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Versions prior to 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 have two authorization issues in the chat direct message API. First, when creating a direct message channel or adding users to an existing one, the `target_groups` parameter was passed directly to the user resolution query without checking group or member visibility for the acting user. An authenticated chat user could craft an API request with a known private/hidden group name and receive a channel containing that group's members, leaking their identities. Second, `can_chat?` only checked group membership, not the `chat_enabled` user preference. A chat-disabled user could create or query DM channels between other users via the direct messages API, potentially exposing private `last_message` content from the serialized channel response. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e6eac557f8a7c8106b1deb8af4649f13e983cf109414cc592af9b6ac561644af",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 135,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33410"
+}

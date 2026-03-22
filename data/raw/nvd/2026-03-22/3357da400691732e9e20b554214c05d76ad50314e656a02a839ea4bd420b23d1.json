@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24316",
+  "ingested_at": "2026-03-22T07:54:42.476384+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver Application Server for ABAP provides an ABAP Report for testing purposes, which allows to send HTTP requests to arbitrary internal or external endpoints. The report is therefore vulnerable to Server-Side Request Forgery (SSRF). Successful exploitation could lead to interaction with potentially sensitive internal endpoints, resulting in a low impact on data confidentiality and integrity. There is no impact on availability of the application.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3357da400691732e9e20b554214c05d76ad50314e656a02a839ea4bd420b23d1",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24316"
+}

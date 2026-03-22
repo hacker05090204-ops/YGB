@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-59544",
+  "ingested_at": "2026-03-22T07:54:41.230337+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.34, the functionality for the user to update the category does not implement authorization checks for the \"category_id\" parameter which allows users to update the category of any user by replacing the \"category_id\" parameter. This issue has been patched in version 1.11.34.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b2208c0b7eca2812adc8457919f1e66f6a068d3c7e8c26abb5a698dab4406a0a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-59544"
+}

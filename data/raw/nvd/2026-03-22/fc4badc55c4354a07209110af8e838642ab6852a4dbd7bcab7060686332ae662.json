@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-1693",
+  "ingested_at": "2026-03-22T07:54:32.617360+00:00",
+  "lang": "en",
+  "raw_text": "The OAuth grant type Resource Owner Password Credentials (ROPC) flow is still used by the werbservices used by the WebVue, WebScheduler, TouchVue and Snapvue features of PcVue in version 12.0.0 through 16.3.3 included despite being deprecated. It might allow a remote attacker to steal user credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "fc4badc55c4354a07209110af8e838642ab6852a4dbd7bcab7060686332ae662",
+  "source": "nvd",
+  "tags": [
+    "CWE-477",
+    "CWE-1390"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1693"
+}

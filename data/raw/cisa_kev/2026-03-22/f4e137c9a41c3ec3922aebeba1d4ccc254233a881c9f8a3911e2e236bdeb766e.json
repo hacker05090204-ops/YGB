@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-40765",
+  "ingested_at": "2026-03-22T07:45:17.516848+00:00",
+  "lang": "en",
+  "raw_text": "Mitel MiVoice Connect The Mitel Edge Gateway component of MiVoice Connect allows an authenticated attacker with internal network access to execute commands within the context of the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f4e137c9a41c3ec3922aebeba1d4ccc254233a881c9f8a3911e2e236bdeb766e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

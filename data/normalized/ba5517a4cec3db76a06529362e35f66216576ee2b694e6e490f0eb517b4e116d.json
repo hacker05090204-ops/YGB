@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an information disclosure vulnerability that allows administrators to inadvertently expose OAuth secrets by exporting plugin options as JSON. Attackers can obtain exported files containing plaintext API secrets like fbAppSecret, googleClientSecret, twitterAppSecret, and other social login credentials from support tickets, backups, or version control repositories.",
+  "token_count": 48
+}

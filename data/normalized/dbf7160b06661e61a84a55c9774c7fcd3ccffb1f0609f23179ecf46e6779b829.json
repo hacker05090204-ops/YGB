@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Broadcom VMware Aria Operations and VMware Tools Broadcom VMware Aria Operations and VMware Tools contain a privilege defined with unsafe actions vulnerability. A malicious local actor with non-administrative privileges having access to a VM with VMware Tools installed and managed by Aria Operations with SDMP enabled may exploit this vulnerability to escalate privileges to root on the same VM.",
+  "token_count": 59
+}

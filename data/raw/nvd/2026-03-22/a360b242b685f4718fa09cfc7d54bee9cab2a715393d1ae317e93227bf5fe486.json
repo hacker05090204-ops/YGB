@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67991",
+  "ingested_at": "2026-03-22T07:54:30.043573+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in vanquish User Extra Fields wp-user-extra-fields allows Reflected XSS.This issue affects User Extra Fields: from n/a through < = 16.8.",
+  "severity": "HIGH",
+  "sha256_hash": "a360b242b685f4718fa09cfc7d54bee9cab2a715393d1ae317e93227bf5fe486",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67991"
+}

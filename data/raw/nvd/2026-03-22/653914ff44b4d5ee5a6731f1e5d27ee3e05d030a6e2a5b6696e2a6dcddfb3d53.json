@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-25702",
+  "ingested_at": "2026-03-22T07:54:40.710867+00:00",
+  "lang": "en",
+  "raw_text": "A Improper Access Control vulnerability in the kernel of SUSE SUSE Linux Enterprise Server 12 SP5 breaks nftables, causing firewall rules applied via nftables to not be effective.This issue affects SUSE Linux Enterprise Server: from 9e6d9d4601768c75fdb0bad3fbbe636e748939c2 before 9c294edb7085fb91650bc12233495a8974c5ff2d.",
+  "severity": "HIGH",
+  "sha256_hash": "653914ff44b4d5ee5a6731f1e5d27ee3e05d030a6e2a5b6696e2a6dcddfb3d53",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25702"
+}

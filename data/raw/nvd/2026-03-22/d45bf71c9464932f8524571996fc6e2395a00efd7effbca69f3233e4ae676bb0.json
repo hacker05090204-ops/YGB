@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25564",
+  "ingested_at": "2026-03-22T07:54:49.520743+00:00",
+  "lang": "en",
+  "raw_text": "PCHelpWareV2 1.0.0.5 contains a denial of service vulnerability that allows local attackers to crash the application by supplying an excessively long string in the Group field. Attackers can paste a buffer overflow payload into the Group property field and click Ok to trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d45bf71c9464932f8524571996fc6e2395a00efd7effbca69f3233e4ae676bb0",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25564"
+}

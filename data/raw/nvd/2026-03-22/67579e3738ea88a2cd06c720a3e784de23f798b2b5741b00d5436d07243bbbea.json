@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69534",
+  "ingested_at": "2026-03-22T07:54:40.780782+00:00",
+  "lang": "en",
+  "raw_text": "Python-Markdown version 3.8 contain a vulnerability where malformed HTML-like sequences can cause html.parser.HTMLParser to raise an unhandled AssertionError during Markdown parsing. Because Python-Markdown does not catch this exception, any application that processes attacker-controlled Markdown may crash. This enables remote, unauthenticated Denial of Service in web applications, documentation systems, CI/CD pipelines, and any service that renders untrusted Markdown. The issue was acknowledged by the vendor and fixed in version 3.8.1. This issue causes a remote Denial of Service in any application parsing untrusted Markdown, and can lead to Information Disclosure through uncaught exceptions.",
+  "severity": "HIGH",
+  "sha256_hash": "67579e3738ea88a2cd06c720a3e784de23f798b2b5741b00d5436d07243bbbea",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69534"
+}

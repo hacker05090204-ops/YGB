@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25169",
+  "ingested_at": "2026-03-22T07:54:42.727736+00:00",
+  "lang": "en",
+  "raw_text": "Divide by zero in Microsoft Graphics Component allows an unauthorized attacker to deny service locally.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4a87ef83df94b343d3b4e746681fc6fd5165e231cbb996b84cf25cfaf6f08f22",
+  "source": "nvd",
+  "tags": [
+    "CWE-369"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25169"
+}

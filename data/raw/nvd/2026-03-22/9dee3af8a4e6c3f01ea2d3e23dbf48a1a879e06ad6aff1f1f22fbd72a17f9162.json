@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-23665",
+  "ingested_at": "2026-03-22T07:54:42.663422+00:00",
+  "lang": "en",
+  "raw_text": "Heap-based buffer overflow in Azure Linux Virtual Machines allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "9dee3af8a4e6c3f01ea2d3e23dbf48a1a879e06ad6aff1f1f22fbd72a17f9162",
+  "source": "nvd",
+  "tags": [
+    "CWE-122",
+    "CWE-787"
+  ],
+  "token_count": 16,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23665"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-19006",
+  "ingested_at": "2026-03-22T07:45:15.941926+00:00",
+  "lang": "en",
+  "raw_text": "Sangoma FreePBX Sangoma FreePBX contains an improper authentication vulnerability that potentially allows unauthorized users to bypass password authentication and access services provided by the FreePBX admin.",
+  "severity": "CRITICAL",
+  "sha256_hash": "06df49a0123c036503e418a12d0010ae01d7b30f9fabd2ec8461fddd84bb2533",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

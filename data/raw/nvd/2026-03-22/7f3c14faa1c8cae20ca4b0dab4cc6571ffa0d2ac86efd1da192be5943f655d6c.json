@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30783",
+  "ingested_at": "2026-03-22T07:54:40.804300+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in rustdesk-client RustDesk Client rustdesk-client on Windows, MacOS, Linux, iOS, Android, WebClient (Client signaling, API sync loop, config management modules) allows Privilege Abuse. This vulnerability is associated with program files src/rendezvous_mediator.Rs, src/hbbs_http/sync.Rs and program routines API sync loop, api-server config handling. This issue affects RustDesk Client: through 1.4.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "7f3c14faa1c8cae20ca4b0dab4cc6571ffa0d2ac86efd1da192be5943f655d6c",
+  "source": "nvd",
+  "tags": [
+    "CWE-602",
+    "CWE-841"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30783"
+}

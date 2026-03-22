@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Telesquare SKT LTE Router SDT-CS3B1 version 1.2.0 contains an arbitrary file upload vulnerability that allows unauthenticated attackers to upload malicious content by exploiting enabled WebDAV HTTP methods. Attackers can use PUT, DELETE, MKCOL, MOVE, COPY, and PROPPATCH methods to upload executable code, delete files, or manipulate server content for remote code execution or denial of service.",
+  "token_count": 56
+}

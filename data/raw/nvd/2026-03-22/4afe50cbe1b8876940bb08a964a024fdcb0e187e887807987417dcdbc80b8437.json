@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3906",
+  "ingested_at": "2026-03-22T07:54:43.548842+00:00",
+  "lang": "en",
+  "raw_text": "WordPress core is vulnerable to unauthorized access in versions 6.9 through 6.9.1. The Notes feature (block-level collaboration annotations) was introduced in WordPress 6.9 to allow editorial comments directly on posts in the block editor. However, the REST API `create_item_permissions_check()` method in the comments controller did not verify that the authenticated user has `edit_post` permission on the target post when creating a note. This makes it possible for authenticated attackers with Subscriber-level access to create notes on any post, including posts authored by other users, private posts, and posts in any status.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4afe50cbe1b8876940bb08a964a024fdcb0e187e887807987417dcdbc80b8437",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3906"
+}

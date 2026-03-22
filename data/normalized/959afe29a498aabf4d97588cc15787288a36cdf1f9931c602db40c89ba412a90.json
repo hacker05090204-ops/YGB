@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "FreshRSS is a free, self-hostable RSS aggregator. Prior 1.28.0, a bug in the auth logic related to master authentication tokens, this restriction is bypassed. Usually only the default user's feed should be viewable if anonymous viewing is enabled, and feeds of other users should be private. This vulnerability is fixed in 1.28.0.",
+  "token_count": 52
+}

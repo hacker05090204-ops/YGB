@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-27137",
+  "ingested_at": "2026-03-22T07:54:41.655179+00:00",
+  "lang": "en",
+  "raw_text": "When verifying a certificate chain which contains a certificate containing multiple email address constraints which share common local portions but different domain portions, these constraints will not be properly applied, and only the last constraint will be considered.",
+  "severity": "HIGH",
+  "sha256_hash": "67e726a39d35818015ca144f3b9b5904699abb2b72287a88f89087c6d1cd1864",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27137"
+}

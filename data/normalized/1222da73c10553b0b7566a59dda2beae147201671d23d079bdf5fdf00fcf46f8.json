@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A Memory Allocation with Excessive Size Value vulnerability in Trane Tracer SC, Tracer SC+, and Tracer Concierge could allow an unauthenticated attacker to cause a denial-of-service condition",
+  "token_count": 27
+}

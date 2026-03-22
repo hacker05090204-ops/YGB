@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "in OpenHarmony v5.0.3 and prior versions allow a local attacker cause information improper input. This vulnerability can be exploited only in restricted scenarios.",
+  "token_count": 23
+}

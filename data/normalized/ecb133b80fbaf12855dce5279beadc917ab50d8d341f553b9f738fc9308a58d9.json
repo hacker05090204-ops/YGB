@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use after free in Windows Win32K allows an authorized attacker to elevate privileges locally.",
+  "token_count": 14
+}

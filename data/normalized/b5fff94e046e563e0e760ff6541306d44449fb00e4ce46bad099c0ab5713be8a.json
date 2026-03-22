@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server contains an unspecified vulnerability allowing an unauthenticated attacker to perform remote code execution. This vulnerability is related to CVE-2020-14882.",
+  "token_count": 25
+}

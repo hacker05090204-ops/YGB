@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32018",
+  "ingested_at": "2026-03-22T07:54:48.196435+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 contain a race condition vulnerability in concurrent updateRegistry and removeRegistryEntry operations for sandbox containers and browsers. Attackers can exploit unsynchronized read-modify-write operations without locking to cause registry updates to lose data, resurrect removed entries, or corrupt sandbox state affecting list, prune, and recreate operations.",
+  "severity": "LOW",
+  "sha256_hash": "1affabe4e63ceb32c4ac6a65ff6ccdbac2ec95843484f2559271e19775198db9",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32018"
+}

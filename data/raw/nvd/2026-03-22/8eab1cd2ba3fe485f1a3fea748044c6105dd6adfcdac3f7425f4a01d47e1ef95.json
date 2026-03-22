@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-30044",
+  "ingested_at": "2026-03-22T07:54:33.561591+00:00",
+  "lang": "en",
+  "raw_text": "In the endpoints \"/cgi-bin/CliniNET.prd/utils/usrlogstat_simple.pl\", \"/cgi-bin/CliniNET.prd/utils/usrlogstat.pl\", \"/cgi-bin/CliniNET.prd/utils/userlogstat2.pl\", and \"/cgi-bin/CliniNET.prd/utils/dblogstat.pl\", the parameters are not sufficiently normalized, which enables code injection.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "8eab1cd2ba3fe485f1a3fea748044c6105dd6adfcdac3f7425f4a01d47e1ef95",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-30044"
+}

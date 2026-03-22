@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27796",
+  "ingested_at": "2026-03-22T07:54:41.742393+00:00",
+  "lang": "en",
+  "raw_text": "Homarr is an open-source dashboard. Prior to version 1.54.0, the integration.all tRPC endpoint in Homarr is exposed as a publicProcedure, allowing unauthenticated users to retrieve a complete list of configured integrations. This metadata includes sensitive information such as internal service URLs, integration names, and service types. This issue has been patched in version 1.54.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f075f8cc0315295440173b1cf868a96d96fb7aace05161955882f7d136a739c3",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-862"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27796"
+}

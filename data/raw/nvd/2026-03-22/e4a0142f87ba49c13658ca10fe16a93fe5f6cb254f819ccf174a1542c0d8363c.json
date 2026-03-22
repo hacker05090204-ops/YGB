@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28539",
+  "ingested_at": "2026-03-22T07:54:40.729164+00:00",
+  "lang": "en",
+  "raw_text": "Data processing vulnerability in the certificate management module. Impact: Successful exploitation of this vulnerability may affect service confidentiality.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e4a0142f87ba49c13658ca10fe16a93fe5f6cb254f819ccf174a1542c0d8363c",
+  "source": "nvd",
+  "tags": [
+    "CWE-19",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28539"
+}

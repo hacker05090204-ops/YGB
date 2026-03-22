@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "EyesOfNetwork EyesOfNetwork EyesOfNetwork contains an improper privilege management vulnerability that may allow a user to run commands as root via a crafted Nmap Scripting Engine (NSE) script to nmap7.",
+  "token_count": 29
+}

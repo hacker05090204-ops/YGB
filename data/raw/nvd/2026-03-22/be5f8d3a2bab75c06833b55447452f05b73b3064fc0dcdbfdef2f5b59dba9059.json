@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22192",
+  "ingested_at": "2026-03-22T07:54:44.612163+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a stored cross-site scripting vulnerability that allows authenticated attackers to inject malicious JavaScript by importing a crafted options file with unescaped customCss field values. Attackers can supply a malicious JSON import file containing script payloads in the customCss parameter that execute on every page when rendered through the options handler without proper sanitization.",
+  "severity": "MEDIUM",
+  "sha256_hash": "be5f8d3a2bab75c06833b55447452f05b73b3064fc0dcdbfdef2f5b59dba9059",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22192"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23536",
+  "ingested_at": "2026-03-22T07:54:49.016751+00:00",
+  "lang": "en",
+  "raw_text": "A security issue was discovered in the Feast Feature Server's `/read-document` endpoint that allows an unauthenticated remote attacker to read any file accessible to the server process. By sending a specially crafted HTTP POST request, an attacker can bypass intended access restrictions to potentially retrieve sensitive system files, application configurations, and credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "a4f45b4f30de12005e7064a0a0194f74946b3e4c9dbd30a027f6cfeb70635a62",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23536"
+}

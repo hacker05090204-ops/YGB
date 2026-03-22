@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32897",
+  "ingested_at": "2026-03-22T07:54:49.240986+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 reuse gateway.auth.token as a fallback hash secret for owner-ID prompt obfuscation when commands.ownerDisplay is set to hash and commands.ownerDisplaySecret is unset, creating dual-use of authentication secrets across security domains. Attackers with access to system prompts sent to third-party model providers can derive the gateway authentication token from the hash outputs, compromising gateway authentication security.",
+  "severity": "LOW",
+  "sha256_hash": "b434b20b3f2900b6c74e8ff5b25e468e71fd8fc0c46ba69630d6fa4c6e500d4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-320"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32897"
+}

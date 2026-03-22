@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A SUID root-owned binary in /home/xd/terminal/XDTerminal in International Data Casting (IDC) SFX2100 on Linux allows a local actor to potentially preform local privilege escalation depending on conditions of the system via execution of the affected SUID binary. This can be via PATH hijacking, symlink abuse or shared object hijacking.",
+  "token_count": 49
+}

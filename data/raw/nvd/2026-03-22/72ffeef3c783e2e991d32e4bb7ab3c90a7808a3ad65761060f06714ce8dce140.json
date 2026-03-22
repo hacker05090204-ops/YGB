@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3398",
+  "ingested_at": "2026-03-22T07:54:33.465949+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Tenda F453 1.0.0.3. Affected is the function fromAdvSetWan of the file /goform/AdvSetWan of the component httpd. Executing a manipulation of the argument wanmode/PPPOEPassword can lead to buffer overflow. The attack can be launched remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "72ffeef3c783e2e991d32e4bb7ab3c90a7808a3ad65761060f06714ce8dce140",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3398"
+}

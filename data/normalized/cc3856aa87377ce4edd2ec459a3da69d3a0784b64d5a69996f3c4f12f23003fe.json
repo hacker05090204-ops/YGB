@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Rails Ruby on Rails Directory traversal vulnerability in actionpack/lib/abstract_controller/base.rb in the implicit-render implementation in Ruby on Rails allows remote attackers to read arbitrary files via a crafted request.",
+  "token_count": 28
+}

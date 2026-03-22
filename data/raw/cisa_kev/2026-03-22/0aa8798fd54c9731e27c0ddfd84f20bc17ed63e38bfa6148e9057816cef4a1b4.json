@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-21391",
+  "ingested_at": "2026-03-22T07:45:16.599958+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Storage contains a link following vulnerability that could allow for privilege escalation. This vulnerability could allow an attacker to delete data including data that results in the service being unavailable.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0aa8798fd54c9731e27c0ddfd84f20bc17ed63e38bfa6148e9057816cef4a1b4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

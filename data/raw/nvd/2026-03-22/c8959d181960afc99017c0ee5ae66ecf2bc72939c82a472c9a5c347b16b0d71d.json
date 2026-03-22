@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4161",
+  "ingested_at": "2026-03-22T07:54:49.459348+00:00",
+  "lang": "en",
+  "raw_text": "The Review Map by RevuKangaroo plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin settings in all versions up to, and including, 1.7 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with administrator-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. This only affects multi-site installations and installations where unfiltered_html has been disabled.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c8959d181960afc99017c0ee5ae66ecf2bc72939c82a472c9a5c347b16b0d71d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4161"
+}

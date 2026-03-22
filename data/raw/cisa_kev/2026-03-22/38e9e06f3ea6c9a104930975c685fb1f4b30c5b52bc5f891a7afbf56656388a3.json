@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-45382",
+  "ingested_at": "2026-03-22T07:45:18.170952+00:00",
+  "lang": "en",
+  "raw_text": "D-Link Multiple Routers A remote code execution vulnerability exists in all series H/W revisions routers via the DDNS function in ncc2 binary file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "38e9e06f3ea6c9a104930975c685fb1f4b30c5b52bc5f891a7afbf56656388a3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

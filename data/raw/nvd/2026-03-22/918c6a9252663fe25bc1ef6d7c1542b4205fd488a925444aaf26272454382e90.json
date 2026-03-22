@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20021",
+  "ingested_at": "2026-03-22T07:54:34.750995+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the OSPF protocol of Cisco Secure Firewall Adaptive Security Appliance (ASA) Software and Cisco Secure Firewall Threat Defense (FTD) Software could allow an authenticated, adjacent attacker to exhaust memory on an affected device, resulting in a denial of service (DoS) condition. This vulnerability is due to improperly validating input by the OSPF protocol when parsing packets. An attacker could exploit this vulnerability by by sending crafted OSPF packets to an affected device. A successful exploit could allow the attacker to exhaust memory on the affected device, resulting in a DoS condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "918c6a9252663fe25bc1ef6d7c1542b4205fd488a925444aaf26272454382e90",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 94,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20021"
+}

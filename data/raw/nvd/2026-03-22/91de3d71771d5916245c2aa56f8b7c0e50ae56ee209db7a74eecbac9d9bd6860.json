@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3394",
+  "ingested_at": "2026-03-22T07:54:33.461882+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in jarikomppa soloud up to 20200207. This affects the function SoLoud::Wav::loadwav of the file src/audiosource/wav/soloud_wav.cpp of the component WAV File Parser. Performing a manipulation results in memory corruption. The attack must be initiated from a local position. The exploit is now public and may be used. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "91de3d71771d5916245c2aa56f8b7c0e50ae56ee209db7a74eecbac9d9bd6860",
+  "source": "nvd",
+  "tags": [
+    "CWE-119"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3394"
+}

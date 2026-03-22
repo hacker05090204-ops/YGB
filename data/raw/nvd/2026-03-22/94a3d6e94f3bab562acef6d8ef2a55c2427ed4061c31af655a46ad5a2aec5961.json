@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26130",
+  "ingested_at": "2026-03-22T07:54:42.823341+00:00",
+  "lang": "en",
+  "raw_text": "Allocation of resources without limits or throttling in ASP.NET Core allows an unauthorized attacker to deny service over a network.",
+  "severity": "HIGH",
+  "sha256_hash": "94a3d6e94f3bab562acef6d8ef2a55c2427ed4061c31af655a46ad5a2aec5961",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26130"
+}

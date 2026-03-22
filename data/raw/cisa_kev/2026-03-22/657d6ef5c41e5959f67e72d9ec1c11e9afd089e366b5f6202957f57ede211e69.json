@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-40766",
+  "ingested_at": "2026-03-22T07:45:16.834210+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SonicOS SonicWall SonicOS contains an improper access control vulnerability that could lead to unauthorized resource access and, under certain conditions, may cause the firewall to crash.",
+  "severity": "CRITICAL",
+  "sha256_hash": "657d6ef5c41e5959f67e72d9ec1c11e9afd089e366b5f6202957f57ede211e69",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

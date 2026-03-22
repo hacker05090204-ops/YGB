@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33053",
+  "ingested_at": "2026-03-22T07:54:48.643529+00:00",
+  "lang": "en",
+  "raw_text": "Langflow is a tool for building and deploying AI-powered agents and workflows. In versions prior to 1.9.0, the delete_api_key_route() endpoint accepts an api_key_id path parameter and deletes it with only a generic authentication check (get_current_active_user dependency). However, the delete_api_key() CRUD function does NOT verify that the API key belongs to the current user before deletion.",
+  "severity": "HIGH",
+  "sha256_hash": "59c5a1fc6f6306e7145ea015631389f40d8b2e2978fdc6b7582a50e6a447c028",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33053"
+}

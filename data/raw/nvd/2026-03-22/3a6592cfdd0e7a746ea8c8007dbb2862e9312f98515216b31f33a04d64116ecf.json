@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26986",
+  "ingested_at": "2026-03-22T07:54:32.348270+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to version 3.23.0, `rail_window_free` dereferences a freed `xfAppWindow` pointer during `HashTable_Free` cleanup because `xf_rail_window_common` calls `free(appWindow)` on title allocation failure without first removing the entry from the `railWindows` hash table, leaving a dangling pointer that is freed again on disconnect. Version 3.23.0 fixes the vulnerability.",
+  "severity": "HIGH",
+  "sha256_hash": "3a6592cfdd0e7a746ea8c8007dbb2862e9312f98515216b31f33a04d64116ecf",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26986"
+}

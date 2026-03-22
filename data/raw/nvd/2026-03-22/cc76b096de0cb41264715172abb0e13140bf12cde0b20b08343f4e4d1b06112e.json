@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25186",
+  "ingested_at": "2026-03-22T07:54:42.752055+00:00",
+  "lang": "en",
+  "raw_text": "Exposure of sensitive information to an unauthorized actor in Windows Accessibility Infrastructure (ATBroker.exe) allows an authorized attacker to disclose information locally.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cc76b096de0cb41264715172abb0e13140bf12cde0b20b08343f4e4d1b06112e",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25186"
+}

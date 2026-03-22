@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SandboxJS is a JavaScript sandboxing library. Prior to 0.8.34, it is possible to obtain arrays containing Function, which allows escaping the sandbox. Given an array containing Function, and Object.fromEntries, it is possible to construct {[p]: Function} where p is any constructible property. This vulnerability is fixed in 0.8.34.",
+  "token_count": 48
+}

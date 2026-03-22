@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-2898",
+  "ingested_at": "2026-03-22T07:54:30.903564+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in funadmin up to 7.1.0-rc4. This issue affects the function getMember of the file app/common/service/AuthCloudService.php of the component Backend Endpoint. The manipulation of the argument cloud_account results in deserialization. The attack may be performed from remote. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "908803cd21c555a3b17187853fd793cd0fb91f954fdab8971602043648027879",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-502",
+    "CWE-502"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2898"
+}

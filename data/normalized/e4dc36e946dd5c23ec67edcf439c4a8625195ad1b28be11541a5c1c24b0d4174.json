@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability exists in Copeland XWEB Pro version 1.12.1 and prior, in which an unexpected return value from the authentication routine is later on processed as a legitimate value, resulting in an authentication bypass.",
+  "token_count": 34
+}

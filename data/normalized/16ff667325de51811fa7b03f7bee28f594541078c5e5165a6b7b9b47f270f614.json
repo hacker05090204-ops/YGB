@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wger is a free, open-source workout and fitness manager. Five routine detail action endpoints check a cache before calling `self.get_object()`. In versions up to and including 2.4, ache keys are scoped only by `pk` \u2014 no user ID is included. When a victim has previously accessed their routine via the API, an attacker can retrieve the cached response for the same PK without any ownership check. Commit e964328784e2ee2830a1991d69fadbce86ac9fbf contains a patch for the issue.",
+  "token_count": 74
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32985",
+  "ingested_at": "2026-03-22T07:54:48.390755+00:00",
+  "lang": "en",
+  "raw_text": "Xerte Online Toolkits versions 3.14 and earlier contain an unauthenticated arbitrary file upload vulnerability in the template import functionality that allows remote attackers to execute arbitrary code by uploading a crafted ZIP archive containing malicious PHP payloads. Attackers can bypass authentication checks in the import.php file to upload a template archive with PHP code in the media directory, which gets extracted to a web-accessible path where the malicious PHP can be directly accessed and executed under the web server context.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9822e7fe25a01b044ca4232d97d992245bfac0b29c06e49bfaf03710c11132a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-306",
+    "CWE-434"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32985"
+}

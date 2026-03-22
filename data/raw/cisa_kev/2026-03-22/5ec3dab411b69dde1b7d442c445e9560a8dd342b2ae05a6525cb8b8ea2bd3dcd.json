@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-34527",
+  "ingested_at": "2026-03-22T07:45:19.349703+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Print Spooler contains an unspecified vulnerability due to the Windows Print Spooler service improperly performing privileged file operations. Successful exploitation allows an attacker to perform remote code execution with SYSTEM privileges. The vulnerability is also known under the moniker of PrintNightmare.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5ec3dab411b69dde1b7d442c445e9560a8dd342b2ae05a6525cb8b8ea2bd3dcd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

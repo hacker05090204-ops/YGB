@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows DWM Core Library contains a use-after-free vulnerability that allows an authorized attacker to elevate privileges locally.",
+  "token_count": 20
+}

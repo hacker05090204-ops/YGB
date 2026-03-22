@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69399",
+  "ingested_at": "2026-03-22T07:54:30.304812+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Cobble cobble allows PHP Local File Inclusion.This issue affects Cobble: from n/a through < = 1.7.",
+  "severity": "HIGH",
+  "sha256_hash": "6b493f01acf65237d42a0e80598dc04bfbc57e6866893e31a9e12ee5d2d98068",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69399"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26131",
+  "ingested_at": "2026-03-22T07:54:42.824344+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect default permissions in .NET allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "1e58c9ad8eb17d67aee361946771f0c078ba56bc9b43ca951b202d2d5affaaaa",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26131"
+}

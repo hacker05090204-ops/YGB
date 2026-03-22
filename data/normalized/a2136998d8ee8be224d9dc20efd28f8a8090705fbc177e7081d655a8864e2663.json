@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Due to missing authorization check in SAP S/4HANA HCM Portugal and SAP ERP HCM Portugal, a user with high privileges could access sensitive data belonging to another company. This vulnerability has a high impact on confidentiality and does not affect integrity and availability.",
+  "token_count": 43
+}

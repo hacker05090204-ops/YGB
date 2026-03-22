@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3743",
+  "ingested_at": "2026-03-22T07:54:42.064277+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in YiFang CMS 2.0.5. This affects the function update of the file app/db/admin/D_singlePageGroup.php. Executing a manipulation of the argument Name can lead to cross site scripting. It is possible to launch the attack remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "5e6e8fb9645941dc66e7e0fb40941270a6f0967581a07a53ed2c02f2a29c064f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3743"
+}

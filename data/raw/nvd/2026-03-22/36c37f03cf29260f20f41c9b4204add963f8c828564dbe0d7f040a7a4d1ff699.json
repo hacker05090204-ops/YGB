@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2016-20029",
+  "ingested_at": "2026-03-22T07:54:46.249819+00:00",
+  "lang": "en",
+  "raw_text": "ZKTeco ZKBioSecurity 3.0 contains a file path manipulation vulnerability that allows attackers to access arbitrary files by modifying file paths used to retrieve local resources. Attackers can manipulate path parameters to bypass access controls and retrieve sensitive information including configuration files, source code, and protected application resources.",
+  "severity": "MEDIUM",
+  "sha256_hash": "36c37f03cf29260f20f41c9b4204add963f8c828564dbe0d7f040a7a4d1ff699",
+  "source": "nvd",
+  "tags": [
+    "CWE-276"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2016-20029"
+}

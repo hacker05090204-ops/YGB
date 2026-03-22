@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-38645",
+  "ingested_at": "2026-03-22T07:45:19.320458+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Open Management Infrastructure (OMI) Microsoft Open Management Infrastructure (OMI) within Azure VM Management Extensions contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b4892ec81f16e6f0bff5fbf2270d90a32d9a075ab35382be8e7b69d0468780f0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

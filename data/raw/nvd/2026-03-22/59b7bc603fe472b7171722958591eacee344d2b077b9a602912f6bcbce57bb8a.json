@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28208",
+  "ingested_at": "2026-03-22T07:54:32.827181+00:00",
+  "lang": "en",
+  "raw_text": "Junrar is an open source java RAR archive library. Prior to version 7.5.8, a backslash path traversal vulnerability in `LocalFolderExtractor` allows an attacker to write arbitrary files with attacker-controlled content anywhere on the filesystem when a crafted RAR archive is extracted on Linux/Unix. This can often lead to remote code execution (e.g., overwriting shell profiles, source code, cron jobs, etc). Version 7.5.8 has a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "59b7bc603fe472b7171722958591eacee344d2b077b9a602912f6bcbce57bb8a",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28208"
+}

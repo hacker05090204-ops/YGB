@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25190",
+  "ingested_at": "2026-03-22T07:54:42.760052+00:00",
+  "lang": "en",
+  "raw_text": "Untrusted search path in Windows GDI allows an unauthorized attacker to execute code locally.",
+  "severity": "HIGH",
+  "sha256_hash": "6b57e481c3f136a83ca4b7aef18773845749cc104bc43a907edd716021b5538e",
+  "source": "nvd",
+  "tags": [
+    "CWE-426"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25190"
+}

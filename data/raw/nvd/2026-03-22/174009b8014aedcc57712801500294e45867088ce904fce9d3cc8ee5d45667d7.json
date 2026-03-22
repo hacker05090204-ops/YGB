@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2589",
+  "ingested_at": "2026-03-22T07:54:41.204832+00:00",
+  "lang": "en",
+  "raw_text": "The Greenshift \u2013 animation and page builder blocks plugin for WordPress is vulnerable to Sensitive Information Exposure in all versions up to, and including, 12.8.3 via the automated Settings Backup stored in a publicly accessible file. This makes it possible for unauthenticated attackers to extract sensitive data including the configured OpenAI, Claude, Google Maps, Gemini, DeepSeek, and Cloudflare Turnstile API keys.",
+  "severity": "MEDIUM",
+  "sha256_hash": "174009b8014aedcc57712801500294e45867088ce904fce9d3cc8ee5d45667d7",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2589"
+}

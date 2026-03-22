@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31988",
+  "ingested_at": "2026-03-22T07:54:44.112176+00:00",
+  "lang": "en",
+  "raw_text": "yauzl (aka Yet Another Unzip Library) version 3.2.0 for Node.js contains an off-by-one error in the NTFS extended timestamp extra field parser within the getLastModDate() function. The while loop condition checks cursor < data.length + 4 instead of cursor + 4 < = data.length, allowing readUInt16LE() to read past the buffer boundary. A remote attacker can cause a denial of service (process crash via ERR_OUT_OF_RANGE exception) by sending a crafted zip file with a malformed NTFS extra field. This affects any Node.js application that processes zip file uploads and calls entry.getLastModDate() on parsed entries. Fixed in version 3.2.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6a8ba1c4406059b7a7dc4d38235189609e30314fee25d5bc14fb9fe3e727f4f3",
+  "source": "nvd",
+  "tags": [
+    "CWE-193"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31988"
+}

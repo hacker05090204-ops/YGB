@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Privilege escalation and improper access control in GCOM EPON 1GE C00R371V00B01 allows remote authenticated users to modify administrator only settings and extract administrator credentials.",
+  "token_count": 24
+}

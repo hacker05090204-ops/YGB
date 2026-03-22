@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Dell Wyse Management Suite, versions prior to WMS 5.5, contain an Unrestricted Upload of File with Dangerous Type vulnerability. A high privileged attacker with remote access could potentially exploit this vulnerability, leading to Remote execution.",
+  "token_count": 35
+}

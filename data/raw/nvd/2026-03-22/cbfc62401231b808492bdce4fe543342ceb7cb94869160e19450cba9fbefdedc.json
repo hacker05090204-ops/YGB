@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3449",
+  "ingested_at": "2026-03-22T07:54:34.024779+00:00",
+  "lang": "en",
+  "raw_text": "Versions of the package @tootallnate/once before 3.0.1 are vulnerable to Incorrect Control Flow Scoping in promise resolving when AbortSignal option is used. The Promise remains in a permanently pending state after the signal is aborted, causing any await or .then() usage to hang indefinitely. This can cause a control-flow leak that can lead to stalled requests, blocked workers, or degraded application availability.",
+  "severity": "LOW",
+  "sha256_hash": "cbfc62401231b808492bdce4fe543342ceb7cb94869160e19450cba9fbefdedc",
+  "source": "nvd",
+  "tags": [
+    "CWE-705"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3449"
+}

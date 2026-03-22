@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Laravel Ignition Laravel Ignition contains a file upload vulnerability that allows unauthenticated remote attackers to execute malicious code due to insecure usage of file_get_contents() and file_put_contents().",
+  "token_count": 26
+}

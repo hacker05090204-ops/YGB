@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows Transaction Manager improperly handles objects in memory.",
+  "token_count": 17
+}

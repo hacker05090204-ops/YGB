@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-0976",
+  "ingested_at": "2026-03-22T07:54:31.952949+00:00",
+  "lang": "en",
+  "raw_text": "Information Exposure Vulnerability in Hitachi Ops Center API Configuration Manager, Hitachi Configuration Manager.This issue affects Hitachi Ops Center API Configuration Manager: from 10.0.0-00 before 11.0.4-00; Hitachi Configuration Manager: from 8.6.1-00 before 11.0.5-00.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1cc0a64e4a2fa1dde8ca6079e03e204da4e2c813d6fc9cb750c37ca29ed578ef",
+  "source": "nvd",
+  "tags": [
+    "CWE-532"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-0976"
+}

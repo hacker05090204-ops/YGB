@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28411",
+  "ingested_at": "2026-03-22T07:54:33.353112+00:00",
+  "lang": "en",
+  "raw_text": "WeGIA is a web manager for charitable institutions. Prior to version 3.6.5, an unsafe use of the `extract()` function on the `$_REQUEST` superglobal allows an unauthenticated attacker to overwrite local variables in multiple PHP scripts. This vulnerability can be leveraged to completely bypass authentication checks, allowing unauthorized access to administrative and protected areas of the WeGIA application. Version 3.6.5 fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "086decbdb37dd28ce29f295d6e41569537e7fb0e3f5d7c709a09e5114ccfbe7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-288",
+    "CWE-473"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28411"
+}

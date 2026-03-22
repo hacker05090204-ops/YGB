@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-295: Improper Certificate Validation was discovered in YMFE yapi v1.12.0. The application disables TLS/SSL certificate validation by setting 'rejectUnauthorized': false in the HTTPS agent configuration for Axios requests",
+  "token_count": 32
+}

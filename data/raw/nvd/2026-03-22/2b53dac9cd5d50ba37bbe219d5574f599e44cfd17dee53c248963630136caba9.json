@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27026",
+  "ingested_at": "2026-03-22T07:54:30.595362+00:00",
+  "lang": "en",
+  "raw_text": "pypdf is a free and open-source pure-python PDF library. Prior to 6.7.1, an attacker who uses this vulnerability can craft a PDF which leads to long runtimes. This requires a malformed /FlateDecode stream, where the byte-by-byte decompression is used. This vulnerability is fixed in 6.7.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2b53dac9cd5d50ba37bbe219d5574f599e44cfd17dee53c248963630136caba9",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27026"
+}

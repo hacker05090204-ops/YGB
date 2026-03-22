@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple OS X The XPC implementation in Admin Framework in Apple OS X before 10.10.3 allows local users to bypass authentication and obtain admin privileges.",
+  "token_count": 25
+}

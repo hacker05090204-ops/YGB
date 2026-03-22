@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-11738",
+  "ingested_at": "2026-03-22T07:45:19.656315+00:00",
+  "lang": "en",
+  "raw_text": "WordPress Snap Creek Duplicator Plugin WordPress Snap Creek Duplicator plugin contains a file download vulnerability when an administrator creates a new copy of their site that allows an attacker to download the generated files from their Wordpress dashboard. This vulnerability affects Duplicator and Dulplicator Pro.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1207a005be9bdefa535cd1d43126de6bbcd33047bb72ca75316fa32eac0283cf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 45,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

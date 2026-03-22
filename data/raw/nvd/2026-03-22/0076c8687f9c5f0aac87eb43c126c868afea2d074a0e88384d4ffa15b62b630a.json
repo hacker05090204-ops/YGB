@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27065",
+  "ingested_at": "2026-03-22T07:54:47.918889+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThimPress BuilderPress allows PHP Local File Inclusion.This issue affects BuilderPress: from n/a through 2.0.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0076c8687f9c5f0aac87eb43c126c868afea2d074a0e88384d4ffa15b62b630a",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27065"
+}

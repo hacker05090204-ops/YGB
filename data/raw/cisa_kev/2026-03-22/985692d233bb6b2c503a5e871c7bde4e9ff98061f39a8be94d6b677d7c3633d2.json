@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-3718",
+  "ingested_at": "2026-03-22T07:45:19.251911+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick ImageMagick ImageMagick contains an unspecified vulnerability that allows attackers to perform server-side request forgery (SSRF) via a crafted image.",
+  "severity": "CRITICAL",
+  "sha256_hash": "985692d233bb6b2c503a5e871c7bde4e9ff98061f39a8be94d6b677d7c3633d2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

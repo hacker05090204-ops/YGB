@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21525",
+  "ingested_at": "2026-03-22T07:45:15.923481+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Remote Access Connection Manager contains a NULL pointer dereference that could allow an unauthorized attacker to deny service locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "75e5421256bb13e5b3931bd9d483de50bb3187a2ccc2e4d0d3cf4fe8f791c39f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26673",
+  "ingested_at": "2026-03-22T07:54:34.546459+00:00",
+  "lang": "en",
+  "raw_text": "An issue in DJI Mavic Mini, Spark, Mavic Air, Mini, Mini SE 0.1.00.0500 and below allows a remote attacker to cause a denial of service via the DJI Enhanced-WiFi transmission subsystem",
+  "severity": "HIGH",
+  "sha256_hash": "dcac31c8b1f1c9424f4ba8e79585516b5d0bc93ecd1273ace0c2f01db23d4379",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26673"
+}

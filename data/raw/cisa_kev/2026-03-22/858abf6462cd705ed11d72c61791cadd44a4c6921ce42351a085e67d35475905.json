@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-36942",
+  "ingested_at": "2026-03-22T07:45:19.379600+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Local Security Authority (LSA) contains a spoofing vulnerability allowing an unauthenticated attacker to call a method on the LSARPC interface and coerce the domain controller to authenticate against another server using NTLM.",
+  "severity": "CRITICAL",
+  "sha256_hash": "858abf6462cd705ed11d72c61791cadd44a4c6921ce42351a085e67d35475905",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

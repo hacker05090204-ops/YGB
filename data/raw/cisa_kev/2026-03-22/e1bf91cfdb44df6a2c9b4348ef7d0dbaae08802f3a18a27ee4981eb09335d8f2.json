@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-6367",
+  "ingested_at": "2026-03-22T07:45:17.981641+00:00",
+  "lang": "en",
+  "raw_text": "Cisco Adaptive Security Appliance (ASA) A vulnerability in the command-line interface (CLI) parser of Cisco ASA software could allow an authenticated, local attacker to create a denial-of-service (DoS) condition or potentially execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e1bf91cfdb44df6a2c9b4348ef7d0dbaae08802f3a18a27ee4981eb09335d8f2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

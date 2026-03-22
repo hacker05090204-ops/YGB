@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25172",
+  "ingested_at": "2026-03-22T07:54:41.418392+00:00",
+  "lang": "en",
+  "raw_text": "Pedidos 1.0 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the 'q' parameter. Attackers can send GET requests to the ajax/load_proveedores.php endpoint with crafted SQL payloads to extract sensitive database information including schema names and table structures.",
+  "severity": "HIGH",
+  "sha256_hash": "385c5fdf3e0719903e18dccb0aee24ed05485b254fdf3a9ba18dae7b6aaf7e7c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25172"
+}

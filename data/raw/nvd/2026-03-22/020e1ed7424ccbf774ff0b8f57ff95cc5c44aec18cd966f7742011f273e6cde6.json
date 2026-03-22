@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32611",
+  "ingested_at": "2026-03-22T07:54:47.644569+00:00",
+  "lang": "en",
+  "raw_text": "Glances is an open-source system cross-platform monitoring tool. The GHSA-x46r fix (commit 39161f0) addressed SQL injection in the TimescaleDB export module by converting all SQL operations to use parameterized queries and `psycopg.sql` composable objects. However, the DuckDB export module (`glances/exports/glances_duckdb/__init__.py`) was not included in this fix and contains the same class of vulnerability: table names and column names derived from monitoring statistics are directly interpolated into SQL statements via f-strings. While DuckDB INSERT values already use parameterized queries (`?` placeholders), the DDL construction and table name references do not escape or parameterize identifier names. Version 4.5.3 provides a more complete fix.",
+  "severity": "HIGH",
+  "sha256_hash": "020e1ed7424ccbf774ff0b8f57ff95cc5c44aec18cd966f7742011f273e6cde6",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32611"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-5119",
+  "ingested_at": "2026-03-22T07:45:18.629567+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player A use-after-free vulnerability exists within the ActionScript 3 ByteArray class in Adobe Flash Player that allows an attacker to perform remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d785210f0654a1cead313bedcc18de4b9d24ec14849a8091e059a2bf4fb1a1aa",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

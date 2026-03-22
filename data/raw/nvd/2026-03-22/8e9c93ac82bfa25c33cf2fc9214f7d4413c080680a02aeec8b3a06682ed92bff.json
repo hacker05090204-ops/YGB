@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24283",
+  "ingested_at": "2026-03-22T07:54:42.689639+00:00",
+  "lang": "en",
+  "raw_text": "Heap-based buffer overflow in Windows File Server allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "8e9c93ac82bfa25c33cf2fc9214f7d4413c080680a02aeec8b3a06682ed92bff",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24283"
+}

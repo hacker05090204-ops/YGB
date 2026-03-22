@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-22225",
+  "ingested_at": "2026-03-22T07:45:16.543278+00:00",
+  "lang": "en",
+  "raw_text": "VMware ESXi VMware ESXi contains an arbitrary write vulnerability. Successful exploitation allows an attacker with privileges within the VMX process to trigger an arbitrary kernel write leading to an escape of the sandbox.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2906053dd7702f648f92295d7457d225a78e9439dacde59268dc738c3cfe9b6e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

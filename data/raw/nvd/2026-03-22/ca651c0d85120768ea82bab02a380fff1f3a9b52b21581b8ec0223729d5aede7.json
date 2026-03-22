@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-47381",
+  "ingested_at": "2026-03-22T07:54:33.748932+00:00",
+  "lang": "en",
+  "raw_text": "Memory Corruption while processing IOCTL calls when concurrent access to shared buffer occurs.",
+  "severity": "HIGH",
+  "sha256_hash": "ca651c0d85120768ea82bab02a380fff1f3a9b52b21581b8ec0223729d5aede7",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-47381"
+}

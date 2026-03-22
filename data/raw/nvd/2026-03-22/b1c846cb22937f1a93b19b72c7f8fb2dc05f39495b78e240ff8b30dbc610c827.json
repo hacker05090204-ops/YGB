@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28515",
+  "ingested_at": "2026-03-22T07:54:33.387723+00:00",
+  "lang": "en",
+  "raw_text": "openDCIM version 23.04, through commit 4467e9c4, contains a missing authorization vulnerability in install.php and container-install.php. The installer and upgrade handler expose LDAP configuration functionality without enforcing application role checks. Any authenticated user can access this functionality regardless of assigned privileges. In deployments where REMOTE_USER is set without authentication enforcement, the endpoint may be accessible without credentials. This allows unauthorized modification of application configuration.",
+  "severity": "HIGH",
+  "sha256_hash": "b1c846cb22937f1a93b19b72c7f8fb2dc05f39495b78e240ff8b30dbc610c827",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28515"
+}

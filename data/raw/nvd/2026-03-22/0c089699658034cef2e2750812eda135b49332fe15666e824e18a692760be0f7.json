@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4258",
+  "ingested_at": "2026-03-22T07:54:47.013845+00:00",
+  "lang": "en",
+  "raw_text": "All versions of the package sjcl are vulnerable to Improper Verification of Cryptographic Signature due to missing point-on-curve validation in sjcl.ecc.basicKey.publicKey(). An attacker can recover a victim's ECDH private key by sending crafted off-curve public keys and observing ECDH outputs. The dhJavaEc() function directly returns the raw x-coordinate of the scalar multiplication result (no hashing), providing a plaintext oracle without requiring any decryption feedback.",
+  "severity": "HIGH",
+  "sha256_hash": "0c089699658034cef2e2750812eda135b49332fe15666e824e18a692760be0f7",
+  "source": "nvd",
+  "tags": [
+    "CWE-347",
+    "CWE-325"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4258"
+}

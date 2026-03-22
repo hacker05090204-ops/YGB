@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-14634",
+  "ingested_at": "2026-03-22T07:45:15.950510+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains an integer overflow vulnerability in the create_elf_tables() function which could allow an unprivileged local user with access to SUID (or otherwise privileged) binary to escalate their privileges on the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "73e0c7407266cda4b30b5fe2abd0ac325d4664efa22bb27e11b77ad894634dd6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

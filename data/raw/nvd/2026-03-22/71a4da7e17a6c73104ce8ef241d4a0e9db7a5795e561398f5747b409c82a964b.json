@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-29093",
+  "ingested_at": "2026-03-22T07:54:41.251342+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 24.0, the official docker-compose.yml publishes the memcached service on host port 11211 (0.0.0.0:11211) with no authentication, while the Dockerfile configures PHP to store all user sessions in that memcached instance. An attacker who can reach port 11211 can read, modify, or flush session data \u2014 enabling session hijacking, admin impersonation, and mass session destruction without any application-level authentication. This issue has been patched in version 24.0.",
+  "severity": "HIGH",
+  "sha256_hash": "71a4da7e17a6c73104ce8ef241d4a0e9db7a5795e561398f5747b409c82a964b",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-668",
+    "CWE-668"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29093"
+}

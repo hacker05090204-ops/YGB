@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-8464",
+  "ingested_at": "2026-03-22T07:45:18.767958+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Windows Shell in multiple versions of Microsoft Windows allows local users or remote attackers to execute arbitrary code via a crafted .LNK file",
+  "severity": "CRITICAL",
+  "sha256_hash": "fc0edb7c0bae6c2ef7bf1d19df756e201b048d3c301b6ac754c9a45926a43de3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

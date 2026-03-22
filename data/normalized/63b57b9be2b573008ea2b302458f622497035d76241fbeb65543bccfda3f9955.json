@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenBSD 2.x < 3.3 - 'exec_ibcs2_coff_prep_zmagic()' kernel stack overflow",
+  "token_count": 9
+}

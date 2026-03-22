@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Aspera Console 3.3.0 through 3.4.8 could allow a privileged user to cause a denial of service due to improper enforcement of behavioral workflow.",
+  "token_count": 24
+}

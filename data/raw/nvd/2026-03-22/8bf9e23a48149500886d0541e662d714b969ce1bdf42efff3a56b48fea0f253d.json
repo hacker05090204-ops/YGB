@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31840",
+  "ingested_at": "2026-03-22T07:54:43.738348+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to 9.6.0-alpha.2 and 8.6.28, an attacker can use a dot-notation field name in combination with the sort query parameter to inject SQL into the PostgreSQL database through an improper escaping of sub-field values in dot-notation queries. The vulnerability may also affect queries that use dot-notation field names with the distinct and where query parameters. This vulnerability only affects deployments using a PostgreSQL database. This vulnerability is fixed in 9.6.0-alpha.2 and 8.6.28.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8bf9e23a48149500886d0541e662d714b969ce1bdf42efff3a56b48fea0f253d",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31840"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "NETGEAR Multiple Routers NETGEAR confirmed multiple routers allow unauthenticated web pages to pass form input directly to the command-line interface, permitting remote code execution.",
+  "token_count": 24
+}

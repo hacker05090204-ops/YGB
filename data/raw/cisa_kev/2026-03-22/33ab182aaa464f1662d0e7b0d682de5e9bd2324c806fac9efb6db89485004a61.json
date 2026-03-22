@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38475",
+  "ingested_at": "2026-03-22T07:45:16.443361+00:00",
+  "lang": "en",
+  "raw_text": "Apache HTTP Server Apache HTTP Server contains an improper escaping of output vulnerability in mod_rewrite that allows an attacker to map URLs to filesystem locations that are permitted to be served by the server but are not intentionally/directly reachable by any URL, resulting in code execution or source code disclosure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "33ab182aaa464f1662d0e7b0d682de5e9bd2324c806fac9efb6db89485004a61",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

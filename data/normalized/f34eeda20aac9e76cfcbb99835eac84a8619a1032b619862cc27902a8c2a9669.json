@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Telerik User Interface (UI) for ASP.NET AJAX Telerik UI for ASP.NET AJAX contains an insecure direct object reference vulnerability in RadAsyncUpload that can result in file uploads in a limited location and/or remote code execution.",
+  "token_count": 35
+}

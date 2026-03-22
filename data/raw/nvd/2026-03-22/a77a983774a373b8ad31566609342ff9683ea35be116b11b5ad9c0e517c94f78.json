@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-64166",
+  "ingested_at": "2026-03-22T07:54:40.796303+00:00",
+  "lang": "en",
+  "raw_text": "Mercurius is a GraphQL adapter for Fastify. Prior to version 16.4.0, a cross-site request forgery (CSRF) vulnerability was identified. The issue arises from incorrect parsing of the Content-Type header in requests. Specifically, requests with Content-Type values such as application/x-www-form-urlencoded, multipart/form-data, or text/plain could be misinterpreted as application/json. This misinterpretation bypasses the preflight checks performed by the fetch() API, potentially allowing unauthorized actions to be performed on behalf of an authenticated user. This issue has been patched in version 16.4.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a77a983774a373b8ad31566609342ff9683ea35be116b11b5ad9c0e517c94f78",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-64166"
+}

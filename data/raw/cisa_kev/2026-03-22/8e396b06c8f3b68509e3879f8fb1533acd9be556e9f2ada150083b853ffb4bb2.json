@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0149",
+  "ingested_at": "2026-03-22T07:45:17.953384+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a memory corruption vulnerability that allows remote attackers to execute code or cause a denial-of-service (DoS) via a crafted website.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8e396b06c8f3b68509e3879f8fb1533acd9be556e9f2ada150083b853ffb4bb2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-38406",
+  "ingested_at": "2026-03-22T07:45:17.693457+00:00",
+  "lang": "en",
+  "raw_text": "Delta Electronics DOPSoft 2 Delta Electronics DOPSoft 2 lacks proper validation of user-supplied data when parsing specific project files (improper input validation) resulting in an out-of-bounds write that allows for code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b7fb98b69087492925608487f0dd1b2064dac01567a14327e448160da6c3de62",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-6961",
+  "ingested_at": "2026-03-22T07:45:18.335221+00:00",
+  "lang": "en",
+  "raw_text": "VMware SD-WAN Edge VMware SD-WAN Edge by VeloCloud contains a command injection vulnerability in the local web UI component. Successful exploitation of this issue could result in remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bfdc6fb85bccf2488774838607b1e5d765c61f0406a4a19c2e795b7c19e063f4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

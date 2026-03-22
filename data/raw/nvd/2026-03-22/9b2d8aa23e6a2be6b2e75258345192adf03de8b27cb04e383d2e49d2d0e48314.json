@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3379",
+  "ingested_at": "2026-03-22T07:54:33.433614+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Tenda F453 1.0.0.3. This vulnerability affects the function fromSetIpBind of the file /goform/SetIpBind. The manipulation of the argument page leads to buffer overflow. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "9b2d8aa23e6a2be6b2e75258345192adf03de8b27cb04e383d2e49d2d0e48314",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-120"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3379"
+}

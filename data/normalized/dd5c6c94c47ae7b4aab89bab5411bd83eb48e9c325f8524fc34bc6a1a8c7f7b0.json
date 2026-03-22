@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TP-Link Multiple Routers TP-Link TL-WR940N V2/V4, TL-WR841N V8/V10, and TL-WR740N V1/V2 contain a command injection vulnerability via the component /userRpm/WlanNetworkRpm. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "token_count": 35
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30947",
+  "ingested_at": "2026-03-22T07:54:43.174810+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server is an open source backend that can be deployed to any infrastructure that can run Node.js. Prior to 9.5.2-alpha.3 and 8.6.16, class-level permissions (CLP) are not enforced for LiveQuery subscriptions. An unauthenticated or unauthorized client can subscribe to any LiveQuery-enabled class and receive real-time events for all objects, regardless of CLP restrictions. All Parse Server deployments that use LiveQuery with class-level permissions are affected. Data intended to be restricted by CLP is leaked to unauthorized subscribers in real time. This vulnerability is fixed in 9.5.2-alpha.3 and 8.6.16.",
+  "severity": "HIGH",
+  "sha256_hash": "9fc80329a0f1300abaffb50c2637d136fa2bf21aea4e4710cb25c60dc7a01525",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30947"
+}

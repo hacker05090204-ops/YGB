@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Realtek AP-Router SDK Realtek AP-Router SDK HTTP web server boa contains a buffer overflow vulnerability due to unsafe copies of some overly long parameters submitted in the form that lead to denial-of-service (DoS).",
+  "token_count": 33
+}

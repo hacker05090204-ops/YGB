@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-1823",
+  "ingested_at": "2026-03-22T07:45:18.410185+00:00",
+  "lang": "en",
+  "raw_text": "PHP PHP sapi/cgi/cgi_main.c in PHP, when configured as a CGI script, does not properly handle query strings, which allows remote attackers to execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7fc09cdbed3b07bea995a5bbfb6a62468f359a45081a1366b108b19d4a98f298",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

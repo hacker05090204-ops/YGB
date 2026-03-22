@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "AMI MegaRAC SPx AMI MegaRAC SPx contains an authentication bypass by spoofing vulnerability in the Redfish Host Interface. A successful exploitation of this vulnerability may lead to a loss of confidentiality, integrity, and/or availability.",
+  "token_count": 34
+}

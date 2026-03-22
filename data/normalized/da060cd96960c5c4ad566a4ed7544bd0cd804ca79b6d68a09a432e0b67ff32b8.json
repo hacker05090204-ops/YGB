@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Kernel - 'NtQueryVirtualMemory(MemoryMappedFilenameInformation)' Double-Write Ring-0 Address Leak",
+  "token_count": 9
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25937",
+  "ingested_at": "2026-03-22T07:54:47.221429+00:00",
+  "lang": "en",
+  "raw_text": "GLPI is a free Asset and IT management software package. Starting in version 11.0.0 and prior to version 11.0.6, a malicious actor with knowledge of a user's credentials can bypass MFA and steal their account. Version 11.0.6 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "96769306f5ecbe2a7b74a27445ade5a5cda3aaea48239c3c14bb6e9f2c1b5a22",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25937"
+}

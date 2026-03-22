@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-26018",
+  "ingested_at": "2026-03-22T07:54:41.512663+00:00",
+  "lang": "en",
+  "raw_text": "CoreDNS is a DNS server that chains plugins. Prior to version 1.14.2, a denial of service vulnerability exists in CoreDNS's loop detection plugin that allows an attacker to crash the DNS server by sending specially crafted DNS queries. The vulnerability stems from the use of a predictable pseudo-random number generator (PRNG) for generating a secret query name, combined with a fatal error handler that terminates the entire process. This issue has been patched in version 1.14.2.",
+  "severity": "HIGH",
+  "sha256_hash": "2f719c1b062e9816956ce2f290b682e394073c06971ebfeb5e1705a88890eaae",
+  "source": "nvd",
+  "tags": [
+    "CWE-337",
+    "CWE-400",
+    "CWE-770"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26018"
+}

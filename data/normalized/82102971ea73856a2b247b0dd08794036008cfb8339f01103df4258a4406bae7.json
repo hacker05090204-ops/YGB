@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a missing rate limiting vulnerability that allows unauthenticated attackers to subscribe arbitrary email addresses to post notifications by sending POST requests to the wpdAddSubscription handler in class.WpdiscuzHelperAjax.php. Attackers can exploit LIKE wildcard characters in the subscription query to match multiple email addresses and generate unwanted notification emails to victim accounts.",
+  "token_count": 54
+}

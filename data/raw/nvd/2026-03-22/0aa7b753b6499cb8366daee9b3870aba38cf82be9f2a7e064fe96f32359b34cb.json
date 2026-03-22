@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24487",
+  "ingested_at": "2026-03-22T07:54:32.228058+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, an authorization bypass vulnerability in the FHIR CareTeam resource endpoint allows patient-scoped FHIR tokens to access care team data for all patients instead of being restricted to only the authenticated patient's data. This could potentially lead to unauthorized disclosure of Protected Health Information (PHI), including patient-provider relationships and care team structures across the entire system. The issue occurs because the `FhirCareTeamService` does not implement the `IPatientCompartmentResourceService` interface and does not pass the patient binding parameter to the underlying service, bypassing the patient compartment filtering mechanism. Version 8.0.0 contains a patch for this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0aa7b753b6499cb8366daee9b3870aba38cf82be9f2a7e064fe96f32359b34cb",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-863"
+  ],
+  "token_count": 112,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24487"
+}

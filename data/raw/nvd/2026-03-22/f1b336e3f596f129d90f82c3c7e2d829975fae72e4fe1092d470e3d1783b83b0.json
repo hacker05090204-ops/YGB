@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32262",
+  "ingested_at": "2026-03-22T07:54:46.954834+00:00",
+  "lang": "en",
+  "raw_text": "Craft CMS is a content management system (CMS). From version 4.0.0-RC1 to before version 4.17.5 and from version 5.0.0-RC1 to before version 5.9.11, the AssetsController->replaceFile() method has a targetFilename body parameter that is used unsanitized in a deleteFile() call before Assets::prepareAssetName() is applied on save. This allows an authenticated user with replaceFiles permission to delete arbitrary files within the same filesystem root by injecting ../ path traversal sequences into the filename. This could allow an authenticated user with replaceFiles permission on one volume to delete files in other folders/volumes that share the same filesystem root. This only affects local filesystems. This issue has been patched in versions 4.17.5 and 5.9.11.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f1b336e3f596f129d90f82c3c7e2d829975fae72e4fe1092d470e3d1783b83b0",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 110,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32262"
+}

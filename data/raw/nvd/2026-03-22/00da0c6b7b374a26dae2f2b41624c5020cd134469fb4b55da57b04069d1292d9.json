@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2025-67298",
+  "ingested_at": "2026-03-22T07:54:43.584984+00:00",
+  "lang": "en",
+  "raw_text": "An issue in ClasroomIO before v.0.2.6 allows a remote attacker to escalate privileges via the endpoints /api/verify and /rest/v1/profile",
+  "severity": "HIGH",
+  "sha256_hash": "00da0c6b7b374a26dae2f2b41624c5020cd134469fb4b55da57b04069d1292d9",
+  "source": "nvd",
+  "tags": [
+    "CWE-290",
+    "CWE-345",
+    "CWE-639"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67298"
+}

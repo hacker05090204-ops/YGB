@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32001",
+  "ingested_at": "2026-03-22T07:54:48.160353+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an authentication bypass vulnerability that allows clients authenticated with a shared gateway token to connect as role=node without device identity verification. Attackers can exploit this by claiming the node role during WebSocket handshake to inject unauthorized node.event calls, triggering agent.request and voice.transcript flows without proper device pairing.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2e0bd83ae52b259a15f5bf458053c0fb160390d8199098f1a52aff3ad32f5496",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32001"
+}

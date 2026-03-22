@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29194",
+  "ingested_at": "2026-03-22T07:54:41.861751+00:00",
+  "lang": "en",
+  "raw_text": "Netmaker makes networks with WireGuard. Prior to version 1.5.0, the Authorize middleware in Netmaker incorrectly validates host JWT tokens. When a route permits host authentication (hostAllowed=true), a valid host token bypasses all subsequent authorization checks without verifying that the host is authorized to access the specific requested resource. Any entity possessing knowledge of object identifiers (node IDs, host IDs) can craft a request with an arbitrary valid host token to access, modify, or delete resources belonging to other hosts. Affected endpoints include node info retrieval, host deletion, MQTT signal transmission, fallback host updates, and failover operations. This issue has been patched in version 1.5.0.",
+  "severity": "HIGH",
+  "sha256_hash": "4dc6e53d42e1adf647d73e563fb5f904ea8721dec6bf2841d23b0d3f0c9bc808",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 104,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29194"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an email header injection vulnerability that allows attackers to manipulate mail recipients by injecting malicious data into the comment_author_email cookie. Attackers can craft a malicious cookie value that, when processed through urldecode() and passed to wp_mail() functions, enables header injection to alter email recipients or inject additional headers.",
+  "token_count": 52
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TensorFlow HDF5 Library Uncontrolled Search Path Element Local Privilege Escalation Vulnerability. This vulnerability allows local attackers to escalate privileges on affected installations of TensorFlow. An attacker must first obtain the ability to execute low-privileged code on the target system in order to exploit this vulnerability. The specific flaw exists within the handling of plugins. The application loads plugins from an unsecured location. An attacker can leverage this vulnerability to escalate privileges and execute arbitrary code in the context of a target user. Was ZDI-CAN-25480.",
+  "token_count": 84
+}

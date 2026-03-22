@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in Mollie Mollie Payments for WooCommerce mollie-payments-for-woocommerce allows Reflected XSS.This issue affects Mollie Payments for WooCommerce: from n/a through < = 8.1.1.",
+  "token_count": 33
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-21762",
+  "ingested_at": "2026-03-22T07:45:17.057506+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiOS Fortinet FortiOS contains an out-of-bound write vulnerability that allows a remote unauthenticated attacker to execute code or commands via specially crafted HTTP requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8ab40b55f38cd9a58c62d1bdc284f9bc1b009fb83fee4e9accfe49afb879523c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

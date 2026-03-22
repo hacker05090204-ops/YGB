@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-20953",
+  "ingested_at": "2026-03-22T07:45:16.567514+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Agile Product Lifecycle Management (PLM) Oracle Agile Product Lifecycle Management (PLM) contains a deserialization vulnerability that allows a low-privileged attacker with network access via HTTP to compromise the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "85ac27580a341942c1591abc767879ad0c5a0b0ac1c1d5353b2e47f5b994f4cf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

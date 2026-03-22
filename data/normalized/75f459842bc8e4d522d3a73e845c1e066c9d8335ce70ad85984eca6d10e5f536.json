@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Magento 1.2 - '/app/code/core/Mage/Adminhtml/controllers/IndexController.php?email' Cross-Site Scripting",
+  "token_count": 6
+}

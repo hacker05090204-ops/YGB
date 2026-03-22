@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26049",
+  "ingested_at": "2026-03-22T07:54:30.472183+00:00",
+  "lang": "en",
+  "raw_text": "The web management interface of the device renders the passwords in a plaintext input field. The current password is directly visible to anyone with access to the UI, potentially exposing administrator credentials to unauthorized observation via shoulder surfing, screenshots, or browser form caching.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4e7d22907070fe12b088e39cad89d0e5e5a9b6a537cde362d2b011bd5a2f5ae0",
+  "source": "nvd",
+  "tags": [
+    "CWE-522"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26049"
+}

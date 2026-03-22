@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1822",
+  "ingested_at": "2026-03-22T07:54:49.301543+00:00",
+  "lang": "en",
+  "raw_text": "The WP NG Weather plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's 'ng-weather' shortcode in all versions up to, and including, 1.0.9 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0190cd7af3aa269ebb0359704e22095c74cb91f0a681e4f98ba1202bfc07a863",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1822"
+}

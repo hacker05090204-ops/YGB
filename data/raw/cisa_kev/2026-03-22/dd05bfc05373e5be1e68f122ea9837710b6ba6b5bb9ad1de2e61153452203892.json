@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-61757",
+  "ingested_at": "2026-03-22T07:45:16.044052+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Fusion Middleware Oracle Fusion Middleware contains a missing authentication for critical function vulnerability, allowing unauthenticated remote attackers to take over Identity Manager.",
+  "severity": "CRITICAL",
+  "sha256_hash": "dd05bfc05373e5be1e68f122ea9837710b6ba6b5bb9ad1de2e61153452203892",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

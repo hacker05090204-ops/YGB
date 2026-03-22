@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-2775",
+  "ingested_at": "2026-03-22T07:45:16.292602+00:00",
+  "lang": "en",
+  "raw_text": "SysAid SysAid On-Prem SysAid On-Prem contains an improper restriction of XML external entity reference vulnerability in the Checkin processing functionality, allowing for administrator account takeover and file read primitives.",
+  "severity": "CRITICAL",
+  "sha256_hash": "02f4fd32752afcc79725e7edc412d7d915272747de79fb110600e511227e547b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

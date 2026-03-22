@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29081",
+  "ingested_at": "2026-03-22T07:54:41.000809+00:00",
+  "lang": "en",
+  "raw_text": "Frappe is a full-stack web application framework. Prior to versions 14.100.1 and 15.100.0, an endpoint was vulnerable to SQL injection through specially crafted requests, which would allow a malicious actor to extract sensitive information. This issue has been patched in versions 14.100.1 and 15.100.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2e478c20bb73aaef247f2835aae0216bf371ffc581b41e2bc9ee0ff0b8a1c8cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29081"
+}

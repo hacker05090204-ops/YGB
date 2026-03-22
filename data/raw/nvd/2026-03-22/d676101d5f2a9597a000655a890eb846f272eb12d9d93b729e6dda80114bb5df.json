@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3148",
+  "ingested_at": "2026-03-22T07:54:31.962947+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in SourceCodester Simple and Nice Shopping Cart Script 1.0. This impacts an unknown function of the file /signup.php. This manipulation of the argument Username causes sql injection. The attack may be initiated remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "d676101d5f2a9597a000655a890eb846f272eb12d9d93b729e6dda80114bb5df",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3148"
+}

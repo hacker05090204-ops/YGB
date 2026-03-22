@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33424",
+  "ingested_at": "2026-03-22T07:54:49.147792+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, an attacker can grant access to a private message topic through invites even after they lose access to that PM. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "79e89057b841c2fef166f234b8bc31fde552e44d70ee034fe2be057b9390f9af",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33424"
+}

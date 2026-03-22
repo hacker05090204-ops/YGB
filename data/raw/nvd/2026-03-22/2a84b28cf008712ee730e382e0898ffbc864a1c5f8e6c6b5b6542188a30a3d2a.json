@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68552",
+  "ingested_at": "2026-03-22T07:54:30.129031+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in WebCodingPlace WooCommerce Coming Soon Product with Countdown woo-coming-soon-product allows PHP Local File Inclusion.This issue affects WooCommerce Coming Soon Product with Countdown: from n/a through < = 5.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2a84b28cf008712ee730e382e0898ffbc864a1c5f8e6c6b5b6542188a30a3d2a",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68552"
+}

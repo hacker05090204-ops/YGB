@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22414",
+  "ingested_at": "2026-03-22T07:54:40.041585+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Mikado-Themes Marra marra allows PHP Local File Inclusion.This issue affects Marra: from n/a through < = 1.2.",
+  "severity": "HIGH",
+  "sha256_hash": "22c0c861ea5480a9d4ae4ea134cd1ccebc14be80cdacda59ea806064958b29e6",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22414"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Juniper Junos OS Juniper Junos OS contains an improper isolation or compartmentalization vulnerability. This vulnerability could allows a local attacker with high privileges to inject arbitrary code.",
+  "token_count": 27
+}

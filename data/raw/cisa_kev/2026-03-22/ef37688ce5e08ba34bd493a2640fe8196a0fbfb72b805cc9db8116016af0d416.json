@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-0151",
+  "ingested_at": "2026-03-22T07:45:17.820466+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows The Authenticode Signature Verification function in Microsoft Windows (WinVerifyTrust) does not properly validate the digest of a signed portable executable (PE) file, which allows user-assisted remote attackers to execute code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ef37688ce5e08ba34bd493a2640fe8196a0fbfb72b805cc9db8116016af0d416",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

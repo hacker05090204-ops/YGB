@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-15961",
+  "ingested_at": "2026-03-22T07:45:18.978069+00:00",
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion Adobe ColdFusion contains an unrestricted file upload vulnerability that could allow for code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "eebf62ac594209ea5858878a169842b978eb6186ca77c8c2dc2ff2cd4039b809",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

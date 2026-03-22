@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32600",
+  "ingested_at": "2026-03-22T07:54:46.495741+00:00",
+  "lang": "en",
+  "raw_text": "xml-security is a library that implements XML signatures and encryption. Prior to versions 2.3.1 and 1.13.9, XML nodes encrypted with either aes-128-gcm, aes-192-gcm, or aes-256-gcm lack validation of the authentication tag length. An attacker can use this to brute-force an authentication tag, recover the GHASH key, and decrypt the encrypted nodes. It also allows to forge arbitrary ciphertexts without knowing the encryption key. This vulnerability is fixed in 2.3.1 and 1.13.9.",
+  "severity": "HIGH",
+  "sha256_hash": "deafeed5900f1aa320e3fe0cdb4ed700f854f91c5a619f2a58da51f3d145ccf6",
+  "source": "nvd",
+  "tags": [
+    "CWE-354"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32600"
+}

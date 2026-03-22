@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sensitive information disclosure and manipulation due to insufficient authorization checks. The following products are affected: Acronis Cyber Protect 17 (Linux, macOS, Windows) before build 41186, Acronis Cyber Protect Cloud Agent (Linux, macOS, Windows) before build 41124.",
+  "token_count": 36
+}

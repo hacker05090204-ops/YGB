@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3710",
+  "ingested_at": "2026-03-22T07:54:42.005050+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in code-projects Simple Flight Ticket Booking System 1.0. This impacts an unknown function of the file /Adminadd.php. The manipulation of the argument flightno/airplaneid/departure/dtime/arrival/atime/ec/ep/bc/bp leads to sql injection. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "181be577de119c0aa853e75ef69cbf1226f3fb4c570ed2cbcb0d11d0e1bee0ea",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3710"
+}

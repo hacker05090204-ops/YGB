@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MarkUs is a web application for the submission and grading of student assignments. Prior to version 2.9.4, MarkUs allows course instructors to upload YAML files to create/update various entities (e.g., assignment settings). These YAML files are parsed with aliases enabled. This issue has been patched in version 2.9.4.",
+  "token_count": 48
+}

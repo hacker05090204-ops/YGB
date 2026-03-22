@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20892",
+  "ingested_at": "2026-03-22T07:54:43.482474+00:00",
+  "lang": "en",
+  "raw_text": "Code injection vulnerability exists in MR-GM5L-S1 and MR-GM5A-L1, which may allow an attacker with administrative privileges to execute arbitrary commands.",
+  "severity": "HIGH",
+  "sha256_hash": "c1bc1d4def1ecb8b4007938f958c2a8556b931bf95d559b8ac1f6a356d86f19d",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20892"
+}

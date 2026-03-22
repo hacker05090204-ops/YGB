@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30230",
+  "ingested_at": "2026-03-22T07:54:41.642789+00:00",
+  "lang": "en",
+  "raw_text": "Flare is a Next.js-based, self-hostable file sharing platform that integrates with screenshot tools. Prior to version 1.7.2, the thumbnail endpoint does not validate the password for password\u2010protected files. It checks ownership/admin for private files but skips password verification, allowing thumbnail access without the password. This issue has been patched in version 1.7.2.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "c5a6210bfa88389cd0800b86e25e637483c37ee7ec114b2e3645f86c0b9c11b4",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30230"
+}

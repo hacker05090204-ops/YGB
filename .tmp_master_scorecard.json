@@ -1,0 +1,116 @@
+{
+  "scorecard": [
+    {
+      "folder": "api/",
+      "score": 2.6,
+      "tag": "RED",
+      "sub_tags": [
+        "INSECURE"
+      ],
+      "source": "inferred from .tmp_inferred_scores.json + AGENT-API.json"
+    },
+    {
+      "folder": "backend/",
+      "score": 3.4,
+      "tag": "RED",
+      "sub_tags": [],
+      "source": "AGENT-BACKEND.json"
+    },
+    {
+      "folder": "backend/ingestion/",
+      "score": 2.0,
+      "tag": "RED",
+      "sub_tags": [
+        "NO-DATA"
+      ],
+      "source": "AGENT-INGESTION.json"
+    },
+    {
+      "folder": "frontend/",
+      "score": 1.4,
+      "tag": "RED",
+      "sub_tags": [],
+      "source": "inferred from AGENT-FRONTEND_summary.json"
+    },
+    {
+      "folder": "python/",
+      "score": 6.5,
+      "tag": "ORANGE",
+      "sub_tags": [],
+      "source": "AGENT-PYTHON summary"
+    },
+    {
+      "folder": "impl_v1/",
+      "score": 0.0,
+      "tag": "RED",
+      "sub_tags": [
+        "HOLLOW"
+      ],
+      "source": "impl_v1 subagent summary + .tmp_inferred_scores.json"
+    },
+    {
+      "folder": "HUMANOID_HUNTER/",
+      "score": 6.7,
+      "tag": "ORANGE",
+      "sub_tags": [],
+      "source": "HUMANOID_HUNTER subagent summary"
+    },
+    {
+      "folder": "training/",
+      "score": 1.7,
+      "tag": "RED",
+      "sub_tags": [
+        "NO-DATA"
+      ],
+      "source": "training subagent summary"
+    },
+    {
+      "folder": "scripts/",
+      "score": 0.6,
+      "tag": "RED",
+      "sub_tags": [],
+      "source": "AGENT-SCRIPTS.json"
+    },
+    {
+      "folder": "native/",
+      "score": 2.0,
+      "tag": "RED",
+      "sub_tags": [],
+      "source": "native subagent summary"
+    },
+    {
+      "folder": "voice_mode/",
+      "score": 0.5,
+      "tag": "RED",
+      "sub_tags": [],
+      "source": "AGENT-VOICE.json"
+    },
+    {
+      "folder": "data/",
+      "score": 8.4,
+      "tag": "YELLOW",
+      "sub_tags": [],
+      "source": "AGENT-DATA.json"
+    },
+    {
+      "folder": "config/",
+      "score": 6.5,
+      "tag": "ORANGE",
+      "sub_tags": [
+        "INSECURE"
+      ],
+      "source": "config subagent summary"
+    },
+    {
+      "folder": "reports/ + ai_report_generator/",
+      "score": 7.8,
+      "tag": "YELLOW",
+      "sub_tags": [],
+      "source": "reports subagent summary"
+    }
+  ],
+  "overall_score": 3.6,
+  "count": 14,
+  "loc_analyzed": 332823,
+  "repo_tests_plus_checks_estimate": 3898
+}

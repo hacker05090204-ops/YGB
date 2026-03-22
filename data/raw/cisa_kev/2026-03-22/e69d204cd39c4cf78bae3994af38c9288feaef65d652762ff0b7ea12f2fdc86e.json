@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-4437",
+  "ingested_at": "2026-03-22T07:45:19.001890+00:00",
+  "lang": "en",
+  "raw_text": "Apache Shiro Apache Shiro contains a vulnerability which may allow remote attackers to execute code or bypass intended access restrictions via an unspecified request parameter when a cipher key has not been configured for the \"remember me\" feature.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e69d204cd39c4cf78bae3994af38c9288feaef65d652762ff0b7ea12f2fdc86e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

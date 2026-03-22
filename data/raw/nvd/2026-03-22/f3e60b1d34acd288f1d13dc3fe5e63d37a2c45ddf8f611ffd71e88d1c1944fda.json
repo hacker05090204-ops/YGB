@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3089",
+  "ingested_at": "2026-03-22T07:54:42.287170+00:00",
+  "lang": "en",
+  "raw_text": "Actual Sync Server allows authenticated users to upload files through POST /sync/upload-user-file. In versions prior to 26.3.0, improper validation of the user-controlled x-actual-file-id header means that traversal segments (../) can escape the intended directory and write files outside userFiles.This issue affects prior versions of Actual Sync Server 26.3.0.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f3e60b1d34acd288f1d13dc3fe5e63d37a2c45ddf8f611ffd71e88d1c1944fda",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3089"
+}

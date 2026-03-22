@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2893",
+  "ingested_at": "2026-03-22T07:54:40.750165+00:00",
+  "lang": "en",
+  "raw_text": "The Page and Post Clone plugin for WordPress is vulnerable to SQL Injection via the 'meta_key' parameter in the content_clone() function in all versions up to, and including, 6.3. This is due to insufficient escaping on the user-supplied meta_key value and insufficient preparation on the existing SQL query. This makes it possible for authenticated attackers, with Contributor-level access and above, to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database. The injection is second-order: the malicious payload is stored as a post meta key and executed when the post is cloned.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5b360d2148349438f2d40ae234010b68ab1ea54630c80fadc0db884aede0a0b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2893"
+}

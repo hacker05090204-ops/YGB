@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24352",
+  "ingested_at": "2026-03-22T07:54:33.151056+00:00",
+  "lang": "en",
+  "raw_text": "PluXml CMS allows a user's session identifier to be set before authentication. The value of this session ID stays the same after authentication. This behaviour enables an attacker to fix a session ID for a victim and later hijack the authenticated session. The vendor was notified early about this vulnerability, but didn't respond with the details of vulnerability or vulnerable version range. Only versions 5.8.21 and 5.9.0-rc7 were tested and confirmed as vulnerable, other versions were not tested and might also be vulnerable.",
+  "severity": "CRITICAL",
+  "sha256_hash": "afbc2907b38c1475d3ea710b2de3cd03610799af564c92257b87773c0017c281",
+  "source": "nvd",
+  "tags": [
+    "CWE-384"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24352"
+}

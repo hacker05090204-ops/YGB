@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SKYSEA Client View SKYSEA Client View contains an improper authentication vulnerability that allows remote code execution via a flaw in processing authentication on the TCP connection with the management console program.",
+  "token_count": 31
+}

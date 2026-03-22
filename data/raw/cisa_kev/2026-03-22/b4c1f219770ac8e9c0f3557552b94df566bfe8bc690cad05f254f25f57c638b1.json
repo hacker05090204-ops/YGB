@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2002-0367",
+  "ingested_at": "2026-03-22T07:45:18.715310+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows smss.exe debugging subsystem in Microsoft Windows does not properly authenticate programs that connect to other programs, which allows local users to gain administrator or SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b4c1f219770ac8e9c0f3557552b94df566bfe8bc690cad05f254f25f57c638b1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

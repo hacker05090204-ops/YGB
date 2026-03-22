@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22363",
+  "ingested_at": "2026-03-22T07:54:30.366486+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in axiomthemes Rhodos rhodos allows PHP Local File Inclusion.This issue affects Rhodos: from n/a through < = 1.3.3.",
+  "severity": "HIGH",
+  "sha256_hash": "dcb0c271d67778f323a30660b063f6776ab7fb6dcda135f86aed4a96714aef19",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22363"
+}

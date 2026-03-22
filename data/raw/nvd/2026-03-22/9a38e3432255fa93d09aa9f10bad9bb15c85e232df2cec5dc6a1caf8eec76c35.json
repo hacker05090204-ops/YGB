@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68514",
+  "ingested_at": "2026-03-22T07:54:30.104697+00:00",
+  "lang": "en",
+  "raw_text": "Authorization Bypass Through User-Controlled Key vulnerability in Cozmoslabs Paid Member Subscriptions paid-member-subscriptions allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Paid Member Subscriptions: from n/a through < = 2.16.8.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9a38e3432255fa93d09aa9f10bad9bb15c85e232df2cec5dc6a1caf8eec76c35",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68514"
+}

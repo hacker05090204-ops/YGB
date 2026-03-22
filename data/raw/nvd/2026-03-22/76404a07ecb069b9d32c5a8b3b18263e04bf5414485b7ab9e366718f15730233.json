@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28360",
+  "ingested_at": "2026-03-22T07:54:33.793315+00:00",
+  "lang": "en",
+  "raw_text": "NocoDB is software for building databases as spreadsheets. Prior to version 0.301.3, shared view passwords were stored in plaintext in the database and compared using direct string equality. This issue has been patched in version 0.301.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "76404a07ecb069b9d32c5a8b3b18263e04bf5414485b7ab9e366718f15730233",
+  "source": "nvd",
+  "tags": [
+    "CWE-256"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28360"
+}

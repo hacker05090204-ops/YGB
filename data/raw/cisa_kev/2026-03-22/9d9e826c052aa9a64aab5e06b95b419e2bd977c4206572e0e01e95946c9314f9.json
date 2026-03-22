@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2545",
+  "ingested_at": "2026-03-22T07:45:18.636664+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Office Microsoft Office allows remote attackers to execute arbitrary code via a crafted EPS image.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9d9e826c052aa9a64aab5e06b95b419e2bd977c4206572e0e01e95946c9314f9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

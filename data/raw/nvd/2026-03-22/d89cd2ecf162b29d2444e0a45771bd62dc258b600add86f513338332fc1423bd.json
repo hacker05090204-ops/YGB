@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4495",
+  "ingested_at": "2026-03-22T07:54:48.928100+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in atjiu pybbs 6.0.0. This impacts the function create of the file src/main/java/co/yiiu/pybbs/controller/api/CommentApiController.java. The manipulation results in cross site scripting. It is possible to launch the attack remotely. The exploit has been released to the public and may be used for attacks.",
+  "severity": "LOW",
+  "sha256_hash": "d89cd2ecf162b29d2444e0a45771bd62dc258b600add86f513338332fc1423bd",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4495"
+}

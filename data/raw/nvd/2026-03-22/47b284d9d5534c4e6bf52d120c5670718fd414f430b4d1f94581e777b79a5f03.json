@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11792",
+  "ingested_at": "2026-03-22T07:54:41.151701+00:00",
+  "lang": "en",
+  "raw_text": "Local privilege escalation due to DLL hijacking vulnerability. The following products are affected: Acronis Cyber Protect Cloud Agent (Windows) before build 41124.",
+  "severity": "HIGH",
+  "sha256_hash": "47b284d9d5534c4e6bf52d120c5670718fd414f430b4d1f94581e777b79a5f03",
+  "source": "nvd",
+  "tags": [
+    "CWE-427"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11792"
+}

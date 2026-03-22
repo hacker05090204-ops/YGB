@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3760",
+  "ingested_at": "2026-03-22T07:54:42.098797+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in itsourcecode University Management System 1.0. This vulnerability affects unknown code of the file /view_result.php. Performing a manipulation of the argument seme results in sql injection. The attack is possible to be carried out remotely. The exploit is now public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "5ccf5be25ded2f998cc88c986fa5daa7a0295890b95a6065d14d0a589ef0edef",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3760"
+}

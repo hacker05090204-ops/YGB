@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Npm package System Information Library for Node.JS In this vulnerability, an attacker can send a malicious payload that will exploit the name parameter. After successful exploitation, attackers can execute remote.",
+  "token_count": 30
+}

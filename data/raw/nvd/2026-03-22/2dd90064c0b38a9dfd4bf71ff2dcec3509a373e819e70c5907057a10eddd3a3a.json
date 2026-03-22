@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25176",
+  "ingested_at": "2026-03-22T07:54:41.428651+00:00",
+  "lang": "en",
+  "raw_text": "Alive Parish 2.0.4 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the key parameter in the search endpoint. Attackers can also upload arbitrary files via the person photo upload functionality to the images/uploaded directory for remote code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "2dd90064c0b38a9dfd4bf71ff2dcec3509a373e819e70c5907057a10eddd3a3a",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25176"
+}

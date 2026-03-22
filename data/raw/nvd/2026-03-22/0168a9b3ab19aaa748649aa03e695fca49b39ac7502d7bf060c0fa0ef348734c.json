@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30796",
+  "ingested_at": "2026-03-22T07:54:40.835640+00:00",
+  "lang": "en",
+  "raw_text": "Cleartext Transmission of Sensitive Information vulnerability in rustdesk-server-pro RustDesk Server Pro rustdesk-server-pro on Windows, MacOS, Linux (Address book sync API modules) allows Sniffing Attacks. This vulnerability is associated with program files Closed source \u2014 API endpoint handling heartbeat sync and program routines Heartbeat API handler (accepts preset-address-book-password in plaintext). This issue affects RustDesk Server Pro: through 1.7.5.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "0168a9b3ab19aaa748649aa03e695fca49b39ac7502d7bf060c0fa0ef348734c",
+  "source": "nvd",
+  "tags": [
+    "CWE-319"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30796"
+}

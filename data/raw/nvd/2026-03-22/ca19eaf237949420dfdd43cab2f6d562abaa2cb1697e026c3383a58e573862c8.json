@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2802",
+  "ingested_at": "2026-03-22T07:54:31.601099+00:00",
+  "lang": "en",
+  "raw_text": "Race condition in the JavaScript: GC component. This vulnerability affects Firefox < 148 and Thunderbird < 148.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ca19eaf237949420dfdd43cab2f6d562abaa2cb1697e026c3383a58e573862c8",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2802"
+}

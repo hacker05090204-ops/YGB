@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-34438",
+  "ingested_at": "2026-03-22T07:54:29.958513+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Anssi Laitila Shared Files shared-files.This issue affects Shared Files: from n/a through < = 1.7.19.",
+  "severity": "MEDIUM",
+  "sha256_hash": "014e56cac838105c27c07b8e18683839380c016c46ec31c33db6439303f393b8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-34438"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4136",
+  "ingested_at": "2026-03-22T07:54:48.568758+00:00",
+  "lang": "en",
+  "raw_text": "The Membership Plugin \u2013 Restrict Content plugin for WordPress is vulnerable to Unvalidated Redirect in all versions up to, and including, 3.2.24. This is due to insufficient validation on the redirect url supplied via the 'rcp_redirect' parameter. This makes it possible for unauthenticated attackers to redirect users with the password reset email to potentially malicious sites if they can successfully trick them into performing an action.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2bdfc0d7b5474509a8f8fa0e2efadfece8e5006f1f40c502a04af993d599e9e3",
+  "source": "nvd",
+  "tags": [
+    "CWE-640"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4136"
+}

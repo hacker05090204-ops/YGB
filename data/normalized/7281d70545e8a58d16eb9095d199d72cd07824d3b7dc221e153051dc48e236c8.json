@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper access control in multiple DVLS REST API endpoints in Devolutions Server 2025.3.14.0 and earlier allows an authenticated user with view-only permission to access sensitive connection data.",
+  "token_count": 27
+}

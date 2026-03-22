@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32733",
+  "ingested_at": "2026-03-22T07:54:49.066240+00:00",
+  "lang": "en",
+  "raw_text": "Halloy is an IRC application written in Rust. Prior to commit 0f77b2cfc5f822517a256ea5a4b94bad8bfe38b6, the DCC receive flow did not sanitize filenames from incoming `DCC SEND` requests. A remote IRC user could send a filename with path traversal sequences like `../../.ssh/authorized_keys` and the file would be written outside the user's configured `save_directory`. With auto-accept enabled this required zero interaction from the victim. Starting with commit 0f77b2cfc5f822517a256ea5a4b94bad8bfe38b6, all identified code paths sanitize filenames through a shared `sanitize_filename` function.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "7f6d8c8bd3e512b56d3f2acdefe37b8d138fe055cc979d12ef125eea917534cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 75,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32733"
+}

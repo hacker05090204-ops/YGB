@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Royal Addons for Elementor plugin for WordPress is vulnerable to arbitrary file upload in all versions up to, and including, 1.7.1049. This is due to insufficient file type validation detecting files named main.php, allowing a file with such a name to bypass sanitization. This makes it possible for authenticated attackers, with author-level access and above, to upload arbitrary files on the affected site's server which may make remote code execution possible.",
+  "token_count": 72
+}

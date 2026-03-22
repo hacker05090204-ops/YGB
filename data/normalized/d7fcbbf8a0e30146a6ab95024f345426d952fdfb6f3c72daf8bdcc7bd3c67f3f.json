@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-312: Cleartext Storage of Sensitive Information was discovered in lesspass lesspass v9.6.9 which allows attackers to obtain sensitive information.",
+  "token_count": 23
+}

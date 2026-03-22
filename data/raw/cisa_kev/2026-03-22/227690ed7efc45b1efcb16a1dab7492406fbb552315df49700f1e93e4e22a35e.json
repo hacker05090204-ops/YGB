@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-15811",
+  "ingested_at": "2026-03-22T07:45:19.139968+00:00",
+  "lang": "en",
+  "raw_text": "DotNetNuke (DNN) DotNetNuke (DNN) DotNetNuke (DNN) contains an inadequate encryption strength vulnerability resulting from the use of a weak encryption algorithm to protect input parameters.",
+  "severity": "CRITICAL",
+  "sha256_hash": "227690ed7efc45b1efcb16a1dab7492406fbb552315df49700f1e93e4e22a35e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

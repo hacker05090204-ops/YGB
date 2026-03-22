@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2011-2462",
+  "ingested_at": "2026-03-22T07:45:17.823522+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Reader and Acrobat The Universal 3D (U3D) component in Adobe Reader and Acrobat contains a memory corruption vulnerability which could allow remote attackers to execute code or cause denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "24b6433a41dcec11eea3b24bf6ffdc5652be1caebd5ad41052cf4050743d8074",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

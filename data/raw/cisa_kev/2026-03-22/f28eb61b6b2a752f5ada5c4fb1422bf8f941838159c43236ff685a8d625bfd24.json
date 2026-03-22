@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27101",
+  "ingested_at": "2026-03-22T07:45:18.964567+00:00",
+  "lang": "en",
+  "raw_text": "Accellion FTA Accellion FTA contains a SQL injection vulnerability exploited via a crafted host header in a request to document_root.html.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f28eb61b6b2a752f5ada5c4fb1422bf8f941838159c43236ff685a8d625bfd24",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

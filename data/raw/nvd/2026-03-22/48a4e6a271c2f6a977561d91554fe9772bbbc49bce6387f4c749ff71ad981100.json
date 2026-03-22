@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28721",
+  "ingested_at": "2026-03-22T07:54:41.188835+00:00",
+  "lang": "en",
+  "raw_text": "Local privilege escalation due to improper soft link handling. The following products are affected: Acronis Cyber Protect 17 (Windows) before build 41186.",
+  "severity": "HIGH",
+  "sha256_hash": "48a4e6a271c2f6a977561d91554fe9772bbbc49bce6387f4c749ff71ad981100",
+  "source": "nvd",
+  "tags": [
+    "CWE-610"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28721"
+}

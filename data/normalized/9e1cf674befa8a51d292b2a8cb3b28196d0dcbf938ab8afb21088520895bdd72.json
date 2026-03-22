@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Tina4 Stack 1.0.3 contains a cross-site request forgery vulnerability that allows attackers to modify admin user credentials by submitting forged POST requests to the profile endpoint. Attackers can craft HTML forms targeting the /kim/profile endpoint with hidden fields containing malicious user data like passwords and email addresses to update administrator accounts without authentication.",
+  "token_count": 53
+}

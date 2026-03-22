@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-26923",
+  "ingested_at": "2026-03-22T07:45:17.714828+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Active Directory An authenticated user could manipulate attributes on computer accounts they own or manage, and acquire a certificate from Active Directory Certificate Services that would allow for privilege escalation to SYSTEM.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b615a0b3c06a40ad1e8cd758de35b83ec54d2400ddda315ca3f36957e5cfd2c0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

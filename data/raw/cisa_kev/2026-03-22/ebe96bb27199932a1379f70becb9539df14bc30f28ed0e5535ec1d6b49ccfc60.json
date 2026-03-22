@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21385",
+  "ingested_at": "2026-03-22T07:45:15.877538+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Multiple Chipsets Multiple Qualcomm chipsets contain a memory corruption vulnerability while using alignments for memory allocation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ebe96bb27199932a1379f70becb9539df14bc30f28ed0e5535ec1d6b49ccfc60",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 17,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

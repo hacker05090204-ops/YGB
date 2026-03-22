@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2252",
+  "ingested_at": "2026-03-22T07:54:33.120422+00:00",
+  "lang": "en",
+  "raw_text": "An XML External Entity (XXE) vulnerability allows malicious user to perform Server-Side Request Forgery (SSRF) via crafted XML input containing malicious external entity references. This issue affects Xerox FreeFlow Core versions up to and including 8.0.7. Please consider upgrading to FreeFlow Core version 8.1.0 via the software available on - https://www.support.xerox.com/en-us/product/core/downloads",
+  "severity": "HIGH",
+  "sha256_hash": "0bf42c319cfde9793862f4443dbacd882f6fa44af544c83653495bd50b15a25e",
+  "source": "nvd",
+  "tags": [
+    "CWE-611",
+    "CWE-918"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2252"
+}

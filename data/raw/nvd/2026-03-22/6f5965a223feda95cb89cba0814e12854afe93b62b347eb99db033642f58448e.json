@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32137",
+  "ingested_at": "2026-03-22T07:54:44.431914+00:00",
+  "lang": "en",
+  "raw_text": "Dataease is an open source data visualization analysis tool. Prior to 2.10.20, The table parameter for /de2api/datasource/previewData is directly concatenated into the SQL statement without any filtering or parameterization. Since tableName is a user-controllable string, attackers can inject malicious SQL statements by constructing malicious table names. This vulnerability is fixed in 2.10.20.",
+  "severity": "HIGH",
+  "sha256_hash": "6f5965a223feda95cb89cba0814e12854afe93b62b347eb99db033642f58448e",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32137"
+}

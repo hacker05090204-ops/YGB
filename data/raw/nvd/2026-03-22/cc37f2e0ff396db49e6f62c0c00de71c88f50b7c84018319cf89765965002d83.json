@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69252",
+  "ingested_at": "2026-03-22T07:54:31.256022+00:00",
+  "lang": "en",
+  "raw_text": "free5gc UDM provides Unified Data Management (UDM) for free5GC, an open-source project for 5th generation (5G) mobile core networks. Versions up to and including 1.4.1 have a NULL Pointer Dereference vulnerability. Remote unauthenticated attackers can trigger a service panic (Denial of Service) by sending a crafted PUT request with an unexpected ueId, crashing the UDM service. All deployments of free5GC using the UDM component may be affected. free5gc/udm pull request 76 contains a fix for the issue. No direct workaround is available at the application level. Applying the official patch is recommended.",
+  "severity": "HIGH",
+  "sha256_hash": "cc37f2e0ff396db49e6f62c0c00de71c88f50b7c84018319cf89765965002d83",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69252"
+}

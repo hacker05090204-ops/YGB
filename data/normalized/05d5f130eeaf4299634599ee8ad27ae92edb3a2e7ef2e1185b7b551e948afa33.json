@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sandbox escape in the Storage: IndexedDB component. This vulnerability affects Firefox < 148, Firefox ESR < 140.8, Thunderbird < 148, and Thunderbird < 140.8.",
+  "token_count": 24
+}

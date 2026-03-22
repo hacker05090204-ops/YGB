@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In multiple locations, there is a possible bypass of a file path filter designed to prevent access to sensitive directories due to incorrect unicode normalization. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is needed for exploitation.",
+  "token_count": 45
+}

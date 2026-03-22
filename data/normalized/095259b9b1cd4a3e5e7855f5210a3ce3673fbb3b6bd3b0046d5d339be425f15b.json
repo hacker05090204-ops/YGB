@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in LambertGroup LBG Zoominoutslider lbg_zoominoutslider allows Reflected XSS.This issue affects LBG Zoominoutslider: from n/a through < = 5.4.5.",
+  "token_count": 29
+}

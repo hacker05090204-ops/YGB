@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3302",
+  "ingested_at": "2026-03-22T07:54:33.080286+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in SourceCodester Doctor Appointment System 1.0. Affected by this issue is some unknown functionality of the file /register.php of the component Sign Up Page. Executing a manipulation of the argument Email can lead to cross site scripting. The attack can be launched remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "20ee376b08f4a87e30bc8c2f13a5b282c056bb5b6babbff9af979a3cc7df8642",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3302"
+}

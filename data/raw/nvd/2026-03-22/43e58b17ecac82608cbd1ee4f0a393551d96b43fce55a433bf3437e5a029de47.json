@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27012",
+  "ingested_at": "2026-03-22T07:54:34.289703+00:00",
+  "lang": "en",
+  "raw_text": "OpenSTAManager is an open source management software for technical assistance and invoicing. In 2.9.8 and earlier, a privilege escalation and authentication bypass vulnerability in OpenSTAManager allows any attacker to arbitrarily change a user's group (idgruppo) by directly calling modules/utenti/actions.php. This can promote an existing account (e.g. agent) into the Amministratori group as well as demote any user including existing administrators.",
+  "severity": "CRITICAL",
+  "sha256_hash": "43e58b17ecac82608cbd1ee4f0a393551d96b43fce55a433bf3437e5a029de47",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 60,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27012"
+}

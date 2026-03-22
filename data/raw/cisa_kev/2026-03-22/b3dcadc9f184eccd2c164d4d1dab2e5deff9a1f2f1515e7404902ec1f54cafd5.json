@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-25372",
+  "ingested_at": "2026-03-22T07:45:17.343819+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an improper boundary check vulnerability within DSP driver that allows for out-of-bounds memory access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b3dcadc9f184eccd2c164d4d1dab2e5deff9a1f2f1515e7404902ec1f54cafd5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

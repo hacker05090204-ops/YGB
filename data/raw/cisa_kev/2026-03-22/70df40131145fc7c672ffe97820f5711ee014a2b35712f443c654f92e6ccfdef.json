@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-4404",
+  "ingested_at": "2026-03-22T07:45:18.790199+00:00",
+  "lang": "en",
+  "raw_text": "Apple OS X Heap-based buffer overflow in IOHIDFamily in Apple OS X, which affects, iOS before 8 and Apple TV before 7, allows attackers to execute arbitrary code in a privileged context.",
+  "severity": "CRITICAL",
+  "sha256_hash": "70df40131145fc7c672ffe97820f5711ee014a2b35712f443c654f92e6ccfdef",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-26984",
+  "ingested_at": "2026-03-22T07:54:32.343267+00:00",
+  "lang": "en",
+  "raw_text": "LORIS (Longitudinal Online Research and Imaging System) is a self-hosted web application that provides data- and project-management for neuroimaging research. Prior to versions 26.0.5, 27.0.2, and 28.0.0, an authenticated user with sufficient privileges can exploit a path traversal vulnerability to upload a malicious file to an arbitrary location on the server. Once uploaded, the file can be used to achieve remote code execution (RCE). An attacker must be authenticated and have the appropriate permissions to exploit this issue. If the server is configured as read-only, remote code execution (RCE) is not possible; however, the malicious file upload may still be achievable. This problem is fixed in LORIS v26.0.5 and above, v27.0.2 and above, and v28.0.0 and above. As a workaround, LORIS administrators can disable the media module if it is not being used.",
+  "severity": "HIGH",
+  "sha256_hash": "1d779bfcc9933005a4edb6a0e2decbd3f1603ad878ad03711bbb193e85fda2d3",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-434",
+    "CWE-22"
+  ],
+  "token_count": 133,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26984"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-36173",
+  "ingested_at": "2026-03-22T07:54:42.454371+00:00",
+  "lang": "en",
+  "raw_text": "Affected Product(s)Version(s)InfoSphere Data Architect9.2.1",
+  "severity": "MEDIUM",
+  "sha256_hash": "9d896cd8dadf11aaad2227325a2c903e68a57e76fd755f40a38adb0d1c3fd695",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 4,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-36173"
+}

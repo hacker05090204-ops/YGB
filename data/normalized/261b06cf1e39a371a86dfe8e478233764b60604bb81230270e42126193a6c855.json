@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Quest KACE System Management Appliance The '/common/download_agent_installer.php' script in the Quest KACE System Management Appliance is accessible by anonymous users and can be abused to perform remote code execution.",
+  "token_count": 29
+}

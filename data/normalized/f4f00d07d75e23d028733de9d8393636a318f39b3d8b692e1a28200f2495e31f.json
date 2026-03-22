@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The User Frontend: AI Powered Frontend Posting, User Directory, Profile, Membership & User Registration plugin for WordPress is vulnerable to unauthorized modification of data due to a missing capability check on the draft_post() function in all versions up to, and including, 4.2.8. This makes it possible for unauthenticated attackers to modify arbitrary posts (e.g. unpublish published posts and overwrite the contents) via the 'post_id' parameter.",
+  "token_count": 65
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26228",
+  "ingested_at": "2026-03-22T07:54:32.676866+00:00",
+  "lang": "en",
+  "raw_text": "VideoLAN VLC for Android prior to version 3.7.0 contains a path traversal vulnerability in the Remote Access Server routing for the authenticated endpoint GET /download. The file query parameter is concatenated into a filesystem path under the configured download directory without canonicalization or directory containment checks, allowing an authenticated attacker with network reachability to the Remote Access Server to request files outside the intended directory. The impact is bounded by the Android application sandbox and storage restrictions, typically limiting exposure to app-internal and app-specific external storage.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3c7a3dd42da0afdbe33bab06ef35ba66c1b22a9d2e0180eac2166f2777f5a1a0",
+  "source": "nvd",
+  "tags": [
+    "CWE-22",
+    "CWE-73"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26228"
+}

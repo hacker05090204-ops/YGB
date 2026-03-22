@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11845",
+  "ingested_at": "2026-03-22T07:54:31.338058+00:00",
+  "lang": "en",
+  "raw_text": "A null pointer dereference vulnerability in the certificate downloader CGI program of the Zyxel VMG3625-T50B firmware versions through 5.50(ABPM.9.6)C0 and the Zyxel WX3100-T0 firmware versions through 5.50(ABVL.4.8)C0 could allow an authenticated attacker with administrator privileges to trigger a denial-of-service (DoS) condition by sending a crafted HTTP request.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c82848e904e326f86413eb13fe90408386b119c12e7e0dac4b3a804d09da07a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11845"
+}

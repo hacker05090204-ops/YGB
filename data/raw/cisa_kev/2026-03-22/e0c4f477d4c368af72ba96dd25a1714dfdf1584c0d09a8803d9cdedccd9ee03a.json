@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-0174",
+  "ingested_at": "2026-03-22T07:45:18.534909+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS XE Software A vulnerability in the DHCP option 82 encapsulation functionality of Cisco IOS Software and Cisco IOS XE Software could allow for denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "e0c4f477d4c368af72ba96dd25a1714dfdf1584c0d09a8803d9cdedccd9ee03a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

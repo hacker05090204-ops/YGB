@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2021-35486",
+  "ingested_at": "2026-03-22T07:54:34.145961+00:00",
+  "lang": "en",
+  "raw_text": "A Cross-Site Request Forgery (CSRF) vulnerability in Nokia IMPACT through 19.11.2.10-20210118042150283 allows a remote attacker to import and overwrite the entire application configuration. Specifically, in /ui/rest-proxy/entity/import, neither the X-CSRF-NONCE HTTP header nor the CSRF-NONCE cookie is validated.",
+  "severity": "HIGH",
+  "sha256_hash": "7b7aa508d5d2c2233673661509c50b84163997dc196ce5772fe456cff4b9ef4c",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 37,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-35486"
+}

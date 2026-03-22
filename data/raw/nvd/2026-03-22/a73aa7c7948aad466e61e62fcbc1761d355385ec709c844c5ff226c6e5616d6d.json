@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3389",
+  "ingested_at": "2026-03-22T07:54:33.450718+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Squirrel up to 3.2. This vulnerability affects the function sqstd_rex_newnode in the library sqstdlib/sqstdrex.cpp. Executing a manipulation can lead to null pointer dereference. The attack can only be executed locally. The exploit has been publicly disclosed and may be utilized. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "a73aa7c7948aad466e61e62fcbc1761d355385ec709c844c5ff226c6e5616d6d",
+  "source": "nvd",
+  "tags": [
+    "CWE-404",
+    "CWE-476"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3389"
+}

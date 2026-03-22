@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-37580",
+  "ingested_at": "2026-03-22T07:45:17.293564+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a cross-site scripting vulnerability impacting the confidentiality and integrity of data.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2cb4f17a1bcf6df8d6ff191592ad9f737b65758323b598c74f2eb8b1d4cb3cd4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

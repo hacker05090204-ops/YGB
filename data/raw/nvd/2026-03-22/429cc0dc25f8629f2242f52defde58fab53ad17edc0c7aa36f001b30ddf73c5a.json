@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3638",
+  "ingested_at": "2026-03-22T07:54:42.351818+00:00",
+  "lang": "en",
+  "raw_text": "Improper access control in user and role restore API endpoints in Devolutions Server 2025.3.11.0 and earlier allows a low-privileged authenticated user to restore deleted users and roles via crafted API requests.",
+  "severity": "MEDIUM",
+  "sha256_hash": "429cc0dc25f8629f2242f52defde58fab53ad17edc0c7aa36f001b30ddf73c5a",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3638"
+}

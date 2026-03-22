@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28219",
+  "ingested_at": "2026-03-22T07:54:32.804205+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, an improper authorization check in the topic management logic allows authenticated users to modify privileged attributes of their topics. By manipulating specific parameters in a PUT or POST request, a regular user can elevate a topic\u2019s status to a site-wide notice or banner, bypassing intended administrative restrictions. Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. There are no practical workarounds to prevent this behavior other than applying the security patch. Administrators concerned about unauthorized promotions should audit recent changes to site banners and global notices until the fix is deployed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3bc0d18e9ff3037b895333aded93e5c302c32cd5140c423c28e1b06514b862a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-915"
+  ],
+  "token_count": 104,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28219"
+}

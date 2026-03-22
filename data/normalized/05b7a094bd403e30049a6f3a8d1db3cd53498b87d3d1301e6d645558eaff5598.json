@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Jenkins Jenkins Command Line Interface (CLI) Jenkins Command Line Interface (CLI) contains a path traversal vulnerability that allows attackers limited read access to certain files, which can lead to code execution.",
+  "token_count": 31
+}

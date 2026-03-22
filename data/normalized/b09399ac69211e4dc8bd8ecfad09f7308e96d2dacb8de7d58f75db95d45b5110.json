@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CyberPersons CyberPanel CyberPanel contains an incorrect default permissions vulnerability that allows a remote, unauthenticated attacker to execute commands as root.",
+  "token_count": 20
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft MSCOMCTL.OCX Microsoft MSCOMCTL.OCX contains an unspecified vulnerability that allows for remote code execution, allowing an attacker to take complete control of an affected system under the context of the current user.",
+  "token_count": 32
+}

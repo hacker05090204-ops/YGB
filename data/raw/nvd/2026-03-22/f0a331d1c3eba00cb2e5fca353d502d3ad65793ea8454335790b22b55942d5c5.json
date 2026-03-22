@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69410",
+  "ingested_at": "2026-03-22T07:54:30.329122+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in Edge-Themes Belletrist belletrist allows PHP Local File Inclusion.This issue affects Belletrist: from n/a through < = 1.2.",
+  "severity": "HIGH",
+  "sha256_hash": "f0a331d1c3eba00cb2e5fca353d502d3ad65793ea8454335790b22b55942d5c5",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69410"
+}

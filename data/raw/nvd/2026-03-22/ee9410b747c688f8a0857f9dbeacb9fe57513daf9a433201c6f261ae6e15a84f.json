@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32458",
+  "ingested_at": "2026-03-22T07:54:46.148795+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in RealMag777 WOLF bulk-editor allows Blind SQL Injection.This issue affects WOLF: from n/a through < = 1.0.8.7.",
+  "severity": "HIGH",
+  "sha256_hash": "ee9410b747c688f8a0857f9dbeacb9fe57513daf9a433201c6f261ae6e15a84f",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32458"
+}

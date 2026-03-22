@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpForo Forum 2.4.14 contains a stored cross-site scripting vulnerability that allows script injection via forum URL data output into an inline script block using json_encode without the JSON_HEX_TAG flag. Attackers set a forum slug containing a closing script tag or unescaped single quote to break out of the JavaScript string context and execute arbitrary script in all visitors' browsers.",
+  "token_count": 59
+}

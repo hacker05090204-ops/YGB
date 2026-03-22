@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2360",
+  "ingested_at": "2026-03-22T07:45:17.877797+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Win32k Win32k.sys in the kernel-mode drivers in Microsoft Windows allows local users to gain privileges or cause denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "9bc68868335e598e31af95e366a39baea1a7eb81b98d28099a8fa6c7406f18f9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25580",
+  "ingested_at": "2026-03-22T07:54:49.559255+00:00",
+  "lang": "en",
+  "raw_text": "ownDMS 4.7 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the IMG parameter. Attackers can send GET requests to pdfstream.php, imagestream.php, or anyfilestream.php with crafted SQL payloads in the IMG parameter to extract sensitive database information including version and database names.",
+  "severity": "HIGH",
+  "sha256_hash": "ace04cc08e6d973b6219bf530b7a06b66a295ca9d1857349930846bd0984b572",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25580"
+}

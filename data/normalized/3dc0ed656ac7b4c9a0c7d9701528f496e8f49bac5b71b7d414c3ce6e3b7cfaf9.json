@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Siemens SIMATIC CP An improper privilege management vulnerability exists within the Siemens SIMATIC Communication Processor (CP) that allows a privileged attacker to remotely cause a denial of service.",
+  "token_count": 28
+}

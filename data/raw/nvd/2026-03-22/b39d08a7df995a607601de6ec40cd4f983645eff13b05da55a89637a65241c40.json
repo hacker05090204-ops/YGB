@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28282",
+  "ingested_at": "2026-03-22T07:54:48.146264+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Versions prior to 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 have a security flaw in the discourse-policy plugin which allowed a user with policy creation permission to gain membership access to any private/restricted groups. Once membership to a private/restricted group has been obtained, the user will be able to read private topics that only the group has access to. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. As a workaround, review all policies for the use of `add-users-to-group` and temporarily remove the attribute from the policy. Alternatively, disable the discourse-policy plugin by disabling the `policy_enabled` site setting.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b39d08a7df995a607601de6ec40cd4f983645eff13b05da55a89637a65241c40",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 100,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28282"
+}

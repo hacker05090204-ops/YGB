@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-0111",
+  "ingested_at": "2026-03-22T07:45:16.574631+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks PAN-OS Palo Alto Networks PAN-OS contains an external control of file name or path vulnerability. Successful exploitation enables an authenticated attacker with network access to the management web interface to read files on the PAN-OS filesystem that are readable by the \u201cnobody\u201d user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aef1bef25ecc6410ddda24a024ad89e71944c11b8a1fa55bc4546734e9473d9c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

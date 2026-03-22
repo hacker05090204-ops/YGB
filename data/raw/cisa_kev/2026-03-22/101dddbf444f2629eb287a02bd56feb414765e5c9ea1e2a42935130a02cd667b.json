@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-6663",
+  "ingested_at": "2026-03-22T07:45:18.573395+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS and IOS XE Software A vulnerability in the Autonomic Networking feature of Cisco IOS Software and Cisco IOS XE Software could allow an unauthenticated, adjacent attacker to cause autonomic nodes of an affected system to reload, resulting in denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "101dddbf444f2629eb287a02bd56feb414765e5c9ea1e2a42935130a02cd667b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

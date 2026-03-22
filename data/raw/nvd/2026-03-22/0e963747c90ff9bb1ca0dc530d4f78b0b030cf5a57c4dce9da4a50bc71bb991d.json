@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25891",
+  "ingested_at": "2026-03-22T07:54:31.787483+00:00",
+  "lang": "en",
+  "raw_text": "Fiber is an Express inspired web framework written in Go. A Path Traversal (CWE-22) vulnerability in Fiber allows a remote attacker to bypass the static middleware sanitizer and read arbitrary files on the server file system on Windows. This affects Fiber v3 through version 3.0.0. This has been patched in Fiber v3 version 3.1.0.",
+  "severity": "HIGH",
+  "sha256_hash": "0e963747c90ff9bb1ca0dc530d4f78b0b030cf5a57c4dce9da4a50bc71bb991d",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25891"
+}

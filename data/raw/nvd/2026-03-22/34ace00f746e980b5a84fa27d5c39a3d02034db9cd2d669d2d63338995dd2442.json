@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69394",
+  "ingested_at": "2026-03-22T07:54:30.293297+00:00",
+  "lang": "en",
+  "raw_text": "Authorization Bypass Through User-Controlled Key vulnerability in cnvrse Cnvrse cnvrse allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Cnvrse: from n/a through < = 026.02.10.20.",
+  "severity": "HIGH",
+  "sha256_hash": "34ace00f746e980b5a84fa27d5c39a3d02034db9cd2d669d2d63338995dd2442",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69394"
+}

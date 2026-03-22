@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The web management interface of the device allows the administrator username and password to be set to blank values. Once applied, the device permits authentication with empty credentials over the web management interface and Telnet service. This effectively disables authentication across all critical management channels, allowing any network-adjacent attacker to gain full administrative control without credentials.",
+  "token_count": 56
+}

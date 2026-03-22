@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28793",
+  "ingested_at": "2026-03-22T07:54:44.386831+00:00",
+  "lang": "en",
+  "raw_text": "Tina is a headless content management system. Prior to 2.1.8, the TinaCMS CLI development server exposes media endpoints that are vulnerable to path traversal, allowing attackers to read and write arbitrary files on the filesystem outside the intended media directory. When running tinacms dev, the CLI starts a local HTTP server (default port 4001) exposing endpoints such as /media/list/*, /media/upload/*, and /media/*. These endpoints process user-controlled path segments using decodeURI() and path.join() without validating that the resolved path remains within the configured media directory. This vulnerability is fixed in 2.1.8.",
+  "severity": "HIGH",
+  "sha256_hash": "edbca6bc6b65b80ced070f0a96db446f39b8defce00057cf6d5ab4ca2ba688e3",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28793"
+}

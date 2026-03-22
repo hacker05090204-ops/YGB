@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SVXportal version 2.5 and prior contain a stored cross-site scripting vulnerability in the user profile update workflow (user_settings.php submitting to admin/update_user.php). Authenticated users can store malicious HTML/JavaScript in fields such as Firstname, lastname, email, and image_url, which are later rendered without adequate output encoding in the administrator interface (admin/users.php), resulting in JavaScript execution in an administrator's browser when the affected page is viewed.",
+  "token_count": 63
+}

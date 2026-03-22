@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22193",
+  "ingested_at": "2026-03-22T07:54:44.614155+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an SQL injection vulnerability in the getAllSubscriptions() function where string parameters lack proper quote escaping in SQL queries. Attackers can inject malicious SQL code through email, activation_key, subscription_date, and imported_from parameters to manipulate database queries and extract sensitive information.",
+  "severity": "HIGH",
+  "sha256_hash": "b69396b62a8f1735c765fd831ed6adbf23e7d64fecef7f8c2fb60abbc911248b",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22193"
+}

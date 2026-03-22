@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32763",
+  "ingested_at": "2026-03-22T07:54:48.382756+00:00",
+  "lang": "en",
+  "raw_text": "Kysely is a type-safe TypeScript SQL query builder. Versions up to and including 0.28.11 has a SQL injection vulnerability in JSON path compilation for MySQL and SQLite dialects. The `visitJSONPathLeg()` function appends user-controlled values from `.key()` and `.at()` directly into single-quoted JSON path string literals (`'$.key'`) without escaping single quotes. An attacker can break out of the JSON path string context and inject arbitrary SQL. This is inconsistent with `sanitizeIdentifier()`, which properly doubles delimiter characters for identifiers \u2014 both are non-parameterizable SQL constructs requiring manual escaping, but only identifiers are protected. Version 0.28.12 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "2998f9f4b251edbbf816f4b87b502cc45b282bec359683e3914bd9027a5ad107",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 96,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32763"
+}

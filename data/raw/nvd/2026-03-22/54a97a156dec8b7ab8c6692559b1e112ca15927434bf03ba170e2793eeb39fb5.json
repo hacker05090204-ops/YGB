@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29613",
+  "ingested_at": "2026-03-22T07:54:41.125077+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.12 contain a vulnerability in the BlueBubbles (optional plugin) webhook handler in which it authenticates requests based solely on loopback remoteAddress without validating forwarding headers, allowing bypass of configured webhook passwords. When the gateway operates behind a reverse proxy, unauthenticated remote attackers can inject arbitrary BlueBubbles message and reaction events by reaching the proxy endpoint.",
+  "severity": "MEDIUM",
+  "sha256_hash": "54a97a156dec8b7ab8c6692559b1e112ca15927434bf03ba170e2793eeb39fb5",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29613"
+}

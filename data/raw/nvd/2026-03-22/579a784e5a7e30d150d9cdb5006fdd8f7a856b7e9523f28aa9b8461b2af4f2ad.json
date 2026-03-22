@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3742",
+  "ingested_at": "2026-03-22T07:54:42.061277+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in YiFang CMS 2.0.5. The impacted element is the function update of the file app/db/admin/D_singlePage.php. Performing a manipulation of the argument Title results in cross site scripting. It is possible to initiate the attack remotely. The exploit is now public and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "579a784e5a7e30d150d9cdb5006fdd8f7a856b7e9523f28aa9b8461b2af4f2ad",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3742"
+}

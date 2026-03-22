@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-14611",
+  "ingested_at": "2026-03-22T07:45:16.009849+00:00",
+  "lang": "en",
+  "raw_text": "Gladinet CentreStack and Triofox Gladinet CentreStack and TrioFox contain a hardcoded cryptographic keys vulnerability for their implementation of the AES cryptoscheme. This vulnerability degrades security for public exposed endpoints that may make use of it and may offer arbitrary local file inclusion when provided a specially crafted request without authentication.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8564ec4d74e1dc0c9935410a1386a4867f2b91f3bccd4d00d639978e671c0900",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

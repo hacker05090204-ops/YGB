@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4010",
+  "ingested_at": "2026-03-22T07:54:44.202359+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in ThakeeNathees pocketlang up to cc73ca61b113d48ee130d837a7a8b145e41de5ce. The affected element is the function pkByteBufferAddString. The manipulation of the argument length with the input 4294967290 results in memory corruption. The attack requires a local approach. The exploit has been made public and could be used. This product does not use versioning. This is why information about affected and unaffected releases are unavailable. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "LOW",
+  "sha256_hash": "0a34f5c7373cb9c3cf5196c98c8954600894b1587eb623b362b6d068aaedab20",
+  "source": "nvd",
+  "tags": [
+    "CWE-119"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4010"
+}

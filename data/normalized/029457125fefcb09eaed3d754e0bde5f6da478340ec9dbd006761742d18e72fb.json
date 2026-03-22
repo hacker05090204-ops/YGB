@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: io_uring/zcrx: fix page array leak d9f595b9a65e (\"io_uring/zcrx: fix leaking pages on sg init fail\") fixed a page leakage but didn't free the page array, release it as well.",
+  "token_count": 38
+}

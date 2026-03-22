@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3022",
+  "ingested_at": "2026-03-22T07:54:46.580293+00:00",
+  "lang": "en",
+  "raw_text": "Non-relational SQL injection vulnerability (NoSQLi) in the Wakyma web application, specifically in the endpoint 'vets.wakyma.com/hospitalization/generate-hospitalization-summary'. This vulnerability could allow an authenticated user to alter a POST request to the affected endpoint for the purpose of injecting special NoSQL commands, resulting in the attacker being able to obtain customer reports.",
+  "severity": "MEDIUM",
+  "sha256_hash": "119c5f29e3cbd22c361e3b71c5946ec4cba23a176fb09f313862d6c806c5aa2a",
+  "source": "nvd",
+  "tags": [
+    "CWE-943",
+    "CWE-89"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3022"
+}

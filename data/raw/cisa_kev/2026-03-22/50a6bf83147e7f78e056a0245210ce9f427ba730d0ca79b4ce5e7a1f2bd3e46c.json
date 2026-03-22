@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-26318",
+  "ingested_at": "2026-03-22T07:45:18.271067+00:00",
+  "lang": "en",
+  "raw_text": "WatchGuard Firebox and XTM Appliances On WatchGuard Firebox and XTM appliances, an unauthenticated user can execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "50a6bf83147e7f78e056a0245210ce9f427ba730d0ca79b4ce5e7a1f2bd3e46c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

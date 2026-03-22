@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25884",
+  "ingested_at": "2026-03-22T07:54:33.973177+00:00",
+  "lang": "en",
+  "raw_text": "Exiv2 is a C++ library and a command-line utility to read, write, delete and modify Exif, IPTC, XMP and ICC image metadata. Prior to version 0.28.8, an out-of-bounds read was found. The vulnerability is in the CRW image parser. This issue has been patched in version 0.28.8.",
+  "severity": "HIGH",
+  "sha256_hash": "57230a41c83b2a37193e70d17d0f7e37f9ac73dc9319e336f45f4fcdc63df1a9",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25884"
+}

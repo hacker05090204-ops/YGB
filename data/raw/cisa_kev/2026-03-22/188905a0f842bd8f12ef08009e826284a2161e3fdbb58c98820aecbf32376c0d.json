@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-21551",
+  "ingested_at": "2026-03-22T07:45:18.183256+00:00",
+  "lang": "en",
+  "raw_text": "Dell dbutil Driver Dell dbutil driver contains an insufficient access control vulnerability which may lead to escalation of privileges, denial-of-service (DoS), or information disclosure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "188905a0f842bd8f12ef08009e826284a2161e3fdbb58c98820aecbf32376c0d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

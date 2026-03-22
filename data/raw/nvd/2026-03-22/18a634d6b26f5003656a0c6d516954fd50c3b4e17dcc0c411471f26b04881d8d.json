@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32777",
+  "ingested_at": "2026-03-22T07:54:46.573020+00:00",
+  "lang": "en",
+  "raw_text": "libexpat before 2.7.5 allows an infinite loop while parsing DTD content.",
+  "severity": "MEDIUM",
+  "sha256_hash": "18a634d6b26f5003656a0c6d516954fd50c3b4e17dcc0c411471f26b04881d8d",
+  "source": "nvd",
+  "tags": [
+    "CWE-835"
+  ],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32777"
+}

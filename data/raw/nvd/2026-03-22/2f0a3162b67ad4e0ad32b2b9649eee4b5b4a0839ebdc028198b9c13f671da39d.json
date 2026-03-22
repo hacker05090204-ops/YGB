@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2025-63261",
+  "ingested_at": "2026-03-22T07:54:48.977971+00:00",
+  "lang": "en",
+  "raw_text": "AWStats 8.0 is vulnerable to Command Injection via the open function",
+  "severity": "UNKNOWN",
+  "sha256_hash": "2f0a3162b67ad4e0ad32b2b9649eee4b5b4a0839ebdc028198b9c13f671da39d",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 11,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-63261"
+}

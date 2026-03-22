@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PaperCut NG/MF PaperCut NG/MF contains a cross-site request forgery (CSRF) vulnerability, which, under specific conditions, could potentially enable an attacker to alter security settings or execute arbitrary code.",
+  "token_count": 28
+}

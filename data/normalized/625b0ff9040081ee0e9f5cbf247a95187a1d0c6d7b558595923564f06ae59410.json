@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware ESXi and Workstation VMware ESXi and Workstation contain a time-of-check time-of-use (TOCTOU) race condition vulnerability that leads to an out-of-bounds write. Successful exploitation enables an attacker with local administrative privileges on a virtual machine to execute code as the virtual machine's VMX process running on the host.",
+  "token_count": 48
+}

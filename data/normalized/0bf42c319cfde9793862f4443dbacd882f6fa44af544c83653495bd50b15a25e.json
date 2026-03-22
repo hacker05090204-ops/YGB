@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An XML External Entity (XXE) vulnerability allows malicious user to perform Server-Side Request Forgery (SSRF) via crafted XML input containing malicious external entity references. This issue affects Xerox FreeFlow Core versions up to and including 8.0.7. Please consider upgrading to FreeFlow Core version 8.1.0 via the software available on - https://www.support.xerox.com/en-us/product/core/downloads",
+  "token_count": 51
+}

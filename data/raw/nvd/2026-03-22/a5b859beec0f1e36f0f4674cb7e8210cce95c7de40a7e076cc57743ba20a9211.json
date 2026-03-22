@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27190",
+  "ingested_at": "2026-03-22T07:54:30.578004+00:00",
+  "lang": "en",
+  "raw_text": "Deno is a JavaScript, TypeScript, and WebAssembly runtime. Prior to 2.6.8, a command injection vulnerability exists in Deno's node:child_process implementation. This vulnerability is fixed in 2.6.8.",
+  "severity": "HIGH",
+  "sha256_hash": "a5b859beec0f1e36f0f4674cb7e8210cce95c7de40a7e076cc57743ba20a9211",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27190"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in code-projects Simple Flight Ticket Booking System 1.0. Affected by this vulnerability is an unknown functionality of the file SearchResultOneway.php. Such manipulation of the argument from leads to sql injection. The attack can be launched remotely. The exploit has been disclosed to the public and may be used.",
+  "token_count": 53
+}

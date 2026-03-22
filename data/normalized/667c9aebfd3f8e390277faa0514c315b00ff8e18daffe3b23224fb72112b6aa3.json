@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An improper authorization vulnerability in GitHub Trigger Comment Control in Google Cloud Build prior to 2026-1-26 allows a remote attacker to execute arbitrary code in the build environment. This vulnerability was patched on 26 January 2026, and no customer action is needed.",
+  "token_count": 42
+}

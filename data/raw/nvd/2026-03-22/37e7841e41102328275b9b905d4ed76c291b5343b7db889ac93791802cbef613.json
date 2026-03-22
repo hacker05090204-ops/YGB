@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2852",
+  "ingested_at": "2026-03-22T07:54:30.553365+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in yeqifu warehouse up to aaf29962ba407d22d991781de28796ee7b4670e4. This issue affects the function addSales/updateSales/deleteSales of the file dataset\\repos\\warehouse\\src\\main\\java\\com\\yeqifu\\bus\\controller\\SalesController.java of the component Sales Endpoint. The manipulation leads to improper access controls. The attack is possible to be carried out remotely. The exploit is publicly available and might be used. This product adopts a rolling release strategy to maintain continuous delivery. Therefore, version details for affected or updated releases cannot be specified. The project was informed of the problem early through an issue report but has not responded yet.",
+  "severity": "MEDIUM",
+  "sha256_hash": "37e7841e41102328275b9b905d4ed76c291b5343b7db889ac93791802cbef613",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-284"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2852"
+}

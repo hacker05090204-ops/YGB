@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Vim is an open source, command line text editor. Versions prior to 9.2.0077 have a heap-buffer-overflow and a segmentation fault (SEGV) exist in Vim's swap file recovery logic. Both are caused by unvalidated fields read from crafted pointer blocks within a swap file. Version 9.2.0077 fixes the issue.",
+  "token_count": 48
+}

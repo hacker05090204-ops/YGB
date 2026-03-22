@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1824",
+  "ingested_at": "2026-03-22T07:54:41.805274+00:00",
+  "lang": "en",
+  "raw_text": "The Infomaniak Connect for OpenID plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'endpoint_login' parameter of the infomaniak_connect_generic_auth_url shortcode in all versions up to, and including, 1.0.2 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b5720e484e7e2cc35259d4a4bd457521cd350c9584f4302701ffb2499021829e",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 67,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1824"
+}

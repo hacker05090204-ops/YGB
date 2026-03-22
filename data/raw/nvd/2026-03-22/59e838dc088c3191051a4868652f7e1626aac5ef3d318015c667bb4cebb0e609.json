@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25554",
+  "ingested_at": "2026-03-22T07:54:49.499423+00:00",
+  "lang": "en",
+  "raw_text": "Tomabo MP4 Converter 3.25.22 contains a denial of service vulnerability that allows local attackers to crash the application by supplying an excessively long string in the Name field. Attackers can trigger a buffer overflow by pasting a large payload into the Name parameter when adding a preset in the Video/Audio Formats options, causing the application to crash when Reset All is clicked.",
+  "severity": "MEDIUM",
+  "sha256_hash": "59e838dc088c3191051a4868652f7e1626aac5ef3d318015c667bb4cebb0e609",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25554"
+}

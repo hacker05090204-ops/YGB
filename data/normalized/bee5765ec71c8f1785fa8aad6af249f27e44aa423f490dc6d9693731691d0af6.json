@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Citrix StoreFront Server Citrix StoreFront Server contains an XML External Entity (XXE) processing vulnerability that may allow an unauthenticated attacker to retrieve potentially sensitive information.",
+  "token_count": 25
+}

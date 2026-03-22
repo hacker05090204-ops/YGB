@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-69250",
+  "ingested_at": "2026-03-22T07:54:31.249443+00:00",
+  "lang": "en",
+  "raw_text": "free5gc UDM provides Unified Data Management (UDM) for free5GC, an open-source project for 5th generation (5G) mobile core networks. In versions up to and including 1.4.1, the service reliably leaks detailed internal error messages (e.g., strconv.ParseInt parsing errors) to remote clients when processing invalid pduSessionId inputs. This exposes implementation details and can be used for service fingerprinting. All deployments of free5GC using the UDM Nudm_UECM DELETE service may be vulnerable. free5gc/udm pull request 76 contains a fix for the issue. No direct workaround is available at the application level. Applying the official patch is recommended.",
+  "severity": "HIGH",
+  "sha256_hash": "41061790d10f61f8fa50f6145086ed23b876dec0d10d2be28844686e4a62774d",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-754"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69250"
+}

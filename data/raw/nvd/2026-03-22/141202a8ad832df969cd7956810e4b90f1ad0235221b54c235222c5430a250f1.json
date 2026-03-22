@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28517",
+  "ingested_at": "2026-03-22T07:54:33.392724+00:00",
+  "lang": "en",
+  "raw_text": "openDCIM version 23.04, through commit 4467e9c4, contains an OS command injection vulnerability in report_network_map.php. The application retrieves the 'dot' configuration parameter from the database and passes it directly to exec() without validation or sanitation. If an attacker can modify the fac_Config.dot value, arbitrary commands may be executed in the context of the web server process.",
+  "severity": "CRITICAL",
+  "sha256_hash": "141202a8ad832df969cd7956810e4b90f1ad0235221b54c235222c5430a250f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28517"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29120",
+  "ingested_at": "2026-03-22T07:54:34.401964+00:00",
+  "lang": "en",
+  "raw_text": "The /root/anaconda-ks.cfg installation configuration file in International Datacasting Corporation (IDC) SFX Series(SFX2100) SuperFlex Satellite Receiver insecurely stores the hardcoded root password hash. The password itself is highly insecure and susceptible to offline dictionary attacks using the rockyou.txt wordlist. Because direct root SSH login is disabled, an attacker must first obtain low-privileged access to the system (e.g., via other vulnerabilities) to be able to log in as the root user. The password is hardcoded and so allows for an actor with local access on effected versions to escalate to root",
+  "severity": "HIGH",
+  "sha256_hash": "2c6cef65f41d38cda07c3cf40df7c53fc600deb1901c0fe15b2352d5a67b9d85",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 89,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29120"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30856",
+  "ingested_at": "2026-03-22T07:54:41.922019+00:00",
+  "lang": "en",
+  "raw_text": "WeKnora is an LLM-powered framework designed for deep document understanding and semantic retrieval. Prior to version 0.3.0, a vulnerability involving tool name collision and indirect prompt injection allows a malicious remote MCP server to hijack tool execution. By exploiting an ambiguous naming convention in the MCP client (mcp_{service}_{tool}), an attacker can register a malicious tool that overwrites a legitimate one (e.g., tavily_extract). This enables the attacker to redirect LLM execution flow, exfiltrate system prompts, context, and potentially execute other tools with the user's privileges. This issue has been patched in version 0.3.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "eca770756030c7d9cea4a403d13f5430ec743e8e3b3b9a5aa90b78d28980393a",
+  "source": "nvd",
+  "tags": [
+    "CWE-706"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30856"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13777",
+  "ingested_at": "2026-03-22T07:54:44.560635+00:00",
+  "lang": "en",
+  "raw_text": "Authentication bypass by capture-replay vulnerability in ABB AWIN GW100 rev.2, ABB AWIN GW120.This issue affects AWIN GW100 rev.2: 2.0-0, 2.0-1; AWIN GW120: 1.2-0, 1.2-1.",
+  "severity": "HIGH",
+  "sha256_hash": "a6ec3feeefb9a66fc027d1a9098d93cf10aaa334096f0e39a8cb5e9900d5aa78",
+  "source": "nvd",
+  "tags": [
+    "CWE-294"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13777"
+}

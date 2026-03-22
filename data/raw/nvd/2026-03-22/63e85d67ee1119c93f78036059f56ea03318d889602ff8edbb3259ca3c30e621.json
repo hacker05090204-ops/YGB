@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3996",
+  "ingested_at": "2026-03-22T07:54:49.423902+00:00",
+  "lang": "en",
+  "raw_text": "The WP Games Embed plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the [game] shortcode in all versions up to and including 0.1beta. This is due to insufficient input sanitization and output escaping on user-supplied shortcode attributes such as 'width', 'height', 'src', 'title', 'description', 'game_url', 'main', and 'thumb', which are all directly concatenated into HTML output without any escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "63e85d67ee1119c93f78036059f56ea03318d889602ff8edbb3259ca3c30e621",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3996"
+}

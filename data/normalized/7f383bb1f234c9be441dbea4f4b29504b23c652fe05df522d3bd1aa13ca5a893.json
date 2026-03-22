@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An OS command injection vulnerability exists in XWEB Pro version 1.12.1 and prior, enabling an authenticated attacker to achieve remote code execution on the system by modifying malicious input injected into the MBird SMS service URL and/or code via the utility route which is later processed during system setup, leading to remote code execution.",
+  "token_count": 54
+}

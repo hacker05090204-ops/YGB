@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-32896",
+  "ingested_at": "2026-03-22T07:45:16.942626+00:00",
+  "lang": "en",
+  "raw_text": "Android Pixel Android Pixel contains an unspecified vulnerability in the firmware that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "13f45f5bc633b0b8572dd0affe193d7f74b39943c1cc897c78681185613160e9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

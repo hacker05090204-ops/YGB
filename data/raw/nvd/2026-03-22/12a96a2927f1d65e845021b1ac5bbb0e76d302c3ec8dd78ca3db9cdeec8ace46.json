@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15515",
+  "ingested_at": "2026-03-22T07:54:44.570638+00:00",
+  "lang": "en",
+  "raw_text": "The authentication mechanism for a specific feature in the EasyShare module contains a vulnerability. If specific conditions are met on a local network, it can cause data leakage",
+  "severity": "UNKNOWN",
+  "sha256_hash": "12a96a2927f1d65e845021b1ac5bbb0e76d302c3ec8dd78ca3db9cdeec8ace46",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15515"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27149",
+  "ingested_at": "2026-03-22T07:54:32.768677+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open source discussion platform. Prior to versions 2025.12.2, 2026.1.1, and 2026.2.0, SQL injection in PM tag filtering (`list_private_messages_tag`) allows bypassing tag filter conditions, potentially disclosing unauthorized private message metadata. Versions 2025.12.2, 2026.1.1, and 2026.2.0 patch the issue. No known workarounds are available.",
+  "severity": "MEDIUM",
+  "sha256_hash": "531ad602edefb270189f0818c2439915cab69350515edb908fac93c8a3002782",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27149"
+}

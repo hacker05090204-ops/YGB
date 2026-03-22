@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0020",
+  "ingested_at": "2026-03-22T07:54:33.920182+00:00",
+  "lang": "en",
+  "raw_text": "In parsePermissionGroup of ParsedPermissionUtils.java, there is a possible way to bypass a consent dialog to obtain permissions due to a permissions bypass. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "b5280c3a29c8853cbdc891af21b25455a461b7830cc83e071b98741495da63aa",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0020"
+}

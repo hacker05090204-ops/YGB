@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32295",
+  "ingested_at": "2026-03-22T07:54:47.101336+00:00",
+  "lang": "en",
+  "raw_text": "JetKVM before 0.5.4 does not rate limit login requests, enabling brute-force attempts to guess credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "c1c0d591ceb8ede53526bca49ffb36f2f726c5135987f9caf3a3af9f6ddb4ed1",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32295"
+}

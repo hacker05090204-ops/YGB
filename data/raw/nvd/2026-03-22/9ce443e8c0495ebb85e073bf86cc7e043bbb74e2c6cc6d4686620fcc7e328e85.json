@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27336",
+  "ingested_at": "2026-03-22T07:54:40.192501+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in AncoraThemes Consultor | Consulting, Accounting & Legal Counsel WordPress Theme consultor allows PHP Local File Inclusion.This issue affects Consultor | Consulting, Accounting & Legal Counsel WordPress Theme: from n/a through < = 1.2.4.",
+  "severity": "HIGH",
+  "sha256_hash": "9ce443e8c0495ebb85e073bf86cc7e043bbb74e2c6cc6d4686620fcc7e328e85",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27336"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "MobaXterm versions prior to 26.1 contain an uncontrolled search path element vulnerability. The application calls WinExec to execute Notepad++ without a fully qualified executable path when opening remote files. An attacker can exploit the search path behavior by placing a malicious executable earlier in the search order, resulting in arbitrary code execution in the context of the affected user.",
+  "token_count": 59
+}

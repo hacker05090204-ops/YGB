@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A malicious user can manipulate the parameters.pathPattern to create PersistentVolumes in arbitrary locations on the host node, potentially overwriting sensitive files or gaining access to unintended directories.",
+  "token_count": 27
+}

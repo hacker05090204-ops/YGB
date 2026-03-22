@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-4902",
+  "ingested_at": "2026-03-22T07:45:18.630567+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE Unspecified vulnerability in Oracle Java SE allows remote attackers to affect integrity via Unknown vectors related to deployment.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3407f824145e0cb44b363012a8c97eb830c5ce8b1be9bf501a14bda542236ef5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

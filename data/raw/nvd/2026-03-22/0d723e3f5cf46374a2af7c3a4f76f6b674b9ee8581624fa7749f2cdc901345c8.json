@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2915",
+  "ingested_at": "2026-03-22T07:54:34.242797+00:00",
+  "lang": "en",
+  "raw_text": "HP System Event Utility might allow denial of service with elevated arbitrary file writes. This potential vulnerability was remediated with HP System Event Utility version 3.2.16.",
+  "severity": "HIGH",
+  "sha256_hash": "0d723e3f5cf46374a2af7c3a4f76f6b674b9ee8581624fa7749f2cdc901345c8",
+  "source": "nvd",
+  "tags": [
+    "CWE-276",
+    "CWE-732"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2915"
+}

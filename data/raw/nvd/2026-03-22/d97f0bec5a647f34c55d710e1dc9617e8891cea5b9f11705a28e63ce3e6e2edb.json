@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32059",
+  "ingested_at": "2026-03-22T07:54:43.565967+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw version 2026.2.22-2 prior to 2026.2.23 tools.exec.safeBins validation for sort command fails to properly validate GNU long-option abbreviations, allowing attackers to bypass denied-flag checks via abbreviated options. Remote attackers can execute sort commands with abbreviated long options to skip approval requirements in allowlist mode.",
+  "severity": "HIGH",
+  "sha256_hash": "d97f0bec5a647f34c55d710e1dc9617e8891cea5b9f11705a28e63ce3e6e2edb",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32059"
+}

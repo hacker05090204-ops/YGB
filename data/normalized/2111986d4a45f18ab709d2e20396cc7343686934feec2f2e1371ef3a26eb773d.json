@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Elastic Elasticsearch The Groovy scripting engine in Elasticsearch allows remote attackers to bypass the sandbox protection mechanism and execute arbitrary shell commands.",
+  "token_count": 22
+}

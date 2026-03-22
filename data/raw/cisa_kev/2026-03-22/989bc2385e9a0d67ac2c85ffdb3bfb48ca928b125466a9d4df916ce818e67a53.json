@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-5217",
+  "ingested_at": "2026-03-22T07:45:16.899512+00:00",
+  "lang": "en",
+  "raw_text": "ServiceNow Utah, Vancouver, and Washington DC Now Platform ServiceNow Washington DC, Vancouver, and earlier Now Platform releases contain an incomplete list of disallowed inputs vulnerability in the GlideExpression script. An unauthenticated user could exploit this vulnerability to execute code remotely.",
+  "severity": "CRITICAL",
+  "sha256_hash": "989bc2385e9a0d67ac2c85ffdb3bfb48ca928b125466a9d4df916ce818e67a53",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

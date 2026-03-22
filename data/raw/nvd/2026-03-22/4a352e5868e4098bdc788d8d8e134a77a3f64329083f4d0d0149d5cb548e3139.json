@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30241",
+  "ingested_at": "2026-03-22T07:54:41.669181+00:00",
+  "lang": "en",
+  "raw_text": "Mercurius is a GraphQL adapter for Fastify. Prior to version 16.8.0, Mercurius fails to enforce the configured queryDepth limit on GraphQL subscription queries received over WebSocket connections. The depth check is correctly applied to HTTP queries and mutations, but subscription queries are parsed and executed without invoking the depth validation. This allows a remote client to submit arbitrarily deeply nested subscription queries over WebSocket, bypassing the intended depth restriction. On schemas with recursive types, this can lead to denial of service through exponential data resolution on each subscription event. This issue has been patched in version 16.8.0.",
+  "severity": "HIGH",
+  "sha256_hash": "4a352e5868e4098bdc788d8d8e134a77a3f64329083f4d0d0149d5cb548e3139",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30241"
+}

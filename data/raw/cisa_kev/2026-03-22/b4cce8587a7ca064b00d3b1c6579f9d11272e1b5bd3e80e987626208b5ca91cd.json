@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-30397",
+  "ingested_at": "2026-03-22T07:45:16.420180+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Scripting Engine contains a type confusion vulnerability that allows an unauthorized attacker to execute code over a network via a specially crafted URL.",
+  "severity": "CRITICAL",
+  "sha256_hash": "b4cce8587a7ca064b00d3b1c6579f9d11272e1b5bd3e80e987626208b5ca91cd",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

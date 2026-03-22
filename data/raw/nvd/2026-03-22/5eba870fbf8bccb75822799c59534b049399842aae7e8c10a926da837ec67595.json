@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29052",
+  "ingested_at": "2026-03-22T07:54:40.694437+00:00",
+  "lang": "en",
+  "raw_text": "The Calendar module for HumHub enables users to create one-time or recurring events, manage attendee invitations, and efficiently track all scheduled activities. Prior to version 1.8.11, a Stored Cross-Site Scripting (XSS) vulnerability in the Event Types of the HumHub Calendar module impacts users viewing events created by an administrative account. This issue has been patched in version 1.8.11.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5eba870fbf8bccb75822799c59534b049399842aae7e8c10a926da837ec67595",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29052"
+}

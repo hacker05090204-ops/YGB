@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25571",
+  "ingested_at": "2026-03-22T07:54:42.766055+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been identified in SICAM SIAPP SDK (All versions < V2.1.7). The SICAM SIAPP SDK client component does not enforce maximum length checks on certain variables before use. This could allow an attacker to send an oversized input that could trigger a stack overflow crashing the process and potentially causing denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cfa522f0c6595515dcc5c7cef0eaeba6a673f7083be6886fec67e570c881cbde",
+  "source": "nvd",
+  "tags": [
+    "CWE-130"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25571"
+}

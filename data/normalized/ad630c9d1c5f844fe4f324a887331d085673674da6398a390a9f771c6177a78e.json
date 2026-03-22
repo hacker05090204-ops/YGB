@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in libsoup. An integer underflow vulnerability occurs when processing content with a zero-length resource, leading to a buffer overread. This can allow an attacker to potentially access sensitive information or cause an application level denial of service.",
+  "token_count": 41
+}

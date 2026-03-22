@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A type confusion vulnerability exists in the EMF functionality of Canva Affinity. A specially crafted EMF file can trigger this vulnerability, which can lead to memory corruption and result in arbitrary code execution.",
+  "token_count": 33
+}

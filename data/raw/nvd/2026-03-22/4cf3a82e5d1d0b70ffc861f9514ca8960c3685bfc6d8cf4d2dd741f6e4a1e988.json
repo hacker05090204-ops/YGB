@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33004",
+  "ingested_at": "2026-03-22T07:54:47.520894+00:00",
+  "lang": "en",
+  "raw_text": "Jenkins LoadNinja Plugin 2.1 and earlier does not mask LoadNinja API keys displayed on the job configuration form, increasing the potential for attackers to observe and capture them.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4cf3a82e5d1d0b70ffc861f9514ca8960c3685bfc6d8cf4d2dd741f6e4a1e988",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33004"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15602",
+  "ingested_at": "2026-03-22T07:54:41.526672+00:00",
+  "lang": "en",
+  "raw_text": "Snipe-IT versions prior to 8.3.7 contain sensitive user attributes related to account privileges that are insufficiently protected against mass assignment. An authenticated, low-privileged user can craft a malicious API request to modify restricted fields of another user account, including the Super Admin account. By changing the email address of the Super Admin and triggering a password reset, an attacker can fully take over the Super Admin account, resulting in complete administrative control of the Snipe-IT instance.",
+  "severity": "HIGH",
+  "sha256_hash": "8c6af00626f24c99c984955b9116f6396006b4b1430ffddf3db4f38eacf28ea2",
+  "source": "nvd",
+  "tags": [
+    "CWE-915"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15602"
+}

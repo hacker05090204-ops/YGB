@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-66178",
+  "ingested_at": "2026-03-22T07:54:42.602016+00:00",
+  "lang": "en",
+  "raw_text": "A improper neutralization of special elements used in an os command ('os command injection') vulnerability in Fortinet FortiWeb 8.0.0 through 8.0.1, FortiWeb 7.6.0 through 7.6.5, FortiWeb 7.4.0 through 7.4.11, FortiWeb 7.2.0 through 7.2.12, FortiWeb 7.0.0 through 7.0.12 may allow an authenticated attacked to execute arbitrary commands via a specialy crafted HTTP request.",
+  "severity": "HIGH",
+  "sha256_hash": "0a008c598f40e48e218569c04dd7f0be862cbe33a81b302b0ca014587edcf0ab",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-66178"
+}

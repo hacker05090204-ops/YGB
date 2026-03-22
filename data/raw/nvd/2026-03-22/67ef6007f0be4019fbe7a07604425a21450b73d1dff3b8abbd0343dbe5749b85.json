@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3178",
+  "ingested_at": "2026-03-22T07:54:43.559970+00:00",
+  "lang": "en",
+  "raw_text": "The Name Directory plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'name_directory_name' parameter in all versions up to, and including, 1.32.1 due to insufficient input sanitization and output escaping. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. The vulnerability was partially patched in versions 1.30.3 and 1.32.1.",
+  "severity": "HIGH",
+  "sha256_hash": "67ef6007f0be4019fbe7a07604425a21450b73d1dff3b8abbd0343dbe5749b85",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3178"
+}

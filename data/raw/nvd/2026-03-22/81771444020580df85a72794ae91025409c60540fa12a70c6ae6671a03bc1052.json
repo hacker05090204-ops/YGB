@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25536",
+  "ingested_at": "2026-03-22T07:54:44.340690+00:00",
+  "lang": "en",
+  "raw_text": "Netartmedia PHP Real Estate Agency 4.0 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the features[] parameter. Attackers can send POST requests to index.php with crafted SQL payloads in the features[] parameter to extract sensitive database information or manipulate database queries.",
+  "severity": "HIGH",
+  "sha256_hash": "81771444020580df85a72794ae91025409c60540fa12a70c6ae6671a03bc1052",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25536"
+}

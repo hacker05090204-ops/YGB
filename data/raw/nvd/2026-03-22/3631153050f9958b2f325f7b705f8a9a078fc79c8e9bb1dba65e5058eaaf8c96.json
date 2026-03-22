@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25780",
+  "ingested_at": "2026-03-22T07:54:46.423818+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost versions 11.3.x < = 11.3.0, 11.2.x < = 11.2.2, 10.11.x < = 10.11.10 fail to bound memory allocation when processing DOC files which allows an authenticated attacker to cause server memory exhaustion and denial of service via uploading a specially crafted DOC file.. Mattermost Advisory ID: MMSA-2026-00581",
+  "severity": "MEDIUM",
+  "sha256_hash": "3631153050f9958b2f325f7b705f8a9a078fc79c8e9bb1dba65e5058eaaf8c96",
+  "source": "nvd",
+  "tags": [
+    "CWE-789"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25780"
+}

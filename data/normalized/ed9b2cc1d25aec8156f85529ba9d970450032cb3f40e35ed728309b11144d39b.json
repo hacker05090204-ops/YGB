@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper privilege management in ThemeManager prior to SMR Mar-2026 Release 1 allows local privileged attackers to reuse trial contents.",
+  "token_count": 19
+}

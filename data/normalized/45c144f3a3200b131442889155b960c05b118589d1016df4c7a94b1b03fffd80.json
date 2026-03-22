@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "October CMS October CMS In affected versions of the october/system package an attacker can request an account password reset and then gain access to the account using a specially crafted request.",
+  "token_count": 31
+}

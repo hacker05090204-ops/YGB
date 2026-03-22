@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Raytha CMS is vulnerable to User Enumeration in password reset functionality. Difference in messages could allow an attacker to determine if the login is valid or not, enabling a brute force attack with valid logins. This issue was fixed in version 1.5.0.",
+  "token_count": 42
+}

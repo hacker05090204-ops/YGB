@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29067",
+  "ingested_at": "2026-03-22T07:54:41.829150+00:00",
+  "lang": "en",
+  "raw_text": "ZITADEL is an open source identity management platform. From version 4.0.0-rc.1 to 4.7.0, a potential vulnerability exists in ZITADEL's password reset mechanism in login V2. ZITADEL utilizes the Forwarded or X-Forwarded-Host header from incoming requests to construct the URL for the password reset confirmation link. This link, containing a secret code, is then emailed to the user. This issue has been patched in version 4.7.1.",
+  "severity": "HIGH",
+  "sha256_hash": "1c3341201b26a9c849e3aa0a335fbf76652552867bbc08bddd7ff66bec5d898e",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29067"
+}

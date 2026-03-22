@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3353",
+  "ingested_at": "2026-03-22T07:54:49.388831+00:00",
+  "lang": "en",
+  "raw_text": "The Comment SPAM Wiper plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'API Key' setting in all versions up to, and including, 1.2.1. This is due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Administrator-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. This only affects multi-site installations and installations where unfiltered_html has been disabled.",
+  "severity": "MEDIUM",
+  "sha256_hash": "360f57c3b447b215f122b2c45aaa803ea7654c44b4ff0a2614352852f089f26b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3353"
+}

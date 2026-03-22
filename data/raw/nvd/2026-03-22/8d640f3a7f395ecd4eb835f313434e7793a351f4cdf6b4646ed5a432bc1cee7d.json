@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29856",
+  "ingested_at": "2026-03-22T07:54:47.622097+00:00",
+  "lang": "en",
+  "raw_text": "An issue in the VirtualHost configuration handling/parser component of aaPanel v7.57.0 allows attackers to cause a Regular Expression Denial of Service (ReDoS) via a crafted input.",
+  "severity": "HIGH",
+  "sha256_hash": "8d640f3a7f395ecd4eb835f313434e7793a351f4cdf6b4646ed5a432bc1cee7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 26,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29856"
+}

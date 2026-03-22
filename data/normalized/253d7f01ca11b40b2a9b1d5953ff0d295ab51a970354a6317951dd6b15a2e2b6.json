@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Software installed and run as a non-privileged user may conduct improper GPU system calls to gain write permission to read-only wrapped user-mode memory. This is caused by improper handling of the memory protections for the user-mode wrapped memory resource.",
+  "token_count": 39
+}

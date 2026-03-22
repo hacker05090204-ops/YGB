@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3265",
+  "ingested_at": "2026-03-22T07:54:32.874398+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in go2ismail Free-CRM up to b83c40a90726d5e58f0cc680ffdcaa28a03fb5d1. This affects an unknown part of the file /api/Security/ of the component Security API. The manipulation leads to improper authorization. The attack is possible to be carried out remotely. The exploit is publicly available and might be used. This product adopts a rolling release strategy to maintain continuous delivery. Therefore, version details for affected or updated releases cannot be specified. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a4b2c9709b2a96fdad6eedd0a5c7e1207de180b7e6c2c844ddbe41d6ee125419",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3265"
+}

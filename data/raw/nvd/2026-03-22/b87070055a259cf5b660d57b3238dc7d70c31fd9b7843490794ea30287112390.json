@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2021-35483",
+  "ingested_at": "2026-03-22T07:54:34.139724+00:00",
+  "lang": "en",
+  "raw_text": "The Applications component of Nokia IMPACT version through 19.11.2.10-20210118042150283 allows an authenticated user to arbitrarily upload JavaScript files via the /ui/rest-proxy/application fileupload parameter. This can occur during the adding of a new application, or during the editing of an existing one. If an authenticated user visits the web page where the file is published, the JavaScript code is executed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b87070055a259cf5b660d57b3238dc7d70c31fd9b7843490794ea30287112390",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 59,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2021-35483"
+}

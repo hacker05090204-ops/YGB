@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-20996",
+  "ingested_at": "2026-03-22T07:54:46.396569+00:00",
+  "lang": "en",
+  "raw_text": "Use of a broken or risky cryptographic algorithm in Smart Switch prior to version 3.7.69.15 allows remote attackers to configure a downgraded scheme for authentication.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "2ea9021b258326cbf6ebf8068f33e77f1ea27199a493898bffa11e460e5e62fc",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20996"
+}

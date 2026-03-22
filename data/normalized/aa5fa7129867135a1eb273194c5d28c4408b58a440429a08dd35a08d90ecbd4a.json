@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Pixel Google Pixel contains a possible out-of-bounds write due to a logic error in the code that could lead to local escalation of privilege.",
+  "token_count": 25
+}

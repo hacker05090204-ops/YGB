@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "TIBCO JasperReports TIBCO JasperReports Server contain a vulnerability which may allow any authenticated user read-only access to the contents of the web application, including key configuration files.",
+  "token_count": 27
+}

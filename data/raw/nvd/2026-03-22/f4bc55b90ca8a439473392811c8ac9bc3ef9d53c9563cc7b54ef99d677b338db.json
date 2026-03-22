@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33423",
+  "ingested_at": "2026-03-22T07:54:49.119245+00:00",
+  "lang": "en",
+  "raw_text": "Discourse is an open-source discussion platform. Prior to versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2, staff can modify any user's group notification level. Versions 2026.3.0-latest.1, 2026.2.1, and 2026.1.2 contain a patch. No known workarounds are available.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "f4bc55b90ca8a439473392811c8ac9bc3ef9d53c9563cc7b54ef99d677b338db",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33423"
+}

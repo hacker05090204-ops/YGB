@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26938",
+  "ingested_at": "2026-03-22T07:54:32.727097+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements Used in a Template Engine (CWE-1336) exists in Workflows in Kibana which could allow an attacker to read arbitrary files from the Kibana server filesystem, and perform Server-Side Request Forgery (SSRF) via Code Injection (CAPEC-242). This requires an authenticated user who has the workflowsManagement:executeWorkflow privilege.",
+  "severity": "HIGH",
+  "sha256_hash": "2856fbf5309fad37339bf57d1ec45afa9d8a7bc9acbf406db6465c47d74bcdfa",
+  "source": "nvd",
+  "tags": [
+    "CWE-1336"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26938"
+}

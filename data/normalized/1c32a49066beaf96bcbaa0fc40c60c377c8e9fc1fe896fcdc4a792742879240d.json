@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue was discovered in Lantronix EDS3000PS 3.1.0.0R2. The host parameter of the TFTP client in the Filesystem Browser page is not properly sanitized. This can be exploited to escape from the original command and execute an arbitrary one with root privileges.",
+  "token_count": 42
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25167",
+  "ingested_at": "2026-03-22T07:54:41.403873+00:00",
+  "lang": "en",
+  "raw_text": "Net-Billetterie 2.9 contains an SQL injection vulnerability in the login parameter of login.inc.php that allows unauthenticated attackers to execute arbitrary SQL queries. Attackers can submit malicious SQL code through the login POST parameter to extract database information including usernames, passwords, and system credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "6a0c2eec97a8a3433a9d42ce39770952ebb21bccdc04da74fde41263de18a86a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25167"
+}

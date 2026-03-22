@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Digiever DS-2105 Pro Digiever DS-2105 Pro contains a missing authorization vulnerability which could allow for command injection via time_tzsetup.cgi.",
+  "token_count": 19
+}

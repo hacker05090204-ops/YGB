@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27776",
+  "ingested_at": "2026-03-22T07:54:33.099814+00:00",
+  "lang": "en",
+  "raw_text": "IM-LogicDesigner module of intra-mart Accel Platform contains insecure deserialization issue. This can be exploited only when IM-LogicDesigner is deployed on the system. Arbitrary code may be executed when some crafted file is imported by a user with the administrative privilege.",
+  "severity": "HIGH",
+  "sha256_hash": "7269e714f8cc961ca8bd3a375c51a8455a41ca38eb34f4d97f5e5b87b5990115",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27776"
+}

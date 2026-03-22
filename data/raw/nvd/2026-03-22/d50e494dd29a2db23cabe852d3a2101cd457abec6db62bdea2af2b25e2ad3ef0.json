@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29105",
+  "ingested_at": "2026-03-22T07:54:48.316786+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 7.15.1 and 8.9.3, SuiteCRM contains an unauthenticated open redirect vulnerability in the WebToLead capture functionality. A user-supplied POST parameter is used as a redirect destination without validation, allowing attackers to redirect victims to arbitrary external websites. This vulnerability allows attackers to abuse the trusted SuiteCRM domain for phishing and social engineering attacks by redirecting users to malicious external websites. Versions 7.15.1 and 8.9.3 patch the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d50e494dd29a2db23cabe852d3a2101cd457abec6db62bdea2af2b25e2ad3ef0",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29105"
+}

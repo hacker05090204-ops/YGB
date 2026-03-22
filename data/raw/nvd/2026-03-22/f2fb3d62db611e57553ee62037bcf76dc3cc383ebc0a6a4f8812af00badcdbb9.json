@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3563",
+  "ingested_at": "2026-03-22T07:54:47.173282+00:00",
+  "lang": "en",
+  "raw_text": "Improper input validation in the apps and endpoints configuration in PowerShell Universal before 2026.1.4 allows an authenticated user with permissions to create or modify Apps or Endpoints to override existing application or system routes, resulting in unintended request routing and denial of service via a conflicting URL path.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f2fb3d62db611e57553ee62037bcf76dc3cc383ebc0a6a4f8812af00badcdbb9",
+  "source": "nvd",
+  "tags": [
+    "CWE-1289"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3563"
+}

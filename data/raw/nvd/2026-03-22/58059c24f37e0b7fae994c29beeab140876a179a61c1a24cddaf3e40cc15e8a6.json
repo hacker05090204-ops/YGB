@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3556",
+  "ingested_at": "2026-03-22T07:54:46.621685+00:00",
+  "lang": "en",
+  "raw_text": "Philips Hue Bridge HomeKit Pair-Setup Heap-based Buffer Overflow Remote Code Execution Vulnerability. This vulnerability allows network-adjacent attackers to execute arbitrary code on affected installations of Philips Hue Bridge. Authentication is not required to exploit this vulnerability. The specific flaw exists within the hk_hap_pair_storage_put function. The issue results from the lack of proper validation of the length of user-supplied data prior to copying it to a fixed-length heap-based buffer. An attacker can leverage this vulnerability to execute code in the context of the HomeKit service. Was ZDI-CAN-28326.",
+  "severity": "HIGH",
+  "sha256_hash": "58059c24f37e0b7fae994c29beeab140876a179a61c1a24cddaf3e40cc15e8a6",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3556"
+}

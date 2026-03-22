@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Multiple i-\u30d5\u30a3\u30eb\u30bf\u30fc products are configured with improper file access permission settings. Files may be created or overwritten in the system directory or backup directory by a non-administrative user.",
+  "token_count": 28
+}

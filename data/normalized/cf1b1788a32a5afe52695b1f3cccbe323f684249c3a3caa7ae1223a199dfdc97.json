@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ghost is a Node.js content management system. From version 5.101.6 to 6.19.2, incomplete CSRF protections around /session/verify made it possible to use OTCs in login sessions different from the requesting session. In some scenarios this might have made it easier for phishers to take over a Ghost site. This issue has been patched in version 6.19.3.",
+  "token_count": 56
+}

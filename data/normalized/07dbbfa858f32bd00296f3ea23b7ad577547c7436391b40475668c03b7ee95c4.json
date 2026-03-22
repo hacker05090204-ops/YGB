@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An issue was discovered in LBS in Samsung Mobile Processor Exynos 2200. There was no check for memory initialization within DL NAS Transport messages.",
+  "token_count": 24
+}

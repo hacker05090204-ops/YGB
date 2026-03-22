@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68002",
+  "ingested_at": "2026-03-22T07:54:30.062957+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in 100plugins Open User Map open-user-map allows Path Traversal.This issue affects Open User Map: from n/a through < = 1.4.16.",
+  "severity": "MEDIUM",
+  "sha256_hash": "193d3f33e8085c81358c36010ee5e5ce03b35a613599a0ae36bbacbdb4388831",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68002"
+}

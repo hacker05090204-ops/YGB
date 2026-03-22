@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SQL Injection vulnerability in \"imageserver\" module when processing C-FIND queries in CGM NETRAAD software allows attacker connected to PACS gaining access to database, including data processed by GCM CLININET software.This issue affects CGM NETRAAD with imageserver module in versions before 7.9.0.",
+  "token_count": 41
+}

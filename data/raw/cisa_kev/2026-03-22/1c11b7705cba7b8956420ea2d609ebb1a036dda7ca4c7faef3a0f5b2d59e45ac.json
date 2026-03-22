@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-33010",
+  "ingested_at": "2026-03-22T07:45:17.378032+00:00",
+  "lang": "en",
+  "raw_text": "Zyxel Multiple Firewalls Zyxel ATP, USG FLEX, USG FLEX 50(W), USG20(W)-VPN, VPN, and ZyWALL/USG firewalls contain a buffer overflow vulnerability in the ID processing function that could allow an unauthenticated attacker to cause denial-of-service (DoS) conditions and remote code execution on an affected device.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1c11b7705cba7b8956420ea2d609ebb1a036dda7ca4c7faef3a0f5b2d59e45ac",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

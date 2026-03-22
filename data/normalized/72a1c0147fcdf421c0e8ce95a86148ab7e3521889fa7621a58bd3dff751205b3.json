@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Smartbedded Meteobridge Smartbedded Meteobridge contains a command injection vulnerability that could allow remote unauthenticated attackers to gain arbitrary command execution with elevated privileges (root) on affected devices.",
+  "token_count": 27
+}

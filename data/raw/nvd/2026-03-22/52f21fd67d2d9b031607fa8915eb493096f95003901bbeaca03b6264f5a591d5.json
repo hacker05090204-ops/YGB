@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29069",
+  "ingested_at": "2026-03-22T07:54:34.599020+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 5.9.0-beta.2 and 4.17.0-beta.2, the actionSendActivationEmail() endpoint is accessible to unauthenticated users and does not require a permission check for pending users. An attacker with no prior access can trigger activation emails for any pending user account by knowing or guessing the user ID. If the attacker controls the target user\u2019s email address, they can activate the account and gain access to the system. This vulnerability is fixed in 5.9.0-beta.2 and 4.17.0-beta.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "52f21fd67d2d9b031607fa8915eb493096f95003901bbeaca03b6264f5a591d5",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29069"
+}

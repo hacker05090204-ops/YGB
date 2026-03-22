@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-32730",
+  "ingested_at": "2026-03-22T07:54:47.761786+00:00",
+  "lang": "en",
+  "raw_text": "ApostropheCMS is an open-source content management framework. Prior to version 4.28.0, the bearer token authentication middleware in `@apostrophecms/express/index.js` (lines 386-389) contains an incorrect MongoDB query that allows incomplete login tokens \u2014 where the password was verified but TOTP/MFA requirements were NOT \u2014 to be used as fully authenticated bearer tokens. This completely bypasses multi-factor authentication for any ApostropheCMS deployment using `@apostrophecms/login-totp` or any custom `afterPasswordVerified` login requirement. Version 4.28.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "7aec638e6c8cd318bda6b0429d2c61cd95350b3a37138a9c102f93e64ad11a87",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-305"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32730"
+}

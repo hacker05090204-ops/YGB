@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32387",
+  "ingested_at": "2026-03-22T07:54:45.997107+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Noor Alam Checkout for PayPal checkout-for-paypal allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Checkout for PayPal: from n/a through < = 1.0.46.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7f5656742b464d6e4f9f4db8d03c53ba8be3fb09b5132bc16f73d2c615431370",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32387"
+}

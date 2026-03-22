@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-9670",
+  "ingested_at": "2026-03-22T07:45:18.870275+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains an improper restriction of XML external entity (XXE) vulnerability in the mailboxd component.",
+  "severity": "CRITICAL",
+  "sha256_hash": "abf0ae15793a3dffa526536064bdf26244b84a66346044a826739b32fa1c6b1a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The GL-iNet Comet (GL-RM1) KVM connects to a GL-iNet site during boot-up to provision client and CA certificates. The GL-RM1 does not verify certificates used for this connection, allowing an attacker-in-the-middle to serve invalid client and CA certificates. The GL-RM1 will attempt to use the invalid certificates and fail to connect to the legitimate GL-iNet KVM cloud service.",
+  "token_count": 58
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-4253",
+  "ingested_at": "2026-03-22T07:54:46.914664+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Tenda AC8 16.03.50.11. This affects the function route_set_user_policy_rule of the file /cgi-bin/UploadCfg of the component Web Interface. The manipulation of the argument wans.policy.list1 results in os command injection. It is possible to launch the attack remotely. The exploit has been released to the public and may be used for attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "88570a327a7c0888e91a77ac8c160031ec683cf6df85fe24be9ae5c1c09b0516",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78",
+    "CWE-78"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4253"
+}

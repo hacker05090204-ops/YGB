@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70044",
+  "ingested_at": "2026-03-22T07:54:31.118289+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-295: Improper Certificate Validation was discovered in fofolee uTools-quickcommand 5.0.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "22f6810deeeecad8fc09088ce353b648a91deb99f6481e9c71c678aa7dac15b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70044"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in LoftOcean PatioTime patiotime allows Object Injection.This issue affects PatioTime: from n/a through < 2.1.",
+  "token_count": 20
+}

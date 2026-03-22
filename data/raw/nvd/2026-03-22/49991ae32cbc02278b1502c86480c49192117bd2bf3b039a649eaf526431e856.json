@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25785",
+  "ingested_at": "2026-03-22T07:54:31.969263+00:00",
+  "lang": "en",
+  "raw_text": "Path traversal vulnerability exists in Lanscope Endpoint Manager (On-Premises) Sub-Manager Server Ver.9.4.7.3 and earlier, which may allow an attacker to tamper with arbitrary files and execute arbitrary code on the affected system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "49991ae32cbc02278b1502c86480c49192117bd2bf3b039a649eaf526431e856",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25785"
+}

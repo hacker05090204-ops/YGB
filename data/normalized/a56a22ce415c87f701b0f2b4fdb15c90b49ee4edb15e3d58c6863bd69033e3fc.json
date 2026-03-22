@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A low-privileged remote attacker can exploit the ubr-editfile method in wwwubr.cgi, an undocumented and unused API endpoint to read arbitrary files on the system.",
+  "token_count": 24
+}

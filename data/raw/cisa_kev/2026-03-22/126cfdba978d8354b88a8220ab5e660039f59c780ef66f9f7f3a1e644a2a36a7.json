@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2010-2883",
+  "ingested_at": "2026-03-22T07:45:17.826524+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contain a stack-based buffer overflow vulnerability that allows remote attackers to execute code or cause denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "126cfdba978d8354b88a8220ab5e660039f59c780ef66f9f7f3a1e644a2a36a7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

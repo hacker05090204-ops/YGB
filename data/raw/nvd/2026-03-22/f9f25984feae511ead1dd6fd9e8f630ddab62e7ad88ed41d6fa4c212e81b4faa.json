@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1454",
+  "ingested_at": "2026-03-22T07:54:43.535840+00:00",
+  "lang": "en",
+  "raw_text": "The Responsive Contact Form Builder & Lead Generation Plugin plugin for WordPress is vulnerable to Stored Cross-Site Scripting in all versions up to, and including, 2.0.1 via form field submissions. This is due to insufficient input sanitization in the lfb_lead_sanitize() function which omits certain field types from its sanitization whitelist, combined with an overly permissive wp_kses() filter at output time that allows onclick attributes on anchor tags. This makes it possible for unauthenticated attackers to inject arbitrary web scripts in pages that will execute whenever an administrator views the lead entries in the WordPress dashboard.",
+  "severity": "HIGH",
+  "sha256_hash": "f9f25984feae511ead1dd6fd9e8f630ddab62e7ad88ed41d6fa4c212e81b4faa",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1454"
+}

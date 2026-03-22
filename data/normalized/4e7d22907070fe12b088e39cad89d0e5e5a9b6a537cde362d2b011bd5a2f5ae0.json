@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The web management interface of the device renders the passwords in a plaintext input field. The current password is directly visible to anyone with access to the UI, potentially exposing administrator credentials to unauthorized observation via shoulder surfing, screenshots, or browser form caching.",
+  "token_count": 43
+}

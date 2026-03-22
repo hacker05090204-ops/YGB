@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-16256",
+  "ingested_at": "2026-03-22T07:45:19.558778+00:00",
+  "lang": "en",
+  "raw_text": "SIMalliance Toolbox Browser SIMalliance Toolbox Browser contains an command injection vulnerability that could allow remote attackers to retrieve location and IMEI information or execute a range of other attacks by modifying the attack message.",
+  "severity": "CRITICAL",
+  "sha256_hash": "29b357cdfafbc8b19444aa48878a956a09264bfaec567e8199f386df408aa482",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

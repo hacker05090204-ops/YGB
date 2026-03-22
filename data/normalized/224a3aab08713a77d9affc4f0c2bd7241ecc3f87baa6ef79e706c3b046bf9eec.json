@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware ESXi VMware ESXi OpenSLP contains a use-after-free vulnerability that allows an attacker residing in the management network with access to port 427 to perform remote code execution.",
+  "token_count": 28
+}

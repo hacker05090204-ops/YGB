@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SEPPmail Secure Email Gateway before version 15.0.1 insufficiently neutralizes the PDF encryption password, allowing OS command execution.",
+  "token_count": 17
+}

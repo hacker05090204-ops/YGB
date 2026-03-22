@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29781",
+  "ingested_at": "2026-03-22T07:54:41.873930+00:00",
+  "lang": "en",
+  "raw_text": "Sliver is a command and control framework that uses a custom Wireguard netstack. In versions from 1.7.3 and prior, a vulnerability exists in the Sliver C2 server's Protobuf unmarshalling logic due to a systemic lack of nil-pointer validation. By extracting valid implant credentials and omitting nested fields in a signed message, an authenticated actor can trigger an unhandled runtime panic. Because the mTLS, WireGuard, and DNS transport layers lack the panic recovery middleware present in the HTTP transport, this results in a global process termination. While requiring post-authentication access (a captured implant), this flaw effectively acts as an infrastructure \"kill-switch,\" instantly severing all active sessions across the entire fleet and requiring a manual server restart to restore operations. At time of publication, there are no publicly available patches.",
+  "severity": "MEDIUM",
+  "sha256_hash": "29f43282715fc956558d7c14a11ed6b27f305c369554fdce2802c7b865fc78f3",
+  "source": "nvd",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 128,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29781"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-1130",
+  "ingested_at": "2026-03-22T07:45:18.788068+00:00",
+  "lang": "en",
+  "raw_text": "Apple OS X The XPC implementation in Admin Framework in Apple OS X before 10.10.3 allows local users to bypass authentication and obtain admin privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "db6e4ddea04b8713a4dca2feb572e73ca8d6013a17843c01ce8994592977b411",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

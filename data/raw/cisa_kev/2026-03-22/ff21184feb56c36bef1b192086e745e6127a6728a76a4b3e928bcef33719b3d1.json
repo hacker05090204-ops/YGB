@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-42856",
+  "ingested_at": "2026-03-22T07:45:17.557479+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS Apple iOS contains a type confusion vulnerability when processing maliciously crafted web content leading to code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff21184feb56c36bef1b192086e745e6127a6728a76a4b3e928bcef33719b3d1",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 19,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

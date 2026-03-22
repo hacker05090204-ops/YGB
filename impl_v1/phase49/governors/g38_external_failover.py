@@ -37,7 +37,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Tuple, Optional, List
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 # =============================================================================
@@ -106,7 +106,7 @@ def _generate_id(prefix: str) -> str:
 
 def _now_iso() -> str:
     """Current timestamp."""
-    return datetime.utcnow().isoformat() + "Z"
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 # =============================================================================

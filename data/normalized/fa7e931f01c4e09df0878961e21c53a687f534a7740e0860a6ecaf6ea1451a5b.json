@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PHP 5.3.x < 5.3.2 - 'ext/phar/stream.c' / 'ext/phar/dirstream.c' Multiple Format String Vulnerabilities",
+  "token_count": 12
+}

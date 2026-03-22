@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-5418",
+  "ingested_at": "2026-03-22T07:45:16.324865+00:00",
+  "lang": "en",
+  "raw_text": "Rails Ruby on Rails Rails Ruby on Rails contains a path traversal vulnerability in Action View. Specially crafted accept headers in combination with calls to `render file:` can cause arbitrary files on the target server to be rendered, disclosing the file contents.",
+  "severity": "CRITICAL",
+  "sha256_hash": "20358142a25214c135b79680643dbff5d3bf2e14196abdef51b6cf06c79cf1a2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 42,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

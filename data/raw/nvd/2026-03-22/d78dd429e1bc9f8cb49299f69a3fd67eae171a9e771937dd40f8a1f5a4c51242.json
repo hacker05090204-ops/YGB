@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1276",
+  "ingested_at": "2026-03-22T07:54:47.842195+00:00",
+  "lang": "en",
+  "raw_text": "IBM QRadar SIEM 7.5.0 through 7.5.0 Update Package 14 is vulnerable to cross-site scripting. This vulnerability allows an authenticated user to embed arbitrary JavaScript code in the Web UI thus altering the intended functionality potentially leading to credentials disclosure within a trusted session.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d78dd429e1bc9f8cb49299f69a3fd67eae171a9e771937dd40f8a1f5a4c51242",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1276"
+}

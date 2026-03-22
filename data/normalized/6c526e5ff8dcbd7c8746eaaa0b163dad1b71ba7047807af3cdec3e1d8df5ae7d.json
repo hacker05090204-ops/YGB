@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Small Business RV320 and RV325 Routers Cisco Small Business RV320 and RV325 Dual Gigabit WAN VPN Routers contain improper access controls for URLs. Exploitation could allow an attacker to download the router configuration or detailed diagnostic information.",
+  "token_count": 38
+}

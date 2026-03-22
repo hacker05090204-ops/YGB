@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-40602",
+  "ingested_at": "2026-03-22T07:45:16.002130+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SMA1000 appliance SonicWall SMA1000 contains a missing authorization vulnerability that could allow for privilege escalation appliance management console (AMC) of affected devices.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8232aed985dff51dd65d611ac5f6c8eb1aef11746f13a9650c9e4131498c945f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

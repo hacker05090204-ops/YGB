@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-13720",
+  "ingested_at": "2026-03-22T07:45:18.012264+00:00",
+  "lang": "en",
+  "raw_text": "Google Chrome WebAudio Google Chrome WebAudio contains a use-after-free vulnerability that allows a remote attacker to potentially exploit heap corruption via a crafted HTML page.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa7419774d3f34ab8601ad3a9c8ea11a9bee3ecf41d22ef38d3329481c9055f6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

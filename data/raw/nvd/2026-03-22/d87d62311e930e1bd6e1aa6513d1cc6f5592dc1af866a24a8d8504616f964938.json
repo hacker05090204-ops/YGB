@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22178",
+  "ingested_at": "2026-03-22T07:54:47.282713+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 construct RegExp objects directly from unescaped Feishu mention metadata in the stripBotMention function, allowing regex injection and denial of service. Attackers can craft nested-quantifier patterns or metacharacters in mention metadata to trigger catastrophic backtracking, block message processing, or remove unintended content before model processing.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d87d62311e930e1bd6e1aa6513d1cc6f5592dc1af866a24a8d8504616f964938",
+  "source": "nvd",
+  "tags": [
+    "CWE-1333"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22178"
+}

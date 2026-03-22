@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-0386",
+  "ingested_at": "2026-03-22T07:45:16.348230+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Linux Kernel contains an improper ownership management vulnerability, where unauthorized access to the execution of the setuid file with capabilities was found in the Linux kernel\u2019s OverlayFS subsystem in how a user copies a capable file from a nosuid mount into another mount. This uid mapping bug allows a local user to escalate their privileges on the system.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4b33540a9ab2622b42ce429efb818d49246ab03bc299c5697c9b0e1d4140c3f8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 60,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

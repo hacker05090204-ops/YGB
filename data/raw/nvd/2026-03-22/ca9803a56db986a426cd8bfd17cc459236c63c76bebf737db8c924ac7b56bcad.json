@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25450",
+  "ingested_at": "2026-03-22T07:54:30.983647+00:00",
+  "lang": "en",
+  "raw_text": "Dolibarr ERP/CRM 10.0.1 contains multiple SQL injection vulnerabilities that allow authenticated attackers to manipulate database queries by injecting SQL code through POST parameters. Attackers can inject malicious SQL through parameters like actioncode, demand_reason_id, and availability_id in card.php endpoints to extract sensitive database information using boolean-based blind, error-based, and time-based blind techniques.",
+  "severity": "HIGH",
+  "sha256_hash": "ca9803a56db986a426cd8bfd17cc459236c63c76bebf737db8c924ac7b56bcad",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25450"
+}

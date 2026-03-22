@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-2616",
+  "ingested_at": "2026-03-22T07:45:18.308539+00:00",
+  "lang": "en",
+  "raw_text": "Oracle BI Publisher (Formerly XML Publisher) Oracle BI Publisher, formerly XML Publisher, contains an unspecified vulnerability that allows for various unauthorized actions. Open-source reporting attributes this vulnerability to allowing for authentication bypass.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d09ab76fbfdb8701824c76c6c349f3a1b2fd2d2332b9efb6827e493c24502925",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

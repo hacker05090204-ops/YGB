@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-38606",
+  "ingested_at": "2026-03-22T07:45:17.295570+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and watchOS contain an unspecified vulnerability allowing an app to modify a sensitive kernel state.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4c3f93d586a7af7bbe108ae47dea86d08938eb25b6a7e57a91ea034bd5b06000",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

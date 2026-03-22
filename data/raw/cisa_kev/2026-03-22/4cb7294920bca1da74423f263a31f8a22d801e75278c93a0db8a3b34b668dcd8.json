@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-23209",
+  "ingested_at": "2026-03-22T07:45:16.576636+00:00",
+  "lang": "en",
+  "raw_text": "Craft CMS Craft CMS Craft CMS contains a code injection vulnerability caused by improper validation of the database backup path, ultimately enabling remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4cb7294920bca1da74423f263a31f8a22d801e75278c93a0db8a3b34b668dcd8",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

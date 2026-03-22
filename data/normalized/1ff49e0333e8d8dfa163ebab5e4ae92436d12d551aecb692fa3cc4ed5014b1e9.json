@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation (XSS or 'Cross-site Scripting') vulnerability in Pascal Birchler Preferred Languages allows DOM-Based XSS.This issue affects Preferred Languages: from n/a through 2.2.2.",
+  "token_count": 29
+}

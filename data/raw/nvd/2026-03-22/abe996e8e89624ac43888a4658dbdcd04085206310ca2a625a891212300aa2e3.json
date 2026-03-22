@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31896",
+  "ingested_at": "2026-03-22T07:54:43.883979+00:00",
+  "lang": "en",
+  "raw_text": "WeGIA is a web manager for charitable institutions. Prior to version 3.6.6, a critical SQL injection vulnerability exists in the WeGIA application. The remover_produto_ocultar.php script uses extract($_REQUEST) to populate local variables and then directly concatenates these variables into a SQL query executed via PDO::query. This allows an authenticated (or auth-bypassed) attacker to execute arbitrary SQL commands. This can be used to exfiltrate sensitive data from the database or, as demonstrated in this PoC, cause a time-based delay (denial of service). This vulnerability is fixed in 3.6.6.",
+  "severity": "CRITICAL",
+  "sha256_hash": "abe996e8e89624ac43888a4658dbdcd04085206310ca2a625a891212300aa2e3",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 86,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31896"
+}

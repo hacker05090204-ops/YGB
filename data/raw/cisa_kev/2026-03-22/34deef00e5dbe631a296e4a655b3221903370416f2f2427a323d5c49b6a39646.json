@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-34486",
+  "ingested_at": "2026-03-22T07:45:18.198515+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Event Tracing contains an unspecified vulnerability which can allow for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "34deef00e5dbe631a296e4a655b3221903370416f2f2427a323d5c49b6a39646",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Devome GRR v4.5.0 was discovered to contain multiple authenticated SQL injection vulnerabilities in the include/session.inc.php file via the referer and user-agent.",
+  "token_count": 21
+}

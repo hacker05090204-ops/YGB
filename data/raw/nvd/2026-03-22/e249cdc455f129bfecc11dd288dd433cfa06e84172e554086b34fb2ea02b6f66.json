@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30855",
+  "ingested_at": "2026-03-22T07:54:41.919023+00:00",
+  "lang": "en",
+  "raw_text": "WeKnora is an LLM-powered framework designed for deep document understanding and semantic retrieval. Prior to version 0.3.2, an authorization bypass in tenant management endpoints of WeKnora application allows any authenticated user to read, modify, or delete any tenant by ID. Since account registration is open to the public, this vulnerability allows any unauthenticated attacker to register an account and subsequently exploit the system. This enables cross-tenant account takeover and destruction, making the impact critical. This issue has been patched in version 0.3.2.",
+  "severity": "HIGH",
+  "sha256_hash": "e249cdc455f129bfecc11dd288dd433cfa06e84172e554086b34fb2ea02b6f66",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30855"
+}

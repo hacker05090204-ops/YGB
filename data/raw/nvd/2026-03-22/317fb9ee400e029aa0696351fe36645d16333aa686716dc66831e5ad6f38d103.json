@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28696",
+  "ingested_at": "2026-03-22T07:54:34.583275+00:00",
+  "lang": "en",
+  "raw_text": "Craft is a content management system (CMS). Prior to 4.17.0-beta.1 and 5.9.0-beta.1, the GraphQL directive @parseRefs, intended to parse internal reference tags (e.g., {user:1:email}), can be abused by both authenticated users and unauthenticated guests (if a Public Schema is enabled) to access sensitive attributes of any element in the CMS. The implementation in Elements::parseRefs fails to perform authorization checks, allowing attackers to read data they are not authorized to view. This vulnerability is fixed in 4.17.0-beta.1 and 5.9.0-beta.1.",
+  "severity": "HIGH",
+  "sha256_hash": "317fb9ee400e029aa0696351fe36645d16333aa686716dc66831e5ad6f38d103",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 78,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28696"
+}

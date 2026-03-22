@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3437",
+  "ingested_at": "2026-03-22T07:54:34.175130+00:00",
+  "lang": "en",
+  "raw_text": "An Improper Restriction of Operations within the Bounds of a Memory Buffer vulnerability in Portwell Engineering Toolkits version 4.8.2 could allow a local authenticated attacker to read and write to arbitrary memory via the Portwell Engineering Toolkits driver. Successful exploitation of this vulnerability could result in escalation of privileges or cause a denial-of-service condition.",
+  "severity": "HIGH",
+  "sha256_hash": "d5bfe439387ed8c1ca2fa539a38e561bce785dff098952325898189f8cfdb59b",
+  "source": "nvd",
+  "tags": [
+    "CWE-119"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3437"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32376",
+  "ingested_at": "2026-03-22T07:54:45.973946+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in raratheme Kalon kalon allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Kalon: from n/a through < = 1.2.9.",
+  "severity": "MEDIUM",
+  "sha256_hash": "cd95fa380e159e298095780f5394c9bea31f5d7b4b755470bf7c41f97fdf40b8",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32376"
+}

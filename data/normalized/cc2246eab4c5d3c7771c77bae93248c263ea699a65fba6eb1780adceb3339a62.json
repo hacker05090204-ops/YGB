@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) contain a command injection vulnerability, which can allow an unauthenticated attacker to inject commands that are run as a site user.",
+  "token_count": 39
+}

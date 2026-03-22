@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper trust boundary enforcement in Kiro IDE before version 0.8.0 on all supported platforms might allow a remote unauthenticated threat actor to execute arbitrary code via maliciously crafted project directory files that bypass workspace trust protections when a local user opens the directory. To remediate this issue, users should upgrade to version 0.8.0 or higher.",
+  "token_count": 55
+}

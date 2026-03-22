@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3839",
+  "ingested_at": "2026-03-22T07:54:46.639482+00:00",
+  "lang": "en",
+  "raw_text": "Unraid Authentication Request Path Traversal Authentication Bypass Vulnerability. This vulnerability allows remote attackers to bypass authentication on affected installations of Unraid. Authentication is not required to exploit this vulnerability. The specific flaw exists within the auth-request.php file. The issue results from the lack of proper validation of a user-supplied path prior to using it in authentications. An attacker can leverage this vulnerability to bypass authentication on the system. Was ZDI-CAN-28912.",
+  "severity": "HIGH",
+  "sha256_hash": "f7f703881978a5148ab5be56e98ec019db38ce11c6dc0871b1f5ee4296ee9ad9",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3839"
+}

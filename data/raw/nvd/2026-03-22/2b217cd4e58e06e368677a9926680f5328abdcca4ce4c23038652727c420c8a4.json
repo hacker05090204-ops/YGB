@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2023-43010",
+  "ingested_at": "2026-03-22T07:54:44.131167+00:00",
+  "lang": "en",
+  "raw_text": "The issue was addressed with improved memory handling. This issue is fixed in iOS 17.2 and iPadOS 17.2, macOS Sonoma 14.2, Safari 17.2, iOS 16.7.15 and iPadOS 16.7.15, iOS 15.8.7 and iPadOS 15.8.7. Processing maliciously crafted web content may lead to memory corruption.",
+  "severity": "HIGH",
+  "sha256_hash": "2b217cd4e58e06e368677a9926680f5328abdcca4ce4c23038652727c420c8a4",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2023-43010"
+}

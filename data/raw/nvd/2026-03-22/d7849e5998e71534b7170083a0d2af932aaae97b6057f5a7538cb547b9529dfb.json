@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4356",
+  "ingested_at": "2026-03-22T07:54:47.323156+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in itsourcecode University Management System 1.0. Affected is an unknown function of the file /add_result.php. Executing a manipulation of the argument vr can lead to cross site scripting. The attack may be launched remotely. The exploit has been published and may be used.",
+  "severity": "LOW",
+  "sha256_hash": "d7849e5998e71534b7170083a0d2af932aaae97b6057f5a7538cb547b9529dfb",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4356"
+}

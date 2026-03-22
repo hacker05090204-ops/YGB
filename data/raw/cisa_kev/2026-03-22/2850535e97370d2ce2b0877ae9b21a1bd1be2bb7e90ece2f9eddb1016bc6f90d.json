@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-3163",
+  "ingested_at": "2026-03-22T07:45:17.468957+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a memory corruption vulnerability that allows remote attackers to execute code or cause a denial of service via a crafted website.",
+  "severity": "CRITICAL",
+  "sha256_hash": "2850535e97370d2ce2b0877ae9b21a1bd1be2bb7e90ece2f9eddb1016bc6f90d",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Prettier eslint-config-prettier Prettier eslint-config-prettier contains an embedded malicious code vulnerability. Installing an affected package executes an install.js file that launches the node-gyp.dll malware on Windows.",
+  "token_count": 25
+}

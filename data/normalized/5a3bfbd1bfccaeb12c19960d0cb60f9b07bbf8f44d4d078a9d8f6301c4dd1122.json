@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker can use firmware images to extract password hashes and brute force plaintext passwords of accounts with limited access.",
+  "token_count": 22
+}

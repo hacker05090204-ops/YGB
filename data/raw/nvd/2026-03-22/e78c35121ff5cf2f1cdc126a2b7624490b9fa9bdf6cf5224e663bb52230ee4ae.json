@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32124",
+  "ingested_at": "2026-03-22T07:54:44.006916+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, the dynamic code picker AJAX endpoint returns code descriptions (code_text) that are rendered in the front end (e.g. DataTables) without HTML escaping. If an administrator (or user with code management rights) creates or edits a code with a malicious description containing script, that script runs in the browser of every user who uses the picker. This vulnerability is fixed in 8.0.0.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e78c35121ff5cf2f1cdc126a2b7624490b9fa9bdf6cf5224e663bb52230ee4ae",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32124"
+}

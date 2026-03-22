@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-54068",
+  "ingested_at": "2026-03-22T07:45:15.824949+00:00",
+  "lang": "en",
+  "raw_text": "Laravel Livewire Laravel Livewire contain a code injection vulnerability that could allow unauthenticated attackers to achieve remote command execution in specific scenarios.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9fd760f749ca06df01d8e06671d52872bcab96cc01c0f988018434057e48336c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

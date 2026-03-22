@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-27860",
+  "ingested_at": "2026-03-22T07:45:18.894956+00:00",
+  "lang": "en",
+  "raw_text": "FatPipe WARP, IPVPN, and MPVPN software A vulnerability in the web management interface of FatPipe WARP, IPVPN, and MPVPN software allows a remote, unauthenticated attacker to upload a file to any location on the filesystem.",
+  "severity": "CRITICAL",
+  "sha256_hash": "54754b535c4c1164f921f1f39bdcece86629fbcc822597e7038b6a1a00fa57ba",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 35,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

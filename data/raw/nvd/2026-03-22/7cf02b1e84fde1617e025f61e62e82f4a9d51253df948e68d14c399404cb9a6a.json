@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29783",
+  "ingested_at": "2026-03-22T07:54:41.539762+00:00",
+  "lang": "en",
+  "raw_text": "The shell tool within GitHub Copilot CLI versions prior to and including 0.0.422 can allow arbitrary code execution through crafted bash parameter expansion patterns. An attacker who can influence the commands executed by the agent (e.g., via prompt injection through repository files, MCP server responses, or user instructions) can exploit bash parameter transformation operators to execute hidden commands, bypassing the safety assessment that classifies commands as \"read-only.\" This has been patched in version 0.0.423. The vulnerability stems from how the CLI's shell safety assessment evaluates commands before execution. The safety layer parses and classifies shell commands as either read-only (safe) or write-capable (requires user approval). However, several bash parameter expansion features can embed executable code within arguments to otherwise read-only commands, causing them to appear safe while actually performing arbitrary operations. The specific dangerous patterns are ${var@P}, ${var=value} / ${var:=value}, ${!var}, and nested $(cmd) or < (cmd) inside ${...} expansions. An attacker who can influence command text sent to the shell tool - for example, through prompt injection via malicious repository content (README files, code comments, issue bodies), compromised or malicious MCP server responses, or crafted user instructions containing obfuscated commands - could achieve arbitrary code execution on the user's workstation. This is possible even in permission modes that require user approval for write operations, since the commands can appear to use only read-only utilities to ultimately trigger write operations. Successful exploitation could lead to data exfiltration, file modification, or further system compromise.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "7cf02b1e84fde1617e025f61e62e82f4a9d51253df948e68d14c399404cb9a6a",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 243,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29783"
+}

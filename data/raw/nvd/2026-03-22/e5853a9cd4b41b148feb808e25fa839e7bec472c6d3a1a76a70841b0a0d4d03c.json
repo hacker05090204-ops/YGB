@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-30840",
+  "ingested_at": "2026-03-22T07:54:41.767747+00:00",
+  "lang": "en",
+  "raw_text": "Wallos is an open-source, self-hostable personal subscription tracker. Prior to version 4.6.2, there is a server-side request forgery vulnerability in notification testers. This issue has been patched in version 4.6.2.",
+  "severity": "HIGH",
+  "sha256_hash": "e5853a9cd4b41b148feb808e25fa839e7bec472c6d3a1a76a70841b0a0d4d03c",
+  "source": "nvd",
+  "tags": [
+    "CWE-295",
+    "CWE-918"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30840"
+}

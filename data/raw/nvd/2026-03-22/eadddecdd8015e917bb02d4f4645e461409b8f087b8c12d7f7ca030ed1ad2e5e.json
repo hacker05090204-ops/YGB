@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0047",
+  "ingested_at": "2026-03-22T07:54:33.953991+00:00",
+  "lang": "en",
+  "raw_text": "In dumpBitmapsProto of ActivityManagerService.java, there is a possible way for an app to access private information due to a missing permission check. This could lead to local escalation of privilege with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "HIGH",
+  "sha256_hash": "eadddecdd8015e917bb02d4f4645e461409b8f087b8c12d7f7ca030ed1ad2e5e",
+  "source": "nvd",
+  "tags": [
+    "CWE-280"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0047"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "fr",
+  "raw_text": "PHP 4.4.5/4.4.6 - 'session_decode()' Double-Free (PoC)",
+  "token_count": 6
+}

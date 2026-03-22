@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68032",
+  "ingested_at": "2026-03-22T07:54:30.085032+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Passionate Brains Advanced WC Analytics advance-wc-analytics allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Advanced WC Analytics: from n/a through < = 3.19.0.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3b4f0d0ed4637557f429163550d938df11e6d1c158efc3d322d57cc448392607",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68032"
+}

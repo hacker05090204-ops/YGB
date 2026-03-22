@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27382",
+  "ingested_at": "2026-03-22T07:54:40.252585+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in RadiusTheme Metro metro allows DOM-Based XSS.This issue affects Metro: from n/a through < = 2.13.",
+  "severity": "HIGH",
+  "sha256_hash": "c2f25d28eb1c7c22e0d8a66db21369ce58e0d3e4b00a32d98e5bbd210ac28d24",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27382"
+}

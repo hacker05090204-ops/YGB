@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28361",
+  "ingested_at": "2026-03-22T07:54:33.795310+00:00",
+  "lang": "en",
+  "raw_text": "NocoDB is software for building databases as spreadsheets. Prior to version 0.301.3, the MCP token service did not validate token ownership, allowing a Creator within the same base to read, regenerate, or delete another user's MCP tokens if the token ID was known. This issue has been patched in version 0.301.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4d82ebb694dbf0c54f74af41020a9c6ace023e947bbf9ce962a68536a8251575",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28361"
+}

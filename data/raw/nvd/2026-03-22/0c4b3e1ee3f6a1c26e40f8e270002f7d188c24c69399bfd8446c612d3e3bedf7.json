@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32116",
+  "ingested_at": "2026-03-22T07:54:44.426780+00:00",
+  "lang": "en",
+  "raw_text": "Magic Wormhole makes it possible to get arbitrary-sized files and directories from one computer to another. From 0.21.0 to before 0.23.0, receiving a file (wormhole receive) from a malicious party could result in overwriting critical local files, including ~/.ssh/authorized_keys and .bashrc. This could be used to compromise the receiver's computer. Only the sender of the file (the party who runs wormhole send) can mount the attack. Other parties (including the transit/relay servers) are excluded by the wormhole protocol. This vulnerability is fixed in 0.23.0.",
+  "severity": "HIGH",
+  "sha256_hash": "0c4b3e1ee3f6a1c26e40f8e270002f7d188c24c69399bfd8446c612d3e3bedf7",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32116"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1914",
+  "ingested_at": "2026-03-22T07:54:49.322080+00:00",
+  "lang": "en",
+  "raw_text": "The FuseDesk plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's fusedesk_newcase shortcode in all versions up to, and including, 6.8 due to insufficient input sanitization and output escaping on the 'emailtext' attribute. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a00c703f9922c83a8d21e28c4d9c4a4b3ea17621d3d4d88974d17cff5d243233",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1914"
+}

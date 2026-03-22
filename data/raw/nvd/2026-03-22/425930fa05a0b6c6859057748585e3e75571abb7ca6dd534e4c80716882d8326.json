@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2722",
+  "ingested_at": "2026-03-22T07:54:41.720527+00:00",
+  "lang": "en",
+  "raw_text": "The Stock Ticker plugin for WordPress is vulnerable to Stored Cross-Site Scripting via admin settings in all versions up to, and including, 3.26.1 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with administrator-level permissions and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page. This only affects multi-site installations and installations where unfiltered_html has been disabled.",
+  "severity": "MEDIUM",
+  "sha256_hash": "425930fa05a0b6c6859057748585e3e75571abb7ca6dd534e4c80716882d8326",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2722"
+}

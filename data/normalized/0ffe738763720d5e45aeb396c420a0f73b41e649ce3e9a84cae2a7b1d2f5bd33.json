@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in BoldThemes Travelicious travelicious allows Object Injection.This issue affects Travelicious: from n/a through < 1.6.7.",
+  "token_count": 20
+}

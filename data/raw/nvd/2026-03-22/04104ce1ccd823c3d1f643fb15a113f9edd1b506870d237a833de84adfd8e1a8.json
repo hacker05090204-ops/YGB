@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-25277",
+  "ingested_at": "2026-03-22T07:54:46.320775+00:00",
+  "lang": "en",
+  "raw_text": "in OpenHarmony v5.1.0 and prior versions allow a local attacker arbitrary code execution in pre-installed apps through using incompatible type. This vulnerability can be exploited only in restricted scenarios.",
+  "severity": "MEDIUM",
+  "sha256_hash": "04104ce1ccd823c3d1f643fb15a113f9edd1b506870d237a833de84adfd8e1a8",
+  "source": "nvd",
+  "tags": [
+    "CWE-843"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-25277"
+}

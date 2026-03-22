@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28451",
+  "ingested_at": "2026-03-22T07:54:41.031053+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.14 contain server-side request forgery vulnerabilities in the Feishu extension that allow attackers to fetch attacker-controlled remote URLs without SSRF protections via sendMediaFeishu function and markdown image processing. Attackers can influence tool calls through direct manipulation or prompt injection to trigger requests to internal services and re-upload responses as Feishu media.",
+  "severity": "HIGH",
+  "sha256_hash": "9c26d4b2cb7e6cc8374b46dd059e24b092d1bd5c2431878545594fbadf55578e",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28451"
+}

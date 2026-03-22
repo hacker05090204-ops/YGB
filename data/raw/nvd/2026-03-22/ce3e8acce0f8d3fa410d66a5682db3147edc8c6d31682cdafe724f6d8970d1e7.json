@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2015-20113",
+  "ingested_at": "2026-03-22T07:54:46.212467+00:00",
+  "lang": "en",
+  "raw_text": "Next Click Ventures RealtyScript 4.0.2 contains cross-site request forgery and persistent cross-site scripting vulnerabilities that allow attackers to perform administrative actions and inject malicious scripts. Attackers can craft malicious web pages that execute unauthorized actions when logged-in users visit them, or inject persistent scripts that execute in the application context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ce3e8acce0f8d3fa410d66a5682db3147edc8c6d31682cdafe724f6d8970d1e7",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2015-20113"
+}

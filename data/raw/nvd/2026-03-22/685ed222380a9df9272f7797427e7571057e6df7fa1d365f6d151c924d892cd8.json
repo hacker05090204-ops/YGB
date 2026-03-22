@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28474",
+  "ingested_at": "2026-03-22T07:54:41.079064+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw's Nextcloud Talk plugin versions prior to 2026.2.6 accept equality matching on the mutable actor.name display name field for allowlist validation, allowing attackers to bypass DM and room allowlists. An attacker can change their Nextcloud display name to match an allowlisted user ID and gain unauthorized access to restricted conversations.",
+  "severity": "CRITICAL",
+  "sha256_hash": "685ed222380a9df9272f7797427e7571057e6df7fa1d365f6d151c924d892cd8",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28474"
+}

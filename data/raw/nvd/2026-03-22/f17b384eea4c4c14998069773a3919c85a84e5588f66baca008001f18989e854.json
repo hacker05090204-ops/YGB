@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28045",
+  "ingested_at": "2026-03-22T07:54:40.462359+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX N7 | Golf Club Sports & Events n7-golf-club allows PHP Local File Inclusion.This issue affects N7 | Golf Club Sports & Events: from n/a through < = 2.16.0.",
+  "severity": "HIGH",
+  "sha256_hash": "f17b384eea4c4c14998069773a3919c85a84e5588f66baca008001f18989e854",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28045"
+}

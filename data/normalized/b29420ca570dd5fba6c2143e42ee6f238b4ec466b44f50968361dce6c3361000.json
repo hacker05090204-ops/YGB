@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in loopus WP Attractive Donations System - Easy Stripe & Paypal donations WP_AttractiveDonationsSystem allows Blind SQL Injection.This issue affects WP Attractive Donations System - Easy Stripe & Paypal donations: from n/a through < = 1.25.",
+  "token_count": 48
+}

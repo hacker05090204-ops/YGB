@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Commerce and Magento Adobe Commerce and Magento Open Source contain an improper input validation vulnerability that could allow an attacker to take over customer accounts through the Commerce REST API.",
+  "token_count": 31
+}

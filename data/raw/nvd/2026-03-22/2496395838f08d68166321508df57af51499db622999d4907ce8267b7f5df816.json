@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2018-25171",
+  "ingested_at": "2026-03-22T07:54:41.415388+00:00",
+  "lang": "en",
+  "raw_text": "EdTv 2 contains an SQL injection vulnerability that allows unauthenticated attackers to execute arbitrary SQL queries by injecting malicious code through the 'id' parameter. Attackers can send GET requests to the admin/edit_source endpoint with crafted SQL UNION statements to extract database information including schema names, user credentials, and version details.",
+  "severity": "HIGH",
+  "sha256_hash": "2496395838f08d68166321508df57af51499db622999d4907ce8267b7f5df816",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2018-25171"
+}

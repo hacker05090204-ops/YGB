@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67995",
+  "ingested_at": "2026-03-22T07:54:30.052559+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in LoftOcean PatioTime patiotime allows Object Injection.This issue affects PatioTime: from n/a through < 2.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4175941ee1224b9ac3e8ce2d82dddd1722646c154ca844a5dcdaddcd294eff1c",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67995"
+}

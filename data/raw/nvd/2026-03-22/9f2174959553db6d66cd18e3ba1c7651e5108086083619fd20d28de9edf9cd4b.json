@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-68277",
+  "ingested_at": "2026-03-22T07:54:31.828960+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 7.0.4, when a link is sent via Secure Messaging, clicking the link opens the website within the OpenEMR/Portal site. This behavior could be exploited for phishing. Version 7.0.4 patches the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9f2174959553db6d66cd18e3ba1c7651e5108086083619fd20d28de9edf9cd4b",
+  "source": "nvd",
+  "tags": [
+    "CWE-451"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-68277"
+}

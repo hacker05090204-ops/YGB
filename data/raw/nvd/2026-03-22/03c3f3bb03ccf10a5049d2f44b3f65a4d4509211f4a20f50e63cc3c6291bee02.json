@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22201",
+  "ingested_at": "2026-03-22T07:54:44.620158+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains an IP spoofing vulnerability in the getIP() function that allows attackers to bypass IP-based rate limiting and ban enforcement by trusting untrusted HTTP headers. Attackers can set HTTP_CLIENT_IP or HTTP_X_FORWARDED_FOR headers to spoof their IP address and circumvent security controls.",
+  "severity": "MEDIUM",
+  "sha256_hash": "03c3f3bb03ccf10a5049d2f44b3f65a4d4509211f4a20f50e63cc3c6291bee02",
+  "source": "nvd",
+  "tags": [
+    "CWE-348"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22201"
+}

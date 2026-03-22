@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27521",
+  "ingested_at": "2026-03-22T07:54:31.679038+00:00",
+  "lang": "en",
+  "raw_text": "Binardat 10G08-0800GSM network switch firmware version V300SP10260209 and prior do not implement rate limiting or account lockout on failed login attempts, enabling brute-force attacks against user credentials.",
+  "severity": "HIGH",
+  "sha256_hash": "5a7d88fcbed0d16075180fbdf3cb158a974dff7e983f5bd0b31ff68e259c1c73",
+  "source": "nvd",
+  "tags": [
+    "CWE-307"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27521"
+}

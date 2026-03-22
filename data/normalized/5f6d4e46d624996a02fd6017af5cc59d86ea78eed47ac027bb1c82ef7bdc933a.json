@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Gutena Forms WordPress plugin before 1.6.1 does not validate option to be updated, which could allow contributors and above role to update arbitrary boolean and array options (such as users_can_register).",
+  "token_count": 31
+}

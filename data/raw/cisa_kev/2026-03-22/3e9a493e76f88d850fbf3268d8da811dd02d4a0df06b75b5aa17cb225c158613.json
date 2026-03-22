@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-5122",
+  "ingested_at": "2026-03-22T07:45:18.122036+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Use-after-free vulnerability in the DisplayObject class in the ActionScript 3 (AS3) implementation in Adobe Flash Player allows remote attackers to execute code or cause a denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "3e9a493e76f88d850fbf3268d8da811dd02d4a0df06b75b5aa17cb225c158613",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

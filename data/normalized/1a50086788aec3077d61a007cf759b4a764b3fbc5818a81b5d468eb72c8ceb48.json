@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Memu Play 6.0.7 contains an insecure file permissions vulnerability that allows low-privilege users to escalate privileges by replacing the MemuService.exe executable. Attackers can rename and overwrite MemuService.exe in the installation directory with a malicious executable, which executes with system-level privileges when the service restarts after a computer reboot.",
+  "token_count": 48
+}

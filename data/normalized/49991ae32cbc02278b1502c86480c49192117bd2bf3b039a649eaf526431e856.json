@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Path traversal vulnerability exists in Lanscope Endpoint Manager (On-Premises) Sub-Manager Server Ver.9.4.7.3 and earlier, which may allow an attacker to tamper with arbitrary files and execute arbitrary code on the affected system.",
+  "token_count": 32
+}

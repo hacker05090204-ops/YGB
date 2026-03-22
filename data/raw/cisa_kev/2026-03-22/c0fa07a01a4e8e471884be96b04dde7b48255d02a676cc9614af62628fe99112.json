@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-3398",
+  "ingested_at": "2026-03-22T07:45:19.073592+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Server and Data Center Atlassian Confluence Server and Data Center contain a path traversal vulnerability in the downloadallattachments resource that may allow a privileged, remote attacker to write files. Exploitation can lead to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c0fa07a01a4e8e471884be96b04dde7b48255d02a676cc9614af62628fe99112",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

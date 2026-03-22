@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25435",
+  "ingested_at": "2026-03-22T07:54:30.623838+00:00",
+  "lang": "en",
+  "raw_text": "Sricam DeviceViewer 3.12.0.1 contains a local buffer overflow vulnerability in the user management add user function that allows authenticated attackers to execute arbitrary code by bypassing data execution prevention. Attackers can inject a malicious payload through the Username field in User Management to trigger a stack-based buffer overflow and execute commands via ROP chain gadgets.",
+  "severity": "HIGH",
+  "sha256_hash": "7564cfd33a597c15eafaea5d58e6431ed0f52bbe8d5ce1dba3fdf8c4c3b78134",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25435"
+}

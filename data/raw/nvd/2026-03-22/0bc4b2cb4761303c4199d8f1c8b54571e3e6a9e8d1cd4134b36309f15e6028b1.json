@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4064",
+  "ingested_at": "2026-03-22T07:54:47.174805+00:00",
+  "lang": "en",
+  "raw_text": "Missing authorization checks on multiple gRPC service endpoints in PowerShell Universal before 2026.1.4 allows an authenticated user with any valid token to bypass role-based access controls and perform privileged operations \u2014 including reading sensitive data, creating or deleting resources, and disrupting service operations \u2014 via crafted gRPC requests.",
+  "severity": "HIGH",
+  "sha256_hash": "0bc4b2cb4761303c4199d8f1c8b54571e3e6a9e8d1cd4134b36309f15e6028b1",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4064"
+}

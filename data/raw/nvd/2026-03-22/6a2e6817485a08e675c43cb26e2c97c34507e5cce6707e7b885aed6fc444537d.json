@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29023",
+  "ingested_at": "2026-03-22T07:54:42.343819+00:00",
+  "lang": "en",
+  "raw_text": "Keygraph Shannon contains a hard-coded API key in its router configuration that, when the router component is enabled and exposed, allows network attackers to authenticate using the publicly known static key. An attacker able to reach the router port can proxy requests through the Shannon instance using the victim\u2019s configured upstream provider API credentials, resulting in unauthorized API usage and potential disclosure of proxied request and response data. This vulnerability's general exploitability has been mitigated with the introduction of commit 023cc95.",
+  "severity": "HIGH",
+  "sha256_hash": "6a2e6817485a08e675c43cb26e2c97c34507e5cce6707e7b885aed6fc444537d",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 81,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29023"
+}

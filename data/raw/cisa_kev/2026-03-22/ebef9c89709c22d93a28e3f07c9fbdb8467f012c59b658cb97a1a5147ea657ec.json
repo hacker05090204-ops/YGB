@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-21674",
+  "ingested_at": "2026-03-22T07:45:17.552476+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Advanced Local Procedure Call (ALPC) contains an unspecified vulnerability that allows for privilege escalation.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ebef9c89709c22d93a28e3f07c9fbdb8467f012c59b658cb97a1a5147ea657ec",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

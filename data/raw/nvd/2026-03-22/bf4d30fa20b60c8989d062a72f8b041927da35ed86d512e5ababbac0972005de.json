@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1369",
+  "ingested_at": "2026-03-22T07:54:30.932559+00:00",
+  "lang": "en",
+  "raw_text": "The Conditional CAPTCHA WordPress plugin through 4.0.0 does not validate a parameter before redirecting the user to its value, leading to an Open Redirect issue",
+  "severity": "MEDIUM",
+  "sha256_hash": "bf4d30fa20b60c8989d062a72f8b041927da35ed86d512e5ababbac0972005de",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 25,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1369"
+}

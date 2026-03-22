@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26001",
+  "ingested_at": "2026-03-22T07:54:47.223749+00:00",
+  "lang": "en",
+  "raw_text": "The GLPI Inventory Plugin handles network discovery, inventory, software deployment, and data collection for GLPI agents. Prior to 1.6.6, non sanitized user input can lend to an SQL injection from reports, with adequate rights. This vulnerability is fixed in 1.6.6.",
+  "severity": "HIGH",
+  "sha256_hash": "e9f442773514b84b447834aa03ba3e6383225b7ab6f504d9c50981990bf8c22c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 40,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26001"
+}

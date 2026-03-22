@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in SourceCodester Sales and Inventory System 1.0. This affects an unknown part of the file purchase_invoice.php of the component GET Parameter Handler. The manipulation of the argument purchaseid results in sql injection. The attack may be performed from remote. The exploit has been made public and could be used.",
+  "token_count": 53
+}

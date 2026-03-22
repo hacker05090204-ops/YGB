@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32805",
+  "ingested_at": "2026-03-22T07:54:47.777471+00:00",
+  "lang": "en",
+  "raw_text": "Romeo gives the capability to reach high code coverage of Go \u22651.20 apps by helping to measure code coverage for functional and integration tests within GitHub Actions. Prior to version 0.2.2, the `sanitizeArchivePath` function in `webserver/api/v1/decoder.go` (lines 80-88) is vulnerable to a path traversal bypass due to a missing trailing path separator in the `strings.HasPrefix` check. A crafted tar archive can write files outside the intended destination directory. Version 0.2.2 fixes the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "67a310b2997111958378c40610863f04dd050d16af4942f8b05b083c01ff0de1",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32805"
+}

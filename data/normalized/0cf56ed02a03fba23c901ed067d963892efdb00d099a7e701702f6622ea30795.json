@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Hammas Calendar plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'apix' parameter in the 'hp-calendar-manage-redirect' shortcode in all versions up to, and including, 1.5.11 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "token_count": 65
+}

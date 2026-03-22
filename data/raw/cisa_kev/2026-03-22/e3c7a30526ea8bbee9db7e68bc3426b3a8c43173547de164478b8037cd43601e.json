@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-11899",
+  "ingested_at": "2026-03-22T07:45:18.515800+00:00",
+  "lang": "en",
+  "raw_text": "Treck TCP/IP stack IPv6 The Treck TCP/IP stack contains an IPv6 out-of-bounds read vulnerability.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e3c7a30526ea8bbee9db7e68bc3426b3a8c43173547de164478b8037cd43601e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 14,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

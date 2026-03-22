@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Qool CMS contains multiple persistent cross-site scripting vulnerabilities in several administrative scripts where POST parameters are not properly sanitized before being stored and returned to users. Attackers can inject malicious JavaScript code through parameters like 'title', 'name', 'email', 'username', 'link', and 'task' in endpoints such as addnewtype, addnewdatafield, addmenu, addusergroup, addnewuserfield, adduser, addgeneraldata, and addcontentitem to execute arbitrary scripts in administrator browsers.",
+  "token_count": 62
+}

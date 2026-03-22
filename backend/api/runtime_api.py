@@ -32,7 +32,6 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
 
 TELEMETRY_PATH = os.path.join(PROJECT_ROOT, 'reports', 'training_telemetry.json')
-HMAC_KEY_PATH = os.path.join(PROJECT_ROOT, 'config', 'hmac_secret.key')
 LAST_SEEN_PATH = os.path.join(PROJECT_ROOT, 'reports', 'last_seen_timestamp.json')
 EXPECTED_SCHEMA_VERSION = 1
 EXPECTED_HMAC_VERSION = 4  # Emergency rotation: previous key exposed in git
@@ -76,7 +75,7 @@ def get_hmac_secret() -> str:
     if not secret:
         raise RuntimeError(
             "YGB_HMAC_SECRET not set. "
-            "Set it via env var or config/hmac_secret.key. "
+            "Set it via the environment before startup. "
             "No mock/test fallback permitted."
         )
     return secret
@@ -135,33 +134,17 @@ def compute_payload_crc(payload: dict) -> int:
 # =========================================================================
 
 def load_hmac_key() -> bytes:
-    """Load HMAC secret key. Priority: env var > file.
-
-    Always fail-closed: raises RuntimeError if no secret found.
-    No mock/empty fallback permitted.
-    """
-    # Priority 1: Environment variable (works in CI and local)
+    """Load the HMAC secret key from environment variables only."""
     env_secret = os.environ.get('YGB_HMAC_SECRET', '').strip()
     if env_secret:
         try:
             return bytes.fromhex(env_secret)
         except ValueError:
-            # Treat as raw UTF-8 key if not valid hex
             return env_secret.encode('utf-8')
 
-    # Priority 2: Key file (local development only)
-    try:
-        with open(HMAC_KEY_PATH, 'r') as f:
-            hex_key = f.read().strip()
-        if not hex_key:
-            raise ValueError("key file empty")
-        return bytes.fromhex(hex_key)
-    except (FileNotFoundError, ValueError) as e:
-        raise RuntimeError(
-            f"HMAC secret not configured: {e}. "
-            "Set YGB_HMAC_SECRET env var or create config/hmac_secret.key. "
-            "No fallback permitted."
-        )
+    raise RuntimeError(
+        "HMAC secret not configured. Set YGB_HMAC_SECRET before startup."
+    )
 
 
 def compute_payload_hmac(payload: dict) -> str:
@@ -524,10 +507,6 @@ def initialize_runtime():
     secret = os.environ.get('YGB_HMAC_SECRET', '').strip()
     if not secret:
         raise RuntimeError("FATAL: YGB_HMAC_SECRET not set in production")
-
-    # Verify HMAC key file exists
-    if not os.path.exists(HMAC_KEY_PATH):
-        logger.warning("HMAC key file not found at %s", HMAC_KEY_PATH)
 
     # Phase 5: Invalidate old telemetry on version bump
     if os.path.exists(TELEMETRY_PATH):

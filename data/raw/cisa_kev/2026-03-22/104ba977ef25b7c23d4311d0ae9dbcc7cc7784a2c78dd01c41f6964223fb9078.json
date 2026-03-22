@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-7775",
+  "ingested_at": "2026-03-22T07:45:16.206235+00:00",
+  "lang": "en",
+  "raw_text": "Citrix NetScaler Citrix NetScaler ADC and NetScaler Gateway contain a memory overflow vulnerability that could allow for remote code execution and/or denial of service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "104ba977ef25b7c23d4311d0ae9dbcc7cc7784a2c78dd01c41f6964223fb9078",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

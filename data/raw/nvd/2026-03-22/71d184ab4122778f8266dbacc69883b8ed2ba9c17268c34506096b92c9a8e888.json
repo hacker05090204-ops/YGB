@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-27692",
+  "ingested_at": "2026-03-22T07:54:32.070658+00:00",
+  "lang": "en",
+  "raw_text": "iccDEV provides a set of libraries and tools for working with ICC color management profiles. In versions up to and including 2.3.1.4, heap-buffer-overflow read occurs during CIccTagTextDescription::Release() when strlen() reads past a heap buffer while parsing ICC profile XML text description tags, causing a crash. Commit 29d088840b962a7cdd35993dfabc2cb35a049847 fixes the issue. No known workarounds are available.",
+  "severity": "HIGH",
+  "sha256_hash": "71d184ab4122778f8266dbacc69883b8ed2ba9c17268c34506096b92c9a8e888",
+  "source": "nvd",
+  "tags": [
+    "CWE-125",
+    "CWE-170",
+    "CWE-787",
+    "CWE-787"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27692"
+}

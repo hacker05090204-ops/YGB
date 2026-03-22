@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2018-8653",
+  "ingested_at": "2026-03-22T07:45:19.375152+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a memory corruption vulnerability due to how the Scripting Engine handles objects in memory, leading to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c8ba09df9fb9fa31dbb59538d91acc557f56c93c5271ba9684cdbdec731b79ac",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-33203",
+  "ingested_at": "2026-03-22T07:54:49.080239+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to version 3.6.2, the SiYuan kernel WebSocket server accepts unauthenticated connections when a specific \"auth keepalive\" query parameter is present. After connection, incoming messages are parsed using unchecked type assertions on attacker-controlled JSON. A remote attacker can send malformed messages that trigger a runtime panic, potentially crashing the kernel process and causing denial of service. Version 3.6.2 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "a26f1a3f87b61c748045b564d420edf2d5740b674916567a2189f9fc0892943b",
+  "source": "nvd",
+  "tags": [
+    "CWE-248",
+    "CWE-306"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33203"
+}

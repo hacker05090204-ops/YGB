@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3554",
+  "ingested_at": "2026-03-22T07:54:49.404767+00:00",
+  "lang": "en",
+  "raw_text": "The Sherk Custom Post Type Displays plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'title' shortcode attribute in all versions up to, and including, 1.2.1. This is due to insufficient input sanitization and output escaping on the 'title' attribute of the 'sherkcptdisplays' shortcode. Specifically, in the sherkcptdisplays_func() function in includes/SherkCPTDisplaysShortcode.php, the 'title' attribute value is extracted from shortcode_atts() on line 19 and directly concatenated into an HTML tag on line 31 without any escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b9f0bd23db3d63740bb1b66c8866478bf34e4165866d5048dae3024cab734a5b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 106,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3554"
+}

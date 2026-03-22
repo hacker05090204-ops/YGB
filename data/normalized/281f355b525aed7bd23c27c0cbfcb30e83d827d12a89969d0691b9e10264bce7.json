@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco VPN Routers A vulnerability in the web interface of the Cisco VPN Routers could allow an unauthenticated, remote attacker to execute arbitrary code as root and gain full control of an affected system.",
+  "token_count": 34
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30405",
+  "ingested_at": "2026-03-22T07:54:46.873669+00:00",
+  "lang": "en",
+  "raw_text": "An issue in GoBGP gobgpd v.4.2.0 allows a remote attacker to cause a denial of service via the NEXT_HOP path attribute",
+  "severity": "HIGH",
+  "sha256_hash": "0e0e51cb27166f2c41e6ac7e55f5fa6d733958aa89d06150d6ab07a6015bc679",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30405"
+}

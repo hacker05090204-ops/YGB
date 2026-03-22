@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Nagios Nagios XI Nagios XI contains a vulnerability which can lead to OS command injection on the Nagios XI server.",
+  "token_count": 20
+}

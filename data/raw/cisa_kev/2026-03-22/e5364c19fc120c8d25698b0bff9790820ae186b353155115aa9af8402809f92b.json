@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-12234",
+  "ingested_at": "2026-03-22T07:45:18.589072+00:00",
+  "lang": "en",
+  "raw_text": "Cisco IOS software There is a vulnerability in the implementation of the Common Industrial Protocol (CIP) feature in Cisco IOS could allow an unauthenticated, remote attacker to cause an affected device to reload, resulting in a denial of service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e5364c19fc120c8d25698b0bff9790820ae186b353155115aa9af8402809f92b",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 39,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

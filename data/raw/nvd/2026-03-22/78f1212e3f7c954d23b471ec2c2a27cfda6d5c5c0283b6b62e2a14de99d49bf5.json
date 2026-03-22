@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2476",
+  "ingested_at": "2026-03-22T07:54:46.464006+00:00",
+  "lang": "en",
+  "raw_text": "Mattermost Plugins versions < =2.0.3.0 fail to properly mask sensitive configuration values which allows an attacker with access to support packets to obtain original plugin settings via exported configuration data. Mattermost Advisory ID: MMSA-2026-00606",
+  "severity": "HIGH",
+  "sha256_hash": "78f1212e3f7c954d23b471ec2c2a27cfda6d5c5c0283b6b62e2a14de99d49bf5",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "NVD-CWE-noinfo"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2476"
+}

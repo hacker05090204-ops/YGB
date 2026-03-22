@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3986",
+  "ingested_at": "2026-03-22T07:54:46.190233+00:00",
+  "lang": "en",
+  "raw_text": "The Calculated Fields Form plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the form settings in all versions up to, and including, 5.4.5.0. This is due to insufficient capability checks on the form settings save handler and insufficient input sanitization of the `fcontent` field in `fhtml` field types. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "741b7ab3654a7772abff57fd9d9a2cdb82ba8b8c6c2f58271eed232d7b407c8f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 79,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3986"
+}

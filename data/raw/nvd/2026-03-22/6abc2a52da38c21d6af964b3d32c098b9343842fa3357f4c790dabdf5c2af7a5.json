@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31809",
+  "ingested_at": "2026-03-22T07:54:43.215156+00:00",
+  "lang": "en",
+  "raw_text": "SiYuan is a personal knowledge management system. Prior to 3.5.10, SiYuan's SVG sanitizer (SanitizeSVG) checks href attributes for the javascript: prefix using strings.HasPrefix(). However, inserting ASCII tab ( ), newline ( ), or carriage return ( ) characters inside the javascript: string bypasses this prefix check. Browsers strip these characters per the WHATWG URL specification before parsing the URL scheme, so the JavaScript still executes. This allows an attacker to inject executable JavaScript into the unauthenticated /api/icon/getDynamicIcon endpoint, creating a reflected XSS. This is a second bypass of the fix for CVE-2026-29183 (fixed in v3.5.9). This vulnerability is fixed in 3.5.10.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6abc2a52da38c21d6af964b3d32c098b9343842fa3357f4c790dabdf5c2af7a5",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31809"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20005",
+  "ingested_at": "2026-03-22T07:54:34.559682+00:00",
+  "lang": "en",
+  "raw_text": "Multiple Cisco products are affected by a vulnerability in the Snort 3 Detection Engine that could allow an unauthenticated, remote attacker to cause the Snort 3 Detection Engine to restart, resulting in an interruption of packet inspection. This vulnerability is due to incomplete parsing of the SSL handshake ingress packets. An attacker could exploit this vulnerability by sending crafted SSL handshake packets. A successful exploit could allow the attacker to cause a denial of service (DoS) condition when the Snort 3 Detection Engine restarts unexpectedly.",
+  "severity": "MEDIUM",
+  "sha256_hash": "8edf6ab1cfd29533c52ebfc4b0c183e38f6d826b63b5ca773f22721f7403b04d",
+  "source": "nvd",
+  "tags": [
+    "CWE-392"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20005"
+}

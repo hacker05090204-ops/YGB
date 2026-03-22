@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Philips Hue Bridge hk_hap Ed25519 Signature Verification Authentication Bypass Vulnerability. This vulnerability allows network-adjacent attackers to execute arbitrary code on affected installations of Philips Hue Bridge. Authentication is not required to exploit this vulnerability. The specific flaw exists within the ed25519_sign_open function. The issue results from improper verification of a cryptographic signature. An attacker can leverage this vulnerability to bypass authentication on the system. Was ZDI-CAN-28480.",
+  "token_count": 66
+}

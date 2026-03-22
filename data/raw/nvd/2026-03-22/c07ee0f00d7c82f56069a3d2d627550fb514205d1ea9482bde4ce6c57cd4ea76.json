@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20438",
+  "ingested_at": "2026-03-22T07:54:33.538847+00:00",
+  "lang": "en",
+  "raw_text": "In MAE, there is a possible out of bounds write due to a race condition. This could lead to local escalation of privilege if a malicious actor has already obtained the System privilege. User interaction is not needed for exploitation. Patch ID: ALPS10431920; Issue ID: MSV-5835.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c07ee0f00d7c82f56069a3d2d627550fb514205d1ea9482bde4ce6c57cd4ea76",
+  "source": "nvd",
+  "tags": [
+    "CWE-367"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20438"
+}

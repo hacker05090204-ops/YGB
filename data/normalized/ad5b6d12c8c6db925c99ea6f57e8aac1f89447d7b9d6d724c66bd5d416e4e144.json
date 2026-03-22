@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Task Scheduler contains a privilege escalation vulnerability that can allow an attacker-provided, local application to escalate privileges outside of its AppContainer, and access privileged RPC functions.",
+  "token_count": 30
+}

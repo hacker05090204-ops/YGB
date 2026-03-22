@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3332",
+  "ingested_at": "2026-03-22T07:54:49.375506+00:00",
+  "lang": "en",
+  "raw_text": "The Xhanch - My Advanced Settings plugin for WordPress is vulnerable to Cross-Site Request Forgery in all versions up to, and including, 1.1.2. This is due to missing nonce validation in the `xms_setting()` function on the settings update handler. This makes it possible for unauthenticated attackers to modify plugin settings via a forged request granted they can trick a site administrator into performing an action such as clicking on a link. Settings that can be modified include favicon URL, Google Analytics account ID, and various WordPress behavior toggles. The `favicon_url` and `ga_acc_id` values are output on the front-end without escaping, enabling a CSRF to Stored XSS chain.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ef3f93bc8c0555a4ac1607a90072d204a282a4160abb0f2bd7add71d4724a482",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 107,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3332"
+}

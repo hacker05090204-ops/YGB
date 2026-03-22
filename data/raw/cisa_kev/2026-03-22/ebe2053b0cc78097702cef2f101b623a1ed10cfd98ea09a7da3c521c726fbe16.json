@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-30663",
+  "ingested_at": "2026-03-22T07:45:19.053214+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, tvOS, and Safari WebKit contain an integer overflow vulnerability that leads to code execution when processing maliciously crafted web content. This vulnerability could impact HTML parsers that use WebKit, including but not limited to Apple Safari and non-Apple products which rely on WebKit for HTML processing.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ebe2053b0cc78097702cef2f101b623a1ed10cfd98ea09a7da3c521c726fbe16",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 53,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

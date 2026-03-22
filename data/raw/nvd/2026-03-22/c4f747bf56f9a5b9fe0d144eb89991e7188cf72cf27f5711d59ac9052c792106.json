@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21991",
+  "ingested_at": "2026-03-22T07:54:46.983243+00:00",
+  "lang": "en",
+  "raw_text": "A DTrace component, dtprobed, allows arbitrary file creation through crafted USDT provider names.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c4f747bf56f9a5b9fe0d144eb89991e7188cf72cf27f5711d59ac9052c792106",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 13,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21991"
+}

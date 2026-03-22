@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-29186",
+  "ingested_at": "2026-03-22T07:54:41.837036+00:00",
+  "lang": "en",
+  "raw_text": "Backstage is an open framework for building developer portals. Prior to version 1.14.3, this is a configuration bypass vulnerability that enables arbitrary code execution. The @backstage/plugin-techdocs-node package uses an allowlist to filter dangerous MkDocs configuration keys during the documentation build process. A gap in this allowlist allows attackers to craft an mkdocs.yml that causes arbitrary Python code execution, completely bypassing TechDocs' security controls. This issue has been patched in version 1.14.3.",
+  "severity": "HIGH",
+  "sha256_hash": "e3e78c082a343acf47462de07aaa4ef8dc490d5f77ab4c9fa078946e38a5ee73",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-434",
+    "CWE-434"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29186"
+}

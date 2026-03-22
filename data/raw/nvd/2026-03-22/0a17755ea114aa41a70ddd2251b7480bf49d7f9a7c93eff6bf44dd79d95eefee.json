@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-29165",
+  "ingested_at": "2026-03-22T07:54:40.935164+00:00",
+  "lang": "en",
+  "raw_text": "An issue in D-Link DIR-1253 MESH V1.6.1684 allows an attacker to escalate privileges via the etc/shadow.sample component",
+  "severity": "CRITICAL",
+  "sha256_hash": "0a17755ea114aa41a70ddd2251b7480bf49d7f9a7c93eff6bf44dd79d95eefee",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-29165"
+}

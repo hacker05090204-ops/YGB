@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3228",
+  "ingested_at": "2026-03-22T07:54:42.949229+00:00",
+  "lang": "en",
+  "raw_text": "The NextScripts: Social Networks Auto-Poster plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the `[nxs_fbembed]` shortcode in all versions up to, and including, 4.4.6. This is due to insufficient input sanitization and output escaping on the `snapFB` post meta value. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e11650b22a05df7b904038b8b14817d74aff8629fa1c6c935a4c07c9685c57a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3228"
+}

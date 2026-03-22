@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25796",
+  "ingested_at": "2026-03-22T07:54:31.297734+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, in `ReadSTEGANOImage()` (`coders/stegano.c`), the `watermark` Image object is not freed on three early-return paths, resulting in a definite memory leak (~13.5KB+ per invocation) that can be exploited for denial of service. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d9dff41695faded729aa91b357417b24730adfc4e8d1833036a67a2f6fa75ead",
+  "source": "nvd",
+  "tags": [
+    "CWE-401"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25796"
+}

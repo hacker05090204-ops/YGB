@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DIR-820L D-Link DIR-820L contains an unspecified vulnerability in Device Name parameter in /lan.asp which allows for remote code execution.",
+  "token_count": 20
+}

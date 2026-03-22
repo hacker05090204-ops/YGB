@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-21973",
+  "ingested_at": "2026-03-22T07:45:18.477288+00:00",
+  "lang": "en",
+  "raw_text": "VMware vCenter Server and Cloud Foundation VMware vCenter Server and Cloud Foundation Server contain a SSRF vulnerability due to improper validation of URLs in a vCenter Server plugin. This allows for information disclosure.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d8707c4ca8daa0af275c85e6c15a5adc6668f01eed342e9476c22470bed14210",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3066",
+  "ingested_at": "2026-03-22T07:54:31.435414+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in HummerRisk up to 1.5.0. This vulnerability affects the function fixedCommand of the file hummer-common/hummer-common-core/src/main/java/com/hummer/common/core/utils/PlatformUtils.java of the component Cloud Compliance Scanning. Executing a manipulation can lead to command injection. The attack can be executed remotely. The exploit has been published and may be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "77a56eec0ac09d233b8b38bc7b745b0202a093a7f844a064df99b3babc6d248b",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77",
+    "CWE-77"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3066"
+}

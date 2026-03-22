@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3327",
+  "ingested_at": "2026-03-22T07:54:33.170715+00:00",
+  "lang": "en",
+  "raw_text": "Authenticated Iframe Injection in Dato CMS Web Previews plugin. This vulnerability permits a malicious authenticated user to circumvent the restriction enforced on the configured frontend URL, enabling the loading of arbitrary external resources or origins. This issue affects Web Previews < v1.0.31.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "fe0114b4a0ad26496e04e6c19c0a7a3b3827cdd4d542867e7250bf4eb2efe4de",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3327"
+}

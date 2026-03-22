@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Under certain conditions SAP S/4HANA (Manage Payment Media) allows an authenticated attacker to access information which would otherwise be restricted. This could cause low impact on confidentiality of the application while integrity and availability are not impacted.",
+  "token_count": 37
+}

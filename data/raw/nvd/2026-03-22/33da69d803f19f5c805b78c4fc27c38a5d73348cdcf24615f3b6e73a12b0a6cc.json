@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33056",
+  "ingested_at": "2026-03-22T07:54:48.665979+00:00",
+  "lang": "en",
+  "raw_text": "tar-rs is a tar archive reading/writing library for Rust. In versions 0.4.44 and below, when unpacking a tar archive, the tar crate's unpack_dir function uses fs::metadata() to check whether a path that already exists is a directory. Because fs::metadata() follows symbolic links, a crafted tarball containing a symlink entry followed by a directory entry with the same name causes the crate to treat the symlink target as a valid existing directory \u2014 and subsequently apply chmod to it. This allows an attacker to modify the permissions of arbitrary directories outside the extraction root. This issue has been fixed in version 0.4.45.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "33da69d803f19f5c805b78c4fc27c38a5d73348cdcf24615f3b6e73a12b0a6cc",
+  "source": "nvd",
+  "tags": [
+    "CWE-61"
+  ],
+  "token_count": 101,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33056"
+}

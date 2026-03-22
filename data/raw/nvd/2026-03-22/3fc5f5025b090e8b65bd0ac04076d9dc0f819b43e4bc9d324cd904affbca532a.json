@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27497",
+  "ingested_at": "2026-03-22T07:54:32.385430+00:00",
+  "lang": "en",
+  "raw_text": "n8n is an open source workflow automation platform. Prior to versions 2.10.1, 2.9.3, and 1.123.22, an authenticated user with permission to create or modify workflows could leverage the Merge node's SQL query mode to execute arbitrary code and write arbitrary files on the n8n server. The issues have been fixed in n8n versions 2.10.1, 2.9.3, and 1.123.22. Users should upgrade to one of these versions or later to remediate all known vulnerabilities. If upgrading is not immediately possible, administrators should consider the following temporary mitigations. Limit workflow creation and editing permissions to fully trusted users only, and/or disable the Merge node by adding `n8n-nodes-base.merge` to the `NODES_EXCLUDE` environment variable. These workarounds do not fully remediate the risk and should only be used as short-term mitigation measures.",
+  "severity": "HIGH",
+  "sha256_hash": "3fc5f5025b090e8b65bd0ac04076d9dc0f819b43e4bc9d324cd904affbca532a",
+  "source": "nvd",
+  "tags": [
+    "CWE-89",
+    "CWE-94"
+  ],
+  "token_count": 126,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27497"
+}

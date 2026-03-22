@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Kaseya Virtual System/Server Administrator (VSA) ConnectWise ManagedITSync integration for Kaseya VSA is vulnerable to unauthenticated remote commands that allow full direct access to the Kaseya VSA database.",
+  "token_count": 27
+}

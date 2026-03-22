@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14811",
+  "ingested_at": "2026-03-22T07:54:44.568642+00:00",
+  "lang": "en",
+  "raw_text": "IBM Sterling Partner Engagement Manager 6.2.3.0 through 6.2.3.5 and 6.2.4.0 through 6.2.4.2 could allow an attacker to obtain sensitive information from the query string of an HTTP GET method to process a request which could be obtained using man in the middle techniques.",
+  "severity": "LOW",
+  "sha256_hash": "88459aaedab6a10e18ab629b622c522e6493a47999b40cb50fa5446d7d59998b",
+  "source": "nvd",
+  "tags": [
+    "CWE-598"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14811"
+}

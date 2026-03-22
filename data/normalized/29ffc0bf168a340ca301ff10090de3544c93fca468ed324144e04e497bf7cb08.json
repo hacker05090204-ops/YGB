@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DCS-2530L and DCS-2670L Devices D-Link DCS-2530L and DCS-2670L devices contains a command injection vulnerability in the cgi-bin/ddns_enc.cgi. The impacted products could be end-of-life (EoL) and/or end-of-service (EoS). Users should discontinue product utilization.",
+  "token_count": 33
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cleo Multiple Products Cleo Harmony, VLTrader, and LexiCom, which are managed file transfer products, contain an unrestricted file upload vulnerability that could allow an unauthenticated user to import and execute arbitrary bash or PowerShell commands on the host system by leveraging the default settings of the Autorun directory.",
+  "token_count": 48
+}

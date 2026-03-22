@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "D-Link DIR-825 R1 Devices D-Link DIR-825 R1 devices contain a buffer overflow vulnerability in the web interface that may allow for remote code execution.",
+  "token_count": 24
+}

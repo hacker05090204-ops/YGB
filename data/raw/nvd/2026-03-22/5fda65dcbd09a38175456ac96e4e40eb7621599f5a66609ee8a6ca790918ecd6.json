@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24292",
+  "ingested_at": "2026-03-22T07:54:42.704374+00:00",
+  "lang": "en",
+  "raw_text": "Use after free in Connected Devices Platform Service (Cdpsvc) allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "5fda65dcbd09a38175456ac96e4e40eb7621599f5a66609ee8a6ca790918ecd6",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24292"
+}

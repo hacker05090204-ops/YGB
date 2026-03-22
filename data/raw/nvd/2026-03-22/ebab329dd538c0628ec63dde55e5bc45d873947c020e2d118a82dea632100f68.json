@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1732",
+  "ingested_at": "2026-03-22T07:54:43.638436+00:00",
+  "lang": "en",
+  "raw_text": "GitLab has remediated an issue in GitLab CE/EE affecting all versions from 12.6 before 18.7.6, 18.8 before 18.8.6, and 18.9 before 18.9.2 that could have allowed an authenticated user to disclose confidential issue titles due to improper filtering under certain circumstances.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ebab329dd538c0628ec63dde55e5bc45d873947c020e2d118a82dea632100f68",
+  "source": "nvd",
+  "tags": [
+    "CWE-212"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1732"
+}

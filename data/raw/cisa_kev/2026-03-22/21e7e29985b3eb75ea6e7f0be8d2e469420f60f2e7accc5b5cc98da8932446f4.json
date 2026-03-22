@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-4681",
+  "ingested_at": "2026-03-22T07:45:18.675033+00:00",
+  "lang": "en",
+  "raw_text": "Oracle Java SE The Java Runtime Environment (JRE) component in Oracle Java SE allow for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "21e7e29985b3eb75ea6e7f0be8d2e469420f60f2e7accc5b5cc98da8932446f4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 18,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

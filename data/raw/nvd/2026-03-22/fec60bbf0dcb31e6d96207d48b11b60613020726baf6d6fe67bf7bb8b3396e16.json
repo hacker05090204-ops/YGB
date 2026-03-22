@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32139",
+  "ingested_at": "2026-03-22T07:54:44.434800+00:00",
+  "lang": "en",
+  "raw_text": "Dataease is an open source data visualization analysis tool. In DataEase 2.10.19 and earlier, the static resource upload interface allows SVG uploads. However, backend validation only checks whether the XML is parseable and whether the root node is svg. It does not sanitize active content such as onload/onerror event handlers or script-capable attributes. As a result, an attacker can upload a malicious SVG and then trigger script execution in a browser by visiting the exposed static resource URL, forming a full stored XSS exploitation chain. This vulnerability is fixed in 2.10.20.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fec60bbf0dcb31e6d96207d48b11b60613020726baf6d6fe67bf7bb8b3396e16",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 91,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32139"
+}

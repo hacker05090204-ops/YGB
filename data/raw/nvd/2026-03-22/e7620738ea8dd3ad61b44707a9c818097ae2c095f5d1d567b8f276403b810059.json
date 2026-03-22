@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25166",
+  "ingested_at": "2026-03-22T07:54:42.721735+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of untrusted data in Windows System Image Manager allows an authorized attacker to execute code locally.",
+  "severity": "HIGH",
+  "sha256_hash": "e7620738ea8dd3ad61b44707a9c818097ae2c095f5d1d567b8f276403b810059",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 17,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25166"
+}

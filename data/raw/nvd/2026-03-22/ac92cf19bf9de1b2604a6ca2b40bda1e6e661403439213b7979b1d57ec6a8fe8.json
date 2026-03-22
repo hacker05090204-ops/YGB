@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27738",
+  "ingested_at": "2026-03-22T07:54:32.188224+00:00",
+  "lang": "en",
+  "raw_text": "The Angular SSR is a server-rise rendering tool for Angular applications. An Open Redirect vulnerability exists in the internal URL processing logic in versions on the 19.x branch prior to 19.2.21, the 20.x branch prior to 20.3.17, and the 21.x branch prior to 21.1.5 and 21.2.0-rc.1. The logic normalizes URL segments by stripping leading slashes; however, it only removes a single leading slash. When an Angular SSR application is deployed behind a proxy that passes the `X-Forwarded-Prefix` header, an attacker can provide a value starting with three slashes. This vulnerability allows attackers to conduct large-scale phishing and SEO hijacking. In order to be vulnerable, the application must use Angular SSR, the application must have routes that perform internal redirects, the infrastructure (Reverse Proxy/CDN) must pass the `X-Forwarded-Prefix` header to the SSR process without sanitization, and the cache must not vary on the `X-Forwarded-Prefix` header. Versions 21.2.0-rc.1, 21.1.5, 20.3.17, and 19.2.21 contain a patch. Until the patch is applied, developers should sanitize the `X-Forwarded-Prefix` header in their`server.ts` before the Angular engine processes the request.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ac92cf19bf9de1b2604a6ca2b40bda1e6e661403439213b7979b1d57ec6a8fe8",
+  "source": "nvd",
+  "tags": [
+    "CWE-601"
+  ],
+  "token_count": 173,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27738"
+}

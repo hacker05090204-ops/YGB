@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4533",
+  "ingested_at": "2026-03-22T07:54:49.602028+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in code-projects Simple Food Ordering System 1.0. Affected by this issue is some unknown functionality of the file all-tickets.php. The manipulation of the argument Status results in sql injection. It is possible to launch the attack remotely. The exploit is now public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6cee359d62c78d87c5f2d57bbc393d92ce24103840b0be990dcf38647529e091",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4533"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33012",
+  "ingested_at": "2026-03-22T07:54:48.589236+00:00",
+  "lang": "en",
+  "raw_text": "Micronaut Framework is a JVM-based full stack Java framework designed for building modular, easily testable JVM applications. Versions 4.7.0 through 4.10.16 used an unbounded ConcurrentHashMap cache with no eviction policy in its DefaultHtmlErrorResponseBodyProvider. If the application throws an exception whose message may be influenced by an attacker, (for example, including request query value parameters) it could be used by remote attackers to cause an unbounded heap growth and OutOfMemoryError, leading to DoS. This issue has been fixed in version 4.10.7.",
+  "severity": "HIGH",
+  "sha256_hash": "feccb5d619a7daa502a1f096098e7a756fd89ed20f64f4933fc01400d93ccdd7",
+  "source": "nvd",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33012"
+}

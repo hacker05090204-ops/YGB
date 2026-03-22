@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-43939",
+  "ingested_at": "2026-03-22T07:45:16.556271+00:00",
+  "lang": "en",
+  "raw_text": "Hitachi Vantara Pentaho Business Analytics (BA) Server Hitachi Vantara Pentaho BA Server contains a use of non-canonical URL paths for authorization decisions vulnerability that enables an attacker to bypass authorization.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a480d920c9fed65143f3fd223a0c2784e679e8b1ea4ef6f66ac7876fce515911",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

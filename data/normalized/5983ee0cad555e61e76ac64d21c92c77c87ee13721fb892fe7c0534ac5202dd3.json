@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GCB/FCB Audit Software developed by DrangSoft has a Missing Authentication vulnerability, allowing unauthenticated remote attackers to directly access certain APIs to create a new administrative account.",
+  "token_count": 26
+}

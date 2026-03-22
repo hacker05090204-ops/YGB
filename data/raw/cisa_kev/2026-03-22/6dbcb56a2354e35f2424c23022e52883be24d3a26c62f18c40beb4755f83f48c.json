@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-24489",
+  "ingested_at": "2026-03-22T07:45:17.283350+00:00",
+  "lang": "en",
+  "raw_text": "Citrix Content Collaboration Citrix Content Collaboration contains an improper access control vulnerability that could allow an unauthenticated attacker to remotely compromise customer-managed ShareFile storage zones controllers.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6dbcb56a2354e35f2424c23022e52883be24d3a26c62f18c40beb4755f83f48c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

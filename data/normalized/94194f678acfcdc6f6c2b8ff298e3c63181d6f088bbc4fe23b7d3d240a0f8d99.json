@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, iPadOS, macOS, and watchOS IOMobileFrameBuffer contain a memory corruption vulnerability which may allow an application to execute code with kernel privileges.",
+  "token_count": 26
+}

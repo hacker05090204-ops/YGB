@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24953",
+  "ingested_at": "2026-03-22T07:54:30.441515+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in Mitchell Bennis Simple File List simple-file-list allows Path Traversal.This issue affects Simple File List: from n/a through < = 6.1.15.",
+  "severity": "MEDIUM",
+  "sha256_hash": "0877318fc39b26b1086e80bf63cb98c8460b9bda4d278782b8ad2a7d04274bb9",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24953"
+}

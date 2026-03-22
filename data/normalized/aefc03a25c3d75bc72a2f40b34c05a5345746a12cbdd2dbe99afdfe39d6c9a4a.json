@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in OpenTextTM Filr allows Authentication Bypass. The vulnerability could allow unauthenticated users to get XSRF token and do RPC with carefully crafted programs. This issue affects Filr: through 25.1.2.",
+  "token_count": 32
+}

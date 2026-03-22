@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1889",
+  "ingested_at": "2026-03-22T07:54:49.310624+00:00",
+  "lang": "en",
+  "raw_text": "The Outgrow plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'id' attribute of the 'outgrow' shortcode in all versions up to, and including, 2.1. This is due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3c73c37332c61b9056519cb1309264ae1ff8280c16b3812d20aa89d92ef9d36b",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 70,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1889"
+}

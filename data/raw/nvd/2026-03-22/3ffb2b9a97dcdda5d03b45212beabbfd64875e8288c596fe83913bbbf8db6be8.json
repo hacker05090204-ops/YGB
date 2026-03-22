@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4120",
+  "ingested_at": "2026-03-22T07:54:47.877507+00:00",
+  "lang": "en",
+  "raw_text": "The Info Cards \u2013 Add Text and Media in Card Layouts plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'btnUrl' parameter within the Info Cards block in all versions up to, and including, 2.0.7. This is due to insufficient input validation on URL schemes, specifically the lack of javascript: protocol filtering. The block's render.php passes all attributes as JSON to the frontend via a data-attributes HTML attribute using esc_attr(wp_json_encode()), which prevents HTML attribute injection but does not validate URL protocols within the JSON data. The client-side view.js then renders the btnUrl value directly as an href attribute on anchor elements without any protocol sanitization. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject javascript: URLs that execute arbitrary web scripts when a user clicks the rendered button link.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3ffb2b9a97dcdda5d03b45212beabbfd64875e8288c596fe83913bbbf8db6be8",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 136,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4120"
+}

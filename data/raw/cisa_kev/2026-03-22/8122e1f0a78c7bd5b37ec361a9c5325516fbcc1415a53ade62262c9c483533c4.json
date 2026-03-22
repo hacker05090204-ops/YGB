@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-2533",
+  "ingested_at": "2026-03-22T07:45:16.280996+00:00",
+  "lang": "en",
+  "raw_text": "PaperCut NG/MF PaperCut NG/MF contains a cross-site request forgery (CSRF) vulnerability, which, under specific conditions, could potentially enable an attacker to alter security settings or execute arbitrary code.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8122e1f0a78c7bd5b37ec361a9c5325516fbcc1415a53ade62262c9c483533c4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Kleor Contact Manager contact-manager allows Object Injection.This issue affects Contact Manager: from n/a through < = 9.1.1.",
+  "token_count": 23
+}

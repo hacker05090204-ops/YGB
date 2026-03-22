@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-9463",
+  "ingested_at": "2026-03-22T07:45:16.720254+00:00",
+  "lang": "en",
+  "raw_text": "Palo Alto Networks Expedition Palo Alto Networks Expedition contains an OS command injection vulnerability that allows an unauthenticated attacker to run arbitrary OS commands as root in Expedition, resulting in disclosure of usernames, cleartext passwords, device configurations, and device API keys of PAN-OS firewalls.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6dd15a9ad1b21a891a8366c5c2b126fdaf7437cc1c975e28200d182ad5f27787",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 44,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

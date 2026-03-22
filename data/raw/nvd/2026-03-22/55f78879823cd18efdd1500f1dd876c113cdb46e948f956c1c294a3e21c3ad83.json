@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-40894",
+  "ingested_at": "2026-03-22T07:54:34.478203+00:00",
+  "lang": "en",
+  "raw_text": "A Stored HTML Injection vulnerability was discovered in the Alerted Nodes Dashboard functionality due to improper validation on an input parameter. A malicious authenticated user with the required privileges could edit a node label to inject HTML tags. If the system is configured to use the Alerted Nodes Dashboard, and alerts are reported for the affected node, then the injected HTML may render in the browser of a victim user interacting with it, enabling phishing and possibly open redirect attacks. Full XSS exploitation and direct information disclosure are prevented by the existing input validation and Content Security Policy configuration.",
+  "severity": "MEDIUM",
+  "sha256_hash": "55f78879823cd18efdd1500f1dd876c113cdb46e948f956c1c294a3e21c3ad83",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 99,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-40894"
+}

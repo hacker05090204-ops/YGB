@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-59287",
+  "ingested_at": "2026-03-22T07:45:16.082677+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Server Update Service (WSUS) contains a deserialization of untrusted data vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7fb665362d5468f442b6554c17d5656c9c44bb183fc39cdf11a0420ce138d796",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

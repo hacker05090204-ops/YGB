@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CoreDNS is a DNS server that chains plugins. Prior to version 1.14.2, a logical vulnerability in CoreDNS allows DNS access controls to be bypassed due to the default execution order of plugins. Security plugins such as acl are evaluated before the rewrite plugin, resulting in a Time-of-Check Time-of-Use (TOCTOU) flaw. This issue has been patched in version 1.14.2.",
+  "token_count": 58
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32713",
+  "ingested_at": "2026-03-22T07:54:46.541404+00:00",
+  "lang": "en",
+  "raw_text": "PX4 autopilot is a flight control solution for drones. Prior to 1.17.0-rc2, A logic error in the PX4 Autopilot MAVLink FTP session validation uses incorrect boolean logic (&& instead of ||), allowing BurstReadFile and WriteFile operations to proceed with invalid sessions or closed file descriptors. This enables an unauthenticated attacker to put the FTP subsystem into an inconsistent state, trigger operations on invalid file descriptors, and bypass session isolation checks. This vulnerability is fixed in 1.17.0-rc2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "105613ab828741485a3fa4d8e34b964deaf431ffd95e682dd6118b00c974aeec",
+  "source": "nvd",
+  "tags": [
+    "CWE-670"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32713"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Netartmedia Deals Portal contains an SQL injection vulnerability in the Email parameter of loginaction.php that allows unauthenticated attackers to manipulate database queries. Attackers can submit crafted SQL payloads through POST requests to extract sensitive information or bypass authentication mechanisms.",
+  "token_count": 39
+}

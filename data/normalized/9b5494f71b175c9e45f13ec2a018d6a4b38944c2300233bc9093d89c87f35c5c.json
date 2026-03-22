@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "uHotelBooking System contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the system_page GET parameter. Attackers can send crafted requests to index.php with malicious system_page values using time-based blind SQL injection techniques to extract sensitive database information.",
+  "token_count": 46
+}

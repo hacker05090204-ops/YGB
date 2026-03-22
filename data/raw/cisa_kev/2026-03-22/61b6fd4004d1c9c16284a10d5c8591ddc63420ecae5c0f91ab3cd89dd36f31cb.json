@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-21315",
+  "ingested_at": "2026-03-22T07:45:18.839546+00:00",
+  "lang": "en",
+  "raw_text": "Npm package System Information Library for Node.JS In this vulnerability, an attacker can send a malicious payload that will exploit the name parameter. After successful exploitation, attackers can execute remote.",
+  "severity": "CRITICAL",
+  "sha256_hash": "61b6fd4004d1c9c16284a10d5c8591ddc63420ecae5c0f91ab3cd89dd36f31cb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-21668",
+  "ingested_at": "2026-03-22T07:54:44.244445+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability allowing an authenticated domain user to bypass restrictions and manipulate arbitrary files on a Backup Repository.",
+  "severity": "HIGH",
+  "sha256_hash": "18cf5f74c994a950b41dd83cc6efc8ed72c25c3847501311b660f155805fb79b",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 18,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21668"
+}

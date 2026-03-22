@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1321",
+  "ingested_at": "2026-03-22T07:54:40.720158+00:00",
+  "lang": "en",
+  "raw_text": "The Membership Plugin \u2013 Restrict Content plugin for WordPress is vulnerable to Privilege Escalation in all versions up to, and including, 3.2.20. This is due to the `rcp_setup_registration_init()` function accepting any membership level ID via the `rcp_level` POST parameter without validating that the level is active or that payment is required. Combined with the `add_user_role()` method which assigns the WordPress role configured on the membership level without status checks, this makes it possible for unauthenticated attackers to register with any membership level, including inactive levels that grant privileged WordPress roles such as Administrator, or paid levels that charge a sign-up fee. The vulnerability was partially patched in version 3.2.18.",
+  "severity": "HIGH",
+  "sha256_hash": "731987c964181f06da9e8ced1bd4c2295fa1fee245f5f9aa30f1ffc2263242c0",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1321"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0385",
+  "ingested_at": "2026-03-22T07:54:46.361897+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Edge (Chromium-based) for Android Spoofing Vulnerability",
+  "severity": "MEDIUM",
+  "sha256_hash": "7ed31c91afaab520e2f1c33b458aa79831add4654c64b42492c62fe3cab2d0c1",
+  "source": "nvd",
+  "tags": [
+    "CWE-290"
+  ],
+  "token_count": 7,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0385"
+}

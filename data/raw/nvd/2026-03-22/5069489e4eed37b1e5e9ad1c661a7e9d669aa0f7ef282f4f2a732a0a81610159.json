@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28039",
+  "ingested_at": "2026-03-22T07:54:40.446607+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in wpDataTables wpDataTables wpdatatables allows PHP Local File Inclusion.This issue affects wpDataTables: from n/a through < = 6.5.0.1.",
+  "severity": "HIGH",
+  "sha256_hash": "5069489e4eed37b1e5e9ad1c661a7e9d669aa0f7ef282f4f2a732a0a81610159",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28039"
+}

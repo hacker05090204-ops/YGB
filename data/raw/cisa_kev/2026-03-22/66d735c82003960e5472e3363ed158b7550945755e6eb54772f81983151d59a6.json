@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-5849",
+  "ingested_at": "2026-03-22T07:45:19.623593+00:00",
+  "lang": "en",
+  "raw_text": "Unraid Unraid Unraid contains an authentication bypass vulnerability that allows attackers to gain access to the administrative interface. This CVE is chainable with CVE-2020-5847 for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "66d735c82003960e5472e3363ed158b7550945755e6eb54772f81983151d59a6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

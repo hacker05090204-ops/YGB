@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25745",
+  "ingested_at": "2026-03-22T07:54:47.696965+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. In versions up to and including 8.0.0, the message/note update endpoint (e.g. PUT or POST) updates by message/note ID only and does not verify that the message belongs to the current patient (or that the user is allowed to edit that patient\u2019s notes). An authenticated user with notes permission can modify any patient\u2019s messages by supplying another message ID. Commit 92a2ff9eaaa80674b3a934a6556e35e7aded5a41 contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d574b20ac4bed17c450e718a89f6c75144c9ea0804fe5b8232773f6ba2a280da",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25745"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-0005",
+  "ingested_at": "2026-03-22T07:54:33.895905+00:00",
+  "lang": "en",
+  "raw_text": "In onServiceDisconnected of KeyguardServiceDelegate.java, there is a possible partial bypass of app pinning allowing limited interaction with other apps without knowing the LSKF due to a missing permission check. This could lead to local information disclosure where the extent of interaction and impact is app-dependent with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b851b6bb79794996d30d3808c41805cad1ae650b6ede05eae71cb6fc3564829e",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-200"
+  ],
+  "token_count": 58,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0005"
+}

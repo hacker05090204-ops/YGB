@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38856",
+  "ingested_at": "2026-03-22T07:45:16.851519+00:00",
+  "lang": "en",
+  "raw_text": "Apache OFBiz Apache OFBiz contains an incorrect authorization vulnerability that could allow remote code execution via a Groovy payload in the context of the OFBiz user process by an unauthenticated attacker.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e2a5e59c5c0cf6cd3a52df2af06cddfaba1ec5cc7c48a3dfd05be6ca3a1a5fd4",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

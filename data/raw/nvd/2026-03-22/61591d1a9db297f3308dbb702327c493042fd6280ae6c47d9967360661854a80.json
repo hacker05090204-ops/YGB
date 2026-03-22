@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3283",
+  "ingested_at": "2026-03-22T07:54:33.029035+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in libvips 8.19.0. This issue affects the function vips_extract_band_build of the file libvips/conversion/extract.c. The manipulation of the argument extract_band leads to out-of-bounds read. The attack needs to be performed locally. The exploit has been disclosed to the public and may be used. The identifier of the patch is 24795bb3d19d84f7b6f5ed86451ad556c8f2fe70. To fix this issue, it is recommended to deploy a patch.",
+  "severity": "LOW",
+  "sha256_hash": "61591d1a9db297f3308dbb702327c493042fd6280ae6c47d9967360661854a80",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-125"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3283"
+}

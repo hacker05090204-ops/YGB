@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28495",
+  "ingested_at": "2026-03-22T07:54:43.084769+00:00",
+  "lang": "en",
+  "raw_text": "GetSimple CMS is a content management system. The massiveAdmin plugin (v6.0.3) bundled with GetSimpleCMS-CE v3.3.22 allows an authenticated administrator to overwrite the gsconfig.php configuration file with arbitrary PHP code via the gsconfig editor module. The form lacks CSRF protection, enabling a remote unauthenticated attacker to exploit this via Cross-Site Request Forgery against a logged-in admin, achieving Remote Code Execution (RCE) on the web server.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3739ccbd319a46d7763fddd9e5733880489aac6b6322f33c6512aaaa024fa8c7",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28495"
+}

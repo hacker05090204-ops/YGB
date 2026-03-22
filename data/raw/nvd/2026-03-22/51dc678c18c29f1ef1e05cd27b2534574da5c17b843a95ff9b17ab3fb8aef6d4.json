@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24944",
+  "ingested_at": "2026-03-22T07:54:30.431293+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in weDevs Subscribe2 subscribe2 allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Subscribe2: from n/a through < = 10.44.",
+  "severity": "MEDIUM",
+  "sha256_hash": "51dc678c18c29f1ef1e05cd27b2534574da5c17b843a95ff9b17ab3fb8aef6d4",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24944"
+}

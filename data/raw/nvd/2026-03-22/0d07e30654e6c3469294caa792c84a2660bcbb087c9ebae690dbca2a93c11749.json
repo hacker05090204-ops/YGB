@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27699",
+  "ingested_at": "2026-03-22T07:54:32.076068+00:00",
+  "lang": "en",
+  "raw_text": "The `basic-ftp` FTP client library for Node.js contains a path traversal vulnerability (CWE-22) in versions prior to 5.2.0 in the `downloadToDir()` method. A malicious FTP server can send directory listings with filenames containing path traversal sequences (`../`) that cause files to be written outside the intended download directory. Version 5.2.0 patches the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0d07e30654e6c3469294caa792c84a2660bcbb087c9ebae690dbca2a93c11749",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27699"
+}

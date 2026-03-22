@@ -19,7 +19,9 @@ import time
 from datetime import datetime, UTC
 from typing import Any, Dict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+
+from backend.auth.auth_guard import require_auth
 
 logger = logging.getLogger("ygb.api.system_status")
 
@@ -83,7 +85,7 @@ def _get_storage_health() -> Dict[str, Any]:
 
 
 @system_status_router.get("/api/system/status")
-async def aggregated_system_status():
+async def aggregated_system_status(user=Depends(require_auth)):
     """Aggregated system health — all subsystems in one response.
 
     Returns real runtime data from every subsystem. No mocks, no placeholders.

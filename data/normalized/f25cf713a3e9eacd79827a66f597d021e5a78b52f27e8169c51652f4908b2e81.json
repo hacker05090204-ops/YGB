@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: btrfs: do not free data reservation in fallback from inline due to -ENOSPC If we fail to create an inline extent due to -ENOSPC, we will attempt to go through the normal COW path, reserve an extent, create an ordered extent, etc. However we were always freeing the reserved qgroup data, which is wrong since we will use data. Fix this by freeing the reserved qgroup data in __cow_file_range_inline() only if we are not doing the fallback (ret is < = 0).",
+  "token_count": 92
+}

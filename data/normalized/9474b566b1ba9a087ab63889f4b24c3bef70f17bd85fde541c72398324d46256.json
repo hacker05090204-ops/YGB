@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Struts 1 ActionForm in Apache Struts versions before 1.2.9 with BeanUtils 1.7 contains a vulnerability that allows for denial-of-service (DoS).",
+  "token_count": 21
+}

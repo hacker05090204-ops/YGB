@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30973",
+  "ingested_at": "2026-03-22T07:54:42.912030+00:00",
+  "lang": "en",
+  "raw_text": "Appium is an automation framework that provides WebDriver-based automation possibilities for a wide range platforms. Prior to 7.0.6, @appium/support contains a ZIP extraction implementation (extractAllTo() via ZipExtractor.extract()) with a path traversal (Zip Slip) check that is non-functional. The check at line 88 of packages/support/lib/zip.js creates an Error object but never throws it, allowing malicious ZIP entries with ../ path components to write files outside the intended destination directory. This affects all JS-based extractions (the default code path), not only those using the fileNamesEncoding option. This vulnerability is fixed in 7.0.6.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5de686e44c6262fc1a1c59c758f6e76acefda24832fa07c14fe5c916c1c56c51",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 90,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30973"
+}

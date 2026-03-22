@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27709",
+  "ingested_at": "2026-03-22T07:54:32.417444+00:00",
+  "lang": "en",
+  "raw_text": "NanaZip is an open source file archive. Starting in version 5.0.1252.0 and prior to versions 6.0.1638.0 and 6.5.1638.0, NanaZip\u2019s `.NET Single File Application` parser has an out-of-bounds read vulnerability in manifest parsing. A crafted bundle can provide a malformed `RelativePathLength` so the parser constructs a `std::string` from memory beyond `HeaderBuffer`, leading to crash and potential in-process memory disclosure. Versions 6.0.1638.0 and 6.5.1638.0 fix the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "b4d3703b0991035cc33808e5b6ed118a279c8de34a5fc586f21a3104ca14092b",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27709"
+}

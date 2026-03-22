@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3930",
+  "ingested_at": "2026-03-22T07:54:44.081129+00:00",
+  "lang": "en",
+  "raw_text": "Unsafe navigation in Navigation in Google Chrome on iOS prior to 146.0.7680.71 allowed a remote attacker to bypass navigation restrictions via a crafted HTML page. (Chromium security severity: Medium)",
+  "severity": "MEDIUM",
+  "sha256_hash": "ecd0a69de3722ce15caabe1808de2898b319b3073b47b8899012a9980e0a434a",
+  "source": "nvd",
+  "tags": [
+    "NVD-CWE-noinfo",
+    "CWE-288"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3930"
+}

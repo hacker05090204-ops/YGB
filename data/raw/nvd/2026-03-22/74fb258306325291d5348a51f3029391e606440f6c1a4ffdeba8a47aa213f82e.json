@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32723",
+  "ingested_at": "2026-03-22T07:54:47.726904+00:00",
+  "lang": "en",
+  "raw_text": "SandboxJS is a JavaScript sandboxing library. Prior to 0.8.35, SandboxJS timers have an execution-quota bypass. A global tick state (`currentTicks.current`) is shared between sandboxes. Timer string handlers are compiled at execution time using that global tick state rather than the scheduling sandbox's tick object. In multi-tenant / concurrent sandbox scenarios, another sandbox can overwrite `currentTicks.current` between scheduling and execution, causing the timer callback to run under a different sandbox's tick budget and bypass the original sandbox's execution quota/watchdog. Version 0.8.35 fixes this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "74fb258306325291d5348a51f3029391e606440f6c1a4ffdeba8a47aa213f82e",
+  "source": "nvd",
+  "tags": [
+    "CWE-362"
+  ],
+  "token_count": 83,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32723"
+}

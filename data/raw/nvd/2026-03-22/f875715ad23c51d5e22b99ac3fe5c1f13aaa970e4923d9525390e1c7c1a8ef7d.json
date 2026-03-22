@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3024",
+  "ingested_at": "2026-03-22T07:54:46.584297+00:00",
+  "lang": "en",
+  "raw_text": "Stored Cross-Site Scripting (XSS) vulnerability in the Wakyma web application, specifically in the endpoint 'vets.wakyma.com/configuracion/agenda/modelo-formulario-evento'. A user with permission to create personalized accounts could exploit this vulnerability simply by creating a malicious survey that would harm the entire veterinary team. At the same time, a user with low privileges could exploit this vulnerability to access unauthorized data and perform actions with elevated privileges.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f875715ad23c51d5e22b99ac3fe5c1f13aaa970e4923d9525390e1c7c1a8ef7d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3024"
+}

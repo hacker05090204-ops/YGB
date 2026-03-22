@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2016-10033",
+  "ingested_at": "2026-03-22T07:45:16.327882+00:00",
+  "lang": "en",
+  "raw_text": "PHP PHPMailer PHPMailer contains a command injection vulnerability because it fails to sanitize user-supplied input. Specifically, this issue affects the 'mail()' function of 'class.phpmailer.php' script. An attacker can exploit this issue to execute arbitrary code within the context of the application. Failed exploit attempts will result in a denial-of-service condition.",
+  "severity": "CRITICAL",
+  "sha256_hash": "21ecc4bfa2bf30ac82c258e008c02cff94d8883325789196ba3f8a8d3092b1b2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 50,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

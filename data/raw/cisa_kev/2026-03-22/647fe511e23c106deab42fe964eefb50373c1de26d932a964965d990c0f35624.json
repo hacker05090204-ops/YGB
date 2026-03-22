@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-22527",
+  "ingested_at": "2026-03-22T07:45:17.066541+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Data Center and Server Atlassian Confluence Data Center and Server contain an unauthenticated OGNL template injection vulnerability that can lead to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "647fe511e23c106deab42fe964eefb50373c1de26d932a964965d990c0f35624",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

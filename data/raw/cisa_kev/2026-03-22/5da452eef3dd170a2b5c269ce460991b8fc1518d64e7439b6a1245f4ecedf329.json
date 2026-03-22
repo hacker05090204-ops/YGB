@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-25489",
+  "ingested_at": "2026-03-22T07:45:17.333637+00:00",
+  "lang": "en",
+  "raw_text": "Samsung Mobile Devices Samsung mobile devices contain an improper input validation vulnerability within the modem interface driver that results in a format string bug leading to kernel panic.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5da452eef3dd170a2b5c269ce460991b8fc1518d64e7439b6a1245f4ecedf329",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

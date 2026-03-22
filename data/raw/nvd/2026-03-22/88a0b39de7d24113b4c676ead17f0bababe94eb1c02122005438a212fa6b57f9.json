@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27464",
+  "ingested_at": "2026-03-22T07:54:30.807125+00:00",
+  "lang": "en",
+  "raw_text": "Metabase is an open-source data analytics platform. In versions prior to 0.57.13 and versions 0.58.x through 0.58.6, authenticated users are able to retrieve sensitive information from a Metabase instance, including database access credentials. During testing, it was confirmed that a low-privileged user can extract sensitive information including database credentials, into the email body via template evaluation. This issue has been fixed in versions 0.57.13 and 0.58.7. To workaround this issue, users can disable notifications in their Metabase instance to disallow access to the vulnerable endpoints.",
+  "severity": "HIGH",
+  "sha256_hash": "88a0b39de7d24113b4c676ead17f0bababe94eb1c02122005438a212fa6b57f9",
+  "source": "nvd",
+  "tags": [
+    "CWE-94",
+    "CWE-1336"
+  ],
+  "token_count": 85,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27464"
+}

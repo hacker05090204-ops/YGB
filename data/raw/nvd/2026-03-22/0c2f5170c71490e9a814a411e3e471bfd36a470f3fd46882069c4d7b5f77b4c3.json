@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22451",
+  "ingested_at": "2026-03-22T07:54:40.115115+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in AncoraThemes Handyman handyman-services allows Object Injection.This issue affects Handyman: from n/a through < = 1.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0c2f5170c71490e9a814a411e3e471bfd36a470f3fd46882069c4d7b5f77b4c3",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22451"
+}

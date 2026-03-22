@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3476",
+  "ingested_at": "2026-03-22T07:54:46.616595+00:00",
+  "lang": "en",
+  "raw_text": "A Code Injection vulnerability affecting SOLIDWORKS Desktop from Release 2025 through Release 2026 could allow an attacker to execute arbitrary code on the user's machine while opening a specially crafted file.",
+  "severity": "HIGH",
+  "sha256_hash": "ac5f241c3fb675cac407aadeae9feff080910dc4745f074cd70e9160fab85a9c",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3476"
+}

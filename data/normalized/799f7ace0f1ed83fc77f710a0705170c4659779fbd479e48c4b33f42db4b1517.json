@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "LeafKit is a templating language with Swift-inspired syntax. Prior to version 1.14.2, HTML escaping doesn't work correctly when a template prints a collection (Array / Dictionary) via `#(value)`. This can result in XSS, allowing potentially untrusted input to be rendered unescaped. Version 1.14.2 fixes the issue.",
+  "token_count": 46
+}

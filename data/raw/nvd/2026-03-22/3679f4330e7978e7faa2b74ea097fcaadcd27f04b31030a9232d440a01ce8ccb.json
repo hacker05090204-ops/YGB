@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25930",
+  "ingested_at": "2026-03-22T07:54:32.256333+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, the Layout-Based Form (LBF) printable view accepts `formid` and `visitid` (or `patientid`) from the request and does not verify that the form belongs to the current user\u2019s authorized patient/encounter. An authenticated user with LBF access can enumerate form IDs and view or print any patient\u2019s encounter forms. Version 8.0.0 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3679f4330e7978e7faa2b74ea097fcaadcd27f04b31030a9232d440a01ce8ccb",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25930"
+}

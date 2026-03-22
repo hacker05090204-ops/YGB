@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SysAid SysAid On-Prem SysAid On-Prem contains an improper restriction of XML external entity reference vulnerability in the Checkin processing functionality, allowing for administrator account takeover and file read primitives.",
+  "token_count": 29
+}

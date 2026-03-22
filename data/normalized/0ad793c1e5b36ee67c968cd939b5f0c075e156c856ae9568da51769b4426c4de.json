@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in itsourcecode Free Hotel Reservation System 1.0. The affected element is an unknown function of the file /hotel/admin/mod_amenities/index.php?view=edit. Performing a manipulation of the argument amen_id/rmtype_id results in sql injection. The attack is possible to be carried out remotely. The exploit has been released to the public and may be used for attacks.",
+  "token_count": 58
+}

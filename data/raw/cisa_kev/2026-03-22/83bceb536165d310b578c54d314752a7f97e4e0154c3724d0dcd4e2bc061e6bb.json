@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-32049",
+  "ingested_at": "2026-03-22T07:45:17.316298+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Defender SmartScreen contains a security feature bypass vulnerability that allows an attacker to bypass the Open File - Security Warning prompt.",
+  "severity": "CRITICAL",
+  "sha256_hash": "83bceb536165d310b578c54d314752a7f97e4e0154c3724d0dcd4e2bc061e6bb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

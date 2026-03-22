@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-21660",
+  "ingested_at": "2026-03-22T07:54:33.139779+00:00",
+  "lang": "en",
+  "raw_text": "Hardcoded Email Credentials Saved as Plaintext in Firmware (CWE-256: Plaintext Storage of a Password) vulnerability in Frick Controls Quantum HD version 10.22 and prior lead to unauthorized access, exposure of sensitive information, and potential misuse or system compromise This issue affects Frick Controls Quantum HD version 10.22 and prior.",
+  "severity": "CRITICAL",
+  "sha256_hash": "fa448f7b334c212c6b77f184ead2dea99c906f585fb29765f72d3f3051f05e36",
+  "source": "nvd",
+  "tags": [
+    "CWE-256",
+    "CWE-522"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21660"
+}

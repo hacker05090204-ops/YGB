@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe ColdFusion A directory traversal vulnerability exists in the administrator console in Adobe ColdFusion which allows remote attackers to read arbitrary files.",
+  "token_count": 22
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "ConnectWise ScreenConnect ConnectWise ScreenConnect contains an improper authentication vulnerability. This vulnerability could allow a ViewState code injection attack, which could allow remote code execution if machine keys are compromised.",
+  "token_count": 29
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30901",
+  "ingested_at": "2026-03-22T07:54:43.596494+00:00",
+  "lang": "en",
+  "raw_text": "Improper Input Validation in Zoom Rooms for Windows before 6.6.5 in Kiosk Mode may allow an authenticated user to conduct an escalation of privilege via local access.",
+  "severity": "HIGH",
+  "sha256_hash": "2807261146de1a9424af8c6ecf4958027d46afe63177df06c83afc908f9564f7",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30901"
+}

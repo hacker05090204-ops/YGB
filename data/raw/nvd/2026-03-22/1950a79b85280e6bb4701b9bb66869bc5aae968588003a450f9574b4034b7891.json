@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13459",
+  "ingested_at": "2026-03-22T07:54:46.301134+00:00",
+  "lang": "en",
+  "raw_text": "IBM Aspera Console 3.3.0 through 3.4.8 could allow a privileged user to cause a denial of service due to improper enforcement of behavioral workflow.",
+  "severity": "LOW",
+  "sha256_hash": "1950a79b85280e6bb4701b9bb66869bc5aae968588003a450f9574b4034b7891",
+  "source": "nvd",
+  "tags": [
+    "CWE-841"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13459"
+}

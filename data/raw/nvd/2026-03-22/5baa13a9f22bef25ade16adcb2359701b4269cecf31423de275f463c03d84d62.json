@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2831",
+  "ingested_at": "2026-03-22T07:54:33.153057+00:00",
+  "lang": "en",
+  "raw_text": "The MailArchiver plugin for WordPress is vulnerable to SQL Injection via the \u2018logid\u2019 parameter in all versions up to, and including, 4.5.0 due to insufficient escaping on the user supplied parameter and lack of sufficient preparation on the existing SQL query. This makes it possible for authenticated attackers, with Administrator-level access and above, to append additional SQL queries into already existing queries that can be used to extract sensitive information from the database.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5baa13a9f22bef25ade16adcb2359701b4269cecf31423de275f463c03d84d62",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2831"
+}

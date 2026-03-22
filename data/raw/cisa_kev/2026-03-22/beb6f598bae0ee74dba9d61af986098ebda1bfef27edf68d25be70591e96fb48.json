@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-5054",
+  "ingested_at": "2026-03-22T07:45:17.809546+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains an integer overflow vulnerability that allows remote attackers to execute code via malformed arguments.",
+  "severity": "CRITICAL",
+  "sha256_hash": "beb6f598bae0ee74dba9d61af986098ebda1bfef27edf68d25be70591e96fb48",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

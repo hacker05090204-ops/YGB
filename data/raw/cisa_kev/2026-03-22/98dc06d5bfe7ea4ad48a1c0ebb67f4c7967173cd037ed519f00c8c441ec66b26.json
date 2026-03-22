@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-1976",
+  "ingested_at": "2026-03-22T07:45:16.452517+00:00",
+  "lang": "en",
+  "raw_text": "Broadcom Brocade Fabric OS Broadcom Brocade Fabric OS contains a code injection vulnerability that allows a local user with administrative privileges to execute arbitrary code with full root privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "98dc06d5bfe7ea4ad48a1c0ebb67f4c7967173cd037ed519f00c8c441ec66b26",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

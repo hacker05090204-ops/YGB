@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31991",
+  "ingested_at": "2026-03-22T07:54:47.813176+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.26 contain an authorization bypass vulnerability where Signal group allowlist policy incorrectly accepts sender identities from DM pairing-store approvals. Attackers can exploit this boundary weakness by obtaining DM pairing approval to bypass group allowlist checks and gain unauthorized group access.",
+  "severity": "LOW",
+  "sha256_hash": "0fb215ed366f651871ca44f0c8dccf6677b9835fc828b6b06cb2b1d983634f5d",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31991"
+}

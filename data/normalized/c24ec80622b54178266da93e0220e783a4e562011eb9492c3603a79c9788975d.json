@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Struts Apache Struts Jakarta Multipart parser allows for malicious file upload using the Content-Type value, leading to remote code execution.",
+  "token_count": 21
+}

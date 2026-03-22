@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28791",
+  "ingested_at": "2026-03-22T07:54:44.381698+00:00",
+  "lang": "en",
+  "raw_text": "Tina is a headless content management system. Prior to 2.1.7, a path traversal vulnerability exists in the TinaCMS development server's media upload handler. The code at media.ts joins user-controlled path segments using path.join() without validating that the resulting path stays within the intended media directory. This allows writing files to arbitrary locations on the filesystem. This vulnerability is fixed in 2.1.7.",
+  "severity": "HIGH",
+  "sha256_hash": "0ffcb35a3b5db18d4a3b7855304ce243c4e96de9202f4ce88463a9a30e3ac93b",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28791"
+}

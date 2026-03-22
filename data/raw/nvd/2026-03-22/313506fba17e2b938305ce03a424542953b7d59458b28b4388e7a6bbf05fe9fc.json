@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0014",
+  "ingested_at": "2026-03-22T07:54:33.912903+00:00",
+  "lang": "en",
+  "raw_text": "In isPackageNullOrSystem of AppOpsService.java, there is a possible persistent denial of service due to improper input validation. This could lead to local denial of service with no additional execution privileges needed. User interaction is not needed for exploitation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "313506fba17e2b938305ce03a424542953b7d59458b28b4388e7a6bbf05fe9fc",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 38,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0014"
+}

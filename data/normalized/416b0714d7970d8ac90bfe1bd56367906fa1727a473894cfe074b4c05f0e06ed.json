@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "GNU GNU Bash GNU Bash contains an OS command injection vulnerability which allows remote attackers to execute arbitrary commands via a crafted environment.",
+  "token_count": 23
+}

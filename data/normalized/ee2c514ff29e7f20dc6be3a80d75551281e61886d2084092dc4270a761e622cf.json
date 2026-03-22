@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Shopware is an open commerce platform. Prior to 6.6.10.15 and 6.7.8.1, a vulnerability in the Shopware app registration flow that could, under specific conditions, allow attackers to take over the communication channel between a shop and an app. The legacy app registration flow used HMAC\u2010based authentication without sufficiently binding a shop installation to its original domain. During re\u2010registration, the shop-url could be updated without proving control over the previously registered shop or domain. This made targeted hijacking of app communication feasible if an attacker possessed the relevant app\u2010side secret. By abusing app re\u2010registration, an attacker could redirect app traffic to an attacker\u2010controlled domain and potentially obtain API credentials intended for the legitimate shop. This vulnerability is fixed in 6.6.10.15 and 6.7.8.1.",
+  "token_count": 121
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20757",
+  "ingested_at": "2026-03-22T07:54:34.015683+00:00",
+  "lang": "en",
+  "raw_text": "Improper Locking vulnerability (CWE-667) in Gallagher Morpho integration allows a privileged operator to cause a limited denial-of-service in the Command Centre Server. This issue affects Command Centre Server: 9.40 prior to vEL9.40.1976(MR1), 9.30 prior to vEL9.30.3382 (MR4), 9.20 prior to vEL9.20.3783 (MR6), 9.10 prior to vEL9.10.4647 (MR9), all versions of 9.00 and prior.",
+  "severity": "LOW",
+  "sha256_hash": "8945fb9933db27c98567ba0fefa58e1f110acea7a63bfc79d5ea8dd29562ac0b",
+  "source": "nvd",
+  "tags": [
+    "CWE-667"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20757"
+}

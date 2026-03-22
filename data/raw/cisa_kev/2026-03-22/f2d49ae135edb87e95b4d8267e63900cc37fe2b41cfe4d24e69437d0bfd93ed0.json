@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-0411",
+  "ingested_at": "2026-03-22T07:45:16.612945+00:00",
+  "lang": "en",
+  "raw_text": "7-Zip 7-Zip 7-Zip contains a protection mechanism failure vulnerability that allows remote attackers to bypass the Mark-of-the-Web security feature to execute arbitrary code in the context of the current user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f2d49ae135edb87e95b4d8267e63900cc37fe2b41cfe4d24e69437d0bfd93ed0",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 30,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

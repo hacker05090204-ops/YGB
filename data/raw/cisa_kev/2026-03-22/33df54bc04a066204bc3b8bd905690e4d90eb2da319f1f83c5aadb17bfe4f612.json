@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-36537",
+  "ingested_at": "2026-03-22T07:45:17.510305+00:00",
+  "lang": "en",
+  "raw_text": "ZK Framework AuUploader ZK Framework AuUploader servlets contain an unspecified vulnerability that could allow an attacker to retrieve the content of a file located in the web context. The ZK Framework is an open-source Java framework. This vulnerability can impact multiple products, including but not limited to ConnectWise R1Soft Server Backup Manager.",
+  "severity": "CRITICAL",
+  "sha256_hash": "33df54bc04a066204bc3b8bd905690e4d90eb2da319f1f83c5aadb17bfe4f612",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 52,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70045",
+  "ingested_at": "2026-03-22T07:54:31.121633+00:00",
+  "lang": "en",
+  "raw_text": "An issue pertaining to CWE-295: Improper Certificate Validation was discovered in jxcore jxm master. The application disables TLS/SSL certificate validation by setting 'rejectUnauthorized': false in HTTPS request options when 'jx_obj.IsSecure' is true",
+  "severity": "HIGH",
+  "sha256_hash": "661a4361fda00affeb770e1c4ac3ec8d1537adf4e6f4ebfceffadb14123f963d",
+  "source": "nvd",
+  "tags": [
+    "CWE-295"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70045"
+}

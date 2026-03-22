@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-29360",
+  "ingested_at": "2026-03-22T07:45:17.041414+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Streaming Service Microsoft Streaming Service contains an untrusted pointer dereference vulnerability that allows for privilege escalation, enabling a local attacker to gain SYSTEM privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e4b2292a5e11ac8107b4c96dd34e6d2c24dff59ca095dd7bef97662c8a697752",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

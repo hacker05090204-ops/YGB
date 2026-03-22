@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OrientDB 3.0.17 contains a stored cross-site scripting vulnerability that allows authenticated attackers to inject malicious scripts by creating users with script payloads in the name parameter. Attackers can send POST requests to the document endpoint with JavaScript code in the name field to execute arbitrary scripts when users view the application.",
+  "token_count": 51
+}

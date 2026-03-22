@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31998",
+  "ingested_at": "2026-03-22T07:54:47.831171+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions 2026.2.22 and 2026.2.23 contain an authorization bypass vulnerability in the synology-chat channel plugin where dmPolicy set to allowlist with empty allowedUserIds fails open. Attackers with Synology sender access can bypass authorization checks and trigger unauthorized agent dispatch and downstream tool actions.",
+  "severity": "HIGH",
+  "sha256_hash": "0495abfee97377fe83a2623f458b9b767e55a0900ff775c38f16a1eba78586e5",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31998"
+}

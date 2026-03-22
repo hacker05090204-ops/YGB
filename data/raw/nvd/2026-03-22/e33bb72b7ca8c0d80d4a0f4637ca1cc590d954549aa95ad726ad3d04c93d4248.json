@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4314",
+  "ingested_at": "2026-03-22T07:54:49.606042+00:00",
+  "lang": "en",
+  "raw_text": "The 'The Ultimate WordPress Toolkit \u2013 WP Extended' plugin for WordPress is vulnerable to Privilege Escalation in all versions up to, and including, 3.2.4. This is due to the `isDashboardOrProfileRequest()` method in the Menu Editor module using an insecure `strpos()` check against `$_SERVER['REQUEST_URI']` to determine if a request targets the dashboard or profile page. The `grantVirtualCaps()` method, which is hooked into the `user_has_cap` filter, grants elevated capabilities including `manage_options` when this check returns true. This makes it possible for authenticated attackers, with Subscriber-level access and above, to gain administrative capabilities by appending a crafted query parameter to any admin URL, allowing them to update arbitrary WordPress options and ultimately create new Administrator accounts.",
+  "severity": "HIGH",
+  "sha256_hash": "e33bb72b7ca8c0d80d4a0f4637ca1cc590d954549aa95ad726ad3d04c93d4248",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 113,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4314"
+}

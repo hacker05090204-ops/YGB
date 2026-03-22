@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3724",
+  "ingested_at": "2026-03-22T07:54:42.027166+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in SourceCodester Patients Waiting Area Queue Management System 1.0. This impacts an unknown function of the file /checkin.php. This manipulation of the argument patient_id causes improper authorization. It is possible to initiate the attack remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "MEDIUM",
+  "sha256_hash": "fb2812341075033602ccd7f9ea6712a9fe0b7f11ba62a9ed7c5624c045037e8b",
+  "source": "nvd",
+  "tags": [
+    "CWE-266",
+    "CWE-285"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3724"
+}

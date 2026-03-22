@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows A privilege escalation vulnerability exists when the Windows UPnP service improperly allows COM object creation.",
+  "token_count": 17
+}

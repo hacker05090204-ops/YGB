@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24713",
+  "ingested_at": "2026-03-22T07:54:42.235412+00:00",
+  "lang": "en",
+  "raw_text": "Improper Input Validation vulnerability in Apache IoTDB. This issue affects Apache IoTDB: from 1.0.0 before 1.3.7, from 2.0.0 before 2.0.7. Users are recommended to upgrade to version 1.3.7 or 2.0.7, which fixes the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e2304df26a4913cf0414c8b7cb7255c95acbc4b7fe75907e3bf01a460b574fe",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-917"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24713"
+}

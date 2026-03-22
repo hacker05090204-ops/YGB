@@ -1,0 +1,17 @@
+{
+  "cve_id": "CVE-2026-29776",
+  "ingested_at": "2026-03-22T07:54:44.676804+00:00",
+  "lang": "en",
+  "raw_text": "FreeRDP is a free implementation of the Remote Desktop Protocol. Prior to 3.24.0, Integer Underflow in update_read_cache_bitmap_order Function of FreeRDP's Core Library This vulnerability is fixed in 3.24.0.",
+  "severity": "LOW",
+  "sha256_hash": "877f8f48ae3365a7f9918fea1e6f38109122774f366da714f472cff0c8eab26c",
+  "source": "nvd",
+  "tags": [
+    "CWE-190",
+    "CWE-191",
+    "CWE-400",
+    "CWE-789"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29776"
+}

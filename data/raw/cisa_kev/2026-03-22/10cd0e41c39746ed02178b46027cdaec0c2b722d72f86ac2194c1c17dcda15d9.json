@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-38831",
+  "ingested_at": "2026-03-22T07:45:17.272075+00:00",
+  "lang": "en",
+  "raw_text": "RARLAB WinRAR RARLAB WinRAR contains an unspecified vulnerability that allows an attacker to execute code when a user attempts to view a benign file within a ZIP archive.",
+  "severity": "CRITICAL",
+  "sha256_hash": "10cd0e41c39746ed02178b46027cdaec0c2b722d72f86ac2194c1c17dcda15d9",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

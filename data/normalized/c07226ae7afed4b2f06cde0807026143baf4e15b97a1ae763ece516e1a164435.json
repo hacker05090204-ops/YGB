@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in Stylemix uListing ulisting allows Object Injection.This issue affects uListing: from n/a through < = 2.2.0.",
+  "token_count": 21
+}

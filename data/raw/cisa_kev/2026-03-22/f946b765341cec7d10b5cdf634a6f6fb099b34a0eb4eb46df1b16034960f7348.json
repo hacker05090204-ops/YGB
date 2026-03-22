@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-24983",
+  "ingested_at": "2026-03-22T07:45:16.522299+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Win32 Kernel Subsystem contains a use-after-free vulnerability that allows an authorized attacker to elevate privileges locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f946b765341cec7d10b5cdf634a6f6fb099b34a0eb4eb46df1b16034960f7348",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

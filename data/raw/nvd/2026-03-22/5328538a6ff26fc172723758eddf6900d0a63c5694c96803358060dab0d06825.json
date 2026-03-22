@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31382",
+  "ingested_at": "2026-03-22T07:54:48.829742+00:00",
+  "lang": "en",
+  "raw_text": "The error_description parameter is vulnerable to Reflected XSS. An attacker can bypass the domain's WAF using a Safari-specific onpagereveal payload.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5328538a6ff26fc172723758eddf6900d0a63c5694c96803358060dab0d06825",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31382"
+}

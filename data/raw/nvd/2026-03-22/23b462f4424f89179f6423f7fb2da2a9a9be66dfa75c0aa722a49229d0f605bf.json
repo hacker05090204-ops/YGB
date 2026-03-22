@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30821",
+  "ingested_at": "2026-03-22T07:54:41.733373+00:00",
+  "lang": "en",
+  "raw_text": "Flowise is a drag & drop user interface to build a customized large language model flow. Prior to version 3.0.13, the /api/v1/attachments/:chatflowId/:chatId endpoint is listed in WHITELIST_URLS, allowing unauthenticated access to the file upload API. While the server validates uploads based on the MIME types defined in chatbotConfig.fullFileUpload.allowedUploadFileTypes, it implicitly trusts the client-provided Content-Type header (file.mimetype) without verifying the file's actual content (magic bytes) or extension (file.originalname). Consequently, an attacker can bypass this restriction by spoofing the Content-Type as a permitted type (e.g., application/pdf) while uploading malicious scripts or arbitrary files. Once uploaded via addArrayFilesToStorage, these files persist in backend storage (S3, GCS, or local disk). This vulnerability serves as a critical entry point that, when chained with other features like static hosting or file retrieval, can lead to Stored XSS, malicious file hosting, or Remote Code Execution (RCE). This issue has been patched in version 3.0.13.",
+  "severity": "CRITICAL",
+  "sha256_hash": "23b462f4424f89179f6423f7fb2da2a9a9be66dfa75c0aa722a49229d0f605bf",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 147,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30821"
+}

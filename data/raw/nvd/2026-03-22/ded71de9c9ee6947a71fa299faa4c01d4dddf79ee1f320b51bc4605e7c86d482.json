@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4407",
+  "ingested_at": "2026-03-22T07:54:47.757743+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bounds array write in Xpdf 4.06 and earlier, due to incorrect validation of the \"N\" field in ICCBased color spaces.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "ded71de9c9ee6947a71fa299faa4c01d4dddf79ee1f320b51bc4605e7c86d482",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-787"
+  ],
+  "token_count": 20,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4407"
+}

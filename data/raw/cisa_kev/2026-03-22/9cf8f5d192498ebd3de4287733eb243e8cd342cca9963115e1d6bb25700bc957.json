@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-15752",
+  "ingested_at": "2026-03-22T07:45:19.149085+00:00",
+  "lang": "en",
+  "raw_text": "Docker Desktop Community Edition Docker Desktop Community Edition contains a vulnerability that may allow local users to escalate privileges by placing a trojan horse docker-credential-wincred.exe file in %PROGRAMDATA%\\DockerDesktop\\version-bin\\.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9cf8f5d192498ebd3de4287733eb243e8cd342cca9963115e1d6bb25700bc957",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

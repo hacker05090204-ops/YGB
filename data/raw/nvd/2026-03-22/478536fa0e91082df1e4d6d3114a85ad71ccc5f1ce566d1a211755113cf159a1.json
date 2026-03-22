@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-26066",
+  "ingested_at": "2026-03-22T07:54:31.394422+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to versions 7.1.2-15 and 6.9.13-40, a crafted profile contain invalid IPTC data may cause an infinite loop when writing it with `IPTCTEXT`. Versions 7.1.2-15 and 6.9.13-40 contain a patch.",
+  "severity": "MEDIUM",
+  "sha256_hash": "478536fa0e91082df1e4d6d3114a85ad71ccc5f1ce566d1a211755113cf159a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-400",
+    "CWE-835",
+    "CWE-835"
+  ],
+  "token_count": 43,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26066"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2014-0130",
+  "ingested_at": "2026-03-22T07:45:18.399653+00:00",
+  "lang": "en",
+  "raw_text": "Rails Ruby on Rails Directory traversal vulnerability in actionpack/lib/abstract_controller/base.rb in the implicit-render implementation in Ruby on Rails allows remote attackers to read arbitrary files via a crafted request.",
+  "severity": "CRITICAL",
+  "sha256_hash": "cc3856aa87377ce4edd2ec459a3da69d3a0784b64d5a69996f3c4f12f23003fe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

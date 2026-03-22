@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In the Linux kernel, the following vulnerability has been resolved: perf: Fix __perf_event_overflow() vs perf_remove_from_context() race Make sure that __perf_event_overflow() runs with IRQs disabled for all possible callchains. Specifically the software events can end up running it with only preemption disabled. This opens up a race vs perf_event_exit_event() and friends that will go and free various things the overflow path expects to be present, like the BPF program.",
+  "token_count": 68
+}

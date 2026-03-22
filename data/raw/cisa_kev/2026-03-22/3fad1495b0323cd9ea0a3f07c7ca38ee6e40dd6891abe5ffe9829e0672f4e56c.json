@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-38178",
+  "ingested_at": "2026-03-22T07:45:16.881929+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Scripting Engine contains a memory corruption vulnerability that allows unauthenticated attacker to initiate remote code execution via a specially crafted URL.",
+  "severity": "CRITICAL",
+  "sha256_hash": "3fad1495b0323cd9ea0a3f07c7ca38ee6e40dd6891abe5ffe9829e0672f4e56c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

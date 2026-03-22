@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apache Tomcat Apache Tomcat treats Apache JServ Protocol (AJP) connections as having higher trust than, for example, a similar HTTP connection. If such connections are available to an attacker, they can be exploited.",
+  "token_count": 33
+}

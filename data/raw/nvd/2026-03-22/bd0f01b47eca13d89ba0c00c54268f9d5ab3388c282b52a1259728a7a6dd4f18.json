@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32045",
+  "ingested_at": "2026-03-22T07:54:49.195345+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.21 incorrectly apply tokenless Tailscale header authentication to HTTP gateway routes, allowing bypass of token and password requirements. Attackers on trusted networks can exploit this misconfiguration to access HTTP gateway routes without proper authentication credentials.",
+  "severity": "MEDIUM",
+  "sha256_hash": "bd0f01b47eca13d89ba0c00c54268f9d5ab3388c282b52a1259728a7a6dd4f18",
+  "source": "nvd",
+  "tags": [
+    "CWE-290"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32045"
+}

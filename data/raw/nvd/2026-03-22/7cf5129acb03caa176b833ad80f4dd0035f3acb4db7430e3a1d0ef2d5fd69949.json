@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-52482",
+  "ingested_at": "2026-03-22T07:54:33.617419+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, a Stored XSS vulnerability exists in the glossary function, enabling all users with the Teachers role to inject JavaScript malicious code against the administrator. This issue has been patched in version 1.11.30.",
+  "severity": "HIGH",
+  "sha256_hash": "7cf5129acb03caa176b833ad80f4dd0035f3acb4db7430e3a1d0ef2d5fd69949",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-52482"
+}

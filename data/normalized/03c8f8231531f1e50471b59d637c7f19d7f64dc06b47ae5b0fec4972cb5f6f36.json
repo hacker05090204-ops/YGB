@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in itsourcecode University Management System 1.0. Affected by this issue is some unknown functionality of the file /admin_single_student_update.php. The manipulation of the argument ID leads to sql injection. Remote exploitation of the attack is possible. The exploit has been disclosed publicly and may be used.",
+  "token_count": 51
+}

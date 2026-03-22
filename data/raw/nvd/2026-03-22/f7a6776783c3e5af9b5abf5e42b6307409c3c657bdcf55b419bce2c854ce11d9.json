@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-2399",
+  "ingested_at": "2026-03-22T07:54:42.449372+00:00",
+  "lang": "en",
+  "raw_text": "Improper Validation of Specified Index, Position, or Offset in Input vulnerability in Mitsubishi Electric CNC M800V Series M800VW and M800VS, M80V Series M80V and M80VW, M800 Series M800W and M800S, M80 Series M80 and M80W, E80 Series E80, C80 Series C80, M700V Series M750VW, M720VW, 730VW, M720VS, M730VS, and M750VS, M70V Series M70V, E70 Series E70, and Software Tools NC Trainer2 and NC Trainer2 plus allows a remote attacker to cause an out-of-bounds read, resulting in a denial-of-service condition by sending specially crafted packets to TCP port 683.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f7a6776783c3e5af9b5abf5e42b6307409c3c657bdcf55b419bce2c854ce11d9",
+  "source": "nvd",
+  "tags": [
+    "CWE-1285"
+  ],
+  "token_count": 88,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-2399"
+}

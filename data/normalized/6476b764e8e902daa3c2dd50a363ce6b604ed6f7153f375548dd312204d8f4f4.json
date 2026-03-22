@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS, macOS, and other Apple products contain an unspecified vulnerability when processing maliciously crafted web content that may lead to a cross-site scripting (XSS) attack.",
+  "token_count": 29
+}

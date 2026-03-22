@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, stored cross-site scripting (XSS) in the Graphical Pain Map (\"clickmap\") form allows any authenticated clinician to inject arbitrary JavaScript that executes in the browser of every subsequent user who views the affected encounter form. Because session cookies are not marked HttpOnly, this enables full session hijacking of other users, including administrators. This vulnerability is fixed in 8.0.0.1.",
+  "token_count": 75
+}

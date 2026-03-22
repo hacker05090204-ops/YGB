@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24849",
+  "ingested_at": "2026-03-22T07:54:31.837959+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 7.0.4, the `disposeDocument()` method in `EtherFaxActions.php` allows authenticated users to read arbitrary files from the server filesystem. Any authenticated user (regardless of privilege level) can exploit this vulnerability to read sensitive files. Version 7.0.4 patches the issue.",
+  "severity": "CRITICAL",
+  "sha256_hash": "746edf77e0093c159e9672e0a8fbab593a9c4be65e8a919baa247a5f01a4f465",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 55,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24849"
+}

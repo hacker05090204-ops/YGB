@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31386",
+  "ingested_at": "2026-03-22T07:54:46.485137+00:00",
+  "lang": "en",
+  "raw_text": "OpenLiteSpeed and LSWS Enterprise provided by LiteSpeed Technologies contain an OS command injection vulnerability. An arbitrary OS command may be executed by an attacker with the administrative privilege.",
+  "severity": "HIGH",
+  "sha256_hash": "d61d5ae22c744b792700c5354b30e1f5eaef59dda39b74079b4c2088cb56b02c",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 28,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31386"
+}

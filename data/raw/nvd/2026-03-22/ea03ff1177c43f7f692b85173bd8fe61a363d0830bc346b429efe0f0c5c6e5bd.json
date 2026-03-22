@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30868",
+  "ingested_at": "2026-03-22T07:54:43.729901+00:00",
+  "lang": "en",
+  "raw_text": "OPNsense is a FreeBSD based firewall and routing platform. Prior to 26.1.4, multiple OPNsense MVC API endpoints perform state\u2010changing operations but are accessible via HTTP GET requests without CSRF protection. The framework CSRF validation in ApiControllerBase only applies to POST/PUT/DELETE methods, allowing authenticated GET requests to bypass CSRF verification. As a result, a malicious website can trigger privileged backend actions when visited by an authenticated user, causing unintended service reloads and configuration changes through configd. This results in an authenticated Cross\u2010Site Request Forgery vulnerability allowing unauthorized system state changes. This vulnerability is fixed in 26.1.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ea03ff1177c43f7f692b85173bd8fe61a363d0830bc346b429efe0f0c5c6e5bd",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30868"
+}

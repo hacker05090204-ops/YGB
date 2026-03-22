@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-26138",
+  "ingested_at": "2026-03-22T07:45:17.729964+00:00",
+  "lang": "en",
+  "raw_text": "Atlassian Confluence Atlassian Questions For Confluence App has hard-coded credentials, exposing the username and password in plaintext. A remote unauthenticated attacker can use these credentials to log into Confluence and access all content accessible to users in the confluence-users group.",
+  "severity": "CRITICAL",
+  "sha256_hash": "229db066c0838a6820f9c4a0cb856eb584d31ceebdfeae1aa466140e3a847185",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

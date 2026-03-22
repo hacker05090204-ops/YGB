@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-20775",
+  "ingested_at": "2026-03-22T07:45:15.879935+00:00",
+  "lang": "en",
+  "raw_text": "Cisco SD-WAN Cisco SD-WAN CLI contains a path traversal vulnerability that could allow an authenticated local attacker to gain elevated privileges via improper access controls on commands within the application CLI. A successful exploit could allow the attacker to execute arbitrary commands as the root user.",
+  "severity": "CRITICAL",
+  "sha256_hash": "6928517e8ba4dd300e84106319e65eaec4910655c8e9c5b5552be85a13c28da2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 46,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

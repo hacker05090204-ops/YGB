@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26416",
+  "ingested_at": "2026-03-22T07:54:40.887999+00:00",
+  "lang": "en",
+  "raw_text": "An authorization bypass vulnerability in Tata Consultancy Services Cognix Recon Client v3.0 allows authenticated users to escalate privileges across role boundaries via crafted requests.",
+  "severity": "HIGH",
+  "sha256_hash": "a92042ba187c64ce5d293c3e7f2d89a3592d9bc55d2ffb3d5126c94dcbdfaf80",
+  "source": "nvd",
+  "tags": [
+    "CWE-269"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26416"
+}

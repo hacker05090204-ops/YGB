@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22320",
+  "ingested_at": "2026-03-22T07:54:47.398332+00:00",
+  "lang": "en",
+  "raw_text": "A stack-based buffer overflow in the CLI's TFTP file\u2010transfer command handling allows a low-privileged attacker with Telnet/SSH access to trigger memory corruption by supplying unexpected or oversized filename input. Exploitation results in the corruption of the internal buffer, causing the CLI and web dashboard to become unavailable and leading to a denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "99acf72001524b132cf3866cf27aaa0a700f422fc44e3c0c2b1cb48b386766aa",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22320"
+}

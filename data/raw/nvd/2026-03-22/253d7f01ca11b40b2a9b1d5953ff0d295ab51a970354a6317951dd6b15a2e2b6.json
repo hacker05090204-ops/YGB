@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21736",
+  "ingested_at": "2026-03-22T07:54:42.273743+00:00",
+  "lang": "en",
+  "raw_text": "Software installed and run as a non-privileged user may conduct improper GPU system calls to gain write permission to read-only wrapped user-mode memory. This is caused by improper handling of the memory protections for the user-mode wrapped memory resource.",
+  "severity": "MEDIUM",
+  "sha256_hash": "253d7f01ca11b40b2a9b1d5953ff0d295ab51a970354a6317951dd6b15a2e2b6",
+  "source": "nvd",
+  "tags": [
+    "CWE-280"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21736"
+}

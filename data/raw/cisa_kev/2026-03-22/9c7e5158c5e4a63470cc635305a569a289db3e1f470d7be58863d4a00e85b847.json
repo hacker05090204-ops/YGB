@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-1862",
+  "ingested_at": "2026-03-22T07:45:17.839921+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader, Flash Player Adobe Acrobat and Reader and Adobe Flash Player allows remote attackers to execute code or cause denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "9c7e5158c5e4a63470cc635305a569a289db3e1f470d7be58863d4a00e85b847",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

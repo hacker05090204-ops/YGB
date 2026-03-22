@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A null pointer dereference vulnerability in the account settings CGI program of the Zyxel VMG3625-T50B firmware versions through 5.50(ABPM.9.6)C0 and the Zyxel WX3100-T0 firmware versions through 5.50(ABVL.4.8)C0 could allow an authenticated attacker with administrator privileges to trigger a denial-of-service (DoS) condition by sending a crafted HTTP request.",
+  "token_count": 47
+}

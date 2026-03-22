@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-35644",
+  "ingested_at": "2026-03-22T07:54:41.383612+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation (XSS or 'Cross-site Scripting') vulnerability in Pascal Birchler Preferred Languages allows DOM-Based XSS.This issue affects Preferred Languages: from n/a through 2.2.2.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1ff49e0333e8d8dfa163ebab5e4ae92436d12d551aecb692fa3cc4ed5014b1e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 29,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-35644"
+}

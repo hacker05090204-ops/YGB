@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13943",
+  "ingested_at": "2026-03-22T07:54:31.389748+00:00",
+  "lang": "en",
+  "raw_text": "A post-authentication command injection vulnerability in the log file download function of the Zyxel EX3301-T0 firmware versions through 5.50(ABVY.7)C0 could allow an authenticated attacker to execute operating system (OS) commands on an affected device.",
+  "severity": "HIGH",
+  "sha256_hash": "0e5ce4882d2e66c4423f132c5152467d9d063bb51aa57bc35938519ebcf3fd82",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 34,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13943"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-0005",
+  "ingested_at": "2026-03-22T07:45:17.951382+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows The Graphics Device Interface (GDI) in Microsoft Windows allows local users to gain privileges via a crafted application.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0ec31aa06a95a9c87649fcabdf87d6da92ee71421d38a720e7335e9f65b7152e",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 20,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

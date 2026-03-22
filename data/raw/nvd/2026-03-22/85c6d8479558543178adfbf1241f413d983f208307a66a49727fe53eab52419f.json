@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3338",
+  "ingested_at": "2026-03-22T07:54:33.992346+00:00",
+  "lang": "en",
+  "raw_text": "Improper signature validation in PKCS7_verify() in AWS-LC allows an unauthenticated user to bypass signature verification when processing PKCS7 objects with Authenticated Attributes. Customers of AWS services do not need to take action. Applications using AWS-LC should upgrade to AWS-LC version 1.69.0.",
+  "severity": "HIGH",
+  "sha256_hash": "85c6d8479558543178adfbf1241f413d983f208307a66a49727fe53eab52419f",
+  "source": "nvd",
+  "tags": [
+    "CWE-347"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3338"
+}

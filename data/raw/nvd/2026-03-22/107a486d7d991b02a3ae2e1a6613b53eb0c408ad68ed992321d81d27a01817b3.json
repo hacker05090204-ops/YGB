@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2756",
+  "ingested_at": "2026-03-22T07:54:49.567567+00:00",
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in OmniPEMF NeoRhythm up to 20260308. This affects an unknown function of the component BLE Interface. Such manipulation leads to missing authentication. The attack can only be initiated within the local network. This attack is characterized by high complexity. The exploitability is reported as difficult. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "107a486d7d991b02a3ae2e1a6613b53eb0c408ad68ed992321d81d27a01817b3",
+  "source": "nvd",
+  "tags": [
+    "CWE-287",
+    "CWE-306"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2756"
+}

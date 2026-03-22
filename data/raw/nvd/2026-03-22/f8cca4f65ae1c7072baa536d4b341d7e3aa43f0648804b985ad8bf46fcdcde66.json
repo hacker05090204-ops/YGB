@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-67994",
+  "ingested_at": "2026-03-22T07:54:30.051568+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in YayCommerce YayCurrency yaycurrency allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects YayCurrency: from n/a through < = 3.3.",
+  "severity": "HIGH",
+  "sha256_hash": "f8cca4f65ae1c7072baa536d4b341d7e3aa43f0648804b985ad8bf46fcdcde66",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-67994"
+}

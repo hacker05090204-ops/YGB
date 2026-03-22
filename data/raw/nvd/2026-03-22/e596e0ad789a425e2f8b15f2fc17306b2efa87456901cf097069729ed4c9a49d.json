@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0655",
+  "ingested_at": "2026-03-22T07:54:33.811721+00:00",
+  "lang": "en",
+  "raw_text": "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal') vulnerability in TP-Link Deco BE25 v1.0 (web modules) allows authenticated adjacent attacker to read arbitrary files or cause denial of service. This issue affects Deco BE25 v1.0: through 1.1.1 Build 20250822.",
+  "severity": "HIGH",
+  "sha256_hash": "e596e0ad789a425e2f8b15f2fc17306b2efa87456901cf097069729ed4c9a49d",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0655"
+}

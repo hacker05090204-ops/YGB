@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29108",
+  "ingested_at": "2026-03-22T07:54:48.352651+00:00",
+  "lang": "en",
+  "raw_text": "SuiteCRM is an open-source, enterprise-ready Customer Relationship Management (CRM) software application. Prior to versions 8.9.3, an authenticated API endpoint allows any user to retrieve detailed information about any other user, including their password hash, username, and MFA configuration. As any authenticated user can query this endpoint, it's possible to retrieve and potentially crack the passwords of administrative users. Version 8.9.3 patches the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7227d497a1e66e8ff754e47993c5e9a78e72520d1058fe9886d8000091a7b985",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 63,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29108"
+}

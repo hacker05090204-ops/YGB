@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24790",
+  "ingested_at": "2026-03-22T07:54:30.466173+00:00",
+  "lang": "en",
+  "raw_text": "The underlying PLC of the device can be remotely influenced, without proper safeguards or authentication.",
+  "severity": "HIGH",
+  "sha256_hash": "7ac0b4f48c0b89e31adb3a72b08e45099bc6c8a42fe3e34a335105744ebf1c4a",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24790"
+}

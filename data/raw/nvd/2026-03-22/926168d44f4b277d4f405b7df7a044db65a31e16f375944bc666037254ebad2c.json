@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2383",
+  "ingested_at": "2026-03-22T07:54:33.126421+00:00",
+  "lang": "en",
+  "raw_text": "The Simple Download Monitor plugin for WordPress is vulnerable to Stored Cross-Site Scripting via custom field in all versions up to, and including, 4.0.5 due to insufficient input sanitization and output escaping. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "926168d44f4b277d4f405b7df7a044db65a31e16f375944bc666037254ebad2c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2383"
+}

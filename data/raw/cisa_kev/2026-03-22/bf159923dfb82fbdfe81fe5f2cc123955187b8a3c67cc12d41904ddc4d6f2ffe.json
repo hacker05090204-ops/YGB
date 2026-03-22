@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2011-3402",
+  "ingested_at": "2026-03-22T07:45:16.132931+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Kernel contains an unspecified vulnerability in the TrueType font parsing engine in win32k.sys in the kernel-mode drivers that allows remote attackers to execute arbitrary code via crafted font data in a Word document or web page.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bf159923dfb82fbdfe81fe5f2cc123955187b8a3c67cc12d41904ddc4d6f2ffe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 40,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

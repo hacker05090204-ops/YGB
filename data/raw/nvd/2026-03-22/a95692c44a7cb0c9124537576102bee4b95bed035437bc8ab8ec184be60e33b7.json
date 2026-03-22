@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22215",
+  "ingested_at": "2026-03-22T07:54:44.635156+00:00",
+  "lang": "en",
+  "raw_text": "wpDiscuz before 7.6.47 contains a cross-site request forgery vulnerability in the getFollowsPage() function that allows attackers to trigger unauthorized actions without nonce validation. Attackers can craft malicious requests to enumerate follow relationships and manipulate user follow data by exploiting the missing CSRF protection in the follows page handler.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a95692c44a7cb0c9124537576102bee4b95bed035437bc8ab8ec184be60e33b7",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22215"
+}

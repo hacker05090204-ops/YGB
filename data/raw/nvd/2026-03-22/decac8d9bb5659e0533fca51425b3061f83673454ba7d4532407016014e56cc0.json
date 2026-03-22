@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25432",
+  "ingested_at": "2026-03-22T07:54:30.619839+00:00",
+  "lang": "en",
+  "raw_text": "Part-DB 0.4 contains an authentication bypass vulnerability that allows unauthenticated attackers to login by injecting SQL syntax into authentication parameters. Attackers can submit a single quote followed by 'or' in the login form to bypass credential validation and gain unauthorized access to the application.",
+  "severity": "HIGH",
+  "sha256_hash": "decac8d9bb5659e0533fca51425b3061f83673454ba7d4532407016014e56cc0",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25432"
+}

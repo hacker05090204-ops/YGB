@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0609",
+  "ingested_at": "2026-03-22T07:54:49.256994+00:00",
+  "lang": "en",
+  "raw_text": "The Logo Slider \u2013 Logo Carousel, Logo Showcase & Client Logo Slider Plugin plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the image alt text in all versions up to, and including, 4.9.0 due to insufficient input sanitization and output escaping in the 'logo-slider' shortcode. This makes it possible for authenticated attackers, with author level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "228585b989fd2510d94cc77f9b3620344b4db3700fa4042b6f1ce9fb51481b4f",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0609"
+}

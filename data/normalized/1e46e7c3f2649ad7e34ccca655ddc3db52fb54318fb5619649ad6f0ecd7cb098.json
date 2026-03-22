@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An improper access control vulnerability exists where an authenticated user could access areas outside of their authorized scope.",
+  "token_count": 18
+}

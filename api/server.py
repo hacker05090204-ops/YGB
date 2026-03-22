@@ -162,6 +162,7 @@ from backend.auth.auth_guard import (
     is_temporary_auth_bypass_enabled,
     revoke_token, revoke_session,
     preflight_check_secrets,
+    get_required_secret,
     validate_target_url,
     ws_authenticate,
     AUTH_COOKIE_NAME,
@@ -227,6 +228,7 @@ from backend.training.runtime_artifacts import (
     bootstrap_runtime_artifacts,
     repair_runtime_artifacts_if_needed,
 )
+from backend.training.runtime_status_validator import validate_precision_breach_status
 
 # Import auth and alerts
 from backend.auth.auth import (
@@ -363,6 +365,21 @@ async def lifespan(app):
         logger.info("[BOOT] Runtime artifacts bootstrapped")
     except Exception as e:
         logger.warning("[BOOT] Runtime artifact bootstrap degraded: %s", e)
+
+    try:
+        precision_status = validate_precision_breach_status()
+        if precision_status.get("checked"):
+            logger.info(
+                "[BOOT] Runtime precision status reconciled: %s "
+                "(precision=%.4f threshold=%.4f samples=%s source=%s)",
+                precision_status.get("state"),
+                float(precision_status.get("current_precision", 0.0)),
+                float(precision_status.get("precision_threshold", 0.0)),
+                precision_status.get("validation_samples"),
+                precision_status.get("validation_source"),
+            )
+    except Exception as e:
+        logger.warning("[BOOT] Runtime precision reconciliation degraded: %s", e)
 
     # Start CVE scheduler (async — must be awaited)
     try:
@@ -507,7 +524,7 @@ try:
         return response
 
     @app.get("/metrics/snapshot")
-    async def _metrics_snapshot():
+    async def _metrics_snapshot(user=Depends(require_auth)):
         """Internal metrics snapshot for observability dashboards."""
         return _metrics.get_snapshot()
 
@@ -905,19 +922,19 @@ def _get_integration_summary() -> Dict[str, Any]:
 
 
 @app.get("/api/readiness")
-async def get_readiness():
+async def get_readiness(user=Depends(require_auth)):
     """Dataset readiness endpoint — shows sample counts, thresholds, and blocking reasons."""
     return _get_dataset_readiness()
 
 
 @app.get("/api/integration/status")
-async def get_integration_status():
+async def get_integration_status(user=Depends(require_auth)):
     """Integration status per configured service."""
     return _get_integration_summary()
 
 
 @app.get("/api/cve/status")
-async def get_cve_status():
+async def get_cve_status(user=Depends(require_auth)):
     """CVE pipeline status — sources, freshness, record counts."""
     try:
         from backend.cve.cve_pipeline import get_pipeline
@@ -931,7 +948,7 @@ async def get_cve_status():
 
 
 @app.get("/api/cve/scheduler/health")
-async def get_cve_scheduler_health():
+async def get_cve_scheduler_health(user=Depends(require_auth)):
     """CVE scheduler SLO metrics and health status."""
     try:
         from backend.cve.cve_scheduler import get_scheduler
@@ -945,7 +962,7 @@ async def get_cve_scheduler_health():
 
 
 @app.get("/api/cve/pipeline/status")
-async def get_cve_pipeline_full_status():
+async def get_cve_pipeline_full_status(user=Depends(require_auth)):
     """Full CVE pipeline status with promotion, dedup/drift, and anti-hallucination."""
     try:
         from backend.cve.cve_pipeline import get_pipeline
@@ -1040,7 +1057,7 @@ async def readyz():
 
 
 @app.get("/api/cve/summary")
-async def get_cve_summary():
+async def get_cve_summary(user=Depends(require_auth)):
     """Quick CVE summary — total records, sources, freshness."""
     try:
         from backend.cve.cve_pipeline import get_pipeline
@@ -1091,7 +1108,7 @@ async def search_cves(q: str = "", user=Depends(require_auth)):
 
 
 @app.get("/api/training/readiness")
-async def get_training_readiness():
+async def get_training_readiness(user=Depends(require_auth)):
     """Training readiness truth table — per-field status with exact block reasons."""
     try:
         from impl_v1.training.data.real_dataset_loader import (
@@ -1175,7 +1192,7 @@ async def get_training_readiness():
 
 
 @app.get("/api/backup/status")
-async def get_backup_status_endpoint():
+async def get_backup_status_endpoint(user=Depends(require_auth)):
     """Backup strategy status — local HDD, peer replication, Google Drive."""
     try:
         from backend.storage.backup_config import get_backup_status
@@ -1842,7 +1859,7 @@ async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(
 # =============================================================================
 
 @app.get("/api/g38/status")
-async def get_g38_status(user=Depends(require_auth)):
+async def get_g38_status():
     """Get G38 auto-training status."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
@@ -4176,18 +4193,8 @@ def _as_bool(value: Any) -> bool:
 
 
 def _load_telemetry_hmac_secret() -> str:
-    """Load telemetry HMAC secret using native-priority sources."""
-    secret = os.getenv("YGB_HMAC_SECRET", "").strip()
-    if secret:
-        return secret
-
-    key_path = PROJECT_ROOT / "config" / "hmac_secret.key"
-    try:
-        if key_path.exists():
-            return key_path.read_text(encoding="utf-8").strip()
-    except Exception:
-        logger.exception("Failed reading telemetry key from %s", key_path)
-    return ""
+    """Load the telemetry HMAC secret from the environment only."""
+    return get_required_secret("YGB_HMAC_SECRET", 32)
 
 
 def _compute_telemetry_crc32(data: Dict[str, Any]) -> int:
@@ -4922,7 +4929,7 @@ def _get_oauth_state_ttl_seconds() -> int:
 
 
 def _get_oauth_state_secret() -> str:
-    return os.getenv("YGB_HMAC_SECRET", "") or os.getenv("JWT_SECRET", "")
+    return get_required_secret("YGB_HMAC_SECRET", 32)
 
 
 def _refresh_oauth_env(provider: str) -> None:

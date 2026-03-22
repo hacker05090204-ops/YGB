@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26935",
+  "ingested_at": "2026-03-22T07:54:32.712887+00:00",
+  "lang": "en",
+  "raw_text": "Improper Input Validation (CWE-20) in the internal Content Connectors search endpoint in Kibana can lead Denial of Service via Input Data Manipulation (CAPEC-153)",
+  "severity": "MEDIUM",
+  "sha256_hash": "8abe390533d478d21102823be3bfdf392491e082aba53b2cc319b7d56cf61f8b",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26935"
+}

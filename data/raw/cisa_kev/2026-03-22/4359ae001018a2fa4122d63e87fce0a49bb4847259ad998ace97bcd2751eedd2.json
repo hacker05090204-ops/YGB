@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-16010",
+  "ingested_at": "2026-03-22T07:45:19.187201+00:00",
+  "lang": "en",
+  "raw_text": "Google Chrome for Android UI Google Chrome for Android UI contains a heap buffer overflow vulnerability that allows a remote attacker, who has compromised the renderer process, to potentially perform a sandbox escape via a crafted HTML page.",
+  "severity": "CRITICAL",
+  "sha256_hash": "4359ae001018a2fa4122d63e87fce0a49bb4847259ad998ace97bcd2751eedd2",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

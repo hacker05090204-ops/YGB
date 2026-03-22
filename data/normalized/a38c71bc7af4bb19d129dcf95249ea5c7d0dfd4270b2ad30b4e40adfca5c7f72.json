@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in SourceCodester Web-based Pharmacy Product Management System 1.0. This affects an unknown function of the file add_admin.php. Such manipulation leads to improper authorization. The attack may be launched remotely.",
+  "token_count": 33
+}

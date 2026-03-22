@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3395",
+  "ingested_at": "2026-03-22T07:54:33.463891+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in MaxSite CMS up to 109.1. This impacts the function eval of the file application/maxsite/admin/plugins/editor_markitup/preview-ajax.php of the component MarkItUp Preview AJAX Endpoint. Executing a manipulation can lead to code injection. It is possible to launch the attack remotely. The exploit has been published and may be used. Upgrading to version 109.2 will fix this issue. This patch is called 08937a3c5d672a242d68f53e9fccf8a748820ef3. You should upgrade the affected component. The code maintainer was informed beforehand about the issues. He reacted very fast and highly professional.",
+  "severity": "HIGH",
+  "sha256_hash": "5559bd49faa07affcbcbc2ddb618e412c05d093544a809273e49f76a9d4d146b",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-94",
+    "CWE-94"
+  ],
+  "token_count": 87,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3395"
+}

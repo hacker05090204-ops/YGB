@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-9680",
+  "ingested_at": "2026-03-22T07:45:16.769090+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox Mozilla Firefox and Firefox ESR contain a use-after-free vulnerability in Animation timelines that allows for code execution in the content process.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0adb66783da3274281b7c466691653b815319a2e0f4359a358bf07b8651afa34",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 23,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

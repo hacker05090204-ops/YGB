@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22176",
+  "ingested_at": "2026-03-22T07:54:47.786992+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.19 contain a command injection vulnerability in Windows Scheduled Task script generation where environment variables are written to gateway.cmd using unquoted set KEY=VALUE assignments, allowing shell metacharacters to break out of assignment context. Attackers can inject arbitrary commands through environment variable values containing metacharacters like &, |, ^, %, or ! to achieve command execution when the scheduled task script is generated and executed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "355e77994677127221460cc85271fa1457d71312e5a7de20bd7e82b4e76f8cdc",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 68,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22176"
+}

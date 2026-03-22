@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In Modem, there is a possible out of bounds write due to a missing bounds check. This could lead to remote escalation of privilege, if a UE has connected to a rogue base station controlled by the attacker, with no additional execution privileges needed. User interaction is needed for exploitation. Patch ID: MOLY00782946; Issue ID: MSV-4135.",
+  "token_count": 56
+}

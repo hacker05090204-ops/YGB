@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-13460",
+  "ingested_at": "2026-03-22T07:54:46.302580+00:00",
+  "lang": "en",
+  "raw_text": "IBM Aspera Console 3.3.0 through 3.4.8 could allow an attacker to enumerate usernames due to an observable response discrepancy.",
+  "severity": "MEDIUM",
+  "sha256_hash": "5b98ba4ad137ed9e389f3adf8db51cfbfb2a4446a931d2a0d9269c8ad95e1acc",
+  "source": "nvd",
+  "tags": [
+    "CWE-204"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-13460"
+}

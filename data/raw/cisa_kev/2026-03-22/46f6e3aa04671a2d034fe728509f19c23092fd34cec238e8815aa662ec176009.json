@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-42999",
+  "ingested_at": "2026-03-22T07:45:16.408514+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Visual Composer Metadata Uploader contains a deserialization vulnerability that allows a privileged attacker to compromise the confidentiality, integrity, and availability of the host system by deserializing untrusted or malicious content.",
+  "severity": "CRITICAL",
+  "sha256_hash": "46f6e3aa04671a2d034fe728509f19c23092fd34cec238e8815aa662ec176009",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69365",
+  "ingested_at": "2026-03-22T07:54:30.233109+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in TeconceTheme Uroan Core uroan-core allows Blind SQL Injection.This issue affects Uroan Core: from n/a through < = 1.4.4.",
+  "severity": "CRITICAL",
+  "sha256_hash": "591416f7f6ddd354eb3d9fd897420adc8fb501572e7b6111bd68afc8ff715422",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69365"
+}

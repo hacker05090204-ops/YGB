@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player does not properly restrict discovery of memory addresses, which allows attackers to bypass the address space layout randomization (ASLR) protection mechanism.",
+  "token_count": 27
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The Conditional CAPTCHA WordPress plugin through 4.0.0 does not validate a parameter before redirecting the user to its value, leading to an Open Redirect issue",
+  "token_count": 25
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-28499",
+  "ingested_at": "2026-03-22T07:54:47.306396+00:00",
+  "lang": "en",
+  "raw_text": "LeafKit is a templating language with Swift-inspired syntax. Prior to version 1.14.2, HTML escaping doesn't work correctly when a template prints a collection (Array / Dictionary) via `#(value)`. This can result in XSS, allowing potentially untrusted input to be rendered unescaped. Version 1.14.2 fixes the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "799f7ace0f1ed83fc77f710a0705170c4659779fbd479e48c4b33f42db4b1517",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-80",
+    "CWE-116"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28499"
+}

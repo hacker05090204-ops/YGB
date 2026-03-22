@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "WeKnora is an LLM-powered framework designed for deep document understanding and semantic retrieval. Prior to version 0.3.0, a vulnerability involving tool name collision and indirect prompt injection allows a malicious remote MCP server to hijack tool execution. By exploiting an ambiguous naming convention in the MCP client (mcp_{service}_{tool}), an attacker can register a malicious tool that overwrites a legitimate one (e.g., tavily_extract). This enables the attacker to redirect LLM execution flow, exfiltrate system prompts, context, and potentially execute other tools with the user's privileges. This issue has been patched in version 0.3.0.",
+  "token_count": 92
+}

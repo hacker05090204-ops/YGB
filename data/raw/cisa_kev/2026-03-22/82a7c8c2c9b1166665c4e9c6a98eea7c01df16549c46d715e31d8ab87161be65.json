@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-0643",
+  "ingested_at": "2026-03-22T07:45:16.818762+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Flash Player Adobe Flash Player contains an incorrect default permissions vulnerability in the Firefox sandbox that allows a remote attacker to execute arbitrary code via crafted SWF content.",
+  "severity": "CRITICAL",
+  "sha256_hash": "82a7c8c2c9b1166665c4e9c6a98eea7c01df16549c46d715e31d8ab87161be65",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 29,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

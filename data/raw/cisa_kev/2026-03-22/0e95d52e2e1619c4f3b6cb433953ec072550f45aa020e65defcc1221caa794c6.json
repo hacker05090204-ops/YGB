@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-4324",
+  "ingested_at": "2026-03-22T07:45:17.834925+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Use-after-free vulnerability in Adobe Acrobat and Reader allows remote attackers to execute code via a crafted PDF file.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e95d52e2e1619c4f3b6cb433953ec072550f45aa020e65defcc1221caa794c6",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

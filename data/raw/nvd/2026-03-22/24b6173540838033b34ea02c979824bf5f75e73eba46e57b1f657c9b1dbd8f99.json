@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30955",
+  "ingested_at": "2026-03-22T07:54:44.705234+00:00",
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to 2.2.4, An API endpoint accepts unbounded request bodies without any size limit. An authenticated user can cause an OOM kill and complete service disruption for all users. This vulnerability is fixed in 2.2.4.",
+  "severity": "MEDIUM",
+  "sha256_hash": "24b6173540838033b34ea02c979824bf5f75e73eba46e57b1f657c9b1dbd8f99",
+  "source": "nvd",
+  "tags": [
+    "CWE-400"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30955"
+}

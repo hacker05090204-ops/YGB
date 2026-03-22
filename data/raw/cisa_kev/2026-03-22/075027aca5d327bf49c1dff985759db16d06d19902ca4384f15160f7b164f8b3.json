@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-39780",
+  "ingested_at": "2026-03-22T07:45:16.387922+00:00",
+  "lang": "en",
+  "raw_text": "ASUS RT-AX55 Routers ASUS RT-AX55 devices contain an OS command injection vulnerability that could allow a remote, authenticated attacker to execute arbitrary commands. As represented by CVE-2023-41346.",
+  "severity": "CRITICAL",
+  "sha256_hash": "075027aca5d327bf49c1dff985759db16d06d19902ca4384f15160f7b164f8b3",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 27,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

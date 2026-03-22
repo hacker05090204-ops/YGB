@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 Engine contains an out-of-bounds read vulnerability that allows a remote attacker to cause a denial of service or possibly have another unspecified impact via crafted JavaScript code. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "token_count": 54
+}

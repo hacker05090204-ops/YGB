@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-33053",
+  "ingested_at": "2026-03-22T07:45:16.356239+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows contains an external control of file name or path vulnerability that could allow an attacker to execute code from a remote WebDAV location specified by the WorkingDirectory attribute of Internet Shortcut files.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9e2e64e5a1d498af330466f72499421042f0d76a7153f1e1b9b78bc0920e50ab",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 36,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

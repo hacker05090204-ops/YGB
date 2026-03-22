@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "CrushFTP CrushFTP CrushFTP contains an unspecified sandbox escape vulnerability that allows a remote attacker to escape the CrushFTP virtual file system (VFS).",
+  "token_count": 22
+}

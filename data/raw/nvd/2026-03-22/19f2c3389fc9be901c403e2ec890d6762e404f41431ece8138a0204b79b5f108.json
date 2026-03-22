@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1305",
+  "ingested_at": "2026-03-22T07:54:33.134423+00:00",
+  "lang": "en",
+  "raw_text": "The Japanized for WooCommerce plugin for WordPress is vulnerable to Improper Authentication in versions up to, and including, 2.8.4. This is due to a flawed permission check in the `paidy_webhook_permission_check` function that unconditionally returns `true` when the webhook signature header is omitted. This makes it possible for unauthenticated attackers to bypass payment verification and fraudulently mark orders as \"Processing\" or \"Completed\" without actual payment via a crafted POST request to the Paidy webhook endpoint.",
+  "severity": "MEDIUM",
+  "sha256_hash": "19f2c3389fc9be901c403e2ec890d6762e404f41431ece8138a0204b79b5f108",
+  "source": "nvd",
+  "tags": [
+    "CWE-287"
+  ],
+  "token_count": 74,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1305"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "An exposed dangerous method in Ivanti DSM before version 2026.1.1 allows a local authenticated attacker to escalate their privileges.",
+  "token_count": 19
+}

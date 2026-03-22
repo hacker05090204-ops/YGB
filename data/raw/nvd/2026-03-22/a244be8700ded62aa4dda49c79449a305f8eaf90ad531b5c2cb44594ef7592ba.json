@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27121",
+  "ingested_at": "2026-03-22T07:54:30.654362+00:00",
+  "lang": "en",
+  "raw_text": "svelte performance oriented web framework. Versions of svelte prior to 5.51.5 are vulnerable to cross-site scripting (XSS) during server-side rendering. When using spread syntax to render attributes from untrusted data, event handler properties are included in the rendered HTML output. If an application spreads user-controlled or external data as element attributes, an attacker can inject malicious event handlers that execute in victims' browsers. This vulnerability is fixed in 5.51.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a244be8700ded62aa4dda49c79449a305f8eaf90ad531b5c2cb44594ef7592ba",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27121"
+}

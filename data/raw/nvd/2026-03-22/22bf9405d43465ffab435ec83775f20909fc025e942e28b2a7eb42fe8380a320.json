@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32402",
+  "ingested_at": "2026-03-22T07:54:46.028463+00:00",
+  "lang": "en",
+  "raw_text": "Missing Authorization vulnerability in Ays Pro Image Slider by Ays ays-slider allows Exploiting Incorrectly Configured Access Control Security Levels.This issue affects Image Slider by Ays: from n/a through < = 2.7.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "22bf9405d43465ffab435ec83775f20909fc025e942e28b2a7eb42fe8380a320",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32402"
+}

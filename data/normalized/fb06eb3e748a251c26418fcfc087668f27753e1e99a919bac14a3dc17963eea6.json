@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Chrome Blink Google Chrome Blink contains a heap use-after-free vulnerability that allows an attacker to potentially perform out of bounds memory access via a crafted HTML page.",
+  "token_count": 28
+}

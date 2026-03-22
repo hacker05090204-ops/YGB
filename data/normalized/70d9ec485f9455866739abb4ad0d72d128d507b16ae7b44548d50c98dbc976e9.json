@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in itsourcecode Online Doctor Appointment System 1.0. Affected is an unknown function of the file /admin/doctor_action.php. Performing a manipulation of the argument ID results in sql injection. Remote exploitation of the attack is possible. The exploit has been made public and could be used.",
+  "token_count": 48
+}

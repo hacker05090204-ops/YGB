@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28391",
+  "ingested_at": "2026-03-22T07:54:41.009806+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.2 fail to properly validate Windows cmd.exe metacharacters in allowlist-gated exec requests (non-default configuration), allowing attackers to bypass command approval restrictions. Remote attackers can craft command strings with shell metacharacters like & or %...% to execute unapproved commands beyond the allowlisted operations.",
+  "severity": "CRITICAL",
+  "sha256_hash": "c27b460f215c6d9e966657e7533317cb6c53ea43568b04c31bbc8811c593b265",
+  "source": "nvd",
+  "tags": [
+    "CWE-78",
+    "CWE-78"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28391"
+}

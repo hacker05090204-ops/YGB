@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30875",
+  "ingested_at": "2026-03-22T07:54:46.943276+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo LMS is a learning management system. Prior to version 1.11.36, an arbitrary file upload vulnerability in the H5P Import feature allows authenticated users with Teacher role to achieve Remote Code Execution (RCE). The H5P package validation only checks if h5p.json exists but doesn't block .htaccess or PHP files with alternative extensions. An attacker uploads a crafted H5P package containing a webshell and .htaccess that enables PHP execution for .txt files, bypassing security control. This issue has been patched in version 1.11.36.",
+  "severity": "HIGH",
+  "sha256_hash": "c3956332bb1df1c7de2700d5dc5ebacde9335f75fb9deb8179c2b6e9cbf370f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30875"
+}

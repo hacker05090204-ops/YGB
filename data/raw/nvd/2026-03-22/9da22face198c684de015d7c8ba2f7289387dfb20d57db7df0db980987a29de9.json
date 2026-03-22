@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-21627",
+  "ingested_at": "2026-03-22T07:54:29.956395+00:00",
+  "lang": "en",
+  "raw_text": "The vulnerability was rooted in how the Tassos Framework plugin handled specific AJAX requests through Joomla\u2019s com_ajax entry point. Under certain conditions, internal framework functionality could be invoked without proper restriction.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "9da22face198c684de015d7c8ba2f7289387dfb20d57db7df0db980987a29de9",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 31,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-21627"
+}

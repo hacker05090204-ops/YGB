@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contain a stack-based buffer overflow vulnerability that allows remote attackers to execute code or cause denial-of-service (DoS).",
+  "token_count": 25
+}

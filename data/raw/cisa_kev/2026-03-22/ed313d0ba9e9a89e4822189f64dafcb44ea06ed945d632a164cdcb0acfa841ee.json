@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-32893",
+  "ingested_at": "2026-03-22T07:45:17.710387+00:00",
+  "lang": "en",
+  "raw_text": "Apple iOS and macOS Apple iOS and macOS contain an out-of-bounds write vulnerability that could allow for remote code execution when processing malicious crafted web content.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ed313d0ba9e9a89e4822189f64dafcb44ea06ed945d632a164cdcb0acfa841ee",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

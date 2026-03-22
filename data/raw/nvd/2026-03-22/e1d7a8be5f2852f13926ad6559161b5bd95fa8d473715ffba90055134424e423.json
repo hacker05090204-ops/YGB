@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27540",
+  "ingested_at": "2026-03-22T07:54:47.854075+00:00",
+  "lang": "en",
+  "raw_text": "Unrestricted Upload of File with Dangerous Type vulnerability in Rymera Web Co Pty Ltd. Woocommerce Wholesale Lead Capture allows Using Malicious Files.This issue affects Woocommerce Wholesale Lead Capture: from n/a through 2.0.3.1.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e1d7a8be5f2852f13926ad6559161b5bd95fa8d473715ffba90055134424e423",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27540"
+}

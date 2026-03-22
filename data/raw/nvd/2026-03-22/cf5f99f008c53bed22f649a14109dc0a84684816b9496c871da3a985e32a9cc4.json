@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3580",
+  "ingested_at": "2026-03-22T07:54:48.046368+00:00",
+  "lang": "en",
+  "raw_text": "In wolfSSL 5.8.4, constant-time masking logic in sp_256_get_entry_256_9 is optimized into conditional branches (bnez) by GCC when targeting RISC-V RV32I with -O3. This transformation breaks the side-channel resistance of ECC scalar multiplication, potentially allowing a local attacker to recover secret keys via timing analysis.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "cf5f99f008c53bed22f649a14109dc0a84684816b9496c871da3a985e32a9cc4",
+  "source": "nvd",
+  "tags": [
+    "CWE-203"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3580"
+}

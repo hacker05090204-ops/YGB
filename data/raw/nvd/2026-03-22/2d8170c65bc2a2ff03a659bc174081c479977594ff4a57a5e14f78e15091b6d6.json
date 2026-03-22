@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3997",
+  "ingested_at": "2026-03-22T07:54:49.426889+00:00",
+  "lang": "en",
+  "raw_text": "The Text Toggle plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the 'title' shortcode attribute of the [tt_part] and [tt] shortcodes in all versions up to and including 1.1. This is due to insufficient input sanitization and output escaping on user-supplied shortcode attributes. Specifically, in the avp_texttoggle_part_shortcode() function, the 'title' attribute is extracted from shortcode attributes and concatenated directly into HTML output without any escaping \u2014 both within an HTML attribute context (title=\"...\") on line 116 and in HTML content on line 119. While the 'class' attribute is properly validated using ctype_alnum(), the 'title' attribute has no sanitization whatsoever. An attacker can inject double-quote characters to break out of the title attribute and inject arbitrary HTML attributes including event handlers. This makes it possible for authenticated attackers, with Contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "2d8170c65bc2a2ff03a659bc174081c479977594ff4a57a5e14f78e15091b6d6",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 151,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3997"
+}

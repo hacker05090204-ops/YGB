@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28287",
+  "ingested_at": "2026-03-22T07:54:40.915162+00:00",
+  "lang": "en",
+  "raw_text": "FreePBX is an open source IP PBX. From versions 16.0.17.2 to before 16.0.20 and from version 17.0.2.4 to before 17.0.5, multiple command injection vulnerabilities exist in the recordings module. This issue has been patched in versions 16.0.20 and 17.0.5.",
+  "severity": "HIGH",
+  "sha256_hash": "9d2f22040c1d470bcc2dd1cc70fb7e1d28e4bc0a86f83403ab19a073b66904f4",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28287"
+}

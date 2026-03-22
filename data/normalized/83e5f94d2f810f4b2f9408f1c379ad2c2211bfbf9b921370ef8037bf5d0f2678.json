@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Excel A remote code execution vulnerability exists in Microsoft Excel when the software fails to properly handle objects in memory.",
+  "token_count": 21
+}

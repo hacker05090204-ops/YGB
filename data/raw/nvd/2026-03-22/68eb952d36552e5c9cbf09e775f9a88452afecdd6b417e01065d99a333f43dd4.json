@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28025",
+  "ingested_at": "2026-03-22T07:54:40.379640+00:00",
+  "lang": "en",
+  "raw_text": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion') vulnerability in ThemeREX Stargaze stargaze allows PHP Local File Inclusion.This issue affects Stargaze: from n/a through < = 1.5.",
+  "severity": "HIGH",
+  "sha256_hash": "68eb952d36552e5c9cbf09e775f9a88452afecdd6b417e01065d99a333f43dd4",
+  "source": "nvd",
+  "tags": [
+    "CWE-98"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28025"
+}

@@ -1,0 +1,12 @@
+{
+  "cve_id": "CVE-2026-20995",
+  "ingested_at": "2026-03-22T07:54:46.394567+00:00",
+  "lang": "en",
+  "raw_text": "Exposure of sensitive functionality to an unauthorized actor in Smart Switch prior to version 3.7.69.15 allows remote attackers to set a specific configuration.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "b417c64c561d3da29cb5097734ee452afd12b57374a612eaf89bb0fe3131f168",
+  "source": "nvd",
+  "tags": [],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20995"
+}

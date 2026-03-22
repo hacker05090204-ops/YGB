@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-32434",
+  "ingested_at": "2026-03-22T07:45:17.345817+00:00",
+  "lang": "en",
+  "raw_text": "Apple Multiple Products Apple iOS. iPadOS, macOS, and watchOS contain an integer overflow vulnerability that could allow an application to execute code with kernel privileges.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5f40cfa70a872827b668d7888f2df40358c588cf7a71e2d026068766cdda0152",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

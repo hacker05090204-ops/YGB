@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-20038",
+  "ingested_at": "2026-03-22T07:45:18.797347+00:00",
+  "lang": "en",
+  "raw_text": "SonicWall SMA 100 Appliances SonicWall SMA 100 devies are vulnerable to an unauthenticated stack-based buffer overflow vulnerability where exploitation can result in code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "5b14666b094eecbe2031e19d189f6fe83656898c00132e633f9fd408bf3cecbf",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

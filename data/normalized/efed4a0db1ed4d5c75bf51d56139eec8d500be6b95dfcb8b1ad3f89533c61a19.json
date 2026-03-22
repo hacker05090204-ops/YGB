@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "The installer for Qsee Client versions 1.0.1 and prior insecurely load Dynamic Link Libraries (DLLs). When a user is directed to place some malicious DLL to the same directory and execute the affected installer, then arbitrary code may be executed with the administrative privilege.",
+  "token_count": 44
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69902",
+  "ingested_at": "2026-03-22T07:54:46.968880+00:00",
+  "lang": "en",
+  "raw_text": "A command injection vulnerability in the minimal_wrapper.py component of kubectl-mcp-server v1.2.0 allows attackers to execute arbitrary commands via injecting arbitrary shell metacharacters.",
+  "severity": "CRITICAL",
+  "sha256_hash": "9aadc4138540b1924a75fe705acfdf56ef5536c994cf817b9fc4e87857340e30",
+  "source": "nvd",
+  "tags": [
+    "CWE-94"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69902"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-0402",
+  "ingested_at": "2026-03-22T07:54:31.627023+00:00",
+  "lang": "en",
+  "raw_text": "A post-authentication Out-of-bounds Read vulnerability in SonicOS allows a remote attacker to crash a firewall.",
+  "severity": "MEDIUM",
+  "sha256_hash": "21c64c5eab9dfa644b47e17f7dfcb574ceb00ac9365febdc606f3e2ffe218bba",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-0402"
+}

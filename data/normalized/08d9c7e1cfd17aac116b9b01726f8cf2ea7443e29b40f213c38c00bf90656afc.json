@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "HCL Connections is vulnerable to a cross-site scripting attack where an attacker may leverage this issue to execute arbitrary script code in the browser of an unsuspecting user which leads to executing malicious script code. This may allow the attacker steal cookie-based authentication credentials and comprise user's account then launch other attacks.",
+  "token_count": 52
+}

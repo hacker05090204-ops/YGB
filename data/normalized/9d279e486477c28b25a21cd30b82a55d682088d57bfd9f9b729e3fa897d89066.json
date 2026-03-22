@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenProject is an open-source, web-based project management software. Prior to 17.2.0, this vulnerability occurs due to improper validation of OpenProject\u2019s Markdown rendering, specifically in the hyperlink handling. This allows an attacker to inject malicious hyperlink payloads that perform DOM clobbering. DOM clobbering can crash or blank the entire page by overwriting native DOM functions with HTML elements, causing critical JavaScript calls to throw runtime errors during application initialization and halt further execution. This vulnerability is fixed in 17.2.0.",
+  "token_count": 78
+}

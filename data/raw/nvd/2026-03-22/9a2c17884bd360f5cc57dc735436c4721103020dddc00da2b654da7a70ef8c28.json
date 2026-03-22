@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3715",
+  "ingested_at": "2026-03-22T07:54:42.014054+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Wavlink WL-WN579X3-C 231124. This affects the function sub_40139C of the file /cgi-bin/firewall.cgi. Performing a manipulation of the argument del_flag results in stack-based buffer overflow. It is possible to initiate the attack remotely. The exploit has been made public and could be used. Upgrading to version 20260226 is able to mitigate this issue. You should upgrade the affected component. The vendor was contacted early, responded in a very professional manner and quickly released a fixed version of the affected product.",
+  "severity": "HIGH",
+  "sha256_hash": "9a2c17884bd360f5cc57dc735436c4721103020dddc00da2b654da7a70ef8c28",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 84,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3715"
+}

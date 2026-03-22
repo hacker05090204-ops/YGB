@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25473",
+  "ingested_at": "2026-03-22T07:54:44.257444+00:00",
+  "lang": "en",
+  "raw_text": "Clinic Pro contains a SQL injection vulnerability that allows authenticated attackers to manipulate database queries by injecting SQL code through the month parameter. Attackers can send POST requests to the monthly_expense_overview endpoint with crafted month values using boolean-based blind, time-based blind, or error-based SQL injection techniques to extract sensitive database information.",
+  "severity": "HIGH",
+  "sha256_hash": "3402913a4da84dbe5b2ec29b4fa2625233cb6c910b9abb32146aad7f46f66f21",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25473"
+}

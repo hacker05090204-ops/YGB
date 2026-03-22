@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Tenda F453 1.0.0.3. Affected by this vulnerability is the function formWrlsafeset of the file /goform/AdvSetWrlsafeset of the component httpd. Such manipulation of the argument mit_ssid_index leads to buffer overflow. The attack can be executed remotely. The exploit is publicly available and might be used.",
+  "token_count": 49
+}

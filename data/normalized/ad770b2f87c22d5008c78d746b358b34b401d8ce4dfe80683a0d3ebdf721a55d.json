@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A zip slip vulnerability in the Admin import functionality of CTFd v3.8.1-18-gdb5a18c4 allows attackers to write arbitrary files outside the intended directories via supplying a crafted import.",
+  "token_count": 27
+}

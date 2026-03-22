@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14456",
+  "ingested_at": "2026-03-22T07:54:34.255028+00:00",
+  "lang": "en",
+  "raw_text": "IBM MQ Appliance 9.4 CD through 9.4.4.0 to 9.4.4.1",
+  "severity": "MEDIUM",
+  "sha256_hash": "d8a8669bfbfa0c5da2f2c8d1c0dfb533d4fdad2672c3288b923375a5c3f6e199",
+  "source": "nvd",
+  "tags": [
+    "CWE-327"
+  ],
+  "token_count": 9,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14456"
+}

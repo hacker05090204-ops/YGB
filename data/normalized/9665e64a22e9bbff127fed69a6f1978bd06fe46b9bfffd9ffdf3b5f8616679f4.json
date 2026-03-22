@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Initialization of a resource with an insecure default in Azure Compute Gallery allows an authorized attacker to disclose information over a network.",
+  "token_count": 22
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in Jordy Meow Meow Gallery meow-gallery allows Blind SQL Injection.This issue affects Meow Gallery: from n/a through < = 5.4.4.",
+  "token_count": 33
+}

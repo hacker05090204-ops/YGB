@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows The kernel in Microsoft Windows contains a vulnerability that allows local users to gain privileges via a crafted application.",
+  "token_count": 21
+}

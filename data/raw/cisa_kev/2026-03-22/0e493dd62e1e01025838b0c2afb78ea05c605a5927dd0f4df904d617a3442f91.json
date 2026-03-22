@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-26828",
+  "ingested_at": "2026-03-22T07:45:16.032696+00:00",
+  "lang": "en",
+  "raw_text": "OpenPLC ScadaBR OpenPLC ScadaBR contains an unrestricted upload of file with dangerous type vulnerability that allows remote authenticated users to upload and execute arbitrary JSP files via view_edit.shtm.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e493dd62e1e01025838b0c2afb78ea05c605a5927dd0f4df904d617a3442f91",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

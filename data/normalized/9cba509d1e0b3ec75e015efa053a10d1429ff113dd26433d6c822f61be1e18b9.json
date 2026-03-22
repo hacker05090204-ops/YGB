@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco Secure Access Control System (ACS) A vulnerability in Java deserialization used by Cisco Secure Access Control System (ACS) could allow an unauthenticated, remote attacker to execute arbitrary commands on an affected device. The vulnerability is due to insecure deserialization of user-supplied content by the affected software.",
+  "token_count": 47
+}

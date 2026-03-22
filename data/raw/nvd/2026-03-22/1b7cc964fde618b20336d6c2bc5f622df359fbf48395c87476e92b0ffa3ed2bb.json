@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26340",
+  "ingested_at": "2026-03-22T07:54:31.755612+00:00",
+  "lang": "en",
+  "raw_text": "Tattile Smart+, Vega, and Basic device families firmware versions 1.181.5 and prior expose RTSP streams without requiring authentication. A remote attacker can connect to the RTSP service and access live video/audio streams without valid credentials, resulting in unauthorized disclosure of surveillance data.",
+  "severity": "HIGH",
+  "sha256_hash": "1b7cc964fde618b20336d6c2bc5f622df359fbf48395c87476e92b0ffa3ed2bb",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26340"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-26794",
+  "ingested_at": "2026-03-22T07:54:44.402458+00:00",
+  "lang": "en",
+  "raw_text": "GL-iNet GL-AR300M16 v4.3.11 was discovered to contain a SQL injection vulnerability via the add_group() function. This vulnerability allows attackers to execute arbitrary SQL database operations via a crafted HTTP request.",
+  "severity": "HIGH",
+  "sha256_hash": "4d4a6060f4e0243b38139e01e9d343207ddf86212aff696fb56dda2e0918f845",
+  "source": "nvd",
+  "tags": [
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26794"
+}

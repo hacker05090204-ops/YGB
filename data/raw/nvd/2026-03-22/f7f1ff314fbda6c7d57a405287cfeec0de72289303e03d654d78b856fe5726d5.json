@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3800",
+  "ingested_at": "2026-03-22T07:54:42.160630+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in SourceCodester/janobe Resort Reservation System 1.0. Affected is the function doInsert of the file /controller.php?action=add. Such manipulation of the argument image leads to unrestricted upload. The attack can be executed remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f7f1ff314fbda6c7d57a405287cfeec0de72289303e03d654d78b856fe5726d5",
+  "source": "nvd",
+  "tags": [
+    "CWE-284",
+    "CWE-434",
+    "CWE-434"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3800"
+}

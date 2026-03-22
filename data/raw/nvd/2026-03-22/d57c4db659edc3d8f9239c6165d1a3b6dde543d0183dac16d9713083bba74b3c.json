@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-1823",
+  "ingested_at": "2026-03-22T07:54:41.803274+00:00",
+  "lang": "en",
+  "raw_text": "The Consensus Embed plugin for WordPress is vulnerable to Stored Cross-Site Scripting via the plugin's consensus shortcode in all versions up to, and including, 1.6 due to insufficient input sanitization and output escaping on user supplied attributes. This makes it possible for authenticated attackers, with contributor-level access and above, to inject arbitrary web scripts in pages that will execute whenever a user accesses an injected page.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d57c4db659edc3d8f9239c6165d1a3b6dde543d0183dac16d9713083bba74b3c",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-1823"
+}

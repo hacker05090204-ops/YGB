@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-26485",
+  "ingested_at": "2026-03-22T07:45:18.470273+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox Mozilla Firefox contains a use-after-free vulnerability in XSLT parameter processing which can be exploited to perform arbitrary code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1714e760f4c22bd0f4f0a9b59f94e929c1e50d32606ee4e49596bb06fe346450",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

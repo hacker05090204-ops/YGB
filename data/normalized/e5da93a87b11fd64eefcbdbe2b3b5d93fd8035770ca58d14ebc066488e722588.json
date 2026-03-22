@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in mod_proxy_cluster. This vulnerability, a Carriage Return Line Feed (CRLF) injection in the decodeenc() function, allows a remote attacker to bypass input validation. By injecting CRLF sequences into the cluster configuration, an attacker can corrupt the response body of INFO endpoint responses. Exploitation requires network access to the MCMP protocol port, but no authentication is needed.",
+  "token_count": 60
+}

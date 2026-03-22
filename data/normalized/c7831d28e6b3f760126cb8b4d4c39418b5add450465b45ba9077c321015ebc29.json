@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Server-side request forgery (ssrf) in Microsoft 365 Copilot's Business Chat allows an authorized attacker to elevate privileges over a network.",
+  "token_count": 20
+}

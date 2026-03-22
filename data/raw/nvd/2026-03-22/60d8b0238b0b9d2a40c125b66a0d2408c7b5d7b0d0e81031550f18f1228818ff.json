@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33070",
+  "ingested_at": "2026-03-22T07:54:48.746362+00:00",
+  "lang": "en",
+  "raw_text": "FileRise is a self-hosted web file manager / WebDAV server. In versions prior to 3.8.0, a missing-authentication vulnerability in the deleteShareLink endpoint allows any unauthenticated user to delete arbitrary file share links by providing only the share token, causing denial of service to shared file access. The POST /api/file/deleteShareLink.php endpoint calls FileController::deleteShareLink() which performs no authentication, authorization, or CSRF validation before deleting a share link. Any anonymous HTTP client can destroy share links. This issue is fixed in version 3.8.0.",
+  "severity": "LOW",
+  "sha256_hash": "60d8b0238b0b9d2a40c125b66a0d2408c7b5d7b0d0e81031550f18f1228818ff",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 80,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33070"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-41710",
+  "ingested_at": "2026-03-22T07:54:42.571159+00:00",
+  "lang": "en",
+  "raw_text": "An unauthenticated remote attacker may use hardcodes credentials to get access to the previously activated FTP Server with limited read and write privileges.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4c6ff7441591b274f636aae3fd474c54f75e7029269bd8b7d1eefbe953535374",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-41710"
+}

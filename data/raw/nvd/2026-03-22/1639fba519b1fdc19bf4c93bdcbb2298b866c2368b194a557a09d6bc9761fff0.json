@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25456",
+  "ingested_at": "2026-03-22T07:54:30.999196+00:00",
+  "lang": "en",
+  "raw_text": "Web Ofisi Emlak v2 contains an SQL injection vulnerability that allows unauthenticated attackers to manipulate database queries by injecting SQL code through the 'ara' GET parameter. Attackers can send requests to with time-based SQL injection payloads to extract sensitive database information or cause denial of service.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1639fba519b1fdc19bf4c93bdcbb2298b866c2368b194a557a09d6bc9761fff0",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25456"
+}

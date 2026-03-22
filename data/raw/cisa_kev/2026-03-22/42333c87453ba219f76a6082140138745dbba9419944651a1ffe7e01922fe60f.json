@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-47813",
+  "ingested_at": "2026-03-22T07:45:15.844710+00:00",
+  "lang": "en",
+  "raw_text": "Wing FTP Server Wing FTP Server Wing FTP Server contains a generation of error message containing sensitive information vulnerability when using a long value in the UID cookie.",
+  "severity": "CRITICAL",
+  "sha256_hash": "42333c87453ba219f76a6082140138745dbba9419944651a1ffe7e01922fe60f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

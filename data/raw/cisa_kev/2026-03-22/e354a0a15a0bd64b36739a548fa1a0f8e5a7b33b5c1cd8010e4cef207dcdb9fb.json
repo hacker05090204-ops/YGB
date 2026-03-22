@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2020-9377",
+  "ingested_at": "2026-03-22T07:45:18.284507+00:00",
+  "lang": "en",
+  "raw_text": "D-Link DIR-610 Devices D-Link DIR-610 devices allow remote code execution via the cmd parameter to command.php.",
+  "severity": "CRITICAL",
+  "sha256_hash": "e354a0a15a0bd64b36739a548fa1a0f8e5a7b33b5c1cd8010e4cef207dcdb9fb",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

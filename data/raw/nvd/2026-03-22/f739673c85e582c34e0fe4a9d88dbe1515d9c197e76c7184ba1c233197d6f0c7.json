@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33550",
+  "ingested_at": "2026-03-22T07:54:49.599569+00:00",
+  "lang": "en",
+  "raw_text": "SOGo before 5.12.5 does not renew the OTP if a user disables/enables it, and has a too short length (only 12 digits instead of the 20 recommended).",
+  "severity": "LOW",
+  "sha256_hash": "f739673c85e582c34e0fe4a9d88dbe1515d9c197e76c7184ba1c233197d6f0c7",
+  "source": "nvd",
+  "tags": [
+    "CWE-308"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33550"
+}

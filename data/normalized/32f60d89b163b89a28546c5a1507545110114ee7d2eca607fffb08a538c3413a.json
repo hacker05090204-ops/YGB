@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use of a custom token encoding algorithm in Streamsoft Presti\u017c software allows the value of the KSeF (Krajowy System e-Faktur) token to be guessed after analyzing how tokens with know values are encoded. This issue was fixed in version 20.0.380.92.",
+  "token_count": 40
+}

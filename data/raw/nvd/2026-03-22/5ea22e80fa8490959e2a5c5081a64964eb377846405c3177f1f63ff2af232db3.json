@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30707",
+  "ingested_at": "2026-03-22T07:54:47.164086+00:00",
+  "lang": "en",
+  "raw_text": "An issue was discovered in SpeedExam Online Examination System (SaaS) after v.FEV2026. It allows Broken Access Control via the ReviewAnswerDetails ASP.NET PageMethod. Authenticated attackers can bypass client-side restrictions and invoke this method directly to retrieve the full answer key",
+  "severity": "HIGH",
+  "sha256_hash": "5ea22e80fa8490959e2a5c5081a64964eb377846405c3177f1f63ff2af232db3",
+  "source": "nvd",
+  "tags": [
+    "CWE-284"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30707"
+}

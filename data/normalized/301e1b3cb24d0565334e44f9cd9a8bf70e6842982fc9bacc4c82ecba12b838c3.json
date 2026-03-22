@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in codepeople CP Contact Form with Paypal cp-contact-form-with-paypal allows Blind SQL Injection.This issue affects CP Contact Form with Paypal: from n/a through < = 1.3.61.",
+  "token_count": 38
+}

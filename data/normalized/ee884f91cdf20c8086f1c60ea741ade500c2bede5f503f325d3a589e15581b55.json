@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Zabbix Frontend Unsafe client-side session storage leading to authentication bypass/instance takeover via Zabbix Frontend with configured SAML.",
+  "token_count": 17
+}

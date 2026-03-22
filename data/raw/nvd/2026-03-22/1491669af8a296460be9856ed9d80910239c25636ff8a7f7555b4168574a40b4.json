@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-2886",
+  "ingested_at": "2026-03-22T07:54:30.887865+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Tenda A21 1.0.0.0. This affects the function set_device_name of the file /goform/SetOnlineDevName. This manipulation of the argument devName causes stack-based buffer overflow. It is possible to initiate the attack remotely. The exploit has been made available to the public and could be used for attacks.",
+  "severity": "HIGH",
+  "sha256_hash": "1491669af8a296460be9856ed9d80910239c25636ff8a7f7555b4168574a40b4",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2886"
+}

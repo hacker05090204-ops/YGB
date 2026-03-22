@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-4852",
+  "ingested_at": "2026-03-22T07:45:19.487512+00:00",
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server contains a deserialization of untrusted data vulnerability within Apache Commons, which can allow for for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "32a3cc486385e41e5e94096126cced5a0d3e1047e5ba5ee683edd82623841492",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 24,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

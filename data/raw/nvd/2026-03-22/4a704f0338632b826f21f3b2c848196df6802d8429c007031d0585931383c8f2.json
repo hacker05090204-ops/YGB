@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33150",
+  "ingested_at": "2026-03-22T07:54:48.993304+00:00",
+  "lang": "en",
+  "raw_text": "libfuse is the reference implementation of the Linux FUSE. From version 3.18.0 to before version 3.18.2, a use-after-free vulnerability in the io_uring subsystem of libfuse allows a local attacker to crash FUSE filesystem processes and potentially execute arbitrary code. When io_uring thread creation fails due to resource exhaustion (e.g., cgroup pids.max), fuse_uring_start() frees the ring pool structure but stores the dangling pointer in the session state, leading to a use-after-free when the session shuts down. The trigger is reliable in containerized environments where cgroup pids.max limits naturally constrain thread creation. This issue has been patched in version 3.18.2.",
+  "severity": "HIGH",
+  "sha256_hash": "4a704f0338632b826f21f3b2c848196df6802d8429c007031d0585931383c8f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 98,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33150"
+}

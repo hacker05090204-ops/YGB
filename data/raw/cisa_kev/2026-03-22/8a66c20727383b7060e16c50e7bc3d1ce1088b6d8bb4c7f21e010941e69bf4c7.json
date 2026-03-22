@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0708",
+  "ingested_at": "2026-03-22T07:45:19.342694+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Remote Desktop Services Microsoft Remote Desktop Services, formerly known as Terminal Service, contains an unspecified vulnerability that allows an unauthenticated attacker to connect to the target system using RDP and send specially crafted requests. Successful exploitation allows for remote code execution. The vulnerability is also known under the moniker of BlueKeep.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8a66c20727383b7060e16c50e7bc3d1ce1088b6d8bb4c7f21e010941e69bf4c7",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 52,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

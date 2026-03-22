@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3925",
+  "ingested_at": "2026-03-22T07:54:44.070946+00:00",
+  "lang": "en",
+  "raw_text": "Incorrect security UI in LookalikeChecks in Google Chrome on Android prior to 146.0.7680.71 allowed a remote attacker to perform UI spoofing via a crafted HTML page. (Chromium security severity: Medium)",
+  "severity": "MEDIUM",
+  "sha256_hash": "61bb1134550642387df11b5440198700d85b03b22c0568c84f795764c915f0a1",
+  "source": "nvd",
+  "tags": [
+    "CWE-451"
+  ],
+  "token_count": 30,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3925"
+}

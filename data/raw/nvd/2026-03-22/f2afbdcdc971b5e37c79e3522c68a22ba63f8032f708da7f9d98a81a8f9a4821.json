@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-69405",
+  "ingested_at": "2026-03-22T07:54:30.317120+00:00",
+  "lang": "en",
+  "raw_text": "Deserialization of Untrusted Data vulnerability in ThemeREX Lorem Ipsum | Books & Media Store lorem-ipsum-books-media-store allows Object Injection.This issue affects Lorem Ipsum | Books & Media Store: from n/a through < = 1.2.6.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f2afbdcdc971b5e37c79e3522c68a22ba63f8032f708da7f9d98a81a8f9a4821",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-69405"
+}

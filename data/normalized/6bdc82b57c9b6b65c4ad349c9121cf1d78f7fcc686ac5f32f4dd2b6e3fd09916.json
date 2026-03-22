@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A flaw was found in the Red Hat Ansible Automation Platform, Event-Driven Ansible (EDA) Event Stream API. This vulnerability allows exposure of sensitive client credentials and internal infrastructure headers via the test_headers field when an event stream is in test mode. The possible outcome includes leakage of internal infrastructure details, accidental disclosure of user or system credentials, privilege escalation if high-value tokens are exposed, and persistent sensitive data exposure to all users with read access on the event stream.",
+  "token_count": 79
+}

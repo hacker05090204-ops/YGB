@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-12690",
+  "ingested_at": "2026-03-22T07:54:43.610963+00:00",
+  "lang": "en",
+  "raw_text": "Execution with unnecessary privileges in Forcepoint NGFW Engine allows local privilege escalation.This issue affects NGFW Engine through 6.10.19, through 7.3.0, through 7.2.4, through 7.1.10.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "951df106381954d54cfd32c1adad5e4f8da6c8325bb8d7e2eda8b4a5b5eb52c4",
+  "source": "nvd",
+  "tags": [
+    "CWE-250"
+  ],
+  "token_count": 24,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-12690"
+}

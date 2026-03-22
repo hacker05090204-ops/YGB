@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-70221",
+  "ingested_at": "2026-03-22T07:54:34.802115+00:00",
+  "lang": "en",
+  "raw_text": "Stack buffer overflow vulnerability in D-Link DIR-513 v1.10 via the curTime parameter to goform/formLogin.",
+  "severity": "CRITICAL",
+  "sha256_hash": "bfb7ab01f4cf7c6fb37e30b687abb78ec1fa52f8b84c3ba2a1c961c8935f5625",
+  "source": "nvd",
+  "tags": [
+    "CWE-121"
+  ],
+  "token_count": 14,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-70221"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2009-3953",
+  "ingested_at": "2026-03-22T07:45:17.837922+00:00",
+  "lang": "en",
+  "raw_text": "Adobe Acrobat and Reader Adobe Acrobat and Reader contains an array boundary issue in Universal 3D (U3D) support that could lead to remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "0e4a4243c39c61cc809d9a72928b720913b889aeff55df99ce3c6acbaba7d057",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

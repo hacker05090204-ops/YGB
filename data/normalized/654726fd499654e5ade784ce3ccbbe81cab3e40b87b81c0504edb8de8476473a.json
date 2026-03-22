@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "PEAR Archive_Tar PEAR Archive_Tar allows an unserialization attack because phar: is blocked but PHAR: is not blocked. PEAR stands for PHP Extension and Application Repository and it is an open-source framework and distribution system for reusable PHP components with known usage in third-party products such as Drupal Core and Red Hat Linux.",
+  "token_count": 52
+}

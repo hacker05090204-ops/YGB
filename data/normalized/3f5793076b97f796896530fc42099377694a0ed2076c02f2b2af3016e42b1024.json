@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Free5GC 4.1.0. Affected is the function HandleRegistrationComplete of the file internal/gmm/handler.go of the component AMF. Executing a manipulation can lead to denial of service. The attack may be performed from remote. This patch is called 52e9386401ce56ea773c5aa587d4cdf7d53da799. It is best practice to apply a patch to resolve this issue.",
+  "token_count": 54
+}

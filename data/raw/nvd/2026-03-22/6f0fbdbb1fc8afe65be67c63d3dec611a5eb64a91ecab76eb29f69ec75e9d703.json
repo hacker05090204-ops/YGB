@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15473",
+  "ingested_at": "2026-03-22T07:54:44.178781+00:00",
+  "lang": "en",
+  "raw_text": "The Timetics WordPress plugin before 1.0.52 does not have authorization in a REST endpoint, allowing unauthenticated users to arbitrarily change a booking's payment status and post status for the \"timetics-booking\" custom post type.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6f0fbdbb1fc8afe65be67c63d3dec611a5eb64a91ecab76eb29f69ec75e9d703",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 33,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-15473"
+}

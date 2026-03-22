@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sophos CyberoamOS CyberoamOS (CROS) contains a SQL injection vulnerability in the WebAdmin that allows an unauthenticated attacker to execute arbitrary SQL statements remotely.",
+  "token_count": 23
+}

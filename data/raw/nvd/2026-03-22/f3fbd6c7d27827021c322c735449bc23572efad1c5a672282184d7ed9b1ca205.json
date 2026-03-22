@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2571",
+  "ingested_at": "2026-03-22T07:54:47.870051+00:00",
+  "lang": "en",
+  "raw_text": "The Download Manager plugin for WordPress is vulnerable to unauthorized access of data due to a missing capability check on the 'reviewUserStatus' function in all versions up to, and including, 3.3.49. This makes it possible for authenticated attackers, with Subscriber-level access and above, to retrieve sensitive information for any user on the site including email addresses, display names, and registration dates.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f3fbd6c7d27827021c322c735449bc23572efad1c5a672282184d7ed9b1ca205",
+  "source": "nvd",
+  "tags": [
+    "CWE-200"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2571"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-56145",
+  "ingested_at": "2026-03-22T07:45:16.385924+00:00",
+  "lang": "en",
+  "raw_text": "Craft CMS Craft CMS Craft CMS contains a code injection vulnerability. Users with affected versions are vulnerable to remote code execution if their php.ini configuration has `register_argc_argv` enabled.",
+  "severity": "CRITICAL",
+  "sha256_hash": "ff5dfde0c93ccdc6d2f759039c5da6c34ef3d5ae3fc77e2067bc1e4caf31073f",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 28,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

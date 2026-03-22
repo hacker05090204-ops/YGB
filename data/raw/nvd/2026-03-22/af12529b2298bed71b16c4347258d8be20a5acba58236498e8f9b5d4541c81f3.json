@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50195",
+  "ingested_at": "2026-03-22T07:54:33.677543+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, there is an OS Command Injection vulnerability in /plugin/vchamilo/views/manage.controller.php. This issue has been patched in version 1.11.30.",
+  "severity": "HIGH",
+  "sha256_hash": "af12529b2298bed71b16c4347258d8be20a5acba58236498e8f9b5d4541c81f3",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50195"
+}

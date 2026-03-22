@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Cisco NX-OS Cisco NX-OS contains a command injection vulnerability in the command line interface (CLI) that could allow an authenticated, local attacker to execute commands as root on the underlying operating system of an affected device.",
+  "token_count": 36
+}

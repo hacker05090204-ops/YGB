@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-20805",
+  "ingested_at": "2026-03-22T07:45:15.979871+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Desktop Windows Manager contains an information disclosure vulnerability that allows an authorized attacker to disclose information locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "39eaa55eb5093166a3484860605b5f421294b7d2ced0c607077c8afc01eb9316",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

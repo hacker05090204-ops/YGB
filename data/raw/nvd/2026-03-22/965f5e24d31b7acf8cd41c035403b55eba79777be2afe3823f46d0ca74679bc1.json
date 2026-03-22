@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-20131",
+  "ingested_at": "2026-03-22T07:54:34.729826+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability in the web-based management interface of Cisco Secure Firewall Management Center (FMC) Software could allow an unauthenticated, remote attacker to execute arbitrary Java code as root on an affected device. This vulnerability is due to insecure deserialization of a user-supplied Java byte stream. An attacker could exploit this vulnerability by sending a crafted serialized Java object to the web-based management interface of an affected device. A successful exploit could allow the attacker to execute arbitrary code on the device and elevate privileges to root. Note: If the FMC management interface does not have public internet access, the attack surface that is associated with this vulnerability is reduced.",
+  "severity": "CRITICAL",
+  "sha256_hash": "965f5e24d31b7acf8cd41c035403b55eba79777be2afe3823f46d0ca74679bc1",
+  "source": "nvd",
+  "tags": [
+    "CWE-502"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-20131"
+}

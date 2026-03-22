@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-36025",
+  "ingested_at": "2026-03-22T07:45:17.152202+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows SmartScreen contains a security feature bypass vulnerability that could allow an attacker to bypass Windows Defender SmartScreen checks and their associated prompts.",
+  "severity": "CRITICAL",
+  "sha256_hash": "91fa386d6cb4469bcc33ad2cc7f60f920e678dd14f7a941a368316c2df85c413",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 26,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

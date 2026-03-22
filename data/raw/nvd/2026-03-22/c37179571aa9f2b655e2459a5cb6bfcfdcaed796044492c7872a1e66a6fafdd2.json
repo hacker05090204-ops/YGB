@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22720",
+  "ingested_at": "2026-03-22T07:54:32.267602+00:00",
+  "lang": "en",
+  "raw_text": "VMware Aria Operations contains a stored cross-site scripting vulnerability. A malicious actor with privileges to create custom benchmarks may be able to inject script to perform administrative actions in VMware Aria Operations. To remediate CVE-2026-22720, apply the patches listed in the 'Fixed Version' column of the 'Response Matrix' of VMSA-2026-0001 https://support.broadcom.com/web/ecx/support-content-notification/-/external/content/SecurityAdvisories/0/36947https:// .",
+  "severity": "HIGH",
+  "sha256_hash": "c37179571aa9f2b655e2459a5cb6bfcfdcaed796044492c7872a1e66a6fafdd2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-22720"
+}

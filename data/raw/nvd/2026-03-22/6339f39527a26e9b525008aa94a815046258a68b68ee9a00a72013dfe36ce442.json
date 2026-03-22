@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25174",
+  "ingested_at": "2026-03-22T07:54:42.736059+00:00",
+  "lang": "en",
+  "raw_text": "Out-of-bounds read in Windows Extensible File Allocation allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "6339f39527a26e9b525008aa94a815046258a68b68ee9a00a72013dfe36ce442",
+  "source": "nvd",
+  "tags": [
+    "CWE-125"
+  ],
+  "token_count": 15,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25174"
+}

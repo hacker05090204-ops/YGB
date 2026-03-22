@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3747",
+  "ingested_at": "2026-03-22T07:54:42.073277+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in itsourcecode University Management System 1.0. Affected by this issue is some unknown functionality of the file /add_result.php. Such manipulation of the argument subject leads to sql injection. The attack may be launched remotely. The exploit is publicly available and might be used.",
+  "severity": "HIGH",
+  "sha256_hash": "d3d40e9594917e5c882969b3ecd08508c6a1eeb2e718bf4ff96e29e78df6fa65",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3747"
+}

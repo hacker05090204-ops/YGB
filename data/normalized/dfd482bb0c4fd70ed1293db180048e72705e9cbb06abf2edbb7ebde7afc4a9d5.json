@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Photobooth prior to 1.0.1 has a cross-site scripting (XSS) vulnerability in user input fields. Malicious users could inject scripts through unvalidated form inputs. This vulnerability is fixed in 1.0.1.",
+  "token_count": 29
+}

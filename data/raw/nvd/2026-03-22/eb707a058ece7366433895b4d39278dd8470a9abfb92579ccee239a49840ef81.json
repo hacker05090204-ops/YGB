@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-14339",
+  "ingested_at": "2026-03-22T07:54:30.828216+00:00",
+  "lang": "en",
+  "raw_text": "The weMail - Email Marketing, Lead Generation, Optin Forms, Email Newsletters, A/B Testing, and Automation plugin for WordPress is vulnerable to unauthorized form deletion in all versions up to, and including, 2.0.7. This is due to the `Forms::permission()` callback only validating the `X-WP-Nonce` header without checking user capabilities. Since the REST nonce is exposed to unauthenticated visitors via the `weMail` JavaScript object on pages with weMail forms, any unauthenticated user can permanently delete all weMail forms by extracting the nonce from the page source and sending a DELETE request to the forms endpoint.",
+  "severity": "MEDIUM",
+  "sha256_hash": "eb707a058ece7366433895b4d39278dd8470a9abfb92579ccee239a49840ef81",
+  "source": "nvd",
+  "tags": [
+    "CWE-862"
+  ],
+  "token_count": 93,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-14339"
+}

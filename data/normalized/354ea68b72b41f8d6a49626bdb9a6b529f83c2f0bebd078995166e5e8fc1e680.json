@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SaltStack Salt SaltStack Salt contains a path traversal vulnerability in the salt-master process ClearFuncs which allows directory access to authenticated users. Salt users who follow fundamental internet security guidelines and best practices are not affected by this vulnerability.",
+  "token_count": 38
+}

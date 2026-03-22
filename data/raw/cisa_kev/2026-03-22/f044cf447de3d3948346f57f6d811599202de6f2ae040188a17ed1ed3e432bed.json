@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-33246",
+  "ingested_at": "2026-03-22T07:45:17.269069+00:00",
+  "lang": "en",
+  "raw_text": "Apache RocketMQ Several components of Apache RocketMQ, including NameServer, Broker, and Controller, are exposed to the extranet and lack permission verification. An attacker can exploit this vulnerability by using the update configuration function to execute commands as the system users that RocketMQ is running as or achieve the same effect by forging the RocketMQ protocol content.",
+  "severity": "CRITICAL",
+  "sha256_hash": "f044cf447de3d3948346f57f6d811599202de6f2ae040188a17ed1ed3e432bed",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 56,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-50188",
+  "ingested_at": "2026-03-22T07:54:33.603920+00:00",
+  "lang": "en",
+  "raw_text": "Chamilo is a learning management system. Prior to version 1.11.30, the application performs insufficient validation of data coming from the user from the GET value parameter with the following scripts: /plugin/vchamilo/views/syncparams.php and /plugin/vchamilo/ajax/service.php, which allows an attacker to perform an attack aimed at modifying the database query logic by injecting an arbitrary SQL statements. This issue has been patched in version 1.11.30.",
+  "severity": "HIGH",
+  "sha256_hash": "dcd43cad79db0f77fca9749184552222f7b3e41316087f9d1ba3bdeb2ea8ec2c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-50188"
+}

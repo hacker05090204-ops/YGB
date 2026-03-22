@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2024-55023",
+  "ingested_at": "2026-03-22T07:54:34.185024+00:00",
+  "lang": "en",
+  "raw_text": "Weintek cMT-3072XH2 easyweb v2.1.53, OS v20231011 was discovered to contain a hardcoded encryption key which could allow attackers to access sensitive information.",
+  "severity": "MEDIUM",
+  "sha256_hash": "eee9fb6fbae601fc7319196416c0c819297dd3c701015bf080892f87c96a15e9",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 22,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-55023"
+}

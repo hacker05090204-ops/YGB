@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2017-12637",
+  "ingested_at": "2026-03-22T07:45:16.498539+00:00",
+  "lang": "en",
+  "raw_text": "SAP NetWeaver SAP NetWeaver Application Server (AS) Java contains a directory traversal vulnerability in scheduler/ui/js/ffffffffbca41eb4/UIUtilJavaScriptJS that allows a remote attacker to read arbitrary files via a .. (dot dot) in the query string.",
+  "severity": "CRITICAL",
+  "sha256_hash": "14b26a5ca0d4efa310d776345f4991a821e90e5fbf7b784247f0ba959bd4295a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 33,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

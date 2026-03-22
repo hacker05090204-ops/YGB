@@ -1,0 +1,18 @@
+{
+  "cve_id": "CVE-2026-27204",
+  "ingested_at": "2026-03-22T07:54:31.800480+00:00",
+  "lang": "en",
+  "raw_text": "Wasmtime is a runtime for WebAssembly. Prior to versions 24.0.6, 36.0.6, 4.0.04, 41.0.4, and 42.0.0, Wasmtime's implementation of WASI host interfaces are susceptible to guest-controlled resource exhaustion on the host. Wasmtime did not appropriately place limits on resource allocations requested by the guests. This serves as a Denial of Service vector. Wasmtime 24.0.6, 36.0.6, 40.0.4, 41.0.4, and 42.0.0 have all been released with the fix for this issue. These versions do not prevent this issue in their default configuration to avoid breaking preexisting behaviors. All versions of Wasmtime have appropriate knobs to prevent this behavior, and Wasmtime 42.0.0-and-later will have these knobs tuned by default to prevent this issue from happening. There are no known workarounds for this issue without upgrading. Embedders are recommended to upgrade and configure their embeddings as necessary to prevent possibly-malicious guests from triggering this issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f49d7ea3b0b73f1d3991eb96e5d4820d3cc157e9518eba428df73bb2c4fafebd",
+  "source": "nvd",
+  "tags": [
+    "CWE-400",
+    "CWE-770",
+    "CWE-774",
+    "CWE-789",
+    "CWE-770"
+  ],
+  "token_count": 140,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27204"
+}

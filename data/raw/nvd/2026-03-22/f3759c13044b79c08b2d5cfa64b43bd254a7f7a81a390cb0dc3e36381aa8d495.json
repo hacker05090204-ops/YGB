@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-24295",
+  "ingested_at": "2026-03-22T07:54:42.710367+00:00",
+  "lang": "en",
+  "raw_text": "Concurrent execution using shared resource with improper synchronization ('race condition') in Windows Device Association Service allows an authorized attacker to elevate privileges locally.",
+  "severity": "HIGH",
+  "sha256_hash": "f3759c13044b79c08b2d5cfa64b43bd254a7f7a81a390cb0dc3e36381aa8d495",
+  "source": "nvd",
+  "tags": [
+    "CWE-362",
+    "CWE-416"
+  ],
+  "token_count": 23,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24295"
+}

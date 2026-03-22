@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32636",
+  "ingested_at": "2026-03-22T07:54:47.711035+00:00",
+  "lang": "en",
+  "raw_text": "ImageMagick is free and open-source software used for editing and manipulating digital images. Prior to 7.1.2-17 and 6.9.13-42, the NewXMLTree method contains a bug that could result in a crash due to an out of write bounds of a single zero byte. Versions 7.1.2-17 and 6.9.13-42 fix the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "6b7ed9924de1a8864871e1eb102b8fb1f679674e9eb1106558fad965b0e89cd4",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32636"
+}

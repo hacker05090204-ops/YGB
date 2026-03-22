@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-25147",
+  "ingested_at": "2026-03-22T07:54:33.193372+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, in `portal/portal_payment.php`, the patient id used for the page is taken from the request (`$pid = $_REQUEST['pid'] ?? $pid` and `$pid = ($_REQUEST['hidden_patient_code'] ?? null) > 0 ? $_REQUEST['hidden_patient_code'] : $pid`) instead of being fixed to the authenticated portal user. The portal session already has a valid `$pid` for the logged-in patient. Overwriting it with user-supplied values and using it without authorization allows a portal user to view and interact with another patient's demographics, invoices, and payment history\u2014horizontal privilege escalation and IDOR. Version 8.0.0 contains a fix for the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "6e5f7dc1e82a2c753091c4834503e0d9522faa5c8fc8fd2c220e181a50d73282",
+  "source": "nvd",
+  "tags": [
+    "CWE-639"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-25147"
+}

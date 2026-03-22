@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-23627",
+  "ingested_at": "2026-03-22T07:54:32.221577+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to version 8.0.0, an SQL injection vulnerability in the Immunization module allows any authenticated user to execute arbitrary SQL queries, leading to complete database compromise, PHI exfiltration, credential theft, and potential remote code execution. The vulnerability exists because user-supplied `patient_id` values are directly concatenated into SQL WHERE clauses without parameterization or escaping. Version 8.0.0 patches the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "68eff2dee6cc51ff6d42262932dc1d57eaf4c843ffad49bca9dbd738e4aebd7c",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 73,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-23627"
+}

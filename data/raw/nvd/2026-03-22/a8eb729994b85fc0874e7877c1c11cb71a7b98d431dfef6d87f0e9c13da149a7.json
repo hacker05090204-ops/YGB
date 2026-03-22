@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-27146",
+  "ingested_at": "2026-03-22T07:54:30.715889+00:00",
+  "lang": "en",
+  "raw_text": "GetSimple CMS is a content management system. All versions of GetSimple CMS do not implement CSRF protection on the administrative file upload endpoint. As a result, an attacker can craft a malicious web page that silently triggers a file upload request from an authenticated victim\u2019s browser. The request is accepted without requiring a CSRF token or origin validation. This allows an attacker to upload arbitrary files to the application without the victim\u2019s knowledge or consent. In order to exploit this vulnerability, the victim must be authenticated to GetSimple CMS (e.g., admin user), and visit an attacker-controlled webpage. This issue does not have a fix at the time of publication.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a8eb729994b85fc0874e7877c1c11cb71a7b98d431dfef6d87f0e9c13da149a7",
+  "source": "nvd",
+  "tags": [
+    "CWE-352",
+    "CWE-434",
+    "CWE-352"
+  ],
+  "token_count": 109,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27146"
+}

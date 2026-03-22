@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-28108",
+  "ingested_at": "2026-03-22T07:54:40.632710+00:00",
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting') vulnerability in LambertGroup LambertGroup - AllInOne - Banner with Thumbnails all-in-one-thumbnailsBanner allows Reflected XSS.This issue affects LambertGroup - AllInOne - Banner with Thumbnails: from n/a through < = 3.8.",
+  "severity": "HIGH",
+  "sha256_hash": "270487488a35fabe72c603233870d6256360528e99656e0eab3f38746bfc09f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 39,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28108"
+}

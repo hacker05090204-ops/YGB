@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4499",
+  "ingested_at": "2026-03-22T07:54:48.966939+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in D-Link DIR-820LW 2.03. Affected is the function ssdpcgi_main of the component SSDP. Executing a manipulation can lead to os command injection. The attack may be launched remotely. The exploit has been publicly disclosed and may be utilized.",
+  "severity": "HIGH",
+  "sha256_hash": "1ca76b8a8e68048090ecc778334607c2e9c6155949378f2ebc507241edc05bf7",
+  "source": "nvd",
+  "tags": [
+    "CWE-77",
+    "CWE-78"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4499"
+}

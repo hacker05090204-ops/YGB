@@ -37,7 +37,7 @@ from typing import Tuple, Dict, Optional, List
 import hashlib
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class AutoMode(Enum):
@@ -150,7 +150,7 @@ def _hash_content(content: str) -> str:
 
 def _now_iso() -> str:
     """Current timestamp in ISO format."""
-    return datetime.utcnow().isoformat() + "Z"
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 # =============================================================================

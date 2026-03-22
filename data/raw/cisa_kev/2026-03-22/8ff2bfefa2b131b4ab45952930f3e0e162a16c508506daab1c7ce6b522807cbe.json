@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-9621",
+  "ingested_at": "2026-03-22T07:45:16.321314+00:00",
+  "lang": "en",
+  "raw_text": "Synacor Zimbra Collaboration Suite (ZCS) Synacor Zimbra Collaboration Suite (ZCS) contains a server-side request forgery (SSRF) vulnerability via the ProxyServlet component.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8ff2bfefa2b131b4ab45952930f3e0e162a16c508506daab1c7ce6b522807cbe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

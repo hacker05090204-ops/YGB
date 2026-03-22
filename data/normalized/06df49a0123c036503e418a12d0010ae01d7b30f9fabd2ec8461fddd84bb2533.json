@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Sangoma FreePBX Sangoma FreePBX contains an improper authentication vulnerability that potentially allows unauthorized users to bypass password authentication and access services provided by the FreePBX admin.",
+  "token_count": 26
+}

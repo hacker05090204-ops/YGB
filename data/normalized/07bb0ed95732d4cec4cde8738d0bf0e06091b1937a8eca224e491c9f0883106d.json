@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Vikunja is an open-source self-hosted task management platform. Prior to version 2.0.0, a reflected HTML injection vulnerability exists in the Projects module where the `filter` URL parameter is rendered into the DOM without output encoding when the user clicks \"Filter.\" While `",
+  "token_count": 42
+}

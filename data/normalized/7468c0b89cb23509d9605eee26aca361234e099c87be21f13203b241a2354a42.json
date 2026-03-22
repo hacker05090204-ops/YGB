@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Use-after-free in the JavaScript: WebAssembly component. This vulnerability affects Firefox < 148 and Thunderbird < 148.",
+  "token_count": 16
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2023-48788",
+  "ingested_at": "2026-03-22T07:45:17.023007+00:00",
+  "lang": "en",
+  "raw_text": "Fortinet FortiClient EMS Fortinet FortiClient EMS contains a SQL injection vulnerability that allows an unauthenticated attacker to execute commands as SYSTEM via specifically crafted requests.",
+  "severity": "CRITICAL",
+  "sha256_hash": "d863587a2fae3efa3d1b43e57bea459db911082199863f334617cd586cce0172",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33192",
+  "ingested_at": "2026-03-22T07:54:48.759364+00:00",
+  "lang": "en",
+  "raw_text": "Free5GC is an open-source Linux Foundation project for 5th generation (5G) mobile core networks. In versions prior to 1.4.2, the UDM incorrectly converts a downstream 400 Bad Request (from UDR) into a 500 Internal Server Error when handling PATCH requests with an empty supi path parameter. Additionally, the UDM incorrectly translates the PATCH method to PUT when forwarding to UDR, indicating a deeper architectural issue. This leaks internal error handling behavior, making it difficult for clients to distinguish between client-side errors and server-side failures. The issue has been patched in version 1.4.2.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "30a7fee7b0a4efd66da1985486d9b08c9c74b4a60601f7ebdbf10f32758fafc9",
+  "source": "nvd",
+  "tags": [
+    "CWE-209"
+  ],
+  "token_count": 92,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33192"
+}

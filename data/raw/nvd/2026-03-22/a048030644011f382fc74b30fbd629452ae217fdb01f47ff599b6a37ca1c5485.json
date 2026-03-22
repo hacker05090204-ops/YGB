@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11143",
+  "ingested_at": "2026-03-22T07:54:40.766160+00:00",
+  "lang": "en",
+  "raw_text": "The Jetty URI parser has some key differences to other common parsers when evaluating invalid or unusual URIs. Differential parsing of URIs in systems using multiple components may result in security by-pass. For example a component that enforces a black list may interpret the URIs differently from one that generates a response. At the very least, differential parsing may divulge implementation details.",
+  "severity": "LOW",
+  "sha256_hash": "a048030644011f382fc74b30fbd629452ae217fdb01f47ff599b6a37ca1c5485",
+  "source": "nvd",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11143"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "In LibreChat 0.8.1-rc2, a logged-in user obtains a JWT for both the LibreChat API and the RAG API.",
+  "token_count": 18
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2015-2291",
+  "ingested_at": "2026-03-22T07:45:17.527986+00:00",
+  "lang": "en",
+  "raw_text": "Intel Ethernet Diagnostics Driver for Windows Intel ethernet diagnostics driver for Windows IQVW32.sys and IQVW64.sys contain an unspecified vulnerability that allows for a denial-of-service (DoS).",
+  "severity": "CRITICAL",
+  "sha256_hash": "9d279a5264f9fde73c8ca723babb575d350cf4b7aa788cb8a26993220d8d3cbe",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

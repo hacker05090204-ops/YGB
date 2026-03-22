@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Exim Exim Exim allows local users to gain privileges by leveraging the ability of the exim user account to specify an alternate configuration file with a directive that contains arbitrary commands.",
+  "token_count": 31
+}

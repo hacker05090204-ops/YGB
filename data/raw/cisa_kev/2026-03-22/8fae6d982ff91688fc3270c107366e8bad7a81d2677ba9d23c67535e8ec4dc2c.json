@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2021-1675",
+  "ingested_at": "2026-03-22T07:45:19.429789+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Print Spooler contains an unspecified vulnerability that allows for remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "8fae6d982ff91688fc3270c107366e8bad7a81d2677ba9d23c67535e8ec4dc2c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 16,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

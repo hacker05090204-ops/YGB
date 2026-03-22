@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware Multiple Products VMware Fusion, Remote Console (VMRC) for Mac, and Horizon Client for Mac contain a privilege escalation vulnerability due to improper use of setuid binaries that allows attackers to escalate privileges to root.",
+  "token_count": 35
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3819",
+  "ingested_at": "2026-03-22T07:54:42.283164+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in SourceCodester Resort Reservation System 1.0. The affected element is an unknown function of the file /?page=manage_reservation of the component Reservation Management Module. Such manipulation of the argument ID leads to cross site scripting. The attack may be launched remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "LOW",
+  "sha256_hash": "fbab3fac9c054cabb71def4c185ad75d46d9cb8ea2933381de90b8de653b0cc7",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94",
+    "CWE-79"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3819"
+}

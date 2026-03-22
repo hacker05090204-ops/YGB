@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection') vulnerability in robfelty Collapsing Archives collapsing-archives allows Blind SQL Injection.This issue affects Collapsing Archives: from n/a through < = 3.0.7.",
+  "token_count": 32
+}

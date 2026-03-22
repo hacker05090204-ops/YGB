@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32058",
+  "ingested_at": "2026-03-22T07:54:49.224984+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.26 contain an approval context-binding weakness in system.run execution flows with host=node that allows reuse of previously approved requests with modified environment variables. Attackers with access to an approval id can exploit this by reusing an approval with changed env input, bypassing execution-integrity controls in approval-enabled workflows.",
+  "severity": "LOW",
+  "sha256_hash": "28ae918cc6fdde5cf8437dd63fa2d4928da6a274db42e2448c1900905fdd05e1",
+  "source": "nvd",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32058"
+}

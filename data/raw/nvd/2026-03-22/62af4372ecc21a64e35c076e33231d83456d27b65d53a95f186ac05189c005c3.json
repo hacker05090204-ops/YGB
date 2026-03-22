@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-29125",
+  "ingested_at": "2026-03-22T07:54:39.937522+00:00",
+  "lang": "en",
+  "raw_text": "IDC SFX2100 Satalite Recievers set the `/etc/resolv.conf` file to be world-writable by any local user, allowing DNS resolver tampering that can redirect network communications, facilitate man-in-the-middle attacks, and cause denial of service.",
+  "severity": "MEDIUM",
+  "sha256_hash": "62af4372ecc21a64e35c076e33231d83456d27b65d53a95f186ac05189c005c3",
+  "source": "nvd",
+  "tags": [
+    "CWE-732"
+  ],
+  "token_count": 32,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29125"
+}

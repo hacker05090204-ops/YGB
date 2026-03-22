@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-24448",
+  "ingested_at": "2026-03-22T07:54:43.484484+00:00",
+  "lang": "en",
+  "raw_text": "Use of hard-coded credentials issue exists in MR-GM5L-S1 and MR-GM5A-L1, which may allow an attacker to obtain administrative access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1129f5fc18b99dde4a5862b58c0c1b4434d4855b0ba03758e24381f73efcd491",
+  "source": "nvd",
+  "tags": [
+    "CWE-798"
+  ],
+  "token_count": 19,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-24448"
+}

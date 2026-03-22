@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32666",
+  "ingested_at": "2026-03-22T07:54:49.139739+00:00",
+  "lang": "en",
+  "raw_text": "WebCTRL systems that communicate over BACnet inherit the protocol's lack of network layer authentication. WebCTRL does not implement additional validation of BACnet traffic so an attacker with network access could spoof BACnet packets directed at either the WebCTRL server or associated AutomatedLogic controllers. Spoofed packets may be processed as legitimate.",
+  "severity": "HIGH",
+  "sha256_hash": "d0ff5e0640bd3b0997474cd73a958819fd4cc2ed920cf1b05c23c2d7593f395e",
+  "source": "nvd",
+  "tags": [
+    "CWE-290"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32666"
+}

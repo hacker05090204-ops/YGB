@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25488",
+  "ingested_at": "2026-03-22T07:54:44.265444+00:00",
+  "lang": "en",
+  "raw_text": "Jettweb Hazir Rent A Car Scripti V4 contains multiple SQL injection vulnerabilities in the admin panel that allow unauthenticated attackers to manipulate database queries through GET parameters. Attackers can inject SQL code into the 'tur', 'id', and 'ozellikdil' parameters of the admin/index.php endpoint to extract sensitive database information or cause denial of service.",
+  "severity": "HIGH",
+  "sha256_hash": "2fec26d33aac8e66d2a62125d4e74078fff513900848864b63f1c74fe09eba57",
+  "source": "nvd",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25488"
+}

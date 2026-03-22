@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27800",
+  "ingested_at": "2026-03-22T07:54:32.433548+00:00",
+  "lang": "en",
+  "raw_text": "Zed, a code editor, has a Zip Slip (Path Traversal) vulnerability exists in its extension archive extraction functionality prior to version 0.224.4. The `extract_zip()` function in `crates/util/src/archive.rs` fails to validate ZIP entry filenames for path traversal sequences (e.g., `../`). This allows a malicious extension to write files outside its designated sandbox directory by downloading and extracting a crafted ZIP archive. Version 0.224.4 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "fa6a6cb41a57ba85584028e98715b7b891f85e05e10bce95bc75f835aa50f17c",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27800"
+}

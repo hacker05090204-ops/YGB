@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26801",
+  "ingested_at": "2026-03-22T07:54:42.985752+00:00",
+  "lang": "en",
+  "raw_text": "Server-Side Request Forgery (SSRF) vulnerability in pdfmake versions 0.3.0-beta.2 through 0.3.5 allows a remote attacker to obtain sensitive information via the src/URLResolver.js component. The fix was released in version 0.3.6 which introduces the setUrlAccessPolicy() method allowing server operators to define URL access rules. A warning is now logged when pdfmake is used server-side without a policy configured.",
+  "severity": "HIGH",
+  "sha256_hash": "4988bc564a235c050ab7dd89be2b74fc6530d6f22373ff075e7ca389439a1073",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-26801"
+}

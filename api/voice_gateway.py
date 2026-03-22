@@ -24,11 +24,21 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-from backend.auth.auth_guard import require_admin, require_auth, ws_authenticate
+from backend.auth.auth_guard import (
+    require_admin,
+    require_auth,
+    ws_authenticate,
+    get_allowed_origins,
+    is_allowed_origin,
+)
 
 logger = logging.getLogger(__name__)
 
 voice_gw_router = APIRouter(tags=["voice-gateway"])
+VOICE_WS_ALLOWED_ORIGINS = frozenset({
+    "http://localhost:3000",
+    "https://ygb-nas.tail7521c4.ts.net",
+})
 
 
 # =============================================================================
@@ -120,6 +130,44 @@ def _get_tts_engine():
     if not hasattr(_get_tts_engine, "_inst"):
         _get_tts_engine._inst = TTSEngine()
     return _get_tts_engine._inst
+
+
+def _voice_ws_origins() -> set[str]:
+    return set(get_allowed_origins()) | set(VOICE_WS_ALLOWED_ORIGINS)
+
+
+def _voice_ws_origin_is_allowed(origin: str) -> bool:
+    normalized = (origin or "").strip().rstrip("/")
+    return normalized in _voice_ws_origins() or is_allowed_origin(origin)
+
+
+def _select_bearer_subprotocol(ws: WebSocket) -> Optional[str]:
+    protocols = ws.headers.get("sec-websocket-protocol", "")
+    for proto in protocols.split(","):
+        candidate = proto.strip()
+        if candidate.startswith("bearer."):
+            return candidate
+    return None
+
+
+async def _accept_authenticated_voice_ws(ws: WebSocket) -> dict:
+    origin = ws.headers.get("origin", "")
+    if origin and not _voice_ws_origin_is_allowed(origin):
+        logger.warning("[VOICE_GW] WebSocket origin rejected: %s", origin)
+        await ws.close(code=4403, reason="Origin not allowed")
+        return {}
+
+    user = await ws_authenticate(ws)
+    if user is None:
+        await ws.close(code=4401, reason="Authentication required")
+        return {}
+
+    subprotocol = _select_bearer_subprotocol(ws)
+    if subprotocol:
+        await ws.accept(subprotocol=subprotocol)
+    else:
+        await ws.accept()
+    return user
 
 
 # =============================================================================
@@ -354,6 +402,7 @@ async def train_local_stt(req: STTTrainRequest, user=Depends(require_admin)):
 # WEBSOCKET VOICE STREAM
 # =============================================================================
 
+@voice_gw_router.websocket("/ws/voice")
 @voice_gw_router.websocket("/ws/voice/stream")
 async def voice_stream(ws: WebSocket):
     """
@@ -367,10 +416,8 @@ async def voice_stream(ws: WebSocket):
     """
     # Authenticate — ws_authenticate returns None on failure but does NOT
     # close the socket.  We must close explicitly to prevent dangling connections.
-    await ws.accept()
-    user = await ws_authenticate(ws)
-    if user is None:
-        await ws.close(code=4401, reason="Authentication required")
+    user = await _accept_authenticated_voice_ws(ws)
+    if not user:
         return
     user_id = user.get("sub", "ws_user") if isinstance(user, dict) else "ws_user"
 

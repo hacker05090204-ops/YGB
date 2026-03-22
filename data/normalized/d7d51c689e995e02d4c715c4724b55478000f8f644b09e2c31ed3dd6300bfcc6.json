@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in Tenda F453 1.0.0.3. This affects the function fromwebExcptypemanFilter of the file /goform/webExcptypemanFilter. The manipulation of the argument page leads to stack-based buffer overflow. The attack may be initiated remotely. The exploit has been disclosed to the public and may be used.",
+  "token_count": 47
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Oracle WebLogic Server Oracle WebLogic Server, a product within the Fusion Middleware suite, contains an OS command injection vulnerability that allows an attacker to execute arbitrary code via a specially crafted HTTP request that includes a malicious XML document.",
+  "token_count": 39
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2012-4969",
+  "ingested_at": "2026-03-22T07:45:17.811552+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer Microsoft Internet Explorer contains a use-after-free vulnerability that allows remote attackers to execute code via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "68693fc910ab2165fc27b76e6fa79c7de9fa8a30a42ee746ab8ad92d573805c5",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 22,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

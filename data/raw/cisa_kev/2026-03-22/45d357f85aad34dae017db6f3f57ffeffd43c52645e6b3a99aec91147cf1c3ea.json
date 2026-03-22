@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2013-1690",
+  "ingested_at": "2026-03-22T07:45:18.253482+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Firefox and Thunderbird Mozilla Firefox and Thunderbird do not properly handle onreadystatechange events in conjunction with page reloading, which allows remote attackers to cause a denial-of-service (DoS) or possibly execute malicious code via a crafted web site.",
+  "severity": "CRITICAL",
+  "sha256_hash": "45d357f85aad34dae017db6f3f57ffeffd43c52645e6b3a99aec91147cf1c3ea",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 38,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

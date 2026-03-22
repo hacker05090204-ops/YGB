@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-11563",
+  "ingested_at": "2026-03-22T07:54:31.997702+00:00",
+  "lang": "en",
+  "raw_text": "URLs containing percent-encoded slashes (`/` or `\\`) can trick wcurl into saving the output file outside of the current directory without the user explicitly asking for it. This flaw only affects the wcurl command line tool.",
+  "severity": "MEDIUM",
+  "sha256_hash": "72b0437e30b4da94e5ab83120243cea75bcb0b3d10d2c96151efb0ec090f182a",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 36,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2025-11563"
+}

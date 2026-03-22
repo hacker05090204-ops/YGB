@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "OpenViking through version 0.1.18, prior to commit 0251c70, contains a broken access control vulnerability that allows unauthenticated attackers to gain ROOT privileges when the root_api_key configuration is omitted. Attackers can send requests to protected endpoints without authentication headers to access administrative functions including account management, resource operations, and system configuration.",
+  "token_count": 50
+}

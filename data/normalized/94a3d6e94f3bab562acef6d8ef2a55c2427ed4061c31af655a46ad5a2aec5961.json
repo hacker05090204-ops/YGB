@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Allocation of resources without limits or throttling in ASP.NET Core allows an unauthorized attacker to deny service over a network.",
+  "token_count": 20
+}

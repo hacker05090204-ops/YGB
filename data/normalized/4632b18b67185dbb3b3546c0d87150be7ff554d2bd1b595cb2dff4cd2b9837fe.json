@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "wpForo 2.4.14 contains an unauthenticated SQL injection vulnerability in Topics::get_topics() where the ORDER BY clause relies on ineffective esc_sql() sanitization on unquoted identifiers. Attackers exploit the wpfob parameter with CASE WHEN payloads to perform blind boolean extraction of credentials from the WordPress database.",
+  "token_count": 43
+}

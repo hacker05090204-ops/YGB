@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Froxlor is open source server administration software. Prior to 2.3.4, a typo in Froxlor's input validation code (== instead of =) completely disables email format checking for all settings fields declared as email type. This allows an authenticated admin to store arbitrary strings in the panel.adminmail setting. This value is later concatenated into a shell command executed as root by a cron job, where the pipe character | is explicitly whitelisted. The result is full root-level Remote Code Execution. This vulnerability is fixed in 2.3.4.",
+  "token_count": 85
+}

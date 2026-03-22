@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27640",
+  "ingested_at": "2026-03-22T07:54:31.927263+00:00",
+  "lang": "en",
+  "raw_text": "tfplan2md is software for converting Terraform plan JSON files into human-readable Markdown reports. Prior to version 1.26.1, a bug in tfplan2md affected several distinct rendering paths: AzApi resource body properties, AzureDevOps variable groups, Scriban template context variables, and hierarchical sensitivity detection. This caused reports to render values that should have been masked as \"(sensitive)\" instead. This issue is fixed in v1.26.1. No known workarounds are available.",
+  "severity": "HIGH",
+  "sha256_hash": "b306ccf4afa1c586fea23f4c2620416ad1879aad73baea8a83aac23d3a9da33a",
+  "source": "nvd",
+  "tags": [
+    "CWE-212"
+  ],
+  "token_count": 66,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27640"
+}

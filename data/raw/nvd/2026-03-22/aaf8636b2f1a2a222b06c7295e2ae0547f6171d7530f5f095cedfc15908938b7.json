@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4164",
+  "ingested_at": "2026-03-22T07:54:46.643544+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in Wavlink WL-WN578W2 221110. Impacted is the function Delete_Mac_list/SetName/GuestWifi of the file /cgi-bin/wireless.cgi of the component POST Request Handler. Executing a manipulation can lead to command injection. It is possible to launch the attack remotely. The exploit has been published and may be used. It is recommended to upgrade the affected component.",
+  "severity": "CRITICAL",
+  "sha256_hash": "aaf8636b2f1a2a222b06c7295e2ae0547f6171d7530f5f095cedfc15908938b7",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77"
+  ],
+  "token_count": 57,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4164"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-27818",
+  "ingested_at": "2026-03-22T07:54:32.448868+00:00",
+  "lang": "en",
+  "raw_text": "TerriaJS-Server is a NodeJS Express server for TerriaJS, a library for building web-based geospatial data explorers. A validation bug in versions prior to 4.0.3 allows an attacker to proxy domains not explicitly allowed in the `proxyableDomains` configuration. Version 4.0.3 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "6113fb0d86fca80662757582592169d4db6b162b5d50d01cf1bbac83d88ab059",
+  "source": "nvd",
+  "tags": [
+    "CWE-20",
+    "CWE-918"
+  ],
+  "token_count": 42,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27818"
+}

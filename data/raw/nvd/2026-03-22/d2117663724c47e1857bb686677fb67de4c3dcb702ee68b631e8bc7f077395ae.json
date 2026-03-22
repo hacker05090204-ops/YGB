@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27741",
+  "ingested_at": "2026-03-22T07:54:31.226757+00:00",
+  "lang": "en",
+  "raw_text": "Bludit version 3.16.1 contains a cross-site request forgery (CSRF) vulnerability in the /admin/uninstall-plugin/ and /admin/install-theme/ endpoints. The application does not implement anti-CSRF tokens or other request origin validation mechanisms for these administrative actions. An attacker can induce an authenticated administrator to visit a malicious page that silently submits crafted requests, resulting in unauthorized plugin uninstallation or theme installation. This may lead to loss of functionality, execution of untrusted code via malicious themes, and compromise of system integrity.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d2117663724c47e1857bb686677fb67de4c3dcb702ee68b631e8bc7f077395ae",
+  "source": "nvd",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27741"
+}

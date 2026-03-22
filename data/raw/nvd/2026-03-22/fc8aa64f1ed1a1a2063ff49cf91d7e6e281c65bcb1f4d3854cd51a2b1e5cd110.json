@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32296",
+  "ingested_at": "2026-03-22T07:54:47.107824+00:00",
+  "lang": "en",
+  "raw_text": "Sipeed NanoKVM before 2.3.1 exposes a Wi-Fi configuration endpoint without proper security checks, allowing an unauthenticated attacker with network access to change the saved configured Wi-Fi network to one of the attacker's choosing, or craft a request to exhaust the system memory and terminate the KVM process.",
+  "severity": "HIGH",
+  "sha256_hash": "fc8aa64f1ed1a1a2063ff49cf91d7e6e281c65bcb1f4d3854cd51a2b1e5cd110",
+  "source": "nvd",
+  "tags": [
+    "CWE-306"
+  ],
+  "token_count": 47,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32296"
+}

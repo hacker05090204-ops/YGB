@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SolarWinds Serv-U SolarWinds Serv-U versions 15.2.5 and earlier contain an improper input validation vulnerability that allows attackers to build and send queries without sanitization.",
+  "token_count": 24
+}

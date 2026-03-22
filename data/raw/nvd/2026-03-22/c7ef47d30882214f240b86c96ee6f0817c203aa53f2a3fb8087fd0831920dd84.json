@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3632",
+  "ingested_at": "2026-03-22T07:54:47.033592+00:00",
+  "lang": "en",
+  "raw_text": "A flaw was found in libsoup, a library used by applications to send network requests. This vulnerability occurs because libsoup does not properly validate hostnames, allowing special characters to be injected into HTTP headers. A remote attacker could exploit this to perform HTTP smuggling, where they can send hidden, malicious requests alongside legitimate ones. In certain situations, this could lead to Server-Side Request Forgery (SSRF), enabling an attacker to force the server to make unauthorized requests to other internal or external systems. The impact is low, as SoupServer is not actually used in internet infrastructure.",
+  "severity": "LOW",
+  "sha256_hash": "c7ef47d30882214f240b86c96ee6f0817c203aa53f2a3fb8087fd0831920dd84",
+  "source": "nvd",
+  "tags": [
+    "CWE-1286"
+  ],
+  "token_count": 95,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3632"
+}

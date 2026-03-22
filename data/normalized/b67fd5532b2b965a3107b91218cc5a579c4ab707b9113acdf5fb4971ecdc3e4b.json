@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Google Skia Google Skia contains an out-of-bounds write vulnerability that could allow a remote attacker to perform out of bounds memory access via a crafted HTML page. This vulnerability affects Google Chrome and ChromeOS, Android, Flutter, and possibly other products.",
+  "token_count": 40
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-27566",
+  "ingested_at": "2026-03-22T07:54:47.789553+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.22 contain an allowlist bypass vulnerability in system.run exec analysis that fails to unwrap env and shell-dispatch wrapper chains. Attackers can route execution through wrapper binaries like env bash to smuggle payloads that satisfy allowlist entries while executing non-allowlisted commands.",
+  "severity": "HIGH",
+  "sha256_hash": "242a95cdf4aceb2a62f727920d8d4e16e4826cc2dca783b6df03a6c346d0206e",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 44,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-27566"
+}

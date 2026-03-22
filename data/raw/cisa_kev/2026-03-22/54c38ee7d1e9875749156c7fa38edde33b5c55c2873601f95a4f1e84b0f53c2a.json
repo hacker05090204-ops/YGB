@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-4885",
+  "ingested_at": "2026-03-22T07:45:16.549274+00:00",
+  "lang": "en",
+  "raw_text": "Progress WhatsUp Gold Progress WhatsUp Gold contains a path traversal vulnerability that allows an unauthenticated attacker to achieve remote code execution.",
+  "severity": "CRITICAL",
+  "sha256_hash": "54c38ee7d1e9875749156c7fa38edde33b5c55c2873601f95a4f1e84b0f53c2a",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2025-24985",
+  "ingested_at": "2026-03-22T07:45:16.519284+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Windows Microsoft Windows Fast FAT File System Driver contains an integer overflow or wraparound vulnerability that allows an unauthorized attacker to execute code locally.",
+  "severity": "CRITICAL",
+  "sha256_hash": "78f7d4e93c49f624ed4699959e68dc2f5942868a221a3e6849b7a8eff8050e4c",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 25,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

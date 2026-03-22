@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Microsoft Windows - 'gdi32.dll' Heap Buffer Overflow in ExtEscape() Triggerable via EMR_EXTESCAPE EMF Record (MS16-055)",
+  "token_count": 15
+}

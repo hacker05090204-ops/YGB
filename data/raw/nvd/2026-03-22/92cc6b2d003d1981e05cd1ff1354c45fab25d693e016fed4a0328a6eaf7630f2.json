@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32125",
+  "ingested_at": "2026-03-22T07:54:44.009910+00:00",
+  "lang": "en",
+  "raw_text": "OpenEMR is a free and open source electronic health records and medical practice management application. Prior to 8.0.0.1, track/item names from the Track Anything feature are stored from user input (POST) and later rendered in Dygraph charts (titles/labels) using innerHTML or equivalent without escaping. A user who can create or edit Track Anything items can inject script that runs when any user views the corresponding graph. This vulnerability is fixed in 8.0.0.1.",
+  "severity": "MEDIUM",
+  "sha256_hash": "92cc6b2d003d1981e05cd1ff1354c45fab25d693e016fed4a0328a6eaf7630f2",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 72,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32125"
+}

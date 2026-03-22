@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-30834",
+  "ingested_at": "2026-03-22T07:54:41.888854+00:00",
+  "lang": "en",
+  "raw_text": "PinchTab is a standalone HTTP server that gives AI agents direct control over a Chrome browser. Prior to version 0.7.7, a Server-Side Request Forgery (SSRF) vulnerability in the /download endpoint allows any user with API access to induce the PinchTab server to make requests to arbitrary URLs, including internal network services and local system files, and exfiltrate the full response content. This issue has been patched in version 0.7.7.",
+  "severity": "HIGH",
+  "sha256_hash": "13986c0b98f63cfd2a2570ec573fb5bd4c005c5030c435e1e28b28ef95252f25",
+  "source": "nvd",
+  "tags": [
+    "CWE-918"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-30834"
+}

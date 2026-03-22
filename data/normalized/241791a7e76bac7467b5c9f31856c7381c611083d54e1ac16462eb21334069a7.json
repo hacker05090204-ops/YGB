@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A UNIX symbolic link (Symlink) following vulnerability in Fortinet FortiClientLinux 7.4.0 through 7.4.4, FortiClientLinux 7.2.2 through 7.2.12 may allow a local and unprivileged user to escalate their privileges to root.",
+  "token_count": 30
+}

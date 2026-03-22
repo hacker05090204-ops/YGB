@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-0676",
+  "ingested_at": "2026-03-22T07:45:18.004213+00:00",
+  "lang": "en",
+  "raw_text": "Microsoft Internet Explorer An information disclosure vulnerability exists when Internet Explorer improperly handles objects in memory. An attacker who successfully exploited this vulnerability could test for the presence of files on disk.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7787a517d14db3f6d3a01e80b083f110e475c7f752c7712096fbf01cfe6e1a49",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 32,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

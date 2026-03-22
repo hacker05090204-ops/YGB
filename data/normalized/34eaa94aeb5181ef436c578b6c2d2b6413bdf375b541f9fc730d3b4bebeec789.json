@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Citrix NetScaler ADC and NetScaler Gateway Citrix NetScaler ADC and NetScaler Gateway contain a code injection vulnerability that allows for authenticated remote code execution on the management interface with access to NSIP, CLIP, or SNIP.",
+  "token_count": 35
+}

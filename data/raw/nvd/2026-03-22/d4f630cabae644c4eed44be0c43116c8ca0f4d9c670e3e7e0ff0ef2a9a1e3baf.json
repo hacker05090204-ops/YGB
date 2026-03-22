@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4395",
+  "ingested_at": "2026-03-22T07:54:48.133944+00:00",
+  "lang": "en",
+  "raw_text": "Heap-based buffer overflow in the KCAPI ECC code path of wc_ecc_import_x963_ex() in wolfSSL wolfcrypt allows a remote attacker to write attacker-controlled data past the bounds of the pubkey_raw buffer via a crafted oversized EC public key point. The WOLFSSL_KCAPI_ECC code path copies the input to key->pubkey_raw (132 bytes) using XMEMCPY without a bounds check, unlike the ATECC code path which includes a length validation. This can be triggered during TLS key exchange when a malicious peer sends a crafted ECPoint in ServerKeyExchange.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "d4f630cabae644c4eed44be0c43116c8ca0f4d9c670e3e7e0ff0ef2a9a1e3baf",
+  "source": "nvd",
+  "tags": [
+    "CWE-122"
+  ],
+  "token_count": 82,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4395"
+}

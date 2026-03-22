@@ -1,0 +1,16 @@
+{
+  "cve_id": "CVE-2026-3151",
+  "ingested_at": "2026-03-22T07:54:31.974262+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in itsourcecode College Management System 1.0. This vulnerability affects unknown code of the file /login/login.php. The manipulation of the argument email results in sql injection. The attack may be performed from remote. The exploit is now public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "5f4cd740a4cab765c8c437f173ef0ea48817c426412eb2a2088a42c011d8f9a4",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89",
+    "CWE-89"
+  ],
+  "token_count": 45,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3151"
+}

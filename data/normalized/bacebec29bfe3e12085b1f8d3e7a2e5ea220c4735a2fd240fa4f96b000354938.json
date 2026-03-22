@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "IBM Data Risk Manager IBM Data Risk Manager contains a security bypass vulnerability that could allow a remote attacker to bypass security restrictions when configured with SAML authentication. By sending a specially crafted HTTP request, an attacker could exploit this vulnerability to bypass the authentication process and gain full administrative access to the system.",
+  "token_count": 54
+}

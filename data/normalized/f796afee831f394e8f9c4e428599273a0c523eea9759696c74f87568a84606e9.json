@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Freedom Factory dGEN1 up to 20260221. Affected by this vulnerability is the function FakeAppProvider of the component org.ethosmobile.ethoslauncher. Performing a manipulation results in improper authorization. The attack must be initiated from a local position. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 64
+}

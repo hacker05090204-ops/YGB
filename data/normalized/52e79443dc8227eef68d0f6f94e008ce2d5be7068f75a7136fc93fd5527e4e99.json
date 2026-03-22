@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Apple iOS, macOS, watchOS In affected versions of Apple iOS, macOS, and watchOS, a sandboxed process may be able to circumvent sandbox restrictions.",
+  "token_count": 23
+}

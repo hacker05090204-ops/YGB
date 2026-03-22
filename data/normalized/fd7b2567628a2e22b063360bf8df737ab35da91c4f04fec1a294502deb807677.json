@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "XikeStor SKS8310-8X Network Switch firmware versions 1.04.B07 and prior contain a stored cross-site scripting vulnerability that allows authenticated attackers to inject arbitrary script content through the System Name field. Attackers can inject malicious scripts that execute in a victim's browser when the stored value is viewed due to improper output encoding.",
+  "token_count": 51
+}

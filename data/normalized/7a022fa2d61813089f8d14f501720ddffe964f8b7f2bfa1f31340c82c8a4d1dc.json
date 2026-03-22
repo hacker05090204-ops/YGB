@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "VMware ESXi, Workstation, and Fusion VMware ESXi, Workstation, and Fusion contain an information disclosure vulnerability due to an out-of-bounds read in HGFS. Successful exploitation allows an attacker with administrative privileges to a virtual machine to leak memory from the vmx process.",
+  "token_count": 41
+}

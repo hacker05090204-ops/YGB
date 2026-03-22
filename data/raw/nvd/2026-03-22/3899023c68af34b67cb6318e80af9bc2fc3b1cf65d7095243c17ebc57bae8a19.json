@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3613",
+  "ingested_at": "2026-03-22T07:54:41.213337+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was identified in Wavlink WL-NU516U1 V240425. This vulnerability affects the function sub_401A0C of the file /cgi-bin/login.cgi. Such manipulation of the argument ipaddr leads to stack-based buffer overflow. It is possible to launch the attack remotely. The exploit is publicly available and might be used. The vendor was contacted early about this disclosure.",
+  "severity": "HIGH",
+  "sha256_hash": "3899023c68af34b67cb6318e80af9bc2fc3b1cf65d7095243c17ebc57bae8a19",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-3613"
+}

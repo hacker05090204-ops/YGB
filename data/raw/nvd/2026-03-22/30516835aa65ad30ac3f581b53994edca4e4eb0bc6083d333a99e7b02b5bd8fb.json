@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32034",
+  "ingested_at": "2026-03-22T07:54:48.233866+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.21 contain an authentication bypass vulnerability in the Control UI when allowInsecureAuth is explicitly enabled and the gateway is exposed over plaintext HTTP, allowing attackers to bypass device identity and pairing verification. An attacker with leaked or intercepted credentials can obtain high-privilege Control UI access by exploiting the lack of secure authentication enforcement over unencrypted HTTP connections.",
+  "severity": "MEDIUM",
+  "sha256_hash": "30516835aa65ad30ac3f581b53994edca4e4eb0bc6083d333a99e7b02b5bd8fb",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 61,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32034"
+}

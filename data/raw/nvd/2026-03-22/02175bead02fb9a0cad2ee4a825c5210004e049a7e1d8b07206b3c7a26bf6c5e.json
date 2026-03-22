@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-29127",
+  "ingested_at": "2026-03-22T07:54:39.952518+00:00",
+  "lang": "en",
+  "raw_text": "The IDC SFX2100 Satellite Receiver sets overly permissive file system permissions on the monitor user's home directory. The directory is configured with permissions 0777, granting read, write, and execute access to all local users on the system, which may cause local privilege escalation depending on conditions of the system due to the presence of highly privileged processes and binaries residing within the affected directory.",
+  "severity": "HIGH",
+  "sha256_hash": "02175bead02fb9a0cad2ee4a825c5210004e049a7e1d8b07206b3c7a26bf6c5e",
+  "source": "nvd",
+  "tags": [
+    "CWE-269",
+    "CWE-863"
+  ],
+  "token_count": 64,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-29127"
+}

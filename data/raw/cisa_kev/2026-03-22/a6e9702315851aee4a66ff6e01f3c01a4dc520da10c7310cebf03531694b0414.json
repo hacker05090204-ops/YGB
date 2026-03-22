@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2019-13272",
+  "ingested_at": "2026-03-22T07:45:18.902376+00:00",
+  "lang": "en",
+  "raw_text": "Linux Kernel Kernel/ptrace.c in Linux kernel mishandles contains an improper privilege management vulnerability that allows local users to obtain root access.",
+  "severity": "CRITICAL",
+  "sha256_hash": "a6e9702315851aee4a66ff6e01f3c01a4dc520da10c7310cebf03531694b0414",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 21,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

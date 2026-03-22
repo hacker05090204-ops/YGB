@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Code injection vulnerability exists in MR-GM5L-S1 and MR-GM5A-L1, which may allow an attacker with administrative privileges to execute arbitrary commands.",
+  "token_count": 20
+}

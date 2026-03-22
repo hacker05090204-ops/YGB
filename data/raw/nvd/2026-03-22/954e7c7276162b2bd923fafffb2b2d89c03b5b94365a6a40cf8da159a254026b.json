@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-28682",
+  "ingested_at": "2026-03-22T07:54:41.293214+00:00",
+  "lang": "en",
+  "raw_text": "Gokapi is a self-hosted file sharing server with automatic expiration and encryption support. Prior to version 2.2.3, the upload status SSE implementation on /uploadStatus publishes global upload state to any authenticated listener and includes file_id values that are not scoped to the requesting user. This issue has been patched in version 2.2.3.",
+  "severity": "MEDIUM",
+  "sha256_hash": "954e7c7276162b2bd923fafffb2b2d89c03b5b94365a6a40cf8da159a254026b",
+  "source": "nvd",
+  "tags": [
+    "CWE-200",
+    "CWE-284"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-28682"
+}

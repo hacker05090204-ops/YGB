@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-3910",
+  "ingested_at": "2026-03-22T07:45:15.846713+00:00",
+  "lang": "en",
+  "raw_text": "Google Chromium V8 Google Chromium V8 contains an improper restriction of operations within the bounds of a memory buffer vulnerability that could allow a remote attacker to execute arbitrary code inside a sandbox via a crafted HTML page. This vulnerability could affect multiple web browsers that utilize Chromium, including, but not limited to, Google Chrome, Microsoft Edge, and Opera.",
+  "severity": "CRITICAL",
+  "sha256_hash": "1cf9f4f6d4b1e2b451e555dbd9fa2b5e903ef978467fc19cfdffc9d971817820",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 59,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

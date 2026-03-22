@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2022-39197",
+  "ingested_at": "2026-03-22T07:45:17.476953+00:00",
+  "lang": "en",
+  "raw_text": "Fortra Cobalt Strike Fortra Cobalt Strike contains a cross-site scripting (XSS) vulnerability in Teamserver that would allow an attacker to set a malformed username in the Beacon configuration, allowing them to execute code remotely.",
+  "severity": "CRITICAL",
+  "sha256_hash": "7f603eae37805d64092468bb73f47a69f106640812b1a1ef435b58334ec08145",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 34,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

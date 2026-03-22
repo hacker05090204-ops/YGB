@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2024-40891",
+  "ingested_at": "2026-03-22T07:45:16.592944+00:00",
+  "lang": "en",
+  "raw_text": "Zyxel DSL CPE Devices Multiple Zyxel DSL CPE devices contain a post-authentication command injection vulnerability in the management commands that could allow an authenticated attacker to execute OS commands via Telnet.",
+  "severity": "CRITICAL",
+  "sha256_hash": "03585d42f51d549f8410f899aaf9bca58d9de1e2e94ef27c7b8fa670712e7c01",
+  "source": "cisa_kev",
+  "tags": [
+    "kev",
+    "exploited_in_wild"
+  ],
+  "token_count": 31,
+  "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+}

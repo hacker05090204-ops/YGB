@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32052",
+  "ingested_at": "2026-03-22T07:54:49.211832+00:00",
+  "lang": "en",
+  "raw_text": "OpenClaw versions prior to 2026.2.24 contain a command injection vulnerability in the system.run shell-wrapper that allows attackers to execute hidden commands by injecting positional argv carriers after inline shell payloads. Attackers can craft misleading approval text while executing arbitrary commands through trailing positional arguments that bypass display context validation.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a7de59059e0d1077ed5b5184be5178b4ec279f8d05f5fb447f02c6bcc7e33ce7",
+  "source": "nvd",
+  "tags": [
+    "CWE-436"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-32052"
+}

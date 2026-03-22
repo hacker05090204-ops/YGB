@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-2769",
+  "ingested_at": "2026-03-22T07:54:31.528520+00:00",
+  "lang": "en",
+  "raw_text": "Use-after-free in the Storage: IndexedDB component. This vulnerability affects Firefox < 148, Firefox ESR < 115.33, Firefox ESR < 140.8, Thunderbird < 148, and Thunderbird < 140.8.",
+  "severity": "HIGH",
+  "sha256_hash": "a8bd516fe8263c8d33034998f01c7c5f577ae2d60b8064e5d98fc0ade9e03b72",
+  "source": "nvd",
+  "tags": [
+    "CWE-416"
+  ],
+  "token_count": 27,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-2769"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-31381",
+  "ingested_at": "2026-03-22T07:54:48.826255+00:00",
+  "lang": "en",
+  "raw_text": "An attacker can extract user email addresses (PII) exposed in base64 encoding via the state parameter in the OAuth callback URL.",
+  "severity": "MEDIUM",
+  "sha256_hash": "60635ca26c7cf7c84a48768b9b11920d5c7691916193f0749b1956830351c7f5",
+  "source": "nvd",
+  "tags": [
+    "CWE-598"
+  ],
+  "token_count": 21,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-31381"
+}
