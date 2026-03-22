@@ -5,7 +5,10 @@
  * Query-string tokens are never used.
  */
 
-const WS_BASE = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000"
+const WS_BASE =
+  process.env.NEXT_PUBLIC_YGB_WS_URL ||
+  process.env.NEXT_PUBLIC_WS_URL ||
+  "ws://localhost:8000"
 
 export function createAuthWebSocket(
   path: string,

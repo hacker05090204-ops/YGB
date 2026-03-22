@@ -2,7 +2,7 @@
 
 import { AuthGuard } from "@/components/auth-guard"
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { authFetch , getApiBase } from "@/lib/ygb-api"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import {
@@ -90,16 +90,18 @@ function DashboardContent() {
   const [newTargetScope, setNewTargetScope] = useState("")
   const [newTargetLink, setNewTargetLink] = useState("")
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async (signal?: AbortSignal) => {
     try {
       const [usersRes, bountiesRes, targetsRes, statsRes, activityRes, readinessRes] = await Promise.all([
-        authFetch(`${getApiBase()}/api/db/users`),
-        authFetch(`${getApiBase()}/api/db/bounties`),
-        authFetch(`${getApiBase()}/api/db/targets`),
-        authFetch(`${getApiBase()}/api/db/admin/stats`),
-        authFetch(`${getApiBase()}/api/db/activity?limit=20`),
-        fetch(`${getApiBase()}/api/training/readiness`).catch(() => null),
+        authFetch(`${getApiBase()}/api/db/users`, { signal }),
+        authFetch(`${getApiBase()}/api/db/bounties`, { signal }),
+        authFetch(`${getApiBase()}/api/db/targets`, { signal }),
+        authFetch(`${getApiBase()}/api/db/admin/stats`, { signal }),
+        authFetch(`${getApiBase()}/api/db/activity?limit=20`, { signal }),
+        fetch(`${getApiBase()}/api/training/readiness`, { signal }).catch(() => null),
       ])
+
+      if (signal?.aborted) return
 
       if (usersRes.ok) {
         const data = await usersRes.json()
@@ -134,30 +136,47 @@ function DashboardContent() {
         setTrainingReadiness(null)
       }
     } catch (e) {
+      if (signal?.aborted) return
       console.error("Failed to fetch data:", e)
     }
-  }
+  }, [])
 
   // Separate server health check — uses plain fetch (no auth required)
   useEffect(() => {
+    const controller = new AbortController()
+
     async function checkHealth() {
       try {
-        const res = await fetch(`${getApiBase()}/api/health`, { cache: "no-store" })
+        const res = await fetch(`${getApiBase()}/api/health`, {
+          cache: "no-store",
+          signal: controller.signal,
+        })
+        if (controller.signal.aborted) return
         setApiStatus(res.ok ? "online" : "offline")
       } catch {
+        if (controller.signal.aborted) return
         setApiStatus("offline")
       }
     }
-    checkHealth()
+    void checkHealth()
     const interval = setInterval(checkHealth, 15000)
-    return () => clearInterval(interval)
+    return () => {
+      controller.abort()
+      clearInterval(interval)
+    }
   }, [])
 
   useEffect(() => {
-    fetchData()
-    const interval = setInterval(fetchData, 30000) // Refresh every 30 seconds
-    return () => clearInterval(interval)
-  }, [])
+    const controller = new AbortController()
+    void fetchData(controller.signal)
+    const interval = setInterval(() => {
+      void fetchData(controller.signal)
+    }, 30000)
+    return () => {
+      controller.abort()
+      clearInterval(interval)
+    }
+  }, [fetchData])
 
   const addUser = async () => {
     if (!newUserName.trim()) return
@@ -264,7 +283,9 @@ function DashboardContent() {
           </div>
           <div className="ml-auto flex items-center gap-4">
             <button
-              onClick={fetchData}
+              onClick={() => {
+                void fetchData()
+              }}
               className="p-2 rounded-lg hover:bg-white/[0.05] transition-colors"
             >
               <RefreshCw className={`w-4 h-4 text-[#737373] ${apiStatus === "loading" ? "animate-spin" : ""}`} />

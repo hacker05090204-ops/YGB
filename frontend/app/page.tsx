@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createAuthWebSocket } from "@/lib/ws-auth"
-import { authFetch } from "@/lib/ygb-api"
+import { authFetch, getApiBase } from "@/lib/ygb-api"
 import { useAuthUser } from "@/hooks/use-auth-user"
 import {
   CheckCircle,
@@ -126,11 +126,10 @@ interface G38Status {
   }
 }
 
-const API_BASE = "http://localhost:8000"
-
 export default function Home() {
   const router = useRouter()
   const authUser = useAuthUser()
+  const apiBase = getApiBase()
   const containerRef = useRef(null)
   const phaseLogRef = useRef<HTMLDivElement>(null)
   const browserLogRef = useRef<HTMLDivElement>(null)
@@ -151,6 +150,7 @@ export default function Home() {
   const [result, setResult] = useState<WorkflowResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [g38Status, setG38Status] = useState<G38Status | null>(null)
+  const [hasG38, setHasG38] = useState(true)
 
   const wsRef = useRef<WebSocket | null>(null)
 
@@ -162,39 +162,66 @@ export default function Home() {
 
   // Check API — use plain fetch, health endpoint requires no auth
   useEffect(() => {
+    const controller = new AbortController()
+
     async function checkAPI() {
       try {
-        const res = await fetch(`${API_BASE}/api/health`, { cache: "no-store" })
+        const res = await fetch(`${apiBase}/api/health`, {
+          cache: "no-store",
+          signal: controller.signal,
+        })
+        if (controller.signal.aborted) return
         if (res.ok) {
           setApiStatus("online")
         } else {
           setApiStatus("offline")
         }
       } catch {
+        if (controller.signal.aborted) return
         setApiStatus("offline")
       }
     }
-    checkAPI()
-  }, [])
+    void checkAPI()
+    return () => controller.abort()
+  }, [apiBase])
 
   // Fetch G38 status periodically
   useEffect(() => {
+    const controller = new AbortController()
+
     async function fetchG38Status() {
       try {
-        const res = await authFetch(`${API_BASE}/api/g38/status`)
+        const res = await authFetch(`${apiBase}/api/g38/status`, {
+          signal: controller.signal,
+        })
+        if (controller.signal.aborted) return
         if (res.ok) {
           const data = await res.json()
+          setHasG38(data?.available !== false)
           setG38Status(data)
+        } else {
+          setHasG38(false)
+          setG38Status({ available: false })
         }
       } catch {
-        // G38 not available
+        if (controller.signal.aborted) return
+        setHasG38(false)
+        setG38Status({ available: false })
       }
     }
 
-    fetchG38Status()
-    const interval = setInterval(fetchG38Status, 5000) // Refresh every 5 seconds
-    return () => clearInterval(interval)
-  }, [])
+    void fetchG38Status()
+    if (!hasG38) {
+      return () => controller.abort()
+    }
+    const interval = setInterval(() => {
+      void fetchG38Status()
+    }, 5000)
+    return () => {
+      controller.abort()
+      clearInterval(interval)
+    }
+  }, [apiBase, hasG38])
 
   // Auto-scroll logs
   useEffect(() => {
@@ -224,7 +251,7 @@ export default function Home() {
 
     try {
       // Start workflow via REST API - uses phase_runner.py
-      const res = await authFetch(`${API_BASE}/api/workflow/bounty/start`, {
+      const res = await authFetch(`${apiBase}/api/workflow/bounty/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ target, mode })
@@ -775,7 +802,7 @@ export default function Home() {
                   <div className="flex items-center gap-3">
                     {result.summary?.report_file && (
                       <a
-                        href={`${API_BASE}/api/reports/${result.summary.report_file.split(/[\\\/]/).pop()}`}
+                        href={`${apiBase}/api/reports/${result.summary.report_file.split(/[\\\/]/).pop()}`}
                         download
                         className="px-4 py-2 bg-gradient-to-r from-white/10 to-white/5 border border-white/[0.1] rounded-xl text-sm font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
                       >
@@ -785,7 +812,7 @@ export default function Home() {
                     )}
                     {result.summary?.report_json_file && (
                       <a
-                        href={`${API_BASE}/api/reports/${result.summary.report_json_file.split(/[\\\/]/).pop()}`}
+                        href={`${apiBase}/api/reports/${result.summary.report_json_file.split(/[\\\/]/).pop()}`}
                         download
                         className="px-4 py-2 bg-[#111111] border border-white/[0.1] rounded-xl text-sm font-medium hover:bg-white/[0.04] transition-colors"
                       >

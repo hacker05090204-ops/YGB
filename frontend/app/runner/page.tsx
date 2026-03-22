@@ -83,19 +83,27 @@ function RunnerPageContent() {
 
     // Check API status on mount — use plain fetch, health requires no auth
     useEffect(() => {
+        const controller = new AbortController()
+
         async function checkApi() {
             try {
-                const res = await fetch(`${getApiBase()}/health`, { cache: "no-store" })
+                const res = await fetch(`${getApiBase()}/health`, {
+                    cache: "no-store",
+                    signal: controller.signal,
+                })
+                if (controller.signal.aborted) return
                 if (res.ok) {
                     setApiStatus("online")
                 } else {
                     setApiStatus("offline")
                 }
             } catch {
+                if (controller.signal.aborted) return
                 setApiStatus("offline")
             }
         }
-        checkApi()
+        void checkApi()
+        return () => controller.abort()
     }, [])
 
     useEffect(() => {
@@ -109,16 +117,28 @@ function RunnerPageContent() {
 
     // Auto-scroll phase list
     useEffect(() => {
+        let frame = 0
         if (phaseListRef.current) {
-            phaseListRef.current.scrollTop = phaseListRef.current.scrollHeight
+            frame = requestAnimationFrame(() => {
+                if (phaseListRef.current) {
+                    phaseListRef.current.scrollTop = phaseListRef.current.scrollHeight
+                }
+            })
         }
+        return () => cancelAnimationFrame(frame)
     }, [phases])
 
     // Auto-scroll browser actions
     useEffect(() => {
+        let frame = 0
         if (browserListRef.current) {
-            browserListRef.current.scrollTop = browserListRef.current.scrollHeight
+            frame = requestAnimationFrame(() => {
+                if (browserListRef.current) {
+                    browserListRef.current.scrollTop = browserListRef.current.scrollHeight
+                }
+            })
         }
+        return () => cancelAnimationFrame(frame)
     }, [browserActions])
 
     const startWorkflow = useCallback(async () => {

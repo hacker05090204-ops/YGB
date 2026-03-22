@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: isProduction,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

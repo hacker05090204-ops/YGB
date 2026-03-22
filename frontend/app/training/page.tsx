@@ -2,7 +2,7 @@
 
 import { AuthGuard } from "@/components/auth-guard"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { authFetch , getApiBase } from "@/lib/ygb-api"
 import Link from "next/link"
 import {
@@ -75,16 +75,18 @@ function TrainingDashboardContent() {
     const [lastMonotonic, setLastMonotonic] = useState<number | null>(null)
     const [lastMonotonicTime, setLastMonotonicTime] = useState<number>(Date.now())
     const [trainingStalled, setTrainingStalled] = useState(false)
+    const [hasG38, setHasG38] = useState(true)
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async (signal?: AbortSignal) => {
         try {
             const [statusRes, eventsRes] = await Promise.all([
-                authFetch(`${getApiBase()}/api/g38/status`),
-                authFetch(`${getApiBase()}/api/g38/events?limit=100`)
+                authFetch(`${getApiBase()}/api/g38/status`, { signal }),
+                authFetch(`${getApiBase()}/api/g38/events?limit=100`, { signal })
             ])
 
             if (statusRes.ok) {
                 const statusData = await statusRes.json()
+                setHasG38(statusData?.available !== false)
                 setStatus(statusData)
 
                 // Phase 9: Track monotonic_last_update for stall detection
@@ -100,6 +102,9 @@ function TrainingDashboardContent() {
                         setTrainingStalled(false)
                     }
                 }
+            } else {
+                setHasG38(false)
+                setStatus({ available: false })
             }
 
             if (eventsRes.ok) {
@@ -107,11 +112,14 @@ function TrainingDashboardContent() {
                 setEvents(eventsData.events || [])
             }
         } catch (error) {
+            if (signal?.aborted) return
+            setHasG38(false)
+            setStatus({ available: false })
             console.error("Failed to fetch training data:", error)
         } finally {
             setLoading(false)
         }
-    }
+    }, [lastMonotonic, lastMonotonicTime])
 
     const startTraining = async (epochs: number) => {
         setStartingTraining(true)
@@ -126,10 +134,19 @@ function TrainingDashboardContent() {
     }
 
     useEffect(() => {
-        fetchData()
-        const interval = setInterval(fetchData, 5000)
-        return () => clearInterval(interval)
-    }, [])
+        const controller = new AbortController()
+        void fetchData(controller.signal)
+        if (!hasG38) {
+            return () => controller.abort()
+        }
+        const interval = setInterval(() => {
+            void fetchData(controller.signal)
+        }, 5000)
+        return () => {
+            controller.abort()
+            clearInterval(interval)
+        }
+    }, [fetchData, hasG38])
 
     const getEventColor = (type: string) => {
         switch (type) {
@@ -188,6 +205,11 @@ function TrainingDashboardContent() {
                         </div>
                     ) : (
                         <>
+                            {(!hasG38 || status?.available === false) && (
+                                <div className="mb-8 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-yellow-300">
+                                    G38 status is unavailable right now. Polling has been paused until the page is refreshed.
+                                </div>
+                            )}
                             {/* Summary Cards */}
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                                 <div className="p-6 rounded-2xl bg-[#0A0A0A] border border-white/[0.06]">
