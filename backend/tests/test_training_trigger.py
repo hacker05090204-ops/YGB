@@ -454,10 +454,18 @@ def test_incremental_trainer_circuit_breaker_rolls_back(monkeypatch, tmp_path):
     baseline_path.write_text(json.dumps({"baseline_accuracy": 0.95}), encoding="utf-8")
     monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
     monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
-    monkeypatch.setattr("backend.training.incremental_trainer.accuracy_score", lambda y_true, y_pred: 0.0)
-    monkeypatch.setattr("backend.training.incremental_trainer.precision_score", lambda y_true, y_pred, zero_division=0: 0.0)
-    monkeypatch.setattr("backend.training.incremental_trainer.recall_score", lambda y_true, y_pred, zero_division=0: 0.0)
-    monkeypatch.setattr("backend.training.incremental_trainer.f1_score", lambda y_true, y_pred, zero_division=0: 0.0)
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.calibrate_positive_threshold",
+        lambda labels, probabilities, fallback_threshold=0.5: {
+            "threshold": float(fallback_threshold),
+            "predictions": [0 for _ in labels],
+            "accuracy": 0.0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "strategy": "forced_rollback_for_test",
+        },
+    )
 
     trainer = IncrementalTrainer(model_path=model_path, state_path=state_path, baseline_path=baseline_path, raw_data_root=tmp_path / "raw", num_workers=0)
     trainer.load_new_samples = lambda: [_sample_with_time(index, positive=index % 2 == 0) for index in range(50)]

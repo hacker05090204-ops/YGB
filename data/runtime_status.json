@@ -1,7 +1,7 @@
 {
   "containment_active": true,
-  "containment_reason": "precision_breach: current_precision=0.9266 < threshold=0.9500",
-  "current_precision": 0.926562,
+  "containment_reason": "precision_breach: current_precision=0.9272 < threshold=0.9500",
+  "current_precision": 0.927245,
   "data_freshness": "fresh",
   "decision_threshold": 0.499886843,
   "determinism_pass": true,
@@ -15,7 +15,7 @@
   "training_velocity_batches_sec": 36.026531640973765,
   "training_velocity_samples_hr": 133690135.73585673,
   "updated_at": "2026-03-22T10:14:57.630839+00:00",
-  "validation_checked_at": "2026-03-22T10:32:35.185800+00:00",
+  "validation_checked_at": "2026-03-22T10:59:57.036715+00:00",
   "validation_samples": 1500,
   "validation_source": "data_raw"
 }

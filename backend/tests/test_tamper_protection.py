@@ -27,6 +27,7 @@ import pytest
 # Add project root to path
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, PROJECT_ROOT)
+os.environ.setdefault("YGB_HMAC_SECRET", "ab" * 32)
 
 from backend.api.runtime_api import (
     compute_crc32,
@@ -38,7 +39,6 @@ from backend.api.runtime_api import (
     load_last_seen_timestamp,
     save_last_seen_timestamp,
     TELEMETRY_PATH,
-    HMAC_KEY_PATH,
     LAST_SEEN_PATH,
     EXPECTED_SCHEMA_VERSION,
     EXPECTED_HMAC_VERSION,
@@ -296,8 +296,8 @@ class TestReplayProtection:
 # =========================================================================
 
 class TestSecretKey:
-    def test_key_exists(self):
-        assert os.path.exists(HMAC_KEY_PATH)
+    def test_secret_env_exists(self):
+        assert os.environ.get("YGB_HMAC_SECRET")
 
     def test_key_non_empty(self):
         key = load_hmac_key()

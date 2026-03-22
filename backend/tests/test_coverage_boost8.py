@@ -107,32 +107,33 @@ class TestReportGeneratorTestClient(unittest.TestCase):
         from fastapi.testclient import TestClient
         app, rg, orig = self._make_app()
         try:
-            client = TestClient(app)
-            # Create a report first
-            resp = client.post("/api/reports/", json={
-                "title": "Video Report", "description": "d",
-                "report_type": "assessment",
-            })
-            self.assertEqual(resp.status_code, 200)
-            rid = resp.json()["report"]["id"]
+            with patch.dict(os.environ, {"YGB_HDD_ROOT": self.tmp}):
+                client = TestClient(app)
+                # Create a report first
+                resp = client.post("/api/reports/", json={
+                    "title": "Video Report", "description": "d",
+                    "report_type": "assessment",
+                })
+                self.assertEqual(resp.status_code, 200)
+                rid = resp.json()["report"]["id"]
 
-            # Start recording
-            resp = client.post("/api/reports/videos/start", json={
-                "report_id": rid, "filename": "rec.webm",
-            })
-            self.assertEqual(resp.status_code, 200)
-            vid = resp.json()["recording"]["id"]
+                # Start recording
+                resp = client.post("/api/reports/videos/start", json={
+                    "report_id": rid, "filename": "rec.webm",
+                })
+                self.assertEqual(resp.status_code, 200)
+                vid = resp.json()["recording"]["id"]
 
-            # Stop recording
-            resp = client.post(f"/api/reports/videos/{vid}/stop", json={
-                "duration_seconds": 30, "file_size_bytes": 500000,
-            })
-            self.assertEqual(resp.status_code, 200)
-            self.assertEqual(resp.json()["recording"]["status"], "completed")
+                # Stop recording
+                resp = client.post(f"/api/reports/videos/{vid}/stop", json={
+                    "duration_seconds": 30, "file_size_bytes": 500000,
+                })
+                self.assertEqual(resp.status_code, 200)
+                self.assertEqual(resp.json()["recording"]["status"], "completed")
 
-            # Stop nonexistent
-            resp = client.post("/api/reports/videos/nope/stop", json={})
-            self.assertEqual(resp.status_code, 404)
+                # Stop nonexistent
+                resp = client.post("/api/reports/videos/nope/stop", json={})
+                self.assertEqual(resp.status_code, 404)
         finally:
             rg.get_db_connection = orig
 
@@ -245,26 +246,18 @@ class TestRuntimeAPIHMACReal(unittest.TestCase):
             key = rt.load_hmac_key()
         self.assertEqual(key, bytes.fromhex(hex_key))
 
-    def test_load_hmac_key_from_file(self):
+    def test_load_hmac_key_missing_env_fails(self):
         import backend.api.runtime_api as rt
-        key_path = os.path.join(self.tmp, "hmac.key")
-        hex_key = secrets.token_hex(32)
-        with open(key_path, "w") as f:
-            f.write(hex_key)
         with patch.dict(os.environ, {"YGB_HMAC_SECRET": ""}):
-            with patch.object(rt, 'HMAC_KEY_PATH', key_path):
-                key = rt.load_hmac_key()
-        self.assertEqual(key, bytes.fromhex(hex_key))
+            with self.assertRaises(RuntimeError):
+                rt.load_hmac_key()
 
-    def test_load_hmac_key_empty_file_fails(self):
+    def test_compute_payload_hmac_missing_secret_fails(self):
         import backend.api.runtime_api as rt
-        key_path = os.path.join(self.tmp, "hmac.key")
-        with open(key_path, "w") as f:
-            f.write("")
+        payload = {"schema_version": 1, "crc32": 12345, "timestamp": 1000}
         with patch.dict(os.environ, {"YGB_HMAC_SECRET": ""}):
-            with patch.object(rt, 'HMAC_KEY_PATH', key_path):
-                with self.assertRaises(RuntimeError):
-                    rt.load_hmac_key()
+            with self.assertRaises(RuntimeError):
+                rt.compute_payload_hmac(payload)
 
     def test_compute_payload_hmac_real(self):
         import backend.api.runtime_api as rt

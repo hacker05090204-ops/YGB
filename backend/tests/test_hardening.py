@@ -38,8 +38,22 @@ class TestStorageBridgeErrorSanitization(unittest.TestCase):
             )
             storage_bridge._engine = mock_engine
 
-            result = storage_bridge.get_storage_health()
-            reason = result.get("reason", "")
+            with patch.object(
+                storage_bridge,
+                "get_storage_topology",
+                return_value={
+                    "primary_root": "D:/ygb_hdd",
+                    "fallback_root": "C:/ygb_hdd_fallback",
+                    "active_root": "D:/ygb_hdd",
+                    "primary_available": True,
+                    "fallback_available": False,
+                    "fallback_active": False,
+                    "mode": "PRIMARY",
+                    "reason": "Primary NAS root active",
+                },
+            ):
+                result = storage_bridge.get_storage_health()
+                reason = result.get("reason", "")
 
             # The raw exception message must NOT appear
             self.assertNotIn("C:\\secret\\internal\\path", reason)
@@ -65,7 +79,21 @@ class TestStorageBridgeErrorSanitization(unittest.TestCase):
             storage_bridge._lifecycle = MagicMock()
             storage_bridge._disk_monitor = MagicMock()
 
-            result = storage_bridge.get_storage_health()
+            with patch.object(
+                storage_bridge,
+                "get_storage_topology",
+                return_value={
+                    "primary_root": "D:/ygb_hdd",
+                    "fallback_root": "C:/ygb_hdd_fallback",
+                    "active_root": "D:/ygb_hdd",
+                    "primary_available": True,
+                    "fallback_available": False,
+                    "fallback_active": False,
+                    "mode": "PRIMARY",
+                    "reason": "Primary NAS root active",
+                },
+            ):
+                result = storage_bridge.get_storage_health()
             self.assertEqual(result["status"], "ACTIVE")
             self.assertTrue(result["storage_active"])
         finally:

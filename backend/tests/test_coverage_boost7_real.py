@@ -284,8 +284,7 @@ class TestRuntimeAPIRealFiles(unittest.TestCase):
             json.dump({"hmac_version": rt.EXPECTED_HMAC_VERSION - 1, "data": "old"}, f)
         with patch.dict(os.environ, {"YGB_ENV": "production", "YGB_HMAC_SECRET": "real-secret-value"}):
             with patch.object(rt, 'TELEMETRY_PATH', telem_path):
-                with patch.object(rt, 'HMAC_KEY_PATH', os.path.join(self.tmp, "hmac.key")):
-                    rt.initialize_runtime()
+                rt.initialize_runtime()
         self.assertFalse(os.path.exists(telem_path))
 
     def test_get_runtime_status_with_real_state_file(self):
