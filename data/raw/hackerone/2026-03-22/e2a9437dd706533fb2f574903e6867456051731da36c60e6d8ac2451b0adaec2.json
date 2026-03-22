@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.595739+00:00",
+  "lang": "en",
+  "raw_text": "Urban Company Offers bounties $200 minimum bounty We take security seriously at Urban Company, and we\u2019re committed to protecting our community. If you are a security researcher or expert and believe you\u2019ve identified security-related issues with Urban Company\u2019s website or apps, we would appreciate...",
+  "severity": "INFO",
+  "sha256_hash": "e2a9437dd706533fb2f574903e6867456051731da36c60e6d8ac2451b0adaec2",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/urbancompany"
+}

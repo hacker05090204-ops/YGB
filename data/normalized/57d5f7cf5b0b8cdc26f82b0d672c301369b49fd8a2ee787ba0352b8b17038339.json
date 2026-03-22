@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Parse Server has an auth provider validation bypass on login via partial authData ### Impact An authentication bypass vulnerability allows an attacker to log in as any user who has linked a third-party authentication provider, without knowing the user's credentials. The attacker only needs to know the user's provider ID to gain full access to their account, including a valid session token. This affects Parse Server deployments where the server option `allowExpiredAuthDataToken` is set to `true`. The default value is `false`. ### Patches Auth providers are now always validated on login, regardless of the `allowExpiredAuthDataToken` setting. The option `allowExpiredAuthDataToken` has been deprecated and will be removed in a future major version. ### Workarounds Set `allowExpiredAuthDataToken` to `false` (the default) or remove the option from the server configuration.",
+  "token_count": 127
+}

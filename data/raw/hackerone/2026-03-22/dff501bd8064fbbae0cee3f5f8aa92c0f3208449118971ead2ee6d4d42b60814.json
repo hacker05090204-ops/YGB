@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.180022+00:00",
+  "lang": "en",
+  "raw_text": "Kong Managed Offers bounties $50 minimum bounty Kong's Bug Bounty Policy At Kong, security is a top priority. We value the contributions of the security research community in helping keep our products, services, and users safe. If you discover a vulnerability, we welcome your report and are...",
+  "severity": "INFO",
+  "sha256_hash": "dff501bd8064fbbae0cee3f5f8aa92c0f3208449118971ead2ee6d4d42b60814",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/kong"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.574970+00:00",
+  "lang": "en",
+  "raw_text": "Truecaller Managed Offers bounties $100 minimum bounty General rules Provide detailed reports with reproducible steps. If the report is not detailed enough to reproduce the issue, the issue will not be eligible for a reward. Submit one vulnerability per report, unless you need to chain vulnerabilities...",
+  "severity": "INFO",
+  "sha256_hash": "df5398fe94664b42d3f44fc177aad7d6dbdf1093e228d45ec292cf2294cac1b1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/truecaller"
+}

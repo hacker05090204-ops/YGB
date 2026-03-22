@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.873112+00:00",
+  "lang": "en",
+  "raw_text": "BitMEX Managed Offers bounties $300 minimum bounty Disclosure Policy Let us know as soon as possible upon discovery of a potential security issue, and we'll make every effort to quickly resolve the issue. Provide us a reasonable amount of time to resolve the issue before any disclosure to the public...",
+  "severity": "INFO",
+  "sha256_hash": "b66f11bca0bf59a7eb1a80956839d66402849f3251cda9cc9531a7d3d40067ca",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/bitmex"
+}

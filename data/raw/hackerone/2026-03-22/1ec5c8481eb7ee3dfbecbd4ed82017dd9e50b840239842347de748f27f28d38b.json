@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.416802+00:00",
+  "lang": "en",
+  "raw_text": "Ripple Old We are offering a bounty for any security-relevant bugs. This includes exploits, vulnerabilities and information about ongoing attacks. In order to qualify for a bounty, a bug must be - Relevant \u2013 Only security issues qualify for this bounty. A...",
+  "severity": "INFO",
+  "sha256_hash": "1ec5c8481eb7ee3dfbecbd4ed82017dd9e50b840239842347de748f27f28d38b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/ripple-old"
+}

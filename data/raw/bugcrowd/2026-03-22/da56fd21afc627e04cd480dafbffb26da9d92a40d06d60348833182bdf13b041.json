@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.663619+00:00",
+  "lang": "en",
+  "raw_text": "Under Armour Corporate Submit your finding to Under Armour's program!",
+  "severity": "INFO",
+  "sha256_hash": "da56fd21afc627e04cd480dafbffb26da9d92a40d06d60348833182bdf13b041",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 10,
+  "url": "https://bugcrowd.com/engagements/underarmour-corp"
+}

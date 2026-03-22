@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.163561+00:00",
+  "lang": "en",
+  "raw_text": "Judge.me Managed Offers bounties $50 minimum bounty Security is top priority at Judge.me. We constantly release new features and no system is perfect. We look forward to working with the security community around the world to find vulnerabilities in order to keep our businesses and customers safe...",
+  "severity": "INFO",
+  "sha256_hash": "55c47e19c4369cd82193c18a002d09c92c9f9ea185c2a11da9f51078dc781641",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/judgeme"
+}

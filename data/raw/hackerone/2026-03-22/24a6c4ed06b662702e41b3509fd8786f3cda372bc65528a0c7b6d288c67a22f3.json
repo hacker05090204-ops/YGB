@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.060546+00:00",
+  "lang": "en",
+  "raw_text": "FloQast Managed Offers bounties $50 minimum bounty Temporary Program Pause Thank you for all of your reports to our bug bounty program! You may have noticed that we temporarily paused our program and are only offering a maximum $50 bounty. This is a short-term measure to allow us some time to...",
+  "severity": "INFO",
+  "sha256_hash": "24a6c4ed06b662702e41b3509fd8786f3cda372bc65528a0c7b6d288c67a22f3",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 51,
+  "url": "https://hackerone.com/floqast"
+}

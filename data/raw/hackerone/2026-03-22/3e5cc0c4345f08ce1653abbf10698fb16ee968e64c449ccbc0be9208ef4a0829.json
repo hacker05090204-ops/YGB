@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.130450+00:00",
+  "lang": "nl",
+  "raw_text": "Hybrid Saas Responsible disclosure Hybrid SaaS vindt het erg belangrijk dat de eigen ICT-systemen veilig zijn en streeft het een hoge beveiliging daarvan na. Toch kan het gebeuren dat er een zwakke plek in \u00e9\u00e9n van deze systemen voorkomt. Kwetsbaarheden in ICT...",
+  "severity": "INFO",
+  "sha256_hash": "3e5cc0c4345f08ce1653abbf10698fb16ee968e64c449ccbc0be9208ef4a0829",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/hybridsaas"
+}

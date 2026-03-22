@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.852854+00:00",
+  "lang": "en",
+  "raw_text": "Avast! Please submit bugs to email address bugs@avast.com. It is recommended to encrypt your email - here's our PGP key (http://virfile.avast.com/viruslab/avast-bugs-pgp-key.txt).",
+  "severity": "INFO",
+  "sha256_hash": "5d8b5074840cefb6850437e3175b55bcb35440fd3bb7b8461f793953e4066e6e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 21,
+  "url": "https://hackerone.com/avast"
+}

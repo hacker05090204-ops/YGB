@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.848074+00:00",
+  "lang": "en",
+  "raw_text": "Audible Managed Offers bounties $50 minimum bounty Introduction Audible exists to unleash the power of the spoken word and to take the digital audio book download business into the mainstream. We work to change the way individuals control the what, when, where, and how of the words they hear, and to...",
+  "severity": "INFO",
+  "sha256_hash": "56777f343d9ee32a37b9c3b7a39a5f1bcf80d2f6c7b6fa35e0d08c373d723bb1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 51,
+  "url": "https://hackerone.com/audible"
+}

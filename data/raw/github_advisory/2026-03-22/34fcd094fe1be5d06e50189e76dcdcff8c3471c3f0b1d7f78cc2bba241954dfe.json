@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4427",
+  "ingested_at": "2026-03-22T09:56:22.430234+00:00",
+  "lang": "en",
+  "raw_text": "pgproto3: Negative field length panics in DataRow.Decode A flaw was found in pgproto3. A malicious or compromised PostgreSQL server can exploit this by sending a DataRow message with a negative field length. This input validation vulnerability can lead to a denial of service (DoS) due to a slice bounds out of range panic.",
+  "severity": "HIGH",
+  "sha256_hash": "34fcd094fe1be5d06e50189e76dcdcff8c3471c3f0b1d7f78cc2bba241954dfe",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-129"
+  ],
+  "token_count": 53,
+  "url": "https://github.com/advisories/GHSA-x6gf-mpr2-68h6"
+}

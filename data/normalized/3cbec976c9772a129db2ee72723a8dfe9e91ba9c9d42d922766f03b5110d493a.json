@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: web_search citation redirect SSRF via private-network-allowing policy ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-g99v-8hwm-g76g. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.3.1 contain a server-side request forgery vulnerability in web_search citation redirect resolution that uses a private-network-allowing SSRF policy. An attacker who can influence citation redirect targets can trigger internal-network requests from the OpenClaw host to loopback, private, or internal destinations.",
+  "token_count": 79
+}

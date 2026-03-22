@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.825255+00:00",
+  "lang": "en",
+  "raw_text": "Amazon Vulnerability Research Program - Devices Managed Offers bounties $50 minimum bounty Amazon Devices and Services Bug Bounty Program Overview Safeguarding our customers\u2019 security is a top priority. We recognize that performing high quality security research requires considerable amount of effort, time, and skills investment from...",
+  "severity": "INFO",
+  "sha256_hash": "0e44c00efdb8d92e3afdd6fd538d94affb6eb05cfb7c2b3538ed35f8b0bc8676",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/amazonvrp-devices"
+}

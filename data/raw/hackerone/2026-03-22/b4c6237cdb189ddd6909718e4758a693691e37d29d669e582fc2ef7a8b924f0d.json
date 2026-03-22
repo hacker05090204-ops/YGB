@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.538844+00:00",
+  "lang": "en",
+  "raw_text": "Test Inc All south of bugs",
+  "severity": "INFO",
+  "sha256_hash": "b4c6237cdb189ddd6909718e4758a693691e37d29d669e582fc2ef7a8b924f0d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 6,
+  "url": "https://hackerone.com/h1111"
+}

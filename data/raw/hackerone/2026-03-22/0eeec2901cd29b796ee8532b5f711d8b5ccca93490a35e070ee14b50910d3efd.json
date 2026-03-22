@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.190200+00:00",
+  "lang": "en",
+  "raw_text": "Lark Technologies Managed Offers bounties $100 minimum bounty The security and privacy of your data are our utmost concern. Lark abides by rigorous security policies, and implements robust systems to protect user data. We encourage security research individuals as well as teams to test our security, and we...",
+  "severity": "INFO",
+  "sha256_hash": "0eeec2901cd29b796ee8532b5f711d8b5ccca93490a35e070ee14b50910d3efd",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/lark_technologies"
+}

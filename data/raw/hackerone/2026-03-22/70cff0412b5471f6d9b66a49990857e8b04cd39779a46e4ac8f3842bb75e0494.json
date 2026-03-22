@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.875113+00:00",
+  "lang": "en",
+  "raw_text": "Blackphone Program Rules Maintaining top-notch security is a group effort and Blackphone encourages independent security researchers to help us spot potential issues. To recognize such efforts and the important role they play in keeping the Blackphone...",
+  "severity": "INFO",
+  "sha256_hash": "70cff0412b5471f6d9b66a49990857e8b04cd39779a46e4ac8f3842bb75e0494",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/blackphone"
+}

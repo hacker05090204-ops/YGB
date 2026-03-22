@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.480908+00:00",
+  "lang": "en",
+  "raw_text": "Snapchat Offers bounties $250 minimum bounty Policy At Snapchat, we are looking forward to fostering new relationships with the security community as part of our bug bounty program (\u201cBug Bounty Program\u201d). Our security team reviews all vulnerability reports and acts upon them in accordance with...",
+  "severity": "INFO",
+  "sha256_hash": "4835fc007f6268e91fcf60fd65dcb44419fc1a19065aeaa0bc154503aff0f7e8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/snapchat"
+}

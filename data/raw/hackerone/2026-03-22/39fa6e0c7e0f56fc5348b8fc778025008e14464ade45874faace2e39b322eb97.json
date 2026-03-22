@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.270503+00:00",
+  "lang": "en",
+  "raw_text": "N26 N26 Bugbounty Program Security has the highest priority at N26 and we are continuously working to provide secure products. We follow international standards as defined by leading tech companies and security communities. However, no technology is...",
+  "severity": "INFO",
+  "sha256_hash": "39fa6e0c7e0f56fc5348b8fc778025008e14464ade45874faace2e39b322eb97",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/n26"
+}

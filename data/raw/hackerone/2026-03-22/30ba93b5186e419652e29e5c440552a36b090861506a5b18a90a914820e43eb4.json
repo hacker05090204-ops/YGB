@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.463584+00:00",
+  "lang": "en",
+  "raw_text": "Simple Simple offers a bank account that has all the tools you need to manage your money built right in, including a Simple Visa\u00ae Card, our powerful iOS and Android apps, a beautifully designed web interface, and customer support that really cares. Simple...",
+  "severity": "INFO",
+  "sha256_hash": "30ba93b5186e419652e29e5c440552a36b090861506a5b18a90a914820e43eb4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/simple"
+}

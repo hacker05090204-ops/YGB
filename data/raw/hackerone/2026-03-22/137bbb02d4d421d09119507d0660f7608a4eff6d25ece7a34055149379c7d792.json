@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.193532+00:00",
+  "lang": "en",
+  "raw_text": "LastPass LastPass Security Response We Value Your Concerns Our business is keeping customer information both private and secure. We appreciate all security concerns brought forth and are constantly striving to keep on top of the latest threats. Being pro...",
+  "severity": "INFO",
+  "sha256_hash": "137bbb02d4d421d09119507d0660f7608a4eff6d25ece7a34055149379c7d792",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/lastpass"
+}

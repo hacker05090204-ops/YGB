@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.656617+00:00",
+  "lang": "en",
+  "raw_text": "Verisign Bug Bounty A global provider of critical internet infrastructure and domain name registry services.",
+  "severity": "INFO",
+  "sha256_hash": "8c220693d472f8f8113440d9c7dcd38532015a0e8a42775f06aeb321ea6e9b82",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 15,
+  "url": "https://bugcrowd.com/engagements/verisign"
+}

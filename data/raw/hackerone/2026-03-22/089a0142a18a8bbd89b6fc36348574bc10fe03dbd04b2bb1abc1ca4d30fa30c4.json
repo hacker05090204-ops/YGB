@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.124448+00:00",
+  "lang": "en",
+  "raw_text": "hostinger Offers bounties $100 minimum bounty HOSTINGER BUG BOUNTY REWARD PROGRAM PLEASE READ THIS AGREEMENT CAREFULLY, AS IT CONTAINS IMPORTANT INFORMATION REGARDING YOUR LEGAL RIGHTS AND REMEDIES. Last Revised: 2024-01-24 RESPONSIBLE DISCLOSURE POLICY Hostinger encourages the responsible...",
+  "severity": "INFO",
+  "sha256_hash": "089a0142a18a8bbd89b6fc36348574bc10fe03dbd04b2bb1abc1ca4d30fa30c4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/hostinger"
+}

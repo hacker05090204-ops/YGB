@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.623483+00:00",
+  "lang": "en",
+  "raw_text": "Wallet on Telegram Managed Offers bounties $50 minimum bounty Wallet on Telegram looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Vulnerability Classification & Severity Levels We assess and categorize reported vulnerabilities...",
+  "severity": "INFO",
+  "sha256_hash": "6ca79bd952eddfe2d9fbbe2acdbedae959eba63a78fe6ada075f3551298a0224",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/wallet_on_telegram"
+}

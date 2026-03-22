@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.294504+00:00",
+  "lang": "en",
+  "raw_text": "Nextcloud Offers bounties $100 minimum bounty We're inviting researchers all over the globe to take a look at Nextcloud and bring its security to the next level. If you're interested in learning how we handle security you can read more about it on our dedicated security page (https://nextcloud...",
+  "severity": "INFO",
+  "sha256_hash": "946b58f9eb3b20ea3b4008ad43a0c59ad0e7c8ddd5974cb25f8579f64ad82d44",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/nextcloud"
+}

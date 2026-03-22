@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.360011+00:00",
+  "lang": "en",
+  "raw_text": "PlayStation Managed Offers bounties $50 minimum bounty Program Overview At PlayStation, we strive to be the best place to play, and believe that the security of our environment is fundamental to that goal. We believe that through close partnerships with the security research community we can deliver a...",
+  "severity": "INFO",
+  "sha256_hash": "3d3acaaa180cf0015429de3bef8323e81f90229296ebc9fa6bfa9fa72a08f7cc",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/playstation"
+}

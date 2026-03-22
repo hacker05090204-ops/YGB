@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.135463+00:00",
+  "lang": "en",
+  "raw_text": "ICANN ICANN looks forward to working with the community to find security vulnerabilities in order to keep our businesses and customers safe. SLA ICANN will make a best effort to meet the following SLAs for hackers participating in our program: * Time to...",
+  "severity": "INFO",
+  "sha256_hash": "5612ad8082393b8028a29ac012afa8bda4bac2f8126849766775e18fc4b43893",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/icann"
+}

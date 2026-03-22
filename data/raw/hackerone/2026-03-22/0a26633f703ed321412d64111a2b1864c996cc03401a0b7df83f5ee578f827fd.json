@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.331874+00:00",
+  "lang": "en",
+  "raw_text": "OVH While we are trying our best to keep OVH services as safe as possible, We know that some vulnerabilities have slip trough our scrutiny. If you believe you've found a security issue in the services listed in our scope, we will work with you to...",
+  "severity": "INFO",
+  "sha256_hash": "0a26633f703ed321412d64111a2b1864c996cc03401a0b7df83f5ee578f827fd",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/ovh-group"
+}

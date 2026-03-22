@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: OpenClaw's Node system.run approval hardening wrapper semantic drift can execute unintended local scripts ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-h3rm-6x7g-882f. This link is maintained to preserve external references. ## Original Description OpenClaw 2026.3.1 contains an approval integrity vulnerability in system.run node-host execution where argv rewriting changes command semantics. Attackers can place malicious local scripts in the working directory to execute unintended code despite operator approval of different command text.",
+  "token_count": 79
+}

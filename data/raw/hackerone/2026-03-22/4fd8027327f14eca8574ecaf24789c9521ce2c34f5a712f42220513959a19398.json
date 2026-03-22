@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.588737+00:00",
+  "lang": "en",
+  "raw_text": "Udemy Managed Offers bounties $50 minimum bounty TL;DR Do no harm. Respect users\u2019 privacy. Research and disclose in good faith. Udemy is a global marketplace for learning and instruction. By connecting students all over the world to the best instructors, Udemy is helping individuals reach their...",
+  "severity": "INFO",
+  "sha256_hash": "4fd8027327f14eca8574ecaf24789c9521ce2c34f5a712f42220513959a19398",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/udemy"
+}

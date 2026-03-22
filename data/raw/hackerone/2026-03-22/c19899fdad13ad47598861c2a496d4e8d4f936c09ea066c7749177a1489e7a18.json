@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.313479+00:00",
+  "lang": "en",
+  "raw_text": "OKG Managed Offers bounties $50 minimum bounty About OKG: OKG Technology Holdings Limited is a leading innovator in the blockchain sector, dedicated to the research, development, and commercial application of blockchain technology. Founded in 2013, the company has emerged as a global blockchain...",
+  "severity": "INFO",
+  "sha256_hash": "c19899fdad13ad47598861c2a496d4e8d4f936c09ea066c7749177a1489e7a18",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/okg"
+}

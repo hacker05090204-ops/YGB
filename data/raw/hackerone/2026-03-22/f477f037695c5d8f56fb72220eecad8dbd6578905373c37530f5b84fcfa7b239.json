@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.394798+00:00",
+  "lang": "en",
+  "raw_text": "Redox Managed Offers bounties $50 minimum bounty Our Security team identifies, evaluates, and manages vulnerabilities across Redox, including corporate assets, applications, and cloud infrastructure. Our purpose is to reduce risk exposure and support our goal to become the most trusted brand in...",
+  "severity": "INFO",
+  "sha256_hash": "f477f037695c5d8f56fb72220eecad8dbd6578905373c37530f5b84fcfa7b239",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/redox_bbp"
+}

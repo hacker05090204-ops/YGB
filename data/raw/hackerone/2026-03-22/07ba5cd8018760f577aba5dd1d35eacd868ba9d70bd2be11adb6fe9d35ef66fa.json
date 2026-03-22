@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.074546+00:00",
+  "lang": "en",
+  "raw_text": "Giesecke+Devrient Giesecke+Devrient Directory Page This page is to enable you to submit information about technical weaknesses and vulnerabilities in Giesecke+Devrient Group\u2019s (\u201cG+D\u201d) products and services. Submission of a Vulnerability If you identify any potential...",
+  "severity": "INFO",
+  "sha256_hash": "07ba5cd8018760f577aba5dd1d35eacd868ba9d70bd2be11adb6fe9d35ef66fa",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 34,
+  "url": "https://hackerone.com/giesecke_devrient"
+}

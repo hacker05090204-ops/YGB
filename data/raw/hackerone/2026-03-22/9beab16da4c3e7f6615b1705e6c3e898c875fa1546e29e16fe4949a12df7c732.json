@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.985257+00:00",
+  "lang": "en",
+  "raw_text": "Discourse Managed Offers bounties $256 minimum bounty We welcome review of our 100% open source code (https://github.com/discourse/discourse), and our public instance at https://try.discourse.org, to ensure the safety and security of Discourse forums across the world. Temporary Bounty Suspension As of...",
+  "severity": "INFO",
+  "sha256_hash": "9beab16da4c3e7f6615b1705e6c3e898c875fa1546e29e16fe4949a12df7c732",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/discourse"
+}

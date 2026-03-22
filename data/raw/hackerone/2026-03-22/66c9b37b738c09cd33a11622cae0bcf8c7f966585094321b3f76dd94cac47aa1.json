@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.666509+00:00",
+  "lang": "en",
+  "raw_text": "Zapier OLD Contact Please email us at security@zapier.com with any vulnerability reports or questions about the program. Please report each new bug in a separate email thread. Security Exploit Bounty Program (https://zapier.com/engineering/bug-bounty-program/)",
+  "severity": "INFO",
+  "sha256_hash": "66c9b37b738c09cd33a11622cae0bcf8c7f966585094321b3f76dd94cac47aa1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 32,
+  "url": "https://hackerone.com/zapier-old"
+}

@@ -15,36 +15,62 @@ Endpoints added to the main YGB server:
 import json
 import logging
 import os
-import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 logger = logging.getLogger("ygb.sync.peer")
 
-SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+_ENV_CACHE: dict[str, str] | None = None
+
+
+def _load_local_env() -> dict[str, str]:
+    global _ENV_CACHE
+    if _ENV_CACHE is not None:
+        return _ENV_CACHE
+    env_path = PROJECT_ROOT / ".env"
+    values: dict[str, str] = {}
+    if env_path.exists():
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#") or "=" not in stripped:
+                continue
+            key, value = stripped.split("=", 1)
+            values[key.strip()] = value.strip()
+    _ENV_CACHE = values
+    return values
+
+
+def _get_env(name: str, default: str = "") -> str:
+    value = os.environ.get(name)
+    if value:
+        return value
+    return _load_local_env().get(name, default)
+
+
+SYNC_ROOT = Path(_get_env("YGB_SYNC_ROOT", "D:\\"))
 SYNC_META = SYNC_ROOT / "ygb_sync"
 MANIFEST_PATH = SYNC_META / "manifest.json"
 PEER_STATE = SYNC_META / "peer_state"
-DEVICE_ID = os.getenv("YGB_DEVICE_ID", "laptop_a")
-
-# Peer format: "name:ip:port" — e.g. "laptop_b:100.64.0.2:8000"
-_PEER_NODES_RAW = os.getenv("YGB_PEER_NODES", "")
+DEVICE_ID = _get_env("YGB_DEVICE_ID", "laptop_a")
 
 
 def _parse_peers() -> List[Dict[str, str]]:
     """Parse peer nodes from env var."""
-    if not _PEER_NODES_RAW:
+    peer_nodes_raw = _get_env("YGB_PEER_NODES", "")
+    if not peer_nodes_raw:
         return []
     peers = []
-    for entry in _PEER_NODES_RAW.split(","):
+    for entry in peer_nodes_raw.split(","):
         parts = entry.strip().split(":")
         if len(parts) >= 3:
+            scheme = "https" if parts[2] == "8443" else "http"
             peers.append({
                 "name": parts[0],
                 "ip": parts[1],
                 "port": parts[2],
-                "url": f"http://{parts[1]}:{parts[2]}",
+                "url": f"{scheme}://{parts[1]}:{parts[2]}",
             })
         elif len(parts) == 2:
             peers.append({
@@ -68,13 +94,17 @@ def check_peer_health(peer_url: str, timeout: float = 2.0) -> str:
     """Check if a peer is reachable. Returns 'ONLINE', 'OFFLINE', or 'ERROR'."""
     try:
         import urllib.request
-        req = urllib.request.Request(
-            f"{peer_url}/health",
-            headers={"User-Agent": "YGB-Sync"},
-        )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            if resp.status == 200:
-                return "ONLINE"
+        for health_path in ("/api/health", "/health"):
+            req = urllib.request.Request(
+                f"{peer_url}{health_path}",
+                headers={"User-Agent": "YGB-Sync"},
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                    if resp.status == 200:
+                        return "ONLINE"
+            except Exception:
+                continue
         return "ERROR"
     except Exception:
         return "OFFLINE"
@@ -84,19 +114,24 @@ def fetch_peer_manifest(peer_url: str, timeout: float = 5.0) -> Optional[dict]:
     """Fetch a peer's sync manifest."""
     try:
         import urllib.request
-        req = urllib.request.Request(
-            f"{peer_url}/sync/manifest",
-            headers={
-                "User-Agent": "YGB-Sync",
-                "Accept": "application/json",
-            },
-        )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-            return data
+        for manifest_path in ("/api/sync/manifest", "/sync/manifest"):
+            req = urllib.request.Request(
+                f"{peer_url}{manifest_path}",
+                headers={
+                    "User-Agent": "YGB-Sync",
+                    "Accept": "application/json",
+                },
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    return data
+            except Exception:
+                continue
     except Exception as e:
         logger.debug("Failed to fetch manifest from %s: %s", peer_url, e)
         return None
+    return None
 
 
 def fetch_chunk_from_peer(peer_url: str, chunk_hash: str, timeout: float = 30.0) -> Optional[bytes]:

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Spring Boot has an Authentication Bypass under Actuator Health groups paths Spring Boot applications with Actuator can be vulnerable to an \"Authentication Bypass\" vulnerability when an application endpoint that requires authentication is declared under a specific path, already configured for a Health Group additional path. This issue affects Spring Boot: from 4.0 before 4.0.3, from 3.5 before 3.5.11, from 3.4 before 3.4.15. This CVE is similar but not equivalent to CVE-2026-22733, as the conditions for exploit and vulnerable versions are different.",
+  "token_count": 81
+}

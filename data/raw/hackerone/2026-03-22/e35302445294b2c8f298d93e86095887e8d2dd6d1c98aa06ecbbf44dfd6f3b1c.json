@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.905355+00:00",
+  "lang": "en",
+  "raw_text": "Bykea Offers bounties $50 minimum bounty Bykea looks forward to working with the security community to find security vulnerabilities to keep our businesses and customers safe. Kindly review the rules set forth on this page before testing and submitting a report to us. Testing Guidelines...",
+  "severity": "INFO",
+  "sha256_hash": "e35302445294b2c8f298d93e86095887e8d2dd6d1c98aa06ecbbf44dfd6f3b1c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/bykea"
+}

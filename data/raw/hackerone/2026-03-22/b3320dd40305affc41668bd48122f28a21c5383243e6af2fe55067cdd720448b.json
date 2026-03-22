@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.472905+00:00",
+  "lang": "sv",
+  "raw_text": "slack https://slack.com",
+  "severity": "INFO",
+  "sha256_hash": "b3320dd40305affc41668bd48122f28a21c5383243e6af2fe55067cdd720448b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 2,
+  "url": "https://hackerone.com/slack-bbp"
+}

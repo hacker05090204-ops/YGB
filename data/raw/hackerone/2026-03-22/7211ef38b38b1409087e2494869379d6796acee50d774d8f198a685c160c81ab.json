@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.178028+00:00",
+  "lang": "en",
+  "raw_text": "KOHO Offers bounties $50 minimum bounty Introduction KOHO is a Canadian fintech company rooted in the belief that a better banking alternative exists. Our bug bounty program will allow researchers to help us improve our security for our customers to enable that better banking experience...",
+  "severity": "INFO",
+  "sha256_hash": "7211ef38b38b1409087e2494869379d6796acee50d774d8f198a685c160c81ab",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/koho"
+}

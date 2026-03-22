@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.893415+00:00",
+  "lang": "en",
+  "raw_text": "Bugify Responsible Disclosure Security issues within our product offerings take a very high priority. We want to work with you to understand the scope of the vulnerability and ensure that we correct the problem fully. In pursuit of the best possible...",
+  "severity": "INFO",
+  "sha256_hash": "ea5ab960d5533e60fa4157f1f7d0a4b624ba9a2eb327e006b34b045c5035a54b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/bugify"
+}

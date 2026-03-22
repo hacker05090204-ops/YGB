@@ -6,6 +6,8 @@ Tests for voice STT governor.
 """
 
 import pytest
+import io
+import wave
 from impl_v1.phase49.governors.g29_voice_stt import (
     VoiceIntent,
     VoiceState,
@@ -13,6 +15,7 @@ from impl_v1.phase49.governors.g29_voice_stt import (
     VoiceCommand,
     VoiceSession,
     IntentResult,
+    TranscriptionResult,
     can_voice_execute,
     can_voice_approve,
     can_voice_click,
@@ -21,9 +24,12 @@ from impl_v1.phase49.governors.g29_voice_stt import (
     DEFAULT_WAKE_WORD,
     STOP_HOTWORDS,
     SUPPORTED_WAKE_WORDS,
+    SUPPORTED_LANGUAGES,
     assess_audio_quality,
     apply_noise_filter,
+    is_forbidden,
     parse_intent,
+    transcribe,
     VoiceInputEngine,
     create_voice_engine,
     is_voice_supported,
@@ -261,7 +267,13 @@ class TestConstants:
     def test_supported_wake_words(self):
         """Supported wake words defined."""
         assert len(SUPPORTED_WAKE_WORDS) > 0
-    
+
+    def test_supported_languages(self):
+        """Supported language list includes Hindi and English variants."""
+        assert "en-US" in SUPPORTED_LANGUAGES
+        assert "en-IN" in SUPPORTED_LANGUAGES
+        assert "hi-IN" in SUPPORTED_LANGUAGES
+
     def test_is_voice_supported_with_runtime_probe(self, monkeypatch):
         """Voice support reflects real runtime capability probes."""
         monkeypatch.setattr(
@@ -305,3 +317,37 @@ class TestDataclasses:
         )
         with pytest.raises(Exception):
             session.state = VoiceState.LISTENING
+
+
+class TestTranscription:
+    """Test the real STT integration surface."""
+
+    @staticmethod
+    def _make_silence_wav(duration_sec: float = 0.25) -> bytes:
+        frame_count = int(16000 * duration_sec)
+        pcm = b"\x00\x00" * frame_count
+        buffer = io.BytesIO()
+        with wave.open(buffer, "wb") as wav_file:
+            wav_file.setnchannels(1)
+            wav_file.setsampwidth(2)
+            wav_file.setframerate(16000)
+            wav_file.writeframes(pcm)
+        return buffer.getvalue()
+
+    def test_transcribe_returns_result(self):
+        """Transcribe should return a result object even when local STT is degraded."""
+        result = transcribe(self._make_silence_wav(), language="en-US")
+        assert isinstance(result, TranscriptionResult)
+        assert result.language == "en-US"
+        assert result.duration_ms >= 0.0
+        assert result.engine.startswith("local_conformer_ctc")
+
+    def test_transcribe_rejects_unsupported_language(self):
+        """Unsupported language codes fail closed."""
+        with pytest.raises(ValueError):
+            transcribe(self._make_silence_wav(), language="fr-FR")
+
+    def test_is_forbidden_flags_dangerous_text(self):
+        """Forbidden voice commands are blocked by pattern."""
+        assert is_forbidden("please run exploit now") is True
+        assert is_forbidden("show status") is False

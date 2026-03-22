@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33283",
+  "ingested_at": "2026-03-22T09:56:16.131674+00:00",
+  "lang": "en",
+  "raw_text": "Ella Core panics on malformed ULNASTransport Message without a Request Type ## Summary Ella Core panics when processing malformed UL NAS Transport NAS messages without a Request Type. ## Impact An attacker able to send crafted NAS messages to Ella Core can crash the process, causing service disruption for all connected subscribers. No authentication is required. ## Fix Add a guard when receiving an UL NAS Message without a Request Type given no SM Context.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ee4bf917b6f309db543aaab5a80ee542b1e459ade4cc88ee91fdbaa96825b334",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-476"
+  ],
+  "token_count": 75,
+  "url": "https://github.com/advisories/GHSA-3366-gw57-fcm5"
+}

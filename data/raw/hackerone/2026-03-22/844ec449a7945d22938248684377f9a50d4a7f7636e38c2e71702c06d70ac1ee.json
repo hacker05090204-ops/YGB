@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.016092+00:00",
+  "lang": "en",
+  "raw_text": "Epic Games Managed Offers bounties $200 minimum bounty Program Rules Program Eligibility You are not a resident of, and will not make your submission from, a country against which the United State has issued export sanctions or other trade restrictions (eg: Cuba, Iran, North Korea, Sudan, and Syria)...",
+  "severity": "INFO",
+  "sha256_hash": "844ec449a7945d22938248684377f9a50d4a7f7636e38c2e71702c06d70ac1ee",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/epicgames"
+}

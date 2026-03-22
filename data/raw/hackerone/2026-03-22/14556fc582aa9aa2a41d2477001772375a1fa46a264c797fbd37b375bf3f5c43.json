@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.572968+00:00",
+  "lang": "en",
+  "raw_text": "TRON DAO Offers bounties $50 minimum bounty TRON is an open-source platform for launching highly decentralized applications, new financial primitives, and new interoperable blockchains. It is conducted and supported by the active TRON developer community and is governed by TRON DAO. The TRON...",
+  "severity": "INFO",
+  "sha256_hash": "14556fc582aa9aa2a41d2477001772375a1fa46a264c797fbd37b375bf3f5c43",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/tron_dao"
+}

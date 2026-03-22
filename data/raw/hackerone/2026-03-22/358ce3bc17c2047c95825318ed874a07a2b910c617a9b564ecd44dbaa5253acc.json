@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.908456+00:00",
+  "lang": "en",
+  "raw_text": "Capital One Bug Bounty Managed Offers bounties $50 minimum bounty Capital One Bug Bounty Program Terms Capital One looks forward to working with the security community to keep our businesses and customers safe. Please read this program policy in its entirety before you start any testing. Capital One has...",
+  "severity": "INFO",
+  "sha256_hash": "358ce3bc17c2047c95825318ed874a07a2b910c617a9b564ecd44dbaa5253acc",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/capital-one-bounty"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.014090+00:00",
+  "lang": "en",
+  "raw_text": "Enjin Offers bounties $60 minimum bounty Security is the utmost highest priority at Enjin. Despite the heavy attention to detail, we understand that bugs are present within all pieces of technology - that includes our own. It's for that reason why we love to work with talented security...",
+  "severity": "INFO",
+  "sha256_hash": "f3e7f0a61451eb685d6455ee787b4026e53e56b602be792e8d70c84020fdadec",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/enjin"
+}

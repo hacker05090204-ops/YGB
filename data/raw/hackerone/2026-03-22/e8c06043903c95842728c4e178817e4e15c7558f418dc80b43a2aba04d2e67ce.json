@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.223020+00:00",
+  "lang": "en",
+  "raw_text": "Magic Eden Managed Offers bounties $50 minimum bounty Magic Eden looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. We\u2019ll try to keep you informed about our progress throughout the process. Disclosure Policy Please do not...",
+  "severity": "INFO",
+  "sha256_hash": "e8c06043903c95842728c4e178817e4e15c7558f418dc80b43a2aba04d2e67ce",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/magic-eden"
+}

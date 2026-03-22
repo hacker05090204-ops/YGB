@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.666616+00:00",
+  "lang": "en",
+  "raw_text": "Octopus Deploy Submit your finding to the program!",
+  "severity": "INFO",
+  "sha256_hash": "fa50cada4cea6b861ae4f6639a42a5efa3d7b9a255b3fd0a767c0d8b57adfcf6",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 8,
+  "url": "https://bugcrowd.com/engagements/octopus-deploy"
+}

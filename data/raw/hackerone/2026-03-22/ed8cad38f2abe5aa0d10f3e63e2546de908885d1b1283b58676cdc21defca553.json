@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.384576+00:00",
+  "lang": "fr",
+  "raw_text": "ragnarocSec ourPolicy",
+  "severity": "INFO",
+  "sha256_hash": "ed8cad38f2abe5aa0d10f3e63e2546de908885d1b1283b58676cdc21defca553",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 2,
+  "url": "https://hackerone.com/ragnarocsec"
+}

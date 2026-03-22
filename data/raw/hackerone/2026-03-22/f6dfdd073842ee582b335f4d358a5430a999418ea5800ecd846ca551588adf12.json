@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.172576+00:00",
+  "lang": "en",
+  "raw_text": "Klarna Managed Offers bounties $50 minimum bounty Smoooth hacking Klarna looks forward to working with the security community to find vulnerabilities in order to keep its businesses and customers safe. Our program accepts reports of bugs that provide a potential attacker with the ability to...",
+  "severity": "INFO",
+  "sha256_hash": "f6dfdd073842ee582b335f4d358a5430a999418ea5800ecd846ca551588adf12",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/klarna"
+}

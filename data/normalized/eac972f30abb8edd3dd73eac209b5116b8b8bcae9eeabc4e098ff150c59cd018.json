@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "SVG Dimension Capping Bypass via XML Comment Injection in @dicebear/converter ensureSize() ## Summary The `ensureSize()` function in `@dicebear/converter` used a regex-based approach to rewrite SVG `width`/`height` attributes, capping them at 2048px to prevent denial of service. This size capping could be bypassed by crafting SVG input that causes the regex to match a non-functional occurrence of `",
+  "token_count": 57
+}

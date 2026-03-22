@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.916355+00:00",
+  "lang": "en",
+  "raw_text": "Chaturbate Managed Offers bounties $100 minimum bounty Security Stance Security and transparency are top priorities at Chaturbate. Networks are dynamic. The technology, users, data in the systems, risks, and security requirements are ever-changing. Chaturbate knows that security is never perfect and can...",
+  "severity": "INFO",
+  "sha256_hash": "c2db8688cb56878314ba140d5baea4f8486143bac1bb1aea2c207e43500f22a8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/chaturbate"
+}

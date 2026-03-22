@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.630019+00:00",
+  "lang": "en",
+  "raw_text": "Magic Labs Managed Bug Bounty Engagement Magic Labs provides web3 wallet infrastructure to make it easier for users to access decentralized applications.",
+  "severity": "INFO",
+  "sha256_hash": "4f28e5721a441748f28444cfc3d89c76b52df38075134f1098072b12a6341603",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 22,
+  "url": "https://bugcrowd.com/engagements/magiclabs-mbb-og"
+}

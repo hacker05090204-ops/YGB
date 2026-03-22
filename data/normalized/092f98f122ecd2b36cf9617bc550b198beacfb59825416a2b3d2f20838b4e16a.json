@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Metricbeat Allocates Memory with Excessive Size Value Leading to Denial of Service Memory Allocation with Excessive Size Value (CWE-789) in the Prometheus remote_write HTTP handler in Metricbeat can lead Denial of Service via Excessive Allocation (CAPEC-130).",
+  "token_count": 36
+}

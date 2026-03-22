@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.460256+00:00",
+  "lang": "en",
+  "raw_text": "Shopify Offers bounties $500 minimum bounty Shopify's Bug Bounty Program We reward security researchers for finding and reporting vulnerabilities that help keep our platform secure. Our bug bounty program offers rewards up to $200,000 and bonuses for outstanding contributions. Here\u2019s what you...",
+  "severity": "INFO",
+  "sha256_hash": "e682771adfd78a527eca1259968f38ea764083e04d14df07e5ec0c196d3e15ab",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/shopify"
+}

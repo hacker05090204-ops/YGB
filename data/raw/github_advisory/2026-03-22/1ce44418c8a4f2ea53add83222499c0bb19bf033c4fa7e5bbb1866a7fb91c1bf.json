@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.527244+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: OpenClaw: WebSocket shared-auth connections could self-declare elevated scopes ### Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-7fcc-cw49-xm78. This link is maintained to preserve external references. ### Original Description OpenClaw versions prior to 2026.2.19 contain a command injection vulnerability in the Lobster extension tool execution that uses Windows shell fallback with shell: true after spawn failures. Attackers can inject shell metacharacters in command arguments to execute arbitrary commands when subprocess launch fails with EINVAL or ENOENT errors.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1ce44418c8a4f2ea53add83222499c0bb19bf033c4fa7e5bbb1866a7fb91c1bf",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 84,
+  "url": "https://github.com/advisories/GHSA-5rp4-cwgh-gvwq"
+}

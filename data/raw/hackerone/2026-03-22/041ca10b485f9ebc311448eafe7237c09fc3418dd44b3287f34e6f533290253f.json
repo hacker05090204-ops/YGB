@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.911561+00:00",
+  "lang": "en",
+  "raw_text": "CareerZooms Program Policy for External Researchers Introduction Welcome to CareerZooms.com\u2019s External Research Program on HackerOne! We value your contributions and dedication to improving our platform\u2019s security. This policy outlines the rules and guidelines...",
+  "severity": "INFO",
+  "sha256_hash": "041ca10b485f9ebc311448eafe7237c09fc3418dd44b3287f34e6f533290253f",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 33,
+  "url": "https://hackerone.com/careerzooms"
+}

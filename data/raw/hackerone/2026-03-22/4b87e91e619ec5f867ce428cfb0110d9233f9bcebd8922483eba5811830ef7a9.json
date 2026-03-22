@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.251336+00:00",
+  "lang": "en",
+  "raw_text": "Mergify Offers bounties $50 minimum bounty Mergify looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Response Targets Mergify will make its best effort to meet the following SLAs for hackers participating in our...",
+  "severity": "INFO",
+  "sha256_hash": "4b87e91e619ec5f867ce428cfb0110d9233f9bcebd8922483eba5811830ef7a9",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/mergify"
+}

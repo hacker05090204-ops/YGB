@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.003570+00:00",
+  "lang": "en",
+  "raw_text": "eero Managed Offers bounties $50 minimum bounty eero Program Policy Introduction The first mesh home wifi system, eero blankets any home in reliable and secure wifi. eero offers advanced online security tools, eero Secure and eero Secure+, to help protect personal data, devices, and networks from...",
+  "severity": "INFO",
+  "sha256_hash": "decc4ceb23e0c90df15a11ba4541bccfad5eb4bf7be5b49ccd51c5c4c2bfdfb1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/eero"
+}

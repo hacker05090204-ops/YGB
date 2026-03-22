@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.633510+00:00",
+  "lang": "en",
+  "raw_text": "Wells Fargo Bounty Managed Offers bounties $150 minimum bounty Introduction Wells Fargo welcomes security researchers to participate in our bug bounty program to help us identify and fix vulnerabilities in our systems. By working together, we can improve everyone's security of our products and services. Note:...",
+  "severity": "INFO",
+  "sha256_hash": "2edfa2ba82b521b35dd8bca53899475e2368011e64ca102e152c26b59e23b1f5",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/wellsfargo-bbp"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.044357+00:00",
+  "lang": "en",
+  "raw_text": "FanDuel Offers bounties $100 minimum bounty Bug Bounty Program Policy At FanDuel, Everything Begins with the Customer. We strive to protect our valued customers from attackers who seek to compromise the confidentiality, integrity or availability of our platform. We also recognize the...",
+  "severity": "INFO",
+  "sha256_hash": "07375edfa4b104669123eb550610831dd7a5cfcab54c327af6b6295254654693",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/fanduel"
+}

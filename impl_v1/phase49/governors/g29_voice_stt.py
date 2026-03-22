@@ -20,8 +20,15 @@ STRICT RULES:
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional, Tuple, Callable, Dict, Any
+import audioop
+import io
 import uuid
 from datetime import datetime, UTC
+import time
+import wave
+
+from impl_v1.phase49.governors.g38_self_trained_model import can_ai_execute
+from impl_v1.training.voice.stt_model import get_local_stt_service
 
 
 class VoiceIntent(Enum):
@@ -87,6 +94,17 @@ class IntentResult:
     timestamp: str
 
 
+@dataclass(frozen=True)
+class TranscriptionResult:
+    """Speech-to-text output for one audio blob."""
+
+    text: str
+    confidence: float
+    language: str
+    duration_ms: float
+    engine: str
+
+
 # =============================================================================
 # GUARDS (MANDATORY - ABSOLUTE)
 # =============================================================================
@@ -148,6 +166,19 @@ SUPPORTED_WAKE_WORDS = (
     "ok hunter",
     "hunter",
     "start listening",
+)
+
+SUPPORTED_LANGUAGES = frozenset({"en-US", "en-IN", "hi-IN"})
+FORBIDDEN_PATTERNS = frozenset(
+    {
+        "execute",
+        "run exploit",
+        "attack",
+        "hack",
+        "bypass",
+        "override governance",
+        "disable guard",
+    }
 )
 
 
@@ -230,6 +261,56 @@ def apply_noise_filter(raw_audio: bytes, threshold: float = 0.2) -> tuple:
         "Audio returned unfiltered."
     )
     return (raw_audio, False)
+
+
+def _decode_audio_to_pcm16_mono(audio_bytes: bytes) -> bytes:
+    """Convert WAV payloads to 16-bit mono PCM for the local STT model."""
+    if audio_bytes[:4] != b"RIFF":
+        return audio_bytes
+
+    with wave.open(io.BytesIO(audio_bytes), "rb") as wav_file:
+        channels = wav_file.getnchannels()
+        sample_width = wav_file.getsampwidth()
+        sample_rate = wav_file.getframerate()
+        frames = wav_file.readframes(wav_file.getnframes())
+
+    if channels > 1:
+        frames = audioop.tomono(frames, sample_width, 0.5, 0.5)
+        channels = 1
+    if sample_width != 2:
+        frames = audioop.lin2lin(frames, sample_width, 2)
+        sample_width = 2
+    if sample_rate != 16000:
+        frames, _ = audioop.ratecv(frames, sample_width, channels, sample_rate, 16000, None)
+    return frames
+
+
+def transcribe(audio_bytes: bytes, language: str = "en-US") -> TranscriptionResult:
+    """Run real local STT inference over WAV or PCM audio bytes."""
+    if can_ai_execute()[0]:
+        raise RuntimeError("GUARD: can_ai_execute returned True")
+    if language not in SUPPORTED_LANGUAGES:
+        raise ValueError(f"Unsupported language: {language}")
+
+    start = time.monotonic()
+    pcm_audio = _decode_audio_to_pcm16_mono(audio_bytes)
+    service = get_local_stt_service()
+    stt_result = service.transcribe(pcm_audio, sample_rate=16000)
+    duration_ms = stt_result.latency_ms or ((time.monotonic() - start) * 1000.0)
+    engine = "local_conformer_ctc" if stt_result.model_loaded else "local_conformer_ctc_degraded"
+    return TranscriptionResult(
+        text=stt_result.text.strip(),
+        confidence=max(float(stt_result.confidence), 0.0),
+        language=language,
+        duration_ms=float(duration_ms),
+        engine=engine,
+    )
+
+
+def is_forbidden(text: str) -> bool:
+    """Reject clearly disallowed spoken commands."""
+    lowered = text.lower()
+    return any(pattern in lowered for pattern in FORBIDDEN_PATTERNS)
 
 
 # =============================================================================

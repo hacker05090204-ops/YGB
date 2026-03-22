@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.200543+00:00",
+  "lang": "en",
+  "raw_text": "Lightspark BBP Managed Offers bounties $50 minimum bounty Response Times Lightspark is committed to meeting our response targets for hackers participating in our program. We'll ensure regular updates on our progress throughout the process. | Type of Response | SLA in business days | | ------------- | -----...",
+  "severity": "INFO",
+  "sha256_hash": "1fb0f8fc586f4ec0c1532c37826a801e0e24c2d22a4a002a3a31c2b8ed4e8ddf",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/lightspark_bbp"
+}

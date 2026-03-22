@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.114375+00:00",
+  "lang": "en",
+  "raw_text": "HireVue At Hirevue, we are committed to the security of our products and the protection of our customers' data. We value the crucial role that security researchers play in helping us maintain a safe and secure environment. If you believe you've discovered a...",
+  "severity": "INFO",
+  "sha256_hash": "528ee31b246071d6b1eb86f8a8a7bd4ab06a265fb4243e00b0e30f0c70b32f37",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/hirevue"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.578743+00:00",
+  "lang": "en",
+  "raw_text": "Tweakers Tweakers has a bug bounty program via Intigriti. For more information and reports see: https://app.intigriti.com/programs/dpgm/tweakers/detail",
+  "severity": "INFO",
+  "sha256_hash": "1bfaaefd5b0babc5142599b988c8f596654f5749974ab944808b526d980c7e24",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 16,
+  "url": "https://hackerone.com/tweakers"
+}

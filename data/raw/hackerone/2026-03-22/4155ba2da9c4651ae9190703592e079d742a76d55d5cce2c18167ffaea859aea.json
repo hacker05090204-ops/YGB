@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.195548+00:00",
+  "lang": "en",
+  "raw_text": "LaunchDarkly Managed Offers bounties $50 minimum bounty LaunchDarkly Program Policy At LaunchDarkly, our vision is to create a world in which software releases are safe and unceremonious. LaunchDarkly gives product delivery teams the safeguards to move fast without breaking things through the use of...",
+  "severity": "INFO",
+  "sha256_hash": "4155ba2da9c4651ae9190703592e079d742a76d55d5cce2c18167ffaea859aea",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/launchdarkly"
+}

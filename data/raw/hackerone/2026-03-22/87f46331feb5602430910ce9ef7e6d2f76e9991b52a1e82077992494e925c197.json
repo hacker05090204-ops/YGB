@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.819254+00:00",
+  "lang": "en",
+  "raw_text": "Aliexpress If you believe you have found a vulnerability within an asset relating to AliExpress, please submit it via the Alibaba Vulnerability Disclosure Program (https://hackerone.com/alibaba). This is a vulnerability disclosure program and therefore we...",
+  "severity": "INFO",
+  "sha256_hash": "87f46331feb5602430910ce9ef7e6d2f76e9991b52a1e82077992494e925c197",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 34,
+  "url": "https://hackerone.com/aliexpress"
+}

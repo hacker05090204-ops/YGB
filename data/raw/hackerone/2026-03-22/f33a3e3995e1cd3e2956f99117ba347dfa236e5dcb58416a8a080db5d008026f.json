@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.171561+00:00",
+  "lang": "en",
+  "raw_text": "Kiwi.com Managed Offers bounties $100 minimum bounty Kiwi.com is committed to working with security experts worldwide in cooperation with HackerOne\u2019s Triage team to ensure the high quality of our bug bounty program and the security of our customers. If you\u2019re good enough to spot a vulnerability on our...",
+  "severity": "INFO",
+  "sha256_hash": "f33a3e3995e1cd3e2956f99117ba347dfa236e5dcb58416a8a080db5d008026f",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/kiwicom"
+}

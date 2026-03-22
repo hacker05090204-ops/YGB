@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.503233+00:00",
+  "lang": "en",
+  "raw_text": "StatusPage.io StatusPage takes security very seriously, and we thank all of the white hats in our community for their research and assistance. Below you will find our responsible vulnerability disclosure policy, as well as multiple methods to get in contact with...",
+  "severity": "INFO",
+  "sha256_hash": "9d6eb057945cf769ab64daee5ad75c888371b5dfeb93c29276d57c85a611ca3a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/statuspageio"
+}

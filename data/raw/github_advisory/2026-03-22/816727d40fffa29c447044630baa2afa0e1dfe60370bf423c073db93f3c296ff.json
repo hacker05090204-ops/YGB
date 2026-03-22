@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22735",
+  "ingested_at": "2026-03-22T09:56:16.002853+00:00",
+  "lang": "en",
+  "raw_text": "Spring MVC and WebFlux has Server Sent Event stream corruption Spring MVC and WebFlux applications are vulnerable to stream corruption when using Server-Sent Events (SSE). This issue affects Spring Foundation: from 7.0.0 through 7.0.5, from 6.2.0 through 6.2.16, from 6.1.0 through 6.1.25, from 5.3.0 through 5.3.46.",
+  "severity": "LOW",
+  "sha256_hash": "816727d40fffa29c447044630baa2afa0e1dfe60370bf423c073db93f3c296ff",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-667"
+  ],
+  "token_count": 46,
+  "url": "https://github.com/advisories/GHSA-6hcq-hmm3-jj3c"
+}

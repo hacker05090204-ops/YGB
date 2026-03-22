@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.631488+00:00",
+  "lang": "en",
+  "raw_text": "Websecurify Bug Bounty Eligibility Rules Give us reasonable time before making any information public. Be the first person to report the bug. All high to critical severity issues qualify. The award value varies depending on the severity and creativity of your...",
+  "severity": "INFO",
+  "sha256_hash": "1c002775e3c56ee91e6166fbf1b240ffcd0a3803a0826d0b19b26b97046c78e3",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/websecurify"
+}

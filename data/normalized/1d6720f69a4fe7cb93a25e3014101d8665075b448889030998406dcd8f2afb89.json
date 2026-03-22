@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: OpenClaw's Nextcloud Talk webhook replay could trigger duplicate inbound processing ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-r9q5-c7qc-p26w. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.25 lack durable replay state for Nextcloud Talk webhook events, allowing valid signed webhook requests to be replayed without suppression. Attackers can capture and replay previously valid signed webhook requests to trigger duplicate inbound message processing and cause integrity or availability issues.",
+  "token_count": 84
+}

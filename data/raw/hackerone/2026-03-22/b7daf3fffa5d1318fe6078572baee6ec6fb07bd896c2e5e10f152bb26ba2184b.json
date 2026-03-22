@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.353132+00:00",
+  "lang": "en",
+  "raw_text": "Pinterest Pinterest is a place to discover ideas for all your projects and interests, hand-picked by people like you. We take our security very seriously and welcome any responsible disclosure of potential gaps in our systems.",
+  "severity": "INFO",
+  "sha256_hash": "b7daf3fffa5d1318fe6078572baee6ec6fb07bd896c2e5e10f152bb26ba2184b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/pinterest"
+}

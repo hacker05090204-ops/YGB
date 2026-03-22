@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.091811+00:00",
+  "lang": "en",
+  "raw_text": "GoodRx Managed Offers bounties $100 minimum bounty Intro GoodRx is America\u2019s healthcare marketplace. Each month, more than 17 million people use GoodRx\u2019s website and popular mobile apps to find current prices and discounts for their healthcare, and we\u2019ve helped people save more than $20 billion...",
+  "severity": "INFO",
+  "sha256_hash": "1dfdca81b5d36edede439468e80baa67b965e0f3ed96b3bcca574b9dc25699c8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/goodrx"
+}

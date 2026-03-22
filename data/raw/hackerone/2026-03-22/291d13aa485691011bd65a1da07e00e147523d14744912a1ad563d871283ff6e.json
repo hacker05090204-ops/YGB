@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.212999+00:00",
+  "lang": "en",
+  "raw_text": "Logitech Managed Offers bounties $200 minimum bounty Welcome to Logitech's Vulnerability Disclosure and Bug Bounty Program! Here at Logitech we are committed to providing secure products and services to our customers. If you believe you have discovered a potential security vulnerability with any of...",
+  "severity": "INFO",
+  "sha256_hash": "291d13aa485691011bd65a1da07e00e147523d14744912a1ad563d871283ff6e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/logitech"
+}

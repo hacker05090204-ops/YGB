@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.955276+00:00",
+  "lang": "en",
+  "raw_text": "Cosmos Offers bounties $1000 minimum bounty Cosmos Stack Bug Bounty Program Within the Cosmos ecosystem, we believe that proactively finding and fixing bugs is a vital part of building strong, resilient blockchain protocols. This program exists as a public good to actively reward the people...",
+  "severity": "INFO",
+  "sha256_hash": "f9dc7157035b0f34e6585c466120f27217f5c0ec3060129c65b33ca4ef0099e1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/cosmos"
+}

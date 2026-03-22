@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.544263+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: OpenClaw macOS companion app (beta): allowlist parsing mismatch for system.run shell chains ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-5f9p-f3w2-fwch. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.22 contain an allowlist parsing mismatch vulnerability in the macOS companion app that allows authenticated operators to bypass exec approval checks. Attackers with operator.write privileges and a paired macOS beta node can craft shell-chain payloads that pass incomplete allowlist validation and execute arbitrary commands on the paired host.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f8ed2165002bcf0f7c8179dd605b08eed77542a4c7faa171aae269dab08bc3e3",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-184"
+  ],
+  "token_count": 92,
+  "url": "https://github.com/advisories/GHSA-5326-6f73-m96w"
+}

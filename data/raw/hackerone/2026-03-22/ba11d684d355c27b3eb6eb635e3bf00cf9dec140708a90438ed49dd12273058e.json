@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.628487+00:00",
+  "lang": "en",
+  "raw_text": "Wealthsimple Managed Offers bounties $100 minimum bounty Introduction Wealthsimple looks forward to working with the security community to find security vulnerabilities in order to keep our businesses and customers safe. Please read through and abide by the following program rules and scope exclusions...",
+  "severity": "INFO",
+  "sha256_hash": "ba11d684d355c27b3eb6eb635e3bf00cf9dec140708a90438ed49dd12273058e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/wealthsimple"
+}

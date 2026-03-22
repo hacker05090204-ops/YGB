@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.865864+00:00",
+  "lang": "en",
+  "raw_text": "bigbasket Security is a top priority for us and we take it very seriously. We put a lot of effort into our application, infrastructure, and processes to ensure that BigBasket is safe and secure for our customers to shop their groceries online. We also put a...",
+  "severity": "INFO",
+  "sha256_hash": "4939ec8f4875aebeb211f9b8b91101371986e78507b097c1cde2d6d4dbb53c9c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/bigbasket"
+}

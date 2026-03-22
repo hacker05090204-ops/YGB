@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33494",
+  "ingested_at": "2026-03-22T09:56:14.914221+00:00",
+  "lang": "en",
+  "raw_text": "Ory Oathkeeper has a path traversal authorization bypass ## Description Ory Oathkeeper is vulnerable to an authorization bypass via HTTP path traversal. An attacker can craft a URL containing path traversal sequences (e.g. `/public/../admin/secrets`) that resolves to a protected path after normalization, but is matched against a permissive rule because the raw, un-normalized path is used during rule evaluation. ## Preconditions Ory Oathkeeper rules are typically configured with patterns like: ``` /public/ < .*> \u2192 allow unauthenticated access /admin/ < .*> \u2192 require authentication ``` Without path normalization, a request to `/public/../admin/secrets` is matched against the raw path `/public/../admin/secrets`. This matches the `/public/ < .*>` rule, bypassing the authentication required for `/admin/secrets`. After Ory Oathkeeper permits the request, the upstream server normalizes the path and serves the protected `/admin/secrets` resource. ## Mitigation Going forward, Ory Oathkeeper normalizes the request path before performing rule matching and before forwarding. The path `/public/../admin/secrets` is normalized to `/admin/secrets`, which correctly matches the `/admin/ < .*>` rule and triggers authentication. As an immediate mitigation, all requests reaching Oathkeeper should be normalized, as described in the section below. Oathkeeper should be upgraded to a fixed version as soon as possible. ## Defense in depth: Cleaning paths before Oathkeeper Even after this fix, it is good practice to normalize HTTP paths in the layers in front of Oathkeeper. This provides defense in depth and protects against similar bypasses in other components. The following examples show how to achieve this with common reverse proxies and CDNs. ### Nginx Nginx normalizes paths by default when using `proxy_pass`. Alternatively, use `$uri` (which Nginx normalizes) rather than `$request_uri` in your matching rules. ### Envoy Enable the `normalize_path` option (available since Envoy 1.14) to normalize the path components before matching and forwarding. See the Envoy docs on path normalization . ### Cloudflare Cloudflare normalizes URLs by default. In the Cloudflare dashboard, ensure **Normalize incoming URLs** is enabled under **Rules \u2192 Normalization**. See the Cloudflare URL normalization docs .",
+  "severity": "CRITICAL",
+  "sha256_hash": "23468f4f98b6c6e1d5dff096ec149cd9f172d964943bec60f5a6a41df80cfb30",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-23"
+  ],
+  "token_count": 326,
+  "url": "https://github.com/advisories/GHSA-p224-6x5r-fjpm"
+}

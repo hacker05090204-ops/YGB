@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.405815+00:00",
+  "lang": "nl",
+  "raw_text": "Rijksoverheid Hoe kan ik een zwakke plek in een ICT-systeem van de Rijksoverheid melden (Responsible Disclosure)? Een zwakke plek in een ICT-systeem van de Rijksoverheid, zoals Rijksoverheid.nl, kunt u melden aan het Nationaal Cyber Security Centrum (NCSC). U...",
+  "severity": "INFO",
+  "sha256_hash": "956286c886938fb605c948fccf7a9328671ddcec362ac320890c23620bf189d8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/rijksoverheid"
+}

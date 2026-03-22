@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4544",
+  "ingested_at": "2026-03-22T10:42:27.099405+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was determined in Wavlink WL-WN578W2 221110. This affects an unknown function of the file /cgi-bin/login.cgi of the component POST Request Handler. Executing a manipulation of the argument homepage/hostname/login_page can lead to cross site scripting. It is possible to launch the attack remotely. The exploit has been publicly disclosed and may be utilized. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "LOW",
+  "sha256_hash": "20b0dd39e6e3f66c4e43c66d7d49561966a532e9559032a7999aa3ac25b73942",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4544"
+}

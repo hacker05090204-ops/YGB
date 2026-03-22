@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Spring MVC and WebFlux has Server Sent Event stream corruption Spring MVC and WebFlux applications are vulnerable to stream corruption when using Server-Sent Events (SSE). This issue affects Spring Foundation: from 7.0.0 through 7.0.5, from 6.2.0 through 6.2.16, from 6.1.0 through 6.1.25, from 5.3.0 through 5.3.46.",
+  "token_count": 46
+}

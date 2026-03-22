@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.676830+00:00",
+  "lang": "en",
+  "raw_text": "ZTE ZTE has launched its new Bug Bounty Programs to encourage security researchers/organizations worldwide to identify vulnerabilities in ZTE\u2019s products and services. ZTE Bug Bounty Programs cover the following four categories of products, specifically,...",
+  "severity": "INFO",
+  "sha256_hash": "aa0b757a7d7804c7f979b0ea72ca25fe5a5b11a41f643c470860e7150812b392",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 34,
+  "url": "https://hackerone.com/zte"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.586739+00:00",
+  "lang": "en",
+  "raw_text": "Ubiquiti Inc. Managed Offers bounties $150 minimum bounty Introduction At Ubiquiti Inc. (\"Ubiquiti\"), we take security very seriously, and embrace the security research community. We provide products and services that millions around the world use every day, and understand privacy and security is very...",
+  "severity": "INFO",
+  "sha256_hash": "e92faead63714d26056314a2e08d1e111286618744fc96aa0f674c216d99219c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/ui"
+}

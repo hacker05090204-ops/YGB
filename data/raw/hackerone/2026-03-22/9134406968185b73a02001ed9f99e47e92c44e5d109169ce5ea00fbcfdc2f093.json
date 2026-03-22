@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.474902+00:00",
+  "lang": "en",
+  "raw_text": "Slack Managed Offers bounties $250 minimum bounty Slack Technologies, LLC, a Salesforce company Over $12M in bounties awarded across all our H1 Bug Bounty programs since 2015! At Slack, a Salesforce company, Trust is our #1 value and we take the protection of our customers' data very seriously. We...",
+  "severity": "INFO",
+  "sha256_hash": "9134406968185b73a02001ed9f99e47e92c44e5d109169ce5ea00fbcfdc2f093",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/slack"
+}

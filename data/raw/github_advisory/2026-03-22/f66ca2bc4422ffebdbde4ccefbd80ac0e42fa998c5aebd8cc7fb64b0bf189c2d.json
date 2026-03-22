@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.565262+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: OpenClaw's system.run allowlist bypass via shell line-continuation command substitution ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-9868-vxmx-w862. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.22 contain an allowlist bypass vulnerability in system.run that allows attackers to execute non-allowlisted commands by splitting command substitution using shell line-continuation characters. Attackers can bypass security analysis by injecting $\\\\ followed by a newline and opening parenthesis inside double quotes, causing the shell to fold the line continuation into executable command substitution that circumvents approval boundaries.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f66ca2bc4422ffebdbde4ccefbd80ac0e42fa998c5aebd8cc7fb64b0bf189c2d",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 98,
+  "url": "https://github.com/advisories/GHSA-xrgv-34cc-q765"
+}

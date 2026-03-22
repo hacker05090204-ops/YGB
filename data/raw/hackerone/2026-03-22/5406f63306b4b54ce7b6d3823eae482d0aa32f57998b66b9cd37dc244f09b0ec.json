@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.148206+00:00",
+  "lang": "en",
+  "raw_text": "Insightly Managed Offers bounties $100 minimum bounty Introduction No technology is perfect, and Insightly believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. If you believe you've found a security issue in our product or...",
+  "severity": "INFO",
+  "sha256_hash": "5406f63306b4b54ce7b6d3823eae482d0aa32f57998b66b9cd37dc244f09b0ec",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/insightly"
+}

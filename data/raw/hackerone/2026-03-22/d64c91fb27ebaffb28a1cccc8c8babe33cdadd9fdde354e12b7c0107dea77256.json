@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.613487+00:00",
+  "lang": "en",
+  "raw_text": "Via Offers bounties $50 minimum bounty About Via At Via, we are building the transportation systems of tomorrow, right now. Via's technology is deployed worldwide through dozens of partner projects with public transportation agencies, private transit operators, taxi fleets, private...",
+  "severity": "INFO",
+  "sha256_hash": "d64c91fb27ebaffb28a1cccc8c8babe33cdadd9fdde354e12b7c0107dea77256",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/ridewithvia"
+}

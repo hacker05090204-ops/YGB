@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.534843+00:00",
+  "lang": "en",
+  "raw_text": "Telegram Q: Why should I trust you? Telegram is open, anyone can check our source code, protocol and API, see how everything works and make an informed decision. In fact, we welcome security experts to audit our system and will appreciate any feedback. We...",
+  "severity": "INFO",
+  "sha256_hash": "e486ffdf97980db3d2d3e36b813e7a530558175505c5b206df46205d756d6d08",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/telegram"
+}

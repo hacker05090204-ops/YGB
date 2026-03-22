@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.633017+00:00",
+  "lang": "en",
+  "raw_text": "Chime Managed Bug Bounty Engagement We unite everyday people to unlock their financial progress!",
+  "severity": "INFO",
+  "sha256_hash": "d53133b36a78b63ce9e9e567d54e98cd5492840e1b78d7b2fc97019516b6850f",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 14,
+  "url": "https://bugcrowd.com/engagements/chime"
+}

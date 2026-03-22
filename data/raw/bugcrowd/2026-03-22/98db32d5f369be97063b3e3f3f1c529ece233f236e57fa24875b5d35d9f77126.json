@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.609431+00:00",
+  "lang": "en",
+  "raw_text": "Rapyd We provide APIs that help integrate local payments and Fintech capabilities.",
+  "severity": "INFO",
+  "sha256_hash": "98db32d5f369be97063b3e3f3f1c529ece233f236e57fa24875b5d35d9f77126",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 12,
+  "url": "https://bugcrowd.com/engagements/rapyd"
+}

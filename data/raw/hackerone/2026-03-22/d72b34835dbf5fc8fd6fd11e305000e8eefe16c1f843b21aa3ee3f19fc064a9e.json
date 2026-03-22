@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.241204+00:00",
+  "lang": "en",
+  "raw_text": "Meesho Offers bounties $50 minimum bounty Overview At Meesho, we prioritise security and value responsible disclosure. If you identify a security issue in our website or apps, we encourage you to report it to us responsibly. Our team is committed to resolving issues promptly and requests...",
+  "severity": "INFO",
+  "sha256_hash": "d72b34835dbf5fc8fd6fd11e305000e8eefe16c1f843b21aa3ee3f19fc064a9e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/meesho_bbp"
+}

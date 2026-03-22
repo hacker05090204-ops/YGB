@@ -15,30 +15,60 @@ logger = logging.getLogger("ygb.ingestion.adapters.bugcrowd")
 
 class BugcrowdAdapter(BaseAdapter):
     SOURCE = "bugcrowd"
-    BASE = "https://bugcrowd.com/programs.json"
-
-    @staticmethod
-    def _target_group_text(program: dict[str, object]) -> str:
-        groups = program.get("target_groups", [])
-        if isinstance(groups, dict):
-            groups = [groups]
-        return " ".join(str(group.get("description", "")).strip() for group in groups if group.get("description"))
+    BASE = "https://bugcrowd.com/engagements.json"
+    FALLBACK_BASE = "https://bugcrowd.com/disclosures.json"
+    PARAMS = {
+        "category": "bug_bounty",
+        "sort_by": "promoted",
+        "sort_direction": "desc",
+        "page": 1,
+    }
 
     async def fetch(self) -> list[IngestedSample]:
-        async with aiohttp.ClientSession() as session:
-            payload = await self._get(session, self.BASE)
-        programs = payload.get("programs", payload if isinstance(payload, list) else [])
+        timeout = aiohttp.ClientTimeout(total=60, connect=20)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            try:
+                payload = await self._get(
+                    session,
+                    self.BASE,
+                    params=self.PARAMS,
+                    timeout=timeout,
+                )
+                engagements = payload.get("engagements", payload if isinstance(payload, list) else [])
+            except Exception as primary_error:
+                logger.warning(
+                    "bugcrowd_engagements_unavailable",
+                    extra={"source": self.SOURCE, "error": str(primary_error), "url": self.BASE},
+                )
+                try:
+                    payload = await self._get(session, self.FALLBACK_BASE, timeout=timeout)
+                    engagements = payload.get("disclosures", payload if isinstance(payload, list) else [])
+                except Exception as fallback_error:
+                    logger.warning(
+                        "bugcrowd_public_api_unavailable",
+                        extra={"source": self.SOURCE, "error": str(fallback_error), "url": self.FALLBACK_BASE},
+                    )
+                    return []
         samples: list[IngestedSample] = []
-        for program in programs:
-            raw_text = f"{program.get('name', '')} {program.get('tagline', '')} {self._target_group_text(program)}".strip()
+        for engagement in engagements:
+            name = str(engagement.get("name", "")).strip()
+            tagline = str(engagement.get("tagline", "")).strip()
+            raw_text = " ".join(part for part in (name, tagline) if part).strip()
             if not raw_text:
                 continue
-            program_url = str(program.get("program_url", ""))
+            program_url = str(
+                engagement.get("briefUrl")
+                or engagement.get("program_url")
+                or engagement.get("url")
+                or ""
+            ).strip()
+            if program_url and not program_url.startswith("http"):
+                program_url = f"https://bugcrowd.com{program_url}"
             samples.append(
                 make_sample(
                     source=self.SOURCE,
                     raw_text=raw_text,
-                    url=f"https://bugcrowd.com{program_url}",
+                    url=program_url,
                     cve_id="",
                     severity="INFO",
                     tags=("bug_bounty", "bugcrowd"),

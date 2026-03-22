@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.402814+00:00",
+  "lang": "en",
+  "raw_text": "ResourceSpace Before submittting a report please check the following:- Your organisation doesn't have a have a commercial contract with us. Supported customers should have their designated contact raise issues via the customer extranet. You are running the latest...",
+  "severity": "INFO",
+  "sha256_hash": "5c1465015910bac2303b9bd0b8f9003c070bed9de43dd254fdb8666119530072",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/resourcespace"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.616432+00:00",
+  "lang": "en",
+  "raw_text": "Fireblocks Web Managed Bug Bounty Engagement Fireblocks is a user-friendly platform that enables the creation of blockchain-based products and manages daily digital asset operations.",
+  "severity": "INFO",
+  "sha256_hash": "7da60080a9e380ade2753514854e066b0839208cf87064cd83f3230f0d4c1112",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 24,
+  "url": "https://bugcrowd.com/engagements/fireblocks-mbb-og"
+}

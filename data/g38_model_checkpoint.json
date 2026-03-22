@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "format": "safetensors",
+  "epoch": 9,
+  "accuracy": 0.5497698047309096,
+  "holdout_accuracy": 0.5497698047309096,
+  "loss": 0.6893575494939631,
+  "real_samples_processed": 1013760,
+  "saved_at": "2026-03-22T10:14:57.529904+00:00"
+}

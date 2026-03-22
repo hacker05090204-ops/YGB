@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.555971+00:00",
+  "lang": "en",
+  "raw_text": "TradingView We offer rewards for reports about security vulnerabilities in our services, infrastructure, web and mobile applications. If you have found a security vulnerability and would like to report it to us, please use this form: https://www.tradingview.com...",
+  "severity": "INFO",
+  "sha256_hash": "91a1b8ea8e1d4a9b8c55c6450ef266d97676bb9d6282ac6a3f981d6a88e5acd4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/tradingview-2"
+}

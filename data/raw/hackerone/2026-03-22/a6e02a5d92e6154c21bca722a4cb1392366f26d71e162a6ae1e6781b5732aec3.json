@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.440137+00:00",
+  "lang": "en",
+  "raw_text": "Samsung SmartTV Samsung welcomes you to the Samsung Smart TV Security Bug Bounty Program. We are pleased to offer a monetary bounty for certain qualifying security bugs. Every participant has to log a security bug in the Smart TV/BD which thereafter will be...",
+  "severity": "INFO",
+  "sha256_hash": "a6e02a5d92e6154c21bca722a4cb1392366f26d71e162a6ae1e6781b5732aec3",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/samsungsmarttv"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.033087+00:00",
+  "lang": "en",
+  "raw_text": "EXNESS Offers bounties $50 minimum bounty HOW TO SUBMIT BUG REPORT? A bug report must have the following (including mobile reports): - Impact - it should describe the REAL impact of vulnerability that may affect our users and company funds or reputation - Highly detailed description of the...",
+  "severity": "INFO",
+  "sha256_hash": "a8abb39696874de2b7a21417f3e24e0ec9115eefab70e6e434dcdd737a205398",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/exness"
+}

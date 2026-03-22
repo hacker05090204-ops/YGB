@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.538261+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: ACPX Windows wrapper shell fallback allowed cwd injection in specific paths ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-6f6j-wx9w-ff4j. This link is maintained to preserve external references. ## Original Description OpenClaw versions 2026.2.26 prior to 2026.3.1 on Windows contain a current working directory injection vulnerability in wrapper resolution for .cmd/.bat files that allows attackers to influence execution behavior through cwd manipulation. Remote attackers can exploit improper shell execution fallback mechanisms to achieve command execution integrity loss by controlling the current working directory during wrapper resolution.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c4db19e9fdf347f449046723a08e73a0f13a47d5773652f775457c998160af65",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 94,
+  "url": "https://github.com/advisories/GHSA-h36m-2vh5-x699"
+}

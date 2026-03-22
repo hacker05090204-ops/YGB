@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.453239+00:00",
+  "lang": "en",
+  "raw_text": "Semrush Offers bounties $100 minimum bounty Program Policy Play by the rules. This includes following this policy (\"Policy\"), HackerOne\u2019s Disclosure Guidelines (https://hackerone.com/guidelines) and any other relevant agreements. Test only with your own account(s) when investigating bugs, and...",
+  "severity": "INFO",
+  "sha256_hash": "ddc3eb01fed45d7a8677d84d808afb989e677a33d975e4927ccc29be61ff8ad6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/semrush"
+}

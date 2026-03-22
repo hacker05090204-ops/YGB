@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.534260+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: safeBins stdin-only bypass via sort output and recursive grep flags ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-4685-c5cp-vp95. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.19 tools.exec.safeBins contains an input validation bypass vulnerability that allows attackers to execute unintended filesystem operations through sort output flags or recursive grep flags. Attackers with command execution access can leverage sort -o flag for arbitrary file writes or grep -R flag for recursive file reads, circumventing intended stdin-only restrictions.",
+  "severity": "LOW",
+  "sha256_hash": "aec70005ed88cc67dd7a80949b6d843c36dd00e580ccefe8863d1492eefc4269",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 92,
+  "url": "https://github.com/advisories/GHSA-ggm6-h3mx-cmmp"
+}

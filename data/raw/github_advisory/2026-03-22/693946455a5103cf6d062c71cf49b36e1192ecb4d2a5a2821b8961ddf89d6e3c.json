@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:16.017367+00:00",
+  "lang": "en",
+  "raw_text": "Scriban Affected by Memory Exhaustion (OOM) via Unbounded String Generation (Denial of Service) `TemplateContext.LimitToString` defaults to `0` (unlimited). While Scriban implements a default `LoopLimit` of 1000, an attacker can still cause massive memory allocation via exponential string growth. Doubling a string for just 30 iterations generates over 1GB of text, instantly exhausting heap memory and crashing the host process. Because no output size limit is enforced, repeated string concatenation results in exponential memory growth. **Proof of Concept (PoC):** The following payload executes in under 30 iterations but results in ~1GB string allocation, crashing the process. ```csharp using Scriban; string maliciousTemplate = @\" {{ a = \"\"A\"\" for i in 1..30 a = a + a end a }}\"; var template = Template.Parse(maliciousTemplate); var context = new TemplateContext(); try { template.Render(context); } catch (Exception ex) { Console.WriteLine(\"\\nException: \" + ex.Message); } ``` **Impact:** An attacker can supply a small template that triggers exponential string growth, forcing the application to allocate excessive memory. This leads to severe memory pressure, garbage collection thrashing, and eventual process termination (DoS). **Suggested Fix:** Enforce a sensible default limit for string output. Set default `LimitToString` to 1MB (1,048,576 characters). ```csharp public int LimitToString { get; set; } = 1048576; ```",
+  "severity": "MEDIUM",
+  "sha256_hash": "693946455a5103cf6d062c71cf49b36e1192ecb4d2a5a2821b8961ddf89d6e3c",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-770"
+  ],
+  "token_count": 203,
+  "url": "https://github.com/advisories/GHSA-5rpf-x9jg-8j5p"
+}

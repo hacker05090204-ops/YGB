@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.829255+00:00",
+  "lang": "en",
+  "raw_text": "Anduril Industries Managed Offers bounties $50 minimum bounty Disclosure Policy We currently don't disclose reports marked as Informative. Exceptional reports may be considered for disclosure on a case-by-case basis. Program Rules Please provide detailed reports with reproducible steps. If the report is not...",
+  "severity": "INFO",
+  "sha256_hash": "015e208a0208c69fbf35087836fca358eca1d9601a51d84109c1878f48414858",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/anduril_industries"
+}

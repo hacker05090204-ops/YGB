@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.346142+00:00",
+  "lang": "en",
+  "raw_text": "PayPal Managed Offers bounties Our team of dedicated security professionals works diligently to maintain the security of customer information. We acknowledge the crucial role that security researchers and our user community play in helping to keep PayPal and our customers secure...",
+  "severity": "INFO",
+  "sha256_hash": "8214c9ead2ff4519e99fe4393f60378ea5afe7d4c385d29c60efd38e9b7494aa",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/paypal"
+}

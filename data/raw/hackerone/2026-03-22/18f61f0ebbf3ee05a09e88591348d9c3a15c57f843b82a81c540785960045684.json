@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.315878+00:00",
+  "lang": "en",
+  "raw_text": "Ola We request you not to do any public disclosure of a bug before it has been fixed. Please understand that due to high number of submissions, it might take a bit of time in order to fix the vulnerability reported by you. Therefore, give us reasonable...",
+  "severity": "INFO",
+  "sha256_hash": "18f61f0ebbf3ee05a09e88591348d9c3a15c57f843b82a81c540785960045684",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/olacabs"
+}

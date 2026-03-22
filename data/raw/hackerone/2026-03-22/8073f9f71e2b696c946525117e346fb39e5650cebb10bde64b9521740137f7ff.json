@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.197545+00:00",
+  "lang": "en",
+  "raw_text": "LG Electronics If you have found a potential security issue with any of our products or services related to our products, we kindly ask you to let us know at your earliest convenience via email at product.security@lge.com",
+  "severity": "INFO",
+  "sha256_hash": "8073f9f71e2b696c946525117e346fb39e5650cebb10bde64b9521740137f7ff",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/lge"
+}

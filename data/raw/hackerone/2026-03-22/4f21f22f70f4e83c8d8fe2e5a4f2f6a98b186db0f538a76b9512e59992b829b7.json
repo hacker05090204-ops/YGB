@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.780096+00:00",
+  "lang": "en",
+  "raw_text": "Security Test External Program + Invite-only See @security.",
+  "severity": "INFO",
+  "sha256_hash": "4f21f22f70f4e83c8d8fe2e5a4f2f6a98b186db0f538a76b9512e59992b829b7",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 8,
+  "url": "https://hackerone.com/security-test-ep-invite-only"
+}

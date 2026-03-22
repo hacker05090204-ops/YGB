@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.817258+00:00",
+  "lang": "en",
+  "raw_text": "Akamai Akamai CDN The Akamai Bug Bounty Program currently operates as a soft-launch, invite-only, semi-private program. At this time, we are primarily interested in findings relating to the CDN, the communications between our proxy layer and the origins,...",
+  "severity": "INFO",
+  "sha256_hash": "91cd3cbb196f3077a7d8b662f249b087e13324e274e76ce7d1c02ad70d29bab9",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/akamai"
+}

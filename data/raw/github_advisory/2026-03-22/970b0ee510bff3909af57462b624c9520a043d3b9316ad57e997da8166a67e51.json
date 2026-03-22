@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33281",
+  "ingested_at": "2026-03-22T09:56:16.137674+00:00",
+  "lang": "en",
+  "raw_text": "Ella Core panics on invalid PDU Session IDs in NGAP messages ## Summary Ella Core panics when processing NGAP messages with invalid PDU Session IDs outside of 1-15. ## Impact An attacker able to send crafted NGAP messages to Ella Core can crash the process, causing service disruption for all connected subscribers. No authentication is required. ## Fix Added PDU Session ID validations during NGAP message handling.",
+  "severity": "MEDIUM",
+  "sha256_hash": "970b0ee510bff3909af57462b624c9520a043d3b9316ad57e997da8166a67e51",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-129"
+  ],
+  "token_count": 67,
+  "url": "https://github.com/advisories/GHSA-q669-4gmv-g8mf"
+}

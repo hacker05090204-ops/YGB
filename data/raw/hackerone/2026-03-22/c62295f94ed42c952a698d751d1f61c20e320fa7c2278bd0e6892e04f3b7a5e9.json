@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.505228+00:00",
+  "lang": "en",
+  "raw_text": "Stripchat Offers bounties $50 minimum bounty Stripchat Bug Bounty Program Policy (\u201cProgram Policy\u201d) At Stripchat, we take the security and privacy of our platform very seriously. We highly value collaboration with skilled security researchers who help us improve the protection of our users,...",
+  "severity": "INFO",
+  "sha256_hash": "c62295f94ed42c952a698d751d1f61c20e320fa7c2278bd0e6892e04f3b7a5e9",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/stripchat"
+}

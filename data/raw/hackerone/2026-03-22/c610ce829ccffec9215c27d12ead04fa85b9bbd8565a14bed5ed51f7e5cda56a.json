@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.165561+00:00",
+  "lang": "en",
+  "raw_text": "KAYAK Managed Offers bounties $100 minimum bounty KAYAK is committed to working with security experts across the world to stay up to date with the latest security techniques. If you have discovered a security issue that you believe we should know about, we'd welcome working with you. Scope Scope...",
+  "severity": "INFO",
+  "sha256_hash": "c610ce829ccffec9215c27d12ead04fa85b9bbd8565a14bed5ed51f7e5cda56a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/kayak"
+}

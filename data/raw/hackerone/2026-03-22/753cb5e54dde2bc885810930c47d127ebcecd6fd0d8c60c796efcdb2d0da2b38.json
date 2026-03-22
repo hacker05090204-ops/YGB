@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.268505+00:00",
+  "lang": "en",
+  "raw_text": "Mux Mux is an API driven platform for developers to build amazing video experiences into their websites or apps. We work hard to ensure Mux is a safe and secure environment for our customers and their viewers. We welcome and reward vulnerability reports...",
+  "severity": "INFO",
+  "sha256_hash": "753cb5e54dde2bc885810930c47d127ebcecd6fd0d8c60c796efcdb2d0da2b38",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/mux"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.260507+00:00",
+  "lang": "en",
+  "raw_text": "MongoDB Managed Offers bounties $50 minimum bounty {F1894478} At MongoDB, our mission is to empower investors to create, transform, and disrupt industries by unleashing the power of software and data. We are a leading modern, general purpose database platform and our open-source model provides...",
+  "severity": "INFO",
+  "sha256_hash": "16ce64b0cdc0084427133e8a3d071b40a12a8bf0c039ad5fca76dffe285164b7",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/mongodb"
+}

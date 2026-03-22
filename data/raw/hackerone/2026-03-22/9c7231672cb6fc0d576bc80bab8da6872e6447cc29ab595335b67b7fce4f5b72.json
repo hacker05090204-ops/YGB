@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.351135+00:00",
+  "lang": "en",
+  "raw_text": "Ping Identity Managed Offers bounties $125 minimum bounty Ping Identity looks forward to working with the security community to find and solve vulnerabilities. Thank you for helping us keep our customers safe. Getting Access For our docker images: Please clone this repo (https://github.com/pingidentity/bug...",
+  "severity": "INFO",
+  "sha256_hash": "9c7231672cb6fc0d576bc80bab8da6872e6447cc29ab595335b67b7fce4f5b72",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/pingidentity"
+}

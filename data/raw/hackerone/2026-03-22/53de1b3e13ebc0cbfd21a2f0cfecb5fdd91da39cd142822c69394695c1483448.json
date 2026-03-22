@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.832255+00:00",
+  "lang": "en",
+  "raw_text": "Aptible Please see our Responsible Disclosure Policy (https://www.aptible.com/legal/responsible-disclosure/). Do not test or report on out-of-scope issues.",
+  "severity": "INFO",
+  "sha256_hash": "53de1b3e13ebc0cbfd21a2f0cfecb5fdd91da39cd142822c69394695c1483448",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 16,
+  "url": "https://hackerone.com/aptible"
+}

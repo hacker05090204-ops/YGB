@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.526496+00:00",
+  "lang": "en",
+  "raw_text": "Tarsnap According to Linus' Law, \"given enough eyeballs, all bugs are shallow\". This is one of the reasons why the Tarsnap client source code is publicly available; but merely making the source code available doesn't accomplish anything if people don't...",
+  "severity": "INFO",
+  "sha256_hash": "f41affae16d500860732a6f1876ae48cc20e1a8e042bbb91ae5583e3e10aea51",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/tarsnap"
+}

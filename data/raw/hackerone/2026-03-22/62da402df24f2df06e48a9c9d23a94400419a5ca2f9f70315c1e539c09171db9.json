@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.608943+00:00",
+  "lang": "en",
+  "raw_text": "Veridu We understand the hard work that goes into security research. To show our appreciation for researchers who help us keep our users safe, we operate a reward program for responsibly disclosed vulnerabilities on our API and Widgets. Veridu may reward...",
+  "severity": "INFO",
+  "sha256_hash": "62da402df24f2df06e48a9c9d23a94400419a5ca2f9f70315c1e539c09171db9",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/veridu"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.021091+00:00",
+  "lang": "en",
+  "raw_text": "Ethereum ETHEREUM Bounty Program Ethereum has a clear goal: delivering stable protocols and secure software upon genesis block release. We call on our community and all bug bounty hunters to help us deliver flawless protocols and clients. Earn cold hard cash...",
+  "severity": "INFO",
+  "sha256_hash": "ce1040666502927e5abd7d6b6c44cd6be788f4320e7aee8ac0670b6c2dbd6998",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/ethereum"
+}

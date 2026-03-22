@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.673823+00:00",
+  "lang": "en",
+  "raw_text": "Zooplus Managed Offers bounties $50 minimum bounty Zooplus Since 1999, zooplus has been a pioneer in pet supplies e-commerce, serving millions of pet parents with an ever-growing range of nutritional and lifestyle products, proprietary premium food and accessory brands, alongside expert advice,...",
+  "severity": "INFO",
+  "sha256_hash": "05913b7e8931a0795bc6171048a8dca66642a6f3b8bde286bebdd57203900507",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/zooplus"
+}

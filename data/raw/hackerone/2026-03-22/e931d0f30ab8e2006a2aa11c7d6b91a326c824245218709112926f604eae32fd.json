@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.320876+00:00",
+  "lang": "en",
+  "raw_text": "OnePlus Old We welcome independent security researchers of all backgrounds and levels to join us in our efforts to secure the OnePlus ecosystem. If you believe you've found a security issue in our products or systems, we encourage you to notify us through...",
+  "severity": "INFO",
+  "sha256_hash": "e931d0f30ab8e2006a2aa11c7d6b91a326c824245218709112926f604eae32fd",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/oneplus_old"
+}

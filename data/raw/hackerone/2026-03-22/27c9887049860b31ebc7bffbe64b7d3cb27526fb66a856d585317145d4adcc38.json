@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.843540+00:00",
+  "lang": "en",
+  "raw_text": "AT&T Managed Offers bounties $100 minimum bounty AT&T Bug Bounty Program Policy Welcome to the AT&T Bug Bounty Program! We now use a pay per vulnerability model and utilize the HackerOne platform! UPDATE: The following asset has been removed from scope as of 1/2/2025 SupplierGateway...",
+  "severity": "INFO",
+  "sha256_hash": "27c9887049860b31ebc7bffbe64b7d3cb27526fb66a856d585317145d4adcc38",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/att"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.023089+00:00",
+  "lang": "en",
+  "raw_text": "Etsy For Professional Security Researchers We genuinely appreciate the efforts of security researchers and offer a bounty for certain security bugs per the qualifications below: Q) What's a valid bug? A) Web application vulnerabilities such as XSS, CSRF...",
+  "severity": "INFO",
+  "sha256_hash": "26edde5baf9b62a05ce400eaaf7a5e1954f605c0022cef8d20bb022549b9ec0f",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/etsy"
+}

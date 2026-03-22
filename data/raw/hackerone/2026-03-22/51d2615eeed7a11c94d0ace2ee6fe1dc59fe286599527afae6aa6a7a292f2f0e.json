@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.238067+00:00",
+  "lang": "en",
+  "raw_text": "Match.com Match Bug Bounty Program Terms Security is a priority at Match. If you believe you've found a security bug in our in-scope applications or infrastructure, we are happy to work with you to resolve the issue promptly and ensure you are fairly rewarded...",
+  "severity": "INFO",
+  "sha256_hash": "51d2615eeed7a11c94d0ace2ee6fe1dc59fe286599527afae6aa6a7a292f2f0e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/match"
+}

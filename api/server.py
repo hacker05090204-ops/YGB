@@ -228,6 +228,7 @@ from backend.training.runtime_artifacts import (
     bootstrap_runtime_artifacts,
     repair_runtime_artifacts_if_needed,
 )
+from backend.api.system_status_store import refresh_system_status_file
 from backend.training.runtime_status_validator import validate_precision_breach_status
 
 # Import auth and alerts
@@ -381,6 +382,12 @@ async def lifespan(app):
     except Exception as e:
         logger.warning("[BOOT] Runtime precision reconciliation degraded: %s", e)
 
+    try:
+        refresh_system_status_file()
+        logger.info("[BOOT] Canonical system status refreshed")
+    except Exception as e:
+        logger.warning("[BOOT] Canonical system status refresh degraded: %s", e)
+
     # Start CVE scheduler (async — must be awaited)
     try:
         from backend.cve.cve_scheduler import get_scheduler
@@ -489,9 +496,10 @@ app.add_middleware(
 
 # Sync engine API endpoints
 try:
-    from backend.sync.sync_routes import sync_router
+    from backend.sync.sync_routes import api_sync_router, sync_router
     app.include_router(sync_router, prefix="/sync")
-    logger.info("[SYNC] Sync API routes mounted at /sync/*")
+    app.include_router(api_sync_router, prefix="/api/sync")
+    logger.info("[SYNC] Sync API routes mounted at /sync/* and /api/sync/*")
 except ImportError as _sync_err:
     logger.warning("[SYNC] Sync routes unavailable: %s", _sync_err)
 

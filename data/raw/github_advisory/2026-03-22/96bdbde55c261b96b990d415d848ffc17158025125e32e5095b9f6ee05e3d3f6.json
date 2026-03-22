@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.570259+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: OpenClaw's allow-always wrapper persistence could bypass future approvals and enable command execution ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-6j27-pc5c-m8w8. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.22 contain an authorization bypass vulnerability in allow-always wrapper persistence that allows attackers to bypass approval checks by persisting wrapper-level allowlist entries instead of validating inner executable intent. Remote attackers can approve benign wrapped system.run commands and subsequently execute different payloads without approval, enabling remote code execution on gateway and node-host execution flows.",
+  "severity": "HIGH",
+  "sha256_hash": "96bdbde55c261b96b990d415d848ffc17158025125e32e5095b9f6ee05e3d3f6",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 97,
+  "url": "https://github.com/advisories/GHSA-pfv5-rpcw-x34x"
+}

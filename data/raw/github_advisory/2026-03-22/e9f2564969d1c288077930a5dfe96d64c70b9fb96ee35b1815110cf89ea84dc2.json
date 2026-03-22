@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-3029",
+  "ingested_at": "2026-03-22T09:56:16.105031+00:00",
+  "lang": "en",
+  "raw_text": "PyMuPDF has a path traversal in _main_.py A path traversal and arbitrary file write vulnerability exist in the embedded get function in '_main_.py' in PyMuPDF version, 1.26.5.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e9f2564969d1c288077930a5dfe96d64c70b9fb96ee35b1815110cf89ea84dc2",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 27,
+  "url": "https://github.com/advisories/GHSA-cxqh-p2w9-fmr7"
+}

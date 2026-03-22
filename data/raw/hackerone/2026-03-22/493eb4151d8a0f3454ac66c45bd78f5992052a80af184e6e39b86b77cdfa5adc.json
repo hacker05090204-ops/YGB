@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.640516+00:00",
+  "lang": "en",
+  "raw_text": "WHMCS WHMCS is now a part of the WebPros Private Bug Bounty on HackerOne. This page is retained for legacy reasons and does not accept new reports. Please use the contacts listed in the security.txt (https://www.webpros.com/.well-known/security.txt) to...",
+  "severity": "INFO",
+  "sha256_hash": "493eb4151d8a0f3454ac66c45bd78f5992052a80af184e6e39b86b77cdfa5adc",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/whmcs"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.654617+00:00",
+  "lang": "en",
+  "raw_text": "City of Vienna Managed Bug Bounty Please submit your finding to the City of Vienna's Bug Bounty!",
+  "severity": "INFO",
+  "sha256_hash": "92be9b868929767ad8fee59a9772dfe7c083b4cc040177440faa463ca61244e3",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 17,
+  "url": "https://bugcrowd.com/engagements/city-of-vienna-mbb-og"
+}

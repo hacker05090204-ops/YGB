@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.488968+00:00",
+  "lang": "en",
+  "raw_text": "Sorare Managed Offers bounties $50 minimum bounty Introduction Sorare recognizes the importance and value of security researchers\u2019 efforts in helping keep our community safe. We encourage responsible disclosure of security vulnerabilities via our bug bounty program (\u201cBug Bounty Program\u201d) described...",
+  "severity": "INFO",
+  "sha256_hash": "d258a2ea0cfdb6965e65251cd67472dc4a92593d52fabf48042baf281d8ee92d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/sorare"
+}

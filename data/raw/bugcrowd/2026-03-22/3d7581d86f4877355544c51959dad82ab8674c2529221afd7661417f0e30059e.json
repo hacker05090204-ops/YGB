@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.641146+00:00",
+  "lang": "en",
+  "raw_text": "OneTrust OneTrust helps companies build and demonstrate trust, measure and manage risk, and go beyond compliance.",
+  "severity": "INFO",
+  "sha256_hash": "3d7581d86f4877355544c51959dad82ab8674c2529221afd7661417f0e30059e",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 16,
+  "url": "https://bugcrowd.com/engagements/onetrust"
+}

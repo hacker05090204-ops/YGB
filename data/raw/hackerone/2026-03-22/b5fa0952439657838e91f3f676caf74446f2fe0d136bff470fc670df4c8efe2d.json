@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.597755+00:00",
+  "lang": "en",
+  "raw_text": "Valve Managed Offers bounties $100 minimum bounty If you are a Steam user and have a security issue to report regarding your personal Steam account, please visit our support site https://help.steampowered.com/. This includes password problems, login issues, suspected fraud, and account abuse issues...",
+  "severity": "INFO",
+  "sha256_hash": "b5fa0952439657838e91f3f676caf74446f2fe0d136bff470fc670df4c8efe2d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/valve"
+}

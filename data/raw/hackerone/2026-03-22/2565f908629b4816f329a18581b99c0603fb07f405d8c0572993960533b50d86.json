@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.647520+00:00",
+  "lang": "en",
+  "raw_text": "WordPress Offers bounties $10 minimum bounty WordPress (https://wordpress.org/) is an open-source publishing platform. Our HackerOne program covers the Core software, as well as a variety of related projects and infrastructure. Our most critical targets are: WordPress Core software (https:/...",
+  "severity": "INFO",
+  "sha256_hash": "2565f908629b4816f329a18581b99c0603fb07f405d8c0572993960533b50d86",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/wordpress"
+}

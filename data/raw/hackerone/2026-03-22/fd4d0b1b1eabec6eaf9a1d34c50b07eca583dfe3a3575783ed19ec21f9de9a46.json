@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.509233+00:00",
+  "lang": "en",
+  "raw_text": "Sunrise We appreciate all security concerns brought forth and are constantly striving to keep on top of the latest threats. Being pro-active rather than re-active to emerging security issues is a fundamental belief at Sunrise. Every day new security issues...",
+  "severity": "INFO",
+  "sha256_hash": "fd4d0b1b1eabec6eaf9a1d34c50b07eca583dfe3a3575783ed19ec21f9de9a46",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/sunrise"
+}

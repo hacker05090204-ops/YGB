@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.922675+00:00",
+  "lang": "en",
+  "raw_text": "Chia Network Managed Offers bounties $50 minimum bounty No technology is perfect and Chia Network believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. We are excited for you to participate as a security researcher to help us...",
+  "severity": "INFO",
+  "sha256_hash": "61c4c57b947d20b4f33cb49142428d1bc5a592b5ecb56a618c42e1bc0c0e2d87",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/chia_network"
+}

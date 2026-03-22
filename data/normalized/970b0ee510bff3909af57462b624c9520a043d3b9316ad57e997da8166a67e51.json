@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ella Core panics on invalid PDU Session IDs in NGAP messages ## Summary Ella Core panics when processing NGAP messages with invalid PDU Session IDs outside of 1-15. ## Impact An attacker able to send crafted NGAP messages to Ella Core can crash the process, causing service disruption for all connected subscribers. No authentication is required. ## Fix Added PDU Session ID validations during NGAP message handling.",
+  "token_count": 67
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.008575+00:00",
+  "lang": "en",
+  "raw_text": "Electronic Frontier Foundation EFF is committed to protecting the privacy and security of our members, users of our software tools, and visitors to EFF sites. Our Vulnerability Disclosure Program is intended to minimize the impact any security flaws have on our tools, our hosted...",
+  "severity": "INFO",
+  "sha256_hash": "0f9f4691229a2a0da8c73252b56b1ac5ba2670c804070ffb18ced5d10933024e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/eff"
+}

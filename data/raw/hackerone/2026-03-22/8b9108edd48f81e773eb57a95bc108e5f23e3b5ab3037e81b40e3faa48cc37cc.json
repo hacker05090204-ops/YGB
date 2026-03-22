@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.053551+00:00",
+  "lang": "en",
+  "raw_text": "Files.com Offers bounties $100 minimum bounty Here at Files.com, we take security seriously and encourage independent security researchers to help us keep our platform secure. We offer a Security Bug Bounty Program (the \u201cProgram\u201d) to provide a clear incentive and reward structure for...",
+  "severity": "INFO",
+  "sha256_hash": "8b9108edd48f81e773eb57a95bc108e5f23e3b5ab3037e81b40e3faa48cc37cc",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/files"
+}

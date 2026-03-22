@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.042359+00:00",
+  "lang": "en",
+  "raw_text": "F. Hoffmann-La Roche Ltd. We are currently running an invite-only bug-bounty program at HackerOne. If you would like to be invited, we kindly ask you to submit one issue with high severity as we define it (see below) with a working POC that is in scope for our program. If...",
+  "severity": "INFO",
+  "sha256_hash": "66b9aefc46915a2830177e525dc27ef487cc1101b418a25155639364853e7247",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/roche"
+}

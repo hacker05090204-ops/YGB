@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.226011+00:00",
+  "lang": "en",
+  "raw_text": "Malwarebytes Managed Offers bounties $50 minimum bounty {F2076724} Here at Malwarebytes, we believe that when you\u2019re free from threats, you\u2019re free to thrive. It all started with one person who needed help with a malware infection, and a community coming together to find solutions. In that moment in time...",
+  "severity": "INFO",
+  "sha256_hash": "6f7557ea3fdeba28516f29951e5b1d25d860e00b89beea328fd67b9c44a1f383",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/malwarebytes"
+}

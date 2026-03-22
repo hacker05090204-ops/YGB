@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.035089+00:00",
+  "lang": "en",
+  "raw_text": "Exodus Offers bounties $100 minimum bounty Exodus is one of the top non-custodial crypto wallets. We value our customers wallet's security more than anything. We are looking forward to working with you. ==Do NOT test Exodus contact form and do NOT create multiple support tickets via Exodus...",
+  "severity": "INFO",
+  "sha256_hash": "ee4be81344100e612ea8ab8ebf5f3c2d5a7d31a08ed11f2dc52b4ccd3eeff8c6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/exodus"
+}

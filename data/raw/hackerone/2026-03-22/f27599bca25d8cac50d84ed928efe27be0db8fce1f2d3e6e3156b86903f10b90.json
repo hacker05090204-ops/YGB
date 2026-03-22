@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.584747+00:00",
+  "lang": "en",
+  "raw_text": "Uber Managed Offers bounties $500 minimum bounty Uber Bug Bounty Program Terms \u1160 The scope for Uber\u2019s Bug Bounty Program is focused on securing the data of our users and company assets. Therefore, our approach is to evaluate any given report based on the specific security impact for users ...",
+  "severity": "INFO",
+  "sha256_hash": "f27599bca25d8cac50d84ed928efe27be0db8fce1f2d3e6e3156b86903f10b90",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/uber"
+}

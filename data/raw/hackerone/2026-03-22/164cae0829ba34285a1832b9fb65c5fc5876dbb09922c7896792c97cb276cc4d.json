@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.625491+00:00",
+  "lang": "en",
+  "raw_text": "Wamba Wamba Bug Bounty Program Wamba invites you to take part in Wamba Bug Bounty Program, which aims to search for possible vulnerabilities of our service. We give a reward for each vulnerability found, and add the names of users who successfully found...",
+  "severity": "INFO",
+  "sha256_hash": "164cae0829ba34285a1832b9fb65c5fc5876dbb09922c7896792c97cb276cc4d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/wamba"
+}

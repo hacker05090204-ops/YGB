@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.083040+00:00",
+  "lang": "en",
+  "raw_text": "Glassdoor Managed Offers bounties $50 minimum bounty \ud83d\udc9a Our Mission Helping people everywhere find jobs and companies they love. At Glassdoor we take our security very seriously and welcome any responsible disclosure of potential gaps in our systems. We believe that working with skilled security...",
+  "severity": "INFO",
+  "sha256_hash": "eab187501ce37144d1a66cbfe05cb9793efbeb0432a4199c1ecd66b4dfb0cc77",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/glassdoor"
+}

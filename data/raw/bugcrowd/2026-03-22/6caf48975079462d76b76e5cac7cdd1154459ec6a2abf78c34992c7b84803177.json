@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.618431+00:00",
+  "lang": "tl",
+  "raw_text": "Luno Bug Bounty Program Luno Bug Bounty Program",
+  "severity": "INFO",
+  "sha256_hash": "6caf48975079462d76b76e5cac7cdd1154459ec6a2abf78c34992c7b84803177",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 8,
+  "url": "https://bugcrowd.com/engagements/luno-og"
+}

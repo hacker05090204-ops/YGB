@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.550972+00:00",
+  "lang": "en",
+  "raw_text": "Tinder Managed Offers bounties $250 minimum bounty Tinder Bug Bounty Program Terms Security is a top priority at Tinder. If you believe you've found a security bug in our in-scope applications or infrastructure, we are happy to work with you to resolve the issue promptly and ensure you are fairly...",
+  "severity": "INFO",
+  "sha256_hash": "031315e59e414b683f3a5f6124c360f31db2af285e92c426d5fb269d377bbb36",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/tinder"
+}

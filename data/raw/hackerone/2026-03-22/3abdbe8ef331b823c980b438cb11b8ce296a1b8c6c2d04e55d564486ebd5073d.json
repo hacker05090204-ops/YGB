@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.433401+00:00",
+  "lang": "en",
+  "raw_text": "S-Pankki Managed Offers bounties $150 minimum bounty S-Pankki Bug Bounty Program S-Pankki and S-Group looks forward to working with the security community to find security vulnerabilities in order to keep our businesses, systems and customers safe. This program is a joint effort between S-Pankki and S...",
+  "severity": "INFO",
+  "sha256_hash": "3abdbe8ef331b823c980b438cb11b8ce296a1b8c6c2d04e55d564486ebd5073d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/s-pankki"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.140454+00:00",
+  "lang": "en",
+  "raw_text": "Inditex Managed Offers bounties $150 minimum bounty Summer Special Campaign From 29/07/2024 to 15/08/2024 Summer Special Campaign conditions. We are excited to announce our special summer bug bounty campaign, where we will be offering up to 2x payouts for Critical and High severity vulnerabilities...",
+  "severity": "INFO",
+  "sha256_hash": "920002850aa87e878264352c957831a7672bcda317552ff7252e7ee3fbd04b00",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/inditex"
+}

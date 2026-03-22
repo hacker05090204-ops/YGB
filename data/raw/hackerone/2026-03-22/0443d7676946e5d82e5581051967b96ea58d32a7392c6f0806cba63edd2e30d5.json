@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.638509+00:00",
+  "lang": "en",
+  "raw_text": "Whatnot Managed Offers bounties $50 minimum bounty Whatnot is a livestream shopping platform where people buy and sell in real time across categories like trading cards, sneakers, fashion, collectibles, and more. Sellers host live shows and auctions while buyers chat, bid, and purchase directly in...",
+  "severity": "INFO",
+  "sha256_hash": "0443d7676946e5d82e5581051967b96ea58d32a7392c6f0806cba63edd2e30d5",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/whatnot"
+}

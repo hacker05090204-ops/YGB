@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.506229+00:00",
+  "lang": "en",
+  "raw_text": "Stripe Managed Offers bounties $100 minimum bounty The Stripe Bug Bounty Program Terms and Conditions (\"Terms'') governs your participation in the Stripe Bug Bounty Program (\"Program\"). These Terms are between you and Stripe (\"Stripe,\" \"us,\" or \"we\"). By performing vulnerability research against...",
+  "severity": "INFO",
+  "sha256_hash": "072fe55fda136284f70085fa4b0c00582c12924c2c2f0df33e895e1cc874033b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/stripe"
+}

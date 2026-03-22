@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.287503+00:00",
+  "lang": "en",
+  "raw_text": "Netlify Managed Offers bounties $100 minimum bounty About Netlify Netlify is the fastest way to combine your favorite tools and APIs to build the fastest sites, stores, and apps for the web. Attack surface Netlify provides a UI (app.netlify.com), an API (api.netlify.com), a build system triggered by...",
+  "severity": "INFO",
+  "sha256_hash": "8eeb8b0425c0039a3c875b816d3208cca4945803cab0b1a1df428c585be8e9a8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/netlify"
+}

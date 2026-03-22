@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Parse Server has a query condition depth bypass via pre-validation transform pipeline ### Impact An attacker can send an unauthenticated HTTP request with a deeply nested query containing logical operators to permanently hang the Parse Server process. The server becomes completely unresponsive and must be manually restarted. This is a bypass of the fix for CVE-2026-32944. ### Patches The query condition nesting depth is now validated before the query enters the transformation pipeline, preventing deeply nested structures from being recursively processed before the existing depth guard can fire. ### Workarounds None.",
+  "token_count": 91
+}

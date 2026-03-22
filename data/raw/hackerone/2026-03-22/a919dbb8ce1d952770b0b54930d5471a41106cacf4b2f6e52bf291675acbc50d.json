@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.444150+00:00",
+  "lang": "en",
+  "raw_text": "Scopely Managed Offers bounties $150 minimum bounty Scopely Bug Bounty Program Welcome to Scopely's Bug Bounty Program! This program encourages and rewards contributions by security researchers who help make Scopely's mobile games and communities more secure. To recognise your efforts and the...",
+  "severity": "INFO",
+  "sha256_hash": "a919dbb8ce1d952770b0b54930d5471a41106cacf4b2f6e52bf291675acbc50d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/scopely"
+}

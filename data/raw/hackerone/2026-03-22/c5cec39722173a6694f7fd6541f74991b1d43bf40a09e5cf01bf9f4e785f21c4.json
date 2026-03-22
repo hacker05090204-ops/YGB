@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.895414+00:00",
+  "lang": "en",
+  "raw_text": "Bumba Managed Offers bounties $50 minimum bounty Bumba.global is committed to security and recognizes the importance of security researchers in keeping the community safe. We encourage responsible disclosure of security vulnerabilities via our bug bounty program described on this page. Note: This...",
+  "severity": "INFO",
+  "sha256_hash": "c5cec39722173a6694f7fd6541f74991b1d43bf40a09e5cf01bf9f4e785f21c4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/bumba_bbp"
+}

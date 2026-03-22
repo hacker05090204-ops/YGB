@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "pgproto3: Negative field length panics in DataRow.Decode A flaw was found in pgproto3. A malicious or compromised PostgreSQL server can exploit this by sending a DataRow message with a negative field length. This input validation vulnerability can lead to a denial of service (DoS) due to a slice bounds out of range panic.",
+  "token_count": 53
+}

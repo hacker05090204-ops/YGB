@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.089801+00:00",
+  "lang": "en",
+  "raw_text": "Goldman Sachs Managed Offers bounties ==Most Valuable Hacker (MVH) Recognition Program== The Most Valuable Hacker (MVH) program recognizes security researchers who consistently demonstrate exceptional contributions to our security posture through high-impact, high-quality vulnerability...",
+  "severity": "INFO",
+  "sha256_hash": "f27e3f2272651798b9f689644536036aa2acecbeca3a2b1db5ffe5faa186a48d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 33,
+  "url": "https://hackerone.com/goldmansachs"
+}

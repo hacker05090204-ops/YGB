@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33418",
+  "ingested_at": "2026-03-22T09:56:15.163364+00:00",
+  "lang": "en",
+  "raw_text": "SVG Dimension Capping Bypass via XML Comment Injection in @dicebear/converter ensureSize() ## Summary The `ensureSize()` function in `@dicebear/converter` used a regex-based approach to rewrite SVG `width`/`height` attributes, capping them at 2048px to prevent denial of service. This size capping could be bypassed by crafting SVG input that causes the regex to match a non-functional occurrence of `",
+  "severity": "HIGH",
+  "sha256_hash": "eac972f30abb8edd3dd73eac209b5116b8b8bcae9eeabc4e098ff150c59cd018",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-185"
+  ],
+  "token_count": 57,
+  "url": "https://github.com/advisories/GHSA-7j2x-32w6-p43p"
+}

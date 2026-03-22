@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.602744+00:00",
+  "lang": "en",
+  "raw_text": "Varonis Managed Offers bounties $50 minimum bounty Varonis Bug Bounty Program (BBP) Policy At Varonis, we specialize in software for data protection, threat detection and response, and compliance \u2013 and we know how valuable contributions from the security community help safeguard organizations. We...",
+  "severity": "INFO",
+  "sha256_hash": "71e1546ebb1d012caf1d66b1c722ae46d3d199030da58a280965d903a47f4b99",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/varonis"
+}

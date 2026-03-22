@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.870120+00:00",
+  "lang": "en",
+  "raw_text": "Bitdefender The Bug Bounty Reward program encourages security researchers to identify and submit vulnerability reports regarding virtually everything that bears the Bitdefender brand, including but not limited to the website, products and services. Program...",
+  "severity": "INFO",
+  "sha256_hash": "67cd065622411e76d08cb818125acfa136b3acab8737ab748328e2c49195af7a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 34,
+  "url": "https://hackerone.com/bitdefender"
+}

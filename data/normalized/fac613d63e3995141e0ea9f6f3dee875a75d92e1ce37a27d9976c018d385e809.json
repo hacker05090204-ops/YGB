@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Braze, Inc. Managed Offers bounties $50 minimum bounty Quick summary Test only the three bug-bounty-.braze-dev.com hosts listed below \u2014 all other Braze domains are out of scope No automated scanners, DoS, or large-scale discovery scans Use one test-account pattern: h1-username[+N]@wearehackerone.com...",
+  "token_count": 40
+}

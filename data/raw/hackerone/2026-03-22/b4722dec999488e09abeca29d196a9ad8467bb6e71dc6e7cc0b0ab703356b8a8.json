@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.929412+00:00",
+  "lang": "en",
+  "raw_text": "CLEAR Managed Offers bounties $100 minimum bounty About Us CLEAR's mission is to strengthen security and create frictionless experiences. With over 36 million Members and a growing network of partners across the world, CLEAR's secure identity platform is transforming the way people live, work, and...",
+  "severity": "INFO",
+  "sha256_hash": "b4722dec999488e09abeca29d196a9ad8467bb6e71dc6e7cc0b0ab703356b8a8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/clear"
+}

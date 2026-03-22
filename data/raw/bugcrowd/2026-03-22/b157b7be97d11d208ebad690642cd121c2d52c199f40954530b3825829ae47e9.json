@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.646616+00:00",
+  "lang": "en",
+  "raw_text": "BitGo Mobile Apps Bug Bounty Engagement BitGo offers secure, scalable solutions for the digital asset economy, including regulated custody, borrowing, lending, and core infrastructure for investors and builders.",
+  "severity": "INFO",
+  "sha256_hash": "b157b7be97d11d208ebad690642cd121c2d52c199f40954530b3825829ae47e9",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 28,
+  "url": "https://bugcrowd.com/engagements/bitgo-mobileapps-mbb-og"
+}

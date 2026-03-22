@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Juju affected by timing ownership claim attack on new external back-end secrets A race condition in the secrets management subsystem of Juju versions 3.0.0 through 3.6.18 allows an authenticated unit agent to claim ownership of a newly initialized secret. Between generating a Juju Secret ID and creating the secret's first revision, an attacker authenticated as another unit agent can claim ownership of a known secret. This leads to the attacking unit being able to read the content of the initial secret revision. ### Impact Between generating a Secret ID and creating the secret's first revision, an attacker authenticated as another unit agent can claim ownership of a known secret. This leads to the attacking unit being able to read the content of the initial secret revision. ### Patches 3.6.19",
+  "token_count": 129
+}

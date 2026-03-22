@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.232061+00:00",
+  "lang": "en",
+  "raw_text": "Marriott Bug Bounty Program Managed Offers bounties $100 minimum bounty Welcome to the Marriott Bug Bounty Program ! Marriott takes cybersecurity seriously. Individuals that participate in the Program by responsibly researching and reporting vulnerabilities help us to ensure the security and privacy of our customers and...",
+  "severity": "INFO",
+  "sha256_hash": "1d341c88975c7bca093b60d7c045b67add7c8de3a71611358b09b7faa874a419",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/marriott"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.644508+00:00",
+  "lang": "en",
+  "raw_text": "WisdomTree, Inc. Managed Offers bounties $50 minimum bounty WISDOMTREE BUG BOUNTY PROGRAM POLICY Updates: February 2026: Updated Bounty Table WisdomTree, Inc. and its subsidiaries (\u201cWisdomTree\u201d) takes very seriously and prioritizes the security of our customers data, products and services. If you have...",
+  "severity": "INFO",
+  "sha256_hash": "27a75274da91ec8b04575ed5b35d201a3945c6147b85d9375921c89a370afa58",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/wisdomtree"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.078550+00:00",
+  "lang": "en",
+  "raw_text": "GitHub Offers bounties $617 minimum bounty GitHub Security Bug Bounty Software security researchers are increasingly engaging with internet companies to hunt down vulnerabilities. Our bounty program gives a tip of the hat to these researchers and provides rewards of $30,000 or more for...",
+  "severity": "INFO",
+  "sha256_hash": "716939b6511dfabb29f36fb125b4b310405a19e5e4ae1cdf47d4beb674e27cef",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/github"
+}

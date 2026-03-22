@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.784091+00:00",
+  "lang": "en",
+  "raw_text": "1Password - Enterprise Password Manager Offers bounties $50 minimum bounty Get started This isn\u2019t an easy program \u2014 scanners are unlikely to help, and standard XSS-type injections won't yield much either. We need creative researchers who aren\u2019t afraid to think outside the box. We're happy you're here. Start with the...",
+  "severity": "INFO",
+  "sha256_hash": "a86be68e4a73a9fce6692d013f8ff4be839c04e7d655405d5b7af10bb5e3ec04",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/1password"
+}

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
+import time
 from datetime import datetime, timedelta, timezone
 
 import aiohttp
@@ -40,12 +42,23 @@ class GitHubAdvisoryAdapter(BaseAdapter):
         next_url: str | None = self.BASE
         page_number = 0
         lookback_days = int(os.environ.get("YGB_GITHUB_ADVISORY_LOOKBACK_DAYS", "30"))
-        max_pages = int(os.environ.get("YGB_GITHUB_ADVISORY_MAX_PAGES", "10"))
+        max_pages = int(os.environ.get("YGB_GITHUB_ADVISORY_MAX_PAGES", "3"))
         cutoff = datetime.now(timezone.utc) - timedelta(days=lookback_days)
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=120, connect=20)
+        headers = {"Accept": "application/vnd.github+json"}
+        github_token = os.environ.get("GITHUB_TOKEN", "").strip()
+        if github_token:
+            headers["Authorization"] = f"Bearer {github_token}"
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             while next_url and page_number < max_pages:
-                params = {"per_page": 100, "type": "reviewed"} if page_number == 0 else None
-                payload = await self._get(session, next_url, params=params)
+                params = {"per_page": 50, "type": "reviewed"} if page_number == 0 else None
+                payload = await self._get(
+                    session,
+                    next_url,
+                    params=params,
+                    headers=headers,
+                    timeout=timeout,
+                )
                 advisories = payload if isinstance(payload, list) else []
                 reached_cutoff = False
                 for advisory in advisories:
@@ -71,6 +84,11 @@ class GitHubAdvisoryAdapter(BaseAdapter):
                     break
                 next_url = self._extract_next_link(self._last_response_headers.get("Link", ""))
                 page_number += 1
+                remaining = self._last_response_headers.get("X-RateLimit-Remaining", "")
+                reset = self._last_response_headers.get("X-RateLimit-Reset", "")
+                if next_url and remaining.isdigit() and int(remaining) < 10:
+                    sleep_seconds = max(int(reset) - int(time.time()), 1) if reset.isdigit() else 60
+                    await asyncio.sleep(sleep_seconds)
         return samples
 
 

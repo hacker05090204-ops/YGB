@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.376468+00:00",
+  "lang": "en",
+  "raw_text": "Privy (Bounty) Offers bounties $100 minimum bounty IMPORTANT ** To be eligible for bounties, please create your Privy account name with the string \"(BBP)\" (e.g., in the \"Project or company name\" field) so we can associate your account with any submissions to the program. ** Overview Privy believes...",
+  "severity": "INFO",
+  "sha256_hash": "56997eb566169c2fcbf7eb5d7ebd86e02cd3c47d5e2155f1fca9f3e5b28b9b2b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/privy-bbp"
+}

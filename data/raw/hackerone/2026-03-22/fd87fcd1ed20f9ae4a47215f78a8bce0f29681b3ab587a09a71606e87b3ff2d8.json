@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.342876+00:00",
+  "lang": "en",
+  "raw_text": "Payoneer Managed Offers bounties $50 minimum bounty Payoneer looks forward to working with the security community and welcome your participation in our program aimed at identifying potential security vulnerabilities related to Payoneer\u2019s products or website (the \u201cProgram\u201d), in order to keep our...",
+  "severity": "INFO",
+  "sha256_hash": "fd87fcd1ed20f9ae4a47215f78a8bce0f29681b3ab587a09a71606e87b3ff2d8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/payoneer"
+}

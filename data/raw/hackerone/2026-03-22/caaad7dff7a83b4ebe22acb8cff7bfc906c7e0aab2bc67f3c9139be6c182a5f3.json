@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.859863+00:00",
+  "lang": "en",
+  "raw_text": "Basecamp Offers bounties $100 minimum bounty TL;DR - Your insight and discoveries = our deep <3, and now $. We're a small team born and bred on open source, so we look to the security community's lead for exploit patterns, best practices, top vulns, new research\u2014everything. We've learned...",
+  "severity": "INFO",
+  "sha256_hash": "caaad7dff7a83b4ebe22acb8cff7bfc906c7e0aab2bc67f3c9139be6c182a5f3",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/basecamp"
+}

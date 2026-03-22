@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.425403+00:00",
+  "lang": "en",
+  "raw_text": "Rockstar Games Managed Offers bounties $150 minimum bounty Statement We are dedicated to the privacy and security of our users, and the environment we create for them. We believe that having a talented group of independent security researchers is paramount to achieving that goal. We are running this...",
+  "severity": "INFO",
+  "sha256_hash": "0338c9b75fe5dcddcd4582418ecf773dbb862b686d0ad357a50703b22142f739",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/rockstargames"
+}

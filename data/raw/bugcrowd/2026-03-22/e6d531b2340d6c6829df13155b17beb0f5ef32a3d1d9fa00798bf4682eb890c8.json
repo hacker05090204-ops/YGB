@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.644618+00:00",
+  "lang": "en",
+  "raw_text": "SnapNames Bug Bounty SnapNames is the web's domain name marketplace of choice throughout the world. We bring businesses global access to already-registered domains with the convenience of online and mobile shopping.",
+  "severity": "INFO",
+  "sha256_hash": "e6d531b2340d6c6829df13155b17beb0f5ef32a3d1d9fa00798bf4682eb890c8",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 31,
+  "url": "https://bugcrowd.com/engagements/snapnames"
+}

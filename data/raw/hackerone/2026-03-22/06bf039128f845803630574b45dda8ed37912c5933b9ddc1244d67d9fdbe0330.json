@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.618490+00:00",
+  "lang": "en",
+  "raw_text": "Visa Managed Offers bounties $50 minimum bounty Visa Bug Bounty Program Rules Visa is a global payments technology company that connects consumers, businesses, financial institutions and governments in more than 200 countries and territories to fast, secure and reliable digital currency. We have...",
+  "severity": "INFO",
+  "sha256_hash": "06bf039128f845803630574b45dda8ed37912c5933b9ddc1244d67d9fdbe0330",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/visa"
+}

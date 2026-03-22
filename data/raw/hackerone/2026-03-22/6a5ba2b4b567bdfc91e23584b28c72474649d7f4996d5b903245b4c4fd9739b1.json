@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.335875+00:00",
+  "lang": "en",
+  "raw_text": "Paper Inc This program has been temporarily paused !! Submit your findings at https://hackerone.com/9343d489-683d-4c4b-9c30-554adb715ead/embedded_submissions/new or reach out to security@malicious.com Best Regards, Paper Security Team",
+  "severity": "INFO",
+  "sha256_hash": "6a5ba2b4b567bdfc91e23584b28c72474649d7f4996d5b903245b4c4fd9739b1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 24,
+  "url": "https://hackerone.com/withpaper"
+}

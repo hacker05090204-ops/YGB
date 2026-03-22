@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.661616+00:00",
+  "lang": "en",
+  "raw_text": "Under Armour Product Security Under Armour\u2019s vision is to inspire you with performance solutions you never knew you needed and can\u2019t imagine living without.",
+  "severity": "INFO",
+  "sha256_hash": "4be69fffd3a1394f23f7e0e02856b3d31de46deb431dfa62e4ebe7155bc67ddb",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 24,
+  "url": "https://bugcrowd.com/engagements/underarmour"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-15031",
+  "ingested_at": "2026-03-22T09:56:22.574260+00:00",
+  "lang": "en",
+  "raw_text": "Arbitrary file write via tar traversal in mlflow A vulnerability in MLflow's pyfunc extraction process allows for arbitrary file writes due to improper handling of tar archive entries. Specifically, the use of `tarfile.extractall` without path validation enables crafted tar.gz files containing `..` or absolute paths to escape the intended extraction directory. This issue affects the latest version of MLflow and poses a high/critical risk in scenarios involving multi-tenant environments or ingestion of untrusted artifacts, as it can lead to arbitrary file overwrites and potential remote code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "052c90a2f0c6e3bf4acd6886c28a02e1dec12efebe52a3418e4073c9dd832703",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 87,
+  "url": "https://github.com/advisories/GHSA-fhff-qmm8-h2fp"
+}

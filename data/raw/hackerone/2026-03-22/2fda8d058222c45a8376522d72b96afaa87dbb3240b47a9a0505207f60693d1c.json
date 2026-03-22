@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.291503+00:00",
+  "lang": "en",
+  "raw_text": "Newegg Managed Offers bounties $50 minimum bounty Introduction Our mission at Newegg is to make e-Commerce better for everyone. Newegg's bug bounty program will give the security community the opportunity to help us accomplish our mission by making us the most secure and trusted e-commerce platform...",
+  "severity": "INFO",
+  "sha256_hash": "2fda8d058222c45a8376522d72b96afaa87dbb3240b47a9a0505207f60693d1c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/newegg"
+}

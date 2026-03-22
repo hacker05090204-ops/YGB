@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.175027+00:00",
+  "lang": "en",
+  "raw_text": "KnowBe4 KnowBe4 is running an invite-only bug-bounty program at HackerOne. If you would like to submit an issue please contact us via email and provide us with your hackerone username or you may submit the vulnerability directly to us outside of our bug...",
+  "severity": "INFO",
+  "sha256_hash": "4d6beaa86863b6b8d1c861185fe0f3fa1e1042ce0d9c34bb1a4c19c235994f7b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/knowbe4"
+}

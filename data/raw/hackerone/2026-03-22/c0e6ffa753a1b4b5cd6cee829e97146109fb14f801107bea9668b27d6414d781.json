@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.117414+00:00",
+  "lang": "en",
+  "raw_text": "Hootsuite We take security very seriously at Hootsuite, and have an Information Security Bug Bounty program geared towards the identification and remediation of security issues. Submitting a Report If you are interested in submitting your findings for review,...",
+  "severity": "INFO",
+  "sha256_hash": "c0e6ffa753a1b4b5cd6cee829e97146109fb14f801107bea9668b27d6414d781",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/hootsuite"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: allowlist exec-guard bypass via env -S ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-48wf-g7cp-gr3m. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.23 contain an allowlist bypass vulnerability in system.run guardrails that allows authenticated operators to execute unintended commands. When /usr/bin/env is allowlisted, attackers can use env -S to bypass policy analysis and execute shell wrapper payloads at runtime.",
+  "token_count": 75
+}

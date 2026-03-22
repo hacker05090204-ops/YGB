@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.994566+00:00",
+  "lang": "en",
+  "raw_text": "Dynamic Labs Managed Offers bounties $50 minimum bounty Brand Promise Dynamic Labs looks forward to working with the security community to find vulnerabilities to keep our businesses and customers safe. We are on a mission to accelerate the adoption of wallet-based authentication and identity. We make it...",
+  "severity": "INFO",
+  "sha256_hash": "3e2673611c98deed5337a1f5597c182eaa9b33a1f451edf153a6fad86a91c53d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/dynamic_labs"
+}

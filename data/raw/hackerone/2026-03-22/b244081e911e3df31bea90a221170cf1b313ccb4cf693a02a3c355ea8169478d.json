@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.240210+00:00",
+  "lang": "en",
+  "raw_text": "Matomo Offers bounties $10000 minimum bounty No technology is perfect, and Matomo believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. If you believe you've found a security issue in our product or service, we...",
+  "severity": "INFO",
+  "sha256_hash": "b244081e911e3df31bea90a221170cf1b313ccb4cf693a02a3c355ea8169478d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/matomo"
+}

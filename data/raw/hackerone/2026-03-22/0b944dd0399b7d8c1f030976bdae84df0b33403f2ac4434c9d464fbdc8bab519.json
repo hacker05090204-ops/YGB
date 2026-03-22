@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.855874+00:00",
+  "lang": "en",
+  "raw_text": "Banco Plata Managed Offers bounties $50 minimum bounty Disclosure Policy As this is a private program, please do not discuss this program or any vulnerabilities (even resolved ones) outside of the program without express consent from the organization. Follow HackerOne's disclosure guidelines (https:/...",
+  "severity": "INFO",
+  "sha256_hash": "0b944dd0399b7d8c1f030976bdae84df0b33403f2ac4434c9d464fbdc8bab519",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/banco_plata"
+}

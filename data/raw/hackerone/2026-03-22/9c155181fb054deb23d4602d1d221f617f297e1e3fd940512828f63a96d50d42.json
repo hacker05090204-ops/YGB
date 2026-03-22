@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.868089+00:00",
+  "lang": "en",
+  "raw_text": "Bitcoin.de We value security during the development of bitcoin.de. For safety our team will be regularly trained at external companies. A specialized company examines our platform with security audits and penetrations tests. Your efforts can contribute to make...",
+  "severity": "INFO",
+  "sha256_hash": "9c155181fb054deb23d4602d1d221f617f297e1e3fd940512828f63a96d50d42",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/bitcoin_de"
+}

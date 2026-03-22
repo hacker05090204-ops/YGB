@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.153220+00:00",
+  "lang": "en",
+  "raw_text": "Instacart Managed Offers bounties $50 minimum bounty Table of Contents Rules & Terms Vulnerability Types Out-of-Scope Known Issues Assets Core Assets Out-of-Scope Rewards Eligibility Payout Amounts Additional Factors Google Play Security Reward Program Submissions Report Quality Demonstrating...",
+  "severity": "INFO",
+  "sha256_hash": "e2cd4d4267828f6ac246634a26f1ed09752d2659484edc96c2a867e9481b1476",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/instacart"
+}

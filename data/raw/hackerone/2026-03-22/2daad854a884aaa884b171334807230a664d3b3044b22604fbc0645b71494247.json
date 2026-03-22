@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.383582+00:00",
+  "lang": "en",
+  "raw_text": "Rabobank Welcome ! This is our private program and is invitation-only.",
+  "severity": "INFO",
+  "sha256_hash": "2daad854a884aaa884b171334807230a664d3b3044b22604fbc0645b71494247",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 11,
+  "url": "https://hackerone.com/rabobank"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.879112+00:00",
+  "lang": "en",
+  "raw_text": "Blogger This application is covered under the Google Vulnerability Reward Program \u2013 read more @google.",
+  "severity": "INFO",
+  "sha256_hash": "21751576f213c528653c1ccc1f32351cb3ee3c78cd8943a0d80b529f713f7e4f",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 15,
+  "url": "https://hackerone.com/blogger"
+}

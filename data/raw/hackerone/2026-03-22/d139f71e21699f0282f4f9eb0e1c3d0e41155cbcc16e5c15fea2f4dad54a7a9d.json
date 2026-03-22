@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.827269+00:00",
+  "lang": "en",
+  "raw_text": "Android Android Security Rewards Program Rules The Android Security Rewards program recognizes the contributions of security researchers who invest their time and effort in helping us make Android more secure. Through this program we provide monetary...",
+  "severity": "INFO",
+  "sha256_hash": "d139f71e21699f0282f4f9eb0e1c3d0e41155cbcc16e5c15fea2f4dad54a7a9d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/android"
+}

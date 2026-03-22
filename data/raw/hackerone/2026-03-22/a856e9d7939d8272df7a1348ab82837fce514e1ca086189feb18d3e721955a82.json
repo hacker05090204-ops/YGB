@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.050358+00:00",
+  "lang": "en",
+  "raw_text": "Figma Managed Offers bounties $50 minimum bounty Figma looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Response Targets Our primary focus is on high/critical findings right now, and we aim to expand scope beyond that...",
+  "severity": "INFO",
+  "sha256_hash": "a856e9d7939d8272df7a1348ab82837fce514e1ca086189feb18d3e721955a82",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/figma"
+}

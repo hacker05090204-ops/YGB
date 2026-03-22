@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.651508+00:00",
+  "lang": "en",
+  "raw_text": "Xiaomi Offers bounties $50 minimum bounty TABLE OF CONTENTS Ground Rules Disclosure Policy Safe Harbour Response Time General Assessment Rules Detailed Rules and Reward Scheme Web Vulnerabilities Mobile Vulnerabilities Hardware Vulnerabilities Privacy Vulnerabilities Out of scope...",
+  "severity": "INFO",
+  "sha256_hash": "46a35649535daeb1ab4bf87d7ed528918f9c06b01522cbb8e47738fe0c7b954d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/xiaomi"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.497966+00:00",
+  "lang": "en",
+  "raw_text": "Starbucks China Managed Offers bounties $50 minimum bounty Starbucks believes in a program that fosters collaboration among security professionals to help protect our systems and customers\u2019 personal information from malicious activity and to help set security policies across our organization. We value the...",
+  "severity": "INFO",
+  "sha256_hash": "64a22dbbd0dfe47019eef30b70cae407996c7a9d35f656ccc26e42d1d6c6da23",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/starbucks_china"
+}

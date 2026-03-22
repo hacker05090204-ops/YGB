@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.230074+00:00",
+  "lang": "en",
+  "raw_text": "Mapbox Managed Offers bounties $200 minimum bounty Mapbox appreciates the effort of software security researchers who work to make the Internet more secure. Our security vulnerability bounty system exists to reward the work of security researchers who find issues with our software and web services...",
+  "severity": "INFO",
+  "sha256_hash": "77d217076d9052ba60eb5a6bc5fed6f99fccd64f2cf27a0b3feb501be98c13de",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/mapbox"
+}

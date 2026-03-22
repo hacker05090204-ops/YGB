@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.850353+00:00",
+  "lang": "en",
+  "raw_text": "Automattic Offers bounties Automattic runs WordPress.com (https://wordpress.com/), Jetpack (https://jetpack.com/), WordPress VIP (https://wpvip.com/), Beeper (https://beeper.com), Texts (https://texts.com/), Akismet (https://akismet.com/), Gravatar (https://gravatar.com/),...",
+  "severity": "INFO",
+  "sha256_hash": "2f643bd7d90519a3c619d5fdecb3134286744853a16851c1e71661dfedd7056a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 20,
+  "url": "https://hackerone.com/automattic"
+}

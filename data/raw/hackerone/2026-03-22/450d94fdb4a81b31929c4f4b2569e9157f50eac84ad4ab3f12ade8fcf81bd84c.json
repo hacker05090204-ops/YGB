@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.970977+00:00",
+  "lang": "en",
+  "raw_text": "curl Offers bounties $50 minimum bounty No technology is perfect, and curl believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. If you believe you've found a security issue in our products, we encourage you to...",
+  "severity": "INFO",
+  "sha256_hash": "450d94fdb4a81b31929c4f4b2569e9157f50eac84ad4ab3f12ade8fcf81bd84c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/curl"
+}

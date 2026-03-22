@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.919571+00:00",
+  "lang": "en",
+  "raw_text": "Check Point Software Technologies Report a Potential Security Issue Check Point is committed to the security of its products. The security response team in Check Point is dedicated to respond to potential security problems and to make sure reports on such issues are handled properly...",
+  "severity": "INFO",
+  "sha256_hash": "9f1a7431fe839b7b8fd971f0b02bb20c4307ce8e67b85c94f2b342bc2ce1579c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/checkpointsw"
+}

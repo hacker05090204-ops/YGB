@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.989258+00:00",
+  "lang": "en",
+  "raw_text": "DoorDash Managed Offers bounties $50 minimum bounty DoorDash welcomes the contributions of security researchers to help keep our consumers, Dashers, and merchants safe. Our Bug Bounty Program focuses on identifying vulnerabilities that could meaningfully impact the confidentiality, integrity, or...",
+  "severity": "INFO",
+  "sha256_hash": "4e3a0ede99f9af7d2c3ceb5695ec811ec8ae9a2d1f0a46923cc84b81ab5a6404",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/doordash"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-32935",
+  "ingested_at": "2026-03-22T09:56:22.404727+00:00",
+  "lang": "en",
+  "raw_text": "phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack ### Impact Those using AES in CBC mode may be susceptible to a padding oracle timing attack. ### Patches https://github.com/phpseclib/phpseclib/commit/ccc21aef71eb170e9bf819b167e67d1fd9e6e788 ### Workarounds Use AES in CTR, CFB or OFB modes",
+  "severity": "HIGH",
+  "sha256_hash": "ee5a584e744bb22fb5fc64cf27e085f4a0287ed4fbfcf52d8129edc04b2badd6",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-208"
+  ],
+  "token_count": 39,
+  "url": "https://github.com/advisories/GHSA-94g3-g5v7-q4jg"
+}

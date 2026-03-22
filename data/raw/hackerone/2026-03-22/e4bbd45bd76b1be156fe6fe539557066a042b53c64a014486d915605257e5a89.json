@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.247327+00:00",
+  "lang": "en",
+  "raw_text": "MercadoLibre Managed Offers bounties $100 minimum bounty Table of Contents Current Active Challenge (#user-content-current-active-challenge) Rewards (#user-content-rewards) Loyalty And Gamification (#user-content-loyalty-and-gamification) Response Times (#user-content-response-times) Testing (#user...",
+  "severity": "INFO",
+  "sha256_hash": "e4bbd45bd76b1be156fe6fe539557066a042b53c64a014486d915605257e5a89",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 25,
+  "url": "https://hackerone.com/mercadolibre"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.651617+00:00",
+  "lang": "en",
+  "raw_text": "YNAB Download YNAB to get good with money and never worry about it again.",
+  "severity": "INFO",
+  "sha256_hash": "68562a0be1f55f391f71ec53732cff9a20bf261091647f0a581ffd856083bd55",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 14,
+  "url": "https://bugcrowd.com/engagements/ynab"
+}

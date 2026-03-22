@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.910027+00:00",
+  "lang": "en",
+  "raw_text": "CARD.com CARD.com creates Fair, Fashionable and Fun online prepaid card solutions. Inelegible targets The following are specifically excluded from scope and should not be tested: 3rd party tools used by by CARD.com 3rd party service providers to CARD.com...",
+  "severity": "INFO",
+  "sha256_hash": "b6236b22e0f90c608b6a4ef1802a1b8122a9cc6114f40c2e3ff03daeae61d504",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/card"
+}

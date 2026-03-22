@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.285510+00:00",
+  "lang": "en",
+  "raw_text": "Netflix Managed Offers bounties $50 minimum bounty Netflix Program Policy Netflix\u2019s goal is to deliver joy to our members around the world, and it is the security team's job to keep our members, partners, and employees secure. We have been engaging with the security community to achieve this goal...",
+  "severity": "INFO",
+  "sha256_hash": "d114aae40c8b0b546d9e461871d3060ac0266eac9b8a13ab258d33ae6c8de810",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/netflix"
+}

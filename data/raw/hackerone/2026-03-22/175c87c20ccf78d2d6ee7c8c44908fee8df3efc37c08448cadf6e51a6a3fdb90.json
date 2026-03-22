@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.275503+00:00",
+  "lang": "en",
+  "raw_text": "NBA Public Bug Bounty Managed Offers bounties $50 minimum bounty Purpose (#user-content-purpose) Scope (#user-content-scope) Rules of Engagement (#user-content-rules-of-engagement) In-Scope Vulnerabilities (#user-content-in-scope-vulnerabilities) Out of Scope Vulnerabilities (#user-content-out-of-scope...",
+  "severity": "INFO",
+  "sha256_hash": "175c87c20ccf78d2d6ee7c8c44908fee8df3efc37c08448cadf6e51a6a3fdb90",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 26,
+  "url": "https://hackerone.com/nba-public"
+}

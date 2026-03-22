@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.500133+00:00",
+  "lang": "en",
+  "raw_text": "Starbucks Japan Managed Offers bounties $50 minimum bounty Starbucks believes in a program that fosters collaboration among security professionals to help protect our systems and customers\u2019 personal information from malicious activity and to help set security policies across our organization. We value the...",
+  "severity": "INFO",
+  "sha256_hash": "2c3bce2ef1d414ea2b3cf30174f720af96e1b00e0d4adebd6c018fa2aac7a28c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/starbucks_japan"
+}

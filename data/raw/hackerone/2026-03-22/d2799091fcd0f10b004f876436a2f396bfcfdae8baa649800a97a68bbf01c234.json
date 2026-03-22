@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.262503+00:00",
+  "lang": "en",
+  "raw_text": "MoonPay Offers bounties $50 minimum bounty MoonPay Bug Bounty Program At MoonPay, we are committed to maintaining the security and privacy of our products and customers. We believe that working with the security research community through our bug bounty program is a crucial part of our...",
+  "severity": "INFO",
+  "sha256_hash": "d2799091fcd0f10b004f876436a2f396bfcfdae8baa649800a97a68bbf01c234",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/moonpay"
+}

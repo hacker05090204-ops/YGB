@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.821262+00:00",
+  "lang": "en",
+  "raw_text": "ALSCO Offers bounties $50 minimum bounty ALSCO Promise ALSCO looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Secure Gateway Promise At ALSCO, we are committed to partnering with the security community to...",
+  "severity": "INFO",
+  "sha256_hash": "a44832c031df255a79d4f6a2d6790331babc35b3a5e35d4fc030574c35c193a3",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/alsco"
+}

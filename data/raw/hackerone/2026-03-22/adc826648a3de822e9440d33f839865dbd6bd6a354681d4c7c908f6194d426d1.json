@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.495972+00:00",
+  "lang": "en",
+  "raw_text": "Starbucks Managed Offers bounties $100 minimum bounty Starbucks believes in a program that fosters collaboration among security professionals to help protect our systems and customers\u2019 personal information from malicious activity and to help set security policies across our organization. We value the...",
+  "severity": "INFO",
+  "sha256_hash": "adc826648a3de822e9440d33f839865dbd6bd6a354681d4c7c908f6194d426d1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/starbucks"
+}

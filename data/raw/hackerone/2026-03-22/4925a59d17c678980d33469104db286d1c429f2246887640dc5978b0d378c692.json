@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.108855+00:00",
+  "lang": "en",
+  "raw_text": "Hilton Managed Offers bounties $50 minimum bounty Introduction At Hilton, our mission is to provide the light and warmth of hospitality to the world, by delivering an exceptional, safe, and reliable customer experience. In pursuit of this mission, we are partnering with HackerOne and the security...",
+  "severity": "INFO",
+  "sha256_hash": "4925a59d17c678980d33469104db286d1c429f2246887640dc5978b0d378c692",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/hilton"
+}

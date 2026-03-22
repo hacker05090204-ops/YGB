@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.255502+00:00",
+  "lang": "en",
+  "raw_text": "Modern Treasury Managed Offers bounties $50 minimum bounty Modern Treasury Bug Bounty Policy Modern Treasury looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. This policy (\u201cPolicy\u201d) governs your participation in our bug bounty...",
+  "severity": "INFO",
+  "sha256_hash": "9cba3813055fd86ad347d4db512ba8c874d87713a0cc29231d71c7930eaa43df",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/modern_treasury"
+}

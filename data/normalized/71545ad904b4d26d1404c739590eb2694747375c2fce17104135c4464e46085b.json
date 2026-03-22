@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ruby JSON has a format string injection vulnerability ### Impact A format string injection vulnerability than that lead to denial of service attacks or information disclosure, when the `allow_duplicate_key: false` parsing option is used to parse user supplied documents. This option isn't the default, if you didn't opt-in to use it, you are not impacted. ### Patches Patched in `2.19.2`. ### Workarounds The issue can be avoided by not using the `allow_duplicate_key: false` parsing option.",
+  "token_count": 75
+}

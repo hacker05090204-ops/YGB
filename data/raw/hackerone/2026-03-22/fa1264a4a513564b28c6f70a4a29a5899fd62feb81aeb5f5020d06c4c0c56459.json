@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.610941+00:00",
+  "lang": "en",
+  "raw_text": "Verily Life Sciences Managed Offers bounties $50 minimum bounty Disclosure Policy Please do not discuss any vulnerabilities (even resolved ones) outside of the program without express consent from the organization. Follow HackerOne's disclosure guidelines (https://www.hackerone.com/disclosure-guidelines)...",
+  "severity": "INFO",
+  "sha256_hash": "fa1264a4a513564b28c6f70a4a29a5899fd62feb81aeb5f5020d06c4c0c56459",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 35,
+  "url": "https://hackerone.com/verily_life_sciences"
+}

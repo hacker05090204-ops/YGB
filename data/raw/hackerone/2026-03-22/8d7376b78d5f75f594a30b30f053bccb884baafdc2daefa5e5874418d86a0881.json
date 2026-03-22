@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.664508+00:00",
+  "lang": "en",
+  "raw_text": "YouTube This application is covered under the Google Vulnerability Reward Program \u2013 read more @google.",
+  "severity": "INFO",
+  "sha256_hash": "8d7376b78d5f75f594a30b30f053bccb884baafdc2daefa5e5874418d86a0881",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 15,
+  "url": "https://hackerone.com/youtube"
+}

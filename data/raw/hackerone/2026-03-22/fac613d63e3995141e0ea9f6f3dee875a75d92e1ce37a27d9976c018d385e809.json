@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.889424+00:00",
+  "lang": "en",
+  "raw_text": "Braze, Inc. Managed Offers bounties $50 minimum bounty Quick summary Test only the three bug-bounty-.braze-dev.com hosts listed below \u2014 all other Braze domains are out of scope No automated scanners, DoS, or large-scale discovery scans Use one test-account pattern: h1-username[+N]@wearehackerone.com...",
+  "severity": "INFO",
+  "sha256_hash": "fac613d63e3995141e0ea9f6f3dee875a75d92e1ce37a27d9976c018d385e809",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/braze_inc"
+}

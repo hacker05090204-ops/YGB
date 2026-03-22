@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "langflow: /profile_pictures/{folder_name}/{file_name} endpoint file reading ### Summary In the download_profile_picture function of the /profile_pictures/{folder_name}/{file_name} endpoint, the folder_name and file_name parameters are not strictly filtered, which allows the secret_key to be read across directories. ### Details src/backend/base/langflow/api/v1/files.py ![image](https://github.com/user-attachments/assets/19bc387c-93d8-475b-bab0-2675669c1c36) storage local get_file, directly concatenate flow_id and file_name ![image](https://github.com/user-attachments/assets/daf47b73-6e1b-414e-bb8b-66b67cf5a9e9) ### PoC ```curl --path-as-is 'http://127.0.0.1:7860/api/v1/files/profile_pictures/../secret_key' ``` ```QNuonm***********``` ### Impact secret_key is used for jwt authentication. Attackers can forge authentication tokens and log into the system.",
+  "token_count": 71
+}

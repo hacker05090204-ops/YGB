@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.332874+00:00",
+  "lang": "en",
+  "raw_text": "Palantir Public Offers bounties $50 minimum bounty If you've identified a potential security flaw in our infrastructure or software, please let us know within 24 hours. Prior to reporting, please review the following information including our responsible disclosure policy, scope, reward information,...",
+  "severity": "INFO",
+  "sha256_hash": "b86607c46e337a6727ffc6eff457a87576d372a94b7cc146039405d561aeca51",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/palantir_public"
+}

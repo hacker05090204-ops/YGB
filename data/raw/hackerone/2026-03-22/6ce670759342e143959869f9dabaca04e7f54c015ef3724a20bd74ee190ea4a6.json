@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.657508+00:00",
+  "lang": "en",
+  "raw_text": "Yammer Yammer is participating in the Microsoft Online Services Bug Bounty (http://blogs.office.com/2014/09/23/microsoft-online-services-bug-bounty-program-launches-office-365/), which allows thousands of security researchers to test Yammer and help make...",
+  "severity": "INFO",
+  "sha256_hash": "6ce670759342e143959869f9dabaca04e7f54c015ef3724a20bd74ee190ea4a6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 24,
+  "url": "https://hackerone.com/yammer"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.066548+00:00",
+  "lang": "en",
+  "raw_text": "Front Managed Offers bounties $100 minimum bounty Front is a customer operations platform used by over 8,000 teams to streamline communication. It combines the efficiency of a help desk and the familiarity of email so teams can deliver exceptional service at scale. See here (https://front.com...",
+  "severity": "INFO",
+  "sha256_hash": "a5dfe5717eb55710e55d5bdc17585a5dea55501ae13afc7b8db0b88f8ba7cb40",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/fronthq"
+}

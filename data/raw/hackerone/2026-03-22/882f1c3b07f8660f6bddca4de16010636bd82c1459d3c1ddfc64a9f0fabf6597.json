@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.428402+00:00",
+  "lang": "en",
+  "raw_text": "Ruby Offers bounties $500 minimum bounty Scope This bounty program is for security issues in the Ruby programming language, neither websites (including *.ruby-lang.org) nor third party applications nor processing Ruby code with RDoc. Please submit issues that are regarding the Ruby...",
+  "severity": "INFO",
+  "sha256_hash": "882f1c3b07f8660f6bddca4de16010636bd82c1459d3c1ddfc64a9f0fabf6597",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/ruby"
+}

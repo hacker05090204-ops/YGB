@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.790178+00:00",
+  "lang": "en",
+  "raw_text": "3CX Managed Offers bounties $50 minimum bounty Who we are 3CX is a global leader in business communications, being used by more than 350,000 companies around the world. Taking advantage of the SIP open-standard and WebRTC technology, 3CX has evolved from its roots as a PBX phone system to a...",
+  "severity": "INFO",
+  "sha256_hash": "cc36c749032cc206ec37f5976836bef778ba3157eaebb2a5490ca3473c5f93c6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/3cx"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.485950+00:00",
+  "lang": "en",
+  "raw_text": "Sofi Introduction Welcome to SoFi\u2019s Bug Bounty Program! Our commitment to security means we value the independent security research community's contribution. SoFi\u2019s bug bounty program is private and invite-only and requires SoFi\u2019s Security Team to review...",
+  "severity": "INFO",
+  "sha256_hash": "00c8ec6d56c7e1bb8c22f913b229f05608814110065b11603186fa80fa0fa510",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/sofi-1"
+}

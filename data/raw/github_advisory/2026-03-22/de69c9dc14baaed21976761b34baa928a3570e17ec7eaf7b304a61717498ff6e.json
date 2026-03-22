@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.529249+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: Signal group allowlist authorization bypass via DM pairing-store leakage ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-wm8r-w8pf-2v6w. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.26 contain an authorization bypass vulnerability where Signal group allowlist policy incorrectly accepts sender identities from DM pairing-store approvals. Attackers can exploit this boundary weakness by obtaining DM pairing approval to bypass group allowlist checks and gain unauthorized group access.",
+  "severity": "LOW",
+  "sha256_hash": "de69c9dc14baaed21976761b34baa928a3570e17ec7eaf7b304a61717498ff6e",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-863"
+  ],
+  "token_count": 81,
+  "url": "https://github.com/advisories/GHSA-r849-826x-wgqm"
+}

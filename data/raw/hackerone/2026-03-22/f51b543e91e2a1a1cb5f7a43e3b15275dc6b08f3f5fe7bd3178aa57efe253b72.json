@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.835263+00:00",
+  "lang": "en",
+  "raw_text": "Arkose Labs Managed Offers bounties $50 minimum bounty At Arkose Labs, we take cybersecurity seriously and appreciate the valuable contributions from the wider security community. We encourage security research individuals to test our security, and we offer rewards for valid reported vulnerabilities...",
+  "severity": "INFO",
+  "sha256_hash": "f51b543e91e2a1a1cb5f7a43e3b15275dc6b08f3f5fe7bd3178aa57efe253b72",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/arkose_labs"
+}

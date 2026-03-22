@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.029089+00:00",
+  "lang": "en",
+  "raw_text": "Eutelsat Eutelsat Group (OneWeb) looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. As a global Hybrid Satellite Network communications company powered from both Low Earth Orbit ...",
+  "severity": "INFO",
+  "sha256_hash": "2efe8a101bce50b2e5a55b9028a74d2c1280e5190f74fc3c103965c3d24b163c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/eutelsat-bbp"
+}

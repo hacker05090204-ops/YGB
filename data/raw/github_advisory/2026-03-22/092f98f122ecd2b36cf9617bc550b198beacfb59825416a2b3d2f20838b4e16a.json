@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-26931",
+  "ingested_at": "2026-03-22T09:56:16.102035+00:00",
+  "lang": "en",
+  "raw_text": "Metricbeat Allocates Memory with Excessive Size Value Leading to Denial of Service Memory Allocation with Excessive Size Value (CWE-789) in the Prometheus remote_write HTTP handler in Metricbeat can lead Denial of Service via Excessive Allocation (CAPEC-130).",
+  "severity": "MEDIUM",
+  "sha256_hash": "092f98f122ecd2b36cf9617bc550b198beacfb59825416a2b3d2f20838b4e16a",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-789"
+  ],
+  "token_count": 36,
+  "url": "https://github.com/advisories/GHSA-5vrw-qjxw-89r5"
+}

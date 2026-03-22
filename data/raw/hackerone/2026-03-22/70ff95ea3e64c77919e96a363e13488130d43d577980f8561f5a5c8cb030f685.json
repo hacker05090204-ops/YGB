@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.106854+00:00",
+  "lang": "en",
+  "raw_text": "Highrise HQ We are currently running a limited, invite-only bug-bounty program at HackerOne for all Basecamp products, which includes *.highrisehq.com. If you would like to submit a severe issue in the mean time outside of the bounty program, please contact us...",
+  "severity": "INFO",
+  "sha256_hash": "70ff95ea3e64c77919e96a363e13488130d43d577980f8561f5a5c8cb030f685",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/highrise_hq"
+}

@@ -21,6 +21,7 @@ from typing import Any, Dict
 
 from fastapi import APIRouter, Depends
 
+from backend.api.system_status_store import refresh_system_status_file
 from backend.auth.auth_guard import require_auth
 
 logger = logging.getLogger("ygb.api.system_status")
@@ -99,6 +100,7 @@ async def aggregated_system_status(user=Depends(require_auth)):
     training = _safe_call("training", _get_training_state)
     voice = _safe_call("voice", _get_voice_status)
     storage = _safe_call("storage", _get_storage_health)
+    canonical = _safe_call("canonical_status", refresh_system_status_file)
 
     # Determine overall status
     is_ready = readiness.get("ready", False) if isinstance(readiness, dict) else False
@@ -123,4 +125,11 @@ async def aggregated_system_status(user=Depends(require_auth)):
             "voice": voice,
         },
         "metrics": metrics,
+        "canonical_status": canonical,
     }
+
+
+@system_status_router.get("/api/status")
+async def canonical_system_status(user=Depends(require_auth)):
+    """Return the canonical system status file and refresh it first."""
+    return refresh_system_status_file()

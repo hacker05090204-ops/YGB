@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.010572+00:00",
+  "lang": "en",
+  "raw_text": "Elisa About Elisa bug bounty program Elisa is a telecommunications, ICT and online service company serving 2.3 million consumer, corporate and public administration organisation customers. In Finland, Elisa is the market leader in its field. Customer...",
+  "severity": "INFO",
+  "sha256_hash": "7c95f3251a9a90c184aefc5f234a732ae22d1e7377c3c5114d2e02614e7793d6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/elisa"
+}

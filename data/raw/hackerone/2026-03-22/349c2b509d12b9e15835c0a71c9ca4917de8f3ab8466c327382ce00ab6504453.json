@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.324875+00:00",
+  "lang": "en",
+  "raw_text": "OPPO Managed Offers bounties $10 minimum bounty OPPO\u2019s commitment to global researcher collaboration significantly enhances product security. We welcome hackers worldwide to submit security vulnerability reports related to OPPO services. Your contributions will help enhance the security of OPPO...",
+  "severity": "INFO",
+  "sha256_hash": "349c2b509d12b9e15835c0a71c9ca4917de8f3ab8466c327382ce00ab6504453",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/oppo_bbp"
+}

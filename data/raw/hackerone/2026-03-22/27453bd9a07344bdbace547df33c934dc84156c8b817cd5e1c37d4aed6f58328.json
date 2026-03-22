@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.182031+00:00",
+  "lang": "en",
+  "raw_text": "Krisp Offers bounties $50 minimum bounty Krisp looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Response Targets Krisp will make a best effort to meet the following SLAs for hackers participating in our program...",
+  "severity": "INFO",
+  "sha256_hash": "27453bd9a07344bdbace547df33c934dc84156c8b817cd5e1c37d4aed6f58328",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/krisp"
+}

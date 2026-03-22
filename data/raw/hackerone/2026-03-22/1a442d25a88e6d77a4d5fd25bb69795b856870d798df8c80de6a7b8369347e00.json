@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.304512+00:00",
+  "lang": "en",
+  "raw_text": "Notion Labs, Inc. Managed Offers bounties $50 minimum bounty Notion Labs, Inc. looks forward to working with the security community to find security vulnerabilities in order to keep our businesses and customers safe. Response Targets Notion Labs, Inc. will make a best effort to meet the following response...",
+  "severity": "INFO",
+  "sha256_hash": "1a442d25a88e6d77a4d5fd25bb69795b856870d798df8c80de6a7b8369347e00",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/notion"
+}

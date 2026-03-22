@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.858865+00:00",
+  "lang": "en",
+  "raw_text": "Barracuda Networks Please visit https://bugcrowd.com/barracuda for the complete bounty brief",
+  "severity": "INFO",
+  "sha256_hash": "7dcb922724608465f1f268bad645ad179c915714fef4b3a6cd164e15402e914e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 10,
+  "url": "https://hackerone.com/barracuda"
+}

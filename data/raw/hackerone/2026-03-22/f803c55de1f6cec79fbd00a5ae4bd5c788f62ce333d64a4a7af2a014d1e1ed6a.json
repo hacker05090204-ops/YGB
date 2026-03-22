@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.654517+00:00",
+  "lang": "en",
+  "raw_text": "XVIDEOS Managed Offers bounties $50 minimum bounty Xvideos looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. While we are doing our best to keep Xvideos services as safe as possible, we know that some bugs can slip...",
+  "severity": "INFO",
+  "sha256_hash": "f803c55de1f6cec79fbd00a5ae4bd5c788f62ce333d64a4a7af2a014d1e1ed6a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/xvideos"
+}

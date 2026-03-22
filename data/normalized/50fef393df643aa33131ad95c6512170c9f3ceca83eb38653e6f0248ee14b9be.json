@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ory Oathkeeper has an authentication bypass by cache key confusion ## Description Ory Oathkeeper is vulnerable to authentication bypass due to cache key confusion. The `oauth2_introspection` authenticator cache does not distinguish tokens that were validated with different introspection URLs. An attacker can therefore legitimately use a token to prime the cache, and subsequently use the same token for rules that use a different introspection server. ## Preconditions Ory Oathkeeper has to be configured with multiple `oauth2_introspection` authenticator servers, each accepting different tokens. The authenticators also must be [configured to use caching](https://www.ory.com/docs/oathkeeper/pipeline/authn#oauth2_introspection-configuration). An attacker has to have a way to gain a valid token for one of the configured introspection servers. ## Mitigation Ory Oathkeeper now includes the introspection server URL in the cache key, preventing confusion of tokens. Update to the patched version of Ory Oathkeeper. If that is not immediately possible, disable caching for `oauth2_introspection` authenticators.",
+  "token_count": 147
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.094802+00:00",
+  "lang": "en",
+  "raw_text": "Google Google Vulnerability Reward Program (VRP) We have long enjoyed a close relationship with the security research community. To honor all the cutting-edge external contributions that help us keep our users safe, we maintain a Vulnerability Reward...",
+  "severity": "INFO",
+  "sha256_hash": "83fee03bf3b3196ce369e2083b6cc4a06e2686642981ba6c7c881546a90d153e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/google"
+}

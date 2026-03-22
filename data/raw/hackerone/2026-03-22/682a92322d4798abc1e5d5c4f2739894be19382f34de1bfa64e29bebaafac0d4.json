@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.167574+00:00",
+  "lang": "en",
+  "raw_text": "KFC Responsible Disclosure Policy: This page is for security researchers interested in reporting application security vulnerabilities. If you have reported an issue determined to be within program scope, is determined to be a valid security issue, and...",
+  "severity": "INFO",
+  "sha256_hash": "682a92322d4798abc1e5d5c4f2739894be19382f34de1bfa64e29bebaafac0d4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/kfc"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.514883+00:00",
+  "lang": "en",
+  "raw_text": "Superhuman (formerly Grammarly) Managed Offers bounties $100 minimum bounty \ud83d\udee1\ufe0f Superhuman (formerly Grammarly) Bug Bounty Program Welcome, Hackers \ud83d\udc4b We\u2019ve merged the Grammarly and Coda programs into a single unified program \u2014 Superhuman (formerly Grammarly). We\u2019re excited to continue working with the security community...",
+  "severity": "INFO",
+  "sha256_hash": "b8218a2e2a7c3aebf64d7adb8b1f46e534a5a04ff33bad142343fd4a15bdd1fd",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/superhuman"
+}

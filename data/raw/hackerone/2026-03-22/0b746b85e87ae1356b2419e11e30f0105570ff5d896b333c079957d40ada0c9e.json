@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.983257+00:00",
+  "lang": "en",
+  "raw_text": "Deutsche Telekom Within the Deutsche Telekom Bug Bounty initiative, only weaknesses in web portals of the telekom.de domain including subdomains are relevant. Further notifications are, of course, welcome at any time, but are excluded from the reward program. The...",
+  "severity": "INFO",
+  "sha256_hash": "0b746b85e87ae1356b2419e11e30f0105570ff5d896b333c079957d40ada0c9e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/deutschetelekom"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.169562+00:00",
+  "lang": "en",
+  "raw_text": "KHealth Managed Offers bounties $100 minimum bounty About Us K Health [Inc.]\u2019s (\u201cK Health\u201d, \u201cwe\u201d, \u201cus\u201d or \u201cour\u201d) mission is to use the power of shared knowledge to provide everyone with access to better, more affordable healthcare. We offer our users healthcare information based on the similar health...",
+  "severity": "INFO",
+  "sha256_hash": "b14e86fba05db05dd1cd2f85a253ec0f31955615d7efd3603cb6377d431102b8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/khealth"
+}

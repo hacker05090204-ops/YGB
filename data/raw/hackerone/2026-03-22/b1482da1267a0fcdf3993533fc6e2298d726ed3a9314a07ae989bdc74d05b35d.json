@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.562974+00:00",
+  "lang": "en",
+  "raw_text": "TripAdvisor Testing ...",
+  "severity": "INFO",
+  "sha256_hash": "b1482da1267a0fcdf3993533fc6e2298d726ed3a9314a07ae989bdc74d05b35d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 3,
+  "url": "https://hackerone.com/tripadvisor"
+}

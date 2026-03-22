@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.157925+00:00",
+  "lang": "en",
+  "raw_text": "Instructure TELL US ABOUT A SECURITY ISSUE. Email us about vulnerabilities at security@instructure.com. (If you want, you can use our public key (http://www.canvaslms.com/downloads/security@instructure.asc).) Or participate in our bug bounty via Bugcrowd (https...",
+  "severity": "INFO",
+  "sha256_hash": "d39b449d815337ae28f2044c9959659913b32b7cb5087fb07dab1059529f89a4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 32,
+  "url": "https://hackerone.com/instructure"
+}

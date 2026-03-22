@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22733",
+  "ingested_at": "2026-03-22T09:56:16.006847+00:00",
+  "lang": "en",
+  "raw_text": "Spring Boot has an Authentication Bypass under Actuator CloudFoundry endpoints Spring Boot applications with Actuator can be vulnerable to an \"Authentication Bypass\" vulnerability when an application endpoint that requires authentication is declared under the path used by the CloudFoundry Actuator endpoints. This issue affects Spring Security: from 4.0.0 through 4.0.3, from 3.5.0 through 3.5.11, from 3.4.0 through 3.4.14, from 3.3.0 through 3.3.17, from 2.7.0 through 2.7.31.",
+  "severity": "HIGH",
+  "sha256_hash": "0f1a23ddce9006cde82772924b415d878527db93028137fec09fb8d245a380c4",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-288"
+  ],
+  "token_count": 66,
+  "url": "https://github.com/advisories/GHSA-mgvc-8q2h-5pgc"
+}

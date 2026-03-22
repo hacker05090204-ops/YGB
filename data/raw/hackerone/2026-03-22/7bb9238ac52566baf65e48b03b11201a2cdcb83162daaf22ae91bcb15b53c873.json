@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.283504+00:00",
+  "lang": "en",
+  "raw_text": "Nest If you\u2019re a security researcher and think you\u2019ve found a security vulnerability, we want to hear about it right away. We ask that you give us a reasonable amount of time to respond to your report before making any information public. Please don\u2019t...",
+  "severity": "INFO",
+  "sha256_hash": "7bb9238ac52566baf65e48b03b11201a2cdcb83162daaf22ae91bcb15b53c873",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/nest"
+}

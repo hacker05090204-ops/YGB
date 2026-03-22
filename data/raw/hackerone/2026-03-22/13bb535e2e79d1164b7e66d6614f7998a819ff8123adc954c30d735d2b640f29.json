@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.470905+00:00",
+  "lang": "en",
+  "raw_text": "SIX Group Private SIX operates the infrastructure for the financial centers in Switzerland and Spain, thus ensuring the flow of information and money between financial market players. SIX offers exchange services, financial information and banking services with the...",
+  "severity": "INFO",
+  "sha256_hash": "13bb535e2e79d1164b7e66d6614f7998a819ff8123adc954c30d735d2b640f29",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/six-group-private"
+}

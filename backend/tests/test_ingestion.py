@@ -59,7 +59,7 @@ class FakeSession:
 
 
 class FakeClientSession:
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         self.entered = False
 
     async def __aenter__(self):
@@ -225,7 +225,10 @@ async def test_nvd_adapter_includes_pub_end_date(monkeypatch):
         return {"totalResults": 0, "resultsPerPage": 1, "vulnerabilities": []}
 
     monkeypatch.setattr(adapter, "_get", fake_get)
-    monkeypatch.setattr("backend.ingestion.adapters.nvd.aiohttp.ClientSession", lambda: FakeClientSession())
+    monkeypatch.setattr(
+        "backend.ingestion.adapters.nvd.aiohttp.ClientSession",
+        lambda *args, **kwargs: FakeClientSession(*args, **kwargs),
+    )
 
     await adapter.fetch()
 
@@ -286,54 +289,57 @@ async def test_base_adapter_decode_plain_text(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_hackerone_adapter_pagination(monkeypatch):
+async def test_hackerone_adapter_parses_directory_html(monkeypatch):
     adapter = HackerOneAdapter(asyncio.Semaphore(10), AsyncLimiter(2, 1))
     client = FakeClientSession()
-    payloads = [
-        {
-            "data": {
-                "opportunities": {
-                    "nodes": [{"title": "One", "description": "Desc", "severity": {"rating": "high"}, "url": "https://h1/1"}],
-                    "pageInfo": {"hasNextPage": True, "endCursor": "abc"},
-                }
-            }
-        },
-        {
-            "data": {
-                "opportunities": {
-                    "nodes": [{"title": "Two", "description": "More", "severity": {"rating": "low"}, "url": "https://h1/2"}],
-                    "pageInfo": {"hasNextPage": False, "endCursor": None},
-                }
-            }
-        },
-    ]
-    monkeypatch.setattr("backend.ingestion.adapters.hackerone.aiohttp.ClientSession", lambda: client)
-    monkeypatch.setattr(adapter, "_get", AsyncMock(side_effect=payloads))
-    samples = await adapter.fetch()
-
-    assert client.entered is True
-    assert [sample.severity for sample in samples] == ["HIGH", "LOW"]
-
-
-@pytest.mark.asyncio
-async def test_hackerone_adapter_skips_empty_and_caps(monkeypatch):
-    adapter = HackerOneAdapter(asyncio.Semaphore(10), AsyncLimiter(2, 1))
-    client = FakeClientSession()
-    payload = {
-        "data": {
-            "opportunities": {
-                "nodes": [{"title": "", "description": "", "severity": {"rating": "high"}, "url": "https://h1/empty"}]
-                + [{"title": f"Title {index}", "description": "Desc", "severity": {"rating": "medium"}, "url": f"https://h1/{index}"} for index in range(1001)],
-                "pageInfo": {"hasNextPage": True, "endCursor": "unused"},
-            }
-        }
-    }
-    monkeypatch.setattr("backend.ingestion.adapters.hackerone.aiohttp.ClientSession", lambda: client)
+    payload = """
+    <html><body>
+      <a href="https://hackerone.com/program-one" data-item-name="Program One" class="bug-bounty-list-item">
+        <span class="bug-bounty-list-item-meta-item">Public</span>
+        <div class="bug-bounty-list-item-policy">Find real bugs fast</div>
+      </a>
+      <a href="https://hackerone.com/program-two" data-item-name="Program Two" class="bug-bounty-list-item">
+        <span class="bug-bounty-list-item-meta-item">Private</span>
+        <div class="bug-bounty-list-item-policy">Second policy summary</div>
+      </a>
+    </body></html>
+    """
+    monkeypatch.setattr("backend.ingestion.adapters.hackerone.aiohttp.ClientSession", lambda *args, **kwargs: client)
     monkeypatch.setattr(adapter, "_get", AsyncMock(return_value=payload))
     samples = await adapter.fetch()
 
-    assert len(samples) == 1000
-    assert all(sample.raw_text for sample in samples)
+    assert client.entered is True
+    assert len(samples) == 2
+    assert samples[0].url == "https://hackerone.com/program-one"
+    assert all(sample.severity == "INFO" for sample in samples)
+
+
+@pytest.mark.asyncio
+async def test_hackerone_adapter_skips_short_and_duplicate_entries(monkeypatch):
+    adapter = HackerOneAdapter(asyncio.Semaphore(10), AsyncLimiter(2, 1))
+    client = FakeClientSession()
+    payload = """
+    <html><body>
+      <a href="https://hackerone.com/skip" data-item-name="Tiny" class="bug-bounty-list-item">
+        <div class="bug-bounty-list-item-policy">short</div>
+      </a>
+      <a href="https://hackerone.com/keep" data-item-name="Keep Me" class="bug-bounty-list-item">
+        <span class="bug-bounty-list-item-meta-item">Public</span>
+        <div class="bug-bounty-list-item-policy">A much longer policy description for ingestion</div>
+      </a>
+      <a href="https://hackerone.com/keep" data-item-name="Keep Me Again" class="bug-bounty-list-item">
+        <span class="bug-bounty-list-item-meta-item">Duplicate</span>
+        <div class="bug-bounty-list-item-policy">Duplicate URL should be dropped</div>
+      </a>
+    </body></html>
+    """
+    monkeypatch.setattr("backend.ingestion.adapters.hackerone.aiohttp.ClientSession", lambda *args, **kwargs: client)
+    monkeypatch.setattr(adapter, "_get", AsyncMock(return_value=payload))
+    samples = await adapter.fetch()
+
+    assert len(samples) == 1
+    assert samples[0].url == "https://hackerone.com/keep"
+    assert samples[0].raw_text
 
 
 @pytest.mark.asyncio
@@ -354,7 +360,7 @@ async def test_nvd_adapter_parsing(monkeypatch):
             }
         ],
     }
-    monkeypatch.setattr("backend.ingestion.adapters.nvd.aiohttp.ClientSession", lambda: client)
+    monkeypatch.setattr("backend.ingestion.adapters.nvd.aiohttp.ClientSession", lambda *args, **kwargs: client)
     monkeypatch.setattr(adapter, "_get", AsyncMock(return_value=payload))
     samples = await adapter.fetch()
 
@@ -375,7 +381,7 @@ async def test_nvd_adapter_empty_pages_and_blank_descriptions(monkeypatch):
         "resultsPerPage": 2000,
         "vulnerabilities": [{"cve": {"id": "CVE-EMPTY", "descriptions": [], "metrics": {}, "weaknesses": []}}],
     }
-    monkeypatch.setattr("backend.ingestion.adapters.nvd.aiohttp.ClientSession", lambda: client)
+    monkeypatch.setattr("backend.ingestion.adapters.nvd.aiohttp.ClientSession", lambda *args, **kwargs: client)
     monkeypatch.setattr(adapter, "_get", AsyncMock(side_effect=[empty_payload, blank_payload]))
     assert await adapter.fetch() == []
     assert await adapter.fetch() == []
@@ -400,7 +406,7 @@ async def test_github_advisory_adapter_link_pagination(monkeypatch):
         adapter._last_response_headers = {"Link": ""}
         return payloads[1]
 
-    monkeypatch.setattr("backend.ingestion.adapters.github_advisory.aiohttp.ClientSession", lambda: client)
+    monkeypatch.setattr("backend.ingestion.adapters.github_advisory.aiohttp.ClientSession", lambda *args, **kwargs: client)
     monkeypatch.setattr(adapter, "_get", fake_get)
     samples = await adapter.fetch()
 
@@ -417,7 +423,7 @@ async def test_cisa_kev_adapter(monkeypatch):
             {"vendorProject": "Vendor", "product": "Product", "shortDescription": "Desc", "cveID": "CVE-1"}
         ]
     }
-    monkeypatch.setattr("backend.ingestion.adapters.cisa_kev.aiohttp.ClientSession", lambda: client)
+    monkeypatch.setattr("backend.ingestion.adapters.cisa_kev.aiohttp.ClientSession", lambda *args, **kwargs: client)
     monkeypatch.setattr(adapter, "_get", AsyncMock(return_value=payload))
     samples = await adapter.fetch()
 
@@ -430,7 +436,7 @@ async def test_exploitdb_adapter(monkeypatch):
     adapter = ExploitDBAdapter(asyncio.Semaphore(10), AsyncLimiter(2, 1))
     client = FakeClientSession()
     csv_payload = 'id,description,verified,type,platform\n1,Remote exploit,1,remote,"linux,windows"\n2,Ignore me,0,local,linux\n3,,1,local,linux\n'
-    monkeypatch.setattr("backend.ingestion.adapters.exploitdb.aiohttp.ClientSession", lambda: client)
+    monkeypatch.setattr("backend.ingestion.adapters.exploitdb.aiohttp.ClientSession", lambda *args, **kwargs: client)
     monkeypatch.setattr(adapter, "_get", AsyncMock(return_value=csv_payload))
     samples = await adapter.fetch()
 
@@ -442,14 +448,13 @@ async def test_exploitdb_adapter(monkeypatch):
 async def test_bugcrowd_adapter(monkeypatch):
     adapter = BugcrowdAdapter(asyncio.Semaphore(10), AsyncLimiter(2, 1))
     client = FakeClientSession()
-    assert adapter._target_group_text({"target_groups": {"description": "Scope"}}) == "Scope"
     payload = {
-        "programs": [
-            {"name": "", "tagline": "", "program_url": "/skip", "target_groups": []},
-            {"name": "Program", "tagline": "Tag", "program_url": "/p/1", "target_groups": [{"description": "Scope"}]}
+        "engagements": [
+            {"name": "", "tagline": "", "briefUrl": "/skip"},
+            {"name": "Program", "tagline": "Tag", "briefUrl": "/p/1"}
         ]
     }
-    monkeypatch.setattr("backend.ingestion.adapters.bugcrowd.aiohttp.ClientSession", lambda: client)
+    monkeypatch.setattr("backend.ingestion.adapters.bugcrowd.aiohttp.ClientSession", lambda *args, **kwargs: client)
     monkeypatch.setattr(adapter, "_get", AsyncMock(return_value=payload))
     samples = await adapter.fetch()
 

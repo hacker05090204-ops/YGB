@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.318876+00:00",
+  "lang": "en",
+  "raw_text": "Olark Security at Olark We sincerely thank you for your help, and will happily offer a bounty for submissions of security bugs under the following criteria: The bug is an application vulnerability (database injection, XSS, session hijacking, remote code...",
+  "severity": "INFO",
+  "sha256_hash": "0d660fee2536ab16cce431c9957ef75c9f9f992a2eaab2261386c65ad0f6b02b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/olark"
+}

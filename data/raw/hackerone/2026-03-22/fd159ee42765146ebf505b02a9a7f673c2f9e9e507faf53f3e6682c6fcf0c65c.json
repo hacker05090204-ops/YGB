@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.782097+00:00",
+  "lang": "en",
+  "raw_text": "1Password - CTF Offers bounties $50 minimum bounty AgileBits/1Password introduced a $1 million CTF bug bounty challenge in 2022 to further our commitment to providing an industry-leading security platform for individuals, families, and businesses. Other Security Research Opportunities ==This program...",
+  "severity": "INFO",
+  "sha256_hash": "fd159ee42765146ebf505b02a9a7f673c2f9e9e507faf53f3e6682c6fcf0c65c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/1password_ctf"
+}

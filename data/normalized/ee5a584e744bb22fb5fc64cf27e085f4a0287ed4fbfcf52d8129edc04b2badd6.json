@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "phpseclib's AES-CBC unpadding susceptible to padding oracle timing attack ### Impact Those using AES in CBC mode may be susceptible to a padding oracle timing attack. ### Patches https://github.com/phpseclib/phpseclib/commit/ccc21aef71eb170e9bf819b167e67d1fd9e6e788 ### Workarounds Use AES in CTR, CFB or OFB modes",
+  "token_count": 39
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.025088+00:00",
+  "lang": "en",
+  "raw_text": "eufy Security Managed Offers bounties $50 minimum bounty ** We\u2019ve recently noticed new CVEs related to Node.js, Dify and n8n, which have already been identified and are being addressed internally. During this period, we\u2019re temporarily not accepting vulnerability reports related to these infrastructures,...",
+  "severity": "INFO",
+  "sha256_hash": "5eb8e6f37702e488832ea5c4fe120065d8a0bb2da06236f1976c9cf94f199e99",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/eufy_security"
+}

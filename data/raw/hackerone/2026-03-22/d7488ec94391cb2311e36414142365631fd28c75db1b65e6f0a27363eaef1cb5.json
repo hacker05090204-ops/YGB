@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.813260+00:00",
+  "lang": "en",
+  "raw_text": "Airlock Secure Access Hub Airlock Secure Access Hub protects more than 30,000 web applications worldwide. We have a private bug bounty program on HackerOne in which the security features of the Web Application Firewall (WAF) and Identity and Access Management (IAM) solution...",
+  "severity": "INFO",
+  "sha256_hash": "d7488ec94391cb2311e36414142365631fd28c75db1b65e6f0a27363eaef1cb5",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/airlock"
+}

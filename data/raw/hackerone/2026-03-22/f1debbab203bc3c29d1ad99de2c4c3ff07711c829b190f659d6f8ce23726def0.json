@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.903755+00:00",
+  "lang": "en",
+  "raw_text": "Bybit Fintech Ltd Managed Offers bounties $50 minimum bounty Introduction Bybit is a cryptocurrency exchange established in March 2018 to offer a professional platform where crypto traders can find an ultra-fast matching engine, excellent customer service and multilingual community support. The company...",
+  "severity": "INFO",
+  "sha256_hash": "f1debbab203bc3c29d1ad99de2c4c3ff07711c829b190f659d6f8ce23726def0",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/bybit_fintech"
+}

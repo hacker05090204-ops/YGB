@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.264507+00:00",
+  "lang": "en",
+  "raw_text": "Mozilla Managed Offers bounties $50 minimum bounty Table of Contents Program Scope Test Plan Submission Guidelines Program Rules Appeal Process Response Targets Disclosure Policy Safe Harbor Program Scope Please check the list of sites under the Scope section, we would like testing to focus on those...",
+  "severity": "INFO",
+  "sha256_hash": "ff4c69cf3f6f674cc1836263b2546bbe0a8dac9f8155e283ea9dc604589ba19f",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/mozilla"
+}

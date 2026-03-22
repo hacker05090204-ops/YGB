@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.142452+00:00",
+  "lang": "en",
+  "raw_text": "inDrive Offers bounties $50 minimum bounty Security is a top priority at inDrive. If you believe you've found a security bug in our in-scope applications or infrastructure, we are happy to work with you to resolve the issue promptly and ensure you are fairly rewarded for your discovery. Also...",
+  "severity": "INFO",
+  "sha256_hash": "ac0dc95a54ea18aa8337e6c2c19d16166a478ac4458d570c4f0554264366591a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/indrive"
+}

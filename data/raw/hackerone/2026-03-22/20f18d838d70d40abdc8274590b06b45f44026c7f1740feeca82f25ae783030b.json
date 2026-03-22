@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.161565+00:00",
+  "lang": "en",
+  "raw_text": "Internet Bug Bounty Offers bounties $50 minimum bounty Welcome to the Internet Bug Bounty! The Internet Bug Bounty is a crowdfunded bug bounty program that has been in operation since 2013, and in our book, with longevity comes renewal, reform, and expansion. So, in the spirit of constant improvement,...",
+  "severity": "INFO",
+  "sha256_hash": "20f18d838d70d40abdc8274590b06b45f44026c7f1740feeca82f25ae783030b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/ibb"
+}

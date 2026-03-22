@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.951222+00:00",
+  "lang": "en",
+  "raw_text": "Compass Managed Offers bounties $50 minimum bounty Compass Bug Bounty Policy Compass is committed to protecting the data that drives our marketplace. If you\u2019re an independent security expert or researcher and believe you\u2019ve discovered a security-related issue on our platform, or other assets owned...",
+  "severity": "INFO",
+  "sha256_hash": "e5a4e591dbc410b4eeac778f026b44f37b6002d61fe5c2df37c5fb9b3f43be5a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/compass-bbp"
+}

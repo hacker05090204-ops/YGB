@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.605752+00:00",
+  "lang": "en",
+  "raw_text": "Vercel Open Source Managed Offers bounties $50 minimum bounty Vercel looks forward to working with the security community to find vulnerabilities in our open source projects in order to keep our ecosystem and users safe. This program covers core Vercel open source projects that power modern web development...",
+  "severity": "INFO",
+  "sha256_hash": "91cb33afc48f29eb894bb8fe08f6aba7138029e6496e08132e46824ff498a0fc",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/vercel-open-source"
+}

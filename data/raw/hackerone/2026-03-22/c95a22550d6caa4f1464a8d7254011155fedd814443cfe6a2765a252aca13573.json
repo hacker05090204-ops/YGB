@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.961626+00:00",
+  "lang": "en",
+  "raw_text": "Crowdstrike Offers bounties $100 minimum bounty CrowdStrike encourages researchers to follow responsible disclosure procedures when reporting security issues in our products, services, websites, or infrastructure. CrowdStrike is committed to engaging with the research community in a positive,...",
+  "severity": "INFO",
+  "sha256_hash": "c95a22550d6caa4f1464a8d7254011155fedd814443cfe6a2765a252aca13573",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/crowdstrike"
+}

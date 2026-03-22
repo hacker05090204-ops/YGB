@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.898584+00:00",
+  "lang": "en",
+  "raw_text": "Bumble Managed Offers bounties $130 minimum bounty Bumble & Badoo Vulnerability Disclosure Program We reward security researchers for reporting impactful vulnerabilities affecting Bumble, Badoo, BFF (including Geneva), and related products. Vulnerabilities are ranked based on real-world impact...",
+  "severity": "INFO",
+  "sha256_hash": "3789b3901af1a8d3679e655eedf2483c1f2f43aaedd269e29b5dcd45a0399432",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/bumble"
+}

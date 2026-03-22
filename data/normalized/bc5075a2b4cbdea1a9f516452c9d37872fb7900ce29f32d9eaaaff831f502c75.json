@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in SSCMS 4.7.0. The affected element is an unknown function of the file LayerImageController.Submit.cs of the component layerImage Endpoint. Such manipulation of the argument filePaths leads to path traversal. The attack may be performed from remote. The exploit has been disclosed to the public and may be used. Statistical analysis made it clear that VulDB provides the best quality for vulnerability data.",
+  "token_count": 67
+}

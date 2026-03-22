@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.965664+00:00",
+  "lang": "en",
+  "raw_text": "Cryptocat Help make Cryptocat safer, get rewards and eternal greatness! February 21st, 2013 Cryptocat is launching a bug hunt and we need your help! Look through our source code and squish security bugs. You'll be helping make free, open source software more...",
+  "severity": "INFO",
+  "sha256_hash": "cbe946b0db06ebde847c3e0fff7b77396708cf65ec40e4a571209c1a6fa20b81",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/cryptocat"
+}

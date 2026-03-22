@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.279506+00:00",
+  "lang": "en",
+  "raw_text": "Neon Managed Offers bounties $50 minimum bounty Overview Neon is an open-source database company dedicated to delivering a serverless PostgreSQL platform optimized for cloud deployment. Our architecture separates storage and compute, enabling features like autoscaling, instant branching, and...",
+  "severity": "INFO",
+  "sha256_hash": "ca635019b2097254269fc445c1144597c6636281ac90d8767ac62feae7415487",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/neon_bbp"
+}

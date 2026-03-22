@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.629482+00:00",
+  "lang": "en",
+  "raw_text": "WEB.DE GmbH Security of data entrusted to us by our clients has the highest priority. This is why we have decided to implement a bug bounty program and invite independent security researchers to help us further improve the security of our systems. Systems in...",
+  "severity": "INFO",
+  "sha256_hash": "3240ee22e680685fc927ee04fc9ffebd84db87d6eaee42f056ff158ca32941a0",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/web_de_gmbh"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.551263+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: Command Injection via unescaped environment assignments in Windows Scheduled Task script generation ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-pj5x-38rw-6fph. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.19 contain a command injection vulnerability in Windows Scheduled Task script generation where environment variables are written to gateway.cmd using unquoted set KEY=VALUE assignments, allowing shell metacharacters to break out of assignment context. Attackers can inject arbitrary commands through environment variable values containing metacharacters like &, |, ^, %, or ! to achieve command execution when the scheduled task script is generated and executed.",
+  "severity": "MEDIUM",
+  "sha256_hash": "3a9da8bec5a212bd0a245ceaaa54856ea1d5d6d0d68efeebe6496dba447c9bed",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 108,
+  "url": "https://github.com/advisories/GHSA-82gw-wqw6-r2cf"
+}

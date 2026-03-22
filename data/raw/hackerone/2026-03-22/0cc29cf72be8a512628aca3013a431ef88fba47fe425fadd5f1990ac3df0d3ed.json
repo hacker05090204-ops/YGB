@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.490967+00:00",
+  "lang": "en",
+  "raw_text": "Sourcegraph OLD Our policy is documented at https://about.sourcegraph.com/security",
+  "severity": "INFO",
+  "sha256_hash": "0cc29cf72be8a512628aca3013a431ef88fba47fe425fadd5f1990ac3df0d3ed",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 8,
+  "url": "https://hackerone.com/sourcegraph_old"
+}

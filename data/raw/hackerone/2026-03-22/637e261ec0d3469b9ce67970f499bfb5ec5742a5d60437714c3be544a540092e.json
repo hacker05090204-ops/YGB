@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.616482+00:00",
+  "lang": "en",
+  "raw_text": "Vimeo Managed Offers bounties $100 minimum bounty Vimeo's Bug Bounty Program Policy Vimeo engineers are committed to ensuring the safety and security of our site and users. We greatly respect the work of security experts and strive to stay up-to-date with the latest security techniques. However, we...",
+  "severity": "INFO",
+  "sha256_hash": "637e261ec0d3469b9ce67970f499bfb5ec5742a5d60437714c3be544a540092e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/vimeo"
+}

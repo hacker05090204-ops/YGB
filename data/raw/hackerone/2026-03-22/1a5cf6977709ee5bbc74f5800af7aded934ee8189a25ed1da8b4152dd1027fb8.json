@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.446157+00:00",
+  "lang": "en",
+  "raw_text": "Sea As the security threat landscape evolves, effective security requires continual engagement and innovation. Sea\u2019s security professionals are committed to continual improvement and strategic collaboration with other security experts in the security...",
+  "severity": "INFO",
+  "sha256_hash": "1a5cf6977709ee5bbc74f5800af7aded934ee8189a25ed1da8b4152dd1027fb8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 32,
+  "url": "https://hackerone.com/sea"
+}

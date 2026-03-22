@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.953275+00:00",
+  "lang": "en",
+  "raw_text": "Consensys Managed Offers bounties $50 minimum bounty At Consensys, we take cybersecurity seriously and value the contributions of the security community at large. We look forward to working with the security community to identify potential issues that will help us ensure the security and privacy of...",
+  "severity": "INFO",
+  "sha256_hash": "bd42b9ee98e5b1424b6b25720095ce24e4fe68a7b3666f189fa3d8939d47e8a6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/consensys"
+}

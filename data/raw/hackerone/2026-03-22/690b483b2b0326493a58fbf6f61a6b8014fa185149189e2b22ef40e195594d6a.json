@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.516882+00:00",
+  "lang": "en",
+  "raw_text": "Sweet TV Sweet TV engineers work hard to ensure that our site and users are 100% safe and sound. We greatly respect the work of security experts everywhere and strive to stay up to date with the latest security techniques. But nobody's perfect. Should you...",
+  "severity": "INFO",
+  "sha256_hash": "690b483b2b0326493a58fbf6f61a6b8014fa185149189e2b22ef40e195594d6a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/sweet_bbp"
+}

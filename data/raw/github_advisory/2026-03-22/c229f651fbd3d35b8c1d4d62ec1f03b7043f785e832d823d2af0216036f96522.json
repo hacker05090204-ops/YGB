@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-4342",
+  "ingested_at": "2026-03-22T09:56:16.010850+00:00",
+  "lang": "en",
+  "raw_text": "ingress-nginx comment-based nginx configuration injection A security issue was discovered in ingress-nginx where a combination of Ingress annotations can be used to inject configuration into nginx. This can lead to arbitrary code execution in the context of the ingress-nginx controller, and disclosure of Secrets accessible to the controller. (Note that in the default installation, the controller can access all Secrets cluster-wide.)",
+  "severity": "HIGH",
+  "sha256_hash": "c229f651fbd3d35b8c1d4d62ec1f03b7043f785e832d823d2af0216036f96522",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-20"
+  ],
+  "token_count": 61,
+  "url": "https://github.com/advisories/GHSA-f53h-mxv9-cp98"
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ella Core panics on malformed ULNASTransport Message without a Request Type ## Summary Ella Core panics when processing malformed UL NAS Transport NAS messages without a Request Type. ## Impact An attacker able to send crafted NAS messages to Ella Core can crash the process, causing service disruption for all connected subscribers. No authentication is required. ## Fix Add a guard when receiving an UL NAS Message without a Request Type given no SM Context.",
+  "token_count": 75
+}

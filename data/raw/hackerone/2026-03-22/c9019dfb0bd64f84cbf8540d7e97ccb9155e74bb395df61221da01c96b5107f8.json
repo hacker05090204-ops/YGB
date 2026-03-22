@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.552970+00:00",
+  "lang": "en",
+  "raw_text": "Tools for Humanity Managed Offers bounties $100 minimum bounty Tools For Humanity (TFH) is proud to collaborate with the vibrant community of independent security research to secure our platform and our users. To recognize your efforts and the role you play in enhancing the security of TFH and the World...",
+  "severity": "INFO",
+  "sha256_hash": "c9019dfb0bd64f84cbf8540d7e97ccb9155e74bb395df61221da01c96b5107f8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/toolsforhumanity"
+}

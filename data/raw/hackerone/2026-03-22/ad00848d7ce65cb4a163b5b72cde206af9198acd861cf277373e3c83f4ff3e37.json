@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.823255+00:00",
+  "lang": "en",
+  "raw_text": "Amazon Vulnerability Research Program Managed Offers bounties $100 minimum bounty Amazon Vulnerability Research Program (VRP) - Program Policy Introduction At Amazon, we take security and privacy very seriously. If you believe that you have found a security vulnerability that affects any Amazon product or service, please report...",
+  "severity": "INFO",
+  "sha256_hash": "ad00848d7ce65cb4a163b5b72cde206af9198acd861cf277373e3c83f4ff3e37",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/amazonvrp"
+}

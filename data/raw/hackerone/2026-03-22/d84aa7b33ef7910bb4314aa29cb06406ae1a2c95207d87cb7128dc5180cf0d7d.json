@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.412658+00:00",
+  "lang": "en",
+  "raw_text": "Ripio Offers bounties $100 minimum bounty Ripio HackerOne Program - Scope & Exclusions Policy (Logic-Based) To ensure clear communication and efficient triage, we have defined our scope using strict logic-based rules. Please review these exclusions carefully before submitting. \ud83c\udfc6 ATO...",
+  "severity": "INFO",
+  "sha256_hash": "d84aa7b33ef7910bb4314aa29cb06406ae1a2c95207d87cb7128dc5180cf0d7d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/ripio"
+}

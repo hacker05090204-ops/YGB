@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4543",
+  "ingested_at": "2026-03-22T10:42:27.097413+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Wavlink WL-WN578W2 221110. The impacted element is an unknown function of the file /cgi-bin/firewall.cgi of the component POST Request Handler. Performing a manipulation of the argument dmz_flag/del_flag results in command injection. It is possible to initiate the attack remotely. The exploit has been made public and could be used. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "MEDIUM",
+  "sha256_hash": "9bbb81ab55f99d6879258403fedc3418f01356959dc9e15cbd69c51f2454e81e",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-77"
+  ],
+  "token_count": 69,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4543"
+}

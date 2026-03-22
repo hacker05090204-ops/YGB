@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.468912+00:00",
+  "lang": "en",
+  "raw_text": "SIX Group Managed Offers bounties $50 minimum bounty SIX operates the infrastructure for the financial centers in Switzerland and Spain, thus ensuring the flow of information and money between financial market players. SIX offers exchange services, financial information and banking services with the...",
+  "severity": "INFO",
+  "sha256_hash": "2dbe9c381c56a804a3d37c00552ae52883a5cac6ab870075e9d0550448f53347",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/six-group"
+}

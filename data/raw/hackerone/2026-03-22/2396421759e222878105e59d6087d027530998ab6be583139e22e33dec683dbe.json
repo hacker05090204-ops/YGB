@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.208877+00:00",
+  "lang": "en",
+  "raw_text": "lock&key my test program",
+  "severity": "INFO",
+  "sha256_hash": "2396421759e222878105e59d6087d027530998ab6be583139e22e33dec683dbe",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 4,
+  "url": "https://hackerone.com/lockkey"
+}

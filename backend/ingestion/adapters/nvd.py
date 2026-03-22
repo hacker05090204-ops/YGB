@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 
@@ -53,19 +54,22 @@ class NVDAdapter(BaseAdapter):
         start_index = 0
         total_results = None
         now = datetime.now(timezone.utc).replace(microsecond=0)
-        pub_start_date = (now - timedelta(days=30)).isoformat().replace("+00:00", "Z")
-        pub_end_date = now.isoformat().replace("+00:00", "Z")
-        async with aiohttp.ClientSession() as session:
+        results_per_page = 500
+        timeout = aiohttp.ClientTimeout(total=120, connect=30)
+        pub_start_date = (now - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
+        pub_end_date = now.strftime("%Y-%m-%dT%H:%M:%S.000+00:00")
+        async with aiohttp.ClientSession(timeout=timeout) as session:
             while total_results is None or start_index < total_results:
                 payload = await self._get(
                     session,
                     self.BASE,
                     params={
-                        "resultsPerPage": 2000,
+                        "resultsPerPage": results_per_page,
                         "startIndex": start_index,
                         "pubStartDate": pub_start_date,
                         "pubEndDate": pub_end_date,
                     },
+                    timeout=timeout,
                 )
                 total_results = int(payload.get("totalResults", 0))
                 vulnerabilities = payload.get("vulnerabilities", [])
@@ -87,7 +91,15 @@ class NVDAdapter(BaseAdapter):
                             tags=self._extract_tags(cve),
                         )
                     )
-                start_index += int(payload.get("resultsPerPage", 2000))
+                start_index += int(payload.get("resultsPerPage", results_per_page))
+                if total_results is not None and start_index < total_results:
+                    remaining = self._last_response_headers.get("X-RateLimit-Remaining", "")
+                    reset = self._last_response_headers.get("X-RateLimit-Reset", "")
+                    if remaining.isdigit() and reset.isdigit() and int(remaining) <= 1:
+                        sleep_seconds = max(int(reset) - int(datetime.now(timezone.utc).timestamp()), 1)
+                    else:
+                        sleep_seconds = 6
+                    await asyncio.sleep(sleep_seconds)
         return samples
 
 

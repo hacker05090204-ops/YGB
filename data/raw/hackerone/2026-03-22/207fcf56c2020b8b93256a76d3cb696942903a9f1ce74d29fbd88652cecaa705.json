@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.055546+00:00",
+  "lang": "en",
+  "raw_text": "Flickr Managed Offers bounties $200 minimum bounty Welcome to Flickr's BugBounty Program! We look forward to seeing your reports and working with you to improve our product. Please reach out with any questions, and feel free to share a link to your photostream on reports if you're a user of the...",
+  "severity": "INFO",
+  "sha256_hash": "207fcf56c2020b8b93256a76d3cb696942903a9f1ce74d29fbd88652cecaa705",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 51,
+  "url": "https://hackerone.com/flickr"
+}

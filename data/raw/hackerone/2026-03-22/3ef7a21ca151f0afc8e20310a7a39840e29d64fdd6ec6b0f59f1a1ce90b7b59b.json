@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.545845+00:00",
+  "lang": "en",
+  "raw_text": "The Browser Company of NYC Managed Offers bounties $50 minimum bounty Response Targets The Browser Company will make a best effort to meet the following response targets for researchers participating in our program: Time to first response (from report submit) - 3 business days Time to triage (from report submit) - 10...",
+  "severity": "INFO",
+  "sha256_hash": "3ef7a21ca151f0afc8e20310a7a39840e29d64fdd6ec6b0f59f1a1ce90b7b59b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 52,
+  "url": "https://hackerone.com/bcny"
+}

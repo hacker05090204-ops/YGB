@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.861880+00:00",
+  "lang": "nl",
+  "raw_text": "Belastingdienst Het kan onverhoopt voorkomen dat er een zwakke plek in een van onze systemen zit. Als u een kwetsbaarheid ontdekt, kunt u deze volgens onderstaande afspraken aan ons melden. U mag de Belastingdienst houden aan dit beleid ten aanzien van Responsible...",
+  "severity": "INFO",
+  "sha256_hash": "acc35d97548216a0ab20b9a912ed2c83942e4e3589c73f154e16bd8dbb66727f",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/belastingdienst"
+}

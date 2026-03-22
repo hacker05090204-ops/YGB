@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.660616+00:00",
+  "lang": "en",
+  "raw_text": "Just Eat Takeaway.com Lead, Deliver, Care - Justeattakeaway.com",
+  "severity": "INFO",
+  "sha256_hash": "e49b6bc492b5abac053be53967e093caa4bdc7f2aaae85ae229acd38219d87e9",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 8,
+  "url": "https://bugcrowd.com/engagements/justeattakeaway"
+}

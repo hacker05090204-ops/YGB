@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.072559+00:00",
+  "lang": "en",
+  "raw_text": "Ghostscript Artifex Software is committed to producing code with as few bugs as possible. As such, we have a public bug tracker where anyone is welcome to view open issues, report new ones, and contribute analysis and fixes. When we have bugs that we'd like to...",
+  "severity": "INFO",
+  "sha256_hash": "8a7918dfee2661ece778865ea5b5d33b6cfb93c83a72f34693570d8422f5f76c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/ghostscript"
+}

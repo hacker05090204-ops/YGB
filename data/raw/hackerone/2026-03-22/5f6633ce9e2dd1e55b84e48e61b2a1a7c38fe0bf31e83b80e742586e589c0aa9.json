@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.978257+00:00",
+  "lang": "en",
+  "raw_text": "Deribit Offers bounties $50 minimum bounty ATTENTION : ALL TESTS SHOULD BE PERFORMED ON OUR TEST ENVIRONMENT : TEST.DERIBIT.COM Testing directly on www.deribit.com will make you ineligible for bounty and disallowed from further hunting. Introduction Deribit is the leading cryptocurrency...",
+  "severity": "INFO",
+  "sha256_hash": "5f6633ce9e2dd1e55b84e48e61b2a1a7c38fe0bf31e83b80e742586e589c0aa9",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/deribit"
+}

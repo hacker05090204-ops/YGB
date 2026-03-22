@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.299518+00:00",
+  "lang": "en",
+  "raw_text": "Node.js Offers bounties $500 minimum bounty Reporting a Bug in Node.js All security bugs in Node.js are taken seriously. Please report any security issues here (/nodejs/reports/new). All reports are evaluated based on the Node.js Threat Model. You can find more information about it at...",
+  "severity": "INFO",
+  "sha256_hash": "0e962725209d9f7d2e801115d0822e1cefa76d2c3b87fe9e76655c9068883e24",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/nodejs"
+}

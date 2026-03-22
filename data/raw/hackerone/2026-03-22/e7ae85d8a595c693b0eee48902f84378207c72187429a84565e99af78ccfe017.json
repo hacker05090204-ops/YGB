@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.914815+00:00",
+  "lang": "en",
+  "raw_text": "Chainlink Offers bounties $50 minimum bounty SmartContract looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Response Targets SmartContract will make a best effort to meet the following SLAs for hackers...",
+  "severity": "INFO",
+  "sha256_hash": "e7ae85d8a595c693b0eee48902f84378207c72187429a84565e99af78ccfe017",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/chainlink"
+}

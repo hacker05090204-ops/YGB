@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.137452+00:00",
+  "lang": "en",
+  "raw_text": "Independer Responsible Disclosure Policy Independer Independer's mission is to restore confidence in financial institutions and products. In it we run themselves like lead. Independer customers can be confident that we are security and privacy seriously. Our...",
+  "severity": "INFO",
+  "sha256_hash": "3766f3c2e2276640e5d590a049f2f2176eaf6d25184ae11db39d9636a4f68547",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/independer"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.621483+00:00",
+  "lang": "en",
+  "raw_text": "Vodafone Oman Offers bounties $50 minimum bounty Vodafone Oman looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Response Targets Vodafone Oman will make a best effort to meet the following SLAs for hackers...",
+  "severity": "INFO",
+  "sha256_hash": "66e478ae8b9a4ba3a0caf6b5b4ffc836f387608eed30f5a51bee8b5d22b3c682",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/vodafone_oman"
+}

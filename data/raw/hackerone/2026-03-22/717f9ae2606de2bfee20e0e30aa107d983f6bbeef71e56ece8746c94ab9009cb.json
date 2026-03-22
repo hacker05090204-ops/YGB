@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.649510+00:00",
+  "lang": "en",
+  "raw_text": "X / xAI Managed Offers bounties $100 minimum bounty Program Rules Maintaining effective security is a community effort, and we are proud to have a vibrant group of independent security researchers who volunteer their time to help us spot potential issues. To recognize their efforts and the important...",
+  "severity": "INFO",
+  "sha256_hash": "717f9ae2606de2bfee20e0e30aa107d983f6bbeef71e56ece8746c94ab9009cb",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/x"
+}

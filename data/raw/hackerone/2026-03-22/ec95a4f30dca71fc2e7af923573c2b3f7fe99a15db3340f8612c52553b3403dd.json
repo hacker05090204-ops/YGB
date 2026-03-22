@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.999568+00:00",
+  "lang": "en",
+  "raw_text": "Dyson Managed Offers bounties $100 minimum bounty Dyson Bug Bounty Program Dyson takes the security of its customers, employees, and technology very seriously. Whilst we build our systems to be as robust as possible, we greatly value the support of security experts around the world in helping us...",
+  "severity": "INFO",
+  "sha256_hash": "ec95a4f30dca71fc2e7af923573c2b3f7fe99a15db3340f8612c52553b3403dd",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/dyson"
+}

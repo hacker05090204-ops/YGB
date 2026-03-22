@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.309823+00:00",
+  "lang": "en",
+  "raw_text": "Oculus Responsible Disclosure Policy If you give us reasonable time to respond to your report before making any information public, and make a good faith effort to avoid privacy violations, destruction of data, and interruption or degradation of our...",
+  "severity": "INFO",
+  "sha256_hash": "97736ec1739b683f1866d3b7fb0c343c22bba8af33ac980f715931029fafb1aa",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/oculus"
+}

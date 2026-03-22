@@ -23,6 +23,10 @@ from backend.auth.revocation_store import reset_store
 PUBLIC_HTTP_ROUTES = {
     "/api/health",
     "/api/g38/status",
+    "/api/sync/manifest",
+    "/api/sync/receive",
+    "/api/sync/file",
+    "/api/sync/status",
     "/health",
     "/healthz",
     "/readyz",
@@ -45,6 +49,7 @@ MANUALLY_GUARDED_ROUTES = {
 
 EXPECTED_401_WITHOUT_AUTH = [
     ("GET", "/metrics/snapshot"),
+    ("GET", "/api/status"),
     ("GET", "/api/system/status"),
     ("GET", "/api/readiness"),
     ("GET", "/api/integration/status"),
@@ -116,7 +121,7 @@ def test_selected_routes_reject_missing_auth(
 
 @pytest.mark.parametrize(
     "path",
-    ["/metrics/snapshot", "/api/system/status", "/api/readiness", "/sync/status"],
+    ["/metrics/snapshot", "/api/status", "/api/system/status", "/api/readiness", "/sync/status"],
 )
 def test_selected_routes_reject_invalid_bearer(client: TestClient, path: str):
     response = client.get(path, headers={"Authorization": "Bearer invalid-token"})
@@ -125,7 +130,7 @@ def test_selected_routes_reject_invalid_bearer(client: TestClient, path: str):
 
 @pytest.mark.parametrize(
     "path",
-    ["/metrics/snapshot", "/api/system/status", "/sync/status"],
+    ["/metrics/snapshot", "/api/status", "/api/system/status", "/sync/status"],
 )
 def test_selected_routes_accept_valid_jwt(
     client: TestClient,

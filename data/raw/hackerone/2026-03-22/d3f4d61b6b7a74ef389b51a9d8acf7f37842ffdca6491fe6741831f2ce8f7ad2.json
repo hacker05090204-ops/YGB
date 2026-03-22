@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.103853+00:00",
+  "lang": "en",
+  "raw_text": "HackerOne Managed Offers bounties $200 minimum bounty Must Read Header Requirements Set a custom HTTP header in all your testing traffic. Once again, report to us what header you set so we can identify it easily for deconfliction purposes. | Identifier Type | Format | Example | |----------------------|...",
+  "severity": "INFO",
+  "sha256_hash": "d3f4d61b6b7a74ef389b51a9d8acf7f37842ffdca6491fe6741831f2ce8f7ad2",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/security"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.980262+00:00",
+  "lang": "en",
+  "raw_text": "Deriv.com Offers bounties $100 minimum bounty The security of our products is very important to us, and we constantly strive to guarantee our users' security. The deriv.com security team aims to raise the comprehensive security of our products by working closely with individuals, organisations,...",
+  "severity": "INFO",
+  "sha256_hash": "34a925b601fc5f30ecbb7ca7f11a5825041c1608c27786974e70a589c2519efe",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/deriv"
+}

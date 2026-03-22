@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.522498+00:00",
+  "lang": "en",
+  "raw_text": "Symphony Enterprise customers may report issues via their Symphony technical support contacts. Symphony runs a private invitation-only program on HackerOne, receiving vulnerability disclosures from participants covering freely accessible web sites.",
+  "severity": "INFO",
+  "sha256_hash": "63731bef8be9d68bf74963e4fc44b7c7c9a1742b2ea70360fa72f2ff2aff83f6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 30,
+  "url": "https://hackerone.com/symphony-3"
+}

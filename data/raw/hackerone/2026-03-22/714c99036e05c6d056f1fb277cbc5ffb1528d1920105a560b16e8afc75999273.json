@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.257507+00:00",
+  "lang": "en",
+  "raw_text": "Moneybird Offers bounties $50 minimum bounty Disclosure policy At Moneybird, we consider the security of our systems a top priority. But no matter how much effort we put into system security, there can still be vulnerabilities present. If you discover a vulnerability, we would like to know...",
+  "severity": "INFO",
+  "sha256_hash": "714c99036e05c6d056f1fb277cbc5ffb1528d1920105a560b16e8afc75999273",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/moneybird"
+}

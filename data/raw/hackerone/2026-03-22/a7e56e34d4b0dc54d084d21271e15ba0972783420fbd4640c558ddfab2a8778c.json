@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.246290+00:00",
+  "lang": "en",
+  "raw_text": "Meraki This program is managed by Bugcrowd and can be found at https://bugcrowd.com/ciscomeraki.",
+  "severity": "INFO",
+  "sha256_hash": "a7e56e34d4b0dc54d084d21271e15ba0972783420fbd4640c558ddfab2a8778c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 13,
+  "url": "https://hackerone.com/meraki"
+}

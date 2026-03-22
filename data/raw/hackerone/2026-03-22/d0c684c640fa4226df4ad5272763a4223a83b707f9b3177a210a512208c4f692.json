@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.057549+00:00",
+  "lang": "en",
+  "raw_text": "Flipkart Managed Offers bounties $100 minimum bounty At Flipkart, we take the security of our systems very seriously, and it is our constant endeavour to make our products secure for our customers. However, in the rare case when some security researcher or member of the general public identifies a...",
+  "severity": "INFO",
+  "sha256_hash": "d0c684c640fa4226df4ad5272763a4223a83b707f9b3177a210a512208c4f692",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/flipkart"
+}

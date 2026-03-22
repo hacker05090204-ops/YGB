@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.900590+00:00",
+  "lang": "en",
+  "raw_text": "BuzzFeed BuzzFeed is a cross-platform, global network for news and entertainment that generates seven billion views each month. BuzzFeed creates and distributes content for a global audience and utilizes proprietary technology to continuously test, learn and...",
+  "severity": "INFO",
+  "sha256_hash": "f89917239e64b632fd6268d3e6013a6519d7b4f095f6c6c090934157ed680740",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/buzzfeed"
+}

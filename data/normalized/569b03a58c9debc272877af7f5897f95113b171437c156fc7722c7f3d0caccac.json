@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: OpenClaw: WebSocket shared-auth connections could self-declare elevated scopes ### Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-rqpp-rjj8-7wv8. This link is maintained to preserve external references. ### Original Description OpenClaw versions prior to 2026.3.12 contain an authorization bypass vulnerability in the WebSocket connect path that allows shared-token or password-authenticated connections to self-declare elevated scopes without server-side binding. Attackers can exploit this logic flaw to present unauthorized scopes such as operator.admin and perform admin-only gateway operations.",
+  "token_count": 82
+}

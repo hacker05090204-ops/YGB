@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.322875+00:00",
+  "lang": "en",
+  "raw_text": "Onshape Onshape Security Bug Identification Program (Effective as of April 15, 2015) Rules for you Don\u2019t attempt to gain access to another user\u2019s account or data. Don\u2019t perform any attack that could harm the reliability/integrity of our services or data...",
+  "severity": "INFO",
+  "sha256_hash": "13bb1c86d9bcecc9abb454386c3b18971e46c2e3222d7fb66cf2ab7cf3d8ad44",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/onshape"
+}

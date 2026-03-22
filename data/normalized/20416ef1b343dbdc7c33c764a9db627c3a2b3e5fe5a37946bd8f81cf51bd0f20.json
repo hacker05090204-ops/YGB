@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in projectworlds Online Notes Sharing System 1.0. This issue affects some unknown processing of the file /login.php of the component Parameters Handler. The manipulation of the argument Benutzer results in SQL Injection. The attack can be executed remotely. The exploit is now public and may be used.",
+  "token_count": 51
+}

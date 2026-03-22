@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.027087+00:00",
+  "lang": "en",
+  "raw_text": "Eureka Eureka Bug Bounty Program Terms Security is a priority at Eureka. If you believe you've found a security bug in our in-scope applications or infrastructure, we are happy to work with you to resolve the issue promptly and ensure you are fairly...",
+  "severity": "INFO",
+  "sha256_hash": "b6326bb1ef75021039530e097394391be8cb796ec7ad66dbe51f2a55107a05d6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/eureka_jp"
+}

@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.635020+00:00",
+  "lang": "en",
+  "raw_text": "Zendesk Managed Bug Bounty Engagement Zendesk aims to keep its Services safe for everyone and the security of our products & data is of utmost priority.",
+  "severity": "INFO",
+  "sha256_hash": "6357baa36536b78a2360a7f8998adbae5bd370baf9dad436139e86fc258ddc7d",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 26,
+  "url": "https://bugcrowd.com/engagements/zendesk"
+}

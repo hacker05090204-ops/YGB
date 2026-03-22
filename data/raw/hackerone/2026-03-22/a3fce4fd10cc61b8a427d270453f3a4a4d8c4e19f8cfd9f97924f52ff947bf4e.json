@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.001573+00:00",
+  "lang": "en",
+  "raw_text": "Early Warning Managed Offers bounties $50 minimum bounty Summary Zelle\u00ae is transforming how money moves, with more than five billion digital payments sent since its launch in 2017. The Zelle Network\u00ae connects more than 2,100 bank and credit union brands of all sizes, enabling consumers and businesses to...",
+  "severity": "INFO",
+  "sha256_hash": "a3fce4fd10cc61b8a427d270453f3a4a4d8c4e19f8cfd9f97924f52ff947bf4e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/early_warning"
+}

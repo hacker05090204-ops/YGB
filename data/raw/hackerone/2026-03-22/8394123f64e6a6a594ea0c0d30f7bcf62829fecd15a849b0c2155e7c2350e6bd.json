@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.560965+00:00",
+  "lang": "en",
+  "raw_text": "Trip.com Managed Offers bounties $50 minimum bounty Trip.com Group looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. ==** Before submitting a vulnerability report, please read our policy first**== Response Targets Trip.com...",
+  "severity": "INFO",
+  "sha256_hash": "8394123f64e6a6a594ea0c0d30f7bcf62829fecd15a849b0c2155e7c2350e6bd",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/trip_com"
+}

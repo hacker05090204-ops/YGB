@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.628019+00:00",
+  "lang": "en",
+  "raw_text": "Blockchain.com Managed Bug Bounty Engagement The world\u2019s leading crypto finance house serving people, projects, protocols and institutions since 2011.",
+  "severity": "INFO",
+  "sha256_hash": "7706cbb34f0a5e6c220193c94c5e0841f33530ba07e174f2ecd01336751d166a",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 19,
+  "url": "https://bugcrowd.com/engagements/blockchain-dot-com"
+}

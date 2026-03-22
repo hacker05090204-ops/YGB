@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.457252+00:00",
+  "lang": "en",
+  "raw_text": "SHEIN Managed Offers bounties $100 minimum bounty SHEIN looks forward to working with the security community to find security vulnerabilities in order to keep our businesses and customers safe. Response Targets SHEIN will make a best effort to meet the following response targets for hackers...",
+  "severity": "INFO",
+  "sha256_hash": "1478cd5556e548e7188d6fbdbc869b9f44b2a48bf4351e749bff44375304033a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/shein"
+}

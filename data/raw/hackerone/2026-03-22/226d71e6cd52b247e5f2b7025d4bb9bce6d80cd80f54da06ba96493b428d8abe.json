@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.511744+00:00",
+  "lang": "en",
+  "raw_text": "Superbet Managed Offers bounties $100 minimum bounty Please limit the amount of requests to max 50/second Do not use Scanners such as Nessus, acunetix,etc, we already scan our assets with these tools and you won't be rewarded if you report vulnerabilities found by scanners All our LOGIN services are...",
+  "severity": "INFO",
+  "sha256_hash": "226d71e6cd52b247e5f2b7025d4bb9bce6d80cd80f54da06ba96493b428d8abe",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/superbet"
+}

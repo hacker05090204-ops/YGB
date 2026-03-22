@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.374029+00:00",
+  "lang": "en",
+  "raw_text": "Priceline Managed Offers bounties $100 minimum bounty Welcome to Priceline's Bug Bounty Program Priceline is committed to collaborating with security experts across the globe to stay up-to-date with the latest security developments. If you have discovered a security issue that you believe requires our...",
+  "severity": "INFO",
+  "sha256_hash": "8ebf1b4a7c6c89ab5de28e9e37d712babc97c9b04d0910d7d673349d6037b59c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/priceline"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.635511+00:00",
+  "lang": "en",
+  "raw_text": "Werken Bij Defensie Responsible disclosure Optimizing safety when it comes to the ICT systems is a top priority for the Dutch Ministry of Defense. However, as such systems remain vulnerable, possible loopholes and weaknesses cannot be eliminated. Hence, we would love...",
+  "severity": "INFO",
+  "sha256_hash": "4297978d5edeb39167b3f0d86b44c55cae16abda73ceba21daf5c2b4dd70ed3b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/werkenbijdef"
+}

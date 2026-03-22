@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.493977+00:00",
+  "lang": "en",
+  "raw_text": "Spotify Managed Offers bounties $250 minimum bounty We're big believers in protecting your privacy and security. As a company, we not only have a vested interest, but also a deep desire to see the Internet remain as safe as possible for us all. So, needless to say, we take security issues very...",
+  "severity": "INFO",
+  "sha256_hash": "1efe00e9dbbce2f583cede9255431c46893e2c5a9a04054a436116f19c7583e7",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 52,
+  "url": "https://hackerone.com/spotify"
+}

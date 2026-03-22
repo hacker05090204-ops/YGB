@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.959608+00:00",
+  "lang": "en",
+  "raw_text": "Credit Karma Managed Offers bounties $100 minimum bounty Credit Karma is a personal finance technology company with nearly 130 million members in the United States, Canada and UK. The company offers a suite of products for members to monitor and improve credit health and provides identity monitoring,...",
+  "severity": "INFO",
+  "sha256_hash": "1ebd7c1c24c22e4f8222af367ae28e60bed2686561d8530fa257e573294b83a5",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/creditkarma"
+}

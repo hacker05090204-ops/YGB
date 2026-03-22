@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.380575+00:00",
+  "lang": "en",
+  "raw_text": "Quora Offers bounties $100 minimum bounty Update Highlights: Poe.com (http://poe.com/) We highly encourage all researchers who are interested in AI products to test it and help us maintain the highest possible levels of security for our users. Introduction We are committed to the safety and...",
+  "severity": "INFO",
+  "sha256_hash": "110222e71cad1489b7b99d2e7db207f38c8b70e0a54d42e4b03f5f2c862d2abe",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/quora"
+}

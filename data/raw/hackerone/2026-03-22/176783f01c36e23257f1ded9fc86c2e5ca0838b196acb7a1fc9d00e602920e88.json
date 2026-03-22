@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.234059+00:00",
+  "lang": "en",
+  "raw_text": "Massachusetts Institute of Technology The MIT Security Bug Bounty Program We do our best to keep MIT's network and services secure, but we're not perfect. If you're an MIT affiliate and find a security vulnerability that falls within scope, we'll reward you for responsibly disclosing...",
+  "severity": "INFO",
+  "sha256_hash": "176783f01c36e23257f1ded9fc86c2e5ca0838b196acb7a1fc9d00e602920e88",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/mit"
+}

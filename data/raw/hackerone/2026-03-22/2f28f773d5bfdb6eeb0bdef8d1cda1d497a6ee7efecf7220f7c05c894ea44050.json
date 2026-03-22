@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.364013+00:00",
+  "lang": "en",
+  "raw_text": "Pleo Pleo looks forward to working with the security community to find security vulnerabilities. Please submit any questions you might have to security-vd@pleo.io. Join our private program Pleo runs a private program. Joining the private program grants...",
+  "severity": "INFO",
+  "sha256_hash": "2f28f773d5bfdb6eeb0bdef8d1cda1d497a6ee7efecf7220f7c05c894ea44050",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 37,
+  "url": "https://hackerone.com/pleo"
+}

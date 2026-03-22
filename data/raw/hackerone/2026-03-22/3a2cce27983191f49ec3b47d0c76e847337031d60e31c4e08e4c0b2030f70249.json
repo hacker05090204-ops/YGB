@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.085486+00:00",
+  "lang": "en",
+  "raw_text": "GMX GmbH Security of data entrusted to us by our clients has the highest priority. This is why we have decided to implement a bug bounty program and invite independent security researchers to help us further improve the security of our systems. Systems in...",
+  "severity": "INFO",
+  "sha256_hash": "3a2cce27983191f49ec3b47d0c76e847337031d60e31c4e08e4c0b2030f70249",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/gmx_gmbh"
+}

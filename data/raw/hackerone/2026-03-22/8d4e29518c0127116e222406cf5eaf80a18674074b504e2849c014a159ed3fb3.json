@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.366010+00:00",
+  "lang": "en",
+  "raw_text": "Polygon Technology Managed Offers bounties $50 minimum bounty Polygon Labs Bug Bounty Program Polygon Labs looks forward to working with the security community to find security vulnerabilities to keep users safe. Response Targets Polygon Labs will make a best effort to meet the following response targets for...",
+  "severity": "INFO",
+  "sha256_hash": "8d4e29518c0127116e222406cf5eaf80a18674074b504e2849c014a159ed3fb3",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/polygon-technology"
+}

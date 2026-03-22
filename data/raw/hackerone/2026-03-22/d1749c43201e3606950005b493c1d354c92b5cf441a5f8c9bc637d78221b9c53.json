@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.536848+00:00",
+  "lang": "en",
+  "raw_text": "Temu Managed Offers bounties $50 minimum bounty Temu looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Response Targets Temu will make a best effort to meet the following SLAs for hackers participating in our program: ...",
+  "severity": "INFO",
+  "sha256_hash": "d1749c43201e3606950005b493c1d354c92b5cf441a5f8c9bc637d78221b9c53",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/temu"
+}

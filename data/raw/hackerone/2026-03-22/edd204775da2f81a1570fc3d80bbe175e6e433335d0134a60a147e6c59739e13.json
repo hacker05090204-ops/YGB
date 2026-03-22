@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.355147+00:00",
+  "lang": "en",
+  "raw_text": "pixiv Managed Offers bounties $200 minimum bounty No technology is perfect, and pixiv believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. If you believe you've found a security issue in our product or service, we encourage...",
+  "severity": "INFO",
+  "sha256_hash": "edd204775da2f81a1570fc3d80bbe175e6e433335d0134a60a147e6c59739e13",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/pixiv"
+}

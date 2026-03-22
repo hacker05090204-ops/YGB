@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.949222+00:00",
+  "lang": "en",
+  "raw_text": "CoinSpot Managed Offers bounties $250 minimum bounty Response Targets CoinSpot will make a best effort to meet the following response targets for hackers participating in our program: Time to first response (from report submit) - 5 days Time to triage (from report submit) - 10 days Time to bounty ...",
+  "severity": "INFO",
+  "sha256_hash": "040d6d8935c7e3da7ca4187e3b0132fef3633c9191ef06c32ecf7eedb8ce8d27",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/coinspot"
+}

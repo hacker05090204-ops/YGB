@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.547870+00:00",
+  "lang": "en",
+  "raw_text": "TikTok Managed Offers bounties $50 minimum bounty TikTok Bug Bounty Program Policy TikTok's mission is to inspire creativity and bring joy to our vibrant community. We recognize and value external feedback from the global security research community on potential vulnerabilities which helps...",
+  "severity": "INFO",
+  "sha256_hash": "2d5c24954b07591773a1956a590ca9a2e5696c1a24e72b8f5da7ef863bf17cab",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/tiktok"
+}

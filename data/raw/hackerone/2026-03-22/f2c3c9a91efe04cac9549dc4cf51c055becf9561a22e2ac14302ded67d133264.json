@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.362025+00:00",
+  "lang": "en",
+  "raw_text": "Playtika Managed Offers bounties $50 minimum bounty Playtika is a leading mobile gaming company with over 34 million monthly active users across a portfolio of games titles. Playtika Ltd. and all of its affiliate companies (together, \u201cPlaytika\u201d) look forward to working in collaboration with the...",
+  "severity": "INFO",
+  "sha256_hash": "f2c3c9a91efe04cac9549dc4cf51c055becf9561a22e2ac14302ded67d133264",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/playtika"
+}

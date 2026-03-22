@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.421102+00:00",
+  "lang": "en",
+  "raw_text": "Robinhood Markets Bounty Managed Offers bounties $50 minimum bounty Robinhood Markets Bounty looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Bug Bounty Program Rules By submitting reports to our program, you agree that you\u2019ve read,...",
+  "severity": "INFO",
+  "sha256_hash": "c4532960c537732cb55983998dacfa788e50e8b87bd1c0906276737247795d60",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 47,
+  "url": "https://hackerone.com/robinhood"
+}

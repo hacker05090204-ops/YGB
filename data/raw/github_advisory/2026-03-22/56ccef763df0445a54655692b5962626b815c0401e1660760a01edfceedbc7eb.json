@@ -1,0 +1,14 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:56:22.568259+00:00",
+  "lang": "en",
+  "raw_text": "Duplicate Advisory: Exec allowlist wrapper analysis did not unwrap env/shell dispatch chains ## Duplicate Advisory This advisory has been withdrawn because it is a duplicate of GHSA-jj82-76v6-933r. This link is maintained to preserve external references. ## Original Description OpenClaw versions prior to 2026.2.22 contain an allowlist bypass vulnerability in system.run exec analysis that fails to unwrap env and shell-dispatch wrapper chains. Attackers can route execution through wrapper binaries like env bash to smuggle payloads that satisfy allowlist entries while executing non-allowlisted commands.",
+  "severity": "HIGH",
+  "sha256_hash": "56ccef763df0445a54655692b5962626b815c0401e1660760a01edfceedbc7eb",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 82,
+  "url": "https://github.com/advisories/GHSA-3846-mfvc-xwpf"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.203550+00:00",
+  "lang": "en",
+  "raw_text": "LinkedIn Managed Offers bounties $100 minimum bounty Introduction LinkedIn believes that close partnerships with security researchers makes us all more secure. Security researchers play an integral role in our ecosystem by discovering vulnerabilities that went undiscovered during the software...",
+  "severity": "INFO",
+  "sha256_hash": "fac143051e7e6aa429d902d739d74c279faae849bcb2e583bbcb3565c1bf19b4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/linkedin"
+}

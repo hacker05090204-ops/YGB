@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.638135+00:00",
+  "lang": "en",
+  "raw_text": "Okta Cloud Identity and Mobility Management Service",
+  "severity": "INFO",
+  "sha256_hash": "da173cab7f2e57cf952b45b4570613b7cfda4226096dff0ac21f2e4bb6e94e09",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 7,
+  "url": "https://bugcrowd.com/engagements/okta"
+}

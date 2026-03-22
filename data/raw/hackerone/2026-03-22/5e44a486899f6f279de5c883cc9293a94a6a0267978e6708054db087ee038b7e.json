@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.048356+00:00",
+  "lang": "en",
+  "raw_text": "FetLife Offers bounties $100 minimum bounty No technology is perfect, and FetLife believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. If you believe you've found a security issue in our product or service, we...",
+  "severity": "INFO",
+  "sha256_hash": "5e44a486899f6f279de5c883cc9293a94a6a0267978e6708054db087ee038b7e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/fetlife"
+}

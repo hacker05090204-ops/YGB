@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33503",
+  "ingested_at": "2026-03-22T09:56:14.910719+00:00",
+  "lang": "en",
+  "raw_text": "Ory Kratos has a SQL injection via forged pagination tokens ## Description The **ListCourierMessages** Admin API in Ory Kratos is vulnerable to SQL injection due to flaws in its pagination implementation. Pagination tokens are encrypted using the secret configured in `secrets.pagination`. An attacker who knows this secret can craft their own tokens, including malicious tokens that lead to SQL injection. If this configuration value is not set, Kratos falls back to a default pagination encryption secret. Because this default value is publicly known, attackers can generate valid and malicious pagination tokens manually for installations where this secret is not set. ## Preconditions This issue can be exploited when the following conditions are met: - **ListCourierMessages API** is directly or indirectly accessible to the attacker - The attacker can pass a raw pagination token to the affected API - The configuration value `secrets.pagination` is not set or known to the attacker ## Impact An attacker can execute arbitrary SQL queries through forged pagination tokens. ## Mitigation As a first line of defense, **immediately** configure a custom value for `secrets.pagination` by generating a cryptographically secure random secret, for example: ``` openssl rand -base64 32 ``` Next, upgrade **Kratos** to a fixed version **as soon as possible**.",
+  "severity": "HIGH",
+  "sha256_hash": "e77cd54c22912bc28a90cbab631eb671442b160de0a55860b95ff08071dfc172",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-89"
+  ],
+  "token_count": 204,
+  "url": "https://github.com/advisories/GHSA-hgx2-28f8-6g2r"
+}

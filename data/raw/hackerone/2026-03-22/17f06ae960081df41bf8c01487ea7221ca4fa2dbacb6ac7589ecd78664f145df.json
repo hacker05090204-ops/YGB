@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.931431+00:00",
+  "lang": "en",
+  "raw_text": "Cloud Software Group Managed Offers bounties $50 minimum bounty Citrix Bug Bounty Program Policy Citrix looks forward to working with the security community to find security vulnerabilities to keep our businesses and customers safe. Your participation in the Bug Bounty Program (\u201cProgram\u201d) is voluntary and...",
+  "severity": "INFO",
+  "sha256_hash": "17f06ae960081df41bf8c01487ea7221ca4fa2dbacb6ac7589ecd78664f145df",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/csg-public"
+}

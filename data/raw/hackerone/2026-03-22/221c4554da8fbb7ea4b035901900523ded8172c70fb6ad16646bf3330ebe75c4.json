@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.991564+00:00",
+  "lang": "en",
+  "raw_text": "Doppler Managed Offers bounties $50 minimum bounty Doppler believes that working with skilled security researchers across the globe is crucial in identifying potential security vulnerabilities. If you believe you have found a security issue in our product or service, please notify us. We will make...",
+  "severity": "INFO",
+  "sha256_hash": "221c4554da8fbb7ea4b035901900523ded8172c70fb6ad16646bf3330ebe75c4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/doppler"
+}

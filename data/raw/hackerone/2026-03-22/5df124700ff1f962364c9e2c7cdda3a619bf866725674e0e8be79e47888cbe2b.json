@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.968665+00:00",
+  "lang": "en",
+  "raw_text": "CS Money Offers bounties $50 minimum bounty No technology is perfect, and CS.MONEY believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. If you believe you've found a security issue in our product or service, we...",
+  "severity": "INFO",
+  "sha256_hash": "5df124700ff1f962364c9e2c7cdda3a619bf866725674e0e8be79e47888cbe2b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/cs_money"
+}

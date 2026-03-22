@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.582737+00:00",
+  "lang": "en",
+  "raw_text": "TYPO3 Security in TYPO3 TYPO3 Security Team (https://typo3.org/community/teams/security) Reporting & Security Policy (https://typo3.org/community/teams/security/security-in-typo3) Bug Bounty Program & Rules (https://typo3.org/community/teams...",
+  "severity": "INFO",
+  "sha256_hash": "8469807e7aeddad8bf02c0fb7796ad3361804b9c356dc7a02d78294335ed51dc",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 19,
+  "url": "https://hackerone.com/typo3"
+}

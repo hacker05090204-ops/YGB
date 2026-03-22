@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.150202+00:00",
+  "lang": "en",
+  "raw_text": "Inspectorio Managed Offers bounties $50 minimum bounty INSPECTORIO looks forward to working with the security community to find security vulnerabilities in order to keep our businesses and customers safe. Response Targets INSPECTORIO will make a best effort to meet the following response targets for...",
+  "severity": "INFO",
+  "sha256_hash": "227b875feb29f64f4955d11971984ec00cc1b724adac01bc4dc6ac0cd3cc1240",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/inspectorio"
+}

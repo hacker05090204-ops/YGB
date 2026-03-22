@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.921124+00:00",
+  "lang": "en",
+  "raw_text": "Chess.com Chess.com Bug Bounty Policy Updated: May 12, 2025, 9:58 AM [v0.1.6 | Last updated May 12, 2025] This policy covers all payments to third parties for finding and disclosing bugs, vulnerabilities, and exploits within the Chess.com domain and not on...",
+  "severity": "INFO",
+  "sha256_hash": "ccac2b30105a59a7dce419a76e4032f8c851d85ec0d0f08633462fc87bb8e4df",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/chess_com"
+}

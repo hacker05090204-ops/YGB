@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.272506+00:00",
+  "lang": "en",
+  "raw_text": "Naver Whale 1.Introduction Naver Corp. launches the Whale Security Bug Bounty Program to encourage security researchers in helping us to find and fix security vulnerabilities on Whale and to reward their efforts spent to make our product more safe. 2.Scope We...",
+  "severity": "INFO",
+  "sha256_hash": "23283227c7642467813959a5d235a9633db5ff5acb2b14770e7d053d7074b3d4",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/naver_whale"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.220013+00:00",
+  "lang": "en",
+  "raw_text": "M-Pesa Africa Limited Managed Offers bounties $50 minimum bounty If you believe you have found a security vulnerability on any of our Mpesa products or services, we encourage you to let us know right away. We will investigate all legitimate reports and do our best to quickly fix the problem. Please be aware that...",
+  "severity": "INFO",
+  "sha256_hash": "9f8f2a2a97c3cc74322fdee771158f08a40e407f4a961c8d8bf0c60c6680de4a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 54,
+  "url": "https://hackerone.com/mpesa"
+}

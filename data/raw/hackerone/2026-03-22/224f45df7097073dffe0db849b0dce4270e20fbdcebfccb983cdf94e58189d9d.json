@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.996563+00:00",
+  "lang": "en",
+  "raw_text": "Dynatrace Managed Offers bounties $100 minimum bounty How to get your testing environment To get your testing environment, follow these steps: Visit this link: https://www.dynatrace.com/signup/hackerone/ (https://www.dynatrace.com/signup/hackerone/) Use your @wearehackerone.com email address for...",
+  "severity": "INFO",
+  "sha256_hash": "224f45df7097073dffe0db849b0dce4270e20fbdcebfccb983cdf94e58189d9d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 32,
+  "url": "https://hackerone.com/dynatrace"
+}

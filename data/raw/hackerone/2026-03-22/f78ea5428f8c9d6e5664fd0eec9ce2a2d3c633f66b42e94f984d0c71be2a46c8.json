@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.945234+00:00",
+  "lang": "en",
+  "raw_text": "CoinJar As part of our ongoing effort to keep your money safe and information secure, we run a bug bounty program. If you discover a security related issue in our software, we'd like to work with you to fix it and reward you for your assistance. Rewards We...",
+  "severity": "INFO",
+  "sha256_hash": "f78ea5428f8c9d6e5664fd0eec9ce2a2d3c633f66b42e94f984d0c71be2a46c8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/coinjar"
+}

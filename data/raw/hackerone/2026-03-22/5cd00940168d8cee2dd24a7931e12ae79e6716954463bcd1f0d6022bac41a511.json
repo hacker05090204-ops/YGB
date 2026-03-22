@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.338873+00:00",
+  "lang": "en",
+  "raw_text": "Parse If you believe you have found a security vulnerability on Facebook, we encourage you to let us know right away. We will investigate all legitimate reports and do our best to quickly fix the problem. Before reporting though, please review this page ...",
+  "severity": "INFO",
+  "sha256_hash": "5cd00940168d8cee2dd24a7931e12ae79e6716954463bcd1f0d6022bac41a511",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/parseit"
+}

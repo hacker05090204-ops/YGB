@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.378578+00:00",
+  "lang": "en",
+  "raw_text": "Qualcomm Qualcomm Technologies Inc. Vulnerability Rewards Program Qualcomm Technologies, Inc. (QTI) understands that maintaining a large variety of products comes with certain responsibilities. We recognize that conducting security research often requires...",
+  "severity": "INFO",
+  "sha256_hash": "b128318c53488f07bd62cdbf33f0df95e19c04e835617d9d7d437587e49186e1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 31,
+  "url": "https://hackerone.com/qualcomm"
+}

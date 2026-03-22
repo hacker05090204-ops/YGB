@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33481",
+  "ingested_at": "2026-03-22T09:56:15.072306+00:00",
+  "lang": "en",
+  "raw_text": "Syft improper temporary file cleanup ### Impact Syft versions before v1.42.3 would not properly cleanup temporary storage if the temporary storage was exhausted during a scan. When scanning archives Syft will unpack those archives into temporary storage then inspect the unpacked contents. Under normal operation Syft will remove the temporary data it writes after completing a scan. This vulnerability would affect users of Syft that were scanning content that could cause Syft to fill the temporary storage that would then cause Syft to raise an error and exit. When the error is triggered Syft would exit without properly removing the temporary files in use. In our testing this was most easily reproduced by scanning very large artifacts or highly compressed artifacts such as a zipbomb. Because Syft would not clean up its temporary files, the result would be filling temporary file storage preventing future runs of Syft or other system utilities that rely on temporary storage being available. ### Patches The patch has been released in v1.42.3 Syft now cleans up temporary files when an error condition is encountered. ### Workarounds There are no workarounds for this vulnerability in Syft. Users that find their temporary storage depleted can manually remove the temporary files.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a44d6c4f1803997cde512d75a1344947cd569918f76d7d99ee99a1b15b36dd45",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-460"
+  ],
+  "token_count": 203,
+  "url": "https://github.com/advisories/GHSA-rjcw-vg7j-m9rc"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.642512+00:00",
+  "lang": "en",
+  "raw_text": "Whoop Bug Bounty Managed Offers bounties $50 minimum bounty At WHOOP, our mission is to unlock human performance. We exist to improve the lives of our members, not invade their lives. Like all companies providing wearable devices and health monitoring services, WHOOP manages personal and sensitive data of...",
+  "severity": "INFO",
+  "sha256_hash": "ec180812717ac815021960fc7b2da226f794bab6c9d73b08721c607afaa2f4a6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/whoop_bug_bounty"
+}

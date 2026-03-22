@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.419059+00:00",
+  "lang": "en",
+  "raw_text": "Risk.io This engagement is an on-going bounty against a hosted vulnerability intelligence platform. The application processes over 50 million vulnerabilities daily on behalf of its customers against threat, exploit and breach data collected across 150+...",
+  "severity": "INFO",
+  "sha256_hash": "a27c68343a25beba70ec9d1e2b0dd5f9b0b7d7a168e8426c4faf94d571ad98ab",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 35,
+  "url": "https://hackerone.com/riskio"
+}

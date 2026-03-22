@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.530843+00:00",
+  "lang": "es",
+  "raw_text": "Technisys Introducci\u00f3n \u00a1Bienvenido al Programa de Recompensas por Errores de Technisys! Nuestro compromiso con la seguridad significa que valoramos la contribuci\u00f3n de la comunidad de investigaci\u00f3n independiente en seguridad. El programa de recompensas por...",
+  "severity": "INFO",
+  "sha256_hash": "65ed69e29c6655a03eec5e1e68b0e11b381f89048aaa5b530f04a6ef98a73bf0",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 34,
+  "url": "https://hackerone.com/galileo-ft"
+}

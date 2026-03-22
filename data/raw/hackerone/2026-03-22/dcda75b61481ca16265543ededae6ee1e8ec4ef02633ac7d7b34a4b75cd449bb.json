@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.064549+00:00",
+  "lang": "en",
+  "raw_text": "ForeScout Technologies Managed Offers bounties $100 minimum bounty Forescout Technologies (the organization) looks forward to working with the security community to find vulnerabilities in order to keep its businesses and customers safe. Response Targets Forescout Technologies will make commercially reasonable...",
+  "severity": "INFO",
+  "sha256_hash": "dcda75b61481ca16265543ededae6ee1e8ec4ef02633ac7d7b34a4b75cd449bb",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/forescout_technologies"
+}

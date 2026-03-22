@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.987261+00:00",
+  "lang": "en",
+  "raw_text": "Django Offers bounties $250 minimum bounty Django is used to power some of the most important sites on the web and its increasing popularity has made it a critical piece of internet infrastructure. If you\u2019ve found a security bug that could potentially impact the security of these sites, you...",
+  "severity": "INFO",
+  "sha256_hash": "6b64382a773dde9b573d23f6fdbe9548fcb134320ccaa40408185e5f0c5b1872",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/django"
+}

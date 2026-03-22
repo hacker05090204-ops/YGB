@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.483901+00:00",
+  "lang": "en",
+  "raw_text": "Socket If you believe you've found a security issue in our product or service, we encourage you to notify us. We will work with you to resolve the issue promptly. Thanks in advance! Socket has other policies concerning disclosure of vulnerabilities found...",
+  "severity": "INFO",
+  "sha256_hash": "d768aeb12278c908b3c5121deb2a1b300a9df933aed27bc15a419f73c1da5b45",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/socket_dev"
+}

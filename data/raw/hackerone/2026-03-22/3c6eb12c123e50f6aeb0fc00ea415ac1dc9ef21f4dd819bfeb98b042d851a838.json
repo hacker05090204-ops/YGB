@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.399816+00:00",
+  "lang": "en",
+  "raw_text": "ReleaseWire Bug Bounty Program If you have found a bug or a security vulnerability in the ReleaseWire site or related web sites not managed by a 3rd party, we ask that you let us know as soon as possible. We take all submitted bugs seriously and work to...",
+  "severity": "INFO",
+  "sha256_hash": "3c6eb12c123e50f6aeb0fc00ea415ac1dc9ef21f4dd819bfeb98b042d851a838",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/releasewire"
+}

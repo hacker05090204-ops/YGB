@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.040354+00:00",
+  "lang": "en",
+  "raw_text": "F-Secure We want to hear about any security vulnerabilities in our products and services. In order to reward security researchers, we offer monetary rewards for eligible security vulnerability reports that are disclosed to us in a coordinated way. However,...",
+  "severity": "INFO",
+  "sha256_hash": "c79895b8260cd091f5cdef5375243993ab2833aae5eb04b7ca54ab96fbcb741e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/fsecure"
+}

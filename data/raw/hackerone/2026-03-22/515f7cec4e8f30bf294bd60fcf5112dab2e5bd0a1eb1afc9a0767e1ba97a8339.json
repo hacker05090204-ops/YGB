@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.302512+00:00",
+  "lang": "en",
+  "raw_text": "Nord Security Managed Offers bounties $100 minimum bounty At Nord Security, we strive to maximize the security of our infrastructure and customers' data. We believe that in order to reach our goal community participation is essential. Please note that your submission of potential security vulnerability...",
+  "severity": "INFO",
+  "sha256_hash": "515f7cec4e8f30bf294bd60fcf5112dab2e5bd0a1eb1afc9a0767e1ba97a8339",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/nordsecurity"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.932958+00:00",
+  "lang": "en",
+  "raw_text": "CloudBees CloudBees takes security very seriously and investigates all reported vulnerabilities. We want to keep our software and services safe for everybody. We welcome working with the security community to resolve valid issues promptly. Bounty Program...",
+  "severity": "INFO",
+  "sha256_hash": "3b959ac6b2f38f62bf549063bce7309eb8a59412c6b6dcd5d7f068cf2df4695e",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/cloudbees"
+}

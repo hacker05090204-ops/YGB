@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.671625+00:00",
+  "lang": "en",
+  "raw_text": "Zoominfo Before submitting a claim, please read some of the guidelines and scope of the program. If you have other issues with your account, please use the links or contacts below for help. Be aware that accessing another person\u2019s account while logged into...",
+  "severity": "INFO",
+  "sha256_hash": "8141d0895d92f9197cf0bfa31120f47870614254ff0149d8a6500f96a8852da7",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 43,
+  "url": "https://hackerone.com/zoominfo"
+}

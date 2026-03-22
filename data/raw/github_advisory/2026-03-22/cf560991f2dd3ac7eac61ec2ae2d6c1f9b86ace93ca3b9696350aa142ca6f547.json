@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33252",
+  "ingested_at": "2026-03-22T09:56:22.401720+00:00",
+  "lang": "en",
+  "raw_text": "Cross-Site Tool Execution for HTTP Servers without Authorizatrion in github.com/modelcontextprotocol/go-sdk The Go SDK's Streamable HTTP transport accepted browser-generated cross-site `POST` requests without validating the `Origin` header and without requiring `Content-Type: application/json`. In deployments without Authorization, especially stateless or sessionless configurations, this allows an arbitrary website to send MCP requests to a local server and potentially trigger tool execution. #### Impact: A malicious website may have been able to send cross-site POST requests with `Content-Type: text/plain`, which due to CORS-safelisted properties would reach the MCP message handling without any CORS preflight barrier. #### Fix: The SDK was modified to perform `Content-Type` header validation for POST requests and introduced a configurable protection for verifying the origin of the request in commit a433a83. Users are advised to update to v1.4.1 to use this additional protection. Note: v1.4.1 requires Go 1.25 or later. #### Credits: Thank you to L\u00ea Minh Qu\u00e2n for reporting the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "cf560991f2dd3ac7eac61ec2ae2d6c1f9b86ace93ca3b9696350aa142ca6f547",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-352"
+  ],
+  "token_count": 151,
+  "url": "https://github.com/advisories/GHSA-89xv-2j6f-qhc8"
+}

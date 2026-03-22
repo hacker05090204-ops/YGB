@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2025-55988",
+  "ingested_at": "2026-03-22T09:56:14.857363+00:00",
+  "lang": "en",
+  "raw_text": "DreamFactory has a directory traversal An issue in the component /Controllers/RestController.php of DreamFactory Core v1.0.3 allows attackers to execute a directory traversal via an unsanitized URI path.",
+  "severity": "HIGH",
+  "sha256_hash": "f6ef32b66a91328f757aedb6031a30a15c138e05ad7f1303ef98e6b221fdef76",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 27,
+  "url": "https://github.com/advisories/GHSA-gv7f-w92j-383q"
+}

@@ -1,0 +1,32 @@
+{
+  "bytes_received": 0,
+  "bytes_sent": 0,
+  "device_id": "ygb-nas",
+  "errors": 1,
+  "files_received": 0,
+  "files_sent": 0,
+  "files_synced_last_cycle": 0,
+  "last_sync_time": "2026-03-22T10:42:53.282618+00:00",
+  "peer_results": [
+    {
+      "base_url": "http://100.70.206.107:8000",
+      "bytes_received": 0,
+      "bytes_sent": 0,
+      "device_id": "kinetic4",
+      "errors": 1,
+      "files_received": 0,
+      "files_sent": 0
+    }
+  ],
+  "peers_configured": [
+    {
+      "device_id": "kinetic4",
+      "host": "100.70.206.107",
+      "ip": "100.70.206.107",
+      "port": 8000,
+      "scheme": "http"
+    }
+  ],
+  "peers_connected": 0,
+  "sync_root": "C:\\Users\\Unkno\\YGB"
+}

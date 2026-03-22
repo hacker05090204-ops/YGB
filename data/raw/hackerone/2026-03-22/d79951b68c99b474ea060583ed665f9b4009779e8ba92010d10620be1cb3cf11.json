@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.937629+00:00",
+  "lang": "en",
+  "raw_text": "Cobalt The objective of this program is to identify vulnerabilities on the Cobalt platform. Vulnerabilities of special interest include: - Unauthorized access to vulnerabilities. - Access to admin functionalities. - Information leaks. Please use Dummy...",
+  "severity": "INFO",
+  "sha256_hash": "d79951b68c99b474ea060583ed665f9b4009779e8ba92010d10620be1cb3cf11",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 35,
+  "url": "https://hackerone.com/cobalt"
+}

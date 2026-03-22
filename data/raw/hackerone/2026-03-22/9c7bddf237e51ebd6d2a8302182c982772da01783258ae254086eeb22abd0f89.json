@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.296503+00:00",
+  "lang": "en",
+  "raw_text": "Nintendo Offers bounties $100 minimum bounty Nintendo\u2019s goal is to provide a secure environment for our customers so that they can enjoy our games and services. In order to achieve this goal, Nintendo is interested in receiving vulnerability information that researchers may discover regarding...",
+  "severity": "INFO",
+  "sha256_hash": "9c7bddf237e51ebd6d2a8302182c982772da01783258ae254086eeb22abd0f89",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/nintendo"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.031088+00:00",
+  "lang": "en",
+  "raw_text": "Evernote Managed Offers bounties $150 minimum bounty Evernote is the go-to app that helps millions of people worldwide remember everything and accomplish anything. It's important to us that our customer experience be both private and secure. We strive to keep abreast on the latest state-of-the-art...",
+  "severity": "INFO",
+  "sha256_hash": "84ed3542edd621e265ba82c3521eaf972f4ee5859e79c570b5b312387913752b",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/evernote"
+}

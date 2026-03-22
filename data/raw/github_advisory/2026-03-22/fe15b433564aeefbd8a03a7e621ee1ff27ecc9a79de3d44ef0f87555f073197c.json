@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33508",
+  "ingested_at": "2026-03-22T09:56:14.833312+00:00",
+  "lang": "en",
+  "raw_text": "Parse Server LiveQuery subscription query depth bypass ### Impact Parse Server's LiveQuery component does not enforce the `requestComplexity.queryDepth` configuration setting when processing WebSocket subscription requests. An attacker can send a subscription with deeply nested logical operators, causing excessive recursion and CPU consumption that degrades or disrupts service availability. Deployments are affected when the LiveQuery WebSocket endpoint is reachable by untrusted clients. ### Patches The fix adds query condition depth validation to the LiveQuery subscription handler, enforcing the same `requestComplexity.queryDepth` limit that already protects REST API queries. ### Workarounds There is no known workaround other than upgrading.",
+  "severity": "HIGH",
+  "sha256_hash": "fe15b433564aeefbd8a03a7e621ee1ff27ecc9a79de3d44ef0f87555f073197c",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-674"
+  ],
+  "token_count": 96,
+  "url": "https://github.com/advisories/GHSA-6qh5-m6g3-xhq6"
+}

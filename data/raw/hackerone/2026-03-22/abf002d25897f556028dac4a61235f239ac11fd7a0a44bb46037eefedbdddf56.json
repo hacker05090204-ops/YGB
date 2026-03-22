@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.019090+00:00",
+  "lang": "en",
+  "raw_text": "Eternal Offers bounties $50 minimum bounty We take security seriously at Eternal and are committed to protecting our community. If you are a security researcher or expert and believe you've identified a security-related issue with any of Eternal\u2019s key verticals - Zomato, Blinkit, Hyperpure,...",
+  "severity": "INFO",
+  "sha256_hash": "abf002d25897f556028dac4a61235f239ac11fd7a0a44bb46037eefedbdddf56",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/eternal"
+}

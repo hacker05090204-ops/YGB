@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.455253+00:00",
+  "lang": "en",
+  "raw_text": "Sheer Managed Offers bounties $50 minimum bounty While we are doing our best to keep Sheer as safe as possible, we know that some bugs can slip trough our scrutiny. If you believe you've found a security issue in the services listed in our scope, we will work with you to resolve it promptly and...",
+  "severity": "INFO",
+  "sha256_hash": "f06e3d01e73a2deb33c7cbbd6233d3d7a0d1eaa850b7b8311c21fc98c722a042",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 55,
+  "url": "https://hackerone.com/sheer_bbp"
+}

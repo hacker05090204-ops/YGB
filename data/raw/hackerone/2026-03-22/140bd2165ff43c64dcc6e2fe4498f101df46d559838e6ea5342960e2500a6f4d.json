@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.662509+00:00",
+  "lang": "en",
+  "raw_text": "Yoti Offers bounties $100 minimum bounty SIGNUP / Hackerone identification SIGNUP: when registering an organisation, page, application or any \"service\" within our various services, can you please prepend [Hackerone] to the names you use! For example, when register a business or...",
+  "severity": "INFO",
+  "sha256_hash": "140bd2165ff43c64dcc6e2fe4498f101df46d559838e6ea5342960e2500a6f4d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 41,
+  "url": "https://hackerone.com/yoti"
+}

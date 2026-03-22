@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.218012+00:00",
+  "lang": "en",
+  "raw_text": "Lyst Managed Offers bounties $100 minimum bounty No technology is perfect, and Lyst believes that working with skilled security researchers across the globe is crucial in identifying weaknesses in any technology. If you believe you've found a security issue in our product or service, we encourage...",
+  "severity": "INFO",
+  "sha256_hash": "5b3299d6daad3a1691af4966dc88e201838e2a1bee12b1fadcbbfb8df280465c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/lyst"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.891418+00:00",
+  "lang": "en",
+  "raw_text": "Bugcrowd View Bugcrowd's security and disclosure policies at http://bugcrowd.com/bugcrowd.",
+  "severity": "INFO",
+  "sha256_hash": "7dbee5f2ad0f294b581485b50689fdfb21db4118db012cd1312fb8044df5bf57",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 9,
+  "url": "https://hackerone.com/bugcrowd"
+}

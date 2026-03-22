@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.614433+00:00",
+  "lang": "en",
+  "raw_text": "Moovit Managed Bug Bounty Program Moovit is a leading Mobility as a Service (MaaS) solutions company and the #1 urban mobility app. Please submit your findings to this Bug Bounty Program.",
+  "severity": "INFO",
+  "sha256_hash": "269b317f65532b7393605e48d404217896e0555869ccbca94907ed595314da86",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 31,
+  "url": "https://bugcrowd.com/engagements/moovit-mbb-og"
+}

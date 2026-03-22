@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.593744+00:00",
+  "lang": "en",
+  "raw_text": "United United Airlines vulnerability disclosure program At United, we take your safety, security and privacy seriously. We utilize best practices and are confident that our systems are secure. We are committed to protecting our customers' privacy and the...",
+  "severity": "INFO",
+  "sha256_hash": "9d2a061c164a9cd97145f991f3cf3bdc5de07a39618fdead484b1a194814e590",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/united"
+}

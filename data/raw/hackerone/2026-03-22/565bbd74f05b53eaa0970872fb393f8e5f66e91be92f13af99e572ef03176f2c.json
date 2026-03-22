@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.228008+00:00",
+  "lang": "en",
+  "raw_text": "ManageWP White Hat Reward Terms for claiming your bounty Provide us reasonable time to analyze and respond to your report and please do not disclose this information without our consent. Avoid privacy violations, deleting our data and interruption of our...",
+  "severity": "INFO",
+  "sha256_hash": "565bbd74f05b53eaa0970872fb393f8e5f66e91be92f13af99e572ef03176f2c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 40,
+  "url": "https://hackerone.com/managewp"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.307826+00:00",
+  "lang": "en",
+  "raw_text": "Nuon Nuon pays much attention to the proper security of its information and communication systems. Despite this, a weak spot may exist or develop: a security vulnerability. Abusing a security vulnerability, or informing third parties about such a...",
+  "severity": "INFO",
+  "sha256_hash": "c9475457286082904f55a53864c672700bfbc8f78e15419e3d839479bcd544d8",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/nuon"
+}

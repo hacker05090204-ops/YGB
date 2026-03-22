@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.883409+00:00",
+  "lang": "en",
+  "raw_text": "Boozt Fashion AB Managed Offers bounties $50 minimum bounty Boozt invites you to help enhance our security. We value your expertise in identifying vulnerabilities. We're serious about security and eager to collaborate. Join us in making a difference. Response Targets Boozt will make its best effort to meet...",
+  "severity": "INFO",
+  "sha256_hash": "09e0b91ba0e8e6ff6068c97904d0670fb97c8804960bbdea3cdbdd60e19ffb94",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 48,
+  "url": "https://hackerone.com/boozt"
+}

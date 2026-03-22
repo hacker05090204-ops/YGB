@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.047355+00:00",
+  "lang": "en",
+  "raw_text": "Faraday, Inc. Managed Offers bounties $50 minimum bounty Introduction Faraday, Inc. looks forward to working with the security community to find security vulnerabilities in order to keep our businesses and customers safe. Please see the \"Out of scope\" section - there are important exclusions. Response...",
+  "severity": "INFO",
+  "sha256_hash": "ca588ea7352dcd07b1741714077865385a79b506733b23dd8dfbbd6d67bfaedc",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/faraday_inc"
+}

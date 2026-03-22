@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.216015+00:00",
+  "lang": "en",
+  "raw_text": "Lyft Currently, the Lyft bug bounty program is private and is on a per-invite basis only. If you believe you've discovered a security bug or vulnerability in the Lyft service, please report it to us at the \"Contact Security team\" link on this page. We...",
+  "severity": "INFO",
+  "sha256_hash": "88a54bb331676402aaa1e78eeadbf91079b46dcce21bef3fc9a6b74d2f3b8e4a",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 45,
+  "url": "https://hackerone.com/lyft"
+}

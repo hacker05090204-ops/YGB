@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.038358+00:00",
+  "lang": "en",
+  "raw_text": "Expedia Group Bug Bounty Managed Offers bounties $100 minimum bounty Bug Bounty Program Guidelines Expedia Group recognizes the important role that security researchers play in helping to keep Expedia Group and our customers secure. By submitting a vulnerability to us either directly or indirectly you acknowledge...",
+  "severity": "INFO",
+  "sha256_hash": "8fa21a4dad8a4e6e4ee1cf079901408a63afa4ea18c0c52068efdde0cbf8f129",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/expediagroup_bbp"
+}

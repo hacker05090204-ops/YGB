@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.069547+00:00",
+  "lang": "en",
+  "raw_text": "Frontegg Managed Offers bounties $50 minimum bounty Frontegg looks forward to working with the security community to find vulnerabilities in order to keep our businesses and customers safe. Frontegg is a comprehensive developer platform designed to empower teams with self-service capabilities, robust...",
+  "severity": "INFO",
+  "sha256_hash": "effa6139d59b806ac6fe6e6d4f6d1c203f09488342330d2e799d5b88908e25f6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/frontegg"
+}

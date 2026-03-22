@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Parse Server has a protected field change detection oracle via LiveQuery watch parameter ### Impact An attacker can subscribe to LiveQuery with a `watch` parameter targeting a protected field. Although the protected field value is properly stripped from event payloads, the presence or absence of update events reveals whether the protected field changed, creating a binary oracle. For boolean protected fields, the timing of change events is equivalent to knowing the field value. ### Patches The `watch` parameter is now validated against protected fields at subscription time, mirroring the existing validation for the `where` clause. Subscriptions that include protected fields in `watch` are rejected with a permission error. Master key connections are exempt. ### Workarounds None.",
+  "token_count": 116
+}

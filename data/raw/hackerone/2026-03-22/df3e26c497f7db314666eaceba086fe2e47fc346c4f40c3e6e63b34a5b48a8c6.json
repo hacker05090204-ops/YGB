@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.839539+00:00",
+  "lang": "en",
+  "raw_text": "Asana Responsible Disclosure Security of user data and communication is of utmost importance to Asana. In pursuit of the best possible security for our service, we welcome responsible disclosure of any vulnerability you find in Asana. Principles of...",
+  "severity": "INFO",
+  "sha256_hash": "df3e26c497f7db314666eaceba086fe2e47fc346c4f40c3e6e63b34a5b48a8c6",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 38,
+  "url": "https://hackerone.com/asana"
+}

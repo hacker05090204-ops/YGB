@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.881281+00:00",
+  "lang": "en",
+  "raw_text": "Booking.com Managed Offers bounties $100 minimum bounty Please note when researching any vulnerability please use your @wearehackerone.com email address this will help us to know on our internal monitoring tools that its a researcher from hackerone and not a malicious actor Introduction Booking.com is...",
+  "severity": "INFO",
+  "sha256_hash": "d3ad85ce5f78e150ce248395fb395fa99762c0c9eae20266c4f00cc3b8342955",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/bookingcom"
+}

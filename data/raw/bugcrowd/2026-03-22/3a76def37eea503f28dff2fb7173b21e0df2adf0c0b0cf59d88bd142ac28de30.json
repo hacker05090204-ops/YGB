@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.652617+00:00",
+  "lang": "en",
+  "raw_text": "Bitso Managed Bug Bounty Engagement Bitso is Latin America\u2019s leading Financial Services company powered by crypto.",
+  "severity": "INFO",
+  "sha256_hash": "3a76def37eea503f28dff2fb7173b21e0df2adf0c0b0cf59d88bd142ac28de30",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 16,
+  "url": "https://bugcrowd.com/engagements/bitso-mbb-og"
+}

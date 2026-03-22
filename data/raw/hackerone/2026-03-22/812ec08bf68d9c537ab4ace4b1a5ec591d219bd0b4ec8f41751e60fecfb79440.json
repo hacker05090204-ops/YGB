@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.187201+00:00",
+  "lang": "en",
+  "raw_text": "Kyup If you believe you've discovered a security vulnerability in Kyup, you may responsibly disclose your find by sending an email to security@kyup.com. Please include the following details with your disclosure: Description of vulnerability and potential...",
+  "severity": "INFO",
+  "sha256_hash": "812ec08bf68d9c537ab4ace4b1a5ec591d219bd0b4ec8f41751e60fecfb79440",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/kyupcloud"
+}

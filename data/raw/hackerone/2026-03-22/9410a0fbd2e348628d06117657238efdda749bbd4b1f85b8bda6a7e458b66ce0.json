@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.144911+00:00",
+  "lang": "en",
+  "raw_text": "ING Responsible Disclosure Do you have the skills and did you discover any vulnerabilities in our systems? If so, help us by reporting these vulnerabilities. So that we can improve the safety and reliability of our systems together. ING and safety As...",
+  "severity": "INFO",
+  "sha256_hash": "9410a0fbd2e348628d06117657238efdda749bbd4b1f85b8bda6a7e458b66ce0",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 42,
+  "url": "https://hackerone.com/ing"
+}

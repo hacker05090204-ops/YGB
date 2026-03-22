@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.155214+00:00",
+  "lang": "en",
+  "raw_text": "Instagram If you believe you have found a security vulnerability on Facebook, we encourage you to let us know right away. We will investigate all legitimate reports and do our best to quickly fix the problem. Before reporting though, please review this page ...",
+  "severity": "INFO",
+  "sha256_hash": "ed245df1a18d0bbf1d33b303c10ca6aaa61b7d45119deeea76bb0af939cc85f3",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 44,
+  "url": "https://hackerone.com/instagram"
+}

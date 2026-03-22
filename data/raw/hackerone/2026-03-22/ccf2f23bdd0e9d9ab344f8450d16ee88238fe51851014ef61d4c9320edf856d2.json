@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.429405+00:00",
+  "lang": "en",
+  "raw_text": "Ruby on Rails Offers bounties $500 minimum bounty Rails is used to power some of the most important sites on the web and its increasing popularity has made it a critical piece of internet infrastructure. If you've found a security bug that could potentially impact the security of these sites, you...",
+  "severity": "INFO",
+  "sha256_hash": "ccf2f23bdd0e9d9ab344f8450d16ee88238fe51851014ef61d4c9320edf856d2",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 51,
+  "url": "https://hackerone.com/rails"
+}

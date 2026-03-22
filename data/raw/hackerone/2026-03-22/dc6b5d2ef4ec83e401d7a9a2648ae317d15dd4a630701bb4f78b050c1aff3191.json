@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.110854+00:00",
+  "lang": "en",
+  "raw_text": "Hinge Rewards | https://hinge-ue1-prod-sre-public.s3.amazonaws.com/hackerone/bar_low.png Low | https://hinge-ue1-prod-sre-public.s3.amazonaws.com...",
+  "severity": "INFO",
+  "sha256_hash": "dc6b5d2ef4ec83e401d7a9a2648ae317d15dd4a630701bb4f78b050c1aff3191",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 7,
+  "url": "https://hackerone.com/hinge"
+}

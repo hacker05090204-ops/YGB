@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.963626+00:00",
+  "lang": "en",
+  "raw_text": "Crypto.com Offers bounties $100 minimum bounty Our Products As a globally regulated company, Crypto.com is required to follow various laws and regulations in order to provide you access to our services. This means that to gain access to our main product, the Crypto.com App, you will need to go...",
+  "severity": "INFO",
+  "sha256_hash": "4698ba0bb53ed1bb04834784f01f7c1c804fe1a591aeb32a0541267043534315",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 49,
+  "url": "https://hackerone.com/crypto"
+}

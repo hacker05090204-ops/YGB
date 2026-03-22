@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.289503+00:00",
+  "lang": "en",
+  "raw_text": "NetScaler Public Program Offers bounties $50 minimum bounty Disclosure Policy Follow HackerOne's disclosure guidelines (https://www.hackerone.com/disclosure-guidelines). Program Rules Please provide detailed reports with reproducible steps. If the report is not detailed enough to reproduce the issue, the...",
+  "severity": "INFO",
+  "sha256_hash": "d3210a6e1eac1aca2eb4a12c7fb90c5b73633c9bb5c9fd61b5f8d6a728096e0d",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 36,
+  "url": "https://hackerone.com/netscaler_public_program"
+}

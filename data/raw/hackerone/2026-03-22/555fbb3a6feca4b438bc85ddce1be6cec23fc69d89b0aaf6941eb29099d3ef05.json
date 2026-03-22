@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.580739+00:00",
+  "lang": "en",
+  "raw_text": "Twilio Managed Offers bounties $50 minimum bounty Twilio Security Disclosure Program Overview Ensuring the security and integrity of the Twilio platform is critical to the service we provide to our customers. We are committed to providing a secure product and appreciate help from the community in...",
+  "severity": "INFO",
+  "sha256_hash": "555fbb3a6feca4b438bc85ddce1be6cec23fc69d89b0aaf6941eb29099d3ef05",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 46,
+  "url": "https://hackerone.com/twilio"
+}

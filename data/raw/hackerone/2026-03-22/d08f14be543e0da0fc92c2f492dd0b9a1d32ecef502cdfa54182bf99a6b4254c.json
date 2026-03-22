@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:06.887419+00:00",
+  "lang": "en",
+  "raw_text": "Brave Software Offers bounties $50 minimum bounty Brave Software believes that working with security researchers across the globe is crucial in making the web safer. If you believe you've found a security issue in our product or service, we encourage you to notify us. We will do our best to work...",
+  "severity": "INFO",
+  "sha256_hash": "d08f14be543e0da0fc92c2f492dd0b9a1d32ecef502cdfa54182bf99a6b4254c",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 51,
+  "url": "https://hackerone.com/brave"
+}

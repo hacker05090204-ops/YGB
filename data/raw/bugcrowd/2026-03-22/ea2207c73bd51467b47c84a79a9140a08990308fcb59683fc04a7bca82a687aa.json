@@ -1,0 +1,15 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:48:47.648621+00:00",
+  "lang": "en",
+  "raw_text": "Internet Brands Public Internet Brands is an online media and technology company that serves businesses and consumers in four major categories: Automotive, Health, Legal, and Home/Travel.",
+  "severity": "INFO",
+  "sha256_hash": "ea2207c73bd51467b47c84a79a9140a08990308fcb59683fc04a7bca82a687aa",
+  "source": "bugcrowd",
+  "tags": [
+    "bug_bounty",
+    "bugcrowd"
+  ],
+  "token_count": 26,
+  "url": "https://bugcrowd.com/engagements/internetbrands-public"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-22737",
+  "ingested_at": "2026-03-22T09:56:16.004852+00:00",
+  "lang": "en",
+  "raw_text": "Spring Framework Improper Path Limitation with Script View Templates Use of Java scripting engine enabled (e.g. JRuby, Jython) template views in Spring MVC and Spring WebFlux applications can result in disclosure of content from files outside the configured locations for script template views. This issue affects Spring Framework: from 7.0.0 through 7.0.5, from 6.2.0 through 6.2.16, from 6.1.0 through 6.1.25, from 5.3.0 through 5.3.46.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f6add2bc6bc37d6134f19e46e5c6d6563c656bbb403e04407f48efc6fa5691f4",
+  "source": "github_advisory",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 64,
+  "url": "https://github.com/advisories/GHSA-4773-3jfm-qmx3"
+}

@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.061547+00:00",
+  "lang": "en",
+  "raw_text": "Flutter UK&I Managed Offers bounties $250 minimum bounty Flutter UK & Ireland looks forward to work with the security community to find vulnerabilities in our brands to keep our businesses and customers safe. The only brands in scope of this program are Betfair, Paddy Power and Sky Betting and Gaming...",
+  "severity": "INFO",
+  "sha256_hash": "8df6b7553db1e4cb95be5685d4b44ee9f5a00163f45bb898a23ac06de34d995f",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 50,
+  "url": "https://hackerone.com/flutteruki"
+}

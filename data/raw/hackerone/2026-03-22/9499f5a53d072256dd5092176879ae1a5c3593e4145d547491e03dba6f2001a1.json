@@ -1,0 +1,16 @@
+{
+  "cve_id": "",
+  "ingested_at": "2026-03-22T09:46:07.441156+00:00",
+  "lang": "en",
+  "raw_text": "Schuberg Philis RESPONSIBLE DISCLOSURE We are dedicated to providing a secure environment for our customers, our visitors and ourselves. Therefore, we appreciate it if you notify us of any security issues you may encounter. Since we launched our responsible...",
+  "severity": "INFO",
+  "sha256_hash": "9499f5a53d072256dd5092176879ae1a5c3593e4145d547491e03dba6f2001a1",
+  "source": "hackerone",
+  "tags": [
+    "bug_bounty",
+    "hackerone",
+    "program"
+  ],
+  "token_count": 39,
+  "url": "https://hackerone.com/schubergphilis"
+}
