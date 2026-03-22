@@ -9,10 +9,12 @@ Models: users, sessions, devices, training_runs, audit_log
 Configure via DATABASE_URL in .env (default: D:/ygb_data/ygb.db)
 """
 
+import asyncio
 import os
 import uuid
 import json
 import aiosqlite
+from functools import lru_cache
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, List, Any
@@ -198,11 +200,29 @@ async def _fetch_one(query: str, params: tuple = ()) -> Optional[Dict[str, Any]]
     return _row_to_dict(row) if row else None
 
 
+@lru_cache(maxsize=256)
+def _cached_fetch_one_task(loop_id: int, query: str, params: tuple):
+    loop = asyncio.get_running_loop()
+    return loop.create_task(_fetch_one(query, params))
+
+
+async def _fetch_one_cached(query: str, params: tuple = ()) -> Optional[Dict[str, Any]]:
+    """Execute a query and return one cached row as a copy."""
+    loop_id = id(asyncio.get_running_loop())
+    result = await _cached_fetch_one_task(loop_id, query, tuple(params))
+    return dict(result) if result else None
+
+
+def _clear_read_caches():
+    _cached_fetch_one_task.cache_clear()
+
+
 async def _execute(query: str, params: tuple = ()):
     """Execute a write query."""
     db = await _get_db()
     await db.execute(query, params)
     await db.commit()
+    _clear_read_caches()
 
 
 # =============================================================================
@@ -226,7 +246,7 @@ async def create_user(name: str, email: str = None, role: str = "hunter") -> Dic
 
 async def get_user(user_id: str) -> Optional[Dict[str, Any]]:
     """Get a user by ID."""
-    return await _fetch_one("SELECT * FROM users WHERE id = ?", (user_id,))
+    return await _fetch_one_cached("SELECT * FROM users WHERE id = ?", (user_id,))
 
 
 async def get_all_users() -> List[Dict[str, Any]]:
@@ -244,7 +264,7 @@ async def update_user_stats(user_id: str, bounties: int = 0, earnings: float = 0
 
 async def get_user_by_email(email: str) -> Optional[Dict[str, Any]]:
     """Get a user by email address."""
-    return await _fetch_one("SELECT * FROM users WHERE email = ?", (email,))
+    return await _fetch_one_cached("SELECT * FROM users WHERE email = ?", (email,))
 
 
 async def update_user_password(user_id: str, password_hash: str):
@@ -282,7 +302,7 @@ async def get_all_targets() -> List[Dict[str, Any]]:
 
 async def get_target(target_id: str) -> Optional[Dict[str, Any]]:
     """Get a target by ID."""
-    return await _fetch_one("SELECT * FROM targets WHERE id = ?", (target_id,))
+    return await _fetch_one_cached("SELECT * FROM targets WHERE id = ?", (target_id,))
 
 
 # =============================================================================

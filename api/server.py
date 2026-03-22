@@ -123,6 +123,11 @@ def _load_shared_oauth_env(provider: str) -> None:
             break
 
 
+async def _abort_if_disconnected(request: "Request") -> None:
+    if await request.is_disconnected():
+        raise HTTPException(status_code=499, detail="Client disconnected")
+
+
 # Load env files FIRST — before any other imports read env vars.
 _ENV_ROOT = _Path(__file__).resolve().parent.parent
 _load_env_file(_ENV_ROOT / ".env", allow_placeholders=False)
@@ -1002,7 +1007,7 @@ async def get_cve_pipeline_full_status(user=Depends(require_auth)):
 
 
 @app.post("/api/cve/backfill")
-async def trigger_cve_backfill(max_samples: int = 0, user=Depends(require_auth)):
+async def trigger_cve_backfill(request: Request, max_samples: int = 0, user=Depends(require_auth)):
     """One-shot backfill: rapidly ingest all CVE pipeline records into training bridge.
 
     Used for fast ramp of internet-only AUTO mode.
@@ -1021,7 +1026,8 @@ async def trigger_cve_backfill(max_samples: int = 0, user=Depends(require_auth))
                 "active_ingestion": False,
             }
 
-        result = worker.backfill(pipeline, max_samples=max_samples)
+        await _abort_if_disconnected(request)
+        result = await asyncio.to_thread(worker.backfill, pipeline, max_samples=max_samples)
         return {
             **result,
             "active_ingestion": True,
@@ -1086,7 +1092,7 @@ async def get_cve_summary(user=Depends(require_auth)):
 
 
 @app.get("/api/cve/search")
-async def search_cves(q: str = "", user=Depends(require_auth)):
+async def search_cves(request: Request, q: str = "", user=Depends(require_auth)):
     """Search CVE records by ID or keyword."""
     if not q or len(q) < 3:
         return {"results": [], "query": q, "reason": "Query must be at least 3 characters"}
@@ -1094,12 +1100,15 @@ async def search_cves(q: str = "", user=Depends(require_auth)):
         from backend.cve.cve_pipeline import get_pipeline
 
         pipeline = get_pipeline()
-        results = pipeline.search(q)
+        await _abort_if_disconnected(request)
+        results = await asyncio.to_thread(pipeline.search, q)
         research = None
         if not results:
             from backend.assistant.voice_runtime import run_research_analysis
 
-            research = run_research_analysis(
+            await _abort_if_disconnected(request)
+            research = await asyncio.to_thread(
+                run_research_analysis,
                 f"{q} CVE severity NVD Vulners VulDB latest advisory"
             )
         return {
@@ -3591,19 +3600,21 @@ async def admin_auth_intel(req: Request, limit: int = 200):
 
 
 @app.get("/api/storage/tiered")
-async def storage_tiered_status(user=Depends(require_auth)):
+async def storage_tiered_status(request: Request, user=Depends(require_auth)):
     """Get SSD/HDD storage tiering status."""
     if not TIERED_STORAGE_AVAILABLE:
         return {"available": False, "error": "Tiered storage not loaded"}
+    await _abort_if_disconnected(request)
     report = await asyncio.to_thread(get_tiered_report)
     return {"available": True, **report}
 
 
 @app.post("/api/storage/enforce")
-async def storage_enforce(user=Depends(require_admin)):
+async def storage_enforce(request: Request, user=Depends(require_admin)):
     """Manually trigger SSD cap enforcement (compress + migrate)."""
     if not TIERED_STORAGE_AVAILABLE:
         return {"available": False, "error": "Tiered storage not loaded"}
+    await _abort_if_disconnected(request)
     result = await asyncio.to_thread(enforce_ssd_cap)
     return {"available": True, **result.to_dict()}
 

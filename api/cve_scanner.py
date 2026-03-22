@@ -213,6 +213,30 @@ HEADER_CVE_PATTERNS = {
     ],
 }
 
+_COMPILED_CVE_PATTERNS = {
+    tech: [{**pattern_info, "regex": re.compile(pattern_info["pattern"])} for pattern_info in patterns]
+    for tech, patterns in CVE_PATTERNS.items()
+}
+
+_COMPILED_HEADER_CVE_PATTERNS = {
+    header_name: [
+        {**pattern_info, "regex": re.compile(pattern_info["pattern"], re.I)}
+        for pattern_info in patterns
+    ]
+    for header_name, patterns in HEADER_CVE_PATTERNS.items()
+}
+
+_SCRIPT_SRC_RE = re.compile(r'<script[^>]+src=["\']([^"\']+)["\']', re.I)
+_VULNERABLE_SCRIPT_PATTERNS = (
+    (re.compile(r'jquery[/-]?(\d+\.\d+\.\d+)', re.I), "jquery"),
+    (re.compile(r'angular[.-]?(\d+\.\d+\.\d+)', re.I), "angular"),
+    (re.compile(r'bootstrap[/-]?(\d+\.\d+\.\d+)', re.I), "bootstrap"),
+    (re.compile(r'lodash[/-]?(\d+\.\d+\.\d+)', re.I), "lodash"),
+    (re.compile(r'moment[/-]?(\d+\.\d+\.\d+)', re.I), "moment"),
+    (re.compile(r'react[/-]?(\d+\.\d+\.\d+)', re.I), "react"),
+    (re.compile(r'vue[/-]?(\d+\.\d+\.\d+)', re.I), "vue"),
+)
+
 
 class CVEScanner:
     """Professional CVE vulnerability scanner."""
@@ -243,9 +267,9 @@ class CVEScanner:
         """Scan page content for CVE vulnerabilities."""
         content_lower = content.lower()
         
-        for tech, patterns in CVE_PATTERNS.items():
+        for tech, patterns in _COMPILED_CVE_PATTERNS.items():
             for pattern_info in patterns:
-                if re.search(pattern_info["pattern"], content_lower, re.I):
+                if pattern_info["regex"].search(content_lower):
                     match = CVEMatch(
                         cve_id=pattern_info["cve"],
                         title=pattern_info["title"],
@@ -269,13 +293,13 @@ class CVEScanner:
         """Scan HTTP headers for CVE vulnerabilities."""
         headers_lower = {k.lower(): v for k, v in headers.items()}
         
-        for header_name, patterns in HEADER_CVE_PATTERNS.items():
+        for header_name, patterns in _COMPILED_HEADER_CVE_PATTERNS.items():
             header_value = headers_lower.get(header_name, "")
             if not header_value:
                 continue
             
             for pattern_info in patterns:
-                if re.search(pattern_info["pattern"], header_value, re.I):
+                if pattern_info["regex"].search(header_value):
                     match = CVEMatch(
                         cve_id=pattern_info["cve"],
                         title=pattern_info["title"],
@@ -297,29 +321,18 @@ class CVEScanner:
     async def scan_scripts(self, content: str, url: str = "") -> List[CVEMatch]:
         """Scan script tags for vulnerable library versions."""
         # Extract script sources
-        script_pattern = r'<script[^>]+src=["\']([^"\']+)["\']'
-        scripts = re.findall(script_pattern, content, re.I)
-        
-        vulnerable_patterns = [
-            # CDN patterns with versions
-            (r'jquery[/-]?(\d+\.\d+\.\d+)', "jquery"),
-            (r'angular[.-]?(\d+\.\d+\.\d+)', "angular"),
-            (r'bootstrap[/-]?(\d+\.\d+\.\d+)', "bootstrap"),
-            (r'lodash[/-]?(\d+\.\d+\.\d+)', "lodash"),
-            (r'moment[/-]?(\d+\.\d+\.\d+)', "moment"),
-            (r'react[/-]?(\d+\.\d+\.\d+)', "react"),
-            (r'vue[/-]?(\d+\.\d+\.\d+)', "vue"),
-        ]
+        scripts = _SCRIPT_SRC_RE.findall(content)
         
         for script_src in scripts:
-            for pattern, lib_name in vulnerable_patterns:
-                match = re.search(pattern, script_src, re.I)
+            for pattern, lib_name in _VULNERABLE_SCRIPT_PATTERNS:
+                match = pattern.search(script_src)
                 if match:
                     version = match.group(1)
                     # Check against known vulnerable versions
-                    if lib_name in CVE_PATTERNS:
-                        for vuln in CVE_PATTERNS[lib_name]:
-                            if re.search(vuln["pattern"], f"{lib_name}/{version}", re.I):
+                    if lib_name in _COMPILED_CVE_PATTERNS:
+                        lib_version = f"{lib_name}/{version}"
+                        for vuln in _COMPILED_CVE_PATTERNS[lib_name]:
+                            if vuln["regex"].search(lib_version):
                                 cve_match = CVEMatch(
                                     cve_id=vuln["cve"],
                                     title=vuln["title"],
@@ -341,9 +354,12 @@ class CVEScanner:
     
     async def full_scan(self, content: str, headers: Dict[str, str], url: str = "") -> Dict[str, Any]:
         """Perform full CVE scan of content, headers, and scripts."""
-        await self.scan_content(content, url)
-        await self.scan_headers(headers, url)
-        await self.scan_scripts(content, url)
+        self.findings = []
+        await asyncio.gather(
+            self.scan_content(content, url),
+            self.scan_headers(headers, url),
+            self.scan_scripts(content, url),
+        )
         
         # Deduplicate by CVE ID
         unique_cves = {}
