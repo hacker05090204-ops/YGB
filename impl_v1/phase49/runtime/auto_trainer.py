@@ -29,6 +29,7 @@ RULES:
 
 import asyncio
 import concurrent.futures
+from contextlib import nullcontext
 import os
 import subprocess
 import sys
@@ -235,6 +236,9 @@ class AutoTrainer:
         self._gpu_model = None  # Persistent model in GPU memory
         self._gpu_optimizer = None
         self._gpu_criterion = None
+        self._persistent_model = None
+        self._persistent_optimizer = None
+        self._persistent_criterion = None
         self._gpu_features = None  # Pre-created tensors on GPU
         self._gpu_labels = None
         self._gpu_device = None
@@ -434,6 +438,8 @@ class AutoTrainer:
         )
         
         self._events.append(event)
+        if len(self._events) > 1000:
+            self._events = self._events[-500:]
         if event_type == "ERROR":
             self._last_error = details
         
@@ -878,14 +884,13 @@ class AutoTrainer:
                 prefetch_factor=prefetch,
                 seed=seed,
             )
-            first_batch = next(iter(train_loader))
             logger.info(
                 "DataLoader: num_workers=%s, persistent=%s, profile=%s",
                 num_workers,
                 persistent,
                 _TRAINING_PROFILE,
             )
-            return train_loader, holdout_loader, stats, first_batch
+            return train_loader, holdout_loader, stats
 
         try:
             return _create(requested_workers)
@@ -939,19 +944,22 @@ class AutoTrainer:
             )
             
             # Create model on GPU (PERSISTENT)
-            if self._gpu_model is None:
-                self._gpu_model = BugClassifier(config)
-            self._gpu_model = self._gpu_model.to(self._gpu_device)
+            if self._persistent_model is None:
+                self._persistent_model = BugClassifier(config)
+            self._persistent_model = self._persistent_model.to(self._gpu_device)
+            self._gpu_model = self._persistent_model
             
             # Create optimizer and criterion (PERSISTENT)
-            if self._gpu_optimizer is None:
-                self._gpu_optimizer = optim.Adam(
-                    self._gpu_model.parameters(),
+            if self._persistent_optimizer is None:
+                self._persistent_optimizer = optim.Adam(
+                    self._persistent_model.parameters(),
                     lr=config.learning_rate,
                     weight_decay=1e-5,
                 )
-            if self._gpu_criterion is None:
-                self._gpu_criterion = nn.CrossEntropyLoss()
+            if self._persistent_criterion is None:
+                self._persistent_criterion = nn.CrossEntropyLoss()
+            self._gpu_optimizer = self._persistent_optimizer
+            self._gpu_criterion = self._persistent_criterion
             
             # LR scheduler — cosine annealing with warm restarts (24/7 mode)
             # T_0=50: full cosine cycle every 50 epochs, T_mult=1: same length each restart
@@ -1012,7 +1020,7 @@ class AutoTrainer:
                 logger.info("GPU initialization aborted before DataLoader creation")
                 return False
             
-            train_loader, holdout_loader, stats, first_batch = self._build_training_dataloaders(
+            train_loader, holdout_loader, stats = self._build_training_dataloaders(
                 batch_size=1024,
                 seed=42,
             )
@@ -1034,9 +1042,10 @@ class AutoTrainer:
                 logger.info("GPU initialization aborted after DataLoader creation")
                 return False
             
-            # Pre-load first batch to GPU for fast access
-            self._gpu_features = first_batch[0].to(self._gpu_device)
-            self._gpu_labels = first_batch[1].to(self._gpu_device)
+            # Cache the latest batch during real training instead of eagerly
+            # pulling one batch during startup.
+            self._gpu_features = None
+            self._gpu_labels = None
             
             # === GOVERNANCE: Register data source + validate trust ===
             try:
@@ -1221,6 +1230,7 @@ class AutoTrainer:
             # Initialize AMP scaler if not exists
             if not hasattr(self, '_scaler') or self._scaler is None:
                 self._scaler = GradScaler('cuda') if AMP_AVAILABLE else None
+            amp_enabled = AMP_AVAILABLE and self._scaler is not None
             
             self._gpu_model.train()
             
@@ -1275,7 +1285,7 @@ class AutoTrainer:
                 batch_size = batch_labels.size(0)
                 
                 # AMP: Mixed precision forward pass
-                if AMP_AVAILABLE and self._scaler is not None:
+                if amp_enabled:
                     with autocast('cuda', dtype=torch.float16):
                         outputs = self._gpu_model(batch_features)
                         loss = self._gpu_criterion(outputs, batch_labels)
@@ -1323,7 +1333,8 @@ class AutoTrainer:
                 self._gpu_model.eval()
                 holdout_correct_gpu = torch.zeros(1, dtype=torch.long, device=self._gpu_device)
                 holdout_total = 0
-                with torch.no_grad(), autocast('cuda', dtype=torch.float16):
+                holdout_autocast = autocast('cuda', dtype=torch.float16) if amp_enabled else nullcontext()
+                with torch.no_grad(), holdout_autocast:
                     for h_features, h_labels in self._gpu_holdout_loader:
                         h_features = h_features.to(self._gpu_device, non_blocking=True)
                         h_labels = h_labels.to(self._gpu_device, non_blocking=True)
@@ -1545,8 +1556,19 @@ class AutoTrainer:
                     gpu_used=True,
                 )
                 return False
+
+            if self._persistent_model is None and not self._init_gpu_resources():
+                self._emit_event(
+                    "ERROR",
+                    "Persistent GPU model was not initialized",
+                    epoch=self._epoch,
+                    gpu_used=True,
+                )
+                return False
             
             # === REAL GPU TRAINING using full DataLoader (20K+ samples) ===
+            # Full dataloader iteration happens in _gpu_train_step
+            # (for batch in the loader, not next(iter(...))).
             import time as _time
             _step_start = _time.perf_counter()
             success, accuracy, loss = self._gpu_train_step()
@@ -2201,6 +2223,14 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                 else:
                     trainer._emit_event("ERROR", "Failed to initialize GPU resources", gpu_used=True)
                 return
+
+        if trainer._persistent_model is None:
+            trainer._continuous_mode = False
+            with trainer._training_lock:
+                trainer._state = TrainingState.ERROR
+                trainer._continuous_thread = None
+            trainer._emit_event("ERROR", "Persistent GPU model was not initialized", gpu_used=True)
+            return
         
         epoch_count = 0
         while trainer._continuous_mode and not trainer._abort_flag.is_set():
