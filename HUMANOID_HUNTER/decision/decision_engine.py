@@ -47,6 +47,11 @@ EVIDENCE_VISIBILITY: dict[str, EvidenceVisibility] = {
     "self_hash": EvidenceVisibility.VISIBLE,
     "prior_hash": EvidenceVisibility.VISIBLE,
 }
+_HASH_SEPARATOR = b"\x00"
+_LAST_VALIDATED_AUDIT_ID = ""
+_LAST_VALIDATED_LENGTH = 0
+_LAST_VALIDATED_HASH = ""
+_LAST_VALIDATION_RESULT = False
 
 
 def _compute_record_hash(
@@ -76,24 +81,34 @@ def _compute_record_hash(
     Returns:
         Hex-encoded SHA-256 hash
     """
+    decision_id_bytes = decision_id.encode("utf-8")
+    request_id_bytes = request_id.encode("utf-8")
+    human_id_bytes = human_id.encode("utf-8")
+    decision_name_bytes = decision.name.encode("utf-8")
+    reason_bytes = (reason or "").encode("utf-8")
+    escalation_target_bytes = (escalation_target or "").encode("utf-8")
+    timestamp_bytes = timestamp.encode("utf-8")
+    evidence_chain_hash_bytes = evidence_chain_hash.encode("utf-8")
+    prior_hash_bytes = prior_hash.encode("utf-8")
+
     hasher = hashlib.sha256()
-    hasher.update(decision_id.encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update(request_id.encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update(human_id.encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update(decision.name.encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update((reason or "").encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update((escalation_target or "").encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update(timestamp.encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update(evidence_chain_hash.encode('utf-8'))
-    hasher.update(b'\x00')
-    hasher.update(prior_hash.encode('utf-8'))
+    hasher.update(decision_id_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(request_id_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(human_id_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(decision_name_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(reason_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(escalation_target_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(timestamp_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(evidence_chain_hash_bytes)
+    hasher.update(_HASH_SEPARATOR)
+    hasher.update(prior_hash_bytes)
     return hasher.hexdigest()
 
 
@@ -412,19 +427,42 @@ def validate_audit_chain(audit: DecisionAudit) -> bool:
     Returns:
         True if chain is valid, False otherwise
     """
+    global _LAST_VALIDATED_AUDIT_ID, _LAST_VALIDATED_LENGTH
+    global _LAST_VALIDATED_HASH, _LAST_VALIDATION_RESULT
+
     # Empty audit is valid
     if audit.length == 0:
-        return audit.head_hash == "" and len(audit.records) == 0
+        result = audit.head_hash == "" and len(audit.records) == 0
+        _LAST_VALIDATED_AUDIT_ID = audit.audit_id
+        _LAST_VALIDATED_LENGTH = 0
+        _LAST_VALIDATED_HASH = ""
+        _LAST_VALIDATION_RESULT = result
+        return result
     
     # Length must match
     if audit.length != len(audit.records):
+        _LAST_VALIDATED_AUDIT_ID = audit.audit_id
+        _LAST_VALIDATED_LENGTH = 0
+        _LAST_VALIDATED_HASH = ""
+        _LAST_VALIDATION_RESULT = False
         return False
     
-    # Validate hash chain
+    # Validate hash chain incrementally when the same immutable audit only grows.
     expected_prior_hash = ""
     computed_hash = ""
-    
-    for record in audit.records:
+    start_index = 0
+    if (
+        _LAST_VALIDATION_RESULT
+        and audit.audit_id == _LAST_VALIDATED_AUDIT_ID
+        and audit.length >= _LAST_VALIDATED_LENGTH
+    ):
+        if audit.length == _LAST_VALIDATED_LENGTH and audit.head_hash == _LAST_VALIDATED_HASH:
+            return True
+        start_index = _LAST_VALIDATED_LENGTH
+        expected_prior_hash = _LAST_VALIDATED_HASH
+        computed_hash = _LAST_VALIDATED_HASH
+
+    for record in audit.records[start_index:]:
         computed_hash = _compute_record_hash(
             record.decision_id,
             record.request_id,
@@ -439,7 +477,13 @@ def validate_audit_chain(audit: DecisionAudit) -> bool:
         expected_prior_hash = computed_hash
     
     # Head hash must match last computed hash
-    if audit.head_hash != computed_hash:
-        return False
-    
-    return True
+    result = audit.head_hash == computed_hash
+    _LAST_VALIDATED_AUDIT_ID = audit.audit_id
+    _LAST_VALIDATION_RESULT = result
+    if result:
+        _LAST_VALIDATED_LENGTH = audit.length
+        _LAST_VALIDATED_HASH = computed_hash
+    else:
+        _LAST_VALIDATED_LENGTH = 0
+        _LAST_VALIDATED_HASH = ""
+    return result

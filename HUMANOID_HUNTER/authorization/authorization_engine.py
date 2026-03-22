@@ -20,7 +20,8 @@ CORE RULES:
 """
 import hashlib
 import uuid
-from typing import Optional, Tuple, Set
+from collections import OrderedDict
+from typing import Optional, Tuple
 
 from HUMANOID_HUNTER.intent import (
     ExecutionIntent,
@@ -45,8 +46,30 @@ from .authorization_context import (
 )
 
 
-# Track authorized intents to prevent duplicates
-_AUTHORIZED_INTENTS: Set[str] = set()
+class _BoundedSet:
+    """Bounded insertion-ordered set for hot-path duplicate tracking."""
+
+    def __init__(self, maxsize: int = 10000):
+        self._maxsize = maxsize
+        self._entries: OrderedDict[str, None] = OrderedDict()
+
+    def add(self, key: str) -> None:
+        self._entries[key] = None
+        self._entries.move_to_end(key)
+        if len(self._entries) > self._maxsize:
+            evict_count = max(1, self._maxsize // 4)
+            for _ in range(min(evict_count, len(self._entries))):
+                self._entries.popitem(last=False)
+
+    def __contains__(self, key: str) -> bool:
+        return key in self._entries
+
+    def clear(self) -> None:
+        self._entries.clear()
+
+
+# Track authorized intents to prevent duplicates.
+_AUTHORIZED_INTENTS = _BoundedSet(10000)
 
 
 def _compute_authorization_hash(

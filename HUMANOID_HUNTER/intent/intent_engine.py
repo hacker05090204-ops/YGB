@@ -19,7 +19,8 @@ CORE RULES:
 """
 import hashlib
 import uuid
-from typing import Optional, Tuple, Set
+from collections import OrderedDict
+from typing import Optional, Tuple
 
 from HUMANOID_HUNTER.decision import DecisionRecord, HumanDecision
 
@@ -32,9 +33,31 @@ from .intent_context import (
 )
 
 
+class _BoundedSet:
+    """Bounded insertion-ordered set for hot-path duplicate tracking."""
+
+    def __init__(self, maxsize: int = 10000):
+        self._maxsize = maxsize
+        self._entries: OrderedDict[str, None] = OrderedDict()
+
+    def add(self, key: str) -> None:
+        self._entries[key] = None
+        self._entries.move_to_end(key)
+        if len(self._entries) > self._maxsize:
+            evict_count = max(1, self._maxsize // 4)
+            for _ in range(min(evict_count, len(self._entries))):
+                self._entries.popitem(last=False)
+
+    def __contains__(self, key: str) -> bool:
+        return key in self._entries
+
+    def clear(self) -> None:
+        self._entries.clear()
+
+
 # Track bound decisions to prevent duplicates (in-memory for pure function use)
-# In real implementation, this would be persisted
-_BOUND_DECISIONS: Set[str] = set()
+# In real implementation, this would be persisted.
+_BOUND_DECISIONS = _BoundedSet(10000)
 
 
 def _compute_intent_hash(
