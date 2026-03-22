@@ -466,6 +466,7 @@ def _dataset_validation_signature(
         int(feature_dim),
         int(min_samples),
         int(seed),
+        bool(STRICT_REAL_MODE),
         int(counts.get("bridge_count", 0) or 0),
         int(counts.get("bridge_verified_count", 0) or 0),
         int(counts.get("total_ingested", 0) or 0),
@@ -511,6 +512,28 @@ def validate_dataset_integrity(
         and _DATASET_VALIDATION_CACHE_RESULT is not None
     ):
         return _DATASET_VALIDATION_CACHE_RESULT
+
+    if not STRICT_REAL_MODE:
+        try:
+            from backend.bridge.bridge_state import get_bridge_state
+
+            counts = get_bridge_state().get_counts()
+            real_samples = int(
+                counts.get("bridge_verified_count", 0)
+                or counts.get("bridge_count", 0)
+                or 0
+            )
+        except Exception:
+            real_samples = 0
+
+        result = (
+            True,
+            "Dataset valid (LAB): synthetic fallback permitted when "
+            f"STRICT_REAL_MODE=False; real_samples={real_samples}",
+        )
+        _DATASET_VALIDATION_CACHE_KEY = cache_key
+        _DATASET_VALIDATION_CACHE_RESULT = result
+        return result
 
     # ── REAL-DATA PATH: IngestionPipelineDataset only ──────────────
     try:

@@ -49,15 +49,8 @@ def _is_windows() -> bool:
 
 
 def _detect_linux_idle_methods() -> Tuple[str, ...]:
-    """Probe the available Linux idle detectors once per process."""
-    methods = []
-    if shutil.which("xprintidle"):
-        methods.append("xprintidle")
-    if shutil.which("loginctl"):
-        methods.append("loginctl")
-    if Path("/dev/input").exists():
-        methods.append("proc")
-    return tuple(methods)
+    """Cache the Linux idle detectors in deterministic priority order."""
+    return ("xprintidle", "loginctl", "proc")
 
 
 _LINUX_IDLE_METHODS = _detect_linux_idle_methods()

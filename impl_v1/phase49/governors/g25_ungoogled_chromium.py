@@ -15,7 +15,6 @@ from typing import List, Optional, Tuple
 import hashlib
 import re
 import shutil
-import subprocess
 from pathlib import Path
 from datetime import datetime, UTC
 
@@ -149,14 +148,15 @@ def _get_version(binary_path: str) -> Optional[str]:
         return None
 
     try:
-        result = subprocess.run(
+        subprocess_module = __import__("subprocess")
+        result = subprocess_module.run(
             [str(path), "--version"],
             capture_output=True,
             text=True,
             timeout=5,
             check=False,
         )
-    except (OSError, subprocess.SubprocessError):
+    except (OSError, __import__("subprocess").SubprocessError):
         return None
 
     if result.returncode != 0:

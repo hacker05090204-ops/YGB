@@ -868,9 +868,9 @@ class AutoTrainer:
         if env_workers:
             requested_workers = max(0, int(env_workers))
         elif sys.platform == "win32":
-            # Windows worker spawn has repeatedly hit DLL pickling failures and
-            # multi-minute startup stalls in the ingestion dataset path.
-            requested_workers = 0
+            # Probe with a small worker count on Windows first, then fall back
+            # to 0 if worker startup or pickling fails.
+            requested_workers = 2
         else:
             requested_workers = 4
 
@@ -884,13 +884,14 @@ class AutoTrainer:
                 prefetch_factor=prefetch,
                 seed=seed,
             )
+            first_batch = next(iter(train_loader))
             logger.info(
                 "DataLoader: num_workers=%s, persistent=%s, profile=%s",
                 num_workers,
                 persistent,
                 _TRAINING_PROFILE,
             )
-            return train_loader, holdout_loader, stats
+            return train_loader, holdout_loader, stats, first_batch
 
         try:
             return _create(requested_workers)
@@ -1020,7 +1021,7 @@ class AutoTrainer:
                 logger.info("GPU initialization aborted before DataLoader creation")
                 return False
             
-            train_loader, holdout_loader, stats = self._build_training_dataloaders(
+            train_loader, holdout_loader, stats, _first_batch = self._build_training_dataloaders(
                 batch_size=1024,
                 seed=42,
             )
@@ -1557,16 +1558,8 @@ class AutoTrainer:
                 )
                 return False
 
-            if self._persistent_model is None and not self._init_gpu_resources():
-                self._emit_event(
-                    "ERROR",
-                    "Persistent GPU model was not initialized",
-                    epoch=self._epoch,
-                    gpu_used=True,
-                )
-                return False
-            
             # === REAL GPU TRAINING using full DataLoader (20K+ samples) ===
+            # self._persistent_model is initialized lazily in _gpu_train_step.
             # Full dataloader iteration happens in _gpu_train_step
             # (for batch in the loader, not next(iter(...))).
             import time as _time

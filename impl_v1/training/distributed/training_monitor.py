@@ -5,7 +5,175 @@ import os
 import time
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import Dict, List, Optional
+
+
+class DriftType(Enum):
+    LOSS_SPIKE = "LOSS_SPIKE"
+    GRAD_EXPLOSION = "GRAD_EXPLOSION"
+    ACCURACY_DROP = "ACCURACY_DROP"
+
+
+class DriftSeverity(Enum):
+    WARNING = "WARNING"
+    CRITICAL = "CRITICAL"
+
+
+@dataclass
+class EnergyMetric:
+    epoch: int
+    avg_power_watts: float
+    epoch_duration_sec: float
+    energy_joules: float
+    energy_kwh: float
+    timestamp: str
+
+
+@dataclass
+class DriftAnomaly:
+    epoch: int
+    drift_type: DriftType
+    severity: DriftSeverity
+    message: str
+
+
+@dataclass
+class DriftCheckResult:
+    epoch: int
+    anomalies: List[DriftAnomaly] = field(default_factory=list)
+    should_pause: bool = False
+
+
+class EnergyTracker:
+    def __init__(self):
+        self.metrics: List[EnergyMetric] = []
+
+    def record_epoch(self, epoch: int, avg_power_watts: float, epoch_duration_sec: float) -> EnergyMetric:
+        energy_joules = float(avg_power_watts) * float(epoch_duration_sec)
+        metric = EnergyMetric(
+            epoch=int(epoch),
+            avg_power_watts=float(avg_power_watts),
+            epoch_duration_sec=float(epoch_duration_sec),
+            energy_joules=energy_joules,
+            energy_kwh=energy_joules / 3_600_000.0,
+            timestamp=datetime.now().isoformat(),
+        )
+        self.metrics.append(metric)
+        return metric
+
+    def get_average_energy(self) -> float:
+        if not self.metrics:
+            return 0.0
+        return sum(metric.energy_joules for metric in self.metrics) / len(self.metrics)
+
+    def get_summary(self) -> Dict[str, float]:
+        total_energy = sum(metric.energy_joules for metric in self.metrics)
+        return {
+            "total_epochs": len(self.metrics),
+            "total_energy_joules": total_energy,
+            "average_energy_joules": self.get_average_energy(),
+        }
+
+
+class DriftDetector:
+    def __init__(self):
+        self._previous_loss: Optional[float] = None
+        self._previous_grad_norm: Optional[float] = None
+        self._previous_accuracy: Optional[float] = None
+        self._results: List[DriftCheckResult] = []
+
+    def check_epoch(self, epoch: int, val_loss: float, grad_norm: float, accuracy: float) -> DriftCheckResult:
+        anomalies: List[DriftAnomaly] = []
+
+        if self._previous_loss and self._previous_loss > 0:
+            loss_ratio = float(val_loss) / self._previous_loss
+            if loss_ratio >= 5.0:
+                anomalies.append(
+                    DriftAnomaly(
+                        epoch=int(epoch),
+                        drift_type=DriftType.LOSS_SPIKE,
+                        severity=DriftSeverity.CRITICAL,
+                        message=f"Validation loss spiked {loss_ratio:.2f}x",
+                    )
+                )
+            elif loss_ratio >= 2.0:
+                anomalies.append(
+                    DriftAnomaly(
+                        epoch=int(epoch),
+                        drift_type=DriftType.LOSS_SPIKE,
+                        severity=DriftSeverity.WARNING,
+                        message=f"Validation loss spiked {loss_ratio:.2f}x",
+                    )
+                )
+
+        if self._previous_grad_norm and self._previous_grad_norm > 0:
+            grad_ratio = float(grad_norm) / self._previous_grad_norm
+            if grad_ratio >= 25.0:
+                anomalies.append(
+                    DriftAnomaly(
+                        epoch=int(epoch),
+                        drift_type=DriftType.GRAD_EXPLOSION,
+                        severity=DriftSeverity.CRITICAL,
+                        message=f"Gradient norm spiked {grad_ratio:.2f}x",
+                    )
+                )
+            elif grad_ratio >= 10.0:
+                anomalies.append(
+                    DriftAnomaly(
+                        epoch=int(epoch),
+                        drift_type=DriftType.GRAD_EXPLOSION,
+                        severity=DriftSeverity.WARNING,
+                        message=f"Gradient norm spiked {grad_ratio:.2f}x",
+                    )
+                )
+
+        if self._previous_accuracy is not None:
+            accuracy_drop = self._previous_accuracy - float(accuracy)
+            if accuracy_drop >= 0.15:
+                anomalies.append(
+                    DriftAnomaly(
+                        epoch=int(epoch),
+                        drift_type=DriftType.ACCURACY_DROP,
+                        severity=DriftSeverity.CRITICAL,
+                        message=f"Accuracy dropped by {accuracy_drop:.4f}",
+                    )
+                )
+            elif accuracy_drop >= 0.05:
+                anomalies.append(
+                    DriftAnomaly(
+                        epoch=int(epoch),
+                        drift_type=DriftType.ACCURACY_DROP,
+                        severity=DriftSeverity.WARNING,
+                        message=f"Accuracy dropped by {accuracy_drop:.4f}",
+                    )
+                )
+
+        result = DriftCheckResult(
+            epoch=int(epoch),
+            anomalies=anomalies,
+            should_pause=any(anomaly.severity == DriftSeverity.CRITICAL for anomaly in anomalies),
+        )
+        self._results.append(result)
+
+        self._previous_loss = float(val_loss)
+        self._previous_grad_norm = float(grad_norm)
+        self._previous_accuracy = float(accuracy)
+        return result
+
+    def get_summary(self) -> Dict[str, float]:
+        total_anomalies = sum(len(result.anomalies) for result in self._results)
+        total_critical = sum(
+            1
+            for result in self._results
+            for anomaly in result.anomalies
+            if anomaly.severity == DriftSeverity.CRITICAL
+        )
+        return {
+            "epochs_monitored": len(self._results),
+            "total_anomalies": total_anomalies,
+            "critical_anomalies": total_critical,
+        }
 
 
 @dataclass

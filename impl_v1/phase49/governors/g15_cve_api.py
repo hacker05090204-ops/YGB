@@ -53,6 +53,10 @@ class CVEAPIConfig:
     timeout: int = 30
     cache_ttl_hours: int = 24
 
+    def get(self, key: str, default=None):
+        """Dict-style accessor for older tests and status helpers."""
+        return getattr(self, key, default)
+
 
 @dataclass(frozen=True)
 class CVEAPIResult:

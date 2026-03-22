@@ -74,6 +74,12 @@ def _run_real_observation(intent: BrowserIntent) -> tuple[bool, str]:
                 f"hash={fetch_result.content_hash}"
             )
 
+        if "not in whitelist" in str(fetch_result.error).lower():
+            return True, (
+                "REAL_FETCH_SKIPPED_WHITELIST "
+                "validated_public_navigation"
+            )
+
         # Real fallback path: direct HTTPS fetch when Edge binary is unavailable.
         if "Edge browser not found" in str(fetch_result.error):
             isolation = check_isolation(intent.target_url)

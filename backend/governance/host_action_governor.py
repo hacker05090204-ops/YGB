@@ -179,7 +179,14 @@ class HostActionGovernor:
         self._path = str(ledger_path or HOST_ACTION_LEDGER_PATH)
         self._entries: list[dict] = []
         self._chain_hash = "0" * 64
-        self._key_mgr = key_manager or KeyManager()
+        if key_manager is not None:
+            self._key_mgr = key_manager
+        else:
+            use_env_secret_fallback = (
+                bool(os.environ.get("YGB_APPROVAL_SECRET"))
+                and not os.environ.get("YGB_KEY_DIR")
+            )
+            self._key_mgr = KeyManager(strict=False) if use_env_secret_fallback else KeyManager()
 
     @property
     def chain_hash(self) -> str:

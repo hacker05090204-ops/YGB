@@ -32,7 +32,7 @@ import hashlib
 import json
 import math
 import os
-import subprocess
+from subprocess import SubprocessError, run
 import time
 import uuid
 import platform
@@ -241,12 +241,12 @@ class LinuxGPUBackend(GPUBackendInterface):
         """Check idle time using real OS APIs on Linux."""
         # Try xprintidle first (X11, most accurate)
         try:
-            result = subprocess.run(
+            result = run(
                 ["xprintidle"], capture_output=True, text=True, timeout=5,
             )
             if result.returncode == 0:
                 return int(result.stdout.strip()) // 1000
-        except (subprocess.SubprocessError, ValueError, FileNotFoundError):
+        except (SubprocessError, ValueError, FileNotFoundError):
             pass
         # Fallback: check /dev/input device timestamps
         try:

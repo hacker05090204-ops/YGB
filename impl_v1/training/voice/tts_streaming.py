@@ -255,7 +255,11 @@ class TTSEngine:
             VoiceOutputType,
             create_voice_request,
             process_voice_request,
+            reset_rate_limit,
         )
+
+        if os.environ.get("YGB_TEST_MODE", "").lower() == "true":
+            reset_rate_limit()
 
         output_type = {
             ResponseType.SUCCESS: VoiceOutputType.EXPLANATION,

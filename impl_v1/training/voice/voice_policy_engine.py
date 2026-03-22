@@ -39,7 +39,7 @@ class PolicyDecision:
 # =============================================================================
 
 # Apps allowed to be launched by voice
-ALLOWED_APPS: Set[str] = {
+ALLOWED_APPS: Set[str] = frozenset({
     "notepad", "notepad.exe",
     "code", "code.exe",               # VS Code
     "chrome", "chrome.exe",
@@ -50,10 +50,10 @@ ALLOWED_APPS: Set[str] = {
     "explorer", "explorer.exe",
     "calc", "calc.exe",
     "terminal", "wt", "wt.exe",       # Windows Terminal
-}
+})
 
 # Domains allowed for download
-ALLOWED_DOWNLOAD_DOMAINS: Set[str] = {
+ALLOWED_DOWNLOAD_DOMAINS: Set[str] = frozenset({
     "github.com",
     "raw.githubusercontent.com",
     "pypi.org",
@@ -64,10 +64,10 @@ ALLOWED_DOWNLOAD_DOMAINS: Set[str] = {
     "static.crates.io",
     "dl.google.com",
     "releases.hashicorp.com",
-}
+})
 
 # Filesystem paths that CANNOT be accessed
-DENIED_PATHS: Set[str] = {
+DENIED_PATHS: Set[str] = frozenset({
     "C:\\Windows",
     "C:\\Program Files",
     "C:\\Program Files (x86)",
@@ -76,7 +76,7 @@ DENIED_PATHS: Set[str] = {
     "/sys",
     "/proc",
     "/boot",
-}
+})
 
 # Command injection patterns
 INJECTION_PATTERNS = [
@@ -90,12 +90,12 @@ INJECTION_PATTERNS = [
     r"<script",                # XSS
 ]
 
-HOST_GOVERNED_COMMANDS = {
+HOST_GOVERNED_COMMANDS = frozenset({
     "LAUNCH_APP",
     "OPEN_APP",
     "OPEN_URL",
     "RUN_APPROVED_TASK",
-}
+})
 
 
 # =============================================================================
@@ -129,7 +129,28 @@ class VoicePolicyEngine:
                     evaluated_at=now,
                 )
 
-        # 2. Special host-action governance
+        # 2. App launch policy
+        if command_type in ("LAUNCH_APP", "OPEN_APP", "FOCUS_APP"):
+            app_name = args.get("app", "").lower().strip()
+            canonical_app = None
+            if app_name:
+                try:
+                    from backend.governance.host_action_governor import HostActionGovernor
+
+                    canonical_app = HostActionGovernor.canonicalize_app_name(app_name)
+                except Exception:
+                    canonical_app = None
+
+            if app_name and (app_name not in ALLOWED_APPS or canonical_app is None):
+                self._denied_count += 1
+                return PolicyDecision(
+                    verdict=PolicyVerdict.DENIED,
+                    reason=f"Unknown or not allowed app '{app_name}'",
+                    policy_name="APP_ALLOWLIST",
+                    evaluated_at=now,
+                )
+
+        # 3. Special host-action governance
         if command_type in HOST_GOVERNED_COMMANDS:
             session_id = args.get("host_session_id", "").strip()
             if not session_id:
@@ -165,19 +186,7 @@ class VoicePolicyEngine:
                     evaluated_at=now,
                 )
 
-        # 2. App launch policy
-        if command_type in ("LAUNCH_APP", "OPEN_APP", "FOCUS_APP"):
-            app_name = args.get("app", "").lower().strip()
-            if app_name and app_name not in ALLOWED_APPS:
-                self._denied_count += 1
-                return PolicyDecision(
-                    verdict=PolicyVerdict.DENIED,
-                    reason=f"App '{app_name}' not in allowlist",
-                    policy_name="APP_ALLOWLIST",
-                    evaluated_at=now,
-                )
-
-        # 3. Download domain policy
+        # 4. Download domain policy
         if command_type in ("DOWNLOAD", "DOWNLOAD_FILE"):
             url = args.get("url", "")
             if url:
@@ -192,7 +201,7 @@ class VoicePolicyEngine:
                         evaluated_at=now,
                     )
 
-        # 4. Filesystem path policy
+        # 5. Filesystem path policy
         path = args.get("path", "")
         if path:
             normalized = os.path.normpath(path)
@@ -206,7 +215,7 @@ class VoicePolicyEngine:
                         evaluated_at=now,
                     )
 
-        # 5. Critical commands always require override
+        # 6. Critical commands always require override
         if command_type in ("SECURITY_CHANGE", "CONFIG_CHANGE"):
             return PolicyDecision(
                 verdict=PolicyVerdict.REQUIRES_OVERRIDE,
