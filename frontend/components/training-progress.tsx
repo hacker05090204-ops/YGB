@@ -142,10 +142,41 @@ export function TrainingProgress({
     }, [fetchStatus])
 
     useEffect(() => {
-        fetchStatus()
-        const interval = setInterval(fetchStatus, refreshInterval)
-        return () => clearInterval(interval)
-    }, [fetchStatus, refreshInterval])
+        const pollMs = status?.auto_training?.is_training ? refreshInterval : 15000
+        let interval: ReturnType<typeof setInterval> | null = null
+
+        const clearPolling = () => {
+            if (interval !== null) {
+                clearInterval(interval)
+                interval = null
+            }
+        }
+
+        const startPolling = () => {
+            clearPolling()
+            if (document.hidden) {
+                return
+            }
+            fetchStatus()
+            interval = setInterval(fetchStatus, pollMs)
+        }
+
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                clearPolling()
+            } else {
+                startPolling()
+            }
+        }
+
+        startPolling()
+        document.addEventListener("visibilitychange", handleVisibilityChange)
+
+        return () => {
+            clearPolling()
+            document.removeEventListener("visibilitychange", handleVisibilityChange)
+        }
+    }, [fetchStatus, refreshInterval, status?.auto_training?.is_training])
 
     const getStateColor = (state: string) => {
         switch (state?.toUpperCase()) {

@@ -98,6 +98,15 @@ function RunnerPageContent() {
         checkApi()
     }, [])
 
+    useEffect(() => {
+        return () => {
+            if (wsRef.current) {
+                wsRef.current.close()
+                wsRef.current = null
+            }
+        }
+    }, [])
+
     // Auto-scroll phase list
     useEffect(() => {
         if (phaseListRef.current) {

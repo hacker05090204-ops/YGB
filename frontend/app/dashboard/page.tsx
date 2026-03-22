@@ -2,9 +2,9 @@
 
 import { AuthGuard } from "@/components/auth-guard"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { authFetch , getApiBase } from "@/lib/ygb-api"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import {
   Users,
   Target,
@@ -92,49 +92,44 @@ function DashboardContent() {
 
   const fetchData = async () => {
     try {
-      // Fetch users
-      const usersRes = await authFetch(`${getApiBase()}/api/db/users`)
+      const [usersRes, bountiesRes, targetsRes, statsRes, activityRes, readinessRes] = await Promise.all([
+        authFetch(`${getApiBase()}/api/db/users`),
+        authFetch(`${getApiBase()}/api/db/bounties`),
+        authFetch(`${getApiBase()}/api/db/targets`),
+        authFetch(`${getApiBase()}/api/db/admin/stats`),
+        authFetch(`${getApiBase()}/api/db/activity?limit=20`),
+        fetch(`${getApiBase()}/api/training/readiness`).catch(() => null),
+      ])
+
       if (usersRes.ok) {
         const data = await usersRes.json()
         setUsers(data.users || [])
       }
 
-      // Fetch bounties
-      const bountiesRes = await authFetch(`${getApiBase()}/api/db/bounties`)
       if (bountiesRes.ok) {
         const data = await bountiesRes.json()
         setBounties(data.bounties || [])
       }
 
-      // Fetch targets
-      const targetsRes = await authFetch(`${getApiBase()}/api/db/targets`)
       if (targetsRes.ok) {
         const data = await targetsRes.json()
         setTargets(data.targets || [])
       }
 
-      // Fetch admin stats
-      const statsRes = await authFetch(`${getApiBase()}/api/db/admin/stats`)
       if (statsRes.ok) {
         const data = await statsRes.json()
         setAdminStats(data.stats)
       }
 
-      // Fetch activity
-      const activityRes = await authFetch(`${getApiBase()}/api/db/activity?limit=20`)
       if (activityRes.ok) {
         const data = await activityRes.json()
         setActivities(data.activities || [])
       }
 
-      // Fetch training readiness (truthful status)
-      try {
-        const readinessRes = await fetch(`${getApiBase()}/api/training/readiness`)
-        if (readinessRes.ok) {
-          const data = await readinessRes.json()
-          setTrainingReadiness(data)
-        }
-      } catch {
+      if (readinessRes?.ok) {
+        const data = await readinessRes.json()
+        setTrainingReadiness(data)
+      } else {
         // Training readiness API not available — show unknown
         setTrainingReadiness(null)
       }
@@ -228,30 +223,24 @@ function DashboardContent() {
   }
 
   // Aggregate real activity data by day-of-week from API
-  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const dayCounts: Record<string, number> = { Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0, Sun: 0 }
-  for (const act of activities) {
-    if (act.created_at) {
-      const day = dayNames[new Date(act.created_at).getDay()]
+  const chartData = useMemo(() => {
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
+    const chartOrder = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+    const dayCounts = Object.fromEntries(dayNames.map((day) => [day, 0])) as Record<string, number>
+
+    for (const bounty of bounties) {
+      if (!bounty.submitted_at) {
+        continue
+      }
+      const day = dayNames[new Date(bounty.submitted_at).getDay()]
       dayCounts[day] = (dayCounts[day] || 0) + 1
     }
-  }
-  // Also count bounties submitted per day
-  for (const b of bounties) {
-    if (b.submitted_at) {
-      const day = dayNames[new Date(b.submitted_at).getDay()]
-      dayCounts[day] = (dayCounts[day] || 0) + 1
-    }
-  }
-  const chartData = [
-    { name: 'Mon', bounties: dayCounts['Mon'] },
-    { name: 'Tue', bounties: dayCounts['Tue'] },
-    { name: 'Wed', bounties: dayCounts['Wed'] },
-    { name: 'Thu', bounties: dayCounts['Thu'] },
-    { name: 'Fri', bounties: dayCounts['Fri'] },
-    { name: 'Sat', bounties: dayCounts['Sat'] },
-    { name: 'Sun', bounties: dayCounts['Sun'] },
-  ]
+
+    return chartOrder.map((name) => ({
+      name,
+      bounties: dayCounts[name],
+    }))
+  }, [bounties])
 
   return (
     <SidebarProvider>

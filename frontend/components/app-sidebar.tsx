@@ -83,10 +83,16 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const containerRef = useRef(null)
+  const hasAnimatedRef = useRef(false)
   const pathname = usePathname()
   const authUser = useAuthUser()
 
   useGSAP(() => {
+    if (hasAnimatedRef.current) {
+      return
+    }
+    hasAnimatedRef.current = true
+
     // Staggered entry for menu items
     gsap.from(".sidebar-item", {
       x: -20,

@@ -389,11 +389,26 @@ export function VoiceControls({
   }, [])
 
   useEffect(() => {
-    const speechWindow = window as typeof window & {
-      webkitSpeechRecognition?: any
+    return () => {
+      recognitionRef.current?.abort()
+      recognitionRef.current = null
+      void cleanupAudioCapture()
     }
-    if (typeof window !== "undefined" && speechWindow.webkitSpeechRecognition) {
-      const SpeechRecognition = speechWindow.webkitSpeechRecognition
+  }, [cleanupAudioCapture])
+
+  const toggleVoice = () => {
+    if (!voiceEnabled) {
+      const speechWindow = window as typeof window & {
+        SpeechRecognition?: any
+        webkitSpeechRecognition?: any
+      }
+      const SpeechRecognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition
+
+      if (!SpeechRecognition) {
+        setSampleStatus("Speech recognition is not available in this browser.")
+        return
+      }
+
       recognitionRef.current = new SpeechRecognition()
       recognitionRef.current.continuous = false
       recognitionRef.current.interimResults = true
@@ -424,16 +439,7 @@ export function VoiceControls({
         setIsListening(false)
         void finishAudioCapture()
       }
-    }
 
-    return () => {
-      recognitionRef.current?.abort()
-      void cleanupAudioCapture()
-    }
-  }, [cleanupAudioCapture, finishAudioCapture, language, onVoiceInput, uploadTrainingSample])
-
-  const toggleVoice = () => {
-    if (!voiceEnabled) {
       setVoiceEnabled(true)
       void refreshSttStatus()
       return
@@ -441,6 +447,7 @@ export function VoiceControls({
 
     setVoiceEnabled(false)
     recognitionRef.current?.abort()
+    recognitionRef.current = null
     setIsListening(false)
     void finishAudioCapture()
   }
