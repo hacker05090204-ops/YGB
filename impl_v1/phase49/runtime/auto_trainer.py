@@ -213,7 +213,7 @@ class AutoTrainer:
     
     def __init__(self):
         self._state = TrainingState.IDLE
-        self._training_lock = threading.Lock()
+        self._training_lock = threading.RLock()
         self._abort_flag = threading.Event()
         self._events: List[TrainingEvent] = []
         self._epoch = 0  # Total epochs completed ever
@@ -281,11 +281,19 @@ class AutoTrainer:
         self._early_stop_patience = 5  # Stop after 5 epochs without improvement
         self._early_stop_baseline = 0.80  # Min accuracy before early stop allowed
         self._write_worker_status()
+
+    def _get_state(self) -> TrainingState:
+        with self._training_lock:
+            return self._state
+
+    def _set_state(self, new_state: TrainingState) -> None:
+        with self._training_lock:
+            self._state = new_state
     
     @property
     def state(self) -> TrainingState:
         """Get current training state."""
-        return self._state
+        return self._get_state()
     
     @property
     def events(self) -> List[TrainingEvent]:
@@ -295,7 +303,7 @@ class AutoTrainer:
     @property
     def is_training(self) -> bool:
         """Check if training is active."""
-        return self._state == TrainingState.TRAINING
+        return self._get_state() == TrainingState.TRAINING
     
     def set_event_callback(self, callback: Callable[[TrainingEvent], None]) -> None:
         """Set callback for training events (for dashboard)."""
@@ -691,7 +699,7 @@ class AutoTrainer:
                 loss_trend = "idle"
 
             write_runtime_state_snapshot(
-                mode=self._state.value,
+                mode=self._get_state().value,
                 total_epochs=runtime_total_epochs,
                 completed_epochs=current_epoch,
                 current_loss=float(self._last_loss),
@@ -931,18 +939,26 @@ class AutoTrainer:
             )
             
             # Create model on GPU (PERSISTENT)
-            self._gpu_model = BugClassifier(config)
+            if self._gpu_model is None:
+                self._gpu_model = BugClassifier(config)
             self._gpu_model = self._gpu_model.to(self._gpu_device)
             
             # Create optimizer and criterion (PERSISTENT)
-            self._gpu_optimizer = optim.Adam(self._gpu_model.parameters(), lr=config.learning_rate, weight_decay=1e-5)
-            self._gpu_criterion = nn.CrossEntropyLoss()
+            if self._gpu_optimizer is None:
+                self._gpu_optimizer = optim.Adam(
+                    self._gpu_model.parameters(),
+                    lr=config.learning_rate,
+                    weight_decay=1e-5,
+                )
+            if self._gpu_criterion is None:
+                self._gpu_criterion = nn.CrossEntropyLoss()
             
             # LR scheduler — cosine annealing with warm restarts (24/7 mode)
             # T_0=50: full cosine cycle every 50 epochs, T_mult=1: same length each restart
-            self._gpu_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
-                self._gpu_optimizer, T_0=50, T_mult=1, eta_min=1e-6,
-            )
+            if self._gpu_scheduler is None:
+                self._gpu_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+                    self._gpu_optimizer, T_0=50, T_mult=1, eta_min=1e-6,
+                )
             
             # === REAL DATA PIPELINE (NO SYNTHETIC DATA) ===
             from impl_v1.training.data.real_dataset_loader import (
@@ -1628,7 +1644,7 @@ class AutoTrainer:
             idle_result = check_idle_conditions(conditions)
             
             if not idle_result.can_train:
-                self._state = TrainingState.IDLE
+                self._set_state(TrainingState.IDLE)
                 return False
             
             # Emit idle detected event
@@ -1646,7 +1662,7 @@ class AutoTrainer:
                     f"Training blocked: {guard_msg}",
                     idle_seconds=conditions.idle_seconds,
                 )
-                self._state = TrainingState.IDLE
+                self._set_state(TrainingState.IDLE)
                 return False
             
             # Evaluate training trigger
@@ -1657,7 +1673,7 @@ class AutoTrainer:
             )
             
             if not trigger.should_train:
-                self._state = TrainingState.IDLE
+                self._set_state(TrainingState.IDLE)
                 return False
             
             # Start training session
@@ -1687,7 +1703,7 @@ class AutoTrainer:
             
         except Exception as e:
             self._emit_event("ERROR", str(e))
-            self._state = TrainingState.ERROR
+            self._set_state(TrainingState.ERROR)
             return False
     
     def _generate_session_report(self) -> None:
@@ -1757,7 +1773,7 @@ class AutoTrainer:
                 # MANUAL MODE: scheduler loop runs but does NOT auto-trigger training.
                 # Training is triggered ONLY via explicit API call (force_start_training).
                 # This loop monitors system conditions for dashboard reporting only.
-                if self._state != TrainingState.TRAINING:
+                if not self.is_training:
                     conditions = self._get_current_conditions()
                     if conditions.idle_seconds >= IDLE_THRESHOLD_SECONDS:
                         logger.debug(
@@ -1792,11 +1808,11 @@ class AutoTrainer:
     
     def abort_training(self) -> dict:
         """Abort training immediately. Returns status."""
-        if self._state != TrainingState.TRAINING:
+        if self.state != TrainingState.TRAINING:
             return {
                 "aborted": False,
                 "reason": "No training in progress",
-                "state": self._state.value,
+                "state": self.state.value,
             }
         
         self._abort_flag.set()
@@ -1969,7 +1985,7 @@ class AutoTrainer:
             
         except Exception as e:
             self._last_error = str(e).strip()
-            self._state = TrainingState.ERROR
+            self._set_state(TrainingState.ERROR)
             self._emit_event("ERROR", f"GPU training failed: {str(e)}", gpu_used=True)
             return {
                 "started": False,
@@ -1980,6 +1996,7 @@ class AutoTrainer:
     def get_status(self) -> dict:
         """Get current trainer status for dashboard."""
         conditions = self._get_current_conditions()
+        current_state = self.state
         
         # Calculate REAL progress percentage
         is_continuous = getattr(self, '_continuous_mode', False)
@@ -2014,7 +2031,7 @@ class AutoTrainer:
             gpu_mem_reserved = torch.cuda.memory_reserved() / 1024 / 1024  # MB
         
         return {
-            "state": self._state.value,
+            "state": current_state.value,
             "is_training": self.is_training,
             "epoch": current_epoch,
             "total_epochs": target,
