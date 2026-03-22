@@ -430,7 +430,6 @@ class MultiHeadOutput:
     inference_time_ms: float
 
 
-@dataclass(frozen=True)
 class TrainingDataSource(Enum):
     """Valid training data sources."""
     G33_VERIFIED_REAL = "G33_VERIFIED_REAL"
@@ -441,21 +440,14 @@ class TrainingDataSource(Enum):
     ACCEPTED_REPORTS = "ACCEPTED_REPORTS"  # Structure only
 
 
-class TrainingDataSourceEnum(Enum):
-    """Training data sources for the model."""
-    G33_VERIFIED_REAL = "G33_VERIFIED_REAL"
-    G36_AUTO_VERIFIED = "G36_AUTO_VERIFIED"
-    REJECTED_FINDINGS = "REJECTED_FINDINGS"
-    DUPLICATE_CLUSTERS = "DUPLICATE_CLUSTERS"
-    HUMAN_CORRECTIONS = "HUMAN_CORRECTIONS"
-    ACCEPTED_REPORTS = "ACCEPTED_REPORTS"
+TrainingDataSourceEnum = TrainingDataSource
 
 
 @dataclass(frozen=True)
 class TrainingSample:
     """Training sample with provenance."""
     sample_id: str
-    source: TrainingDataSourceEnum
+    source: TrainingDataSource
     features: Tuple[float, ...]
     real_label: int           # 0 or 1
     duplicate_label: int      # 0 or 1

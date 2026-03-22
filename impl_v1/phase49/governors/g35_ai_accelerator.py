@@ -25,6 +25,8 @@ from typing import Tuple, Optional, Dict
 import hashlib
 import uuid
 
+from impl_v1.phase49.governors.g38_self_trained_model import can_ai_execute
+
 
 class AdvisoryType(Enum):
     """CLOSED ENUM - Types of AI advisory output."""
@@ -345,16 +347,6 @@ def can_ai_verify() -> Tuple[bool, str]:
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot verify bugs - G33 + human verification required"
-
-
-def can_ai_execute() -> Tuple[bool, str]:
-    """
-    Check if AI can execute actions.
-    
-    Returns (can_execute, reason).
-    ALWAYS returns (False, ...).
-    """
-    return False, "AI cannot execute actions - advisory only"
 
 
 def can_ai_bypass_governance() -> Tuple[bool, str]:
