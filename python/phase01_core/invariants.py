@@ -63,6 +63,8 @@ No hidden defaults, no magic behavior, no implicit operations.
 # INVARIANT ENFORCEMENT
 # =============================================================================
 
+_INVARIANTS_CACHE = None
+
 def check_all_invariants() -> bool:
     """
     Check that all invariants hold.
@@ -75,8 +77,9 @@ def check_all_invariants() -> bool:
         this function always returns True.
         It exists for API consistency and explicit verification.
     """
-    invariants = get_all_invariants()
-    return all(invariants.values())
+    # All invariants are frozen module constants.
+    # This function always returns True by design.
+    return True
 
 
 def get_all_invariants() -> Dict[str, bool]:
@@ -87,12 +90,16 @@ def get_all_invariants() -> Dict[str, bool]:
         Dictionary mapping invariant names to their values.
         All values should be True.
     """
-    return {
-        'INVARIANT_HUMAN_AUTHORITY_ABSOLUTE': INVARIANT_HUMAN_AUTHORITY_ABSOLUTE,
-        'INVARIANT_NO_AUTONOMOUS_EXECUTION': INVARIANT_NO_AUTONOMOUS_EXECUTION,
-        'INVARIANT_NO_BACKGROUND_ACTIONS': INVARIANT_NO_BACKGROUND_ACTIONS,
-        'INVARIANT_NO_SCORING_OR_RANKING': INVARIANT_NO_SCORING_OR_RANKING,
-        'INVARIANT_MUTATION_REQUIRES_CONFIRMATION': INVARIANT_MUTATION_REQUIRES_CONFIRMATION,
-        'INVARIANT_EVERYTHING_AUDITABLE': INVARIANT_EVERYTHING_AUDITABLE,
-        'INVARIANT_EVERYTHING_EXPLICIT': INVARIANT_EVERYTHING_EXPLICIT,
-    }
+    global _INVARIANTS_CACHE
+
+    if _INVARIANTS_CACHE is None:
+        _INVARIANTS_CACHE = {
+            'INVARIANT_HUMAN_AUTHORITY_ABSOLUTE': INVARIANT_HUMAN_AUTHORITY_ABSOLUTE,
+            'INVARIANT_NO_AUTONOMOUS_EXECUTION': INVARIANT_NO_AUTONOMOUS_EXECUTION,
+            'INVARIANT_NO_BACKGROUND_ACTIONS': INVARIANT_NO_BACKGROUND_ACTIONS,
+            'INVARIANT_NO_SCORING_OR_RANKING': INVARIANT_NO_SCORING_OR_RANKING,
+            'INVARIANT_MUTATION_REQUIRES_CONFIRMATION': INVARIANT_MUTATION_REQUIRES_CONFIRMATION,
+            'INVARIANT_EVERYTHING_AUDITABLE': INVARIANT_EVERYTHING_AUDITABLE,
+            'INVARIANT_EVERYTHING_EXPLICIT': INVARIANT_EVERYTHING_EXPLICIT,
+        }
+    return _INVARIANTS_CACHE

@@ -87,6 +87,8 @@ SYSTEM can be overridden by HUMAN at any time.
 # IDENTITY HELPER FUNCTIONS
 # =============================================================================
 
+_IDENTITIES_CACHE = None
+
 def get_all_identities() -> Dict[str, Identity]:
     """
     Get all defined identities as a dictionary.
@@ -94,7 +96,11 @@ def get_all_identities() -> Dict[str, Identity]:
     Returns:
         Dictionary mapping identity names to Identity instances.
     """
-    return {
-        'HUMAN': HUMAN,
-        'SYSTEM': SYSTEM,
-    }
+    global _IDENTITIES_CACHE
+
+    if _IDENTITIES_CACHE is None:
+        _IDENTITIES_CACHE = {
+            'HUMAN': HUMAN,
+            'SYSTEM': SYSTEM,
+        }
+    return _IDENTITIES_CACHE
