@@ -11,6 +11,7 @@ Phases:
 """
 
 import asyncio
+import functools
 import importlib
 import sys
 import json
@@ -23,8 +24,58 @@ import traceback
 from urllib.parse import urlparse, urljoin
 import re
 import logging
+import uuid
 
 logger = logging.getLogger("ygb.phase_runner")
+
+HTTP_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+}
+RE_HREF = re.compile(r'href=["\']([^"\']+)["\']')
+RE_TITLE = re.compile(r"<title>([^<]+)</title>", re.I)
+RE_FORM = re.compile(r"<form[^>]*>(.*?)</form>", re.I | re.DOTALL)
+RE_FORM_ACTION = re.compile(r'action=["\']([^"\']*)["\']', re.I)
+RE_FORM_METHOD = re.compile(r'method=["\']([^"\']*)["\']', re.I)
+RE_INPUT_NAME = re.compile(r'<input[^>]*name=["\']([^"\']+)["\']', re.I)
+RE_INLINE_EVENT = re.compile(r'\bon(\w+)\s*=\s*["\'][^"\']*["\']', re.I)
+RE_HTML_COMMENT = re.compile(r"<!--(.*?)-->", re.DOTALL)
+RE_EMAIL = re.compile(r"[\w\.-]+@[\w\.-]+\.\w+")
+RE_INCLUDE_REQUIRE = re.compile(r"include|require|include_once|require_once", re.I)
+RE_JWT = re.compile(r"eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+")
+RE_XML_TOKEN = re.compile(r"\bxml\b", re.I)
+RE_API_PATTERNS = (
+    re.compile(r'["\']/?api/v?\d*/?\w+["\']', re.I),
+    re.compile(r'["\']/?rest/\w+["\']', re.I),
+    re.compile(r'fetch\(["\'][^"\']+["\']', re.I),
+    re.compile(r'axios\.\w+\(["\'][^"\']+["\']', re.I),
+)
+RE_IDOR_PATTERNS = (
+    (re.compile(r"[?&](id|user_id|account_id|order_id|doc_id)=\d+", re.I), "Numeric ID parameter"),
+    (re.compile(r"/users?/\d+", re.I), "User ID in path"),
+    (re.compile(r"/orders?/\d+", re.I), "Order ID in path"),
+    (re.compile(r"/accounts?/\d+", re.I), "Account ID in path"),
+    (re.compile(r"/files?/\d+", re.I), "File ID in path"),
+    (re.compile(r"/documents?/\d+", re.I), "Document ID in path"),
+)
+RE_JS_SENSITIVE_PATTERNS = (
+    (re.compile(r'api[_-]?key\s*[:=]\s*["\'][^"\']+["\']', re.I), "API key exposed"),
+    (re.compile(r'secret\s*[:=]\s*["\'][^"\']+["\']', re.I), "Secret exposed"),
+    (re.compile(r'password\s*[:=]\s*["\'][^"\']+["\']', re.I), "Password exposed"),
+    (re.compile(r'auth[_-]?token\s*[:=]\s*["\'][^"\']+["\']', re.I), "Auth token exposed"),
+)
+RE_TEMPLATE_PATTERNS = (
+    re.compile(r"\{\{"),
+    re.compile(r"\{\%"),
+    re.compile(r"\$\{"),
+    re.compile(r"\#\{"),
+    re.compile(r"\<\%"),
+)
+RE_SENSITIVE_DATA_PATTERNS = (
+    (re.compile(r"\b\d{3}-\d{2}-\d{4}\b", re.I), "SSN pattern"),
+    (re.compile(r"\b\d{16}\b", re.I), "Credit card pattern"),
+    (re.compile(r'password\s*[=:]\s*["\'][^"\']+["\']', re.I), "Password in source"),
+    (re.compile(r"private[_-]?key", re.I), "Private key reference"),
+)
 
 # ==============================================================================
 # PATHS
@@ -137,6 +188,15 @@ class UnifiedPhaseRunner:
         self.driver = None
         self.use_browser = False
         self.verification_engine = VerificationEngine() if VERIFICATION_ENGINE_AVAILABLE else None
+
+    @staticmethod
+    def _get_content_views(context: WorkflowContext) -> tuple[str, str]:
+        content = str(context.page_data.get("content", "") or "")
+        return content, content.lower()
+
+    @staticmethod
+    def _get_headers_lower(context: WorkflowContext) -> Dict[str, str]:
+        return {str(k).lower(): str(v) for k, v in context.headers.items()}
         
     async def _emit(self, data: Dict[str, Any]):
         """Emit progress update."""
@@ -174,7 +234,7 @@ class UnifiedPhaseRunner:
         })
     
     def _gen_id(self, prefix: str) -> str:
-        return f"{prefix}-{hashlib.md5(str(datetime.now(UTC)).encode()).hexdigest()[:8]}"
+        return f"{prefix}-{uuid.uuid4().hex[:8]}"
     
     async def _add_finding(self, context: WorkflowContext, category: str, severity: str, title: str,
                            description: str, url: str = "", evidence: Optional[Dict[str, Any]] = None):
@@ -600,7 +660,7 @@ class UnifiedPhaseRunner:
             try:
                 module_path = f"python.phase{i:02d}_core" if i == 1 else f"python.phase{i:02d}_actors" if i == 2 else None
                 if module_path:
-                    importlib.import_module(module_path)
+                    await asyncio.to_thread(importlib.import_module, module_path)
                     loaded += 1
             except:
                 pass
@@ -648,10 +708,8 @@ class UnifiedPhaseRunner:
                 return {"error": "Navigation failed"}
         else:
             # HTTP fallback
-            async with httpx.AsyncClient(follow_redirects=True, timeout=30) as client:
-                response = await client.get(url, headers={
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-                })
+            async with httpx.AsyncClient(follow_redirects=True, timeout=httpx.Timeout(30.0)) as client:
+                response = await client.get(url, headers=HTTP_HEADERS)
                 
                 context.headers = dict(response.headers)
                 context.page_data["status"] = response.status_code
@@ -676,10 +734,10 @@ class UnifiedPhaseRunner:
             context.links = [l.get_attribute("href") for l in links[:100] if l.get_attribute("href")]
         else:
             html = context.page_data.get("content", "")
-            context.links = re.findall(r'href=["\']([^"\']+)["\']', html)[:100]
+            context.links = RE_HREF.findall(html)[:100]
         
         # Extract title
-        title_match = re.search(r'<title>([^<]+)</title>', html, re.I)
+        title_match = RE_TITLE.search(html)
         title = title_match.group(1) if title_match else ""
         
         await self._emit_action("EXTRACT", context.page_data.get("url", context.target_url), {
@@ -714,11 +772,11 @@ class UnifiedPhaseRunner:
                         "Password sent via GET method",
                         "Login form uses GET method which exposes credentials in URL")
         else:
-            form_matches = re.findall(r'<form[^>]*>(.*?)</form>', content, re.I | re.DOTALL)
+            form_matches = RE_FORM.findall(content)
             for form_html in form_matches:
-                action = re.search(r'action=["\']([^"\']*)["\']', form_html)
-                method = re.search(r'method=["\']([^"\']*)["\']', form_html)
-                inputs = re.findall(r'<input[^>]*name=["\']([^"\']+)["\']', form_html)
+                action = RE_FORM_ACTION.search(form_html)
+                method = RE_FORM_METHOD.search(form_html)
+                inputs = RE_INPUT_NAME.findall(form_html)
                 forms.append({
                     "action": action.group(1) if action else "",
                     "method": (method.group(1) if method else "GET").upper(),
@@ -741,7 +799,7 @@ class UnifiedPhaseRunner:
     
     async def _phase_analyze_headers(self, context: WorkflowContext) -> Dict:
         """Phase 5: Analyze security headers."""
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        headers = self._get_headers_lower(context)
         findings = 0
         
         # Security headers to check
@@ -843,7 +901,7 @@ class UnifiedPhaseRunner:
         findings = 0
         
         # Check for inline event handlers
-        event_handlers = re.findall(r'\bon(\w+)\s*=\s*["\'][^"\']*["\']', content, re.I)
+        event_handlers = RE_INLINE_EVENT.findall(content)
         if len(event_handlers) > 5:
             await self._add_finding(context, "XSS", "LOW",
                 f"Multiple inline event handlers ({len(event_handlers)})",
@@ -1023,8 +1081,8 @@ class UnifiedPhaseRunner:
         ]
         
         for link in context.links[:50]:
-            for pattern, desc in idor_patterns:
-                if re.search(pattern, link, re.I):
+            for pattern, desc in RE_IDOR_PATTERNS:
+                if pattern.search(link):
                     await self._add_finding(context, "IDOR", "MEDIUM",
                         f"Potential IDOR: {desc}",
                         f"Sequential/predictable ID found: {link[:100]}")
@@ -1043,7 +1101,7 @@ class UnifiedPhaseRunner:
         findings = 0
         
         # Check HTML comments
-        comments = re.findall(r'<!--(.*?)-->', content, re.DOTALL)
+        comments = RE_HTML_COMMENT.findall(content)
         sensitive_words = ['password', 'secret', 'api_key', 'apikey', 'token', 
                           'admin', 'debug', 'todo', 'fixme', 'hack', 'bug',
                           'credential', 'private', 'internal']
@@ -1069,7 +1127,7 @@ class UnifiedPhaseRunner:
                 findings += 1
         
         # Check for email addresses
-        emails = re.findall(r'[\w\.-]+@[\w\.-]+\.\w+', content)
+        emails = RE_EMAIL.findall(content)
         if emails:
             await self._add_finding(context, "INFO_DISCLOSURE", "INFO",
                 f"Email addresses exposed ({len(emails)})",
@@ -1093,8 +1151,8 @@ class UnifiedPhaseRunner:
     
     async def _phase_detect_tech(self, context: WorkflowContext) -> Dict:
         """Phase 12: Technology fingerprinting."""
-        content = context.page_data.get("content", "").lower()
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        _, content_lower = self._get_content_views(context)
+        headers = self._get_headers_lower(context)
         techs = []
         
         tech_patterns = {
@@ -1117,7 +1175,7 @@ class UnifiedPhaseRunner:
         
         for tech, patterns in tech_patterns.items():
             for pattern in patterns:
-                if pattern.lower() in content:
+                if pattern.lower() in content_lower:
                     if tech not in techs:
                         techs.append(tech)
                     break
@@ -1148,7 +1206,7 @@ class UnifiedPhaseRunner:
     async def _phase_crawl_links(self, context: WorkflowContext, max_pages: int) -> Dict:
         """Phase 13: Crawl internal links and discover common paths."""
         start = datetime.now(UTC)
-        visited = set([context.target_url])
+        visited = {context.target_url}
         parsed_base = urlparse(context.target_url)
         base_url = f"{parsed_base.scheme}://{parsed_base.netloc}"
         
@@ -1188,58 +1246,73 @@ class UnifiedPhaseRunner:
         
         discovered_pages = []
         sql_tested = 0
-        
-        # Crawl and test pages
-        for url in to_visit[:max_pages]:
-            if url in visited:
-                continue
-            
+
+        async def _fetch_one(client: "httpx.AsyncClient", url: str) -> Optional[Dict[str, Any]]:
             try:
-                status_code = 0
-                html = ""
-                resp_headers = {}
-                
-                if self.use_browser and self.driver:
-                    try:
-                        self.driver.get(url)
-                        html = self.driver.page_source
-                        await self._emit_action("NAVIGATE", url, {"title": self.driver.title})
-                        status_code = 200  # Browser navigated
-                    except:
-                        continue
-                else:
-                    try:
-                        async with httpx.AsyncClient(follow_redirects=True, timeout=10) as client:
-                            response = await client.get(url, headers={
-                                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-                            })
-                            status_code = response.status_code
-                            html = response.text
-                            resp_headers = dict(response.headers)
-                    except:
-                        continue
-                
-                # Only process valid pages
+                response = await client.get(url, headers=HTTP_HEADERS)
+            except Exception as exc:
+                logger.warning("Fetch failed %s: %s", url, exc)
+                return None
+            return {
+                "url": url,
+                "status_code": response.status_code,
+                "html": response.text,
+                "headers": dict(response.headers),
+            }
+        
+        if self.use_browser and self.driver:
+            for url in to_visit[:max_pages]:
+                if url in visited:
+                    continue
+                try:
+                    self.driver.get(url)
+                    html = self.driver.page_source
+                    status_code = 200
+                    resp_headers = {}
+                except Exception:
+                    continue
                 if status_code in [200, 301, 302, 401, 403]:
                     visited.add(url)
                     context.pages_visited.append(url)
                     discovered_pages.append({"url": url, "status": status_code})
-                    
-                    # Quick security scan
                     await self._quick_scan(context, url, html, resp_headers)
-                    
-                    # SQL injection test on login/search pages
-                    if any(p in url.lower() for p in ['/login', '/search', '/admin', '/user', '/api']):
+                    if any(p in url.lower() for p in ["/login", "/search", "/admin", "/user", "/api"]):
                         await self._test_sql_injection(context, url, html)
                         sql_tested += 1
-                    
                     await self._emit_action("PAGE_FOUND", url, {
                         "status": status_code,
                         "type": "login" if "login" in url.lower() else "page"
                     })
-                    
-            except Exception as e:
-                pass
+        else:
+            crawl_targets = [url for url in to_visit[:max_pages] if url not in visited]
+            async with httpx.AsyncClient(
+                timeout=httpx.Timeout(30.0),
+                follow_redirects=True,
+                limits=httpx.Limits(max_connections=20),
+            ) as client:
+                responses = await asyncio.gather(
+                    *[_fetch_one(client, url) for url in crawl_targets],
+                    return_exceptions=False,
+                )
+            for result in responses:
+                if result is None:
+                    continue
+                url = str(result["url"])
+                status_code = int(result["status_code"])
+                html = str(result["html"])
+                resp_headers = dict(result["headers"])
+                if status_code in [200, 301, 302, 401, 403]:
+                    visited.add(url)
+                    context.pages_visited.append(url)
+                    discovered_pages.append({"url": url, "status": status_code})
+                    await self._quick_scan(context, url, html, resp_headers)
+                    if any(p in url.lower() for p in ["/login", "/search", "/admin", "/user", "/api"]):
+                        await self._test_sql_injection(context, url, html)
+                        sql_tested += 1
+                    await self._emit_action("PAGE_FOUND", url, {
+                        "status": status_code,
+                        "type": "login" if "login" in url.lower() else "page"
+                    })
         
         duration = int((datetime.now(UTC) - start).total_seconds() * 1000)
         await self._emit_action("CRAWL", context.target_url, {
@@ -1251,11 +1324,7 @@ class UnifiedPhaseRunner:
     
     async def _test_sql_injection(self, context: WorkflowContext, url: str, html: str):
         """Test a specific page for SQL injection vulnerabilities."""
-        # Find forms
-        form_pattern = r'<form[^>]*>(.*?)</form>'
-        input_pattern = r'<input[^>]+name=["\']([^"\']+)["\']'
-        
-        forms = re.findall(form_pattern, html, re.I | re.S)
+        forms = RE_FORM.findall(html)
         
         sql_payloads = [
             "' OR '1'='1",
@@ -1268,7 +1337,7 @@ class UnifiedPhaseRunner:
         ]
         
         for form in forms:
-            inputs = re.findall(input_pattern, form, re.I)
+            inputs = RE_INPUT_NAME.findall(form)
             if inputs:
                 await self._add_finding(context, "SQLI", "HIGH",
                     f"Form with inputs found at {url}",
@@ -1323,15 +1392,8 @@ class UnifiedPhaseRunner:
         findings = 0
         
         # Check for sensitive data in JS
-        sensitive_patterns = [
-            (r'api[_-]?key\s*[:=]\s*["\'][^"\']+["\']', 'API key exposed'),
-            (r'secret\s*[:=]\s*["\'][^"\']+["\']', 'Secret exposed'),
-            (r'password\s*[:=]\s*["\'][^"\']+["\']', 'Password exposed'),
-            (r'auth[_-]?token\s*[:=]\s*["\'][^"\']+["\']', 'Auth token exposed'),
-        ]
-        
-        for pattern, desc in sensitive_patterns:
-            if re.search(pattern, content, re.I):
+        for pattern, desc in RE_JS_SENSITIVE_PATTERNS:
+            if pattern.search(content):
                 await self._add_finding(context, "INFO_DISCLOSURE", "HIGH",
                     desc + " in JavaScript",
                     f"Found hardcoded secret in client-side JavaScript")
@@ -1347,15 +1409,8 @@ class UnifiedPhaseRunner:
         endpoints = []
         
         # Find API endpoints
-        api_patterns = [
-            r'["\']/?api/v?\d*/?\w+["\']',
-            r'["\']/?rest/\w+["\']',
-            r'fetch\(["\'][^"\']+["\']',
-            r'axios\.\w+\(["\'][^"\']+["\']',
-        ]
-        
-        for pattern in api_patterns:
-            matches = re.findall(pattern, content, re.I)
+        for pattern in RE_API_PATTERNS:
+            matches = pattern.findall(content)
             endpoints.extend(matches)
         
         if endpoints:
@@ -1369,7 +1424,7 @@ class UnifiedPhaseRunner:
     
     async def _phase_auth_analysis(self, context: WorkflowContext) -> Dict:
         """Phase 16: Authentication analysis."""
-        content = context.page_data.get("content", "")
+        content, content_lower = self._get_content_views(context)
         findings = 0
         
         # Check for login forms
@@ -1377,13 +1432,13 @@ class UnifiedPhaseRunner:
         
         if has_login:
             # Check for remember me
-            if 'remember' in content.lower():
+            if 'remember' in content_lower:
                 await self._add_finding(context, "AUTH", "INFO",
                     "Remember me functionality detected",
                     "Ensure remember me tokens are properly secured")
             
             # Check registration
-            if 'register' in content.lower() or 'signup' in content.lower():
+            if 'register' in content_lower or 'signup' in content_lower:
                 await self._add_finding(context, "AUTH", "INFO",
                     "Registration functionality detected",
                     "Test for weak password requirements and email enumeration")
@@ -1395,7 +1450,7 @@ class UnifiedPhaseRunner:
     
     async def _phase_cors_check(self, context: WorkflowContext) -> Dict:
         """Phase 17: CORS policy check."""
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        headers = self._get_headers_lower(context)
         findings = 0
         
         cors = headers.get('access-control-allow-origin', '')
@@ -1423,7 +1478,7 @@ class UnifiedPhaseRunner:
     
     async def _phase_csp_analysis(self, context: WorkflowContext) -> Dict:
         """Phase 18: CSP analysis."""
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        headers = self._get_headers_lower(context)
         csp = headers.get('content-security-policy', '')
         findings = 0
         
@@ -1502,7 +1557,7 @@ class UnifiedPhaseRunner:
             findings += 1
         
         # Check HSTS
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        headers = self._get_headers_lower(context)
         if is_https and "strict-transport-security" not in headers:
             await self._add_finding(context, "SSL", "MEDIUM",
                 "HSTS not enabled",
@@ -1552,10 +1607,11 @@ class UnifiedPhaseRunner:
     async def _phase_xxe_detection(self, context: WorkflowContext) -> Dict:
         """Phase 25: XXE vulnerability check."""
         findings = 0
-        content = context.page_data.get("content", "")
+        content, content_lower = self._get_content_views(context)
+        headers_lower = self._get_headers_lower(context)
         
         # Check for XML handling
-        if "xml" in content.lower() or "application/xml" in str(context.headers).lower():
+        if RE_XML_TOKEN.search(content_lower) or "application/xml" in headers_lower.get("content-type", "").lower():
             await self._add_finding(context, "XXE", "INFO",
                 "XML handling detected",
                 "Application processes XML - test for XXE vulnerabilities")
@@ -1621,7 +1677,7 @@ class UnifiedPhaseRunner:
         content = context.page_data.get("content", "")
         
         # Check for include/require patterns
-        if re.search(r'include|require|include_once|require_once', content, re.I):
+        if RE_INCLUDE_REQUIRE.search(content):
             await self._add_finding(context, "LFI_RFI", "INFO",
                 "PHP include patterns detected",
                 "Test for Local/Remote File Inclusion vulnerabilities")
@@ -1635,9 +1691,8 @@ class UnifiedPhaseRunner:
         content = context.page_data.get("content", "")
         
         # Check for template syntax
-        template_patterns = [r'\{\{', r'\{\%', r'\$\{', r'\#\{', r'\<\%']
-        for pattern in template_patterns:
-            if re.search(pattern, content):
+        for pattern in RE_TEMPLATE_PATTERNS:
+            if pattern.search(content):
                 await self._add_finding(context, "SSTI", "INFO",
                     "Template syntax detected",
                     "Test for Server-Side Template Injection")
@@ -1649,7 +1704,7 @@ class UnifiedPhaseRunner:
     async def _phase_clickjacking(self, context: WorkflowContext) -> Dict:
         """Phase 30: Clickjacking defense check."""
         findings = 0
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        headers = self._get_headers_lower(context)
         
         has_xfo = 'x-frame-options' in headers
         has_csp_frame = 'frame-ancestors' in headers.get('content-security-policy', '')
@@ -1668,7 +1723,7 @@ class UnifiedPhaseRunner:
         findings = 0
         
         # Check Allow header
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        headers = self._get_headers_lower(context)
         allow = headers.get('allow', '')
         
         dangerous_methods = ['PUT', 'DELETE', 'TRACE', 'CONNECT']
@@ -1701,22 +1756,22 @@ class UnifiedPhaseRunner:
     async def _phase_websocket_security(self, context: WorkflowContext) -> Dict:
         """Phase 33: WebSocket security check."""
         findings = 0
-        content = context.page_data.get("content", "")
+        content, content_lower = self._get_content_views(context)
         
-        if 'websocket' in content.lower() or 'new WebSocket' in content:
+        if 'websocket' in content_lower or 'new WebSocket' in content:
             await self._add_finding(context, "WEBSOCKET", "INFO",
                 "WebSocket usage detected",
                 "Test WebSocket connections for security issues (CSWSH)")
         
-        await self._emit_action("WEBSOCKET_CHECK", context.target_url, {"has_ws": 'websocket' in content.lower()})
+        await self._emit_action("WEBSOCKET_CHECK", context.target_url, {"has_ws": 'websocket' in content_lower})
         return {"findings": findings}
     
     async def _phase_graphql_security(self, context: WorkflowContext) -> Dict:
         """Phase 34: GraphQL security analysis."""
         findings = 0
-        content = context.page_data.get("content", "")
+        content, content_lower = self._get_content_views(context)
         
-        if 'graphql' in content.lower() or '/graphql' in str(context.links):
+        if 'graphql' in content_lower or '/graphql' in str(context.links):
             await self._add_finding(context, "GRAPHQL", "INFO",
                 "GraphQL endpoint detected",
                 "Test for introspection, injection, and DoS vulnerabilities")
@@ -1737,8 +1792,7 @@ class UnifiedPhaseRunner:
         content = context.page_data.get("content", "")
         
         # Look for JWT patterns
-        jwt_pattern = r'eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+'
-        if re.search(jwt_pattern, content):
+        if RE_JWT.search(content):
             await self._add_finding(context, "JWT", "MEDIUM",
                 "JWT token exposed in page content",
                 "JWT tokens should not be visible in HTML source")
@@ -1766,7 +1820,7 @@ class UnifiedPhaseRunner:
     async def _phase_rate_limiting(self, context: WorkflowContext) -> Dict:
         """Phase 37: Rate limiting check."""
         findings = 0
-        headers = {k.lower(): v for k, v in context.headers.items()}
+        headers = self._get_headers_lower(context)
         
         rate_headers = ['x-ratelimit-limit', 'x-rate-limit-limit', 'retry-after', 'x-ratelimit-remaining']
         has_rate_limit = any(h in headers for h in rate_headers)
@@ -1854,11 +1908,11 @@ class UnifiedPhaseRunner:
     async def _phase_password_policy(self, context: WorkflowContext) -> Dict:
         """Phase 42: Password policy check."""
         findings = 0
-        content = context.page_data.get("content", "")
+        _, content_lower = self._get_content_views(context)
         
         weak_hints = ['minimum 6', 'min 4', 'at least 4', 'minimum 4']
         for hint in weak_hints:
-            if hint in content.lower():
+            if hint in content_lower:
                 await self._add_finding(context, "PASSWORD", "MEDIUM",
                     "Weak password policy detected",
                     f"Password requirement suggests weak policy: '{hint}'")
@@ -1917,15 +1971,8 @@ class UnifiedPhaseRunner:
         content = context.page_data.get("content", "")
         
         # Check for sensitive data patterns
-        patterns = [
-            (r'\b\d{3}-\d{2}-\d{4}\b', 'SSN pattern'),
-            (r'\b\d{16}\b', 'Credit card pattern'),
-            (r'password\s*[=:]\s*["\'][^"\']+["\']', 'Password in source'),
-            (r'private[_-]?key', 'Private key reference'),
-        ]
-        
-        for pattern, desc in patterns:
-            if re.search(pattern, content, re.I):
+        for pattern, desc in RE_SENSITIVE_DATA_PATTERNS:
+            if pattern.search(content):
                 await self._add_finding(context, "DATA_EXPOSURE", "HIGH",
                     f"Sensitive data pattern: {desc}",
                     "Sensitive data may be exposed in page source")
@@ -2184,8 +2231,7 @@ class UnifiedPhaseRunner:
         
         # Write report to file
         report_content = "\n".join(lines)
-        report_path.write_text(report_content, encoding="utf-8")
-        report_json_path.write_text(json.dumps({
+        report_json_content = json.dumps({
             **report,
             "workflow_id": context.workflow_id,
             "mode": context.mode,
@@ -2201,7 +2247,18 @@ class UnifiedPhaseRunner:
                 }
                 for finding in context.findings
             ],
-        }, indent=2), encoding="utf-8")
+        }, indent=2)
+        loop = asyncio.get_running_loop()
+        await asyncio.gather(
+            loop.run_in_executor(
+                None,
+                functools.partial(report_path.write_text, report_content, encoding="utf-8"),
+            ),
+            loop.run_in_executor(
+                None,
+                functools.partial(report_json_path.write_text, report_json_content, encoding="utf-8"),
+            ),
+        )
 
         # Store path in context for frontend
         context.report_file = str(report_path)

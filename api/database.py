@@ -307,17 +307,38 @@ async def create_bounty(user_id: str, target_id: str = None, title: str = "",
     }
 
 
+async def _attach_targets_to_bounties(bounties: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Batch-load linked targets once and attach them to bounty rows."""
+    target_ids = tuple({b["target_id"] for b in bounties if b.get("target_id")})
+    if not target_ids:
+        for bounty in bounties:
+            bounty["target"] = {}
+        return bounties
+
+    placeholders = ",".join("?" for _ in target_ids)
+    targets = await _fetch_all(
+        f"SELECT * FROM targets WHERE id IN ({placeholders})",
+        target_ids,
+    )
+    targets_map = {target["id"]: target for target in targets}
+    for bounty in bounties:
+        bounty["target"] = targets_map.get(bounty.get("target_id"), {})
+    return bounties
+
+
 async def get_user_bounties(user_id: str) -> List[Dict[str, Any]]:
     """Get all bounties for a user."""
-    return await _fetch_all(
+    bounties = await _fetch_all(
         "SELECT * FROM bounties WHERE user_id = ? ORDER BY submitted_at DESC",
         (user_id,)
     )
+    return await _attach_targets_to_bounties(bounties)
 
 
 async def get_all_bounties() -> List[Dict[str, Any]]:
     """Get all bounties."""
-    return await _fetch_all("SELECT * FROM bounties ORDER BY submitted_at DESC")
+    bounties = await _fetch_all("SELECT * FROM bounties ORDER BY submitted_at DESC")
+    return await _attach_targets_to_bounties(bounties)
 
 
 async def update_bounty_status(bounty_id: str, status: str, reward: float = None):
