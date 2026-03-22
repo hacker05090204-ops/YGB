@@ -82,6 +82,17 @@ MODE_A_CONFIG = TrainingModeConfig(
     bug_label_learning=False,
     description="Representation-only training from internet - structure learning only"
 )
+_FORBIDDEN_KEYWORDS = frozenset({
+    "hackerone",
+    "bugcrowd",
+    "accepted",
+    "rejected",
+    "critical",
+    "high",
+    "medium",
+    "low",
+    "severity",
+})
 
 # MODE-B: PROOF-LEARNING (LOCKED)
 MODE_B_CONFIG = TrainingModeConfig(
@@ -281,14 +292,13 @@ def is_source_safe(source: SafeDataSource) -> Tuple[bool, str]:
 def is_source_forbidden(source_name: str) -> Tuple[bool, str]:
     """Check if a data source is forbidden."""
     forbidden_names = {s.value.lower() for s in ForbiddenDataSource}
-    if source_name.lower() in forbidden_names:
+    source_name_lower = source_name.lower()
+    if source_name_lower in forbidden_names:
         return True, f"Source {source_name} is FORBIDDEN - cannot be used for training"
     
     # Check for keywords that indicate forbidden sources
-    forbidden_keywords = ["hackerone", "bugcrowd", "accepted", "rejected", 
-                          "critical", "high", "medium", "low", "severity"]
-    for keyword in forbidden_keywords:
-        if keyword in source_name.lower():
+    for keyword in _FORBIDDEN_KEYWORDS:
+        if keyword in source_name_lower:
             return True, f"Source contains forbidden keyword: {keyword}"
     
     return False, f"Source {source_name} is not explicitly forbidden"

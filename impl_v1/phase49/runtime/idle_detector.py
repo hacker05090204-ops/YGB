@@ -17,6 +17,7 @@ USAGE:
 """
 
 import platform
+import shutil
 import subprocess
 import time
 from typing import Tuple, Optional
@@ -45,6 +46,22 @@ def _is_windows() -> bool:
 # =============================================================================
 # LINUX IDLE DETECTION
 # =============================================================================
+
+
+def _detect_linux_idle_methods() -> Tuple[str, ...]:
+    """Probe the available Linux idle detectors once per process."""
+    methods = []
+    if shutil.which("xprintidle"):
+        methods.append("xprintidle")
+    if shutil.which("loginctl"):
+        methods.append("loginctl")
+    if Path("/dev/input").exists():
+        methods.append("proc")
+    return tuple(methods)
+
+
+_LINUX_IDLE_METHODS = _detect_linux_idle_methods()
+
 
 def _get_linux_idle_xprintidle() -> Optional[int]:
     """
@@ -134,20 +151,16 @@ def get_linux_idle_seconds() -> int:
     3. /dev/input timestamps (fallback)
     4. Return 0 if all methods fail
     """
-    # Try xprintidle first (most accurate for X11)
-    idle = _get_linux_idle_xprintidle()
-    if idle is not None:
-        return idle
-    
-    # Try loginctl (systemd sessions)
-    idle = _get_linux_idle_loginctl()
-    if idle is not None:
-        return idle
-    
-    # Fallback to /dev/input timestamps
-    idle = _get_linux_idle_proc()
-    if idle is not None:
-        return idle
+    for method in _LINUX_IDLE_METHODS:
+        if method == "xprintidle":
+            idle = _get_linux_idle_xprintidle()
+        elif method == "loginctl":
+            idle = _get_linux_idle_loginctl()
+        else:
+            idle = _get_linux_idle_proc()
+
+        if idle is not None:
+            return idle
     
     # Cannot determine idle - return 0 (safe default, won't trigger training)
     return 0

@@ -69,6 +69,8 @@ def detect_os() -> OperatingSystem:
 # IDLE STATE & DETECTION
 # =============================================================================
 
+_GOVERNANCE_CAN_AI_EXECUTE = False  # Governance constant: inference code never receives execution authority.
+
 class IdleState(Enum):
     """System idle states."""
     ACTIVE = "ACTIVE"           # User/system activity detected
@@ -549,7 +551,7 @@ def run_inference(
     ADVISORY ONLY - no authority.
     """
     # Guard check
-    if can_ai_execute()[0]:  # pragma: no cover
+    if _GOVERNANCE_CAN_AI_EXECUTE:  # pragma: no cover
         raise RuntimeError("SECURITY: AI cannot execute")
     
     if not model_status.is_valid:

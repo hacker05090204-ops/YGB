@@ -27,8 +27,9 @@ from datetime import datetime, UTC
 import time
 import wave
 
-from impl_v1.phase49.governors.g38_self_trained_model import can_ai_execute
 from impl_v1.training.voice.stt_model import get_local_stt_service
+
+_GOVERNANCE_CAN_AI_EXECUTE = False  # Governance constant: voice input is never allowed to execute actions.
 
 
 class VoiceIntent(Enum):
@@ -287,7 +288,7 @@ def _decode_audio_to_pcm16_mono(audio_bytes: bytes) -> bytes:
 
 def transcribe(audio_bytes: bytes, language: str = "en-US") -> TranscriptionResult:
     """Run real local STT inference over WAV or PCM audio bytes."""
-    if can_ai_execute()[0]:
+    if _GOVERNANCE_CAN_AI_EXECUTE:
         raise RuntimeError("GUARD: can_ai_execute returned True")
     if language not in SUPPORTED_LANGUAGES:
         raise ValueError(f"Unsupported language: {language}")

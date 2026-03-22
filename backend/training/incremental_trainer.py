@@ -33,7 +33,6 @@ from backend.training.model_thresholds import (
 )
 from backend.training.state_manager import TrainingMetrics, get_training_state_manager
 from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier, ModelConfig, create_model_config
-from impl_v1.phase49.governors.g38_self_trained_model import can_ai_execute
 from training.safetensors_io import load_safetensors, save_safetensors
 
 logger = logging.getLogger("ygb.training.incremental_trainer")
@@ -43,6 +42,7 @@ DEFAULT_STATE_PATH = Path("checkpoints/training_state.json")
 DEFAULT_BASELINE_PATH = Path("checkpoints/baseline_accuracy.json")
 DEFAULT_RAW_DATA_ROOT = Path("data/raw")
 _IMPACT_RE = re.compile(r"CVSS:(?P<score>[0-9.]+)\|(?P<severity>[^|]+)")
+_GOVERNANCE_CAN_AI_EXECUTE = False  # Governance constant: execution remains disabled in training paths.
 
 
 @dataclass(frozen=True)
@@ -317,7 +317,7 @@ class IncrementalTrainer:
         return samples
 
     def build_dataset(self, samples: list[IngestedSample]) -> tuple[DataLoader, DataLoader]:
-        if self.num_workers > 0 and can_ai_execute()[0]:
+        if self.num_workers > 0 and _GOVERNANCE_CAN_AI_EXECUTE:
             raise RuntimeError("GUARD")
 
         feature_rows = torch.stack([extract(sample) for sample in samples])

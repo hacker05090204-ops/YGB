@@ -21,6 +21,7 @@ from torch.utils.data import Dataset, DataLoader
 from typing import List, Tuple, Optional, Dict, Any
 import random
 from dataclasses import dataclass
+from pathlib import Path
 
 # Import the scaled dataset generator
 from impl_v1.training.data.scaled_dataset import (
@@ -435,6 +436,45 @@ def create_training_dataloader(
 
 # Minimum real samples threshold (configurable via env)
 YGB_MIN_REAL_SAMPLES = int(_os.environ.get("YGB_MIN_REAL_SAMPLES", "125000"))
+_VALIDATION_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+_VALIDATION_MANIFEST_PATH = _VALIDATION_PROJECT_ROOT / "secure_data" / "dataset_manifest.json"
+_DATASET_VALIDATION_CACHE_KEY: Optional[Tuple[Any, ...]] = None
+_DATASET_VALIDATION_CACHE_RESULT: Optional[Tuple[bool, str]] = None
+
+
+def _dataset_validation_signature(
+    *,
+    feature_dim: int,
+    min_samples: int,
+    seed: int,
+) -> Tuple[Any, ...]:
+    manifest_mtime_ns = 0
+    if _VALIDATION_MANIFEST_PATH.exists():
+        try:
+            manifest_mtime_ns = _VALIDATION_MANIFEST_PATH.stat().st_mtime_ns
+        except OSError:
+            manifest_mtime_ns = 0
+
+    try:
+        from backend.bridge.bridge_state import get_bridge_state
+
+        counts = get_bridge_state().get_counts()
+    except Exception as exc:
+        counts = {"bridge_state_error": str(exc)}
+
+    return (
+        int(feature_dim),
+        int(min_samples),
+        int(seed),
+        int(counts.get("bridge_count", 0) or 0),
+        int(counts.get("bridge_verified_count", 0) or 0),
+        int(counts.get("total_ingested", 0) or 0),
+        int(counts.get("total_dropped", 0) or 0),
+        int(counts.get("total_deduped", 0) or 0),
+        str(counts.get("last_ingest_at") or ""),
+        manifest_mtime_ns,
+        str(counts.get("bridge_state_error") or ""),
+    )
 
 
 def validate_dataset_integrity(
@@ -458,7 +498,19 @@ def validate_dataset_integrity(
     Returns:
         Tuple of (passed, message)
     """
+    global _DATASET_VALIDATION_CACHE_KEY, _DATASET_VALIDATION_CACHE_RESULT
+
     min_samples = YGB_MIN_REAL_SAMPLES if min_samples is None else int(min_samples)
+    cache_key = _dataset_validation_signature(
+        feature_dim=feature_dim,
+        min_samples=min_samples,
+        seed=seed,
+    )
+    if (
+        cache_key == _DATASET_VALIDATION_CACHE_KEY
+        and _DATASET_VALIDATION_CACHE_RESULT is not None
+    ):
+        return _DATASET_VALIDATION_CACHE_RESULT
 
     # ── REAL-DATA PATH: IngestionPipelineDataset only ──────────────
     try:
@@ -468,44 +520,54 @@ def validate_dataset_integrity(
             seed=seed,
         )
     except FileNotFoundError:
-        return False, (
+        result = (
+            False,
             "INGESTION_SOURCE_INVALID: Ingestion bridge library not found. "
-            "Real ingestion pipeline is required."
+            "Real ingestion pipeline is required.",
         )
     except RuntimeError as e:
         msg = str(e)
         if "Insufficient" in msg:
-            return False, (
+            result = (
+                False,
                 f"INSUFFICIENT_REAL_SAMPLES: {msg} "
-                f"(threshold: {min_samples})"
+                f"(threshold: {min_samples})",
             )
-        return False, f"REAL_DATA_REQUIRED: {msg}"
+        else:
+            result = (False, f"REAL_DATA_REQUIRED: {msg}")
     except Exception as e:
-        return False, f"INGESTION_SOURCE_INVALID: {str(e)}"
-
-    stats = dataset.get_statistics()
-
-    if stats["total"] < min_samples:
-        deficit = min_samples - stats["total"]
-        return False, (
-            f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples} "
-            f"(deficit: {deficit} samples needed)"
-        )
-
-    if stats["total"] > 0:
-        positive_ratio = stats["positive"] / stats["total"]
-        if not (0.40 <= positive_ratio <= 0.60):
-            return False, (
-                f"REAL_DATA_REQUIRED: Class imbalance: "
-                f"{positive_ratio:.2%} positive"
-            )
+        result = (False, f"INGESTION_SOURCE_INVALID: {str(e)}")
     else:
-        return False, "INSUFFICIENT_REAL_SAMPLES: 0 samples available"
+        stats = dataset.get_statistics()
 
-    return True, (
-        f"Dataset valid (REAL): {stats['total']} samples, "
-        f"{positive_ratio:.2%} positive, source={stats.get('dataset_source', 'INGESTION_PIPELINE')}"
-    )
+        if stats["total"] < min_samples:
+            deficit = min_samples - stats["total"]
+            result = (
+                False,
+                f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples} "
+                f"(deficit: {deficit} samples needed)",
+            )
+        elif stats["total"] > 0:
+            positive_ratio = stats["positive"] / stats["total"]
+            if not (0.40 <= positive_ratio <= 0.60):
+                result = (
+                    False,
+                    f"REAL_DATA_REQUIRED: Class imbalance: "
+                    f"{positive_ratio:.2%} positive",
+                )
+            else:
+                result = (
+                    True,
+                    f"Dataset valid (REAL): {stats['total']} samples, "
+                    f"{positive_ratio:.2%} positive, "
+                    f"source={stats.get('dataset_source', 'INGESTION_PIPELINE')}",
+                )
+        else:
+            result = (False, "INSUFFICIENT_REAL_SAMPLES: 0 samples available")
+
+    _DATASET_VALIDATION_CACHE_KEY = cache_key
+    _DATASET_VALIDATION_CACHE_RESULT = result
+    return result
 
 
 # =============================================================================

@@ -68,6 +68,13 @@ FORBIDDEN_WORDS = frozenset([
     "perhaps", "probably", "seems like", "appears to",
     "i think", "i believe", "in my opinion",
 ])
+_REASONING_PATTERNS = {
+    "XSS": "User input is reflected in response without sanitization. This allows script injection.",
+    "SQLi": "User input is concatenated into SQL query without parameterization. This allows query manipulation.",
+    "IDOR": "Object reference is exposed without authorization check. This allows unauthorized access.",
+    "SSRF": "User-controlled URL is fetched server-side without validation. This allows internal network access.",
+    "RCE": "User input reaches command execution context without sanitization. This allows arbitrary commands.",
+}
 
 
 @dataclass(frozen=True)
@@ -289,16 +296,10 @@ def build_reasoning_section(
     evidence_pack: EvidencePack,
 ) -> ReportSectionContent:
     """Build LOGICAL_REASONING section - deterministic logic only."""
-    # Map bug types to fixed reasoning patterns
-    REASONING_PATTERNS = {
-        "XSS": "User input is reflected in response without sanitization. This allows script injection.",
-        "SQLi": "User input is concatenated into SQL query without parameterization. This allows query manipulation.",
-        "IDOR": "Object reference is exposed without authorization check. This allows unauthorized access.",
-        "SSRF": "User-controlled URL is fetched server-side without validation. This allows internal network access.",
-        "RCE": "User input reaches command execution context without sanitization. This allows arbitrary commands.",
-    }
-    
-    pattern = REASONING_PATTERNS.get(bug_type, f"Vulnerability of type {bug_type} was identified based on evidence.")
+    pattern = _REASONING_PATTERNS.get(
+        bug_type,
+        f"Vulnerability of type {bug_type} was identified based on evidence.",
+    )
     
     refs = []
     if evidence_pack.scope_extraction:

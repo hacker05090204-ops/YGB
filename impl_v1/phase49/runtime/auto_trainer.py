@@ -1792,7 +1792,11 @@ class AutoTrainer:
         if self._task is not None:
             return
         
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
         self._task = loop.create_task(self.run_scheduler())
         self._write_worker_status()
     

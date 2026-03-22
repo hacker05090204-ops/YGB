@@ -11,8 +11,10 @@ Lock thresholds:
 - P99 < 300ms
 """
 
+from bisect import bisect_left, insort
+from collections import deque
 from dataclasses import dataclass
-from typing import List, Tuple
+from typing import Deque, List, Tuple
 from datetime import datetime
 import statistics
 import time
@@ -54,24 +56,27 @@ class PerformanceTracker:
     
     def __init__(self, thresholds: PerformanceThresholds = None):
         self.thresholds = thresholds or PerformanceThresholds()
-        self.latencies: List[float] = []
+        self.latencies: Deque[float] = deque(maxlen=10000)
+        self._sorted_latencies: List[float] = []
         self.alerts: List[dict] = []
     
     def record_latency(self, latency_ms: float) -> None:
         """Record a latency measurement."""
+        if len(self.latencies) == self.latencies.maxlen:
+            oldest = self.latencies[0]
+            remove_idx = bisect_left(self._sorted_latencies, oldest)
+            if remove_idx < len(self._sorted_latencies):
+                self._sorted_latencies.pop(remove_idx)
         self.latencies.append(latency_ms)
-        
-        # Keep only last 10000 samples
-        if len(self.latencies) > 10000:
-            self.latencies = self.latencies[-10000:]
+        insort(self._sorted_latencies, latency_ms)
     
     def compute_metrics(self) -> LatencyMetrics:
         """Compute latency percentiles."""
-        if len(self.latencies) < 2:
-            return LatencyMetrics(0, 0, 0, 0, 0, len(self.latencies))
+        n = len(self._sorted_latencies)
+        if n < 2:
+            return LatencyMetrics(0, 0, 0, 0, 0, n)
         
-        sorted_latencies = sorted(self.latencies)
-        n = len(sorted_latencies)
+        sorted_latencies = self._sorted_latencies
         
         p50_idx = int(n * 0.50)
         p95_idx = int(n * 0.95)
