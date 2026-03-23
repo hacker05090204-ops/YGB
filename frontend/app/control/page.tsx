@@ -516,7 +516,7 @@ function ControlPageContent() {
                     target: target.scope_summary,
                     scope: target.scope_summary,
                     proposed_mode: "READ_ONLY",
-                    risk_level: (target.payout_tier === "HIGH" ? "LOW" : "MEDIUM") as RiskLevelType,
+                    risk_level: (target.payout_tier === "HIGH" ? "HIGH" : "MEDIUM") as RiskLevelType,
                     risk_summary: `Analysis of ${target.program_name} (${target.scope_summary})`,
                     status: "PENDING",
                     created_at: new Date().toISOString(),

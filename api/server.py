@@ -288,6 +288,8 @@ try:
     from impl_v1.phase49.governors.g38_self_trained_model import (
         verify_all_guards,
         ALL_GUARDS,
+        can_ai_execute,
+        can_ai_submit,
     )
     from impl_v1.phase49.governors.g38_safe_pretraining import (
         verify_pretraining_guards,
@@ -297,6 +299,10 @@ try:
     G38_AVAILABLE = True
 except ImportError as e:
     print(f"[WARN] G38 modules not available: {e}")
+    verify_all_guards = lambda: {}
+    ALL_GUARDS = ()
+    can_ai_execute = lambda: (False, "G38 unavailable")
+    can_ai_submit = lambda: (False, "G38 unavailable")
     G38_AVAILABLE = False
 
 # =============================================================================
@@ -1291,6 +1297,8 @@ async def get_hunter_modules(user=Depends(require_auth)):
 @app.post("/api/run-phase")
 async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
     """Run a governance phase. Delegates to RealPhaseRunner."""
+    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
+    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     phases = discover_python_phases()
     phase_names = [p["name"] for p in phases]
     if request.phase not in phase_names:
@@ -1312,6 +1320,8 @@ async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
 @app.post("/api/run-hunter")
 async def run_hunter_module(request: RunHunterRequest, user=Depends(require_auth)):
     """Run a HUMANOID_HUNTER module. Delegates to RealPhaseRunner."""
+    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
+    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     modules = discover_hunter_modules()
     if request.module not in modules:
         raise HTTPException(status_code=404, detail=f"Hunter module '{request.module}' not found")
@@ -1424,6 +1434,8 @@ async def get_report_content(filename: str, user=Depends(require_auth)):
 @app.post("/api/hunter/start")
 async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)):
     """Start a V1 Hunter workflow."""
+    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
+    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
     
@@ -1438,6 +1450,7 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
         "type": "hunter",
         "target": request.target,
         "status": "started",
+        "stopped": False,
         "started_at": datetime.now(UTC).isoformat(),
         "steps": [],
         "owner_id": user.get("sub", ""),
@@ -1457,6 +1470,8 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
 @app.post("/api/workflow/bounty/start")  # Alias for frontend compatibility
 async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)):
     """Start a Bounty Finder workflow with REAL browser automation."""
+    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
+    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
     
@@ -1478,6 +1493,7 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
         "target": target,
         "mode": request.mode,  # READ_ONLY or REAL
         "status": "started",
+        "stopped": False,
         "started_at": datetime.now(UTC).isoformat(),
         "steps": [],
         "findings": [],
@@ -1764,11 +1780,26 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
 
     # Guard: nonexistent session → structured error, not bare 404
     session = target_sessions.get(session_id)
-    if session is None:
+    workflow = active_workflows.get(session_id)
+    if session is None and workflow is None:
         return {
             "stopped": False,
             "error": f"Session {session_id!r} not found",
             "session_id": session_id,
+        }
+
+    if workflow is not None:
+        check_resource_owner(workflow, user, "workflow", session_id)
+        workflow["status"] = "STOPPED"
+        workflow["stopped"] = True
+        workflow["stopped_at"] = now
+
+    if session is None:
+        return {
+            "stopped": True,
+            "session_id": session_id,
+            "stopped_at": now,
+            "duration_seconds": 0,
         }
 
     # Ownership check: only owner or admin can stop a session
@@ -3771,6 +3802,8 @@ async def hunting_websocket(websocket: WebSocket):
 @app.websocket("/ws/hunter/{workflow_id}")
 async def hunter_websocket(websocket: WebSocket, workflow_id: str):
     """WebSocket endpoint for Hunter workflow updates."""
+    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
+    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     # B8: Auth gating — verify token before accepting
     user = await ws_authenticate(websocket)
     if user is None:
@@ -3785,6 +3818,7 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
 
     await websocket.accept()
     hunter_connections[workflow_id] = websocket
+    workflow["stopped"] = bool(workflow.get("stopped", False))
     
     try:
         
@@ -3797,6 +3831,9 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
         step_hashes = []
         
         for idx, module_name in enumerate(module_names):
+            if workflow.get("stopped"):
+                workflow["status"] = "STOPPED"
+                break
             # Execute module directly — fail-closed, no simulated success
             step_success = False
             step_output = {}
@@ -3861,7 +3898,8 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
         await websocket.send_json({"type": "complete", "result": result})
         
     except WebSocketDisconnect:
-        pass
+        workflow["status"] = "STOPPED"
+        workflow["stopped"] = True
     finally:
         hunter_connections.pop(workflow_id, None)
 
@@ -3869,6 +3907,8 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
 @app.websocket("/ws/bounty/{report_id}")
 async def bounty_websocket(websocket: WebSocket, report_id: str):
     """WebSocket endpoint for HTTP-based security analysis."""
+    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
+    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     # B8: Auth gating — verify token before accepting
     user = await ws_authenticate(websocket)
     if user is None:
@@ -3884,6 +3924,7 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
     await websocket.accept()
     bounty_connections[report_id] = websocket
     ws_closed = False
+    workflow["stopped"] = bool(workflow.get("stopped", False))
     
     try:
         
@@ -3898,14 +3939,20 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
         # Create phase runner with WebSocket progress callback
         async def send_progress(update):
             nonlocal ws_closed
-            if ws_closed:
+            if ws_closed or workflow.get("stopped"):
+                ws_closed = True
+                workflow["stopped"] = True
                 return
             try:
                 await websocket.send_json(update)
             except Exception:
                 ws_closed = True
+                workflow["stopped"] = True
         
-        runner = RealPhaseRunner(on_progress=send_progress)
+        runner = RealPhaseRunner(
+            on_progress=send_progress,
+            should_stop=lambda: ws_closed or bool(workflow.get("stopped")),
+        )
         
         # Run the HTTP-based workflow
         context = await runner.run_workflow(
@@ -3913,6 +3960,10 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
             workflow_id=report_id,
             mode=mode
         )
+        if context.stopped:
+            workflow["status"] = "STOPPED"
+            workflow["stopped"] = True
+            return
         
         if ws_closed:
             return
@@ -3981,6 +4032,8 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
             pass
         
     except WebSocketDisconnect:
+        workflow["status"] = "STOPPED"
+        workflow["stopped"] = True
         print(f"[WS] WebSocket disconnected: {report_id}")
     except Exception as e:
         logger.exception(f"WebSocket error: {report_id}")

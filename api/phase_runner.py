@@ -107,11 +107,15 @@ SELENIUM_AVAILABLE = False  # Browser execution disabled per governance
 # CVE SCANNER
 # ==============================================================================
 try:
-    from cve_scanner import scan_for_cves, CVEScanner
+    from api.cve_scanner import scan_for_cves, CVEScanner
     CVE_SCANNER_AVAILABLE = True
 except ImportError:
-    CVE_SCANNER_AVAILABLE = False
-    print("[INFO] CVE scanner not available.")
+    try:
+        from cve_scanner import scan_for_cves, CVEScanner
+        CVE_SCANNER_AVAILABLE = True
+    except ImportError:
+        CVE_SCANNER_AVAILABLE = False
+        print("[INFO] CVE scanner not available.")
 
 try:
     from backend.cve.verification_engine import VerificationEngine
@@ -181,12 +185,18 @@ class UnifiedPhaseRunner:
     Uses Selenium (Edge/Chrome) or HTTP fallback.
     """
     
-    def __init__(self, on_progress: Optional[Callable] = None):
+    def __init__(
+        self,
+        on_progress: Optional[Callable] = None,
+        should_stop: Optional[Callable[[], bool]] = None,
+    ):
         self.on_progress = on_progress
+        self.should_stop = should_stop
         self.loaded_modules: Dict[int, Any] = {}
         self.action_count = 0
         self.driver = None
         self.use_browser = False
+        self._stop_requested = False
         self.verification_engine = VerificationEngine() if VERIFICATION_ENGINE_AVAILABLE else None
 
     @staticmethod
@@ -275,312 +285,70 @@ class UnifiedPhaseRunner:
             "mode": mode
         })
         
-        # ==========================================================
-        # PHASE 0: GOVERNANCE INITIALIZATION
-        # ==========================================================
-        await self._run_phase(context, 0, "Governance Initialization", 0, 
-                             lambda c: self._phase_governance_init(c))
-        
-        # ==========================================================
-        # PHASE 1: BROWSER/HTTP INIT
-        # ==========================================================
-        await self._run_phase(context, 1, "Browser Initialization", 5, 
-                             lambda c: self._phase_browser_init(c))
-        
-        # ==========================================================
-        # PHASE 2: TARGET NAVIGATION
-        # ==========================================================
-        await self._run_phase(context, 2, f"Navigating to {target_url[:50]}...", 10, 
-                             lambda c: self._phase_navigate(c))
-        
-        # ==========================================================
-        # PHASE 3: PAGE EXTRACTION
-        # ==========================================================
-        await self._run_phase(context, 3, "Extracting Page Content", 15, 
-                             lambda c: self._phase_extract_content(c))
-        
-        # ==========================================================
-        # PHASE 4: FORM DETECTION
-        # ==========================================================
-        await self._run_phase(context, 4, "Detecting Forms & Inputs", 20, 
-                             lambda c: self._phase_detect_forms(c))
-        
-        # ==========================================================
-        # PHASE 5: SECURITY HEADERS
-        # ==========================================================
-        await self._run_phase(context, 5, "Analyzing Security Headers", 25, 
-                             lambda c: self._phase_analyze_headers(c))
-        
-        # ==========================================================
-        # PHASE 6: COOKIE SECURITY
-        # ==========================================================
-        await self._run_phase(context, 6, "Checking Cookie Security", 30, 
-                             lambda c: self._phase_check_cookies(c))
-        
-        # ==========================================================
-        # PHASE 7: XSS DETECTION
-        # ==========================================================
-        await self._run_phase(context, 7, "XSS Vulnerability Detection", 35, 
-                             lambda c: self._phase_detect_xss(c))
-        
-        # ==========================================================
-        # PHASE 8: SQL INJECTION
-        # ==========================================================
-        await self._run_phase(context, 8, "SQL Injection Detection", 40, 
-                             lambda c: self._phase_detect_sqli(c))
-        
-        # ==========================================================
-        # PHASE 9: CSRF ANALYSIS
-        # ==========================================================
-        await self._run_phase(context, 9, "CSRF Token Analysis", 45, 
-                             lambda c: self._phase_check_csrf(c))
-        
-        # ==========================================================
-        # PHASE 10: IDOR DETECTION
-        # ==========================================================
-        await self._run_phase(context, 10, "IDOR Vulnerability Check", 48, 
-                             lambda c: self._phase_detect_idor(c))
-        
-        # ==========================================================
-        # PHASE 11: INFO DISCLOSURE
-        # ==========================================================
-        await self._run_phase(context, 11, "Information Disclosure Scan", 50, 
-                             lambda c: self._phase_info_disclosure(c))
-        
-        # ==========================================================
-        # PHASE 12: TECHNOLOGY DETECTION
-        # ==========================================================
-        await self._run_phase(context, 12, "Technology Fingerprinting", 55, 
-                             lambda c: self._phase_detect_tech(c))
-        
-        # ==========================================================
-        # PHASE 13: LINK CRAWLING
-        # ==========================================================
         max_pages = 5 if mode == "REAL" else 3
-        await self._run_phase(context, 13, f"Crawling Links (max {max_pages})", 60, 
-                             lambda c: self._phase_crawl_links(c, max_pages))
+        phase_specs = [
+            (0, "Governance Initialization", 0, lambda c: self._phase_governance_init(c)),
+            (1, "Browser Initialization", 5, lambda c: self._phase_browser_init(c)),
+            (2, f"Navigating to {target_url[:50]}...", 10, lambda c: self._phase_navigate(c)),
+            (3, "Extracting Page Content", 15, lambda c: self._phase_extract_content(c)),
+            (4, "Detecting Forms & Inputs", 20, lambda c: self._phase_detect_forms(c)),
+            (5, "Analyzing Security Headers", 25, lambda c: self._phase_analyze_headers(c)),
+            (6, "Checking Cookie Security", 30, lambda c: self._phase_check_cookies(c)),
+            (7, "XSS Vulnerability Detection", 35, lambda c: self._phase_detect_xss(c)),
+            (8, "SQL Injection Detection", 40, lambda c: self._phase_detect_sqli(c)),
+            (9, "CSRF Token Analysis", 45, lambda c: self._phase_check_csrf(c)),
+            (10, "IDOR Vulnerability Check", 48, lambda c: self._phase_detect_idor(c)),
+            (11, "Information Disclosure Scan", 50, lambda c: self._phase_info_disclosure(c)),
+            (12, "Technology Fingerprinting", 55, lambda c: self._phase_detect_tech(c)),
+            (13, f"Crawling Links (max {max_pages})", 60, lambda c: self._phase_crawl_links(c, max_pages)),
+            (14, "JavaScript Security Analysis", 65, lambda c: self._phase_js_analysis(c)),
+            (15, "API Endpoint Discovery", 70, lambda c: self._phase_api_discovery(c)),
+            (16, "Authentication Analysis", 75, lambda c: self._phase_auth_analysis(c)),
+            (17, "CORS Policy Check", 80, lambda c: self._phase_cors_check(c)),
+            (18, "CSP Analysis", 85, lambda c: self._phase_csp_analysis(c)),
+            (19, "Capturing Screenshot", 90, lambda c: self._phase_screenshot(c)),
+            (20, "Subdomain Enumeration", 42, lambda c: self._phase_subdomain_enum(c)),
+            (21, "DNS Security Analysis", 44, lambda c: self._phase_dns_analysis(c)),
+            (22, "SSL/TLS Certificate Check", 46, lambda c: self._phase_ssl_check(c)),
+            (23, "Open Redirect Detection", 48, lambda c: self._phase_open_redirect(c)),
+            (24, "SSRF Vulnerability Check", 50, lambda c: self._phase_ssrf_detection(c)),
+            (25, "XXE Vulnerability Check", 52, lambda c: self._phase_xxe_detection(c)),
+            (26, "Command Injection Detection", 54, lambda c: self._phase_cmd_injection(c)),
+            (27, "Path Traversal Detection", 56, lambda c: self._phase_path_traversal(c)),
+            (28, "File Inclusion Check", 58, lambda c: self._phase_file_inclusion(c)),
+            (29, "Template Injection Detection", 60, lambda c: self._phase_template_injection(c)),
+            (30, "Clickjacking Defense Check", 62, lambda c: self._phase_clickjacking(c)),
+            (31, "HTTP Method Testing", 64, lambda c: self._phase_http_methods(c)),
+            (32, "Header Injection Detection", 66, lambda c: self._phase_header_injection(c)),
+            (33, "WebSocket Security Check", 68, lambda c: self._phase_websocket_security(c)),
+            (34, "GraphQL Security Analysis", 70, lambda c: self._phase_graphql_security(c)),
+            (35, "JWT Token Analysis", 72, lambda c: self._phase_jwt_analysis(c)),
+            (36, "OAuth Implementation Check", 74, lambda c: self._phase_oauth_security(c)),
+            (37, "Rate Limiting Check", 76, lambda c: self._phase_rate_limiting(c)),
+            (38, "CAPTCHA Implementation Check", 78, lambda c: self._phase_captcha_check(c)),
+            (39, "Payment Security Analysis", 80, lambda c: self._phase_payment_security(c)),
+            (40, "Business Logic Flaws", 82, lambda c: self._phase_business_logic(c)),
+            (41, "Race Condition Detection", 84, lambda c: self._phase_race_conditions(c)),
+            (42, "Password Policy Check", 86, lambda c: self._phase_password_policy(c)),
+            (43, "2FA Implementation Check", 88, lambda c: self._phase_2fa_analysis(c)),
+            (44, "Session Fixation Check", 89, lambda c: self._phase_session_fixation(c)),
+            (45, "Privilege Escalation Check", 90, lambda c: self._phase_privilege_escalation(c)),
+            (46, "Sensitive Data Exposure", 92, lambda c: self._phase_data_exposure(c)),
+            (47, "CVE Vulnerability Detection", 93, lambda c: self._phase_cve_scan(c)),
+            (48, "Dependency Security Scan", 95, lambda c: self._phase_dependency_scan(c)),
+            (49, "Final Security Summary", 97, lambda c: self._phase_final_scan(c)),
+            (49, "Generating Security Report", 98, lambda c: self._phase_generate_report(c)),
+        ]
         
-        # ==========================================================
-        # PHASE 14: JAVASCRIPT ANALYSIS
-        # ==========================================================
-        await self._run_phase(context, 14, "JavaScript Security Analysis", 65, 
-                             lambda c: self._phase_js_analysis(c))
-        
-        # ==========================================================
-        # PHASE 15: API ENDPOINT DISCOVERY
-        # ==========================================================
-        await self._run_phase(context, 15, "API Endpoint Discovery", 70, 
-                             lambda c: self._phase_api_discovery(c))
-        
-        # ==========================================================
-        # PHASE 16: AUTHENTICATION ANALYSIS
-        # ==========================================================
-        await self._run_phase(context, 16, "Authentication Analysis", 75, 
-                             lambda c: self._phase_auth_analysis(c))
-        
-        # ==========================================================
-        # PHASE 17: CORS POLICY
-        # ==========================================================
-        await self._run_phase(context, 17, "CORS Policy Check", 80, 
-                             lambda c: self._phase_cors_check(c))
-        
-        # ==========================================================
-        # PHASE 18: CSP ANALYSIS
-        # ==========================================================
-        await self._run_phase(context, 18, "CSP Analysis", 85, 
-                             lambda c: self._phase_csp_analysis(c))
-        
-        # ==========================================================
-        # PHASE 19: SCREENSHOT
-        # ==========================================================
-        await self._run_phase(context, 19, "Capturing Screenshot", 90, 
-                             lambda c: self._phase_screenshot(c))
-        
-        # ==========================================================
-        # PHASE 20: SUBDOMAIN ENUMERATION
-        # ==========================================================
-        await self._run_phase(context, 20, "Subdomain Enumeration", 42, 
-                             lambda c: self._phase_subdomain_enum(c))
-        
-        # ==========================================================
-        # PHASE 21: DNS ANALYSIS
-        # ==========================================================
-        await self._run_phase(context, 21, "DNS Security Analysis", 44, 
-                             lambda c: self._phase_dns_analysis(c))
-        
-        # ==========================================================
-        # PHASE 22: SSL/TLS CHECK
-        # ==========================================================
-        await self._run_phase(context, 22, "SSL/TLS Certificate Check", 46, 
-                             lambda c: self._phase_ssl_check(c))
-        
-        # ==========================================================
-        # PHASE 23: OPEN REDIRECT
-        # ==========================================================
-        await self._run_phase(context, 23, "Open Redirect Detection", 48, 
-                             lambda c: self._phase_open_redirect(c))
-        
-        # ==========================================================
-        # PHASE 24: SSRF DETECTION
-        # ==========================================================
-        await self._run_phase(context, 24, "SSRF Vulnerability Check", 50, 
-                             lambda c: self._phase_ssrf_detection(c))
-        
-        # ==========================================================
-        # PHASE 25: XXE DETECTION
-        # ==========================================================
-        await self._run_phase(context, 25, "XXE Vulnerability Check", 52, 
-                             lambda c: self._phase_xxe_detection(c))
-        
-        # ==========================================================
-        # PHASE 26: COMMAND INJECTION
-        # ==========================================================
-        await self._run_phase(context, 26, "Command Injection Detection", 54, 
-                             lambda c: self._phase_cmd_injection(c))
-        
-        # ==========================================================
-        # PHASE 27: PATH TRAVERSAL
-        # ==========================================================
-        await self._run_phase(context, 27, "Path Traversal Detection", 56, 
-                             lambda c: self._phase_path_traversal(c))
-        
-        # ==========================================================
-        # PHASE 28: FILE INCLUSION
-        # ==========================================================
-        await self._run_phase(context, 28, "File Inclusion Check", 58, 
-                             lambda c: self._phase_file_inclusion(c))
-        
-        # ==========================================================
-        # PHASE 29: TEMPLATE INJECTION
-        # ==========================================================
-        await self._run_phase(context, 29, "Template Injection Detection", 60, 
-                             lambda c: self._phase_template_injection(c))
-        
-        # ==========================================================
-        # PHASE 30: CLICKJACKING
-        # ==========================================================
-        await self._run_phase(context, 30, "Clickjacking Defense Check", 62, 
-                             lambda c: self._phase_clickjacking(c))
-        
-        # ==========================================================
-        # PHASE 31: HTTP METHOD TESTING
-        # ==========================================================
-        await self._run_phase(context, 31, "HTTP Method Testing", 64, 
-                             lambda c: self._phase_http_methods(c))
-        
-        # ==========================================================
-        # PHASE 32: HEADER INJECTION
-        # ==========================================================
-        await self._run_phase(context, 32, "Header Injection Detection", 66, 
-                             lambda c: self._phase_header_injection(c))
-        
-        # ==========================================================
-        # PHASE 33: WEBSOCKET SECURITY
-        # ==========================================================
-        await self._run_phase(context, 33, "WebSocket Security Check", 68, 
-                             lambda c: self._phase_websocket_security(c))
-        
-        # ==========================================================
-        # PHASE 34: GRAPHQL SECURITY
-        # ==========================================================
-        await self._run_phase(context, 34, "GraphQL Security Analysis", 70, 
-                             lambda c: self._phase_graphql_security(c))
-        
-        # ==========================================================
-        # PHASE 35: JWT ANALYSIS
-        # ==========================================================
-        await self._run_phase(context, 35, "JWT Token Analysis", 72, 
-                             lambda c: self._phase_jwt_analysis(c))
-        
-        # ==========================================================
-        # PHASE 36: OAUTH SECURITY
-        # ==========================================================
-        await self._run_phase(context, 36, "OAuth Implementation Check", 74, 
-                             lambda c: self._phase_oauth_security(c))
-        
-        # ==========================================================
-        # PHASE 37: RATE LIMITING
-        # ==========================================================
-        await self._run_phase(context, 37, "Rate Limiting Check", 76, 
-                             lambda c: self._phase_rate_limiting(c))
-        
-        # ==========================================================
-        # PHASE 38: CAPTCHA BYPASS
-        # ==========================================================
-        await self._run_phase(context, 38, "CAPTCHA Implementation Check", 78, 
-                             lambda c: self._phase_captcha_check(c))
-        
-        # ==========================================================
-        # PHASE 39: PAYMENT SECURITY
-        # ==========================================================
-        await self._run_phase(context, 39, "Payment Security Analysis", 80, 
-                             lambda c: self._phase_payment_security(c))
-        
-        # ==========================================================
-        # PHASE 40: BUSINESS LOGIC
-        # ==========================================================
-        await self._run_phase(context, 40, "Business Logic Flaws", 82, 
-                             lambda c: self._phase_business_logic(c))
-        
-        # ==========================================================
-        # PHASE 41: RACE CONDITIONS
-        # ==========================================================
-        await self._run_phase(context, 41, "Race Condition Detection", 84, 
-                             lambda c: self._phase_race_conditions(c))
-        
-        # ==========================================================
-        # PHASE 42: PASSWORD POLICY
-        # ==========================================================
-        await self._run_phase(context, 42, "Password Policy Check", 86, 
-                             lambda c: self._phase_password_policy(c))
-        
-        # ==========================================================
-        # PHASE 43: 2FA ANALYSIS
-        # ==========================================================
-        await self._run_phase(context, 43, "2FA Implementation Check", 88, 
-                             lambda c: self._phase_2fa_analysis(c))
-        
-        # ==========================================================
-        # PHASE 44: SESSION FIXATION
-        # ==========================================================
-        await self._run_phase(context, 44, "Session Fixation Check", 89, 
-                             lambda c: self._phase_session_fixation(c))
-        
-        # ==========================================================
-        # PHASE 45: PRIVILEGE ESCALATION
-        # ==========================================================
-        await self._run_phase(context, 45, "Privilege Escalation Check", 90, 
-                             lambda c: self._phase_privilege_escalation(c))
-        
-        # ==========================================================
-        # PHASE 46: DATA EXPOSURE
-        # ==========================================================
-        await self._run_phase(context, 46, "Sensitive Data Exposure", 92, 
-                             lambda c: self._phase_data_exposure(c))
-        
-        # ==========================================================
-        # PHASE 47: CVE VULNERABILITY SCAN
-        # ==========================================================
-        await self._run_phase(context, 47, "CVE Vulnerability Detection", 93, 
-                             lambda c: self._phase_cve_scan(c))
-        
-        # ==========================================================
-        # PHASE 48: DEPENDENCY SCAN
-        # ==========================================================
-        await self._run_phase(context, 48, "Dependency Security Scan", 95, 
-                             lambda c: self._phase_dependency_scan(c))
-        
-        # ==========================================================
-        # PHASE 49: FINAL SECURITY SUMMARY
-        # ==========================================================
-        await self._run_phase(context, 49, "Final Security Summary", 97, 
-                             lambda c: self._phase_final_scan(c))
-        
-        # ==========================================================
-        # PHASE 50: REPORT GENERATION
-        # ==========================================================
-        await self._run_phase(context, 49, "Generating Security Report", 98, 
-                             lambda c: self._phase_generate_report(c))
+        for phase_num, phase_name, progress, phase_func in phase_specs:
+            if getattr(context, "stopped", False) or self._stop_requested or (
+                self.should_stop is not None and self.should_stop()
+            ):
+                context.stopped = True
+                logger.info("Execution stopped by human operator")
+                break
+            context.current_phase = phase_num
+            await self._run_phase(context, phase_num, phase_name, progress, phase_func)
         
         # ==========================================================
         # CLEANUP
@@ -625,6 +393,10 @@ class UnifiedPhaseRunner:
             result = await func(context)
             if result:
                 output = result
+        except NotImplementedError as exc:
+            status = "SKIPPED"
+            output = {"error": str(exc)}
+            logger.info("Phase %s (%s) skipped: %s", phase_num, name, exc)
         except Exception:
             status = "FAILED"
             output = {"error": "Phase execution failed"}
@@ -896,155 +668,30 @@ class UnifiedPhaseRunner:
         return {"findings": findings}
     
     async def _phase_detect_xss(self, context: WorkflowContext) -> Dict:
-        """Phase 7: XSS vulnerability detection."""
-        content = context.page_data.get("content", "")
-        findings = 0
-        
-        # Check for inline event handlers
-        event_handlers = RE_INLINE_EVENT.findall(content)
-        if len(event_handlers) > 5:
-            await self._add_finding(context, "XSS", "LOW",
-                f"Multiple inline event handlers ({len(event_handlers)})",
-                "Inline event handlers can be XSS vectors if user input is reflected",
-                evidence={
-                    "dom_event_handlers": event_handlers[:10],
-                    "verification_notes": ["Inline JavaScript handlers increase XSS exposure."],
-                })
-            findings += 1
-        
-        # Dangerous JavaScript patterns
-        xss_patterns = [
-            ('document.write', 'MEDIUM', 'document.write() usage'),
-            ('innerHTML', 'MEDIUM', 'innerHTML assignment'),
-            ('outerHTML', 'MEDIUM', 'outerHTML assignment'),
-            ('eval(', 'HIGH', 'eval() function usage'),
-            ('setTimeout(', 'LOW', 'setTimeout with string'),
-            ('setInterval(', 'LOW', 'setInterval with string'),
-            ('.html(', 'MEDIUM', 'jQuery .html() usage'),
-            ('dangerouslySetInnerHTML', 'HIGH', 'React dangerouslySetInnerHTML'),
-            ('v-html', 'HIGH', 'Vue v-html directive'),
-            ('[innerHTML]', 'HIGH', 'Angular innerHTML binding'),
-        ]
-        
-        for pattern, severity, desc in xss_patterns:
-            count = content.count(pattern)
-            if count > 0:
-                await self._add_finding(context, "XSS", severity,
-                    f"Potential XSS: {desc} ({count} occurrences)",
-                    f"Found {count} instances of {pattern} which could lead to XSS",
-                    evidence={
-                        "request_response_pairs": [{
-                            "url": context.target_url,
-                            "matched_pattern": pattern,
-                            "count": count,
-                        }],
-                        "verification_notes": [f"Client-side sink/source detected: {desc}"],
-                    })
-                findings += 1
-        
-        # Check for reflected parameters in URL
-        parsed = urlparse(context.target_url)
-        if parsed.query:
-            for param in parsed.query.split('&'):
-                if '=' in param:
-                    value = param.split('=')[1]
-                    if value and value in content:
-                        await self._add_finding(context, "XSS", "MEDIUM",
-                            f"URL parameter reflected in page",
-                            f"Parameter value appears in response - potential reflected XSS",
-                            evidence={
-                                "request_response_pairs": [{
-                                    "url": context.target_url,
-                                    "parameter": param.split('=')[0],
-                                    "reflected_value": value[:80],
-                                }],
-                                "verification_notes": ["Reflected parameter detected in response body."],
-                            })
-                        findings += 1
-                        break
-        
-        # Check for DOM-based XSS sinks
-        dom_sinks = ['location.hash', 'location.search', 'location.href', 
-                     'document.URL', 'document.referrer', 'window.name']
-        for sink in dom_sinks:
-            if sink in content:
-                await self._add_finding(context, "XSS", "MEDIUM",
-                    f"DOM-based XSS source detected: {sink}",
-                    "User-controllable data source found in JavaScript",
-                    evidence={
-                        "dom_sources": [sink],
-                        "verification_notes": [f"DOM source present: {sink}"],
-                    })
-                findings += 1
-        
-        await self._emit_action("XSS_SCAN", context.target_url, {"patterns_found": findings})
-        
-        return {"findings": findings}
+        """DEPRECATED: Automated scanning. See governance workflow.
+
+        Phase 7: XSS vulnerability detection.
+        """
+        raise NotImplementedError(
+            "Automated scanning removed. "
+            "This system uses governance-based intelligence, "
+            "not automated tool scanning. "
+            "Human researchers provide findings through the "
+            "approval workflow."
+        )
     
     async def _phase_detect_sqli(self, context: WorkflowContext) -> Dict:
-        """Phase 8: SQL injection detection."""
-        content = context.page_data.get("content", "").lower()
-        findings = 0
-        
-        # SQL error patterns
-        sql_errors = [
-            ('sql syntax', 'MySQL syntax error'),
-            ('mysql_', 'MySQL function error'),
-            ('sqlite_', 'SQLite error'),
-            ('postgresql', 'PostgreSQL error'),
-            ('ora-', 'Oracle error'),
-            ('mssql', 'MSSQL error'),
-            ('unclosed quotation', 'Unclosed quotation error'),
-            ('quoted string not properly', 'String termination error'),
-            ('syntax error at or near', 'SQL syntax error'),
-            ('sqlstate[', 'SQL state error'),
-            ('warning: pg_', 'PostgreSQL warning'),
-            ('valid postgresql result', 'PostgreSQL error'),
-            ('pgsql', 'PostgreSQL error'),
-            ('odbc', 'ODBC error'),
-            ('microsoft ole db', 'OLE DB error'),
-            ('you have an error in your sql', 'MySQL error'),
-        ]
-        
-        for pattern, desc in sql_errors:
-            if pattern in content:
-                await self._add_finding(context, "SQLI", "CRITICAL",
-                    f"SQL error message exposed",
-                    f"Found '{pattern}' indicating possible SQL injection vulnerability",
-                    evidence={
-                        "error_messages": [pattern],
-                        "request_response_pairs": [{
-                            "url": context.target_url,
-                            "matched_pattern": pattern,
-                        }],
-                        "verification_notes": [f"Database error signature detected: {desc}"],
-                    })
-                findings += 1
-                break
-        
-        # Check for common SQLi-vulnerable parameter names
-        sqli_params = ['id', 'user_id', 'item_id', 'product', 'category', 'page', 'sort', 'order']
-        for link in context.links[:50]:
-            for param in sqli_params:
-                if f'{param}=' in link:
-                    await self._add_finding(context, "SQLI", "LOW",
-                        f"Potentially injectable parameter: {param}",
-                        f"Common SQL-injectable parameter found in URL: {link[:100]}",
-                        evidence={
-                            "request_response_pairs": [{
-                                "url": link,
-                                "parameter": param,
-                            }],
-                            "verification_notes": [f"Common SQLi parameter candidate: {param}"],
-                        })
-                    findings += 1
-                    break
-            if findings > 0:
-                break
-        
-        await self._emit_action("SQLI_SCAN", context.target_url, {"findings": findings})
-        
-        return {"findings": findings}
+        """DEPRECATED: Automated scanning. See governance workflow.
+
+        Phase 8: SQL injection detection.
+        """
+        raise NotImplementedError(
+            "Automated scanning removed. "
+            "This system uses governance-based intelligence, "
+            "not automated tool scanning. "
+            "Human researchers provide findings through the "
+            "approval workflow."
+        )
     
     async def _phase_check_csrf(self, context: WorkflowContext) -> Dict:
         """Phase 9: CSRF protection check."""
@@ -1204,187 +851,43 @@ class UnifiedPhaseRunner:
         return {"technologies": techs}
     
     async def _phase_crawl_links(self, context: WorkflowContext, max_pages: int) -> Dict:
-        """Phase 13: Crawl internal links and discover common paths."""
-        start = datetime.now(UTC)
-        visited = {context.target_url}
-        parsed_base = urlparse(context.target_url)
-        base_url = f"{parsed_base.scheme}://{parsed_base.netloc}"
-        
-        # Common paths to discover (login, admin, api, etc.)
-        common_paths = [
-            "/login", "/signin", "/sign-in", "/auth/login",
-            "/admin", "/administrator", "/admin/login", "/dashboard",
-            "/register", "/signup", "/sign-up", "/auth/register",
-            "/api", "/api/v1", "/api/v2", "/api/auth", "/api/users",
-            "/forgot-password", "/reset-password", "/password-reset",
-            "/profile", "/account", "/settings", "/user",
-            "/logout", "/signout",
-            "/search", "/contact", "/about",
-            "/wp-admin", "/wp-login.php", "/administrator/index.php",
-            "/.env", "/.git/config", "/robots.txt", "/sitemap.xml",
-            "/graphql", "/graphiql", "/playground",
-            "/swagger", "/api-docs", "/swagger.json", "/openapi.json",
-            "/debug", "/phpinfo.php", "/info.php", "/test.php",
-            "/backup", "/db", "/database", "/sql",
-        ]
-        
-        to_visit = []
-        
-        # Add links from page
-        for link in context.links:
-            full_url = urljoin(context.target_url, link)
-            parsed = urlparse(full_url)
-            if parsed.netloc == parsed_base.netloc and full_url not in visited:
-                if not any(ext in parsed.path for ext in ['.pdf', '.jpg', '.png', '.css', '.js', '.gif', '.ico']):
-                    to_visit.append(full_url)
-        
-        # Add common paths
-        for path in common_paths:
-            full_url = base_url + path
-            if full_url not in visited and full_url not in to_visit:
-                to_visit.append(full_url)
-        
-        discovered_pages = []
-        sql_tested = 0
+        """DEPRECATED: Automated scanning. See governance workflow.
 
-        async def _fetch_one(client: "httpx.AsyncClient", url: str) -> Optional[Dict[str, Any]]:
-            try:
-                response = await client.get(url, headers=HTTP_HEADERS)
-            except Exception as exc:
-                logger.warning("Fetch failed %s: %s", url, exc)
-                return None
-            return {
-                "url": url,
-                "status_code": response.status_code,
-                "html": response.text,
-                "headers": dict(response.headers),
-            }
-        
-        if self.use_browser and self.driver:
-            for url in to_visit[:max_pages]:
-                if url in visited:
-                    continue
-                try:
-                    self.driver.get(url)
-                    html = self.driver.page_source
-                    status_code = 200
-                    resp_headers = {}
-                except Exception:
-                    continue
-                if status_code in [200, 301, 302, 401, 403]:
-                    visited.add(url)
-                    context.pages_visited.append(url)
-                    discovered_pages.append({"url": url, "status": status_code})
-                    await self._quick_scan(context, url, html, resp_headers)
-                    if any(p in url.lower() for p in ["/login", "/search", "/admin", "/user", "/api"]):
-                        await self._test_sql_injection(context, url, html)
-                        sql_tested += 1
-                    await self._emit_action("PAGE_FOUND", url, {
-                        "status": status_code,
-                        "type": "login" if "login" in url.lower() else "page"
-                    })
-        else:
-            crawl_targets = [url for url in to_visit[:max_pages] if url not in visited]
-            async with httpx.AsyncClient(
-                timeout=httpx.Timeout(30.0),
-                follow_redirects=True,
-                limits=httpx.Limits(max_connections=20),
-            ) as client:
-                responses = await asyncio.gather(
-                    *[_fetch_one(client, url) for url in crawl_targets],
-                    return_exceptions=False,
-                )
-            for result in responses:
-                if result is None:
-                    continue
-                url = str(result["url"])
-                status_code = int(result["status_code"])
-                html = str(result["html"])
-                resp_headers = dict(result["headers"])
-                if status_code in [200, 301, 302, 401, 403]:
-                    visited.add(url)
-                    context.pages_visited.append(url)
-                    discovered_pages.append({"url": url, "status": status_code})
-                    await self._quick_scan(context, url, html, resp_headers)
-                    if any(p in url.lower() for p in ["/login", "/search", "/admin", "/user", "/api"]):
-                        await self._test_sql_injection(context, url, html)
-                        sql_tested += 1
-                    await self._emit_action("PAGE_FOUND", url, {
-                        "status": status_code,
-                        "type": "login" if "login" in url.lower() else "page"
-                    })
-        
-        duration = int((datetime.now(UTC) - start).total_seconds() * 1000)
-        await self._emit_action("CRAWL", context.target_url, {
-            "pages_discovered": len(discovered_pages),
-            "sql_tested": sql_tested
-        }, duration)
-        
-        return {"pages_crawled": len(visited), "discovered": discovered_pages}
+        Phase 13: Crawl internal links and discover common paths.
+        """
+        raise NotImplementedError(
+            "Automated scanning removed. "
+            "This system uses governance-based intelligence, "
+            "not automated tool scanning. "
+            "Human researchers provide findings through the "
+            "approval workflow."
+        )
     
     async def _test_sql_injection(self, context: WorkflowContext, url: str, html: str):
-        """Test a specific page for SQL injection vulnerabilities."""
-        forms = RE_FORM.findall(html)
-        
-        sql_payloads = [
-            "' OR '1'='1",
-            "1' OR '1'='1' --",
-            "admin'--",
-            "1; DROP TABLE users--",
-            "' UNION SELECT NULL--",
-            "1' AND '1'='1",
-            "' OR 1=1#",
-        ]
-        
-        for form in forms:
-            inputs = RE_INPUT_NAME.findall(form)
-            if inputs:
-                await self._add_finding(context, "SQLI", "HIGH",
-                    f"Form with inputs found at {url}",
-                    f"Inputs: {', '.join(inputs[:5])}. Test with SQL payloads: {sql_payloads[0]}",
-                    evidence={
-                        "request_response_pairs": [{
-                            "url": url,
-                            "inputs": inputs[:5],
-                        }],
-                        "auto_poc_steps": [
-                            "Capture the form submission request from the affected page.",
-                            f"Replay the request with a baseline payload such as {sql_payloads[0]} in a non-destructive field.",
-                            "Compare application behavior, status code, and response length against the baseline.",
-                        ],
-                    })
-                break
-        
-        # Check URL parameters
-        parsed = urlparse(url)
-        if parsed.query:
-            await self._add_finding(context, "SQLI", "MEDIUM",
-                f"URL with parameters found",
-                f"URL: {url} - Test parameters for SQL injection",
-                evidence={
-                    "request_response_pairs": [{"url": url}],
-                    "verification_notes": ["Parameterized URL discovered during crawl."],
-                })
+        """DEPRECATED: Automated scanning. See governance workflow.
+
+        Test a specific page for SQL injection vulnerabilities.
+        """
+        raise NotImplementedError(
+            "Automated scanning removed. "
+            "This system uses governance-based intelligence, "
+            "not automated tool scanning. "
+            "Human researchers provide findings through the "
+            "approval workflow."
+        )
     
     async def _quick_scan(self, context: WorkflowContext, url: str, html: str, headers: Dict):
-        """Quick security scan on crawled page."""
-        headers_lower = {k.lower(): v for k, v in headers.items()}
-        
-        if 'x-frame-options' not in headers_lower:
-            await self._add_finding(context, "HEADERS", "MEDIUM",
-                "Missing X-Frame-Options", f"Page {url} vulnerable to clickjacking", url,
-                evidence={
-                    "missing_header": "X-Frame-Options",
-                    "response_headers": sorted(headers_lower.keys()),
-                })
+        """DEPRECATED: Automated scanning. See governance workflow.
 
-        if 'content-security-policy' not in headers_lower:
-            await self._add_finding(context, "HEADERS", "MEDIUM",
-                "Missing CSP", f"Page {url} lacks Content-Security-Policy", url,
-                evidence={
-                    "missing_header": "Content-Security-Policy",
-                    "response_headers": sorted(headers_lower.keys()),
-                })
+        Quick security scan on crawled page.
+        """
+        raise NotImplementedError(
+            "Automated scanning removed. "
+            "This system uses governance-based intelligence, "
+            "not automated tool scanning. "
+            "Human researchers provide findings through the "
+            "approval workflow."
+        )
     
     async def _phase_js_analysis(self, context: WorkflowContext) -> Dict:
         """Phase 14: JavaScript security analysis."""

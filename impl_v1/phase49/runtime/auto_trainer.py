@@ -30,6 +30,7 @@ RULES:
 import asyncio
 import concurrent.futures
 from contextlib import nullcontext
+import io
 import os
 import subprocess
 import sys
@@ -158,6 +159,15 @@ if not logger.handlers:
         "%(asctime)s [G38] %(levelname)s: %(message)s"
     ))
     logger.addHandler(handler)
+
+
+def _checkpoint_state_hash(model: Any) -> str:
+    """Hash the actual model weights for integrity tracking."""
+    if not TORCH_AVAILABLE or torch is None:
+        raise RuntimeError("PyTorch is required for checkpoint hashing")
+    buf = io.BytesIO()
+    torch.save(model.state_dict(), buf)
+    return hashlib.sha256(buf.getvalue()).hexdigest()[:16]
 
 
 # =============================================================================
@@ -1609,7 +1619,7 @@ class AutoTrainer:
                 )
             
             # Save checkpoint
-            checkpoint_hash = hashlib.sha256(f"epoch-{self._epoch}-gpu".encode()).hexdigest()[:16]
+            checkpoint_hash = _checkpoint_state_hash(self._gpu_model)
             self._emit_event(
                 "CHECKPOINT_SAVED",
                 f"Saved GPU checkpoint for epoch {self._epoch} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
@@ -1960,7 +1970,7 @@ class AutoTrainer:
                     self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
                 
                 if not self._abort_flag.is_set() and success:
-                    checkpoint_hash = hashlib.sha256(f"epoch-{self._epoch}-gpu".encode()).hexdigest()[:16]
+                    checkpoint_hash = _checkpoint_state_hash(self._gpu_model)
                     self._emit_event(
                         "CHECKPOINT_SAVED",
                         f"GPU checkpoint {self._session_epoch}/{epochs} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
@@ -2255,7 +2265,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                     ds_total = trainer._gpu_dataset_stats.get('train', {}).get('total', 0) if trainer._gpu_dataset_stats else 0
                     trainer._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
                     
-                    checkpoint_hash = hashlib.sha256(f"epoch-{trainer._epoch}-gpu".encode()).hexdigest()[:16]
+                    checkpoint_hash = _checkpoint_state_hash(trainer._gpu_model)
                     trainer._emit_event(
                         "CHECKPOINT_SAVED",
                         f"Saved GPU checkpoint epoch {epoch_count} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
