@@ -1,6 +1,6 @@
 "use client"
 
-import { type CSSProperties, useState, useEffect, useCallback, useRef } from "react"
+import { type CSSProperties, useState, useCallback, useRef } from "react"
 import { useAuthUser } from "@/hooks/use-auth-user"
 import { authFetch , getApiBase } from "@/lib/ygb-api"
 import { cn } from "@/lib/utils"
@@ -10,6 +10,9 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { ProtectedSidebarShell } from "@/components/protected-sidebar-shell"
+import { useDashboardConnection } from "./hooks/use-dashboard-connection"
+import { useRuntimeTelemetry } from "./hooks/use-runtime-telemetry"
+import { RuntimeOverview } from "./components/runtime-overview"
 
 // Import all dashboard components
 import { ExecutionState, type ExecutionStateType } from "@/components/execution-state"
@@ -59,10 +62,17 @@ function ControlPageContent() {
     const authUserId = getAuthUserId(authUser)
     const authUserName = getAuthUserName(authUser)
 
-    // Dashboard State
-    const [dashboardId, setDashboardId] = useState<string | null>(null)
-    const [isConnected, setIsConnected] = useState(false)
-    const [isLoading, setIsLoading] = useState(true)
+    const {
+        dashboardId,
+        isConnected,
+        isLoading,
+        initDashboard,
+    } = useDashboardConnection({
+        authStatus: authUser.status,
+        authUserId,
+        authUserName,
+        isAbortError,
+    })
 
     // Execution State (from G01)
     const [executionState, setExecutionState] = useState<ExecutionStateType>("IDLE")
@@ -91,240 +101,17 @@ function ControlPageContent() {
     const [voiceProcessing, setVoiceProcessing] = useState(false)
     const [voiceMode, setVoiceMode] = useState<VoiceModeType>("SECURITY")
 
-    // Runtime Mode Control (Train/Hunt separation)
-    const [runtimeMode, setRuntimeMode] = useState<"IDLE" | "TRAIN" | "HUNT">("IDLE")
     const [modeLoading, setModeLoading] = useState(false)
-    const [accuracySnapshot, setAccuracySnapshot] = useState<{
-        precision: number; recall: number; ece_score: number;
-        dup_suppression_rate: number; scope_compliance: number;
-    } | null>(null)
     const [targetsActive] = useState(0)
     const maxTargets = 5
-
-    // Runtime telemetry — polled from /runtime/status (C++ authoritative source)
-    const [runtimeStatus, setRuntimeStatus] = useState<{
-        status: string;
-        runtime?: {
-            total_epochs: number; completed_epochs: number; current_loss: number;
-            precision: number; ece: number; drift_kl: number; duplicate_rate: number;
-            gpu_util: number; cpu_util: number; temperature: number;
-            determinism_status: boolean; freeze_status: boolean;
-            mode: string; progress_pct: number; loss_trend: number;
-            // Phase 2: Real-time training visibility
-            wall_clock_unix: number;
-            monotonic_start_time: number;
-            training_duration_seconds: number;
-        };
-        determinism_ok?: boolean;
-        stale?: boolean;
-        last_update_ms?: number;
-        signature?: string;
-        source?: string;
-        auto_repaired?: boolean;
-        repair_issues?: string[];
-    } | null>(null)
-
-    // Phase 2: Real-time clock and stall detection
-    const [liveTime, setLiveTime] = useState<number>(Date.now())
-    const lastTelemetryTs = useRef<number>(0)
-    const [isStalled, setIsStalled] = useState(false)
-    const healthFailureCount = useRef(0)
-    const healthCheckInFlight = useRef(false)
-
-    // Connectivity comes from unprotected health checks, not dashboard creation.
-    const checkServerHealth = useCallback(async () => {
-        if (healthCheckInFlight.current) {
-            return
-        }
-
-        healthCheckInFlight.current = true
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort("health_timeout"), 5000)
-
-        try {
-            const response = await fetch(`${getApiBase()}/health`, {
-                method: "GET",
-                signal: controller.signal,
-            })
-            if (response.ok) {
-                healthFailureCount.current = 0
-                setIsConnected(true)
-            } else {
-                healthFailureCount.current += 1
-                if (healthFailureCount.current >= 3) {
-                    setIsConnected(false)
-                }
-            }
-        } catch (error) {
-            if (!isAbortError(error)) {
-                console.warn("Health check failed:", error)
-            }
-            healthFailureCount.current += 1
-            if (healthFailureCount.current >= 3) {
-                setIsConnected(false)
-            }
-        } finally {
-            clearTimeout(timeout)
-            healthCheckInFlight.current = false
-        }
-    }, [])
-
-    // Initialize dashboard with timeout
-    const initDashboard = useCallback(async () => {
-        if (authUser.status !== "authenticated" || !authUserId) {
-            return
-        }
-
-        setIsLoading(true)
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort("dashboard_init_timeout"), 5000)
-
-        try {
-            const response = await authFetch(`${getApiBase()}/api/dashboard/create`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: authUserId, user_name: authUserName }),
-                signal: controller.signal
-            })
-
-            if (response.ok) {
-                const data = await response.json()
-                setDashboardId(data.dashboard_id)
-            } else {
-                const statusTag = response.status === 401 || response.status === 403
-                    ? "AUTH_REQUIRED"
-                    : "UNAVAILABLE"
-                console.warn(`Dashboard init unavailable (${response.status})`)
-                setDashboardId(statusTag)
-            }
-        } catch (error) {
-            if (!isAbortError(error)) {
-                console.error("Dashboard init failed:", error)
-            }
-            setDashboardId("UNAVAILABLE")
-        } finally {
-            clearTimeout(timeout)
-            setIsLoading(false)
-        }
-    }, [authUser.status, authUserId, authUserName])
-
-    useEffect(() => {
-        if (authUser.status === "authenticated" && authUserId) {
-            void initDashboard()
-        }
-    }, [authUser.status, authUserId, initDashboard])
-
-    // Recover from transient startup/API blips automatically once backend is healthy.
-    useEffect(() => {
-        if (authUser.status !== "authenticated" || !authUserId) return
-        if (!isConnected) return
-        if (dashboardId === "AUTH_REQUIRED") return
-        if (!dashboardId || dashboardId === "UNAVAILABLE") {
-            void initDashboard()
-        }
-    }, [authUser.status, authUserId, isConnected, dashboardId, initDashboard])
-
-    useEffect(() => {
-        checkServerHealth()
-        const interval = setInterval(checkServerHealth, 10000)
-        return () => clearInterval(interval)
-    }, [checkServerHealth])
-
-    // Poll accuracy snapshot — every 3s for real-time updates
-    useEffect(() => {
-        let inFlight = false
-
-        const fetchAccuracy = async () => {
-            if (inFlight) {
-                return
-            }
-            inFlight = true
-            const controller = new AbortController()
-            const timeout = setTimeout(() => controller.abort("accuracy_timeout"), 2500)
-
-            try {
-                const res = await authFetch(`${getApiBase()}/api/accuracy/snapshot`, {
-                    signal: controller.signal
-                })
-                if (res.ok) {
-                    const data = await res.json()
-                    setAccuracySnapshot(data)
-                } else {
-                    setAccuracySnapshot(null)
-                }
-            } catch {
-                setAccuracySnapshot(null)
-            } finally {
-                clearTimeout(timeout)
-                inFlight = false
-            }
-        }
-        fetchAccuracy()
-        const interval = setInterval(fetchAccuracy, 3000)
-        return () => clearInterval(interval)
-    }, [])
-
-    // Poll runtime status from backend — every 3s for real-time updates
-    useEffect(() => {
-        let inFlight = false
-
-        const fetchRuntimeStatus = async () => {
-            if (inFlight) {
-                return
-            }
-            inFlight = true
-            const controller = new AbortController()
-            const timeout = setTimeout(() => controller.abort("runtime_status_timeout"), 2500)
-
-            try {
-                const res = await authFetch(`${getApiBase()}/runtime/status`, {
-                    signal: controller.signal
-                })
-                if (res.ok) {
-                    const data = await res.json()
-                    setRuntimeStatus(data)
-                    // Sync runtime mode from backend training state
-                    if (data.runtime?.training_state === "TRAINING" || data.status === "active") {
-                        setRuntimeMode("TRAIN")
-                    } else if (data.status === "idle" || data.runtime?.training_state === "IDLE") {
-                        setRuntimeMode(prev => prev === "TRAIN" ? "IDLE" : prev)
-                    }
-                    // Phase 2: Track telemetry freshness for stall detection
-                    if (data.runtime?.wall_clock_unix) {
-                        const newTs = data.runtime.wall_clock_unix
-                        if (lastTelemetryTs.current > 0 && newTs === lastTelemetryTs.current) {
-                            // Timestamp hasn't changed — check stall threshold (30s)
-                            const elapsed = (Date.now() / 1000) - newTs
-                            setIsStalled(elapsed > 30)
-                        } else {
-                            setIsStalled(false)
-                        }
-                        lastTelemetryTs.current = newTs
-                    }
-                } else {
-                    setRuntimeStatus({ status: "error", stale: true })
-                    setIsStalled(false)
-                    lastTelemetryTs.current = 0
-                }
-            } catch {
-                setRuntimeStatus({ status: "error", stale: true })
-                setIsStalled(false)
-                lastTelemetryTs.current = 0
-            } finally {
-                clearTimeout(timeout)
-                inFlight = false
-            }
-        }
-        fetchRuntimeStatus()
-        const interval = setInterval(fetchRuntimeStatus, 3000)
-        return () => clearInterval(interval)
-    }, [])
-
-    // Phase 2: Live clock tick every 1s
-    useEffect(() => {
-        const tick = setInterval(() => setLiveTime(Date.now()), 1000)
-        return () => clearInterval(tick)
-    }, [])
+    const {
+        runtimeMode,
+        setRuntimeMode,
+        accuracySnapshot,
+        runtimeStatus,
+        liveTime,
+        isStalled,
+    } = useRuntimeTelemetry()
 
     // Phase 2: Format seconds duration to HH:MM:SS
     const formatDuration = (seconds: number): string => {
@@ -667,339 +454,21 @@ function ControlPageContent() {
                 <main className="flex-1 p-6">
                     <div className="max-w-[1600px] mx-auto">
 
-                        {/* Runtime Mode Control Panel */}
-                        <div className="mb-6 p-5 rounded-2xl bg-card/50 border border-border/50">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className={cn(
-                                        "w-8 h-8 rounded-lg flex items-center justify-center",
-                                        runtimeMode === "TRAIN" ? "bg-blue-500/20" :
-                                            runtimeMode === "HUNT" ? "bg-red-500/20" : "bg-zinc-500/20"
-                                    )}>
-                                        {runtimeMode === "TRAIN" ? <BookOpen className="w-4 h-4 text-blue-400" /> :
-                                            runtimeMode === "HUNT" ? <Crosshair className="w-4 h-4 text-red-400" /> :
-                                                <Gauge className="w-4 h-4 text-zinc-400" />}
-                                    </div>
-                                    <div>
-                                        <h2 className="text-sm font-bold">Runtime Mode</h2>
-                                        <p className={cn(
-                                            "text-xs font-medium",
-                                            runtimeMode === "TRAIN" ? "text-blue-400" :
-                                                runtimeMode === "HUNT" ? "text-red-400" : "text-zinc-400"
-                                        )}>
-                                            {runtimeMode === "TRAIN" ? "LAB TRAINING" :
-                                                runtimeMode === "HUNT" ? "HUNT EXECUTION" : "IDLE"}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    {runtimeMode === "IDLE" ? (
-                                        <>
-                                            <button
-                                                onClick={handleStartTraining}
-                                                disabled={modeLoading}
-                                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 text-xs font-medium transition-colors disabled:opacity-50"
-                                            >
-                                                <Play className="w-3 h-3" /> Start Training
-                                            </button>
-                                            <button
-                                                onClick={handleStartHunting}
-                                                disabled={modeLoading}
-                                                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-400 text-xs font-medium transition-colors disabled:opacity-50"
-                                            >
-                                                <Crosshair className="w-3 h-3" /> Start Hunting
-                                            </button>
-                                        </>
-                                    ) : runtimeMode === "TRAIN" ? (
-                                        <button
-                                            onClick={handleStopTraining}
-                                            disabled={modeLoading}
-                                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-xs font-medium transition-colors disabled:opacity-50"
-                                        >
-                                            <Square className="w-3 h-3" /> Stop Training
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={handleStopHunting}
-                                            disabled={modeLoading}
-                                            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 text-xs font-medium transition-colors disabled:opacity-50"
-                                        >
-                                            <Square className="w-3 h-3" /> Stop Hunting
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Metrics Strip */}
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Lab Accuracy</p>
-                                    <p className="text-lg font-bold text-emerald-400">
-                                        {accuracySnapshot ? `${(accuracySnapshot.precision * 100).toFixed(1)}%` : "—"}
-                                    </p>
-                                </div>
-                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Precision</p>
-                                    <p className="text-lg font-bold text-blue-400">
-                                        {accuracySnapshot ? `${(accuracySnapshot.precision * 100).toFixed(1)}%` : "—"}
-                                    </p>
-                                </div>
-                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dup Suppression</p>
-                                    <p className="text-lg font-bold text-purple-400">
-                                        {accuracySnapshot ? `${(accuracySnapshot.dup_suppression_rate * 100).toFixed(0)}%` : "—"}
-                                    </p>
-                                </div>
-                                <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Scope Compliance</p>
-                                    <p className="text-lg font-bold text-cyan-400">
-                                        {accuracySnapshot ? `${(accuracySnapshot.scope_compliance * 100).toFixed(0)}%` : "—"}
-                                    </p>
-                                </div>
-                                <div className="p-3 rounded-xl bg-background/50 border border-border/30" id="metric-targets">
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Targets Active</p>
-                                    <p className="text-lg font-bold">
-                                        <span className={runtimeMode === "HUNT" ? "text-red-400" : "text-zinc-400"}>
-                                            {targetsActive}
-                                        </span>
-                                        <span className="text-xs text-muted-foreground">/{maxTargets}</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* ═══ Runtime Telemetry Panel ═══ */}
-                        <div className="mb-6 p-5 rounded-2xl bg-card/50 border border-border/50" id="runtime-telemetry">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                                        <Activity className="w-4 h-4 text-emerald-400" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-sm font-bold">Runtime Telemetry</h2>
-                                        <p className="text-xs text-muted-foreground">
-                                            {runtimeStatus?.source === "g38_live"
-                                                ? "Live trainer fallback"
-                                                : runtimeStatus?.source === "telemetry_file_self_healed"
-                                                    ? "Auto-repaired idle baseline"
-                                                    : "Validated telemetry source"}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isStalled && (
-                                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-medium animate-pulse">
-                                            <AlertTriangle className="w-3 h-3" />
-                                            ⚠ Training Stalled
-                                        </div>
-                                    )}
-                                    {runtimeStatus?.stale && (
-                                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium animate-pulse">
-                                            <AlertTriangle className="w-3 h-3" />
-                                            STALE DATA
-                                        </div>
-                                    )}
-                                    {runtimeStatus?.auto_repaired && !runtimeStatus?.stale && (
-                                        <div className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-medium">
-                                            AUTO-FIXED
-                                        </div>
-                                    )}
-                                    {runtimeStatus?.status === "awaiting_data" && (
-                                        <div className="px-3 py-1 rounded-full bg-zinc-500/20 text-zinc-400 text-xs font-medium">
-                                            Awaiting Training Start
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Phase 2: Real-time timestamp display */}
-                            {runtimeStatus?.runtime && (
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-4">
-                                    <div className="p-2.5 rounded-xl bg-background/50 border border-emerald-500/20">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Clock className="w-3 h-3 text-emerald-400" />
-                                            <p className="text-[10px] text-emerald-400 uppercase tracking-wider font-medium">Training Started</p>
-                                        </div>
-                                        <p className="text-xs font-mono text-emerald-300">
-                                            {runtimeStatus.runtime.wall_clock_unix > 0
-                                                ? new Date((runtimeStatus.runtime.wall_clock_unix - runtimeStatus.runtime.training_duration_seconds) * 1000).toLocaleTimeString()
-                                                : "—"}
-                                        </p>
-                                    </div>
-                                    <div className="p-2.5 rounded-xl bg-background/50 border border-blue-500/20">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Clock className="w-3 h-3 text-blue-400" />
-                                            <p className="text-[10px] text-blue-400 uppercase tracking-wider font-medium">Elapsed Time</p>
-                                        </div>
-                                        <p className="text-xs font-mono text-blue-300">
-                                            {formatDuration(runtimeStatus.runtime.training_duration_seconds)}
-                                        </p>
-                                    </div>
-                                    <div className="p-2.5 rounded-xl bg-background/50 border border-violet-500/20">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Clock className="w-3 h-3 text-violet-400" />
-                                            <p className="text-[10px] text-violet-400 uppercase tracking-wider font-medium">Samples/sec</p>
-                                        </div>
-                                        <p className="text-xs font-mono text-violet-300">
-                                            {((runtimeStatus.runtime as any).samples_per_sec ?? 0).toFixed(1)}
-                                        </p>
-                                    </div>
-                                    <div className="p-2.5 rounded-xl bg-background/50 border border-cyan-500/20">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Clock className="w-3 h-3 text-cyan-400" />
-                                            <p className="text-[10px] text-cyan-400 uppercase tracking-wider font-medium">Checkpoints</p>
-                                        </div>
-                                        <p className="text-xs font-mono text-cyan-300">
-                                            {(runtimeStatus.runtime as any).checkpoints_saved ?? 0}
-                                        </p>
-                                    </div>
-                                    <div className="p-2.5 rounded-xl bg-background/50 border border-orange-500/20">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Clock className="w-3 h-3 text-orange-400" />
-                                            <p className="text-[10px] text-orange-400 uppercase tracking-wider font-medium">Tensor Files</p>
-                                        </div>
-                                        <p className="text-xs font-mono text-orange-300">
-                                            {(runtimeStatus.runtime as any).safetensors_files ?? 0}
-                                        </p>
-                                    </div>
-                                    <div className="p-2.5 rounded-xl bg-background/50 border border-pink-500/20">
-                                        <div className="flex items-center gap-1.5 mb-1">
-                                            <Clock className="w-3 h-3 text-pink-400" />
-                                            <p className="text-[10px] text-pink-400 uppercase tracking-wider font-medium">Live Clock</p>
-                                        </div>
-                                        <p className="text-xs font-mono text-pink-300">
-                                            {new Date(liveTime).toLocaleTimeString()}
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
-
-                            {(runtimeStatus?.status === "active" || (runtimeStatus?.status === "idle" && runtimeStatus?.runtime)) && runtimeStatus?.runtime ? (
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Epochs</p>
-                                        <p className="text-lg font-bold text-violet-400">
-                                            {runtimeStatus.runtime.completed_epochs ?? 0}/{runtimeStatus.runtime.total_epochs ?? 0}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Progress</p>
-                                        <p className="text-lg font-bold text-blue-400">
-                                            {(runtimeStatus.runtime.progress_pct ?? 0).toFixed(1)}%
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Loss</p>
-                                        <p className="text-lg font-bold text-amber-400">
-                                            {(runtimeStatus.runtime.current_loss ?? 0).toFixed(4)}
-                                            <span className={cn("text-xs ml-1", (runtimeStatus.runtime.loss_trend ?? 0) < 0 ? "text-emerald-400" : "text-red-400")}>
-                                                {(runtimeStatus.runtime.loss_trend ?? 0) < 0 ? "↓" : "↑"}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Precision</p>
-                                        <p className="text-lg font-bold text-emerald-400">
-                                            {((runtimeStatus.runtime.precision ?? 0) * 100).toFixed(1)}%
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">ECE</p>
-                                        <p className="text-lg font-bold text-cyan-400">
-                                            {(runtimeStatus.runtime.ece ?? 0).toFixed(4)}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Drift KL</p>
-                                        <p className="text-lg font-bold text-purple-400">
-                                            {(runtimeStatus.runtime.drift_kl ?? 0).toFixed(4)}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">GPU Util</p>
-                                        <p className="text-lg font-bold text-orange-400">
-                                            {(runtimeStatus.runtime.gpu_util ?? 0).toFixed(0)}%
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">CPU Util</p>
-                                        <p className="text-lg font-bold text-sky-400">
-                                            {(runtimeStatus.runtime.cpu_util ?? 0).toFixed(0)}%
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Temp</p>
-                                        <p className={cn("text-lg font-bold", (runtimeStatus.runtime.temperature ?? 0) > 85 ? "text-red-400" : "text-emerald-400")}>
-                                            {(runtimeStatus.runtime.temperature ?? 0).toFixed(0)}°C
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dup Rate</p>
-                                        <p className="text-lg font-bold text-pink-400">
-                                            {((runtimeStatus.runtime.duplicate_rate ?? 0) * 100).toFixed(1)}%
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Determinism</p>
-                                        <p className={cn("text-lg font-bold", runtimeStatus.runtime.determinism_status ? "text-emerald-400" : "text-red-400")}>
-                                            {runtimeStatus.runtime.determinism_status ? "✓ OK" : "✗ FAIL"}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Freeze</p>
-                                        <p className={cn("text-lg font-bold", runtimeStatus.runtime.freeze_status ? "text-emerald-400" : "text-amber-400")}>
-                                            {runtimeStatus.runtime.freeze_status ? "✓ Valid" : "⚠ Invalid"}
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : runtimeStatus?.status === "idle" && runtimeStatus.runtime ? (
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Epochs Done</p>
-                                        <p className="text-lg font-bold text-violet-400">
-                                            {runtimeStatus.runtime.completed_epochs ?? 0}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Last Accuracy</p>
-                                        <p className="text-lg font-bold text-emerald-400">
-                                            {((runtimeStatus.runtime.precision ?? 0) * 100).toFixed(1)}%
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Last Loss</p>
-                                        <p className="text-lg font-bold text-amber-400">
-                                            {(runtimeStatus.runtime.current_loss ?? 0).toFixed(6)}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Checkpoints</p>
-                                        <p className="text-lg font-bold text-cyan-400">
-                                            {(runtimeStatus.runtime as any).checkpoints_saved ?? 0}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Tensor Files</p>
-                                        <p className="text-lg font-bold text-purple-400">
-                                            {(runtimeStatus.runtime as any).safetensors_files ?? 0}
-                                        </p>
-                                    </div>
-                                    <div className="p-3 rounded-xl bg-background/50 border border-border/30">
-                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Dataset</p>
-                                        <p className="text-lg font-bold text-blue-400">
-                                            {((runtimeStatus.runtime as any).dataset_size ?? 0).toLocaleString()}
-                                        </p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="text-center py-6 text-muted-foreground text-sm">
-                                    {runtimeStatus?.status === "error"
-                                        ? "⚠ Error reading runtime state"
-                                        : "Waiting for training telemetry..."}
-                                </div>
-                            )}
-                        </div>
+                        <RuntimeOverview
+                            runtimeMode={runtimeMode}
+                            modeLoading={modeLoading}
+                            onStartTraining={handleStartTraining}
+                            onStopTraining={handleStopTraining}
+                            onStartHunting={handleStartHunting}
+                            onStopHunting={handleStopHunting}
+                            accuracySnapshot={accuracySnapshot}
+                            targetsActive={targetsActive}
+                            maxTargets={maxTargets}
+                            runtimeStatus={runtimeStatus}
+                            liveTime={liveTime}
+                            isStalled={isStalled}
+                            formatDuration={formatDuration}
+                        />
 
                         {/* Distributed Training Panel */}
                         <div className="mb-6 p-5 rounded-2xl bg-card/50 border border-border/50">

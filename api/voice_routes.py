@@ -22,6 +22,12 @@ from pydantic import BaseModel
 
 from backend.auth.auth_guard import require_auth
 from backend.auth.ownership import check_resource_owner
+from api.services.voice_service import (
+    get_voice_audit,
+    get_voice_orchestrator,
+    get_voice_policy,
+    get_voice_rate_limiter,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +37,7 @@ voice_router = APIRouter(tags=["voice"])
 # =============================================================================
 # REQUEST/RESPONSE MODELS
 # =============================================================================
+
 
 class VoiceCommandRequest(BaseModel):
     text: str
@@ -54,40 +61,9 @@ class HostSessionRequest(BaseModel):
 
 
 # =============================================================================
-# SHARED STATE
-# =============================================================================
-
-def _get_orchestrator():
-    from impl_v1.training.voice.voice_intent_orchestrator import VoiceIntentOrchestrator
-    if not hasattr(_get_orchestrator, "_instance"):
-        _get_orchestrator._instance = VoiceIntentOrchestrator()
-    return _get_orchestrator._instance
-
-
-def _get_policy():
-    from impl_v1.training.voice.voice_policy_engine import VoicePolicyEngine
-    if not hasattr(_get_policy, "_instance"):
-        _get_policy._instance = VoicePolicyEngine()
-    return _get_policy._instance
-
-
-def _get_audit():
-    from impl_v1.training.voice.voice_security import VoiceAuditLog
-    if not hasattr(_get_audit, "_instance"):
-        _get_audit._instance = VoiceAuditLog()
-    return _get_audit._instance
-
-
-def _get_rate_limiter():
-    from impl_v1.training.voice.voice_security import VoiceRateLimiter
-    if not hasattr(_get_rate_limiter, "_instance"):
-        _get_rate_limiter._instance = VoiceRateLimiter()
-    return _get_rate_limiter._instance
-
-
-# =============================================================================
 # ROUTES
 # =============================================================================
+
 
 @voice_router.post("/api/voice/command")
 async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_auth)):
@@ -101,15 +77,18 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
         user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
 
         # Rate limit check
-        rl = _get_rate_limiter()
+        rl = get_voice_rate_limiter()
         allowed, reason = rl.is_allowed(user_id, req.device_id)
         if not allowed:
             raise HTTPException(status_code=429, detail=reason)
 
         # Process through orchestrator
-        orch = _get_orchestrator()
+        orch = get_voice_orchestrator()
         from backend.api.runtime_state import runtime_state
-        host_session_id = req.host_session_id or runtime_state.get("active_host_action_session")
+
+        host_session_id = req.host_session_id or runtime_state.get(
+            "active_host_action_session"
+        )
         if host_session_id:
             runtime_state.set("active_host_action_session", host_session_id)
         intent = orch.process_transcript(
@@ -118,18 +97,17 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
             device_id=req.device_id,
             confidence=req.confidence,
             context_args=(
-                {"host_session_id": host_session_id}
-                if host_session_id else None
+                {"host_session_id": host_session_id} if host_session_id else None
             ),
         )
         runtime_state.set("active_voice_mode", intent.route_mode)
 
         # Policy check
-        policy = _get_policy()
+        policy = get_voice_policy()
         decision = policy.evaluate(intent.command_type, intent.args)
 
         # Audit
-        audit = _get_audit()
+        audit = get_voice_audit()
         audit.log(
             user_id=user_id,
             device_id=req.device_id,
@@ -138,8 +116,10 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
             action="PENDING",
             policy=decision.verdict.value,
             result=(
-                "BLOCKED" if intent.error
-                else "AWAITING" if intent.requires_confirmation
+                "BLOCKED"
+                if intent.error
+                else "AWAITING"
+                if intent.requires_confirmation
                 else "QUEUED"
             ),
         )
@@ -148,6 +128,7 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
         _voice_latency = round((_time.monotonic() - _t0) * 1000, 2)
         try:
             from backend.observability.metrics import metrics_registry
+
             metrics_registry.record("voice_inference_latency_ms", _voice_latency)
         except Exception:
             logger.debug("Metrics recording unavailable", exc_info=True)
@@ -174,18 +155,23 @@ async def submit_voice_command(req: VoiceCommandRequest, user=Depends(require_au
 
 
 @voice_router.post("/api/voice/confirm/{intent_id}")
-async def confirm_voice_intent(intent_id: str, req: VoiceConfirmRequest,
-                                user=Depends(require_auth)):
+async def confirm_voice_intent(
+    intent_id: str, req: VoiceConfirmRequest, user=Depends(require_auth)
+):
     """Confirm a high-risk voice intent for execution."""
-    orch = _get_orchestrator()
+    orch = get_voice_orchestrator()
     success = orch.confirm_intent(intent_id, req.confirmer_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Intent not found or not confirmable")
+        raise HTTPException(
+            status_code=404, detail="Intent not found or not confirmable"
+        )
     return {"confirmed": True, "intent_id": intent_id}
 
 
 @voice_router.post("/api/voice/host-session")
-async def create_host_action_session(req: HostSessionRequest, user=Depends(require_auth)):
+async def create_host_action_session(
+    req: HostSessionRequest, user=Depends(require_auth)
+):
     """Create a signed bounded host-action session."""
     user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
     try:
@@ -242,13 +228,14 @@ async def voice_pipeline_status(user=Depends(require_auth)):
 async def voice_metrics(user=Depends(require_auth)):
     """Get detailed voice SLO metrics."""
     from impl_v1.training.voice.voice_metrics import get_voice_health
+
     return get_voice_health()
 
 
 @voice_router.get("/api/voice/history")
 async def voice_audit_history(limit: int = 50, user=Depends(require_auth)):
     """Get voice command audit history."""
-    audit = _get_audit()
+    audit = get_voice_audit()
     return {
         "entries": audit.get_entries(limit=limit),
         "total": audit.count,

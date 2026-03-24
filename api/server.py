@@ -238,6 +238,21 @@ from backend.storage.storage_bridge import (
     update_user_auth_profile,
     get_admin_user_security_view,
 )
+from api.routers.report_router import build_report_router
+from api.routers.storage_router import build_storage_router
+from api.services.runtime_status_service import (
+    get_accuracy_snapshot_payload,
+    get_runtime_status_payload,
+)
+from api.services.execution_control_service import enforce_governed_execution
+from api.services.auth_read_service import (
+    build_auth_me_response,
+    build_auth_profile_payload,
+    build_auth_provider_status,
+)
+from api.services.voice_parse_service import parse_voice_request, voice_mode_payload
+from api.services.voice_service import get_voice_orchestrator
+from training_core.scheduler import register_execution_validator
 
 # Import tiered storage manager (SSD cap + HDD overflow)
 try:
@@ -609,6 +624,9 @@ try:
 except ImportError as _health_err:
     logger.warning("[BOOT] Health probes unavailable: %s", _health_err)
 
+app.include_router(build_report_router(PROJECT_ROOT))
+app.include_router(build_storage_router())
+
 # =============================================================================
 # OBSERVABILITY — per-request latency tracking middleware
 # =============================================================================
@@ -778,45 +796,6 @@ class AutonomySessionRequest(BaseModel):
 
 
 # =============================================================================
-# DATABASE MODELS
-# =============================================================================
-
-
-class CreateUserRequest(BaseModel):
-    name: str
-    email: Optional[str] = None
-    role: str = "researcher"
-
-
-class CreateTargetRequest(BaseModel):
-    program_name: str
-    scope: str
-    link: Optional[str] = None
-    platform: Optional[str] = None
-    payout_tier: str = "MEDIUM"
-
-
-class CreateBountyRequest(BaseModel):
-    user_id: str
-    target_id: Optional[str] = None
-    title: str
-    description: Optional[str] = None
-    severity: str = "MEDIUM"
-
-
-class UpdateBountyRequest(BaseModel):
-    bounty_id: str
-    status: str
-    reward: Optional[float] = None
-
-
-class CreateSessionRequest(BaseModel):
-    user_id: str
-    mode: str
-    target_scope: Optional[str] = None
-
-
-# =============================================================================
 # IN-MEMORY STATE (runtime state — persisted in-memory per server lifetime)
 # =============================================================================
 
@@ -914,6 +893,17 @@ def _store_runtime_status_cached(payload: Dict[str, Any]) -> Dict[str, Any]:
         _RUNTIME_STATUS_CACHE["telemetry_mtime"] = telemetry_mtime
         _RUNTIME_STATUS_CACHE["value"] = dict(payload)
     return payload
+
+
+def _enforce_training_execution_control() -> None:
+    enforce_governed_execution(
+        action_name="training_core_entrypoint",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
+
+
+register_execution_validator(_enforce_training_execution_control)
 
 
 def _get_cached_storage_health() -> Dict[str, Any]:
@@ -1504,8 +1494,11 @@ async def get_hunter_modules(user=Depends(require_auth)):
 @app.post("/api/run-phase")
 async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
     """Run a governance phase. Delegates to RealPhaseRunner."""
-    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
-    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
+    enforce_governed_execution(
+        action_name="run_phase",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     phases = discover_python_phases()
     phase_names = [p["name"] for p in phases]
     if request.phase not in phase_names:
@@ -1529,8 +1522,11 @@ async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
 @app.post("/api/run-hunter")
 async def run_hunter_module(request: RunHunterRequest, user=Depends(require_auth)):
     """Run a HUMANOID_HUNTER module. Delegates to RealPhaseRunner."""
-    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
-    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
+    enforce_governed_execution(
+        action_name="run_hunter_module",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     modules = discover_hunter_modules()
     if request.module not in modules:
         raise HTTPException(
@@ -1586,86 +1582,24 @@ async def fields_approve_endpoint(
         return {"status": "error", "message": "Internal error"}
 
 
-@app.get("/api/reports")
-async def list_reports(user=Depends(require_auth)):
-    """List all security reports in the report directory. Auth required."""
-    report_dir = PROJECT_ROOT / "report"
-    if not report_dir.exists():
-        return {"reports": [], "count": 0}
-
-    reports = []
-    for file in sorted(report_dir.glob("*.txt"), reverse=True):
-        stat = file.stat()
-        reports.append(
-            {
-                "filename": file.name,
-                "size": stat.st_size,
-                "created": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                "download_url": f"/api/reports/{file.name}",
-            }
-        )
-
-    return {"reports": reports, "count": len(reports)}
-
-
-@app.get("/api/reports/{filename}")
-async def download_report(filename: str, user=Depends(require_auth)):
-    """Download a specific report file."""
-    report_dir = PROJECT_ROOT / "report"
-    file_path = report_dir / filename
-
-    if not file_path.exists() or not file_path.is_file():
-        raise HTTPException(status_code=404, detail="Report not found")
-
-    # Security check - prevent directory traversal
-    if not str(file_path.resolve()).startswith(str(report_dir.resolve())):
-        raise HTTPException(status_code=403, detail="Access denied")
-
-    media_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
-    return FileResponse(
-        path=str(file_path),
-        filename=filename,
-        media_type=media_type,
-    )
-
-
-@app.get("/api/reports/{filename}/content")
-async def get_report_content(filename: str, user=Depends(require_auth)):
-    """Get report content as text."""
-    report_dir = PROJECT_ROOT / "report"
-    file_path = report_dir / filename
-
-    if not file_path.exists() or not file_path.is_file():
-        raise HTTPException(status_code=404, detail="Report not found")
-
-    # Security check
-    if not str(file_path.resolve()).startswith(str(report_dir.resolve())):
-        raise HTTPException(status_code=403, detail="Access denied")
-
-    content = file_path.read_text(encoding="utf-8")
-    return PlainTextResponse(content)
-
-
 @app.post("/api/hunter/start")
 async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)):
     """Start a V1 Hunter workflow."""
-    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
-    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
-
-    # SSRF protection
-    is_safe, violations = validate_target_url(request.target)
-    if not is_safe:
-        raise HTTPException(
-            status_code=400, detail=f"Target URL rejected: {violations[0]['message']}"
-        )
+    target = enforce_governed_execution(
+        action_name="start_hunter",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+        target_url=request.target,
+        validate_target_url=validate_target_url,
+    )
 
     workflow_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
 
     active_workflows[workflow_id] = {
         "type": "hunter",
-        "target": request.target,
+        "target": target,
         "status": "started",
         "stopped": False,
         "started_at": datetime.now(UTC).isoformat(),
@@ -1684,22 +1618,16 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
 @app.post("/api/workflow/bounty/start")  # Alias for frontend compatibility
 async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)):
     """Start a Bounty Finder workflow with REAL browser automation."""
-    assert not can_ai_execute()[0], "GUARD: AI cannot execute"
-    assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
-
-    # Validate target URL
-    target = request.target.strip()
-    if not target.startswith(("http://", "https://")):
-        target = f"https://{target}"
-
-    # SSRF protection
-    is_safe, violations = validate_target_url(target)
-    if not is_safe:
-        raise HTTPException(
-            status_code=400, detail=f"Target URL rejected: {violations[0]['message']}"
-        )
+    target = enforce_governed_execution(
+        action_name="start_bounty",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+        target_url=request.target,
+        validate_target_url=validate_target_url,
+        normalize_target=True,
+    )
 
     report_id = f"RPT-{uuid.uuid4().hex[:12].upper()}"
 
@@ -2400,6 +2328,11 @@ async def training_status(user=Depends(require_auth)):
 @app.post("/training/start")
 async def training_start(epochs: int = 0, user=Depends(require_admin)):
     """Start continuous GPU training (default infinite)."""
+    enforce_governed_execution(
+        action_name="training_start",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     trainer = get_auto_trainer()
@@ -2432,6 +2365,11 @@ async def training_start(epochs: int = 0, user=Depends(require_admin)):
 @app.post("/training/stop")
 async def training_stop(user=Depends(require_admin)):
     """Stop training immediately."""
+    enforce_governed_execution(
+        action_name="training_stop",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     trainer = get_auto_trainer()
@@ -2460,6 +2398,11 @@ async def training_stop(user=Depends(require_admin)):
 @app.post("/training/continuous")
 async def training_continuous(request: Request, user=Depends(require_admin)):
     """Toggle continuous training mode."""
+    enforce_governed_execution(
+        action_name="training_continuous",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
     data = await request.json()
@@ -2476,6 +2419,11 @@ async def training_continuous(request: Request, user=Depends(require_admin)):
 @app.post("/training/interval")
 async def training_interval(request: Request, user=Depends(require_admin)):
     """Set training check interval via admin panel."""
+    enforce_governed_execution(
+        action_name="training_interval",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     if not G38_AVAILABLE:
         raise HTTPException(status_code=503, detail="G38 not available")
     data = await request.json()
@@ -2970,170 +2918,6 @@ async def dataset_stats(user=Depends(require_auth)):
 # =============================================================================
 
 
-@app.get("/api/db/users")
-def list_users(limit: int = 100, offset: int = 0, user=Depends(require_admin)):
-    """Get all users from HDD storage."""
-    try:
-        users, total = get_users_page(limit=limit, offset=offset)
-        return {"users": users, "total": total, "limit": limit, "offset": offset}
-    except Exception as e:
-        logger.exception("Error listing users")
-        return {"users": [], "total": 0, "error": "Internal error"}
-
-
-@app.post("/api/db/users")
-def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
-    """Create a new user."""
-    try:
-        new_user = create_user(request.name, request.email, request.role)
-        log_activity(
-            str(new_user["id"]), "USER_CREATED", f"User {request.name} created"
-        )
-        return {"success": True, "user": new_user}
-    except Exception as e:
-        logger.exception("Error creating user")
-        raise HTTPException(status_code=400, detail="Failed to create user")
-
-
-@app.get("/api/db/users/{user_id}")
-def get_single_user(user_id: str, user=Depends(require_admin)):
-    """Get a specific user by ID."""
-    try:
-        user = get_user(user_id)
-        if user:
-            return {"success": True, "user": user}
-        return {"success": False, "error": "User not found"}
-    except Exception as e:
-        logger.exception("Error fetching user")
-        raise HTTPException(status_code=400, detail="Failed to fetch user")
-
-
-@app.get("/api/db/users/{user_id}/bounties")
-def get_user_bounties_endpoint(user_id: str, user=Depends(require_admin)):
-    """Get all bounties for a specific user."""
-    try:
-        bounties = get_user_bounties(user_id)
-        return {"bounties": bounties, "total": len(bounties)}
-    except Exception as e:
-        logger.exception("Error listing user bounties")
-        return {"bounties": [], "total": 0, "error": "Internal error"}
-
-
-@app.get("/api/db/targets")
-def list_targets(limit: int = 100, offset: int = 0, user=Depends(require_auth)):
-    """Get all targets from HDD storage."""
-    try:
-        targets, total = get_targets_page(limit=limit, offset=offset)
-        return {"targets": targets, "total": total, "limit": limit, "offset": offset}
-    except Exception as e:
-        logger.exception("Error listing targets")
-        return {"targets": [], "total": 0, "error": "Internal error"}
-
-
-@app.post("/api/db/targets")
-def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
-    """Create a new target."""
-    try:
-        target = create_target(
-            request.program_name,
-            request.scope,
-            request.link,
-            request.platform,
-            request.payout_tier,
-        )
-        log_activity(None, "TARGET_CREATED", f"Target {request.program_name} created")
-        return {"success": True, "target": target}
-    except Exception as e:
-        logger.exception("Error creating target")
-        raise HTTPException(status_code=400, detail="Failed to create target")
-
-
-@app.get("/api/db/bounties")
-def list_bounties(limit: int = 100, offset: int = 0, user=Depends(require_auth)):
-    """Get all bounties."""
-    try:
-        bounties, total = get_bounties_page(limit=limit, offset=offset)
-        return {"bounties": bounties, "total": total, "limit": limit, "offset": offset}
-    except Exception as e:
-        logger.exception("Error listing bounties")
-        return {"bounties": [], "total": 0, "error": "Internal error"}
-
-
-@app.post("/api/db/bounties")
-def add_bounty(request: CreateBountyRequest, user=Depends(require_admin)):
-    """Create a new bounty submission."""
-    try:
-        bounty = create_bounty(
-            request.user_id,
-            request.target_id,
-            request.title,
-            request.description,
-            request.severity,
-        )
-        log_activity(request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}")
-        return {"success": True, "bounty": bounty}
-    except Exception as e:
-        logger.exception("Error creating bounty")
-        raise HTTPException(status_code=400, detail="Failed to create bounty")
-
-
-@app.put("/api/db/bounties")
-def update_bounty(request: UpdateBountyRequest, user=Depends(require_admin)):
-    """Update bounty status and reward."""
-    try:
-        update_bounty_status(request.bounty_id, request.status, request.reward)
-        log_activity(
-            None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}"
-        )
-        return {
-            "success": True,
-            "bounty_id": request.bounty_id,
-            "status": request.status,
-        }
-    except Exception as e:
-        logger.exception("Error updating bounty")
-        raise HTTPException(status_code=400, detail="Failed to update bounty")
-
-
-@app.post("/api/db/sessions")
-def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
-    """Create a new session."""
-    try:
-        session = create_session(request.user_id, request.mode, request.target_scope)
-        log_activity(request.user_id, "SESSION_STARTED", f"Mode: {request.mode}")
-        return {"success": True, "session": session}
-    except Exception as e:
-        logger.exception("Error creating session")
-        raise HTTPException(status_code=400, detail="Failed to create session")
-
-
-@app.get("/api/db/activity")
-def list_activity(limit: int = 50, offset: int = 0, user=Depends(require_admin)):
-    """Get recent activity log."""
-    try:
-        activities = get_recent_activity(limit, offset)
-        return {
-            "activities": activities,
-            "total": len(activities),
-            "limit": limit,
-            "offset": offset,
-        }
-    except Exception as e:
-        logger.exception("Error listing activity")
-        return {"activities": [], "total": 0, "error": "Internal error"}
-
-
-@app.get("/api/db/admin/stats")
-def get_admin_statistics(user=Depends(require_admin)):
-    """Get admin dashboard statistics."""
-    try:
-        stats = get_admin_stats()
-        return {"success": True, "stats": stats}
-    except Exception as e:
-        logger.exception("Error fetching admin stats")
-        return {"success": False, "stats": None, "error": "Internal error"}
-
-
 # =============================================================================
 # HDD STORAGE ENGINE ENDPOINTS (NEW)
 # =============================================================================
@@ -3314,38 +3098,15 @@ def _allowed_cookie_origins() -> set[str]:
 @app.get("/api/auth/providers")
 async def auth_provider_status(response: Response = None):
     """Public auth-provider status for the login page."""
-    github_cfg = _get_github_oauth_config()
-    google_cfg = _get_google_oauth_config()
-    if response is not None:
-        response.headers["Cache-Control"] = "no-store"
-    return {
-        "password": {
-            "enabled": _ALLOW_PASSWORD_LOGIN,
-        },
-        "temporary_bypass": {
-            "enabled": is_temporary_auth_bypass_enabled(),
-            "role": _temporary_auth_user().get("role", "admin"),
-        },
-        "github": {
-            "enabled": not github_cfg["missing"],
-            "missing": github_cfg["missing"],
-            "redirect_uri": github_cfg["redirect_uri"],
-            "frontend_url": github_cfg["frontend_url"],
-            "shared_candidates": [
-                str(path) for path in _shared_oauth_candidate_files("github")
-            ],
-        },
-        "google": {
-            "enabled": not google_cfg["missing"],
-            "missing": google_cfg["missing"],
-            "redirect_uri": google_cfg["redirect_uri"],
-            "frontend_url": google_cfg["frontend_url"],
-            "shared_candidates": [
-                str(path) for path in _shared_oauth_candidate_files("google")
-            ],
-        },
-        "checked_at": datetime.now(UTC).isoformat(),
-    }
+    return build_auth_provider_status(
+        allow_password_login=_ALLOW_PASSWORD_LOGIN,
+        temporary_bypass_enabled=is_temporary_auth_bypass_enabled(),
+        temporary_auth_user=_temporary_auth_user,
+        get_github_oauth_config=_get_github_oauth_config,
+        get_google_oauth_config=_get_google_oauth_config,
+        shared_oauth_candidate_files=_shared_oauth_candidate_files,
+        response=response,
+    )
 
 
 def _normalize_origin(origin: str) -> str:
@@ -3873,101 +3634,22 @@ async def logout(req: Request, response: Response, user=Depends(require_auth)):
 @app.get("/auth/profile")
 async def auth_profile(user=Depends(require_auth)):
     """Return authenticated profile. Sensitive auth intel is admin-only."""
-    if user.get("_temporary_bypass"):
-        return _temporary_auth_profile_payload(user)
-
-    user_id = user.get("sub", "")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid auth token payload")
-
-    record = get_user(user_id)
-    if not record:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    base = {
-        "success": True,
-        "user": {
-            "id": record["id"],
-            "name": record.get("name", ""),
-            "email": record.get("email"),
-            "phone_number": record.get("phone_number"),
-            "role": record.get("role", "hunter"),
-        },
-        "session_id": user.get("session_id"),
-    }
-
-    # Do not expose network/github auth intel to non-admin users.
-    if record.get("role", "").lower() != "admin":
-        return base
-
-    devices = get_user_devices(user_id)
-    latest_device = None
-    if devices:
-        latest_device = max(devices, key=lambda d: d.get("last_seen", ""))
-
-    github_profile = None
-    for evt in get_recent_activity(limit=200):
-        if evt.get("user_id") != user_id:
-            continue
-        if evt.get("action_type") != "LOGIN_SUCCESS_GITHUB":
-            continue
-        md = evt.get("metadata_json") or {}
-        if isinstance(md, dict) and md.get("github_profile"):
-            github_profile = md.get("github_profile")
-            break
-
-    return {
-        **base,
-        "network": {
-            "ip_address": latest_device.get("ip_address") if latest_device else None,
-            "geolocation": latest_device.get("location") if latest_device else None,
-        },
-        "device": latest_device,
-        "github_profile": github_profile,
-    }
+    return build_auth_profile_payload(
+        user=user,
+        temporary_bypass_payload=_temporary_auth_profile_payload,
+        get_user=get_user,
+        get_user_devices=get_user_devices,
+        get_recent_activity=get_recent_activity,
+    )
 
 
 @app.get("/auth/me")
 async def auth_me(user=Depends(require_auth)):
-    """Current authenticated user session — no-cache, always fresh.
-
-    Returns user identity, auth provider, session linkage.
-    Frontend uses this as source of truth (no hardcoded defaults).
-    Rejects stale/revoked tokens via require_auth guard.
-    """
-    if user.get("_temporary_bypass"):
-        return Response(
-            content=json.dumps(_temporary_auth_me_payload(user)),
-            media_type="application/json",
-            headers={"Cache-Control": "no-store"},
-        )
-
-    user_id = user.get("sub", "")
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid auth token payload")
-
-    record = get_user(user_id)
-    if not record:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    result = {
-        "user_id": record["id"],
-        "name": record.get("name", ""),
-        "email": record.get("email"),
-        "phone_number": record.get("phone_number"),
-        "role": record.get("role", "hunter"),
-        "github_login": record.get("github_login"),
-        "google_email": record.get("google_email"),
-        "google_picture": record.get("google_picture"),
-        "avatar_url": record.get("avatar_url"),
-        "auth_provider": record.get("auth_provider", "email"),
-        "session_id": user.get("session_id"),
-        "timestamp": datetime.now(UTC).isoformat(),
-    }
-    return Response(
-        content=json.dumps(result),
-        media_type="application/json",
-        headers={"Cache-Control": "no-store"},
+    """Current authenticated user session — no-cache, always fresh."""
+    return build_auth_me_response(
+        user=user,
+        temporary_bypass_payload=_temporary_auth_me_payload,
+        get_user=get_user,
     )
 
 
@@ -4491,194 +4173,35 @@ class VoiceParseRequest(BaseModel):
 
 @app.post("/api/voice/parse")
 async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
-    """
-    Dual-mode voice parser.
+    """Dual-mode voice parser."""
+    from backend.assistant.voice_runtime import run_research_analysis
+    from impl_v1.phase49.governors.g12_voice_input import extract_intent
 
-    - SECURITY mode: routes to g12_voice_input.extract_intent()
-    - RESEARCH mode: routes to isolated Edge search pipeline
-    - Auto-classifies if mode not specified
-    """
-    _active_voice_mode = runtime_state.get("active_voice_mode", "SECURITY")
-    text = request.text.strip()
-
-    if not text:
-        return {
-            "intent_id": f"VOC-EMPTY",
-            "intent_type": "UNKNOWN",
-            "raw_text": "",
-            "extracted_value": None,
-            "confidence": 0.0,
-            "status": "INVALID",
-            "block_reason": "Empty voice input",
-            "active_mode": _active_voice_mode,
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
-
-    # Determine mode
-    mode = request.mode
-    route_decision = None
-    host_session_id = request.host_session_id or runtime_state.get(
-        "active_host_action_session"
+    return parse_voice_request(
+        text=request.text,
+        requested_mode=request.mode,
+        host_session_id=request.host_session_id,
+        user=user,
+        runtime_state=runtime_state,
+        research_available=RESEARCH_AVAILABLE,
+        query_router_cls=QueryRouter,
+        isolation_guard_cls=IsolationGuard,
+        run_research_analysis=run_research_analysis,
+        extract_intent=extract_intent,
+        get_voice_orchestrator=get_voice_orchestrator,
+        cache_runtime_status=_store_runtime_status_cached,
+        research_status_enum=ResearchStatus,
+        logger=logger,
     )
-
-    if RESEARCH_AVAILABLE and mode is None:
-        # Auto-classify
-        router = QueryRouter()
-        route_decision = router.classify(text)
-        mode = route_decision.mode.value
-    elif mode is None:
-        mode = "SECURITY"
-
-    runtime_state.set("active_voice_mode", mode)
-
-    if host_session_id:
-        try:
-            from impl_v1.training.voice.voice_intent_orchestrator import (
-                VoiceIntentOrchestrator,
-            )
-
-            orch = VoiceIntentOrchestrator()
-            user_id = (
-                user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
-            )
-            host_intent = orch.process_transcript(
-                text=text,
-                user_id=user_id,
-                device_id="browser",
-                confidence=0.8,
-                context_args={"host_session_id": host_session_id},
-            )
-            if host_intent.command_type in {
-                "LAUNCH_APP",
-                "OPEN_APP",
-                "OPEN_URL",
-                "RUN_APPROVED_TASK",
-            }:
-                runtime_state.set("active_voice_mode", host_intent.route_mode)
-                runtime_state.set("active_host_action_session", host_session_id)
-                return _store_runtime_status_cached(
-                    {
-                        "intent_id": host_intent.intent_id,
-                        "intent_type": host_intent.command_type,
-                        "raw_text": text,
-                        "extracted_value": host_intent.args.get("app")
-                        or host_intent.args.get("url")
-                        or host_intent.args.get("task"),
-                        "confidence": host_intent.confidence,
-                        "status": "PARSED" if not host_intent.error else "BLOCKED",
-                        "block_reason": host_intent.error,
-                        "active_mode": host_intent.route_mode,
-                        "args": host_intent.args,
-                        "timestamp": host_intent.timestamp,
-                    }
-                )
-        except Exception:
-            logger.exception("Host-action parse failed")
-
-    # ===== RESEARCH MODE =====
-    if mode == "RESEARCH" and RESEARCH_AVAILABLE:
-        # Run isolation pre-check
-        guard = IsolationGuard()
-        isolation_check = guard.pre_query_check(text)
-
-        if not isolation_check.allowed:
-            return {
-                "intent_id": f"VOC-BLOCKED",
-                "intent_type": "RESEARCH_QUERY",
-                "raw_text": text,
-                "extracted_value": None,
-                "confidence": 0.0,
-                "status": "BLOCKED",
-                "block_reason": isolation_check.reason,
-                "active_mode": "RESEARCH",
-                "timestamp": datetime.now(UTC).isoformat(),
-            }
-
-        from backend.assistant.voice_runtime import run_research_analysis
-
-        analysis = run_research_analysis(text)
-        research = analysis.get("research", {})
-        verification = analysis.get("verification", {})
-        audit = analysis.get("audit", {})
-
-        return _store_runtime_status_cached(
-            {
-                "intent_id": f"VOC-RESEARCH",
-                "intent_type": "RESEARCH_QUERY",
-                "raw_text": text,
-                "extracted_value": research.get("summary"),
-                "confidence": 0.9
-                if research.get("status") == ResearchStatus.SUCCESS.value
-                else 0.3,
-                "status": "PARSED"
-                if research.get("status") == ResearchStatus.SUCCESS.value
-                else "INVALID",
-                "block_reason": None
-                if research.get("status") == ResearchStatus.SUCCESS.value
-                else research.get("summary"),
-                "active_mode": "RESEARCH",
-                "research_result": {
-                    "title": research.get("title"),
-                    "summary": research.get("summary"),
-                    "source": research.get("source"),
-                    "search_backend": research.get("search_backend"),
-                    "key_terms": research.get("key_terms", []),
-                    "word_count": research.get("word_count", 0),
-                    "elapsed_ms": research.get("elapsed_ms", 0),
-                },
-                "verification": verification,
-                "audit": audit,
-                "route_decision": {
-                    "confidence": route_decision.confidence if route_decision else 1.0,
-                    "reason": route_decision.reason
-                    if route_decision
-                    else "Manual mode selection",
-                }
-                if route_decision or mode == "RESEARCH"
-                else None,
-                "timestamp": analysis.get("audit", {}).get(
-                    "timestamp", datetime.now(UTC).isoformat()
-                ),
-            }
-        )
-
-    # ===== SECURITY MODE (default) =====
-    try:
-        from impl_v1.phase49.governors.g12_voice_input import extract_intent
-
-        intent = extract_intent(text)
-        return {
-            "intent_id": intent.intent_id,
-            "intent_type": intent.intent_type.value,
-            "raw_text": intent.raw_text,
-            "extracted_value": intent.extracted_value,
-            "confidence": intent.confidence,
-            "status": intent.status.value,
-            "block_reason": intent.block_reason,
-            "active_mode": "SECURITY",
-            "timestamp": intent.timestamp,
-        }
-    except ImportError:
-        return {
-            "intent_id": "VOC-ERROR",
-            "intent_type": "UNKNOWN",
-            "raw_text": text,
-            "extracted_value": None,
-            "confidence": 0.0,
-            "status": "INVALID",
-            "block_reason": "Voice parser not available",
-            "active_mode": "SECURITY",
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
 
 
 @app.get("/api/voice/mode")
 async def voice_mode(user=Depends(require_auth)):
     """Return current active voice mode."""
-    return {
-        "mode": runtime_state.get("active_voice_mode", "SECURITY"),
-        "research_available": RESEARCH_AVAILABLE,
-    }
+    return voice_mode_payload(
+        runtime_state=runtime_state,
+        research_available=RESEARCH_AVAILABLE,
+    )
 
 
 # =============================================================================
@@ -4822,485 +4345,27 @@ def _read_validated_telemetry(
 
 @app.get("/runtime/status")
 async def runtime_status(user=Depends(require_auth)):
-    """
-    GET /runtime/status — Validated runtime telemetry.
-    Reads from C++ authoritative source (reports/training_telemetry.json),
-    validates schema + CRC + HMAC before returning data.
-    Falls back to live G38 auto_trainer metrics if no telemetry file exists.
-    """
-    cached_payload = _get_runtime_status_cached()
-    if cached_payload is not None:
-        return cached_payload
-
-    telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
-    live_status = None
-    training_active = False
-
-    if G38_AVAILABLE:
-        try:
-            trainer = get_auto_trainer()
-            live_status = trainer.get_status()
-            training_active = bool(live_status.get("is_training", False))
-        except Exception:
-            logger.exception("runtime_status live trainer probe failed")
-            live_status = None
-
-    repair_status = {"repaired": False, "issues": []}
-    try:
-        repair_status = repair_runtime_artifacts_if_needed(
-            training_active=training_active
-        )
-    except Exception:
-        logger.exception("runtime_status auto-repair failed")
-        repair_status = {"repaired": False, "issues": ["auto_repair_failed"]}
-
-    # --- Fallback: G38 auto_trainer live metrics when no telemetry file ---
-    if not telemetry_path.exists():
-        if live_status is not None:
-            try:
-                trainer = get_auto_trainer()
-                status = live_status
-                is_training = bool(status.get("is_training", False))
-                epoch = status.get("epoch", 0)
-                total_epochs = status.get("total_epochs", 0)
-                loss = float(status.get("last_loss", 0.0) or 0.0)
-                accuracy = float(status.get("last_accuracy", 0.0) or 0.0)
-                gpu_mem = float(status.get("gpu_mem_allocated_mb", 0.0) or 0.0)
-                gpu_reserved = float(status.get("gpu_mem_reserved_mb", 0.0) or 0.0)
-                samples_sec = float(status.get("samples_per_sec", 0.0) or 0.0)
-                dataset_size = int(status.get("dataset_size", 0) or 0)
-                events_count = int(status.get("events_count", 0) or 0)
-                is_continuous = bool(status.get("continuous_mode", False))
-
-                # Count checkpoint files (avoid expensive recursive glob)
-                checkpoint_count = 0
-                safetensors_count = 0
-                try:
-                    import glob as _glob
-
-                    # Only check known dirs
-                    g38_dir = PROJECT_ROOT / "reports" / "g38_training"
-                    if g38_dir.exists():
-                        checkpoint_count = len(_glob.glob(str(g38_dir / "*.json")))
-                    # Check only project root for safetensors
-                    safetensors_count = len(
-                        _glob.glob(str(PROJECT_ROOT / "*.safetensors"))
-                    )
-                    safetensors_count += len(
-                        _glob.glob(str(PROJECT_ROOT / "training" / "*.safetensors"))
-                    )
-                except Exception:
-                    pass
-
-                # Training duration: use trainer state
-                import time as _time
-
-                duration_seconds = 0.0
-                wall_clock = _time.time()
-                try:
-                    session = getattr(trainer, "_current_session", None)
-                    if session and hasattr(session, "started_at"):
-                        from datetime import datetime as _dt, timezone as _tz
-
-                        start = _dt.fromisoformat(str(session.started_at))
-                        duration_seconds = (_dt.now(_tz.utc) - start).total_seconds()
-                except Exception:
-                    # Use events to estimate duration
-                    try:
-                        if trainer.events and len(trainer.events) > 0:
-                            first_event = trainer.events[0]
-                            if hasattr(first_event, "timestamp"):
-                                from datetime import datetime as _dt2, timezone as _tz2
-
-                                ts = _dt2.fromisoformat(str(first_event.timestamp))
-                                duration_seconds = (
-                                    _dt2.now(_tz2.utc) - ts
-                                ).total_seconds()
-                    except Exception:
-                        pass
-
-                # GPU stats (quick, non-blocking)
-                gpu_temp = 0.0
-                gpu_util_pct = 0.0
-                try:
-                    import subprocess as _sp
-
-                    smi = _sp.run(
-                        [
-                            "nvidia-smi",
-                            "--query-gpu=temperature.gpu,utilization.gpu",
-                            "--format=csv,noheader,nounits",
-                        ],
-                        capture_output=True,
-                        text=True,
-                        timeout=2,
-                    )
-                    if smi.returncode == 0:
-                        parts = smi.stdout.strip().split(",")
-                        gpu_temp = float(parts[0].strip())
-                        gpu_util_pct = float(parts[1].strip())
-                except Exception:
-                    pass
-
-                cpu_util = 0.0
-                try:
-                    import psutil
-
-                    cpu_util = psutil.cpu_percent(interval=0)
-                except Exception:
-                    pass
-
-                progress_pct = float(status.get("progress", 0) or 0)
-                if is_continuous and is_training:
-                    progress_pct = round(accuracy * 100, 1)
-
-                return _store_runtime_status_cached(
-                    {
-                        "api_version": 2,
-                        "status": "active" if is_training else "idle",
-                        "runtime": {
-                            "total_epochs": total_epochs,
-                            "completed_epochs": epoch,
-                            "current_loss": loss,
-                            "precision": accuracy,
-                            "ece": None,
-                            "drift_kl": None,
-                            "duplicate_rate": None,
-                            "gpu_util": gpu_util_pct,
-                            "cpu_util": cpu_util,
-                            "temperature": gpu_temp,
-                            "determinism_status": None,
-                            "freeze_status": None,
-                            "mode": "CONTINUOUS"
-                            if is_continuous
-                            else status.get("training_mode", "MANUAL"),
-                            "progress_pct": progress_pct,
-                            "loss_trend": None,
-                            "wall_clock_unix": wall_clock,
-                            "monotonic_start_time": wall_clock - duration_seconds
-                            if wall_clock
-                            else 0,
-                            "training_duration_seconds": duration_seconds,
-                            # Extended metrics for Control Dashboard
-                            "samples_per_sec": samples_sec,
-                            "dataset_size": dataset_size,
-                            "gpu_mem_allocated_mb": gpu_mem,
-                            "gpu_mem_reserved_mb": gpu_reserved,
-                            "events_count": events_count,
-                            "checkpoints_saved": checkpoint_count,
-                            "safetensors_files": safetensors_count,
-                            "training_state": status.get("state", "IDLE"),
-                            "continuous_mode": is_continuous,
-                            "is_measured": True,
-                        },
-                        "determinism_ok": None,
-                        "stale": False,
-                        "last_update_ms": 0,
-                        "signature": None,
-                        "source": "g38_live",
-                        "auto_repaired": repair_status.get("repaired", False),
-                        "repair_issues": repair_status.get("issues", []),
-                    }
-                )
-            except Exception:
-                logger.exception("runtime_status G38 fallback failed")
-
-        return _store_runtime_status_cached(
-            {
-                "api_version": 2,
-                "status": "unavailable",
-                "reason": "No telemetry source available",
-                "runtime": None,
-                "determinism_ok": None,
-                "stale": True,
-                "last_update_ms": 0,
-                "signature": None,
-                "source": "none",
-                "is_measured": False,
-                "auto_repaired": repair_status.get("repaired", False),
-                "repair_issues": repair_status.get("issues", []),
-            }
-        )
-
-    try:
-        data, validation_error = _read_validated_telemetry(telemetry_path)
-        if data is None:
-            # Telemetry file exists but failed validation.
-            # Delete it so the self-heal cycle can regenerate it.
-            try:
-                telemetry_path.unlink(missing_ok=True)
-            except OSError:
-                pass
-
-            if live_status is not None:
-                # Fall back to G38 live trainer metrics.
-                logger.warning(
-                    "Telemetry file validation failed (%s), "
-                    "falling back to G38 live trainer",
-                    validation_error,
-                )
-                import time as _time
-
-                trainer = get_auto_trainer()
-                status = live_status
-                is_training = bool(status.get("is_training", False))
-                epoch = status.get("epoch", 0)
-                total_epochs_val = status.get("total_epochs", 0)
-                loss_val = float(status.get("last_loss", 0.0) or 0.0)
-                accuracy_val = float(status.get("last_accuracy", 0.0) or 0.0)
-                wall_clock = _time.time()
-                duration_seconds = 0.0
-                try:
-                    session = getattr(trainer, "_current_session", None)
-                    if session and hasattr(session, "started_at"):
-                        from datetime import datetime as _dt, timezone as _tz
-
-                        start = _dt.fromisoformat(str(session.started_at))
-                        duration_seconds = (_dt.now(_tz.utc) - start).total_seconds()
-                except Exception:
-                    pass
-                cpu_util_val = 0.0
-                try:
-                    import psutil
-
-                    cpu_util_val = psutil.cpu_percent(interval=0)
-                except Exception:
-                    pass
-                gpu_temp_val = 0.0
-                gpu_util_val = 0.0
-                try:
-                    import subprocess as _sp
-
-                    smi = _sp.run(
-                        [
-                            "nvidia-smi",
-                            "--query-gpu=temperature.gpu,utilization.gpu",
-                            "--format=csv,noheader,nounits",
-                        ],
-                        capture_output=True,
-                        text=True,
-                        timeout=2,
-                    )
-                    if smi.returncode == 0:
-                        parts = smi.stdout.strip().split(",")
-                        gpu_temp_val = float(parts[0].strip())
-                        gpu_util_val = float(parts[1].strip())
-                except Exception:
-                    pass
-                return _store_runtime_status_cached(
-                    {
-                        "api_version": 2,
-                        "status": "active" if is_training else "idle",
-                        "runtime": {
-                            "total_epochs": total_epochs_val,
-                            "completed_epochs": epoch,
-                            "current_loss": loss_val,
-                            "precision": accuracy_val,
-                            "ece": None,
-                            "drift_kl": None,
-                            "duplicate_rate": None,
-                            "gpu_util": gpu_util_val,
-                            "cpu_util": cpu_util_val,
-                            "temperature": gpu_temp_val,
-                            "determinism_status": None,
-                            "freeze_status": None,
-                            "mode": str(status.get("training_mode", "IDLE") or "IDLE"),
-                            "progress_pct": round(accuracy_val * 100, 1)
-                            if is_training
-                            else 0,
-                            "loss_trend": None,
-                            "wall_clock_unix": wall_clock,
-                            "monotonic_start_time": wall_clock - duration_seconds,
-                            "training_duration_seconds": duration_seconds,
-                            "training_state": str(
-                                status.get("state", "IDLE") or "IDLE"
-                            ),
-                            "samples_per_sec": float(
-                                status.get("samples_per_sec", 0.0) or 0.0
-                            ),
-                            "dataset_size": int(status.get("dataset_size", 0) or 0),
-                            "is_measured": True,
-                        },
-                        "determinism_ok": None,
-                        "stale": False,
-                        "last_update_ms": 0,
-                        "signature": None,
-                        "source": "g38_live",
-                        "auto_repaired": repair_status.get("repaired", False),
-                        "repair_issues": repair_status.get("issues", []),
-                    }
-                )
-            else:
-                return _store_runtime_status_cached(
-                    {
-                        "status": "error",
-                        "reason": validation_error
-                        or "Telemetry integrity validation failed",
-                        "runtime": None,
-                        "determinism_ok": False,
-                        "stale": True,
-                        "last_update_ms": 0,
-                        "signature": None,
-                        "source": "telemetry_file",
-                        "auto_repaired": repair_status.get("repaired", False),
-                        "repair_issues": repair_status.get("issues", []),
-                    }
-                )
-
-        # Check staleness (>60s since file mod time)
-        import time as _time
-
-        mod_time = telemetry_path.stat().st_mtime
-        age_ms = int((_time.time() - mod_time) * 1000)
-        is_stale = training_active and age_ms > 60000
-        runtime_mode = "IDLE"
-        training_state = "IDLE"
-        samples_per_second = data.get("samples_per_second", 0.0)
-        dataset_size = data.get("dataset_size", 0)
-        checkpoints_saved = 0
-        safetensors_files = 0
-        if live_status is not None:
-            runtime_mode = str(live_status.get("training_mode", "IDLE") or "IDLE")
-            training_state = str(live_status.get("state", "IDLE") or "IDLE")
-            samples_per_second = live_status.get("samples_per_sec", samples_per_second)
-            dataset_size = live_status.get("dataset_size", dataset_size)
-            checkpoints_saved = int(live_status.get("events_count", 0) or 0)
-        status_value = "active" if training_active else "idle"
-
-        return _store_runtime_status_cached(
-            {
-                "status": status_value,
-                "runtime": {
-                    "total_epochs": data.get("total_epochs", 100),
-                    "completed_epochs": data.get("epoch", 0),
-                    "current_loss": data.get("loss", 0.0),
-                    "precision": data.get("precision", 0.0),
-                    "ece": data.get("ece", 0.0),
-                    "drift_kl": data.get("kl_divergence", 0.0),
-                    "duplicate_rate": data.get("duplicate_rate", 0.0),
-                    "gpu_util": data.get("gpu_util", 0.0),
-                    "cpu_util": data.get("cpu_util", 0.0),
-                    "temperature": data.get("gpu_temperature", 0.0),
-                    "determinism_status": data.get("determinism_status", False),
-                    "freeze_status": data.get("freeze_status", False),
-                    "mode": runtime_mode,
-                    "progress_pct": min(
-                        100.0,
-                        (data.get("epoch", 0) / max(data.get("total_epochs", 100), 1))
-                        * 100,
-                    ),
-                    "loss_trend": data.get("loss_trend", 0.0),
-                    # Phase 2: Real-time training visibility
-                    "wall_clock_unix": data.get("wall_clock_unix", 0),
-                    "monotonic_start_time": data.get("monotonic_start_time", 0),
-                    "training_duration_seconds": data.get(
-                        "training_duration_seconds", 0.0
-                    ),
-                    "training_state": training_state,
-                    "samples_per_sec": samples_per_second,
-                    "dataset_size": dataset_size,
-                    "checkpoints_saved": checkpoints_saved,
-                    "safetensors_files": safetensors_files,
-                },
-                "determinism_ok": data.get("determinism_status", False),
-                "stale": is_stale,
-                "last_update_ms": age_ms,
-                "signature": data.get("hmac", None),
-                "source": (
-                    "telemetry_file_self_healed"
-                    if repair_status.get("repaired")
-                    else "telemetry_file"
-                ),
-                "auto_repaired": repair_status.get("repaired", False),
-                "repair_issues": repair_status.get("issues", []),
-            }
-        )
-    except Exception:
-        logger.exception("runtime_status failed")
-        return _store_runtime_status_cached(
-            {
-                "status": "error",
-                "reason": "Internal error",
-                "runtime": None,
-                "determinism_ok": False,
-                "stale": True,
-                "last_update_ms": 0,
-                "signature": None,
-                "source": "telemetry_file",
-                "auto_repaired": repair_status.get("repaired", False),
-                "repair_issues": repair_status.get("issues", []),
-            }
-        )
+    return get_runtime_status_payload(
+        project_root=PROJECT_ROOT,
+        g38_available=G38_AVAILABLE,
+        get_auto_trainer=get_auto_trainer,
+        repair_runtime_artifacts_if_needed=repair_runtime_artifacts_if_needed,
+        read_validated_telemetry=_read_validated_telemetry,
+        get_runtime_status_cached=_get_runtime_status_cached,
+        store_runtime_status_cached=_store_runtime_status_cached,
+        logger=logger,
+    )
 
 
 @app.get("/api/accuracy/snapshot")
 async def accuracy_snapshot(user=Depends(require_auth)):
-    """
-    GET /api/accuracy/snapshot — Current accuracy metrics snapshot.
-    Returns precision, recall, ECE, dup suppression, and scope compliance.
-    Returns degraded/unavailable state when data is missing (never synthetic).
-    """
-    telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
-
-    unavailable_response = {
-        "api_version": 2,
-        "precision": None,
-        "recall": None,
-        "ece_score": None,
-        "dup_suppression_rate": None,
-        "scope_compliance": None,
-        "source": "unavailable",
-        "is_measured": False,
-        "reason": "No telemetry data available",
-    }
-
-    if not telemetry_path.exists():
-        # G38 fallback: use live training metrics for accuracy data
-        if G38_AVAILABLE:
-            try:
-                trainer = get_auto_trainer()
-                status = trainer.get_status()
-                accuracy = status.get("last_accuracy", 0.0)
-                is_training = status.get("is_training", False)
-                dataset_size = status.get("dataset_size", 0)
-
-                return {
-                    "api_version": 2,
-                    "precision": accuracy,
-                    "recall": None,  # Not measured — was previously fabricated as accuracy*0.95
-                    "ece_score": None,  # Not measured in G38
-                    "dup_suppression_rate": None,  # Not measured in G38
-                    "scope_compliance": 1.0 if is_training or accuracy > 0 else None,
-                    "source": "g38_live",
-                    "is_measured": accuracy > 0,
-                    "training_active": is_training,
-                    "dataset_size": dataset_size,
-                }
-            except Exception:
-                logger.exception("accuracy_snapshot G38 fallback failed")
-        return unavailable_response
-
-    try:
-        data, validation_error = _read_validated_telemetry(telemetry_path)
-        if data is None:
-            logger.warning("accuracy_snapshot: validation failed: %s", validation_error)
-            return {
-                **unavailable_response,
-                "reason": validation_error or "Validation failed",
-            }
-        return {
-            "api_version": 2,
-            "precision": data.get("precision"),
-            "recall": data.get("recall"),
-            "ece_score": data.get("ece"),
-            "dup_suppression_rate": data.get("dup_suppression_rate"),
-            "scope_compliance": data.get("scope_compliance"),
-            "source": "telemetry_file",
-            "is_measured": True,
-        }
-    except Exception:
-        logger.exception("accuracy_snapshot failed")
-        return {**unavailable_response, "reason": "Internal error reading telemetry"}
+    return get_accuracy_snapshot_payload(
+        project_root=PROJECT_ROOT,
+        g38_available=G38_AVAILABLE,
+        get_auto_trainer=get_auto_trainer,
+        read_validated_telemetry=_read_validated_telemetry,
+        logger=logger,
+    )
 
 
 # =============================================================================
@@ -5414,6 +4479,11 @@ async def training_data_source(user=Depends(require_auth)):
 @app.post("/api/mode/train/start")
 async def start_training_mode(user=Depends(require_admin)):
     """Start TRAIN mode. Blocked if HUNT is active."""
+    enforce_governed_execution(
+        action_name="start_training_mode",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode == "HUNT":
         from fastapi.responses import JSONResponse
@@ -5468,6 +4538,11 @@ async def start_training_mode(user=Depends(require_admin)):
 @app.post("/api/mode/train/stop")
 async def stop_training_mode(user=Depends(require_admin)):
     """Stop TRAIN mode."""
+    enforce_governed_execution(
+        action_name="stop_training_mode",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode != "TRAIN":
         return {"mode": current_mode, "status": "not_in_train"}
@@ -5486,6 +4561,11 @@ async def stop_training_mode(user=Depends(require_admin)):
 @app.post("/api/mode/hunt/start")
 async def start_hunt_mode(user=Depends(require_admin)):
     """Start HUNT mode. Blocked if TRAIN is active."""
+    enforce_governed_execution(
+        action_name="start_hunt_mode",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode == "TRAIN":
         from fastapi.responses import JSONResponse
@@ -5507,6 +4587,11 @@ async def start_hunt_mode(user=Depends(require_admin)):
 @app.post("/api/mode/hunt/stop")
 async def stop_hunt_mode(user=Depends(require_admin)):
     """Stop HUNT mode."""
+    enforce_governed_execution(
+        action_name="stop_hunt_mode",
+        can_ai_execute=can_ai_execute,
+        can_ai_submit=can_ai_submit,
+    )
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode != "HUNT":
         return {"mode": current_mode, "status": "not_in_hunt"}

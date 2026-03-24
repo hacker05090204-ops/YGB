@@ -64,6 +64,24 @@ from .idle_detector import (
     is_scan_active,
 )
 from .telegram_notifier import build_training_telegram_notifier_from_env
+from .trainer_state_helpers import (
+    build_trainer_status,
+    emit_training_event,
+    session_duration_seconds,
+    write_worker_status,
+)
+from .trainer_checkpoint_helpers import (
+    archive_legacy_checkpoint,
+    build_checkpoint_metadata,
+    checkpoint_paths_for,
+    load_checkpoint_metadata,
+    save_checkpoint_bundle,
+)
+from .trainer_metrics_helpers import (
+    generate_session_report_for_trainer,
+    persist_runtime_artifacts,
+)
+from .trainer_execution_helpers import gpu_train_step
 
 # Import guards and conditions from G38
 from impl_v1.phase49.governors.g38_self_trained_model import (
@@ -101,6 +119,7 @@ from impl_v1.phase49.governors.g37_pytorch_backend import (
     DeviceType,
     PYTORCH_AVAILABLE,
 )
+from training_core.scheduler import validate_execution
 
 # Try importing torch for GPU enforcement
 try:
@@ -108,6 +127,7 @@ try:
     import torch.nn as nn
     import torch.optim as optim
     from torch.amp import autocast, GradScaler
+
     TORCH_AVAILABLE = True
     AMP_AVAILABLE = True
 except ImportError:
@@ -115,7 +135,11 @@ except ImportError:
     AMP_AVAILABLE = False
 
 try:
-    from safetensors.torch import load_file as load_safetensors_file, save_file as save_safetensors_file
+    from safetensors.torch import (
+        load_file as load_safetensors_file,
+        save_file as save_safetensors_file,
+    )
+
     SAFETENSORS_AVAILABLE = True
 except ImportError:
     SAFETENSORS_AVAILABLE = False
@@ -140,7 +164,7 @@ if TORCH_AVAILABLE:
     torch.backends.cudnn.allow_tf32 = True
 
 # CUBLAS deterministic workspace config
-os.environ.setdefault('CUBLAS_WORKSPACE_CONFIG', ':4096:8')
+os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
 
 # Background thread pool for async checkpoint saving (1 worker = serialized saves)
 _checkpoint_executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
@@ -155,9 +179,9 @@ logger.setLevel(logging.INFO)
 
 if not logger.handlers:
     handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter(
-        "%(asctime)s [G38] %(levelname)s: %(message)s"
-    ))
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s [G38] %(levelname)s: %(message)s")
+    )
     logger.addHandler(handler)
 
 
@@ -174,8 +198,10 @@ def _checkpoint_state_hash(model: Any) -> str:
 # TRAINING STATE
 # =============================================================================
 
+
 class TrainingState(Enum):
     """Current training state."""
+
     IDLE = "IDLE"
     CHECKING = "CHECKING"
     TRAINING = "TRAINING"
@@ -186,6 +212,7 @@ class TrainingState(Enum):
 @dataclass
 class TrainingEvent:
     """Training event for observability."""
+
     event_id: str
     event_type: str  # "IDLE_DETECTED", "TRAINING_STARTED", "TRAINING_STOPPED", etc.
     timestamp: str
@@ -198,6 +225,7 @@ class TrainingEvent:
 @dataclass
 class TrainingSession:
     """Training session metadata for report generation."""
+
     started_at: str
     start_epoch: int
     gpu_used: bool
@@ -209,19 +237,20 @@ class TrainingSession:
 # AUTO TRAINER CLASS
 # =============================================================================
 
+
 class AutoTrainer:
     """
     MANUAL-CONTROL trainer for G38.
-    
+
     Training is triggered ONLY by explicit user action via API.
     NO idle-based auto-trigger. NO automatic background training.
-    
+
     OPTIMIZATION: Uses RealTrainingDataset with 18K+ structured samples,
     PyTorch DataLoader with pin_memory, and AMP mixed precision.
     """
-    
+
     CHECK_INTERVAL_SECONDS = 30
-    
+
     def __init__(self):
         self._state = TrainingState.IDLE
         self._training_lock = threading.RLock()
@@ -236,12 +265,14 @@ class AutoTrainer:
         self._current_session: Optional[TrainingSession] = None
         # 24/7 CONTINUOUS MODE - training runs regardless of user activity
         self._continuous_mode = False
-        self._continuous_target = 0  # Target epochs for continuous training (0 = infinite)
+        self._continuous_target = (
+            0  # Target epochs for continuous training (0 = infinite)
+        )
         self._continuous_thread: Optional[threading.Thread] = None
         # Track last completed session for progress display
         self._last_completed_epochs = 0
         self._last_target_epochs = 0
-        
+
         # === GPU RESOURCE CACHING (reduces CPU overhead) ===
         self._gpu_model = None  # Persistent model in GPU memory
         self._gpu_optimizer = None
@@ -265,12 +296,12 @@ class AutoTrainer:
         self._last_batch_index = 0  # Live batch index in current epoch
         self._last_total_batches = 0  # Total batches in current epoch
         self._last_epoch_samples = 0  # Samples processed in current epoch
-        
+
         # === GOVERNANCE INTEGRATION ===
         self._curriculum = None  # RealDataCurriculum instance
-        self._promotion = None   # GovernedFieldPromotion instance
-        self._source_id = None   # Registered data source ID
-        
+        self._promotion = None  # GovernedFieldPromotion instance
+        self._source_id = None  # Registered data source ID
+
         # === ATTRIBUTES SET DYNAMICALLY (declared here for type-checker) ===
         self._checkpoint_path: Optional[str] = None
         self._checkpoint_meta_path: Optional[str] = None
@@ -282,18 +313,33 @@ class AutoTrainer:
         self._batch_size = 0
         self._last_error = ""
         self._telegram_notifier = build_training_telegram_notifier_from_env()
-        self._worker_status_path = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), "..", "..", "..", "reports", "g38_training_worker.status.json"
-        ))
-        self._dataset_manifest_path = os.path.abspath(os.path.join(
-            os.path.dirname(__file__), "..", "..", "..", "secure_data", "dataset_manifest.json"
-        ))
-        
+        self._worker_status_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                "..",
+                "reports",
+                "g38_training_worker.status.json",
+            )
+        )
+        self._dataset_manifest_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                "..",
+                "secure_data",
+                "dataset_manifest.json",
+            )
+        )
+
         # === MODE_A EARLY STOPPING ===
         self._best_accuracy = 0.0
         self._no_improvement_count = 0
         self._early_stop_patience = 5  # Stop after 5 epochs without improvement
         self._early_stop_baseline = 0.80  # Min accuracy before early stop allowed
+        self._checkpoint_executor = _checkpoint_executor
         self._write_worker_status()
 
     def _get_state(self) -> TrainingState:
@@ -303,22 +349,22 @@ class AutoTrainer:
     def _set_state(self, new_state: TrainingState) -> None:
         with self._training_lock:
             self._state = new_state
-    
+
     @property
     def state(self) -> TrainingState:
         """Get current training state."""
         return self._get_state()
-    
+
     @property
     def events(self) -> List[TrainingEvent]:
         """Get all training events."""
         return self._events.copy()
-    
+
     @property
     def is_training(self) -> bool:
         """Check if training is active."""
         return self._get_state() == TrainingState.TRAINING
-    
+
     def set_event_callback(self, callback: Callable[[TrainingEvent], None]) -> None:
         """Set callback for training events (for dashboard)."""
         self._on_event_callback = callback
@@ -347,12 +393,7 @@ class AutoTrainer:
 
     @staticmethod
     def _checkpoint_paths_for(base_dir: str) -> tuple[str, str, str]:
-        base = os.path.join(base_dir, "g38_model_checkpoint")
-        return (
-            base + ".safetensors",
-            base + ".json",
-            base + ".pt",
-        )
+        return checkpoint_paths_for(base_dir)
 
     @staticmethod
     def _build_checkpoint_metadata(
@@ -363,16 +404,13 @@ class AutoTrainer:
         loss: float,
         real_samples_processed: int,
     ) -> Dict[str, Any]:
-        return {
-            "schema_version": 1,
-            "format": "safetensors",
-            "epoch": int(epoch),
-            "accuracy": float(accuracy),
-            "holdout_accuracy": float(holdout_accuracy),
-            "loss": float(loss),
-            "real_samples_processed": int(real_samples_processed),
-            "saved_at": datetime.now(timezone.utc).isoformat(),
-        }
+        return build_checkpoint_metadata(
+            epoch=epoch,
+            accuracy=accuracy,
+            holdout_accuracy=holdout_accuracy,
+            loss=loss,
+            real_samples_processed=real_samples_processed,
+        )
 
     @classmethod
     def _save_checkpoint_bundle(
@@ -382,52 +420,26 @@ class AutoTrainer:
         model_state: Dict[str, "torch.Tensor"],
         metadata: Dict[str, Any],
     ) -> None:
-        if not SAFETENSORS_AVAILABLE or save_safetensors_file is None:
-            raise RuntimeError("safetensors package not available")
-
-        os.makedirs(os.path.dirname(checkpoint_path), exist_ok=True)
-        fd, tmp_weights = tempfile.mkstemp(
-            dir=os.path.dirname(checkpoint_path),
-            prefix=os.path.basename(checkpoint_path) + ".",
-            suffix=".tmp",
+        save_checkpoint_bundle(
+            checkpoint_path=checkpoint_path,
+            checkpoint_meta_path=checkpoint_meta_path,
+            model_state=model_state,
+            metadata=metadata,
+            safetensors_available=SAFETENSORS_AVAILABLE,
+            save_safetensors_file=save_safetensors_file,
+            atomic_write_json=cls._atomic_write_json,
         )
-        os.close(fd)
-        try:
-            save_safetensors_file(model_state, tmp_weights)
-            os.replace(tmp_weights, checkpoint_path)
-        except Exception:
-            try:
-                os.remove(tmp_weights)
-            except OSError:
-                pass
-            raise
-
-        cls._atomic_write_json(checkpoint_meta_path, metadata)
 
     def _load_checkpoint_metadata(self, checkpoint_meta_path: str) -> Dict[str, Any]:
-        try:
-            with open(checkpoint_meta_path, "r", encoding="utf-8") as handle:
-                payload = json.load(handle)
-            if isinstance(payload, dict):
-                return payload
-        except (FileNotFoundError, json.JSONDecodeError, OSError):
-            pass
-        return {}
+        return load_checkpoint_metadata(checkpoint_meta_path)
 
     def _write_worker_status(self) -> None:
-        try:
-            payload = self.get_status()
-            self._atomic_write_json(self._worker_status_path, payload)
-        except Exception as exc:
-            logger.debug("Worker status write skipped: %s", exc)
+        write_worker_status(self, logger)
 
     @staticmethod
     def _archive_legacy_checkpoint(legacy_checkpoint_path: str) -> None:
-        if not legacy_checkpoint_path or not os.path.exists(legacy_checkpoint_path):
-            return
-        archived_path = legacy_checkpoint_path + ".legacy"
-        os.replace(legacy_checkpoint_path, archived_path)
-    
+        archive_legacy_checkpoint(legacy_checkpoint_path)
+
     def _emit_event(
         self,
         event_type: str,
@@ -437,69 +449,20 @@ class AutoTrainer:
         epoch: Optional[int] = None,
     ) -> TrainingEvent:
         """Emit and log a training event."""
-        event = TrainingEvent(
-            event_id=f"EVT-{uuid.uuid4().hex[:12].upper()}",
-            event_type=event_type,
-            timestamp=datetime.now(timezone.utc).isoformat(),
-            details=details,
+        return emit_training_event(
+            self,
+            TrainingEvent,
+            logger,
+            event_type,
+            details,
             idle_seconds=idle_seconds,
             gpu_used=gpu_used,
             epoch=epoch,
         )
-        
-        self._events.append(event)
-        if len(self._events) > 1000:
-            self._events = self._events[-500:]
-        if event_type == "ERROR":
-            self._last_error = details
-        
-        # Log to console
-        log_msg = f"[{event_type}] {details}"
-        if event_type in ("TRAINING_STARTED", "IDLE_DETECTED"):
-            logger.info(log_msg)
-        elif event_type in ("TRAINING_STOPPED", "CHECKPOINT_SAVED"):
-            logger.info(log_msg)
-        elif event_type in ("TRAINING_ABORTED", "GUARD_BLOCKED"):
-            logger.warning(log_msg)
-        elif event_type == "ERROR":
-            logger.error(log_msg)
-        else:
-            logger.debug(log_msg)
-        
-        # Notify callback
-        if self._on_event_callback:
-            try:
-                self._on_event_callback(event)
-            except Exception:
-                pass
-
-        if self._telegram_notifier is not None:
-            try:
-                self._telegram_notifier.notify(event, self.get_status())
-            except Exception:
-                pass
-
-        try:
-            self._write_worker_status()
-        except Exception:
-            pass
-        
-        return event
 
     def _session_duration_seconds(self) -> float:
         """Return current session duration in seconds."""
-        if not self._current_session:
-            return 0.0
-        try:
-            started = datetime.fromisoformat(self._current_session.started_at)
-            if started.tzinfo is None:
-                started = started.replace(tzinfo=timezone.utc)
-            return max(
-                0.0,
-                (datetime.now(timezone.utc) - started).total_seconds(),
-            )
-        except ValueError:
-            return 0.0
+        return session_duration_seconds(self._current_session)
 
     def _fast_validate_dataset_manifest(self, min_samples: int) -> Tuple[bool, str]:
         """Use the signed dataset manifest as the fast-path readiness check."""
@@ -515,23 +478,36 @@ class AutoTrainer:
         dataset_source = str(manifest.get("dataset_source", "") or "").upper()
         strict_real = bool(manifest.get("strict_real_mode", False))
         training_mode = str(manifest.get("training_mode", "") or "").upper()
-        sample_count = int(manifest.get("sample_count", manifest.get("total_samples", 0)) or 0)
+        sample_count = int(
+            manifest.get("sample_count", manifest.get("total_samples", 0)) or 0
+        )
         class_histogram = manifest.get("class_histogram", {}) or {}
         positive = int(class_histogram.get("1", class_histogram.get(1, 0)) or 0)
-        total = max(sample_count, int(manifest.get("total_samples", sample_count) or sample_count))
+        total = max(
+            sample_count,
+            int(manifest.get("total_samples", sample_count) or sample_count),
+        )
         positive_ratio = (positive / total) if total > 0 else 0.0
-        signed = bool(manifest.get("signature_hash")) and bool(manifest.get("signed_by"))
+        signed = bool(manifest.get("signature_hash")) and bool(
+            manifest.get("signed_by")
+        )
 
         if not strict_real:
             return False, "manifest_invalid: strict_real_mode is not enabled"
         if dataset_source != "INGESTION_PIPELINE":
-            return False, f"manifest_invalid: dataset_source={dataset_source or '<missing>'}"
+            return (
+                False,
+                f"manifest_invalid: dataset_source={dataset_source or '<missing>'}",
+            )
         if training_mode and training_mode != "PRODUCTION_REAL":
             return False, f"manifest_invalid: training_mode={training_mode}"
         if not signed:
             return False, "manifest_invalid: signature fields missing"
         if total < min_samples:
-            return False, f"manifest_invalid: sample_count={total} below threshold={min_samples}"
+            return (
+                False,
+                f"manifest_invalid: sample_count={total} below threshold={min_samples}",
+            )
         if not (0.40 <= positive_ratio <= 0.60):
             return False, f"manifest_invalid: class balance {positive_ratio:.2%}"
 
@@ -554,7 +530,9 @@ class AutoTrainer:
         except Exception:
             return False
 
-    def _extract_governance_dataset_arrays(self, dataset) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+    def _extract_governance_dataset_arrays(
+        self, dataset
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
         """Extract feature and label arrays from the active dataset, including Subset wrappers."""
         if dataset is None:
             return None, None
@@ -562,7 +540,9 @@ class AutoTrainer:
         subset_indices = getattr(dataset, "indices", None)
         underlying_dataset = getattr(dataset, "dataset", None)
         if subset_indices is not None and underlying_dataset is not None:
-            base_features, base_labels = self._extract_governance_dataset_arrays(underlying_dataset)
+            base_features, base_labels = self._extract_governance_dataset_arrays(
+                underlying_dataset
+            )
             if base_features is None or base_labels is None:
                 return None, None
             index_array = np.asarray(list(subset_indices), dtype=np.int64)
@@ -588,12 +568,18 @@ class AutoTrainer:
     def _run_governance_pre_training_gate(self) -> bool:
         """Run the pre-training governance gate against the real DataLoader dataset."""
         if self._gpu_dataloader is None:
-            logger.error("Governance pre-training gate failed: DataLoader not initialized")
+            logger.error(
+                "Governance pre-training gate failed: DataLoader not initialized"
+            )
             return False
 
-        features, labels = self._extract_governance_dataset_arrays(self._gpu_dataloader.dataset)
+        features, labels = self._extract_governance_dataset_arrays(
+            self._gpu_dataloader.dataset
+        )
         if features is None or labels is None or features.size == 0 or labels.size == 0:
-            logger.error("Governance pre-training gate failed: dataset tensors unavailable")
+            logger.error(
+                "Governance pre-training gate failed: dataset tensors unavailable"
+            )
             return False
 
         from impl_v1.training.data.governance_pipeline import pre_training_gate
@@ -609,8 +595,14 @@ class AutoTrainer:
         self._governance_dataset_hash = self._hash_governance_dataset(features, labels)
 
         if not result.passed:
-            failure_summary = "; ".join(result.failures[:3]) if result.failures else "unknown governance failure"
-            logger.error(f"Governance pre-training gate blocked training: {failure_summary}")
+            failure_summary = (
+                "; ".join(result.failures[:3])
+                if result.failures
+                else "unknown governance failure"
+            )
+            logger.error(
+                f"Governance pre-training gate blocked training: {failure_summary}"
+            )
             self._emit_event(
                 "GUARD_BLOCKED",
                 f"Governance pre-training gate failed: {failure_summary}",
@@ -658,137 +650,9 @@ class AutoTrainer:
         epoch_elapsed_seconds: Optional[float] = None,
     ) -> None:
         """Persist telemetry, gate state, and field progression outputs."""
-        try:
-            host_metrics = probe_host_metrics()
-            determinism_status = self._determinism_status()
-            promotion_frozen = bool(
-                self._promotion is not None and self._promotion.state.frozen
-            )
-            promotion_reason = (
-                self._promotion.state.freeze_reason
-                if self._promotion is not None else None
-            )
-            duration_seconds = self._session_duration_seconds()
-            total_epochs = (
-                self._target_epochs
-                if self._target_epochs > 0 and self._target_epochs < 999999
-                else 0
-            )
-            batch_velocity = None
-            if epoch_elapsed_seconds and self._last_total_batches > 0:
-                batch_velocity = self._last_total_batches / max(epoch_elapsed_seconds, 0.001)
-
-            write_training_gate(
-                determinism_status=determinism_status,
-                freeze_status=promotion_frozen,
-                gpu_temperature=host_metrics.get("gpu_temperature"),
-            )
-            write_training_telemetry(
-                epoch=self._session_epoch if self._session_epoch > 0 else self._epoch,
-                batch_size=int(self._batch_size or 0),
-                loss=float(self._last_loss),
-                precision=float(self._last_accuracy),
-                total_epochs=total_epochs,
-                training_duration_seconds=duration_seconds,
-                samples_per_second=float(self._samples_per_sec),
-                determinism_status=determinism_status,
-                freeze_status=promotion_frozen,
-                gpu_temperature=host_metrics.get("gpu_temperature"),
-                cpu_util=host_metrics.get("cpu_util"),
-                gpu_util=host_metrics.get("gpu_util"),
-                monotonic_start_time=int(self._session_start_monotonic or time.monotonic()),
-                dataset_size=(
-                    self._gpu_dataset_stats["train"]["total"]
-                    if self._gpu_dataset_stats else None
-                ),
-            )
-            current_epoch = self._session_epoch if self._session_epoch > 0 else self._epoch
-            runtime_total_epochs = total_epochs if total_epochs > 0 else max(current_epoch, 0)
-            progress_pct = 0.0
-            if runtime_total_epochs > 0 and current_epoch > 0:
-                progress_pct = min((current_epoch / runtime_total_epochs) * 100.0, 100.0)
-            if self._last_loss > 0 and self._best_accuracy > 0 and self._last_accuracy >= self._best_accuracy:
-                loss_trend = "improving"
-            elif self._last_loss > 0:
-                loss_trend = "active"
-            else:
-                loss_trend = "idle"
-
-            write_runtime_state_snapshot(
-                mode=self._get_state().value,
-                total_epochs=runtime_total_epochs,
-                completed_epochs=current_epoch,
-                current_loss=float(self._last_loss),
-                best_loss=float(self._last_loss if self._best_accuracy <= 0 else self._last_loss),
-                precision=float(self._last_accuracy),
-                ece=0.0,
-                drift_kl=0.0,
-                duplicate_rate=0.0,
-                gpu_util=host_metrics.get("gpu_util"),
-                cpu_util=host_metrics.get("cpu_util"),
-                temperature=host_metrics.get("gpu_temperature"),
-                determinism_status=determinism_status,
-                freeze_status=promotion_frozen,
-                progress_pct=progress_pct,
-                loss_trend=loss_trend,
-                training_start_ms=(
-                    int(self._session_start_timestamp.timestamp() * 1000)
-                    if self._session_start_timestamp else 0
-                ),
-                total_errors=0,
-            )
-            write_field_runtime_status(
-                containment_active=promotion_frozen,
-                containment_reason=promotion_reason,
-                precision_breach=bool(
-                    self._last_accuracy > 0 and self._last_accuracy < self._early_stop_baseline
-                ),
-                drift_alert=promotion_frozen,
-                freeze_valid=(not promotion_frozen) if self._last_accuracy > 0 else None,
-                freeze_reason=promotion_reason,
-                training_velocity_samples_hr=(
-                    float(self._samples_per_sec) * 3600.0
-                    if self._samples_per_sec > 0 else None
-                ),
-                training_velocity_batches_sec=batch_velocity,
-                gpu_utilization=host_metrics.get("gpu_util"),
-                determinism_pass=determinism_status,
-                data_freshness="fresh" if self._gpu_dataset_stats else None,
-                merge_status="blocked" if promotion_frozen else None,
-            )
-
-            try:
-                from backend.api.field_progression_api import sync_active_field_training
-
-                sync_active_field_training(
-                    precision=float(self._last_accuracy) if self._last_accuracy > 0 else None,
-                    fpr=max(0.0, 1.0 - float(self._last_accuracy))
-                    if self._last_accuracy > 0 else None,
-                    stability_cycles=(
-                        self._promotion.state.stable_cycles
-                        if self._promotion is not None else None
-                    ),
-                    promotion_ready=bool(
-                        self._promotion is not None and self._promotion.is_live_ready()
-                    ),
-                    promotion_frozen=promotion_frozen,
-                    promotion_freeze_reason=promotion_reason,
-                    determinism_passed=determinism_status,
-                    drift_passed=not promotion_frozen,
-                    regression_passed=True,
-                    training_velocity_samples_hr=(
-                        float(self._samples_per_sec) * 3600.0
-                        if self._samples_per_sec > 0 else None
-                    ),
-                    training_velocity_batches_sec=batch_velocity,
-                    gpu_utilization=host_metrics.get("gpu_util"),
-                    data_freshness="fresh" if self._gpu_dataset_stats else None,
-                    merge_status="blocked" if promotion_frozen else None,
-                )
-            except Exception as exc:
-                logger.warning(f"Field progression sync failed: {exc}")
-        except Exception as exc:
-            logger.warning(f"Runtime artifact persistence failed: {exc}")
+        persist_runtime_artifacts(
+            self, logger, epoch_elapsed_seconds=epoch_elapsed_seconds
+        )
 
     def _attempt_ingestion_recovery(self, target_samples: int) -> Tuple[bool, str]:
         """
@@ -811,7 +675,9 @@ class AutoTrainer:
 
         env_target = os.environ.get("YGB_AUTO_INGEST_TARGET", "")
         try:
-            target = max(target_samples, int(env_target)) if env_target else target_samples
+            target = (
+                max(target_samples, int(env_target)) if env_target else target_samples
+            )
         except ValueError:
             target = target_samples
         timeout_sec = int(os.environ.get("YGB_AUTO_INGEST_TIMEOUT_SEC", "7200"))
@@ -915,11 +781,11 @@ class AutoTrainer:
                 raise
             logger.warning("Retrying with num_workers=0")
             return _create(0)
-    
+
     def _init_gpu_resources(self) -> bool:
         """
         Initialize GPU resources ONCE with REAL structured data.
-        
+
         Uses RealTrainingDataset (18K+ samples) with PyTorch DataLoader.
         NO synthetic data. NO random samples.
         """
@@ -929,19 +795,19 @@ class AutoTrainer:
         if self._abort_flag.is_set():
             logger.info("GPU initialization skipped: abort requested")
             return False
-        
+
         if not TORCH_AVAILABLE or not PYTORCH_AVAILABLE:
             return False
-        
+
         device_info = detect_compute_device()
         if device_info.device_type != DeviceType.CUDA:
             return False
-        
+
         try:
             from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier
-            
+
             self._gpu_device = get_torch_device()
-            
+
             # Create model config
             config = create_model_config(
                 input_dim=256,
@@ -953,13 +819,13 @@ class AutoTrainer:
                 epochs=1,
                 seed=42,
             )
-            
+
             # Create model on GPU (PERSISTENT)
             if self._persistent_model is None:
                 self._persistent_model = BugClassifier(config)
             self._persistent_model = self._persistent_model.to(self._gpu_device)
             self._gpu_model = self._persistent_model
-            
+
             # Create optimizer and criterion (PERSISTENT)
             if self._persistent_optimizer is None:
                 self._persistent_optimizer = optim.Adam(
@@ -971,21 +837,24 @@ class AutoTrainer:
                 self._persistent_criterion = nn.CrossEntropyLoss()
             self._gpu_optimizer = self._persistent_optimizer
             self._gpu_criterion = self._persistent_criterion
-            
+
             # LR scheduler — cosine annealing with warm restarts (24/7 mode)
             # T_0=50: full cosine cycle every 50 epochs, T_mult=1: same length each restart
             if self._gpu_scheduler is None:
                 self._gpu_scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
-                    self._gpu_optimizer, T_0=50, T_mult=1, eta_min=1e-6,
+                    self._gpu_optimizer,
+                    T_0=50,
+                    T_mult=1,
+                    eta_min=1e-6,
                 )
-            
+
             # === REAL DATA PIPELINE (NO SYNTHETIC DATA) ===
             from impl_v1.training.data.real_dataset_loader import (
                 get_per_field_report,
                 validate_dataset_integrity,
                 YGB_MIN_REAL_SAMPLES,
             )
-            
+
             # Validate dataset before use. Fast-path via the signed manifest, then
             # fall back to the full ingestion integrity scan if the manifest is
             # missing or insufficient.
@@ -1001,7 +870,9 @@ class AutoTrainer:
                 try:
                     report = get_per_field_report()
                     threshold = int(report.get("threshold", YGB_MIN_REAL_SAMPLES))
-                    manifest_verified = int(report.get("manifest_verified_count", 0) or 0)
+                    manifest_verified = int(
+                        report.get("manifest_verified_count", 0) or 0
+                    )
                     bridge_verified = int(report.get("bridge_verified_count", 0) or 0)
                     consistency_warning = str(report.get("consistency_warning", ""))
                     has_manifest_bridge_mismatch = (
@@ -1030,12 +901,14 @@ class AutoTrainer:
             if self._abort_flag.is_set():
                 logger.info("GPU initialization aborted before DataLoader creation")
                 return False
-            
-            train_loader, holdout_loader, stats, _first_batch = self._build_training_dataloaders(
-                batch_size=1024,
-                seed=42,
+
+            train_loader, holdout_loader, stats, _first_batch = (
+                self._build_training_dataloaders(
+                    batch_size=1024,
+                    seed=42,
+                )
             )
-            
+
             self._gpu_dataloader = train_loader
             self._gpu_holdout_loader = holdout_loader  # Store holdout for validation
             self._gpu_dataset_stats = stats
@@ -1052,20 +925,24 @@ class AutoTrainer:
             if self._abort_flag.is_set():
                 logger.info("GPU initialization aborted after DataLoader creation")
                 return False
-            
+
             # Cache the latest batch during real training instead of eagerly
             # pulling one batch during startup.
             self._gpu_features = None
             self._gpu_labels = None
-            
+
             # === GOVERNANCE: Register data source + validate trust ===
             try:
-                from impl_v1.training.data.data_source_registry import DataSourceRegistry
+                from impl_v1.training.data.data_source_registry import (
+                    DataSourceRegistry,
+                )
+
                 registry = DataSourceRegistry()
                 sources = registry.get_all_sources()
                 if not sources:
                     src = registry.register_source(
-                        "ingestion_pipeline", "INGESTION_PIPELINE",
+                        "ingestion_pipeline",
+                        "INGESTION_PIPELINE",
                         tags=["real", "production"],
                     )
                     registry.verify_source(src.source_id)  # +30 trust
@@ -1080,21 +957,28 @@ class AutoTrainer:
 
             if not self._run_governance_pre_training_gate():
                 return False
-            
+
             # === GOVERNANCE: Initialize curriculum + promotion ===
             try:
-                from impl_v1.training.data.real_data_curriculum import RealDataCurriculum
-                from impl_v1.training.data.governed_field_promotion import GovernedFieldPromotion
+                from impl_v1.training.data.real_data_curriculum import (
+                    RealDataCurriculum,
+                )
+                from impl_v1.training.data.governed_field_promotion import (
+                    GovernedFieldPromotion,
+                )
+
                 self._curriculum = RealDataCurriculum()
                 self._promotion = GovernedFieldPromotion()
-                logger.info(f"Curriculum initialized: {self._curriculum.get_stage_name()}")
+                logger.info(
+                    f"Curriculum initialized: {self._curriculum.get_stage_name()}"
+                )
             except Exception as e:
                 logger.warning(f"Curriculum/promotion init: {e}")
-            
+
             # === TRY TO LOAD EXISTING CHECKPOINT ===
             try:
-                hdd_root = os.environ.get('YGB_HDD_ROOT', 'D:/ygb_hdd')
-                checkpoint_dir = os.path.join(hdd_root, 'training')
+                hdd_root = os.environ.get("YGB_HDD_ROOT", "D:/ygb_hdd")
+                checkpoint_dir = os.path.join(hdd_root, "training")
                 (
                     self._checkpoint_path,
                     self._checkpoint_meta_path,
@@ -1103,30 +987,42 @@ class AutoTrainer:
                 os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
             except OSError:
                 # HDD path not available (e.g. D: drive missing), use local fallback
-                checkpoint_dir = os.path.abspath(os.path.join(
-                    os.path.dirname(__file__), '..', '..', '..', 'data'
-                ))
+                checkpoint_dir = os.path.abspath(
+                    os.path.join(os.path.dirname(__file__), "..", "..", "..", "data")
+                )
                 (
                     self._checkpoint_path,
                     self._checkpoint_meta_path,
                     legacy_checkpoint_path,
                 ) = self._checkpoint_paths_for(checkpoint_dir)
                 os.makedirs(os.path.dirname(self._checkpoint_path), exist_ok=True)
-                logger.warning(f"HDD path unavailable, using local checkpoint: {self._checkpoint_path}")
-            
+                logger.warning(
+                    f"HDD path unavailable, using local checkpoint: {self._checkpoint_path}"
+                )
+
             if os.path.exists(self._checkpoint_path):
                 try:
                     if not SAFETENSORS_AVAILABLE or load_safetensors_file is None:
                         raise RuntimeError("safetensors package not available")
-                    model_state = load_safetensors_file(self._checkpoint_path, device='cpu')
+                    model_state = load_safetensors_file(
+                        self._checkpoint_path, device="cpu"
+                    )
                     self._gpu_model.load_state_dict(model_state)
-                    ckpt_meta = self._load_checkpoint_metadata(self._checkpoint_meta_path or "")
-                    self._epoch = int(ckpt_meta.get('epoch', 0) or 0)
-                    self._last_accuracy = float(ckpt_meta.get('accuracy', 0.0) or 0.0)
-                    self._last_holdout_accuracy = float(ckpt_meta.get('holdout_accuracy', self._last_accuracy) or self._last_accuracy)
-                    self._last_loss = float(ckpt_meta.get('loss', 0.0) or 0.0)
+                    ckpt_meta = self._load_checkpoint_metadata(
+                        self._checkpoint_meta_path or ""
+                    )
+                    self._epoch = int(ckpt_meta.get("epoch", 0) or 0)
+                    self._last_accuracy = float(ckpt_meta.get("accuracy", 0.0) or 0.0)
+                    self._last_holdout_accuracy = float(
+                        ckpt_meta.get("holdout_accuracy", self._last_accuracy)
+                        or self._last_accuracy
+                    )
+                    self._last_loss = float(ckpt_meta.get("loss", 0.0) or 0.0)
                     self._real_samples_processed = int(
-                        ckpt_meta.get('real_samples_processed', self._real_samples_processed) or 0
+                        ckpt_meta.get(
+                            "real_samples_processed", self._real_samples_processed
+                        )
+                        or 0
                     )
                     if os.path.exists(legacy_checkpoint_path):
                         self._archive_legacy_checkpoint(legacy_checkpoint_path)
@@ -1138,22 +1034,50 @@ class AutoTrainer:
                     logger.warning(f"Could not load checkpoint, starting fresh: {e}")
             elif os.path.exists(legacy_checkpoint_path):
                 try:
-                    ckpt = torch.load(legacy_checkpoint_path, map_location=self._gpu_device, weights_only=True)
-                    model_state = ckpt.get('model_state') or ckpt.get('model_state_dict') or ckpt
+                    ckpt = torch.load(
+                        legacy_checkpoint_path,
+                        map_location=self._gpu_device,
+                        weights_only=True,
+                    )
+                    model_state = (
+                        ckpt.get("model_state") or ckpt.get("model_state_dict") or ckpt
+                    )
                     self._gpu_model.load_state_dict(model_state)
-                    if isinstance(ckpt, dict) and 'optimizer_state' in ckpt:
-                        self._gpu_optimizer.load_state_dict(ckpt['optimizer_state'])
-                    if isinstance(ckpt, dict) and 'scheduler_state' in ckpt:
-                        self._gpu_scheduler.load_state_dict(ckpt['scheduler_state'])
-                    self._epoch = int(ckpt.get('epoch', 0) or 0) if isinstance(ckpt, dict) else 0
-                    self._last_accuracy = float(ckpt.get('accuracy', 0.0) or 0.0) if isinstance(ckpt, dict) else 0.0
-                    self._last_holdout_accuracy = float(
-                        ckpt.get('holdout_accuracy', self._last_accuracy) or self._last_accuracy
-                    ) if isinstance(ckpt, dict) else self._last_accuracy
-                    self._last_loss = float(ckpt.get('loss', 0.0) or 0.0) if isinstance(ckpt, dict) else 0.0
-                    self._real_samples_processed = int(
-                        ckpt.get('real_samples_processed', self._real_samples_processed) or 0
-                    ) if isinstance(ckpt, dict) else self._real_samples_processed
+                    if isinstance(ckpt, dict) and "optimizer_state" in ckpt:
+                        self._gpu_optimizer.load_state_dict(ckpt["optimizer_state"])
+                    if isinstance(ckpt, dict) and "scheduler_state" in ckpt:
+                        self._gpu_scheduler.load_state_dict(ckpt["scheduler_state"])
+                    self._epoch = (
+                        int(ckpt.get("epoch", 0) or 0) if isinstance(ckpt, dict) else 0
+                    )
+                    self._last_accuracy = (
+                        float(ckpt.get("accuracy", 0.0) or 0.0)
+                        if isinstance(ckpt, dict)
+                        else 0.0
+                    )
+                    self._last_holdout_accuracy = (
+                        float(
+                            ckpt.get("holdout_accuracy", self._last_accuracy)
+                            or self._last_accuracy
+                        )
+                        if isinstance(ckpt, dict)
+                        else self._last_accuracy
+                    )
+                    self._last_loss = (
+                        float(ckpt.get("loss", 0.0) or 0.0)
+                        if isinstance(ckpt, dict)
+                        else 0.0
+                    )
+                    self._real_samples_processed = (
+                        int(
+                            ckpt.get(
+                                "real_samples_processed", self._real_samples_processed
+                            )
+                            or 0
+                        )
+                        if isinstance(ckpt, dict)
+                        else self._real_samples_processed
+                    )
                     logger.info(
                         "Loaded legacy checkpoint for migration: epoch=%s, accuracy=%.2f%%, loss=%.4f",
                         self._epoch,
@@ -1179,15 +1103,20 @@ class AutoTrainer:
                             migrated_meta,
                         )
                         self._archive_legacy_checkpoint(legacy_checkpoint_path)
-                        logger.info("Migrated legacy checkpoint to safetensors: %s", self._checkpoint_path)
+                        logger.info(
+                            "Migrated legacy checkpoint to safetensors: %s",
+                            self._checkpoint_path,
+                        )
                 except Exception as e:
-                    logger.warning(f"Could not load legacy checkpoint, starting fresh: {e}")
-            
+                    logger.warning(
+                        f"Could not load legacy checkpoint, starting fresh: {e}"
+                    )
+
             # NOTE: torch.compile skipped — model is too small to benefit,
             # and torch._dynamo can silently corrupt outputs on Windows.
-            
+
             self._gpu_initialized = True
-            
+
             # Verify model is on GPU (not CPU)
             model_device = next(self._gpu_model.parameters()).device
             logger.info(
@@ -1196,293 +1125,61 @@ class AutoTrainer:
                 f"(model on {model_device}, NOT CPU)"
             )
             return True
-            
+
         except Exception as e:
             self._last_error = str(e).strip()
             logger.error(f"Failed to initialize GPU resources: {e}")
             return False
-    
+
     def _check_all_guards(self) -> Tuple[bool, str]:
         """
         Check ALL guards before training.
-        
+
         Returns (passed, reason).
         """
         # Check main G38 guards
         result, msg = verify_all_guards()
         if not result:
             return False, msg
-        
+
         # Check pretraining guards
         result, msg = verify_pretraining_guards()
         if not result:
             return False, msg
-        
+
         # Check MODE-A status
         status, _ = get_mode_a_status()
         if status != TrainingModeStatus.ACTIVE:
             return False, "MODE-A is not active"
-        
-        return True, "All guards passed"
-    
-    def _gpu_train_step(self) -> tuple:
-        """
-        Execute one FULL EPOCH over the entire DataLoader with AMP.
-        
-        Iterates through ALL batches of the real 20K+ sample dataset.
-        Uses mixed precision for RTX 2050 Tensor cores.
-        Returns (success: bool, accuracy: float, loss: float).
-        """
-        if not self._gpu_initialized:
-            if not self._init_gpu_resources():
-                return False, 0.0, 0.0
-        
-        try:
-            # Initialize AMP scaler if not exists
-            if not hasattr(self, '_scaler') or self._scaler is None:
-                self._scaler = GradScaler('cuda') if AMP_AVAILABLE else None
-            amp_enabled = AMP_AVAILABLE and self._scaler is not None
-            
-            self._gpu_model.train()
-            
-            # Accumulate metrics on GPU to avoid per-batch GPU→CPU sync stalls
-            total_loss_gpu = torch.zeros(1, device=self._gpu_device)
-            total_correct_gpu = torch.zeros(1, dtype=torch.long, device=self._gpu_device)
-            total_samples = 0
-            batch_count = 0
-            try:
-                self._last_total_batches = len(self._gpu_dataloader)
-            except Exception:
-                self._last_total_batches = 0
-            self._last_batch_index = 0
-            self._last_epoch_samples = 0
-            
-            self._gpu_optimizer.zero_grad(set_to_none=True)
-            
-            # === CUDA STREAM PREFETCHING ===
-            # Overlap data transfer with computation
-            prefetch_stream = torch.cuda.Stream()
-            
-            # === ITERATE OVER FULL DATALOADER (all batches, all 20K+ samples) ===
-            data_iter = iter(self._gpu_dataloader)
-            
-            # Pre-fetch first batch
-            try:
-                next_batch = next(data_iter)
-                with torch.cuda.stream(prefetch_stream):
-                    next_features = next_batch[0].to(self._gpu_device, non_blocking=True)
-                    next_labels = next_batch[1].to(self._gpu_device, non_blocking=True)
-            except StopIteration:
-                return False, 0.0, 0.0
-            
-            while next_features is not None:
-                if self._abort_flag.is_set():
-                    return False, 0.0, 0.0
-                
-                # Wait for prefetch to complete
-                torch.cuda.current_stream().wait_stream(prefetch_stream)
-                batch_features = next_features
-                batch_labels = next_labels
-                
-                # Start prefetching NEXT batch while we compute
-                try:
-                    next_batch = next(data_iter)
-                    with torch.cuda.stream(prefetch_stream):
-                        next_features = next_batch[0].to(self._gpu_device, non_blocking=True)
-                        next_labels = next_batch[1].to(self._gpu_device, non_blocking=True)
-                except StopIteration:
-                    next_features = None
-                    next_labels = None
-                batch_size = batch_labels.size(0)
-                
-                # AMP: Mixed precision forward pass
-                if amp_enabled:
-                    with autocast('cuda', dtype=torch.float16):
-                        outputs = self._gpu_model(batch_features)
-                        loss = self._gpu_criterion(outputs, batch_labels)
-                    
-                    # AMP: Scaled backward + step every batch (no accumulation)
-                    self._scaler.scale(loss).backward()
-                    self._scaler.step(self._gpu_optimizer)
-                    self._scaler.update()
-                    self._gpu_optimizer.zero_grad(set_to_none=True)
-                else:
-                    # Fallback: Standard FP32 training
-                    outputs = self._gpu_model(batch_features)
-                    loss = self._gpu_criterion(outputs, batch_labels)
-                    loss.backward()
-                    self._gpu_optimizer.step()
-                    self._gpu_optimizer.zero_grad(set_to_none=True)
-                
-                # Accumulate batch stats on GPU (no per-batch CPU sync)
-                total_loss_gpu += loss.detach() * batch_size
-                _, predicted = torch.max(outputs.data, 1)
-                total_correct_gpu += (predicted == batch_labels).sum()
-                total_samples += batch_size
-                batch_count += 1
-                self._last_batch_index = batch_count
-                self._last_epoch_samples = total_samples
-            
-            # Synchronize CUDA streams before computing metrics
-            torch.cuda.synchronize()
-            
-            # Also update the cached batch reference for status queries
-            if total_samples > 0:
-                self._gpu_features = batch_features
-                self._gpu_labels = batch_labels
-            
-            # Track real samples processed
-            self._real_samples_processed += total_samples
-            
-            # Epoch-level training metrics (single GPU→CPU sync point)
-            avg_loss = total_loss_gpu.item() / max(total_samples, 1)
-            train_accuracy = total_correct_gpu.item() / max(total_samples, 1)
-            
-            # === HOLDOUT VALIDATION (real generalization accuracy) ===
-            holdout_accuracy = train_accuracy  # Fallback if no holdout loader
-            if self._gpu_holdout_loader is not None:
-                self._gpu_model.eval()
-                holdout_correct_gpu = torch.zeros(1, dtype=torch.long, device=self._gpu_device)
-                holdout_total = 0
-                holdout_autocast = autocast('cuda', dtype=torch.float16) if amp_enabled else nullcontext()
-                with torch.no_grad(), holdout_autocast:
-                    for h_features, h_labels in self._gpu_holdout_loader:
-                        h_features = h_features.to(self._gpu_device, non_blocking=True)
-                        h_labels = h_labels.to(self._gpu_device, non_blocking=True)
-                        h_outputs = self._gpu_model(h_features)
-                        _, h_predicted = torch.max(h_outputs.data, 1)
-                        holdout_correct_gpu += (h_predicted == h_labels).sum()
-                        holdout_total += h_labels.size(0)
-                if holdout_total > 0:
-                    holdout_accuracy = holdout_correct_gpu.item() / holdout_total
-                self._gpu_model.train()
-            self._last_holdout_accuracy = holdout_accuracy
-            
-            # Use holdout accuracy as the real accuracy metric
-            accuracy = holdout_accuracy
-            
-            # Step LR scheduler (cosine annealing — no loss arg needed)
-            current_lr = self._gpu_optimizer.param_groups[0]['lr']
-            if hasattr(self, '_gpu_scheduler') and self._gpu_scheduler is not None:
-                self._gpu_scheduler.step()
-                current_lr = self._gpu_optimizer.param_groups[0]['lr']
-            
-            # === CURRICULUM STAGE UPDATE ===
-            if self._curriculum is not None:
-                try:
-                    fpr = 1.0 - accuracy  # Approximate FPR
-                    self._curriculum.update_metrics(
-                        accuracy=accuracy, fpr=fpr, fnr=fpr,
-                        loss=avg_loss, epochs=1, samples=total_samples,
-                    )
-                    advanced, adv_msg = self._curriculum.try_advance()
-                    if advanced:
-                        logger.info(f"Curriculum: {adv_msg}")
-                except Exception as e:
-                    logger.warning(f"Curriculum update: {e}")
-            
-            # === PROMOTION GATE EVALUATION ===
-            if self._promotion is not None:
-                try:
-                    curriculum_done = (
-                        self._curriculum.state.curriculum_complete
-                        if self._curriculum else False
-                    )
-                    fpr = 1.0 - accuracy
-                    all_passed, gates = self._promotion.evaluate_gates(
-                        accuracy=accuracy,
-                        fpr=fpr,
-                        binding_ratio=1.0,
-                        curriculum_complete=curriculum_done,
-                        deterministic_verified=True,
-                        previous_accuracy=self._last_accuracy,
-                    )
-                    if self._promotion.is_live_ready():
-                        logger.info("\U0001f3af LIVE_READY achieved — all 7 gates × 5 cycles")
-                except Exception as e:
-                    logger.warning(f"Promotion eval: {e}")
-            
-            # Save checkpoint async (background thread — doesn't block GPU training)
-            try:
-                self._run_governance_post_epoch_audit(
-                    epoch=self._epoch,
-                    accuracy=accuracy,
-                    holdout_accuracy=holdout_accuracy,
-                    loss=avg_loss,
-                    train_accuracy=train_accuracy,
-                    total_samples=total_samples,
-                )
-            except Exception as e:
-                logger.warning(f"Post-epoch governance audit failed: {e}")
 
-            if hasattr(self, '_checkpoint_path') and self._checkpoint_path:
-                try:
-                    if not SAFETENSORS_AVAILABLE or not self._checkpoint_meta_path:
-                        raise RuntimeError("safetensors checkpoint support unavailable")
-                    model_state = {
-                        key: value.detach().cpu().clone().contiguous()
-                        for key, value in self._gpu_model.state_dict().items()
-                    }
-                    checkpoint_meta = self._build_checkpoint_metadata(
-                        epoch=self._epoch,
-                        accuracy=accuracy,
-                        holdout_accuracy=holdout_accuracy,
-                        loss=avg_loss,
-                        real_samples_processed=self._real_samples_processed,
-                    )
-                    future = _checkpoint_executor.submit(
-                        self._save_checkpoint_bundle,
-                        self._checkpoint_path,
-                        self._checkpoint_meta_path,
-                        model_state,
-                        checkpoint_meta,
-                    )
-                    def _on_checkpoint_done(f, path=self._checkpoint_path):
-                        exc = f.exception()
-                        if exc:
-                            logger.error(f"Async checkpoint save FAILED for {path}: {exc}")
-                        else:
-                            logger.info(f"Checkpoint saved: {path}")
-                            if self._current_session:
-                                self._current_session.checkpoints_saved += 1
-                    future.add_done_callback(_on_checkpoint_done)
-                except Exception as e:
-                    logger.warning(f"Checkpoint save failed: {e}")
-            
-            # Verify training is on GPU, not CPU
-            model_device = next(self._gpu_model.parameters()).device
-            
-            logger.info(
-                f"Epoch complete: {batch_count} batches, "
-                f"{total_samples} samples, "
-                f"train_acc={train_accuracy:.2%}, holdout_acc={holdout_accuracy:.2%}, "
-                f"loss={avg_loss:.4f}, lr={current_lr:.2e}, device={model_device}"
-            )
-            
-            return True, accuracy, avg_loss
-            
-        except Exception as e:
-            self._last_error = str(e).strip()
-            import traceback
-            err_tb = traceback.format_exc()
-            logger.error(f"GPU training step failed: {e}\n{err_tb}")
-            print(f"\n!!! GPU TRAIN ERROR !!!\n{e}\n{err_tb}", flush=True)
-            return False, 0.0, 0.0
-    
+        return True, "All guards passed"
+
+    def _gpu_train_step(self) -> tuple:
+        """Execute one FULL EPOCH over the entire DataLoader with AMP."""
+        return gpu_train_step(
+            self,
+            logger,
+            torch=torch,
+            AMP_AVAILABLE=AMP_AVAILABLE,
+            GradScaler=GradScaler,
+            autocast=autocast,
+        )
+
     def _get_current_conditions(self) -> IdleConditions:
         """Get current idle conditions from real OS."""
         idle_seconds = get_idle_seconds()
         power_connected = is_power_connected()
         scan_active = is_scan_active()
-        
+
         # GPU detection
         gpu_available = False
         try:
             import torch
+
             gpu_available = torch.cuda.is_available()
         except ImportError:
             pass
-        
+
         return IdleConditions(
             no_active_scan=not scan_active,
             no_human_interaction=idle_seconds >= IDLE_THRESHOLD_SECONDS,
@@ -1490,19 +1187,19 @@ class AutoTrainer:
             gpu_available=gpu_available,
             idle_seconds=idle_seconds,
         )
-    
+
     def _train_representation_only(self) -> bool:
         """
         Execute MODE-A representation-only training using REAL GPU.
-        
+
         This updates embeddings and weights WITHOUT:
         - Verifying bugs
         - Labeling severity
         - Learning accepted/rejected outcomes
-        
+
         ENFORCES GPU-ONLY MODE - will NOT fall back to CPU.
         Uses the shared full-DataLoader training step (20K+ real samples).
-        
+
         Returns True if training completed, False if aborted.
         """
         # === GPU ENFORCEMENT ===
@@ -1513,7 +1210,7 @@ class AutoTrainer:
                 epoch=self._epoch,
             )
             return False
-        
+
         device_info = detect_compute_device()
         if device_info.device_type != DeviceType.CUDA:
             self._emit_event(
@@ -1523,16 +1220,16 @@ class AutoTrainer:
                 gpu_used=False,
             )
             return False
-        
+
         self._epoch += 1
-        
+
         self._emit_event(
             "TRAINING_STARTED",
             f"Starting epoch {self._epoch} on GPU ({device_info.device_name})",
             epoch=self._epoch,
             gpu_used=True,
         )
-        
+
         try:
             # Check for abort before training
             if self._abort_flag.is_set():
@@ -1543,7 +1240,7 @@ class AutoTrainer:
                     gpu_used=True,
                 )
                 return False
-            
+
             # Check if scan started
             if is_scan_active():
                 self._abort_flag.set()
@@ -1554,7 +1251,7 @@ class AutoTrainer:
                     gpu_used=True,
                 )
                 return False
-            
+
             # Check if human interaction
             idle = get_idle_seconds()
             if idle < IDLE_THRESHOLD_SECONDS:
@@ -1573,10 +1270,11 @@ class AutoTrainer:
             # Full dataloader iteration happens in _gpu_train_step
             # (for batch in the loader, not next(iter(...))).
             import time as _time
+
             _step_start = _time.perf_counter()
             success, accuracy, loss = self._gpu_train_step()
             _step_elapsed = _time.perf_counter() - _step_start
-            
+
             if not success:
                 self._emit_event(
                     "ERROR",
@@ -1585,22 +1283,28 @@ class AutoTrainer:
                     gpu_used=True,
                 )
                 return False
-            
+
             # Update metrics
             self._last_loss = loss
             self._last_accuracy = accuracy
-            ds_total = self._gpu_dataset_stats.get('train', {}).get('total', 0) if self._gpu_dataset_stats else 0
+            ds_total = (
+                self._gpu_dataset_stats.get("train", {}).get("total", 0)
+                if self._gpu_dataset_stats
+                else 0
+            )
             self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
-            
+
             # === MODE_A EARLY STOPPING → AUTO-RESTART (24/7) ===
             if accuracy > self._best_accuracy:
                 self._best_accuracy = accuracy
                 self._no_improvement_count = 0
             else:
                 self._no_improvement_count += 1
-            
-            if (self._best_accuracy >= self._early_stop_baseline
-                    and self._no_improvement_count >= self._early_stop_patience):
+
+            if (
+                self._best_accuracy >= self._early_stop_baseline
+                and self._no_improvement_count >= self._early_stop_patience
+            ):
                 self._emit_event(
                     "MODE_A_CYCLE_COMPLETE",
                     f"MODE_A cycle complete: accuracy={self._best_accuracy:.2%} "
@@ -1617,7 +1321,7 @@ class AutoTrainer:
                     "[MODE_A] Cycle complete — resetting early stop counters "
                     "for new learning cycle (24/7 continuous mode)"
                 )
-            
+
             # Save checkpoint
             checkpoint_hash = _checkpoint_state_hash(self._gpu_model)
             self._emit_event(
@@ -1626,18 +1330,18 @@ class AutoTrainer:
                 epoch=self._epoch,
                 gpu_used=True,
             )
-            
+
             self._emit_event(
                 "TRAINING_STOPPED",
                 f"Completed GPU epoch {self._epoch} — {ds_total} samples, {_step_elapsed:.1f}s (accuracy: {accuracy:.2%}, loss: {loss:.4f})",
                 epoch=self._epoch,
                 gpu_used=True,
             )
-            
+
             self._persist_runtime_artifacts(epoch_elapsed_seconds=_step_elapsed)
-            
+
             return True
-            
+
         except Exception as e:
             self._emit_event(
                 "ERROR",
@@ -1646,39 +1350,39 @@ class AutoTrainer:
                 gpu_used=True,
             )
             return False
-    
+
     def check_and_train(self) -> bool:
         """
         Check conditions and train if met.
-        
+
         Returns True if training was triggered and completed.
         """
         with self._training_lock:
             # Don't trigger if already training
             if self._state == TrainingState.TRAINING:
                 return False
-            
+
             self._state = TrainingState.CHECKING
             self._abort_flag.clear()
-        
+
         try:
             # Get conditions
             conditions = self._get_current_conditions()
-            
+
             # Check idle conditions
             idle_result = check_idle_conditions(conditions)
-            
+
             if not idle_result.can_train:
                 self._set_state(TrainingState.IDLE)
                 return False
-            
+
             # Emit idle detected event
             self._emit_event(
                 "IDLE_DETECTED",
                 f"System idle for {conditions.idle_seconds}s - checking guards",
                 idle_seconds=conditions.idle_seconds,
             )
-            
+
             # Check ALL guards
             guards_ok, guard_msg = self._check_all_guards()
             if not guards_ok:
@@ -1689,18 +1393,18 @@ class AutoTrainer:
                 )
                 self._set_state(TrainingState.IDLE)
                 return False
-            
+
             # Evaluate training trigger
             trigger = evaluate_training_trigger(
                 idle_result,
                 None,  # model_status - we allow fresh training
                 pending_samples=100,  # representation samples available
             )
-            
+
             if not trigger.should_train:
                 self._set_state(TrainingState.IDLE)
                 return False
-            
+
             # Start training session
             with self._training_lock:
                 self._state = TrainingState.TRAINING
@@ -1711,88 +1415,49 @@ class AutoTrainer:
                     start_epoch=self._epoch,
                     gpu_used=conditions.gpu_available,
                 )
-            
+
             success = self._train_representation_only()
-            
+
             # Generate training report after session
             if self._current_session:
                 self._generate_session_report()
-            
+
             with self._training_lock:
                 self._state = TrainingState.IDLE
                 self._current_session = None
                 self._session_start_timestamp = None
                 self._session_start_monotonic = 0.0
-            
+
             return success
-            
+
         except Exception as e:
             self._emit_event("ERROR", str(e))
             self._set_state(TrainingState.ERROR)
             return False
-    
+
     def _generate_session_report(self) -> None:
         """Generate training report after session completes."""
-        if not self._current_session:
-            return
-        
-        try:
-            stopped_at = datetime.now(timezone.utc).isoformat()
-            epochs_trained = self._epoch - self._current_session.start_epoch
-            
-            # Get last checkpoint hash from events
-            checkpoint_events = [
-                e for e in self._events 
-                if e.event_type == "CHECKPOINT_SAVED"
-            ]
-            last_hash = ""
-            if checkpoint_events:
-                # Extract hash from details
-                details = checkpoint_events[-1].details
-                if "hash: " in details:
-                    last_hash = details.split("hash: ")[1].rstrip(")")
-            
-            paths = generate_training_report(
-                total_epochs=epochs_trained,
-                gpu_used=self._current_session.gpu_used,
-                started_at=self._current_session.started_at,
-                stopped_at=stopped_at,
-                checkpoints_saved=len(checkpoint_events),
-                last_checkpoint_hash=last_hash,
-                samples_processed=getattr(self, '_real_samples_processed', 0),  # Real sample count from ingestion
-                training_mode=ReportTrainingMode.MODE_A,
-                reports_dir="reports/g38_training",
-            )
-            
-            self._emit_event(
-                "REPORT_GENERATED",
-                f"Training report saved: {list(paths.values())[0]}",
-            )
-            
-            logger.info(f"Training report generated: {paths}")
-            
-        except Exception as e:
-            logger.error(f"Failed to generate training report: {e}")
-    
+        generate_session_report_for_trainer(self, logger)
+
     async def run_scheduler(self) -> None:
         """
         Background loop - IDLE AUTO-TRAINING MODE.
-        
+
         Every 30 seconds, checks if the system is idle (≥60s no input).
         If idle + power connected + no scan active + guards pass:
             → Automatically triggers one training epoch.
-        
+
         Training aborts immediately if:
             - User starts interacting (idle < 60s)
             - A scan starts
             - Any guard check fails
-        
+
         Manual training via API always available regardless.
         """
         self._running = True
         self._training_mode_label = "MANUAL"
         logger.info("G38 Trainer started in MANUAL training mode — API-only trigger")
-        
+
         while self._running:
             try:
                 # MANUAL MODE: scheduler loop runs but does NOT auto-trigger training.
@@ -1807,16 +1472,16 @@ class AutoTrainer:
                         )
             except Exception as e:
                 logger.error(f"Scheduler monitoring error: {e}")
-            
+
             await asyncio.sleep(self.CHECK_INTERVAL_SECONDS)
-        
+
         logger.info("G38 Trainer stopped")
-    
+
     def start(self) -> None:
         """Start the background scheduler."""
         if self._task is not None:
             return
-        
+
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
@@ -1824,17 +1489,17 @@ class AutoTrainer:
             asyncio.set_event_loop(loop)
         self._task = loop.create_task(self.run_scheduler())
         self._write_worker_status()
-    
+
     def stop(self) -> None:
         """Stop the background scheduler."""
         self._running = False
         self._abort_flag.set()
-        
+
         if self._task is not None:
             self._task.cancel()
             self._task = None
         self._write_worker_status()
-    
+
     def abort_training(self) -> dict:
         """Abort training immediately. Returns status."""
         if self.state != TrainingState.TRAINING:
@@ -1843,21 +1508,21 @@ class AutoTrainer:
                 "reason": "No training in progress",
                 "state": self.state.value,
             }
-        
+
         self._abort_flag.set()
         self._emit_event(
             "MANUAL_STOP",
             "Training aborted by user",
             gpu_used=True,
         )
-        
+
         return {
             "aborted": True,
             "epoch_at_stop": self._session_epoch,
             "total_completed": self._epoch,
             "state": "ABORTING",
         }
-    
+
     def abort_training_legacy(self) -> None:
         """Legacy abort - use abort_training() instead.
 
@@ -1870,14 +1535,15 @@ class AutoTrainer:
             stacklevel=2,
         )
         self.abort_training()
-    
+
     def force_start_training(self, epochs: int = 5) -> dict:
         """
         Manually start GPU training regardless of idle conditions.
-        
+
         ENFORCES GPU-ONLY MODE - will NOT fall back to CPU.
         Used for demo/testing purposes.
         """
+        validate_execution()
         # === GPU ENFORCEMENT ===
         if not TORCH_AVAILABLE or not PYTORCH_AVAILABLE:
             return {
@@ -1891,7 +1557,7 @@ class AutoTrainer:
                 "reason": "safetensors not installed - required checkpoint format unavailable",
                 "state": "ERROR",
             }
-        
+
         device_info = detect_compute_device()
         if device_info.device_type != DeviceType.CUDA:
             return {
@@ -1899,7 +1565,7 @@ class AutoTrainer:
                 "reason": f"GPU training required but CUDA not available (device: {device_info.device_type.value})",
                 "state": "ERROR",
             }
-        
+
         with self._training_lock:
             if self._state == TrainingState.TRAINING:
                 return {
@@ -1907,7 +1573,7 @@ class AutoTrainer:
                     "reason": "Training already in progress",
                     "state": self._state.value,
                 }
-            
+
             self._last_error = ""
             self._state = TrainingState.TRAINING
             self._abort_flag.clear()
@@ -1922,53 +1588,60 @@ class AutoTrainer:
                 start_epoch=self._epoch,
                 gpu_used=True,  # Always GPU
             )
-        
+
         self._emit_event(
             "MANUAL_START",
             f"Manual GPU training triggered for {epochs} epochs on {device_info.device_name}",
             gpu_used=True,
         )
-        
+
         try:
             # Initialize GPU resources ONCE (data stays on GPU)
             if not self._init_gpu_resources():
-                self._last_error = self._last_error or "Failed to initialize GPU resources"
+                self._last_error = (
+                    self._last_error or "Failed to initialize GPU resources"
+                )
                 self._state = TrainingState.ERROR
                 return {
                     "started": False,
                     "reason": "Failed to initialize GPU resources",
                     "state": "ERROR",
                 }
-            
+
             for i in range(epochs):
                 if self._abort_flag.is_set():
                     break
-                
+
                 # Update progress BEFORE training starts
                 self._session_epoch = i + 1
                 self._epoch += 1
-                
+
                 self._emit_event(
                     "TRAINING_STARTED",
                     f"Starting GPU epoch {self._session_epoch}/{epochs} (OPTIMIZED)",
                     epoch=self._session_epoch,
                     gpu_used=True,
                 )
-                
+
                 # === USE OPTIMIZED GPU TRAINING (zero CPU overhead) ===
                 import time as _time
+
                 _step_start = _time.perf_counter()
                 success, accuracy, loss = self._gpu_train_step()
                 _step_elapsed = _time.perf_counter() - _step_start
-                
+
                 # Store metrics for dashboard display
                 if success:
                     self._last_loss = loss
                     self._last_accuracy = accuracy
                     # Use real dataset size for throughput (full DataLoader iteration)
-                    ds_total = self._gpu_dataset_stats.get('train', {}).get('total', 0) if self._gpu_dataset_stats else 0
+                    ds_total = (
+                        self._gpu_dataset_stats.get("train", {}).get("total", 0)
+                        if self._gpu_dataset_stats
+                        else 0
+                    )
                     self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
-                
+
                 if not self._abort_flag.is_set() and success:
                     checkpoint_hash = _checkpoint_state_hash(self._gpu_model)
                     self._emit_event(
@@ -1977,13 +1650,13 @@ class AutoTrainer:
                         epoch=self._session_epoch,
                         gpu_used=True,
                     )
-            
+
             completed = self._session_epoch
-            
+
             # Generate training report
             if self._current_session:
                 self._generate_session_report()
-            
+
             with self._training_lock:
                 # Save last session for progress display
                 self._last_completed_epochs = completed
@@ -1995,14 +1668,14 @@ class AutoTrainer:
                 self._session_start_timestamp = None
                 self._session_start_monotonic = 0.0
             self._write_worker_status()
-            
+
             self._emit_event(
                 "TRAINING_STOPPED",
                 f"Manual GPU training completed: {completed}/{epochs} epochs",
                 epoch=completed,
                 gpu_used=True,
             )
-            
+
             return {
                 "started": True,
                 "completed_epochs": completed,
@@ -2011,7 +1684,7 @@ class AutoTrainer:
                 "device": device_info.device_name,
                 "state": "COMPLETED",
             }
-            
+
         except Exception as e:
             self._last_error = str(e).strip()
             self._set_state(TrainingState.ERROR)
@@ -2021,80 +1694,19 @@ class AutoTrainer:
                 "reason": "GPU training failed — check server logs",
                 "state": "ERROR",
             }
-    
+
     def get_status(self) -> dict:
         """Get current trainer status for dashboard."""
         conditions = self._get_current_conditions()
-        current_state = self.state
-        
-        # Calculate REAL progress percentage
-        is_continuous = getattr(self, '_continuous_mode', False)
-        
-        if self.is_training and is_continuous:
-            # 24/7 continuous mode: show accuracy as progress
-            real_progress = round(self._last_accuracy * 100)
-            current_epoch = self._session_epoch
-            target = 0  # 0 = infinite
-        elif self.is_training and self._target_epochs > 0:
-            # Fixed-epoch training: show live epoch progress
-            real_progress = round((self._session_epoch / self._target_epochs) * 100)
-            current_epoch = self._session_epoch
-            target = self._target_epochs
-        elif self._last_target_epochs > 0:
-            # Training completed - show last session at 100%
-            real_progress = 100
-            current_epoch = self._last_completed_epochs
-            target = self._last_target_epochs
-        else:
-            # No training has happened yet
-            real_progress = 0
-            current_epoch = 0
-            target = 0
-        
-        # GPU metrics
-        gpu_mem_allocated = 0.0
-        gpu_mem_reserved = 0.0
-        gpu_utilization = 0.0
-        if TORCH_AVAILABLE and torch.cuda.is_available():
-            gpu_mem_allocated = torch.cuda.memory_allocated() / 1024 / 1024  # MB
-            gpu_mem_reserved = torch.cuda.memory_reserved() / 1024 / 1024  # MB
-        
-        return {
-            "state": current_state.value,
-            "is_training": self.is_training,
-            "epoch": current_epoch,
-            "total_epochs": target,
-            "total_completed": self._epoch,
-            "progress": real_progress,
-            "idle_seconds": conditions.idle_seconds,
-            "power_connected": conditions.power_connected,
-            "scan_active": not conditions.no_active_scan,
-            "gpu_available": conditions.gpu_available,
-            "events_count": len(self._events),
-            "last_event": self._events[-1].event_type if self._events else None,
-            # Real GPU metrics
-            "gpu_mem_allocated_mb": round(gpu_mem_allocated, 2),
-            "gpu_mem_reserved_mb": round(gpu_mem_reserved, 2),
-            "last_loss": round(self._last_loss, 6),
-            "last_accuracy": round(self._last_accuracy, 4),
-            "samples_per_sec": round(self._samples_per_sec, 1),
-            "dataset_size": self._gpu_dataset_stats["train"]["total"] if self._gpu_dataset_stats else 0,
-            "training_mode": "CONTINUOUS" if is_continuous else getattr(self, '_training_mode_label', 'MANUAL'),
-            "continuous_mode": is_continuous,
-            "last_error": self._last_error or None,
-            # Explicit dependency availability — never imply success with zeros
-            "dependencies": {
-                "pytorch": "AVAILABLE" if TORCH_AVAILABLE else "UNAVAILABLE",
-                "pytorch_backend": "AVAILABLE" if PYTORCH_AVAILABLE else "UNAVAILABLE",
-                "safetensors": "AVAILABLE" if SAFETENSORS_AVAILABLE else "UNAVAILABLE",
-                "cuda": (
-                    "AVAILABLE" if (TORCH_AVAILABLE and torch.cuda.is_available())
-                    else "UNAVAILABLE"
-                ),
-                "amp": "AVAILABLE" if AMP_AVAILABLE else "UNAVAILABLE",
-                "numpy": "AVAILABLE",  # numpy is a hard dependency (imported at top)
-            },
-        }
+        return build_trainer_status(
+            self,
+            conditions,
+            torch_available=TORCH_AVAILABLE,
+            torch_module=torch,
+            pytorch_available=PYTORCH_AVAILABLE,
+            safetensors_available=SAFETENSORS_AVAILABLE,
+            amp_available=AMP_AVAILABLE,
+        )
 
 
 # =============================================================================
@@ -2114,7 +1726,7 @@ def get_auto_trainer() -> AutoTrainer:
 
 def start_auto_training() -> None:
     """Initialize trainer in MANUAL training mode.
-    
+
     Starts background scheduler for system monitoring.
     Training is triggered ONLY via explicit API call.
     MANUAL mode — no idle auto-trigger. All guards enforced.
@@ -2132,15 +1744,16 @@ def stop_auto_training() -> None:
 def start_continuous_training(target_epochs: int = 0) -> dict:
     """
     Start 24/7 continuous GPU training that runs regardless of user activity.
-    
+
     ENFORCES GPU-ONLY MODE - will NOT fall back to CPU.
-    
+
     Args:
         target_epochs: Number of epochs to train (0 = infinite/24/7)
-    
+
     Returns:
         Status dict with training info
     """
+    validate_execution()
     # === GPU ENFORCEMENT ===
     if not TORCH_AVAILABLE or not PYTORCH_AVAILABLE:
         return {
@@ -2154,7 +1767,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             "reason": "safetensors not installed - required checkpoint format unavailable",
             "state": "ERROR",
         }
-    
+
     device_info = detect_compute_device()
     if device_info.device_type != DeviceType.CUDA:
         return {
@@ -2162,9 +1775,9 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             "reason": f"GPU training required but CUDA not available (device: {device_info.device_type.value})",
             "state": "ERROR",
         }
-    
+
     trainer = get_auto_trainer()
-    
+
     with trainer._training_lock:
         if trainer._state == TrainingState.TRAINING:
             return {
@@ -2172,7 +1785,7 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                 "reason": "Training already in progress",
                 "state": trainer._state.value,
             }
-        
+
         trainer._last_error = ""
         trainer._continuous_mode = True
         trainer._continuous_target = target_epochs
@@ -2196,17 +1809,17 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
         freeze_status=False,
         gpu_temperature=initial_metrics.get("gpu_temperature"),
     )
-    
+
     trainer._emit_event(
         "CONTINUOUS_START",
         f"24/7 continuous GPU training started on {device_info.device_name} (target: {'infinite' if target_epochs == 0 else target_epochs} epochs)",
         gpu_used=True,
     )
-    
+
     # Start background thread for continuous GPU training
     def _run_continuous():
         import time as _time
-        
+
         # Initialize GPU resources ONCE (uses real 20K+ dataset)
         if not trainer._gpu_initialized:
             if not trainer._init_gpu_resources():
@@ -2224,7 +1837,9 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                         gpu_used=True,
                     )
                 else:
-                    trainer._emit_event("ERROR", "Failed to initialize GPU resources", gpu_used=True)
+                    trainer._emit_event(
+                        "ERROR", "Failed to initialize GPU resources", gpu_used=True
+                    )
                 return
 
         if trainer._persistent_model is None:
@@ -2232,39 +1847,50 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             with trainer._training_lock:
                 trainer._state = TrainingState.ERROR
                 trainer._continuous_thread = None
-            trainer._emit_event("ERROR", "Persistent GPU model was not initialized", gpu_used=True)
+            trainer._emit_event(
+                "ERROR", "Persistent GPU model was not initialized", gpu_used=True
+            )
             return
-        
+
         epoch_count = 0
         while trainer._continuous_mode and not trainer._abort_flag.is_set():
             # Check if target reached
             if target_epochs > 0 and epoch_count >= target_epochs:
                 break
-            
+
             epoch_count += 1
             trainer._epoch += 1
             trainer._session_epoch = epoch_count
-            
+
             trainer._emit_event(
                 "TRAINING_STARTED",
-                f"Starting GPU epoch {epoch_count}" + (f"/{target_epochs}" if target_epochs > 0 else " (24/7 mode)"),
+                f"Starting GPU epoch {epoch_count}"
+                + (f"/{target_epochs}" if target_epochs > 0 else " (24/7 mode)"),
                 epoch=epoch_count,
                 gpu_used=True,
             )
-            
+
             try:
                 # Use the shared full-DataLoader training step
                 _step_start = _time.perf_counter()
                 success, accuracy, loss = trainer._gpu_train_step()
                 _step_elapsed = _time.perf_counter() - _step_start
-                
-                if success and not trainer._abort_flag.is_set() and trainer._continuous_mode:
+
+                if (
+                    success
+                    and not trainer._abort_flag.is_set()
+                    and trainer._continuous_mode
+                ):
                     # Update metrics
                     trainer._last_loss = loss
                     trainer._last_accuracy = accuracy
-                    ds_total = trainer._gpu_dataset_stats.get('train', {}).get('total', 0) if trainer._gpu_dataset_stats else 0
+                    ds_total = (
+                        trainer._gpu_dataset_stats.get("train", {}).get("total", 0)
+                        if trainer._gpu_dataset_stats
+                        else 0
+                    )
                     trainer._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
-                    
+
                     checkpoint_hash = _checkpoint_state_hash(trainer._gpu_model)
                     trainer._emit_event(
                         "CHECKPOINT_SAVED",
@@ -2272,8 +1898,10 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                         epoch=epoch_count,
                         gpu_used=True,
                     )
-                    trainer._persist_runtime_artifacts(epoch_elapsed_seconds=_step_elapsed)
-                
+                    trainer._persist_runtime_artifacts(
+                        epoch_elapsed_seconds=_step_elapsed
+                    )
+
             except Exception as e:
                 trainer._emit_event(
                     "ERROR",
@@ -2281,10 +1909,10 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
                     epoch=epoch_count,
                     gpu_used=True,
                 )
-            
+
             # Small pause between epochs
             time.sleep(0.5)
-        
+
         # Cleanup
         trainer._continuous_mode = False
         with trainer._training_lock:
@@ -2297,18 +1925,20 @@ def start_continuous_training(target_epochs: int = 0) -> dict:
             trainer._session_start_monotonic = 0.0
             trainer._continuous_thread = None
         trainer._write_worker_status()
-        
+
         trainer._emit_event(
             "CONTINUOUS_STOP",
             f"Continuous GPU training completed: {epoch_count} epochs",
             epoch=epoch_count,
             gpu_used=True,
         )
-    
-    thread = threading.Thread(target=_run_continuous, daemon=True, name="g38_continuous_trainer")
+
+    thread = threading.Thread(
+        target=_run_continuous, daemon=True, name="g38_continuous_trainer"
+    )
     trainer._continuous_thread = thread
     thread.start()
-    
+
     return {
         "started": True,
         "mode": "continuous",

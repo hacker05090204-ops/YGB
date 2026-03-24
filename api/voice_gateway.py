@@ -31,109 +31,25 @@ from backend.auth.auth_guard import (
     get_allowed_origins,
     is_allowed_origin,
 )
+from api.services.voice_service import (
+    get_voice_audit,
+    get_voice_orchestrator,
+    get_voice_policy,
+    get_voice_rate_limiter,
+    get_voice_stt_chain,
+    get_voice_tts_engine,
+)
 
 logger = logging.getLogger(__name__)
 
 voice_gw_router = APIRouter(tags=["voice-gateway"])
-VOICE_WS_ALLOWED_ORIGINS = frozenset({
-    "http://localhost:3000",
-    "https://ygb-nas.tail7521c4.ts.net",
-})
-
-
-# =============================================================================
-# REQUEST MODELS
-# =============================================================================
-
-class TranscribeRequest(BaseModel):
-    """One-shot transcription request with base64-encoded audio."""
-    audio_b64: str
-    sample_rate: int = 16000
-    device_id: str = "browser"
-
-
-class IntentRequest(BaseModel):
-    """Parse intent from text."""
-    text: str
-    device_id: str = "browser"
-    confidence: float = 0.8
-    host_session_id: Optional[str] = None
-
-
-class ExecuteRequest(BaseModel):
-    """Execute a confirmed intent."""
-    intent_id: str
-    confirmer_id: Optional[str] = None
-
-
-class RespondRequest(BaseModel):
-    """Generate TTS response."""
-    text: str
-    response_type: str = "SUCCESS"
-
-
-class STTSampleRequest(BaseModel):
-    """Browser-captured WAV sample paired with transcript for local STT training."""
-    audio_wav_b64: str
-    transcript: str
-    device_id: str = "browser"
-    language: str = "en-US"
-    provider: str = "BROWSER_WEBSPEECH"
-    session_id: str = ""
-
-
-class STTTrainRequest(BaseModel):
-    """Admin-triggered local STT training request."""
-    epochs: int = 3
-    batch_size: int = 4
-
-
-# =============================================================================
-# SHARED STATE
-# =============================================================================
-
-def _get_orchestrator():
-    from impl_v1.training.voice.voice_intent_orchestrator import VoiceIntentOrchestrator
-    if not hasattr(_get_orchestrator, "_inst"):
-        _get_orchestrator._inst = VoiceIntentOrchestrator()
-    return _get_orchestrator._inst
-
-
-def _get_policy():
-    from impl_v1.training.voice.voice_policy_engine import VoicePolicyEngine
-    if not hasattr(_get_policy, "_inst"):
-        _get_policy._inst = VoicePolicyEngine()
-    return _get_policy._inst
-
-
-def _get_audit():
-    from impl_v1.training.voice.voice_security import VoiceAuditLog
-    if not hasattr(_get_audit, "_inst"):
-        _get_audit._inst = VoiceAuditLog()
-    return _get_audit._inst
-
-
-def _get_rate_limiter():
-    from impl_v1.training.voice.voice_security import VoiceRateLimiter
-    if not hasattr(_get_rate_limiter, "_inst"):
-        _get_rate_limiter._inst = VoiceRateLimiter()
-    return _get_rate_limiter._inst
-
-
-def _get_stt_chain():
-    from impl_v1.training.voice.stt_adapter import get_stt_chain
-    return get_stt_chain()
-
-
-def _get_tts_engine():
-    from impl_v1.training.voice.tts_streaming import TTSEngine
-    if not hasattr(_get_tts_engine, "_inst"):
-        _get_tts_engine._inst = TTSEngine()
-    return _get_tts_engine._inst
 
 
 def _voice_ws_origins() -> set[str]:
-    return set(get_allowed_origins()) | set(VOICE_WS_ALLOWED_ORIGINS)
+    return set(get_allowed_origins()) | {
+        "http://localhost:3000",
+        "https://ygb-nas.tail7521c4.ts.net",
+    }
 
 
 def _voice_ws_origin_is_allowed(origin: str) -> bool:
@@ -171,8 +87,63 @@ async def _accept_authenticated_voice_ws(ws: WebSocket) -> dict:
 
 
 # =============================================================================
+# REQUEST MODELS
+# =============================================================================
+
+
+class TranscribeRequest(BaseModel):
+    """One-shot transcription request with base64-encoded audio."""
+
+    audio_b64: str
+    sample_rate: int = 16000
+    device_id: str = "browser"
+
+
+class IntentRequest(BaseModel):
+    """Parse intent from text."""
+
+    text: str
+    device_id: str = "browser"
+    confidence: float = 0.8
+    host_session_id: Optional[str] = None
+
+
+class ExecuteRequest(BaseModel):
+    """Execute a confirmed intent."""
+
+    intent_id: str
+    confirmer_id: Optional[str] = None
+
+
+class RespondRequest(BaseModel):
+    """Generate TTS response."""
+
+    text: str
+    response_type: str = "SUCCESS"
+
+
+class STTSampleRequest(BaseModel):
+    """Browser-captured WAV sample paired with transcript for local STT training."""
+
+    audio_wav_b64: str
+    transcript: str
+    device_id: str = "browser"
+    language: str = "en-US"
+    provider: str = "BROWSER_WEBSPEECH"
+    session_id: str = ""
+
+
+class STTTrainRequest(BaseModel):
+    """Admin-triggered local STT training request."""
+
+    epochs: int = 3
+    batch_size: int = 4
+
+
+# =============================================================================
 # REST ENDPOINTS
 # =============================================================================
+
 
 @voice_gw_router.post("/api/voice/transcribe")
 async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
@@ -183,7 +154,7 @@ async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
     user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
 
     # Rate limit
-    rl = _get_rate_limiter()
+    rl = get_voice_rate_limiter()
     allowed, reason = rl.is_allowed(user_id, req.device_id)
     if not allowed:
         raise HTTPException(status_code=429, detail=reason)
@@ -193,23 +164,27 @@ async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid base64 audio data")
 
-    chain = _get_stt_chain()
+    chain = get_voice_stt_chain()
     result = chain.transcribe(audio_bytes)
 
     # Emit voice inference latency metric
     _voice_latency = round((_time.monotonic() - _t0) * 1000, 2)
     try:
         from backend.observability.metrics import metrics_registry
+
         metrics_registry.record("voice_inference_latency_ms", _voice_latency)
     except Exception:
         logger.debug("Metrics recording unavailable", exc_info=True)
 
-    audit = _get_audit()
+    audit = get_voice_audit()
     audit.log(
-        user_id=user_id, device_id=req.device_id,
+        user_id=user_id,
+        device_id=req.device_id,
         transcript=result.text if result else "",
-        intent="TRANSCRIBE", action="STT",
-        policy="ALLOWED", result="OK" if result else "FAILED",
+        intent="TRANSCRIBE",
+        action="STT",
+        policy="ALLOWED",
+        result="OK" if result else "FAILED",
     )
 
     if result:
@@ -236,47 +211,57 @@ async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
     user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
 
     # Rate limit
-    rl = _get_rate_limiter()
+    rl = get_voice_rate_limiter()
     allowed, reason = rl.is_allowed(user_id, req.device_id)
     if not allowed:
         raise HTTPException(status_code=429, detail=reason)
 
-    orch = _get_orchestrator()
+    orch = get_voice_orchestrator()
     from backend.api.runtime_state import runtime_state
-    host_session_id = req.host_session_id or runtime_state.get("active_host_action_session")
+
+    host_session_id = req.host_session_id or runtime_state.get(
+        "active_host_action_session"
+    )
     if host_session_id:
         runtime_state.set("active_host_action_session", host_session_id)
     intent = orch.process_transcript(
-        text=req.text, user_id=user_id,
-        device_id=req.device_id, confidence=req.confidence,
+        text=req.text,
+        user_id=user_id,
+        device_id=req.device_id,
+        confidence=req.confidence,
         context_args=(
-            {"host_session_id": host_session_id}
-            if host_session_id else None
+            {"host_session_id": host_session_id} if host_session_id else None
         ),
     )
     runtime_state.set("active_voice_mode", intent.route_mode)
 
     # Policy check
-    policy = _get_policy()
+    policy = get_voice_policy()
     decision = policy.evaluate(intent.command_type, intent.args)
 
     # Emit voice inference latency metric
     _voice_latency = round((_time.monotonic() - _t0) * 1000, 2)
     try:
         from backend.observability.metrics import metrics_registry
+
         metrics_registry.record("voice_inference_latency_ms", _voice_latency)
     except Exception:
         logger.debug("Metrics recording unavailable", exc_info=True)
 
     # Audit
-    audit = _get_audit()
+    audit = get_voice_audit()
     audit.log(
-        user_id=user_id, device_id=req.device_id,
-        transcript=req.text, intent=intent.command_type,
-        action="PENDING", policy=decision.verdict.value,
+        user_id=user_id,
+        device_id=req.device_id,
+        transcript=req.text,
+        intent=intent.command_type,
+        action="PENDING",
+        policy=decision.verdict.value,
         result=(
-            "BLOCKED" if intent.error
-            else "AWAITING" if intent.requires_confirmation
+            "BLOCKED"
+            if intent.error
+            else "AWAITING"
+            if intent.requires_confirmation
             else "QUEUED"
         ),
     )
@@ -300,20 +285,22 @@ async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
 async def execute_intent(req: ExecuteRequest, user=Depends(require_auth)):
     """Execute a confirmed intent. Auth required."""
     user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
-    orch = _get_orchestrator()
+    orch = get_voice_orchestrator()
     from backend.assistant.voice_runtime import execute_orchestrated_intent
 
     result = execute_orchestrated_intent(
         orch,
         req.intent_id,
         req.confirmer_id,
-        policy=_get_policy(),
-        audit=_get_audit(),
+        policy=get_voice_policy(),
+        audit=get_voice_audit(),
         user_id=user_id,
         device_id="browser",
     )
     if result.get("status") == "error":
-        raise HTTPException(status_code=404, detail=result.get("message", "Intent not found"))
+        raise HTTPException(
+            status_code=404, detail=result.get("message", "Intent not found")
+        )
     if result.get("status") == "blocked":
         raise HTTPException(status_code=409, detail=result)
     return result
@@ -324,7 +311,7 @@ async def tts_respond(req: RespondRequest, user=Depends(require_auth)):
     """Generate TTS response. Auth required."""
     from impl_v1.training.voice.tts_streaming import ResponseType
 
-    tts = _get_tts_engine()
+    tts = get_voice_tts_engine()
     resp_type = getattr(ResponseType, req.response_type, ResponseType.SUCCESS)
     result = tts.speak(req.text, resp_type)
 
@@ -360,7 +347,7 @@ async def upload_stt_sample(req: STTSampleRequest, user=Depends(require_auth)):
         provider=req.provider,
         session_id=req.session_id,
     )
-    audit = _get_audit()
+    audit = get_voice_audit()
     audit.log(
         user_id=user_id,
         device_id=req.device_id,
@@ -402,6 +389,7 @@ async def train_local_stt(req: STTTrainRequest, user=Depends(require_admin)):
 # WEBSOCKET VOICE STREAM
 # =============================================================================
 
+
 @voice_gw_router.websocket("/ws/voice")
 @voice_gw_router.websocket("/ws/voice/stream")
 async def voice_stream(ws: WebSocket):
@@ -422,9 +410,9 @@ async def voice_stream(ws: WebSocket):
     user_id = user.get("sub", "ws_user") if isinstance(user, dict) else "ws_user"
 
     logger.info(f"[VOICE_GW] WebSocket connected: user={user_id}")
-    chain = _get_stt_chain()
-    audit = _get_audit()
-    rl = _get_rate_limiter()
+    chain = get_voice_stt_chain()
+    audit = get_voice_audit()
+    rl = get_voice_rate_limiter()
 
     import time as _time
 
@@ -451,27 +439,34 @@ async def voice_stream(ws: WebSocket):
 
                 if result:
                     audit.log(
-                        user_id=user_id, device_id="websocket",
-                        transcript=result.text, intent="STREAM_STT",
-                        action="TRANSCRIBE", policy="ALLOWED",
+                        user_id=user_id,
+                        device_id="websocket",
+                        transcript=result.text,
+                        intent="STREAM_STT",
+                        action="TRANSCRIBE",
+                        policy="ALLOWED",
                         result="OK",
                     )
-                    await ws.send_json({
-                        "type": "transcript",
-                        "transcript_id": result.transcript_id,
-                        "text": result.text,
-                        "confidence": result.confidence,
-                        "provider": result.provider.value,
-                        "is_partial": result.is_partial,
-                        "latency_ms": result.latency_ms,
-                    })
+                    await ws.send_json(
+                        {
+                            "type": "transcript",
+                            "transcript_id": result.transcript_id,
+                            "text": result.text,
+                            "confidence": result.confidence,
+                            "provider": result.provider.value,
+                            "is_partial": result.is_partial,
+                            "latency_ms": result.latency_ms,
+                        }
+                    )
                 else:
-                    await ws.send_json({
-                        "type": "transcript",
-                        "text": "",
-                        "confidence": 0.0,
-                        "error": "STT failed",
-                    })
+                    await ws.send_json(
+                        {
+                            "type": "transcript",
+                            "text": "",
+                            "confidence": 0.0,
+                            "error": "STT failed",
+                        }
+                    )
 
             elif "text" in data and data["text"]:
                 # Control message
@@ -484,7 +479,7 @@ async def voice_stream(ws: WebSocket):
                         break
 
                     elif msg_type == "interrupt":
-                        tts = _get_tts_engine()
+                        tts = get_voice_tts_engine()
                         tts.interrupt()
                         await ws.send_json({"type": "interrupted"})
 
@@ -493,16 +488,23 @@ async def voice_stream(ws: WebSocket):
                         text = msg.get("text", "")
                         confidence = msg.get("confidence", 0.7)
                         result = chain.submit_browser_transcript(text, confidence)
-                        await ws.send_json({
-                            "type": "transcript",
-                            "transcript_id": result.transcript_id,
-                            "text": result.text,
-                            "confidence": result.confidence,
-                            "provider": result.provider.value,
-                        })
+                        await ws.send_json(
+                            {
+                                "type": "transcript",
+                                "transcript_id": result.transcript_id,
+                                "text": result.text,
+                                "confidence": result.confidence,
+                                "provider": result.provider.value,
+                            }
+                        )
 
                     else:
-                        await ws.send_json({"type": "error", "error": f"Unknown message type: {msg_type}"})
+                        await ws.send_json(
+                            {
+                                "type": "error",
+                                "error": f"Unknown message type: {msg_type}",
+                            }
+                        )
 
                 except json.JSONDecodeError:
                     await ws.send_json({"type": "error", "error": "Invalid JSON"})
