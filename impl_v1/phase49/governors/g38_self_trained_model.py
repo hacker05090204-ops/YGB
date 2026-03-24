@@ -31,6 +31,7 @@ from typing import Tuple, Optional, Dict, List, Any, Protocol
 import hashlib
 import uuid
 import platform
+import math
 from datetime import datetime
 from abc import ABC, abstractmethod
 
@@ -39,8 +40,10 @@ from abc import ABC, abstractmethod
 # OPERATING SYSTEM DETECTION
 # =============================================================================
 
+
 class OperatingSystem(Enum):
     """Supported operating systems."""
+
     LINUX = "linux"
     WINDOWS = "windows"
     UNSUPPORTED = "unsupported"
@@ -49,7 +52,7 @@ class OperatingSystem(Enum):
 def detect_os() -> OperatingSystem:
     """
     Detect current operating system.
-    
+
     Python governance - NO execution logic.
     """
     system = platform.system().lower()
@@ -64,18 +67,21 @@ def detect_os() -> OperatingSystem:
 # IDLE STATE & DETECTION
 # =============================================================================
 
+
 class IdleState(Enum):
     """System idle states."""
-    ACTIVE = "ACTIVE"           # User/system activity detected
-    IDLE = "IDLE"               # System idle, but not ready for training
+
+    ACTIVE = "ACTIVE"  # User/system activity detected
+    IDLE = "IDLE"  # System idle, but not ready for training
     TRAINING_READY = "TRAINING_READY"  # All conditions met for training
-    TRAINING = "TRAINING"       # Training in progress
-    ERROR = "ERROR"             # Error state
+    TRAINING = "TRAINING"  # Training in progress
+    ERROR = "ERROR"  # Error state
 
 
 @dataclass(frozen=True)
 class IdleConditions:
     """Conditions required for idle training."""
+
     no_active_scan: bool
     no_human_interaction: bool
     power_connected: bool
@@ -86,6 +92,7 @@ class IdleConditions:
 @dataclass(frozen=True)
 class IdleCheckResult:
     """Result of idle check."""
+
     result_id: str
     state: IdleState
     conditions: IdleConditions
@@ -102,7 +109,7 @@ def check_idle_conditions(
 ) -> IdleCheckResult:
     """
     Check if all idle training conditions are met.
-    
+
     Training MUST start ONLY when ALL are true:
     - System idle >= 60 seconds
     - No active scan
@@ -112,7 +119,7 @@ def check_idle_conditions(
     """
     result_id = f"IDL-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.utcnow().isoformat() + "Z"
-    
+
     # Check all conditions
     if not conditions.no_active_scan:
         return IdleCheckResult(
@@ -123,7 +130,7 @@ def check_idle_conditions(
             reason="Active scan in progress",
             checked_at=now,
         )
-    
+
     if not conditions.no_human_interaction:
         return IdleCheckResult(
             result_id=result_id,
@@ -133,7 +140,7 @@ def check_idle_conditions(
             reason="Human interaction detected",
             checked_at=now,
         )
-    
+
     if not conditions.power_connected:
         return IdleCheckResult(
             result_id=result_id,
@@ -143,7 +150,7 @@ def check_idle_conditions(
             reason="Power not connected - training disabled",
             checked_at=now,
         )
-    
+
     if conditions.idle_seconds < IDLE_THRESHOLD_SECONDS:
         return IdleCheckResult(
             result_id=result_id,
@@ -153,7 +160,7 @@ def check_idle_conditions(
             reason=f"Idle {conditions.idle_seconds}s < {IDLE_THRESHOLD_SECONDS}s threshold",
             checked_at=now,
         )
-    
+
     # GPU available or CPU fallback
     if not conditions.gpu_available:
         return IdleCheckResult(
@@ -164,7 +171,7 @@ def check_idle_conditions(
             reason="CPU fallback - GPU unavailable but training allowed",
             checked_at=now,
         )
-    
+
     return IdleCheckResult(
         result_id=result_id,
         state=IdleState.TRAINING_READY,
@@ -179,29 +186,30 @@ def check_idle_conditions(
 # CROSS-PLATFORM GPU BACKEND INTERFACE
 # =============================================================================
 
+
 class GPUBackendInterface(ABC):
     """
     Abstract interface for GPU backends.
-    
+
     Both LinuxGPUBackend and WindowsGPUBackend MUST implement
     IDENTICAL interfaces for deterministic cross-platform behavior.
     """
-    
+
     @abstractmethod
     def detect_gpu(self) -> Tuple[bool, str]:
         """Detect if GPU is available. Returns (available, device_name)."""
         pass
-    
+
     @abstractmethod
     def check_idle(self) -> int:
         """Check system idle time in seconds."""
         pass
-    
+
     @abstractmethod
     def check_power(self) -> bool:
         """Check if power is connected."""
         pass
-    
+
     @abstractmethod
     def get_memory_mb(self) -> int:
         """Get GPU memory in MB."""
@@ -211,40 +219,42 @@ class GPUBackendInterface(ABC):
 class LinuxGPUBackend(GPUBackendInterface):
     """
     Linux GPU backend.
-    
+
     MAY use:
     - NVML
     - /proc for idle detection
     - POSIX file locks
     - cgroups if available
     """
-    
+
     def detect_gpu(self) -> Tuple[bool, str]:
         """Detect GPU on Linux."""
         # Defer to PyTorch detection
         try:
             import torch
+
             if torch.cuda.is_available():
                 return True, torch.cuda.get_device_name(0)
             return False, "CPU"
         except ImportError:
             return False, "PyTorch unavailable"
-    
+
     def check_idle(self) -> int:
         """Check idle time using /proc on Linux."""
         # Mock implementation - real would read /proc/uptime
         # Governance testing only
         return 120  # Default idle
-    
+
     def check_power(self) -> bool:
         """Check power status on Linux."""
         # Mock - real would check /sys/class/power_supply
         return True
-    
+
     def get_memory_mb(self) -> int:
         """Get GPU memory on Linux."""
         try:
             import torch
+
             if torch.cuda.is_available():
                 return torch.cuda.get_device_properties(0).total_memory // (1024 * 1024)
             return 0
@@ -255,39 +265,41 @@ class LinuxGPUBackend(GPUBackendInterface):
 class WindowsGPUBackend(GPUBackendInterface):
     """
     Windows GPU backend.
-    
+
     MAY use:
     - NVML / nvidia-smi
     - Win32 idle APIs
     - Job Objects
     - Windows power plans
     """
-    
+
     def detect_gpu(self) -> Tuple[bool, str]:
         """Detect GPU on Windows."""
         # Same PyTorch detection - platform agnostic
         try:
             import torch
+
             if torch.cuda.is_available():
                 return True, torch.cuda.get_device_name(0)
             return False, "CPU"
         except ImportError:
             return False, "PyTorch unavailable"
-    
+
     def check_idle(self) -> int:
         """Check idle time using Win32 APIs on Windows."""
         # Mock implementation - real would use ctypes/GetLastInputInfo
         return 120
-    
+
     def check_power(self) -> bool:
         """Check power status on Windows."""
         # Mock - real would use GetSystemPowerStatus
         return True
-    
+
     def get_memory_mb(self) -> int:
         """Get GPU memory on Windows."""
         try:
             import torch
+
             if torch.cuda.is_available():
                 return torch.cuda.get_device_properties(0).total_memory // (1024 * 1024)
             return 0
@@ -297,17 +309,18 @@ class WindowsGPUBackend(GPUBackendInterface):
 
 class UnsupportedOSError(Exception):
     """Raised when OS is not supported."""
+
     pass
 
 
 def get_gpu_backend() -> GPUBackendInterface:
     """
     Get OS-appropriate GPU backend.
-    
+
     MANDATORY: Both backends expose IDENTICAL interfaces.
     """
     os_type = detect_os()
-    
+
     if os_type == OperatingSystem.LINUX:
         return LinuxGPUBackend()
     elif os_type == OperatingSystem.WINDOWS:
@@ -320,14 +333,16 @@ def get_gpu_backend() -> GPUBackendInterface:
 # MODEL ARCHITECTURE
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class ModelArchitecture:
     """Large encoder-based model configuration."""
+
     model_id: str
     input_dim: int
     hidden_dims: Tuple[int, ...]
-    encoder_heads: int           # Multi-head attention
-    output_heads: int            # 4 outputs
+    encoder_heads: int  # Multi-head attention
+    output_heads: int  # 4 outputs
     dropout: float
     learning_rate: float
     seed: int
@@ -337,13 +352,14 @@ class ModelArchitecture:
 class MultiHeadOutput:
     """
     Multi-head model output.
-    
+
     4 separate prediction heads:
     - real_probability: P(bug is real)
     - duplicate_probability: P(bug is duplicate)
     - noise_probability: P(bug is noise/false positive)
     - report_style_id: Recommended report style
     """
+
     result_id: str
     real_probability: float
     duplicate_probability: float
@@ -356,6 +372,7 @@ class MultiHeadOutput:
 @dataclass(frozen=True)
 class TrainingDataSource(Enum):
     """Valid training data sources."""
+
     G33_VERIFIED_REAL = "G33_VERIFIED_REAL"
     G36_AUTO_VERIFIED = "G36_AUTO_VERIFIED"
     REJECTED_FINDINGS = "REJECTED_FINDINGS"
@@ -366,6 +383,7 @@ class TrainingDataSource(Enum):
 
 class TrainingDataSourceEnum(Enum):
     """Training data sources for the model."""
+
     G33_VERIFIED_REAL = "G33_VERIFIED_REAL"
     G36_AUTO_VERIFIED = "G36_AUTO_VERIFIED"
     REJECTED_FINDINGS = "REJECTED_FINDINGS"
@@ -377,18 +395,20 @@ class TrainingDataSourceEnum(Enum):
 @dataclass(frozen=True)
 class TrainingSample:
     """Training sample with provenance."""
+
     sample_id: str
     source: TrainingDataSourceEnum
     features: Tuple[float, ...]
-    real_label: int           # 0 or 1
-    duplicate_label: int      # 0 or 1
-    noise_label: int          # 0 or 1
-    style_id: int             # Report style
+    real_label: int  # 0 or 1
+    duplicate_label: int  # 0 or 1
+    noise_label: int  # 0 or 1
+    style_id: int  # Report style
 
 
 @dataclass(frozen=True)
 class LocalModelStatus:
     """Local model checkpoint status."""
+
     status_id: str
     checkpoint_path: str
     epoch: int
@@ -403,6 +423,7 @@ class LocalModelStatus:
 # =============================================================================
 # MODEL CREATION AND INFERENCE
 # =============================================================================
+
 
 def create_model_architecture(
     input_dim: int = 512,
@@ -432,34 +453,75 @@ def run_inference(
 ) -> MultiHeadOutput:
     """
     Run inference on trained model.
-    
+
     ADVISORY ONLY - no authority.
     """
     # Guard check
     if can_ai_execute()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: AI cannot execute")
-    
+
     result_id = f"INF-{uuid.uuid4().hex[:16].upper()}"
-    
-    # Deterministic mock inference based on feature hash
-    feature_hash = hashlib.sha256(str(features).encode()).hexdigest()
-    hash_int = int(feature_hash[:8], 16)
-    
-    # Generate probabilities from hash (deterministic)
-    real_prob = (hash_int % 100) / 100
-    dup_prob = ((hash_int >> 8) % 100) / 100
-    noise_prob = 1.0 - real_prob - dup_prob
-    if noise_prob < 0:
-        noise_prob = 0.0
-    style_id = hash_int % 8  # 8 report styles
-    
-    # Normalize
+    signal = [float(value) for value in features]
+    if not signal:
+        signal = [0.0] * 8
+    while len(signal) < 8:
+        signal.append(0.0)
+
+    length_signal = min(max((signal[0] + signal[1]) / 2.0, 0.0), 1.0)
+    url_signal = min(max(signal[2], 0.0), 1.0)
+    risk_signal = min(max(signal[3], 0.0), 1.0)
+    severity_signal = min(max(signal[4], 0.0), 1.0)
+    digit_signal = min(max(signal[5], 0.0), 1.0)
+    error_signal = min(max(signal[6], 0.0), 1.0)
+    missing_signal = min(max(signal[7], 0.0), 1.0)
+
+    calibration = 0.5
+    if model_status.is_valid:
+        calibration = min(
+            max((model_status.train_accuracy + model_status.val_accuracy) / 2.0, 0.0),
+            1.0,
+        )
+
+    real_score = (
+        (1.45 * risk_signal)
+        + (1.15 * severity_signal)
+        + (1.2 * error_signal)
+        + (0.55 * url_signal)
+        + (0.35 * length_signal)
+        + (0.15 * digit_signal)
+    ) * (0.7 + (0.5 * calibration))
+    duplicate_score = (
+        (1.1 * missing_signal)
+        + (0.55 * (1.0 - error_signal))
+        + (0.35 * (1.0 - severity_signal))
+        + (0.25 * length_signal)
+    )
+    noise_score = (
+        (1.0 * (1.0 - risk_signal))
+        + (0.85 * (1.0 - severity_signal))
+        + (0.75 * (1.0 - error_signal))
+        + (0.35 * (1.0 - url_signal))
+        + (0.25 * max(0.0, 0.4 - length_signal))
+    ) * (1.1 - (0.2 * calibration))
+
+    real_prob = max(0.001, real_score)
+    dup_prob = max(0.001, duplicate_score)
+    noise_prob = max(0.001, noise_score)
     total = real_prob + dup_prob + noise_prob
-    if total > 0:
-        real_prob /= total
-        dup_prob /= total
-        noise_prob /= total
-    
+    real_prob /= total
+    dup_prob /= total
+    noise_prob /= total
+
+    style_basis = int(
+        math.floor(
+            (real_prob * 3.0)
+            + (dup_prob * 5.0)
+            + (noise_prob * 7.0)
+            + (digit_signal * 11.0)
+        )
+    )
+    style_id = style_basis % 8
+
     return MultiHeadOutput(
         result_id=result_id,
         real_probability=real_prob,
@@ -467,7 +529,7 @@ def run_inference(
         noise_probability=noise_prob,
         report_style_id=style_id,
         confidence=max(real_prob, dup_prob, noise_prob),
-        inference_time_ms=0.5,
+        inference_time_ms=0.2,
     )
 
 
@@ -475,9 +537,11 @@ def run_inference(
 # TRAINING TRIGGER
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class TrainingTrigger:
     """Training trigger decision."""
+
     trigger_id: str
     should_train: bool
     reason: str
@@ -493,7 +557,7 @@ def evaluate_training_trigger(
 ) -> TrainingTrigger:
     """
     Evaluate if training should be triggered.
-    
+
     Training starts ONLY when:
     1. All idle conditions met
     2. Model exists or can be initialized
@@ -501,7 +565,7 @@ def evaluate_training_trigger(
     """
     trigger_id = f"TRG-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.utcnow().isoformat() + "Z"
-    
+
     # Check idle conditions
     if not idle_check.can_train:
         return TrainingTrigger(
@@ -512,7 +576,7 @@ def evaluate_training_trigger(
             model_status=model_status,
             triggered_at=now,
         )
-    
+
     # Check pending samples
     if pending_samples < 1:
         return TrainingTrigger(
@@ -523,7 +587,7 @@ def evaluate_training_trigger(
             model_status=model_status,
             triggered_at=now,
         )
-    
+
     return TrainingTrigger(
         trigger_id=trigger_id,
         should_train=True,
@@ -538,15 +602,17 @@ def evaluate_training_trigger(
 # AUTO-MODE INTEGRATION
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class AutoModeDecision:
     """
     AUTO-MODE AI ranking decision.
-    
+
     Flow: Scan → Candidate → AI Ranking (G38) → Proof Verification (G36)
           → Duplicate Check (G34) → Evidence (G26) → Reasoning (G32)
           → Adaptive Report (G38) → FINAL REPORT
     """
+
     decision_id: str
     candidate_id: str
     inference: MultiHeadOutput
@@ -565,7 +631,7 @@ def make_auto_mode_decision(
 ) -> AutoModeDecision:
     """
     Make AUTO-MODE decision based on AI ranking.
-    
+
     AI is ADVISORY ONLY:
     - Cannot verify bugs (G33/G36 only)
     - Cannot approve bugs
@@ -575,10 +641,10 @@ def make_auto_mode_decision(
     # Guard check
     if can_ai_verify_bug()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: AI cannot verify bugs")
-    
+
     decision_id = f"AMD-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.utcnow().isoformat() + "Z"
-    
+
     # Determine action based on probabilities
     if inference.real_probability > PRECISION_THRESHOLD:
         action = "VERIFY"
@@ -592,7 +658,7 @@ def make_auto_mode_decision(
     else:
         action = "VERIFY"  # Default to verification when uncertain
         threshold_met = False
-    
+
     return AutoModeDecision(
         decision_id=decision_id,
         candidate_id=candidate_id,
@@ -608,10 +674,11 @@ def make_auto_mode_decision(
 # GUARDS (ALL MUST RETURN FALSE)
 # =============================================================================
 
+
 def can_ai_execute() -> Tuple[bool, str]:
     """
     Check if AI can execute actions.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot execute - advisory only"
@@ -620,7 +687,7 @@ def can_ai_execute() -> Tuple[bool, str]:
 def can_ai_submit() -> Tuple[bool, str]:
     """
     Check if AI can submit bugs.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot submit bugs - human authority required"
@@ -629,7 +696,7 @@ def can_ai_submit() -> Tuple[bool, str]:
 def can_ai_override_governance() -> Tuple[bool, str]:
     """
     Check if AI can override governance.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot override governance - governance is immutable"
@@ -638,7 +705,7 @@ def can_ai_override_governance() -> Tuple[bool, str]:
 def can_ai_verify_bug() -> Tuple[bool, str]:
     """
     Check if AI can verify bugs.
-    
+
     ALWAYS returns (False, ...). Only G33/G36 can verify.
     """
     return False, "AI cannot verify bugs - only G33/G36 proof verification"
@@ -647,7 +714,7 @@ def can_ai_verify_bug() -> Tuple[bool, str]:
 def can_ai_expand_scope() -> Tuple[bool, str]:
     """
     Check if AI can expand scope.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot expand scope - scope is human-defined"
@@ -656,7 +723,7 @@ def can_ai_expand_scope() -> Tuple[bool, str]:
 def can_ai_train_while_active() -> Tuple[bool, str]:
     """
     Check if AI can train during active use.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot train during active use - idle training only"
@@ -665,7 +732,7 @@ def can_ai_train_while_active() -> Tuple[bool, str]:
 def can_ai_use_network() -> Tuple[bool, str]:
     """
     Check if AI can use network for training.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot use network - local training only"
@@ -674,7 +741,7 @@ def can_ai_use_network() -> Tuple[bool, str]:
 def can_ai_leak_data() -> Tuple[bool, str]:
     """
     Check if AI can leak data.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot leak data - all training local"
@@ -683,7 +750,7 @@ def can_ai_leak_data() -> Tuple[bool, str]:
 def can_ai_enable_failover_without_error() -> Tuple[bool, str]:
     """
     Check if AI can enable external failover without error.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot enable failover without error - repair mode only"
@@ -692,7 +759,7 @@ def can_ai_enable_failover_without_error() -> Tuple[bool, str]:
 def can_ai_hide_external_usage() -> Tuple[bool, str]:
     """
     Check if AI can hide external AI usage.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "AI cannot hide external usage - all usage logged"
@@ -701,7 +768,7 @@ def can_ai_hide_external_usage() -> Tuple[bool, str]:
 def can_ai_learn_bug_labels_from_internet() -> Tuple[bool, str]:
     """
     Check if AI can learn bug labels from internet.
-    
+
     ALWAYS returns (False, ...).
     Core principle: AI may learn how systems look, NOT what is a bug.
     """
@@ -730,7 +797,7 @@ ALL_GUARDS = (
 def verify_all_guards() -> Tuple[bool, str]:
     """
     Verify all guards return False.
-    
+
     Returns (True, "All guards verified") if all guards return False.
     Returns (False, "Guard X failed") if any guard returns True.
     """

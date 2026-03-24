@@ -13,13 +13,22 @@ import sys
 import uuid
 import asyncio
 import hashlib
-from datetime import datetime, UTC
+import json
+import re
+from datetime import datetime, UTC, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import (
+    APIRouter,
+    FastAPI,
+    WebSocket,
+    WebSocketDisconnect,
+    HTTPException,
+    Request,
+)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse
+from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
 from pydantic import BaseModel
 
 # Add project root to path for imports
@@ -28,55 +37,88 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 # Import database module
 from database import (
-    init_database, close_pool,
-    create_user, get_user, get_all_users, update_user_stats,
-    create_target, get_all_targets, get_target,
-    create_bounty, get_user_bounties, get_all_bounties, update_bounty_status,
-    create_session, get_user_sessions, update_session_progress,
-    log_activity, get_recent_activity, get_admin_stats
+    init_database,
+    close_pool,
+    create_user,
+    get_user,
+    get_all_users,
+    update_user_stats,
+    create_target,
+    get_all_targets,
+    get_target,
+    create_bounty,
+    get_user_bounties,
+    get_all_bounties,
+    update_bounty_status,
+    create_session,
+    get_user_sessions,
+    update_session_progress,
+    log_activity,
+    get_recent_activity,
+    get_admin_stats,
 )
 
 # Import REAL phase runner with actual browser automation
 from phase_runner import RealPhaseRunner, run_real_workflow
+from orchestrator import BackendOrchestrator
 
 # =============================================================================
 # G38 AUTO-TRAINING IMPORTS
 # =============================================================================
 
-try:
-    from impl_v1.phase49.runtime import (
-        get_auto_trainer,
-        start_auto_training,
-        stop_auto_training,
-        get_idle_seconds,
-        is_power_connected,
-        is_scan_active,
-        set_scan_active,
-        TrainingState,
-    )
-    from impl_v1.phase49.governors.g38_self_trained_model import (
-        verify_all_guards,
-        ALL_GUARDS,
-    )
-    from impl_v1.phase49.governors.g38_safe_pretraining import (
-        verify_pretraining_guards,
-        get_mode_a_status,
-        get_training_mode_summary,
-    )
-    G38_AVAILABLE = True
-except ImportError as e:
-    print(f"⚠️  G38 modules not available: {e}")
-    G38_AVAILABLE = False
+_G38_RUNTIME: Optional[Dict[str, Any]] = None
+G38_IMPORT_ERROR: Optional[str] = None
+
+
+def _get_g38_runtime() -> Optional[Dict[str, Any]]:
+    global _G38_RUNTIME, G38_IMPORT_ERROR
+    if _G38_RUNTIME is not None:
+        return _G38_RUNTIME
+    try:
+        from impl_v1.phase49.runtime import (
+            get_auto_trainer,
+            start_auto_training,
+            stop_auto_training,
+        )
+        from impl_v1.phase49.governors.g38_self_trained_model import (
+            verify_all_guards,
+            ALL_GUARDS,
+        )
+        from impl_v1.phase49.governors.g38_safe_pretraining import (
+            verify_pretraining_guards,
+            get_mode_a_status,
+            get_training_mode_summary,
+        )
+
+        _G38_RUNTIME = {
+            "get_auto_trainer": get_auto_trainer,
+            "start_auto_training": start_auto_training,
+            "stop_auto_training": stop_auto_training,
+            "verify_all_guards": verify_all_guards,
+            "ALL_GUARDS": ALL_GUARDS,
+            "verify_pretraining_guards": verify_pretraining_guards,
+            "get_mode_a_status": get_mode_a_status,
+            "get_training_mode_summary": get_training_mode_summary,
+        }
+        G38_IMPORT_ERROR = None
+        return _G38_RUNTIME
+    except ImportError as exc:
+        G38_IMPORT_ERROR = str(exc)
+        return None
+
+
+def _g38_available() -> bool:
+    return _get_g38_runtime() is not None
+
 
 # =============================================================================
 # APP CONFIGURATION
 # =============================================================================
 
 app = FastAPI(
-    title="YGB API",
-    description="Bug Bounty Governance Backend",
-    version="1.0.0"
+    title="YGB API", description="Bug Bounty Governance Backend", version="1.0.0"
 )
+app.state.orchestrator = BackendOrchestrator()
 
 # CORS configuration for frontend
 app.add_middleware(
@@ -87,9 +129,72 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+api_router = APIRouter(tags=["api"])
+telemetry_router = APIRouter(tags=["telemetry"])
+training_router = APIRouter(tags=["training"])
+voice_router = APIRouter(tags=["voice"])
+
+
+def _orchestrator() -> BackendOrchestrator:
+    return app.state.orchestrator
+
+
+async def _get_phase_inventory() -> List[Dict[str, Any]]:
+    return await _orchestrator().cache.get_or_set(
+        "inventory:python_phases",
+        discover_python_phases,
+        ttl_seconds=3600,
+    )
+
+
+async def _get_hunter_inventory() -> Dict[str, bool]:
+    return await _orchestrator().cache.get_or_set(
+        "inventory:hunter_modules",
+        discover_hunter_modules,
+        ttl_seconds=3600,
+    )
+
+
+def _serialize_record(record: Dict[str, Any]) -> Dict[str, Any]:
+    serialized = dict(record)
+    for key, value in list(serialized.items()):
+        if hasattr(value, "isoformat"):
+            serialized[key] = value.isoformat()
+        elif value is not None and (key == "id" or key.endswith("_id")):
+            serialized[key] = str(value)
+    return serialized
+
+
+def _serialize_strategy(strategy: Any) -> Dict[str, Any]:
+    return {
+        "agent_name": getattr(strategy, "agent_name", "workflow-orchestrator"),
+        "task_type": getattr(strategy, "task_type", "request"),
+        "crawl_depth": getattr(strategy, "crawl_depth", 0),
+        "concurrency": getattr(strategy, "concurrency", 1),
+        "payload_profile": getattr(strategy, "payload_profile", "standard"),
+        "verification_level": getattr(strategy, "verification_level", "standard"),
+        "priority": getattr(strategy, "priority", "medium"),
+        "rate_limit_per_host": getattr(strategy, "rate_limit_per_host", 1),
+        "notes": list(getattr(strategy, "notes", [])),
+    }
+
+
+def _g38_error_payload() -> Dict[str, Any]:
+    return {
+        "available": False,
+        "error": G38_IMPORT_ERROR or "G38 modules not loaded",
+    }
+
+
+@app.middleware("http")
+async def orchestrate_http_requests(request: Request, call_next):
+    return await _orchestrator().handle_http_request(request, call_next)
+
+
 # =============================================================================
 # REQUEST/RESPONSE MODELS
 # =============================================================================
+
 
 class StartWorkflowRequest(BaseModel):
     target: str
@@ -112,6 +217,7 @@ class PhaseInfo(BaseModel):
 # =============================================================================
 # PHASE-49 MODELS
 # =============================================================================
+
 
 class CreateDashboardRequest(BaseModel):
     user_id: str
@@ -149,6 +255,7 @@ class AutonomySessionRequest(BaseModel):
 # =============================================================================
 # DATABASE MODELS
 # =============================================================================
+
 
 class CreateUserRequest(BaseModel):
     name: str
@@ -206,10 +313,11 @@ autonomy_sessions: Dict[str, Dict[str, Any]] = {}
 # PHASE DISCOVERY
 # =============================================================================
 
+
 def discover_python_phases() -> List[Dict[str, Any]]:
     """Discover available Python phases."""
     phases = []
-    
+
     # Phases 01-19 in python/
     python_dir = PROJECT_ROOT / "python"
     if python_dir.exists():
@@ -217,16 +325,18 @@ def discover_python_phases() -> List[Dict[str, Any]]:
             if item.is_dir() and item.name.startswith("phase"):
                 try:
                     num = int(item.name.replace("phase", "").split("_")[0])
-                    phases.append({
-                        "name": item.name,
-                        "number": num,
-                        "path": str(item),
-                        "available": True,
-                        "description": f"Phase {num:02d} - {item.name.split('_', 1)[-1].replace('_', ' ').title()}"
-                    })
+                    phases.append(
+                        {
+                            "name": item.name,
+                            "number": num,
+                            "path": str(item),
+                            "available": True,
+                            "description": f"Phase {num:02d} - {item.name.split('_', 1)[-1].replace('_', ' ').title()}",
+                        }
+                    )
                 except ValueError:
                     pass
-    
+
     # Phases 20-49 in impl_v1/
     impl_dir = PROJECT_ROOT / "impl_v1"
     if impl_dir.exists():
@@ -234,16 +344,18 @@ def discover_python_phases() -> List[Dict[str, Any]]:
             if item.is_dir() and item.name.startswith("phase"):
                 try:
                     num = int(item.name.replace("phase", ""))
-                    phases.append({
-                        "name": item.name,
-                        "number": num,
-                        "path": str(item),
-                        "available": True,
-                        "description": f"Phase {num:02d} - Implementation Layer"
-                    })
+                    phases.append(
+                        {
+                            "name": item.name,
+                            "number": num,
+                            "path": str(item),
+                            "available": True,
+                            "description": f"Phase {num:02d} - Implementation Layer",
+                        }
+                    )
                 except ValueError:
                     pass
-    
+
     return sorted(phases, key=lambda x: x["number"])
 
 
@@ -251,12 +363,16 @@ def discover_hunter_modules() -> Dict[str, bool]:
     """Discover available HUMANOID_HUNTER modules."""
     modules = {}
     hunter_dir = PROJECT_ROOT / "HUMANOID_HUNTER"
-    
+
     if hunter_dir.exists():
         for item in hunter_dir.iterdir():
-            if item.is_dir() and not item.name.startswith("_") and not item.name.startswith("."):
+            if (
+                item.is_dir()
+                and not item.name.startswith("_")
+                and not item.name.startswith(".")
+            ):
                 modules[item.name] = True
-    
+
     return modules
 
 
@@ -264,92 +380,143 @@ def discover_hunter_modules() -> Dict[str, bool]:
 # REST ENDPOINTS
 # =============================================================================
 
-@app.get("/api/health")
+
+@telemetry_router.get("/api/health")
 async def health_check():
     """Health check endpoint with system status."""
-    phases = discover_python_phases()
-    hunter_modules = discover_hunter_modules()
-    
-    return {
-        "status": "ok",
-        "ygb_root": str(PROJECT_ROOT),
-        "python_phases": len([p for p in phases if p["number"] <= 19]),
-        "impl_phases": len([p for p in phases if p["number"] >= 20]),
-        "hunter_modules": len(hunter_modules),
-        "hunter_integration": hunter_modules,
-        "timestamp": datetime.now(UTC).isoformat()
-    }
+    phases, hunter_modules = await asyncio.gather(
+        _get_phase_inventory(),
+        _get_hunter_inventory(),
+    )
+
+    return JSONResponse(
+        content={
+            "status": "ok",
+            "ygb_root": str(PROJECT_ROOT),
+            "python_phases": len([p for p in phases if p["number"] <= 19]),
+            "impl_phases": len([p for p in phases if p["number"] >= 20]),
+            "hunter_modules": len(hunter_modules),
+            "hunter_integration": hunter_modules,
+            "timestamp": datetime.now(UTC).isoformat(),
+            "orchestrator": _orchestrator().get_cached_status_snapshot(),
+        },
+        headers=_orchestrator().cache_headers(max_age=15),
+    )
 
 
-@app.get("/api/bounty/phases")
+@telemetry_router.get("/api/bounty/phases")
 async def get_bounty_phases():
     """Get all available bounty phases."""
-    phases = discover_python_phases()
-    return {
-        p["name"]: {
-            "number": p["number"],
-            "available": p["available"],
-            "description": p["description"]
-        }
-        for p in phases
-    }
+    phases = await _get_phase_inventory()
+    return JSONResponse(
+        content={
+            p["name"]: {
+                "number": p["number"],
+                "available": p["available"],
+                "description": p["description"],
+            }
+            for p in phases
+        },
+        headers=_orchestrator().cache_headers(max_age=3600, immutable=True),
+    )
 
 
-@app.get("/api/reports")
-async def list_reports():
+@telemetry_router.get("/api/orchestrator/status")
+async def get_orchestrator_status():
+    """Expose orchestrator telemetry, queue, and agent registry state."""
+    return JSONResponse(
+        content=_orchestrator().get_cached_status_snapshot(),
+        headers=_orchestrator().cache_headers(max_age=5),
+    )
+
+
+@telemetry_router.get("/api/accuracy/status")
+async def get_accuracy_status():
+    """Expose validated accuracy metrics and strategy learning state."""
+    return JSONResponse(
+        content={
+            "metrics": _orchestrator().accuracy_feedback.summary(),
+            "strategy_feedback": _orchestrator().strategy_feedback.snapshot(),
+        },
+        headers=_orchestrator().cache_headers(max_age=10),
+    )
+
+
+@telemetry_router.get("/api/cluster/status")
+async def get_cluster_status():
+    """Expose distributed cluster coordination state."""
+    snapshot = _orchestrator().get_cached_status_snapshot()
+    return JSONResponse(
+        content=snapshot.get("cluster", {}),
+        headers=_orchestrator().cache_headers(max_age=5),
+    )
+
+
+@api_router.get("/api/reports")
+async def list_reports(offset: int = 0, limit: int = 50):
     """List all security reports in the report directory."""
     report_dir = PROJECT_ROOT / "report"
     if not report_dir.exists():
-        return {"reports": [], "count": 0}
-    
+        return JSONResponse(
+            content={"reports": [], "count": 0},
+            headers=_orchestrator().cache_headers(max_age=10),
+        )
+
     reports = []
     for file in sorted(report_dir.glob("*.txt"), reverse=True):
         stat = file.stat()
-        reports.append({
-            "filename": file.name,
-            "path": str(file),
-            "size": stat.st_size,
-            "created": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-            "download_url": f"/api/reports/{file.name}"
-        })
-    
-    return {"reports": reports, "count": len(reports)}
+        reports.append(
+            {
+                "filename": file.name,
+                "path": str(file),
+                "size": stat.st_size,
+                "created": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                "download_url": f"/api/reports/{file.name}",
+            }
+        )
+
+    page = reports[max(offset, 0) : max(offset, 0) + max(limit, 0)]
+    return JSONResponse(
+        content={
+            "reports": page,
+            "count": len(reports),
+            "offset": offset,
+            "limit": limit,
+        },
+        headers=_orchestrator().cache_headers(max_age=10),
+    )
 
 
-@app.get("/api/reports/{filename}")
+@api_router.get("/api/reports/{filename}")
 async def download_report(filename: str):
     """Download a specific report file."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
-    
+
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="Report not found")
-    
+
     # Security check - prevent directory traversal
     if not str(file_path.resolve()).startswith(str(report_dir.resolve())):
         raise HTTPException(status_code=403, detail="Access denied")
-    
-    return FileResponse(
-        path=str(file_path),
-        filename=filename,
-        media_type="text/plain"
-    )
+
+    return FileResponse(path=str(file_path), filename=filename, media_type="text/plain")
 
 
-@app.get("/api/reports/{filename}/content")
+@api_router.get("/api/reports/{filename}/content")
 async def get_report_content(filename: str):
     """Get report content as text."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
-    
+
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="Report not found")
-    
+
     # Security check
     if not str(file_path.resolve()).startswith(str(report_dir.resolve())):
         raise HTTPException(status_code=403, detail="Access denied")
-    
-    content = file_path.read_text(encoding="utf-8")
+
+    content = await asyncio.to_thread(file_path.read_text, encoding="utf-8")
     return PlainTextResponse(content)
 
 
@@ -358,21 +525,37 @@ async def start_hunter(request: StartWorkflowRequest):
     """Start a V1 Hunter workflow."""
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
-    
+
     workflow_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
-    
-    active_workflows[workflow_id] = {
-        "type": "hunter",
-        "target": request.target,
-        "status": "started",
-        "started_at": datetime.now(UTC).isoformat(),
-        "steps": []
-    }
-    
-    return WorkflowStartResponse(
-        workflow_id=workflow_id,
-        status="started"
+    plan = _orchestrator().plan_task(
+        "crawl", {"target": request.target, "mode": request.mode}
     )
+    similar = await _orchestrator().retrieve_experience(
+        "crawler-agent", request.target, limit=3
+    )
+
+    _orchestrator().remember_state(
+        "active_workflows",
+        active_workflows,
+        workflow_id,
+        {
+            "type": "hunter",
+            "target": request.target,
+            "status": "started",
+            "started_at": datetime.now(UTC).isoformat(),
+            "steps": [],
+            "plan": _serialize_strategy(plan.strategy),
+            "request_id": plan.request_id,
+            "similar_experiences": similar,
+        },
+    )
+
+    return {
+        "workflow_id": workflow_id,
+        "status": "started",
+        "plan": _serialize_strategy(plan.strategy),
+        "similar_experiences": similar,
+    }
 
 
 @app.post("/api/bounty/start")
@@ -381,84 +564,108 @@ async def start_bounty(request: StartWorkflowRequest):
     """Start a Bounty Finder workflow with REAL browser automation."""
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
-    
+
     # Validate target URL
     target = request.target.strip()
     if not target.startswith(("http://", "https://")):
         target = f"https://{target}"
-    
+
     report_id = f"RPT-{uuid.uuid4().hex[:12].upper()}"
-    
+    plan = _orchestrator().plan_task(
+        "workflow", {"target": target, "mode": request.mode}
+    )
+    similar = await _orchestrator().retrieve_experience(
+        "crawler-agent", target, limit=3
+    )
+
     # Store workflow with target URL
-    active_workflows[report_id] = {
-        "type": "bounty",
-        "target": target,
-        "mode": request.mode,  # READ_ONLY or REAL
-        "status": "started",
-        "started_at": datetime.now(UTC).isoformat(),
-        "steps": [],
-        "findings": []
-    }
-    
+    _orchestrator().remember_state(
+        "active_workflows",
+        active_workflows,
+        report_id,
+        {
+            "type": "bounty",
+            "target": target,
+            "mode": request.mode,  # READ_ONLY or REAL
+            "status": "started",
+            "started_at": datetime.now(UTC).isoformat(),
+            "steps": [],
+            "findings": [],
+            "plan": _serialize_strategy(plan.strategy),
+            "request_id": plan.request_id,
+            "similar_experiences": similar,
+        },
+    )
+
     # Debug logging
     print(f"🎯 NEW WORKFLOW: {report_id}")
     print(f"   Target: {target}")
     print(f"   Mode: {request.mode}")
-    
-    return WorkflowStartResponse(
-        workflow_id=report_id,
-        report_id=report_id,
-        status="started"
-    )
+
+    return {
+        "workflow_id": report_id,
+        "report_id": report_id,
+        "status": "started",
+        "plan": _serialize_strategy(plan.strategy),
+        "similar_experiences": similar,
+    }
 
 
 # =============================================================================
 # PHASE-49 ENDPOINTS
 # =============================================================================
 
+
 @app.post("/api/dashboard/create")
 async def create_dashboard(request: CreateDashboardRequest):
     """Create a new dashboard for a user."""
     dashboard_id = f"DASH-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.now(UTC).isoformat()
-    
+
     # Create execution kernel for this dashboard
     kernel_id = f"KERN-{uuid.uuid4().hex[:12].upper()}"
-    execution_kernels[kernel_id] = {
-        "session_id": kernel_id,
-        "state": "IDLE",
-        "human_approved": False,
-        "deny_reason": None,
-        "audit_log": []
-    }
-    
-    dashboard_states[dashboard_id] = {
-        "dashboard_id": dashboard_id,
-        "user_id": request.user_id,
-        "user_name": request.user_name,
-        "kernel_id": kernel_id,
-        "created_at": now,
-        "active_panel": "USER"
-    }
-    
-    return {
-        "dashboard_id": dashboard_id,
-        "kernel_id": kernel_id,
-        "status": "created"
-    }
+    _orchestrator().remember_state(
+        "execution_kernels",
+        execution_kernels,
+        kernel_id,
+        {
+            "session_id": kernel_id,
+            "state": "IDLE",
+            "human_approved": False,
+            "deny_reason": None,
+            "audit_log": [],
+        },
+    )
+
+    _orchestrator().remember_state(
+        "dashboard_states",
+        dashboard_states,
+        dashboard_id,
+        {
+            "dashboard_id": dashboard_id,
+            "user_id": request.user_id,
+            "user_name": request.user_name,
+            "kernel_id": kernel_id,
+            "created_at": now,
+            "active_panel": "USER",
+        },
+    )
+
+    return {"dashboard_id": dashboard_id, "kernel_id": kernel_id, "status": "created"}
 
 
 @app.get("/api/dashboard/state")
 async def get_dashboard_state(dashboard_id: str = None):
     """Get current dashboard state."""
     if dashboard_id and dashboard_id in dashboard_states:
+        _orchestrator().touch_state("dashboard_states", dashboard_id)
         return dashboard_states[dashboard_id]
-    
+
     # Return demo state if no specific ID
     return {
         "dashboard_id": "DASH-DEMO",
         "state": "IDLE",
-        "panels": ["USER", "ACTIVITY", "REPORT"]
+        "panels": ["USER", "ACTIVITY", "REPORT"],
     }
 
 
@@ -466,12 +673,10 @@ async def get_dashboard_state(dashboard_id: str = None):
 async def get_execution_state(kernel_id: str = None):
     """Get execution kernel state."""
     if kernel_id and kernel_id in execution_kernels:
+        _orchestrator().touch_state("execution_kernels", kernel_id)
         return execution_kernels[kernel_id]
-    
-    return {
-        "state": "IDLE",
-        "human_approved": False
-    }
+
+    return {"state": "IDLE", "human_approved": False}
 
 
 @app.post("/api/execution/transition")
@@ -491,41 +696,41 @@ async def execution_transition(request: ExecutionTransitionRequest):
         ("SIMULATED", "ABORT"): "STOPPED",
         ("AWAIT_HUMAN", "ABORT"): "STOPPED",
     }
-    
+
     # Find kernel or create demo one
     kernel = None
     for kid, k in execution_kernels.items():
         kernel = k
         break
-    
+
     if not kernel:
         kernel = {"state": "IDLE", "human_approved": False, "deny_reason": None}
-    
+
     current_state = kernel.get("state", "IDLE")
     transition = request.transition
-    
+
     key = (current_state, transition)
     if key in valid_transitions:
         new_state = valid_transitions[key]
         kernel["state"] = new_state
-        
+
         if transition == "HUMAN_APPROVE":
             kernel["human_approved"] = True
         if transition == "HUMAN_DENY":
             kernel["deny_reason"] = request.reason
-        
+
         return {
             "result": "SUCCESS",
             "from_state": current_state,
             "to_state": new_state,
-            "reason": request.reason
+            "reason": request.reason,
         }
-    
+
     return {
         "result": "INVALID",
         "from_state": current_state,
         "to_state": current_state,
-        "reason": f"Invalid transition {transition} from {current_state}"
+        "reason": f"Invalid transition {transition} from {current_state}",
     }
 
 
@@ -533,20 +738,23 @@ async def execution_transition(request: ExecutionTransitionRequest):
 async def submit_approval_decision(request: ApprovalDecisionRequest):
     """Submit an approval decision."""
     now = datetime.now(UTC).isoformat()
-    
+
     decision = {
         "decision_id": f"DEC-{uuid.uuid4().hex[:16].upper()}",
         "request_id": request.request_id,
         "approved": request.approved,
         "approver_id": request.approver_id,
         "reason": request.reason,
-        "timestamp": now
+        "timestamp": now,
     }
-    
+
     # Update any matching approval request
     if request.request_id in approval_requests:
-        approval_requests[request.request_id]["status"] = "APPROVED" if request.approved else "REJECTED"
-    
+        approval_requests[request.request_id]["status"] = (
+            "APPROVED" if request.approved else "REJECTED"
+        )
+        _orchestrator().touch_state("approval_requests", request.request_id)
+
     return decision
 
 
@@ -564,7 +772,7 @@ async def discover_targets(request: TargetDiscoveryRequest):
             "report_density": "LOW",
             "is_public": True,
             "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat()
+            "discovered_at": datetime.now(UTC).isoformat(),
         },
         {
             "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
@@ -575,7 +783,7 @@ async def discover_targets(request: TargetDiscoveryRequest):
             "report_density": "MEDIUM",
             "is_public": True,
             "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat()
+            "discovered_at": datetime.now(UTC).isoformat(),
         },
         {
             "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
@@ -586,35 +794,41 @@ async def discover_targets(request: TargetDiscoveryRequest):
             "report_density": "LOW",
             "is_public": True,
             "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat()
-        }
+            "discovered_at": datetime.now(UTC).isoformat(),
+        },
     ]
-    
+
     # Filter based on request
     filtered = [t for t in mock_targets if t["is_public"] or not request.public_only]
-    
+
     return {
         "result_id": f"DIS-{uuid.uuid4().hex[:16].upper()}",
         "candidates": filtered,
         "total_found": len(mock_targets),
         "filtered_count": len(mock_targets) - len(filtered),
-        "timestamp": datetime.now(UTC).isoformat()
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
-@app.post("/api/voice/parse")
+@voice_router.post("/api/voice/parse")
 async def parse_voice_input(request: VoiceParseRequest):
     """Parse voice input and extract intent."""
-    import re
-    
     text = request.text.strip().lower()
     now = datetime.now(UTC).isoformat()
-    
+    plan = _orchestrator().plan_task(
+        "voice", {"target": request.text, "mode": "READ_ONLY"}
+    )
+    similar_voice = await _orchestrator().retrieve_experience(
+        "voice-agent", request.text, limit=3
+    )
+
     # Forbidden patterns (from G12)
-    forbidden = [r'\b(execute|run|start|launch|attack|exploit|hack)\b',
-                 r'\b(approve|confirm|yes\s+do\s+it)\b',
-                 r'\b(submit|send|post)\b']
-    
+    forbidden = [
+        r"\b(execute|run|start|launch|attack|exploit|hack)\b",
+        r"\b(approve|confirm|yes\s+do\s+it)\b",
+        r"\b(submit|send|post)\b",
+    ]
+
     for pattern in forbidden:
         if re.search(pattern, text, re.IGNORECASE):
             return {
@@ -625,11 +839,13 @@ async def parse_voice_input(request: VoiceParseRequest):
                 "confidence": 0.0,
                 "status": "BLOCKED",
                 "block_reason": f"Forbidden pattern detected",
-                "timestamp": now
+                "timestamp": now,
+                "plan": _serialize_strategy(plan.strategy),
+                "similar_experiences": similar_voice,
             }
-    
+
     # Intent patterns
-    if re.search(r'(?:find|discover|search\s+for)\s+targets?', text):
+    if re.search(r"(?:find|discover|search\s+for)\s+targets?", text):
         return {
             "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
             "intent_type": "FIND_TARGETS",
@@ -638,11 +854,13 @@ async def parse_voice_input(request: VoiceParseRequest):
             "confidence": 0.8,
             "status": "PARSED",
             "block_reason": None,
-            "timestamp": now
+            "timestamp": now,
+            "plan": _serialize_strategy(plan.strategy),
+            "similar_experiences": similar_voice,
         }
-    
-    if re.search(r'(?:set\s+)?target\s+(?:is\s+|to\s+)?(.+)', text):
-        match = re.search(r'(?:set\s+)?target\s+(?:is\s+|to\s+)?(.+)', text)
+
+    if re.search(r"(?:set\s+)?target\s+(?:is\s+|to\s+)?(.+)", text):
+        match = re.search(r"(?:set\s+)?target\s+(?:is\s+|to\s+)?(.+)", text)
         return {
             "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
             "intent_type": "SET_TARGET",
@@ -651,10 +869,12 @@ async def parse_voice_input(request: VoiceParseRequest):
             "confidence": 0.8,
             "status": "PARSED",
             "block_reason": None,
-            "timestamp": now
+            "timestamp": now,
+            "plan": _serialize_strategy(plan.strategy),
+            "similar_experiences": similar_voice,
         }
-    
-    if re.search(r'(?:what\s+is\s+the\s+)?status', text):
+
+    if re.search(r"(?:what\s+is\s+the\s+)?status", text):
         return {
             "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
             "intent_type": "QUERY_STATUS",
@@ -663,9 +883,11 @@ async def parse_voice_input(request: VoiceParseRequest):
             "confidence": 0.8,
             "status": "PARSED",
             "block_reason": None,
-            "timestamp": now
+            "timestamp": now,
+            "plan": _serialize_strategy(plan.strategy),
+            "similar_experiences": similar_voice,
         }
-    
+
     # Unknown intent
     return {
         "intent_id": f"VOC-{uuid.uuid4().hex[:16].upper()}",
@@ -675,23 +897,24 @@ async def parse_voice_input(request: VoiceParseRequest):
         "confidence": 0.0,
         "status": "INVALID",
         "block_reason": "Could not parse intent",
-        "timestamp": now
+        "timestamp": now,
+        "plan": _serialize_strategy(plan.strategy),
+        "similar_experiences": similar_voice,
     }
 
 
-@app.post("/api/autonomy/session")
+@voice_router.post("/api/autonomy/session")
 async def create_autonomy_session(request: AutonomySessionRequest):
     """Create an autonomy session."""
     now = datetime.now(UTC)
     session_id = f"AUT-{uuid.uuid4().hex[:16].upper()}"
-    
+
     # Calculate expiry for AUTONOMOUS_FIND mode
     expires_at = None
     if request.mode == "AUTONOMOUS_FIND" and request.duration_hours > 0:
         max_hours = min(request.duration_hours, 12)  # Cap at 12 hours
-        from datetime import timedelta
         expires_at = (now + timedelta(hours=max_hours)).isoformat()
-    
+
     # Determine blocked actions based on mode
     blocked = []
     if request.mode == "AUTONOMOUS_FIND":
@@ -699,9 +922,17 @@ async def create_autonomy_session(request: AutonomySessionRequest):
     elif request.mode == "READ_ONLY":
         blocked = ["EXPLOIT", "SUBMISSION", "STATE_CHANGE", "BROWSER_ACTION"]
     elif request.mode == "MOCK":
-        blocked = ["TARGET_ANALYSIS", "CVE_CORRELATION", "PASSIVE_DISCOVERY", 
-                   "DRAFT_REPORT", "EXPLOIT", "SUBMISSION", "STATE_CHANGE", "BROWSER_ACTION"]
-    
+        blocked = [
+            "TARGET_ANALYSIS",
+            "CVE_CORRELATION",
+            "PASSIVE_DISCOVERY",
+            "DRAFT_REPORT",
+            "EXPLOIT",
+            "SUBMISSION",
+            "STATE_CHANGE",
+            "BROWSER_ACTION",
+        ]
+
     session = {
         "session_id": session_id,
         "mode": request.mode,
@@ -710,10 +941,12 @@ async def create_autonomy_session(request: AutonomySessionRequest):
         "started_at": now.isoformat(),
         "expires_at": expires_at,
         "human_enabled": request.mode == "REAL",
-        "actions_blocked": blocked
+        "actions_blocked": blocked,
     }
-    
-    autonomy_sessions[session_id] = session
+
+    _orchestrator().remember_state(
+        "autonomy_sessions", autonomy_sessions, session_id, session
+    )
     return session
 
 
@@ -721,20 +954,22 @@ async def create_autonomy_session(request: AutonomySessionRequest):
 # G38 AUTO-TRAINING ENDPOINTS
 # =============================================================================
 
-@app.get("/api/g38/status")
+
+@training_router.get("/api/g38/status")
 async def get_g38_status():
     """Get G38 auto-training status."""
-    if not G38_AVAILABLE:
-        return {"available": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return _g38_error_payload()
+
+    trainer = runtime["get_auto_trainer"]()
     status = trainer.get_status()
-    
+
     # Add guard verification
-    guards_ok, guards_msg = verify_all_guards()
-    pretraining_ok, pretraining_msg = verify_pretraining_guards()
-    mode_a_status, mode_a_msg = get_mode_a_status()
-    
+    guards_ok, guards_msg = runtime["verify_all_guards"]()
+    pretraining_ok, pretraining_msg = runtime["verify_pretraining_guards"]()
+    mode_a_status, mode_a_msg = runtime["get_mode_a_status"]()
+
     return {
         "available": True,
         "auto_training": {
@@ -759,9 +994,8 @@ async def get_g38_status():
             "dataset_size": status.get("dataset_size", 0),
             "training_mode": status.get("training_mode", "MANUAL"),
         },
-
         "guards": {
-            "main_guards": len(ALL_GUARDS),
+            "main_guards": len(runtime["ALL_GUARDS"]),
             "all_verified": guards_ok,
             "message": guards_msg,
         },
@@ -773,19 +1007,20 @@ async def get_g38_status():
             "mode_a_status": mode_a_status.value,
             "message": mode_a_msg,
         },
-        "training_summary": get_training_mode_summary() if G38_AVAILABLE else None,
+        "training_summary": runtime["get_training_mode_summary"](),
     }
 
 
-@app.get("/api/g38/events")
+@training_router.get("/api/g38/events")
 async def get_g38_events(limit: int = 50):
     """Get recent G38 training events."""
-    if not G38_AVAILABLE:
-        return {"events": [], "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return {"events": [], **_g38_error_payload()}
+
+    trainer = runtime["get_auto_trainer"]()
     events = trainer.events[-limit:] if trainer.events else []
-    
+
     return {
         "events": [
             {
@@ -803,30 +1038,34 @@ async def get_g38_events(limit: int = 50):
     }
 
 
-@app.post("/api/g38/abort")
+@training_router.post("/api/g38/abort")
 async def abort_g38_training():
     """Abort current G38 training."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return {"success": False, "error": _g38_error_payload()["error"]}
+
+    trainer = runtime["get_auto_trainer"]()
     result = trainer.abort_training()
-    
+
     return {
         "success": result.get("aborted", False),
         "state": trainer.state.value,
-        "message": "Training abort requested" if result.get("aborted") else result.get("reason", "No training in progress"),
+        "message": "Training abort requested"
+        if result.get("aborted")
+        else result.get("reason", "No training in progress"),
     }
 
 
-@app.post("/api/g38/start")
+@training_router.post("/api/g38/start")
 async def start_g38_training(epochs: int = 10):
     """Manually start G38 training for demo/testing."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
-    
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return {"success": False, "error": _g38_error_payload()["error"]}
+
+    trainer = runtime["get_auto_trainer"]()
+
     # Check if already training
     if trainer.is_training:
         return {
@@ -834,15 +1073,23 @@ async def start_g38_training(epochs: int = 10):
             "error": "Training already in progress",
             "state": trainer.state.value,
         }
-    
-    # Start training in background thread (async)
-    import threading
-    def run_training():
-        trainer.force_start_training(epochs=epochs)
-    
-    thread = threading.Thread(target=run_training, daemon=True)
-    thread.start()
-    
+
+    _orchestrator().dispatch_background(
+        "g38-manual-start",
+        "training",
+        trainer.force_start_training,
+        "high",
+        epochs=epochs,
+    )
+
+    if _orchestrator().http_client is not None:
+        asyncio.create_task(
+            _orchestrator().notifier.send(
+                _orchestrator().http_client,
+                f"YGB training started: {epochs} epochs",
+            )
+        )
+
     return {
         "success": True,
         "message": f"Training started for {epochs} epochs",
@@ -850,21 +1097,24 @@ async def start_g38_training(epochs: int = 10):
     }
 
 
-@app.get("/api/g38/guards")
+@training_router.get("/api/g38/guards")
 async def get_g38_guards():
     """Get all G38 guard statuses."""
-    if not G38_AVAILABLE:
-        return {"guards": [], "error": "G38 modules not loaded"}
-    
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return {"guards": [], "error": _g38_error_payload()["error"]}
+
     guards = []
-    for guard in ALL_GUARDS:
+    for guard in runtime["ALL_GUARDS"]:
         result, msg = guard()
-        guards.append({
-            "name": guard.__name__,
-            "returns_false": not result,
-            "message": msg,
-        })
-    
+        guards.append(
+            {
+                "name": guard.__name__,
+                "returns_false": not result,
+                "message": msg,
+            }
+        )
+
     return {
         "guards": guards,
         "total": len(guards),
@@ -872,43 +1122,51 @@ async def get_g38_guards():
     }
 
 
-@app.get("/api/g38/reports")
+@training_router.get("/api/g38/reports")
 async def get_g38_training_reports():
     """Get G38 training reports."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
-    
+
     if not reports_dir.exists():
         return {"reports": [], "count": 0}
-    
+
     reports = []
-    
+
     # Find all summary files
-    for summary_file in sorted(reports_dir.glob("training_summary_*.txt"), reverse=True):
+    for summary_file in sorted(
+        reports_dir.glob("training_summary_*.txt"), reverse=True
+    ):
         session_id = summary_file.stem.replace("training_summary_", "")
-        
+
         # Find corresponding learned and not_learned files
         learned_file = reports_dir / f"learned_features_{session_id}.json"
         not_learned_file = reports_dir / f"not_learned_yet_{session_id}.txt"
-        
+
         report = {
             "session_id": session_id,
             "summary_file": summary_file.name,
-            "summary_content": summary_file.read_text()[:500] + "..." if summary_file.exists() else None,
+            "summary_content": (await asyncio.to_thread(summary_file.read_text))[:500]
+            + "..."
+            if summary_file.exists()
+            else None,
             "has_learned_features": learned_file.exists(),
             "has_not_learned": not_learned_file.exists(),
-            "created_at": datetime.fromtimestamp(summary_file.stat().st_mtime).isoformat(),
+            "created_at": datetime.fromtimestamp(
+                summary_file.stat().st_mtime
+            ).isoformat(),
         }
-        
+
         # Read learned features JSON if exists
         if learned_file.exists():
-            import json
             try:
-                report["learned_features"] = json.loads(learned_file.read_text())
+                report["learned_features"] = json.loads(
+                    await asyncio.to_thread(learned_file.read_text)
+                )
             except:
                 report["learned_features"] = None
-        
+
         reports.append(report)
-    
+
     return {
         "reports": reports[:20],  # Last 20 reports
         "count": len(reports),
@@ -916,35 +1174,39 @@ async def get_g38_training_reports():
     }
 
 
-@app.get("/api/g38/reports/latest")
+@training_router.get("/api/g38/reports/latest")
 async def get_g38_latest_report():
     """Get the latest G38 training report."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
-    
+
     if not reports_dir.exists():
         return {"available": False, "error": "No reports directory"}
-    
+
     # Find latest summary
     summaries = sorted(reports_dir.glob("training_summary_*.txt"), reverse=True)
-    
+
     if not summaries:
         return {"available": False, "error": "No reports found"}
-    
+
     latest = summaries[0]
     session_id = latest.stem.replace("training_summary_", "")
-    
+
     # Read all files for this session
     learned_file = reports_dir / f"learned_features_{session_id}.json"
     not_learned_file = reports_dir / f"not_learned_yet_{session_id}.txt"
-    
-    import json
-    
+
     return {
         "available": True,
         "session_id": session_id,
-        "summary": latest.read_text() if latest.exists() else None,
-        "learned_features": json.loads(learned_file.read_text()) if learned_file.exists() else None,
-        "not_learned": not_learned_file.read_text() if not_learned_file.exists() else None,
+        "summary": await asyncio.to_thread(latest.read_text)
+        if latest.exists()
+        else None,
+        "learned_features": json.loads(await asyncio.to_thread(learned_file.read_text))
+        if learned_file.exists()
+        else None,
+        "not_learned": await asyncio.to_thread(not_learned_file.read_text)
+        if not_learned_file.exists()
+        else None,
         "created_at": datetime.fromtimestamp(latest.stat().st_mtime).isoformat(),
     }
 
@@ -953,28 +1215,31 @@ async def get_g38_latest_report():
 # MANUAL TRAINING CONTROL ENDPOINTS
 # =============================================================================
 
-@app.post("/training/start")
+
+@training_router.post("/training/start")
 async def manual_start_training(epochs: int = 10):
     """Manually start GPU training. No auto-trigger."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
-    
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return {"success": False, "error": _g38_error_payload()["error"]}
+
+    trainer = runtime["get_auto_trainer"]()
+
     if trainer.is_training:
         return {
             "success": False,
             "error": "Training already in progress",
             "state": trainer.state.value,
         }
-    
-    import threading
-    def run_training():
-        trainer.force_start_training(epochs=epochs)
-    
-    thread = threading.Thread(target=run_training, daemon=True)
-    thread.start()
-    
+
+    _orchestrator().dispatch_background(
+        "manual-training-start",
+        "training",
+        trainer.force_start_training,
+        "high",
+        epochs=epochs,
+    )
+
     return {
         "success": True,
         "message": f"Training started for {epochs} epochs",
@@ -983,41 +1248,46 @@ async def manual_start_training(epochs: int = 10):
     }
 
 
-@app.post("/training/stop")
+@training_router.post("/training/stop")
 async def manual_stop_training():
     """Stop training immediately."""
-    if not G38_AVAILABLE:
-        return {"success": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return {"success": False, "error": _g38_error_payload()["error"]}
+
+    trainer = runtime["get_auto_trainer"]()
     result = trainer.abort_training()
-    
+
     return {
         "success": result.get("aborted", False),
-        "message": "Training stopped" if result.get("aborted") else "No training in progress",
+        "message": "Training stopped"
+        if result.get("aborted")
+        else "No training in progress",
         "state": trainer.state.value,
     }
 
 
-@app.get("/training/status")
+@training_router.get("/training/status")
 async def manual_training_status():
     """Get current training status."""
-    if not G38_AVAILABLE:
-        return {"available": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return _g38_error_payload()
+
+    trainer = runtime["get_auto_trainer"]()
     return trainer.get_status()
 
 
-@app.get("/training/progress")
+@training_router.get("/training/progress")
 async def manual_training_progress():
     """Get real-time training progress."""
-    if not G38_AVAILABLE:
-        return {"available": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return _g38_error_payload()
+
+    trainer = runtime["get_auto_trainer"]()
     status = trainer.get_status()
-    
+
     return {
         "epoch": status["epoch"],
         "total_epochs": status["total_epochs"],
@@ -1032,20 +1302,25 @@ async def manual_training_progress():
     }
 
 
-@app.get("/gpu/status")
+@training_router.get("/gpu/status")
 async def gpu_status():
     """Get GPU utilization and memory metrics."""
     try:
         import torch
+
         if not torch.cuda.is_available():
             return {"available": False, "error": "CUDA not available"}
-        
+
         return {
             "available": True,
             "device_name": torch.cuda.get_device_name(0),
-            "memory_allocated_mb": round(torch.cuda.memory_allocated() / 1024 / 1024, 2),
+            "memory_allocated_mb": round(
+                torch.cuda.memory_allocated() / 1024 / 1024, 2
+            ),
             "memory_reserved_mb": round(torch.cuda.memory_reserved() / 1024 / 1024, 2),
-            "memory_total_mb": round(torch.cuda.get_device_properties(0).total_mem / 1024 / 1024, 2),
+            "memory_total_mb": round(
+                torch.cuda.get_device_properties(0).total_mem / 1024 / 1024, 2
+            ),
             "compute_capability": f"{torch.cuda.get_device_capability(0)[0]}.{torch.cuda.get_device_capability(0)[1]}",
             "amp_available": True,
             "cudnn_deterministic": torch.backends.cudnn.deterministic,
@@ -1054,22 +1329,24 @@ async def gpu_status():
         return {"available": False, "error": str(e)}
 
 
-@app.get("/dataset/stats")
+@training_router.get("/dataset/stats")
 async def dataset_stats():
     """Get training dataset statistics."""
-    if not G38_AVAILABLE:
-        return {"available": False, "error": "G38 modules not loaded"}
-    
-    trainer = get_auto_trainer()
+    runtime = _get_g38_runtime()
+    if not runtime:
+        return _g38_error_payload()
+
+    trainer = runtime["get_auto_trainer"]()
     if trainer._gpu_dataset_stats:
         return {
             "available": True,
             **trainer._gpu_dataset_stats,
         }
-    
+
     # Try to get stats from dataset loader directly
     try:
         from impl_v1.training.data.real_dataset_loader import validate_dataset_integrity
+
         valid, msg = validate_dataset_integrity()
         return {
             "available": valid,
@@ -1078,21 +1355,28 @@ async def dataset_stats():
         }
     except Exception as e:
         return {"available": False, "error": str(e)}
+
+
 # =============================================================================
 
+
 @app.get("/api/db/users")
-async def list_users():
+async def list_users(offset: int = 0, limit: int = 50):
     """Get all users from database."""
     try:
-        users = await get_all_users()
-        # Convert UUID to string for JSON serialization
-        for user in users:
-            user['id'] = str(user['id'])
-            if user.get('created_at'):
-                user['created_at'] = user['created_at'].isoformat()
-            if user.get('last_active'):
-                user['last_active'] = user['last_active'].isoformat()
-        return {"users": users, "total": len(users)}
+        users = [
+            _serialize_record(user)
+            for user in await get_all_users(limit=limit, offset=offset)
+        ]
+        return JSONResponse(
+            content={
+                "users": users,
+                "total": len(users),
+                "offset": offset,
+                "limit": limit,
+            },
+            headers=_orchestrator().cache_headers(max_age=30),
+        )
     except Exception as e:
         return {"users": [], "total": 0, "error": str(e)}
 
@@ -1101,11 +1385,12 @@ async def list_users():
 async def add_user(request: CreateUserRequest):
     """Create a new user."""
     try:
-        user = await create_user(request.name, request.email, request.role)
-        user['id'] = str(user['id'])
-        if user.get('created_at'):
-            user['created_at'] = user['created_at'].isoformat()
-        await log_activity(str(user['id']), "USER_CREATED", f"User {request.name} created")
+        user = _serialize_record(
+            await create_user(request.name, request.email, request.role)
+        )
+        await log_activity(
+            str(user["id"]), "USER_CREATED", f"User {request.name} created"
+        )
         return {"success": True, "user": user}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -1117,12 +1402,7 @@ async def get_single_user(user_id: str):
     try:
         user = await get_user(user_id)
         if user:
-            user['id'] = str(user['id'])
-            if user.get('created_at'):
-                user['created_at'] = user['created_at'].isoformat()
-            if user.get('last_active'):
-                user['last_active'] = user['last_active'].isoformat()
-            return {"success": True, "user": user}
+            return {"success": True, "user": _serialize_record(user)}
         return {"success": False, "error": "User not found"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -1132,26 +1412,31 @@ async def get_single_user(user_id: str):
 async def get_user_bounties_endpoint(user_id: str):
     """Get all bounties for a specific user."""
     try:
-        bounties = await get_user_bounties(user_id)
-        for b in bounties:
-            b['id'] = str(b['id'])
-            if b.get('submitted_at'):
-                b['submitted_at'] = b['submitted_at'].isoformat()
+        bounties = [
+            _serialize_record(bounty) for bounty in await get_user_bounties(user_id)
+        ]
         return {"bounties": bounties, "total": len(bounties)}
     except Exception as e:
         return {"bounties": [], "total": 0, "error": str(e)}
 
 
 @app.get("/api/db/targets")
-async def list_targets():
+async def list_targets(offset: int = 0, limit: int = 50):
     """Get all targets from database."""
     try:
-        targets = await get_all_targets()
-        for t in targets:
-            t['id'] = str(t['id'])
-            if t.get('created_at'):
-                t['created_at'] = t['created_at'].isoformat()
-        return {"targets": targets, "total": len(targets)}
+        targets = [
+            _serialize_record(target)
+            for target in await get_all_targets(limit=limit, offset=offset)
+        ]
+        return JSONResponse(
+            content={
+                "targets": targets,
+                "total": len(targets),
+                "offset": offset,
+                "limit": limit,
+            },
+            headers=_orchestrator().cache_headers(max_age=30),
+        )
     except Exception as e:
         return {"targets": [], "total": 0, "error": str(e)}
 
@@ -1160,32 +1445,40 @@ async def list_targets():
 async def add_target(request: CreateTargetRequest):
     """Create a new target."""
     try:
-        target = await create_target(
-            request.program_name, 
-            request.scope, 
-            request.link, 
-            request.platform, 
-            request.payout_tier
+        target = _serialize_record(
+            await create_target(
+                request.program_name,
+                request.scope,
+                request.link,
+                request.platform,
+                request.payout_tier,
+            )
         )
-        target['id'] = str(target['id'])
-        if target.get('created_at'):
-            target['created_at'] = target['created_at'].isoformat()
-        await log_activity(None, "TARGET_CREATED", f"Target {request.program_name} created")
+        await log_activity(
+            None, "TARGET_CREATED", f"Target {request.program_name} created"
+        )
         return {"success": True, "target": target}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
 @app.get("/api/db/bounties")
-async def list_bounties():
+async def list_bounties(offset: int = 0, limit: int = 50):
     """Get all bounties with user and target info."""
     try:
-        bounties = await get_all_bounties()
-        for b in bounties:
-            b['id'] = str(b['id'])
-            if b.get('submitted_at'):
-                b['submitted_at'] = b['submitted_at'].isoformat()
-        return {"bounties": bounties, "total": len(bounties)}
+        bounties = [
+            _serialize_record(bounty)
+            for bounty in await get_all_bounties(limit=limit, offset=offset)
+        ]
+        return JSONResponse(
+            content={
+                "bounties": bounties,
+                "total": len(bounties),
+                "offset": offset,
+                "limit": limit,
+            },
+            headers=_orchestrator().cache_headers(max_age=30),
+        )
     except Exception as e:
         return {"bounties": [], "total": 0, "error": str(e)}
 
@@ -1194,20 +1487,18 @@ async def list_bounties():
 async def add_bounty(request: CreateBountyRequest):
     """Create a new bounty submission."""
     try:
-        bounty = await create_bounty(
-            request.user_id,
-            request.target_id,
-            request.title,
-            request.description,
-            request.severity
+        bounty = _serialize_record(
+            await create_bounty(
+                request.user_id,
+                request.target_id,
+                request.title,
+                request.description,
+                request.severity,
+            )
         )
-        bounty['id'] = str(bounty['id'])
-        bounty['user_id'] = str(bounty['user_id'])
-        if bounty.get('target_id'):
-            bounty['target_id'] = str(bounty['target_id'])
-        if bounty.get('submitted_at'):
-            bounty['submitted_at'] = bounty['submitted_at'].isoformat()
-        await log_activity(request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}")
+        await log_activity(
+            request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}"
+        )
         return {"success": True, "bounty": bounty}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -1218,8 +1509,14 @@ async def update_bounty(request: UpdateBountyRequest):
     """Update bounty status and reward."""
     try:
         await update_bounty_status(request.bounty_id, request.status, request.reward)
-        await log_activity(None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}")
-        return {"success": True, "bounty_id": request.bounty_id, "status": request.status}
+        await log_activity(
+            None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}"
+        )
+        return {
+            "success": True,
+            "bounty_id": request.bounty_id,
+            "status": request.status,
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -1228,11 +1525,9 @@ async def update_bounty(request: UpdateBountyRequest):
 async def add_session(request: CreateSessionRequest):
     """Create a new session."""
     try:
-        session = await create_session(request.user_id, request.mode, request.target_scope)
-        session['id'] = str(session['id'])
-        session['user_id'] = str(session['user_id'])
-        if session.get('started_at'):
-            session['started_at'] = session['started_at'].isoformat()
+        session = _serialize_record(
+            await create_session(request.user_id, request.mode, request.target_scope)
+        )
         await log_activity(request.user_id, "SESSION_STARTED", f"Mode: {request.mode}")
         return {"success": True, "session": session}
     except Exception as e:
@@ -1240,15 +1535,22 @@ async def add_session(request: CreateSessionRequest):
 
 
 @app.get("/api/db/activity")
-async def list_activity(limit: int = 50):
+async def list_activity(limit: int = 50, offset: int = 0):
     """Get recent activity log."""
     try:
-        activities = await get_recent_activity(limit)
-        for a in activities:
-            a['id'] = str(a['id'])
-            if a.get('created_at'):
-                a['created_at'] = a['created_at'].isoformat()
-        return {"activities": activities, "total": len(activities)}
+        activities = [
+            _serialize_record(activity)
+            for activity in await get_recent_activity(limit, offset)
+        ]
+        return JSONResponse(
+            content={
+                "activities": activities,
+                "total": len(activities),
+                "offset": offset,
+                "limit": limit,
+            },
+            headers=_orchestrator().cache_headers(max_age=15),
+        )
     except Exception as e:
         return {"activities": [], "total": 0, "error": str(e)}
 
@@ -1257,8 +1559,14 @@ async def list_activity(limit: int = 50):
 async def get_admin_statistics():
     """Get admin dashboard statistics."""
     try:
-        stats = await get_admin_stats()
-        return {"success": True, "stats": stats}
+        cached = _orchestrator().get_cached_status_snapshot().get("providers", {})
+        stats = cached.get("admin_stats") if isinstance(cached, dict) else None
+        if not isinstance(stats, dict) or stats.get("error"):
+            stats = await get_admin_stats()
+        return JSONResponse(
+            content={"success": True, "stats": stats},
+            headers=_orchestrator().cache_headers(max_age=15),
+        )
     except Exception as e:
         return {"success": False, "stats": None, "error": str(e)}
 
@@ -1267,23 +1575,26 @@ async def get_admin_statistics():
 # WEBSOCKET ENDPOINTS
 # =============================================================================
 
+
 @app.websocket("/ws/hunter/{workflow_id}")
 async def hunter_websocket(websocket: WebSocket, workflow_id: str):
     """WebSocket endpoint for Hunter workflow updates."""
     await websocket.accept()
     hunter_connections[workflow_id] = websocket
-    
+
     try:
         # Get workflow info
         workflow = active_workflows.get(workflow_id)
         if not workflow:
             await websocket.send_json({"error": "Workflow not found"})
             return
-        
+
+        _orchestrator().touch_state("active_workflows", workflow_id)
+
         # Simulate Hunter module execution
-        hunter_modules = discover_hunter_modules()
+        hunter_modules = await _get_hunter_inventory()
         module_names = list(hunter_modules.keys())
-        
+
         for idx, module_name in enumerate(module_names):
             # Simulate step execution
             step = {
@@ -1292,25 +1603,37 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
                 "success": True,
                 "input_data": {"target": workflow["target"], "module_index": idx},
                 "output_data": {"status": "completed", "checks_passed": True},
-                "timestamp": datetime.now(UTC).isoformat()
+                "timestamp": datetime.now(UTC).isoformat(),
             }
-            
+
             await websocket.send_json({"type": "step", "step": step})
             workflow["steps"].append(step)
             await asyncio.sleep(0.3)  # Simulate processing time
-        
+
+        workflow["status"] = "completed"
+
         # Send completion
         result = {
             "final_result": {
                 "total_modules": len(module_names),
                 "successful": len(module_names),
-                "failed": 0
+                "failed": 0,
             },
-            "evidence_chain_hash": uuid.uuid4().hex
+            "evidence_chain_hash": uuid.uuid4().hex,
         }
-        
+
         await websocket.send_json({"type": "complete", "result": result})
-        
+        _orchestrator().touch_state("active_workflows", workflow_id)
+        await _orchestrator().remember_experience(
+            "crawler-agent",
+            f"hunter workflow={workflow_id} target={workflow['target']} modules={len(module_names)}",
+            {
+                "workflow_id": workflow_id,
+                "target": workflow["target"],
+                "module_count": len(module_names),
+            },
+        )
+
     except WebSocketDisconnect:
         pass
     finally:
@@ -1323,22 +1646,31 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
     await websocket.accept()
     bounty_connections[report_id] = websocket
     ws_closed = False
-    
+
     try:
         # Get workflow info
         workflow = active_workflows.get(report_id)
         if not workflow:
             await websocket.send_json({"error": "Report not found"})
             return
-        
+
         target_url = workflow.get("target", "https://example.com")
         mode = workflow.get("mode", "READ_ONLY")  # READ_ONLY or REAL
-        
+        plan = (
+            workflow.get("plan")
+            or _orchestrator()
+            .plan_task("workflow", {"target": target_url, "mode": mode})
+            .strategy
+        )
+        if not isinstance(plan, dict):
+            plan = _serialize_strategy(plan)
+        _orchestrator().touch_state("active_workflows", report_id)
+
         # Debug logging
         print(f"[WS] WEBSOCKET CONNECTED: {report_id}")
         print(f"   Target URL: {target_url}")
         print(f"   Mode: {mode}")
-        
+
         # Create phase runner with WebSocket progress callback
         async def send_progress(update):
             nonlocal ws_closed
@@ -1348,70 +1680,132 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                 await websocket.send_json(update)
             except Exception:
                 ws_closed = True
-        
-        runner = RealPhaseRunner(on_progress=send_progress)
-        
+
+        runner = RealPhaseRunner(
+            on_progress=send_progress,
+            http_client=_orchestrator().http_client,
+            strategy=type("Strategy", (), plan)(),
+        )
+
         # Run the HTTP-based workflow
         context = await runner.run_workflow(
-            target_url=target_url,
-            workflow_id=report_id,
-            mode=mode
+            target_url=target_url, workflow_id=report_id, mode=mode
         )
-        
+
         if ws_closed:
             return
-        
+
         # Build summary from results
         successful = len([r for r in context.phase_results if r.status == "SUCCESS"])
         failed = len([r for r in context.phase_results if r.status == "FAILED"])
         total_duration = sum(r.duration_ms for r in context.phase_results)
-        
+
         # Convert findings to dict
         findings_data = []
+        verified_findings_data = []
         for f in context.findings:
-            if hasattr(f, '__dict__'):
-                findings_data.append({
+            if hasattr(f, "__dict__"):
+                payload = {
                     "finding_id": f.finding_id,
                     "category": f.category,
                     "severity": f.severity,
                     "title": f.title,
                     "description": f.description,
-                    "url": getattr(f, "url", "")
-                })
+                    "url": getattr(f, "url", ""),
+                    "confidence": getattr(f, "confidence", 0.0),
+                    "verification_status": getattr(
+                        f, "verification_status", "UNVERIFIED"
+                    ),
+                }
+                findings_data.append(payload)
+                if payload["verification_status"] == "CONFIRMED":
+                    verified_findings_data.append(payload)
             else:
                 findings_data.append(f)
-        
+
         # Final result
+        verification_counters = context.governance_data.get("verification_counters", {})
         result = {
             "summary": {
                 "total_phases": len(context.phase_results),
                 "successful_steps": successful,
                 "failed_steps": failed,
                 "findings_count": len(context.findings),
+                "verified_findings_count": len(
+                    [
+                        finding
+                        for finding in context.findings
+                        if getattr(finding, "verification_status", "") == "CONFIRMED"
+                    ]
+                ),
                 "pages_visited": len(context.pages_visited),
                 "technologies": context.technologies,
                 "total_duration_ms": total_duration,
-                "report_file": getattr(context, 'report_file', None)
+                "report_file": getattr(context, "report_file", None),
+                "execution_plan": context.execution_plan,
+                "rejected_false_positives": int(
+                    verification_counters.get("rejected_false_positives", 0)
+                ),
+                "duplicate_findings_rejected": int(
+                    verification_counters.get("duplicates", 0)
+                ),
             },
             "findings": findings_data,
+            "final_findings": verified_findings_data,
             "pages_visited": context.pages_visited,
             "phases": [
                 {
                     "number": r.phase_number,
                     "name": r.phase_name,
                     "status": r.status,
-                    "duration_ms": r.duration_ms
+                    "duration_ms": r.duration_ms,
                 }
                 for r in context.phase_results
             ],
-            "report_hash": hashlib.md5(str(context.phase_results).encode()).hexdigest()
+            "report_hash": hashlib.md5(str(context.phase_results).encode()).hexdigest(),
         }
-        
+
         try:
             await websocket.send_json({"type": "complete", "result": result})
         except Exception:
             pass
-        
+
+        workflow["status"] = "completed"
+        workflow["completed_at"] = datetime.now(UTC).isoformat()
+        workflow["summary"] = result["summary"]
+        workflow["findings"] = findings_data
+        _orchestrator().touch_state("active_workflows", report_id)
+        _orchestrator().record_strategy_outcome(
+            strategy_name=str(plan.get("agent_name", "crawler-agent")),
+            task_type="workflow",
+            verified_findings=result["summary"]["verified_findings_count"],
+            rejected_findings=result["summary"]["rejected_false_positives"],
+            duplicate_findings=result["summary"]["duplicate_findings_rejected"],
+        )
+
+        if _orchestrator().http_client is not None and findings_data:
+            critical = sum(
+                1 for finding in findings_data if finding.get("severity") == "CRITICAL"
+            )
+            asyncio.create_task(
+                _orchestrator().notifier.send(
+                    _orchestrator().http_client,
+                    f"YGB workflow {report_id} completed with {len(findings_data)} findings ({critical} critical) for {target_url}",
+                )
+            )
+
+        await _orchestrator().remember_experience(
+            "crawler-agent",
+            f"workflow={report_id} target={target_url} verified={result['summary']['verified_findings_count']} total={len(findings_data)} tech={','.join(context.technologies)}",
+            {
+                "workflow_id": report_id,
+                "target": target_url,
+                "verified_findings": result["summary"]["verified_findings_count"],
+                "total_findings": len(findings_data),
+                "technologies": context.technologies,
+            },
+        )
+
     except WebSocketDisconnect:
         print(f"[WS] WebSocket disconnected: {report_id}")
     except Exception as e:
@@ -1424,49 +1818,100 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
         bounty_connections.pop(report_id, None)
 
 
-
 # =============================================================================
 # STARTUP EVENT (using modern lifespan)
 # =============================================================================
 
+app.include_router(api_router)
+app.include_router(telemetry_router)
+app.include_router(training_router)
+app.include_router(voice_router)
+
 from contextlib import asynccontextmanager
+
 
 @asynccontextmanager
 async def lifespan(app):
     """Lifespan context manager for startup/shutdown."""
     # Startup
-    phases = discover_python_phases()
-    hunter = discover_hunter_modules()
+    await _orchestrator().startup()
+    _orchestrator().configure_state_store(
+        "active_workflows", ttl_seconds=3600, max_items=1000
+    )
+    _orchestrator().configure_state_store(
+        "dashboard_states", ttl_seconds=43200, max_items=500
+    )
+    _orchestrator().configure_state_store(
+        "execution_kernels", ttl_seconds=43200, max_items=500
+    )
+    _orchestrator().configure_state_store(
+        "approval_requests", ttl_seconds=21600, max_items=1000
+    )
+    _orchestrator().configure_state_store(
+        "autonomy_sessions", ttl_seconds=43200, max_items=500
+    )
+    await asyncio.gather(
+        _orchestrator().apply_recovered_state("active_workflows", active_workflows),
+        _orchestrator().apply_recovered_state("dashboard_states", dashboard_states),
+        _orchestrator().apply_recovered_state("execution_kernels", execution_kernels),
+        _orchestrator().apply_recovered_state("approval_requests", approval_requests),
+        _orchestrator().apply_recovered_state("autonomy_sessions", autonomy_sessions),
+    )
+    phases, hunter = await asyncio.gather(
+        _get_phase_inventory(), _get_hunter_inventory()
+    )
     print(f"[*] YGB API Server starting...")
     print(f"[*] Project root: {PROJECT_ROOT}")
     print(f"[*] Python phases: {len(phases)}")
     print(f"[*] Hunter modules: {len(hunter)}")
-    
+
     # Initialize database
     try:
         await init_database()
         print(f"[+] Database connected")
     except Exception as e:
         print(f"[!] Database connection failed: {e}")
-    
+
     print(f"[+] Server ready at http://localhost:8000")
-    
-    # Start G38 auto-training scheduler
-    if G38_AVAILABLE:
-        start_auto_training()
+
+    runtime = _get_g38_runtime()
+    if runtime:
+        runtime["start_auto_training"]()
         print("[*] G38 auto-training started")
-    
+    else:
+        print(f"⚠️  G38 modules not available: {G38_IMPORT_ERROR}")
+
+    _orchestrator().register_status_provider(
+        "api",
+        lambda: {
+            "ygb_root": str(PROJECT_ROOT),
+            "python_phases": len(phases),
+            "hunter_modules": len(hunter),
+        },
+    )
+    _orchestrator().register_status_provider(
+        "g38",
+        get_g38_status,
+    )
+    _orchestrator().register_status_provider(
+        "admin_stats",
+        get_admin_stats,
+    )
+    await _orchestrator().refresh_status_snapshot()
+
     yield
-    
+
     # Shutdown
     print("[*] YGB API Server shutting down...")
-    
-    # Stop G38 auto-training
-    if G38_AVAILABLE:
-        stop_auto_training()
+
+    runtime = _get_g38_runtime()
+    if runtime:
+        runtime["stop_auto_training"]()
         print("[*] G38 auto-training stopped")
-    
+
     await close_pool()
+    await _orchestrator().shutdown()
+
 
 # Apply lifespan to app
 app.router.lifespan_context = lifespan
@@ -1478,5 +1923,10 @@ app.router.lifespan_context = lifespan
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
 
+    uvicorn.run(
+        "server:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=os.environ.get("YGB_ENV", "dev") == "dev",
+    )
