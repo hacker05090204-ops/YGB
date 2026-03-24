@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25606",
+  "ingested_at": "2026-03-22T18:08:57.569818+00:00",
+  "lang": "en",
+  "raw_text": "Fast AVI MPEG Joiner 1.2.0812 contains a buffer overflow vulnerability that allows local attackers to crash the application by supplying an oversized payload in the License Name field. Attackers can create a malicious text file containing 6000 bytes of data and paste it into the License Name input field to trigger a denial of service condition when the Register button is clicked.",
+  "severity": "MEDIUM",
+  "sha256_hash": "f9983e63fee0b45081c61f5f4bdceccf9d6b3279963e78ef9639a13acef9baea",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25606"
+}

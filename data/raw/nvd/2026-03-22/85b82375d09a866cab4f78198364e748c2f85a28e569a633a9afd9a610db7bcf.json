@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25611",
+  "ingested_at": "2026-03-22T18:08:57.581990+00:00",
+  "lang": "en",
+  "raw_text": "MiniFtp contains a buffer overflow vulnerability in the parseconf_load_setting function that allows local attackers to execute arbitrary code by supplying oversized configuration values. Attackers can craft a miniftpd.conf file with values exceeding 128 bytes to overflow stack buffers and overwrite the return address, enabling code execution with root privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "85b82375d09a866cab4f78198364e748c2f85a28e569a633a9afd9a610db7bcf",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25611"
+}

@@ -116,9 +116,10 @@ export function getApiBase(): string {
  * Centralized fetch wrapper that includes auth credentials (HttpOnly cookies).
  */
 export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
+  const method = (options.method || "GET").toUpperCase();
   return credentialedFetch(url, {
     ...options,
-    cache: "no-store",
+    cache: options.cache ?? (method === "GET" ? "default" : "no-store"),
   });
 }
 

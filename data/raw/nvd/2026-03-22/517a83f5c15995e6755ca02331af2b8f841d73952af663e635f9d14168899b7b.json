@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4549",
+  "ingested_at": "2026-03-22T18:08:57.607386+00:00",
+  "lang": "en",
+  "raw_text": "A flaw has been found in mickasmt next-saas-stripe-starter 1.0.0. Affected by this issue is the function openCustomerPortal of the file actions/open-customer-portal.ts of the component Stripe API. This manipulation causes authorization bypass. Remote exploitation of the attack is possible. The complexity of an attack is rather high. The exploitation is known to be difficult.",
+  "severity": "LOW",
+  "sha256_hash": "517a83f5c15995e6755ca02331af2b8f841d73952af663e635f9d14168899b7b",
+  "source": "nvd",
+  "tags": [
+    "CWE-285",
+    "CWE-639"
+  ],
+  "token_count": 53,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4549"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33295",
+  "ingested_at": "2026-03-22T18:08:57.625127+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 26.0, WWBN/AVideo contains a stored cross-site scripting vulnerability in the CDN plugin's download buttons component. The `clean_title` field of a video record is interpolated directly into a JavaScript string literal without any escaping, allowing an attacker who can create or modify a video to inject arbitrary JavaScript that executes in the browser of any user who visits the affected download page. Version 26.0 fixes the issue.",
+  "severity": "UNKNOWN",
+  "sha256_hash": "62bebaea6bb69d08df773923fef960ea1f468c22d9d0b54cfd6c3d4bca7f15c5",
+  "source": "nvd",
+  "tags": [
+    "CWE-79"
+  ],
+  "token_count": 77,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33295"
+}

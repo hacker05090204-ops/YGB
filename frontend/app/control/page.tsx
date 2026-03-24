@@ -1,19 +1,15 @@
 "use client"
 
-import { AuthGuard } from "@/components/auth-guard"
-
-import { useState, useEffect, useCallback, useRef } from "react"
+import { type CSSProperties, useState, useEffect, useCallback, useRef } from "react"
 import { useAuthUser } from "@/hooks/use-auth-user"
 import { authFetch , getApiBase } from "@/lib/ygb-api"
 import { cn } from "@/lib/utils"
 import { Activity, Shield, AlertTriangle, Play, Square, Crosshair, BookOpen, Gauge, Target, ShieldCheck, Clock, RefreshCw } from "lucide-react"
 
-import { AppSidebar } from "@/components/app-sidebar"
 import {
-    SidebarInset,
-    SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { ProtectedSidebarShell } from "@/components/protected-sidebar-shell"
 
 // Import all dashboard components
 import { ExecutionState, type ExecutionStateType } from "@/components/execution-state"
@@ -148,7 +144,6 @@ function ControlPageContent() {
         try {
             const response = await fetch(`${getApiBase()}/health`, {
                 method: "GET",
-                cache: "no-store",
                 signal: controller.signal,
             })
             if (response.ok) {
@@ -235,7 +230,7 @@ function ControlPageContent() {
         return () => clearInterval(interval)
     }, [checkServerHealth])
 
-    // Poll accuracy snapshot — every 1s for real-time updates
+    // Poll accuracy snapshot — every 3s for real-time updates
     useEffect(() => {
         let inFlight = false
 
@@ -265,11 +260,11 @@ function ControlPageContent() {
             }
         }
         fetchAccuracy()
-        const interval = setInterval(fetchAccuracy, 1000)
+        const interval = setInterval(fetchAccuracy, 3000)
         return () => clearInterval(interval)
     }, [])
 
-    // Poll runtime status from backend — every 1s for real-time updates
+    // Poll runtime status from backend — every 3s for real-time updates
     useEffect(() => {
         let inFlight = false
 
@@ -321,7 +316,7 @@ function ControlPageContent() {
             }
         }
         fetchRuntimeStatus()
-        const interval = setInterval(fetchRuntimeStatus, 1000)
+        const interval = setInterval(fetchRuntimeStatus, 3000)
         return () => clearInterval(interval)
     }, [])
 
@@ -605,14 +600,12 @@ function ControlPageContent() {
     // Loading State
     if (isLoading) {
         return (
-            <SidebarProvider
-                style={{
+            <ProtectedSidebarShell
+                providerStyle={{
                     "--sidebar-width": "calc(var(--spacing) * 64)",
                     "--header-height": "calc(var(--spacing) * 12)",
-                } as React.CSSProperties}
+                } as CSSProperties}
             >
-                <AppSidebar variant="inset" />
-                <SidebarInset>
                     <div className="min-h-screen flex items-center justify-center">
                         <div className="text-center">
                             <div className="w-16 h-16 rounded-2xl bg-card flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -621,20 +614,17 @@ function ControlPageContent() {
                             <p className="text-muted-foreground">Initializing Control Panel...</p>
                         </div>
                     </div>
-                </SidebarInset>
-            </SidebarProvider>
+            </ProtectedSidebarShell>
         )
     }
 
     return (
-        <SidebarProvider
-            style={{
+        <ProtectedSidebarShell
+            providerStyle={{
                 "--sidebar-width": "calc(var(--spacing) * 64)",
                 "--header-height": "calc(var(--spacing) * 12)",
-            } as React.CSSProperties}
+            } as CSSProperties}
         >
-            <AppSidebar variant="inset" />
-            <SidebarInset>
                 {/* Header */}
                 <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border/40 px-4 bg-background/50 backdrop-blur-md">
                     <div className="flex items-center gap-4">
@@ -1230,11 +1220,10 @@ function ControlPageContent() {
                         </div>
                     </div>
                 </main>
-            </SidebarInset>
-        </SidebarProvider>
+        </ProtectedSidebarShell>
     )
 }
 
 export default function ControlPage() {
-    return <AuthGuard><ControlPageContent /></AuthGuard>
+    return <ControlPageContent />
 }

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25616",
+  "ingested_at": "2026-03-22T18:08:57.591653+00:00",
+  "lang": "en",
+  "raw_text": "AnMing MP3 CD Burner 2.0 contains a buffer overflow vulnerability that allows local attackers to crash the application by supplying an oversized string. Attackers can paste a 6000-byte payload into the registration name field to trigger a denial of service condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "1cca691e22f6e0da1920d77f7551163971833488e391efab1d9feea6b1ddd6bf",
+  "source": "nvd",
+  "tags": [
+    "CWE-434"
+  ],
+  "token_count": 41,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25616"
+}

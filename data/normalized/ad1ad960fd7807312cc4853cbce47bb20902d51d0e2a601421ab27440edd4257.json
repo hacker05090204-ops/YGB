@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "EquityPandit 1.0 contains an insecure logging vulnerability that allows attackers to capture sensitive user credentials by accessing developer console logs via Android Debug Bridge. Attackers can use adb logcat to extract plaintext passwords logged during the forgot password function, exposing user account credentials.",
+  "token_count": 43
+}

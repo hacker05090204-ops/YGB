@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4557",
+  "ingested_at": "2026-03-22T22:10:26.437257+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in code-projects Exam Form Submission 1.0. This impacts an unknown function of the file /admin/update_s1.php. Performing a manipulation of the argument sname results in cross site scripting. The attack may be initiated remotely. The exploit is now public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "86af9a030d1440777e20924855d626668ba49a41f01781f9dd79cf1a8e45404d",
+  "source": "nvd",
+  "tags": [
+    "CWE-79",
+    "CWE-94"
+  ],
+  "token_count": 46,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4557"
+}

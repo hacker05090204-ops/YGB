@@ -2,14 +2,14 @@
   "inference": {
     "pid": null,
     "state": "running",
-    "started_at": "2026-03-07T19:58:13.656214",
+    "started_at": "2026-03-23T03:34:39.738543",
     "crash_count": 0
   },
   "training": {
     "pid": null,
     "state": "crashed",
-    "started_at": "2026-03-07T19:58:13.657212",
+    "started_at": "2026-03-23T03:34:39.739554",
     "crash_count": 1
   },
-  "updated": "2026-03-07T19:58:13.658213"
+  "updated": "2026-03-23T03:34:39.740555"
 }

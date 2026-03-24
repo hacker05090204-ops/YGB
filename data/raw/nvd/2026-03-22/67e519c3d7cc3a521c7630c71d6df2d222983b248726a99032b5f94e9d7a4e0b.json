@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25609",
+  "ingested_at": "2026-03-22T18:08:57.576499+00:00",
+  "lang": "en",
+  "raw_text": "JetAudio jetCast Server 2.0 contains a stack-based buffer overflow vulnerability in the Log Directory configuration field that allows local attackers to overwrite structured exception handling pointers. Attackers can inject alphanumeric encoded shellcode through the Log Directory field to trigger an SEH exception handler and execute arbitrary code with application privileges.",
+  "severity": "HIGH",
+  "sha256_hash": "67e519c3d7cc3a521c7630c71d6df2d222983b248726a99032b5f94e9d7a4e0b",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25609"
+}

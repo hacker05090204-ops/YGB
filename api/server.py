@@ -47,7 +47,7 @@ def _load_env_file(
             if _eq <= 0:
                 continue
             _key = _line[:_eq].strip()
-            _val = _line[_eq + 1:].strip()
+            _val = _line[_eq + 1 :].strip()
             if allowed_keys is not None and _key not in allowed_keys:
                 continue
             if not allow_placeholders and _is_placeholder_env_value(_key, _val):
@@ -155,17 +155,31 @@ from datetime import datetime, UTC
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request, Depends
+from fastapi import (
+    FastAPI,
+    WebSocket,
+    WebSocketDisconnect,
+    HTTPException,
+    Request,
+    Depends,
+)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse, RedirectResponse, Response
+from fastapi.responses import (
+    FileResponse,
+    PlainTextResponse,
+    RedirectResponse,
+    Response,
+)
 from pydantic import BaseModel
 
 # Centralized auth guard
 from backend.auth.auth_guard import (
-    require_auth, require_admin,
+    require_auth,
+    require_admin,
     build_temporary_auth_user,
     is_temporary_auth_bypass_enabled,
-    revoke_token, revoke_session,
+    revoke_token,
+    revoke_session,
     preflight_check_secrets,
     get_required_secret,
     validate_target_url,
@@ -183,22 +197,46 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 # Ensure HDD storage root points to the dedicated YGB_DATA partition (D:\)
 import platform as _plat
+
 if _plat.system() == "Windows":
     os.environ.setdefault("YGB_HDD_ROOT", "D:/ygb_hdd")
     os.environ.setdefault("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback")
 
 # Import HDD storage bridge (replaces SQLite database module)
 from backend.storage.storage_bridge import (
-    init_storage, shutdown_storage,
-    create_user, get_user, get_all_users, update_user_stats,
-    create_target, get_all_targets, get_target,
-    create_bounty, get_user_bounties, get_all_bounties, update_bounty_status,
-    create_session, get_user_sessions, update_session_progress,
-    log_activity, get_recent_activity, get_admin_stats,
-    get_storage_stats, get_lifecycle_status, get_disk_status,
-    get_delete_preview, store_video, get_video_stream_token,
-    stream_video, list_videos, get_storage_health,
-    update_user_auth_profile, get_admin_user_security_view,
+    init_storage,
+    shutdown_storage,
+    create_user,
+    get_user,
+    get_all_users,
+    get_users_page,
+    update_user_stats,
+    create_target,
+    get_all_targets,
+    get_targets_page,
+    get_target,
+    create_bounty,
+    get_user_bounties,
+    get_all_bounties,
+    get_bounties_page,
+    update_bounty_status,
+    create_session,
+    get_user_sessions,
+    update_session_progress,
+    log_activity,
+    get_recent_activity,
+    get_admin_stats,
+    get_storage_stats,
+    get_lifecycle_status,
+    get_disk_status,
+    get_delete_preview,
+    store_video,
+    get_video_stream_token,
+    stream_video,
+    list_videos,
+    get_storage_health,
+    update_user_auth_profile,
+    get_admin_user_security_view,
 )
 
 # Import tiered storage manager (SSD cap + HDD overflow)
@@ -209,10 +247,13 @@ try:
         start_enforcement_loop as start_storage_enforcement,
         resolve_path as resolve_storage_path,
     )
+
     TIERED_STORAGE_AVAILABLE = True
     # NOTE: start_storage_enforcement() is called inside lifespan() to avoid
     # spawning background threads at import time (test pollution / orphaned threads).
-    logger.info("[BOOT] Tiered storage module loaded (enforcement deferred to lifespan)")
+    logger.info(
+        "[BOOT] Tiered storage module loaded (enforcement deferred to lifespan)"
+    )
 except Exception as _ts_err:
     TIERED_STORAGE_AVAILABLE = False
     logger.warning("[BOOT] Tiered storage not available: %s", _ts_err)
@@ -220,9 +261,13 @@ except Exception as _ts_err:
 # Import activation profiles
 try:
     from backend.config.activation_profiles import (
-        validate_startup, log_boot_summary, get_profile,
-        get_smtp_pass, IntegrationState,
+        validate_startup,
+        log_boot_summary,
+        get_profile,
+        get_smtp_pass,
+        IntegrationState,
     )
+
     ACTIVATION_PROFILES_AVAILABLE = True
 except ImportError:
     ACTIVATION_PROFILES_AVAILABLE = False
@@ -233,40 +278,62 @@ from backend.training.runtime_artifacts import (
     bootstrap_runtime_artifacts,
     repair_runtime_artifacts_if_needed,
 )
-from backend.api.system_status_store import refresh_system_status_file
+from backend.api.system_status_store import (
+    read_or_refresh_system_status_file,
+    refresh_system_status_file,
+)
 from backend.training.runtime_status_validator import validate_precision_breach_status
 
 # Import auth and alerts
 from backend.auth.auth import (
-    hash_password, verify_password, generate_jwt, verify_jwt,
-    compute_device_hash, get_rate_limiter, generate_csrf_token, verify_csrf_token,
+    hash_password,
+    verify_password,
+    generate_jwt,
+    verify_jwt,
+    compute_device_hash,
+    get_rate_limiter,
+    generate_csrf_token,
+    verify_csrf_token,
     needs_rehash,
 )
 from backend.auth.geoip import resolve_ip_geolocation
 from backend.alerts.email_alerts import (
-    alert_new_login, alert_new_device, alert_multiple_devices,
-    alert_suspicious_activity, alert_rate_limit_exceeded
+    alert_new_login,
+    alert_new_device,
+    alert_multiple_devices,
+    alert_suspicious_activity,
+    alert_rate_limit_exceeded,
 )
 from backend.storage.storage_bridge import (
-    register_device, get_user_devices, get_all_active_devices,
-    get_active_device_count, get_active_sessions, end_session,
-    get_user_by_email, get_user_by_github_id, get_user_by_google_sub,
-    update_user_password
+    register_device,
+    get_user_devices,
+    get_all_active_devices,
+    get_active_device_count,
+    get_active_sessions,
+    end_session,
+    get_user_by_email,
+    get_user_by_github_id,
+    get_user_by_google_sub,
+    update_user_password,
 )
 
 # Import REAL phase runner with actual browser automation
 try:
     from api.phase_runner import RealPhaseRunner, run_real_workflow
+
     PHASE_RUNNER_AVAILABLE = True
 except ImportError:
     try:
         from phase_runner import RealPhaseRunner, run_real_workflow
+
         PHASE_RUNNER_AVAILABLE = True
     except ImportError:
         PHASE_RUNNER_AVAILABLE = False
         RealPhaseRunner = None
         run_real_workflow = None
-        logger.warning("[BOOT] phase_runner not available — browser automation routes degraded")
+        logger.warning(
+            "[BOOT] phase_runner not available — browser automation routes degraded"
+        )
 
 # =============================================================================
 # G38 AUTO-TRAINING IMPORTS
@@ -296,6 +363,7 @@ try:
         get_mode_a_status,
         get_training_mode_summary,
     )
+
     G38_AVAILABLE = True
 except ImportError as e:
     print(f"[WARN] G38 modules not available: {e}")
@@ -311,6 +379,7 @@ except ImportError as e:
 
 try:
     from backend.integrity.integrity_bridge import get_integrity_supervisor
+
     INTEGRITY_AVAILABLE = True
 except ImportError as e:
     print(f"[WARN] Integrity supervisor not available: {e}")
@@ -322,9 +391,13 @@ except ImportError as e:
 
 try:
     from backend.assistant.query_router import (
-        QueryRouter, ResearchSearchPipeline, VoiceMode, ResearchStatus,
+        QueryRouter,
+        ResearchSearchPipeline,
+        VoiceMode,
+        ResearchStatus,
     )
     from backend.assistant.isolation_guard import IsolationGuard
+
     RESEARCH_AVAILABLE = True
 except ImportError as e:
     print(f"[WARN] Research assistant not available: {e}")
@@ -336,6 +409,7 @@ except ImportError as e:
 
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app):
     """Unified server lifespan: preflight → storage → CVE scheduler → G38."""
@@ -343,6 +417,7 @@ async def lifespan(app):
     # Activate structured JSON logging at boot
     try:
         from backend.observability.log_config import configure_logging
+
         configure_logging(level="INFO", structured=True)
         logger.info("[BOOT] Structured logging activated")
     except ImportError:
@@ -394,7 +469,7 @@ async def lifespan(app):
         logger.warning("[BOOT] Runtime precision reconciliation degraded: %s", e)
 
     try:
-        refresh_system_status_file()
+        read_or_refresh_system_status_file(force_refresh=True)
         logger.info("[BOOT] Canonical system status refreshed")
     except Exception as e:
         logger.warning("[BOOT] Canonical system status refresh degraded: %s", e)
@@ -402,6 +477,7 @@ async def lifespan(app):
     # Start CVE scheduler (async — must be awaited)
     try:
         from backend.cve.cve_scheduler import get_scheduler
+
         scheduler = get_scheduler()
         await scheduler.start()
         logger.info(
@@ -417,6 +493,7 @@ async def lifespan(app):
     # Start bridge ingestion worker (CVE → training bridge)
     try:
         from backend.cve.bridge_ingestion_worker import get_bridge_worker
+
         bridge_worker = get_bridge_worker()
         logger.info(
             f"[BOOT] Bridge ingestion worker initialized "
@@ -434,7 +511,9 @@ async def lifespan(app):
             if result.get("started"):
                 print("[*] G38 24/7 continuous training STARTED")
             else:
-                print(f"[*] G38 continuous training deferred: {result.get('reason', 'unknown')}")
+                print(
+                    f"[*] G38 continuous training deferred: {result.get('reason', 'unknown')}"
+                )
         except Exception as e:
             logger.warning(f"[BOOT] G38 continuous training start failed: {e}")
         g38_started = True
@@ -444,7 +523,9 @@ async def lifespan(app):
     if TIERED_STORAGE_AVAILABLE:
         try:
             start_storage_enforcement(300)
-            logger.info("[BOOT] Tiered storage SSD cap enforcement started (5 min interval)")
+            logger.info(
+                "[BOOT] Tiered storage SSD cap enforcement started (5 min interval)"
+            )
         except Exception as _enf_err:
             logger.warning("[BOOT] Tiered storage enforcement failed: %s", _enf_err)
 
@@ -456,6 +537,7 @@ async def lifespan(app):
     print("[*] YGB API Server shutting down...")
     try:
         from backend.cve.cve_scheduler import get_scheduler
+
         scheduler = get_scheduler()
         await scheduler.stop()
         logger.info("[SHUTDOWN] CVE scheduler stopped")
@@ -471,6 +553,7 @@ async def lifespan(app):
     # Shutdown HDD storage engine
     shutdown_storage()
     print("[*] HDD Storage Engine shutdown complete")
+
 
 app = FastAPI(
     title="YGB API",
@@ -508,6 +591,7 @@ app.add_middleware(
 # Sync engine API endpoints
 try:
     from backend.sync.sync_routes import api_sync_router, sync_router
+
     app.include_router(sync_router, prefix="/sync")
     app.include_router(api_sync_router, prefix="/api/sync")
     logger.info("[SYNC] Sync API routes mounted at /sync/* and /api/sync/*")
@@ -519,6 +603,7 @@ except ImportError as _sync_err:
 # =============================================================================
 try:
     from backend.reliability.health_endpoints import health_router
+
     app.include_router(health_router)
     logger.info("[BOOT] Health probes registered: /healthz, /readyz")
 except ImportError as _health_err:
@@ -557,6 +642,7 @@ except ImportError as _obs_err:
 from starlette.responses import JSONResponse
 from backend.api.exceptions import YGBError
 
+
 @app.exception_handler(YGBError)
 async def _ygb_error_handler(request: Request, exc: YGBError):
     """Handle typed YGB exceptions with proper status codes and correlation IDs."""
@@ -566,6 +652,7 @@ async def _ygb_error_handler(request: Request, exc: YGBError):
         content=exc.to_response(),
     )
 
+
 @app.exception_handler(Exception)
 async def _global_exception_handler(request: Request, exc: Exception):
     """
@@ -573,6 +660,7 @@ async def _global_exception_handler(request: Request, exc: Exception):
     with a correlation ID for debugging. Raw traceback logged server-side only.
     """
     import traceback
+
     correlation_id = secrets.token_hex(8)
     logger.error(
         "Unhandled exception [%s] %s %s: %s\n%s",
@@ -591,9 +679,11 @@ async def _global_exception_handler(request: Request, exc: Exception):
         },
     )
 
+
 # Voice pipeline router
 try:
     from api.voice_routes import voice_router
+
     app.include_router(voice_router)
     logger.info("[BOOT] Voice pipeline routes registered")
 except ImportError:
@@ -602,6 +692,7 @@ except ImportError:
 # Voice gateway (WebSocket streaming + REST transcribe/intent/execute/respond)
 try:
     from api.voice_gateway import voice_gw_router
+
     app.include_router(voice_gw_router)
     logger.info("[BOOT] Voice gateway routes registered")
 except ImportError as e:
@@ -610,6 +701,7 @@ except ImportError as e:
 # Report Generator router (reports + video recording metadata)
 try:
     from backend.api.report_generator import router as report_router
+
     app.include_router(report_router)
     logger.info("[BOOT] Report Generator routes registered")
 except ImportError as e:
@@ -618,6 +710,7 @@ except ImportError as e:
 # Aggregated system status endpoint
 try:
     from backend.api.system_status import system_status_router
+
     app.include_router(system_status_router)
     logger.info("[BOOT] System status endpoint registered: /api/system/status")
 except ImportError as e:
@@ -626,6 +719,7 @@ except ImportError as e:
 # =============================================================================
 # REQUEST/RESPONSE MODELS
 # =============================================================================
+
 
 class StartWorkflowRequest(BaseModel):
     target: str
@@ -648,6 +742,7 @@ class PhaseInfo(BaseModel):
 # =============================================================================
 # PHASE-49 MODELS
 # =============================================================================
+
 
 class CreateDashboardRequest(BaseModel):
     user_id: str
@@ -685,6 +780,7 @@ class AutonomySessionRequest(BaseModel):
 # =============================================================================
 # DATABASE MODELS
 # =============================================================================
+
 
 class CreateUserRequest(BaseModel):
     name: str
@@ -752,6 +848,72 @@ _HEALTH_STORAGE_CACHE: Dict[str, Any] = {
     "checked_at_monotonic": 0.0,
     "value": None,
 }
+_RUNTIME_STATUS_CACHE_SECONDS = max(
+    1.0,
+    float(os.getenv("YGB_RUNTIME_STATUS_CACHE_SECONDS", "3")),
+)
+_RUNTIME_STATUS_CACHE_LOCK = threading.Lock()
+_RUNTIME_STATUS_CACHE: Dict[str, Any] = {
+    "checked_at_monotonic": 0.0,
+    "training_active": None,
+    "telemetry_mtime": None,
+    "value": None,
+}
+
+
+def _get_runtime_status_cached() -> Optional[Dict[str, Any]]:
+    telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
+    telemetry_mtime = (
+        telemetry_path.stat().st_mtime if telemetry_path.exists() else None
+    )
+    training_active = False
+    if G38_AVAILABLE:
+        try:
+            training_active = bool(
+                get_auto_trainer().get_status().get("is_training", False)
+            )
+        except Exception:
+            training_active = False
+
+    now = time.monotonic()
+    with _RUNTIME_STATUS_CACHE_LOCK:
+        cached = _RUNTIME_STATUS_CACHE.get("value")
+        checked_at = float(_RUNTIME_STATUS_CACHE.get("checked_at_monotonic") or 0.0)
+        same_training_state = (
+            _RUNTIME_STATUS_CACHE.get("training_active") == training_active
+        )
+        same_telemetry_state = (
+            _RUNTIME_STATUS_CACHE.get("telemetry_mtime") == telemetry_mtime
+        )
+        if (
+            isinstance(cached, dict)
+            and (now - checked_at) < _RUNTIME_STATUS_CACHE_SECONDS
+            and same_training_state
+            and same_telemetry_state
+        ):
+            return dict(cached)
+    return None
+
+
+def _store_runtime_status_cached(payload: Dict[str, Any]) -> Dict[str, Any]:
+    telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
+    telemetry_mtime = (
+        telemetry_path.stat().st_mtime if telemetry_path.exists() else None
+    )
+    training_active = False
+    if G38_AVAILABLE:
+        try:
+            training_active = bool(
+                get_auto_trainer().get_status().get("is_training", False)
+            )
+        except Exception:
+            training_active = False
+    with _RUNTIME_STATUS_CACHE_LOCK:
+        _RUNTIME_STATUS_CACHE["checked_at_monotonic"] = time.monotonic()
+        _RUNTIME_STATUS_CACHE["training_active"] = training_active
+        _RUNTIME_STATUS_CACHE["telemetry_mtime"] = telemetry_mtime
+        _RUNTIME_STATUS_CACHE["value"] = dict(payload)
+    return payload
 
 
 def _get_cached_storage_health() -> Dict[str, Any]:
@@ -766,7 +928,10 @@ def _get_cached_storage_health() -> Dict[str, Any]:
     with _HEALTH_STORAGE_CACHE_LOCK:
         cached = _HEALTH_STORAGE_CACHE["value"]
         checked_at = float(_HEALTH_STORAGE_CACHE["checked_at_monotonic"] or 0.0)
-        if isinstance(cached, dict) and (now - checked_at) < _HEALTH_STORAGE_CACHE_SECONDS:
+        if (
+            isinstance(cached, dict)
+            and (now - checked_at) < _HEALTH_STORAGE_CACHE_SECONDS
+        ):
             return dict(cached)
 
     try:
@@ -799,10 +964,11 @@ def _get_cached_storage_health() -> Dict[str, Any]:
 # PHASE DISCOVERY
 # =============================================================================
 
+
 def discover_python_phases() -> List[Dict[str, Any]]:
     """Discover available Python phases."""
     phases = []
-    
+
     # Phases 01-19 in python/
     python_dir = PROJECT_ROOT / "python"
     if python_dir.exists():
@@ -810,16 +976,18 @@ def discover_python_phases() -> List[Dict[str, Any]]:
             if item.is_dir() and item.name.startswith("phase"):
                 try:
                     num = int(item.name.replace("phase", "").split("_")[0])
-                    phases.append({
-                        "name": item.name,
-                        "number": num,
-                        "path": str(item),
-                        "available": True,
-                        "description": f"Phase {num:02d} - {item.name.split('_', 1)[-1].replace('_', ' ').title()}"
-                    })
+                    phases.append(
+                        {
+                            "name": item.name,
+                            "number": num,
+                            "path": str(item),
+                            "available": True,
+                            "description": f"Phase {num:02d} - {item.name.split('_', 1)[-1].replace('_', ' ').title()}",
+                        }
+                    )
                 except ValueError:
                     pass
-    
+
     # Phases 20-49 in impl_v1/
     impl_dir = PROJECT_ROOT / "impl_v1"
     if impl_dir.exists():
@@ -827,16 +995,18 @@ def discover_python_phases() -> List[Dict[str, Any]]:
             if item.is_dir() and item.name.startswith("phase"):
                 try:
                     num = int(item.name.replace("phase", ""))
-                    phases.append({
-                        "name": item.name,
-                        "number": num,
-                        "path": str(item),
-                        "available": True,
-                        "description": f"Phase {num:02d} - Implementation Layer"
-                    })
+                    phases.append(
+                        {
+                            "name": item.name,
+                            "number": num,
+                            "path": str(item),
+                            "available": True,
+                            "description": f"Phase {num:02d} - Implementation Layer",
+                        }
+                    )
                 except ValueError:
                     pass
-    
+
     return sorted(phases, key=lambda x: x["number"])
 
 
@@ -844,18 +1014,23 @@ def discover_hunter_modules() -> Dict[str, bool]:
     """Discover available HUMANOID_HUNTER modules."""
     modules = {}
     hunter_dir = PROJECT_ROOT / "HUMANOID_HUNTER"
-    
+
     if hunter_dir.exists():
         for item in hunter_dir.iterdir():
-            if item.is_dir() and not item.name.startswith("_") and not item.name.startswith("."):
+            if (
+                item.is_dir()
+                and not item.name.startswith("_")
+                and not item.name.startswith(".")
+            ):
                 modules[item.name] = True
-    
+
     return modules
 
 
 # =============================================================================
 # REST ENDPOINTS
 # =============================================================================
+
 
 @app.get("/api/health")
 async def health_check():
@@ -892,13 +1067,14 @@ async def get_storage_status(user=Depends(require_auth)):
     return get_storage_health()
 
 
-
 def _get_dataset_readiness() -> Dict[str, Any]:
     """Get dataset readiness status for health endpoint."""
     try:
         from impl_v1.training.data.real_dataset_loader import (
-            validate_dataset_integrity, YGB_MIN_REAL_SAMPLES,
+            validate_dataset_integrity,
+            YGB_MIN_REAL_SAMPLES,
         )
+
         ok, msg = validate_dataset_integrity()
         if ok:
             return {
@@ -957,6 +1133,7 @@ async def get_cve_status(user=Depends(require_auth)):
     """CVE pipeline status — sources, freshness, record counts."""
     try:
         from backend.cve.cve_pipeline import get_pipeline
+
         pipeline = get_pipeline()
         return pipeline.get_pipeline_status()
     except ImportError:
@@ -971,6 +1148,7 @@ async def get_cve_scheduler_health(user=Depends(require_auth)):
     """CVE scheduler SLO metrics and health status."""
     try:
         from backend.cve.cve_scheduler import get_scheduler
+
         scheduler = get_scheduler()
         return scheduler.get_health()
     except ImportError:
@@ -1002,6 +1180,7 @@ async def get_cve_pipeline_full_status(user=Depends(require_auth)):
         # Add bridge worker status
         try:
             from backend.cve.bridge_ingestion_worker import get_bridge_worker
+
             result["bridge_worker"] = get_bridge_worker().get_status()
         except Exception:
             result["bridge_worker"] = {"status": "NOT_AVAILABLE"}
@@ -1013,7 +1192,9 @@ async def get_cve_pipeline_full_status(user=Depends(require_auth)):
 
 
 @app.post("/api/cve/backfill")
-async def trigger_cve_backfill(request: Request, max_samples: int = 0, user=Depends(require_auth)):
+async def trigger_cve_backfill(
+    request: Request, max_samples: int = 0, user=Depends(require_auth)
+):
     """One-shot backfill: rapidly ingest all CVE pipeline records into training bridge.
 
     Used for fast ramp of internet-only AUTO mode.
@@ -1033,12 +1214,16 @@ async def trigger_cve_backfill(request: Request, max_samples: int = 0, user=Depe
             }
 
         await _abort_if_disconnected(request)
-        result = await asyncio.to_thread(worker.backfill, pipeline, max_samples=max_samples)
+        result = await asyncio.to_thread(
+            worker.backfill, pipeline, max_samples=max_samples
+        )
         return {
             **result,
             "active_ingestion": True,
             "threshold": 125000,
-            "go_no_go": "GO" if result.get("bridge_verified_count", 0) >= 125000 else "NO_GO",
+            "go_no_go": "GO"
+            if result.get("bridge_verified_count", 0) >= 125000
+            else "NO_GO",
         }
     except Exception:
         logger.exception("trigger_cve_backfill failed")
@@ -1058,6 +1243,7 @@ async def readyz():
     ready = True
     try:
         from api.database import get_db
+
         db = await get_db()
         checks["database"] = "ok" if db else "unavailable"
         if not db:
@@ -1081,6 +1267,7 @@ async def get_cve_summary(user=Depends(require_auth)):
     """Quick CVE summary — total records, sources, freshness."""
     try:
         from backend.cve.cve_pipeline import get_pipeline
+
         pipeline = get_pipeline()
         status = pipeline.get_pipeline_status()
         return {
@@ -1091,17 +1278,30 @@ async def get_cve_summary(user=Depends(require_auth)):
             "timestamp": datetime.now(UTC).isoformat(),
         }
     except ImportError:
-        return {"total_records": 0, "sources_connected": 0, "freshness": "NOT_AVAILABLE"}
+        return {
+            "total_records": 0,
+            "sources_connected": 0,
+            "freshness": "NOT_AVAILABLE",
+        }
     except Exception:
         logger.exception("get_cve_summary failed")
-        return {"total_records": 0, "sources_connected": 0, "freshness": "ERROR", "reason": "Internal error"}
+        return {
+            "total_records": 0,
+            "sources_connected": 0,
+            "freshness": "ERROR",
+            "reason": "Internal error",
+        }
 
 
 @app.get("/api/cve/search")
 async def search_cves(request: Request, q: str = "", user=Depends(require_auth)):
     """Search CVE records by ID or keyword."""
     if not q or len(q) < 3:
-        return {"results": [], "query": q, "reason": "Query must be at least 3 characters"}
+        return {
+            "results": [],
+            "query": q,
+            "reason": "Query must be at least 3 characters",
+        }
     try:
         from backend.cve.cve_pipeline import get_pipeline
 
@@ -1115,7 +1315,7 @@ async def search_cves(request: Request, q: str = "", user=Depends(require_auth))
             await _abort_if_disconnected(request)
             research = await asyncio.to_thread(
                 run_research_analysis,
-                f"{q} CVE severity NVD Vulners VulDB latest advisory"
+                f"{q} CVE severity NVD Vulners VulDB latest advisory",
             )
         return {
             "results": results[:50],
@@ -1135,9 +1335,12 @@ async def get_training_readiness(user=Depends(require_auth)):
     """Training readiness truth table — per-field status with exact block reasons."""
     try:
         from impl_v1.training.data.real_dataset_loader import (
-            validate_dataset_integrity, YGB_MIN_REAL_SAMPLES,
-            STRICT_REAL_MODE, get_per_field_report,
+            validate_dataset_integrity,
+            YGB_MIN_REAL_SAMPLES,
+            STRICT_REAL_MODE,
+            get_per_field_report,
         )
+
         # Run blocking I/O in thread pool to avoid event loop stall
         ok, msg = await asyncio.to_thread(validate_dataset_integrity)
 
@@ -1147,7 +1350,9 @@ async def get_training_readiness(user=Depends(require_auth)):
 
         fields["storage_engine"] = {
             "status": "READY" if storage_health.get("storage_active") else "BLOCKED",
-            "reason": None if storage_health.get("storage_active") else "Storage engine not active",
+            "reason": None
+            if storage_health.get("storage_active")
+            else "Storage engine not active",
         }
         fields["dataset_source"] = {
             "status": "READY" if ok else "BLOCKED",
@@ -1199,7 +1404,9 @@ async def get_training_readiness(user=Depends(require_auth)):
             "training_allowed": overall == "READY",
             "go_no_go": "GO" if overall == "READY" else "NO_GO",
             "remediation": msg if not ok else None,
-            "consistency_ok": bridge_report.get("consistency_ok", False) if 'bridge_report' in locals() else None,
+            "consistency_ok": bridge_report.get("consistency_ok", False)
+            if "bridge_report" in locals()
+            else None,
             "authoritative_source": "bridge_state.json",
             "timestamp": datetime.now(UTC).isoformat(),
         }
@@ -1213,19 +1420,18 @@ async def get_training_readiness(user=Depends(require_auth)):
         }
 
 
-
 @app.get("/api/backup/status")
 async def get_backup_status_endpoint(user=Depends(require_auth)):
     """Backup strategy status — local HDD, peer replication, Google Drive."""
     try:
         from backend.storage.backup_config import get_backup_status
+
         return get_backup_status()
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "Backup config module not found"}
     except Exception:
         logger.exception("get_backup_status_endpoint failed")
         return {"status": "ERROR", "reason": "Internal error"}
-
 
 
 @app.get("/api/bounty/phases")
@@ -1236,7 +1442,7 @@ async def get_bounty_phases(user=Depends(require_auth)):
         p["name"]: {
             "number": p["number"],
             "available": p["available"],
-            "description": p["description"]
+            "description": p["description"],
         }
         for p in phases
     }
@@ -1245,6 +1451,7 @@ async def get_bounty_phases(user=Depends(require_auth)):
 # =============================================================================
 # FRONTEND-REQUIRED ROUTES (phases, hunter modules, field progression)
 # =============================================================================
+
 
 class RunPhaseRequest(BaseModel):
     phase: str
@@ -1302,7 +1509,9 @@ async def run_phase(request: RunPhaseRequest, user=Depends(require_auth)):
     phases = discover_python_phases()
     phase_names = [p["name"] for p in phases]
     if request.phase not in phase_names:
-        raise HTTPException(status_code=404, detail=f"Phase '{request.phase}' not found")
+        raise HTTPException(
+            status_code=404, detail=f"Phase '{request.phase}' not found"
+        )
 
     run_id = f"RUN-{uuid.uuid4().hex[:12].upper()}"
     active_workflows[run_id] = {
@@ -1324,7 +1533,9 @@ async def run_hunter_module(request: RunHunterRequest, user=Depends(require_auth
     assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     modules = discover_hunter_modules()
     if request.module not in modules:
-        raise HTTPException(status_code=404, detail=f"Hunter module '{request.module}' not found")
+        raise HTTPException(
+            status_code=404, detail=f"Hunter module '{request.module}' not found"
+        )
 
     run_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
     active_workflows[run_id] = {
@@ -1344,6 +1555,7 @@ async def fields_state_endpoint(user=Depends(require_auth)):
     """Field progression state — delegates to field_progression_api."""
     try:
         from backend.api.field_progression_api import get_fields_state
+
         return get_fields_state()
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
@@ -1365,6 +1577,7 @@ async def fields_approve_endpoint(
     auth_approver_id = user.get("sub", "")
     try:
         from backend.api.field_progression_api import approve_field
+
         return approve_field(field_id, auth_approver_id, request.reason)
     except ImportError:
         return {"status": "NOT_AVAILABLE", "reason": "field_progression_api not loaded"}
@@ -1379,17 +1592,19 @@ async def list_reports(user=Depends(require_auth)):
     report_dir = PROJECT_ROOT / "report"
     if not report_dir.exists():
         return {"reports": [], "count": 0}
-    
+
     reports = []
     for file in sorted(report_dir.glob("*.txt"), reverse=True):
         stat = file.stat()
-        reports.append({
-            "filename": file.name,
-            "size": stat.st_size,
-            "created": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-            "download_url": f"/api/reports/{file.name}"
-        })
-    
+        reports.append(
+            {
+                "filename": file.name,
+                "size": stat.st_size,
+                "created": datetime.fromtimestamp(stat.st_mtime).isoformat(),
+                "download_url": f"/api/reports/{file.name}",
+            }
+        )
+
     return {"reports": reports, "count": len(reports)}
 
 
@@ -1398,14 +1613,14 @@ async def download_report(filename: str, user=Depends(require_auth)):
     """Download a specific report file."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
-    
+
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="Report not found")
-    
+
     # Security check - prevent directory traversal
     if not str(file_path.resolve()).startswith(str(report_dir.resolve())):
         raise HTTPException(status_code=403, detail="Access denied")
-    
+
     media_type = mimetypes.guess_type(str(file_path))[0] or "application/octet-stream"
     return FileResponse(
         path=str(file_path),
@@ -1419,14 +1634,14 @@ async def get_report_content(filename: str, user=Depends(require_auth)):
     """Get report content as text."""
     report_dir = PROJECT_ROOT / "report"
     file_path = report_dir / filename
-    
+
     if not file_path.exists() or not file_path.is_file():
         raise HTTPException(status_code=404, detail="Report not found")
-    
+
     # Security check
     if not str(file_path.resolve()).startswith(str(report_dir.resolve())):
         raise HTTPException(status_code=403, detail="Access denied")
-    
+
     content = file_path.read_text(encoding="utf-8")
     return PlainTextResponse(content)
 
@@ -1438,14 +1653,16 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
     assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
-    
+
     # SSRF protection
     is_safe, violations = validate_target_url(request.target)
     if not is_safe:
-        raise HTTPException(status_code=400, detail=f"Target URL rejected: {violations[0]['message']}")
-    
+        raise HTTPException(
+            status_code=400, detail=f"Target URL rejected: {violations[0]['message']}"
+        )
+
     workflow_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
-    
+
     active_workflows[workflow_id] = {
         "type": "hunter",
         "target": request.target,
@@ -1455,15 +1672,12 @@ async def start_hunter(request: StartWorkflowRequest, user=Depends(require_auth)
         "steps": [],
         "owner_id": user.get("sub", ""),
     }
-    
+
     # Signal scan active so auto-training yields
     if G38_AVAILABLE:
         set_scan_active(True)
-    
-    return WorkflowStartResponse(
-        workflow_id=workflow_id,
-        status="started"
-    )
+
+    return WorkflowStartResponse(workflow_id=workflow_id, status="started")
 
 
 @app.post("/api/bounty/start")
@@ -1474,19 +1688,21 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
     assert not can_ai_submit()[0], "GUARD: AI cannot submit"
     if not request.target:
         raise HTTPException(status_code=400, detail="Target URL is required")
-    
+
     # Validate target URL
     target = request.target.strip()
     if not target.startswith(("http://", "https://")):
         target = f"https://{target}"
-    
+
     # SSRF protection
     is_safe, violations = validate_target_url(target)
     if not is_safe:
-        raise HTTPException(status_code=400, detail=f"Target URL rejected: {violations[0]['message']}")
-    
+        raise HTTPException(
+            status_code=400, detail=f"Target URL rejected: {violations[0]['message']}"
+        )
+
     report_id = f"RPT-{uuid.uuid4().hex[:12].upper()}"
-    
+
     # Store workflow with target URL
     active_workflows[report_id] = {
         "type": "bounty",
@@ -1499,23 +1715,22 @@ async def start_bounty(request: StartWorkflowRequest, user=Depends(require_auth)
         "findings": [],
         "owner_id": user.get("sub", ""),
     }
-    
+
     # Signal scan active so auto-training yields
     if G38_AVAILABLE:
         set_scan_active(True)
-    
+
     logger.info("NEW WORKFLOW: %s target=%s mode=%s", report_id, target, request.mode)
-    
+
     return WorkflowStartResponse(
-        workflow_id=report_id,
-        report_id=report_id,
-        status="started"
+        workflow_id=report_id, report_id=report_id, status="started"
     )
 
 
 # =============================================================================
 # PHASE-49 ENDPOINTS
 # =============================================================================
+
 
 @app.post("/api/dashboard/create")
 async def create_dashboard(request: CreateDashboardRequest, user=Depends(require_auth)):
@@ -1526,7 +1741,7 @@ async def create_dashboard(request: CreateDashboardRequest, user=Depends(require
 
     dashboard_id = f"DASH-{uuid.uuid4().hex[:16].upper()}"
     now = datetime.now(UTC).isoformat()
-    
+
     # Create execution kernel for this dashboard
     kernel_id = f"KERN-{uuid.uuid4().hex[:12].upper()}"
     execution_kernels[kernel_id] = {
@@ -1537,7 +1752,7 @@ async def create_dashboard(request: CreateDashboardRequest, user=Depends(require
         "audit_log": [],
         "owner_id": auth_user_id,
     }
-    
+
     dashboard_states[dashboard_id] = {
         "dashboard_id": dashboard_id,
         "user_id": auth_user_id,
@@ -1545,44 +1760,47 @@ async def create_dashboard(request: CreateDashboardRequest, user=Depends(require
         "owner_id": auth_user_id,
         "kernel_id": kernel_id,
         "created_at": now,
-        "active_panel": "USER"
+        "active_panel": "USER",
     }
-    
-    return {
-        "dashboard_id": dashboard_id,
-        "kernel_id": kernel_id,
-        "status": "created"
-    }
+
+    return {"dashboard_id": dashboard_id, "kernel_id": kernel_id, "status": "created"}
 
 
 @app.get("/api/dashboard/state")
-async def get_dashboard_state(dashboard_id: Optional[str] = None, user=Depends(require_auth)):
+async def get_dashboard_state(
+    dashboard_id: Optional[str] = None, user=Depends(require_auth)
+):
     """Get current dashboard state. Ownership-checked."""
     if dashboard_id and dashboard_id in dashboard_states:
         dash = dashboard_states[dashboard_id]
         check_resource_owner(dash, user, "dashboard", dashboard_id)
         return dash
-    
+
     # No dashboard found — return error
-    return {"error": "No dashboard found", "dashboard_id": None, "state": "DISCONNECTED"}
+    return {
+        "error": "No dashboard found",
+        "dashboard_id": None,
+        "state": "DISCONNECTED",
+    }
 
 
 @app.get("/api/execution/state")
-async def get_execution_state(kernel_id: Optional[str] = None, user=Depends(require_auth)):
+async def get_execution_state(
+    kernel_id: Optional[str] = None, user=Depends(require_auth)
+):
     """Get execution kernel state. Ownership-checked."""
     if kernel_id and kernel_id in execution_kernels:
         kernel = execution_kernels[kernel_id]
         check_resource_owner(kernel, user, "execution_kernel", kernel_id)
         return kernel
-    
-    return {
-        "state": "IDLE",
-        "human_approved": False
-    }
+
+    return {"state": "IDLE", "human_approved": False}
 
 
 @app.post("/api/execution/transition")
-async def execution_transition(request: ExecutionTransitionRequest, user=Depends(require_auth)):
+async def execution_transition(
+    request: ExecutionTransitionRequest, user=Depends(require_auth)
+):
     """Request a state transition on the execution kernel."""
     # Valid transitions based on G01
     valid_transitions = {
@@ -1598,7 +1816,7 @@ async def execution_transition(request: ExecutionTransitionRequest, user=Depends
         ("SIMULATED", "ABORT"): "STOPPED",
         ("AWAIT_HUMAN", "ABORT"): "STOPPED",
     }
-    
+
     # Find the caller's kernel (not the first one in memory)
     auth_user_id = user.get("sub", "")
     kernel = None
@@ -1606,58 +1824,67 @@ async def execution_transition(request: ExecutionTransitionRequest, user=Depends
         if k.get("owner_id") == auth_user_id:
             kernel = k
             break
-    
+
     if not kernel:
-        kernel = {"state": "IDLE", "human_approved": False, "deny_reason": None, "owner_id": auth_user_id}
-    
+        kernel = {
+            "state": "IDLE",
+            "human_approved": False,
+            "deny_reason": None,
+            "owner_id": auth_user_id,
+        }
+
     current_state: str = kernel.get("state", "IDLE")  # type: ignore[assignment]
     transition = request.transition
-    
+
     key = (current_state, transition)
     if key in valid_transitions:
         new_state = valid_transitions[key]
         kernel["state"] = new_state
-        
+
         if transition == "HUMAN_APPROVE":
             kernel["human_approved"] = True
         if transition == "HUMAN_DENY":
             kernel["deny_reason"] = request.reason
-        
+
         return {
             "result": "SUCCESS",
             "from_state": current_state,
             "to_state": new_state,
-            "reason": request.reason
+            "reason": request.reason,
         }
-    
+
     return {
         "result": "INVALID",
         "from_state": current_state,
         "to_state": current_state,
-        "reason": f"Invalid transition {transition} from {current_state}"
+        "reason": f"Invalid transition {transition} from {current_state}",
     }
 
 
 @app.post("/api/approval/decision")
-async def submit_approval_decision(request: ApprovalDecisionRequest, user=Depends(require_admin)):
+async def submit_approval_decision(
+    request: ApprovalDecisionRequest, user=Depends(require_admin)
+):
     """Submit an approval decision. approver_id bound to authenticated user."""
     now = datetime.now(UTC).isoformat()
     # SECURITY: Override client-supplied approver_id with authenticated identity
     auth_approver_id = user.get("sub", "")
-    
+
     decision = {
         "decision_id": f"DEC-{uuid.uuid4().hex[:16].upper()}",
         "request_id": request.request_id,
         "approved": request.approved,
         "approver_id": auth_approver_id,
         "reason": request.reason,
-        "timestamp": now
+        "timestamp": now,
     }
-    
+
     # Update any matching approval request
     if request.request_id in approval_requests:
-        approval_requests[request.request_id]["status"] = "APPROVED" if request.approved else "REJECTED"
-    
+        approval_requests[request.request_id]["status"] = (
+            "APPROVED" if request.approved else "REJECTED"
+        )
+
     return decision
 
 
@@ -1677,7 +1904,7 @@ async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require
                 "report_density": "UNKNOWN",
                 "is_public": True,
                 "requires_invite": False,
-                "discovered_at": t.get("created_at", datetime.now(UTC).isoformat())
+                "discovered_at": t.get("created_at", datetime.now(UTC).isoformat()),
             }
             candidates.append(candidate)
 
@@ -1689,7 +1916,7 @@ async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require
             "candidates": filtered,
             "total_found": len(candidates),
             "filtered_count": len(candidates) - len(filtered),
-            "timestamp": datetime.now(UTC).isoformat()
+            "timestamp": datetime.now(UTC).isoformat(),
         }
     except Exception as e:
         logger.exception("Error discovering targets")
@@ -1699,7 +1926,7 @@ async def discover_targets(request: TargetDiscoveryRequest, user=Depends(require
             "total_found": 0,
             "filtered_count": 0,
             "error": "Internal error while discovering targets",
-            "timestamp": datetime.now(UTC).isoformat()
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
 
@@ -1726,7 +1953,7 @@ async def validate_scope(request: Request, user=Depends(require_auth)):
         "valid": is_valid,
         "target_url": target_url,
         "violations": violations,
-        "validated_at": now
+        "validated_at": now,
     }
 
 
@@ -1742,7 +1969,11 @@ async def start_target_session(request: Request, user=Depends(require_auth)):
     # Enforce scope validation before starting session (SSRF protection)
     is_safe, violations = validate_target_url(target_url)
     if not is_safe:
-        return {"error": "Scope validation failed", "started": False, "violations": violations}
+        return {
+            "error": "Scope validation failed",
+            "started": False,
+            "violations": violations,
+        }
 
     session_id = f"TSESS-{uuid.uuid4().hex[:12].upper()}"
     target_sessions[session_id] = {
@@ -1767,7 +1998,7 @@ async def start_target_session(request: Request, user=Depends(require_auth)):
         "session_id": session_id,
         "target_url": target_url,
         "mode": mode,
-        "started_at": now
+        "started_at": now,
     }
 
 
@@ -1809,9 +2040,7 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
 
     # Clear scan-active flag if no other sessions remain active
     if G38_AVAILABLE:
-        still_active = any(
-            s["status"] == "ACTIVE" for s in target_sessions.values()
-        )
+        still_active = any(s["status"] == "ACTIVE" for s in target_sessions.values())
         if not still_active:
             set_scan_active(False)
 
@@ -1830,7 +2059,7 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
         "stopped": True,
         "session_id": session_id,
         "stopped_at": now,
-        "duration_seconds": duration
+        "duration_seconds": duration,
     }
 
 
@@ -1844,15 +2073,23 @@ async def get_target_status(user=Depends(require_auth)):
         active = [s for s in target_sessions.values() if s["status"] == "ACTIVE"]
         stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED"]
     else:
-        active = [s for s in target_sessions.values() if s["status"] == "ACTIVE" and s.get("owner_id") == uid]
-        stopped = [s for s in target_sessions.values() if s["status"] == "STOPPED" and s.get("owner_id") == uid]
+        active = [
+            s
+            for s in target_sessions.values()
+            if s["status"] == "ACTIVE" and s.get("owner_id") == uid
+        ]
+        stopped = [
+            s
+            for s in target_sessions.values()
+            if s["status"] == "STOPPED" and s.get("owner_id") == uid
+        ]
 
     return {
         "active_sessions": active,
         "stopped_sessions": stopped[-10:],  # Last 10 stopped
         "total_active": len(active),
         "total_stopped": len(stopped),
-        "violations": scope_violations[-20:] if is_admin else []
+        "violations": scope_violations[-20:] if is_admin else [],
     }
 
 
@@ -1860,20 +2097,22 @@ async def get_target_status(user=Depends(require_auth)):
 # The duplicate simple route has been removed to avoid ambiguity.
 
 
-
 @app.post("/api/autonomy/session")
-async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(require_auth)):
+async def create_autonomy_session(
+    request: AutonomySessionRequest, user=Depends(require_auth)
+):
     """Create an autonomy session."""
     now = datetime.now(UTC)
     session_id = f"AUT-{uuid.uuid4().hex[:16].upper()}"
-    
+
     # Calculate expiry for AUTONOMOUS_FIND mode
     expires_at = None
     if request.mode == "AUTONOMOUS_FIND" and request.duration_hours > 0:
         max_hours = min(request.duration_hours, 12)  # Cap at 12 hours
         from datetime import timedelta
+
         expires_at = (now + timedelta(hours=max_hours)).isoformat()
-    
+
     # Determine blocked actions based on mode
     blocked = []
     if request.mode == "AUTONOMOUS_FIND":
@@ -1882,11 +2121,14 @@ async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(
         blocked = ["EXPLOIT", "SUBMISSION", "STATE_CHANGE", "BROWSER_ACTION"]
     elif request.mode == "MOCK":
         from fastapi.responses import JSONResponse
+
         return JSONResponse(
             status_code=400,
-            content={"error": "MOCK mode is disabled. Use READ_ONLY, AUTONOMOUS_FIND, or REAL."}
+            content={
+                "error": "MOCK mode is disabled. Use READ_ONLY, AUTONOMOUS_FIND, or REAL."
+            },
         )
-    
+
     session = {
         "session_id": session_id,
         "mode": request.mode,
@@ -1895,9 +2137,9 @@ async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(
         "started_at": now.isoformat(),
         "expires_at": expires_at,
         "human_enabled": request.mode == "REAL",
-        "actions_blocked": blocked
+        "actions_blocked": blocked,
     }
-    
+
     autonomy_sessions[session_id] = session
     return session
 
@@ -1906,20 +2148,21 @@ async def create_autonomy_session(request: AutonomySessionRequest, user=Depends(
 # G38 AUTO-TRAINING ENDPOINTS
 # =============================================================================
 
+
 @app.get("/api/g38/status")
 async def get_g38_status():
     """Get G38 auto-training status."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
-    
+
     trainer = get_auto_trainer()
     status = trainer.get_status()
-    
+
     # Add guard verification
     guards_ok, guards_msg = verify_all_guards()
     pretraining_ok, pretraining_msg = verify_pretraining_guards()
     mode_a_status, mode_a_msg = get_mode_a_status()
-    
+
     return {
         "available": True,
         "auto_training": {
@@ -1944,7 +2187,6 @@ async def get_g38_status():
             "dataset_size": status.get("dataset_size", 0),
             "training_mode": status.get("training_mode", "MANUAL"),
         },
-
         "guards": {
             "main_guards": len(ALL_GUARDS),
             "all_verified": guards_ok,
@@ -1967,10 +2209,10 @@ async def get_g38_events(limit: int = 50, user=Depends(require_auth)):
     """Get recent G38 training events."""
     if not G38_AVAILABLE:
         return {"events": [], "error": "G38 modules not loaded"}
-    
+
     trainer = get_auto_trainer()
     events = trainer.events[-limit:] if trainer.events else []
-    
+
     return {
         "events": [
             {
@@ -1993,7 +2235,7 @@ async def abort_g38_training(user=Depends(require_admin)):
     """Abort current G38 training."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
-    
+
     trainer = get_auto_trainer()
     if getattr(trainer, "_continuous_mode", False):
         result = stop_continuous_training()
@@ -2008,11 +2250,13 @@ async def abort_g38_training(user=Depends(require_admin)):
             ),
         }
     result = trainer.abort_training()
-    
+
     return {
         "success": result.get("aborted", False),
         "state": trainer.state.value,
-        "message": "Training abort requested" if result.get("aborted") else result.get("reason", "No training in progress"),
+        "message": "Training abort requested"
+        if result.get("aborted")
+        else result.get("reason", "No training in progress"),
     }
 
 
@@ -2021,9 +2265,9 @@ async def start_g38_training(epochs: int = 0, user=Depends(require_admin)):
     """Start G38 training in continuous mode (default infinite)."""
     if not G38_AVAILABLE:
         return {"success": False, "error": "G38 modules not loaded"}
-    
+
     trainer = get_auto_trainer()
-    
+
     # Check if already training
     if trainer.is_training:
         return {
@@ -2031,7 +2275,7 @@ async def start_g38_training(epochs: int = 0, user=Depends(require_admin)):
             "error": "Training already in progress",
             "state": trainer.state.value,
         }
-    
+
     result = start_continuous_training(target_epochs=max(0, epochs))
     if not result.get("started", False):
         return {
@@ -2058,6 +2302,7 @@ async def start_g38_training(epochs: int = 0, user=Depends(require_admin)):
 # =============================================================================
 
 _gpu_seq_id = 0
+
 
 @app.get("/gpu/status")
 async def gpu_status(user=Depends(require_auth)):
@@ -2086,6 +2331,7 @@ async def gpu_status(user=Depends(require_auth)):
     }
     try:
         import torch
+
         if not torch.cuda.is_available():
             result["error_reason"] = "CUDA not available on this system"
             return Response(
@@ -2095,8 +2341,12 @@ async def gpu_status(user=Depends(require_auth)):
             )
         result["gpu_available"] = True
         result["device_name"] = torch.cuda.get_device_name(0)
-        result["memory_allocated_mb"] = round(torch.cuda.memory_allocated() / 1024 / 1024, 2)
-        result["memory_reserved_mb"] = round(torch.cuda.memory_reserved() / 1024 / 1024, 2)
+        result["memory_allocated_mb"] = round(
+            torch.cuda.memory_allocated() / 1024 / 1024, 2
+        )
+        result["memory_reserved_mb"] = round(
+            torch.cuda.memory_reserved() / 1024 / 1024, 2
+        )
         props = torch.cuda.get_device_properties(0)
         result["memory_total_mb"] = round(props.total_memory / 1024 / 1024, 2)
         cap = torch.cuda.get_device_capability(0)
@@ -2111,11 +2361,15 @@ async def gpu_status(user=Depends(require_auth)):
     # nvidia-smi for utilization, temperature, and driver version
     try:
         import subprocess
+
         smi_output = subprocess.check_output(
-            ["nvidia-smi",
-             "--query-gpu=utilization.gpu,temperature.gpu,driver_version",
-             "--format=csv,noheader,nounits"],
-            timeout=5, text=True
+            [
+                "nvidia-smi",
+                "--query-gpu=utilization.gpu,temperature.gpu,driver_version",
+                "--format=csv,noheader,nounits",
+            ],
+            timeout=5,
+            text=True,
         ).strip()
         parts = smi_output.split(",")
         if len(parts) >= 2:
@@ -2196,7 +2450,9 @@ async def training_stop(user=Depends(require_admin)):
     result = trainer.abort_training()
     return {
         "success": result.get("aborted", False),
-        "message": "Training stopped" if result.get("aborted") else "No training in progress",
+        "message": "Training stopped"
+        if result.get("aborted")
+        else "No training in progress",
         "state": trainer.state.value,
     }
 
@@ -2234,16 +2490,18 @@ async def get_g38_guards(user=Depends(require_auth)):
     """Get all G38 guard statuses."""
     if not G38_AVAILABLE:
         return {"guards": [], "error": "G38 modules not loaded"}
-    
+
     guards = []
     for guard in ALL_GUARDS:
         result, msg = guard()
-        guards.append({
-            "name": guard.__name__,
-            "returns_false": not result,
-            "message": msg,
-        })
-    
+        guards.append(
+            {
+                "name": guard.__name__,
+                "returns_false": not result,
+                "message": msg,
+            }
+        )
+
     return {
         "guards": guards,
         "total": len(guards),
@@ -2255,40 +2513,47 @@ async def get_g38_guards(user=Depends(require_auth)):
 async def get_g38_training_reports(user=Depends(require_auth)):
     """Get G38 training reports."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
-    
+
     if not reports_dir.exists():
         return {"reports": [], "count": 0}
-    
+
     reports = []
-    
+
     # Find all summary files
-    for summary_file in sorted(reports_dir.glob("training_summary_*.txt"), reverse=True):
+    for summary_file in sorted(
+        reports_dir.glob("training_summary_*.txt"), reverse=True
+    ):
         session_id = summary_file.stem.replace("training_summary_", "")
-        
+
         # Find corresponding learned and not_learned files
         learned_file = reports_dir / f"learned_features_{session_id}.json"
         not_learned_file = reports_dir / f"not_learned_yet_{session_id}.txt"
-        
+
         report = {
             "session_id": session_id,
             "summary_file": summary_file.name,
-            "summary_content": summary_file.read_text()[:500] + "..." if summary_file.exists() else None,
+            "summary_content": summary_file.read_text()[:500] + "..."
+            if summary_file.exists()
+            else None,
             "has_learned_features": learned_file.exists(),
             "has_not_learned": not_learned_file.exists(),
-            "created_at": datetime.fromtimestamp(summary_file.stat().st_mtime).isoformat(),
+            "created_at": datetime.fromtimestamp(
+                summary_file.stat().st_mtime
+            ).isoformat(),
         }
-        
+
         # Read learned features JSON if exists
         if learned_file.exists():
             import json
+
             try:
                 report["learned_features"] = json.loads(learned_file.read_text())
             except Exception:
                 logger.exception("Failed to parse learned features JSON")
                 report["learned_features"] = None
-        
+
         reports.append(report)
-    
+
     return {
         "reports": reports[:20],  # Last 20 reports
         "count": len(reports),
@@ -2299,31 +2564,35 @@ async def get_g38_training_reports(user=Depends(require_auth)):
 async def get_g38_latest_report(user=Depends(require_auth)):
     """Get the latest G38 training report."""
     reports_dir = PROJECT_ROOT / "reports" / "g38_training"
-    
+
     if not reports_dir.exists():
         return {"available": False, "error": "No reports directory"}
-    
+
     # Find latest summary
     summaries = sorted(reports_dir.glob("training_summary_*.txt"), reverse=True)
-    
+
     if not summaries:
         return {"available": False, "error": "No reports found"}
-    
+
     latest = summaries[0]
     session_id = latest.stem.replace("training_summary_", "")
-    
+
     # Read all files for this session
     learned_file = reports_dir / f"learned_features_{session_id}.json"
     not_learned_file = reports_dir / f"not_learned_yet_{session_id}.txt"
-    
+
     import json
-    
+
     return {
         "available": True,
         "session_id": session_id,
         "summary": latest.read_text() if latest.exists() else None,
-        "learned_features": json.loads(learned_file.read_text()) if learned_file.exists() else None,
-        "not_learned": not_learned_file.read_text() if not_learned_file.exists() else None,
+        "learned_features": json.loads(learned_file.read_text())
+        if learned_file.exists()
+        else None,
+        "not_learned": not_learned_file.read_text()
+        if not_learned_file.exists()
+        else None,
         "created_at": datetime.fromtimestamp(latest.stat().st_mtime).isoformat(),
     }
 
@@ -2331,6 +2600,7 @@ async def get_g38_latest_report(user=Depends(require_auth)):
 # =============================================================================
 # ADDITIONAL TRAINING ENDPOINTS (non-duplicate)
 # =============================================================================
+
 
 @app.post("/training/continuous/stop")
 async def stop_24_7_training(user=Depends(require_admin)):
@@ -2351,6 +2621,7 @@ async def training_progress(user=Depends(require_auth)):
 
 # _stream_seq_id lives in runtime_state ("stream_seq_id"), initialized at import
 
+
 @app.websocket("/training/stream")
 async def training_stream(websocket: WebSocket):
     """Live training telemetry stream for frontend dashboard."""
@@ -2363,11 +2634,13 @@ async def training_stream(websocket: WebSocket):
     await websocket.accept()
 
     if not G38_AVAILABLE:
-        await websocket.send_json({
-            "error": "G38 modules not loaded",
-            "stalled": True,
-            "timestamp": datetime.now(UTC).isoformat(),
-        })
+        await websocket.send_json(
+            {
+                "error": "G38 modules not loaded",
+                "stalled": True,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
         await websocket.close(code=1011, reason="G38 unavailable")
         return
 
@@ -2434,7 +2707,11 @@ async def training_stream(websocket: WebSocket):
                 samples_per_sec = None
                 loss = None
                 accuracy = None
-                gpu_temp = float(gpu_metrics.get("temperature") or 0.0) if gpu_metrics.get("temperature") is not None else None
+                gpu_temp = (
+                    float(gpu_metrics.get("temperature") or 0.0)
+                    if gpu_metrics.get("temperature") is not None
+                    else None
+                )
                 gpu_mem = None
 
             eta_seconds = None
@@ -2476,15 +2753,18 @@ async def training_stream(websocket: WebSocket):
     except Exception:
         logger.exception("Training stream websocket error")
         try:
-            await websocket.send_json({
-                "error": "Training stream failed",
-                "timestamp": datetime.now(UTC).isoformat(),
-            })
+            await websocket.send_json(
+                {
+                    "error": "Training stream failed",
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
         except Exception:
             pass
 
 
 # _dashboard_seq_id lives in runtime_state ("dashboard_seq_id"), initialized at import
+
 
 @app.websocket("/training/dashboard")
 async def training_dashboard(websocket: WebSocket):
@@ -2511,12 +2791,14 @@ async def training_dashboard(websocket: WebSocket):
     await websocket.accept(subprotocol=accept_proto)
 
     if not G38_AVAILABLE:
-        await websocket.send_json({
-            "error": "G38 modules not loaded",
-            "stalled": True,
-            "mode": "idle",
-            "timestamp": datetime.now(UTC).isoformat(),
-        })
+        await websocket.send_json(
+            {
+                "error": "G38 modules not loaded",
+                "stalled": True,
+                "mode": "idle",
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
         await websocket.close(code=1011, reason="G38 unavailable")
         return
 
@@ -2561,8 +2843,7 @@ async def training_dashboard(websocket: WebSocket):
                     or 0.0
                 )
                 gpu_utilization = (
-                    max(0.0, min(mem_used / mem_total, 1.0))
-                    if mem_total > 0 else None
+                    max(0.0, min(mem_used / mem_total, 1.0)) if mem_total > 0 else None
                 )
 
             total_samples = int(status.get("dataset_size", 0) or 0)
@@ -2583,7 +2864,11 @@ async def training_dashboard(websocket: WebSocket):
                 samples_per_sec = None
                 loss_val = None
                 accuracy_val = None
-                gpu_temp = float(gpu_metrics.get("temperature") or 0.0) if gpu_metrics.get("temperature") is not None else None
+                gpu_temp = (
+                    float(gpu_metrics.get("temperature") or 0.0)
+                    if gpu_metrics.get("temperature") is not None
+                    else None
+                )
                 vram_used = None
 
             eta_seconds = None
@@ -2600,13 +2885,15 @@ async def training_dashboard(websocket: WebSocket):
             queue = []
             for fq in field_queue_raw:
                 if isinstance(fq, dict):
-                    queue.append({
-                        "field_name": fq.get("field_name", "unknown"),
-                        "priority": fq.get("priority", 0),
-                        "status": fq.get("status", "queued"),
-                        "best_accuracy": float(fq.get("best_accuracy", 0.0) or 0.0),
-                        "epochs_completed": int(fq.get("epochs_completed", 0) or 0),
-                    })
+                    queue.append(
+                        {
+                            "field_name": fq.get("field_name", "unknown"),
+                            "priority": fq.get("priority", 0),
+                            "status": fq.get("status", "queued"),
+                            "best_accuracy": float(fq.get("best_accuracy", 0.0) or 0.0),
+                            "epochs_completed": int(fq.get("epochs_completed", 0) or 0),
+                        }
+                    )
 
             # Mode
             if is_training:
@@ -2642,10 +2929,12 @@ async def training_dashboard(websocket: WebSocket):
     except Exception:
         logger.exception("Training dashboard websocket error")
         try:
-            await websocket.send_json({
-                "error": "Dashboard stream failed",
-                "timestamp": datetime.now(UTC).isoformat(),
-            })
+            await websocket.send_json(
+                {
+                    "error": "Dashboard stream failed",
+                    "timestamp": datetime.now(UTC).isoformat(),
+                }
+            )
         except Exception:
             pass
 
@@ -2655,17 +2944,18 @@ async def dataset_stats(user=Depends(require_auth)):
     """Get training dataset statistics."""
     if not G38_AVAILABLE:
         return {"available": False, "error": "G38 modules not loaded"}
-    
+
     trainer = get_auto_trainer()
     if trainer._gpu_dataset_stats:
         return {
             "available": True,
             **trainer._gpu_dataset_stats,
         }
-    
+
     # Try to get stats from dataset loader directly
     try:
         from impl_v1.training.data.real_dataset_loader import validate_dataset_integrity
+
         valid, msg = validate_dataset_integrity()
         return {
             "available": valid,
@@ -2675,14 +2965,17 @@ async def dataset_stats(user=Depends(require_auth)):
     except Exception as e:
         logger.exception("Error in dataset_stats")
         return {"available": False, "error": "Internal error"}
+
+
 # =============================================================================
 
+
 @app.get("/api/db/users")
-def list_users(user=Depends(require_admin)):
+def list_users(limit: int = 100, offset: int = 0, user=Depends(require_admin)):
     """Get all users from HDD storage."""
     try:
-        users = get_all_users()
-        return {"users": users, "total": len(users)}
+        users, total = get_users_page(limit=limit, offset=offset)
+        return {"users": users, "total": total, "limit": limit, "offset": offset}
     except Exception as e:
         logger.exception("Error listing users")
         return {"users": [], "total": 0, "error": "Internal error"}
@@ -2693,7 +2986,9 @@ def add_user(request: CreateUserRequest, admin_user=Depends(require_admin)):
     """Create a new user."""
     try:
         new_user = create_user(request.name, request.email, request.role)
-        log_activity(str(new_user['id']), "USER_CREATED", f"User {request.name} created")
+        log_activity(
+            str(new_user["id"]), "USER_CREATED", f"User {request.name} created"
+        )
         return {"success": True, "user": new_user}
     except Exception as e:
         logger.exception("Error creating user")
@@ -2725,11 +3020,11 @@ def get_user_bounties_endpoint(user_id: str, user=Depends(require_admin)):
 
 
 @app.get("/api/db/targets")
-def list_targets(user=Depends(require_auth)):
+def list_targets(limit: int = 100, offset: int = 0, user=Depends(require_auth)):
     """Get all targets from HDD storage."""
     try:
-        targets = get_all_targets()
-        return {"targets": targets, "total": len(targets)}
+        targets, total = get_targets_page(limit=limit, offset=offset)
+        return {"targets": targets, "total": total, "limit": limit, "offset": offset}
     except Exception as e:
         logger.exception("Error listing targets")
         return {"targets": [], "total": 0, "error": "Internal error"}
@@ -2744,7 +3039,7 @@ def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
             request.scope,
             request.link,
             request.platform,
-            request.payout_tier
+            request.payout_tier,
         )
         log_activity(None, "TARGET_CREATED", f"Target {request.program_name} created")
         return {"success": True, "target": target}
@@ -2754,11 +3049,11 @@ def add_target(request: CreateTargetRequest, user=Depends(require_admin)):
 
 
 @app.get("/api/db/bounties")
-def list_bounties(user=Depends(require_auth)):
+def list_bounties(limit: int = 100, offset: int = 0, user=Depends(require_auth)):
     """Get all bounties."""
     try:
-        bounties = get_all_bounties()
-        return {"bounties": bounties, "total": len(bounties)}
+        bounties, total = get_bounties_page(limit=limit, offset=offset)
+        return {"bounties": bounties, "total": total, "limit": limit, "offset": offset}
     except Exception as e:
         logger.exception("Error listing bounties")
         return {"bounties": [], "total": 0, "error": "Internal error"}
@@ -2773,7 +3068,7 @@ def add_bounty(request: CreateBountyRequest, user=Depends(require_admin)):
             request.target_id,
             request.title,
             request.description,
-            request.severity
+            request.severity,
         )
         log_activity(request.user_id, "BOUNTY_SUBMITTED", f"Bounty: {request.title}")
         return {"success": True, "bounty": bounty}
@@ -2787,8 +3082,14 @@ def update_bounty(request: UpdateBountyRequest, user=Depends(require_admin)):
     """Update bounty status and reward."""
     try:
         update_bounty_status(request.bounty_id, request.status, request.reward)
-        log_activity(None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}")
-        return {"success": True, "bounty_id": request.bounty_id, "status": request.status}
+        log_activity(
+            None, "BOUNTY_UPDATED", f"Bounty {request.bounty_id} -> {request.status}"
+        )
+        return {
+            "success": True,
+            "bounty_id": request.bounty_id,
+            "status": request.status,
+        }
     except Exception as e:
         logger.exception("Error updating bounty")
         raise HTTPException(status_code=400, detail="Failed to update bounty")
@@ -2807,11 +3108,16 @@ def add_session(request: CreateSessionRequest, user=Depends(require_admin)):
 
 
 @app.get("/api/db/activity")
-def list_activity(limit: int = 50, user=Depends(require_admin)):
+def list_activity(limit: int = 50, offset: int = 0, user=Depends(require_admin)):
     """Get recent activity log."""
     try:
-        activities = get_recent_activity(limit)
-        return {"activities": activities, "total": len(activities)}
+        activities = get_recent_activity(limit, offset)
+        return {
+            "activities": activities,
+            "total": len(activities),
+            "limit": limit,
+            "offset": offset,
+        }
     except Exception as e:
         logger.exception("Error listing activity")
         return {"activities": [], "total": 0, "error": "Internal error"}
@@ -2832,6 +3138,7 @@ def get_admin_statistics(user=Depends(require_admin)):
 # HDD STORAGE ENGINE ENDPOINTS (NEW)
 # =============================================================================
 
+
 @app.get("/api/storage/stats")
 def storage_stats_endpoint(user=Depends(require_auth)):
     """Get HDD storage engine statistics."""
@@ -2851,7 +3158,9 @@ def disk_status_endpoint(user=Depends(require_auth)):
 
 
 @app.get("/api/storage/delete-preview")
-def delete_preview_endpoint(entity_type: Optional[str] = None, user=Depends(require_admin)):
+def delete_preview_endpoint(
+    entity_type: Optional[str] = None, user=Depends(require_admin)
+):
     """Preview which entities would be auto-deleted."""
     return get_delete_preview(entity_type)
 
@@ -2913,7 +3222,9 @@ def _temporary_auth_me_payload(user: Optional[Dict[str, Any]] = None) -> Dict[st
     }
 
 
-def _temporary_auth_profile_payload(user: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+def _temporary_auth_profile_payload(
+    user: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
     temp_user = dict(user or _temporary_auth_user())
     return {
         "success": True,
@@ -3020,14 +3331,18 @@ async def auth_provider_status(response: Response = None):
             "missing": github_cfg["missing"],
             "redirect_uri": github_cfg["redirect_uri"],
             "frontend_url": github_cfg["frontend_url"],
-            "shared_candidates": [str(path) for path in _shared_oauth_candidate_files("github")],
+            "shared_candidates": [
+                str(path) for path in _shared_oauth_candidate_files("github")
+            ],
         },
         "google": {
             "enabled": not google_cfg["missing"],
             "missing": google_cfg["missing"],
             "redirect_uri": google_cfg["redirect_uri"],
             "frontend_url": google_cfg["frontend_url"],
-            "shared_candidates": [str(path) for path in _shared_oauth_candidate_files("google")],
+            "shared_candidates": [
+                str(path) for path in _shared_oauth_candidate_files("google")
+            ],
         },
         "checked_at": datetime.now(UTC).isoformat(),
     }
@@ -3069,24 +3384,31 @@ def _enforce_cookie_csrf(req: Request) -> None:
     if req.method.upper() in _SAFE_HTTP_METHODS:
         return
 
-    origin = req.headers.get("origin") or _normalize_origin(req.headers.get("referer", ""))
+    origin = req.headers.get("origin") or _normalize_origin(
+        req.headers.get("referer", "")
+    )
     normalized_origin = _normalize_origin(origin)
-    if (
-        not normalized_origin
-        or (
-            normalized_origin not in _allowed_cookie_origins()
-            and not _is_allowed_private_origin(normalized_origin, allowed_ports={3000, 8000})
+    if not normalized_origin or (
+        normalized_origin not in _allowed_cookie_origins()
+        and not _is_allowed_private_origin(
+            normalized_origin, allowed_ports={3000, 8000}
         )
     ):
         raise HTTPException(status_code=403, detail="Request origin not allowed")
 
     csrf_cookie = req.cookies.get(CSRF_COOKIE_NAME, "")
     csrf_header = req.headers.get("x-csrf-token", "")
-    if not csrf_cookie or not csrf_header or not verify_csrf_token(csrf_header, csrf_cookie):
+    if (
+        not csrf_cookie
+        or not csrf_header
+        or not verify_csrf_token(csrf_header, csrf_cookie)
+    ):
         raise HTTPException(status_code=403, detail="Missing or invalid CSRF token")
 
 
-def _set_admin_auth_cookies(resp: Response, req: Request, session_token: str, auth_token: str) -> None:
+def _set_admin_auth_cookies(
+    resp: Response, req: Request, session_token: str, auth_token: str
+) -> None:
     secure = _is_secure_request(req)
     _set_auth_cookies(resp, req, auth_token)
     resp.set_cookie(
@@ -3125,15 +3447,24 @@ def _extract_admin_session_token(req: Request) -> tuple[Optional[str], bool]:
 
     return None, False
 
+
 # SECURITY: default to NOT trusting proxy headers — set TRUST_PROXY_HEADERS=true
 # and TRUSTED_PROXY_CIDRS explicitly when behind a known reverse proxy.
-_TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "false").lower() in ("1", "true", "yes", "on")
+_TRUST_PROXY_HEADERS = os.getenv("TRUST_PROXY_HEADERS", "false").lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
 _TRUSTED_PROXY_CIDRS_RAW = os.getenv(
     "TRUSTED_PROXY_CIDRS",
     "127.0.0.1/32,::1/128",
 )
 _ENABLE_G38_AUTO_TRAINING = os.getenv("ENABLE_G38_AUTO_TRAINING", "false").lower() in (
-    "1", "true", "yes", "on"
+    "1",
+    "true",
+    "yes",
+    "on",
 )
 
 
@@ -3174,7 +3505,7 @@ def _extract_client_ip(req: Request) -> str:
             val = val[4:].strip().strip('"').strip("'")
         # Strip IPv6 brackets
         if val.startswith("[") and "]" in val:
-            val = val[1:val.index("]")]
+            val = val[1 : val.index("]")]
         # Strip IPv4 :port suffix
         if "." in val and val.count(":") == 1:
             host, port = val.rsplit(":", 1)
@@ -3285,7 +3616,9 @@ async def register_user(request: RegisterRequest, req: Request, response: Respon
         dh = compute_device_hash(ua, ip)
         device = register_device(user["id"], dh, ip, ua, location=location)
         session = create_session(
-            user["id"], "AUTHENTICATED", None,
+            user["id"],
+            "AUTHENTICATED",
+            None,
             ip_address=ip,
             user_agent=ua,
             device_hash=dh,
@@ -3297,14 +3630,21 @@ async def register_user(request: RegisterRequest, req: Request, response: Respon
             ip_address=ip,
             geolocation=location,
         )
-        log_activity(user["id"], "USER_REGISTERED", f"User {request.name} registered", ip_address=ip)
+        log_activity(
+            user["id"],
+            "USER_REGISTERED",
+            f"User {request.name} registered",
+            ip_address=ip,
+        )
         token = generate_jwt(
-            user["id"], request.email,
+            user["id"],
+            request.email,
             session_id=session["id"],
             role="hunter",
         )
         return {
-            "user": user, "token": token,
+            "user": user,
+            "token": token,
             "session_id": session["id"],
             "device": {"hash": dh, "is_new": device.get("is_new", True)},
             "network": {"ip": ip, "geolocation": location},
@@ -3319,7 +3659,12 @@ async def register_user(request: RegisterRequest, req: Request, response: Respon
     _set_auth_cookies(response, req, result["token"])
     return {
         "success": True,
-        "user": {"id": result["user"]["id"], "name": result["user"]["name"], "email": result["user"]["email"], "role": "hunter"},
+        "user": {
+            "id": result["user"]["id"],
+            "name": result["user"]["name"],
+            "email": result["user"]["email"],
+            "role": "hunter",
+        },
         "session_id": result["session_id"],
         "device": result["device"],
         "network": result["network"],
@@ -3363,7 +3708,9 @@ async def login(request: LoginRequest, req: Request, response: Response):
     limiter = get_rate_limiter()
     if limiter.is_rate_limited(ip):
         alert_rate_limit_exceeded(ip, limiter.max_attempts)
-        raise HTTPException(status_code=429, detail="Too many login attempts. Try again later.")
+        raise HTTPException(
+            status_code=429, detail="Too many login attempts. Try again later."
+        )
     limiter.record_attempt(ip)
 
     def _sync_login():
@@ -3372,20 +3719,37 @@ async def login(request: LoginRequest, req: Request, response: Response):
 
         user = get_user_by_email(request.email)
         if not user:
-            log_activity(None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip)
-            return {"error": 401, "detail": {"error": "INVALID_CREDENTIALS", "detail": "Invalid credentials"}}
+            log_activity(
+                None, "LOGIN_FAILED", f"Unknown email: {request.email}", ip_address=ip
+            )
+            return {
+                "error": 401,
+                "detail": {
+                    "error": "INVALID_CREDENTIALS",
+                    "detail": "Invalid credentials",
+                },
+            }
 
-        if not user.get("password_hash") or not verify_password(request.password, user["password_hash"]):
+        if not user.get("password_hash") or not verify_password(
+            request.password, user["password_hash"]
+        ):
             log_activity(user["id"], "LOGIN_FAILED", "Invalid password", ip_address=ip)
             try:
                 alert_suspicious_activity(
                     f"Failed login attempt for {user['name']}",
-                    ip_address=ip, user_name=user["name"],
-                    metadata={"email": request.email}
+                    ip_address=ip,
+                    user_name=user["name"],
+                    metadata={"email": request.email},
                 )
             except Exception:
                 pass
-            return {"error": 401, "detail": {"error": "INVALID_CREDENTIALS", "detail": "Invalid credentials"}}
+            return {
+                "error": 401,
+                "detail": {
+                    "error": "INVALID_CREDENTIALS",
+                    "detail": "Invalid credentials",
+                },
+            }
 
         limiter.reset(ip)
 
@@ -3396,7 +3760,9 @@ async def login(request: LoginRequest, req: Request, response: Response):
         dh = compute_device_hash(ua, ip)
         device = register_device(user["id"], dh, ip, ua, location=location)
         session = create_session(
-            user["id"], "AUTHENTICATED", None,
+            user["id"],
+            "AUTHENTICATED",
+            None,
             ip_address=ip,
             user_agent=ua,
             device_hash=dh,
@@ -3411,7 +3777,9 @@ async def login(request: LoginRequest, req: Request, response: Response):
             ip_address=ip,
             geolocation=location,
         )
-        log_activity(user["id"], "LOGIN_SUCCESS", f"Login from {ip} ({location})", ip_address=ip)
+        log_activity(
+            user["id"], "LOGIN_SUCCESS", f"Login from {ip} ({location})", ip_address=ip
+        )
 
         try:
             alert_new_login(user["name"], ip, ua, location)
@@ -3425,13 +3793,19 @@ async def login(request: LoginRequest, req: Request, response: Response):
             pass  # alerts are best-effort
 
         token = generate_jwt(
-            user["id"], user.get("email"),
+            user["id"],
+            user.get("email"),
             session_id=session["id"],
             role=user.get("role", "hunter"),
         )
         return {
             "success": True,
-            "user": {"id": user["id"], "name": user["name"], "email": user.get("email"), "role": user.get("role", "hunter")},
+            "user": {
+                "id": user["id"],
+                "name": user["name"],
+                "email": user.get("email"),
+                "role": user.get("role", "hunter"),
+            },
             "token": token,
             "session_id": session["id"],
             "device": {"hash": dh, "is_new": device.get("is_new", False)},
@@ -3479,7 +3853,9 @@ async def logout(req: Request, response: Response, user=Depends(require_auth)):
             pass  # Best effort
 
     auth_header = req.headers.get("authorization", "")
-    cookie_token = req.cookies.get(AUTH_COOKIE_NAME) or req.cookies.get(LEGACY_AUTH_COOKIE_NAME)
+    cookie_token = req.cookies.get(AUTH_COOKIE_NAME) or req.cookies.get(
+        LEGACY_AUTH_COOKIE_NAME
+    )
     token = None
     if auth_header.startswith("Bearer "):
         token = auth_header[7:]
@@ -3594,6 +3970,7 @@ async def auth_me(user=Depends(require_auth)):
         headers={"Cache-Control": "no-store"},
     )
 
+
 @app.get("/admin/auth/intel")
 async def admin_auth_intel(req: Request, limit: int = 200):
     """
@@ -3607,10 +3984,16 @@ async def admin_auth_intel(req: Request, limit: int = 200):
     if not token:
         raise HTTPException(status_code=401, detail="Admin authentication required")
     try:
-        from backend.api.admin_auth import require_auth as admin_require_auth, ROLE_ADMIN
+        from backend.api.admin_auth import (
+            require_auth as admin_require_auth,
+            ROLE_ADMIN,
+        )
+
         admin_result = admin_require_auth(jwt_token=token, required_role=ROLE_ADMIN)
         if admin_result.get("status") != "ok":
-            admin_result = admin_require_auth(session_token=token, required_role=ROLE_ADMIN)
+            admin_result = admin_require_auth(
+                session_token=token, required_role=ROLE_ADMIN
+            )
         if admin_result.get("status") != "ok":
             raise HTTPException(status_code=403, detail="Admin role required")
     except HTTPException:
@@ -3694,18 +4077,20 @@ async def get_hunting_targets(user=Depends(require_auth)):
         db_targets = get_all_targets()
         suggestions = []
         for t in db_targets:
-            suggestions.append({
-                "domain": t.get("scope", "unknown"),
-                "program_name": t.get("program_name", "Unknown"),
-                "platform": t.get("platform", "Unknown"),
-                "scope_size": 1,
-                "api_endpoint_count": 0,
-                "wildcard_count": 1 if "*" in t.get("scope", "") else 0,
-                "likelihood_percent": 50,
-                "difficulty": "MEDIUM",
-                "bounty_range": {"min_usd": 100, "max_usd": 5000},
-                "analysis": f"Target from {t.get('platform', 'unknown')} program",
-            })
+            suggestions.append(
+                {
+                    "domain": t.get("scope", "unknown"),
+                    "program_name": t.get("program_name", "Unknown"),
+                    "platform": t.get("platform", "Unknown"),
+                    "scope_size": 1,
+                    "api_endpoint_count": 0,
+                    "wildcard_count": 1 if "*" in t.get("scope", "") else 0,
+                    "likelihood_percent": 50,
+                    "difficulty": "MEDIUM",
+                    "bounty_range": {"min_usd": 100, "max_usd": 5000},
+                    "analysis": f"Target from {t.get('platform', 'unknown')} program",
+                }
+            )
         return {"targets": suggestions, "total": len(suggestions)}
     except Exception as e:
         logger.exception("Error listing hunting targets")
@@ -3770,26 +4155,30 @@ async def hunting_websocket(websocket: WebSocket):
             if msg_type == "chat":
                 # Echo back as assistant response
                 user_text = data.get("content", "")
-                await websocket.send_json({
-                    "type": "response",
-                    "content": f"Acknowledged: {user_text}. Hunting assistant is in shadow-only mode.",
-                })
+                await websocket.send_json(
+                    {
+                        "type": "response",
+                        "content": f"Acknowledged: {user_text}. Hunting assistant is in shadow-only mode.",
+                    }
+                )
             elif msg_type == "detect":
                 # Return a detection status
-                await websocket.send_json({
-                    "type": "detection",
-                    "result": {
-                        "exploit_type": "Awaiting scan",
-                        "confidence": 0.0,
-                        "field_name": "N/A",
-                        "features": [],
-                        "cvss_score": 0.0,
-                        "severity": "INFO",
-                        "reasoning": "No active scan in progress",
-                        "poc": "",
-                        "mitigation": "",
-                    },
-                })
+                await websocket.send_json(
+                    {
+                        "type": "detection",
+                        "result": {
+                            "exploit_type": "Awaiting scan",
+                            "confidence": 0.0,
+                            "field_name": "N/A",
+                            "features": [],
+                            "cvss_score": 0.0,
+                            "severity": "INFO",
+                            "reasoning": "No active scan in progress",
+                            "poc": "",
+                            "mitigation": "",
+                        },
+                    }
+                )
 
     except WebSocketDisconnect:
         pass
@@ -3819,17 +4208,16 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
     await websocket.accept()
     hunter_connections[workflow_id] = websocket
     workflow["stopped"] = bool(workflow.get("stopped", False))
-    
+
     try:
-        
         # Real Hunter module execution — no simulated success
         hunter_modules = discover_hunter_modules()
         module_names = list(hunter_modules.keys())
-        
+
         successful_count = 0
         failed_count = 0
         step_hashes = []
-        
+
         for idx, module_name in enumerate(module_names):
             if workflow.get("stopped"):
                 workflow["status"] = "STOPPED"
@@ -3838,9 +4226,12 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
             step_success = False
             step_output = {}
             try:
-                module_path = PROJECT_ROOT / "HUMANOID_HUNTER" / module_name / "__init__.py"
+                module_path = (
+                    PROJECT_ROOT / "HUMANOID_HUNTER" / module_name / "__init__.py"
+                )
                 if module_path.exists():
                     import importlib.util
+
                     spec = importlib.util.spec_from_file_location(
                         f"hunter.{module_name}", str(module_path)
                     )
@@ -3857,46 +4248,51 @@ async def hunter_websocket(websocket: WebSocket, workflow_id: str):
                 else:
                     step_output = {"status": "module_not_found"}
             except Exception as exec_err:
-                logger.error("Hunter module %s execution failed: %s", module_name, exec_err)
+                logger.error(
+                    "Hunter module %s execution failed: %s", module_name, exec_err
+                )
                 step_success = False
                 step_output = {"status": "execution_failed"}
-            
+
             step = {
                 "module_name": module_name,
                 "function_name": f"execute_{module_name}",
                 "success": step_success,
-                "input_data": {"target": workflow.get("target", ""), "module_index": idx},
+                "input_data": {
+                    "target": workflow.get("target", ""),
+                    "module_index": idx,
+                },
                 "output_data": step_output,
-                "timestamp": datetime.now(UTC).isoformat()
+                "timestamp": datetime.now(UTC).isoformat(),
             }
-            
+
             if step_success:
                 successful_count += 1
             else:
                 failed_count += 1
-            
-            step_hashes.append(hashlib.sha256(
-                json.dumps(step, sort_keys=True, default=str).encode()
-            ).hexdigest())
-            
+
+            step_hashes.append(
+                hashlib.sha256(
+                    json.dumps(step, sort_keys=True, default=str).encode()
+                ).hexdigest()
+            )
+
             await websocket.send_json({"type": "step", "step": step})
             workflow["steps"].append(step)
-        
+
         # Send completion with real counts and content-derived hash
-        chain_hash = hashlib.sha256(
-            "|".join(step_hashes).encode()
-        ).hexdigest()
+        chain_hash = hashlib.sha256("|".join(step_hashes).encode()).hexdigest()
         result = {
             "final_result": {
                 "total_modules": len(module_names),
                 "successful": successful_count,
-                "failed": failed_count
+                "failed": failed_count,
             },
-            "evidence_chain_hash": chain_hash
+            "evidence_chain_hash": chain_hash,
         }
-        
+
         await websocket.send_json({"type": "complete", "result": result})
-        
+
     except WebSocketDisconnect:
         workflow["status"] = "STOPPED"
         workflow["stopped"] = True
@@ -3925,17 +4321,16 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
     bounty_connections[report_id] = websocket
     ws_closed = False
     workflow["stopped"] = bool(workflow.get("stopped", False))
-    
+
     try:
-        
         target_url = workflow.get("target", "https://example.com")
         mode = workflow.get("mode", "READ_ONLY")  # READ_ONLY or REAL
-        
+
         # Debug logging
         print(f"[WS] WEBSOCKET CONNECTED: {report_id}")
         print(f"   Target URL: {target_url}")
         print(f"   Mode: {mode}")
-        
+
         # Create phase runner with WebSocket progress callback
         async def send_progress(update):
             nonlocal ws_closed
@@ -3948,51 +4343,51 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
             except Exception:
                 ws_closed = True
                 workflow["stopped"] = True
-        
+
         runner = RealPhaseRunner(
             on_progress=send_progress,
             should_stop=lambda: ws_closed or bool(workflow.get("stopped")),
         )
-        
+
         # Run the HTTP-based workflow
         context = await runner.run_workflow(
-            target_url=target_url,
-            workflow_id=report_id,
-            mode=mode
+            target_url=target_url, workflow_id=report_id, mode=mode
         )
         if context.stopped:
             workflow["status"] = "STOPPED"
             workflow["stopped"] = True
             return
-        
+
         if ws_closed:
             return
-        
+
         # Build summary from results
         successful = len([r for r in context.phase_results if r.status == "SUCCESS"])
         failed = len([r for r in context.phase_results if r.status == "FAILED"])
         total_duration = sum(r.duration_ms for r in context.phase_results)
-        
+
         # Convert findings to dict
         findings_data = []
         for f in context.findings:
-            if hasattr(f, '__dict__'):
+            if hasattr(f, "__dict__"):
                 evidence = getattr(f, "evidence", {}) or {}
-                findings_data.append({
-                    "finding_id": f.finding_id,
-                    "category": f.category,
-                    "severity": f.severity,
-                    "title": f.title,
-                    "description": f.description,
-                    "url": getattr(f, "url", ""),
-                    "evidence": evidence,
-                    "verification": evidence.get("verification", {}),
-                    "identified_as": evidence.get("identified_as", []),
-                    "auto_poc_steps": evidence.get("auto_poc_steps", []),
-                })
+                findings_data.append(
+                    {
+                        "finding_id": f.finding_id,
+                        "category": f.category,
+                        "severity": f.severity,
+                        "title": f.title,
+                        "description": f.description,
+                        "url": getattr(f, "url", ""),
+                        "evidence": evidence,
+                        "verification": evidence.get("verification", {}),
+                        "identified_as": evidence.get("identified_as", []),
+                        "auto_poc_steps": evidence.get("auto_poc_steps", []),
+                    }
+                )
             else:
                 findings_data.append(f)
-        
+
         # Final result
         result = {
             "summary": {
@@ -4003,9 +4398,9 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                 "pages_visited": len(context.pages_visited),
                 "technologies": context.technologies,
                 "total_duration_ms": total_duration,
-                "report_file": getattr(context, 'report_file', None),
-                "report_json_file": getattr(context, 'report_json_file', None),
-                "verification_summary": getattr(context, 'verification_summary', {}),
+                "report_file": getattr(context, "report_file", None),
+                "report_json_file": getattr(context, "report_json_file", None),
+                "verification_summary": getattr(context, "verification_summary", {}),
             },
             "findings": findings_data,
             "pages_visited": context.pages_visited,
@@ -4014,23 +4409,32 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                     "number": r.phase_number,
                     "name": r.phase_name,
                     "status": r.status,
-                    "duration_ms": r.duration_ms
+                    "duration_ms": r.duration_ms,
                 }
                 for r in context.phase_results
             ],
             "report_hash": hashlib.sha256(
                 json.dumps(
-                    [{"number": r.phase_number, "name": r.phase_name, "status": r.status, "duration_ms": r.duration_ms} for r in context.phase_results],
-                    sort_keys=True, default=str
+                    [
+                        {
+                            "number": r.phase_number,
+                            "name": r.phase_name,
+                            "status": r.status,
+                            "duration_ms": r.duration_ms,
+                        }
+                        for r in context.phase_results
+                    ],
+                    sort_keys=True,
+                    default=str,
                 ).encode()
-            ).hexdigest()
+            ).hexdigest(),
         }
-        
+
         try:
             await websocket.send_json({"type": "complete", "result": result})
         except Exception:
             pass
-        
+
     except WebSocketDisconnect:
         workflow["status"] = "STOPPED"
         workflow["stopped"] = True
@@ -4038,12 +4442,13 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
     except Exception as e:
         logger.exception(f"WebSocket error: {report_id}")
         try:
-            await websocket.send_json({"type": "error", "message": "Internal server error"})
+            await websocket.send_json(
+                {"type": "error", "message": "Internal server error"}
+            )
         except Exception:
             pass
     finally:
         bounty_connections.pop(report_id, None)
-
 
 
 # NOTE: Unified lifespan is defined at module top (line ~161) and passed
@@ -4053,6 +4458,7 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
 # =============================================================================
 # SYSTEM INTEGRITY ENDPOINT
 # =============================================================================
+
 
 @app.get("/system/integrity")
 async def system_integrity(user=Depends(require_auth)):
@@ -4087,14 +4493,14 @@ class VoiceParseRequest(BaseModel):
 async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
     """
     Dual-mode voice parser.
-    
+
     - SECURITY mode: routes to g12_voice_input.extract_intent()
     - RESEARCH mode: routes to isolated Edge search pipeline
     - Auto-classifies if mode not specified
     """
     _active_voice_mode = runtime_state.get("active_voice_mode", "SECURITY")
     text = request.text.strip()
-    
+
     if not text:
         return {
             "intent_id": f"VOC-EMPTY",
@@ -4107,12 +4513,14 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
             "active_mode": _active_voice_mode,
             "timestamp": datetime.now(UTC).isoformat(),
         }
-    
+
     # Determine mode
     mode = request.mode
     route_decision = None
-    host_session_id = request.host_session_id or runtime_state.get("active_host_action_session")
-    
+    host_session_id = request.host_session_id or runtime_state.get(
+        "active_host_action_session"
+    )
+
     if RESEARCH_AVAILABLE and mode is None:
         # Auto-classify
         router = QueryRouter()
@@ -4120,15 +4528,19 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
         mode = route_decision.mode.value
     elif mode is None:
         mode = "SECURITY"
-    
+
     runtime_state.set("active_voice_mode", mode)
 
     if host_session_id:
         try:
-            from impl_v1.training.voice.voice_intent_orchestrator import VoiceIntentOrchestrator
+            from impl_v1.training.voice.voice_intent_orchestrator import (
+                VoiceIntentOrchestrator,
+            )
 
             orch = VoiceIntentOrchestrator()
-            user_id = user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
+            user_id = (
+                user.get("sub", "unknown") if isinstance(user, dict) else "unknown"
+            )
             host_intent = orch.process_transcript(
                 text=text,
                 user_id=user_id,
@@ -4136,23 +4548,30 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
                 confidence=0.8,
                 context_args={"host_session_id": host_session_id},
             )
-            if host_intent.command_type in {"LAUNCH_APP", "OPEN_APP", "OPEN_URL", "RUN_APPROVED_TASK"}:
+            if host_intent.command_type in {
+                "LAUNCH_APP",
+                "OPEN_APP",
+                "OPEN_URL",
+                "RUN_APPROVED_TASK",
+            }:
                 runtime_state.set("active_voice_mode", host_intent.route_mode)
                 runtime_state.set("active_host_action_session", host_session_id)
-                return {
-                    "intent_id": host_intent.intent_id,
-                    "intent_type": host_intent.command_type,
-                    "raw_text": text,
-                    "extracted_value": host_intent.args.get("app")
-                    or host_intent.args.get("url")
-                    or host_intent.args.get("task"),
-                    "confidence": host_intent.confidence,
-                    "status": "PARSED" if not host_intent.error else "BLOCKED",
-                    "block_reason": host_intent.error,
-                    "active_mode": host_intent.route_mode,
-                    "args": host_intent.args,
-                    "timestamp": host_intent.timestamp,
-                }
+                return _store_runtime_status_cached(
+                    {
+                        "intent_id": host_intent.intent_id,
+                        "intent_type": host_intent.command_type,
+                        "raw_text": text,
+                        "extracted_value": host_intent.args.get("app")
+                        or host_intent.args.get("url")
+                        or host_intent.args.get("task"),
+                        "confidence": host_intent.confidence,
+                        "status": "PARSED" if not host_intent.error else "BLOCKED",
+                        "block_reason": host_intent.error,
+                        "active_mode": host_intent.route_mode,
+                        "args": host_intent.args,
+                        "timestamp": host_intent.timestamp,
+                    }
+                )
         except Exception:
             logger.exception("Host-action parse failed")
 
@@ -4161,7 +4580,7 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
         # Run isolation pre-check
         guard = IsolationGuard()
         isolation_check = guard.pre_query_check(text)
-        
+
         if not isolation_check.allowed:
             return {
                 "intent_id": f"VOC-BLOCKED",
@@ -4174,43 +4593,59 @@ async def voice_parse(request: VoiceParseRequest, user=Depends(require_auth)):
                 "active_mode": "RESEARCH",
                 "timestamp": datetime.now(UTC).isoformat(),
             }
-        
+
         from backend.assistant.voice_runtime import run_research_analysis
+
         analysis = run_research_analysis(text)
         research = analysis.get("research", {})
         verification = analysis.get("verification", {})
         audit = analysis.get("audit", {})
 
-        return {
-            "intent_id": f"VOC-RESEARCH",
-            "intent_type": "RESEARCH_QUERY",
-            "raw_text": text,
-            "extracted_value": research.get("summary"),
-            "confidence": 0.9 if research.get("status") == ResearchStatus.SUCCESS.value else 0.3,
-            "status": "PARSED" if research.get("status") == ResearchStatus.SUCCESS.value else "INVALID",
-            "block_reason": None if research.get("status") == ResearchStatus.SUCCESS.value else research.get("summary"),
-            "active_mode": "RESEARCH",
-            "research_result": {
-                "title": research.get("title"),
-                "summary": research.get("summary"),
-                "source": research.get("source"),
-                "search_backend": research.get("search_backend"),
-                "key_terms": research.get("key_terms", []),
-                "word_count": research.get("word_count", 0),
-                "elapsed_ms": research.get("elapsed_ms", 0),
-            },
-            "verification": verification,
-            "audit": audit,
-            "route_decision": {
-                "confidence": route_decision.confidence if route_decision else 1.0,
-                "reason": route_decision.reason if route_decision else "Manual mode selection",
-            } if route_decision or mode == "RESEARCH" else None,
-            "timestamp": analysis.get("audit", {}).get("timestamp", datetime.now(UTC).isoformat()),
-        }
-    
+        return _store_runtime_status_cached(
+            {
+                "intent_id": f"VOC-RESEARCH",
+                "intent_type": "RESEARCH_QUERY",
+                "raw_text": text,
+                "extracted_value": research.get("summary"),
+                "confidence": 0.9
+                if research.get("status") == ResearchStatus.SUCCESS.value
+                else 0.3,
+                "status": "PARSED"
+                if research.get("status") == ResearchStatus.SUCCESS.value
+                else "INVALID",
+                "block_reason": None
+                if research.get("status") == ResearchStatus.SUCCESS.value
+                else research.get("summary"),
+                "active_mode": "RESEARCH",
+                "research_result": {
+                    "title": research.get("title"),
+                    "summary": research.get("summary"),
+                    "source": research.get("source"),
+                    "search_backend": research.get("search_backend"),
+                    "key_terms": research.get("key_terms", []),
+                    "word_count": research.get("word_count", 0),
+                    "elapsed_ms": research.get("elapsed_ms", 0),
+                },
+                "verification": verification,
+                "audit": audit,
+                "route_decision": {
+                    "confidence": route_decision.confidence if route_decision else 1.0,
+                    "reason": route_decision.reason
+                    if route_decision
+                    else "Manual mode selection",
+                }
+                if route_decision or mode == "RESEARCH"
+                else None,
+                "timestamp": analysis.get("audit", {}).get(
+                    "timestamp", datetime.now(UTC).isoformat()
+                ),
+            }
+        )
+
     # ===== SECURITY MODE (default) =====
     try:
         from impl_v1.phase49.governors.g12_voice_input import extract_intent
+
         intent = extract_intent(text)
         return {
             "intent_id": intent.intent_id,
@@ -4244,6 +4679,7 @@ async def voice_mode(user=Depends(require_auth)):
         "mode": runtime_state.get("active_voice_mode", "SECURITY"),
         "research_available": RESEARCH_AVAILABLE,
     }
+
 
 # =============================================================================
 # RUNTIME STATUS & ACCURACY ENDPOINTS (for Control Panel)
@@ -4342,22 +4778,30 @@ def _validate_runtime_telemetry(data: Dict[str, Any]) -> tuple[bool, str]:
         return False, "HMAC secret unavailable"
 
     stored_hmac = str(data.get("hmac", "")).strip().lower()
-    if len(stored_hmac) != 64 or any(ch not in "0123456789abcdef" for ch in stored_hmac):
+    if len(stored_hmac) != 64 or any(
+        ch not in "0123456789abcdef" for ch in stored_hmac
+    ):
         return False, "Invalid HMAC format"
 
     msg = f"{schema_version}|{stored_crc}|{timestamp}"
-    expected_hmac = hmac.new(
-        secret.encode("utf-8"),
-        msg.encode("utf-8"),
-        hashlib.sha256,
-    ).hexdigest().lower()
+    expected_hmac = (
+        hmac.new(
+            secret.encode("utf-8"),
+            msg.encode("utf-8"),
+            hashlib.sha256,
+        )
+        .hexdigest()
+        .lower()
+    )
     if not hmac.compare_digest(stored_hmac, expected_hmac):
         return False, "HMAC validation failed"
 
     return True, ""
 
 
-def _read_validated_telemetry(telemetry_path: Path) -> tuple[Optional[Dict[str, Any]], Optional[str]]:
+def _read_validated_telemetry(
+    telemetry_path: Path,
+) -> tuple[Optional[Dict[str, Any]], Optional[str]]:
     """Read telemetry JSON and enforce integrity checks."""
     try:
         import json as _json
@@ -4384,6 +4828,10 @@ async def runtime_status(user=Depends(require_auth)):
     validates schema + CRC + HMAC before returning data.
     Falls back to live G38 auto_trainer metrics if no telemetry file exists.
     """
+    cached_payload = _get_runtime_status_cached()
+    if cached_payload is not None:
+        return cached_payload
+
     telemetry_path = PROJECT_ROOT / "reports" / "training_telemetry.json"
     live_status = None
     training_active = False
@@ -4429,24 +4877,31 @@ async def runtime_status(user=Depends(require_auth)):
                 safetensors_count = 0
                 try:
                     import glob as _glob
+
                     # Only check known dirs
                     g38_dir = PROJECT_ROOT / "reports" / "g38_training"
                     if g38_dir.exists():
                         checkpoint_count = len(_glob.glob(str(g38_dir / "*.json")))
                     # Check only project root for safetensors
-                    safetensors_count = len(_glob.glob(str(PROJECT_ROOT / "*.safetensors")))
-                    safetensors_count += len(_glob.glob(str(PROJECT_ROOT / "training" / "*.safetensors")))
+                    safetensors_count = len(
+                        _glob.glob(str(PROJECT_ROOT / "*.safetensors"))
+                    )
+                    safetensors_count += len(
+                        _glob.glob(str(PROJECT_ROOT / "training" / "*.safetensors"))
+                    )
                 except Exception:
                     pass
 
                 # Training duration: use trainer state
                 import time as _time
+
                 duration_seconds = 0.0
                 wall_clock = _time.time()
                 try:
-                    session = getattr(trainer, '_current_session', None)
-                    if session and hasattr(session, 'started_at'):
+                    session = getattr(trainer, "_current_session", None)
+                    if session and hasattr(session, "started_at"):
                         from datetime import datetime as _dt, timezone as _tz
+
                         start = _dt.fromisoformat(str(session.started_at))
                         duration_seconds = (_dt.now(_tz.utc) - start).total_seconds()
                 except Exception:
@@ -4454,10 +4909,13 @@ async def runtime_status(user=Depends(require_auth)):
                     try:
                         if trainer.events and len(trainer.events) > 0:
                             first_event = trainer.events[0]
-                            if hasattr(first_event, 'timestamp'):
+                            if hasattr(first_event, "timestamp"):
                                 from datetime import datetime as _dt2, timezone as _tz2
+
                                 ts = _dt2.fromisoformat(str(first_event.timestamp))
-                                duration_seconds = (_dt2.now(_tz2.utc) - ts).total_seconds()
+                                duration_seconds = (
+                                    _dt2.now(_tz2.utc) - ts
+                                ).total_seconds()
                     except Exception:
                         pass
 
@@ -4466,10 +4924,16 @@ async def runtime_status(user=Depends(require_auth)):
                 gpu_util_pct = 0.0
                 try:
                     import subprocess as _sp
+
                     smi = _sp.run(
-                        ["nvidia-smi", "--query-gpu=temperature.gpu,utilization.gpu",
-                         "--format=csv,noheader,nounits"],
-                        capture_output=True, text=True, timeout=2,
+                        [
+                            "nvidia-smi",
+                            "--query-gpu=temperature.gpu,utilization.gpu",
+                            "--format=csv,noheader,nounits",
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=2,
                     )
                     if smi.returncode == 0:
                         parts = smi.stdout.strip().split(",")
@@ -4481,6 +4945,7 @@ async def runtime_status(user=Depends(require_auth)):
                 cpu_util = 0.0
                 try:
                     import psutil
+
                     cpu_util = psutil.cpu_percent(interval=0)
                 except Exception:
                     pass
@@ -4489,65 +4954,73 @@ async def runtime_status(user=Depends(require_auth)):
                 if is_continuous and is_training:
                     progress_pct = round(accuracy * 100, 1)
 
-                return {
-                    "api_version": 2,
-                    "status": "active" if is_training else "idle",
-                    "runtime": {
-                        "total_epochs": total_epochs,
-                        "completed_epochs": epoch,
-                        "current_loss": loss,
-                        "precision": accuracy,
-                        "ece": None,
-                        "drift_kl": None,
-                        "duplicate_rate": None,
-                        "gpu_util": gpu_util_pct,
-                        "cpu_util": cpu_util,
-                        "temperature": gpu_temp,
-                        "determinism_status": None,
-                        "freeze_status": None,
-                        "mode": "CONTINUOUS" if is_continuous else status.get("training_mode", "MANUAL"),
-                        "progress_pct": progress_pct,
-                        "loss_trend": None,
-                        "wall_clock_unix": wall_clock,
-                        "monotonic_start_time": wall_clock - duration_seconds if wall_clock else 0,
-                        "training_duration_seconds": duration_seconds,
-                        # Extended metrics for Control Dashboard
-                        "samples_per_sec": samples_sec,
-                        "dataset_size": dataset_size,
-                        "gpu_mem_allocated_mb": gpu_mem,
-                        "gpu_mem_reserved_mb": gpu_reserved,
-                        "events_count": events_count,
-                        "checkpoints_saved": checkpoint_count,
-                        "safetensors_files": safetensors_count,
-                        "training_state": status.get("state", "IDLE"),
-                        "continuous_mode": is_continuous,
-                        "is_measured": True,
-                    },
-                    "determinism_ok": None,
-                    "stale": False,
-                    "last_update_ms": 0,
-                    "signature": None,
-                    "source": "g38_live",
-                    "auto_repaired": repair_status.get("repaired", False),
-                    "repair_issues": repair_status.get("issues", []),
-                }
+                return _store_runtime_status_cached(
+                    {
+                        "api_version": 2,
+                        "status": "active" if is_training else "idle",
+                        "runtime": {
+                            "total_epochs": total_epochs,
+                            "completed_epochs": epoch,
+                            "current_loss": loss,
+                            "precision": accuracy,
+                            "ece": None,
+                            "drift_kl": None,
+                            "duplicate_rate": None,
+                            "gpu_util": gpu_util_pct,
+                            "cpu_util": cpu_util,
+                            "temperature": gpu_temp,
+                            "determinism_status": None,
+                            "freeze_status": None,
+                            "mode": "CONTINUOUS"
+                            if is_continuous
+                            else status.get("training_mode", "MANUAL"),
+                            "progress_pct": progress_pct,
+                            "loss_trend": None,
+                            "wall_clock_unix": wall_clock,
+                            "monotonic_start_time": wall_clock - duration_seconds
+                            if wall_clock
+                            else 0,
+                            "training_duration_seconds": duration_seconds,
+                            # Extended metrics for Control Dashboard
+                            "samples_per_sec": samples_sec,
+                            "dataset_size": dataset_size,
+                            "gpu_mem_allocated_mb": gpu_mem,
+                            "gpu_mem_reserved_mb": gpu_reserved,
+                            "events_count": events_count,
+                            "checkpoints_saved": checkpoint_count,
+                            "safetensors_files": safetensors_count,
+                            "training_state": status.get("state", "IDLE"),
+                            "continuous_mode": is_continuous,
+                            "is_measured": True,
+                        },
+                        "determinism_ok": None,
+                        "stale": False,
+                        "last_update_ms": 0,
+                        "signature": None,
+                        "source": "g38_live",
+                        "auto_repaired": repair_status.get("repaired", False),
+                        "repair_issues": repair_status.get("issues", []),
+                    }
+                )
             except Exception:
                 logger.exception("runtime_status G38 fallback failed")
 
-        return {
-            "api_version": 2,
-            "status": "unavailable",
-            "reason": "No telemetry source available",
-            "runtime": None,
-            "determinism_ok": None,
-            "stale": True,
-            "last_update_ms": 0,
-            "signature": None,
-            "source": "none",
-            "is_measured": False,
-            "auto_repaired": repair_status.get("repaired", False),
-            "repair_issues": repair_status.get("issues", []),
-        }
+        return _store_runtime_status_cached(
+            {
+                "api_version": 2,
+                "status": "unavailable",
+                "reason": "No telemetry source available",
+                "runtime": None,
+                "determinism_ok": None,
+                "stale": True,
+                "last_update_ms": 0,
+                "signature": None,
+                "source": "none",
+                "is_measured": False,
+                "auto_repaired": repair_status.get("repaired", False),
+                "repair_issues": repair_status.get("issues", []),
+            }
+        )
 
     try:
         data, validation_error = _read_validated_telemetry(telemetry_path)
@@ -4567,6 +5040,7 @@ async def runtime_status(user=Depends(require_auth)):
                     validation_error,
                 )
                 import time as _time
+
                 trainer = get_auto_trainer()
                 status = live_status
                 is_training = bool(status.get("is_training", False))
@@ -4577,9 +5051,10 @@ async def runtime_status(user=Depends(require_auth)):
                 wall_clock = _time.time()
                 duration_seconds = 0.0
                 try:
-                    session = getattr(trainer, '_current_session', None)
-                    if session and hasattr(session, 'started_at'):
+                    session = getattr(trainer, "_current_session", None)
+                    if session and hasattr(session, "started_at"):
                         from datetime import datetime as _dt, timezone as _tz
+
                         start = _dt.fromisoformat(str(session.started_at))
                         duration_seconds = (_dt.now(_tz.utc) - start).total_seconds()
                 except Exception:
@@ -4587,6 +5062,7 @@ async def runtime_status(user=Depends(require_auth)):
                 cpu_util_val = 0.0
                 try:
                     import psutil
+
                     cpu_util_val = psutil.cpu_percent(interval=0)
                 except Exception:
                     pass
@@ -4594,10 +5070,16 @@ async def runtime_status(user=Depends(require_auth)):
                 gpu_util_val = 0.0
                 try:
                     import subprocess as _sp
+
                     smi = _sp.run(
-                        ["nvidia-smi", "--query-gpu=temperature.gpu,utilization.gpu",
-                         "--format=csv,noheader,nounits"],
-                        capture_output=True, text=True, timeout=2,
+                        [
+                            "nvidia-smi",
+                            "--query-gpu=temperature.gpu,utilization.gpu",
+                            "--format=csv,noheader,nounits",
+                        ],
+                        capture_output=True,
+                        text=True,
+                        timeout=2,
                     )
                     if smi.returncode == 0:
                         parts = smi.stdout.strip().split(",")
@@ -4605,53 +5087,69 @@ async def runtime_status(user=Depends(require_auth)):
                         gpu_util_val = float(parts[1].strip())
                 except Exception:
                     pass
-                return {
-                    "api_version": 2,
-                    "status": "active" if is_training else "idle",
-                    "runtime": {
-                        "total_epochs": total_epochs_val,
-                        "completed_epochs": epoch,
-                        "current_loss": loss_val,
-                        "precision": accuracy_val,
-                        "ece": None, "drift_kl": None, "duplicate_rate": None,
-                        "gpu_util": gpu_util_val, "cpu_util": cpu_util_val,
-                        "temperature": gpu_temp_val,
-                        "determinism_status": None, "freeze_status": None,
-                        "mode": str(status.get("training_mode", "IDLE") or "IDLE"),
-                        "progress_pct": round(accuracy_val * 100, 1) if is_training else 0,
-                        "loss_trend": None,
-                        "wall_clock_unix": wall_clock,
-                        "monotonic_start_time": wall_clock - duration_seconds,
-                        "training_duration_seconds": duration_seconds,
-                        "training_state": str(status.get("state", "IDLE") or "IDLE"),
-                        "samples_per_sec": float(status.get("samples_per_sec", 0.0) or 0.0),
-                        "dataset_size": int(status.get("dataset_size", 0) or 0),
-                        "is_measured": True,
-                    },
-                    "determinism_ok": None,
-                    "stale": False,
-                    "last_update_ms": 0,
-                    "signature": None,
-                    "source": "g38_live",
-                    "auto_repaired": repair_status.get("repaired", False),
-                    "repair_issues": repair_status.get("issues", []),
-                }
+                return _store_runtime_status_cached(
+                    {
+                        "api_version": 2,
+                        "status": "active" if is_training else "idle",
+                        "runtime": {
+                            "total_epochs": total_epochs_val,
+                            "completed_epochs": epoch,
+                            "current_loss": loss_val,
+                            "precision": accuracy_val,
+                            "ece": None,
+                            "drift_kl": None,
+                            "duplicate_rate": None,
+                            "gpu_util": gpu_util_val,
+                            "cpu_util": cpu_util_val,
+                            "temperature": gpu_temp_val,
+                            "determinism_status": None,
+                            "freeze_status": None,
+                            "mode": str(status.get("training_mode", "IDLE") or "IDLE"),
+                            "progress_pct": round(accuracy_val * 100, 1)
+                            if is_training
+                            else 0,
+                            "loss_trend": None,
+                            "wall_clock_unix": wall_clock,
+                            "monotonic_start_time": wall_clock - duration_seconds,
+                            "training_duration_seconds": duration_seconds,
+                            "training_state": str(
+                                status.get("state", "IDLE") or "IDLE"
+                            ),
+                            "samples_per_sec": float(
+                                status.get("samples_per_sec", 0.0) or 0.0
+                            ),
+                            "dataset_size": int(status.get("dataset_size", 0) or 0),
+                            "is_measured": True,
+                        },
+                        "determinism_ok": None,
+                        "stale": False,
+                        "last_update_ms": 0,
+                        "signature": None,
+                        "source": "g38_live",
+                        "auto_repaired": repair_status.get("repaired", False),
+                        "repair_issues": repair_status.get("issues", []),
+                    }
+                )
             else:
-                return {
-                    "status": "error",
-                    "reason": validation_error or "Telemetry integrity validation failed",
-                    "runtime": None,
-                    "determinism_ok": False,
-                    "stale": True,
-                    "last_update_ms": 0,
-                    "signature": None,
-                    "source": "telemetry_file",
-                    "auto_repaired": repair_status.get("repaired", False),
-                    "repair_issues": repair_status.get("issues", []),
-                }
+                return _store_runtime_status_cached(
+                    {
+                        "status": "error",
+                        "reason": validation_error
+                        or "Telemetry integrity validation failed",
+                        "runtime": None,
+                        "determinism_ok": False,
+                        "stale": True,
+                        "last_update_ms": 0,
+                        "signature": None,
+                        "source": "telemetry_file",
+                        "auto_repaired": repair_status.get("repaired", False),
+                        "repair_issues": repair_status.get("issues", []),
+                    }
+                )
 
         # Check staleness (>60s since file mod time)
         import time as _time
+
         mod_time = telemetry_path.stat().st_mtime
         age_ms = int((_time.time() - mod_time) * 1000)
         is_stale = training_active and age_ms > 60000
@@ -4669,60 +5167,70 @@ async def runtime_status(user=Depends(require_auth)):
             checkpoints_saved = int(live_status.get("events_count", 0) or 0)
         status_value = "active" if training_active else "idle"
 
-        return {
-            "status": status_value,
-            "runtime": {
-                "total_epochs": data.get("total_epochs", 100),
-                "completed_epochs": data.get("epoch", 0),
-                "current_loss": data.get("loss", 0.0),
-                "precision": data.get("precision", 0.0),
-                "ece": data.get("ece", 0.0),
-                "drift_kl": data.get("kl_divergence", 0.0),
-                "duplicate_rate": data.get("duplicate_rate", 0.0),
-                "gpu_util": data.get("gpu_util", 0.0),
-                "cpu_util": data.get("cpu_util", 0.0),
-                "temperature": data.get("gpu_temperature", 0.0),
-                "determinism_status": data.get("determinism_status", False),
-                "freeze_status": data.get("freeze_status", False),
-                "mode": runtime_mode,
-                "progress_pct": min(100.0, (data.get("epoch", 0) / max(data.get("total_epochs", 100), 1)) * 100),
-                "loss_trend": data.get("loss_trend", 0.0),
-                # Phase 2: Real-time training visibility
-                "wall_clock_unix": data.get("wall_clock_unix", 0),
-                "monotonic_start_time": data.get("monotonic_start_time", 0),
-                "training_duration_seconds": data.get("training_duration_seconds", 0.0),
-                "training_state": training_state,
-                "samples_per_sec": samples_per_second,
-                "dataset_size": dataset_size,
-                "checkpoints_saved": checkpoints_saved,
-                "safetensors_files": safetensors_files,
-            },
-            "determinism_ok": data.get("determinism_status", False),
-            "stale": is_stale,
-            "last_update_ms": age_ms,
-            "signature": data.get("hmac", None),
-            "source": (
-                "telemetry_file_self_healed"
-                if repair_status.get("repaired")
-                else "telemetry_file"
-            ),
-            "auto_repaired": repair_status.get("repaired", False),
-            "repair_issues": repair_status.get("issues", []),
-        }
+        return _store_runtime_status_cached(
+            {
+                "status": status_value,
+                "runtime": {
+                    "total_epochs": data.get("total_epochs", 100),
+                    "completed_epochs": data.get("epoch", 0),
+                    "current_loss": data.get("loss", 0.0),
+                    "precision": data.get("precision", 0.0),
+                    "ece": data.get("ece", 0.0),
+                    "drift_kl": data.get("kl_divergence", 0.0),
+                    "duplicate_rate": data.get("duplicate_rate", 0.0),
+                    "gpu_util": data.get("gpu_util", 0.0),
+                    "cpu_util": data.get("cpu_util", 0.0),
+                    "temperature": data.get("gpu_temperature", 0.0),
+                    "determinism_status": data.get("determinism_status", False),
+                    "freeze_status": data.get("freeze_status", False),
+                    "mode": runtime_mode,
+                    "progress_pct": min(
+                        100.0,
+                        (data.get("epoch", 0) / max(data.get("total_epochs", 100), 1))
+                        * 100,
+                    ),
+                    "loss_trend": data.get("loss_trend", 0.0),
+                    # Phase 2: Real-time training visibility
+                    "wall_clock_unix": data.get("wall_clock_unix", 0),
+                    "monotonic_start_time": data.get("monotonic_start_time", 0),
+                    "training_duration_seconds": data.get(
+                        "training_duration_seconds", 0.0
+                    ),
+                    "training_state": training_state,
+                    "samples_per_sec": samples_per_second,
+                    "dataset_size": dataset_size,
+                    "checkpoints_saved": checkpoints_saved,
+                    "safetensors_files": safetensors_files,
+                },
+                "determinism_ok": data.get("determinism_status", False),
+                "stale": is_stale,
+                "last_update_ms": age_ms,
+                "signature": data.get("hmac", None),
+                "source": (
+                    "telemetry_file_self_healed"
+                    if repair_status.get("repaired")
+                    else "telemetry_file"
+                ),
+                "auto_repaired": repair_status.get("repaired", False),
+                "repair_issues": repair_status.get("issues", []),
+            }
+        )
     except Exception:
         logger.exception("runtime_status failed")
-        return {
-            "status": "error",
-            "reason": "Internal error",
-            "runtime": None,
-            "determinism_ok": False,
-            "stale": True,
-            "last_update_ms": 0,
-            "signature": None,
-            "source": "telemetry_file",
-            "auto_repaired": repair_status.get("repaired", False),
-            "repair_issues": repair_status.get("issues", []),
-        }
+        return _store_runtime_status_cached(
+            {
+                "status": "error",
+                "reason": "Internal error",
+                "runtime": None,
+                "determinism_ok": False,
+                "stale": True,
+                "last_update_ms": 0,
+                "signature": None,
+                "source": "telemetry_file",
+                "auto_repaired": repair_status.get("repaired", False),
+                "repair_issues": repair_status.get("issues", []),
+            }
+        )
 
 
 @app.get("/api/accuracy/snapshot")
@@ -4776,7 +5284,10 @@ async def accuracy_snapshot(user=Depends(require_auth)):
         data, validation_error = _read_validated_telemetry(telemetry_path)
         if data is None:
             logger.warning("accuracy_snapshot: validation failed: %s", validation_error)
-            return {**unavailable_response, "reason": validation_error or "Validation failed"}
+            return {
+                **unavailable_response,
+                "reason": validation_error or "Validation failed",
+            }
         return {
             "api_version": 2,
             "precision": data.get("precision"),
@@ -4796,11 +5307,12 @@ async def accuracy_snapshot(user=Depends(require_auth)):
 # TRAINING DATA SOURCE TRANSPARENCY
 # =============================================================================
 
+
 @app.get("/api/training/data-source")
 async def training_data_source(user=Depends(require_auth)):
     """
     GET /api/training/data-source — Training pipeline source transparency.
-    
+
     Reads secure_data/dataset_manifest.json to report:
     - Data source (INGESTION_PIPELINE / SYNTHETIC / NONE)
     - Dataset hash
@@ -4823,7 +5335,8 @@ async def training_data_source(user=Depends(require_auth)):
 
     try:
         import json as _json
-        with open(manifest_path, 'r', encoding='utf-8') as _f:
+
+        with open(manifest_path, "r", encoding="utf-8") as _f:
             data = _json.load(_f)
         source = data.get("dataset_source", "UNKNOWN")
 
@@ -4840,21 +5353,28 @@ async def training_data_source(user=Depends(require_auth)):
         dll_integrity = "UNKNOWN"
         try:
             import ctypes
-            _bridge_path = os.path.join(_project_root, "native", "distributed", "ingestion_bridge.dll")
+
+            _bridge_path = os.path.join(
+                _project_root, "native", "distributed", "ingestion_bridge.dll"
+            )
             if os.path.exists(_bridge_path):
                 _bridge = ctypes.CDLL(_bridge_path)
                 _bridge.bridge_self_verify(_bridge_path.encode())
                 hash_buf = ctypes.create_string_buffer(65)
                 _bridge.bridge_get_self_hash(hash_buf, 65)
                 bridge_hash = hash_buf.value.decode()
-                dll_integrity = "VERIFIED" if _bridge.bridge_is_self_verified() else "FAILED"
+                dll_integrity = (
+                    "VERIFIED" if _bridge.bridge_is_self_verified() else "FAILED"
+                )
         except Exception:
             dll_integrity = "CHECK_FAILED"
 
         # Module guard status
         guard_status = "UNKNOWN"
         try:
-            _guard_path = os.path.join(_project_root, "native", "security", "module_integrity_guard.dll")
+            _guard_path = os.path.join(
+                _project_root, "native", "security", "module_integrity_guard.dll"
+            )
             guard_status = "ACTIVE" if os.path.exists(_guard_path) else "MISSING"
         except Exception:
             pass
@@ -4890,23 +5410,29 @@ async def training_data_source(user=Depends(require_auth)):
 # MODE CONTROL ENDPOINTS (TRAIN/HUNT mutual exclusion)
 # =============================================================================
 
+
 @app.post("/api/mode/train/start")
 async def start_training_mode(user=Depends(require_admin)):
     """Start TRAIN mode. Blocked if HUNT is active."""
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode == "HUNT":
         from fastapi.responses import JSONResponse
-        return JSONResponse(status_code=409, content={
-            "error": "MUTEX_BLOCKED",
-            "reason": "Cannot enter TRAIN while HUNT is active",
-            "current_mode": current_mode
-        })
+
+        return JSONResponse(
+            status_code=409,
+            content={
+                "error": "MUTEX_BLOCKED",
+                "reason": "Cannot enter TRAIN while HUNT is active",
+                "current_mode": current_mode,
+            },
+        )
     if current_mode == "TRAIN":
         return {"mode": "TRAIN", "status": "already_active"}
 
     # Truthful behavior: start real training pipeline or fail.
     if not G38_AVAILABLE:
         from fastapi.responses import JSONResponse
+
         return JSONResponse(
             status_code=503,
             content={
@@ -4919,6 +5445,7 @@ async def start_training_mode(user=Depends(require_admin)):
     result = start_continuous_training(target_epochs=100)
     if not result.get("started", False):
         from fastapi.responses import JSONResponse
+
         return JSONResponse(
             status_code=503,
             content={
@@ -4962,11 +5489,15 @@ async def start_hunt_mode(user=Depends(require_admin)):
     current_mode = runtime_state.get("runtime_mode", "IDLE")
     if current_mode == "TRAIN":
         from fastapi.responses import JSONResponse
-        return JSONResponse(status_code=409, content={
-            "error": "MUTEX_BLOCKED",
-            "reason": "Cannot enter HUNT while TRAIN is active",
-            "current_mode": current_mode
-        })
+
+        return JSONResponse(
+            status_code=409,
+            content={
+                "error": "MUTEX_BLOCKED",
+                "reason": "Cannot enter HUNT while TRAIN is active",
+                "current_mode": current_mode,
+            },
+        )
     if current_mode == "HUNT":
         return {"mode": "HUNT", "status": "already_active"}
     runtime_state.set("runtime_mode", "HUNT")
@@ -4982,9 +5513,11 @@ async def stop_hunt_mode(user=Depends(require_admin)):
     runtime_state.set("runtime_mode", "IDLE")
     return {"mode": "IDLE", "status": "stopped"}
 
+
 # =============================================================================
 # GITHUB OAUTH LOGIN
 # =============================================================================
+
 
 def _env_oauth_value(key: str, default: str = "") -> str:
     raw = os.getenv(key, default).strip()
@@ -5006,7 +5539,9 @@ def _get_oauth_state_secret() -> str:
 
 def _refresh_oauth_env(provider: str) -> None:
     keys = _oauth_provider_env_keys(provider)
-    if _env_oauth_value(keys["client_id"], "") and _env_oauth_value(keys["client_secret"], ""):
+    if _env_oauth_value(keys["client_id"], "") and _env_oauth_value(
+        keys["client_secret"], ""
+    ):
         return
     allowed_keys = {
         keys["client_id"],
@@ -5015,8 +5550,14 @@ def _refresh_oauth_env(provider: str) -> None:
         "FRONTEND_URL",
         "YGB_ALLOWED_ORIGINS",
     }
-    _load_env_file(_ENV_ROOT / ".env", allow_placeholders=False, allowed_keys=allowed_keys)
-    _load_env_file(_ENV_ROOT / ".env.connected", allow_placeholders=False, allowed_keys=allowed_keys)
+    _load_env_file(
+        _ENV_ROOT / ".env", allow_placeholders=False, allowed_keys=allowed_keys
+    )
+    _load_env_file(
+        _ENV_ROOT / ".env.connected",
+        allow_placeholders=False,
+        allowed_keys=allowed_keys,
+    )
     _load_shared_oauth_env(provider)
 
 
@@ -5079,7 +5620,11 @@ def _get_google_oauth_config() -> Dict[str, Any]:
 
 def _oauth_not_configured_detail(provider: str = "github") -> Dict[str, Any]:
     normalized = (provider or "github").strip().lower()
-    cfg = _get_google_oauth_config() if normalized == "google" else _get_github_oauth_config()
+    cfg = (
+        _get_google_oauth_config()
+        if normalized == "google"
+        else _get_github_oauth_config()
+    )
     label = _oauth_provider_label(normalized)
     return {
         "error": f"{normalized.upper()}_OAUTH_NOT_CONFIGURED",
@@ -5088,17 +5633,23 @@ def _oauth_not_configured_detail(provider: str = "github") -> Dict[str, Any]:
         "redirect_uri": cfg["redirect_uri"],
         "frontend_url": cfg["frontend_url"],
         "checked_files": [".env", ".env.connected"],
-        "shared_candidates": [str(path) for path in _shared_oauth_candidate_files(normalized)],
+        "shared_candidates": [
+            str(path) for path in _shared_oauth_candidate_files(normalized)
+        ],
     }
+
 
 # --- HTTP session pool for OAuth provider APIs (connection reuse / keep-alive) ---
 try:
     import requests as _http_lib
+
     _github_http = _http_lib.Session()
-    _github_http.headers.update({
-        "Accept": "application/json",
-        "User-Agent": "YGB-Server",
-    })
+    _github_http.headers.update(
+        {
+            "Accept": "application/json",
+            "User-Agent": "YGB-Server",
+        }
+    )
     _oauth_http = _github_http
     _HAVE_REQUESTS = True
 except ImportError:
@@ -5144,6 +5695,7 @@ def _allowed_frontend_urls() -> set[str]:
 def _is_private_ip(host: str) -> bool:
     """Check if a host is a private/local network address."""
     import re
+
     ip_part = host.split(":")[0]  # strip port
     if ip_part in ("localhost", "127.0.0.1"):
         return True
@@ -5161,7 +5713,7 @@ def _is_private_ip(host: str) -> bool:
             pass
         return False
     # Treat all other bare IPs as potentially LAN (conservative for OAuth)
-    if re.match(r'^\d+\.\d+\.\d+\.\d+$', ip_part):
+    if re.match(r"^\d+\.\d+\.\d+\.\d+$", ip_part):
         return False  # Fixed: was returning True for ALL IPs including public
     return False
 
@@ -5213,6 +5765,7 @@ def _parse_oauth_state(state: str) -> tuple[bool, Optional[str]]:
 def _perf_ms(start: float) -> int:
     """Milliseconds elapsed since *start* (time.monotonic)."""
     import time as _t
+
     return int((_t.monotonic() - start) * 1000)
 
 
@@ -5278,17 +5831,21 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
         frontend_url = _resolve_frontend_url("")
 
     state = _build_oauth_state(frontend_url)
-    params = urllib.parse.urlencode({
-        "client_id": cfg["client_id"],
-        "redirect_uri": cfg["redirect_uri"],
-        "scope": "user:email",
-        "state": state,
-    })
+    params = urllib.parse.urlencode(
+        {
+            "client_id": cfg["client_id"],
+            "redirect_uri": cfg["redirect_uri"],
+            "scope": "user:email",
+            "state": state,
+        }
+    )
     resp = RedirectResponse(
         url=f"https://github.com/login/oauth/authorize?{params}",
         status_code=302,
     )
-    _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith("https://")
+    _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith(
+        "https://"
+    )
     resp.set_cookie(
         key=_oauth_state_cookie_name("github"),
         value=state,
@@ -5301,7 +5858,9 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
 
 
 @app.get("/auth/github/callback")
-async def github_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
+async def github_auth_callback(
+    req: Request, code: str = "", error: str = "", state: str = ""
+):
     """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
     cfg = _get_github_oauth_config()
     state_cookie = _oauth_state_cookie_name("github")
@@ -5314,6 +5873,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     if not code:
@@ -5322,6 +5882,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     expected_state = req.cookies.get(state_cookie, "")
@@ -5333,6 +5894,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
     if not cookie_ok:
         logger.warning("GitHub OAuth state cookie missing or mismatched — rejecting")
@@ -5341,6 +5903,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     if not cfg["client_id"] or not cfg["client_secret"]:
@@ -5384,10 +5947,12 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             token_resp = token_resp_raw.json()
         else:
             import urllib.request as _ureq
+
             _data = urllib.parse.urlencode(token_payload).encode()
             _req = _ureq.Request(
                 "https://github.com/login/oauth/access_token",
-                data=_data, headers={"Accept": "application/json"},
+                data=_data,
+                headers={"Accept": "application/json"},
             )
             with _ureq.urlopen(_req, timeout=5) as _r:
                 token_resp = json.loads(_r.read().decode())
@@ -5412,9 +5977,14 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             user_data = user_resp.json()
         else:
             import urllib.request as _ureq
+
             _req = _ureq.Request(
                 "https://api.github.com/user",
-                headers={**auth_hdr, "Accept": "application/json", "User-Agent": "YGB-Server"},
+                headers={
+                    **auth_hdr,
+                    "Accept": "application/json",
+                    "User-Agent": "YGB-Server",
+                },
             )
             with _ureq.urlopen(_req, timeout=3) as _r:
                 user_data = json.loads(_r.read().decode())
@@ -5488,11 +6058,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
         safe_user = urllib.parse.quote_plus(user.get("name", github_login or "user"))
         # Security: auth stays in cookies, not URL params.
         return {
-            "redirect_url": (
-                f"{frontend_url}/login"
-                f"?user={safe_user}"
-                f"&auth=github"
-            ),
+            "redirect_url": (f"{frontend_url}/login?user={safe_user}&auth=github"),
             "_auth_token": jwt_token,
             # Pass context to background task (no secrets — only IDs/metadata)
             "_bg_ctx": {
@@ -5515,6 +6081,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
     def _oauth_background_work(bg_ctx: dict):
         """Best-effort enrichment: runs AFTER the user has already been redirected."""
         import time as _t
+
         t_total = _t.monotonic()
         timings: Dict[str, int] = {}
 
@@ -5546,6 +6113,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
                         emails = emails_resp.json()
                     else:
                         import urllib.request as _ureq
+
                         _req = _ureq.Request(
                             "https://api.github.com/user/emails",
                             headers={
@@ -5656,6 +6224,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     # Fire background enrichment (non-blocking)
@@ -5665,6 +6234,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 
     resp = RedirectResponse(url=result["redirect_url"], status_code=302)
     resp.delete_cookie(state_cookie)
+    resp.delete_cookie("ygb_oauth_state")
 
     auth_token = result.get("_auth_token")
     if auth_token:
@@ -5675,6 +6245,7 @@ async def github_auth_callback(req: Request, code: str = "", error: str = "", st
 # =============================================================================
 # GOOGLE OAUTH LOGIN
 # =============================================================================
+
 
 @app.get("/auth/google")
 async def google_auth_redirect(req: Request, frontend_origin: str = ""):
@@ -5699,21 +6270,25 @@ async def google_auth_redirect(req: Request, frontend_origin: str = ""):
         frontend_url = _resolve_frontend_url("")
 
     state = _build_oauth_state(frontend_url)
-    params = urllib.parse.urlencode({
-        "client_id": cfg["client_id"],
-        "redirect_uri": cfg["redirect_uri"],
-        "response_type": "code",
-        "scope": "openid email profile",
-        "state": state,
-        "access_type": "online",
-        "prompt": "select_account",
-        "include_granted_scopes": "true",
-    })
+    params = urllib.parse.urlencode(
+        {
+            "client_id": cfg["client_id"],
+            "redirect_uri": cfg["redirect_uri"],
+            "response_type": "code",
+            "scope": "openid email profile",
+            "state": state,
+            "access_type": "online",
+            "prompt": "select_account",
+            "include_granted_scopes": "true",
+        }
+    )
     resp = RedirectResponse(
         url=f"https://accounts.google.com/o/oauth2/v2/auth?{params}",
         status_code=302,
     )
-    _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith("https://")
+    _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith(
+        "https://"
+    )
     resp.set_cookie(
         key=_oauth_state_cookie_name("google"),
         value=state,
@@ -5726,7 +6301,9 @@ async def google_auth_redirect(req: Request, frontend_origin: str = ""):
 
 
 @app.get("/auth/google/callback")
-async def google_auth_callback(req: Request, code: str = "", error: str = "", state: str = ""):
+async def google_auth_callback(
+    req: Request, code: str = "", error: str = "", state: str = ""
+):
     """Handle Google OAuth callback and establish a local session."""
     cfg = _get_google_oauth_config()
     state_cookie = _oauth_state_cookie_name("google")
@@ -5739,6 +6316,7 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     if not code:
@@ -5747,6 +6325,7 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     expected_state = req.cookies.get(state_cookie, "")
@@ -5758,6 +6337,7 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
     if not cookie_ok:
         logger.warning("Google OAuth state cookie missing or mismatched; rejecting")
@@ -5766,6 +6346,7 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     if not cfg["client_id"] or not cfg["client_secret"]:
@@ -5798,6 +6379,7 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
             token_resp = token_resp_raw.json()
         else:
             import urllib.request as _ureq
+
             _data = urllib.parse.urlencode(token_payload).encode()
             _req = _ureq.Request(
                 "https://oauth2.googleapis.com/token",
@@ -5822,9 +6404,14 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
             user_data = user_resp.json()
         else:
             import urllib.request as _ureq
+
             _req = _ureq.Request(
                 "https://openidconnect.googleapis.com/v1/userinfo",
-                headers={**auth_hdr, "Accept": "application/json", "User-Agent": "YGB-Server"},
+                headers={
+                    **auth_hdr,
+                    "Accept": "application/json",
+                    "User-Agent": "YGB-Server",
+                },
             )
             with _ureq.urlopen(_req, timeout=5) as _r:
                 user_data = json.loads(_r.read().decode())
@@ -5836,7 +6423,11 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
 
         google_email = str(user_data.get("email", "")).strip()
         email_verified = bool(user_data.get("email_verified"))
-        effective_email = google_email if (google_email and email_verified) else f"google-{google_sub}@users.noreply.local"
+        effective_email = (
+            google_email
+            if (google_email and email_verified)
+            else f"google-{google_sub}@users.noreply.local"
+        )
         display_name = (
             str(user_data.get("name", "")).strip()
             or (google_email.split("@", 1)[0] if google_email else "")
@@ -5918,7 +6509,11 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
                 devices = get_user_devices(user["id"])
                 alert_multiple_devices(user_name, active_count, devices)
         except Exception:
-            logger.warning("Device tracking/alerting failed for user %s", user.get("name"), exc_info=True)
+            logger.warning(
+                "Device tracking/alerting failed for user %s",
+                user.get("name"),
+                exc_info=True,
+            )
 
         jwt_token = generate_jwt(
             user_id=user["id"],
@@ -5944,10 +6539,12 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
             status_code=302,
         )
         resp.delete_cookie(state_cookie)
+        resp.delete_cookie("ygb_oauth_state")
         return resp
 
     resp = RedirectResponse(url=result["redirect_url"], status_code=302)
     resp.delete_cookie(state_cookie)
+    resp.delete_cookie("ygb_oauth_state")
 
     auth_token = result.get("_auth_token")
     if auth_token:
@@ -5959,6 +6556,7 @@ async def google_auth_callback(req: Request, code: str = "", error: str = "", st
 # ADMIN ROUTE COMPATIBILITY
 # =============================================================================
 
+
 class AdminLoginRequest(BaseModel):
     email: str
     totp_code: str = ""
@@ -5969,6 +6567,7 @@ async def admin_login(request: AdminLoginRequest, req: Request, response: Respon
     """Admin login — entry point for admin auth. No Depends(require_auth)."""
     try:
         from backend.api.admin_auth import login as admin_auth_login
+
         result = admin_auth_login(
             email=request.email,
             totp_code=request.totp_code,
@@ -6010,6 +6609,7 @@ async def admin_verify(req: Request):
 
     try:
         from backend.api.admin_auth import require_auth as admin_require_auth
+
         # Try as JWT first, then as session token
         result = admin_require_auth(jwt_token=token)
         if result.get("status") == "ok":
@@ -6044,6 +6644,7 @@ async def admin_vault_unlock(request: VaultUnlockRequest, req: Request):
 
     try:
         from backend.api.vault_session import vault_unlock
+
         result = vault_unlock(
             vault_password=request.vault_password,
             session_token=token,
@@ -6052,13 +6653,19 @@ async def admin_vault_unlock(request: VaultUnlockRequest, req: Request):
         if result.get("status") == "ok":
             return result
         elif result.get("status") == "unauthorized":
-            raise HTTPException(status_code=401, detail=result.get("message", "Unauthorized"))
+            raise HTTPException(
+                status_code=401, detail=result.get("message", "Unauthorized")
+            )
         else:
-            raise HTTPException(status_code=400, detail=result.get("message", "Vault unlock failed"))
+            raise HTTPException(
+                status_code=400, detail=result.get("message", "Vault unlock failed")
+            )
     except HTTPException:
         raise
     except ImportError:
-        raise HTTPException(status_code=501, detail="Vault session module not available")
+        raise HTTPException(
+            status_code=501, detail="Vault session module not available"
+        )
     except Exception:
         logger.exception("Vault unlock error")
         raise HTTPException(status_code=500, detail="Vault unlock failed")
@@ -6078,6 +6685,7 @@ async def admin_logout(req: Request, response: Response):
                 revoke_session(payload["session_id"])
         if admin_session_token:
             from backend.api.admin_auth import logout as admin_auth_logout
+
             admin_auth_logout(admin_session_token)
     except ImportError:
         raise HTTPException(status_code=501, detail="Admin auth module not available")
@@ -6093,11 +6701,13 @@ async def admin_logout(req: Request, response: Response):
 # ROLLOUT API COMPATIBILITY
 # =============================================================================
 
+
 @app.get("/api/rollout/status")
 async def rollout_status(user=Depends(require_auth)):
     """Get current rollout governance status."""
     try:
         from governance.real_data_rollout_governor import get_current_status
+
         return get_current_status()
     except ImportError:
         return {
@@ -6128,6 +6738,7 @@ async def rollout_metrics(user=Depends(require_auth)):
     """
     try:
         from governance.real_data_rollout_governor import load_state, ROLLOUT_STAGES
+
         state = load_state()
         real_pct = ROLLOUT_STAGES[state.current_stage]
 
@@ -6187,8 +6798,13 @@ async def rollout_metrics(user=Depends(require_auth)):
 
 if __name__ == "__main__":
     import uvicorn
+
     host = os.getenv("API_HOST", "127.0.0.1")
     port = int(os.getenv("API_PORT", "8000"))
-    reload_enabled = os.getenv("API_RELOAD", "false").lower() in ("1", "true", "yes", "on")
+    reload_enabled = os.getenv("API_RELOAD", "false").lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
     uvicorn.run("server:app", host=host, port=port, reload=reload_enabled)
-

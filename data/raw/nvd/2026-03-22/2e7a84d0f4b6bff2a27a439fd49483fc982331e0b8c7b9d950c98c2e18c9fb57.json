@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25608",
+  "ingested_at": "2026-03-22T18:08:57.574498+00:00",
+  "lang": "en",
+  "raw_text": "Iperius Backup 6.1.0 contains a privilege escalation vulnerability that allows low-privilege users to execute arbitrary programs with elevated privileges by creating backup jobs. Attackers can configure backup jobs to execute malicious batch files or programs before or after backup operations, which run with the privileges of the Iperius Backup Service account (Local System or Administrator), enabling privilege escalation and arbitrary code execution.",
+  "severity": "HIGH",
+  "sha256_hash": "2e7a84d0f4b6bff2a27a439fd49483fc982331e0b8c7b9d950c98c2e18c9fb57",
+  "source": "nvd",
+  "tags": [
+    "CWE-520"
+  ],
+  "token_count": 62,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25608"
+}

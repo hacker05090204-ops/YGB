@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25610",
+  "ingested_at": "2026-03-22T18:08:57.578499+00:00",
+  "lang": "en",
+  "raw_text": "NetNumber Titan Master 7.9.1 contains a path traversal vulnerability in the drp endpoint that allows authenticated users to download arbitrary files by injecting directory traversal sequences. Attackers can manipulate the path parameter with base64-encoded payloads containing ../ sequences to bypass authorization and retrieve sensitive system files like /etc/shadow.",
+  "severity": "MEDIUM",
+  "sha256_hash": "c7a27d64bc61d853b1721a5be967ef2602a017a1e8e1f378f12b7ab0f798b868",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25610"
+}

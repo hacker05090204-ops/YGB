@@ -1,13 +1,13 @@
 {
-  "auto_mode_safe": true,
-  "reason": "ALL GOVERNANCE CHECKS PASSED",
+  "auto_mode_safe": false,
+  "reason": "FAILED: no_override_misuse, override_lane_clear (Override lane not clear: pending)",
   "checks": {
     "registry_valid": true,
     "model_not_expired": true,
-    "no_override_misuse": true,
-    "override_lane_clear": true,
+    "no_override_misuse": false,
+    "override_lane_clear": false,
     "incident_automation": true,
     "governance_active": true
   },
-  "timestamp": "2026-03-08T14:01:56.864812"
+  "timestamp": "2026-03-23T03:34:39.754040"
 }

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25618",
+  "ingested_at": "2026-03-22T18:08:57.595655+00:00",
+  "lang": "en",
+  "raw_text": "AdminExpress 1.2.5 contains a denial of service vulnerability that allows local attackers to crash the application by submitting oversized input through the System Compare feature. Attackers can paste a large buffer of characters into the Folder Path field and trigger the comparison function to cause the application to become unresponsive or crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "e27bed6e7991a51690e081786c88a09af7620445a81ea30bea5614b88d6f5ae4",
+  "source": "nvd",
+  "tags": [
+    "CWE-73"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25618"
+}

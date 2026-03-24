@@ -1,8 +1,8 @@
 {
   "gpu": {
     "available": true,
-    "memory_used_mb": 55,
-    "utilization_pct": 39.0
+    "memory_used_mb": 0,
+    "utilization_pct": 29.0
   },
   "ingestion": {
     "last_cycle_time": "2026-03-22T10:42:27.348662+00:00",
@@ -17,7 +17,7 @@
       "nvd"
     ]
   },
-  "last_updated": "2026-03-22T11:00:35.737103+00:00",
+  "last_updated": "2026-03-23T21:02:20.519606+00:00",
   "schema_version": 2,
   "sync": {
     "files_synced_last_cycle": 0,
@@ -27,8 +27,8 @@
   "training": {
     "checkpoint_sha256": "a4998cdd3092f1220085f03729cf80dac4c32d156dc2319b7dcb837e68d24bc8",
     "last_accuracy": 0.5,
-    "last_epoch": 9,
-    "precision_breach": true,
+    "last_epoch": 7,
+    "precision_breach": false,
     "state": "IDLE"
   }
 }

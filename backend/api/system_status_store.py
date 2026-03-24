@@ -3,6 +3,8 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import threading
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -18,6 +20,16 @@ LEGACY_TRAINING_STATUS_PATH = Path("reports/g38_training_worker.status.json")
 TRAINING_STATE_PATH = Path("checkpoints/training_state.json")
 CHECKPOINT_PATH = Path("checkpoints/g38_model_checkpoint.safetensors")
 RAW_ROOT = Path("data/raw")
+SYSTEM_STATUS_CACHE_TTL_SECONDS = max(
+    1.0,
+    float(os.getenv("YGB_SYSTEM_STATUS_CACHE_TTL_SECONDS", "5")),
+)
+
+_STATUS_CACHE_LOCK = threading.Lock()
+_STATUS_CACHE: dict[str, Any] = {
+    "generated_at_monotonic": 0.0,
+    "payload": None,
+}
 
 
 def _utc_now() -> str:
@@ -37,7 +49,9 @@ def _read_json(path: Path) -> dict[str, Any]:
 def _atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temp_path = path.with_suffix(f"{path.suffix}.tmp")
-    temp_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+    temp_path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
+    )
     os.replace(temp_path, path)
 
 
@@ -124,10 +138,15 @@ def _ingestion_state() -> dict[str, Any]:
     ingestion_status = _read_json(INGESTION_STATUS_PATH)
     legacy_runtime = _read_json(LEGACY_RUNTIME_STATE_PATH)
     return {
-        "last_cycle_time": str(ingestion_status.get("last_cycle_time") or _latest_raw_write_time()),
+        "last_cycle_time": str(
+            ingestion_status.get("last_cycle_time") or _latest_raw_write_time()
+        ),
         "last_new_count": int(ingestion_status.get("last_new_count", 0) or 0),
         "last_duplicate_rate": float(
-            ingestion_status.get("duplicate_rate", legacy_runtime.get("duplicate_rate", 0.0)) or 0.0
+            ingestion_status.get(
+                "duplicate_rate", legacy_runtime.get("duplicate_rate", 0.0)
+            )
+            or 0.0
         ),
         "sources_active": _sources_active(),
     }
@@ -164,7 +183,37 @@ def build_system_status_snapshot() -> dict[str, Any]:
     }
 
 
-def refresh_system_status_file(path: Path = SYSTEM_STATUS_PATH) -> dict[str, Any]:
+def get_cached_system_status_snapshot(*, force_refresh: bool = False) -> dict[str, Any]:
+    now = time.monotonic()
+    with _STATUS_CACHE_LOCK:
+        cached = _STATUS_CACHE.get("payload")
+        generated_at = float(_STATUS_CACHE.get("generated_at_monotonic") or 0.0)
+        if (
+            not force_refresh
+            and isinstance(cached, dict)
+            and (now - generated_at) < SYSTEM_STATUS_CACHE_TTL_SECONDS
+        ):
+            return dict(cached)
+
     payload = build_system_status_snapshot()
+    with _STATUS_CACHE_LOCK:
+        _STATUS_CACHE["generated_at_monotonic"] = now
+        _STATUS_CACHE["payload"] = dict(payload)
+    return dict(payload)
+
+
+def read_or_refresh_system_status_file(
+    path: Path = SYSTEM_STATUS_PATH,
+    *,
+    force_refresh: bool = False,
+) -> dict[str, Any]:
+    payload = get_cached_system_status_snapshot(force_refresh=force_refresh)
+    if force_refresh or not path.exists():
+        _atomic_write_json(path, payload)
+    return payload
+
+
+def refresh_system_status_file(path: Path = SYSTEM_STATUS_PATH) -> dict[str, Any]:
+    payload = get_cached_system_status_snapshot(force_refresh=True)
     _atomic_write_json(path, payload)
     return payload

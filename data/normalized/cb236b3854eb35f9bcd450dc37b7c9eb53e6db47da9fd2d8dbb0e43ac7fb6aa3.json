@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security vulnerability has been detected in mickasmt next-saas-stripe-starter 1.0.0. Affected is the function generateUserStripe of the file actions/generate-user-stripe.ts of the component Checkout Handler. The manipulation of the argument priceId leads to business logic errors. The attack may be initiated remotely.",
+  "token_count": 41
+}

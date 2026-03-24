@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25601",
+  "ingested_at": "2026-03-22T18:08:57.561220+00:00",
+  "lang": "en",
+  "raw_text": "UltraVNC Launcher 1.2.2.4 contains a buffer overflow vulnerability in the Path vncviewer.exe property field that allows local attackers to crash the application by supplying an excessively long string. Attackers can input a 300-byte payload of repeated characters through the Properties dialog to trigger a denial of service condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "7224767654491ef1cab2f646a3b9121f4a4b69ff663fd0781ce1ac20ee5daf30",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 48,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25601"
+}

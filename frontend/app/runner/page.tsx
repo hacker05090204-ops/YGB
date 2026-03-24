@@ -1,7 +1,5 @@
 "use client"
 
-import { AuthGuard } from "@/components/auth-guard"
-
 import { useState, useEffect, useRef, useCallback } from "react"
 import { createAuthWebSocket } from "@/lib/ws-auth"
 import { authFetch , getApiBase } from "@/lib/ygb-api"
@@ -25,13 +23,11 @@ import {
     Activity
 } from "lucide-react"
 
-import { AppSidebar } from "@/components/app-sidebar"
 import {
-    SidebarInset,
-    SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { ProtectedSidebarShell } from "@/components/protected-sidebar-shell"
 
 interface PhaseUpdate {
     type: string
@@ -260,9 +256,7 @@ function RunnerPageContent() {
     }
 
     return (
-        <SidebarProvider>
-            <AppSidebar variant="inset" />
-            <SidebarInset className="bg-[#000000] text-[#FAFAFA]">
+        <ProtectedSidebarShell insetClassName="bg-[#000000] text-[#FAFAFA]">
 
                 {/* Ambient Glow */}
                 <div className="fixed inset-0 pointer-events-none">
@@ -494,11 +488,10 @@ function RunnerPageContent() {
                         </div>
                     </div>
                 </div>
-            </SidebarInset>
-        </SidebarProvider>
+        </ProtectedSidebarShell>
     )
 }
 
 export default function RunnerPage() {
-    return <AuthGuard><RunnerPageContent /></AuthGuard>
+    return <RunnerPageContent />
 }

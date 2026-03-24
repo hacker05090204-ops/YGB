@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25597",
+  "ingested_at": "2026-03-22T18:08:57.552852+00:00",
+  "lang": "en",
+  "raw_text": "NSauditor 3.1.2.0 contains a buffer overflow vulnerability in the SNMP Auditor Community field that allows local attackers to crash the application by supplying an excessively long string. Attackers can paste a large payload into the Community field and trigger the Walk function to cause a denial of service condition.",
+  "severity": "MEDIUM",
+  "sha256_hash": "589c75f6212ffc0cde678bbe9c4d24d2196ac559e3577bfe0cb1b34a61916bd7",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25597"
+}

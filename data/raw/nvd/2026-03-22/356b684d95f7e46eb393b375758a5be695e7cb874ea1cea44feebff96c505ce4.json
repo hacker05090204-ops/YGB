@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25600",
+  "ingested_at": "2026-03-22T18:08:57.559163+00:00",
+  "lang": "en",
+  "raw_text": "UltraVNC Viewer 1.2.2.4 contains a denial of service vulnerability that allows attackers to crash the application by supplying an oversized string to the VNC Server input field. Attackers can paste a malicious string containing 256 repeated characters into the VNC Server field and click Connect to trigger a buffer overflow that crashes the viewer.",
+  "severity": "MEDIUM",
+  "sha256_hash": "356b684d95f7e46eb393b375758a5be695e7cb874ea1cea44feebff96c505ce4",
+  "source": "nvd",
+  "tags": [
+    "CWE-787"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25600"
+}

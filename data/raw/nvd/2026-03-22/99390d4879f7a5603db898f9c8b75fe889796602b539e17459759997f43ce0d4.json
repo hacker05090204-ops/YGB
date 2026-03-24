@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25613",
+  "ingested_at": "2026-03-22T18:08:57.584992+00:00",
+  "lang": "en",
+  "raw_text": "Easy Chat Server 3.1 contains a denial of service vulnerability that allows remote attackers to crash the application by sending oversized data in the message parameter. Attackers can establish a session via the chat.ghp endpoint and then send a POST request to body2.ghp with an excessively large message parameter value to cause the service to crash.",
+  "severity": "HIGH",
+  "sha256_hash": "99390d4879f7a5603db898f9c8b75fe889796602b539e17459759997f43ce0d4",
+  "source": "nvd",
+  "tags": [
+    "CWE-940"
+  ],
+  "token_count": 56,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25613"
+}

@@ -16,10 +16,12 @@ from backend.ingestion._integrity import log_module_sha256
 from backend.ingestion.adapters import (
     BugcrowdAdapter,
     CISAKEVAdapter,
+    CIRCLCVEAdapter,
     ExploitDBAdapter,
     GitHubAdvisoryAdapter,
     HackerOneAdapter,
     NVDAdapter,
+    OSVAdapter,
 )
 from backend.ingestion.dedup import DedupIndex
 from backend.ingestion.models import IngestedSample, sample_to_dict
@@ -53,8 +55,10 @@ class AsyncIngestor:
             NVDAdapter(self.semaphore, self.limiter),
             GitHubAdvisoryAdapter(self.semaphore, self.limiter),
             CISAKEVAdapter(self.semaphore, self.limiter),
+            CIRCLCVEAdapter(self.semaphore, self.limiter),
             ExploitDBAdapter(self.semaphore, self.limiter),
             BugcrowdAdapter(self.semaphore, self.limiter),
+            OSVAdapter(self.semaphore, self.limiter),
         ]
 
     @staticmethod

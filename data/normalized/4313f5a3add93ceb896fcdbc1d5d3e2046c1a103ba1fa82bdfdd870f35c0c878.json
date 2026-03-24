@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Flos Freeware Notepad2 4.2.25. This affects an unknown function in the library PROPSYS.dll. Performing a manipulation results in uncontrolled search path. The attack is only possible with local access. The attack is considered to have high complexity. The exploitability is reported as difficult. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "token_count": 65
+}

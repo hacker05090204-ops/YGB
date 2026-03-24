@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4115",
+  "ingested_at": "2026-03-22T18:08:57.536654+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in PuTTY 0.83. Affected is the function eddsa_verify of the file crypto/ecc-ssh.c of the component Ed25519 Signature Handler. The manipulation results in improper verification of cryptographic signature. The attack may be performed from remote. The attack requires a high level of complexity. The exploitability is told to be difficult. The exploit is now public and may be used. The real existence of this vulnerability is still doubted at the moment. The patch is identified as af996b5ec27ab79bae3882071b9d6acf16044549. It is advisable to implement a patch to correct this issue. The vendor was contacted early, responded in a very professional manner and quickly released a patch for the affected product. However, at the moment there is no proof that this flaw might have any real-world impact.",
+  "severity": "LOW",
+  "sha256_hash": "c81f39f21a640b49ee48e7fd902cb7d89a7f7a4e518daf6c5527598217a0d455",
+  "source": "nvd",
+  "tags": [
+    "CWE-345",
+    "CWE-347"
+  ],
+  "token_count": 127,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4115"
+}

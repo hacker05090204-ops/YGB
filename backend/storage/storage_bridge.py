@@ -12,9 +12,11 @@ All data from HDD engine only.
 import os
 import sys
 import logging
+import threading
+import time
 import uuid
 from datetime import datetime, timezone
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
 
 # Add project root to path
@@ -46,7 +48,7 @@ _disk_monitor: Optional[DiskMonitor] = None
 _video_streamer: Optional[VideoStreamer] = None
 
 # --- In-memory lookup indexes (eliminate full-table scans) ---
-_EMAIL_INDEX: Dict[str, str] = {}       # email → user entity_id
+_EMAIL_INDEX: Dict[str, str] = {}  # email → user entity_id
 _EMAIL_INDEX_BUILT = False
 _GITHUB_ID_INDEX: Dict[str, str] = {}
 _GITHUB_ID_INDEX_BUILT = False
@@ -54,10 +56,14 @@ _GOOGLE_SUB_INDEX: Dict[str, str] = {}
 _GOOGLE_SUB_INDEX_BUILT = False
 _PHONE_INDEX: Dict[str, str] = {}
 _PHONE_INDEX_BUILT = False
-_DEVICE_INDEX: Dict[str, str] = {}      # "user_id|device_hash" → device entity_id
+_DEVICE_INDEX: Dict[str, str] = {}  # "user_id|device_hash" → device entity_id
 _DEVICE_INDEX_BUILT = False
 _storage_active_root: Optional[str] = None
 _storage_mode: str = "UNRESOLVED"
+_PAGE_CACHE_SECONDS = max(1.0, float(os.getenv("YGB_STORAGE_PAGE_CACHE_SECONDS", "5")))
+_PAGE_CACHE_LOCK = threading.Lock()
+_PAGE_CACHE: Dict[str, tuple[float, Any]] = {}
+_ADMIN_STATS_CACHE: Dict[str, Any] = {"checked_at": 0.0, "value": None}
 
 
 def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
@@ -73,7 +79,9 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
 
     topology = {
         "primary_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"))),
-        "fallback_root": str(Path(os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"))),
+        "fallback_root": str(
+            Path(os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"))
+        ),
         "active_root": str(Path(hdd_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"))),
         "primary_available": True,
         "fallback_available": False,
@@ -140,9 +148,54 @@ def shutdown_storage() -> None:
     logger.info("Storage bridge shutdown complete")
 
 
+def _page_cache_key(prefix: str, limit: int, offset: int) -> str:
+    return f"{prefix}:{max(limit, 0)}:{max(offset, 0)}"
+
+
+def _get_cached_page(prefix: str, limit: int, offset: int):
+    if offset != 0:
+        return None
+    now = time.monotonic()
+    key = _page_cache_key(prefix, limit, offset)
+    with _PAGE_CACHE_LOCK:
+        cached = _PAGE_CACHE.get(key)
+        if cached and (now - cached[0]) < _PAGE_CACHE_SECONDS:
+            return cached[1]
+    return None
+
+
+def _store_cached_page(prefix: str, limit: int, offset: int, payload):
+    if offset != 0:
+        return payload
+    key = _page_cache_key(prefix, limit, offset)
+    with _PAGE_CACHE_LOCK:
+        _PAGE_CACHE[key] = (time.monotonic(), payload)
+    return payload
+
+
+def _invalidate_cached_prefix(prefix: str) -> None:
+    with _PAGE_CACHE_LOCK:
+        for key in [
+            item for item in _PAGE_CACHE.keys() if item.startswith(f"{prefix}:")
+        ]:
+            _PAGE_CACHE.pop(key, None)
+        if prefix == "admin_stats":
+            _ADMIN_STATS_CACHE["checked_at"] = 0.0
+            _ADMIN_STATS_CACHE["value"] = None
+
+
+def _read_latest_entity(entity_type: str, entity_id: str) -> Optional[Dict[str, Any]]:
+    entity = _engine.read_entity(entity_type, entity_id)
+    if not entity or not entity.get("latest"):
+        return None
+    latest = entity["latest"]
+    return latest if isinstance(latest, dict) else None
+
+
 # =============================================================================
 # USER OPERATIONS
 # =============================================================================
+
 
 def create_user(name: str, email: str = None, role: str = "hunter") -> Dict[str, Any]:
     """Create a new user entity on HDD."""
@@ -180,6 +233,8 @@ def create_user(name: str, email: str = None, role: str = "hunter") -> Dict[str,
     # Keep email index up to date
     if email:
         _EMAIL_INDEX[email] = user_id
+    _invalidate_cached_prefix("users")
+    _invalidate_cached_prefix("admin_stats")
 
     return {"id": user_id, **data}
 
@@ -198,12 +253,20 @@ def get_user(user_id: str) -> Optional[Dict[str, Any]]:
         "name": latest.get("name", ""),
         "email": latest.get("email"),
         "role": latest.get("role", "hunter"),
-        "auth_provider": latest.get("auth_provider") or latest.get("last_auth_provider"),
+        "auth_provider": latest.get("auth_provider")
+        or latest.get("last_auth_provider"),
         "github_id": latest.get("github_id") or github_profile.get("github_id"),
-        "github_login": latest.get("github_login") or github_profile.get("github_login"),
-        "google_sub": latest.get("google_sub") or google_profile.get("google_sub") or google_profile.get("sub"),
-        "google_email": latest.get("google_email") or google_profile.get("google_email") or google_profile.get("email"),
-        "google_picture": latest.get("google_picture") or google_profile.get("google_picture") or google_profile.get("picture"),
+        "github_login": latest.get("github_login")
+        or github_profile.get("github_login"),
+        "google_sub": latest.get("google_sub")
+        or google_profile.get("google_sub")
+        or google_profile.get("sub"),
+        "google_email": latest.get("google_email")
+        or google_profile.get("google_email")
+        or google_profile.get("email"),
+        "google_picture": latest.get("google_picture")
+        or google_profile.get("google_picture")
+        or google_profile.get("picture"),
         "phone_number": latest.get("phone_number"),
         "phone_verified_at": latest.get("phone_verified_at"),
         "avatar_url": (
@@ -219,14 +282,29 @@ def get_user(user_id: str) -> Optional[Dict[str, Any]]:
     }
 
 
-def get_all_users() -> List[Dict[str, Any]]:
-    """Get all users."""
-    metas = _engine.list_entities("users")
-    users = []
+def get_users_page(
+    limit: int = 100, offset: int = 0
+) -> Tuple[List[Dict[str, Any]], int]:
+    """Get a paginated user page plus total count."""
+    cached = _get_cached_page("users", limit, offset)
+    if cached is not None:
+        return cached
+
+    metas = _engine.list_entities(
+        "users", limit=max(limit, 0) or 100, offset=max(offset, 0)
+    )
+    users: List[Dict[str, Any]] = []
     for meta in metas:
         user = get_user(meta["entity_id"])
         if user:
             users.append(user)
+    payload = (users, _engine.count_entities("users"))
+    return _store_cached_page("users", limit, offset, payload)
+
+
+def get_all_users(limit: int = 10000, offset: int = 0) -> List[Dict[str, Any]]:
+    """Get users with optional pagination."""
+    users, _ = get_users_page(limit=limit, offset=offset)
     return users
 
 
@@ -237,21 +315,32 @@ def update_user_stats(user_id: str, bounties: int = 0, earnings: float = 0.0):
         return
 
     latest = entity["latest"]
-    _engine.append_record("users", user_id, {
-        **latest,
-        "total_bounties": latest.get("total_bounties", 0) + bounties,
-        "total_earnings": latest.get("total_earnings", 0.0) + earnings,
-        "last_active": datetime.now(timezone.utc).isoformat(),
-    })
+    _engine.append_record(
+        "users",
+        user_id,
+        {
+            **latest,
+            "total_bounties": latest.get("total_bounties", 0) + bounties,
+            "total_earnings": latest.get("total_earnings", 0.0) + earnings,
+            "last_active": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+    _invalidate_cached_prefix("users")
+    _invalidate_cached_prefix("bounties")
+    _invalidate_cached_prefix("admin_stats")
 
 
 # =============================================================================
 # TARGET OPERATIONS
 # =============================================================================
 
+
 def create_target(
-    program_name: str, scope: str = None, link: str = None,
-    platform_name: str = "hackerone", payout_tier: str = "medium"
+    program_name: str,
+    scope: str = None,
+    link: str = None,
+    platform_name: str = "hackerone",
+    payout_tier: str = "medium",
 ) -> Dict[str, Any]:
     """Create a new target."""
     target_id = str(uuid.uuid4())
@@ -268,27 +357,45 @@ def create_target(
     }
 
     _engine.create_entity("targets", target_id, data)
+    _invalidate_cached_prefix("targets")
+    _invalidate_cached_prefix("admin_stats")
     return {"id": target_id, **data}
 
 
-def get_all_targets() -> List[Dict[str, Any]]:
-    """Get all targets."""
-    metas = _engine.list_entities("targets")
-    targets = []
+def get_targets_page(
+    limit: int = 100, offset: int = 0
+) -> Tuple[List[Dict[str, Any]], int]:
+    """Get a paginated target page plus total count."""
+    cached = _get_cached_page("targets", limit, offset)
+    if cached is not None:
+        return cached
+
+    metas = _engine.list_entities(
+        "targets", limit=max(limit, 0) or 100, offset=max(offset, 0)
+    )
+    targets: List[Dict[str, Any]] = []
     for meta in metas:
-        entity = _engine.read_entity("targets", meta["entity_id"])
-        if entity and entity.get("latest"):
-            latest = entity["latest"]
-            targets.append({
-                "id": meta["entity_id"],
-                "program_name": latest.get("program_name", ""),
-                "scope": latest.get("scope"),
-                "link": latest.get("link"),
-                "platform": latest.get("platform", "hackerone"),
-                "payout_tier": latest.get("payout_tier", "medium"),
-                "status": latest.get("status", "active"),
-                "created_at": latest.get("created_at", ""),
-            })
+        latest = _read_latest_entity("targets", meta["entity_id"])
+        if latest:
+            targets.append(
+                {
+                    "id": meta["entity_id"],
+                    "program_name": latest.get("program_name", ""),
+                    "scope": latest.get("scope"),
+                    "link": latest.get("link"),
+                    "platform": latest.get("platform", "hackerone"),
+                    "payout_tier": latest.get("payout_tier", "medium"),
+                    "status": latest.get("status", "active"),
+                    "created_at": latest.get("created_at", ""),
+                }
+            )
+    payload = (targets, _engine.count_entities("targets"))
+    return _store_cached_page("targets", limit, offset, payload)
+
+
+def get_all_targets(limit: int = 10000, offset: int = 0) -> List[Dict[str, Any]]:
+    """Get targets with optional pagination."""
+    targets, _ = get_targets_page(limit=limit, offset=offset)
     return targets
 
 
@@ -314,9 +421,13 @@ def get_target(target_id: str) -> Optional[Dict[str, Any]]:
 # BOUNTY OPERATIONS
 # =============================================================================
 
+
 def create_bounty(
-    user_id: str, target_id: str = None, title: str = "",
-    description: str = "", severity: str = "medium"
+    user_id: str,
+    target_id: str = None,
+    title: str = "",
+    description: str = "",
+    severity: str = "medium",
 ) -> Dict[str, Any]:
     """Create a new bounty submission."""
     bounty_id = str(uuid.uuid4())
@@ -340,30 +451,49 @@ def create_bounty(
 
     _engine.create_entity("reports", bounty_id, data)
     update_user_stats(user_id, bounties=1)
+    _invalidate_cached_prefix("bounties")
+    _invalidate_cached_prefix("users")
+    _invalidate_cached_prefix("admin_stats")
 
     return {"id": bounty_id, **data}
 
 
-def get_all_bounties() -> List[Dict[str, Any]]:
-    """Get all bounties."""
-    metas = _engine.list_entities("reports")
-    bounties = []
+def get_bounties_page(
+    limit: int = 100, offset: int = 0
+) -> Tuple[List[Dict[str, Any]], int]:
+    """Get a paginated bounty page plus total count."""
+    cached = _get_cached_page("bounties", limit, offset)
+    if cached is not None:
+        return cached
+
+    metas = _engine.list_entities(
+        "reports", limit=max(limit, 0) or 100, offset=max(offset, 0)
+    )
+    bounties: List[Dict[str, Any]] = []
     for meta in metas:
-        entity = _engine.read_entity("reports", meta["entity_id"])
-        if entity and entity.get("latest"):
-            latest = entity["latest"]
-            bounties.append({
-                "id": meta["entity_id"],
-                "user_id": latest.get("user_id", ""),
-                "user_name": latest.get("user_name", ""),
-                "target_id": latest.get("target_id"),
-                "title": latest.get("title", ""),
-                "description": latest.get("description", ""),
-                "severity": latest.get("severity", "medium"),
-                "status": latest.get("status", "pending"),
-                "reward": latest.get("reward", 0.0),
-                "submitted_at": latest.get("submitted_at", ""),
-            })
+        latest = _read_latest_entity("reports", meta["entity_id"])
+        if latest:
+            bounties.append(
+                {
+                    "id": meta["entity_id"],
+                    "user_id": latest.get("user_id", ""),
+                    "user_name": latest.get("user_name", ""),
+                    "target_id": latest.get("target_id"),
+                    "title": latest.get("title", ""),
+                    "description": latest.get("description", ""),
+                    "severity": latest.get("severity", "medium"),
+                    "status": latest.get("status", "pending"),
+                    "reward": latest.get("reward", 0.0),
+                    "submitted_at": latest.get("submitted_at", ""),
+                }
+            )
+    payload = (bounties, _engine.count_entities("reports"))
+    return _store_cached_page("bounties", limit, offset, payload)
+
+
+def get_all_bounties(limit: int = 10000, offset: int = 0) -> List[Dict[str, Any]]:
+    """Get bounties with optional pagination."""
+    bounties, _ = get_bounties_page(limit=limit, offset=offset)
     return bounties
 
 
@@ -378,17 +508,23 @@ def update_bounty_status(bounty_id: str, status: str, reward: float = None):
     if reward is not None:
         update["reward"] = reward
     _engine.append_record("reports", bounty_id, update)
+    _invalidate_cached_prefix("bounties")
+    _invalidate_cached_prefix("admin_stats")
 
 
 # =============================================================================
 # SESSION OPERATIONS
 # =============================================================================
 
+
 def create_session(
-    user_id: str, mode: str = "READ_ONLY",
-    target_scope: str = None, ip_address: str = None,
-    user_agent: str = None, device_hash: str = None,
-    metadata: Dict[str, Any] = None
+    user_id: str,
+    mode: str = "READ_ONLY",
+    target_scope: str = None,
+    ip_address: str = None,
+    user_agent: str = None,
+    device_hash: str = None,
+    metadata: Dict[str, Any] = None,
 ) -> Dict[str, Any]:
     """Create a new session."""
     session_id = str(uuid.uuid4())
@@ -408,6 +544,7 @@ def create_session(
     }
 
     _engine.create_entity("sessions", session_id, data)
+    _invalidate_cached_prefix("admin_stats")
     return {"id": session_id, **data}
 
 
@@ -421,11 +558,13 @@ def get_active_sessions() -> List[Dict[str, Any]]:
             latest = entity["latest"]
             if latest.get("status") == "active":
                 user = get_user(latest.get("user_id", ""))
-                active.append({
-                    "id": meta["entity_id"],
-                    "user_name": user["name"] if user else "",
-                    **latest,
-                })
+                active.append(
+                    {
+                        "id": meta["entity_id"],
+                        "user_name": user["name"] if user else "",
+                        **latest,
+                    }
+                )
     return active
 
 
@@ -434,16 +573,22 @@ def end_session(session_id: str):
     entity = _engine.read_entity("sessions", session_id)
     if entity and entity.get("latest"):
         latest = entity["latest"]
-        _engine.append_record("sessions", session_id, {
-            **latest,
-            "status": "ended",
-            "ended_at": datetime.now(timezone.utc).isoformat(),
-        })
+        _engine.append_record(
+            "sessions",
+            session_id,
+            {
+                **latest,
+                "status": "ended",
+                "ended_at": datetime.now(timezone.utc).isoformat(),
+            },
+        )
+        _invalidate_cached_prefix("admin_stats")
 
 
 # =============================================================================
 # DEVICE OPERATIONS
 # =============================================================================
+
 
 def _ensure_device_index():
     """Lazily populate the (user_id, device_hash) → entity_id index."""
@@ -464,8 +609,11 @@ def _ensure_device_index():
 
 
 def register_device(
-    user_id: str, device_hash: str, ip_address: str = None,
-    user_agent: str = None, location: str = None
+    user_id: str,
+    device_hash: str,
+    ip_address: str = None,
+    user_agent: str = None,
+    location: str = None,
 ) -> Dict[str, Any]:
     """Register a device, or update an existing device's last-seen metadata."""
     now = datetime.now(timezone.utc).isoformat()
@@ -510,6 +658,7 @@ def register_device(
 # =============================================================================
 # AUTH-RELATED USER OPERATIONS
 # =============================================================================
+
 
 def _ensure_email_index():
     """Lazily populate the email → user entity_id index."""
@@ -556,7 +705,9 @@ def _ensure_google_sub_index():
             continue
         latest = entity["latest"]
         profile = latest.get("google_profile", {}) or {}
-        google_sub = latest.get("google_sub") or profile.get("google_sub") or profile.get("sub")
+        google_sub = (
+            latest.get("google_sub") or profile.get("google_sub") or profile.get("sub")
+        )
         if google_sub:
             _GOOGLE_SUB_INDEX[str(google_sub)] = meta["entity_id"]
     _GOOGLE_SUB_INDEX_BUILT = True
@@ -632,12 +783,16 @@ def update_user_password(user_id: str, password_hash: str):
     if not entity or not entity.get("latest"):
         return
     latest = entity["latest"]
-    _engine.append_record("users", user_id, {
-        **latest,
-        "password_hash": password_hash,
-        "last_auth_provider": "password",
-        "last_auth_at": datetime.now(timezone.utc).isoformat(),
-    })
+    _engine.append_record(
+        "users",
+        user_id,
+        {
+            **latest,
+            "password_hash": password_hash,
+            "last_auth_provider": "password",
+            "last_auth_at": datetime.now(timezone.utc).isoformat(),
+        },
+    )
 
 
 def _bound_auth_profile(profile: Optional[Dict[str, Any]]) -> Dict[str, Any]:
@@ -667,14 +822,20 @@ def update_user_auth_profile(
 
     latest = entity["latest"]
     bounded_github_profile = _bound_auth_profile(
-        github_profile if github_profile is not None else latest.get("github_profile", {}) or {}
+        github_profile
+        if github_profile is not None
+        else latest.get("github_profile", {}) or {}
     )
     bounded_google_profile = _bound_auth_profile(
-        google_profile if google_profile is not None else latest.get("google_profile", {}) or {}
+        google_profile
+        if google_profile is not None
+        else latest.get("google_profile", {}) or {}
     )
 
     github_id = bounded_github_profile.get("github_id") or latest.get("github_id")
-    github_login = bounded_github_profile.get("github_login") or latest.get("github_login")
+    github_login = bounded_github_profile.get("github_login") or latest.get(
+        "github_login"
+    )
     github_avatar = bounded_github_profile.get("avatar_url") or latest.get("avatar_url")
     google_sub = (
         bounded_google_profile.get("google_sub")
@@ -704,24 +865,28 @@ def update_user_auth_profile(
     else:
         avatar_url = avatar_url or github_avatar or google_picture
 
-    _engine.append_record("users", user_id, {
-        **latest,
-        "auth_provider": auth_provider,
-        "last_login_ip": ip_address,
-        "last_geolocation": geolocation,
-        "last_auth_provider": auth_provider,
-        "last_auth_at": datetime.now(timezone.utc).isoformat(),
-        "github_id": github_id,
-        "github_login": github_login,
-        "google_sub": google_sub,
-        "google_email": google_email,
-        "google_picture": google_picture,
-        "phone_number": resolved_phone_number,
-        "phone_verified_at": phone_verified_at,
-        "avatar_url": avatar_url,
-        "github_profile": bounded_github_profile,
-        "google_profile": bounded_google_profile,
-    })
+    _engine.append_record(
+        "users",
+        user_id,
+        {
+            **latest,
+            "auth_provider": auth_provider,
+            "last_login_ip": ip_address,
+            "last_geolocation": geolocation,
+            "last_auth_provider": auth_provider,
+            "last_auth_at": datetime.now(timezone.utc).isoformat(),
+            "github_id": github_id,
+            "github_login": github_login,
+            "google_sub": google_sub,
+            "google_email": google_email,
+            "google_picture": google_picture,
+            "phone_number": resolved_phone_number,
+            "phone_verified_at": phone_verified_at,
+            "avatar_url": avatar_url,
+            "github_profile": bounded_github_profile,
+            "google_profile": bounded_google_profile,
+        },
+    )
     if github_id:
         _GITHUB_ID_INDEX[str(github_id)] = user_id
     if google_sub:
@@ -739,24 +904,26 @@ def get_admin_user_security_view(limit: int = 1000) -> List[Dict[str, Any]]:
         if not entity or not entity.get("latest"):
             continue
         latest = entity["latest"]
-        out.append({
-            "id": meta["entity_id"],
-            "name": latest.get("name", ""),
-            "email": latest.get("email"),
-            "role": latest.get("role", "hunter"),
-            # Never plaintext. Stored value is one-way hash only.
-            "password_hash": latest.get("password_hash"),
-            "last_login_ip": latest.get("last_login_ip"),
-            "last_geolocation": latest.get("last_geolocation"),
-            "last_auth_provider": latest.get("last_auth_provider"),
-            "last_auth_at": latest.get("last_auth_at"),
-            "phone_number": latest.get("phone_number"),
-            "phone_verified_at": latest.get("phone_verified_at"),
-            "github_profile": latest.get("github_profile", {}),
-            "google_profile": latest.get("google_profile", {}),
-            "created_at": latest.get("created_at", ""),
-            "last_active": latest.get("last_active", ""),
-        })
+        out.append(
+            {
+                "id": meta["entity_id"],
+                "name": latest.get("name", ""),
+                "email": latest.get("email"),
+                "role": latest.get("role", "hunter"),
+                # Never plaintext. Stored value is one-way hash only.
+                "password_hash": latest.get("password_hash"),
+                "last_login_ip": latest.get("last_login_ip"),
+                "last_geolocation": latest.get("last_geolocation"),
+                "last_auth_provider": latest.get("last_auth_provider"),
+                "last_auth_at": latest.get("last_auth_at"),
+                "phone_number": latest.get("phone_number"),
+                "phone_verified_at": latest.get("phone_verified_at"),
+                "github_profile": latest.get("github_profile", {}),
+                "google_profile": latest.get("google_profile", {}),
+                "created_at": latest.get("created_at", ""),
+                "last_active": latest.get("last_active", ""),
+            }
+        )
     return out
 
 
@@ -783,10 +950,14 @@ def update_session_progress(session_id: str, progress: float):
     """Update session progress."""
     entity = _engine.read_entity("sessions", session_id)
     if entity and entity.get("latest"):
-        _engine.append_record("sessions", session_id, {
-            **entity["latest"],
-            "progress": progress,
-        })
+        _engine.append_record(
+            "sessions",
+            session_id,
+            {
+                **entity["latest"],
+                "progress": progress,
+            },
+        )
 
 
 def get_user_devices(user_id: str) -> List[Dict[str, Any]]:
@@ -823,10 +994,13 @@ def get_active_device_count(user_id: str) -> int:
 # AUDIT OPERATIONS
 # =============================================================================
 
+
 def log_activity(
-    user_id: str = None, action_type: str = "",
-    description: str = "", ip_address: str = None,
-    metadata: dict = None
+    user_id: str = None,
+    action_type: str = "",
+    description: str = "",
+    ip_address: str = None,
+    metadata: dict = None,
 ) -> Dict[str, Any]:
     """Log an activity to the audit trail."""
     log_id = str(uuid.uuid4())
@@ -842,35 +1016,46 @@ def log_activity(
     }
 
     _engine.create_entity("audit", log_id, data)
+    _invalidate_cached_prefix("activity")
+    _invalidate_cached_prefix("admin_stats")
     return {"id": log_id, "action_type": action_type, "created_at": now}
 
 
-def get_recent_activity(limit: int = 50) -> List[Dict[str, Any]]:
-    """Get recent activity."""
-    metas = _engine.list_entities("audit", limit=limit)
+def get_recent_activity(limit: int = 50, offset: int = 0) -> List[Dict[str, Any]]:
+    """Get recent activity with pagination."""
+    cached = _get_cached_page("activity", limit, offset)
+    if cached is not None:
+        return cached
+
+    metas = _engine.list_entities(
+        "audit", limit=max(limit, 0) or 50, offset=max(offset, 0)
+    )
     activities = []
     for meta in metas:
-        entity = _engine.read_entity("audit", meta["entity_id"])
-        if entity and entity.get("latest"):
-            latest = entity["latest"]
-            activities.append({
-                "id": meta["entity_id"],
-                "user_id": latest.get("user_id"),
-                "action_type": latest.get("action_type", ""),
-                "description": latest.get("description", ""),
-                "ip_address": latest.get("ip_address"),
-                "metadata_json": latest.get("metadata_json"),
-                "created_at": latest.get("created_at", ""),
-            })
-    return activities
+        latest = _read_latest_entity("audit", meta["entity_id"])
+        if latest:
+            activities.append(
+                {
+                    "id": meta["entity_id"],
+                    "user_id": latest.get("user_id"),
+                    "action_type": latest.get("action_type", ""),
+                    "description": latest.get("description", ""),
+                    "ip_address": latest.get("ip_address"),
+                    "metadata_json": latest.get("metadata_json"),
+                    "created_at": latest.get("created_at", ""),
+                }
+            )
+    return _store_cached_page("activity", limit, offset, activities)
 
 
 # =============================================================================
 # TRAINING RUN OPERATIONS
 # =============================================================================
 
-def create_training_run(epochs: int = 0, gpu_used: bool = False,
-                        dataset_size: int = 0) -> Dict[str, Any]:
+
+def create_training_run(
+    epochs: int = 0, gpu_used: bool = False, dataset_size: int = 0
+) -> Dict[str, Any]:
     """Record a training run."""
     run_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
@@ -886,19 +1071,26 @@ def create_training_run(epochs: int = 0, gpu_used: bool = False,
     return {"id": run_id, **data}
 
 
-def complete_training_run(run_id: str, final_loss: float = None,
-                          final_accuracy: float = None,
-                          checkpoint_path: str = None):
+def complete_training_run(
+    run_id: str,
+    final_loss: float = None,
+    final_accuracy: float = None,
+    checkpoint_path: str = None,
+):
     """Complete a training run."""
     entity = _engine.read_entity("training", run_id)
     if entity and entity.get("latest"):
-        _engine.append_record("training", run_id, {
-            **entity["latest"],
-            "ended_at": datetime.now(timezone.utc).isoformat(),
-            "final_loss": final_loss,
-            "final_accuracy": final_accuracy,
-            "checkpoint_path": checkpoint_path,
-        })
+        _engine.append_record(
+            "training",
+            run_id,
+            {
+                **entity["latest"],
+                "ended_at": datetime.now(timezone.utc).isoformat(),
+                "final_loss": final_loss,
+                "final_accuracy": final_accuracy,
+                "checkpoint_path": checkpoint_path,
+            },
+        )
 
 
 def get_training_runs(limit: int = 20) -> List[Dict[str, Any]]:
@@ -916,20 +1108,39 @@ def get_training_runs(limit: int = 20) -> List[Dict[str, Any]]:
 # ADMIN STATS
 # =============================================================================
 
+
 def get_admin_stats() -> Dict[str, Any]:
-    """Get admin dashboard statistics from HDD storage."""
-    return {
+    """Get cached admin dashboard statistics from HDD storage."""
+    now = time.monotonic()
+    with _PAGE_CACHE_LOCK:
+        cached = _ADMIN_STATS_CACHE.get("value")
+        checked_at = float(_ADMIN_STATS_CACHE.get("checked_at") or 0.0)
+        if isinstance(cached, dict) and (now - checked_at) < _PAGE_CACHE_SECONDS:
+            return dict(cached)
+
+    active_sessions = 0
+    for meta in _engine.list_entities("sessions", limit=250):
+        latest = _read_latest_entity("sessions", meta["entity_id"])
+        if latest and latest.get("status") == "active":
+            active_sessions += 1
+
+    payload = {
         "total_users": _engine.count_entities("users"),
         "total_targets": _engine.count_entities("targets"),
         "total_bounties": _engine.count_entities("reports"),
-        "active_sessions": len(get_active_sessions()),
+        "active_sessions": active_sessions,
         "activity_24h": _engine.count_entities("audit"),
     }
+    with _PAGE_CACHE_LOCK:
+        _ADMIN_STATS_CACHE["checked_at"] = now
+        _ADMIN_STATS_CACHE["value"] = dict(payload)
+    return payload
 
 
 # =============================================================================
 # STORAGE / LIFECYCLE / MONITORING ENDPOINTS
 # =============================================================================
+
 
 def get_storage_stats() -> Dict[str, Any]:
     """Get storage engine statistics."""
@@ -1027,7 +1238,9 @@ def get_storage_health() -> Dict[str, Any]:
         reasons.append("Primary HDD/NAS root unavailable — running on local fallback")
 
     reason = "; ".join(reasons) if reasons else None
-    overall_status = "ACTIVE" if (storage_active and db_active and lifecycle_ok) else "INACTIVE"
+    overall_status = (
+        "ACTIVE" if (storage_active and db_active and lifecycle_ok) else "INACTIVE"
+    )
     if storage_active and not lifecycle_ok:
         overall_status = "DEGRADED"
     elif storage_active and topology.get("fallback_active"):
@@ -1039,7 +1252,9 @@ def get_storage_health() -> Dict[str, Any]:
         "db_active": db_active,
         "lifecycle_ok": lifecycle_ok,
         "disk_monitor_ok": disk_monitor_ok,
-        "storage_root": str(getattr(_engine, "root", topology.get("active_root"))) if _engine else topology.get("active_root"),
+        "storage_root": str(getattr(_engine, "root", topology.get("active_root")))
+        if _engine
+        else topology.get("active_root"),
         "storage_mode": topology.get("mode", _storage_mode),
         "primary_hdd_root": topology.get("primary_root"),
         "fallback_hdd_root": topology.get("fallback_root"),
@@ -1056,7 +1271,10 @@ def get_storage_health() -> Dict[str, Any]:
 # VIDEO BRIDGE
 # =============================================================================
 
-def store_video(user_id: str, session_id: str, data: bytes, filename: str = "video.webm"):
+
+def store_video(
+    user_id: str, session_id: str, data: bytes, filename: str = "video.webm"
+):
     """Store a video."""
     if _video_streamer:
         return _video_streamer.store_video(user_id, session_id, data, filename)

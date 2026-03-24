@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4550",
+  "ingested_at": "2026-03-22T18:08:57.609494+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in code-projects Simple Gym Management System up to 1.0. This affects an unknown part of the file /gym/func.php. Such manipulation of the argument Trainer_id/fname leads to sql injection. The attack can be executed remotely. The exploit has been disclosed to the public and may be used.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4098c603b68e63a5719f222b5bd6cc20979af21e22c31d1f92bcfedbde4f68ac",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4550"
+}

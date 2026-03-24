@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1650" viewBox="0 0 2400 1650">
+  <defs>
+    <style>
+      .bg { fill: #f5f1ea; }
+      .panel { fill: #fffdf9; stroke: #d6d0c5; stroke-width: 2; }
+      .title { font: 700 48px 'Segoe UI', Arial, sans-serif; fill: #18251d; }
+      .subtitle { font: 500 22px 'Segoe UI', Arial, sans-serif; fill: #55635a; }
+      .section { font: 700 26px 'Segoe UI', Arial, sans-serif; fill: #183126; }
+      .label { font: 700 20px 'Segoe UI', Arial, sans-serif; fill: #163026; }
+      .body { font: 500 18px 'Segoe UI', Arial, sans-serif; fill: #294036; }
+      .small { font: 500 16px 'Segoe UI', Arial, sans-serif; fill: #5d6d64; }
+      .milestone-title { font: 700 24px 'Segoe UI', Arial, sans-serif; fill: #16251c; }
+      .milestone-sub { font: 600 17px 'Segoe UI', Arial, sans-serif; fill: #4f5f56; }
+      .footer { font: 500 17px 'Segoe UI', Arial, sans-serif; fill: #506056; }
+      .done { fill: #dcefdc; stroke: #2f6b48; stroke-width: 3; }
+      .active { fill: #d9ebf7; stroke: #2d6691; stroke-width: 3; }
+      .next { fill: #fff0d8; stroke: #b87a18; stroke-width: 3; }
+      .later { fill: #f9deeb; stroke: #b04b73; stroke-width: 3; }
+      .scale { fill: #e7defb; stroke: #6550b9; stroke-width: 3; }
+      .badge-done { fill: #2f6b48; }
+      .badge-active { fill: #2d6691; }
+      .badge-next { fill: #b87a18; }
+      .badge-later { fill: #b04b73; }
+      .badge-scale { fill: #6550b9; }
+      .track { stroke: #9db4a7; stroke-width: 10; fill: none; stroke-linecap: round; }
+      .connector { stroke: #587363; stroke-width: 4; fill: none; stroke-linecap: round; stroke-dasharray: 8 8; }
+      .legend-text { font: 600 17px 'Segoe UI', Arial, sans-serif; fill: #21372d; }
+    </style>
+    <marker id="arrow" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto">
+      <path d="M0,0 L14,7 L0,14 z" fill="#587363"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="2400" height="1650"/>
+
+  <text class="title" x="90" y="88">YGB Project Roadmap</text>
+  <text class="subtitle" x="90" y="126">Generated from the repository state on 2026-03-22: frozen governance phases, production hardening, Phase 51 platform upgrades, and the documented next-step backlog.</text>
+
+  <rect class="panel" x="70" y="165" rx="28" ry="28" width="2260" height="150"/>
+  <text class="section" x="105" y="218">Current Read</text>
+  <text class="body" x="105" y="256">The codebase is already beyond a greenfield build. Phases 01-49 are frozen or complete, March audits report production hardening is in place, and Phase 51 adds distributed AI platform capabilities on top.</text>
+  <text class="body" x="105" y="288">The roadmap below therefore focuses on stabilization, measurement quality, distributed training retrofit, and multi-node scale-out rather than baseline feature construction.</text>
+
+  <path class="track" d="M150 450 L2250 450" marker-end="url(#arrow)"/>
+
+  <circle cx="280" cy="450" r="18" fill="#2f6b48"/>
+  <circle cx="760" cy="450" r="18" fill="#2d6691"/>
+  <circle cx="1240" cy="450" r="18" fill="#b87a18"/>
+  <circle cx="1720" cy="450" r="18" fill="#b04b73"/>
+  <circle cx="2120" cy="450" r="18" fill="#6550b9"/>
+
+  <text class="milestone-sub" x="210" y="410">Completed Foundation</text>
+  <text class="milestone-sub" x="660" y="410">Production Hardening</text>
+  <text class="milestone-sub" x="1165" y="410">Next 30 Days</text>
+  <text class="milestone-sub" x="1620" y="410">Platform Retrofit</text>
+  <text class="milestone-sub" x="2030" y="410">Scale-Out Path</text>
+
+  <rect class="done" x="100" y="520" rx="28" ry="28" width="360" height="420"/>
+  <rect class="badge-done" x="126" y="548" rx="14" ry="14" width="128" height="34"/>
+  <text x="156" y="571" style="font:700 16px 'Segoe UI', Arial, sans-serif; fill:#ffffff;">DONE</text>
+  <text class="milestone-title" x="126" y="626">01. Governance Backbone</text>
+  <text class="milestone-sub" x="126" y="657">Phases 01-49 implemented</text>
+  <text class="body" x="126" y="702">• Human authority and immutable phase ordering established</text>
+  <text class="body" x="126" y="736">• Frontend, backend, runtime, and evidence model are present</text>
+  <text class="body" x="126" y="770">• Execution remains constrained by governance boundaries</text>
+  <text class="body" x="126" y="804">• Phase 49 governors formalize controlled runtime behavior</text>
+  <text class="small" x="126" y="858">Source anchors: `PHASE_INDEX.md`, `README.md`</text>
+  <text class="small" x="126" y="888">Interpretation: the repo already has a mature systems foundation</text>
+
+  <rect class="active" x="530" y="520" rx="28" ry="28" width="430" height="500"/>
+  <rect class="badge-active" x="556" y="548" rx="14" ry="14" width="176" height="34"/>
+  <text x="586" y="571" style="font:700 16px 'Segoe UI', Arial, sans-serif; fill:#ffffff;">ACTIVE / VERIFIED</text>
+  <text class="milestone-title" x="556" y="626">02. Hardened Product Baseline</text>
+  <text class="milestone-sub" x="556" y="657">Audit pass completed in March</text>
+  <text class="body" x="556" y="702">• Security remediation items are fixed or mitigated</text>
+  <text class="body" x="556" y="736">• Structured logging, readiness probes, and CI gate checks are wired</text>
+  <text class="body" x="556" y="770">• 32/32 E2E audit tests passed</text>
+  <text class="body" x="556" y="804">• 45/45 remediation validation tests passed</text>
+  <text class="body" x="556" y="838">• Remaining observability gap is low-severity ML metric wiring</text>
+  <text class="body" x="556" y="872">• Phase 51 extends checkpoints, agent routing, streaming voice, and monitoring</text>
+  <text class="small" x="556" y="926">Source anchors: `FULL_AUDIT_REPORT.md`, `VALIDATION_REPORT.md`, `RISK_REGISTER.md`, `PHASE51_PLATFORM_UPGRADE.md`</text>
+  <text class="small" x="556" y="956">Next move: convert verified platform pieces into the active training path</text>
+
+  <rect class="next" x="1030" y="520" rx="28" ry="28" width="430" height="560"/>
+  <rect class="badge-next" x="1056" y="548" rx="14" ry="14" width="156" height="34"/>
+  <text x="1088" y="571" style="font:700 16px 'Segoe UI', Arial, sans-serif; fill:#ffffff;">NEXT 30 DAYS</text>
+  <text class="milestone-title" x="1056" y="626">03. Model Quality Hardening</text>
+  <text class="milestone-sub" x="1056" y="657">Use the existing 4-week plan as the execution sprint</text>
+  <text class="body" x="1056" y="702">• Week 1: tighten calibration, thresholds, monotonicity, and Brier score</text>
+  <text class="body" x="1056" y="736">• Week 2: stress drift, thermal guards, and IO recovery behavior</text>
+  <text class="body" x="1056" y="770">• Week 3: refine duplicate suppression and cross-scope controls</text>
+  <text class="body" x="1056" y="804">• Week 4: stabilize five-target parallel hunt execution</text>
+  <text class="body" x="1056" y="838">• Wire `ece`, `drift_kl`, and `duplicate_rate` emitters into the ML pipeline</text>
+  <text class="body" x="1056" y="872">• Drive toward precision >= 95%, ECE <= 0.02, and zero governance violations</text>
+  <text class="small" x="1056" y="926">Source anchors: `docs/30_DAY_PLAN.md`, `FULL_AUDIT_REPORT.md` residual risks</text>
+  <text class="small" x="1056" y="956">This is the clearest near-term roadmap already documented in the repo</text>
+
+  <rect class="later" x="1530" y="520" rx="28" ry="28" width="430" height="540"/>
+  <rect class="badge-later" x="1556" y="548" rx="14" ry="14" width="178" height="34"/>
+  <text x="1586" y="571" style="font:700 16px 'Segoe UI', Arial, sans-serif; fill:#ffffff;">ENGINEERING NEXT</text>
+  <text class="milestone-title" x="1556" y="626">04. Platform Retrofit</text>
+  <text class="milestone-sub" x="1556" y="657">Move Phase 51 capabilities into the main runtime</text>
+  <text class="body" x="1556" y="702">• Retrofit `run_real_training.py` to the hardened checkpoint manager</text>
+  <text class="body" x="1556" y="736">• Add step-aware `global_step` resume coverage</text>
+  <text class="body" x="1556" y="770">• Introduce distributed engine mapping for DeepSpeed / ZeRO paths</text>
+  <text class="body" x="1556" y="804">• Add node-failure recovery tests for optimizer, RNG, scaler, and scheduler state</text>
+  <text class="body" x="1556" y="838">• Keep agent orchestration and streaming voice aligned with governance constraints</text>
+  <text class="small" x="1556" y="892">Source anchors: `docs/distributed_training_foundation.md`, `PHASE51_PLATFORM_UPGRADE.md`</text>
+  <text class="small" x="1556" y="922">Interpretation: the upgrade modules exist, but the active path still needs deeper adoption</text>
+
+  <rect class="scale" x="2030" y="520" rx="28" ry="28" width="280" height="520"/>
+  <rect class="badge-scale" x="2056" y="548" rx="14" ry="14" width="152" height="34"/>
+  <text x="2088" y="571" style="font:700 16px 'Segoe UI', Arial, sans-serif; fill:#ffffff;">SCALE OUT</text>
+  <text class="milestone-title" x="2056" y="626">05. Multi-Node Ops</text>
+  <text class="milestone-sub" x="2056" y="657">Deferred and scale-specific work</text>
+  <text class="body" x="2056" y="702">• Persist in-memory workflow state with Redis for multi-node correctness</text>
+  <text class="body" x="2056" y="736">• Extend checkpoint sync to local NVMe plus background object-store replication</text>
+  <text class="body" x="2056" y="770">• Strengthen cluster readiness, role assignment, pairing, and mesh validation</text>
+  <text class="body" x="2056" y="804">• Continue removing broad exception handling in high-risk paths</text>
+  <text class="small" x="2056" y="858">Source anchors: `RISK_REGISTER.md`, `docs/MODE_A_CHECKLIST.md`, `docs/distributed_training_foundation.md`</text>
+  <text class="small" x="2056" y="888">These are the steps that turn a hardened single-node system into a resilient cluster</text>
+
+  <path class="connector" d="M280 940 C280 1045,710 1075,760 1020"/>
+  <path class="connector" d="M760 1020 C875 1110,1180 1120,1240 1080"/>
+  <path class="connector" d="M1240 1080 C1365 1145,1660 1135,1720 1060"/>
+  <path class="connector" d="M1720 1060 C1835 1130,2050 1115,2120 1040"/>
+
+  <rect class="panel" x="70" y="1135" rx="28" ry="28" width="2260" height="360"/>
+  <text class="section" x="105" y="1190">Suggested Execution Order</text>
+  <text class="label" x="105" y="1240">1. Protect the current wins</text>
+  <text class="body" x="105" y="1274">Keep the security, observability, and CI baseline green while any training work proceeds.</text>
+  <text class="label" x="105" y="1324">2. Run the 30-day quality sprint</text>
+  <text class="body" x="105" y="1358">The repo already defines concrete calibration, drift, duplicate suppression, and parallel-hunt targets. That is the fastest high-confidence roadmap segment.</text>
+  <text class="label" x="105" y="1408">3. Retrofit distributed foundations into the active path</text>
+  <text class="body" x="105" y="1442">Checkpoint hardening and DeepSpeed-compatible scaffolding exist; the main training entrypoints still need to consume them consistently.</text>
+  <text class="label" x="1160" y="1240">4. Promote from single-node robustness to cluster resilience</text>
+  <text class="body" x="1160" y="1274">Redis-backed workflow state, object-store replication, and failure-recovery drills are the scale multipliers after model-quality work is stable.</text>
+  <text class="label" x="1160" y="1324">5. Measure what matters</text>
+  <text class="body" x="1160" y="1358">The audit explicitly calls out unfinished emitters for `ece`, `drift_kl`, and `duplicate_rate`; wiring those closes the loop between roadmap goals and runtime evidence.</text>
+
+  <rect x="90" y="1530" width="1320" height="64" rx="18" ry="18" fill="#fffdf9" stroke="#d6d0c5" stroke-width="2"/>
+  <rect x="118" y="1548" width="30" height="18" class="done"/>
+  <text class="legend-text" x="160" y="1563">Completed / frozen</text>
+  <rect x="390" y="1548" width="30" height="18" class="active"/>
+  <text class="legend-text" x="432" y="1563">Current verified baseline</text>
+  <rect x="740" y="1548" width="30" height="18" class="next"/>
+  <text class="legend-text" x="782" y="1563">Near-term sprint</text>
+  <rect x="1030" y="1548" width="30" height="18" class="later"/>
+  <text class="legend-text" x="1072" y="1563">Platform retrofit</text>
+  <rect x="1285" y="1548" width="30" height="18" class="scale"/>
+  <text class="legend-text" x="1327" y="1563">Scale-out backlog</text>
+
+  <text class="footer" x="1495" y="1563">Roadmap image generated from repository docs rather than product marketing copy.</text>
+</svg>

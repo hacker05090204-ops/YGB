@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33292",
+  "ingested_at": "2026-03-22T18:08:57.616030+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 26.0, the HLS streaming endpoint (`view/hls.php`) is vulnerable to a path traversal attack that allows an unauthenticated attacker to stream any private or paid video on the platform. The `videoDirectory` GET parameter is used in two divergent code paths \u2014 one for authorization (which truncates at the first `/` segment) and one for file access (which preserves `..` traversal sequences) \u2014 creating a split-oracle condition where authorization is checked against one video while content is served from another. Version 26.0 contains a fix for the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "e019e014abfb25bd1e090099b671c7694de08e8233a3f91cfa17a037376702da",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 97,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33292"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25593",
+  "ingested_at": "2026-03-22T18:08:57.544991+00:00",
+  "lang": "en",
+  "raw_text": "jetCast Server 2.0 contains a denial of service vulnerability that allows local attackers to crash the application by supplying an excessively long string in the Log directory configuration field. Attackers can paste a buffer of 5000 characters into the Log directory input, then click Start to trigger a crash that terminates the server process.",
+  "severity": "MEDIUM",
+  "sha256_hash": "89a4f73219f2a0491fd84e8c72dc7245ba6952b32f00742c5883e7eedda74507",
+  "source": "nvd",
+  "tags": [
+    "CWE-1285"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25593"
+}

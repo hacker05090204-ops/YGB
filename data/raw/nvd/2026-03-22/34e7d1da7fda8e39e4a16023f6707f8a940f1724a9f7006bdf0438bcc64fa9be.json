@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4546",
+  "ingested_at": "2026-03-22T18:08:57.600165+00:00",
+  "lang": "en",
+  "raw_text": "A weakness has been identified in Flos Freeware Notepad2 4.2.25. This impacts an unknown function in the library TextShaping.dll. Executing a manipulation can lead to uncontrolled search path. The attack is restricted to local execution. The attack requires a high level of complexity. The exploitability is said to be difficult. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "34e7d1da7fda8e39e4a16023f6707f8a940f1724a9f7006bdf0438bcc64fa9be",
+  "source": "nvd",
+  "tags": [
+    "CWE-426",
+    "CWE-427"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4546"
+}

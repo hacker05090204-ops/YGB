@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4551",
+  "ingested_at": "2026-03-22T18:08:57.611008+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was found in Tenda F453 1.0.0.3. This vulnerability affects the function fromSafeClientFilter of the file /goform/SafeClientFilter of the component Parameters Handler. Performing a manipulation of the argument menufacturer/Go results in stack-based buffer overflow. The attack is possible to be carried out remotely. The exploit has been made public and could be used.",
+  "severity": "HIGH",
+  "sha256_hash": "6449ffcaf0ab23f60a09241f5c954a4d3630124e5f486501ba4f62850e4106fa",
+  "source": "nvd",
+  "tags": [
+    "CWE-119",
+    "CWE-121"
+  ],
+  "token_count": 54,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4551"
+}

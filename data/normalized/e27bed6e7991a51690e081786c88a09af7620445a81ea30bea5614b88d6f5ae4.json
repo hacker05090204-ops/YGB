@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "AdminExpress 1.2.5 contains a denial of service vulnerability that allows local attackers to crash the application by submitting oversized input through the System Compare feature. Attackers can paste a large buffer of characters into the Folder Path field and trigger the comparison function to cause the application to become unresponsive or crash.",
+  "token_count": 52
+}

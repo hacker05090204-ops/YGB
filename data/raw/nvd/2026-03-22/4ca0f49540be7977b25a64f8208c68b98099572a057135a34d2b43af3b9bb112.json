@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33319",
+  "ingested_at": "2026-03-22T18:08:57.630129+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 26.0, the `uploadVideoToLinkedIn()` method in the SocialMediaPublisher plugin constructs a shell command by directly interpolating an upload URL received from LinkedIn's API response, without sanitization via `escapeshellarg()`. If an attacker can influence the LinkedIn API response (via MITM, compromised OAuth token, or API compromise), they can inject arbitrary OS commands that execute as the web server user. Version 26.0 contains a fix for the issue.",
+  "severity": "MEDIUM",
+  "sha256_hash": "4ca0f49540be7977b25a64f8208c68b98099572a057135a34d2b43af3b9bb112",
+  "source": "nvd",
+  "tags": [
+    "CWE-78"
+  ],
+  "token_count": 76,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33319"
+}

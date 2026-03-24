@@ -1,9 +1,8 @@
 "use client"
 
-import { AuthGuard } from "@/components/auth-guard"
-
 import { useState, useEffect, useMemo, useCallback } from "react"
 import { authFetch , getApiBase } from "@/lib/ygb-api"
+import { useBackendStatus } from "@/hooks/use-backend-status"
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import {
   Users,
@@ -22,10 +21,10 @@ import {
   RefreshCw
 } from "lucide-react"
 
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LiquidMetalButton } from "@/components/ui/liquid-metal"
+import { ProtectedSidebarShell } from "@/components/protected-sidebar-shell"
 
 interface User {
   id: string
@@ -68,12 +67,12 @@ interface AdminStats {
 }
 
 function DashboardContent() {
+  const backendStatus = useBackendStatus()
   const [users, setUsers] = useState<User[]>([])
   const [bounties, setBounties] = useState<Bounty[]>([])
   const [targets, setTargets] = useState<TargetType[]>([])
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null)
   const [activities, setActivities] = useState<any[]>([])
-  const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
   const [activeTab, setActiveTab] = useState<"overview" | "users" | "bounties" | "targets">("overview")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [trainingReadiness, setTrainingReadiness] = useState<{
@@ -93,9 +92,9 @@ function DashboardContent() {
   const fetchData = useCallback(async (signal?: AbortSignal) => {
     try {
       const [usersRes, bountiesRes, targetsRes, statsRes, activityRes, readinessRes] = await Promise.all([
-        authFetch(`${getApiBase()}/api/db/users`, { signal }),
-        authFetch(`${getApiBase()}/api/db/bounties`, { signal }),
-        authFetch(`${getApiBase()}/api/db/targets`, { signal }),
+        authFetch(`${getApiBase()}/api/db/users?limit=100`, { signal }),
+        authFetch(`${getApiBase()}/api/db/bounties?limit=100`, { signal }),
+        authFetch(`${getApiBase()}/api/db/targets?limit=100`, { signal }),
         authFetch(`${getApiBase()}/api/db/admin/stats`, { signal }),
         authFetch(`${getApiBase()}/api/db/activity?limit=20`, { signal }),
         fetch(`${getApiBase()}/api/training/readiness`, { signal }).catch(() => null),
@@ -138,31 +137,6 @@ function DashboardContent() {
     } catch (e) {
       if (signal?.aborted) return
       console.error("Failed to fetch data:", e)
-    }
-  }, [])
-
-  // Separate server health check — uses plain fetch (no auth required)
-  useEffect(() => {
-    const controller = new AbortController()
-
-    async function checkHealth() {
-      try {
-        const res = await fetch(`${getApiBase()}/api/health`, {
-          cache: "no-store",
-          signal: controller.signal,
-        })
-        if (controller.signal.aborted) return
-        setApiStatus(res.ok ? "online" : "offline")
-      } catch {
-        if (controller.signal.aborted) return
-        setApiStatus("offline")
-      }
-    }
-    void checkHealth()
-    const interval = setInterval(checkHealth, 15000)
-    return () => {
-      controller.abort()
-      clearInterval(interval)
     }
   }, [])
 
@@ -262,9 +236,7 @@ function DashboardContent() {
   }, [bounties])
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset className="bg-[#000000] text-[#FAFAFA] overflow-hidden">
+    <ProtectedSidebarShell insetClassName="bg-[#000000] text-[#FAFAFA] overflow-hidden" sidebarVariant="sidebar">
 
         {/* Ambient Glow */}
         <div className="fixed inset-0 pointer-events-none">
@@ -288,20 +260,20 @@ function DashboardContent() {
               }}
               className="p-2 rounded-lg hover:bg-white/[0.05] transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 text-[#737373] ${apiStatus === "loading" ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-4 h-4 text-[#737373] ${backendStatus.status === "checking" ? "animate-spin" : ""}`} />
             </button>
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${apiStatus === "online"
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${backendStatus.status === "online"
               ? "bg-green-500/10 border-green-500/20 text-green-400"
-              : apiStatus === "loading"
+              : backendStatus.status === "checking"
                 ? "bg-yellow-500/10 border-yellow-500/20 text-yellow-400"
                 : "bg-red-500/10 border-red-500/20 text-red-400"
               }`}>
-              <div className={`w-1.5 h-1.5 rounded-full ${apiStatus === "online" ? "bg-green-400" : apiStatus === "loading" ? "bg-yellow-400 animate-pulse" : "bg-red-400"
+              <div className={`w-1.5 h-1.5 rounded-full ${backendStatus.status === "online" ? "bg-green-400" : backendStatus.status === "checking" ? "bg-yellow-400 animate-pulse" : "bg-red-400"
                 }`} />
-              {apiStatus === "online" ? "API Online" : apiStatus === "loading" ? "Loading..." : "Offline"}
+              {backendStatus.status === "online" ? "API Online" : backendStatus.status === "checking" ? "Loading..." : "Offline"}
             </div>
             {/* Training readiness — truthful status from /api/training/readiness */}
-            {apiStatus === "online" && trainingReadiness && (
+            {backendStatus.status === "online" && trainingReadiness && (
               <div
                 className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border cursor-help ${trainingReadiness.overall === "READY"
                   ? "bg-green-500/10 border-green-500/20 text-green-400"
@@ -725,11 +697,10 @@ function DashboardContent() {
 
           </div>
         </ScrollArea>
-      </SidebarInset>
-    </SidebarProvider>
+    </ProtectedSidebarShell>
   )
 }
 
 export default function Dashboard() {
-  return <AuthGuard><DashboardContent /></AuthGuard>
+  return <DashboardContent />
 }

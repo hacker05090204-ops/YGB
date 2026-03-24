@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in mickasmt next-saas-stripe-starter 1.0.0. Affected by this vulnerability is the function updateUserrole of the file actions/update-user-role.ts. The manipulation of the argument userId/role results in improper authorization. The attack may be launched remotely.",
+  "token_count": 36
+}

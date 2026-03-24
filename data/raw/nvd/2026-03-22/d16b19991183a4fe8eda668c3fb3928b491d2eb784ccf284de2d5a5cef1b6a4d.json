@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25617",
+  "ingested_at": "2026-03-22T18:08:57.594654+00:00",
+  "lang": "en",
+  "raw_text": "Ease Audio Converter 5.30 contains a denial of service vulnerability in the Audio Cutter function that allows local attackers to crash the application by processing malformed MP4 files. Attackers can create a crafted MP4 file containing an oversized buffer and load it through the Audio Cutter interface to trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "d16b19991183a4fe8eda668c3fb3928b491d2eb784ccf284de2d5a5cef1b6a4d",
+  "source": "nvd",
+  "tags": [
+    "CWE-226"
+  ],
+  "token_count": 52,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25617"
+}

@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2026-33293",
+  "ingested_at": "2026-03-22T18:08:57.619109+00:00",
+  "lang": "en",
+  "raw_text": "WWBN AVideo is an open source video platform. Prior to version 26.0, the `deleteDump` parameter in `plugin/CloneSite/cloneServer.json.php` is passed directly to `unlink()` without any path sanitization. An attacker with valid clone credentials can use path traversal sequences (e.g., `../../`) to delete arbitrary files on the server, including critical application files such as `configuration.php`, causing complete denial of service or enabling further attacks by removing security-critical files. Version 26.0 fixes the issue.",
+  "severity": "HIGH",
+  "sha256_hash": "16dfedbb6974a1dc12c55e322de59ed2396f3e59266889afd4ec2af569698ebf",
+  "source": "nvd",
+  "tags": [
+    "CWE-22"
+  ],
+  "token_count": 71,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-33293"
+}

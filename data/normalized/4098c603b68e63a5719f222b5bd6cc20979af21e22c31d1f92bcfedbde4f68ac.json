@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "A vulnerability has been found in code-projects Simple Gym Management System up to 1.0. This affects an unknown part of the file /gym/func.php. Such manipulation of the argument Trainer_id/fname leads to sql injection. The attack can be executed remotely. The exploit has been disclosed to the public and may be used.",
+  "token_count": 51
+}

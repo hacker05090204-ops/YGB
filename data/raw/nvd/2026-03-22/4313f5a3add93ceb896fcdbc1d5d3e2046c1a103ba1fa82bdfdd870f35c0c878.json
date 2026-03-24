@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4545",
+  "ingested_at": "2026-03-22T18:08:57.534654+00:00",
+  "lang": "en",
+  "raw_text": "A security flaw has been discovered in Flos Freeware Notepad2 4.2.25. This affects an unknown function in the library PROPSYS.dll. Performing a manipulation results in uncontrolled search path. The attack is only possible with local access. The attack is considered to have high complexity. The exploitability is reported as difficult. The vendor was contacted early about this disclosure but did not respond in any way.",
+  "severity": "HIGH",
+  "sha256_hash": "4313f5a3add93ceb896fcdbc1d5d3e2046c1a103ba1fa82bdfdd870f35c0c878",
+  "source": "nvd",
+  "tags": [
+    "CWE-426",
+    "CWE-427"
+  ],
+  "token_count": 65,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4545"
+}

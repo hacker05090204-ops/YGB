@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Ease Audio Converter 5.30 contains a denial of service vulnerability in the Audio Cutter function that allows local attackers to crash the application by processing malformed MP4 files. Attackers can create a crafted MP4 file containing an oversized buffer and load it through the Audio Cutter interface to trigger an application crash.",
+  "token_count": 52
+}

@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Axessh 4.2 contains a stack-based buffer overflow vulnerability in the log file name field that allows local attackers to execute arbitrary code by supplying an excessively long filename. Attackers can overflow the buffer at offset 214 bytes to overwrite the instruction pointer and execute shellcode with system privileges.",
+  "token_count": 48
+}

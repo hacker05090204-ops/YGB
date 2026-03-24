@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25594",
+  "ingested_at": "2026-03-22T18:08:57.547288+00:00",
+  "lang": "en",
+  "raw_text": "ASPRunner.NET 10.1 contains a denial of service vulnerability that allows local attackers to crash the application by supplying an excessively long string in the table name field. Attackers can input a buffer of 10000 characters in the table name parameter during database table creation to trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "a14f2e72aa4e1ecf35717e095ea12a87ea4924bd86740b1be500ae7e1bdb4767",
+  "source": "nvd",
+  "tags": [
+    "CWE-807"
+  ],
+  "token_count": 49,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25594"
+}

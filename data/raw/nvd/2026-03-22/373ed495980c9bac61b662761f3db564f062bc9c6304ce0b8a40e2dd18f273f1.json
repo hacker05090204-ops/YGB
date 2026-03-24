@@ -1,0 +1,15 @@
+{
+  "cve_id": "CVE-2026-4540",
+  "ingested_at": "2026-03-22T18:08:57.522022+00:00",
+  "lang": "en",
+  "raw_text": "A vulnerability was detected in projectworlds Online Notes Sharing System 1.0. This issue affects some unknown processing of the file /login.php of the component Parameters Handler. The manipulation of the argument User results in sql injection. The attack can be executed remotely. The exploit is now public and may be used.",
+  "severity": "HIGH",
+  "sha256_hash": "373ed495980c9bac61b662761f3db564f062bc9c6304ce0b8a40e2dd18f273f1",
+  "source": "nvd",
+  "tags": [
+    "CWE-74",
+    "CWE-89"
+  ],
+  "token_count": 51,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2026-4540"
+}

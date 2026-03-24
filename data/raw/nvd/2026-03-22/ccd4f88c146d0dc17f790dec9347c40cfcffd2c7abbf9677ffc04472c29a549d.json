@@ -1,0 +1,14 @@
+{
+  "cve_id": "CVE-2019-25596",
+  "ingested_at": "2026-03-22T18:08:57.551346+00:00",
+  "lang": "en",
+  "raw_text": "SpotAuditor 5.2.6 contains a denial of service vulnerability in the registration dialog that allows local attackers to crash the application by supplying an excessively long string in the Name field. Attackers can paste a buffer of 300 repeated characters into the Name input during registration to trigger an application crash.",
+  "severity": "MEDIUM",
+  "sha256_hash": "ccd4f88c146d0dc17f790dec9347c40cfcffd2c7abbf9677ffc04472c29a549d",
+  "source": "nvd",
+  "tags": [
+    "CWE-1287"
+  ],
+  "token_count": 50,
+  "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-25596"
+}

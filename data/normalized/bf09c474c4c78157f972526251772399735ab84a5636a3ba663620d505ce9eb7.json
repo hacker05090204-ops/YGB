@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "Admin Express 1.2.5.485 contains a local structured exception handling buffer overflow vulnerability that allows local attackers to execute arbitrary code by supplying an alphanumeric encoded payload in the Folder Path field. Attackers can trigger the vulnerability through the System Compare feature by pasting a crafted buffer overflow payload into the left-hand side Folder Path field and clicking the scale icon to execute shellcode with application privileges.",
+  "token_count": 66
+}

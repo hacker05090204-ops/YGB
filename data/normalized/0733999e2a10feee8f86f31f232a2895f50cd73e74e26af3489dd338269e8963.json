@@ -1,0 +1,5 @@
+{
+  "lang": "en",
+  "raw_text": "FTP Shell Server 6.83 contains a buffer overflow vulnerability in the 'Account name to ban' field that allows local attackers to execute arbitrary code by supplying a crafted string. Attackers can inject shellcode through the account name parameter in the Manage FTP Accounts dialog to overwrite the return address and execute calc.exe or other commands.",
+  "token_count": 55
+}
