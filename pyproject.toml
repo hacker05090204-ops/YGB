@@ -1,13 +1,9 @@
 [tool.pytest.ini_options]
 testpaths = [
-    "python/phase01_core/tests",
-    "python/phase02_actors/tests",
-    "python/phase03_trust/tests",
-    "python/phase04_validation/tests",
-    "python/phase05_workflow/tests",
-    "python/phase06_decision/tests",
-    "python/phase07_knowledge/tests",
-    "python/phase08_evidence/tests"
+    "api",
+    "python",
+    "impl_v1",
+    "HUMANOID_HUNTER"
 ]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
@@ -15,14 +11,10 @@ python_functions = ["test_*"]
 
 [tool.coverage.run]
 source = [
-    "python/phase01_core",
-    "python/phase02_actors",
-    "python/phase03_trust",
-    "python/phase04_validation",
-    "python/phase05_workflow",
-    "python/phase06_decision",
-    "python/phase07_knowledge",
-    "python/phase08_evidence"
+    "api",
+    "python",
+    "impl_v1",
+    "HUMANOID_HUNTER"
 ]
 omit = [
     "*/tests/*",

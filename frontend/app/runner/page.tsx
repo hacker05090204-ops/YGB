@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useEffect, useRef } from "react"
 import {
     Play,
     Square,
@@ -28,73 +28,29 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
-
-interface PhaseUpdate {
-    type: string
-    phase?: number
-    name?: string
-    status?: string
-    duration_ms?: number
-    progress?: number
-    output?: Record<string, any>
-}
-
-interface BrowserAction {
-    type: string
-    action?: string
-    target?: string
-    details?: Record<string, any>
-    duration_ms?: number
-    timestamp?: string
-}
-
-interface WorkflowResult {
-    summary?: {
-        total_phases: number
-        successful_steps: number
-        failed_steps: number
-        findings_count: number
-        total_duration_ms: number
-    }
-    findings?: any[]
-    phases?: any[]
-}
+import { useLiveData } from "@/components/providers/live-data-provider"
+import { type PhaseUpdate, useWorkflowRunner } from "@/lib/use-workflow-runner"
 
 export default function RunnerPage() {
-    const [targetUrl, setTargetUrl] = useState("")
-    const [mode, setMode] = useState<"READ_ONLY" | "REAL">("READ_ONLY")
-    const [isRunning, setIsRunning] = useState(false)
-    const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking")
+    const { apiStatus } = useLiveData()
+    const {
+        targetUrl,
+        setTargetUrl,
+        mode,
+        setMode,
+        isRunning,
+        phases,
+        browserActions,
+        currentPhase,
+        progress,
+        result,
+        error,
+        start,
+        stop,
+    } = useWorkflowRunner("READ_ONLY")
 
-    const [phases, setPhases] = useState<PhaseUpdate[]>([])
-    const [browserActions, setBrowserActions] = useState<BrowserAction[]>([])
-    const [currentPhase, setCurrentPhase] = useState<number>(0)
-    const [progress, setProgress] = useState<number>(0)
-    const [result, setResult] = useState<WorkflowResult | null>(null)
-    const [error, setError] = useState<string | null>(null)
-
-    const wsRef = useRef<WebSocket | null>(null)
     const phaseListRef = useRef<HTMLDivElement>(null)
     const browserListRef = useRef<HTMLDivElement>(null)
-
-    // Check API status on mount
-    useEffect(() => {
-        async function checkApi() {
-            try {
-                const res = await fetch(`${API_BASE}/health`)
-                if (res.ok) {
-                    setApiStatus("online")
-                } else {
-                    setApiStatus("offline")
-                }
-            } catch {
-                setApiStatus("offline")
-            }
-        }
-        checkApi()
-    }, [])
 
     // Auto-scroll phase list
     useEffect(() => {
@@ -110,92 +66,6 @@ export default function RunnerPage() {
         }
     }, [browserActions])
 
-    const startWorkflow = useCallback(async () => {
-        if (!targetUrl.trim()) return
-
-        setIsRunning(true)
-        setPhases([])
-        setBrowserActions([])
-        setCurrentPhase(0)
-        setProgress(0)
-        setResult(null)
-        setError(null)
-
-        try {
-            // Start workflow via REST API
-            const startRes = await fetch(`${API_BASE}/api/workflow/bounty/start`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    target: targetUrl,
-                    mode: mode
-                })
-            })
-
-            if (!startRes.ok) {
-                throw new Error("Failed to start workflow")
-            }
-
-            const { report_id } = await startRes.json()
-
-            // Connect WebSocket
-            const ws = new WebSocket(`ws://localhost:8000/ws/bounty/${report_id}`)
-            wsRef.current = ws
-
-            ws.onmessage = (event) => {
-                const data = JSON.parse(event.data)
-
-                if (data.type === "workflow_start") {
-                    setPhases(prev => [...prev, { type: "start", ...data }])
-                }
-                else if (data.type === "phase_start") {
-                    setCurrentPhase(data.phase || 0)
-                    setProgress(data.progress || 0)
-                    setPhases(prev => [...prev, { type: "phase_start", ...data }])
-                }
-                else if (data.type === "phase_complete") {
-                    setPhases(prev => [...prev, { type: "phase_complete", ...data }])
-                }
-                else if (data.type === "browser_action") {
-                    setBrowserActions(prev => [...prev, data])
-                }
-                else if (data.type === "workflow_complete") {
-                    setProgress(100)
-                    setPhases(prev => [...prev, { type: "complete", ...data }])
-                }
-                else if (data.type === "complete") {
-                    setResult(data.result)
-                    setIsRunning(false)
-                    ws.close()
-                }
-                else if (data.error) {
-                    setError(data.error)
-                    setIsRunning(false)
-                    ws.close()
-                }
-            }
-
-            ws.onerror = () => {
-                setError("WebSocket connection failed")
-                setIsRunning(false)
-            }
-
-            ws.onclose = () => {
-                setIsRunning(false)
-            }
-
-        } catch (err: any) {
-            setError(err.message)
-            setIsRunning(false)
-        }
-    }, [targetUrl, mode])
-
-    const stopWorkflow = useCallback(() => {
-        if (wsRef.current) {
-            wsRef.current.close()
-        }
-        setIsRunning(false)
-    }, [])
 
     const getActionIcon = (action: string) => {
         switch (action) {
@@ -263,14 +133,14 @@ export default function RunnerPage() {
                                 <input
                                     type="url"
                                     placeholder="https://target-domain.com"
-                                    value={targetUrl}
-                                    onChange={(e) => setTargetUrl(e.target.value)}
+                                        value={targetUrl}
+                                        onChange={(e) => setTargetUrl(e.target.value)}
                                     disabled={isRunning}
                                     className="flex-1 px-4 py-2 bg-[#0A0A0A] border border-white/[0.1] rounded-lg text-[#FAFAFA] placeholder-[#525252] focus:border-purple-500/50 outline-none"
                                 />
                                 <select
                                     value={mode}
-                                    onChange={(e) => setMode(e.target.value as any)}
+                                    onChange={(e) => setMode(e.target.value as "READ_ONLY" | "REAL")}
                                     disabled={isRunning}
                                     className="px-4 py-2 bg-[#0A0A0A] border border-white/[0.1] rounded-lg text-[#FAFAFA] outline-none"
                                 >
@@ -279,7 +149,7 @@ export default function RunnerPage() {
                                 </select>
                                 {isRunning ? (
                                     <button
-                                        onClick={stopWorkflow}
+                                        onClick={stop}
                                         className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center gap-2"
                                     >
                                         <Square className="w-4 h-4" />
@@ -287,7 +157,7 @@ export default function RunnerPage() {
                                     </button>
                                 ) : (
                                     <button
-                                        onClick={startWorkflow}
+                                        onClick={start}
                                         disabled={!targetUrl.trim() || apiStatus !== "online"}
                                         className="px-6 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                                     >
@@ -301,7 +171,7 @@ export default function RunnerPage() {
                             {isRunning && (
                                 <div className="mt-4">
                                     <div className="flex justify-between text-xs text-[#737373] mb-1">
-                                        <span>Phase {currentPhase} / 48</span>
+                                        <span>Phase {currentPhase} / 50</span>
                                         <span>{progress.toFixed(1)}%</span>
                                     </div>
                                     <div className="h-2 bg-[#171717] rounded-full overflow-hidden">

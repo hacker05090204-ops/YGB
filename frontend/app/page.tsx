@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useEffect, useRef } from "react"
 import Link from "next/link"
 import {
   CheckCircle,
@@ -29,119 +29,29 @@ import {
 
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LiquidMetalButton } from "@/components/ui/liquid-metal"
-
-interface PhaseUpdate {
-  type: string
-  phase?: number
-  name?: string
-  status?: string
-  duration_ms?: number
-  progress?: number
-  output?: Record<string, any>
-}
-
-interface BrowserAction {
-  type: string
-  action?: string
-  target?: string
-  details?: Record<string, any>
-  duration_ms?: number
-  timestamp?: string
-}
-
-interface WorkflowResult {
-  summary?: {
-    total_phases: number
-    successful_steps: number
-    failed_steps: number
-    findings_count: number
-    total_duration_ms: number
-    report_file?: string
-  }
-  findings?: any[]
-  phases?: any[]
-}
-
-interface G38Status {
-  available: boolean
-  auto_training?: {
-    state: string
-    is_training: boolean
-    epoch: number
-    idle_seconds: number
-    power_connected: boolean
-    scan_active: boolean
-    gpu_available: boolean
-    events_count: number
-    last_event: string | null
-    progress?: number  // Training progress percentage (0-100)
-    total_epochs?: number  // Total epochs for training
-  }
-  guards?: {
-    main_guards: number
-    all_verified: boolean
-    message: string
-  }
-}
-
-const API_BASE = "http://localhost:8000"
+import { API_BASE } from "@/lib/api-base"
+import { useLiveData } from "@/components/providers/live-data-provider"
+import { useWorkflowRunner } from "@/lib/use-workflow-runner"
 
 export default function Home() {
   const containerRef = useRef(null)
   const phaseLogRef = useRef<HTMLDivElement>(null)
   const browserLogRef = useRef<HTMLDivElement>(null)
-
-  const [target, setTarget] = useState("")
-  const mode = "REAL" // Always use REAL mode for full browser automation
-  const [apiStatus, setApiStatus] = useState<"checking" | "online" | "offline">("checking")
-
-  const [isRunning, setIsRunning] = useState(false)
-  const [phases, setPhases] = useState<PhaseUpdate[]>([])
-  const [browserActions, setBrowserActions] = useState<BrowserAction[]>([])
-  const [findings, setFindings] = useState<any[]>([])
-  const [currentPhase, setCurrentPhase] = useState(0)
-  const [progress, setProgress] = useState(0)
-  const [result, setResult] = useState<WorkflowResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [g38Status, setG38Status] = useState<G38Status | null>(null)
-
-  const wsRef = useRef<WebSocket | null>(null)
-
-  // Check API
-  useEffect(() => {
-    async function checkAPI() {
-      try {
-        const res = await fetch(`${API_BASE}/api/health`)
-        if (res.ok) {
-          setApiStatus("online")
-        } else {
-          setApiStatus("offline")
-        }
-      } catch {
-        setApiStatus("offline")
-      }
-    }
-    checkAPI()
-  }, [])
-
-  // Fetch G38 status periodically
-  useEffect(() => {
-    async function fetchG38Status() {
-      try {
-        const res = await fetch(`${API_BASE}/api/g38/status`)
-        if (res.ok) {
-          const data = await res.json()
-          setG38Status(data)
-        }
-      } catch {
-        // G38 not available
-      }
-    }
-
-    fetchG38Status()
-    const interval = setInterval(fetchG38Status, 5000) // Refresh every 5 seconds
-    return () => clearInterval(interval)
-  }, [])
+  const { apiStatus, g38Status } = useLiveData()
+  const {
+    targetUrl: target,
+    setTargetUrl: setTarget,
+    isRunning,
+    phases,
+    browserActions,
+    findings,
+    currentPhase,
+    progress,
+    result,
+    error,
+    start,
+    stop,
+  } = useWorkflowRunner("REAL")
 
   // Auto-scroll logs
   useEffect(() => {
@@ -151,91 +61,6 @@ export default function Home() {
   useEffect(() => {
     browserLogRef.current?.scrollTo({ top: browserLogRef.current.scrollHeight, behavior: 'smooth' })
   }, [browserActions])
-
-  const startAnalysis = useCallback(async () => {
-    if (!target.trim() || isRunning) return
-
-    setIsRunning(true)
-    setPhases([])
-    setBrowserActions([])
-    setFindings([])
-    setCurrentPhase(0)
-    setProgress(0)
-    setResult(null)
-    setError(null)
-
-    try {
-      // Start workflow via REST API - uses phase_runner.py
-      const res = await fetch(`${API_BASE}/api/workflow/bounty/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ target, mode })
-      })
-
-      if (!res.ok) throw new Error("Failed to start analysis")
-      const data = await res.json()
-
-      // Connect WebSocket for real-time updates
-      const ws = new WebSocket(`ws://localhost:8000/ws/bounty/${data.report_id}`)
-      wsRef.current = ws
-
-      ws.onmessage = (e) => {
-        const msg = JSON.parse(e.data)
-
-        if (msg.type === "workflow_start") {
-          setPhases(prev => [...prev, { type: "start", ...msg }])
-        }
-        else if (msg.type === "phase_start") {
-          setCurrentPhase(msg.phase || 0)
-          setProgress(msg.progress || 0)
-          setPhases(prev => [...prev, { type: "phase_start", ...msg }])
-        }
-        else if (msg.type === "phase_complete") {
-          setPhases(prev => [...prev, { type: "phase_complete", ...msg }])
-        }
-        else if (msg.type === "browser_action") {
-          setBrowserActions(prev => [...prev, msg])
-        }
-        else if (msg.type === "finding") {
-          setFindings(prev => [...prev, msg])
-        }
-        else if (msg.type === "workflow_complete") {
-          setProgress(100)
-          setPhases(prev => [...prev, { type: "complete", ...msg }])
-        }
-        else if (msg.type === "complete") {
-          setResult(msg.result)
-          setIsRunning(false)
-          ws.close()
-        }
-        else if (msg.error) {
-          setError(msg.error)
-          setIsRunning(false)
-          ws.close()
-        }
-      }
-
-      ws.onerror = () => {
-        setError("WebSocket connection failed")
-        setIsRunning(false)
-      }
-
-      ws.onclose = () => {
-        setIsRunning(false)
-      }
-
-    } catch (err: any) {
-      setError(err.message)
-      setIsRunning(false)
-    }
-  }, [target, mode, isRunning])
-
-  const stopAnalysis = useCallback(() => {
-    if (wsRef.current) {
-      wsRef.current.close()
-    }
-    setIsRunning(false)
-  }, [])
 
   const getActionIcon = (action: string) => {
     switch (action) {
@@ -351,7 +176,7 @@ export default function Home() {
             <div className="flex mt-6">
               {isRunning ? (
                 <LiquidMetalButton
-                  onClick={stopAnalysis}
+                  onClick={stop}
                   icon={<Square className="w-5 h-5" />}
                   metalConfig={{ colorBack: "#7f1d1d", colorTint: "#f87171" }}
                   className="flex-1"
@@ -361,7 +186,7 @@ export default function Home() {
                 </LiquidMetalButton>
               ) : (
                 <LiquidMetalButton
-                  onClick={startAnalysis}
+                  onClick={start}
                   disabled={!target.trim() || apiStatus !== "online"}
                   icon={<Play className="w-5 h-5" />}
                   metalConfig={{ colorBack: "#262626", colorTint: "#FAFAFA" }}

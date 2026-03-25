@@ -20,13 +20,14 @@ from typing import Tuple, Dict, Optional, List, Any
 import hashlib
 import uuid
 import json
-from datetime import datetime
+from datetime import datetime, UTC
 
 # Try importing PyTorch - graceful fallback if unavailable
 try:
     import torch
     import torch.nn as nn
     import torch.optim as optim
+
     PYTORCH_AVAILABLE = True
 except ImportError:
     PYTORCH_AVAILABLE = False
@@ -37,6 +38,7 @@ except ImportError:
 
 class DeviceType(Enum):
     """Available compute devices."""
+
     CUDA = "CUDA"
     CPU = "CPU"
     UNAVAILABLE = "UNAVAILABLE"
@@ -45,6 +47,7 @@ class DeviceType(Enum):
 @dataclass(frozen=True)
 class DeviceInfo:
     """Device information."""
+
     device_type: DeviceType
     device_name: str
     memory_total_mb: int
@@ -55,6 +58,7 @@ class DeviceInfo:
 @dataclass(frozen=True)
 class ModelConfig:
     """Neural network configuration."""
+
     input_dim: int
     hidden_dims: Tuple[int, ...]
     output_dim: int
@@ -68,6 +72,7 @@ class ModelConfig:
 @dataclass(frozen=True)
 class TrainingSample:
     """Single training sample."""
+
     sample_id: str
     features: Tuple[float, ...]
     label: int
@@ -77,6 +82,7 @@ class TrainingSample:
 @dataclass(frozen=True)
 class TrainingBatch:
     """Batch of training samples."""
+
     batch_id: str
     samples: Tuple[TrainingSample, ...]
     batch_hash: str
@@ -85,6 +91,7 @@ class TrainingBatch:
 @dataclass(frozen=True)
 class EpochMetrics:
     """Metrics from one training epoch."""
+
     epoch: int
     train_loss: float
     train_accuracy: float
@@ -97,6 +104,7 @@ class EpochMetrics:
 @dataclass(frozen=True)
 class ModelCheckpoint:
     """Saved model state."""
+
     checkpoint_id: str
     epoch: int
     train_accuracy: float
@@ -109,6 +117,7 @@ class ModelCheckpoint:
 @dataclass(frozen=True)
 class InferenceResult:
     """Model inference result."""
+
     result_id: str
     prediction: int
     confidence: float
@@ -119,6 +128,7 @@ class InferenceResult:
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
+
 
 def _generate_id(prefix: str) -> str:
     """Generate unique ID."""
@@ -132,17 +142,18 @@ def _hash_content(content: str) -> str:
 
 def _now_iso() -> str:
     """Current timestamp."""
-    return datetime.utcnow().isoformat() + "Z"
+    return datetime.now(UTC).isoformat()
 
 
 # =============================================================================
 # DEVICE DETECTION (REAL)
 # =============================================================================
 
+
 def detect_compute_device() -> DeviceInfo:
     """
     Detect available compute device.
-    
+
     Returns CUDA if available, otherwise CPU.
     """
     if not PYTORCH_AVAILABLE:
@@ -153,12 +164,12 @@ def detect_compute_device() -> DeviceInfo:
             cuda_version="N/A",
             is_available=False,
         )
-    
+
     if torch.cuda.is_available():
         device_name = torch.cuda.get_device_name(0)
         memory_mb = torch.cuda.get_device_properties(0).total_memory // (1024 * 1024)
         cuda_version = torch.version.cuda or "Unknown"
-        
+
         return DeviceInfo(
             device_type=DeviceType.CUDA,
             device_name=device_name,
@@ -166,7 +177,7 @@ def detect_compute_device() -> DeviceInfo:
             cuda_version=cuda_version,
             is_available=True,
         )
-    
+
     return DeviceInfo(
         device_type=DeviceType.CPU,
         device_name="CPU",
@@ -180,7 +191,7 @@ def get_torch_device() -> Any:
     """Get PyTorch device object."""
     if not PYTORCH_AVAILABLE:
         return None
-    
+
     if torch.cuda.is_available():
         return torch.device("cuda")
     return torch.device("cpu")
@@ -191,34 +202,37 @@ def get_torch_device() -> Any:
 # =============================================================================
 
 if PYTORCH_AVAILABLE:
+
     class BugClassifier(nn.Module):
         """
         Neural network for bug classification.
-        
+
         Architecture:
         - Input layer
         - Multiple hidden layers with ReLU + Dropout
         - Output layer with softmax
         """
-        
+
         def __init__(self, config: ModelConfig):
             super().__init__()
-            
+
             layers = []
             prev_dim = config.input_dim
-            
+
             for hidden_dim in config.hidden_dims:
-                layers.extend([
-                    nn.Linear(prev_dim, hidden_dim),
-                    nn.ReLU(),
-                    nn.Dropout(config.dropout),
-                ])
+                layers.extend(
+                    [
+                        nn.Linear(prev_dim, hidden_dim),
+                        nn.ReLU(),
+                        nn.Dropout(config.dropout),
+                    ]
+                )
                 prev_dim = hidden_dim
-            
+
             layers.append(nn.Linear(prev_dim, config.output_dim))
-            
+
             self.network = nn.Sequential(*layers)
-        
+
         def forward(self, x):
             return self.network(x)
 else:
@@ -228,6 +242,7 @@ else:
 # =============================================================================
 # TRAINING FUNCTIONS (REAL)
 # =============================================================================
+
 
 def create_model_config(
     input_dim: int = 256,
@@ -256,10 +271,8 @@ def prepare_training_batch(
     samples: Tuple[TrainingSample, ...],
 ) -> TrainingBatch:
     """Prepare training batch."""
-    batch_hash = _hash_content(
-        "|".join(s.sample_id for s in samples)
-    )
-    
+    batch_hash = _hash_content("|".join(s.sample_id for s in samples))
+
     return TrainingBatch(
         batch_id=_generate_id("BTH"),
         samples=samples,
@@ -277,13 +290,13 @@ def train_single_epoch(
 ) -> EpochMetrics:
     """
     Train one epoch (REAL gradient descent).
-    
+
     This performs actual backpropagation.
     """
     # Guard check
     if can_train_without_idle()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: Cannot train outside IDLE mode")
-    
+
     if not PYTORCH_AVAILABLE:
         # Fallback mock when PyTorch unavailable
         return EpochMetrics(
@@ -295,15 +308,16 @@ def train_single_epoch(
             learning_rate=0.001,
             time_seconds=0.1,
         )
-    
+
     import time
+
     start_time = time.time()
-    
+
     model.train()
     total_loss = 0.0
     correct = 0
     total = 0
-    
+
     # Convert samples to tensors
     features = torch.tensor(
         [list(s.features) for s in train_data],
@@ -315,30 +329,30 @@ def train_single_epoch(
         dtype=torch.long,
         device=device,
     )
-    
+
     # Forward pass
     optimizer.zero_grad()
     outputs = model(features)
     loss = criterion(outputs, labels)
-    
+
     # Backward pass
     loss.backward()
     optimizer.step()
-    
+
     total_loss = loss.item()
     _, predicted = torch.max(outputs.data, 1)
     total = labels.size(0)
     correct = (predicted == labels).sum().item()
-    
+
     elapsed = time.time() - start_time
-    
+
     return EpochMetrics(
         epoch=epoch,
         train_loss=total_loss,
         train_accuracy=correct / total if total > 0 else 0.0,
         val_loss=total_loss * 1.1,  # Proxy
         val_accuracy=(correct / total) * 0.95 if total > 0 else 0.0,
-        learning_rate=optimizer.param_groups[0]['lr'],
+        learning_rate=optimizer.param_groups[0]["lr"],
         time_seconds=elapsed,
     )
 
@@ -351,11 +365,11 @@ def train_full(
 ) -> Tuple[Any, Tuple[EpochMetrics, ...]]:
     """
     Full training run.
-    
+
     Returns trained model and metrics history.
     """
     device = get_torch_device()
-    
+
     if not PYTORCH_AVAILABLE or device is None:
         # Return mock metrics when PyTorch unavailable
         metrics = []
@@ -373,20 +387,20 @@ def train_full(
             if m.train_accuracy >= early_stop_accuracy:
                 break
         return None, tuple(metrics)
-    
+
     # Set deterministic seed
     torch.manual_seed(config.seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed(config.seed)
-    
+
     # Create model
     model = BugClassifier(config)
     model = model.to(device)
-    
+
     # Optimizer and loss
     optimizer = optim.Adam(model.parameters(), lr=config.learning_rate)
     criterion = nn.CrossEntropyLoss()
-    
+
     # Training loop
     metrics = []
     for epoch in range(1, config.epochs + 1):
@@ -394,11 +408,11 @@ def train_full(
             model, optimizer, criterion, train_data, device, epoch
         )
         metrics.append(epoch_metrics)
-        
+
         # Early stopping
         if epoch_metrics.train_accuracy >= early_stop_accuracy:
             break
-    
+
     return model, tuple(metrics)
 
 
@@ -410,12 +424,15 @@ def save_model_checkpoint(
 ) -> ModelCheckpoint:
     """Save model checkpoint to disk."""
     if PYTORCH_AVAILABLE and model is not None:
-        torch.save({
-            'epoch': metrics.epoch,
-            'model_state_dict': model.state_dict(),
-            'accuracy': metrics.train_accuracy,
-        }, path)
-    
+        torch.save(
+            {
+                "epoch": metrics.epoch,
+                "model_state_dict": model.state_dict(),
+                "accuracy": metrics.train_accuracy,
+            },
+            path,
+        )
+
     return ModelCheckpoint(
         checkpoint_id=_generate_id("CKPT"),
         epoch=metrics.epoch,
@@ -442,20 +459,20 @@ def load_model_checkpoint(
             created_at=_now_iso(),
             path=path,
         )
-    
+
     device = get_torch_device()
     model = BugClassifier(config)
-    
+
     checkpoint = torch.load(path, map_location=device)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    model.load_state_dict(checkpoint["model_state_dict"])
     model = model.to(device)
     model.eval()
-    
+
     return model, ModelCheckpoint(
         checkpoint_id=_generate_id("CKPT"),
-        epoch=checkpoint['epoch'],
-        train_accuracy=checkpoint['accuracy'],
-        val_accuracy=checkpoint['accuracy'] * 0.95,
+        epoch=checkpoint["epoch"],
+        train_accuracy=checkpoint["accuracy"],
+        val_accuracy=checkpoint["accuracy"] * 0.95,
         model_hash=_hash_content(f"{config.seed}:{checkpoint['epoch']}"),
         created_at=_now_iso(),
         path=path,
@@ -466,6 +483,7 @@ def load_model_checkpoint(
 # INFERENCE FUNCTIONS (REAL)
 # =============================================================================
 
+
 def infer_single(
     model: Any,
     sample: TrainingSample,
@@ -474,7 +492,7 @@ def infer_single(
     # Guard check
     if can_infer_without_model()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: Cannot infer without trained model")
-    
+
     if not PYTORCH_AVAILABLE or model is None:
         # Mock inference
         pred = hash(sample.sample_id) % 2
@@ -486,13 +504,14 @@ def infer_single(
             probabilities=(1 - conf, conf) if pred == 1 else (conf, 1 - conf),
             inference_time_ms=0.1,
         )
-    
+
     import time
+
     start = time.time()
-    
+
     device = get_torch_device()
     model.eval()
-    
+
     with torch.no_grad():
         features = torch.tensor(
             [list(sample.features)],
@@ -502,9 +521,9 @@ def infer_single(
         outputs = model(features)
         probs = torch.softmax(outputs, dim=1)
         confidence, predicted = torch.max(probs, 1)
-    
+
     elapsed = (time.time() - start) * 1000
-    
+
     return InferenceResult(
         result_id=_generate_id("INF"),
         prediction=predicted.item(),
@@ -526,10 +545,11 @@ def infer_batch(
 # GUARDS (ALL RETURN FALSE)
 # =============================================================================
 
+
 def can_train_without_idle() -> Tuple[bool, str]:
     """
     Check if training can run outside IDLE mode.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "Training only allowed in IDLE mode"
@@ -538,7 +558,7 @@ def can_train_without_idle() -> Tuple[bool, str]:
 def can_infer_without_model() -> Tuple[bool, str]:
     """
     Check if inference can run without model.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "Inference requires trained model"
@@ -547,7 +567,7 @@ def can_infer_without_model() -> Tuple[bool, str]:
 def can_override_gpu_errors() -> Tuple[bool, str]:
     """
     Check if GPU errors can be silently ignored.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "GPU errors must be explicit - no silent fallback"
@@ -556,7 +576,7 @@ def can_override_gpu_errors() -> Tuple[bool, str]:
 def can_training_modify_governance() -> Tuple[bool, str]:
     """
     Check if training can modify governance.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "Training cannot modify governance"
@@ -565,7 +585,7 @@ def can_training_modify_governance() -> Tuple[bool, str]:
 def can_training_execute_code() -> Tuple[bool, str]:
     """
     Check if training can execute arbitrary code.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "Training cannot execute code"
@@ -574,7 +594,7 @@ def can_training_execute_code() -> Tuple[bool, str]:
 def can_inference_approve_bugs() -> Tuple[bool, str]:
     """
     Check if inference can approve bugs.
-    
+
     ALWAYS returns (False, ...).
     """
     return False, "Inference is advisory only - cannot approve bugs"

@@ -4,3 +4,5 @@
 {"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:42:44.820507"}
 {"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:43:15.413143"}
 {"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-02-07T01:49:38.306132"}
+{"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-03-07T15:21:03.891123"}
+{"event": "throttle", "reasons": ["Latency 150.0ms > 120.0ms"], "timestamp": "2026-03-16T01:50:08.687627"}

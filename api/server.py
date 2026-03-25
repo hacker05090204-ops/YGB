@@ -760,53 +760,61 @@ async def submit_approval_decision(request: ApprovalDecisionRequest):
 
 @app.post("/api/targets/discover")
 async def discover_targets(request: TargetDiscoveryRequest):
-    """Discover potential bug bounty targets."""
-    # Mock target data based on G14
-    mock_targets = [
-        {
-            "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
-            "program_name": "Example Corp",
-            "source": "HACKERONE_PUBLIC",
-            "scope_summary": "*.example.com",
-            "payout_tier": "HIGH",
-            "report_density": "LOW",
-            "is_public": True,
-            "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat(),
-        },
-        {
-            "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
-            "program_name": "Test Inc",
-            "source": "BUGCROWD_PUBLIC",
-            "scope_summary": "api.test.io",
-            "payout_tier": "MEDIUM",
-            "report_density": "MEDIUM",
-            "is_public": True,
-            "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat(),
-        },
-        {
-            "candidate_id": f"TGT-{uuid.uuid4().hex[:16].upper()}",
-            "program_name": "Secure Ltd",
-            "source": "SECURITY_TXT",
-            "scope_summary": "security.secure.io",
-            "payout_tier": "HIGH",
-            "report_density": "LOW",
-            "is_public": True,
-            "requires_invite": False,
-            "discovered_at": datetime.now(UTC).isoformat(),
-        },
-    ]
+    """Discover potential bug bounty targets from verified database targets."""
+    now = datetime.now(UTC).isoformat()
+
+    # Load real targets from database
+    db_targets = (
+        await get_all_users(limit=1000) if False else await get_all_targets(limit=1000)
+    )
+
+    # Convert database targets to candidate format
+    candidates: List[Dict[str, Any]] = []
+    for target in db_targets:
+        platform = (target.get("platform") or "").upper()
+        source_map = {
+            "HACKERONE": "HACKERONE_PUBLIC",
+            "BUGCROWD": "BUGCROWD_PUBLIC",
+            "SECURITYTXT": "SECURITY_TXT",
+            "SELF": "SECURITY_TXT",
+        }
+        source = source_map.get(platform, "DISCOVERED")
+
+        is_public = platform in {"HACKERONE", "BUGCROWD", "SECURITYTXT", "SELF", ""}
+        status = (target.get("status") or "ACTIVE").upper()
+
+        candidates.append(
+            {
+                "candidate_id": f"TGT-{target.get('id', uuid.uuid4().hex[:16].upper())}",
+                "program_name": target.get("program_name") or "Unknown",
+                "source": source,
+                "scope_summary": target.get("scope") or target.get("link") or "",
+                "payout_tier": (target.get("payout_tier") or "MEDIUM").upper(),
+                "report_density": "MEDIUM",
+                "is_public": is_public,
+                "requires_invite": not is_public,
+                "status": status,
+                "discovered_at": target.get("created_at") or now,
+            }
+        )
 
     # Filter based on request
-    filtered = [t for t in mock_targets if t["is_public"] or not request.public_only]
+    if request.public_only:
+        candidates = [c for c in candidates if c["is_public"]]
+
+    # Sort by recency
+    candidates.sort(key=lambda c: c.get("discovered_at") or "", reverse=True)
+
+    total_found = len(candidates)
+    max_results = request.max_results or 20
+    filtered = candidates[:max_results]
 
     return {
         "result_id": f"DIS-{uuid.uuid4().hex[:16].upper()}",
         "candidates": filtered,
-        "total_found": len(mock_targets),
-        "filtered_count": len(mock_targets) - len(filtered),
-        "timestamp": datetime.now(UTC).isoformat(),
+        "total_found": total_found,
+        "filtered_count": total_found - len(filtered),
+        "timestamp": now,
     }
 
 

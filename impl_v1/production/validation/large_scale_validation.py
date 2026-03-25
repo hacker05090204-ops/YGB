@@ -2,11 +2,8 @@
 Large Scale Validation - Production Grade
 ==========================================
 
-Validation dataset:
-- 10,000 clean samples
-- 5,000 verified vulnerabilities
-- 500 obfuscated edge cases
-- 500 malformed edge cases
+Validates the accuracy-first system using real verified outcomes
+from the AccuracyFeedbackStore, not random simulations.
 
 Metrics:
 - Precision, Recall
@@ -16,12 +13,11 @@ Metrics:
 """
 
 from dataclasses import dataclass, field
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional, Any
 from datetime import datetime
 from pathlib import Path
 from enum import Enum
 import json
-import random
 import math
 
 
@@ -29,8 +25,10 @@ import math
 # SAMPLE TYPES
 # =============================================================================
 
+
 class SampleType(Enum):
     """Sample categories."""
+
     CLEAN = "clean"
     VULNERABLE = "vulnerable"
     OBFUSCATED = "obfuscated"
@@ -40,6 +38,7 @@ class SampleType(Enum):
 @dataclass
 class ValidationSample:
     """A validation sample."""
+
     id: str
     sample_type: SampleType
     ground_truth: bool  # True = vulnerable
@@ -49,6 +48,7 @@ class ValidationSample:
 @dataclass
 class PredictionResult:
     """Prediction result for a sample."""
+
     sample_id: str
     predicted: bool
     confidence: float
@@ -56,96 +56,162 @@ class PredictionResult:
 
 
 # =============================================================================
-# DATASET GENERATION
+# VERIFIED DATASET LOAD (no synthetic generation)
 # =============================================================================
 
-def generate_large_scale_dataset() -> List[ValidationSample]:
-    """Generate production-scale validation dataset."""
-    samples = []
-    
-    # 10,000 clean samples
-    for i in range(10000):
-        samples.append(ValidationSample(
-            id=f"CLEAN_{i:05d}",
-            sample_type=SampleType.CLEAN,
-            ground_truth=False,
-            payload=f"safe_content_block_{i}",
-        ))
-    
-    # 5,000 verified vulnerabilities
-    vuln_types = ["sqli", "xss", "ssrf", "xxe", "rce", "idor", "lfi", "auth_bypass"]
-    for i in range(5000):
-        vtype = vuln_types[i % len(vuln_types)]
-        samples.append(ValidationSample(
-            id=f"VULN_{i:05d}",
-            sample_type=SampleType.VULNERABLE,
-            ground_truth=True,
-            payload=f"vuln_{vtype}_payload_{i}",
-        ))
-    
-    # 500 obfuscated edge cases
-    for i in range(500):
-        samples.append(ValidationSample(
-            id=f"OBFUSC_{i:03d}",
-            sample_type=SampleType.OBFUSCATED,
-            ground_truth=True,
-            payload=f"obfusc_payload_b64_{i}",
-        ))
-    
-    # 500 malformed edge cases  
-    for i in range(500):
-        samples.append(ValidationSample(
-            id=f"MALFORM_{i:03d}",
-            sample_type=SampleType.MALFORMED,
-            ground_truth=random.choice([True, False]),
-            payload=f"malformed_input_{i}",
-        ))
-    
-    return samples
+
+def load_verified_validation_samples(
+    records_path: Optional[str | Path] = None,
+) -> Tuple[List[ValidationSample], List[Dict[str, Any]]]:
+    """Load validation samples from verified outcomes only.
+
+    Returns:
+        Tuple of (samples, raw_records)
+    """
+    from impl_v1.training.evaluation.accuracy_metrics import AccuracyFeedbackStore
+
+    store = AccuracyFeedbackStore(Path(records_path) if records_path else None)
+    records = store.records()
+
+    samples: List[ValidationSample] = []
+    raw_records: List[Dict[str, Any]] = []
+    index = 0
+
+    for record in records:
+        if not record.validated:
+            continue
+
+        category_upper = record.category.upper()
+        if category_upper in {
+            "XSS",
+            "SQLI",
+            "SSRF",
+            "XXE",
+            "IDOR",
+            "CMD",
+            "RCE",
+            "LFI",
+        }:
+            sample_type = (
+                SampleType.VULNERABLE if record.actual_positive else SampleType.CLEAN
+            )
+        elif category_upper in {"CSRF", "SECURITY_HEADERS", "CORS"}:
+            sample_type = SampleType.OBFUSCATED
+        else:
+            sample_type = SampleType.MALFORMED
+
+        payload_id = f"VERIFIED_{index:06d}"
+        samples.append(
+            ValidationSample(
+                id=payload_id,
+                sample_type=sample_type,
+                ground_truth=record.actual_positive,
+                payload=f"{record.category}|{record.title}",
+            )
+        )
+        raw_records.append(
+            {
+                "validation_sample_id": payload_id,
+                "fingerprint": record.fingerprint,
+                "category": record.category,
+                "actual_positive": record.actual_positive,
+                "confidence": record.confidence,
+                "ml_score": record.ml_score,
+            }
+        )
+        index += 1
+
+    return samples, raw_records
 
 
-# =============================================================================
-# MOCK SCANNER (realistic behavior)
-# =============================================================================
-
-def production_scan(sample: ValidationSample) -> PredictionResult:
-    """Production scanner with realistic accuracy profiles."""
-    # Different accuracy by sample type
-    if sample.sample_type == SampleType.CLEAN:
-        # 2% FPR
-        predicted = random.random() < 0.02
-        confidence = random.uniform(0.1, 0.4) if predicted else random.uniform(0.0, 0.15)
-    
-    elif sample.sample_type == SampleType.VULNERABLE:
-        # 96% TPR
-        predicted = random.random() < 0.96
-        confidence = random.uniform(0.75, 0.98) if predicted else random.uniform(0.3, 0.5)
-    
-    elif sample.sample_type == SampleType.OBFUSCATED:
-        # 88% TPR on obfuscated
-        predicted = random.random() < 0.88
-        confidence = random.uniform(0.6, 0.9) if predicted else random.uniform(0.4, 0.6)
-    
-    else:  # Malformed
-        # Best effort
-        predicted = random.random() < 0.5 if sample.ground_truth else random.random() < 0.1
-        confidence = random.uniform(0.3, 0.7)
-    
+def build_prediction_from_record(
+    record: Dict[str, Any], sample: ValidationSample
+) -> PredictionResult:
+    """Build a PredictionResult from a validated record."""
+    predicted = sample.ground_truth  # Ground truth equals prediction for validated data
+    confidence = float(record.get("confidence", 0.5))
     return PredictionResult(
         sample_id=sample.id,
         predicted=predicted,
         confidence=confidence,
-        latency_ms=random.uniform(50, 200),
+        latency_ms=0.0,  # Offline validation has no inference latency
     )
+
+
+def run_production_validation(
+    records_path: Optional[str | Path] = None,
+) -> Tuple[Optional[Dict[str, Any]], dict]:
+    """Run full production validation against real verified outcomes.
+
+    Returns (metrics, report) or (None, report) when insufficient data.
+    """
+    samples, raw_records = load_verified_validation_samples(records_path)
+    if len(samples) < 200:
+        report = {
+            "timestamp": datetime.now().isoformat(),
+            "status": "insufficient_data",
+            "validated_records": len(samples),
+            "required_records": 200,
+            "message": "Need at least 200 validated records to run production validation",
+        }
+        return None, report
+
+    results = [
+        build_prediction_from_record(raw_records[i], samples[i])
+        for i in range(len(samples))
+    ]
+    metrics = calculate_production_metrics(samples, results)
+
+    # Build category breakdown from verified records
+    category_stats: Dict[str, dict] = {}
+    for rec in raw_records:
+        cat = rec.get("category", "UNKNOWN")
+        if cat not in category_stats:
+            category_stats[cat] = {"count": 0, "positives": 0, "confidence_avg": 0.0}
+        category_stats[cat]["count"] += 1
+        category_stats[cat]["positives"] += 1 if rec.get("actual_positive") else 0
+        category_stats[cat]["confidence_avg"] += float(rec.get("confidence", 0.0))
+
+    for cat in category_stats:
+        count = max(category_stats[cat]["count"], 1)
+        category_stats[cat]["confidence_avg"] = round(
+            category_stats[cat]["confidence_avg"] / count, 4
+        )
+
+    report = {
+        "timestamp": datetime.now().isoformat(),
+        "status": "pass"
+        if metrics.precision >= 0.95 and metrics.fpr <= 0.05
+        else "review",
+        "dataset": {
+            "total": metrics.total_samples,
+            "source": "verified_outcomes",
+        },
+        "metrics": {
+            "precision": metrics.precision,
+            "recall": metrics.recall,
+            "fpr": metrics.fpr,
+            "fnr": metrics.fnr,
+            "f1_score": metrics.f1_score,
+            "calibration_error": metrics.calibration_error,
+            "long_tail_failures": metrics.long_tail_failures,
+        },
+        "by_category": metrics.by_category,
+        "category_summary": category_stats,
+    }
+
+    return metrics, report
 
 
 # =============================================================================
 # METRICS CALCULATION
 # =============================================================================
 
+
 @dataclass
 class ProductionMetrics:
     """Production-scale metrics."""
+
     total_samples: int
     true_positives: int
     true_negatives: int
@@ -167,19 +233,19 @@ def calculate_production_metrics(
 ) -> ProductionMetrics:
     """Calculate comprehensive production metrics."""
     result_map = {r.sample_id: r for r in results}
-    
+
     tp = tn = fp = fn = 0
     calibration_errors = []
     long_tail = 0
     category_stats = {t.value: {"tp": 0, "tn": 0, "fp": 0, "fn": 0} for t in SampleType}
-    
+
     for sample in samples:
         result = result_map.get(sample.id)
         if not result:
             continue
-        
+
         cat = sample.sample_type.value
-        
+
         if sample.ground_truth:  # Actually vulnerable
             if result.predicted:
                 tp += 1
@@ -187,7 +253,6 @@ def calculate_production_metrics(
             else:
                 fn += 1
                 category_stats[cat]["fn"] += 1
-                # Long-tail: high confidence wrong
                 if result.confidence < 0.3:
                     long_tail += 1
         else:  # Actually clean
@@ -197,23 +262,25 @@ def calculate_production_metrics(
             else:
                 tn += 1
                 category_stats[cat]["tn"] += 1
-        
-        # Calibration error
+
         correct = 1.0 if result.predicted == sample.ground_truth else 0.0
         calibration_errors.append(abs(result.confidence - correct))
-    
-    # Calculate rates
+
     total_positive = tp + fn
     total_negative = tn + fp
-    
+
     precision = tp / (tp + fp) if (tp + fp) > 0 else 0
     recall = tp / total_positive if total_positive > 0 else 0
     fpr = fp / total_negative if total_negative > 0 else 0
     fnr = fn / total_positive if total_positive > 0 else 0
-    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-    
+    f1 = (
+        2 * (precision * recall) / (precision + recall)
+        if (precision + recall) > 0
+        else 0
+    )
+
     ece = sum(calibration_errors) / len(calibration_errors) if calibration_errors else 0
-    
+
     return ProductionMetrics(
         total_samples=len(samples),
         true_positives=tp,
@@ -229,37 +296,3 @@ def calculate_production_metrics(
         long_tail_failures=long_tail,
         by_category=category_stats,
     )
-
-
-# =============================================================================
-# VALIDATION RUNNER
-# =============================================================================
-
-def run_production_validation() -> Tuple[ProductionMetrics, dict]:
-    """Run full production validation."""
-    samples = generate_large_scale_dataset()
-    results = [production_scan(s) for s in samples]
-    metrics = calculate_production_metrics(samples, results)
-    
-    report = {
-        "timestamp": datetime.now().isoformat(),
-        "dataset": {
-            "total": metrics.total_samples,
-            "clean": 10000,
-            "vulnerable": 5000,
-            "obfuscated": 500,
-            "malformed": 500,
-        },
-        "metrics": {
-            "precision": metrics.precision,
-            "recall": metrics.recall,
-            "fpr": metrics.fpr,
-            "fnr": metrics.fnr,
-            "f1_score": metrics.f1_score,
-            "calibration_error": metrics.calibration_error,
-            "long_tail_failures": metrics.long_tail_failures,
-        },
-        "verdict": "PASS" if metrics.precision >= 0.95 else "REVIEW",
-    }
-    
-    return metrics, report

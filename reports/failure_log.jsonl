@@ -10,3 +10,5 @@
 {"failure_id": "FAIL_20260207014315", "failure_type": "calibration_break", "timestamp": "2026-02-07T01:43:15.339566", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}
 {"failure_id": "FAIL_20260207014938", "failure_type": "drift", "timestamp": "2026-02-07T01:49:38.223344", "details": {"drift_type": "accuracy", "value": 0.1}, "auto_mode_disabled": true}
 {"failure_id": "FAIL_20260207014938", "failure_type": "calibration_break", "timestamp": "2026-02-07T01:49:38.225935", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}
+{"failure_id": "FAIL_20260307152103", "failure_type": "drift", "timestamp": "2026-03-07T15:21:03.865972", "details": {"drift_type": "accuracy", "value": 0.1}, "auto_mode_disabled": true}
+{"failure_id": "FAIL_20260307152103", "failure_type": "calibration_break", "timestamp": "2026-03-07T15:21:03.868648", "details": {"ece": 0.1, "threshold": 0.02}, "auto_mode_disabled": true}

@@ -11,5 +11,8 @@ python-dotenv>=1.0.0
 # HTTP analysis
 httpx>=0.25.0
 
+# SQLite for optimized database (replaces JSON-file storage)
+aiosqlite>=0.19.0
+
 # Optional: Native browser automation (Edge/Chrome)
 # selenium>=4.15.0

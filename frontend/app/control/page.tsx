@@ -1,8 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { Activity, Shield, AlertTriangle } from "lucide-react"
+import { API_BASE } from "@/lib/api-base"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import {
@@ -19,9 +20,6 @@ import { BrowserAssistant, type AssistantExplanation } from "@/components/browse
 import { VoiceControls, type VoiceIntent } from "@/components/voice-controls"
 import { TargetDiscoveryPanel, type TargetCandidate } from "@/components/target-discovery-panel"
 import { TrainingProgress } from "@/components/training-progress"
-
-// API Base URL
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 export default function ControlPage() {
     // Dashboard State
@@ -54,6 +52,11 @@ export default function ControlPage() {
     // Voice (from G12)
     const [lastIntent, setLastIntent] = useState<VoiceIntent | null>(null)
     const [voiceProcessing, setVoiceProcessing] = useState(false)
+    const targetsRef = useRef<TargetCandidate[]>([])
+
+    useEffect(() => {
+        targetsRef.current = targets
+    }, [targets])
 
     // Initialize dashboard
     useEffect(() => {
@@ -244,28 +247,34 @@ export default function ControlPage() {
         setSelectedTargets(prev => {
             const next = new Set(prev)
             next.has(id) ? next.delete(id) : next.add(id)
+
+            if (prev.size === 0 && next.size > 0 && !pendingRequest) {
+                const target = targetsRef.current.find(t => t.candidate_id === id)
+                if (target) {
+                    setPendingRequest({
+                        request_id: `APR-${Date.now()}`,
+                        target: target.scope_summary,
+                        scope: target.scope_summary,
+                        proposed_mode: "READ_ONLY",
+                        risk_level: (
+                            target.payout_tier === "HIGH"
+                                ? "HIGH"
+                                : target.payout_tier === "MEDIUM"
+                                    ? "MEDIUM"
+                                    : "LOW"
+                        ) as RiskLevelType,
+                        risk_summary: `Analysis of ${target.program_name} (${target.scope_summary})`,
+                        status: "PENDING",
+                        created_at: new Date().toISOString(),
+                        expires_at: new Date(Date.now() + 3600000).toISOString()
+                    })
+                    setExecutionState("AWAIT_HUMAN")
+                }
+            }
+
             return next
         })
-
-        // Create approval request when first target selected
-        if (selectedTargets.size === 0 && !pendingRequest) {
-            const target = targets.find(t => t.candidate_id === id)
-            if (target) {
-                setPendingRequest({
-                    request_id: `APR-${Date.now()}`,
-                    target: target.scope_summary,
-                    scope: target.scope_summary,
-                    proposed_mode: "READ_ONLY",
-                    risk_level: (target.payout_tier === "HIGH" ? "LOW" : "MEDIUM") as RiskLevelType,
-                    risk_summary: `Analysis of ${target.program_name} (${target.scope_summary})`,
-                    status: "PENDING",
-                    created_at: new Date().toISOString(),
-                    expires_at: new Date(Date.now() + 3600000).toISOString()
-                })
-                setExecutionState("AWAIT_HUMAN")
-            }
-        }
-    }, [targets, selectedTargets, pendingRequest])
+    }, [pendingRequest])
 
     // Voice Input Handler
     const handleVoiceInput = useCallback(async (text: string) => {

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
 import {
   Users,
   Target,
@@ -23,8 +23,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { LiquidMetalButton } from "@/components/ui/liquid-metal"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
+import { API_BASE } from "@/lib/api-base"
 
 interface User {
   id: string
@@ -75,6 +74,7 @@ export default function Dashboard() {
   const [apiStatus, setApiStatus] = useState<"online" | "offline" | "loading">("loading")
   const [activeTab, setActiveTab] = useState<"overview" | "users" | "bounties" | "targets">("overview")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const isFetchingRef = useRef(false)
 
   // Form states
   const [showAddUser, setShowAddUser] = useState(false)
@@ -85,57 +85,39 @@ export default function Dashboard() {
   const [newTargetScope, setNewTargetScope] = useState("")
   const [newTargetLink, setNewTargetLink] = useState("")
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (isFetchingRef.current) return
+    isFetchingRef.current = true
     try {
       setApiStatus("loading")
+      const [usersRes, bountiesRes, targetsRes, statsRes, activityRes] = await Promise.all([
+        fetch(`${API_BASE}/api/db/users?limit=200`, { cache: "no-store" }),
+        fetch(`${API_BASE}/api/db/bounties?limit=200`, { cache: "no-store" }),
+        fetch(`${API_BASE}/api/db/targets?limit=200`, { cache: "no-store" }),
+        fetch(`${API_BASE}/api/db/admin/stats`, { cache: "no-store" }),
+        fetch(`${API_BASE}/api/db/activity?limit=20`, { cache: "no-store" }),
+      ])
 
-      // Fetch users
-      const usersRes = await fetch(`${API_BASE}/api/db/users`)
-      if (usersRes.ok) {
-        const data = await usersRes.json()
-        setUsers(data.users || [])
-      }
-
-      // Fetch bounties
-      const bountiesRes = await fetch(`${API_BASE}/api/db/bounties`)
-      if (bountiesRes.ok) {
-        const data = await bountiesRes.json()
-        setBounties(data.bounties || [])
-      }
-
-      // Fetch targets
-      const targetsRes = await fetch(`${API_BASE}/api/db/targets`)
-      if (targetsRes.ok) {
-        const data = await targetsRes.json()
-        setTargets(data.targets || [])
-      }
-
-      // Fetch admin stats
-      const statsRes = await fetch(`${API_BASE}/api/db/admin/stats`)
-      if (statsRes.ok) {
-        const data = await statsRes.json()
-        setAdminStats(data.stats)
-      }
-
-      // Fetch activity
-      const activityRes = await fetch(`${API_BASE}/api/db/activity?limit=20`)
-      if (activityRes.ok) {
-        const data = await activityRes.json()
-        setActivities(data.activities || [])
-      }
+      if (usersRes.ok) setUsers((await usersRes.json()).users || [])
+      if (bountiesRes.ok) setBounties((await bountiesRes.json()).bounties || [])
+      if (targetsRes.ok) setTargets((await targetsRes.json()).targets || [])
+      if (statsRes.ok) setAdminStats((await statsRes.json()).stats)
+      if (activityRes.ok) setActivities((await activityRes.json()).activities || [])
 
       setApiStatus("online")
     } catch (e) {
       console.error("Failed to fetch data:", e)
       setApiStatus("offline")
+    } finally {
+      isFetchingRef.current = false
     }
-  }
+  }, [])
 
   useEffect(() => {
-    fetchData()
+    void fetchData()
     const interval = setInterval(fetchData, 30000) // Refresh every 30 seconds
     return () => clearInterval(interval)
-  }, [])
+  }, [fetchData])
 
   const addUser = async () => {
     if (!newUserName.trim()) return
@@ -200,15 +182,18 @@ export default function Dashboard() {
     }
   }
 
-  const chartData = [
-    { name: 'Mon', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 2 },
-    { name: 'Tue', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 3 },
-    { name: 'Wed', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 4 },
-    { name: 'Thu', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 2 },
-    { name: 'Fri', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 5 },
-    { name: 'Sat', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 3 },
-    { name: 'Sun', bounties: bounties.length > 0 ? Math.floor(Math.random() * 5) + 1 : 4 },
-  ]
+  const chartData = useMemo(() => {
+    const labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    const counts = new Map(labels.map((label) => [label, 0]))
+
+    for (const bounty of bounties) {
+      const date = new Date(bounty.submitted_at)
+      const label = labels[(date.getDay() + 6) % 7]
+      counts.set(label, (counts.get(label) || 0) + 1)
+    }
+
+    return labels.map((label) => ({ name: label, bounties: counts.get(label) || 0 }))
+  }, [bounties])
 
   return (
     <SidebarProvider>

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { cn } from "@/lib/utils"
+import { API_BASE } from "@/lib/api-base"
+import { useLiveData } from "@/components/providers/live-data-provider"
 import {
     Activity,
     Zap,
@@ -16,8 +18,6 @@ import {
     Square,
     BarChart3
 } from "lucide-react"
-
-const API_BASE = process.env.NEXT_PUBLIC_YGB_API_URL || "http://localhost:8000"
 
 interface G38Status {
     available: boolean
@@ -76,7 +76,7 @@ export function TrainingProgress({
     className,
     refreshInterval = 3000
 }: TrainingProgressProps) {
-    const [status, setStatus] = useState<G38Status | null>(null)
+    const { g38Status, refresh } = useLiveData()
     const [events, setEvents] = useState<TrainingEvent[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -84,20 +84,9 @@ export function TrainingProgress({
     const [isStarting, setIsStarting] = useState(false)
     const [isStopping, setIsStopping] = useState(false)
 
-    const fetchStatus = useCallback(async () => {
+    const fetchEvents = useCallback(async () => {
         try {
-            const [statusRes, eventsRes] = await Promise.all([
-                fetch(`${API_BASE}/api/g38/status`),
-                fetch(`${API_BASE}/api/g38/events?limit=5`)
-            ])
-
-            if (statusRes.ok) {
-                const data = await statusRes.json()
-                setStatus(data)
-                setError(null)
-            } else {
-                setError("Failed to fetch status")
-            }
+            const eventsRes = await fetch(`${API_BASE}/api/g38/events?limit=5`, { cache: "no-store" })
 
             if (eventsRes.ok) {
                 const data = await eventsRes.json()
@@ -117,14 +106,15 @@ export function TrainingProgress({
                 method: 'POST'
             })
             if (res.ok) {
-                fetchStatus()
+                await refresh()
+                fetchEvents()
             }
         } catch (e) {
             console.error('Failed to start training', e)
         } finally {
             setIsStarting(false)
         }
-    }, [selectedEpochs, fetchStatus])
+    }, [selectedEpochs, fetchEvents, refresh])
 
     const stopTraining = useCallback(async () => {
         setIsStopping(true)
@@ -133,20 +123,23 @@ export function TrainingProgress({
                 method: 'POST'
             })
             if (res.ok) {
-                fetchStatus()
+                await refresh()
+                fetchEvents()
             }
         } catch (e) {
             console.error('Failed to stop training', e)
         } finally {
             setIsStopping(false)
         }
-    }, [fetchStatus])
+    }, [fetchEvents, refresh])
 
     useEffect(() => {
-        fetchStatus()
-        const interval = setInterval(fetchStatus, refreshInterval)
+        fetchEvents()
+        const interval = setInterval(fetchEvents, refreshInterval)
         return () => clearInterval(interval)
-    }, [fetchStatus, refreshInterval])
+    }, [fetchEvents, refreshInterval])
+
+    const status = (g38Status as G38Status | null) ?? null
 
     const getStateColor = (state: string) => {
         switch (state?.toUpperCase()) {

@@ -1,0 +1,166 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Next.js (App Router)
+  - Tailwind CSS + custom design system
+  - Radix UI, Recharts, TanStack Table, GSAP, Lucide Icons
+routes:
+  - path: /
+    file: frontend/app/page.tsx
+    auth_required: false
+    description: Landing view that streams phase execution updates and G38 auto-training status from the backend, with rich storytelling UI.
+  - path: /dashboard
+    file: frontend/app/dashboard/page.tsx
+    auth_required: false
+    description: Admin dashboard showing users, targets, bounties, recent activity, and charts powered by the YGB API.
+  - path: /training
+    file: frontend/app/training/page.tsx
+    auth_required: false
+    description: G38 training telemetry view showing auto-training status, events, and guard verification information.
+  - path: /runner
+    file: frontend/app/runner/page.tsx
+    auth_required: false
+    description: Phase and hunter runner that starts workflows against a target URL and streams WebSocket updates from the API.
+  - path: /control
+    file: frontend/app/control/page.tsx
+    auth_required: false
+    description: Autonomy control panel for G38, with execution state, human approvals, target discovery, and browser assistant / voice controls.
+  - path: /security
+    file: frontend/app/security/page.tsx
+    auth_required: false
+    description: Static security status overview with cards describing guardrails, audit trails, and readiness signals.
+  - path: /bug-reports
+    file: frontend/app/bug-reports/page.tsx
+    auth_required: false
+    description: Static bug report gallery showing example findings, severities, and bounty payouts.
+  - path: /earnings
+    file: frontend/app/earnings/page.tsx
+    auth_required: false
+    description: Earnings analytics view with charts and payout history for example bounty programs.
+  - path: /projects
+    file: frontend/app/projects/page.tsx
+    auth_required: false
+    description: Project roadmap view with animated cards for ongoing governance and security initiatives.
+features:
+  - name: Governance Phase Runner
+    description: Run governance phases and HUMANOID_HUNTER hunter modules via the YGB API, with live terminal-style output and report links.
+    files:
+      - frontend/app/page.tsx
+      - frontend/app/runner/page.tsx
+      - frontend/lib/ygb-api.ts
+    entry_route: /runner
+    user_interactions:
+      - Enter or paste a target URL to scan.
+      - Select execution mode (READ_ONLY or REAL) when supported.
+      - Start or stop a workflow run from the UI.
+      - Scroll through live phase and browser action logs.
+      - Open generated reports in a new browser tab.
+    api_calls:
+      - method: GET
+        endpoint: /api/health
+      - method: GET
+        endpoint: /api/phases
+      - method: GET
+        endpoint: /api/hunter-modules
+      - method: POST
+        endpoint: /api/run-phase
+      - method: POST
+        endpoint: /api/run-hunter
+      - method: GET
+        endpoint: /api/reports/{report_file}
+    auth_required: false
+  - name: Admin Dashboard and Bounty Management
+    description: Visualize users, targets, bounties, sessions, and recent activity from the governance backend.
+    files:
+      - frontend/app/dashboard/page.tsx
+      - frontend/components/training-progress.tsx
+    entry_route: /dashboard
+    user_interactions:
+      - View summary cards for users, bounties, targets, and sessions.
+      - Inspect recent activity and select individual users.
+      - View training progress and guard status widgets.
+    api_calls:
+      - method: GET
+        endpoint: /api/admin/stats
+      - method: GET
+        endpoint: /api/bounties
+      - method: GET
+        endpoint: /api/targets
+      - method: GET
+        endpoint: /api/activity/recent
+    auth_required: false
+  - name: G38 Auto-Training Monitor
+    description: Monitor G38 auto-training state, events, GPU utilization, and guard verification from the UI.
+    files:
+      - frontend/app/page.tsx
+      - frontend/app/training/page.tsx
+    entry_route: /training
+    user_interactions:
+      - View current training state, progress, and epochs.
+      - Inspect recent training events and guard summaries.
+      - Navigate from the landing page to detailed training views.
+    api_calls:
+      - method: GET
+        endpoint: /api/g38/status
+      - method: GET
+        endpoint: /api/g38/events
+    auth_required: false
+  - name: Autonomy Control and Human-in-the-Loop
+    description: Control autonomy mode, approve or deny execution transitions, discover targets, and interact with the browser assistant and voice controls.
+    files:
+      - frontend/app/control/page.tsx
+      - frontend/components/approval-panel.tsx
+      - frontend/components/mode-selector.tsx
+      - frontend/components/browser-assistant.tsx
+      - frontend/components/voice-controls.tsx
+      - frontend/components/target-discovery-panel.tsx
+    entry_route: /control
+    user_interactions:
+      - Select autonomy mode for a session (MOCK, READ_ONLY, AUTONOMOUS_FIND, REAL).
+      - Review and approve or deny pending execution requests.
+      - Trigger target discovery and select candidate targets.
+      - Enable the browser assistant and voice controls, then issue natural language commands.
+    api_calls:
+      - method: POST
+        endpoint: /api/g38/dashboard
+      - method: POST
+        endpoint: /api/g38/transition
+      - method: POST
+        endpoint: /api/g38/approval
+      - method: POST
+        endpoint: /api/g38/autonomy/session
+      - method: GET
+        endpoint: /api/g38/targets
+    auth_required: false
+  - name: Security Status and Analytics
+    description: Present static and semi-static views of security posture, bug reports, earnings, and project progress.
+    files:
+      - frontend/app/security/page.tsx
+      - frontend/app/bug-reports/page.tsx
+      - frontend/app/earnings/page.tsx
+      - frontend/app/projects/page.tsx
+    entry_route: /security
+    user_interactions:
+      - Browse animated security status cards.
+      - Filter and inspect example bug reports and bounty payouts.
+      - Review example earnings distributions and project timelines.
+    api_calls: []
+    auth_required: false
+known_limitations:
+  - issue: Hardcoded NVD API key is checked into source control.
+    location: impl_v1/phase49/governors/g15_cve_api.py
+    impact: Leaking this key risks unauthorized use of the NVD API and may violate provider terms; the key should be rotated and moved to environment configuration.
+  - issue: Frontend npm dependencies include 3 known vulnerabilities after installation.
+    location: frontend/package.json and node_modules
+    impact: Vulnerable transitive dependencies could be exploitable; run `npm audit` and apply `npm audit fix` or targeted upgrades before production use.
+  - issue: ESLint reports 30 errors and 34 warnings across pages and components.
+    location: frontend/app and frontend/components
+    impact: Type-safety and React purity issues (e.g., extensive use of `any`, `Math.random` during render) may cause runtime bugs and reduce the reliability of static analysis.
+  - issue: Chart component injects CSS using dangerouslySetInnerHTML.
+    location: frontend/components/ui/chart.tsx
+    impact: Currently uses an internal config to generate CSS, but if config values ever become user-controlled this could allow CSS injection; keep config trusted or sanitize inputs.
+  - issue: Bounty workflow endpoint can start REAL browser automation workflows based on client-supplied mode.
+    location: api/server.py (/api/bounty/start and related WebSocket handlers)
+    impact: If the API is exposed without strong authentication and guardrails, remote callers could initiate autonomous browser workflows against arbitrary targets; restrict this endpoint to trusted operators and environments and enforce server-side checks on allowed modes.
+
