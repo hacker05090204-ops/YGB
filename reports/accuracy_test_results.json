@@ -1,0 +1,148 @@
+{
+  "timestamp": "2026-03-25T05:54:26.490233+00:00",
+  "summary": {
+    "total_cases": 14,
+    "correct_predictions": 13,
+    "accuracy": 0.9286,
+    "precision": 0.8333,
+    "recall": 1.0,
+    "false_positive_rate": 0.1111,
+    "false_negative_rate": 0.0,
+    "f1_score": 0.9091,
+    "duplicate_accuracy": 1.0,
+    "confusion_matrix": {
+      "true_positives": 5,
+      "true_negatives": 8,
+      "false_positives": 1,
+      "false_negatives": 0
+    }
+  },
+  "detailed_results": [
+    {
+      "case_id": "TP_001",
+      "case_type": "true_positive",
+      "actual_positive": true,
+      "expected_status": "CONFIRMED",
+      "predicted_status": "CONFIRMED",
+      "confidence": 0.97,
+      "correct": true
+    },
+    {
+      "case_id": "TP_002",
+      "case_type": "true_positive",
+      "actual_positive": true,
+      "expected_status": "CONFIRMED",
+      "predicted_status": "CONFIRMED",
+      "confidence": 0.97,
+      "correct": true
+    },
+    {
+      "case_id": "TP_003",
+      "case_type": "true_positive",
+      "actual_positive": true,
+      "expected_status": "CONFIRMED",
+      "predicted_status": "CONFIRMED",
+      "confidence": 0.97,
+      "correct": true
+    },
+    {
+      "case_id": "TP_004",
+      "case_type": "true_positive",
+      "actual_positive": true,
+      "expected_status": "CONFIRMED",
+      "predicted_status": "CONFIRMED",
+      "confidence": 0.97,
+      "correct": true
+    },
+    {
+      "case_id": "TN_001",
+      "case_type": "true_negative",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "REJECTED_FALSE_POSITIVE",
+      "confidence": 0.15,
+      "correct": true
+    },
+    {
+      "case_id": "TN_002",
+      "case_type": "true_negative",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "REJECTED_FALSE_POSITIVE",
+      "confidence": 0.0,
+      "correct": true
+    },
+    {
+      "case_id": "TN_003",
+      "case_type": "true_negative",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "REJECTED_FALSE_POSITIVE",
+      "confidence": 0.075,
+      "correct": true
+    },
+    {
+      "case_id": "DUP_001",
+      "case_type": "duplicate",
+      "actual_positive": false,
+      "expected_status": "DUPLICATE",
+      "predicted_status": "DUPLICATE",
+      "confidence": 0.2,
+      "correct": true
+    },
+    {
+      "case_id": "EDGE_001",
+      "case_type": "edge_case",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "CONFIRMED",
+      "confidence": 0.97,
+      "correct": false
+    },
+    {
+      "case_id": "EDGE_002",
+      "case_type": "edge_case",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "REJECTED_FALSE_POSITIVE",
+      "confidence": 0.0,
+      "correct": true
+    },
+    {
+      "case_id": "EDGE_003",
+      "case_type": "edge_case",
+      "actual_positive": true,
+      "expected_status": "CONFIRMED",
+      "predicted_status": "CONFIRMED",
+      "confidence": 0.97,
+      "correct": true
+    },
+    {
+      "case_id": "EDGE_004",
+      "case_type": "edge_case",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "REJECTED_FALSE_POSITIVE",
+      "confidence": 0.0,
+      "correct": true
+    },
+    {
+      "case_id": "AMB_001",
+      "case_type": "ambiguous",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "REJECTED_FALSE_POSITIVE",
+      "confidence": 0.15,
+      "correct": true
+    },
+    {
+      "case_id": "AMB_002",
+      "case_type": "ambiguous",
+      "actual_positive": false,
+      "expected_status": "REJECTED_FALSE_POSITIVE",
+      "predicted_status": "REJECTED_FALSE_POSITIVE",
+      "confidence": 0.15,
+      "correct": true
+    }
+  ]
+}
