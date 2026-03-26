@@ -30,7 +30,9 @@ import httpx
 from fastapi import Request
 from fastapi.responses import JSONResponse, Response
 
+from autonomous_runtime import AutonomousCoordinator
 from distributed_runtime import DistributedClusterCoordinator
+from impl_v1.training.data.autonomous_data_pipeline import AutonomousDataPipeline
 from impl_v1.training.evaluation.accuracy_metrics import (
     AccuracyFeedbackStore,
     EvaluationRecord,
@@ -82,6 +84,8 @@ class OrchestrationPlan:
     strategy: ExecutionStrategy
     created_at: str
     context_summary: dict[str, Any] = field(default_factory=dict)
+    expert_routes: list[dict[str, Any]] = field(default_factory=list)
+    reasoning_trace: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -733,12 +737,23 @@ class TelegramNotifier:
 class AccuracyEngine:
     """Confidence, duplicate, and advisory-ML verification engine."""
 
-    def __init__(self, feedback_store: Optional[AccuracyFeedbackStore] = None) -> None:
+    def __init__(
+        self,
+        feedback_store: Optional[AccuracyFeedbackStore] = None,
+        data_pipeline: Optional[AutonomousDataPipeline] = None,
+    ) -> None:
         self.feedback_store = feedback_store or AccuracyFeedbackStore()
+        pipeline_root = getattr(self.feedback_store, "records_path", None)
+        pipeline_base = (
+            pipeline_root.parent if isinstance(pipeline_root, Path) else None
+        )
+        self.data_pipeline = data_pipeline or AutonomousDataPipeline(pipeline_base)
         self._ml_available = False
         self._run_inference = None
         self._make_auto_mode_decision = None
         self._local_model_status_cls = None
+        self._auto_verify_finding = None
+        self._auto_verify_status_cls = None
         try:
             from impl_v1.phase49.governors.g38_self_trained_model import (  # type: ignore
                 LocalModelStatus,
@@ -752,6 +767,17 @@ class AccuracyEngine:
             self._ml_available = True
         except Exception:
             self._ml_available = False
+        try:
+            from impl_v1.phase49.governors.g36_auto_proof_verifier import (  # type: ignore
+                AutoVerifyStatus,
+                auto_verify_finding,
+            )
+
+            self._auto_verify_finding = auto_verify_finding
+            self._auto_verify_status_cls = AutoVerifyStatus
+        except Exception:
+            self._auto_verify_finding = None
+            self._auto_verify_status_cls = None
 
     def _build_fingerprint(self, category: str, title: str, url: str) -> str:
         raw = f"{category}|{title}|{url}".strip().lower()
@@ -760,6 +786,107 @@ class AccuracyEngine:
     def _category_threshold(self, category: str) -> float:
         recent_fpr = self.feedback_store.recent_false_positive_rate(category)
         return min(0.9, 0.58 + (recent_fpr * 0.4))
+
+    def _blind_verification_signals(
+        self, evidence: dict[str, Any]
+    ) -> tuple[bool, float, list[str]]:
+        notes: list[str] = []
+        confirmed = False
+        confidence = 0.0
+
+        baseline_latency = float(evidence.get("baseline_latency_ms") or 0.0)
+        probe_latency = float(evidence.get("probe_latency_ms") or 0.0)
+        time_delay_delta = float(evidence.get("time_delay_delta_ms") or 0.0)
+        reproduction_count = int(evidence.get("blind_reproduction_count") or 0)
+        oob_confirmed = bool(
+            evidence.get("oob_confirmed")
+            or evidence.get("dns_callback_hit")
+            or evidence.get("http_callback_hit")
+            or evidence.get("interactsh_hit")
+        )
+
+        if time_delay_delta <= 0.0 and baseline_latency > 0 and probe_latency > 0:
+            time_delay_delta = max(probe_latency - baseline_latency, 0.0)
+
+        if time_delay_delta >= 1500.0 and reproduction_count >= 2:
+            confirmed = True
+            confidence = max(confidence, 0.96)
+            notes.append(
+                f"Time-based blind signal reproduced {reproduction_count}x with +{time_delay_delta:.0f}ms latency"
+            )
+        elif time_delay_delta >= 1200.0:
+            confidence = max(confidence, 0.72)
+            notes.append(
+                f"Possible time-based blind signal observed (+{time_delay_delta:.0f}ms latency)"
+            )
+
+        if oob_confirmed:
+            confirmed = True
+            confidence = max(confidence, 0.98)
+            notes.append("Out-of-band callback confirmed the candidate")
+
+        if evidence.get("proof_replayed"):
+            confidence = max(confidence, 0.9)
+            notes.append("Proof replay succeeded")
+
+        return confirmed, confidence, notes
+
+    def _proof_verification_signal(
+        self,
+        *,
+        category: str,
+        title: str,
+        description: str,
+        evidence: dict[str, Any],
+        duplicate: bool,
+    ) -> tuple[Optional[str], float, list[str]]:
+        if self._auto_verify_finding is None or self._auto_verify_status_cls is None:
+            return None, 0.0, []
+        required_keys = {
+            "input_vector",
+            "response_before",
+            "response_after",
+            "request_data",
+            "response_data",
+            "video_path",
+            "video_hash",
+        }
+        if not any(key in evidence for key in required_keys):
+            return None, 0.0, []
+        try:
+            auto_result = self._auto_verify_finding(
+                f"{category}: {title}\n{description}",
+                evidence,
+                duplicate_probability=100 if duplicate else 0,
+            )
+            status = getattr(auto_result, "status", None)
+            confidence = float(getattr(auto_result, "confidence", 0)) / 100.0
+            reason = str(getattr(auto_result, "why_verified_or_rejected", ""))
+            if status == self._auto_verify_status_cls.AUTO_REAL:
+                return (
+                    "CONFIRMED",
+                    confidence,
+                    [f"Auto proof verifier confirmed finding: {reason}"],
+                )
+            if status == self._auto_verify_status_cls.DUPLICATE:
+                return (
+                    "DUPLICATE",
+                    min(confidence, 0.2),
+                    [f"Auto proof verifier marked duplicate: {reason}"],
+                )
+            if status == self._auto_verify_status_cls.NOT_REAL:
+                return (
+                    "REJECTED_FALSE_POSITIVE",
+                    min(confidence, 0.2),
+                    [f"Auto proof verifier rejected finding: {reason}"],
+                )
+            return (
+                "NEEDS_REVIEW",
+                confidence,
+                [f"Auto proof verifier requires review: {reason}"],
+            )
+        except Exception:
+            return None, 0.0, []
 
     def _semantic_duplicate(
         self,
@@ -913,15 +1040,32 @@ class AccuracyEngine:
         notes.extend(semantic_notes)
         ml_score, ml_notes = self._ml_score(category, severity, title, description, url)
         notes.extend(ml_notes)
+        blind_confirmed, blind_confidence, blind_notes = (
+            self._blind_verification_signals(evidence)
+        )
+        notes.extend(blind_notes)
+        proof_status, proof_confidence, proof_notes = self._proof_verification_signal(
+            category=category,
+            title=title,
+            description=description,
+            evidence=evidence,
+            duplicate=duplicate,
+        )
+        notes.extend(proof_notes)
         confidence = heuristic_confidence
         if ml_score > 0:
             confidence = min(0.995, (heuristic_confidence * 0.75) + (ml_score * 0.25))
+        if blind_confidence > 0:
+            confidence = max(confidence, blind_confidence)
+        if proof_confidence > 0:
+            confidence = max(confidence, proof_confidence)
         threshold = self._category_threshold(category)
         real_check_confirmed = bool(
             evidence.get("response_validated")
             or evidence.get("exploit_confirmed")
             or evidence.get("proof_verified")
             or evidence.get("sql_errors")
+            or blind_confirmed
         )
         verification_failed = bool(
             evidence.get("verification_failed")
@@ -936,6 +1080,18 @@ class AccuracyEngine:
             status = "DUPLICATE"
             notes.append("Duplicate finding fingerprint suppressed")
             confidence = min(confidence, 0.2)
+        elif proof_status == "DUPLICATE":
+            status = "DUPLICATE"
+            confidence = min(confidence, 0.2)
+        elif proof_status == "REJECTED_FALSE_POSITIVE":
+            status = "REJECTED_FALSE_POSITIVE"
+            confidence = min(confidence, 0.2)
+        elif proof_status == "CONFIRMED":
+            status = "CONFIRMED"
+            confidence = max(confidence, 0.97)
+        elif proof_status == "NEEDS_REVIEW":
+            status = "NEEDS_REVIEW"
+            confidence = min(max(confidence, 0.6), 0.85)
         elif verification_failed:
             status = "REJECTED_FALSE_POSITIVE"
             confidence = min(confidence, 0.15)
@@ -977,6 +1133,24 @@ class AccuracyEngine:
                     evidence=dict(evidence),
                 )
             )
+        self.data_pipeline.record_candidate(
+            category=category,
+            severity=severity,
+            title=title,
+            description=description,
+            url=url,
+            evidence=evidence,
+            verification_status=status,
+            duplicate=duplicate,
+            confidence=round(confidence, 4),
+            metadata={
+                "strategy_name": strategy_name,
+                "task_type": task_type,
+                "ml_score": round(ml_score, 4),
+                "blind_notes": blind_notes,
+                "proof_notes": proof_notes,
+            },
+        )
         return VerificationOutcome(
             fingerprint=fingerprint,
             status=status,
@@ -1130,6 +1304,11 @@ class BackendOrchestrator:
         )
         self.telemetry = TelemetryMonitor()
         self.accuracy = AccuracyEngine(self.accuracy_feedback)
+        self.autonomy = AutonomousCoordinator(
+            self.accuracy_feedback,
+            self.strategy_feedback,
+            self.accuracy.data_pipeline,
+        )
         self.notifier = TelegramNotifier()
         self.vector_memory = VectorMemoryStore(max_entries_per_namespace=256)
         self.resource_governor = ResourceGovernor()
@@ -1255,6 +1434,30 @@ class BackendOrchestrator:
         self.agents.register(
             AgentProfile(
                 "notification-agent", ("notification",), "Realtime alert delivery", 4
+            )
+        )
+        self.agents.register(
+            AgentProfile(
+                "reasoning-agent",
+                ("request", "voice", "query"),
+                "Builds structured reasoning before any action is taken",
+                3,
+            )
+        )
+        self.agents.register(
+            AgentProfile(
+                "verification-agent",
+                ("workflow", "bounty", "verify"),
+                "Focuses on proof, blind verification, and confidence gating",
+                4,
+            )
+        )
+        self.agents.register(
+            AgentProfile(
+                "learning-agent",
+                ("training", "ml", "learning"),
+                "Turns outcomes into active-learning and idle exploration tasks",
+                1,
             )
         )
         for agent in self.agents.all():
@@ -1424,6 +1627,7 @@ class BackendOrchestrator:
             "vector_memory": await self.vector_memory.snapshot(),
             "strategy_feedback": self.strategy_feedback.snapshot(),
             "accuracy_feedback": self.accuracy_feedback.summary(),
+            "autonomy": self.autonomy.snapshot(self.agents.all()),
             "telemetry": self.telemetry.snapshot(),
             "resource_snapshot": {
                 "cpu_load_ratio": self._resource_snapshot.cpu_load_ratio,
@@ -1445,6 +1649,30 @@ class BackendOrchestrator:
         self, task_type: str, context: Optional[dict[str, Any]] = None
     ) -> OrchestrationPlan:
         plan = self.reasoner.plan(task_type, context)
+        reasoning_trace = self.autonomy.build_reasoning_trace(
+            task_type,
+            context,
+            self.agents.all(),
+        )
+        plan.reasoning_trace = reasoning_trace
+        plan.expert_routes = reasoning_trace.get("expert_routes", [])
+        if plan.expert_routes:
+            top_route = plan.expert_routes[0]
+            plan.strategy.notes.append(
+                f"MoE router primary expert: {top_route['agent_name']} ({top_route['score']:.2f})"
+            )
+        selected_tests = reasoning_trace.get("selected_tests", {}).get(
+            "enabled_tests", []
+        )
+        if selected_tests:
+            plan.strategy.notes.append(
+                f"Reasoning selected tests: {', '.join(selected_tests[:4])}"
+            )
+        data_quality = reasoning_trace.get("data_quality") or {}
+        if data_quality and not data_quality.get("accepted", True):
+            plan.strategy.notes.append(
+                f"Input quality low ({data_quality.get('score', 0.0):.2f}); prefer verification before expansion"
+            )
         scale = self._resource_snapshot.suggested_concurrency_scale
         if scale < 1.0:
             plan.strategy.concurrency = max(
@@ -1644,8 +1872,54 @@ class BackendOrchestrator:
             rejected_findings=rejected_findings,
             duplicate_findings=duplicate_findings,
         )
+        if entry.precision < 0.75 or entry.duplicate_rate > 0.2:
+            self.autonomy.data_pipeline.push_learning_candidate(
+                candidate_type="strategy-feedback",
+                payload={
+                    "strategy_name": strategy_name,
+                    "task_type": task_type,
+                    "precision": round(entry.precision, 4),
+                    "duplicate_rate": round(entry.duplicate_rate, 4),
+                    "recommended_action": "tighten-verification-and-idle-exploration",
+                },
+            )
         self._state_dirty = True
         return entry.to_dict()
+
+    async def reason_about_query(
+        self,
+        *,
+        query: str,
+        task_type: str = "request",
+        context: Optional[dict[str, Any]] = None,
+        agent_name: str = "reasoning-agent",
+    ) -> dict[str, Any]:
+        similar = await self.retrieve_experience(agent_name, query, limit=3)
+        trace = self.autonomy.build_reasoning_trace(
+            task_type,
+            {**(context or {}), "query": query},
+            self.agents.all(),
+        )
+        learning_candidate = trace.get("learning_candidate")
+        if isinstance(learning_candidate, dict):
+            self.autonomy.data_pipeline.push_learning_candidate(
+                candidate_type="reasoning-trace",
+                payload=learning_candidate,
+            )
+        response = self.autonomy.build_reasoned_response(
+            query=query,
+            task_type=task_type,
+            context=context,
+            agents=self.agents.all(),
+            similar_experiences=similar,
+        )
+        return {
+            "query": query,
+            "task_type": task_type,
+            "response": response.to_dict(),
+            "reasoning_trace": trace,
+            "similar_experiences": similar,
+        }
 
     def snapshot(self) -> dict[str, Any]:
         return {
@@ -1675,6 +1949,7 @@ class BackendOrchestrator:
             "memory": {"namespaces": self.vector_memory.counts()},
             "accuracy": self.accuracy_feedback.summary(),
             "strategy_feedback": self.strategy_feedback.snapshot(),
+            "autonomy": self.autonomy.snapshot(self.agents.all()),
             "cluster": self._status_snapshot.get("cluster")
             if self._status_snapshot
             else {},

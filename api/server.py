@@ -29,7 +29,7 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, PlainTextResponse, JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # Add project root to path for imports
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -179,6 +179,18 @@ def _serialize_strategy(strategy: Any) -> Dict[str, Any]:
     }
 
 
+def _serialize_plan(plan: Any) -> Dict[str, Any]:
+    return {
+        "request_id": getattr(plan, "request_id", ""),
+        "task_type": getattr(plan, "task_type", "request"),
+        "strategy": _serialize_strategy(getattr(plan, "strategy", plan)),
+        "context_summary": dict(getattr(plan, "context_summary", {}) or {}),
+        "expert_routes": list(getattr(plan, "expert_routes", []) or []),
+        "reasoning_trace": dict(getattr(plan, "reasoning_trace", {}) or {}),
+        "created_at": getattr(plan, "created_at", datetime.now(UTC).isoformat()),
+    }
+
+
 def _g38_error_payload() -> Dict[str, Any]:
     return {
         "available": False,
@@ -250,6 +262,30 @@ class VoiceParseRequest(BaseModel):
 class AutonomySessionRequest(BaseModel):
     mode: str  # MOCK, READ_ONLY, AUTONOMOUS_FIND, REAL
     duration_hours: float = 0.0
+
+
+class ReasoningPlanRequest(BaseModel):
+    task_type: str = "workflow"
+    target: str = ""
+    mode: str = "READ_ONLY"
+    query: Optional[str] = None
+    scope_text: Optional[str] = None
+    dom_excerpt: Optional[str] = None
+    meta_content: Optional[str] = None
+    category: Optional[str] = None
+    severity: Optional[str] = None
+    evidence: Dict[str, Any] = Field(default_factory=dict)
+    current_findings: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class ReasoningQueryRequest(BaseModel):
+    query: str
+    task_type: str = "request"
+    target: Optional[str] = None
+    mode: str = "READ_ONLY"
+    scope_text: Optional[str] = None
+    dom_excerpt: Optional[str] = None
+    meta_content: Optional[str] = None
 
 
 # =============================================================================
@@ -442,6 +478,15 @@ async def get_accuracy_status():
     )
 
 
+@telemetry_router.get("/api/autonomy/status")
+async def get_autonomy_status():
+    """Expose reasoning, routing, learning, and data-quality status."""
+    return JSONResponse(
+        content=_orchestrator().autonomy.snapshot(_orchestrator().agents.all()),
+        headers=_orchestrator().cache_headers(max_age=10),
+    )
+
+
 @telemetry_router.get("/api/cluster/status")
 async def get_cluster_status():
     """Expose distributed cluster coordination state."""
@@ -546,6 +591,8 @@ async def start_hunter(request: StartWorkflowRequest):
             "steps": [],
             "plan": _serialize_strategy(plan.strategy),
             "request_id": plan.request_id,
+            "reasoning_trace": dict(plan.reasoning_trace or {}),
+            "expert_routes": list(plan.expert_routes or []),
             "similar_experiences": similar,
         },
     )
@@ -554,6 +601,7 @@ async def start_hunter(request: StartWorkflowRequest):
         "workflow_id": workflow_id,
         "status": "started",
         "plan": _serialize_strategy(plan.strategy),
+        "reasoning_plan": _serialize_plan(plan),
         "similar_experiences": similar,
     }
 
@@ -593,6 +641,8 @@ async def start_bounty(request: StartWorkflowRequest):
             "findings": [],
             "plan": _serialize_strategy(plan.strategy),
             "request_id": plan.request_id,
+            "reasoning_trace": dict(plan.reasoning_trace or {}),
+            "expert_routes": list(plan.expert_routes or []),
             "similar_experiences": similar,
         },
     )
@@ -607,8 +657,53 @@ async def start_bounty(request: StartWorkflowRequest):
         "report_id": report_id,
         "status": "started",
         "plan": _serialize_strategy(plan.strategy),
+        "reasoning_plan": _serialize_plan(plan),
         "similar_experiences": similar,
     }
+
+
+@api_router.post("/api/reason/plan")
+async def build_reasoning_plan(request: ReasoningPlanRequest):
+    """Build a reasoning-first execution plan without acting."""
+    context = {
+        "target": request.target,
+        "mode": request.mode,
+        "query": request.query or request.target,
+        "scope_text": request.scope_text or "",
+        "dom_excerpt": request.dom_excerpt or "",
+        "meta_content": request.meta_content or "",
+        "category": request.category or "AUTH",
+        "severity": request.severity or "MEDIUM",
+        "evidence": request.evidence,
+        "current_findings": request.current_findings,
+    }
+    plan = _orchestrator().plan_task(request.task_type, context)
+    return {
+        "plan": _serialize_plan(plan),
+        "autonomy": _orchestrator().autonomy.build_reasoning_trace(
+            request.task_type,
+            context,
+            _orchestrator().agents.all(),
+        ),
+    }
+
+
+@api_router.post("/api/reason/query")
+async def answer_with_reasoning(request: ReasoningQueryRequest):
+    """Answer a user query with reasoning before recommending any action."""
+    response = await _orchestrator().reason_about_query(
+        query=request.query,
+        task_type=request.task_type,
+        context={
+            "target": request.target or "",
+            "mode": request.mode,
+            "scope_text": request.scope_text or "",
+            "dom_excerpt": request.dom_excerpt or "",
+            "meta_content": request.meta_content or "",
+        },
+        agent_name="reasoning-agent",
+    )
+    return response
 
 
 # =============================================================================
@@ -849,6 +944,7 @@ async def parse_voice_input(request: VoiceParseRequest):
                 "block_reason": f"Forbidden pattern detected",
                 "timestamp": now,
                 "plan": _serialize_strategy(plan.strategy),
+                "reasoning_plan": _serialize_plan(plan),
                 "similar_experiences": similar_voice,
             }
 
@@ -864,6 +960,7 @@ async def parse_voice_input(request: VoiceParseRequest):
             "block_reason": None,
             "timestamp": now,
             "plan": _serialize_strategy(plan.strategy),
+            "reasoning_plan": _serialize_plan(plan),
             "similar_experiences": similar_voice,
         }
 
@@ -879,6 +976,7 @@ async def parse_voice_input(request: VoiceParseRequest):
             "block_reason": None,
             "timestamp": now,
             "plan": _serialize_strategy(plan.strategy),
+            "reasoning_plan": _serialize_plan(plan),
             "similar_experiences": similar_voice,
         }
 
@@ -893,6 +991,7 @@ async def parse_voice_input(request: VoiceParseRequest):
             "block_reason": None,
             "timestamp": now,
             "plan": _serialize_strategy(plan.strategy),
+            "reasoning_plan": _serialize_plan(plan),
             "similar_experiences": similar_voice,
         }
 
@@ -907,6 +1006,7 @@ async def parse_voice_input(request: VoiceParseRequest):
         "block_reason": "Could not parse intent",
         "timestamp": now,
         "plan": _serialize_strategy(plan.strategy),
+        "reasoning_plan": _serialize_plan(plan),
         "similar_experiences": similar_voice,
     }
 
