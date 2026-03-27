@@ -20,6 +20,7 @@ from typing import Tuple, Dict, Optional, List, Any
 import hashlib
 import uuid
 import json
+import os
 from datetime import datetime, UTC
 
 # Try importing PyTorch - graceful fallback if unavailable
@@ -145,6 +146,14 @@ def _now_iso() -> str:
     return datetime.now(UTC).isoformat()
 
 
+def _hash_file(path: str) -> str:
+    sha256 = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(8192), b""):
+            sha256.update(chunk)
+    return sha256.hexdigest()[:32]
+
+
 # =============================================================================
 # DEVICE DETECTION (REAL)
 # =============================================================================
@@ -165,7 +174,7 @@ def detect_compute_device() -> DeviceInfo:
             is_available=False,
         )
 
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and os.environ.get("YGB_ENABLE_CUDA", "0") == "1":
         device_name = torch.cuda.get_device_name(0)
         memory_mb = torch.cuda.get_device_properties(0).total_memory // (1024 * 1024)
         cuda_version = torch.version.cuda or "Unknown"
@@ -192,7 +201,7 @@ def get_torch_device() -> Any:
     if not PYTORCH_AVAILABLE:
         return None
 
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and os.environ.get("YGB_ENABLE_CUDA", "0") == "1":
         return torch.device("cuda")
     return torch.device("cpu")
 
@@ -287,6 +296,7 @@ def train_single_epoch(
     train_data: Tuple[TrainingSample, ...],
     device: Any,
     epoch: int,
+    val_data: Tuple[TrainingSample, ...] = tuple(),
 ) -> EpochMetrics:
     """
     Train one epoch (REAL gradient descent).
@@ -297,17 +307,8 @@ def train_single_epoch(
     if can_train_without_idle()[0]:  # pragma: no cover
         raise RuntimeError("SECURITY: Cannot train outside IDLE mode")
 
-    if not PYTORCH_AVAILABLE:
-        # Fallback mock when PyTorch unavailable
-        return EpochMetrics(
-            epoch=epoch,
-            train_loss=max(0.05, 1.0 - (epoch * 0.1)),
-            train_accuracy=min(0.99, 0.7 + (epoch * 0.03)),
-            val_loss=max(0.06, 1.1 - (epoch * 0.1)),
-            val_accuracy=min(0.98, 0.68 + (epoch * 0.03)),
-            learning_rate=0.001,
-            time_seconds=0.1,
-        )
+    if not PYTORCH_AVAILABLE or device is None:
+        raise RuntimeError("PyTorch backend unavailable - training cannot run")
 
     import time
 
@@ -346,12 +347,31 @@ def train_single_epoch(
 
     elapsed = time.time() - start_time
 
+    eval_data = val_data or train_data
+    eval_features = torch.tensor(
+        [list(s.features) for s in eval_data],
+        dtype=torch.float32,
+        device=device,
+    )
+    eval_labels = torch.tensor(
+        [s.label for s in eval_data],
+        dtype=torch.long,
+        device=device,
+    )
+    model.eval()
+    with torch.no_grad():
+        eval_outputs = model(eval_features)
+        eval_loss = criterion(eval_outputs, eval_labels)
+        _, eval_predicted = torch.max(eval_outputs.data, 1)
+        eval_total = eval_labels.size(0)
+        eval_correct = (eval_predicted == eval_labels).sum().item()
+
     return EpochMetrics(
         epoch=epoch,
         train_loss=total_loss,
         train_accuracy=correct / total if total > 0 else 0.0,
-        val_loss=total_loss * 1.1,  # Proxy
-        val_accuracy=(correct / total) * 0.95 if total > 0 else 0.0,
+        val_loss=eval_loss.item(),
+        val_accuracy=eval_correct / eval_total if eval_total > 0 else 0.0,
         learning_rate=optimizer.param_groups[0]["lr"],
         time_seconds=elapsed,
     )
@@ -371,22 +391,7 @@ def train_full(
     device = get_torch_device()
 
     if not PYTORCH_AVAILABLE or device is None:
-        # Return mock metrics when PyTorch unavailable
-        metrics = []
-        for e in range(1, config.epochs + 1):
-            m = EpochMetrics(
-                epoch=e,
-                train_loss=max(0.05, 1.0 - (e * 0.05)),
-                train_accuracy=min(0.99, 0.7 + (e * 0.02)),
-                val_loss=max(0.06, 1.1 - (e * 0.05)),
-                val_accuracy=min(0.98, 0.68 + (e * 0.02)),
-                learning_rate=config.learning_rate,
-                time_seconds=0.01,
-            )
-            metrics.append(m)
-            if m.train_accuracy >= early_stop_accuracy:
-                break
-        return None, tuple(metrics)
+        raise RuntimeError("PyTorch backend unavailable - no mock training fallback")
 
     # Set deterministic seed
     torch.manual_seed(config.seed)
@@ -405,12 +410,12 @@ def train_full(
     metrics = []
     for epoch in range(1, config.epochs + 1):
         epoch_metrics = train_single_epoch(
-            model, optimizer, criterion, train_data, device, epoch
+            model, optimizer, criterion, train_data, device, epoch, val_data
         )
         metrics.append(epoch_metrics)
 
         # Early stopping
-        if epoch_metrics.train_accuracy >= early_stop_accuracy:
+        if epoch_metrics.val_accuracy >= early_stop_accuracy:
             break
 
     return model, tuple(metrics)
@@ -423,22 +428,26 @@ def save_model_checkpoint(
     path: str,
 ) -> ModelCheckpoint:
     """Save model checkpoint to disk."""
-    if PYTORCH_AVAILABLE and model is not None:
-        torch.save(
-            {
-                "epoch": metrics.epoch,
-                "model_state_dict": model.state_dict(),
-                "accuracy": metrics.train_accuracy,
-            },
-            path,
-        )
+    if not PYTORCH_AVAILABLE or model is None:
+        raise RuntimeError("Cannot save checkpoint without a trained PyTorch model")
+
+    os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+    torch.save(
+        {
+            "epoch": metrics.epoch,
+            "model_state_dict": model.state_dict(),
+            "train_accuracy": metrics.train_accuracy,
+            "val_accuracy": metrics.val_accuracy,
+        },
+        path,
+    )
 
     return ModelCheckpoint(
         checkpoint_id=_generate_id("CKPT"),
         epoch=metrics.epoch,
         train_accuracy=metrics.train_accuracy,
         val_accuracy=metrics.val_accuracy,
-        model_hash=_hash_content(f"{config.seed}:{metrics.epoch}"),
+        model_hash=_hash_file(path),
         created_at=_now_iso(),
         path=path,
     )
@@ -450,15 +459,10 @@ def load_model_checkpoint(
 ) -> Tuple[Any, ModelCheckpoint]:
     """Load model from checkpoint."""
     if not PYTORCH_AVAILABLE:
-        return None, ModelCheckpoint(
-            checkpoint_id=_generate_id("CKPT"),
-            epoch=0,
-            train_accuracy=0.0,
-            val_accuracy=0.0,
-            model_hash="",
-            created_at=_now_iso(),
-            path=path,
-        )
+        raise RuntimeError("PyTorch backend unavailable - cannot load checkpoint")
+
+    if not os.path.exists(path):
+        raise FileNotFoundError(path)
 
     device = get_torch_device()
     model = BugClassifier(config)
@@ -471,9 +475,9 @@ def load_model_checkpoint(
     return model, ModelCheckpoint(
         checkpoint_id=_generate_id("CKPT"),
         epoch=checkpoint["epoch"],
-        train_accuracy=checkpoint["accuracy"],
-        val_accuracy=checkpoint["accuracy"] * 0.95,
-        model_hash=_hash_content(f"{config.seed}:{checkpoint['epoch']}"),
+        train_accuracy=float(checkpoint.get("train_accuracy", 0.0)),
+        val_accuracy=float(checkpoint.get("val_accuracy", 0.0)),
+        model_hash=_hash_file(path),
         created_at=_now_iso(),
         path=path,
     )
@@ -494,16 +498,7 @@ def infer_single(
         raise RuntimeError("SECURITY: Cannot infer without trained model")
 
     if not PYTORCH_AVAILABLE or model is None:
-        # Mock inference
-        pred = hash(sample.sample_id) % 2
-        conf = 0.8 + (hash(sample.sample_id) % 20) / 100
-        return InferenceResult(
-            result_id=_generate_id("INF"),
-            prediction=pred,
-            confidence=conf,
-            probabilities=(1 - conf, conf) if pred == 1 else (conf, 1 - conf),
-            inference_time_ms=0.1,
-        )
+        raise RuntimeError("PyTorch backend unavailable - no mock inference fallback")
 
     import time
 

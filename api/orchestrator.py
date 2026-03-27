@@ -97,6 +97,7 @@ class VerificationOutcome:
     confidence: float
     duplicate: bool
     ml_score: float
+    classification: str
     notes: list[str] = field(default_factory=list)
 
 
@@ -831,6 +832,39 @@ class AccuracyEngine:
 
         return confirmed, confidence, notes
 
+    def _behavioral_validation_signal(
+        self, evidence: dict[str, Any]
+    ) -> tuple[bool, float, list[str]]:
+        notes: list[str] = []
+        confirmed = False
+        confidence = 0.0
+
+        if evidence.get("state_change_confirmed"):
+            confirmed = True
+            confidence = max(confidence, 0.94)
+            notes.append("Behavioral validation confirmed an observable state change")
+        if evidence.get("unauthorized_access") or evidence.get("access_validated"):
+            confirmed = True
+            confidence = max(confidence, 0.95)
+            notes.append("Behavioral validation confirmed unauthorized access")
+        if evidence.get("privilege_escalation"):
+            confirmed = True
+            confidence = max(confidence, 0.97)
+            notes.append("Behavioral validation confirmed privilege escalation")
+        if evidence.get("extracted_data"):
+            confirmed = True
+            confidence = max(confidence, 0.95)
+            notes.append("Behavioral validation confirmed sensitive data extraction")
+        if evidence.get("business_impact_confirmed"):
+            confirmed = True
+            confidence = max(confidence, 0.92)
+            notes.append("Behavioral validation confirmed business-impactful behavior")
+        if evidence.get("behavioral_anomaly") and not confirmed:
+            confidence = max(confidence, 0.7)
+            notes.append("Behavioral anomaly detected but full confirmation is pending")
+
+        return confirmed, confidence, notes
+
     def _proof_verification_signal(
         self,
         *,
@@ -1044,6 +1078,10 @@ class AccuracyEngine:
             self._blind_verification_signals(evidence)
         )
         notes.extend(blind_notes)
+        behavioral_confirmed, behavioral_confidence, behavioral_notes = (
+            self._behavioral_validation_signal(evidence)
+        )
+        notes.extend(behavioral_notes)
         proof_status, proof_confidence, proof_notes = self._proof_verification_signal(
             category=category,
             title=title,
@@ -1057,6 +1095,8 @@ class AccuracyEngine:
             confidence = min(0.995, (heuristic_confidence * 0.75) + (ml_score * 0.25))
         if blind_confidence > 0:
             confidence = max(confidence, blind_confidence)
+        if behavioral_confidence > 0:
+            confidence = max(confidence, behavioral_confidence)
         if proof_confidence > 0:
             confidence = max(confidence, proof_confidence)
         threshold = self._category_threshold(category)
@@ -1066,6 +1106,7 @@ class AccuracyEngine:
             or evidence.get("proof_verified")
             or evidence.get("sql_errors")
             or blind_confirmed
+            or behavioral_confirmed
         )
         verification_failed = bool(
             evidence.get("verification_failed")
@@ -1148,8 +1189,16 @@ class AccuracyEngine:
                 "task_type": task_type,
                 "ml_score": round(ml_score, 4),
                 "blind_notes": blind_notes,
+                "behavioral_notes": behavioral_notes,
                 "proof_notes": proof_notes,
             },
+        )
+        classification = (
+            "confirmed"
+            if status == "CONFIRMED"
+            else "probable"
+            if status == "NEEDS_REVIEW"
+            else "hypothesis"
         )
         return VerificationOutcome(
             fingerprint=fingerprint,
@@ -1157,6 +1206,7 @@ class AccuracyEngine:
             confidence=round(confidence, 4),
             duplicate=duplicate,
             ml_score=round(ml_score, 4),
+            classification=classification,
             notes=notes,
         )
 
@@ -1856,6 +1906,45 @@ class BackendOrchestrator:
         local.sort(key=lambda item: item.get("score", 0.0), reverse=True)
         return local[:limit]
 
+    async def retrieve_related_experiences(
+        self,
+        query: str,
+        *,
+        task_type: str = "workflow",
+        limit: int = 6,
+    ) -> list[dict[str, Any]]:
+        task_key = task_type.lower()
+        if task_key in {"workflow", "crawl", "bounty"}:
+            agent_names = ["crawler-agent", "verification-agent", "reasoning-agent"]
+        elif task_key in {"voice", "request", "query"}:
+            agent_names = ["reasoning-agent", "voice-agent", "workflow-orchestrator"]
+        elif task_key in {"training", "ml", "learning"}:
+            agent_names = ["learning-agent", "verification-agent", "reasoning-agent"]
+        else:
+            agent_names = ["reasoning-agent", "workflow-orchestrator"]
+
+        combined: list[dict[str, Any]] = []
+        seen_ids: set[str] = set()
+        for agent_name in agent_names:
+            try:
+                results = await self.retrieve_experience(agent_name, query, limit=limit)
+            except PermissionError:
+                continue
+            for item in results:
+                memory_id = str(item.get("memory_id") or "")
+                if memory_id and memory_id in seen_ids:
+                    continue
+                if memory_id:
+                    seen_ids.add(memory_id)
+                item = dict(item)
+                item.setdefault("metadata", {})
+                if isinstance(item["metadata"], dict):
+                    item["metadata"].setdefault("agent_name", agent_name)
+                combined.append(item)
+
+        combined.sort(key=lambda item: item.get("score", 0.0), reverse=True)
+        return combined[:limit]
+
     def record_strategy_outcome(
         self,
         *,
@@ -1886,6 +1975,43 @@ class BackendOrchestrator:
         self._state_dirty = True
         return entry.to_dict()
 
+    async def remember_finding_outcome(
+        self,
+        *,
+        workflow_id: str,
+        target: str,
+        finding: dict[str, Any],
+        strategy_name: str,
+    ) -> Optional[MemoryExperience]:
+        status = str(finding.get("verification_status") or "UNVERIFIED")
+        classification = str(finding.get("verification_classification") or "hypothesis")
+        category = str(finding.get("category") or "UNKNOWN")
+        title = str(finding.get("title") or "finding")
+        content = (
+            f"workflow={workflow_id} target={target} category={category} title={title} "
+            f"status={status} classification={classification}"
+        )
+        metadata = {
+            "workflow_id": workflow_id,
+            "target": target,
+            "category": category,
+            "severity": finding.get("severity"),
+            "verification_status": status,
+            "verification_classification": classification,
+            "agent_name": strategy_name,
+            "confidence": finding.get("confidence", 0.0),
+        }
+        agent = (
+            "verification-agent"
+            if status
+            in {"CONFIRMED", "DUPLICATE", "REJECTED_FALSE_POSITIVE", "NEEDS_REVIEW"}
+            else "crawler-agent"
+        )
+        try:
+            return await self.remember_experience(agent, content, metadata)
+        except PermissionError:
+            return None
+
     async def reason_about_query(
         self,
         *,
@@ -1894,10 +2020,14 @@ class BackendOrchestrator:
         context: Optional[dict[str, Any]] = None,
         agent_name: str = "reasoning-agent",
     ) -> dict[str, Any]:
-        similar = await self.retrieve_experience(agent_name, query, limit=3)
+        similar = await self.retrieve_related_experiences(
+            query,
+            task_type=task_type,
+            limit=6,
+        )
         trace = self.autonomy.build_reasoning_trace(
             task_type,
-            {**(context or {}), "query": query},
+            {**(context or {}), "query": query, "similar_experiences": similar},
             self.agents.all(),
         )
         learning_candidate = trace.get("learning_candidate")

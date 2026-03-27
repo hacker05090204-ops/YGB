@@ -35,20 +35,23 @@ import os
 # TRAINING MODE
 # =============================================================================
 
+
 class TrainingMode(Enum):
     """Training mode enumeration."""
+
     MODE_A = "REPRESENTATION_ONLY"  # Learn patterns, NOT bug labels
-    MODE_B = "PROOF_LEARNING"       # Learn from verified proofs only
+    MODE_B = "PROOF_LEARNING"  # Learn from verified proofs only
 
 
 # =============================================================================
 # GUARDS (ALL RETURN FALSE)
 # =============================================================================
 
+
 def can_ai_explain_decisions() -> Tuple[bool, str]:
     """
     Check if AI can explain its decisions as authoritative.
-    
+
     ALWAYS returns (False, ...).
     AI explanations are ADVISORY, not authoritative.
     """
@@ -58,7 +61,7 @@ def can_ai_explain_decisions() -> Tuple[bool, str]:
 def can_ai_claim_verification() -> Tuple[bool, str]:
     """
     Check if AI can claim to have verified anything.
-    
+
     ALWAYS returns (False, ...).
     Only G33/G36 can verify.
     """
@@ -68,7 +71,7 @@ def can_ai_claim_verification() -> Tuple[bool, str]:
 def can_ai_hide_training_state() -> Tuple[bool, str]:
     """
     Check if AI can hide its training state.
-    
+
     ALWAYS returns (False, ...).
     Training state MUST be transparent.
     """
@@ -95,37 +98,42 @@ def verify_report_guards() -> Tuple[bool, str]:
 # LEARNED DOMAINS (REPRESENTATION ONLY)
 # =============================================================================
 
+
 class LearnedDomain(Enum):
     """Domains that G38 CAN learn (representation only)."""
-    CODE_PATTERNS = "code_patterns"           # How code looks structurally
-    UI_LAYOUTS = "ui_layouts"                 # How interfaces are structured
-    NETWORK_PROTOCOLS = "network_protocols"   # Protocol structure patterns
-    API_STRUCTURES = "api_structures"         # API format patterns
-    FILE_FORMATS = "file_formats"             # File structure patterns
-    ENCODING_PATTERNS = "encoding_patterns"   # How data is encoded
-    SYNTAX_STRUCTURE = "syntax_structure"     # Language syntax patterns
+
+    CODE_PATTERNS = "code_patterns"  # How code looks structurally
+    UI_LAYOUTS = "ui_layouts"  # How interfaces are structured
+    NETWORK_PROTOCOLS = "network_protocols"  # Protocol structure patterns
+    API_STRUCTURES = "api_structures"  # API format patterns
+    FILE_FORMATS = "file_formats"  # File structure patterns
+    ENCODING_PATTERNS = "encoding_patterns"  # How data is encoded
+    SYNTAX_STRUCTURE = "syntax_structure"  # Language syntax patterns
 
 
 class LockedAbility(Enum):
     """Abilities that G38 CANNOT learn (governance locked)."""
-    BUG_DECISION = "bug_decision"                 # Cannot decide what is a bug
-    SEVERITY_LABELING = "severity_labeling"       # Cannot assign severity
-    EXPLOIT_LOGIC = "exploit_logic"               # Cannot learn exploits
-    SUBMISSION_LOGIC = "submission_logic"         # Cannot submit anything
-    VERIFICATION_AUTHORITY = "verification"       # Cannot verify findings
-    SCOPE_EXPANSION = "scope_expansion"           # Cannot expand scope
-    GOVERNANCE_OVERRIDE = "governance_override"   # Cannot override governance
-    NETWORK_TRAINING = "network_training"         # Cannot train from internet
-    ACTIVE_TRAINING = "active_training"           # Cannot train while active
+
+    BUG_DECISION = "bug_decision"  # Cannot decide what is a bug
+    SEVERITY_LABELING = "severity_labeling"  # Cannot assign severity
+    EXPLOIT_LOGIC = "exploit_logic"  # Cannot learn exploits
+    SUBMISSION_LOGIC = "submission_logic"  # Cannot submit anything
+    VERIFICATION_AUTHORITY = "verification"  # Cannot verify findings
+    SCOPE_EXPANSION = "scope_expansion"  # Cannot expand scope
+    GOVERNANCE_OVERRIDE = "governance_override"  # Cannot override governance
+    NETWORK_TRAINING = "network_training"  # Cannot train from internet
+    ACTIVE_TRAINING = "active_training"  # Cannot train while active
 
 
 # =============================================================================
 # REPORT DATA STRUCTURES
 # =============================================================================
 
+
 @dataclass(frozen=True)
 class TrainingSummary:
     """Training session summary."""
+
     session_id: str
     total_epochs: int
     training_mode: str
@@ -141,19 +149,23 @@ class TrainingSummary:
 @dataclass
 class LearnedFeatures:
     """What G38 has learned."""
+
     session_id: str
     domains_learned: List[str]
-    confidence_calibration: float
-    duplicate_detection_accuracy: float
-    noise_detection_accuracy: float
+    confidence_calibration: Optional[float]
+    duplicate_detection_accuracy: Optional[float]
+    noise_detection_accuracy: Optional[float]
     proof_learning: bool  # Always False for MODE-A
     total_samples_processed: int
     representation_only: bool  # Always True
+    metrics_complete: bool
+    metrics_source: str
 
 
 @dataclass
 class NotLearnedYet:
     """What G38 has NOT learned (governance locked)."""
+
     session_id: str
     locked_abilities: List[str]
     reason: str
@@ -164,27 +176,28 @@ class NotLearnedYet:
 # REPORT GENERATOR
 # =============================================================================
 
+
 class TrainingReportGenerator:
     """
     Generate transparent training reports.
-    
+
     READ-ONLY: Only writes report files, never modifies training.
     """
-    
+
     def __init__(self, reports_dir: str = "reports/g38_training"):
         self.reports_dir = Path(reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
-        
+
         # Verify guards at init
         ok, msg = verify_report_guards()
         if not ok:
             raise RuntimeError(f"Report guard verification failed: {msg}")
-    
+
     def generate_session_id(self) -> str:
         """Generate unique session ID."""
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         return f"G38-{timestamp}"
-    
+
     def generate_summary(
         self,
         session_id: str,
@@ -204,13 +217,13 @@ class TrainingReportGenerator:
             duration = int((stop - start).total_seconds())
         except:
             duration = 0
-        
+
         # Determine learning focus based on mode
         if training_mode == TrainingMode.MODE_A:
             focus = "Representation learning - patterns without bug labels"
         else:
             focus = "Proof-verified learning - only from G33/G36 proofs"
-        
+
         return TrainingSummary(
             session_id=session_id,
             total_epochs=total_epochs,
@@ -223,24 +236,40 @@ class TrainingReportGenerator:
             checkpoints_saved=checkpoints_saved,
             last_checkpoint_hash=last_checkpoint_hash,
         )
-    
+
     def generate_learned_features(
         self,
         session_id: str,
         samples_processed: int,
+        measured_metrics: Optional[Dict[str, Any]] = None,
     ) -> LearnedFeatures:
         """Generate learned features report."""
+        measured_metrics = measured_metrics or {}
+        calibration = measured_metrics.get("confidence_calibration")
+        duplicate_accuracy = measured_metrics.get("duplicate_detection_accuracy")
+        noise_accuracy = measured_metrics.get("noise_detection_accuracy")
         return LearnedFeatures(
             session_id=session_id,
             domains_learned=[d.value for d in LearnedDomain],
-            confidence_calibration=0.85,  # Mock calibration
-            duplicate_detection_accuracy=0.78,
-            noise_detection_accuracy=0.82,
+            confidence_calibration=float(calibration)
+            if calibration is not None
+            else None,
+            duplicate_detection_accuracy=float(duplicate_accuracy)
+            if duplicate_accuracy is not None
+            else None,
+            noise_detection_accuracy=float(noise_accuracy)
+            if noise_accuracy is not None
+            else None,
             proof_learning=False,  # NEVER True for MODE-A
             total_samples_processed=samples_processed,
             representation_only=True,  # ALWAYS True
+            metrics_complete=all(
+                value is not None
+                for value in (calibration, duplicate_accuracy, noise_accuracy)
+            ),
+            metrics_source=str(measured_metrics.get("source") or "unavailable"),
         )
-    
+
     def generate_not_learned(self, session_id: str) -> NotLearnedYet:
         """Generate governance-locked abilities report."""
         return NotLearnedYet(
@@ -249,11 +278,11 @@ class TrainingReportGenerator:
             reason="Governance guards prevent learning these abilities",
             governance_enforced=True,  # ALWAYS True
         )
-    
+
     def write_summary_txt(self, summary: TrainingSummary) -> Path:
         """Write training_summary.txt."""
         path = self.reports_dir / f"training_summary_{summary.session_id}.txt"
-        
+
         content = f"""=== G38 TRAINING SUMMARY ===
 Session ID: {summary.session_id}
 Generated: {datetime.now(timezone.utc).isoformat()}
@@ -284,11 +313,11 @@ GOVERNANCE STATUS:
 """
         path.write_text(content)
         return path
-    
+
     def write_learned_json(self, features: LearnedFeatures) -> Path:
         """Write learned_features.json."""
         path = self.reports_dir / f"learned_features_{features.session_id}.json"
-        
+
         data = {
             "session_id": features.session_id,
             "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -299,23 +328,25 @@ GOVERNANCE STATUS:
             "noise_detection_accuracy": features.noise_detection_accuracy,
             "proof_learning": features.proof_learning,
             "total_samples_processed": features.total_samples_processed,
+            "metrics_complete": features.metrics_complete,
+            "metrics_source": features.metrics_source,
             "governance": {
                 "ai_has_authority": False,
                 "can_decide_bugs": False,
                 "can_verify": False,
                 "can_submit": False,
-            }
+            },
         }
-        
+
         path.write_text(json.dumps(data, indent=2))
         return path
-    
+
     def write_not_learned_txt(self, not_learned: NotLearnedYet) -> Path:
         """Write not_learned_yet.txt."""
         path = self.reports_dir / f"not_learned_yet_{not_learned.session_id}.txt"
-        
+
         abilities_list = "\n".join(f"  - {a}" for a in not_learned.locked_abilities)
-        
+
         content = f"""=== G38 GOVERNANCE-LOCKED ABILITIES ===
 Session ID: {not_learned.session_id}
 Generated: {datetime.now(timezone.utc).isoformat()}
@@ -347,7 +378,7 @@ EXPLANATION:
 """
         path.write_text(content)
         return path
-    
+
     def generate_all_reports(
         self,
         total_epochs: int,
@@ -358,10 +389,11 @@ EXPLANATION:
         checkpoints_saved: int,
         last_checkpoint_hash: str,
         samples_processed: int,
+        measured_metrics: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Path]:
         """Generate all training reports."""
         session_id = self.generate_session_id()
-        
+
         # Generate data structures
         summary = self.generate_summary(
             session_id=session_id,
@@ -373,14 +405,15 @@ EXPLANATION:
             checkpoints_saved=checkpoints_saved,
             last_checkpoint_hash=last_checkpoint_hash,
         )
-        
+
         features = self.generate_learned_features(
             session_id=session_id,
             samples_processed=samples_processed,
+            measured_metrics=measured_metrics,
         )
-        
+
         not_learned = self.generate_not_learned(session_id=session_id)
-        
+
         # Write files
         return {
             "summary": self.write_summary_txt(summary),
@@ -393,17 +426,18 @@ EXPLANATION:
 # LATEST REPORT SYMLINKS
 # =============================================================================
 
+
 def update_latest_symlinks(reports_dir: str = "reports/g38_training") -> None:
     """Update symlinks to latest reports (with fallback to copy on Windows)."""
     import shutil
-    
+
     reports_path = Path(reports_dir)
-    
+
     # Find latest of each type
     summaries = sorted(reports_path.glob("training_summary_*.txt"))
     learned = sorted(reports_path.glob("learned_features_*.json"))
     not_learned = sorted(reports_path.glob("not_learned_yet_*.txt"))
-    
+
     def _link_or_copy(latest: Path, target: Path) -> None:
         """Create symlink or fallback to copy on Windows."""
         if target.is_symlink() or target.exists():
@@ -413,14 +447,14 @@ def update_latest_symlinks(reports_dir: str = "reports/g38_training") -> None:
         except OSError:
             # Fallback: copy file on Windows without admin privileges
             shutil.copy(latest, target)
-    
+
     # Create/update links
     if summaries:
         _link_or_copy(summaries[-1], reports_path / "training_summary.txt")
-    
+
     if learned:
         _link_or_copy(learned[-1], reports_path / "learned_features.json")
-    
+
     if not_learned:
         _link_or_copy(not_learned[-1], reports_path / "not_learned_yet.txt")
 
@@ -428,6 +462,7 @@ def update_latest_symlinks(reports_dir: str = "reports/g38_training") -> None:
 # =============================================================================
 # MAIN ENTRY POINT
 # =============================================================================
+
 
 def generate_training_report(
     total_epochs: int,
@@ -439,14 +474,15 @@ def generate_training_report(
     samples_processed: int = 0,
     training_mode: TrainingMode = TrainingMode.MODE_A,
     reports_dir: str = "reports/g38_training",
+    measured_metrics: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
     """
     Main function to generate training reports after training stops.
-    
+
     Call this after each training session completes.
     """
     generator = TrainingReportGenerator(reports_dir)
-    
+
     paths = generator.generate_all_reports(
         total_epochs=total_epochs,
         training_mode=training_mode,
@@ -456,8 +492,9 @@ def generate_training_report(
         checkpoints_saved=checkpoints_saved,
         last_checkpoint_hash=last_checkpoint_hash,
         samples_processed=samples_processed,
+        measured_metrics=measured_metrics,
     )
-    
+
     update_latest_symlinks(reports_dir)
-    
+
     return {k: str(v) for k, v in paths.items()}

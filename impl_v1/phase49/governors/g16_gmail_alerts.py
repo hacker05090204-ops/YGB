@@ -21,7 +21,11 @@ from typing import Optional, List, Dict
 import uuid
 import os
 import secrets
+import hashlib
+import hmac
+import smtplib
 from datetime import datetime, UTC, timedelta
+from email.message import EmailMessage
 
 # Import owner alert types
 from .g10_owner_alerts import (
@@ -34,6 +38,7 @@ from .g10_owner_alerts import (
 
 class EmailStatus(Enum):
     """CLOSED ENUM - 5 statuses"""
+
     PENDING = "PENDING"
     SENT = "SENT"
     FAILED = "FAILED"
@@ -43,6 +48,7 @@ class EmailStatus(Enum):
 
 class VerificationStatus(Enum):
     """CLOSED ENUM - 4 statuses"""
+
     PENDING = "PENDING"
     VERIFIED = "VERIFIED"
     EXPIRED = "EXPIRED"
@@ -52,6 +58,7 @@ class VerificationStatus(Enum):
 @dataclass(frozen=True)
 class GmailAlertConfig:
     """Gmail SMTP configuration."""
+
     owner_email: str
     smtp_server: str = "smtp.gmail.com"
     smtp_port: int = 587
@@ -61,6 +68,7 @@ class GmailAlertConfig:
 @dataclass(frozen=True)
 class VerificationPassword:
     """Time-limited verification password."""
+
     password_id: str
     password_hash: str  # Never store plaintext
     created_at: str
@@ -71,6 +79,7 @@ class VerificationPassword:
 @dataclass(frozen=True)
 class AlertSendResult:
     """Result of sending an alert."""
+
     result_id: str
     alert_id: str
     email_status: EmailStatus
@@ -78,8 +87,8 @@ class AlertSendResult:
     timestamp: str
 
 
-# Default owner email (configurable)
-DEFAULT_OWNER_EMAIL = "hacker05090204@gmail.com"
+# No embedded recipient. Production must configure OWNER_EMAIL explicitly.
+DEFAULT_OWNER_EMAIL = ""
 
 # Password expiry (5 minutes)
 PASSWORD_EXPIRY_MINUTES = 5
@@ -108,10 +117,10 @@ def clear_verification_store():
 def generate_verification_password() -> tuple:
     """
     Generate cryptographically random password.
-    
+
     Returns:
         (plaintext_password, VerificationPassword)
-        
+
     Password characteristics:
     - Variable length (16-24 characters)
     - Cryptographically secure random
@@ -121,13 +130,12 @@ def generate_verification_password() -> tuple:
     # Variable length password (16-24 chars)
     length = secrets.randbelow(9) + 16  # 16-24 chars
     plaintext = secrets.token_urlsafe(length)[:length]
-    
-    # Hash for storage (in real impl, use bcrypt/argon2)
-    password_hash = secrets.token_hex(32)  # Placeholder hash
-    
+
+    password_hash = hashlib.sha256(plaintext.encode("utf-8")).hexdigest()
+
     now = datetime.now(UTC)
     expires = now + timedelta(minutes=PASSWORD_EXPIRY_MINUTES)
-    
+
     verification = VerificationPassword(
         password_id=f"PWD-{uuid.uuid4().hex[:16].upper()}",
         password_hash=password_hash,
@@ -135,9 +143,9 @@ def generate_verification_password() -> tuple:
         expires_at=expires.isoformat(),
         status=VerificationStatus.PENDING,
     )
-    
+
     _verification_store[verification.password_id] = verification
-    
+
     return plaintext, verification
 
 
@@ -154,15 +162,15 @@ def is_password_expired(password: VerificationPassword) -> bool:
 def verify_password(password_id: str, submitted_password: str) -> tuple:
     """
     Verify a submitted password.
-    
+
     Returns:
         (verified: bool, reason: str)
     """
     if password_id not in _verification_store:
         return False, "Password ID not found"
-    
+
     password = _verification_store[password_id]
-    
+
     if is_password_expired(password):
         # Update status
         expired = VerificationPassword(
@@ -174,12 +182,13 @@ def verify_password(password_id: str, submitted_password: str) -> tuple:
         )
         _verification_store[password_id] = expired
         return False, "Password has expired (5 minute limit)"
-    
-    # In real implementation, compare hashes
-    # For governance testing, accept any non-empty password
+
     if not submitted_password:
         return False, "Empty password submitted"
-    
+    submitted_hash = hashlib.sha256(submitted_password.encode("utf-8")).hexdigest()
+    if not hmac.compare_digest(password.password_hash, submitted_hash):
+        return False, "Password verification failed"
+
     verified = VerificationPassword(
         password_id=password.password_id,
         password_hash=password.password_hash,
@@ -188,33 +197,32 @@ def verify_password(password_id: str, submitted_password: str) -> tuple:
         status=VerificationStatus.VERIFIED,
     )
     _verification_store[password_id] = verified
-    
+
     return True, "Password verified successfully"
 
 
 def send_alert(
     alert: OwnerAlert,
     config: Optional[GmailAlertConfig] = None,
-    _mock_send: bool = True,  # For testing
+    _mock_send: bool = False,  # For testing only
 ) -> AlertSendResult:
     """
     Send alert email to owner.
-    
+
     RULE: Email is ALERT ONLY - cannot approve execution.
-    
+
     Args:
         alert: The alert to send
         config: Gmail configuration
         _mock_send: If True, don't actually send (testing mode)
-    
+
     Returns:
         AlertSendResult with send status
     """
     if config is None:
         config = get_config()
-    
+
     if _mock_send:
-        # Mock successful send for testing
         result = AlertSendResult(
             result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
             alert_id=alert.alert_id,
@@ -224,20 +232,81 @@ def send_alert(
         )
         _sent_alerts.append(result)
         return result
-    
-    # In real implementation, would use smtplib here
-    return AlertSendResult(
-        result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
-        alert_id=alert.alert_id,
-        email_status=EmailStatus.PENDING,
-        error_message="SMTP not implemented in governance layer",
-        timestamp=datetime.now(UTC).isoformat(),
+
+    smtp_username = os.environ.get("SMTP_USERNAME", "").strip()
+    smtp_password = os.environ.get("SMTP_PASSWORD", "").strip()
+    sender_email = os.environ.get("SMTP_FROM_EMAIL", smtp_username).strip()
+
+    if not config.owner_email:
+        result = AlertSendResult(
+            result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
+            alert_id=alert.alert_id,
+            email_status=EmailStatus.FAILED,
+            error_message="OWNER_EMAIL is not configured",
+            timestamp=datetime.now(UTC).isoformat(),
+        )
+        _sent_alerts.append(result)
+        return result
+
+    if not smtp_username or not smtp_password or not sender_email:
+        result = AlertSendResult(
+            result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
+            alert_id=alert.alert_id,
+            email_status=EmailStatus.FAILED,
+            error_message="SMTP credentials are not configured",
+            timestamp=datetime.now(UTC).isoformat(),
+        )
+        _sent_alerts.append(result)
+        return result
+
+    message = EmailMessage()
+    message["Subject"] = f"[{alert.severity.value}] {alert.title}"
+    message["From"] = sender_email
+    message["To"] = config.owner_email
+    message.set_content(
+        "\n".join(
+            [
+                f"Alert ID: {alert.alert_id}",
+                f"Type: {alert.alert_type.value}",
+                f"Severity: {alert.severity.value}",
+                f"Device: {alert.device_id}",
+                f"Status: {alert.status.value}",
+                "",
+                alert.message,
+            ]
+        )
     )
+
+    try:
+        with smtplib.SMTP(config.smtp_server, config.smtp_port, timeout=30) as client:
+            if config.use_tls:
+                client.starttls()
+            client.login(smtp_username, smtp_password)
+            client.send_message(message)
+        result = AlertSendResult(
+            result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
+            alert_id=alert.alert_id,
+            email_status=EmailStatus.SENT,
+            error_message=None,
+            timestamp=datetime.now(UTC).isoformat(),
+        )
+    except Exception as exc:
+        result = AlertSendResult(
+            result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
+            alert_id=alert.alert_id,
+            email_status=EmailStatus.FAILED,
+            error_message=str(exc),
+            timestamp=datetime.now(UTC).isoformat(),
+        )
+
+    _sent_alerts.append(result)
+    return result
 
 
 def send_new_device_alert(device_id: str, ip_address: str) -> AlertSendResult:
     """Send alert for new device registration."""
     from .g10_owner_alerts import alert_new_login
+
     alert = alert_new_login(device_id, ip_address)
     return send_alert(alert)
 
@@ -245,6 +314,7 @@ def send_new_device_alert(device_id: str, ip_address: str) -> AlertSendResult:
 def send_new_ip_alert(device_id: str, old_ip: str, new_ip: str) -> AlertSendResult:
     """Send alert for IP address change."""
     from .g10_owner_alerts import alert_new_ip
+
     alert = alert_new_ip(device_id, old_ip, new_ip)
     return send_alert(alert)
 
@@ -256,6 +326,7 @@ def send_geo_mismatch_alert(
 ) -> AlertSendResult:
     """Send alert for geographic mismatch."""
     from .g10_owner_alerts import alert_geo_mismatch
+
     alert = alert_geo_mismatch(device_id, expected_country, actual_country)
     return send_alert(alert)
 
@@ -263,6 +334,7 @@ def send_geo_mismatch_alert(
 def send_license_violation_alert(device_id: str, violation: str) -> AlertSendResult:
     """Send alert for license violation."""
     from .g10_owner_alerts import create_alert, AlertType
+
     alert = create_alert(
         alert_type=AlertType.LICENSE_FAILURE,
         title="License Violation Detected",
@@ -272,15 +344,20 @@ def send_license_violation_alert(device_id: str, violation: str) -> AlertSendRes
     return send_alert(alert)
 
 
-def send_risk_escalation_alert(device_id: str, risk_level: str, reason: str) -> AlertSendResult:
+def send_risk_escalation_alert(
+    device_id: str, risk_level: str, reason: str
+) -> AlertSendResult:
     """Send alert for risk escalation."""
     from .g10_owner_alerts import create_alert, AlertType, AlertSeverity
+
     alert = create_alert(
         alert_type=AlertType.AUTONOMY_ABUSE,
         title=f"Risk Escalation: {risk_level}",
         message=reason,
         device_id=device_id,
-        severity_override=AlertSeverity.HIGH if risk_level == "HIGH" else AlertSeverity.CRITICAL,
+        severity_override=AlertSeverity.HIGH
+        if risk_level == "HIGH"
+        else AlertSeverity.CRITICAL,
     )
     return send_alert(alert)
 

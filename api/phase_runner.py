@@ -176,6 +176,7 @@ class Finding:
     url: str = ""
     confidence: float = 0.0
     verification_status: str = "UNVERIFIED"
+    verification_classification: str = "hypothesis"
     evidence: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -452,6 +453,7 @@ class UnifiedPhaseRunner:
         target_url = url or context.target_url
         confidence = 0.0
         verification_status = "UNVERIFIED"
+        verification_classification = "hypothesis"
         merged_evidence = dict(evidence or {})
 
         if self.accuracy_engine is not None:
@@ -498,6 +500,7 @@ class UnifiedPhaseRunner:
             context.seen_finding_fingerprints.add(outcome.fingerprint)
             confidence = outcome.confidence
             verification_status = outcome.status
+            verification_classification = outcome.classification
             if verification_status == "CONFIRMED":
                 verification_counters["confirmed"] = (
                     int(verification_counters.get("confirmed", 0)) + 1
@@ -519,6 +522,7 @@ class UnifiedPhaseRunner:
             url=target_url,
             confidence=confidence,
             verification_status=verification_status,
+            verification_classification=verification_classification,
             evidence=merged_evidence,
         )
         context.findings.append(finding)

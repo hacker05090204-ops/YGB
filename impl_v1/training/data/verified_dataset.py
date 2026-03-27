@@ -11,6 +11,7 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Iterable, Optional
+from urllib.parse import urlparse
 
 from impl_v1.training.evaluation.accuracy_metrics import normalize_text, token_set
 
@@ -76,16 +77,15 @@ def _record_is_validated(payload: dict[str, Any]) -> bool:
 
 
 def _record_actual_positive(payload: dict[str, Any]) -> Optional[bool]:
+    status = str(payload.get("verification_status", "")).upper()
+    if bool(payload.get("duplicate")) or status == "DUPLICATE":
+        return None
     if "actual_positive" in payload:
         return bool(payload.get("actual_positive"))
-    status = str(payload.get("verification_status", "")).upper()
     proof_status = str(payload.get("proof_status", "")).upper()
     if proof_status == "REAL" or status == "CONFIRMED":
         return True
-    if (
-        status in {"REJECTED_FALSE_POSITIVE", "NOT_REAL", "DUPLICATE"}
-        or proof_status == "NOT_REAL"
-    ):
+    if status in {"REJECTED_FALSE_POSITIVE", "NOT_REAL"} or proof_status == "NOT_REAL":
         return False
     return None
 
@@ -144,36 +144,30 @@ def load_verified_records(
 def encode_verified_record(
     record: VerifiedFindingRecord, feature_dim: int = 256
 ) -> list[float]:
-    """Encode validated record content into a deterministic dense vector."""
+    """Encode pre-verification content into a deterministic dense vector."""
     vector = [0.0] * feature_dim
-    severity_scale = {
-        "CRITICAL": 1.0,
-        "HIGH": 0.8,
-        "MEDIUM": 0.6,
-        "LOW": 0.4,
-        "INFO": 0.2,
-    }
-    vector[0] = severity_scale.get(record.severity.upper(), 0.1)
-    vector[1] = min(len(normalize_text(record.title)) / 120.0, 1.0)
-    vector[2] = min(len(normalize_text(record.description)) / 500.0, 1.0)
-    vector[3] = 1.0 if record.duplicate else 0.0
-    vector[4] = min(max(record.confidence, 0.0), 1.0)
-    vector[5] = 1.0 if "http" in record.url.lower() else 0.0
-    vector[6] = 1.0 if record.evidence.get("payload_tested") else 0.0
-    vector[7] = min(len(record.evidence.get("sql_errors") or []) / 5.0, 1.0)
-    vector[8] = min(len(record.evidence.get("reflected_parameters") or []) / 5.0, 1.0)
-    vector[9] = 1.0 if record.evidence.get("needs_manual_review") else 0.0
+    normalized_title = normalize_text(record.title)
+    normalized_description = normalize_text(record.description)
+    parsed_url = urlparse(record.url)
+    normalized_url = normalize_text(
+        f"{parsed_url.netloc} {parsed_url.path} {parsed_url.query}"
+    )
+    vector[0] = min(len(normalized_title) / 120.0, 1.0)
+    vector[1] = min(len(normalized_description) / 500.0, 1.0)
+    vector[2] = 1.0 if parsed_url.scheme in {"http", "https"} else 0.0
+    vector[3] = min(
+        len([part for part in parsed_url.path.split("/") if part]) / 8.0, 1.0
+    )
+    vector[4] = 1.0 if parsed_url.query else 0.0
 
     tokens = []
     tokens.extend(token_set(record.category))
-    tokens.extend(token_set(record.severity))
-    tokens.extend(token_set(record.title))
-    tokens.extend(token_set(record.description))
-    tokens.extend(token_set(record.url))
-    tokens.extend(sorted(token_set(" ".join(sorted(record.evidence.keys())))))
+    tokens.extend(token_set(normalized_title))
+    tokens.extend(token_set(normalized_description))
+    tokens.extend(token_set(normalized_url))
     for token in tokens:
         digest = hashlib.sha256(token.encode("utf-8")).digest()
-        index = 10 + (int.from_bytes(digest[:2], "big") % max(feature_dim - 10, 1))
+        index = 5 + (int.from_bytes(digest[:2], "big") % max(feature_dim - 5, 1))
         sign = 1.0 if digest[2] % 2 == 0 else -1.0
         vector[index] += sign * 0.1
 
@@ -188,7 +182,17 @@ def split_verified_records(
     train: list[VerifiedFindingRecord] = []
     holdout: list[VerifiedFindingRecord] = []
     for record in records:
-        if _stable_split(record.fingerprint, holdout_fraction):
+        parsed_url = urlparse(record.url)
+        semantic_key = "|".join(
+            [
+                record.category.upper(),
+                normalize_text(record.title),
+                parsed_url.netloc.lower(),
+                parsed_url.path.lower(),
+            ]
+        )
+        split_key = semantic_key or record.fingerprint
+        if _stable_split(split_key, holdout_fraction):
             holdout.append(record)
         else:
             train.append(record)

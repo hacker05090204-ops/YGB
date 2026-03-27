@@ -9,8 +9,9 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
+import hashlib
 from typing import Any, Optional, Sequence
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, urlparse
 
 from impl_v1.phase49.governors.g32_reasoning_scope_engine import (
     DuplicateCheckResult,
@@ -67,6 +68,7 @@ class VerificationBlueprint:
     methods: list[str]
     blind_checks: list[str]
     stop_conditions: list[str]
+    classification_thresholds: dict[str, float] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -84,6 +86,18 @@ class LearningCandidate:
         payload = asdict(self)
         payload["uncertainty"] = round(self.uncertainty, 4)
         return payload
+
+
+@dataclass(slots=True)
+class TaskUnit:
+    unit_id: str
+    goal: str
+    assigned_agent: str
+    verification_requirement: str
+    depends_on: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
 
 
 @dataclass(slots=True)
@@ -126,6 +140,7 @@ class AutonomousCoordinator:
         ).lower()
         dom_excerpt = str(context.get("dom_excerpt") or "")
         meta_content = str(context.get("meta_content") or "")
+        similar_experiences = list(context.get("similar_experiences") or [])
         indicators = detect_context_indicators(dom_excerpt, meta_content + " " + query)
         routes: list[AgentRoute] = []
 
@@ -174,6 +189,24 @@ class AutonomousCoordinator:
             if history.runs:
                 score += max(min((history.score - 0.5) * 0.3, 0.12), -0.12)
                 reasons.append(f"Historical score {history.score:.2f}")
+            if similar_experiences:
+                strategy_hits = sum(
+                    1
+                    for item in similar_experiences
+                    if str(
+                        (item.get("metadata") or {}).get("agent_name")
+                        or item.get("content")
+                        or ""
+                    )
+                    .lower()
+                    .find(getattr(agent, "name", "").lower())
+                    >= 0
+                )
+                if strategy_hits:
+                    score += min(0.05 * strategy_hits, 0.15)
+                    reasons.append(
+                        f"Memory reuse suggests this agent ({strategy_hits} prior hits)"
+                    )
 
             routes.append(
                 AgentRoute(
@@ -189,6 +222,85 @@ class AutonomousCoordinator:
         routes.sort(key=lambda item: item.score, reverse=True)
         return routes
 
+    def _url_similarity(self, left: str, right: str) -> float:
+        if not left or not right:
+            return 0.0
+        left_parsed = urlparse(left)
+        right_parsed = urlparse(right)
+        host_score = (
+            1.0 if left_parsed.netloc.lower() == right_parsed.netloc.lower() else 0.0
+        )
+        path_score = token_overlap(left_parsed.path, right_parsed.path)
+        param_score = token_overlap(
+            " ".join(
+                name for name, _ in parse_qsl(left_parsed.query, keep_blank_values=True)
+            ),
+            " ".join(
+                name
+                for name, _ in parse_qsl(right_parsed.query, keep_blank_values=True)
+            ),
+        )
+        return min((host_score * 0.5) + (path_score * 0.35) + (param_score * 0.15), 1.0)
+
+    def _payload_similarity(
+        self,
+        evidence: dict[str, Any],
+        current_findings: Sequence[dict[str, Any]],
+    ) -> float:
+        payload_tokens = " ".join(
+            str(evidence.get(key) or "")
+            for key in (
+                "payload",
+                "input_vector",
+                "parameter",
+                "candidate_url",
+            )
+        )
+        if not payload_tokens.strip():
+            return 0.0
+        return max(
+            (
+                token_overlap(
+                    payload_tokens,
+                    " ".join(
+                        str(item.get(key) or "")
+                        for key in ("title", "description", "url")
+                    ),
+                )
+                for item in current_findings
+            ),
+            default=0.0,
+        )
+
+    def _response_fingerprint(self, evidence: dict[str, Any]) -> str:
+        payload = {
+            "status": evidence.get("status_code"),
+            "sql_errors": evidence.get("sql_errors") or [],
+            "reflection": evidence.get("reflected_parameters") or [],
+            "response_before": str(evidence.get("response_before") or "")[:200],
+            "response_after": str(evidence.get("response_after") or "")[:200],
+        }
+        return hashlib.sha256(str(payload).encode("utf-8")).hexdigest()[:24]
+
+    def _response_fingerprint_similarity(
+        self,
+        evidence: dict[str, Any],
+        current_findings: Sequence[dict[str, Any]],
+    ) -> float:
+        fingerprint = self._response_fingerprint(evidence)
+        if fingerprint == hashlib.sha256(str({}).encode("utf-8")).hexdigest()[:24]:
+            return 0.0
+        matches = 0
+        total = 0
+        for item in current_findings:
+            item_evidence = item.get("evidence") or {}
+            if not isinstance(item_evidence, dict):
+                continue
+            total += 1
+            if self._response_fingerprint(item_evidence) == fingerprint:
+                matches += 1
+        return (matches / total) if total else 0.0
+
     def _build_duplicate_signal(
         self,
         *,
@@ -203,6 +315,16 @@ class AutonomousCoordinator:
                 for item in current_findings
             ]
             duplicate_density = max(overlaps or [0.0])
+            duplicate_density = max(
+                duplicate_density,
+                max(
+                    (
+                        self._url_similarity(target, str(item.get("url") or ""))
+                        for item in current_findings
+                    ),
+                    default=0.0,
+                ),
+            )
         summary = self.accuracy_feedback.summary()
         acceptance_rate = 0.5
         if isinstance(summary, dict) and int(summary.get("validated_records", 0)) > 0:
@@ -214,6 +336,77 @@ class AutonomousCoordinator:
             program_age_days=int(len(target) * 3) if target else 30,
             platform_duplicate_density=min(duplicate_density, 1.0),
         )
+
+    def _task_decomposition(
+        self,
+        *,
+        task_type: str,
+        routes: Sequence[AgentRoute],
+        selection: TestSelectionResult,
+        blueprint: VerificationBlueprint,
+    ) -> list[TaskUnit]:
+        primary_agent = routes[0].agent_name if routes else "workflow-orchestrator"
+        verifier = next(
+            (route.agent_name for route in routes if "verify" in route.agent_name),
+            primary_agent,
+        )
+        units: list[TaskUnit] = [
+            TaskUnit(
+                unit_id="unit-analyze-input",
+                goal="Analyze target and derive governed strategy",
+                assigned_agent=primary_agent,
+                verification_requirement="reasoning-trace-required",
+            )
+        ]
+        for index, test in enumerate(selection.enabled_tests[:4], start=1):
+            units.append(
+                TaskUnit(
+                    unit_id=f"unit-test-{index}",
+                    goal=f"Evaluate {test.value} with {blueprint.level} verification",
+                    assigned_agent=primary_agent,
+                    verification_requirement="verification-blueprint-required",
+                    depends_on=["unit-analyze-input"],
+                )
+            )
+        units.append(
+            TaskUnit(
+                unit_id="unit-verify-findings",
+                goal="Run direct/blind/proof verification before keeping any finding",
+                assigned_agent=verifier,
+                verification_requirement="confirmed-or-probable-only",
+                depends_on=[
+                    unit.unit_id
+                    for unit in units
+                    if unit.unit_id.startswith("unit-test-")
+                ],
+            )
+        )
+        if task_type.lower() in {"training", "ml", "learning"}:
+            units.append(
+                TaskUnit(
+                    unit_id="unit-learning-update",
+                    goal="Queue incremental learning update using validated-only outcomes",
+                    assigned_agent="learning-agent",
+                    verification_requirement="validated-data-only",
+                    depends_on=["unit-verify-findings"],
+                )
+            )
+        return units
+
+    def _classification_from_quality(
+        self,
+        *,
+        data_quality: DataQualityAssessment,
+        verification_status: str,
+    ) -> str:
+        if verification_status == "CONFIRMED":
+            return "confirmed"
+        if (
+            verification_status in {"LIKELY", "NEEDS_REVIEW"}
+            or data_quality.destination == "quarantine"
+        ):
+            return "probable"
+        return "hypothesis"
 
     def build_reasoning_trace(
         self,
@@ -231,6 +424,7 @@ class AutonomousCoordinator:
         category = str(context.get("category") or "AUTH")
         evidence = dict(context.get("evidence") or {})
         current_findings = list(context.get("current_findings") or [])
+        similar_experiences = list(context.get("similar_experiences") or [])
 
         scope_result = (
             parse_scope_text(scope_text, context.get("program_name", ""))
@@ -256,6 +450,24 @@ class AutonomousCoordinator:
             duplicate=not duplicate_signal.should_proceed,
             confidence=float(context.get("confidence") or 0.0),
         )
+        payload_similarity = self._payload_similarity(evidence, current_findings)
+        response_similarity = self._response_fingerprint_similarity(
+            evidence, current_findings
+        )
+        if payload_similarity >= 0.82 or response_similarity >= 0.9:
+            data_quality = self.data_pipeline.assess_candidate(
+                category=category,
+                severity=severity,
+                title=str(context.get("title") or query[:80]),
+                description=str(context.get("description") or query),
+                url=target,
+                evidence=evidence,
+                verification_status=str(
+                    context.get("verification_status") or "UNVERIFIED"
+                ),
+                duplicate=True,
+                confidence=float(context.get("confidence") or 0.0),
+            )
 
         primary_test = selection.enabled_tests[0] if selection.enabled_tests else None
         explanation: Optional[ReasoningExplanation] = None
@@ -269,6 +481,7 @@ class AutonomousCoordinator:
 
         verification_methods = [
             "response-validation",
+            "behavioral-validation",
             "proof-verification",
             "duplicate-suppression",
         ]
@@ -294,6 +507,21 @@ class AutonomousCoordinator:
             methods=verification_methods,
             blind_checks=blind_checks,
             stop_conditions=stop_conditions,
+            classification_thresholds={
+                "confirmed": 0.85,
+                "probable": 0.55,
+                "hypothesis": 0.0,
+            },
+        )
+        classification = self._classification_from_quality(
+            data_quality=data_quality,
+            verification_status=str(context.get("verification_status") or "UNVERIFIED"),
+        )
+        task_units = self._task_decomposition(
+            task_type=task_type,
+            routes=routes,
+            selection=selection,
+            blueprint=blueprint,
         )
 
         steps = [
@@ -321,6 +549,11 @@ class AutonomousCoordinator:
                 summary=f"Candidate quality score {data_quality.score:.2f} routed to {data_quality.destination}",
                 evidence=data_quality.reasons or ["High-quality candidate"],
             ),
+            ReasoningStep(
+                name="task-decomposition",
+                summary=f"Decomposed work into {len(task_units)} governed task units before execution",
+                evidence=[unit.goal for unit in task_units[:4]],
+            ),
         ]
 
         learning_candidate: Optional[LearningCandidate] = None
@@ -343,8 +576,28 @@ class AutonomousCoordinator:
             "selected_tests": self._serialize_test_selection(selection),
             "expert_routes": [route.to_dict() for route in routes[:5]],
             "duplicate_signal": self._serialize_duplicate_signal(duplicate_signal),
+            "duplicate_features": {
+                "url_similarity": round(
+                    max(
+                        (
+                            self._url_similarity(target, str(item.get("url") or ""))
+                            for item in current_findings
+                        ),
+                        default=0.0,
+                    ),
+                    4,
+                ),
+                "payload_similarity": round(payload_similarity, 4),
+                "response_fingerprint_similarity": round(response_similarity, 4),
+            },
             "verification_blueprint": blueprint.to_dict(),
+            "classification": classification,
             "data_quality": data_quality.to_dict(),
+            "task_units": [unit.to_dict() for unit in task_units],
+            "memory_reuse": {
+                "similar_experiences": len(similar_experiences),
+                "strategy_reuse_recommended": bool(similar_experiences),
+            },
             "learning_candidate": learning_candidate.to_dict()
             if learning_candidate
             else None,
@@ -389,6 +642,7 @@ class AutonomousCoordinator:
             f"Use {blueprint.get('level', 'standard')} verification for this request",
             f"Enable blind checks: {', '.join(blueprint.get('blind_checks', [])) or 'none required'}",
             f"Reject or quarantine low-quality data below score {trace.get('data_quality', {}).get('score', 0.0):.2f} when evidence is incomplete",
+            f"Current classification is {trace.get('classification', 'hypothesis')}; do not treat it as confirmed until verification succeeds",
         ]
         if similar_experiences:
             recommendations.append(
@@ -455,6 +709,7 @@ class AutonomousCoordinator:
     def snapshot(self, agents: Sequence[Any]) -> dict[str, Any]:
         return {
             "data_pipeline": self.data_pipeline.summary(),
+            "incremental_training": self.data_pipeline.build_incremental_training_plan(),
             "idle_learning": self.recommend_idle_learning(),
             "agent_routes": [
                 route.to_dict()

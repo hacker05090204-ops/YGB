@@ -1,5 +1,9 @@
 # YGB Backend Optimization Summary
 
+> Reality note (2026-03-26): production paths are being shifted away from fake/demo outputs.
+> Where a real integration is not configured, the code should now fail closed with explicit
+> `FAILED`, `OFFLINE`, `DEGRADED`, or empty-state responses instead of mock success data.
+
 ## Overview
 
 This document summarizes the comprehensive backend optimizations implemented for the YGB Bug Bounty Research System. The optimizations focus on performance, code organization, error handling, and maintainability.

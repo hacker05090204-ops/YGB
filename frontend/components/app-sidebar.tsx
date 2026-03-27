@@ -1,8 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 import {
   LayoutDashboard,
   Bug,
@@ -11,12 +12,12 @@ import {
   ShieldCheck,
   Settings,
   HelpCircle,
-  Command,
   ShieldAlert,
   Play,
 } from "lucide-react"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
+import { API_BASE } from "@/lib/api-base"
 
 import { NavUser } from "@/components/nav-user"
 import {
@@ -31,13 +32,14 @@ import {
   SidebarGroupContent,
 } from "@/components/ui/sidebar"
 
+const DEFAULT_USER = {
+  name: "Local Session",
+  email: "No connected user",
+  avatar: "/avatars/agnish.jpg",
+}
+
 // Data Structure
 const data = {
-  user: {
-    name: "BugHunter_01",
-    email: "hunter@bugbounty.com",
-    avatar: "/avatars/agnish.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -87,6 +89,36 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const containerRef = useRef(null)
   const pathname = usePathname()
+  const [user, setUser] = useState(DEFAULT_USER)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadUser = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/db/users?limit=1`, { cache: "no-store" })
+        if (!response.ok) {
+          return
+        }
+        const payload = await response.json()
+        const firstUser = payload.users?.[0]
+        if (!cancelled && firstUser) {
+          setUser({
+            name: firstUser.name || "Connected User",
+            email: firstUser.email || "Email unavailable",
+            avatar: DEFAULT_USER.avatar,
+          })
+        }
+      } catch {
+        // Keep honest local-session fallback when live user data is unavailable.
+      }
+    }
+
+    void loadUser()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   useGSAP(() => {
     // Staggered entry for menu items
@@ -115,15 +147,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="/" className="group">
-                <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary/20 text-primary ring-1 ring-primary/50 group-hover:bg-primary/30 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-all duration-300">
-                  <ShieldAlert className="size-6" />
-                </div>
+                <Link href="/" className="group">
+                  <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary/20 text-primary ring-1 ring-primary/50 group-hover:bg-primary/30 group-hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-all duration-300">
+                    <ShieldAlert className="size-6" />
+                  </div>
                 <div className="grid flex-1 text-left text-sm leading-tight ml-2">
                   <span className="truncate text-xl font-bold tracking-tight text-foreground">BugBounty</span>
                   <span className="truncate text-xs text-muted-foreground font-mono">v2.0 Secure</span>
                 </div>
-              </a>
+                </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -174,7 +206,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter className="sidebar-item p-4">
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

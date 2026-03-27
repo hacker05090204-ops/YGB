@@ -52,6 +52,7 @@ def test_reasoning_trace_adds_blind_checks(tmp_path: Path):
     blueprint = trace["verification_blueprint"]
     assert "oob-callback-check" in blueprint["blind_checks"]
     assert "time-based-blind-check" in blueprint["blind_checks"]
+    assert trace["task_units"]
     assert trace["expert_routes"][0]["agent_name"] in {
         "workflow-orchestrator",
         "verification-agent",
@@ -101,6 +102,31 @@ def test_data_pipeline_quarantines_uncertain_candidate(tmp_path: Path):
     assert pipeline.summary()["quarantine"] == 1
 
 
+def test_data_pipeline_builds_incremental_training_plan(tmp_path: Path):
+    pipeline = AutonomousDataPipeline(tmp_path)
+    for index in range(3):
+        pipeline.record_candidate(
+            category="SQLI",
+            severity="HIGH",
+            title=f"Validated SQLi {index}",
+            description="Confirmed candidate with proof and replay evidence for incremental learning.",
+            url=f"https://example.com/items/{index}",
+            evidence={
+                "payload_tested": True,
+                "response_validated": True,
+                "proof_verified": True,
+                "reproduction_count": 2,
+            },
+            verification_status="CONFIRMED",
+            duplicate=False,
+            confidence=0.97,
+        )
+
+    plan = pipeline.build_incremental_training_plan()
+    assert plan["retrain_from_scratch"] is False
+    assert plan["validated_records"] == 3
+
+
 def test_accuracy_engine_confirms_blind_time_based_signal(tmp_path: Path):
     store = AccuracyFeedbackStore(tmp_path / "verified.jsonl")
     engine = AccuracyEngine(store)
@@ -123,7 +149,63 @@ def test_accuracy_engine_confirms_blind_time_based_signal(tmp_path: Path):
     )
 
     assert outcome.status == "CONFIRMED"
+    assert outcome.classification == "confirmed"
     assert any("Time-based blind signal" in note for note in outcome.notes)
+
+
+def test_accuracy_engine_uses_oob_and_proof_verification(tmp_path: Path):
+    store = AccuracyFeedbackStore(tmp_path / "verified.jsonl")
+    engine = AccuracyEngine(store, AutonomousDataPipeline(tmp_path))
+
+    outcome = engine.verify(
+        category="SSRF",
+        severity="HIGH",
+        title="SSRF callback confirmation",
+        description="out-of-band callback with reproducible proof",
+        url="https://example.com/fetch?url=http://cb",
+        evidence={
+            "payload_tested": True,
+            "oob_confirmed": True,
+            "input_vector": "url",
+            "response_before": "ok",
+            "response_after": "delayed ok",
+            "request_data": "GET /fetch",
+            "response_data": "200",
+            "reproduction_count": 2,
+            "video_hash": "abc123",
+            "extracted_data": "callback-hit",
+        },
+        strategy_name="verification-agent",
+        task_type="workflow",
+    )
+
+    assert outcome.status == "CONFIRMED"
+    assert any("Out-of-band callback confirmed" in note for note in outcome.notes)
+
+
+def test_accuracy_engine_uses_behavioral_validation(tmp_path: Path):
+    store = AccuracyFeedbackStore(tmp_path / "verified.jsonl")
+    engine = AccuracyEngine(store, AutonomousDataPipeline(tmp_path))
+
+    outcome = engine.verify(
+        category="IDOR",
+        severity="HIGH",
+        title="Unauthorized profile access",
+        description="changing identifiers reveals another user's profile",
+        url="https://example.com/api/profile/2",
+        evidence={
+            "payload_tested": True,
+            "unauthorized_access": True,
+            "state_change_confirmed": True,
+            "access_validated": True,
+        },
+        strategy_name="verification-agent",
+        task_type="workflow",
+    )
+
+    assert outcome.status == "CONFIRMED"
+    assert outcome.classification == "confirmed"
+    assert any("Behavioral validation confirmed" in note for note in outcome.notes)
 
 
 def test_plan_task_enriches_reasoning_trace():
@@ -142,4 +224,85 @@ def test_plan_task_enriches_reasoning_trace():
     assert plan.reasoning_trace
     assert plan.expert_routes
     assert plan.reasoning_trace["selected_tests"]["enabled_tests"]
+    assert plan.reasoning_trace["classification"] in {
+        "confirmed",
+        "probable",
+        "hypothesis",
+    }
     assert any("MoE router primary expert" in note for note in plan.strategy.notes)
+
+
+def test_reasoning_trace_uses_similarity_features(tmp_path: Path):
+    coordinator = AutonomousCoordinator(
+        AccuracyFeedbackStore(tmp_path / "verified.jsonl"),
+        StrategyFeedbackStore(),
+        AutonomousDataPipeline(tmp_path),
+    )
+
+    trace = coordinator.build_reasoning_trace(
+        "workflow",
+        {
+            "target": "https://example.com/api/user?id=1",
+            "query": "repeat possible idor finding",
+            "category": "IDOR",
+            "severity": "HIGH",
+            "evidence": {
+                "payload": "user_id=1",
+                "response_after": "email=user@example.com",
+            },
+            "current_findings": [
+                {
+                    "title": "Possible idor finding",
+                    "url": "https://example.com/api/user?id=2",
+                    "evidence": {
+                        "payload": "user_id=2",
+                        "response_after": "email=other@example.com",
+                    },
+                }
+            ],
+        },
+        _agents(),
+    )
+
+    features = trace["duplicate_features"]
+    assert features["url_similarity"] > 0
+    assert features["payload_similarity"] > 0
+
+
+def test_related_experiences_merge_verified_memory():
+    import asyncio
+
+    async def _run() -> None:
+        orchestrator = BackendOrchestrator()
+        orchestrator._register_default_agents()
+        await orchestrator.remember_experience(
+            "crawler-agent",
+            "workflow strategy for login testing",
+            {"agent_name": "crawler-agent"},
+        )
+        await orchestrator.remember_finding_outcome(
+            workflow_id="wf-1",
+            target="https://example.com/login",
+            finding={
+                "category": "AUTH",
+                "title": "Verified auth bypass",
+                "severity": "HIGH",
+                "verification_status": "CONFIRMED",
+                "verification_classification": "confirmed",
+                "confidence": 0.98,
+            },
+            strategy_name="verification-agent",
+        )
+        related = await orchestrator.retrieve_related_experiences(
+            "auth bypass login",
+            task_type="workflow",
+            limit=6,
+        )
+        assert related
+        agent_names = {
+            str((item.get("metadata") or {}).get("agent_name") or "")
+            for item in related
+        }
+        assert "crawler-agent" in agent_names or "verification-agent" in agent_names
+
+    asyncio.run(_run())

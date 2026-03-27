@@ -114,6 +114,7 @@ def load_verified_validation_samples(
                 "validation_sample_id": payload_id,
                 "fingerprint": record.fingerprint,
                 "category": record.category,
+                "predicted_positive": record.predicted_positive,
                 "actual_positive": record.actual_positive,
                 "confidence": record.confidence,
                 "ml_score": record.ml_score,
@@ -128,8 +129,11 @@ def build_prediction_from_record(
     record: Dict[str, Any], sample: ValidationSample
 ) -> PredictionResult:
     """Build a PredictionResult from a validated record."""
-    predicted = sample.ground_truth  # Ground truth equals prediction for validated data
-    confidence = float(record.get("confidence", 0.5))
+    predicted_value = record.get("predicted_positive")
+    if predicted_value is None:
+        predicted_value = float(record.get("confidence", 0.0)) >= 0.5
+    predicted = bool(predicted_value)
+    confidence = max(0.0, min(float(record.get("confidence", 0.5)), 1.0))
     return PredictionResult(
         sample_id=sample.id,
         predicted=predicted,

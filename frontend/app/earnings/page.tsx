@@ -1,47 +1,42 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
-import { DollarSign, TrendingUp, CheckCircle, CreditCard, ArrowUpRight } from "lucide-react"
+import { DollarSign, TrendingUp, CheckCircle, CreditCard } from "lucide-react"
 import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, Tooltip, PieChart, Pie, Cell, CartesianGrid } from "recharts"
 
+import { API_BASE } from "@/lib/api-base"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-const earningsByMonth = [
-    { name: 'Jan', total: 4000 },
-    { name: 'Feb', total: 3000 },
-    { name: 'Mar', total: 9800 },
-    { name: 'Apr', total: 3908 },
-    { name: 'May', total: 4800 },
-    { name: 'Jun', total: 3800 },
-    { name: 'Jul', total: 4300 },
-]
+type BountyRecord = {
+    id: string
+    title: string
+    severity?: string
+    reward?: number | null
+    status?: string
+    submitted_at?: string | null
+}
 
-const distributionData = [
-    { name: "Critical", value: 15000, color: "#a855f7" },
-    { name: "High", value: 8000, color: "#3b82f6" },
-    { name: "Medium", value: 3000, color: "#06b6d4" },
-    { name: "Low", value: 500, color: "#94a3b8" },
-]
-
-const payouts = [
-    { title: "Critical RCE in Payment Gateway", date: "Jan 12, 2024", amount: "$5,000", status: "Paid" },
-    { title: "Stored XSS in User Profile", date: "Jan 08, 2024", amount: "$1,500", status: "Paid" },
-    { title: "IDOR on Order History", date: "Dec 28, 2023", amount: "$2,000", status: "Paid" },
-    { title: "Information Disclosure via API", date: "Dec 15, 2023", amount: "$800", status: "Paid" },
-    { title: "Logic Flaw in Coupon System", date: "Nov 30, 2023", amount: "$3,500", status: "Paid" },
-]
+const COLORS = {
+    CRITICAL: "#ef4444",
+    HIGH: "#f97316",
+    MEDIUM: "#facc15",
+    LOW: "#38bdf8",
+    UNKNOWN: "#737373",
+} as const
 
 export default function EarningsPage() {
     const containerRef = useRef(null)
+    const [bounties, setBounties] = useState<BountyRecord[]>([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useGSAP(() => {
         gsap.from(".animate-item", {
@@ -50,18 +45,82 @@ export default function EarningsPage() {
             stagger: 0.1,
             duration: 0.6,
             ease: "power2.out",
-            delay: 0.2
+            delay: 0.2,
         })
-    }, { scope: containerRef })
+    }, { scope: containerRef, dependencies: [bounties.length, loading, error] })
+
+    useEffect(() => {
+        let cancelled = false
+        const loadBounties = async () => {
+            try {
+                const response = await fetch(`${API_BASE}/api/db/bounties?limit=200`, { cache: "no-store" })
+                if (!response.ok) {
+                    throw new Error(`Request failed: ${response.status}`)
+                }
+                const payload = await response.json()
+                if (!cancelled) {
+                    setBounties(Array.isArray(payload.bounties) ? payload.bounties : [])
+                    setError(null)
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setBounties([])
+                    setError(err instanceof Error ? err.message : "Failed to load earnings data")
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false)
+                }
+            }
+        }
+
+        void loadBounties()
+        return () => {
+            cancelled = true
+        }
+    }, [])
+
+    const rewardBounties = useMemo(
+        () => bounties.filter((bounty) => typeof bounty.reward === "number"),
+        [bounties],
+    )
+
+    const totalEarnings = rewardBounties.reduce((sum, bounty) => sum + Number(bounty.reward || 0), 0)
+    const paidCount = rewardBounties.filter((bounty) => (bounty.status || "").toUpperCase() === "PAID").length
+    const averageReward = rewardBounties.length > 0 ? totalEarnings / rewardBounties.length : 0
+
+    const earningsByMonth = useMemo(() => {
+        const bucket = new Map<string, number>()
+        rewardBounties.forEach((bounty) => {
+            const rawDate = bounty.submitted_at ? new Date(bounty.submitted_at) : null
+            if (!rawDate || Number.isNaN(rawDate.getTime())) {
+                return
+            }
+            const key = rawDate.toLocaleString("en-US", { month: "short" })
+            bucket.set(key, (bucket.get(key) || 0) + Number(bounty.reward || 0))
+        })
+        return Array.from(bucket.entries()).map(([name, total]) => ({ name, total }))
+    }, [rewardBounties])
+
+    const distributionData = useMemo(() => {
+        const counts = new Map<string, number>()
+        rewardBounties.forEach((bounty) => {
+            const severity = (bounty.severity || "UNKNOWN").toUpperCase()
+            counts.set(severity, (counts.get(severity) || 0) + Number(bounty.reward || 0))
+        })
+        return Array.from(counts.entries()).map(([name, value]) => ({
+            name,
+            value,
+            color: COLORS[name as keyof typeof COLORS] || COLORS.UNKNOWN,
+        }))
+    }, [rewardBounties])
 
     return (
         <SidebarProvider
-            style={
-                {
-                    "--sidebar-width": "calc(var(--spacing) * 64)",
-                    "--header-height": "calc(var(--spacing) * 12)",
-                } as React.CSSProperties
-            }
+            style={{
+                "--sidebar-width": "calc(var(--spacing) * 64)",
+                "--header-height": "calc(var(--spacing) * 12)",
+            } as React.CSSProperties}
         >
             <AppSidebar variant="inset" />
             <SidebarInset>
@@ -72,53 +131,22 @@ export default function EarningsPage() {
                 </header>
 
                 <div className="flex flex-1 flex-col p-4 md:p-8 pt-6 gap-8 max-w-7xl mx-auto w-full" ref={containerRef}>
-
                     <div className="space-y-1">
                         <h1 className="text-3xl font-bold tracking-tight text-foreground">Earnings</h1>
-                        <p className="text-muted-foreground text-lg">Track your bug bounty rewards and payouts</p>
+                        <p className="text-muted-foreground text-lg">Reward totals derived from live bounty records</p>
                     </div>
 
+                    {error && (
+                        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+                            {error}
+                        </div>
+                    )}
+
                     <div className="grid gap-4 md:grid-cols-4">
-                        <Card className="animate-item bg-card/40 border-border/50">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">Total Earnings</CardTitle>
-                                <DollarSign className="size-4 text-emerald-500" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold text-emerald-400">$26,500</div>
-                                <p className="text-xs text-muted-foreground mt-1">Lifetime total</p>
-                            </CardContent>
-                        </Card>
-                        <Card className="animate-item bg-card/40 border-border/50">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">Reports Submitted</CardTitle>
-                                <TrendingUp className="size-4 text-primary" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">42</div>
-                                <p className="text-xs text-muted-foreground mt-1">This year</p>
-                            </CardContent>
-                        </Card>
-                        <Card className="animate-item bg-card/40 border-border/50">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">Fully Paid</CardTitle>
-                                <CheckCircle className="size-4 text-blue-500" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">38</div>
-                                <p className="text-xs text-muted-foreground mt-1">90% success</p>
-                            </CardContent>
-                        </Card>
-                        <Card className="animate-item bg-card/40 border-border/50">
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">Avg per Bug</CardTitle>
-                                <CreditCard className="size-4 text-orange-500" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">$630</div>
-                                <p className="text-xs text-muted-foreground mt-1">Estimated</p>
-                            </CardContent>
-                        </Card>
+                        <MetricCard title="Total Earnings" value={`$${totalEarnings.toFixed(2)}`} caption="Rewards recorded in backend" icon={<DollarSign className="size-4 text-emerald-500" />} />
+                        <MetricCard title="Reports Submitted" value={`${bounties.length}`} caption="Live bounty records" icon={<TrendingUp className="size-4 text-primary" />} />
+                        <MetricCard title="Paid Reports" value={`${paidCount}`} caption="Status=PAID" icon={<CheckCircle className="size-4 text-blue-500" />} />
+                        <MetricCard title="Avg per Rewarded Bug" value={`$${averageReward.toFixed(2)}`} caption="Only rewarded records" icon={<CreditCard className="size-4 text-orange-500" />} />
                     </div>
 
                     <div className="grid gap-4 md:grid-cols-7">
@@ -128,18 +156,19 @@ export default function EarningsPage() {
                             </CardHeader>
                             <CardContent>
                                 <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={earningsByMonth}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                                            <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
-                                            <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                                            <Tooltip
-                                                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                                                contentStyle={{ backgroundColor: '#171717', border: '1px solid #333', borderRadius: '8px' }}
-                                            />
-                                            <Bar dataKey="total" fill="#a855f7" radius={[4, 4, 0, 0]} />
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                                    {earningsByMonth.length === 0 ? (
+                                        <div className="flex h-full items-center justify-center text-muted-foreground">No dated reward data available.</div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={earningsByMonth}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                                                <XAxis dataKey="name" stroke="#666" fontSize={12} tickLine={false} axisLine={false} />
+                                                <YAxis stroke="#666" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                                                <Tooltip cursor={{ fill: "rgba(255,255,255,0.05)" }} contentStyle={{ backgroundColor: "#171717", border: "1px solid #333", borderRadius: "8px" }} />
+                                                <Bar dataKey="total" fill="#10b981" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>
@@ -147,37 +176,30 @@ export default function EarningsPage() {
                         <Card className="animate-item md:col-span-3 bg-card/40 border-border/50">
                             <CardHeader>
                                 <CardTitle>Income Source</CardTitle>
-                                <CardDescription>By severity level</CardDescription>
+                                <CardDescription>Reward totals grouped by severity</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <PieChart>
-                                            <Pie
-                                                data={distributionData}
-                                                cx="50%"
-                                                cy="50%"
-                                                innerRadius={70}
-                                                outerRadius={90}
-                                                paddingAngle={5}
-                                                dataKey="value"
-                                            >
-                                                {distributionData.map((entry, index) => (
-                                                    <Cell key={`cell-${index}`} fill={entry.color} stroke="rgba(0,0,0,0)" />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip
-                                                contentStyle={{ backgroundColor: '#171717', border: '1px solid #333', borderRadius: '8px' }}
-                                                itemStyle={{ color: '#e5e5e5' }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
+                                    {distributionData.length === 0 ? (
+                                        <div className="flex h-full items-center justify-center text-muted-foreground">No severity-linked reward data available.</div>
+                                    ) : (
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie data={distributionData} cx="50%" cy="50%" innerRadius={70} outerRadius={90} paddingAngle={5} dataKey="value">
+                                                    {distributionData.map((entry) => (
+                                                        <Cell key={entry.name} fill={entry.color} stroke="rgba(0,0,0,0)" />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip contentStyle={{ backgroundColor: "#171717", border: "1px solid #333", borderRadius: "8px" }} itemStyle={{ color: "#e5e5e5" }} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                    )}
                                 </div>
                                 <div className="flex justify-center gap-4 text-xs text-muted-foreground">
-                                    {distributionData.map(d => (
-                                        <div key={d.name} className="flex items-center gap-1">
-                                            <div className="size-2 rounded-full" style={{ backgroundColor: d.color }}></div>
-                                            {d.name}
+                                    {distributionData.map((entry) => (
+                                        <div key={entry.name} className="flex items-center gap-1">
+                                            <div className="size-2 rounded-full" style={{ backgroundColor: entry.color }} />
+                                            {entry.name}
                                         </div>
                                     ))}
                                 </div>
@@ -187,28 +209,44 @@ export default function EarningsPage() {
 
                     <Card className="animate-item bg-card/40 border-border/50">
                         <CardHeader>
-                            <CardTitle>Recent Payouts</CardTitle>
+                            <CardTitle>Recent Rewarded Reports</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                {payouts.map((payout, i) => (
-                                    <div key={i} className="flex items-center justify-between border-b border-border/40 pb-4 last:border-0 last:pb-0">
+                                {rewardBounties.length === 0 ? (
+                                    <div className="text-muted-foreground">No rewarded reports are available.</div>
+                                ) : rewardBounties.slice(0, 10).map((bounty) => (
+                                    <div key={bounty.id} className="flex items-center justify-between border-b border-border/40 pb-4 last:border-0 last:pb-0">
                                         <div>
-                                            <div className="font-medium text-lg">{payout.title}</div>
-                                            <div className="text-sm text-muted-foreground">{payout.date}</div>
+                                            <div className="font-medium text-lg">{bounty.title}</div>
+                                            <div className="text-sm text-muted-foreground">{bounty.submitted_at || "Submission date unavailable"}</div>
                                         </div>
                                         <div className="text-right">
-                                            <div className="font-bold text-green-500">{payout.amount}</div>
-                                            <div className="text-xs text-muted-foreground">{payout.status}</div>
+                                            <div className="font-bold text-green-500">${Number(bounty.reward || 0).toFixed(2)}</div>
+                                            <div className="text-xs text-muted-foreground">{bounty.status || "Unknown"}</div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </CardContent>
                     </Card>
-
                 </div>
             </SidebarInset>
         </SidebarProvider>
+    )
+}
+
+function MetricCard({ title, value, caption, icon }: { title: string; value: string; caption: string; icon: React.ReactNode }) {
+    return (
+        <Card className="animate-item bg-card/40 border-border/50">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+                {icon}
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{value}</div>
+                <p className="text-xs text-muted-foreground mt-1">{caption}</p>
+            </CardContent>
+        </Card>
     )
 }

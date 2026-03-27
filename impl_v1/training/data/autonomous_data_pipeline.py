@@ -36,6 +36,7 @@ class DataQualityAssessment:
     reasons: list[str] = field(default_factory=list)
     evidence_strength: float = 0.0
     duplicate_risk: float = 0.0
+    reproducibility_score: float = 0.0
     created_at: str = field(default_factory=_now_iso)
 
     def to_dict(self) -> dict[str, Any]:
@@ -43,6 +44,7 @@ class DataQualityAssessment:
         payload["score"] = round(self.score, 4)
         payload["evidence_strength"] = round(self.evidence_strength, 4)
         payload["duplicate_risk"] = round(self.duplicate_risk, 4)
+        payload["reproducibility_score"] = round(self.reproducibility_score, 4)
         return payload
 
 
@@ -79,6 +81,7 @@ class AutonomousDataPipeline:
         score = 0.35
         evidence_strength = 0.0
         duplicate_risk = 1.0 if duplicate else 0.0
+        reproducibility_score = 0.0
 
         if len(title.strip()) >= 12:
             score += 0.1
@@ -97,26 +100,49 @@ class AutonomousDataPipeline:
 
         if evidence.get("payload_tested"):
             evidence_strength += 0.15
+            reproducibility_score += 0.1
         if evidence.get("response_validated"):
             evidence_strength += 0.3
+            reproducibility_score += 0.2
         if evidence.get("exploit_confirmed"):
             evidence_strength += 0.3
+            reproducibility_score += 0.25
         if evidence.get("proof_verified"):
             evidence_strength += 0.3
+            reproducibility_score += 0.2
         if evidence.get("time_based_confirmed"):
             evidence_strength += 0.2
+            reproducibility_score += 0.15
         if evidence.get("oob_confirmed"):
             evidence_strength += 0.25
+            reproducibility_score += 0.2
         if evidence.get("sql_errors"):
             evidence_strength += 0.15
+        if evidence.get("proof_replayed"):
+            reproducibility_score += 0.2
+        reproduction_count = int(
+            evidence.get("reproduction_count")
+            or evidence.get("blind_reproduction_count")
+            or 0
+        )
+        if reproduction_count >= 2:
+            reproducibility_score += min(0.25, 0.1 + (reproduction_count * 0.05))
+        elif reproduction_count == 1:
+            reproducibility_score += 0.05
+            reasons.append("Only one successful reproduction captured")
+        else:
+            reasons.append("No reproducibility evidence recorded")
         if evidence.get("verification_failed"):
             evidence_strength -= 0.3
+            reproducibility_score -= 0.25
             reasons.append("Verification failure lowers data quality")
         if evidence.get("needs_manual_review"):
             evidence_strength -= 0.1
+            reproducibility_score -= 0.05
             reasons.append("Manual review still required")
 
         score += evidence_strength
+        score += max(min(reproducibility_score, 1.0), 0.0) * 0.2
         score += min(max(confidence, 0.0), 1.0) * 0.15
 
         if (
@@ -140,6 +166,12 @@ class AutonomousDataPipeline:
             destination = "validated"
         elif verification_status == "REJECTED_FALSE_POSITIVE":
             destination = "rejected"
+        elif reproducibility_score < 0.05 and verification_status not in {
+            "CONFIRMED",
+            "PROBABLE",
+        }:
+            destination = "rejected"
+            reasons.append("Candidate rejected as non-reproducible")
         elif accepted:
             destination = "quarantine"
             reasons.append("Candidate kept for active learning review")
@@ -155,6 +187,7 @@ class AutonomousDataPipeline:
             reasons=reasons,
             evidence_strength=max(0.0, min(evidence_strength, 1.0)),
             duplicate_risk=duplicate_risk,
+            reproducibility_score=max(0.0, min(reproducibility_score, 1.0)),
         )
 
     def record_candidate(
@@ -226,4 +259,25 @@ class AutonomousDataPipeline:
             "rejected": _line_count(self.rejected_path),
             "validated": _line_count(self.validated_path),
             "learning_candidates": _line_count(self.learning_path),
+        }
+
+    def build_incremental_training_plan(self) -> dict[str, Any]:
+        validated = _line_count(self.validated_path)
+        quarantine = _line_count(self.quarantine_path)
+        learning = _line_count(self.learning_path)
+        mode = "warm-start-incremental"
+        if validated < 25:
+            mode = "hold-collect-more-data"
+        elif validated > 500:
+            mode = "incremental-mini-batch"
+        return {
+            "mode": mode,
+            "validated_records": validated,
+            "quarantine_records": quarantine,
+            "learning_candidates": learning,
+            "retrain_from_scratch": False,
+            "recommended_batch_size": max(
+                8, min(128, validated // 10 if validated else 8)
+            ),
+            "priority": "high" if quarantine > 0 or learning > 0 else "medium",
         }

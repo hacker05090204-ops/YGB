@@ -21,11 +21,29 @@ import { VoiceControls, type VoiceIntent } from "@/components/voice-controls"
 import { TargetDiscoveryPanel, type TargetCandidate } from "@/components/target-discovery-panel"
 import { TrainingProgress } from "@/components/training-progress"
 
+function getOrCreateActorId(): string {
+    if (typeof window === "undefined") {
+        return "local-operator"
+    }
+
+    const stored = window.localStorage.getItem("ygb-control-actor-id")
+    if (stored) {
+        return stored
+    }
+
+    const generated = globalThis.crypto?.randomUUID?.() ?? `actor-${Date.now()}`
+    window.localStorage.setItem("ygb-control-actor-id", generated)
+    return generated
+}
+
 export default function ControlPage() {
     // Dashboard State
     const [dashboardId, setDashboardId] = useState<string | null>(null)
+    const [kernelId, setKernelId] = useState<string | null>(null)
+    const [actorId, setActorId] = useState<string>("local-operator")
     const [isConnected, setIsConnected] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [uiError, setUiError] = useState<string | null>(null)
 
     // Execution State (from G01)
     const [executionState, setExecutionState] = useState<ExecutionStateType>("IDLE")
@@ -33,7 +51,7 @@ export default function ControlPage() {
     const [denyReason, setDenyReason] = useState<string | undefined>()
 
     // Autonomy Mode (from G06)
-    const [autonomyMode, setAutonomyMode] = useState<AutonomyModeType>("MOCK")
+    const [autonomyMode, setAutonomyMode] = useState<AutonomyModeType>("READ_ONLY")
 
     // Approval Requests (from G13)
     const [pendingRequest, setPendingRequest] = useState<ApprovalRequest | null>(null)
@@ -47,7 +65,7 @@ export default function ControlPage() {
     // Browser Assistant (from G05)
     const [assistantActive, setAssistantActive] = useState(false)
     const [currentAction, setCurrentAction] = useState<string | undefined>()
-    const [explanations, setExplanations] = useState<AssistantExplanation[]>([])
+    const [explanations] = useState<AssistantExplanation[]>([])
 
     // Voice (from G12)
     const [lastIntent, setLastIntent] = useState<VoiceIntent | null>(null)
@@ -60,26 +78,28 @@ export default function ControlPage() {
 
     // Initialize dashboard
     useEffect(() => {
+        setActorId(getOrCreateActorId())
         const initDashboard = async () => {
             try {
                 const response = await fetch(`${API_BASE}/api/dashboard/create`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ user_id: "user-001", user_name: "Researcher" })
+                    body: JSON.stringify({ user_id: getOrCreateActorId(), user_name: "Local Operator" })
                 })
 
                 if (response.ok) {
                     const data = await response.json()
                     setDashboardId(data.dashboard_id)
+                    setKernelId(data.kernel_id)
                     setIsConnected(true)
                 } else {
-                    setDashboardId("DASH-DEMO")
-                    setIsConnected(true)
+                    setUiError("Control plane is unavailable. Dashboard session was not created.")
+                    setIsConnected(false)
                 }
             } catch (error) {
                 console.error("Dashboard init failed:", error)
-                setDashboardId("DASH-DEMO")
-                setIsConnected(true)
+                setUiError("Control plane is unavailable. Check backend connectivity.")
+                setIsConnected(false)
             } finally {
                 setIsLoading(false)
             }
@@ -114,7 +134,7 @@ export default function ControlPage() {
                 body: JSON.stringify({
                     request_id: requestId,
                     approved: true,
-                    approver_id: "user-001",
+                    approver_id: actorId,
                     reason
                 })
             })
@@ -125,13 +145,15 @@ export default function ControlPage() {
                 setHumanApproved(true)
                 setAssistantActive(true)
                 setCurrentAction("Starting approved workflow...")
+                setUiError(null)
             }
         } catch (error) {
             console.error("Approval failed:", error)
+            setUiError("Approval request failed.")
         } finally {
             setApprovalLoading(false)
         }
-    }, [])
+    }, [actorId])
 
     const handleReject = useCallback(async (requestId: string, reason?: string) => {
         setApprovalLoading(true)
@@ -143,7 +165,7 @@ export default function ControlPage() {
                 body: JSON.stringify({
                     request_id: requestId,
                     approved: false,
-                    approver_id: "user-001",
+                    approver_id: actorId,
                     reason
                 })
             })
@@ -155,19 +177,29 @@ export default function ControlPage() {
             }
         } catch (error) {
             console.error("Rejection failed:", error)
+            setUiError("Rejection request failed.")
         } finally {
             setApprovalLoading(false)
         }
-    }, [])
+    }, [actorId])
 
     const handleStop = useCallback(async () => {
+        if (!kernelId) {
+            setExecutionState("STOPPED")
+            setAssistantActive(false)
+            setCurrentAction(undefined)
+            setUiError("No execution kernel is active.")
+            return
+        }
+
         try {
             await fetch(`${API_BASE}/api/execution/transition`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
+                    kernel_id: kernelId,
                     transition: "ABORT",
-                    actor_id: "user-001",
+                    actor_id: actorId,
                     reason: "User requested stop"
                 })
             })
@@ -178,8 +210,9 @@ export default function ControlPage() {
         } catch (error) {
             console.error("Stop failed:", error)
             setExecutionState("STOPPED")
+            setUiError("Stop request failed.")
         }
-    }, [])
+    }, [actorId, kernelId])
 
     // Target Discovery Handler
     const handleDiscoverTargets = useCallback(async () => {
@@ -195,48 +228,15 @@ export default function ControlPage() {
             if (response.ok) {
                 const data = await response.json()
                 setTargets(data.candidates || [])
+                setUiError(null)
             } else {
-                // Demo data fallback
-                setTargets([
-                    {
-                        candidate_id: "TGT-001",
-                        program_name: "Example Corp",
-                        source: "HACKERONE_PUBLIC",
-                        scope_summary: "*.example.com",
-                        payout_tier: "HIGH",
-                        report_density: "LOW",
-                        is_public: true,
-                        requires_invite: false,
-                        discovered_at: new Date().toISOString()
-                    },
-                    {
-                        candidate_id: "TGT-002",
-                        program_name: "Test Inc",
-                        source: "BUGCROWD_PUBLIC",
-                        scope_summary: "api.test.io",
-                        payout_tier: "MEDIUM",
-                        report_density: "MEDIUM",
-                        is_public: true,
-                        requires_invite: false,
-                        discovered_at: new Date().toISOString()
-                    }
-                ])
+                setTargets([])
+                setUiError("Target discovery returned no live data.")
             }
         } catch (error) {
             console.error("Discovery failed:", error)
-            setTargets([
-                {
-                    candidate_id: "TGT-001",
-                    program_name: "Example Corp",
-                    source: "HACKERONE_PUBLIC",
-                    scope_summary: "*.example.com",
-                    payout_tier: "HIGH",
-                    report_density: "LOW",
-                    is_public: true,
-                    requires_invite: false,
-                    discovered_at: new Date().toISOString()
-                }
-            ])
+            setTargets([])
+            setUiError("Target discovery failed.")
         } finally {
             setIsDiscovering(false)
         }
@@ -246,7 +246,17 @@ export default function ControlPage() {
     const handleSelectTarget = useCallback((id: string) => {
         setSelectedTargets(prev => {
             const next = new Set(prev)
-            next.has(id) ? next.delete(id) : next.add(id)
+            if (next.has(id)) {
+                next.delete(id)
+            } else {
+                next.add(id)
+            }
+
+            if (next.size === 0) {
+                setPendingRequest(null)
+                setExecutionState("IDLE")
+                return next
+            }
 
             if (prev.size === 0 && next.size > 0 && !pendingRequest) {
                 const target = targetsRef.current.find(t => t.candidate_id === id)
@@ -308,6 +318,7 @@ export default function ControlPage() {
             }
         } catch (error) {
             console.error("Voice parse failed:", error)
+            setUiError("Voice parsing failed.")
         } finally {
             setVoiceProcessing(false)
         }
@@ -356,7 +367,7 @@ export default function ControlPage() {
                             </div>
                             <div>
                                 <h1 className="font-bold text-sm">Phase-49 Control</h1>
-                                <p className="text-xs text-muted-foreground">ID: {dashboardId}</p>
+                                <p className="text-xs text-muted-foreground">ID: {dashboardId ?? "Unavailable"}</p>
                             </div>
                         </div>
                     </div>
@@ -380,6 +391,11 @@ export default function ControlPage() {
                 {/* Main Content */}
                 <main className="flex-1 p-6">
                     <div className="max-w-[1600px] mx-auto">
+                        {uiError && (
+                            <div className="mb-6 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+                                {uiError}
+                            </div>
+                        )}
 
                         {/* Voice Controls Row */}
                         <div className="mb-6 p-4 rounded-2xl bg-card/50 border border-border/50">

@@ -15,45 +15,86 @@ from impl_v1.phase49.governors.g14_target_discovery import (
 )
 
 
+TEST_PROGRAMS = [
+    {
+        "name": "Example Corp",
+        "source": "HACKERONE_PUBLIC",
+        "scope": "*.example.com",
+        "payout": "HIGH",
+        "density": "LOW",
+        "public": True,
+        "invite": False,
+    },
+    {
+        "name": "Test Inc",
+        "source": "BUGCROWD_PUBLIC",
+        "scope": "api.test.io",
+        "payout": "MEDIUM",
+        "density": "MEDIUM",
+        "public": True,
+        "invite": False,
+    },
+    {
+        "name": "Private Corp",
+        "source": "HACKERONE_PUBLIC",
+        "scope": "*.private.com",
+        "payout": "HIGH",
+        "density": "LOW",
+        "public": False,
+        "invite": True,
+    },
+]
+
+
 class TestEnumClosure:
     def test_discovery_source_4_members(self):
         assert len(DiscoverySource) == 4
-    
+
     def test_payout_tier_4_members(self):
         assert len(PayoutTier) == 4
-    
+
     def test_report_density_3_members(self):
         assert len(ReportDensity) == 3
 
 
 class TestDiscoverTargets:
     def test_returns_result(self):
-        result = discover_targets()
+        result = discover_targets(source_records=TEST_PROGRAMS)
         assert isinstance(result, DiscoveryResult)
-    
+
     def test_result_has_id(self):
-        result = discover_targets()
+        result = discover_targets(source_records=TEST_PROGRAMS)
         assert result.result_id.startswith("DIS-")
-    
+
     def test_filters_private(self):
-        result = discover_targets(public_only=True)
+        result = discover_targets(public_only=True, source_records=TEST_PROGRAMS)
         for candidate in result.candidates:
             assert candidate.is_public
-    
+
     def test_filters_invite_required(self):
-        result = discover_targets()
+        result = discover_targets(source_records=TEST_PROGRAMS)
         for candidate in result.candidates:
             assert not candidate.requires_invite
 
 
 class TestGetHighValueTargets:
     def test_high_payout_only(self):
-        result = get_high_value_targets()
+        result = discover_targets(
+            min_payout=PayoutTier.HIGH,
+            max_density=ReportDensity.LOW,
+            public_only=True,
+            source_records=TEST_PROGRAMS,
+        )
         for candidate in result.candidates:
             assert candidate.payout_tier == PayoutTier.HIGH
-    
+
     def test_low_density_only(self):
-        result = get_high_value_targets()
+        result = discover_targets(
+            min_payout=PayoutTier.HIGH,
+            max_density=ReportDensity.LOW,
+            public_only=True,
+            source_records=TEST_PROGRAMS,
+        )
         for candidate in result.candidates:
             assert candidate.report_density == ReportDensity.LOW
 
@@ -80,7 +121,7 @@ class TestValidateCandidate:
         )
         valid, reason = validate_candidate(candidate)
         assert valid
-    
+
     def test_invalid_private_target(self):
         candidate = TargetCandidate(
             candidate_id="TGT-TEST",
@@ -96,7 +137,7 @@ class TestValidateCandidate:
         valid, reason = validate_candidate(candidate)
         assert not valid
         assert "not public" in reason
-    
+
     def test_invalid_invite_required(self):
         candidate = TargetCandidate(
             candidate_id="TGT-TEST",
@@ -112,7 +153,7 @@ class TestValidateCandidate:
         valid, reason = validate_candidate(candidate)
         assert not valid
         assert "invite" in reason
-    
+
     def test_forbidden_scope_login(self):
         candidate = TargetCandidate(
             candidate_id="TGT-TEST",
@@ -128,7 +169,7 @@ class TestValidateCandidate:
         valid, reason = validate_candidate(candidate)
         assert not valid
         assert "forbidden" in reason
-    
+
     def test_forbidden_scope_admin(self):
         candidate = TargetCandidate(
             candidate_id="TGT-TEST",
@@ -147,13 +188,13 @@ class TestValidateCandidate:
 
 class TestDataclassFrozen:
     def test_candidate_frozen(self):
-        result = discover_targets()
+        result = discover_targets(source_records=TEST_PROGRAMS)
         if result.candidates:
             candidate = result.candidates[0]
             with pytest.raises(AttributeError):
                 candidate.program_name = "Modified"
-    
+
     def test_result_frozen(self):
-        result = discover_targets()
+        result = discover_targets(source_records=TEST_PROGRAMS)
         with pytest.raises(AttributeError):
             result.total_found = 999

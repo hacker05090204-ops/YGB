@@ -3,6 +3,11 @@
 **Generated:** 2026-03-16  
 **Scope:** All mocks, synthetic data paths, and partial/broken implementations across the codebase.
 
+**Update (2026-03-26):** Some findings below are now partially fixed. In particular,
+`g14_target_discovery.py`, `g15_cve_api.py`, `g16_gmail_alerts.py`,
+`training_reports.py`, `model_registry.py`, and the frontend demo pages have been moved
+away from fake-success behavior toward real integrations or explicit unavailable states.
+
 ---
 
 ## 1. Mocks
@@ -11,9 +16,9 @@
 
 | Location | What's mocked | Risk |
 |----------|----------------|------|
-| **impl_v1/phase49/governors/g14_target_discovery.py** | `_MOCK_PROGRAMS` – public program list; "Real implementation would query public APIs" | Production returns fake programs unless real API wired |
-| **impl_v1/phase49/governors/g15_cve_api.py** | Production path returns `DEGRADED` with "API call not implemented in governance layer - use mock for testing" | CVE API never calls real service |
-| **impl_v1/phase49/governors/g16_gmail_alerts.py** | "SMTP not implemented in governance layer" | Alerts never actually sent |
+| **impl_v1/phase49/governors/g14_target_discovery.py** | Historical: `_MOCK_PROGRAMS` public program list | Updated: now requires configured source data and returns empty results when unavailable |
+| **impl_v1/phase49/governors/g15_cve_api.py** | Historical: passive API path was not implemented | Updated: now performs real NVD requests and returns explicit `OFFLINE` / `DEGRADED` / `INVALID_KEY` states on failure |
+| **impl_v1/phase49/governors/g16_gmail_alerts.py** | Historical: SMTP path returned mock success or pending | Updated: now sends via real SMTP when configured and otherwise fails closed |
 | **impl_v1/phase49/governors/g19_interactive_browser.py** | `_mock_title`, `_mock_url`, `_mock_text`, `_mock_data` – used when no C++ native; production can hit these if native unavailable | Browser observation can return test-style data |
 | **impl_v1/phase49/governors/g37_gpu_training_backend.py** | `GPUBackend.MOCK`, "Mock GPU (CPU Fallback)", mock feature extraction, mock training metrics, mock inference, mock contrastive similarity/loss | Full GPU path is mock when no CUDA/ROCm |
 | **impl_v1/phase49/governors/g35_ai_accelerator.py** | `simulate_gpu_training()` returns `TrainingResult` with `is_mock=True`, mock loss/accuracy/time | Training results are simulated |
@@ -22,10 +27,10 @@
 | **impl_v1/training/safety/representation_integrity.py** | On `ImportError` (e.g. torch missing): `compute_profile()` → `_mock_profile(checkpoint_id)` with fixed layer profiles | Drift checks can use fake profiles |
 | **impl_v1/training/safety/stress_lock.py** | `run_gpu_starvation_test()`: `utilization = 75.0  # Mock` (and same in branch) | Stress test uses fake GPU utilization |
 | **impl_v1/phase49/runtime/auto_trainer.py** | `_generate_session_report()`: `samples_processed=epochs_trained * 100  # Mock samples` | Reports show fake sample counts |
-| **impl_v1/phase49/runtime/training_reports.py** | `generate_training_report()`: `confidence_calibration=0.85  # Mock calibration` | Calibration in reports is hardcoded |
-| **impl_v1/governance/model_registry.py** | `compute_dataset_hash()` returns `"MOCK_HASH_" + path.name` when hashlib fails or path missing | Dataset hashes can be fake |
+| **impl_v1/phase49/runtime/training_reports.py** | Historical: hardcoded calibration/accuracy placeholders | Updated: missing measurements are now emitted as unavailable instead of fake values |
+| **impl_v1/governance/model_registry.py** | Historical: missing files produced fake hashes | Updated: missing model files now raise explicit errors |
 | **impl_v1/enterprise/checkpoint_sync.py** | Merge only logs; no real weight averaging ("In production: actual weight averaging of tensors") | Sync is protocol-only, no real merge |
-| **api/server.py** | `/api/targets/discover`: returns `mock_targets` list (hardcoded entries) | Target discovery never calls real G14/source |
+| **api/server.py** | Historical: `/api/targets/discover` returned hardcoded targets | Updated: now uses live target records and honest empty-state behavior |
 
 ### 1.2 Test-only mocks (appropriate)
 

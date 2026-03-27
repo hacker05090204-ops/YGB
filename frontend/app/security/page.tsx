@@ -1,21 +1,34 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
-import { ShieldAlert, CheckCircle, AlertTriangle, XCircle, Search, Play, FileText } from "lucide-react"
+import { ShieldAlert, CheckCircle, AlertTriangle, XCircle, Search, FileText } from "lucide-react"
 
+import { API_BASE } from "@/lib/api-base"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+
+type AdminStats = {
+    total_users?: number
+    total_targets?: number
+    total_bounties?: number
+    total_reward?: number
+    average_reward?: number
+    recent_activity_count?: number
+}
 
 export default function SecurityPage() {
     const containerRef = useRef(null)
+    const [stats, setStats] = useState<AdminStats | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
     useGSAP(() => {
         gsap.from(".animate-item", {
@@ -24,18 +37,60 @@ export default function SecurityPage() {
             stagger: 0.1,
             duration: 0.6,
             ease: "power2.out",
-            delay: 0.2
+            delay: 0.2,
         })
-    }, { scope: containerRef })
+    }, { scope: containerRef, dependencies: [stats, loading, error] })
+
+    useEffect(() => {
+        let cancelled = false
+
+        const loadStats = async () => {
+            try {
+                const response = await fetch(`${API_BASE}/api/db/admin/stats`, { cache: "no-store" })
+                if (!response.ok) {
+                    throw new Error(`Request failed: ${response.status}`)
+                }
+                const payload = await response.json()
+                if (!cancelled) {
+                    setStats(payload.stats ?? null)
+                    setError(null)
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setStats(null)
+                    setError(err instanceof Error ? err.message : "Failed to load security status")
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false)
+                }
+            }
+        }
+
+        void loadStats()
+        return () => {
+            cancelled = true
+        }
+    }, [])
+
+    const riskScore = useMemo(() => {
+        if (!stats) {
+            return null
+        }
+        const totalBounties = Number(stats.total_bounties || 0)
+        const recentActivity = Number(stats.recent_activity_count || 0)
+        if (totalBounties === 0 && recentActivity === 0) {
+            return 0
+        }
+        return Math.min(100, Math.round(((recentActivity + totalBounties) / Math.max(totalBounties || 1, 1)) * 15))
+    }, [stats])
 
     return (
         <SidebarProvider
-            style={
-                {
-                    "--sidebar-width": "calc(var(--spacing) * 64)",
-                    "--header-height": "calc(var(--spacing) * 12)",
-                } as React.CSSProperties
-            }
+            style={{
+                "--sidebar-width": "calc(var(--spacing) * 64)",
+                "--header-height": "calc(var(--spacing) * 12)",
+            } as React.CSSProperties}
         >
             <AppSidebar variant="inset" />
             <SidebarInset>
@@ -46,15 +101,18 @@ export default function SecurityPage() {
                 </header>
 
                 <div className="flex flex-1 flex-col p-4 md:p-8 pt-6 gap-8 max-w-7xl mx-auto w-full" ref={containerRef}>
-
                     <div className="space-y-1">
                         <h1 className="text-3xl font-bold tracking-tight text-foreground">Security Status</h1>
-                        <p className="text-muted-foreground text-lg">Monitor your system’s security health</p>
+                        <p className="text-muted-foreground text-lg">Operational security summary backed by live admin stats</p>
                     </div>
 
-                    <div className="grid gap-6 md:grid-cols-2">
+                    {error && (
+                        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
+                            {error}
+                        </div>
+                    )}
 
-                        {/* Main Status Panel */}
+                    <div className="grid gap-6 md:grid-cols-2">
                         <Card className="animate-item bg-red-950/20 border-red-900/50">
                             <CardHeader>
                                 <div className="flex items-center gap-3">
@@ -62,89 +120,77 @@ export default function SecurityPage() {
                                         <ShieldAlert className="size-8" />
                                     </div>
                                     <div>
-                                        <CardTitle className="text-2xl text-red-500">Security Issues Detected</CardTitle>
-                                        <CardDescription className="text-red-400/70">Immediate attention required</CardDescription>
+                                        <CardTitle className="text-2xl text-red-500">Live Security Posture</CardTitle>
+                                        <CardDescription className="text-red-400/70">
+                                            Derived from backend targets, bounties, and recent activity
+                                        </CardDescription>
                                     </div>
                                 </div>
                             </CardHeader>
                             <CardContent className="flex items-center justify-between">
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-muted-foreground">
-                                        <div className="size-2 rounded-full bg-red-500"></div> 3 Critical Vulnerabilities
+                                        <div className="size-2 rounded-full bg-red-500" /> {stats ? `${stats.total_bounties || 0} tracked bounty records` : "No stats available"}
                                     </div>
                                     <div className="flex items-center gap-2 text-muted-foreground">
-                                        <div className="size-2 rounded-full bg-orange-500"></div> 5 High Severity Issues
+                                        <div className="size-2 rounded-full bg-orange-500" /> {stats ? `${stats.recent_activity_count || 0} recent activity events` : "Telemetry unavailable"}
                                     </div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="text-5xl font-bold text-red-500">35%</div>
-                                    <div className="text-sm text-red-400 opacity-80">Risk Score</div>
+                                    <div className="text-5xl font-bold text-red-500">{riskScore === null ? "--" : `${riskScore}%`}</div>
+                                    <div className="text-sm text-red-400 opacity-80">Operational Risk Index</div>
                                 </div>
                             </CardContent>
                             <CardFooter>
-                                <Button variant="destructive" className="w-full">View Critical Issues</Button>
+                                <Button variant="destructive" className="w-full" disabled>
+                                    Live issue triage is backend-driven
+                                </Button>
                             </CardFooter>
                         </Card>
 
-                        {/* Scan Stats */}
                         <div className="grid gap-4 grid-cols-2">
-                            <Card className="animate-item bg-card/40 border-border/50 flex flex-col justify-center items-center py-6">
-                                <div className="text-3xl font-bold text-green-500">124</div>
-                                <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                                    <CheckCircle className="size-3" /> Passed
-                                </div>
-                            </Card>
-                            <Card className="animate-item bg-card/40 border-border/50 flex flex-col justify-center items-center py-6">
-                                <div className="text-3xl font-bold text-red-500">18</div>
-                                <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                                    <XCircle className="size-3" /> Failed
-                                </div>
-                            </Card>
-                            <Card className="animate-item bg-card/40 border-border/50 flex flex-col justify-center items-center py-6">
-                                <div className="text-3xl font-bold text-orange-500">5</div>
-                                <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                                    <AlertTriangle className="size-3" /> Warnings
-                                </div>
-                            </Card>
-                            <Card className="animate-item bg-card/40 border-border/50 flex flex-col justify-center items-center py-6">
-                                <div className="text-3xl font-bold">147</div>
-                                <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                                    <Search className="size-3" /> Total Scans
-                                </div>
-                            </Card>
+                            <StatCard icon={<CheckCircle className="size-3" />} value={`${stats?.total_users ?? 0}`} label="Registered Users" tone="text-green-500" />
+                            <StatCard icon={<XCircle className="size-3" />} value={`${stats?.total_targets ?? 0}`} label="Tracked Targets" tone="text-red-500" />
+                            <StatCard icon={<AlertTriangle className="size-3" />} value={`${stats?.total_bounties ?? 0}`} label="Bounty Records" tone="text-orange-500" />
+                            <StatCard icon={<Search className="size-3" />} value={`${stats?.recent_activity_count ?? 0}`} label="Recent Activity" tone="text-foreground" />
                         </div>
                     </div>
 
-                    {/* Action Panel */}
                     <Card className="animate-item bg-card/40 border-border/50">
                         <CardHeader>
                             <div className="flex justify-between items-center">
-                                <CardTitle>Run Security Scans</CardTitle>
-                                <span className="text-xs text-muted-foreground">Last scan: 2 hours ago</span>
+                                <CardTitle>Security Controls</CardTitle>
+                                <span className="text-xs text-muted-foreground">Live data only - no demo metrics</span>
                             </div>
                         </CardHeader>
                         <CardContent className="grid gap-4 md:grid-cols-4">
-                            <Button variant="outline" className="h-24 flex flex-col gap-2 hover:border-primary hover:bg-primary/5 hover:text-primary">
-                                <Search className="size-6" />
-                                Vulnerability Scan
+                            <Button variant="outline" className="h-24 flex flex-col gap-2" disabled>
+                                <Search className="size-6" /> Vulnerability Scan
                             </Button>
-                            <Button variant="outline" className="h-24 flex flex-col gap-2 hover:border-primary hover:bg-primary/5 hover:text-primary">
-                                <ShieldAlert className="size-6" />
-                                Malware Detection
+                            <Button variant="outline" className="h-24 flex flex-col gap-2" disabled>
+                                <ShieldAlert className="size-6" /> Risk Review
                             </Button>
-                            <Button variant="outline" className="h-24 flex flex-col gap-2 hover:border-primary hover:bg-primary/5 hover:text-primary">
-                                <FileText className="size-6" />
-                                Compliance Check
+                            <Button variant="outline" className="h-24 flex flex-col gap-2" disabled>
+                                <FileText className="size-6" /> Compliance Evidence
                             </Button>
-                            <Button variant="outline" className="h-24 flex flex-col gap-2 hover:border-primary hover:bg-primary/5 hover:text-primary">
-                                <Play className="size-6" />
-                                Penetration Test
+                            <Button variant="outline" className="h-24 flex flex-col gap-2" disabled>
+                                <AlertTriangle className="size-6" /> Manual Escalation
                             </Button>
                         </CardContent>
                     </Card>
-
                 </div>
             </SidebarInset>
         </SidebarProvider>
+    )
+}
+
+function StatCard({ icon, value, label, tone }: { icon: React.ReactNode; value: string; label: string; tone: string }) {
+    return (
+        <Card className="animate-item bg-card/40 border-border/50 flex flex-col justify-center items-center py-6">
+            <div className={`text-3xl font-bold ${tone}`}>{value}</div>
+            <div className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                {icon} {label}
+            </div>
+        </Card>
     )
 }

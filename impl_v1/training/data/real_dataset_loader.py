@@ -39,6 +39,9 @@ FORBIDDEN_FIELDS = frozenset(
         "verified",
         "actual_positive",
         "proof_status",
+        "confidence",
+        "duplicate",
+        "validation_source",
     ]
 )
 
@@ -100,14 +103,6 @@ def _record_to_feature_payload(record: VerifiedFindingRecord) -> dict[str, Any]:
             "title": record.title,
             "description": record.description,
             "url": record.url,
-            "payload_tested": bool(record.evidence.get("payload_tested")),
-            "sql_errors_count": len(record.evidence.get("sql_errors") or []),
-            "reflected_parameters_count": len(
-                record.evidence.get("reflected_parameters") or []
-            ),
-            "needs_manual_review": bool(record.evidence.get("needs_manual_review")),
-            "validation_source": record.validation_source,
-            "duplicate_hint": bool(record.duplicate),
         }
     )
 
@@ -329,7 +324,7 @@ def validate_dataset_integrity(
             _VALIDATION_CACHE[cache_key] = result
             return result
 
-        for sample in train_dataset.samples[:20]:
+        for sample in train_dataset.samples:
             if not validate_no_forbidden_fields(sample.features):
                 result = (
                     False,

@@ -237,6 +237,7 @@ class CreateDashboardRequest(BaseModel):
 
 
 class ExecutionTransitionRequest(BaseModel):
+    kernel_id: Optional[str] = None
     transition: str  # PLAN, SIMULATE, REQUEST_APPROVAL, HUMAN_APPROVE, HUMAN_DENY, COMPLETE, ABORT
     actor_id: str
     reason: str = ""
@@ -253,6 +254,7 @@ class TargetDiscoveryRequest(BaseModel):
     min_payout: str = "LOW"  # LOW, MEDIUM, HIGH
     max_density: str = "MEDIUM"  # LOW, MEDIUM, HIGH
     public_only: bool = True
+    max_results: int = 20
 
 
 class VoiceParseRequest(BaseModel):
@@ -572,11 +574,18 @@ async def start_hunter(request: StartWorkflowRequest):
         raise HTTPException(status_code=400, detail="Target URL is required")
 
     workflow_id = f"HNT-{uuid.uuid4().hex[:12].upper()}"
-    plan = _orchestrator().plan_task(
-        "crawl", {"target": request.target, "mode": request.mode}
+    similar = await _orchestrator().retrieve_related_experiences(
+        request.target,
+        task_type="crawl",
+        limit=6,
     )
-    similar = await _orchestrator().retrieve_experience(
-        "crawler-agent", request.target, limit=3
+    plan = _orchestrator().plan_task(
+        "crawl",
+        {
+            "target": request.target,
+            "mode": request.mode,
+            "similar_experiences": similar,
+        },
     )
 
     _orchestrator().remember_state(
@@ -619,11 +628,14 @@ async def start_bounty(request: StartWorkflowRequest):
         target = f"https://{target}"
 
     report_id = f"RPT-{uuid.uuid4().hex[:12].upper()}"
-    plan = _orchestrator().plan_task(
-        "workflow", {"target": target, "mode": request.mode}
+    similar = await _orchestrator().retrieve_related_experiences(
+        target,
+        task_type="workflow",
+        limit=6,
     )
-    similar = await _orchestrator().retrieve_experience(
-        "crawler-agent", target, limit=3
+    plan = _orchestrator().plan_task(
+        "workflow",
+        {"target": target, "mode": request.mode, "similar_experiences": similar},
     )
 
     # Store workflow with target URL
@@ -665,6 +677,11 @@ async def start_bounty(request: StartWorkflowRequest):
 @api_router.post("/api/reason/plan")
 async def build_reasoning_plan(request: ReasoningPlanRequest):
     """Build a reasoning-first execution plan without acting."""
+    similar = await _orchestrator().retrieve_related_experiences(
+        request.query or request.target,
+        task_type=request.task_type,
+        limit=6,
+    )
     context = {
         "target": request.target,
         "mode": request.mode,
@@ -676,6 +693,7 @@ async def build_reasoning_plan(request: ReasoningPlanRequest):
         "severity": request.severity or "MEDIUM",
         "evidence": request.evidence,
         "current_findings": request.current_findings,
+        "similar_experiences": similar,
     }
     plan = _orchestrator().plan_task(request.task_type, context)
     return {
@@ -756,12 +774,7 @@ async def get_dashboard_state(dashboard_id: str = None):
         _orchestrator().touch_state("dashboard_states", dashboard_id)
         return dashboard_states[dashboard_id]
 
-    # Return demo state if no specific ID
-    return {
-        "dashboard_id": "DASH-DEMO",
-        "state": "IDLE",
-        "panels": ["USER", "ACTIVITY", "REPORT"],
-    }
+    raise HTTPException(status_code=404, detail="Dashboard state not found")
 
 
 @app.get("/api/execution/state")
@@ -771,7 +784,11 @@ async def get_execution_state(kernel_id: str = None):
         _orchestrator().touch_state("execution_kernels", kernel_id)
         return execution_kernels[kernel_id]
 
-    return {"state": "IDLE", "human_approved": False}
+    return {
+        "state": "UNAVAILABLE",
+        "human_approved": False,
+        "error": "Execution kernel not found",
+    }
 
 
 @app.post("/api/execution/transition")
@@ -792,14 +809,14 @@ async def execution_transition(request: ExecutionTransitionRequest):
         ("AWAIT_HUMAN", "ABORT"): "STOPPED",
     }
 
-    # Find kernel or create demo one
+    # Find kernel
     kernel = None
-    for kid, k in execution_kernels.items():
-        kernel = k
-        break
-
+    if request.kernel_id and request.kernel_id in execution_kernels:
+        kernel = execution_kernels[request.kernel_id]
+    elif len(execution_kernels) == 1:
+        kernel = next(iter(execution_kernels.values()))
     if not kernel:
-        kernel = {"state": "IDLE", "human_approved": False, "deny_reason": None}
+        raise HTTPException(status_code=404, detail="Execution kernel not found")
 
     current_state = kernel.get("state", "IDLE")
     transition = request.transition
@@ -857,11 +874,15 @@ async def submit_approval_decision(request: ApprovalDecisionRequest):
 async def discover_targets(request: TargetDiscoveryRequest):
     """Discover potential bug bounty targets from verified database targets."""
     now = datetime.now(UTC).isoformat()
+    payout_order = {"UNKNOWN": 0, "LOW": 1, "MEDIUM": 2, "HIGH": 3}
+    density_order = {"LOW": 1, "MEDIUM": 2, "HIGH": 3}
+    min_payout_value = payout_order.get(request.min_payout.upper(), 0)
+    max_density_value = density_order.get(
+        request.max_density.upper(), density_order["HIGH"]
+    )
 
     # Load real targets from database
-    db_targets = (
-        await get_all_users(limit=1000) if False else await get_all_targets(limit=1000)
-    )
+    db_targets = await get_all_targets(limit=1000)
 
     # Convert database targets to candidate format
     candidates: List[Dict[str, Any]] = []
@@ -873,10 +894,17 @@ async def discover_targets(request: TargetDiscoveryRequest):
             "SECURITYTXT": "SECURITY_TXT",
             "SELF": "SECURITY_TXT",
         }
-        source = source_map.get(platform, "DISCOVERED")
+        source = source_map.get(platform, "PUBLIC_DISCLOSURE")
 
         is_public = platform in {"HACKERONE", "BUGCROWD", "SECURITYTXT", "SELF", ""}
         status = (target.get("status") or "ACTIVE").upper()
+        payout_tier = (target.get("payout_tier") or "UNKNOWN").upper()
+        report_density = (target.get("report_density") or "MEDIUM").upper()
+
+        if payout_order.get(payout_tier, 0) < min_payout_value:
+            continue
+        if density_order.get(report_density, density_order["HIGH"]) > max_density_value:
+            continue
 
         candidates.append(
             {
@@ -884,8 +912,8 @@ async def discover_targets(request: TargetDiscoveryRequest):
                 "program_name": target.get("program_name") or "Unknown",
                 "source": source,
                 "scope_summary": target.get("scope") or target.get("link") or "",
-                "payout_tier": (target.get("payout_tier") or "MEDIUM").upper(),
-                "report_density": "MEDIUM",
+                "payout_tier": payout_tier,
+                "report_density": report_density,
                 "is_public": is_public,
                 "requires_invite": not is_public,
                 "status": status,
@@ -901,7 +929,7 @@ async def discover_targets(request: TargetDiscoveryRequest):
     candidates.sort(key=lambda c: c.get("discovered_at") or "", reverse=True)
 
     total_found = len(candidates)
-    max_results = request.max_results or 20
+    max_results = max(1, request.max_results or 20)
     filtered = candidates[:max_results]
 
     return {
@@ -918,11 +946,18 @@ async def parse_voice_input(request: VoiceParseRequest):
     """Parse voice input and extract intent."""
     text = request.text.strip().lower()
     now = datetime.now(UTC).isoformat()
-    plan = _orchestrator().plan_task(
-        "voice", {"target": request.text, "mode": "READ_ONLY"}
+    similar_voice = await _orchestrator().retrieve_related_experiences(
+        request.text,
+        task_type="voice",
+        limit=6,
     )
-    similar_voice = await _orchestrator().retrieve_experience(
-        "voice-agent", request.text, limit=3
+    plan = _orchestrator().plan_task(
+        "voice",
+        {
+            "target": request.text,
+            "mode": "READ_ONLY",
+            "similar_experiences": similar_voice,
+        },
     )
 
     # Forbidden patterns (from G12)
@@ -1764,10 +1799,18 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
 
         target_url = workflow.get("target", "https://example.com")
         mode = workflow.get("mode", "READ_ONLY")  # READ_ONLY or REAL
+        similar_for_run = workflow.get("similar_experiences") or []
         plan = (
             workflow.get("plan")
             or _orchestrator()
-            .plan_task("workflow", {"target": target_url, "mode": mode})
+            .plan_task(
+                "workflow",
+                {
+                    "target": target_url,
+                    "mode": mode,
+                    "similar_experiences": similar_for_run,
+                },
+            )
             .strategy
         )
         if not isinstance(plan, dict):
@@ -1823,6 +1866,9 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                     "confidence": getattr(f, "confidence", 0.0),
                     "verification_status": getattr(
                         f, "verification_status", "UNVERIFIED"
+                    ),
+                    "verification_classification": getattr(
+                        f, "verification_classification", "hypothesis"
                     ),
                 }
                 findings_data.append(payload)
@@ -1890,6 +1936,26 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
             rejected_findings=result["summary"]["rejected_false_positives"],
             duplicate_findings=result["summary"]["duplicate_findings_rejected"],
         )
+
+        if findings_data:
+            await asyncio.gather(
+                *[
+                    _orchestrator().remember_finding_outcome(
+                        workflow_id=report_id,
+                        target=target_url,
+                        finding=finding,
+                        strategy_name=str(plan.get("agent_name", "crawler-agent")),
+                    )
+                    for finding in findings_data
+                    if finding.get("verification_status")
+                    in {
+                        "CONFIRMED",
+                        "REJECTED_FALSE_POSITIVE",
+                        "DUPLICATE",
+                        "NEEDS_REVIEW",
+                    }
+                ]
+            )
 
         if _orchestrator().http_client is not None and findings_data:
             critical = sum(
