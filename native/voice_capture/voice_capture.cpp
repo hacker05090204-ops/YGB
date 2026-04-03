@@ -94,8 +94,8 @@ static bool try_init_wasapi(void) {
    *   - IAudioClient -> Initialize(...) with AUDCLNT_SHAREMODE_SHARED
    *   - IAudioCaptureClient for buffer reads
    *
-   * This stub checks if the COM subsystem is available.
-   * Full implementation requires linking to ole32.lib and mmdevapi.
+   * This unit does not implement the actual WASAPI capture thread yet.
+   * It must fail closed until the real capture path exists.
    */
   HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
   if (SUCCEEDED(hr) || hr == RPC_E_CHANGED_MODE) {
@@ -135,6 +135,8 @@ VC_API int capture_init(const VoiceCaptureConfig *config) {
     return -1;
 
   g_wasapi_available = try_init_wasapi();
+  if (!g_wasapi_available)
+    return -1;
 
   /* Clear buffer */
   {
@@ -156,19 +158,13 @@ VC_API int capture_start(void) {
   if (g_active.load())
     return 0; /* Already active */
 
-  g_active.store(true);
+  if (!g_wasapi_available)
+    return -1;
+
   g_vad_state.store(VAD_SILENT);
 
-  /*
-   * PRODUCTION: Start WASAPI capture thread here.
-   * The capture thread reads from IAudioCaptureClient in a loop,
-   * writes to g_audio_buffer, and updates VAD state.
-   *
-   * In degraded mode (no WASAPI), we signal BLOCKED and rely on
-   * browser WebSpeech API as fallback.
-   */
-
-  return 0;
+  /* Fail closed until a real WASAPI capture thread is implemented. */
+  return -1;
 }
 
 VC_API int capture_stop(void) {
@@ -216,10 +212,8 @@ VC_API int capture_get_mode(char *buffer, int max_len) {
     return -1;
 
   const char *mode;
-  if (g_wasapi_available && g_initialized.load()) {
+  if (g_wasapi_available && g_initialized.load() && g_active.load()) {
     mode = "REAL";
-  } else if (g_initialized.load()) {
-    mode = "DEGRADED";
   } else {
     mode = "BLOCKED";
   }

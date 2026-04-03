@@ -17,6 +17,7 @@ FORBIDDEN FIELDS (hard blocked):
 """
 
 import torch
+import numpy as np
 from torch.utils.data import Dataset, DataLoader
 from typing import List, Tuple, Optional, Dict, Any
 import random
@@ -54,16 +55,18 @@ def _enforce_strict_real_mode(cls_name: str):
 # FORBIDDEN FIELDS - GOVERNANCE ENFORCEMENT
 # =============================================================================
 
-FORBIDDEN_FIELDS = frozenset([
-    "valid",
-    "accepted", 
-    "rejected",
-    "severity",
-    "platform_decision",
-    "decision",
-    "outcome",
-    "verified",
-])
+FORBIDDEN_FIELDS = frozenset(
+    [
+        "valid",
+        "accepted",
+        "rejected",
+        "severity",
+        "platform_decision",
+        "decision",
+        "outcome",
+        "verified",
+    ]
+)
 
 
 def strip_forbidden_fields(data: dict) -> dict:
@@ -83,6 +86,7 @@ def validate_no_forbidden_fields(data: dict) -> bool:
 # PYTORCH DATASET
 # =============================================================================
 
+
 class SyntheticTrainingDataset(Dataset):
     """
     SYNTHETIC Training Dataset (formerly RealTrainingDataset).
@@ -97,8 +101,9 @@ class SyntheticTrainingDataset(Dataset):
     - Edge cases for robustness
     - Deterministic shuffle
     """
+
     dataset_source = "SYNTHETIC_GENERATOR"  # NOT from ingestion pipeline
-    
+
     def __init__(
         self,
         config: DatasetConfig = None,
@@ -113,57 +118,57 @@ class SyntheticTrainingDataset(Dataset):
         self.seed = seed
         self.feature_dim = feature_dim
         self.is_holdout = is_holdout
-        
+
         # Generate samples
         generator = ScaledDatasetGenerator(self.config, seed)
         train_samples, holdout_samples = generator.generate()
-        
+
         self.samples = holdout_samples if is_holdout else train_samples
         self.rng = random.Random(seed)
-        
+
         # Pre-encode all features to tensors
         self._features = []
         self._labels = []
-        
+
         for sample in self.samples:
             # Strip any forbidden fields
             clean_features = strip_forbidden_fields(sample.features)
-            
+
             # Encode features to fixed-size vector
             feature_vec = self._encode_features(clean_features, sample.is_edge_case)
             self._features.append(feature_vec)
             self._labels.append(sample.label)
-        
+
         # Convert to tensors
         self._features_tensor = torch.tensor(self._features, dtype=torch.float32)
         self._labels_tensor = torch.tensor(self._labels, dtype=torch.long)
-    
+
     def _encode_features(self, features: dict, is_edge: bool) -> List[float]:
         """Encode feature dict to fixed-size vector with label-correlated patterns.
-        
+
         Feature layout:
           [0-63]   Signal-strength features (primary label signal)
           [64-127] Response-ratio features (secondary label signal)
           [128-191] Diverse derived features (NOT simple signal×response)
           [192-255] Controlled noise (small amplitude)
-        
+
         DESIGN: Each feature group encodes INDEPENDENT aspects of the label
         signal. No single group should be sufficient for >90% accuracy.
         Interaction dims use diverse nonlinear combinations with higher
         noise to prevent shortcut dominance.
         """
         vec = []
-        
+
         # Extract label-correlated fields
         signal = features.get("signal_strength", 0.5)
         response = features.get("response_ratio", 0.5)
         difficulty = features.get("difficulty", 0.5)
         noise_level = features.get("noise", 0.1)
-        
+
         # Use a per-sample seed derived from signal+response for determinism
         sample_seed = int((signal * 10000 + response * 1000 + difficulty * 100) * 100)
         sample_rng = random.Random(sample_seed)
-        
+
         for i in range(self.feature_dim):
             if i < 64:
                 # Signal-strength features — PRIMARY label signal
@@ -179,7 +184,7 @@ class SyntheticTrainingDataset(Dataset):
                 # Diverse derived features — INDEPENDENT combinations
                 # Each sub-range uses a different non-redundant encoding
                 sub_idx = i - 128  # 0-63
-                
+
                 if sub_idx < 16:
                     # Polynomial: signal^2 with independent noise
                     base = signal * signal
@@ -191,11 +196,13 @@ class SyntheticTrainingDataset(Dataset):
                 elif sub_idx < 40:
                     # Trigonometric: sin(signal * pi)
                     import math
+
                     base = 0.5 + 0.5 * math.sin(signal * math.pi)
                     noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 48:
                     # Trigonometric: cos(response * pi)
                     import math
+
                     base = 0.5 + 0.5 * math.cos(response * math.pi)
                     noise = 0.05 * sample_rng.gauss(0, 1)
                 elif sub_idx < 56:
@@ -207,7 +214,7 @@ class SyntheticTrainingDataset(Dataset):
                     # Rank-based: difficulty-weighted signal magnitude
                     base = signal * (1.0 - difficulty * 0.3)
                     noise = 0.05 * sample_rng.gauss(0, 1)
-                
+
                 val = base + noise
             else:
                 # [192-255] Additional feature groups from raw metadata
@@ -216,7 +223,7 @@ class SyntheticTrainingDataset(Dataset):
                 exploit_complexity = features.get("exploit_complexity", 0.5)
                 impact_severity_val = features.get("impact_severity", 0.5)
                 fingerprint_density = features.get("fingerprint_density", 0.5)
-                
+
                 if sub_idx < 16:
                     # Endpoint entropy features
                     base = endpoint_entropy
@@ -234,23 +241,23 @@ class SyntheticTrainingDataset(Dataset):
                     base = fingerprint_density
                     noise = 0.04 * sample_rng.gauss(0, 1)
                 val = base + noise
-            
+
             # Clamp to [0, 1]
             vec.append(max(0.0, min(1.0, val)))
-        
+
         return vec
-    
+
     def __len__(self) -> int:
         return len(self.samples)
-    
+
     def __getitem__(self, idx: int) -> Tuple[torch.Tensor, torch.Tensor]:
         return self._features_tensor[idx], self._labels_tensor[idx]
-    
+
     def get_statistics(self) -> dict:
         """Get dataset statistics."""
         n_positive = sum(1 for s in self.samples if s.label == 1)
         n_edge = sum(1 for s in self.samples if s.is_edge_case)
-        
+
         return {
             "total": len(self.samples),
             "positive": n_positive,
@@ -289,6 +296,7 @@ class RealTrainingDataset(Dataset):
 @dataclass
 class _LegacyCompatSample:
     """Minimal legacy sample object for compatibility with old callers/tests."""
+
     id: str
     features: dict
 
@@ -324,27 +332,32 @@ class _LegacySampleCollection:
             )
             reliability = float(raw.get("reliability", 0.7))
             exploit_vector = raw.get("exploit_vector", "")
-            features = strip_forbidden_fields({
-                "signal_strength": min(reliability, 1.0),
-                "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
-                "difficulty": 1.0 - min(reliability, 1.0),
-                "noise": 0.05,
-            })
+            features = strip_forbidden_fields(
+                {
+                    "signal_strength": min(reliability, 1.0),
+                    "response_ratio": min(len(exploit_vector) / 100.0, 1.0),
+                    "difficulty": 1.0 - min(reliability, 1.0),
+                    "noise": 0.05,
+                }
+            )
         else:
             label = int(self._dataset._labels_tensor[idx].item())
             sample_id = f"cached-{idx:08d}"
-            features = strip_forbidden_fields({
-                "signal_strength": 0.9 if label == 1 else 0.5,
-                "response_ratio": 0.5,
-                "difficulty": 0.1 if label == 1 else 0.5,
-                "noise": 0.05,
-            })
+            features = strip_forbidden_fields(
+                {
+                    "signal_strength": 0.9 if label == 1 else 0.5,
+                    "response_ratio": 0.5,
+                    "difficulty": 0.1 if label == 1 else 0.5,
+                    "noise": 0.05,
+                }
+            )
         return _LegacyCompatSample(id=sample_id, features=features)
 
 
 # =============================================================================
 # DATALOADER FACTORY
 # =============================================================================
+
 
 def create_training_dataloader(
     batch_size: int = 1024,
@@ -397,6 +410,7 @@ def create_training_dataloader(
         "pin_memory": pin_memory,
         "dataset_source": "INGESTION_PIPELINE",
     }
+    stats.update(verify_dataset(train_dataset))
     effective_train = train_subset
     effective_holdout = holdout_subset
 
@@ -414,7 +428,7 @@ def create_training_dataloader(
         prefetch_factor=prefetch_factor if num_workers > 0 else None,
         persistent_workers=num_workers > 0,
         drop_last=True,  # Consistent batch sizes
-        generator=g,     # Deterministic shuffle order
+        generator=g,  # Deterministic shuffle order
     )
 
     holdout_loader = DataLoader(
@@ -437,9 +451,15 @@ def create_training_dataloader(
 # Minimum real samples threshold (configurable via env)
 YGB_MIN_REAL_SAMPLES = int(_os.environ.get("YGB_MIN_REAL_SAMPLES", "125000"))
 _VALIDATION_PROJECT_ROOT = Path(__file__).resolve().parents[3]
-_VALIDATION_MANIFEST_PATH = _VALIDATION_PROJECT_ROOT / "secure_data" / "dataset_manifest.json"
+_VALIDATION_MANIFEST_PATH = (
+    _VALIDATION_PROJECT_ROOT / "secure_data" / "dataset_manifest.json"
+)
 _DATASET_VALIDATION_CACHE_KEY: Optional[Tuple[Any, ...]] = None
 _DATASET_VALIDATION_CACHE_RESULT: Optional[Tuple[bool, str]] = None
+_DATASET_MANIFEST_SCHEMA_VERSION = 1
+_DATASET_MAX_FUTURE_SKEW_SECONDS = 300
+_DATASET_VERIFICATION_SAMPLE_LIMIT = 2048
+_DATASET_MIN_SOURCE_CONFIDENCE = 0.5
 
 
 def _dataset_validation_signature(
@@ -553,40 +573,47 @@ def validate_dataset_integrity(
         if "Insufficient" in msg:
             result = (
                 False,
-                f"INSUFFICIENT_REAL_SAMPLES: {msg} "
-                f"(threshold: {min_samples})",
+                f"INSUFFICIENT_REAL_SAMPLES: {msg} (threshold: {min_samples})",
             )
         else:
             result = (False, f"REAL_DATA_REQUIRED: {msg}")
     except Exception as e:
         result = (False, f"INGESTION_SOURCE_INVALID: {str(e)}")
     else:
-        stats = dataset.get_statistics()
+        try:
+            verification = verify_dataset(dataset)
+        except RuntimeError as exc:
+            result = (False, str(exc))
+        else:
+            stats = dataset.get_statistics()
 
-        if stats["total"] < min_samples:
-            deficit = min_samples - stats["total"]
-            result = (
-                False,
-                f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples} "
-                f"(deficit: {deficit} samples needed)",
-            )
-        elif stats["total"] > 0:
-            positive_ratio = stats["positive"] / stats["total"]
-            if not (0.40 <= positive_ratio <= 0.60):
+            if stats["total"] < min_samples:
+                deficit = min_samples - stats["total"]
                 result = (
                     False,
-                    f"REAL_DATA_REQUIRED: Class imbalance: "
-                    f"{positive_ratio:.2%} positive",
+                    f"INSUFFICIENT_REAL_SAMPLES: {stats['total']} < {min_samples} "
+                    f"(deficit: {deficit} samples needed)",
                 )
+            elif stats["total"] > 0:
+                positive_ratio = stats["positive"] / stats["total"]
+                if not (0.40 <= positive_ratio <= 0.60):
+                    result = (
+                        False,
+                        f"REAL_DATA_REQUIRED: Class imbalance: "
+                        f"{positive_ratio:.2%} positive",
+                    )
+                else:
+                    result = (
+                        True,
+                        f"Dataset valid (REAL): {stats['total']} samples, "
+                        f"{positive_ratio:.2%} positive, "
+                        f"source={stats.get('dataset_source', 'INGESTION_PIPELINE')}, "
+                        f"hash={verification['dataset_hash'][:16]}..., "
+                        f"confidence={verification['confidence_score']:.3f}, "
+                        f"duplicates={verification['duplicate_ratio']:.4f}",
+                    )
             else:
-                result = (
-                    True,
-                    f"Dataset valid (REAL): {stats['total']} samples, "
-                    f"{positive_ratio:.2%} positive, "
-                    f"source={stats.get('dataset_source', 'INGESTION_PIPELINE')}",
-                )
-        else:
-            result = (False, "INSUFFICIENT_REAL_SAMPLES: 0 samples available")
+                result = (False, "INSUFFICIENT_REAL_SAMPLES: 0 samples available")
 
     _DATASET_VALIDATION_CACHE_KEY = cache_key
     _DATASET_VALIDATION_CACHE_RESULT = result
@@ -605,10 +632,14 @@ import logging
 import math
 import tempfile
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 try:
-    from safetensors.torch import load_file as load_safetensors_file, save_file as save_safetensors_file
+    from safetensors.torch import (
+        load_file as load_safetensors_file,
+        save_file as save_safetensors_file,
+    )
+
     SAFETENSORS_AVAILABLE = True
 except ImportError:
     load_safetensors_file = None
@@ -624,10 +655,7 @@ _SECURE_DATA = _PROJECT_ROOT / "secure_data"
 _INGESTION_TENSOR_CACHE_SCHEMA_VERSION = 1
 
 # Bridge library name
-_BRIDGE_LIB = (
-    "ingestion_bridge.dll" if os.name == "nt"
-    else "libingestion_bridge.so"
-)
+_BRIDGE_LIB = "ingestion_bridge.dll" if os.name == "nt" else "libingestion_bridge.so"
 
 
 def _load_bridge():
@@ -652,26 +680,37 @@ def _load_bridge():
 
     lib.bridge_fetch_verified_sample.restype = ctypes.c_int
     lib.bridge_fetch_verified_sample.argtypes = [
-        ctypes.c_int,                          # verified_idx
-        ctypes.c_char_p, ctypes.c_int,         # endpoint
-        ctypes.c_char_p, ctypes.c_int,         # parameters
-        ctypes.c_char_p, ctypes.c_int,         # exploit_vector
-        ctypes.c_char_p, ctypes.c_int,         # impact
-        ctypes.c_char_p, ctypes.c_int,         # source_tag
-        ctypes.c_char_p, ctypes.c_int,         # fingerprint
-        ctypes.POINTER(ctypes.c_double),       # reliability
-        ctypes.POINTER(ctypes.c_long),         # ingested_at
+        ctypes.c_int,  # verified_idx
+        ctypes.c_char_p,
+        ctypes.c_int,  # endpoint
+        ctypes.c_char_p,
+        ctypes.c_int,  # parameters
+        ctypes.c_char_p,
+        ctypes.c_int,  # exploit_vector
+        ctypes.c_char_p,
+        ctypes.c_int,  # impact
+        ctypes.c_char_p,
+        ctypes.c_int,  # source_tag
+        ctypes.c_char_p,
+        ctypes.c_int,  # fingerprint
+        ctypes.POINTER(ctypes.c_double),  # reliability
+        ctypes.POINTER(ctypes.c_long),  # ingested_at
     ]
 
     lib.bridge_get_dataset_manifest_hash.restype = None
     lib.bridge_get_dataset_manifest_hash.argtypes = [
-        ctypes.c_char_p, ctypes.c_int,
+        ctypes.c_char_p,
+        ctypes.c_int,
     ]
 
     lib.bridge_ingest_sample.restype = ctypes.c_int
     lib.bridge_ingest_sample.argtypes = [
-        ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p,
-        ctypes.c_char_p, ctypes.c_char_p, ctypes.c_double,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_char_p,
+        ctypes.c_double,
     ]
 
     return lib
@@ -689,6 +728,7 @@ class IngestionPipelineDataset(Dataset):
 
     dataset_source = "INGESTION_PIPELINE" — the ONLY permitted source for training.
     """
+
     dataset_source = "INGESTION_PIPELINE"
 
     def __init__(
@@ -707,6 +747,7 @@ class IngestionPipelineDataset(Dataset):
 
         # Check PERSISTED bridge state first (cross-process authoritative)
         from backend.bridge.bridge_state import get_bridge_state
+
         self._bridge_state = get_bridge_state()
         persisted_counts = self._bridge_state.get_counts()
         persisted_verified = persisted_counts["bridge_verified_count"]
@@ -758,7 +799,8 @@ class IngestionPipelineDataset(Dataset):
 
         # Import policy + quality scorer
         from impl_v1.training.distributed.ingestion_policy import (
-            IngestionPolicy, IngestionCandidate,
+            IngestionPolicy,
+            IngestionCandidate,
         )
         from impl_v1.training.distributed.data_quality_scorer import (
             DataQualityScorer,
@@ -777,8 +819,10 @@ class IngestionPipelineDataset(Dataset):
             logger.info("[INGESTION] Loading samples from persisted store...")
             disk_samples = self._bridge_state.read_samples(max_samples=verified_count)
             logger.info(f"[INGESTION] Loaded {len(disk_samples)} samples from disk")
-            accepted, rejected_policy, rejected_quality = self._process_persisted_samples(
-                disk_samples, policy, scorer, min_samples
+            accepted, rejected_policy, rejected_quality = (
+                self._process_persisted_samples(
+                    disk_samples, policy, scorer, min_samples
+                )
             )
         else:
             # Load from DLL (same-process path)
@@ -797,12 +841,18 @@ class IngestionPipelineDataset(Dataset):
 
                 rc = self._lib.bridge_fetch_verified_sample(
                     idx,
-                    ep, FIELD_LEN,
-                    params, FIELD_LEN,
-                    ev, FIELD_LEN,
-                    imp, FIELD_LEN,
-                    st, FIELD_LEN,
-                    fp, 65,
+                    ep,
+                    FIELD_LEN,
+                    params,
+                    FIELD_LEN,
+                    ev,
+                    FIELD_LEN,
+                    imp,
+                    FIELD_LEN,
+                    st,
+                    FIELD_LEN,
+                    fp,
+                    65,
                     ctypes.byref(reliability),
                     ctypes.byref(ingested_at),
                 )
@@ -906,13 +956,19 @@ class IngestionPipelineDataset(Dataset):
         symbol_ratio = sum(not ch.isalnum() for ch in normalized) / length
         slash_ratio = normalized.count("/") / max(length, 1)
         token_count = len(
-            [token for token in normalized.replace("/", " ").replace("&", " ").split() if token]
+            [
+                token
+                for token in normalized.replace("/", " ").replace("&", " ").split()
+                if token
+            ]
         )
         token_ratio = min(token_count / 16.0, 1.0)
         entropy = cls._char_entropy(normalized)
 
         if fingerprint_mode:
-            hex_ratio = sum(ch.lower() in "0123456789abcdef" for ch in normalized) / length
+            hex_ratio = (
+                sum(ch.lower() in "0123456789abcdef" for ch in normalized) / length
+            )
             symbol_ratio = hex_ratio
 
         return [
@@ -977,12 +1033,19 @@ class IngestionPipelineDataset(Dataset):
             a = clean[i % len(clean)]
             b = clean[(i * 3 + 1) % len(clean)]
             c = clean[(i * 5 + 2) % len(clean)]
-            trig = 0.5 + 0.5 * math.sin((a * math.pi * (i + 1)) + (b * 2.17) + (c * 1.13))
+            trig = 0.5 + 0.5 * math.sin(
+                (a * math.pi * (i + 1)) + (b * 2.17) + (c * 1.13)
+            )
             mixed = (a * b + b * c + c * a) / 3.0
             hashed = cls._stable_unit_value(
                 f"numeric|{i}|{a:.6f}|{b:.6f}|{c:.6f}|{sum(clean):.6f}"
             )
-            val = (0.42 * trig) + (0.28 * mixed) + (0.18 * hashed) + (0.12 * ((a + b + c) / 3.0))
+            val = (
+                (0.42 * trig)
+                + (0.28 * mixed)
+                + (0.18 * hashed)
+                + (0.12 * ((a + b + c) / 3.0))
+            )
             vec.append(min(max(val, 0.0), 1.0))
         return vec
 
@@ -1005,7 +1068,9 @@ class IngestionPipelineDataset(Dataset):
         from impl_v1.training.distributed.ingestion_policy import IngestionCandidate
 
         candidate = IngestionCandidate(
-            sample_id=(fingerprint or hashlib.sha256(endpoint.encode()).hexdigest())[:16],
+            sample_id=(fingerprint or hashlib.sha256(endpoint.encode()).hexdigest())[
+                :16
+            ],
             endpoint=endpoint,
             exploit_vector=exploit_vector,
             impact=impact,
@@ -1023,6 +1088,7 @@ class IngestionPipelineDataset(Dataset):
         ep_entropy = 0.5
         if endpoint:
             from collections import Counter
+
             char_counts = Counter(endpoint)
             ep_len = len(endpoint)
             ep_entropy = 0.0
@@ -1031,16 +1097,18 @@ class IngestionPipelineDataset(Dataset):
                 if p > 0:
                     ep_entropy -= p * math.log2(p)
             ep_entropy = min(ep_entropy / 6.0, 1.0)  # normalize (max ~6 bits)
-        
+
         # Exploit complexity: unique character ratio
         exploit_cmplx = 0.5
         if exploit_vector:
-            exploit_cmplx = min(len(set(exploit_vector)) / max(len(exploit_vector), 1), 1.0)
+            exploit_cmplx = min(
+                len(set(exploit_vector)) / max(len(exploit_vector), 1), 1.0
+            )
 
         # Parameters richness: token density + character entropy
         params_ratio = min(len(parameters) / 96.0, 1.0) if parameters else 0.0
         params_entropy = self._char_entropy(parameters)
-        
+
         # Impact severity: keyword + CVSS-based scoring
         impact_sev = 0.5
         if impact:
@@ -1059,9 +1127,9 @@ class IngestionPipelineDataset(Dataset):
                 impact_sev = 0.50
             elif "low" in impact_lower:
                 impact_sev = 0.25
-        
+
         # Fingerprint density: uniformity of hex character distribution
-        
+
         # Impact severity: keyword + CVSS-based scoring
         impact_sev = 0.5
         if impact:
@@ -1080,15 +1148,16 @@ class IngestionPipelineDataset(Dataset):
                 impact_sev = 0.50
             elif "low" in impact_lower:
                 impact_sev = 0.25
-        
+
         # Fingerprint density: uniformity of hex character distribution
         fp_density = 0.5
         if fingerprint and len(fingerprint) >= 8:
             from collections import Counter
+
             hex_counts = Counter(fingerprint.lower())
             hex_chars = len(hex_counts)
             fp_density = min(hex_chars / 16.0, 1.0)  # 16 hex chars = maximum diversity
-        
+
         # Encode content-derived features ONLY.
         # CRITICAL: reliability is EXCLUDED — it is used for label derivation
         # and including it would cause label leakage (trivial 100% accuracy).
@@ -1121,6 +1190,7 @@ class IngestionPipelineDataset(Dataset):
 
         # Quality score
         import numpy as np
+
         fv_array = np.array(feature_vec, dtype=np.float32)
         quality = scorer.score_features(
             sample_id=candidate.sample_id,
@@ -1142,15 +1212,17 @@ class IngestionPipelineDataset(Dataset):
 
         self._features.append(feature_vec)
         self._labels.append(label)
-        self._raw_samples.append({
-            "endpoint": endpoint,
-            "parameters": parameters,
-            "exploit_vector": exploit_vector,
-            "impact": impact,
-            "source_tag": source_tag,
-            "fingerprint": fingerprint or "",
-            "reliability": reliability_val,
-        })
+        self._raw_samples.append(
+            {
+                "endpoint": endpoint,
+                "parameters": parameters,
+                "exploit_vector": exploit_vector,
+                "impact": impact,
+                "source_tag": source_tag,
+                "fingerprint": fingerprint or "",
+                "reliability": reliability_val,
+            }
+        )
         return "accepted"
 
     @staticmethod
@@ -1234,7 +1306,11 @@ class IngestionPipelineDataset(Dataset):
         return 1 if score >= 0.45 else 0
 
     def _process_persisted_samples(
-        self, disk_samples, policy, scorer, min_samples,
+        self,
+        disk_samples,
+        policy,
+        scorer,
+        min_samples,
     ):
         """Process samples loaded from the persisted gzip store."""
         accepted = 0
@@ -1281,15 +1357,21 @@ class IngestionPipelineDataset(Dataset):
         """Encode raw ingestion content to a dense deterministic 256-dim vector."""
         # Content-derived scalars only — NO reliability leakage.
         endpoint_len = features.get("endpoint_length", min(len(endpoint) / 256.0, 1.0))
-        exploit_len = features.get("exploit_length", min(len(exploit_vector) / 256.0, 1.0))
+        exploit_len = features.get(
+            "exploit_length", min(len(exploit_vector) / 256.0, 1.0)
+        )
         response = features.get("response_ratio", 0.5)
         impact_len = features.get("impact_length", min(len(impact) / 128.0, 1.0))
         endpoint_entropy = features.get("endpoint_entropy", 0.5)
         exploit_complexity = features.get("exploit_complexity", 0.5)
         impact_severity_val = features.get("impact_severity", 0.5)
         fingerprint_density = features.get("fingerprint_density", 0.5)
-        parameter_ratio = features.get("parameter_ratio", min(len(parameters) / 96.0, 1.0))
-        parameters_entropy = features.get("parameters_entropy", self._char_entropy(parameters))
+        parameter_ratio = features.get(
+            "parameter_ratio", min(len(parameters) / 96.0, 1.0)
+        )
+        parameters_entropy = features.get(
+            "parameters_entropy", self._char_entropy(parameters)
+        )
         source_hash = self._stable_unit_value(f"source|{source_tag.lower()}")
 
         endpoint_block = self._build_text_block(
@@ -1346,14 +1428,16 @@ class IngestionPipelineDataset(Dataset):
         )
         combined_block = self._build_text_block(
             "|".join(
-                part for part in (
+                part
+                for part in (
                     endpoint,
                     parameters,
                     exploit_vector,
                     impact,
                     source_tag,
                     fingerprint,
-                ) if part
+                )
+                if part
             ),
             salt="combined",
             scalar_a=(endpoint_len + impact_severity_val) / 2.0,
@@ -1371,7 +1455,7 @@ class IngestionPipelineDataset(Dataset):
             + combined_block
         )
         if len(vec) >= self.feature_dim:
-            return vec[:self.feature_dim]
+            return vec[: self.feature_dim]
 
         while len(vec) < self.feature_dim:
             idx = len(vec)
@@ -1419,11 +1503,16 @@ class IngestionPipelineDataset(Dataset):
         return digest.hexdigest()
 
     def _tensor_cache_paths(self, verified_count: int) -> Tuple[Path, Path]:
-        cache_base = self._tensor_cache_dir() / f"ingestion_{self._tensor_cache_key(verified_count)}"
+        cache_base = (
+            self._tensor_cache_dir()
+            / f"ingestion_{self._tensor_cache_key(verified_count)}"
+        )
         return cache_base.with_suffix(".safetensors"), cache_base.with_suffix(".json")
 
     @staticmethod
-    def _tensor_hash_for_tensors(features_tensor: torch.Tensor, labels_tensor: torch.Tensor) -> str:
+    def _tensor_hash_for_tensors(
+        features_tensor: torch.Tensor, labels_tensor: torch.Tensor
+    ) -> str:
         digest = hashlib.sha256()
         digest.update(features_tensor.detach().cpu().contiguous().numpy().tobytes())
         digest.update(labels_tensor.detach().cpu().contiguous().numpy().tobytes())
@@ -1450,7 +1539,9 @@ class IngestionPipelineDataset(Dataset):
             key = str(int(label))
             class_histogram[key] = class_histogram.get(key, 0) + 1
 
-        trust_scores = [float(sample.get("reliability", 0.0)) for sample in self._raw_samples]
+        trust_scores = [
+            float(sample.get("reliability", 0.0)) for sample in self._raw_samples
+        ]
         return {
             "schema_version": _INGESTION_TENSOR_CACHE_SCHEMA_VERSION,
             "cache_kind": "ingestion_tensor_cache",
@@ -1467,7 +1558,9 @@ class IngestionPipelineDataset(Dataset):
             "rejected_policy": int(rejected_policy),
             "rejected_quality": int(rejected_quality),
             "class_histogram": class_histogram,
-            "source_trust_avg": round(sum(trust_scores) / len(trust_scores), 4) if trust_scores else 0.0,
+            "source_trust_avg": round(sum(trust_scores) / len(trust_scores), 4)
+            if trust_scores
+            else 0.0,
             "source_trust_min": round(min(trust_scores), 4) if trust_scores else 0.0,
             "tensor_hash": self._compute_tensor_hash(),
             "created_at": datetime.now(timezone.utc).isoformat(),
@@ -1544,7 +1637,9 @@ class IngestionPipelineDataset(Dataset):
         if not SAFETENSORS_AVAILABLE or save_safetensors_file is None:
             return
 
-        verified_count = int(metadata.get("verified_count", self._verified_count) or self._verified_count)
+        verified_count = int(
+            metadata.get("verified_count", self._verified_count) or self._verified_count
+        )
         weights_path, meta_path = self._tensor_cache_paths(verified_count)
         weights_path.parent.mkdir(parents=True, exist_ok=True)
         fd, tmp_weights = tempfile.mkstemp(
@@ -1581,11 +1676,15 @@ class IngestionPipelineDataset(Dataset):
             return False
         if not isinstance(manifest, dict):
             return False
-        manifest_samples = int(manifest.get("sample_count", manifest.get("total_samples", 0)) or 0)
+        manifest_samples = int(
+            manifest.get("sample_count", manifest.get("total_samples", 0)) or 0
+        )
         return (
             str(manifest.get("dataset_source", "") or "").upper() == self.dataset_source
-            and str(manifest.get("ingestion_manifest_hash", "") or "") == str(metadata.get("ingestion_manifest_hash", "") or "")
-            and str(manifest.get("tensor_hash", "") or "") == str(metadata.get("tensor_hash", "") or "")
+            and str(manifest.get("ingestion_manifest_hash", "") or "")
+            == str(metadata.get("ingestion_manifest_hash", "") or "")
+            and str(manifest.get("tensor_hash", "") or "")
+            == str(metadata.get("tensor_hash", "") or "")
             and manifest_samples == int(metadata.get("sample_count", 0) or 0)
         )
 
@@ -1606,13 +1705,21 @@ class IngestionPipelineDataset(Dataset):
         self._lib.bridge_get_dataset_manifest_hash(hash_buf, 65)
         return hash_buf.value.decode("utf-8", errors="replace")
 
-    def _write_manifest(self, accepted, rejected_policy, rejected_quality, cache_metadata: Optional[Dict[str, Any]] = None):
+    def _write_manifest(
+        self,
+        accepted,
+        rejected_policy,
+        rejected_quality,
+        cache_metadata: Optional[Dict[str, Any]] = None,
+    ):
         """Write dataset_manifest.json to secure_data/ with hardened quality metrics."""
         _SECURE_DATA.mkdir(parents=True, exist_ok=True)
         manifest_path = _SECURE_DATA / "dataset_manifest.json"
 
         metadata = dict(cache_metadata or {})
-        tensor_hash = str(metadata.get("tensor_hash", "") or self._compute_tensor_hash())
+        tensor_hash = str(
+            metadata.get("tensor_hash", "") or self._compute_tensor_hash()
+        )
 
         class_histogram: Dict[int, int] = {}
         if metadata.get("class_histogram"):
@@ -1623,12 +1730,17 @@ class IngestionPipelineDataset(Dataset):
                 label = int(lbl)
                 class_histogram[label] = class_histogram.get(label, 0) + 1
         else:
-            unique_labels, counts = torch.unique(self._labels_tensor.detach().cpu(), return_counts=True)
+            unique_labels, counts = torch.unique(
+                self._labels_tensor.detach().cpu(), return_counts=True
+            )
             for label, count in zip(unique_labels.tolist(), counts.tolist()):
                 class_histogram[int(label)] = int(count)
 
         # Class entropy (Shannon)
-        total = int(metadata.get("sample_count", self._labels_tensor.shape[0]) or self._labels_tensor.shape[0])
+        total = int(
+            metadata.get("sample_count", self._labels_tensor.shape[0])
+            or self._labels_tensor.shape[0]
+        )
         class_entropy = 0.0
         if total > 0:
             for count in class_histogram.values():
@@ -1646,15 +1758,24 @@ class IngestionPipelineDataset(Dataset):
             min_trust = float(metadata.get("source_trust_min", 0.0) or 0.0)
 
         manifest = {
+            "schema_version": _DATASET_MANIFEST_SCHEMA_VERSION,
             "dataset_source": "INGESTION_PIPELINE",
             "ingestion_manifest_hash": self._manifest_hash,
             "tensor_hash": tensor_hash,
             "sample_count": total,
             "feature_dim": self.feature_dim,
-            "num_classes": int(metadata["num_classes"]) if "num_classes" in metadata else len(class_histogram),
-            "accepted": int(metadata["accepted"]) if "accepted" in metadata else int(accepted),
-            "rejected_policy": int(metadata["rejected_policy"]) if "rejected_policy" in metadata else int(rejected_policy),
-            "rejected_quality": int(metadata["rejected_quality"]) if "rejected_quality" in metadata else int(rejected_quality),
+            "num_classes": int(metadata["num_classes"])
+            if "num_classes" in metadata
+            else len(class_histogram),
+            "accepted": int(metadata["accepted"])
+            if "accepted" in metadata
+            else int(accepted),
+            "rejected_policy": int(metadata["rejected_policy"])
+            if "rejected_policy" in metadata
+            else int(rejected_policy),
+            "rejected_quality": int(metadata["rejected_quality"])
+            if "rejected_quality" in metadata
+            else int(rejected_quality),
             "strict_real_mode": STRICT_REAL_MODE,
             "class_histogram": class_histogram,
             "class_entropy": round(class_entropy, 4),
@@ -1666,6 +1787,7 @@ class IngestionPipelineDataset(Dataset):
 
         # Canonicalize: add signed fields for DatasetManifest compatibility
         from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+
         canonicalize_manifest(manifest)
 
         self._atomic_write_json(manifest_path, manifest)
@@ -1704,6 +1826,7 @@ class IngestionPipelineDataset(Dataset):
 # REAL DATALOADER FACTORY
 # =============================================================================
 
+
 def create_real_training_dataloader(
     batch_size: int = 1024,
     num_workers: int = 4,
@@ -1726,6 +1849,7 @@ def create_real_training_dataloader(
         min_samples=min_samples,
         seed=seed,
     )
+    verification = verify_dataset(dataset)
 
     g = torch.Generator()
     g.manual_seed(seed)
@@ -1746,13 +1870,221 @@ def create_real_training_dataloader(
     stats["batch_size"] = batch_size
     stats["num_workers"] = num_workers
     stats["pin_memory"] = pin_memory
+    stats.update(verification)
 
     return loader, stats
+
+
+def _parse_manifest_timestamp(raw_value: Any) -> str:
+    if raw_value is None:
+        raise RuntimeError("REAL_DATA_REQUIRED: Dataset manifest timestamp missing")
+
+    timestamp_text = str(raw_value).strip()
+    if not timestamp_text:
+        raise RuntimeError("REAL_DATA_REQUIRED: Dataset manifest timestamp missing")
+
+    normalized = timestamp_text.replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: Dataset manifest timestamp invalid ({timestamp_text})"
+        ) from exc
+
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+
+    max_allowed = datetime.now(timezone.utc) + timedelta(
+        seconds=_DATASET_MAX_FUTURE_SKEW_SECONDS
+    )
+    if parsed > max_allowed:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: Dataset manifest timestamp is in the future ({timestamp_text})"
+        )
+
+    return parsed.isoformat()
+
+
+def _verification_indices(sample_count: int) -> np.ndarray:
+    verify_count = min(sample_count, _DATASET_VERIFICATION_SAMPLE_LIMIT)
+    if verify_count <= 0:
+        return np.array([], dtype=np.int64)
+    if verify_count == sample_count:
+        return np.arange(sample_count, dtype=np.int64)
+    return (np.arange(verify_count, dtype=np.int64) * sample_count) // verify_count
+
+
+def verify_dataset(dataset: "IngestionPipelineDataset") -> Dict[str, Any]:
+    if dataset is None:
+        raise RuntimeError("REAL_DATA_REQUIRED: Dataset missing")
+    if (
+        str(getattr(dataset, "dataset_source", "") or "").upper()
+        != "INGESTION_PIPELINE"
+    ):
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: dataset_source must be INGESTION_PIPELINE"
+        )
+
+    features_tensor = getattr(dataset, "_features_tensor", None)
+    labels_tensor = getattr(dataset, "_labels_tensor", None)
+    if features_tensor is None or labels_tensor is None:
+        raise RuntimeError("REAL_DATA_REQUIRED: Dataset tensors unavailable")
+    if features_tensor.ndim != 2 or labels_tensor.ndim != 1:
+        raise RuntimeError("REAL_DATA_REQUIRED: Dataset tensor schema invalid")
+    if (
+        features_tensor.shape[0] != labels_tensor.shape[0]
+        or features_tensor.shape[0] <= 0
+    ):
+        raise RuntimeError("REAL_DATA_REQUIRED: Dataset tensor counts invalid")
+    if (
+        not torch.isfinite(features_tensor).all()
+        or not torch.isfinite(labels_tensor).all()
+    ):
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: Dataset tensors contain non-finite values"
+        )
+
+    from impl_v1.training.safety.dataset_manifest import validate_manifest
+    from impl_v1.training.data.quality_gates import check_duplicates
+    from impl_v1.training.data.semantic_quality_gate import run_sanity_test
+
+    dataset_hash = dataset._compute_tensor_hash()
+    manifest_valid, manifest_reason, _ = validate_manifest(
+        expected_dataset_hash=dataset_hash,
+        path=str(_VALIDATION_MANIFEST_PATH),
+    )
+    if not manifest_valid:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: Dataset manifest validation failed ({manifest_reason})"
+        )
+
+    try:
+        with open(_VALIDATION_MANIFEST_PATH, "r", encoding="utf-8") as handle:
+            manifest = json.load(handle)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: Dataset manifest unreadable ({type(exc).__name__})"
+        ) from exc
+
+    if not isinstance(manifest, dict):
+        raise RuntimeError("REAL_DATA_REQUIRED: Dataset manifest schema invalid")
+
+    required_fields = (
+        "schema_version",
+        "dataset_source",
+        "dataset_hash",
+        "signature_hash",
+        "signed_by",
+        "version",
+        "total_samples",
+        "strict_real_mode",
+        "ingestion_manifest_hash",
+    )
+    missing_fields = [field for field in required_fields if field not in manifest]
+    if missing_fields:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: Dataset manifest missing fields {', '.join(missing_fields)}"
+        )
+
+    schema_version = int(manifest.get("schema_version", 0) or 0)
+    if schema_version != _DATASET_MANIFEST_SCHEMA_VERSION:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: Dataset manifest schema_version={schema_version}"
+        )
+
+    manifest_source = str(manifest.get("dataset_source", "") or "").upper()
+    if manifest_source != "INGESTION_PIPELINE":
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: manifest dataset_source={manifest_source or '<missing>'}"
+        )
+
+    if not bool(manifest.get("strict_real_mode", False)):
+        raise RuntimeError("REAL_DATA_REQUIRED: strict_real_mode is not enabled")
+
+    if str(manifest.get("dataset_hash", "") or "") != dataset_hash:
+        raise RuntimeError("REAL_DATA_REQUIRED: dataset_hash mismatch")
+
+    manifest_hash = str(manifest.get("ingestion_manifest_hash", "") or "")
+    if manifest_hash != str(dataset._manifest_hash or ""):
+        raise RuntimeError("REAL_DATA_REQUIRED: ingestion manifest hash mismatch")
+
+    manifest_samples = int(
+        manifest.get("sample_count", manifest.get("total_samples", 0)) or 0
+    )
+    sample_count = int(features_tensor.shape[0])
+    if manifest_samples != sample_count:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: manifest sample_count={manifest_samples} does not match dataset={sample_count}"
+        )
+
+    manifest_timestamp = _parse_manifest_timestamp(
+        manifest.get("updated_at")
+        or manifest.get("frozen_at")
+        or manifest.get("created_at")
+    )
+
+    marker_blob = " ".join(
+        str(manifest.get(key, "") or "")
+        for key in ("dataset_source", "training_mode", "version", "signed_by")
+    ).lower()
+    if any(
+        token in marker_blob for token in ("synthetic", "mock", "fake", "dummy", "stub")
+    ):
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: Synthetic markers detected in dataset manifest"
+        )
+
+    confidence_score = float(
+        (dataset._tensor_cache_metadata or {}).get("source_trust_avg", 0.0) or 0.0
+    )
+    if confidence_score <= 0.0 and getattr(dataset, "_raw_samples", None):
+        trust_scores = [
+            float(sample.get("reliability", 0.0))
+            for sample in dataset._raw_samples
+            if isinstance(sample, dict)
+        ]
+        if trust_scores:
+            confidence_score = sum(trust_scores) / len(trust_scores)
+    if confidence_score < _DATASET_MIN_SOURCE_CONFIDENCE:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: source confidence {confidence_score:.4f} < {_DATASET_MIN_SOURCE_CONFIDENCE:.4f}"
+        )
+
+    features_np = features_tensor.detach().cpu().numpy()
+    labels_np = labels_tensor.detach().cpu().numpy()
+    indices = _verification_indices(sample_count)
+    features_check = features_np[indices]
+    labels_check = labels_np[indices]
+
+    duplicate_gate = check_duplicates(features_check)
+    duplicate_ratio = float(duplicate_gate.metrics.get("exact_duplicate_ratio", 0.0))
+    if not duplicate_gate.passed:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: duplicate detection failed ({duplicate_gate.message})"
+        )
+
+    n_classes = max(1, int(np.unique(labels_check).size))
+    sanity_result = run_sanity_test(features_check, labels_check, n_classes)
+    if not sanity_result.passed:
+        raise RuntimeError(
+            f"REAL_DATA_REQUIRED: noise filter rejected dataset ({sanity_result.rejection_reason})"
+        )
+
+    return {
+        "dataset_hash": dataset_hash,
+        "sample_count": sample_count,
+        "confidence_score": round(confidence_score, 4),
+        "duplicate_ratio": round(duplicate_ratio, 4),
+        "label_noise_ratio": round(float(sanity_result.label_noise_ratio), 4),
+        "manifest_timestamp": manifest_timestamp,
+        "verification_schema_version": _DATASET_MANIFEST_SCHEMA_VERSION,
+    }
 
 
 # =============================================================================
 # PER-FIELD REPORT (for /api/training/readiness endpoint)
 # =============================================================================
+
 
 def get_per_field_report() -> dict:
     """
@@ -1781,6 +2113,7 @@ def get_per_field_report() -> dict:
     # Load persisted bridge state (authoritative source)
     try:
         from backend.bridge.bridge_state import get_bridge_state
+
         bridge_state = get_bridge_state()
         counts = bridge_state.get_counts()
         report["bridge_count"] = counts["bridge_count"]
@@ -1804,7 +2137,9 @@ def get_per_field_report() -> dict:
             with open(manifest_path) as f:
                 manifest = json.load(f)
             report["manifest"] = {
-                "sample_count": manifest.get("sample_count", manifest.get("total_samples", 0)),
+                "sample_count": manifest.get(
+                    "sample_count", manifest.get("total_samples", 0)
+                ),
                 "dataset_source": manifest.get("dataset_source", "UNKNOWN"),
                 "frozen_at": manifest.get("frozen_at", manifest.get("updated_at")),
                 "class_entropy": manifest.get("class_entropy", 0),
@@ -1827,10 +2162,7 @@ def get_per_field_report() -> dict:
     verified = report["bridge_verified_count"]
     if verified >= min_samples:
         report["status"] = "READY"
-        report["reason"] = (
-            f"{verified} verified samples "
-            f"(threshold: {min_samples})"
-        )
+        report["reason"] = f"{verified} verified samples (threshold: {min_samples})"
     else:
         report["status"] = "BLOCKED"
         report["reason"] = (
@@ -1877,10 +2209,20 @@ def generate_dataset_manifest() -> dict:
 
             rc = lib.bridge_fetch_verified_sample(
                 idx,
-                ep, FIELD_LEN, params, FIELD_LEN,
-                ev, FIELD_LEN, imp, FIELD_LEN,
-                st, FIELD_LEN, fp, 65,
-                ctypes.byref(reliability), ctypes.byref(ingested_at),
+                ep,
+                FIELD_LEN,
+                params,
+                FIELD_LEN,
+                ev,
+                FIELD_LEN,
+                imp,
+                FIELD_LEN,
+                st,
+                FIELD_LEN,
+                fp,
+                65,
+                ctypes.byref(reliability),
+                ctypes.byref(ingested_at),
             )
             if rc != 0:
                 continue
@@ -1897,6 +2239,7 @@ def generate_dataset_manifest() -> dict:
             per_field_deficits[field] = max(0, YGB_MIN_REAL_SAMPLES - count)
 
         manifest = {
+            "schema_version": _DATASET_MANIFEST_SCHEMA_VERSION,
             "dataset_source": "INGESTION_PIPELINE",
             "ingestion_manifest_hash": manifest_hash,
             "total_samples": total,
@@ -1913,6 +2256,7 @@ def generate_dataset_manifest() -> dict:
 
         # Canonicalize: add signed fields for DatasetManifest compatibility
         from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+
         canonicalize_manifest(manifest)
 
         # Write to disk
@@ -1926,5 +2270,7 @@ def generate_dataset_manifest() -> dict:
     except FileNotFoundError:
         return {"success": False, "error": "Ingestion bridge DLL not found"}
     except Exception as e:
-        return {"success": False, "error": f"manifest_generation_failed: {type(e).__name__}"}
-
+        return {
+            "success": False,
+            "error": f"manifest_generation_failed: {type(e).__name__}",
+        }

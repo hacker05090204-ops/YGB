@@ -23,14 +23,24 @@ from typing import Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-MANIFEST_PATH = os.path.join('secure_data', 'dataset_manifest.json')
+MANIFEST_PATH = os.path.join("secure_data", "dataset_manifest.json")
+
+
+def _get_required_authority_hash() -> str:
+    authority_key = os.environ.get("YGB_AUTHORITY_KEY", "").strip()
+    if not authority_key:
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: YGB_AUTHORITY_KEY must be set before manifest validation"
+        )
+    return hashlib.sha256(authority_key.encode("utf-8")).hexdigest()
 
 
 @dataclass
 class DatasetManifest:
     """Signed dataset manifest."""
+
     dataset_hash: str
-    signed_by: str       # SHA-256 of authority key
+    signed_by: str  # SHA-256 of authority key
     version: str
     total_samples: int
     created_at: str
@@ -56,21 +66,21 @@ def create_manifest(
     Returns:
         Created DatasetManifest.
     """
-    signed_by = hashlib.sha256(authority_key.encode('utf-8')).hexdigest()
+    signed_by = hashlib.sha256(authority_key.encode("utf-8")).hexdigest()
     sig_input = f"{dataset_hash}|{signed_by}|{version}"
-    signature_hash = hashlib.sha256(sig_input.encode('utf-8')).hexdigest()
+    signature_hash = hashlib.sha256(sig_input.encode("utf-8")).hexdigest()
 
     manifest = DatasetManifest(
         dataset_hash=dataset_hash,
         signed_by=signed_by,
         version=version,
         total_samples=total_samples,
-        created_at=time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+        created_at=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         signature_hash=signature_hash,
     )
 
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w') as f:
+    with open(path, "w") as f:
         json.dump(asdict(manifest), f, indent=2)
 
     logger.info(f"[MANIFEST] Created: hash={dataset_hash[:16]}..., version={version}")
@@ -97,11 +107,17 @@ def validate_manifest(
 
     # Load
     try:
-        with open(path, 'r') as f:
+        with open(path, "r") as f:
             data = json.load(f)
         # Extract only the 6 signed fields (superset manifests have extra keys)
-        required_keys = {'dataset_hash', 'signed_by', 'version',
-                         'total_samples', 'created_at', 'signature_hash'}
+        required_keys = {
+            "dataset_hash",
+            "signed_by",
+            "version",
+            "total_samples",
+            "created_at",
+            "signature_hash",
+        }
         manifest_data = {k: data[k] for k in required_keys}
         manifest = DatasetManifest(**manifest_data)
     except Exception as e:
@@ -110,7 +126,7 @@ def validate_manifest(
 
     # Verify signature integrity
     sig_input = f"{manifest.dataset_hash}|{manifest.signed_by}|{manifest.version}"
-    expected_sig = hashlib.sha256(sig_input.encode('utf-8')).hexdigest()
+    expected_sig = hashlib.sha256(sig_input.encode("utf-8")).hexdigest()
 
     if manifest.signature_hash != expected_sig:
         logger.error("[MANIFEST] BLOCKED: signature verification failed")
@@ -129,6 +145,18 @@ def validate_manifest(
     if not manifest.signed_by or len(manifest.signed_by) != 64:
         logger.error("[MANIFEST] BLOCKED: invalid authority signature")
         return False, "no_authority", None
+
+    try:
+        required_signed_by = _get_required_authority_hash()
+    except RuntimeError as exc:
+        logger.error("[MANIFEST] BLOCKED: %s", exc)
+        return False, "authority_key_missing", None
+
+    if manifest.signed_by != required_signed_by:
+        logger.error(
+            "[MANIFEST] BLOCKED: manifest signer does not match configured authority"
+        )
+        return False, "authority_mismatch", None
 
     logger.info(
         f"[MANIFEST] VALID: hash={manifest.dataset_hash[:16]}..., "

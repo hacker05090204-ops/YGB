@@ -42,7 +42,7 @@ import hashlib
 import json
 import tempfile
 import numpy as np
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
 from typing import Optional, Callable, List, Tuple, Dict, Any
 from enum import Enum
@@ -476,8 +476,15 @@ class AutoTrainer:
             return False, "manifest_invalid: not a JSON object"
 
         dataset_source = str(manifest.get("dataset_source", "") or "").upper()
+        schema_version = int(manifest.get("schema_version", 0) or 0)
+        dataset_hash = str(manifest.get("dataset_hash", "") or "")
         strict_real = bool(manifest.get("strict_real_mode", False))
         training_mode = str(manifest.get("training_mode", "") or "").upper()
+        manifest_timestamp = (
+            manifest.get("updated_at")
+            or manifest.get("frozen_at")
+            or manifest.get("created_at")
+        )
         sample_count = int(
             manifest.get("sample_count", manifest.get("total_samples", 0)) or 0
         )
@@ -494,15 +501,31 @@ class AutoTrainer:
 
         if not strict_real:
             return False, "manifest_invalid: strict_real_mode is not enabled"
+        if schema_version != 1:
+            return False, f"manifest_invalid: schema_version={schema_version}"
         if dataset_source != "INGESTION_PIPELINE":
             return (
                 False,
                 f"manifest_invalid: dataset_source={dataset_source or '<missing>'}",
             )
+        if not dataset_hash:
+            return False, "manifest_invalid: dataset_hash missing"
         if training_mode and training_mode != "PRODUCTION_REAL":
             return False, f"manifest_invalid: training_mode={training_mode}"
         if not signed:
             return False, "manifest_invalid: signature fields missing"
+        if not manifest_timestamp:
+            return False, "manifest_invalid: timestamp missing"
+        try:
+            parsed_timestamp = datetime.fromisoformat(
+                str(manifest_timestamp).replace("Z", "+00:00")
+            )
+            if parsed_timestamp.tzinfo is None:
+                parsed_timestamp = parsed_timestamp.replace(tzinfo=timezone.utc)
+            if parsed_timestamp > datetime.now(timezone.utc) + timedelta(minutes=5):
+                return False, "manifest_invalid: timestamp in future"
+        except ValueError:
+            return False, "manifest_invalid: timestamp invalid"
         if total < min_samples:
             return (
                 False,

@@ -44,8 +44,14 @@ RELIABILITY_DROP_THRESHOLD = 0.40  # Below this → drop
 # Canonical source names (from cve_pipeline _SOURCE_CONFIGS)
 CANONICAL_SOURCES = {"CVE Services / cve.org", "cve_services"}
 HIGH_TRUST_SOURCES = {"NVD API v2", "nvd", "CISA KEV Catalog", "cisa_kev"}
-ENRICHMENT_SOURCES = {"CVE Project / GitHub", "cveproject", "Vulners API",
-                      "vulners", "VulDB API", "vuldb"}
+ENRICHMENT_SOURCES = {
+    "CVE Project / GitHub",
+    "cveproject",
+    "Vulners API",
+    "vulners",
+    "VulDB API",
+    "vuldb",
+}
 
 
 class BridgeIngestionWorker:
@@ -61,6 +67,7 @@ class BridgeIngestionWorker:
         self._load_bridge()
         # Load persistent bridge state
         from backend.bridge.bridge_state import get_bridge_state
+
         self._bridge_state = get_bridge_state()
 
     def _load_bridge(self):
@@ -87,8 +94,12 @@ class BridgeIngestionWorker:
 
             self._lib.bridge_ingest_sample.restype = ctypes.c_int
             self._lib.bridge_ingest_sample.argtypes = [
-                ctypes.c_char_p, ctypes.c_char_p, ctypes.c_char_p,
-                ctypes.c_char_p, ctypes.c_char_p, ctypes.c_double,
+                ctypes.c_char_p,
+                ctypes.c_char_p,
+                ctypes.c_char_p,
+                ctypes.c_char_p,
+                ctypes.c_char_p,
+                ctypes.c_double,
             ]
 
             logger.info("[BRIDGE] Ingestion bridge DLL loaded")
@@ -161,6 +172,7 @@ class BridgeIngestionWorker:
     @staticmethod
     def _map_cve_to_sample(record) -> Optional[Dict[str, str]]:
         """Map a CVE pipeline record to training sample fields."""
+
         def _read(key: str, default=None):
             """
             Read from dataclass/object records first, then dict-like records.
@@ -204,14 +216,17 @@ class BridgeIngestionWorker:
             if isinstance(provenance, list):
                 for p in provenance:
                     s = getattr(p, "source", None) or (
-                        p.get("source", "") if isinstance(p, dict) else "")
+                        p.get("source", "") if isinstance(p, dict) else ""
+                    )
                     if s:
                         sources.append(s)
             elif isinstance(provenance, dict):
                 s = provenance.get("source", "")
                 if s:
                     sources.append(s)
-        source_tag = "|".join(sources) if sources else _read("source_id", "UNKNOWN")
+        source_tag = "|".join(sources) if sources else str(_read("source_id", "") or "")
+        if not source_tag or source_tag.upper() == "UNKNOWN":
+            raise RuntimeError("REAL_DATA_REQUIRED: source provenance missing")
 
         promotion_status = _read("promotion_status", "RESEARCH_PENDING")
 
@@ -289,14 +304,29 @@ class BridgeIngestionWorker:
                 self._ingested_keys.add(ik)
                 self._total_ingested += 1
                 # Persist sample
-                self._bridge_state.append_sample({
+                persisted_sample = {
                     "endpoint": fields["endpoint"],
                     "parameters": fields["parameters"],
                     "exploit_vector": fields["exploit_vector"],
                     "impact": fields["impact"],
                     "source_tag": fields["source_tag"],
                     "reliability": reliability,
-                })
+                    "ingested_at": datetime.now(timezone.utc).isoformat(),
+                }
+                persisted_sample["sha256_hash"] = hashlib.sha256(
+                    json.dumps(
+                        {
+                            "endpoint": persisted_sample["endpoint"],
+                            "parameters": persisted_sample["parameters"],
+                            "exploit_vector": persisted_sample["exploit_vector"],
+                            "impact": persisted_sample["impact"],
+                            "source_tag": persisted_sample["source_tag"],
+                        },
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest()
+                self._bridge_state.append_sample(persisted_sample)
             elif rc == -3:
                 self._total_deduped += 1
                 self._ingested_keys.add(ik)
@@ -359,14 +389,29 @@ class BridgeIngestionWorker:
                 self._ingested_keys.add(ik)
                 self._total_ingested += 1
                 # Persist sample
-                self._bridge_state.append_sample({
+                persisted_sample = {
                     "endpoint": fields["endpoint"],
                     "parameters": fields["parameters"],
                     "exploit_vector": fields["exploit_vector"],
                     "impact": fields["impact"],
                     "source_tag": fields["source_tag"],
                     "reliability": reliability,
-                })
+                    "ingested_at": datetime.now(timezone.utc).isoformat(),
+                }
+                persisted_sample["sha256_hash"] = hashlib.sha256(
+                    json.dumps(
+                        {
+                            "endpoint": persisted_sample["endpoint"],
+                            "parameters": persisted_sample["parameters"],
+                            "exploit_vector": persisted_sample["exploit_vector"],
+                            "impact": persisted_sample["impact"],
+                            "source_tag": persisted_sample["source_tag"],
+                        },
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                ).hexdigest()
+                self._bridge_state.append_sample(persisted_sample)
             elif rc == -3:
                 deduped += 1
                 self._ingested_keys.add(ik)
@@ -414,6 +459,7 @@ class BridgeIngestionWorker:
         source_mix = {}
         try:
             from backend.cve.cve_pipeline import get_pipeline
+
             pipeline = get_pipeline()
             for cve_id, record in getattr(pipeline, "_records", {}).items():
                 provenance = getattr(record, "provenance", [])
@@ -426,6 +472,8 @@ class BridgeIngestionWorker:
             pass
 
         manifest = {
+            "schema_version": 1,
+            "dataset_source": "INGESTION_PIPELINE",
             "total_samples": counts.get("bridge_count", 0),
             "verified_samples": counts.get("bridge_verified_count", 0),
             "per_field_counts": {
@@ -437,16 +485,17 @@ class BridgeIngestionWorker:
                 "reliability": self._total_ingested,
             },
             "source_mix": source_mix,
-            "strict_real_mode": os.environ.get(
-                "YGB_STRICT_REAL_MODE", "true"
-            ).lower() != "false",
+            "strict_real_mode": os.environ.get("YGB_STRICT_REAL_MODE", "true").lower()
+            != "false",
             "updated_at": datetime.now(timezone.utc).isoformat(),
             "ingestion_manifest_hash": hashlib.sha256(
-                json.dumps({
-                    "total": self._total_ingested,
-                    "dropped": self._total_dropped,
-                    "deduped": self._total_deduped,
-                }).encode()
+                json.dumps(
+                    {
+                        "total": self._total_ingested,
+                        "dropped": self._total_dropped,
+                        "deduped": self._total_deduped,
+                    }
+                ).encode()
             ).hexdigest()[:16],
             "worker_stats": {
                 "total_ingested": self._total_ingested,
@@ -457,6 +506,7 @@ class BridgeIngestionWorker:
 
         # Canonicalize: add signed fields for DatasetManifest compatibility
         from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+
         canonicalize_manifest(manifest)
 
         try:

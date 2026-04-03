@@ -24,6 +24,7 @@ from datetime import datetime, UTC
 
 class VoiceOutputType(Enum):
     """CLOSED ENUM - 5 output types"""
+
     EXPLANATION = "EXPLANATION"
     PROGRESS = "PROGRESS"
     CONFIRMATION_REQUEST = "CONFIRMATION_REQUEST"
@@ -33,6 +34,7 @@ class VoiceOutputType(Enum):
 
 class VoiceOutputStatus(Enum):
     """CLOSED ENUM - 4 statuses"""
+
     PENDING = "PENDING"
     DELIVERED = "DELIVERED"
     FAILED = "FAILED"
@@ -42,6 +44,7 @@ class VoiceOutputStatus(Enum):
 @dataclass(frozen=True)
 class VoiceOutputRequest:
     """Request for voice output."""
+
     request_id: str
     output_type: VoiceOutputType
     text: str
@@ -52,6 +55,7 @@ class VoiceOutputRequest:
 @dataclass(frozen=True)
 class VoiceOutputResult:
     """Result of voice output attempt."""
+
     request_id: str
     status: VoiceOutputStatus
     audio_url: Optional[str]
@@ -78,18 +82,18 @@ def reset_rate_limit():
 def check_rate_limit() -> bool:
     """Check if rate limit allows request."""
     global _request_count, _last_reset
-    
+
     now = datetime.now(UTC)
-    
+
     if _last_reset is None:
         _last_reset = now
         _request_count = 0
-    
+
     # Reset if minute passed
     if (now - _last_reset).total_seconds() >= 60:
         _last_reset = now
         _request_count = 0
-    
+
     return _request_count < MAX_REQUESTS_PER_MINUTE
 
 
@@ -112,7 +116,7 @@ def create_voice_request(
 def build_tts_url(request: VoiceOutputRequest) -> str:
     """Build TTS API URL for request."""
     from urllib.parse import quote
-    
+
     text_encoded = quote(request.text[:500])  # Limit text length
     return f"{TTS_PROXY_URL}?text={text_encoded}&lang={request.language}"
 
@@ -149,22 +153,17 @@ def process_voice_request(request: VoiceOutputRequest) -> VoiceOutputResult:
     # Build TTS proxy URL
     audio_url = build_tts_url(request)
 
-    # Attempt real HTTP call to TTS proxy
+    # Reject the legacy test-mode bypass instead of silently falling back.
     import os
-    _test_mode = os.environ.get("YGB_TEST_MODE", "").lower() == "true"
-    if _test_mode:
-        # TEST_ONLY: Skip real HTTP call in test harness
-        _request_count += 1
-        return VoiceOutputResult(
-            request_id=request.request_id,
-            status=VoiceOutputStatus.DELIVERED,
-            audio_url=audio_url,
-            error_message=None,
-            timestamp=datetime.now(UTC).isoformat(),
+
+    if os.environ.get("YGB_TEST_MODE", "").lower() == "true":
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: YGB_TEST_MODE TTS proxy bypass is disabled"
         )
 
     try:
         import urllib.request
+
         req = urllib.request.Request(audio_url, method="GET")
         req.add_header("User-Agent", "YGB-VoiceProxy/1.0")
         with urllib.request.urlopen(req, timeout=5) as resp:

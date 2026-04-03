@@ -179,7 +179,7 @@ __declspec(dllexport) void audio_capture_stop() {
 } // extern "C"
 
 #else
-// Non-Windows stub
+// Non-Windows fail-closed implementation
 extern "C" {
 int audio_capture_init(int sr, int ch, int bits) { return -1; }
 int audio_capture_read(char *buf, int sz) { return -1; }

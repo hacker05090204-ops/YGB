@@ -2,7 +2,7 @@
 Native Audio Capture Bridge — Python ctypes interface to WASAPI audio capture.
 
 Provides a Python generator of audio chunks from the native audio capture DLL.
-Falls back to PyAudio or simulated capture if the native DLL is not available.
+Fails closed if the native capture library is unavailable.
 """
 
 import ctypes
@@ -18,39 +18,43 @@ logger = logging.getLogger(__name__)
 # Paths
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 _CAPTURE_DIR = Path(__file__).resolve().parent
-_CAPTURE_LIB = "native_audio_capture.dll" if os.name == "nt" else "libnative_audio_capture.so"
+_CAPTURE_LIB = (
+    "native_audio_capture.dll" if os.name == "nt" else "libnative_audio_capture.so"
+)
 
 
 class NativeAudioCapture:
     """
     Python bridge to native WASAPI audio capture.
 
-    If the native DLL is not built, falls back to PyAudio.
     Provides a chunked audio generator for streaming to STT.
+    No fallback backend is permitted in strict real-data mode.
     """
 
-    def __init__(self, sample_rate: int = 16000, chunk_size: int = 4096,
-                 channels: int = 1, bits_per_sample: int = 16):
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        chunk_size: int = 4096,
+        channels: int = 1,
+        bits_per_sample: int = 16,
+    ):
         self.sample_rate = sample_rate
         self.chunk_size = chunk_size
         self.channels = channels
         self.bits_per_sample = bits_per_sample
         self._lib: Optional[ctypes.CDLL] = None
-        self._fallback_stream = None
         self._mode = "NONE"
 
         self._load_native()
 
     def _load_native(self):
-        """Try to load native WASAPI capture DLL."""
+        """Load the native WASAPI capture DLL or abort."""
         lib_path = _CAPTURE_DIR / _CAPTURE_LIB
         if not lib_path.exists():
-            logger.info(
-                f"[AUDIO] Native capture DLL not found: {lib_path}. "
-                f"Will use PyAudio fallback."
+            self._mode = "BLOCKED"
+            raise RuntimeError(
+                f"REAL_DATA_REQUIRED: Native audio capture library missing: {lib_path}"
             )
-            self._mode = "PYAUDIO"
-            return
 
         try:
             self._lib = ctypes.CDLL(str(lib_path))
@@ -58,12 +62,15 @@ class NativeAudioCapture:
             # Configure function signatures
             self._lib.audio_capture_init.restype = ctypes.c_int
             self._lib.audio_capture_init.argtypes = [
-                ctypes.c_int, ctypes.c_int, ctypes.c_int,  # sample_rate, channels, bits
+                ctypes.c_int,
+                ctypes.c_int,
+                ctypes.c_int,  # sample_rate, channels, bits
             ]
 
             self._lib.audio_capture_read.restype = ctypes.c_int
             self._lib.audio_capture_read.argtypes = [
-                ctypes.c_char_p, ctypes.c_int,  # buffer, buffer_size
+                ctypes.c_char_p,
+                ctypes.c_int,  # buffer, buffer_size
             ]
 
             self._lib.audio_capture_stop.restype = None
@@ -77,16 +84,22 @@ class NativeAudioCapture:
                 self._mode = "NATIVE"
                 logger.info("[AUDIO] Native WASAPI capture initialized")
             else:
-                logger.warning(f"[AUDIO] Native init failed (rc={rc}), using PyAudio fallback")
                 self._lib = None
-                self._mode = "PYAUDIO"
+                self._mode = "BLOCKED"
+                raise RuntimeError(
+                    f"REAL_DATA_REQUIRED: Native audio capture init failed (rc={rc})"
+                )
 
         except Exception as e:
-            logger.warning(f"[AUDIO] Native load failed: {e}, using PyAudio fallback")
             self._lib = None
-            self._mode = "PYAUDIO"
+            self._mode = "BLOCKED"
+            raise RuntimeError(
+                f"REAL_DATA_REQUIRED: Native audio capture load failed: {e}"
+            ) from e
 
-    def capture_chunks(self, duration_s: float = 0, max_chunks: int = 0) -> Generator[bytes, None, None]:
+    def capture_chunks(
+        self, duration_s: float = 0, max_chunks: int = 0
+    ) -> Generator[bytes, None, None]:
         """
         Generator yielding audio chunks.
 
@@ -99,12 +112,14 @@ class NativeAudioCapture:
         """
         if self._mode == "NATIVE":
             yield from self._capture_native(duration_s, max_chunks)
-        elif self._mode == "PYAUDIO":
-            yield from self._capture_pyaudio(duration_s, max_chunks)
         else:
-            logger.error("[AUDIO] No capture backend available")
+            raise RuntimeError(
+                "REAL_DATA_REQUIRED: Native audio capture backend unavailable"
+            )
 
-    def _capture_native(self, duration_s: float, max_chunks: int) -> Generator[bytes, None, None]:
+    def _capture_native(
+        self, duration_s: float, max_chunks: int
+    ) -> Generator[bytes, None, None]:
         """Capture from native WASAPI DLL."""
         buf = ctypes.create_string_buffer(self.chunk_size)
         start = time.time()
@@ -123,44 +138,12 @@ class NativeAudioCapture:
             else:
                 time.sleep(0.01)  # Brief sleep to avoid busy-wait
 
-    def _capture_pyaudio(self, duration_s: float, max_chunks: int) -> Generator[bytes, None, None]:
-        """Capture from PyAudio (fallback)."""
-        try:
-            import pyaudio
-        except ImportError:
-            logger.error("[AUDIO] PyAudio not installed. Cannot capture audio.")
-            return
-
-        pa = pyaudio.PyAudio()
-        try:
-            stream = pa.open(
-                format=pyaudio.paInt16,
-                channels=self.channels,
-                rate=self.sample_rate,
-                input=True,
-                frames_per_buffer=self.chunk_size // 2,  # 16-bit = 2 bytes/sample
-            )
-
-            start = time.time()
-            chunks = 0
-
-            while True:
-                if duration_s > 0 and (time.time() - start) >= duration_s:
-                    break
-                if max_chunks > 0 and chunks >= max_chunks:
-                    break
-
-                try:
-                    data = stream.read(self.chunk_size // 2, exception_on_overflow=False)
-                    yield data
-                    chunks += 1
-                except IOError:
-                    continue
-
-        finally:
-            stream.stop_stream()
-            stream.close()
-            pa.terminate()
+    def _capture_pyaudio(
+        self, duration_s: float, max_chunks: int
+    ) -> Generator[bytes, None, None]:
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: PyAudio fallback is disabled for audio capture"
+        )
 
     def stop(self):
         """Stop capture."""

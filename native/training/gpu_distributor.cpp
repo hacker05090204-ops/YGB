@@ -37,7 +37,7 @@ struct DistributionConfig {
 };
 
 // =============================================================================
-// GPU DETECTION (STUB — links with CUDA runtime if available)
+// GPU DETECTION (fail closed when CUDA runtime is unavailable)
 // =============================================================================
 
 static std::vector<GpuInfo> g_detected_gpus;
@@ -79,17 +79,10 @@ static void detect_gpus() {
     g_detected_gpus.push_back(info);
   }
 #else
-  // Fallback: report single CPU-only device
-  GpuInfo cpu_fallback;
-  cpu_fallback.device_id = -1;
-  std::strncpy(cpu_fallback.name, "CPU-only (no CUDA)",
-               sizeof(cpu_fallback.name) - 1);
-  cpu_fallback.name[sizeof(cpu_fallback.name) - 1] = '\0';
-  cpu_fallback.compute_major = 0;
-  cpu_fallback.compute_minor = 0;
-  cpu_fallback.total_memory_bytes = 0;
-  cpu_fallback.is_dedicated = false;
-  g_detected_gpus.push_back(cpu_fallback);
+  std::fprintf(
+      stderr,
+      "[GPU_DIST] ABORT: CUDA runtime unavailable; CPU fallback is disabled\n");
+  g_dist_config.all_same_compute = false;
 #endif
 
   g_dist_config.world_size = 0;
@@ -150,8 +143,19 @@ static ShardSpec compute_shard(int rank, int base_seed) {
   detect_gpus();
 
   ShardSpec spec;
+  if (g_dist_config.world_size <= 0) {
+    std::fprintf(
+        stderr,
+        "[GPU_DIST] ABORT: cannot compute shard without detected CUDA GPUs\n");
+    spec.rank = rank;
+    spec.world_size = 0;
+    spec.seed = base_seed;
+    spec.start_index = -1;
+    spec.stride = 0;
+    return spec;
+  }
   spec.rank = rank;
-  spec.world_size = g_dist_config.world_size > 0 ? g_dist_config.world_size : 1;
+  spec.world_size = g_dist_config.world_size;
   spec.seed = base_seed + rank;
   spec.start_index = rank;
   spec.stride = spec.world_size;

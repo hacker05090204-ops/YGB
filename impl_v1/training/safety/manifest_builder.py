@@ -15,9 +15,17 @@ import time
 from typing import Dict, Any
 
 
-# Authority key for signing — should be set via env in production
-_AUTHORITY_KEY = os.environ.get("YGB_AUTHORITY_KEY", "ygb-training-authority")
 _DEFAULT_VERSION = "1.0"
+_SCHEMA_VERSION = 1
+
+
+def _get_authority_key(explicit_key: str | None) -> str:
+    auth_key = (explicit_key or os.environ.get("YGB_AUTHORITY_KEY", "")).strip()
+    if not auth_key:
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: YGB_AUTHORITY_KEY must be set before manifest canonicalization"
+        )
+    return auth_key
 
 
 def canonicalize_manifest(
@@ -34,7 +42,7 @@ def canonicalize_manifest(
     manifest : dict
         Raw manifest dict produced by any writer (may have legacy-only keys).
     authority_key : str, optional
-        Signing authority key.  Falls back to YGB_AUTHORITY_KEY env var.
+        Signing authority key.  Must be provided directly or via YGB_AUTHORITY_KEY.
     version : str, optional
         Dataset version string.  Falls back to "1.0".
 
@@ -43,8 +51,10 @@ def canonicalize_manifest(
     dict
         The same dict (mutated in-place AND returned) with signed keys added.
     """
-    auth_key = authority_key or _AUTHORITY_KEY
+    auth_key = _get_authority_key(authority_key)
     ver = version or manifest.get("version", _DEFAULT_VERSION)
+
+    manifest.setdefault("schema_version", _SCHEMA_VERSION)
 
     # --- dataset_hash -----------------------------------------------------------
     # Prefer tensor_hash (most precise), then ingestion_manifest_hash, then compute
@@ -54,15 +64,9 @@ def canonicalize_manifest(
     if not dataset_hash:
         dataset_hash = manifest.get("ingestion_manifest_hash")
     if not dataset_hash:
-        # Last resort: hash the total_samples + source to produce a deterministic key
-        fallback_content = (
-            f"{manifest.get('total_samples', manifest.get('sample_count', 0))}"
-            f"|{manifest.get('dataset_source', 'UNKNOWN')}"
-            f"|{manifest.get('frozen_at', manifest.get('updated_at', ''))}"
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: dataset_hash, tensor_hash, or ingestion_manifest_hash is required"
         )
-        dataset_hash = hashlib.sha256(
-            fallback_content.encode("utf-8")
-        ).hexdigest()
 
     # --- signed_by ---------------------------------------------------------------
     signed_by = manifest.get("signed_by")

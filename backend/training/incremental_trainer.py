@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import logging
 import os
-import random
 import re
 import time
 from contextlib import nullcontext
@@ -15,7 +15,6 @@ from pathlib import Path
 
 import torch
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-from sklearn.model_selection import train_test_split
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import OneCycleLR
 from torch.utils.data import DataLoader, TensorDataset
@@ -32,7 +31,11 @@ from backend.training.model_thresholds import (
     save_threshold_artifact,
 )
 from backend.training.state_manager import TrainingMetrics, get_training_state_manager
-from impl_v1.phase49.governors.g37_pytorch_backend import BugClassifier, ModelConfig, create_model_config
+from impl_v1.phase49.governors.g37_pytorch_backend import (
+    BugClassifier,
+    ModelConfig,
+    create_model_config,
+)
 from impl_v1.phase49.governors.g38_self_trained_model import can_ai_execute
 from training.safetensors_io import load_safetensors, save_safetensors
 
@@ -43,6 +46,7 @@ DEFAULT_STATE_PATH = Path("checkpoints/training_state.json")
 DEFAULT_BASELINE_PATH = Path("checkpoints/baseline_accuracy.json")
 DEFAULT_RAW_DATA_ROOT = Path("data/raw")
 _IMPACT_RE = re.compile(r"CVSS:(?P<score>[0-9.]+)\|(?P<severity>[^|]+)")
+_CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -56,6 +60,7 @@ class EpochResult:
     epoch_number: int
     rollback: bool
     early_stopped: bool
+    prediction_hash: str = ""
 
 
 class IncrementalTrainer:
@@ -95,7 +100,9 @@ class IncrementalTrainer:
             self._atomic_write_json(
                 self.state_path,
                 {
-                    "last_training_time": datetime.fromtimestamp(0, timezone.utc).isoformat(),
+                    "last_training_time": datetime.fromtimestamp(
+                        0, timezone.utc
+                    ).isoformat(),
                     "epoch_number": 0,
                     "best_eval_loss": None,
                     "no_improve_count": 0,
@@ -112,8 +119,33 @@ class IncrementalTrainer:
     def _atomic_write_json(self, path: Path, payload: object) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         temp_path = path.with_suffix(f"{path.suffix}.tmp")
-        temp_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        temp_path.write_text(
+            json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
+        )
         os.replace(temp_path, path)
+
+    @staticmethod
+    def _deterministic_indices(total: int, limit: int) -> list[int]:
+        if total <= 0 or limit <= 0:
+            return []
+        if limit >= total:
+            return list(range(total))
+        return [int((index * total) / limit) for index in range(limit)]
+
+    @staticmethod
+    def _hash_predictions(
+        predictions: list[int], probabilities: list[list[float]]
+    ) -> str:
+        payload = {
+            "predictions": [int(prediction) for prediction in predictions],
+            "probabilities": [
+                [round(float(value), 8) for value in row] for row in probabilities
+            ],
+        }
+        encoded = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode(
+            "utf-8"
+        )
+        return hashlib.sha256(encoded).hexdigest()
 
     def _load_or_initialize_model(self) -> torch.nn.Module:
         if BugClassifier is None:
@@ -140,7 +172,11 @@ class IncrementalTrainer:
 
     def _restore_legacy_checkpoint(self) -> bool:
         checkpoints_root = self.model_path.parent
-        legacy_candidates = sorted(checkpoints_root.glob("*.pt"), key=lambda path: path.stat().st_mtime, reverse=True)
+        legacy_candidates = sorted(
+            checkpoints_root.glob("*.pt"),
+            key=lambda path: path.stat().st_mtime,
+            reverse=True,
+        )
         if not legacy_candidates:
             return False
 
@@ -159,7 +195,9 @@ class IncrementalTrainer:
         )
         return True
 
-    def _save_model_state(self, state_dict: dict[str, torch.Tensor], epoch_number: int) -> None:
+    def _save_model_state(
+        self, state_dict: dict[str, torch.Tensor], epoch_number: int
+    ) -> None:
         metadata = {"epoch_number": str(epoch_number)}
         save_safetensors(state_dict, str(self.model_path), metadata=metadata)
 
@@ -186,7 +224,9 @@ class IncrementalTrainer:
         self.positive_threshold = float(payload["positive_threshold"])
 
     def _parse_sample(self, payload: dict[str, object]) -> IngestedSample:
-        ingested_at = datetime.fromisoformat(str(payload["ingested_at"]).replace("Z", "+00:00"))
+        ingested_at = datetime.fromisoformat(
+            str(payload["ingested_at"]).replace("Z", "+00:00")
+        )
         return IngestedSample(
             source=str(payload["source"]),
             raw_text=str(payload["raw_text"]),
@@ -201,7 +241,9 @@ class IncrementalTrainer:
         )
 
     def load_new_samples(self) -> list[IngestedSample]:
-        last_training_time = datetime.fromisoformat(str(self.training_state["last_training_time"]).replace("Z", "+00:00"))
+        last_training_time = datetime.fromisoformat(
+            str(self.training_state["last_training_time"]).replace("Z", "+00:00")
+        )
         samples: list[IngestedSample] = []
         for sample_path in sorted(self.raw_data_root.rglob("*.json")):
             if sample_path.name == "dedup_index.json":
@@ -213,19 +255,31 @@ class IncrementalTrainer:
         if samples:
             logger.info(
                 "incremental_samples_loaded",
-                extra={"event": "incremental_samples_loaded", "count": len(samples), "source": "data_raw"},
+                extra={
+                    "event": "incremental_samples_loaded",
+                    "count": len(samples),
+                    "source": "data_raw",
+                },
             )
             return samples
 
-        bridge_limit = max(1000, int(os.environ.get("YGB_BRIDGE_TRAIN_MAX_SAMPLES", "5000")))
+        bridge_limit = max(
+            1000, int(os.environ.get("YGB_BRIDGE_TRAIN_MAX_SAMPLES", "5000"))
+        )
         bridge_samples = self._load_bridge_samples(max_samples=bridge_limit)
         logger.info(
             "incremental_samples_loaded",
-            extra={"event": "incremental_samples_loaded", "count": len(bridge_samples), "source": "bridge_state"},
+            extra={
+                "event": "incremental_samples_loaded",
+                "count": len(bridge_samples),
+                "source": "bridge_state",
+            },
         )
         return bridge_samples
 
-    def load_evaluation_samples(self, max_samples: int) -> tuple[list[IngestedSample], str]:
+    def load_evaluation_samples(
+        self, max_samples: int
+    ) -> tuple[list[IngestedSample], str]:
         samples: list[IngestedSample] = []
         for sample_path in sorted(self.raw_data_root.rglob("*.json")):
             if sample_path.name == "dedup_index.json":
@@ -234,12 +288,14 @@ class IncrementalTrainer:
                 payload = json.loads(sample_path.read_text(encoding="utf-8"))
                 samples.append(self._parse_sample(payload))
             except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError):
-                logger.warning("evaluation_sample_skipped", extra={"path": str(sample_path)})
+                logger.warning(
+                    "evaluation_sample_skipped", extra={"path": str(sample_path)}
+                )
 
         if samples:
             if len(samples) > max_samples:
-                rng = random.Random(42)
-                samples = rng.sample(samples, max_samples)
+                sample_indices = self._deterministic_indices(len(samples), max_samples)
+                samples = [samples[index] for index in sample_indices]
             return samples, "data_raw"
 
         return self._load_bridge_samples(max_samples=max_samples), "bridge_state"
@@ -271,24 +327,7 @@ class IncrementalTrainer:
     def _load_bridge_samples(self, max_samples: int) -> list[IngestedSample]:
         bridge_state = get_bridge_state()
         rows = bridge_state.read_samples(max_samples=max_samples)
-        sample_path = getattr(bridge_state, "_samples_path", None)
-        if sample_path is not None and bridge_state.get_sample_count() > max_samples:
-            import gzip
-
-            reservoir: list[dict[str, object]] = []
-            rng = random.Random(42)
-            with gzip.open(str(sample_path), "rt", encoding="utf-8") as handle:
-                for index, line in enumerate(handle):
-                    row = json.loads(line)
-                    if index < max_samples:
-                        reservoir.append(row)
-                        continue
-                    swap_index = rng.randint(0, index)
-                    if swap_index < max_samples:
-                        reservoir[swap_index] = row
-            rows = reservoir
         samples: list[IngestedSample] = []
-        fallback_time = datetime.now(timezone.utc)
         for row in rows:
             text = " ".join(
                 str(row.get(field, ""))
@@ -297,42 +336,67 @@ class IncrementalTrainer:
             ).strip()
             if not text:
                 continue
-            source_tag = str(row.get("source_tag", "nvd"))
-            source = source_tag.split("|", 1)[0].lower() or "nvd"
+            source_tag = str(row.get("source_tag", "") or "").strip()
+            if not source_tag:
+                raise RuntimeError("REAL_DATA_REQUIRED: bridge source_tag missing")
+            row_timestamp = str(row.get("ingested_at", "") or "").strip()
+            if not row_timestamp:
+                raise RuntimeError("REAL_DATA_REQUIRED: bridge row ingested_at missing")
+            row_sha256_hash = str(row.get("sha256_hash", "") or "").strip()
+            if len(row_sha256_hash) != 64:
+                raise RuntimeError("REAL_DATA_REQUIRED: bridge row sha256_hash missing")
+            endpoint = str(row.get("endpoint", "") or "").strip()
+            if not _CVE_ID_RE.fullmatch(endpoint):
+                raise RuntimeError(
+                    f"REAL_DATA_REQUIRED: bridge endpoint is not a canonical CVE id ({endpoint or '<missing>'})"
+                )
             severity = self._severity_from_bridge_record(row)
+            ingested_at = datetime.fromisoformat(row_timestamp.replace("Z", "+00:00"))
             samples.append(
                 IngestedSample(
-                    source=source,
+                    source=source_tag,
                     raw_text=text,
-                    url=f"https://nvd.nist.gov/vuln/detail/{row.get('endpoint', '')}",
-                    cve_id=str(row.get("endpoint", "")),
+                    url=f"https://nvd.nist.gov/vuln/detail/{endpoint.upper()}",
+                    cve_id=endpoint.upper(),
                     severity=severity,
                     tags=tuple(),
-                    ingested_at=fallback_time,
-                    sha256_hash=str(row.get("endpoint", "")) or str(row.get("source_tag", "")),
+                    ingested_at=ingested_at,
+                    sha256_hash=row_sha256_hash,
                     token_count=len(text.split()),
                     lang="en",
                 )
             )
         return samples
 
-    def build_dataset(self, samples: list[IngestedSample]) -> tuple[DataLoader, DataLoader]:
+    def build_dataset(
+        self, samples: list[IngestedSample]
+    ) -> tuple[DataLoader, DataLoader]:
         if self.num_workers > 0 and can_ai_execute()[0]:
             raise RuntimeError("GUARD")
+        if len(samples) < 2:
+            raise RuntimeError(
+                "REAL_DATA_REQUIRED: At least two real samples are required"
+            )
 
         feature_rows = torch.stack([extract(sample) for sample in samples])
-        labels = torch.tensor([self._label_for_sample(sample) for sample in samples], dtype=torch.long)
-        indices = list(range(len(samples)))
-        stratify = labels.tolist() if len(set(labels.tolist())) > 1 else None
-        train_indices, eval_indices = train_test_split(
-            indices,
-            test_size=0.1,
-            random_state=42,
-            stratify=stratify,
+        labels = torch.tensor(
+            [self._label_for_sample(sample) for sample in samples], dtype=torch.long
         )
+        indices = list(range(len(samples)))
+        eval_count = min(len(indices) - 1, max(2, int(len(indices) * 0.1)))
+        eval_indices = self._deterministic_indices(len(indices), eval_count)
+        eval_index_set = set(eval_indices)
+        train_indices = [index for index in indices if index not in eval_index_set]
+        if not train_indices or not eval_indices:
+            raise RuntimeError(
+                "REAL_DATA_REQUIRED: Deterministic train/validation split failed"
+            )
 
-        train_dataset = TensorDataset(feature_rows[train_indices], labels[train_indices])
+        train_dataset = TensorDataset(
+            feature_rows[train_indices], labels[train_indices]
+        )
         eval_dataset = TensorDataset(feature_rows[eval_indices], labels[eval_indices])
+        train_generator = torch.Generator().manual_seed(self.model_config.seed)
         train_loader = DataLoader(
             train_dataset,
             batch_size=256,
@@ -340,6 +404,7 @@ class IncrementalTrainer:
             num_workers=self.num_workers,
             pin_memory=self.device.type == "cuda",
             persistent_workers=self.num_workers > 0,
+            generator=train_generator,
         )
         eval_loader = DataLoader(
             eval_dataset,
@@ -353,7 +418,9 @@ class IncrementalTrainer:
 
     def _restore_previous_state(self, previous_state: dict[str, torch.Tensor]) -> None:
         self.model.load_state_dict(previous_state, strict=False)
-        self._save_model_state(previous_state, epoch_number=int(self.training_state.get("epoch_number", 0)))
+        self._save_model_state(
+            previous_state, epoch_number=int(self.training_state.get("epoch_number", 0))
+        )
 
     def _backward_pass(self, scaled_loss: torch.Tensor, scaler) -> None:
         if scaler is not None:
@@ -377,18 +444,24 @@ class IncrementalTrainer:
         if not samples:
             raise RuntimeError("No real samples available for benchmark")
 
-        feature_rows = torch.stack([extract(sample) for sample in samples]).to(self.device)
+        feature_rows = torch.stack([extract(sample) for sample in samples]).to(
+            self.device
+        )
         labels = [self._label_for_sample(sample) for sample in samples]
 
         self.model.eval()
         positive_probabilities: list[float] = []
         with torch.no_grad():
             for start in range(0, len(samples), 512):
-                logits = self.model(feature_rows[start:start + 512])
+                logits = self.model(feature_rows[start : start + 512])
                 probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
-                positive_probabilities.extend(float(probability) for probability in probs)
+                positive_probabilities.extend(
+                    float(probability) for probability in probs
+                )
 
-        live_metrics = compute_binary_metrics(labels, positive_probabilities, self.positive_threshold)
+        live_metrics = compute_binary_metrics(
+            labels, positive_probabilities, self.positive_threshold
+        )
         calibrated_metrics = calibrate_positive_threshold(
             labels,
             positive_probabilities,
@@ -412,7 +485,9 @@ class IncrementalTrainer:
         epoch_number = int(self.training_state.get("epoch_number", 0)) + 1
         if len(samples) < 10:
             logger.info("insufficient samples")
-            return EpochResult(0.0, 0.0, 0.0, 0.0, 0.0, len(samples), epoch_number, False, False)
+            return EpochResult(
+                0.0, 0.0, 0.0, 0.0, 0.0, len(samples), epoch_number, False, False
+            )
 
         train_loader, eval_loader = self.build_dataset(samples)
         optimizer = AdamW(self.model.parameters(), lr=3e-4, weight_decay=0.01)
@@ -425,7 +500,10 @@ class IncrementalTrainer:
         )
         scaler = torch.amp.GradScaler("cuda") if self.device.type == "cuda" else None
         criterion = torch.nn.CrossEntropyLoss()
-        previous_state = {name: tensor.detach().cpu().clone() for name, tensor in self.model.state_dict().items()}
+        previous_state = {
+            name: tensor.detach().cpu().clone()
+            for name, tensor in self.model.state_dict().items()
+        }
 
         start_time = time.perf_counter()
         self.model.train()
@@ -435,7 +513,11 @@ class IncrementalTrainer:
         for step_count, (features, labels) in enumerate(train_loader, start=1):
             features = features.to(self.device)
             labels = labels.to(self.device)
-            autocast_context = torch.amp.autocast("cuda") if self.device.type == "cuda" else nullcontext()
+            autocast_context = (
+                torch.amp.autocast("cuda")
+                if self.device.type == "cuda"
+                else nullcontext()
+            )
             with autocast_context:
                 outputs = self.model(features)
                 loss = criterion(outputs, labels)
@@ -449,7 +531,11 @@ class IncrementalTrainer:
             if step_count % 50 == 0:
                 logger.info(
                     "incremental_training_step",
-                    extra={"event": "incremental_training_step", "step": step_count, "loss": float(loss.item())},
+                    extra={
+                        "event": "incremental_training_step",
+                        "step": step_count,
+                        "loss": float(loss.item()),
+                    },
                 )
 
         if step_count and step_count % accum_steps != 0:
@@ -479,6 +565,7 @@ class IncrementalTrainer:
         )
         positive_threshold = float(threshold_metrics["threshold"])
         predictions = list(threshold_metrics["predictions"])
+        prediction_hash = self._hash_predictions(predictions, probability_rows)
         accuracy = float(threshold_metrics["accuracy"])
         precision = float(threshold_metrics["precision"])
         recall = float(threshold_metrics["recall"])
@@ -496,6 +583,7 @@ class IncrementalTrainer:
                 "precision": precision,
                 "recall": recall,
                 "f1": f1,
+                "prediction_hash": prediction_hash,
             },
         )
 
@@ -503,7 +591,17 @@ class IncrementalTrainer:
             logger.critical("accuracy dropped > 5%, rolling back")
             metrics_registry.increment("training_rollback", 1.0)
             self._restore_previous_state(previous_state)
-            return EpochResult(accuracy, precision, recall, f1, eval_loss, len(samples), epoch_number, True, False)
+            return EpochResult(
+                accuracy,
+                precision,
+                recall,
+                f1,
+                eval_loss,
+                len(samples),
+                epoch_number,
+                True,
+                False,
+            )
 
         early_stopped = False
         best_eval_loss = self.training_state.get("best_eval_loss")
@@ -524,7 +622,9 @@ class IncrementalTrainer:
             if no_improve_count >= 3:
                 early_stopped = True
                 logger.info("early stopping triggered")
-                reloaded_state = load_safetensors(str(self.model_path), device=self.device.type)
+                reloaded_state = load_safetensors(
+                    str(self.model_path), device=self.device.type
+                )
                 self.model.load_state_dict(reloaded_state, strict=False)
 
         gpu_metrics = self.state_manager.get_gpu_metrics(force_emit=True)
@@ -548,10 +648,13 @@ class IncrementalTrainer:
         metrics_registry.set_gauge("training_epoch_number", float(epoch_number))
 
         self.training_state = {
-            "last_training_time": max(sample.ingested_at for sample in samples).isoformat(),
+            "last_training_time": max(
+                sample.ingested_at for sample in samples
+            ).isoformat(),
             "epoch_number": epoch_number,
             "best_eval_loss": best_eval_loss,
             "no_improve_count": no_improve_count,
+            "prediction_hash": prediction_hash,
         }
         self._atomic_write_json(self.state_path, self.training_state)
 
@@ -565,6 +668,7 @@ class IncrementalTrainer:
             epoch_number=epoch_number,
             rollback=False,
             early_stopped=early_stopped,
+            prediction_hash=prediction_hash,
         )
 
 

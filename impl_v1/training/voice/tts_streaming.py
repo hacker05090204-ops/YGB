@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 # TYPES
 # =============================================================================
 
+
 class TTSProvider(Enum):
     API_PROXY = "API_PROXY"
     LOCAL_PYTTSX3 = "LOCAL_PYTTSX3"
@@ -47,6 +48,7 @@ class ResponseType(Enum):
 @dataclass(frozen=True)
 class TTSResponse:
     """A TTS response to be spoken."""
+
     response_id: str
     text: str
     response_type: ResponseType
@@ -82,8 +84,16 @@ def format_response(response_type: ResponseType, **kwargs) -> str:
 # INTERRUPT DETECTION
 # =============================================================================
 
-STOP_HOTWORDS = {"stop speaking", "quiet", "be quiet", "shut up",
-                 "chup", "stop", "bas", "ruko"}
+STOP_HOTWORDS = {
+    "stop speaking",
+    "quiet",
+    "be quiet",
+    "shut up",
+    "chup",
+    "stop",
+    "bas",
+    "ruko",
+}
 
 
 def is_interrupt_command(text: str) -> bool:
@@ -94,6 +104,7 @@ def is_interrupt_command(text: str) -> bool:
 # =============================================================================
 # TTS ENGINE
 # =============================================================================
+
 
 class TTSEngine:
     """Streaming TTS with interrupt support."""
@@ -162,9 +173,8 @@ class TTSEngine:
             if os.environ.get("YGB_TEST_MODE", "").lower() == "true":
                 return {
                     "provider": TTSProvider.API_PROXY.value,
-                    "reachable": True,
-                    "reason": "test_mode",
-                    "audio_url": probe_url,
+                    "reachable": False,
+                    "reason": "REAL_DATA_REQUIRED: YGB_TEST_MODE TTS probe bypass is disabled",
                 }
 
             req = urllib.request.Request(probe_url, method="GET")
@@ -184,8 +194,9 @@ class TTSEngine:
                 "reason": f"proxy_probe_failed:{type(exc).__name__}",
             }
 
-    def speak(self, text: str, response_type: ResponseType = ResponseType.SUCCESS
-              ) -> TTSResponse:
+    def speak(
+        self, text: str, response_type: ResponseType = ResponseType.SUCCESS
+    ) -> TTSResponse:
         """Speak text via TTS. Returns response with status."""
         start = time.time()
         self._status = TTSStatus.SPEAKING
@@ -249,17 +260,20 @@ class TTSEngine:
             return True
         return False
 
-    def _speak_api(self, text: str, response_type: ResponseType) -> tuple[bool, Optional[str]]:
+    def _speak_api(
+        self, text: str, response_type: ResponseType
+    ) -> tuple[bool, Optional[str]]:
         """Speak via the real TTS proxy governor."""
         from impl_v1.phase49.governors.g04_voice_proxy import (
             VoiceOutputType,
             create_voice_request,
             process_voice_request,
-            reset_rate_limit,
         )
 
         if os.environ.get("YGB_TEST_MODE", "").lower() == "true":
-            reset_rate_limit()
+            raise RuntimeError(
+                "REAL_DATA_REQUIRED: YGB_TEST_MODE TTS execution bypass is disabled"
+            )
 
         output_type = {
             ResponseType.SUCCESS: VoiceOutputType.EXPLANATION,
@@ -280,13 +294,17 @@ class TTSEngine:
             logger.info(f"[TTS] Proxy delivered audio for: {text[:50]}...")
             return True, result.audio_url
 
-        logger.warning("[TTS] Proxy delivery failed: %s", result.error_message or result.status.value)
+        logger.warning(
+            "[TTS] Proxy delivery failed: %s",
+            result.error_message or result.status.value,
+        )
         return False, result.audio_url
 
     def _speak_local(self, text: str) -> bool:
         """Speak via local pyttsx3 (privacy mode)."""
         try:
             import pyttsx3
+
             engine = pyttsx3.init()
             engine.say(text)
             engine.runAndWait()

@@ -17,6 +17,7 @@ Flags saturation risk if:
   - interaction dominance > 40%
   - KL divergence < 0.05 between groups
 """
+
 import sys
 import os
 import json
@@ -26,7 +27,7 @@ from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 from dataclasses import dataclass, field, asdict
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 import numpy as np
 
 
@@ -64,19 +65,21 @@ FEATURE_GROUPS = {
     "noise": (192, 256),
 }
 
-PROTOCOL_DIMS = (0, 32)      # HTTP method/status encoded in first signal dims
-DOM_DIMS = (32, 64)           # DOM topology in remaining signal dims
-API_DIMS = (64, 96)           # API schema in first response dims
-AUTH_DIMS = (96, 128)         # Auth flow in remaining response dims
+PROTOCOL_DIMS = (0, 32)  # HTTP method/status encoded in first signal dims
+DOM_DIMS = (32, 64)  # DOM topology in remaining signal dims
+API_DIMS = (64, 96)  # API schema in first response dims
+AUTH_DIMS = (96, 128)  # Auth flow in remaining response dims
 
 
 # =============================================================================
 # AUDIT RESULT
 # =============================================================================
 
+
 @dataclass
 class RepresentationAuditResult:
     """Full representation space audit result."""
+
     passed: bool = True
     saturation_risks: List[str] = field(default_factory=list)
     feature_group_coverage: Dict[str, dict] = field(default_factory=dict)
@@ -99,6 +102,7 @@ class RepresentationAuditResult:
 # ENTROPY CALCULATION
 # =============================================================================
 
+
 def compute_entropy(values: np.ndarray, n_bins: int = 50) -> float:
     """Shannon entropy of a 1D distribution (binned)."""
     hist, _ = np.histogram(values, bins=n_bins, density=True)
@@ -109,8 +113,9 @@ def compute_entropy(values: np.ndarray, n_bins: int = 50) -> float:
     return float(-np.sum(probs * np.log2(probs + 1e-10)))
 
 
-def compute_kl_divergence(p: np.ndarray, q: np.ndarray,
-                          n_bins: int = 50, eps: float = 1e-10) -> float:
+def compute_kl_divergence(
+    p: np.ndarray, q: np.ndarray, n_bins: int = 50, eps: float = 1e-10
+) -> float:
     """KL(P || Q) with epsilon smoothing."""
     all_vals = np.concatenate([p, q])
     bins = np.linspace(all_vals.min(), all_vals.max(), n_bins + 1)
@@ -128,14 +133,17 @@ def compute_kl_divergence(p: np.ndarray, q: np.ndarray,
 # DIVERSITY METRICS
 # =============================================================================
 
-def compute_diversity_metrics(features: np.ndarray,
-                              dim_start: int, dim_end: int) -> dict:
+
+def compute_diversity_metrics(
+    features: np.ndarray, dim_start: int, dim_end: int
+) -> dict:
     """Compute diversity metrics for a feature subspace."""
     sub = features[:, dim_start:dim_end]
 
     # Unique value coverage
-    n_unique_per_dim = np.array([len(np.unique(np.round(sub[:, d], 4)))
-                                  for d in range(sub.shape[1])])
+    n_unique_per_dim = np.array(
+        [len(np.unique(np.round(sub[:, d], 4))) for d in range(sub.shape[1])]
+    )
 
     # Variance per dim
     var_per_dim = np.var(sub, axis=0)
@@ -164,8 +172,10 @@ def compute_diversity_metrics(features: np.ndarray,
 # MAIN AUDIT
 # =============================================================================
 
-def run_representation_audit(features: np.ndarray,
-                              labels: np.ndarray) -> RepresentationAuditResult:
+
+def run_representation_audit(
+    features: np.ndarray, labels: np.ndarray
+) -> RepresentationAuditResult:
     """
     Run full representation space audit.
 
@@ -185,8 +195,9 @@ def run_representation_audit(features: np.ndarray,
     # -----------------------------------------------------------------
     for group_name, (start, end) in FEATURE_GROUPS.items():
         sub = features[:, start:end]
-        var_ratio = float(np.sum(np.var(sub, axis=0)) /
-                          (np.sum(np.var(features, axis=0)) + 1e-10))
+        var_ratio = float(
+            np.sum(np.var(sub, axis=0)) / (np.sum(np.var(features, axis=0)) + 1e-10)
+        )
         result.feature_group_coverage[group_name] = {
             "variance_ratio": round(var_ratio, 4),
             "mean": round(float(np.mean(sub)), 4),
@@ -198,14 +209,10 @@ def run_representation_audit(features: np.ndarray,
     # -----------------------------------------------------------------
     # 2-5. Protocol / DOM / API / Auth diversity
     # -----------------------------------------------------------------
-    result.protocol_diversity = compute_diversity_metrics(
-        features, *PROTOCOL_DIMS)
-    result.dom_diversity = compute_diversity_metrics(
-        features, *DOM_DIMS)
-    result.api_diversity = compute_diversity_metrics(
-        features, *API_DIMS)
-    result.auth_diversity = compute_diversity_metrics(
-        features, *AUTH_DIMS)
+    result.protocol_diversity = compute_diversity_metrics(features, *PROTOCOL_DIMS)
+    result.dom_diversity = compute_diversity_metrics(features, *DOM_DIMS)
+    result.api_diversity = compute_diversity_metrics(features, *API_DIMS)
+    result.auth_diversity = compute_diversity_metrics(features, *AUTH_DIMS)
 
     # -----------------------------------------------------------------
     # 6. Duplicate rate (FNV-1a)
@@ -233,8 +240,7 @@ def run_representation_audit(features: np.ndarray,
     # -----------------------------------------------------------------
     for group_name, (start, end) in FEATURE_GROUPS.items():
         group_flat = features[:, start:end].flatten()
-        result.entropy_per_group[group_name] = round(
-            compute_entropy(group_flat), 4)
+        result.entropy_per_group[group_name] = round(compute_entropy(group_flat), 4)
 
     # -----------------------------------------------------------------
     # 9. KL divergence across sample groups
@@ -254,7 +260,8 @@ def run_representation_audit(features: np.ndarray,
     edge_flat = features[edge_mask].flatten()
     normal_flat = features[normal_mask].flatten()
     result.kl_divergence["edge_vs_normal"] = round(
-        compute_kl_divergence(edge_flat, normal_flat), 6)
+        compute_kl_divergence(edge_flat, normal_flat), 6
+    )
 
     # -----------------------------------------------------------------
     # Interaction dominance
@@ -269,18 +276,19 @@ def run_representation_audit(features: np.ndarray,
     # -----------------------------------------------------------------
     if result.duplicate_rate > 0.05:
         result.saturation_risks.append(
-            f"DUPLICATE_RATE={result.duplicate_rate:.2%} > 5%")
+            f"DUPLICATE_RATE={result.duplicate_rate:.2%} > 5%"
+        )
         result.passed = False
 
     if result.interaction_dominance > 0.40:
         result.saturation_risks.append(
-            f"INTERACTION_DOMINANCE={result.interaction_dominance:.2%} > 40%")
+            f"INTERACTION_DOMINANCE={result.interaction_dominance:.2%} > 40%"
+        )
         result.passed = False
 
     for key, val in result.kl_divergence.items():
         if val < 0.05:
-            result.saturation_risks.append(
-                f"LOW_KL_DIVERGENCE: {key}={val:.6f} < 0.05")
+            result.saturation_risks.append(f"LOW_KL_DIVERGENCE: {key}={val:.6f} < 0.05")
             result.passed = False
 
     return result
@@ -292,7 +300,9 @@ def run_representation_audit(features: np.ndarray,
 
 if __name__ == "__main__":
     from impl_v1.training.data.real_dataset_loader import (
-        IngestionPipelineDataset, STRICT_REAL_MODE, FIXED_SEED,
+        IngestionPipelineDataset,
+        STRICT_REAL_MODE,
+        FIXED_SEED,
     )
 
     print("=" * 60)
@@ -301,17 +311,20 @@ if __name__ == "__main__":
 
     # Load dataset — real ingestion data in production, synthetic only in lab
     if STRICT_REAL_MODE:
-        dataset = IngestionPipelineDataset(feature_dim=256, min_samples=100, seed=FIXED_SEED)
+        dataset = IngestionPipelineDataset(
+            feature_dim=256, min_samples=100, seed=FIXED_SEED
+        )
         source_label = "INGESTION_PIPELINE"
     else:
-        from impl_v1.training.data.scaled_dataset import DatasetConfig
-        from impl_v1.training.data.real_dataset_loader import SyntheticTrainingDataset
-        dataset = SyntheticTrainingDataset(config=DatasetConfig(total_samples=20000), seed=42)
-        source_label = "SYNTHETIC_GENERATOR"
+        raise RuntimeError(
+            "REAL_DATA_REQUIRED: Synthetic validation datasets are disabled for representation_audit"
+        )
 
     stats = dataset.get_statistics()
-    print(f"\nDataset: {stats['total']} samples, "
-          f"{stats['feature_dim']}D features  (source: {source_label})")
+    print(
+        f"\nDataset: {stats['total']} samples, "
+        f"{stats['feature_dim']}D features  (source: {source_label})"
+    )
 
     # Extract features and labels
     features = np.array([dataset[i][0].numpy() for i in range(len(dataset))])
@@ -331,18 +344,24 @@ if __name__ == "__main__":
 
     print(f"\n--- Feature Group Coverage ---")
     for grp, info in result.feature_group_coverage.items():
-        print(f"  {grp:15s}: var_ratio={info['variance_ratio']:.4f}  "
-              f"mean={info['mean']:.4f}  std={info['std']:.4f}")
+        print(
+            f"  {grp:15s}: var_ratio={info['variance_ratio']:.4f}  "
+            f"mean={info['mean']:.4f}  std={info['std']:.4f}"
+        )
 
     print(f"\n--- Diversity ---")
-    for name, div in [("Protocol", result.protocol_diversity),
-                       ("DOM", result.dom_diversity),
-                       ("API", result.api_diversity),
-                       ("Auth", result.auth_diversity)]:
-        print(f"  {name:10s}: unique={div['mean_unique_values_per_dim']:.0f}  "
-              f"var={div['mean_variance']:.4f}  "
-              f"dist={div['mean_pairwise_distance']:.4f}  "
-              f"active={div['active_dims']}/{div['total_dims']}")
+    for name, div in [
+        ("Protocol", result.protocol_diversity),
+        ("DOM", result.dom_diversity),
+        ("API", result.api_diversity),
+        ("Auth", result.auth_diversity),
+    ]:
+        print(
+            f"  {name:10s}: unique={div['mean_unique_values_per_dim']:.0f}  "
+            f"var={div['mean_variance']:.4f}  "
+            f"dist={div['mean_pairwise_distance']:.4f}  "
+            f"active={div['active_dims']}/{div['total_dims']}"
+        )
 
     print(f"\n--- Duplicate Rate: {result.duplicate_rate:.2%} ---")
 
@@ -371,11 +390,12 @@ if __name__ == "__main__":
 
     # Save report
     report_dir = os.path.join(
-        os.path.dirname(__file__), '..', '..', 'reports', 'g38_training')
+        os.path.dirname(__file__), "..", "..", "reports", "g38_training"
+    )
     os.makedirs(report_dir, exist_ok=True)
-    report_path = os.path.join(report_dir, 'representation_audit.json')
+    report_path = os.path.join(report_dir, "representation_audit.json")
 
-    with open(report_path, 'w', encoding='utf-8') as f:
+    with open(report_path, "w", encoding="utf-8") as f:
         json.dump(result.to_dict(), f, indent=2)
 
     print(f"\nReport saved to: {report_path}")

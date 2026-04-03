@@ -37,27 +37,31 @@ static GpuMetrics g_metrics = {0};
 static GpuMetrics g_peak = {0};
 static int g_sample_count = 0;
 static double g_util_sum = 0.0;
+static bool g_memory_available = false;
+static bool g_nvml_available = false;
 
 // =============================================================================
 // CUDA MEMORY QUERY
 // =============================================================================
 
 static void query_cuda_memory() {
+  g_memory_available = false;
 #ifdef __CUDACC__
   size_t free_bytes = 0, total_bytes = 0;
   if (cudaMemGetInfo(&free_bytes, &total_bytes) == cudaSuccess) {
     g_metrics.vram_total_mb = (double)total_bytes / (1024.0 * 1024.0);
     g_metrics.vram_free_mb = (double)free_bytes / (1024.0 * 1024.0);
     g_metrics.vram_used_mb = g_metrics.vram_total_mb - g_metrics.vram_free_mb;
-    g_metrics.available = true;
+    g_memory_available = true;
 
     if (g_metrics.vram_used_mb > g_peak.vram_peak_mb) {
       g_peak.vram_peak_mb = g_metrics.vram_used_mb;
     }
   }
 #else
-  // Stub: values set from Python via set_metrics()
-  g_metrics.available = true;
+  g_metrics.vram_total_mb = 0.0;
+  g_metrics.vram_free_mb = 0.0;
+  g_metrics.vram_used_mb = 0.0;
 #endif
 }
 
@@ -66,12 +70,14 @@ static void query_cuda_memory() {
 // =============================================================================
 
 static void query_nvml_utilization() {
+  g_nvml_available = false;
 #ifdef NVML_AVAILABLE
   nvmlDevice_t device;
   if (nvmlDeviceGetHandleByIndex(0, &device) == NVML_SUCCESS) {
     nvmlUtilization_t util;
     if (nvmlDeviceGetUtilizationRates(device, &util) == NVML_SUCCESS) {
       g_metrics.gpu_util_percent = (double)util.gpu;
+      g_nvml_available = true;
     }
 
     nvmlMemory_t mem;
@@ -93,11 +99,7 @@ static void query_nvml_utilization() {
     }
   }
 #else
-  // Estimate utilization from VRAM ratio when NVML unavailable
-  if (g_metrics.vram_total_mb > 0) {
-    g_metrics.gpu_util_percent =
-        (g_metrics.vram_used_mb / g_metrics.vram_total_mb) * 100.0;
-  }
+  g_metrics.gpu_util_percent = 0.0;
 #endif
 }
 
@@ -111,8 +113,15 @@ extern "C" {
  * Sample current GPU metrics. Call this periodically during training.
  */
 void gpu_monitor_sample() {
+  g_metrics.gpu_util_percent = 0.0;
+  g_metrics.temperature_c = 0.0;
+  g_metrics.power_watts = 0;
   query_cuda_memory();
   query_nvml_utilization();
+  g_metrics.available = g_memory_available && g_nvml_available;
+
+  if (!g_metrics.available)
+    return;
 
   // Track running average
   g_util_sum += g_metrics.gpu_util_percent;
@@ -123,21 +132,17 @@ void gpu_monitor_sample() {
 }
 
 /**
- * Set metrics from Python (when C++ can't query CUDA directly).
+ * Reject Python-injected metrics. Production telemetry must be native.
  */
 void gpu_monitor_set_metrics(double vram_used_mb, double vram_total_mb,
                              double gpu_util_pct) {
-  g_metrics.vram_used_mb = vram_used_mb;
-  g_metrics.vram_total_mb = vram_total_mb;
-  g_metrics.vram_free_mb = vram_total_mb - vram_used_mb;
-  g_metrics.gpu_util_percent = gpu_util_pct;
-  g_metrics.available = true;
-
-  if (vram_used_mb > g_peak.vram_peak_mb)
-    g_peak.vram_peak_mb = vram_used_mb;
-
-  g_util_sum += gpu_util_pct;
-  g_sample_count++;
+  (void)vram_used_mb;
+  (void)vram_total_mb;
+  (void)gpu_util_pct;
+  std::fprintf(
+      stderr,
+      "[GPU_MON] ABORT: Python-injected fallback metrics are disabled\n");
+  g_metrics.available = false;
 }
 
 double gpu_monitor_get_util_percent() { return g_metrics.gpu_util_percent; }
@@ -191,6 +196,8 @@ void gpu_monitor_reset() {
   std::memset(&g_peak, 0, sizeof(g_peak));
   g_sample_count = 0;
   g_util_sum = 0.0;
+  g_memory_available = false;
+  g_nvml_available = false;
 }
 
 } // extern "C"
