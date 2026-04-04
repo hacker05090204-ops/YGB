@@ -1,0 +1,289 @@
+{
+  "startup": {
+    "ok": true,
+    "last": [
+      200,
+      "{\"status\":\"alive\",\"uptime_s\":0.7,\"boot_time\":1774103489.5425174}"
+    ]
+  },
+  "http": {
+    "/api/health": {
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "ygb_root": "C:\\Users\\Unkno\\YGB",
+        "python_phases": 19,
+        "impl_phases": 31,
+        "hunter_modules": 17,
+        "storage_engine_status": {
+          "status": "ACTIVE",
+          "storage_active": true,
+          "db_active": true,
+          "lifecycle_ok": true,
+          "disk_monitor_ok": true,
+          "storage_root": "C:\\ygb_hdd",
+          "storage_mode": "UNAVAILABLE",
+          "primary_hdd_root": "C:\\ygb_hdd",
+          "fallback_hdd_root": "C:\\ygb_hdd_fallback",
+          "primary_available": false,
+          "fallback_available": false,
+          "fallback_active": false,
+          "topology_reason": "Primary unavailable (PermissionError); fallback unavailable (PermissionError)",
+          "reason": null,
+          "checked_at": "2026-03-21T14:31:30.290160+00:00",
+          "cached_for_health_seconds": 1.0
+        },
+        "timestamp": "2026-03-21T14:31:30.290160+00:00"
+      }
+    },
+    "/api/g38/status": {
+      "status": 200,
+      "body": {
+        "available": true,
+        "auto_training": {
+          "state": "TRAINING",
+          "is_training": true,
+          "epoch": 0,
+          "total_epochs": 0,
+          "total_completed": 0,
+          "progress": 0,
+          "idle_seconds": 0,
+          "power_connected": true,
+          "scan_active": true,
+          "gpu_available": true,
+          "events_count": 1,
+          "last_event": "CONTINUOUS_START",
+          "gpu_mem_allocated_mb": 8.92,
+          "gpu_mem_reserved_mb": 24.0,
+          "last_loss": 0.0,
+          "last_accuracy": 0.0,
+          "samples_per_sec": 0.0,
+          "dataset_size": 0,
+          "training_mode": "CONTINUOUS"
+        },
+        "guards": {
+          "main_guards": 11,
+          "all_verified": true,
+          "message": "All 11 guards verified - AI has ZERO authority"
+        },
+        "pretraining": {
+          "verified": true,
+          "message": "All pretraining guards verified - representation-only training enforced"
+        },
+        "mode": {
+          "mode_a_status": "ACTIVE",
+          "message": "MODE-A active - representation learning allowed"
+        },
+        "training_summary": "=== G38 SAFE PRE-TRAINING STATUS ===\n\nMODE-A (REPRESENTATION_ONLY):\n  Status: ACTIVE\n  Internet: ALLOWED\n  Bug Labels: FORBIDDEN\n\nMODE-B (PROOF_LEARNING):\n  Status: LOCKED\n  Internet: BLOCKED\n  Unlock Condition: G33/G36 verified proofs\n\n==================================="
+      }
+    },
+    "seed_target": {
+      "status": 400,
+      "body": {
+        "detail": "Failed to create target"
+      }
+    },
+    "discover_targets": {
+      "status": 200,
+      "body": {
+        "result_id": "DIS-5C886277AAF14CD7",
+        "candidates": [],
+        "total_found": 0,
+        "filtered_count": 0,
+        "timestamp": "2026-03-21T14:31:30.462370+00:00"
+      }
+    },
+    "execution_transitions": [
+      {
+        "transition": "PLAN",
+        "status": 200,
+        "body": {
+          "result": "SUCCESS",
+          "from_state": "IDLE",
+          "to_state": "PLANNED",
+          "reason": "test PLAN"
+        },
+        "expected": {
+          "from": "IDLE",
+          "to": "PLANNED"
+        }
+      },
+      {
+        "transition": "SIMULATE",
+        "status": 200,
+        "body": {
+          "result": "INVALID",
+          "from_state": "IDLE",
+          "to_state": "IDLE",
+          "reason": "Invalid transition SIMULATE from IDLE"
+        },
+        "expected": {
+          "from": "PLANNED",
+          "to": "SIMULATED"
+        }
+      },
+      {
+        "transition": "REQUEST_APPROVAL",
+        "status": 200,
+        "body": {
+          "result": "INVALID",
+          "from_state": "IDLE",
+          "to_state": "IDLE",
+          "reason": "Invalid transition REQUEST_APPROVAL from IDLE"
+        },
+        "expected": {
+          "from": "SIMULATED",
+          "to": "AWAIT_HUMAN"
+        }
+      },
+      {
+        "transition": "HUMAN_APPROVE",
+        "status": 200,
+        "body": {
+          "result": "INVALID",
+          "from_state": "IDLE",
+          "to_state": "IDLE",
+          "reason": "Invalid transition HUMAN_APPROVE from IDLE"
+        },
+        "expected": {
+          "from": "AWAIT_HUMAN",
+          "to": "EXECUTING"
+        }
+      },
+      {
+        "transition": "COMPLETE",
+        "status": 200,
+        "body": {
+          "result": "INVALID",
+          "from_state": "IDLE",
+          "to_state": "IDLE",
+          "reason": "Invalid transition COMPLETE from IDLE"
+        },
+        "expected": {
+          "from": "EXECUTING",
+          "to": "STOPPED"
+        }
+      },
+      {
+        "transition": "ABORT",
+        "status": 200,
+        "body": {
+          "result": "SUCCESS",
+          "from_state": "IDLE",
+          "to_state": "STOPPED",
+          "reason": "test ABORT"
+        },
+        "expected": {
+          "from": "IDLE",
+          "to": "STOPPED"
+        }
+      }
+    ],
+    "approval_approve": {
+      "status": 200,
+      "body": {
+        "decision_id": "DEC-FB5AAF3581D5498C",
+        "request_id": "REQ-42",
+        "approved": true,
+        "approver_id": "api-admin",
+        "reason": "approved",
+        "timestamp": "2026-03-21T14:31:30.505090+00:00"
+      }
+    },
+    "approval_reject": {
+      "status": 200,
+      "body": {
+        "decision_id": "DEC-996374BD80E3493F",
+        "request_id": "REQ-43",
+        "approved": false,
+        "approver_id": "api-admin",
+        "reason": "rejected",
+        "timestamp": "2026-03-21T14:31:30.510608+00:00"
+      }
+    },
+    "voice_parse_english": {
+      "status": 200,
+      "body": {
+        "intent_id": "VOC-6AAF76405859444A",
+        "intent_type": "UNKNOWN",
+        "raw_text": "open chrome and go to example dot com",
+        "extracted_value": null,
+        "confidence": 0.0,
+        "status": "INVALID",
+        "block_reason": "Could not parse intent",
+        "active_mode": "SECURITY",
+        "timestamp": "2026-03-21T14:31:30.526214+00:00"
+      }
+    },
+    "voice_parse_hindi": {
+      "status": 200,
+      "body": {
+        "intent_id": "VOC-0229EE22012B4BC6",
+        "intent_type": "UNKNOWN",
+        "raw_text": "????? ???? ?? example dot com ?? ???",
+        "extracted_value": null,
+        "confidence": 0.0,
+        "status": "INVALID",
+        "block_reason": "Could not parse intent",
+        "active_mode": "SECURITY",
+        "timestamp": "2026-03-21T14:31:30.532212+00:00"
+      }
+    },
+    "autonomy_READ_ONLY": {
+      "status": 200,
+      "body": {
+        "session_id": "AUT-4D04FB52E8B4470C",
+        "mode": "READ_ONLY",
+        "status": "ACTIVE",
+        "duration_hours": 1.5,
+        "started_at": "2026-03-21T14:31:30.540343+00:00",
+        "expires_at": null,
+        "human_enabled": false,
+        "actions_blocked": [
+          "EXPLOIT",
+          "SUBMISSION",
+          "STATE_CHANGE",
+          "BROWSER_ACTION"
+        ]
+      }
+    },
+    "autonomy_AUTONOMOUS_FIND": {
+      "status": 200,
+      "body": {
+        "session_id": "AUT-C6114DFB98F14FAA",
+        "mode": "AUTONOMOUS_FIND",
+        "status": "ACTIVE",
+        "duration_hours": 1.5,
+        "started_at": "2026-03-21T14:31:30.547491+00:00",
+        "expires_at": "2026-03-21T16:01:30.547491+00:00",
+        "human_enabled": false,
+        "actions_blocked": [
+          "EXPLOIT",
+          "SUBMISSION",
+          "STATE_CHANGE",
+          "BROWSER_ACTION"
+        ]
+      }
+    }
+  },
+  "auth": {
+    "no_jwt_g38": 401,
+    "expired_jwt_g38": 401,
+    "csrf_missing_approval": 403,
+    "valid_jwt_g38": 200,
+    "no_jwt_profile": 401,
+    "no_jwt_target_start": 401,
+    "no_jwt_scope_validate": 401
+  },
+  "ws": {
+    "ws_voice": {
+      "status": "failed",
+      "error": "WebSocketBadStatusException: Handshake status 403 Forbidden -+-+- {'date': 'Sat, 21 Mar 2026 14:31:30 GMT', 'content-length': '0', 'content-type': 'text/plain', 'connection': 'close'} -+-+- b''"
+    },
+    "ws_voice_stream": {
+      "status": "failed",
+      "error": "WebSocketException: Invalid WebSocket Header"
+    }
+  },
+  "notes": []
+}

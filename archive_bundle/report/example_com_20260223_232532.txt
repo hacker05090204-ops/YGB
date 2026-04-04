@@ -1,0 +1,192 @@
+================================================================================
+YGB SECURITY REPORT
+================================================================================
+
+Target URL: https://example.com
+Workflow ID: RPT-8690AB0E7F84
+Mode: REAL
+Generated: 2026-02-23T23:25:32.312695
+
+--------------------------------------------------------------------------------
+SUMMARY
+--------------------------------------------------------------------------------
+Total Findings: 14
+Pages Analyzed: 0
+Phases Executed: 50
+Technologies: None detected
+
+--------------------------------------------------------------------------------
+SEVERITY BREAKDOWN
+--------------------------------------------------------------------------------
+  MEDIUM: 6
+  LOW: 5
+  INFO: 3
+
+--------------------------------------------------------------------------------
+CATEGORY BREAKDOWN
+--------------------------------------------------------------------------------
+  2FA: 1
+  CLICKJACKING: 1
+  DNS: 1
+  HEADERS: 8
+  RATE_LIMIT: 1
+  SESSION: 1
+  SSL: 1
+
+================================================================================
+DETAILED FINDINGS
+================================================================================
+
+--- MEDIUM (6) ---
+
+[FND-dbb154c9] Missing X-Frame-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the X-Frame-Options header (Clickjacking protection)
+  URL: https://example.com
+
+[FND-37cfba55] Missing X-Content-Type-Options
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the X-Content-Type-Options header (MIME type sniffing protection)
+  URL: https://example.com
+
+[FND-37cfba55] Missing Content-Security-Policy
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the Content-Security-Policy header (Content injection protection)
+  URL: https://example.com
+
+[FND-37cfba55] Missing Strict-Transport-Security
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the Strict-Transport-Security header (HTTPS enforcement)
+  URL: https://example.com
+
+[FND-3aeb94ba] HSTS not enabled
+  Category: SSL
+  Severity: MEDIUM
+  Description: HTTP Strict Transport Security header missing
+  URL: https://example.com
+
+[FND-858cb403] No clickjacking protection
+  Category: CLICKJACKING
+  Severity: MEDIUM
+  Description: Page can be embedded in iframes (clickjacking possible)
+  URL: https://example.com
+
+--- LOW (5) ---
+
+[FND-37cfba55] Missing X-XSS-Protection
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the X-XSS-Protection header (XSS filter)
+  URL: https://example.com
+
+[FND-37cfba55] Missing Permissions-Policy
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the Permissions-Policy header (Browser feature restrictions)
+  URL: https://example.com
+
+[FND-37cfba55] Missing Referrer-Policy
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the Referrer-Policy header (Referrer information control)
+  URL: https://example.com
+
+[FND-37cfba55] Missing X-Permitted-Cross-Domain-Policies
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the X-Permitted-Cross-Domain-Policies header (Cross-domain policy)
+  URL: https://example.com
+
+[FND-af79a8e7] No rate limiting headers detected
+  Category: RATE_LIMIT
+  Severity: LOW
+  Description: Server may be vulnerable to brute force and DoS attacks
+  URL: https://example.com
+
+--- INFO (3) ---
+
+[FND-3aeb94ba] Email security records not detected
+  Category: DNS
+  Severity: INFO
+  Description: Consider checking SPF, DKIM, and DMARC records
+  URL: https://example.com
+
+[FND-66cfe2c9] No 2FA/MFA detected
+  Category: 2FA
+  Severity: INFO
+  Description: Consider implementing two-factor authentication
+  URL: https://example.com
+
+[FND-66cfe2c9] Manual session fixation test required
+  Category: SESSION
+  Severity: INFO
+  Description: Verify that session IDs are regenerated after login
+  URL: https://example.com
+
+================================================================================
+PHASES EXECUTED
+================================================================================
+
+  [✓] Phase 0: Governance Initialization (35ms)
+  [✓] Phase 1: Browser Initialization (0ms)
+  [✗] Phase 2: Navigating to https://example.com... (968ms)
+  [✓] Phase 3: Extracting Page Content (0ms)
+  [✓] Phase 4: Detecting Forms & Inputs (0ms)
+  [✓] Phase 5: Analyzing Security Headers (1ms)
+  [✓] Phase 6: Checking Cookie Security (0ms)
+  [✓] Phase 7: XSS Vulnerability Detection (0ms)
+  [✓] Phase 8: SQL Injection Detection (0ms)
+  [✓] Phase 9: CSRF Token Analysis (0ms)
+  [✓] Phase 10: IDOR Vulnerability Check (0ms)
+  [✓] Phase 11: Information Disclosure Scan (0ms)
+  [✓] Phase 12: Technology Fingerprinting (0ms)
+  [✓] Phase 13: Crawling Links (max 5) (2511ms)
+  [✓] Phase 14: JavaScript Security Analysis (0ms)
+  [✓] Phase 15: API Endpoint Discovery (0ms)
+  [✓] Phase 16: Authentication Analysis (0ms)
+  [✓] Phase 17: CORS Policy Check (0ms)
+  [✓] Phase 18: CSP Analysis (0ms)
+  [✓] Phase 19: Capturing Screenshot (0ms)
+  [✓] Phase 20: Subdomain Enumeration (0ms)
+  [✓] Phase 21: DNS Security Analysis (0ms)
+  [✓] Phase 22: SSL/TLS Certificate Check (0ms)
+  [✓] Phase 23: Open Redirect Detection (0ms)
+  [✓] Phase 24: SSRF Vulnerability Check (0ms)
+  [✓] Phase 25: XXE Vulnerability Check (0ms)
+  [✓] Phase 26: Command Injection Detection (0ms)
+  [✓] Phase 27: Path Traversal Detection (0ms)
+  [✓] Phase 28: File Inclusion Check (0ms)
+  [✓] Phase 29: Template Injection Detection (0ms)
+  [✓] Phase 30: Clickjacking Defense Check (0ms)
+  [✓] Phase 31: HTTP Method Testing (0ms)
+  [✓] Phase 32: Header Injection Detection (0ms)
+  [✓] Phase 33: WebSocket Security Check (0ms)
+  [✓] Phase 34: GraphQL Security Analysis (0ms)
+  [✓] Phase 35: JWT Token Analysis (0ms)
+  [✓] Phase 36: OAuth Implementation Check (0ms)
+  [✓] Phase 37: Rate Limiting Check (0ms)
+  [✓] Phase 38: CAPTCHA Implementation Check (0ms)
+  [✓] Phase 39: Payment Security Analysis (0ms)
+  [✓] Phase 40: Business Logic Flaws (0ms)
+  [✓] Phase 41: Race Condition Detection (0ms)
+  [✓] Phase 42: Password Policy Check (0ms)
+  [✓] Phase 43: 2FA Implementation Check (0ms)
+  [✓] Phase 44: Session Fixation Check (0ms)
+  [✓] Phase 45: Privilege Escalation Check (0ms)
+  [✓] Phase 46: Sensitive Data Exposure (0ms)
+  [✓] Phase 47: CVE Vulnerability Detection (1ms)
+  [✓] Phase 48: Dependency Security Scan (0ms)
+  [✓] Phase 49: Final Security Summary (0ms)
+
+================================================================================
+PAGES VISITED
+================================================================================
+
+
+================================================================================
+END OF REPORT
+================================================================================

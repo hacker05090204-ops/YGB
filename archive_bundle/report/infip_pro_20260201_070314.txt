@@ -1,0 +1,230 @@
+================================================================================
+YGB SECURITY REPORT
+================================================================================
+
+Target URL: http://infip.pro
+Workflow ID: RPT-AADAE11D8083
+Mode: REAL
+Generated: 2026-02-01T07:03:14.254022
+
+--------------------------------------------------------------------------------
+SUMMARY
+--------------------------------------------------------------------------------
+Total Findings: 18
+Pages Analyzed: 5
+Phases Executed: 50
+Technologies: React, Next.js, Cloudflare
+
+--------------------------------------------------------------------------------
+SEVERITY BREAKDOWN
+--------------------------------------------------------------------------------
+  HIGH: 3
+  MEDIUM: 5
+  LOW: 2
+  INFO: 8
+
+--------------------------------------------------------------------------------
+CATEGORY BREAKDOWN
+--------------------------------------------------------------------------------
+  BUSINESS_LOGIC: 1
+  DNS: 1
+  HEADERS: 6
+  INFO_DISCLOSURE: 1
+  LFI_RFI: 1
+  PAYMENT: 1
+  RACE: 1
+  RATE_LIMIT: 1
+  SESSION: 1
+  SSL: 1
+  SUMMARY: 1
+  XSS: 1
+  XXE: 1
+
+================================================================================
+DETAILED FINDINGS
+================================================================================
+
+--- HIGH (3) ---
+
+[FND-b32c2865] Potential XSS: React dangerouslySetInnerHTML (1 occurrences)
+  Category: XSS
+  Severity: HIGH
+  Description: Found 1 instances of dangerouslySetInnerHTML which could lead to XSS
+  URL: http://infip.pro
+
+[FND-7e3fc9ee] Site not using HTTPS
+  Category: SSL
+  Severity: HIGH
+  Description: Connection is not encrypted, sensitive data at risk
+  URL: http://infip.pro
+
+[FND-b6c93c08] High severity issues found: 2
+  Category: SUMMARY
+  Severity: HIGH
+  Description: Review and remediate high severity findings
+  URL: http://infip.pro
+
+--- MEDIUM (5) ---
+
+[FND-0a7284c7] Missing Content-Security-Policy
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Response is missing the Content-Security-Policy header (Content injection protection)
+  URL: http://infip.pro
+
+[FND-37580a7d] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page http://infip.pro/_next/static/media/b957ea75a84b6ea7-s.p.woff2 lacks Content-Security-Policy
+  URL: http://infip.pro/_next/static/media/b957ea75a84b6ea7-s.p.woff2
+
+[FND-16ab6373] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page http://infip.pro/_next/static/media/eafabf029ad39a43-s.p.woff2 lacks Content-Security-Policy
+  URL: http://infip.pro/_next/static/media/eafabf029ad39a43-s.p.woff2
+
+[FND-a84439ac] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page http://infip.pro/icon.svg lacks Content-Security-Policy
+  URL: http://infip.pro/icon.svg
+
+[FND-7df044e5] Missing CSP
+  Category: HEADERS
+  Severity: MEDIUM
+  Description: Page http://infip.pro/ lacks Content-Security-Policy
+  URL: http://infip.pro/
+
+--- LOW (2) ---
+
+[FND-53faa352] Missing X-Permitted-Cross-Domain-Policies
+  Category: HEADERS
+  Severity: LOW
+  Description: Response is missing the X-Permitted-Cross-Domain-Policies header (Cross-domain policy)
+  URL: http://infip.pro
+
+[FND-467e3511] No rate limiting headers detected
+  Category: RATE_LIMIT
+  Severity: LOW
+  Description: Server may be vulnerable to brute force and DoS attacks
+  URL: http://infip.pro
+
+--- INFO (8) ---
+
+[FND-83ea24c3] Server info disclosed via Server
+  Category: INFO_DISCLOSURE
+  Severity: INFO
+  Description: Server: cloudflare
+  URL: http://infip.pro
+
+[FND-6005e2a1] Email security records not detected
+  Category: DNS
+  Severity: INFO
+  Description: Consider checking SPF, DKIM, and DMARC records
+  URL: http://infip.pro
+
+[FND-afc90b84] XML handling detected
+  Category: XXE
+  Severity: INFO
+  Description: Application processes XML - test for XXE vulnerabilities
+  URL: http://infip.pro
+
+[FND-0ba5d66f] PHP include patterns detected
+  Category: LFI_RFI
+  Severity: INFO
+  Description: Test for Local/Remote File Inclusion vulnerabilities
+  URL: http://infip.pro
+
+[FND-f2fa98fa] Payment functionality detected
+  Category: PAYMENT
+  Severity: INFO
+  Description: Ensure PCI-DSS compliance and secure payment processing
+  URL: http://infip.pro
+
+[FND-1c983ca2] Coupon/discount functionality detected
+  Category: BUSINESS_LOGIC
+  Severity: INFO
+  Description: Test for coupon abuse and price manipulation
+  URL: http://infip.pro
+
+[FND-3641d074] Race condition-prone functionality detected
+  Category: RACE
+  Severity: INFO
+  Description: Test for TOCTOU and race condition vulnerabilities
+  URL: http://infip.pro
+
+[FND-57390c85] Manual session fixation test required
+  Category: SESSION
+  Severity: INFO
+  Description: Verify that session IDs are regenerated after login
+  URL: http://infip.pro
+
+================================================================================
+PHASES EXECUTED
+================================================================================
+
+  [✓] Phase 0: Governance Initialization (10ms)
+  [✓] Phase 1: Browser Initialization (0ms)
+  [✓] Phase 2: Navigating to http://infip.pro... (3870ms)
+  [✓] Phase 3: Extracting Page Content (0ms)
+  [✓] Phase 4: Detecting Forms & Inputs (0ms)
+  [✓] Phase 5: Analyzing Security Headers (0ms)
+  [✓] Phase 6: Checking Cookie Security (0ms)
+  [✓] Phase 7: XSS Vulnerability Detection (1ms)
+  [✓] Phase 8: SQL Injection Detection (1ms)
+  [✓] Phase 9: CSRF Token Analysis (0ms)
+  [✓] Phase 10: IDOR Vulnerability Check (0ms)
+  [✓] Phase 11: Information Disclosure Scan (4ms)
+  [✓] Phase 12: Technology Fingerprinting (1ms)
+  [✓] Phase 13: Crawling Links (max 5) (16048ms)
+  [✓] Phase 14: JavaScript Security Analysis (2ms)
+  [✓] Phase 15: API Endpoint Discovery (2ms)
+  [✓] Phase 16: Authentication Analysis (0ms)
+  [✓] Phase 17: CORS Policy Check (0ms)
+  [✓] Phase 18: CSP Analysis (0ms)
+  [✓] Phase 19: Capturing Screenshot (0ms)
+  [✓] Phase 20: Subdomain Enumeration (0ms)
+  [✓] Phase 21: DNS Security Analysis (0ms)
+  [✓] Phase 22: SSL/TLS Certificate Check (0ms)
+  [✓] Phase 23: Open Redirect Detection (0ms)
+  [✓] Phase 24: SSRF Vulnerability Check (0ms)
+  [✓] Phase 25: XXE Vulnerability Check (0ms)
+  [✓] Phase 26: Command Injection Detection (0ms)
+  [✓] Phase 27: Path Traversal Detection (0ms)
+  [✓] Phase 28: File Inclusion Check (0ms)
+  [✓] Phase 29: Template Injection Detection (0ms)
+  [✓] Phase 30: Clickjacking Defense Check (0ms)
+  [✓] Phase 31: HTTP Method Testing (0ms)
+  [✓] Phase 32: Header Injection Detection (0ms)
+  [✓] Phase 33: WebSocket Security Check (0ms)
+  [✓] Phase 34: GraphQL Security Analysis (0ms)
+  [✓] Phase 35: JWT Token Analysis (0ms)
+  [✓] Phase 36: OAuth Implementation Check (0ms)
+  [✓] Phase 37: Rate Limiting Check (0ms)
+  [✓] Phase 38: CAPTCHA Implementation Check (0ms)
+  [✓] Phase 39: Payment Security Analysis (0ms)
+  [✓] Phase 40: Business Logic Flaws (0ms)
+  [✓] Phase 41: Race Condition Detection (0ms)
+  [✓] Phase 42: Password Policy Check (1ms)
+  [✓] Phase 43: 2FA Implementation Check (0ms)
+  [✓] Phase 44: Session Fixation Check (0ms)
+  [✓] Phase 45: Privilege Escalation Check (0ms)
+  [✓] Phase 46: Sensitive Data Exposure (3ms)
+  [✓] Phase 47: CVE Vulnerability Detection (12ms)
+  [✓] Phase 48: Dependency Security Scan (0ms)
+  [✓] Phase 49: Final Security Summary (0ms)
+
+================================================================================
+PAGES VISITED
+================================================================================
+
+  • http://infip.pro
+  • http://infip.pro/_next/static/media/b957ea75a84b6ea7-s.p.woff2
+  • http://infip.pro/_next/static/media/eafabf029ad39a43-s.p.woff2
+  • http://infip.pro/icon.svg
+  • http://infip.pro/
+
+================================================================================
+END OF REPORT
+================================================================================
