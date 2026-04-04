@@ -275,6 +275,37 @@ class TestReportFileWriting:
         assert data["proof_learning"] is False
         assert data["representation_only"] is True
         assert data["governance"]["ai_has_authority"] is False
+
+    def test_write_learned_json_includes_benchmark_metrics(self, generator):
+        """Learned features JSON persists the benchmark metrics payload."""
+        features = LearnedFeatures(
+            session_id="TEST-002",
+            domains_learned=["code_patterns"],
+            confidence_calibration=0.0,
+            duplicate_detection_accuracy=0.71,
+            noise_detection_accuracy=0.84,
+            proof_learning=False,
+            total_samples_processed=500,
+            representation_only=True,
+            benchmark_metrics={
+                "loss": 0.12,
+                "precision_at_5": 0.81,
+                "precision_at_10": 0.87,
+                "mrr": 0.73,
+                "f1": 0.78,
+            },
+        )
+
+        path = generator.write_learned_json(features)
+
+        data = json.loads(path.read_text())
+        assert data["benchmark_metrics"] == {
+            "loss": 0.12,
+            "precision_at_5": 0.81,
+            "precision_at_10": 0.87,
+            "mrr": 0.73,
+            "f1": 0.78,
+        }
     
     def test_write_not_learned_txt(self, generator):
         """Not learned TXT file is written."""

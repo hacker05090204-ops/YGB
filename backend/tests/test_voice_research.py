@@ -71,9 +71,13 @@ class TestVoiceConfidence(unittest.TestCase):
 
     def test_noisy_input_safe_fallback(self):
         router = self._make_router()
-        result = router.route("asdf jkl qwerty 12345")
+        noisy = "asdf\n" + ("qwerty " * 40)
+        expected = " ".join(noisy.split())[:120]
+        with self.assertLogs("backend.voice.intent_router", level="WARNING") as captured:
+            result = router.route(noisy)
         # Unknown input → default clarification
         self.assertEqual(result.mode, "clarification")
+        self.assertIn(expected, "\n".join(captured.output))
 
 
 # =============================================================================

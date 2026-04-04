@@ -149,6 +149,7 @@ class LearnedFeatures:
     proof_learning: bool  # Always False for MODE-A
     total_samples_processed: int
     representation_only: bool  # Always True
+    benchmark_metrics: Dict[str, Optional[float]] = field(default_factory=dict)
 
 
 @dataclass
@@ -231,6 +232,7 @@ class TrainingReportGenerator:
         confidence_calibration: Optional[float] = None,
         duplicate_detection_accuracy: Optional[float] = None,
         noise_detection_accuracy: Optional[float] = None,
+        benchmark_metrics: Optional[Dict[str, Optional[float]]] = None,
     ) -> LearnedFeatures:
         """Generate learned features report.
 
@@ -239,12 +241,26 @@ class TrainingReportGenerator:
             duplicate_detection_accuracy: Real duplicate detection accuracy, or None.
             noise_detection_accuracy: Real noise detection accuracy, or None.
         """
+        sanitized_benchmark_metrics = {
+            "loss": None,
+            "precision_at_5": None,
+            "precision_at_10": None,
+            "mrr": None,
+            "f1": None,
+        }
+        for key, value in (benchmark_metrics or {}).items():
+            if key in sanitized_benchmark_metrics:
+                sanitized_benchmark_metrics[key] = (
+                    None if value is None else float(value)
+                )
+
         return LearnedFeatures(
             session_id=session_id,
             domains_learned=[d.value for d in LearnedDomain],
             confidence_calibration=confidence_calibration if confidence_calibration is not None else 0.0,
             duplicate_detection_accuracy=duplicate_detection_accuracy if duplicate_detection_accuracy is not None else 0.0,
             noise_detection_accuracy=noise_detection_accuracy if noise_detection_accuracy is not None else 0.0,
+            benchmark_metrics=sanitized_benchmark_metrics,
             proof_learning=False,  # NEVER True for MODE-A
             total_samples_processed=samples_processed,
             representation_only=True,  # ALWAYS True
@@ -306,6 +322,7 @@ GOVERNANCE STATUS:
             "confidence_calibration_trend": features.confidence_calibration,
             "duplicate_detection_accuracy": features.duplicate_detection_accuracy,
             "noise_detection_accuracy": features.noise_detection_accuracy,
+            "benchmark_metrics": features.benchmark_metrics,
             "proof_learning": features.proof_learning,
             "total_samples_processed": features.total_samples_processed,
             "governance": {
@@ -370,6 +387,7 @@ EXPLANATION:
         confidence_calibration: Optional[float] = None,
         duplicate_detection_accuracy: Optional[float] = None,
         noise_detection_accuracy: Optional[float] = None,
+        benchmark_metrics: Optional[Dict[str, Optional[float]]] = None,
     ) -> Dict[str, Path]:
         """Generate all training reports."""
         session_id = self.generate_session_id()
@@ -392,6 +410,7 @@ EXPLANATION:
             confidence_calibration=confidence_calibration,
             duplicate_detection_accuracy=duplicate_detection_accuracy,
             noise_detection_accuracy=noise_detection_accuracy,
+            benchmark_metrics=benchmark_metrics,
         )
         
         not_learned = self.generate_not_learned(session_id=session_id)
@@ -457,6 +476,7 @@ def generate_training_report(
     confidence_calibration: Optional[float] = None,
     duplicate_detection_accuracy: Optional[float] = None,
     noise_detection_accuracy: Optional[float] = None,
+    benchmark_metrics: Optional[Dict[str, Optional[float]]] = None,
 ) -> Dict[str, str]:
     """
     Main function to generate training reports after training stops.
@@ -480,6 +500,7 @@ def generate_training_report(
         confidence_calibration=confidence_calibration,
         duplicate_detection_accuracy=duplicate_detection_accuracy,
         noise_detection_accuracy=noise_detection_accuracy,
+        benchmark_metrics=benchmark_metrics,
     )
     
     update_latest_symlinks(reports_dir)

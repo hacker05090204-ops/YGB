@@ -10,6 +10,7 @@ are preserved for backward compatibility.
 """
 
 import hashlib
+import logging
 import os
 import time
 from typing import Dict, Any
@@ -17,15 +18,51 @@ from typing import Dict, Any
 
 _DEFAULT_VERSION = "1.0"
 _SCHEMA_VERSION = 1
+logger = logging.getLogger(__name__)
+
+
+class MissingAuthorityKeyError(RuntimeError):
+    """Raised when manifest signing cannot proceed without an authority key."""
 
 
 def _get_authority_key(explicit_key: str | None) -> str:
     auth_key = (explicit_key or os.environ.get("YGB_AUTHORITY_KEY", "")).strip()
     if not auth_key:
-        raise RuntimeError(
+        raise MissingAuthorityKeyError(
             "REAL_DATA_REQUIRED: YGB_AUTHORITY_KEY must be set before manifest canonicalization"
         )
     return auth_key
+
+
+def _get_required_dataset_hash(manifest: Dict[str, Any]) -> str:
+    """Return a canonical dataset hash or raise when manifest data is incomplete."""
+    dataset_hash = manifest.get("dataset_hash")
+    if not dataset_hash:
+        dataset_hash = manifest.get("tensor_hash")
+    if not dataset_hash:
+        dataset_hash = manifest.get("ingestion_manifest_hash")
+    if not dataset_hash:
+        raise ValueError(
+            "REAL_DATA_REQUIRED: dataset_hash, tensor_hash, or ingestion_manifest_hash is required"
+        )
+    return str(dataset_hash)
+
+
+def safe_canonicalize_manifest(
+    manifest: Dict[str, Any],
+    authority_key: str | None = None,
+    version: str | None = None,
+) -> Dict[str, Any]:
+    """Canonicalize manifests while surfacing authority-key readiness failures clearly."""
+    try:
+        return canonicalize_manifest(
+            manifest,
+            authority_key=authority_key,
+            version=version,
+        )
+    except MissingAuthorityKeyError as exc:
+        logger.error("AUTHORITY_KEY_MISSING - manifest cannot be signed")
+        raise RuntimeError("SYSTEM NOT READY: Missing authority key") from exc
 
 
 def canonicalize_manifest(
@@ -58,15 +95,7 @@ def canonicalize_manifest(
 
     # --- dataset_hash -----------------------------------------------------------
     # Prefer tensor_hash (most precise), then ingestion_manifest_hash, then compute
-    dataset_hash = manifest.get("dataset_hash")
-    if not dataset_hash:
-        dataset_hash = manifest.get("tensor_hash")
-    if not dataset_hash:
-        dataset_hash = manifest.get("ingestion_manifest_hash")
-    if not dataset_hash:
-        raise RuntimeError(
-            "REAL_DATA_REQUIRED: dataset_hash, tensor_hash, or ingestion_manifest_hash is required"
-        )
+    dataset_hash = _get_required_dataset_hash(manifest)
 
     # --- signed_by ---------------------------------------------------------------
     signed_by = manifest.get("signed_by")

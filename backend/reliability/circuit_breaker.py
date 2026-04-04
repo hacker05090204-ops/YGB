@@ -24,6 +24,12 @@ logger = logging.getLogger("ygb.reliability.circuit_breaker")
 F = TypeVar("F", bound=Callable[..., Any])
 
 
+def _metric_fragment(name: str) -> str:
+    cleaned = "".join(ch.lower() if ch.isalnum() else "_" for ch in name)
+    cleaned = cleaned.strip("_")
+    return cleaned or "default"
+
+
 class CircuitState(str, Enum):
     CLOSED = "CLOSED"
     OPEN = "OPEN"
@@ -72,6 +78,73 @@ class CircuitBreaker:
         self._success_count = 0
         self._last_failure_time = 0.0
         self._opened_at = 0.0
+        self._half_open_probe_in_flight = False
+        self._metric_name = _metric_fragment(name)
+        self._emit_metrics()
+
+    def _emit_metrics(self) -> None:
+        try:
+            from backend.observability.metrics import metrics_registry
+
+            metrics_registry.set_gauge(
+                f"circuit_breaker_state_{self._metric_name}",
+                {
+                    CircuitState.CLOSED: 0.0,
+                    CircuitState.HALF_OPEN: 0.5,
+                    CircuitState.OPEN: 1.0,
+                }[self._state],
+            )
+            metrics_registry.set_gauge(
+                f"circuit_breaker_failures_{self._metric_name}",
+                float(self._failure_count),
+            )
+            metrics_registry.set_gauge(
+                f"circuit_breaker_successes_{self._metric_name}",
+                float(self._success_count),
+            )
+            metrics_registry.set_gauge(
+                f"circuit_breaker_probe_in_flight_{self._metric_name}",
+                1.0 if self._half_open_probe_in_flight else 0.0,
+            )
+        except Exception:
+            logger.debug("Failed to emit circuit-breaker metrics", exc_info=True)
+
+    def _transition_state(
+        self,
+        new_state: CircuitState,
+        *,
+        opened_at: Optional[float] = None,
+        log_level: int = logging.INFO,
+        reason: str = "",
+    ) -> None:
+        if self._state != new_state:
+            self._state = new_state
+            if new_state == CircuitState.OPEN:
+                self._opened_at = opened_at if opened_at is not None else time.monotonic()
+                self._half_open_probe_in_flight = False
+            elif new_state == CircuitState.HALF_OPEN:
+                self._success_count = 0
+                self._half_open_probe_in_flight = False
+            else:
+                self._opened_at = 0.0
+                self._half_open_probe_in_flight = False
+
+            message = f"Circuit '{self.name}' → {new_state.value}"
+            if reason:
+                message = f"{message} ({reason})"
+            logger.log(log_level, message)
+            try:
+                from backend.observability.metrics import metrics_registry
+
+                metrics_registry.increment(
+                    f"circuit_breaker_transitions_total_{self._metric_name}"
+                )
+            except Exception:
+                logger.debug(
+                    "Failed to emit circuit-breaker transition counter",
+                    exc_info=True,
+                )
+        self._emit_metrics()
 
     @property
     def state(self) -> CircuitState:
@@ -83,11 +156,10 @@ class CircuitBreaker:
         if self._state == CircuitState.OPEN:
             elapsed = time.monotonic() - self._opened_at
             if elapsed >= self.recovery_timeout:
-                self._state = CircuitState.HALF_OPEN
-                self._success_count = 0
-                logger.info(
-                    "Circuit '%s' → HALF_OPEN (cooldown expired after %.1fs)",
-                    self.name, elapsed,
+                self._transition_state(
+                    CircuitState.HALF_OPEN,
+                    log_level=logging.INFO,
+                    reason=f"cooldown expired after {elapsed:.1f}s",
                 )
         return self._state
 
@@ -95,24 +167,37 @@ class CircuitBreaker:
         """Check if a request should be allowed through."""
         with self._lock:
             state = self._current_state_unlocked()
-            return state in (CircuitState.CLOSED, CircuitState.HALF_OPEN)
+            if state == CircuitState.CLOSED:
+                return True
+            if state == CircuitState.HALF_OPEN:
+                if self._half_open_probe_in_flight:
+                    return False
+                self._half_open_probe_in_flight = True
+                self._emit_metrics()
+                return True
+            return False
 
     def record_success(self) -> None:
         """Record a successful call."""
         with self._lock:
             state = self._current_state_unlocked()
             if state == CircuitState.HALF_OPEN:
+                self._half_open_probe_in_flight = False
                 self._success_count += 1
                 if self._success_count >= self.success_threshold:
-                    self._state = CircuitState.CLOSED
                     self._failure_count = 0
                     self._success_count = 0
-                    logger.info(
-                        "Circuit '%s' → CLOSED (recovered after %d successes)",
-                        self.name, self.success_threshold,
+                    self._transition_state(
+                        CircuitState.CLOSED,
+                        log_level=logging.INFO,
+                        reason=f"recovered after {self.success_threshold} successes",
                     )
+                else:
+                    self._emit_metrics()
             elif state == CircuitState.CLOSED:
                 self._failure_count = 0
+                self._success_count = 0
+                self._emit_metrics()
 
     def record_failure(self) -> None:
         """Record a failed call."""
@@ -121,23 +206,27 @@ class CircuitBreaker:
             state = self._current_state_unlocked()
             if state == CircuitState.HALF_OPEN:
                 # Probe failed — reopen
-                self._state = CircuitState.OPEN
-                self._opened_at = now
                 self._failure_count += 1
-                logger.warning(
-                    "Circuit '%s' → OPEN (probe failed, re-opening for %.0fs)",
-                    self.name, self.recovery_timeout,
+                self._success_count = 0
+                self._transition_state(
+                    CircuitState.OPEN,
+                    opened_at=now,
+                    log_level=logging.WARNING,
+                    reason=f"probe failed, re-opening for {self.recovery_timeout:.0f}s",
                 )
             elif state == CircuitState.CLOSED:
                 self._failure_count += 1
+                self._success_count = 0
                 self._last_failure_time = now
                 if self._failure_count >= self.failure_threshold:
-                    self._state = CircuitState.OPEN
-                    self._opened_at = now
-                    logger.warning(
-                        "Circuit '%s' → OPEN (hit %d consecutive failures)",
-                        self.name, self._failure_count,
+                    self._transition_state(
+                        CircuitState.OPEN,
+                        opened_at=now,
+                        log_level=logging.WARNING,
+                        reason=f"hit {self._failure_count} consecutive failures",
                     )
+                else:
+                    self._emit_metrics()
 
     def get_status(self) -> dict:
         """Return a JSON-serializable status snapshot."""
@@ -147,8 +236,10 @@ class CircuitBreaker:
                 "name": self.name,
                 "state": state.value,
                 "failure_count": self._failure_count,
+                "success_count": self._success_count,
                 "failure_threshold": self.failure_threshold,
                 "recovery_timeout_s": self.recovery_timeout,
+                "probe_in_flight": self._half_open_probe_in_flight,
             }
             if state == CircuitState.OPEN:
                 result["retry_after_s"] = round(
@@ -184,7 +275,10 @@ def retry_with_backoff(
 
             for attempt in range(max_retries + 1):
                 # Check circuit breaker
-                if circuit_breaker and not circuit_breaker.allow_request():
+                probe_allowed = False
+                if circuit_breaker:
+                    probe_allowed = circuit_breaker.allow_request()
+                if circuit_breaker and not probe_allowed:
                     raise CircuitBreakerError(
                         circuit_breaker.name,
                         circuit_breaker.state,
@@ -216,6 +310,10 @@ def retry_with_backoff(
                             "All %d retries exhausted for %s: %s",
                             max_retries, func.__name__, exc,
                         )
+                except Exception:
+                    if circuit_breaker and probe_allowed:
+                        circuit_breaker.record_failure()
+                    raise
 
             raise last_exc  # type: ignore[misc]
 

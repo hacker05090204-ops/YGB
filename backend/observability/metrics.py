@@ -55,6 +55,11 @@ GPU_RUNTIME_METRICS = frozenset({
     "gpu_watchdog_alert_total",
 })
 
+AUXILIARY_COUNTER_METRICS = frozenset({
+    "metric_missing_counter",
+    "readiness_probe_count",
+})
+
 # Combined set for snapshot completeness
 CRITICAL_METRICS = INFRASTRUCTURE_METRICS | TRAINING_ONLY_METRICS | GPU_RUNTIME_METRICS
 
@@ -75,7 +80,7 @@ class MetricsRegistry:
         self._last_updated: Dict[str, float] = {}
 
         # Pre-register critical metrics so they always appear in snapshots
-        for name in CRITICAL_METRICS:
+        for name in CRITICAL_METRICS | AUXILIARY_COUNTER_METRICS:
             self._counters.setdefault(name, 0.0)
 
     # ----- Recording API -----
@@ -138,6 +143,7 @@ class MetricsRegistry:
                 "counters": dict(self._counters),
                 "gauges": dict(self._gauges),
                 "histograms": {},
+                "last_updated": dict(self._last_updated),
             }
             histogram_names = list(self._histograms.keys())
 
@@ -179,7 +185,7 @@ class MetricsRegistry:
             self._gauges.clear()
             self._histograms.clear()
             self._last_updated.clear()
-            for name in CRITICAL_METRICS:
+            for name in CRITICAL_METRICS | AUXILIARY_COUNTER_METRICS:
                 self._counters[name] = 0.0
 
 
@@ -194,6 +200,7 @@ def get_measurement_completeness(data: Dict[str, Any], expected_fields: List[str
     expected fields that have non-null values.
     """
     if not expected_fields:
+        metrics_registry.set_gauge("measurement_completeness_ratio", 1.0)
         return 1.0
     non_null = sum(1 for f in expected_fields if data.get(f) is not None)
     ratio = non_null / len(expected_fields)
@@ -207,6 +214,7 @@ def get_null_metric_ratio(data: Dict[str, Any], metric_fields: List[str]) -> flo
     Returns float between 0.0 and 1.0.
     """
     if not metric_fields:
+        metrics_registry.set_gauge("null_metric_ratio", 0.0)
         return 0.0
     null_count = sum(1 for f in metric_fields if data.get(f) is None)
     ratio = null_count / len(metric_fields)

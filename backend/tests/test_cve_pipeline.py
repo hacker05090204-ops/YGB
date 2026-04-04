@@ -215,6 +215,27 @@ class TestCVEPipeline:
         assert "total_records" in status
         assert "slo" in status
         assert "sources" in status
+        assert "stage_results" in status
+        assert "strict_rejections" in status
+
+    def test_stage_results_and_rejections_are_reported(self):
+        """Stage reporting and strict rejections should be surfaced."""
+        self.pipeline.record_stage_result(
+            "nvd",
+            "PARSE_INGEST",
+            "SUCCESS",
+            records_seen=3,
+            records_ingested=1,
+            duplicates=1,
+            rejected=1,
+            rejection_reasons={"missing_cve_id": 1},
+        )
+        self.pipeline.record_rejection("nvd", "missing_cve_id", {"foo": "bar"})
+
+        status = self.pipeline.get_pipeline_status()
+        assert status["stage_results"][-1]["stage"] == "PARSE_INGEST"
+        assert status["strict_rejections"]["total"] == 1
+        assert status["strict_rejections"]["recent"][-1]["reason"] == "missing_cve_id"
 
     def test_search_matches_id_and_keywords(self):
         """Search should match CVE IDs and product keywords."""
@@ -598,8 +619,61 @@ class TestScheduler:
         assert health["interval_seconds"] == 300
         assert health["slo_target_job"] == 0.999
         assert health["slo_target_ingest"] == 0.995
+        assert "scheduler_stats" in health
 
     def test_scheduler_not_running_initially(self):
         """Scheduler should not be running initially."""
         from backend.cve.cve_scheduler import get_scheduler
         assert get_scheduler().is_running is False
+
+    def test_scheduler_parse_and_rejection_stats(self):
+        """Rejected CVEs and duplicates should be reflected in parse stats."""
+        import backend.cve.cve_pipeline as pipeline_mod
+        from backend.cve.cve_scheduler import get_scheduler
+
+        scheduler = get_scheduler()
+        pipeline = pipeline_mod.CVEPipeline()
+        stats = scheduler._parse_and_ingest(
+            pipeline,
+            "nvd",
+            {
+                "vulnerabilities": [
+                    {
+                        "cve": {
+                            "id": "CVE-2024-1234",
+                            "descriptions": [{"lang": "en", "value": "Alpha"}],
+                            "metrics": {
+                                "cvssMetricV31": [
+                                    {"cvssData": {"baseScore": 8.0, "baseSeverity": "HIGH"}}
+                                ]
+                            },
+                        }
+                    },
+                    {
+                        "cve": {
+                            "id": "CVE-2024-9999",
+                            "vulnStatus": "Rejected",
+                        }
+                    },
+                    {"cve": {"descriptions": []}},
+                    {
+                        "cve": {
+                            "id": "CVE-2024-1234",
+                            "descriptions": [{"lang": "en", "value": "Alpha"}],
+                            "metrics": {
+                                "cvssMetricV31": [
+                                    {"cvssData": {"baseScore": 8.0, "baseSeverity": "HIGH"}}
+                                ]
+                            },
+                        }
+                    },
+                ]
+            },
+        )
+
+        assert stats["records_seen"] == 4
+        assert stats["records_ingested"] == 1
+        assert stats["duplicates"] == 1
+        assert stats["rejected"] == 2
+        rejection_log = pipeline.get_rejection_log()
+        assert any(entry["reason"] == "rejected_status" for entry in rejection_log)

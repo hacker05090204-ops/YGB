@@ -14,8 +14,17 @@ Blocked intents:
 NO auto-hunt from voice. NO submission from voice.
 """
 
+import logging
 from typing import Optional
+
 from backend.voice.language_detector import LanguageDetector
+
+
+logger = logging.getLogger(__name__)
+
+
+def _sanitize_query_for_log(text: Optional[str], limit: int = 120) -> str:
+    return " ".join(str(text or "").split())[:limit]
 
 
 class VoiceIntent:
@@ -102,99 +111,118 @@ class IntentRouter:
         Returns VoiceIntent with mode, action, allowed flag.
         Ambiguous commands below confidence threshold are safe-rejected.
         """
-        if not text or not text.strip():
-            return VoiceIntent("idle", "none", False, "EMPTY_INPUT")
+        sanitized_text = _sanitize_query_for_log(text)
+        try:
+            if not text or not text.strip():
+                return VoiceIntent("idle", "none", False, "EMPTY_INPUT")
 
-        text_lower = text.lower().strip()
-        lang_result = self._detector.detect(text)
-        lang = lang_result["language"]
+            text_lower = text.lower().strip()
+            lang_result = self._detector.detect(text)
+            lang = lang_result.get("language", "en") if isinstance(lang_result, dict) else "en"
 
-        # Check blocked PHRASES first (more precise than single keywords)
-        for phrase in self.BLOCKED_PHRASES:
-            if phrase in text_lower:
-                self._total_blocked += 1
-                return VoiceIntent(
-                    "blocked", phrase, False,
-                    f"VOICE_BLOCKED: phrase '{phrase}' is not allowed via voice",
-                    risk_score=1.0,
-                )
+            # Check blocked PHRASES first (more precise than single keywords)
+            for phrase in self.BLOCKED_PHRASES:
+                if phrase in text_lower:
+                    self._total_blocked += 1
+                    return VoiceIntent(
+                        "blocked", phrase, False,
+                        f"VOICE_BLOCKED: phrase '{phrase}' is not allowed via voice",
+                        risk_score=1.0,
+                    )
 
-        # Check blocked KEYWORDS (single dangerous words)
-        words = set(text_lower.split())
-        for kw in self.BLOCKED_KEYWORDS:
-            if kw in words:
-                self._total_blocked += 1
-                return VoiceIntent(
-                    "blocked", kw, False,
-                    f"VOICE_BLOCKED: '{kw}' cannot be triggered by voice",
-                    risk_score=1.0,
-                )
+            # Check blocked KEYWORDS (single dangerous words)
+            words = set(text_lower.split())
+            for kw in self.BLOCKED_KEYWORDS:
+                if kw in words:
+                    self._total_blocked += 1
+                    return VoiceIntent(
+                        "blocked", kw, False,
+                        f"VOICE_BLOCKED: '{kw}' cannot be triggered by voice",
+                        risk_score=1.0,
+                    )
 
-        # Check DENYLIST actions (app launch/download/click)
-        for action in self.DENYLIST_ACTIONS:
-            if action in text_lower:
-                self._total_blocked += 1
-                return VoiceIntent(
-                    "blocked", action, False,
-                    f"VOICE_DENYLIST: '{action}' is deny-listed for voice control",
-                    risk_score=1.0,
-                )
+            # Check DENYLIST actions (app launch/download/click)
+            for action in self.DENYLIST_ACTIONS:
+                if action in text_lower:
+                    self._total_blocked += 1
+                    return VoiceIntent(
+                        "blocked", action, False,
+                        f"VOICE_DENYLIST: '{action}' is deny-listed for voice control",
+                        risk_score=1.0,
+                    )
 
-        # Compute confidence: ratio of recognized keywords to total words
-        total_words = len(words) if words else 1
+            # Compute confidence: ratio of recognized keywords to total words
+            total_words = len(words) if words else 1
 
-        # Clarification mode
-        clarify = self.CLARIFICATION_KEYWORDS.get(lang, set())
-        clarify_matches = words & clarify
-        if clarify_matches:
-            confidence = len(clarify_matches) / total_words
-            if confidence < self.MIN_CONFIDENCE_THRESHOLD:
-                self._total_blocked += 1
-                return VoiceIntent(
-                    "ambiguous", "unclear", False,
-                    f"LOW_CONFIDENCE: {confidence:.2f} < {self.MIN_CONFIDENCE_THRESHOLD}"
-                )
+            # Clarification mode
+            clarify = self.CLARIFICATION_KEYWORDS.get(lang, set())
+            clarify_matches = words & clarify
+            if clarify_matches:
+                confidence = len(clarify_matches) / total_words
+                if confidence < self.MIN_CONFIDENCE_THRESHOLD:
+                    self._total_blocked += 1
+                    return VoiceIntent(
+                        "ambiguous", "unclear", False,
+                        f"LOW_CONFIDENCE: {confidence:.2f} < {self.MIN_CONFIDENCE_THRESHOLD}"
+                    )
+                self._total_routed += 1
+                return VoiceIntent("clarification", "explain", True,
+                                 f"CLARIFY_MODE: lang={lang} conf={confidence:.2f}",
+                                 risk_score=0.1)
+
+            # Research mode
+            research = self.RESEARCH_KEYWORDS.get(lang, set())
+            research_matches = words & research
+            if research_matches:
+                confidence = len(research_matches) / total_words
+                if confidence < self.MIN_CONFIDENCE_THRESHOLD:
+                    self._total_blocked += 1
+                    return VoiceIntent(
+                        "ambiguous", "unclear", False,
+                        f"LOW_CONFIDENCE: {confidence:.2f} < {self.MIN_CONFIDENCE_THRESHOLD}"
+                    )
+                self._total_routed += 1
+                return VoiceIntent("research", "search", True,
+                                 f"RESEARCH_MODE: lang={lang} conf={confidence:.2f}",
+                                 risk_score=0.3)
+
+            # Status mode
+            status = self.STATUS_KEYWORDS.get(lang, set())
+            status_matches = words & status
+            if status_matches:
+                confidence = len(status_matches) / total_words
+                if confidence < self.MIN_CONFIDENCE_THRESHOLD:
+                    self._total_blocked += 1
+                    return VoiceIntent(
+                        "ambiguous", "unclear", False,
+                        f"LOW_CONFIDENCE: {confidence:.2f} < {self.MIN_CONFIDENCE_THRESHOLD}"
+                    )
+                self._total_routed += 1
+                return VoiceIntent("status", "query", True,
+                                 f"STATUS_MODE: lang={lang} conf={confidence:.2f}",
+                                 risk_score=0.1)
+
+            logger.warning(
+                "IntentRouter fallback routed unrouted voice query to clarification: %s",
+                sanitized_text,
+            )
             self._total_routed += 1
-            return VoiceIntent("clarification", "explain", True,
-                             f"CLARIFY_MODE: lang={lang} conf={confidence:.2f}",
-                             risk_score=0.1)
-
-        # Research mode
-        research = self.RESEARCH_KEYWORDS.get(lang, set())
-        research_matches = words & research
-        if research_matches:
-            confidence = len(research_matches) / total_words
-            if confidence < self.MIN_CONFIDENCE_THRESHOLD:
-                self._total_blocked += 1
-                return VoiceIntent(
-                    "ambiguous", "unclear", False,
-                    f"LOW_CONFIDENCE: {confidence:.2f} < {self.MIN_CONFIDENCE_THRESHOLD}"
-                )
+            return VoiceIntent("clarification", "general", True,
+                             f"DEFAULT_CLARIFY: lang={lang}")
+        except Exception as exc:
+            logger.warning(
+                "IntentRouter fallback routed unrouted voice query to clarification: %s (%s: %s)",
+                sanitized_text,
+                type(exc).__name__,
+                exc,
+            )
             self._total_routed += 1
-            return VoiceIntent("research", "search", True,
-                             f"RESEARCH_MODE: lang={lang} conf={confidence:.2f}",
-                             risk_score=0.3)
-
-        # Status mode
-        status = self.STATUS_KEYWORDS.get(lang, set())
-        status_matches = words & status
-        if status_matches:
-            confidence = len(status_matches) / total_words
-            if confidence < self.MIN_CONFIDENCE_THRESHOLD:
-                self._total_blocked += 1
-                return VoiceIntent(
-                    "ambiguous", "unclear", False,
-                    f"LOW_CONFIDENCE: {confidence:.2f} < {self.MIN_CONFIDENCE_THRESHOLD}"
-                )
-            self._total_routed += 1
-            return VoiceIntent("status", "query", True,
-                             f"STATUS_MODE: lang={lang} conf={confidence:.2f}",
-                             risk_score=0.1)
-
-        # Default: clarification (safe fallback)
-        self._total_routed += 1
-        return VoiceIntent("clarification", "general", True,
-                         f"DEFAULT_CLARIFY: lang={lang}")
+            return VoiceIntent(
+                "clarification",
+                "general",
+                True,
+                f"ROUTER_FALLBACK: {type(exc).__name__}",
+            )
 
     @property
     def total_routed(self) -> int:
@@ -203,4 +231,3 @@ class IntentRouter:
     @property
     def total_blocked(self) -> int:
         return self._total_blocked
-

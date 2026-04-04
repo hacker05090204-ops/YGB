@@ -12,12 +12,14 @@ from contextlib import nullcontext
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Protocol
 
+import numpy as np
 import torch
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import OneCycleLR
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, Dataset
 
 from backend.ingestion._integrity import log_module_sha256
 from backend.bridge.bridge_state import get_bridge_state
@@ -45,6 +47,8 @@ DEFAULT_MODEL_PATH = Path("checkpoints/g38_model_checkpoint.safetensors")
 DEFAULT_STATE_PATH = Path("checkpoints/training_state.json")
 DEFAULT_BASELINE_PATH = Path("checkpoints/baseline_accuracy.json")
 DEFAULT_RAW_DATA_ROOT = Path("data/raw")
+DEFAULT_DATASET_INDEX_PATH = Path("checkpoints/raw_data_index.json")
+DEFAULT_FEATURE_CACHE_ROOT = Path("checkpoints/feature_cache")
 _IMPACT_RE = re.compile(r"CVSS:(?P<score>[0-9.]+)\|(?P<severity>[^|]+)")
 _CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE)
 
@@ -63,6 +67,71 @@ class EpochResult:
     prediction_hash: str = ""
 
 
+class _StreamingFeatureDataset(Dataset):
+    """Lazy real-data dataset backed by extracted or cached features."""
+
+    def __init__(self, trainer: "IncrementalTrainer", samples: list[IngestedSample], indices: list[int]) -> None:
+        self._trainer = trainer
+        self._samples = samples
+        self._indices = tuple(indices)
+
+    def __len__(self) -> int:
+        return len(self._indices)
+
+    def __getitem__(self, item: int) -> tuple[torch.Tensor, torch.Tensor]:
+        sample = self._samples[self._indices[item]]
+        features = self._trainer._load_or_compute_feature(sample)
+        is_valid, reason = self._trainer._validate_feature_tensor(features)
+        if not is_valid:
+            self._trainer._record_invalid_sample(sample, reason)
+            raise RuntimeError(
+                f"REAL_DATA_REQUIRED: invalid feature tensor for {sample.sha256_hash} ({reason})"
+            )
+        label = torch.tensor(self._trainer._label_for_sample(sample), dtype=torch.long)
+        return features, label
+
+
+class InvalidationSource(Protocol):
+    def get_changed_dirs(self) -> set[Path]:
+        ...
+
+
+class DirectoryMtimeSource:
+    def __init__(self, raw_data_root: Path, cached_directories: dict[str, object] | None = None) -> None:
+        self._raw_data_root = raw_data_root
+        self._cached_directories = cached_directories if isinstance(cached_directories, dict) else {}
+
+    def _iter_candidate_sample_dirs(self) -> list[Path]:
+        if not self._raw_data_root.exists():
+            return []
+        candidate_dirs: list[Path] = [self._raw_data_root]
+        try:
+            source_dirs = sorted(path for path in self._raw_data_root.iterdir() if path.is_dir())
+        except OSError:
+            return candidate_dirs
+        for source_dir in source_dirs:
+            candidate_dirs.append(source_dir)
+            try:
+                child_dirs = sorted(path for path in source_dir.iterdir() if path.is_dir())
+            except OSError:
+                continue
+            candidate_dirs.extend(child_dirs)
+        return candidate_dirs
+
+    def get_changed_dirs(self) -> set[Path]:
+        changed_dirs: set[Path] = set()
+        for candidate_dir in self._iter_candidate_sample_dirs():
+            try:
+                dir_stat = candidate_dir.stat()
+            except OSError:
+                changed_dirs.add(candidate_dir)
+                continue
+            cached_mtime = self._cached_directories.get(str(candidate_dir))
+            if cached_mtime != dir_stat.st_mtime_ns:
+                changed_dirs.add(candidate_dir)
+        return changed_dirs
+
+
 class IncrementalTrainer:
     def __init__(
         self,
@@ -70,13 +139,28 @@ class IncrementalTrainer:
         state_path: str | Path = DEFAULT_STATE_PATH,
         baseline_path: str | Path = DEFAULT_BASELINE_PATH,
         raw_data_root: str | Path = DEFAULT_RAW_DATA_ROOT,
+        dataset_index_path: str | Path | None = None,
+        feature_cache_root: str | Path | None = None,
         num_workers: int = 4,
     ) -> None:
         self.model_path = Path(model_path)
         self.state_path = Path(state_path)
         self.baseline_path = Path(baseline_path)
         self.raw_data_root = Path(raw_data_root)
+        self.dataset_index_path = (
+            Path(dataset_index_path)
+            if dataset_index_path is not None
+            else self.state_path.parent / DEFAULT_DATASET_INDEX_PATH.name
+        )
+        self.feature_cache_root = (
+            Path(feature_cache_root)
+            if feature_cache_root is not None
+            else self.state_path.parent / DEFAULT_FEATURE_CACHE_ROOT.name
+        )
         self.num_workers = num_workers
+        self._indexed_raw_samples_cache: list[tuple[str, IngestedSample]] | None = None
+        self._invalid_sample_warnings: set[str] = set()
+        self._invalid_sample_count: int = 0
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model_config = create_model_config(
             input_dim=512,
@@ -123,6 +207,412 @@ class IncrementalTrainer:
             json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
         )
         os.replace(temp_path, path)
+
+    @staticmethod
+    def _sample_to_payload(sample: IngestedSample) -> dict[str, object]:
+        return {
+            "source": sample.source,
+            "raw_text": sample.raw_text,
+            "url": sample.url,
+            "cve_id": sample.cve_id,
+            "severity": sample.severity,
+            "tags": list(sample.tags),
+            "ingested_at": sample.ingested_at.isoformat(),
+            "sha256_hash": sample.sha256_hash,
+            "token_count": sample.token_count,
+            "lang": sample.lang,
+        }
+
+    def _feature_cache_path(self, sample: IngestedSample) -> Path:
+        return self.feature_cache_root / f"{sample.sha256_hash}.npy"
+
+    def _feature_stats_path(self, sample: IngestedSample) -> Path:
+        return self.feature_cache_root / f"{sample.sha256_hash}.stats.json"
+
+    def _write_feature_cache(self, path: Path, feature: torch.Tensor) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = path.with_suffix(f"{path.suffix}.tmp")
+        with open(temp_path, "wb") as handle:
+            np.save(handle, feature.detach().cpu().numpy(), allow_pickle=False)
+        os.replace(temp_path, path)
+
+    def _write_feature_stats(self, path: Path, payload: dict[str, object]) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = path.with_suffix(f"{path.suffix}.tmp")
+        temp_path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+        os.replace(temp_path, path)
+
+    @staticmethod
+    def _normalize_feature_tensor(
+        feature: torch.Tensor,
+    ) -> tuple[torch.Tensor, dict[str, object]]:
+        feature_cpu = feature.detach().cpu().to(dtype=torch.float32)
+        array = feature_cpu.numpy()
+        mean = float(array.mean())
+        std = float(array.std())
+        safe_std = std if std > 1e-8 else 1.0
+        z_scores = (array - mean) / safe_std
+        clipped = np.clip(z_scores, -3.0, 3.0).astype(np.float32)
+        normalized = torch.from_numpy(clipped)
+        stats = {
+            "mean": mean,
+            "std": std,
+            "safe_std": safe_std,
+            "clip_min": -3.0,
+            "clip_max": 3.0,
+        }
+        return normalized, stats
+
+    @staticmethod
+    def _validate_feature_tensor(feature: torch.Tensor) -> tuple[bool, str]:
+        if torch.isnan(feature).any().item():
+            return False, "nan_detected"
+        if torch.isinf(feature).any().item():
+            return False, "inf_detected"
+        if bool(torch.count_nonzero(feature).item()) is False:
+            return False, "all_zero"
+        return True, "ok"
+
+    def _record_invalid_sample(self, sample: IngestedSample, reason: str) -> None:
+        self._invalid_sample_count += 1
+        warning_key = f"{sample.sha256_hash}:{reason}"
+        if warning_key in self._invalid_sample_warnings:
+            return
+        self._invalid_sample_warnings.add(warning_key)
+        logger.warning(
+            "invalid_feature_sample_rejected",
+            extra={
+                "event": "invalid_feature_sample_rejected",
+                "sample_sha256": sample.sha256_hash,
+                "reason": reason,
+                "source": sample.source,
+                "url": sample.url[:256],
+            },
+        )
+
+    def _load_or_compute_feature(self, sample: IngestedSample) -> torch.Tensor:
+        cache_path = self._feature_cache_path(sample)
+        stats_path = self._feature_stats_path(sample)
+        if cache_path.exists():
+            try:
+                with open(cache_path, "rb") as handle:
+                    array = np.load(handle, allow_pickle=False)
+                feature = torch.from_numpy(array).to(dtype=torch.float32)
+                if tuple(feature.shape) == (512,) and stats_path.exists():
+                    return feature
+                logger.warning(
+                    "feature_cache_invalid",
+                    extra={
+                        "event": "feature_cache_invalid",
+                        "path": str(cache_path),
+                        "shape": tuple(feature.shape),
+                        "stats_present": stats_path.exists(),
+                    },
+                )
+            except (OSError, ValueError) as exc:
+                logger.warning(
+                    "feature_cache_unavailable",
+                    extra={
+                        "event": "feature_cache_unavailable",
+                        "path": str(cache_path),
+                        "reason": type(exc).__name__,
+                    },
+                )
+
+        raw_feature = extract(sample).detach().cpu().to(dtype=torch.float32)
+        feature, stats_payload = self._normalize_feature_tensor(raw_feature)
+        if tuple(feature.shape) != (512,):
+            raise RuntimeError(
+                f"REAL_DATA_REQUIRED: feature extractor returned invalid shape {tuple(feature.shape)}"
+            )
+        try:
+            self._write_feature_cache(cache_path, feature)
+            self._write_feature_stats(stats_path, stats_payload)
+        except OSError as exc:
+            logger.warning(
+                "feature_cache_write_failed",
+                extra={
+                    "event": "feature_cache_write_failed",
+                    "path": str(cache_path),
+                    "reason": type(exc).__name__,
+                },
+            )
+        return feature
+
+    def _safe_parse_raw_sample_file(self, sample_path: Path) -> IngestedSample | None:
+        try:
+            payload = json.loads(sample_path.read_text(encoding="utf-8"))
+            return self._parse_sample(payload)
+        except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+            logger.warning(
+                "raw_sample_skipped",
+                extra={
+                    "event": "raw_sample_skipped",
+                    "path": str(sample_path),
+                    "reason": type(exc).__name__,
+                },
+            )
+            return None
+
+    def _load_dataset_index_payload(self) -> dict[str, object] | None:
+        if not self.dataset_index_path.exists():
+            return None
+        try:
+            payload = json.loads(self.dataset_index_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            logger.warning(
+                "dataset_index_unavailable",
+                extra={
+                    "event": "dataset_index_unavailable",
+                    "path": str(self.dataset_index_path),
+                    "reason": type(exc).__name__,
+                },
+            )
+            return None
+        if not isinstance(payload, dict):
+            logger.warning(
+                "dataset_index_invalid",
+                extra={
+                    "event": "dataset_index_invalid",
+                    "path": str(self.dataset_index_path),
+                    "reason": "not_a_dict",
+                },
+            )
+            return None
+        return payload
+
+    def _deserialize_dataset_index(
+        self, payload: dict[str, object]
+    ) -> list[tuple[str, IngestedSample]]:
+        entries = payload.get("entries", [])
+        if not isinstance(entries, list):
+            logger.warning(
+                "dataset_index_invalid",
+                extra={
+                    "event": "dataset_index_invalid",
+                    "path": str(self.dataset_index_path),
+                    "reason": "entries_not_list",
+                },
+            )
+            return []
+
+        samples: list[tuple[str, IngestedSample]] = []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            sample_payload = entry.get("sample")
+            sample_path = str(entry.get("path", "") or "")
+            if not sample_path or not isinstance(sample_payload, dict):
+                continue
+            try:
+                sample = self._parse_sample(sample_payload)
+            except (KeyError, TypeError, ValueError) as exc:
+                logger.warning(
+                    "dataset_index_entry_rejected",
+                    extra={
+                        "event": "dataset_index_entry_rejected",
+                        "path": sample_path,
+                        "reason": type(exc).__name__,
+                    },
+                )
+                continue
+            samples.append((sample_path, sample))
+        return samples
+
+    def _iter_candidate_sample_dirs(self) -> list[Path]:
+        if not self.raw_data_root.exists():
+            return []
+
+        candidate_dirs: list[Path] = [self.raw_data_root]
+        try:
+            source_dirs = sorted(path for path in self.raw_data_root.iterdir() if path.is_dir())
+        except OSError as exc:
+            logger.warning(
+                "dataset_index_source_scan_failed",
+                extra={
+                    "event": "dataset_index_source_scan_failed",
+                    "path": str(self.raw_data_root),
+                    "reason": type(exc).__name__,
+                },
+            )
+            return candidate_dirs
+
+        for source_dir in source_dirs:
+            candidate_dirs.append(source_dir)
+            try:
+                child_dirs = sorted(path for path in source_dir.iterdir() if path.is_dir())
+            except OSError as exc:
+                logger.warning(
+                    "dataset_index_child_scan_failed",
+                    extra={
+                        "event": "dataset_index_child_scan_failed",
+                        "path": str(source_dir),
+                        "reason": type(exc).__name__,
+                    },
+                )
+                continue
+            candidate_dirs.extend(child_dirs)
+        return candidate_dirs
+
+    def _refresh_dataset_index(
+        self, invalidation_source: InvalidationSource | None = None
+    ) -> list[tuple[str, IngestedSample]]:
+        cached_payload = self._load_dataset_index_payload() or {}
+        cached_entries = cached_payload.get("entries", [])
+        cached_by_path: dict[str, dict[str, object]] = {}
+        cached_by_dir: dict[str, list[dict[str, object]]] = {}
+        cached_dirs = cached_payload.get("directories", {})
+        if isinstance(cached_entries, list):
+            for entry in cached_entries:
+                if not isinstance(entry, dict):
+                    continue
+                entry_path = str(entry.get("path", "") or "")
+                if entry_path:
+                    cached_by_path[entry_path] = entry
+                    directory = str(entry.get("directory", "") or "")
+                    if directory:
+                        cached_by_dir.setdefault(directory, []).append(entry)
+
+        indexed_samples: list[tuple[str, IngestedSample]] = []
+        index_entries: list[dict[str, object]] = []
+        directory_entries: dict[str, int] = {}
+
+        active_invalidation_source = invalidation_source or DirectoryMtimeSource(
+            self.raw_data_root,
+            cached_directories=cached_dirs if isinstance(cached_dirs, dict) else None,
+        )
+        changed_dirs = active_invalidation_source.get_changed_dirs()
+
+        for candidate_dir in self._iter_candidate_sample_dirs():
+            try:
+                dir_stat = candidate_dir.stat()
+            except OSError as exc:
+                logger.warning(
+                    "dataset_index_directory_stat_failed",
+                    extra={
+                        "event": "dataset_index_directory_stat_failed",
+                        "path": str(candidate_dir),
+                        "reason": type(exc).__name__,
+                    },
+                )
+                continue
+
+            dir_key = str(candidate_dir)
+            directory_entries[dir_key] = dir_stat.st_mtime_ns
+            if candidate_dir not in changed_dirs:
+                for entry in cached_by_dir.get(dir_key, []):
+                    sample_payload = entry.get("sample")
+                    sample_path_str = str(entry.get("path", "") or "")
+                    if not sample_path_str or not isinstance(sample_payload, dict):
+                        continue
+                    try:
+                        sample = self._parse_sample(sample_payload)
+                    except (KeyError, TypeError, ValueError) as exc:
+                        logger.warning(
+                            "dataset_index_entry_rejected",
+                            extra={
+                                "event": "dataset_index_entry_rejected",
+                                "path": sample_path_str,
+                                "reason": type(exc).__name__,
+                            },
+                        )
+                        continue
+                    indexed_samples.append((sample_path_str, sample))
+                    index_entries.append(dict(entry))
+                continue
+
+            try:
+                sample_paths = sorted(candidate_dir.glob("*.json"))
+            except OSError as exc:
+                logger.warning(
+                    "raw_sample_directory_scan_failed",
+                    extra={
+                        "event": "raw_sample_directory_scan_failed",
+                        "path": str(candidate_dir),
+                        "reason": type(exc).__name__,
+                    },
+                )
+                continue
+
+            for sample_path in sample_paths:
+                if sample_path.name == "dedup_index.json":
+                    continue
+
+                try:
+                    stat = sample_path.stat()
+                except OSError as exc:
+                    logger.warning(
+                        "raw_sample_stat_failed",
+                        extra={
+                            "event": "raw_sample_stat_failed",
+                            "path": str(sample_path),
+                            "reason": type(exc).__name__,
+                        },
+                    )
+                    continue
+
+                sample: IngestedSample | None = None
+                cached_entry = cached_by_path.get(str(sample_path))
+                cached_mtime_ns = cached_entry.get("mtime_ns") if cached_entry else None
+                if cached_entry and cached_mtime_ns == stat.st_mtime_ns:
+                    sample_payload = cached_entry.get("sample")
+                    if isinstance(sample_payload, dict):
+                        try:
+                            sample = self._parse_sample(sample_payload)
+                        except (KeyError, TypeError, ValueError) as exc:
+                            logger.warning(
+                                "dataset_index_entry_rejected",
+                                extra={
+                                    "event": "dataset_index_entry_rejected",
+                                    "path": str(sample_path),
+                                    "reason": type(exc).__name__,
+                                },
+                            )
+
+                if sample is None:
+                    sample = self._safe_parse_raw_sample_file(sample_path)
+                if sample is None:
+                    continue
+
+                sample_path_str = str(sample_path)
+                indexed_samples.append((sample_path_str, sample))
+                index_entries.append(
+                    {
+                        "path": sample_path_str,
+                        "directory": dir_key,
+                        "mtime_ns": stat.st_mtime_ns,
+                        "sample": self._sample_to_payload(sample),
+                    }
+                )
+
+        self._atomic_write_json(
+            self.dataset_index_path,
+            {
+                "schema_version": 2,
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "raw_data_root": str(self.raw_data_root),
+                "directories": directory_entries,
+                "entries": index_entries,
+            },
+        )
+        self._indexed_raw_samples_cache = list(indexed_samples)
+        return list(indexed_samples)
+
+    def _get_indexed_raw_samples(
+        self, *, refresh: bool = False
+    ) -> list[tuple[str, IngestedSample]]:
+        if refresh:
+            return self._refresh_dataset_index()
+        if self._indexed_raw_samples_cache is not None:
+            return list(self._indexed_raw_samples_cache)
+
+        cached_payload = self._load_dataset_index_payload()
+        if cached_payload is not None:
+            self._indexed_raw_samples_cache = self._deserialize_dataset_index(cached_payload)
+            if self._indexed_raw_samples_cache:
+                return list(self._indexed_raw_samples_cache)
+
+        return self._refresh_dataset_index()
 
     @staticmethod
     def _deterministic_indices(total: int, limit: int) -> list[int]:
@@ -245,11 +735,7 @@ class IncrementalTrainer:
             str(self.training_state["last_training_time"]).replace("Z", "+00:00")
         )
         samples: list[IngestedSample] = []
-        for sample_path in sorted(self.raw_data_root.rglob("*.json")):
-            if sample_path.name == "dedup_index.json":
-                continue
-            payload = json.loads(sample_path.read_text(encoding="utf-8"))
-            sample = self._parse_sample(payload)
+        for _, sample in self._get_indexed_raw_samples(refresh=True):
             if sample.ingested_at > last_training_time:
                 samples.append(sample)
         if samples:
@@ -280,17 +766,7 @@ class IncrementalTrainer:
     def load_evaluation_samples(
         self, max_samples: int
     ) -> tuple[list[IngestedSample], str]:
-        samples: list[IngestedSample] = []
-        for sample_path in sorted(self.raw_data_root.rglob("*.json")):
-            if sample_path.name == "dedup_index.json":
-                continue
-            try:
-                payload = json.loads(sample_path.read_text(encoding="utf-8"))
-                samples.append(self._parse_sample(payload))
-            except (OSError, json.JSONDecodeError, KeyError, TypeError, ValueError):
-                logger.warning(
-                    "evaluation_sample_skipped", extra={"path": str(sample_path)}
-                )
+        samples = [sample for _, sample in self._get_indexed_raw_samples(refresh=False)]
 
         if samples:
             if len(samples) > max_samples:
@@ -324,48 +800,92 @@ class IncrementalTrainer:
             return "LOW"
         return "UNKNOWN"
 
+    def _validate_or_reject_bridge_row(
+        self, row: dict[str, object]
+    ) -> IngestedSample | None:
+        source_tag = str(row.get("source_tag", "") or "").strip()
+        if not source_tag or source_tag.upper() == "UNKNOWN":
+            logger.warning(
+                "INVALID LEGACY DATA - rejected: bridge source_tag missing",
+                extra={"event": "bridge_row_rejected", "reason": "source_tag_missing"},
+            )
+            return None
+
+        row_timestamp = str(row.get("ingested_at", "") or "").strip()
+        if not row_timestamp:
+            logger.warning(
+                "INVALID LEGACY DATA - rejected: bridge row ingested_at missing",
+                extra={"event": "bridge_row_rejected", "reason": "ingested_at_missing"},
+            )
+            return None
+
+        row_sha256_hash = str(row.get("sha256_hash", "") or "").strip()
+        if len(row_sha256_hash) != 64:
+            logger.warning(
+                "INVALID LEGACY DATA - rejected: bridge row sha256_hash missing",
+                extra={"event": "bridge_row_rejected", "reason": "sha256_hash_missing"},
+            )
+            return None
+
+        endpoint = str(row.get("endpoint", "") or "").strip()
+        if not _CVE_ID_RE.fullmatch(endpoint):
+            logger.warning(
+                "INVALID LEGACY DATA - rejected: bridge endpoint is not a canonical CVE id",
+                extra={
+                    "event": "bridge_row_rejected",
+                    "reason": "invalid_endpoint",
+                    "endpoint": endpoint or "<missing>",
+                },
+            )
+            return None
+
+        text = " ".join(
+            str(row.get(field, ""))
+            for field in ("endpoint", "parameters", "exploit_vector")
+            if str(row.get(field, "")).strip()
+        ).strip()
+        if not text:
+            logger.warning(
+                "INVALID LEGACY DATA - rejected: bridge row text fields missing",
+                extra={"event": "bridge_row_rejected", "reason": "text_missing"},
+            )
+            return None
+
+        try:
+            ingested_at = datetime.fromisoformat(row_timestamp.replace("Z", "+00:00"))
+        except ValueError:
+            logger.warning(
+                "INVALID LEGACY DATA - rejected: bridge row ingested_at invalid",
+                extra={
+                    "event": "bridge_row_rejected",
+                    "reason": "ingested_at_invalid",
+                    "value": row_timestamp,
+                },
+            )
+            return None
+
+        severity = self._severity_from_bridge_record(row)
+        return IngestedSample(
+            source=source_tag,
+            raw_text=text,
+            url=f"https://nvd.nist.gov/vuln/detail/{endpoint.upper()}",
+            cve_id=endpoint.upper(),
+            severity=severity,
+            tags=tuple(),
+            ingested_at=ingested_at,
+            sha256_hash=row_sha256_hash,
+            token_count=len(text.split()),
+            lang="en",
+        )
+
     def _load_bridge_samples(self, max_samples: int) -> list[IngestedSample]:
         bridge_state = get_bridge_state()
         rows = bridge_state.read_samples(max_samples=max_samples)
         samples: list[IngestedSample] = []
         for row in rows:
-            text = " ".join(
-                str(row.get(field, ""))
-                for field in ("endpoint", "parameters", "exploit_vector")
-                if str(row.get(field, "")).strip()
-            ).strip()
-            if not text:
-                continue
-            source_tag = str(row.get("source_tag", "") or "").strip()
-            if not source_tag:
-                raise RuntimeError("REAL_DATA_REQUIRED: bridge source_tag missing")
-            row_timestamp = str(row.get("ingested_at", "") or "").strip()
-            if not row_timestamp:
-                raise RuntimeError("REAL_DATA_REQUIRED: bridge row ingested_at missing")
-            row_sha256_hash = str(row.get("sha256_hash", "") or "").strip()
-            if len(row_sha256_hash) != 64:
-                raise RuntimeError("REAL_DATA_REQUIRED: bridge row sha256_hash missing")
-            endpoint = str(row.get("endpoint", "") or "").strip()
-            if not _CVE_ID_RE.fullmatch(endpoint):
-                raise RuntimeError(
-                    f"REAL_DATA_REQUIRED: bridge endpoint is not a canonical CVE id ({endpoint or '<missing>'})"
-                )
-            severity = self._severity_from_bridge_record(row)
-            ingested_at = datetime.fromisoformat(row_timestamp.replace("Z", "+00:00"))
-            samples.append(
-                IngestedSample(
-                    source=source_tag,
-                    raw_text=text,
-                    url=f"https://nvd.nist.gov/vuln/detail/{endpoint.upper()}",
-                    cve_id=endpoint.upper(),
-                    severity=severity,
-                    tags=tuple(),
-                    ingested_at=ingested_at,
-                    sha256_hash=row_sha256_hash,
-                    token_count=len(text.split()),
-                    lang="en",
-                )
-            )
+            sample = self._validate_or_reject_bridge_row(row)
+            if sample is not None:
+                samples.append(sample)
         return samples
 
     def build_dataset(
@@ -378,10 +898,6 @@ class IncrementalTrainer:
                 "REAL_DATA_REQUIRED: At least two real samples are required"
             )
 
-        feature_rows = torch.stack([extract(sample) for sample in samples])
-        labels = torch.tensor(
-            [self._label_for_sample(sample) for sample in samples], dtype=torch.long
-        )
         indices = list(range(len(samples)))
         eval_count = min(len(indices) - 1, max(2, int(len(indices) * 0.1)))
         eval_indices = self._deterministic_indices(len(indices), eval_count)
@@ -392,10 +908,8 @@ class IncrementalTrainer:
                 "REAL_DATA_REQUIRED: Deterministic train/validation split failed"
             )
 
-        train_dataset = TensorDataset(
-            feature_rows[train_indices], labels[train_indices]
-        )
-        eval_dataset = TensorDataset(feature_rows[eval_indices], labels[eval_indices])
+        train_dataset = _StreamingFeatureDataset(self, samples, train_indices)
+        eval_dataset = _StreamingFeatureDataset(self, samples, eval_indices)
         train_generator = torch.Generator().manual_seed(self.model_config.seed)
         train_loader = DataLoader(
             train_dataset,
@@ -444,20 +958,38 @@ class IncrementalTrainer:
         if not samples:
             raise RuntimeError("No real samples available for benchmark")
 
-        feature_rows = torch.stack([extract(sample) for sample in samples]).to(
-            self.device
+        self._invalid_sample_count = 0
+        self._invalid_sample_warnings.clear()
+        benchmark_dataset = _StreamingFeatureDataset(
+            self,
+            samples,
+            list(range(len(samples))),
         )
-        labels = [self._label_for_sample(sample) for sample in samples]
+        benchmark_loader = DataLoader(
+            benchmark_dataset,
+            batch_size=512,
+            shuffle=False,
+            num_workers=self.num_workers,
+            pin_memory=self.device.type == "cuda",
+            persistent_workers=self.num_workers > 0,
+        )
 
         self.model.eval()
         positive_probabilities: list[float] = []
+        labels: list[int] = []
+        eval_losses: list[float] = []
+        criterion = torch.nn.CrossEntropyLoss()
         with torch.no_grad():
-            for start in range(0, len(samples), 512):
-                logits = self.model(feature_rows[start : start + 512])
+            for features, batch_labels in benchmark_loader:
+                features = features.to(self.device)
+                batch_labels_device = batch_labels.to(self.device)
+                logits = self.model(features)
                 probs = torch.softmax(logits, dim=1)[:, 1].detach().cpu().tolist()
                 positive_probabilities.extend(
                     float(probability) for probability in probs
                 )
+                labels.extend(batch_labels.cpu().tolist())
+                eval_losses.append(float(criterion(logits, batch_labels_device).item()))
 
         live_metrics = compute_binary_metrics(
             labels, positive_probabilities, self.positive_threshold
@@ -467,14 +999,44 @@ class IncrementalTrainer:
             positive_probabilities,
             fallback_threshold=self.positive_threshold,
         )
+        ranked_pairs = sorted(
+            zip(positive_probabilities, labels),
+            key=lambda item: item[0],
+            reverse=True,
+        )
+
+        def _precision_at_k(k: int) -> float:
+            top = ranked_pairs[: min(k, len(ranked_pairs))]
+            if not top:
+                return 0.0
+            positives = sum(1 for _, label in top if int(label) == 1)
+            return float(positives / len(top))
+
+        reciprocal_rank = 0.0
+        for rank, (_, label) in enumerate(ranked_pairs, start=1):
+            if int(label) == 1:
+                reciprocal_rank = 1.0 / float(rank)
+                break
+
+        loss = float(sum(eval_losses) / max(len(eval_losses), 1))
+        metrics_registry.set_gauge("benchmark_loss", loss)
+        metrics_registry.set_gauge("benchmark_precision_at_5", _precision_at_k(5))
+        metrics_registry.set_gauge("benchmark_precision_at_10", _precision_at_k(10))
+        metrics_registry.set_gauge("benchmark_mrr", reciprocal_rank)
+        metrics_registry.set_gauge("benchmark_f1", float(calibrated_metrics["f1"]))
         return {
             "samples": len(samples),
             "source": source,
+            "loss": loss,
             "threshold": float(live_metrics["threshold"]),
             "accuracy": float(live_metrics["accuracy"]),
             "precision": float(live_metrics["precision"]),
             "recall": float(live_metrics["recall"]),
             "f1": float(live_metrics["f1"]),
+            "precision_at_5": _precision_at_k(5),
+            "precision_at_10": _precision_at_k(10),
+            "mrr": reciprocal_rank,
+            "rejected_samples": self._invalid_sample_count,
             "recommended_threshold": float(calibrated_metrics["threshold"]),
             "recommended_strategy": str(calibrated_metrics["strategy"]),
             "recommended_f1": float(calibrated_metrics["f1"]),

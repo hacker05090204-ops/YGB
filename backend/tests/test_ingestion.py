@@ -167,6 +167,29 @@ def test_normalize_text_and_batch_cache(monkeypatch, tmp_path):
     assert (tmp_path / "normalized" / f"{sample.sha256_hash}.json").exists()
 
 
+def test_normalize_batch_report_tracks_cache_and_backpressure(monkeypatch):
+    sample_one = make_sample("source", "<p>alpha</p>", "https://example.com/a", "", "info", ())
+    sample_two = make_sample("source", "<p>beta</p>", "https://example.com/b", "", "info", ())
+    monkeypatch.setattr(normalizer, "ProcessPoolExecutor", FakeExecutor)
+
+    batch, report = normalizer.normalize_batch_with_report([sample_one, sample_two], batch_limit=1)
+    cached_batch, cached_report = normalizer.normalize_batch_with_report(
+        [sample_one, sample_two],
+        batch_limit=1,
+    )
+
+    assert len(batch) == 2
+    assert report.requested == 2
+    assert report.cache_hits == 0
+    assert report.cache_misses == 2
+    assert report.backpressure_applied is True
+    assert report.chunk_count == 2
+    assert cached_batch[0].raw_text == batch[0].raw_text
+    assert cached_report.cache_hits == 2
+    assert cached_report.normalized == 0
+    assert cached_report.emitted == 2
+
+
 def test_normalize_batch_falls_back_without_spawnable_main(monkeypatch):
     sample = make_sample("source", "<p>hello</p>", "https://example.com", "", "info", ())
     monkeypatch.setattr(normalizer, "_main_module_supports_spawn", lambda: False)
@@ -479,7 +502,24 @@ async def test_async_ingestor_full_cycle_and_helper(monkeypatch, tmp_path):
         dedup_index_path=str(tmp_path / "raw" / "dedup_index.json"),
         adapters=adapters,
     )
-    monkeypatch.setattr("backend.ingestion.async_ingestor.normalize_batch", lambda samples: samples)
+
+    def fake_normalize_with_report(samples, batch_limit=0):
+        return samples, normalizer.NormalizationReport(
+            requested=len(samples),
+            cache_hits=0,
+            cache_misses=len(samples),
+            normalized=len(samples),
+            emitted=len(samples),
+            used_process_pool=False,
+            pool_disabled=False,
+            backpressure_applied=False,
+            chunk_count=1 if samples else 0,
+        )
+
+    monkeypatch.setattr(
+        "backend.ingestion.async_ingestor.normalize_batch_with_report",
+        fake_normalize_with_report,
+    )
 
     result = await ingestor.run_cycle()
 
@@ -487,6 +527,8 @@ async def test_async_ingestor_full_cycle_and_helper(monkeypatch, tmp_path):
     assert result.new_count == 2
     assert result.dupes_found == 1
     assert result.errors == 1
+    assert result.normalized_count == 2
+    assert result.backpressure_events == 0
     assert metrics_registry.get_counter("ingest_total_count") == 3.0
     assert metrics_registry.get_counter("ingest_new_count") == 2.0
     assert metrics_registry.get_gauge("duplicate_rate") == pytest.approx(1 / 3)
@@ -496,3 +538,42 @@ async def test_async_ingestor_full_cycle_and_helper(monkeypatch, tmp_path):
     with patch("backend.ingestion.async_ingestor.AsyncIngestor.run_cycle", AsyncMock(return_value=result)):
         helper_result = await run_ingestion_cycle()
     assert helper_result == result
+
+
+@pytest.mark.asyncio
+async def test_async_ingestor_reports_backpressure(monkeypatch, tmp_path):
+    samples = [
+        make_sample("nvd", f"Alpha {index}", f"https://example.com/{index}", f"CVE-{index}", "high", ())
+        for index in range(3)
+    ]
+    ingestor = AsyncIngestor(
+        raw_root=str(tmp_path / "raw"),
+        dedup_index_path=str(tmp_path / "raw" / "dedup_index.json"),
+        adapters=[StubAdapter("nvd", samples)],
+    )
+    ingestor.max_pending_samples = 1
+    ingestor.max_normalize_batch = 1
+
+    def fake_normalize_with_report(samples, batch_limit=0):
+        return samples, normalizer.NormalizationReport(
+            requested=len(samples),
+            cache_hits=0,
+            cache_misses=len(samples),
+            normalized=len(samples),
+            emitted=len(samples),
+            used_process_pool=False,
+            pool_disabled=False,
+            backpressure_applied=True,
+            chunk_count=max(1, len(samples)),
+        )
+
+    monkeypatch.setattr(
+        "backend.ingestion.async_ingestor.normalize_batch_with_report",
+        fake_normalize_with_report,
+    )
+
+    result = await ingestor.run_cycle()
+
+    assert result.backpressure_events == 1
+    assert result.max_pending_depth == 3
+    assert result.normalization_reports[0]["backpressure_applied"] is True

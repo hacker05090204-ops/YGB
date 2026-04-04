@@ -518,8 +518,12 @@ def initialize_runtime():
                 os.remove(TELEMETRY_PATH)
                 logger.info("Invalidated old telemetry (version %s != %s)",
                             ver, EXPECTED_HMAC_VERSION)
-        except (json.JSONDecodeError, OSError):
-            pass
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning(
+                "Failed to validate existing telemetry version; keeping current file state: %s",
+                exc,
+                exc_info=True,
+            )
 
     logger.info("Production runtime initialized")
 

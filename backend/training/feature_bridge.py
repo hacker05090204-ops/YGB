@@ -11,12 +11,18 @@ All operations are deterministic (seeded RNG).
 """
 
 import numpy as np
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List, Mapping, Optional
+
+
+_BLOCKED_RANDOM_AUGMENTATION_MESSAGE = (
+    "DISABLED: Random or synthetic feature augmentation is forbidden in production"
+)
 
 
 def _abort_random_augmentation(operation: str) -> None:
     raise RuntimeError(
-        f"REAL_DATA_REQUIRED: {operation} random augmentation is disabled"
+        f"{_BLOCKED_RANDOM_AUGMENTATION_MESSAGE} ({operation})"
     )
 
 
@@ -41,6 +47,63 @@ class FeatureConfig:
     seed: int = 42
 
 
+@dataclass(frozen=True)
+class FeatureHealthReport:
+    """Structured health report for feature bridge inputs."""
+
+    total: int = 0
+    valid: int = 0
+    invalid: int = 0
+    invalid_paths: List[str] = field(default_factory=list)
+
+
+class FeatureHealthCheck:
+    """Run non-synthetic health validation over real feature tensors."""
+
+    def __init__(self, config: FeatureConfig = None):
+        self.config = config or FeatureConfig()
+
+    def _is_valid_feature_array(self, feature_array: np.ndarray) -> bool:
+        if not isinstance(feature_array, np.ndarray):
+            return False
+        if feature_array.size == 0:
+            return False
+        if feature_array.ndim == 1:
+            if feature_array.shape[0] != self.config.input_dim:
+                return False
+        elif feature_array.ndim == 2:
+            if feature_array.shape[1] != self.config.input_dim:
+                return False
+        else:
+            return False
+        return bool(np.isfinite(feature_array).all())
+
+    def run(
+        self,
+        feature_paths: Optional[Mapping[str, np.ndarray]] = None,
+    ) -> FeatureHealthReport:
+        """Return health counts for the supplied bridge-facing feature tensors."""
+        if not feature_paths:
+            return FeatureHealthReport()
+
+        invalid_paths: List[str] = []
+        valid = 0
+        for path, feature_array in feature_paths.items():
+            if self._is_valid_feature_array(feature_array):
+                valid += 1
+            else:
+                invalid_paths.append(str(path))
+
+        total = len(feature_paths)
+        invalid = len(invalid_paths)
+        return FeatureHealthReport(
+            total=total,
+            valid=valid,
+            invalid=invalid,
+            invalid_paths=invalid_paths,
+        )
+
+
 class FeatureDiversifier:
     """
     Breaks interaction shortcut dominance without removing features.
@@ -49,6 +112,17 @@ class FeatureDiversifier:
 
     def __init__(self, config: FeatureConfig = None):
         self.config = config or FeatureConfig()
+        self._health_check = FeatureHealthCheck(self.config)
+        self._last_health_report = FeatureHealthReport()
+
+    def get_health(
+        self,
+        feature_paths: Optional[Mapping[str, np.ndarray]] = None,
+    ) -> FeatureHealthReport:
+        """Return the latest feature bridge health report, optionally refreshing it."""
+        if feature_paths is not None:
+            self._last_health_report = self._health_check.run(feature_paths)
+        return self._last_health_report
 
     def apply_interaction_dropout(
         self, features: np.ndarray, epoch: int, batch: int

@@ -1,6 +1,8 @@
 import types
 from pathlib import Path
 
+import pytest
+
 from backend.assistant import voice_runtime as vr
 from backend.assistant.query_router import ResearchResult, ResearchStatus, VoiceMode
 from impl_v1.training.voice.voice_executors import ExecStatus
@@ -80,7 +82,7 @@ def test_execute_orchestrated_intent_runs_real_dispatch(monkeypatch):
     monkeypatch.setattr(
         vr,
         "dispatch_supported_command",
-        lambda command_type, args, transcript_text: {
+        lambda command_type, args, transcript_text, voice_session=None: {
             "status": "ok",
             "output": "runtime-ok",
             "data": {"query_type": command_type},
@@ -101,6 +103,46 @@ def test_execute_orchestrated_intent_runs_real_dispatch(monkeypatch):
     assert result["executed"] is True
     assert orch.executed_result == "runtime-ok"
     assert audit.entries[-1]["action"] == "EXECUTED"
+
+
+def test_dispatch_supported_command_tracks_and_closes_voice_session(monkeypatch):
+    snapshots = []
+
+    def _fake_research(query):
+        snapshots.append(vr.get_active_sessions())
+        return {"status": "ok", "query": query, "message": "research-complete"}
+
+    monkeypatch.setattr(vr, "run_research_analysis", _fake_research)
+
+    result = vr.dispatch_supported_command(
+        "RESEARCH_QUERY_INTERNAL",
+        {"query": "what is dns poisoning"},
+        "what is dns poisoning",
+    )
+
+    assert result["status"] == "ok"
+    assert len(snapshots) == 1
+    assert len(snapshots[0]) == 1
+    session = next(iter(snapshots[0].values()))
+    assert session["turn_count"] == 1
+    assert session["ended_at"] is None
+    assert vr.get_active_sessions() == {}
+
+
+def test_execute_orchestrated_intent_closes_voice_session_on_exception(monkeypatch):
+    intent = _FakeIntent(command_type="QUERY_STATUS")
+    orch = _FakeOrchestrator(intent)
+
+    def _raising_dispatch(command_type, args, transcript_text, voice_session=None):
+        assert len(vr.get_active_sessions()) == 1
+        raise RuntimeError("dispatch exploded")
+
+    monkeypatch.setattr(vr, "dispatch_supported_command", _raising_dispatch)
+
+    with pytest.raises(RuntimeError, match="dispatch exploded"):
+        vr.execute_orchestrated_intent(orch, "INT-1", None)
+
+    assert vr.get_active_sessions() == {}
 
 
 def test_execute_orchestrated_intent_blocks_policy():

@@ -396,13 +396,60 @@ class TestTTSLoop:
 
     def test_tts_speak_returns_response(self, monkeypatch):
         from impl_v1.training.voice.tts_streaming import TTSEngine, ResponseType
-        monkeypatch.setenv("YGB_TEST_MODE", "true")
         tts = TTSEngine()
+        monkeypatch.setattr(
+            tts,
+            "_deliver_chunk",
+            lambda text, response_type: (True, "https://tts.example/audio", None),
+        )
         response = tts.speak("Test message")
         assert response.text == "Test message"
         assert response.response_type == ResponseType.SUCCESS
         assert response.status.value == "IDLE"
         assert response.audio_url is not None
+
+    def test_tts_stream_health_continues_after_single_chunk_failure(self, monkeypatch):
+        from impl_v1.training.voice.tts_streaming import TTSEngine
+
+        tts = TTSEngine()
+        monkeypatch.setattr(tts, "_chunk_text", lambda text: ["chunk-1", "chunk-2", "chunk-3"])
+        outcomes = iter(
+            [
+                (False, None, "chunk-1-failed"),
+                (True, "https://tts.example/chunk-2", None),
+                (True, "https://tts.example/chunk-3", None),
+            ]
+        )
+        monkeypatch.setattr(tts, "_deliver_chunk", lambda text, response_type: next(outcomes))
+
+        response = tts.speak("One. Two. Three.")
+        health = next(iter(tts.get_stream_health().values()))
+
+        assert response.status.value == "IDLE"
+        assert health["failed_chunks"] == 1
+        assert health["delivered_chunks"] == 2
+        assert health["consecutive_failures"] == 0
+        assert health["aborted"] is False
+
+    def test_tts_stream_aborts_after_three_consecutive_chunk_failures(self, monkeypatch):
+        from impl_v1.training.voice.tts_streaming import TTSEngine
+
+        tts = TTSEngine()
+        monkeypatch.setattr(tts, "_chunk_text", lambda text: ["chunk-1", "chunk-2", "chunk-3", "chunk-4"])
+        monkeypatch.setattr(
+            tts,
+            "_deliver_chunk",
+            lambda text, response_type: (False, None, f"{text}-failed"),
+        )
+
+        response = tts.speak("One. Two. Three. Four.")
+        health = next(iter(tts.get_stream_health().values()))
+
+        assert response.status.value == "ERROR"
+        assert health["aborted"] is True
+        assert health["failed_chunks"] == 3
+        assert health["last_error"].startswith("STREAM_ABORTED")
+        assert tts.get_stats()["total_errors"] == 1
 
     def test_tts_interrupt(self):
         from impl_v1.training.voice.tts_streaming import TTSEngine

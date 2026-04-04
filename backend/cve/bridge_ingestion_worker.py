@@ -64,11 +64,15 @@ class BridgeIngestionWorker:
         self._total_dropped: int = 0
         self._total_deduped: int = 0
         self._last_ingest_at: Optional[str] = None
+        self._batch_sequence: int = 0
+        self._batch_history: list[Dict[str, Any]] = []
+        self._last_batch: Optional[Dict[str, Any]] = None
         self._load_bridge()
         # Load persistent bridge state
         from backend.bridge.bridge_state import get_bridge_state
 
         self._bridge_state = get_bridge_state()
+        self._restore_idempotency_keys()
 
     def _load_bridge(self):
         """Try to load the ingestion bridge DLL."""
@@ -131,8 +135,69 @@ class BridgeIngestionWorker:
             "total_deduped": self._total_deduped,
             "last_ingest_at": self._last_ingest_at,
             "idempotency_keys_cached": len(self._ingested_keys),
+            "batches_completed": len(self._batch_history),
+            "last_batch": dict(self._last_batch) if self._last_batch else None,
             **counts,
         }
+
+    def _restore_idempotency_keys(self):
+        """Restore idempotency and batch sequence from persisted samples."""
+        try:
+            persisted_samples = self._bridge_state.read_samples()
+        except Exception as exc:
+            logger.warning("[BRIDGE] Failed to restore persisted samples: %s", exc)
+            return
+
+        seen_batches = set()
+        for sample in persisted_samples:
+            endpoint = str(sample.get("endpoint", "") or "")
+            exploit_vector = str(sample.get("exploit_vector", "") or "")
+            idempotency_key = str(sample.get("idempotency_key", "") or "")
+            computed_key = ""
+            if endpoint:
+                computed_key = self._compute_idempotency_key(endpoint, exploit_vector)
+            if idempotency_key:
+                self._ingested_keys.add(idempotency_key)
+            if computed_key:
+                self._ingested_keys.add(computed_key)
+
+            batch_id = str(sample.get("ingestion_batch_id", "") or "")
+            if batch_id:
+                seen_batches.add(batch_id)
+
+        self._batch_sequence = len(seen_batches)
+
+    def _start_batch(self, mode: str, total_candidates: int) -> Dict[str, Any]:
+        """Create a tracked ingestion batch."""
+        self._batch_sequence += 1
+        return {
+            "batch_id": f"CBI-{self._batch_sequence:06d}",
+            "mode": mode,
+            "started_at": datetime.now(timezone.utc).isoformat(),
+            "started_monotonic": time.monotonic(),
+            "total_candidates": total_candidates,
+        }
+
+    def _finish_batch(
+        self,
+        batch: Dict[str, Any],
+        ingested: int,
+        dropped: int,
+        deduped: int,
+    ):
+        """Finalize and retain a compact batch summary."""
+        started_monotonic = float(batch.pop("started_monotonic", time.monotonic()))
+        batch_summary = {
+            **batch,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+            "duration_ms": round((time.monotonic() - started_monotonic) * 1000, 2),
+            "ingested": ingested,
+            "dropped": dropped,
+            "deduped": deduped,
+        }
+        self._last_batch = batch_summary
+        self._batch_history.append(batch_summary)
+        self._batch_history = self._batch_history[-25:]
 
     # =========================================================================
     # FIELD MAPPING
@@ -271,9 +336,13 @@ class BridgeIngestionWorker:
             return 0
 
         ingested = 0
+        dropped = 0
+        deduped = 0
         records = getattr(pipeline, "_records", {})
         if not records:
             return 0
+
+        batch = self._start_batch("stream", len(records))
 
         for cve_id, record in records.items():
             fields = self._map_cve_to_sample(record)
@@ -286,6 +355,7 @@ class BridgeIngestionWorker:
             )
             if ik in self._ingested_keys:
                 self._total_deduped += 1
+                deduped += 1
                 continue
 
             # Compute reliability
@@ -295,6 +365,7 @@ class BridgeIngestionWorker:
             )
             if reliability < RELIABILITY_DROP_THRESHOLD:
                 self._total_dropped += 1
+                dropped += 1
                 continue
 
             # Ingest
@@ -312,6 +383,8 @@ class BridgeIngestionWorker:
                     "source_tag": fields["source_tag"],
                     "reliability": reliability,
                     "ingested_at": datetime.now(timezone.utc).isoformat(),
+                    "idempotency_key": ik,
+                    "ingestion_batch_id": batch["batch_id"],
                 }
                 persisted_sample["sha256_hash"] = hashlib.sha256(
                     json.dumps(
@@ -330,12 +403,20 @@ class BridgeIngestionWorker:
             elif rc == -3:
                 self._total_deduped += 1
                 self._ingested_keys.add(ik)
+                deduped += 1
 
         if ingested > 0:
             self._last_ingest_at = datetime.now(timezone.utc).isoformat()
             # Persist counters
             self._bridge_state.record_ingest_batch(ingested, ingested)
             self._bridge_state.flush_samples()
+
+        if dropped > 0:
+            self._bridge_state.record_drop(dropped)
+        if deduped > 0:
+            self._bridge_state.record_dedup(deduped)
+
+        self._finish_batch(batch, ingested=ingested, dropped=dropped, deduped=deduped)
 
         return ingested
 
@@ -358,6 +439,7 @@ class BridgeIngestionWorker:
 
         records = getattr(pipeline, "_records", {})
         total = len(records)
+        batch = self._start_batch("backfill", total)
 
         for cve_id, record in records.items():
             if max_samples and ingested >= max_samples:
@@ -397,6 +479,8 @@ class BridgeIngestionWorker:
                     "source_tag": fields["source_tag"],
                     "reliability": reliability,
                     "ingested_at": datetime.now(timezone.utc).isoformat(),
+                    "idempotency_key": ik,
+                    "ingestion_batch_id": batch["batch_id"],
                 }
                 persisted_sample["sha256_hash"] = hashlib.sha256(
                     json.dumps(
@@ -433,10 +517,12 @@ class BridgeIngestionWorker:
 
         # Update manifest after backfill
         self.update_manifest()
+        self._finish_batch(batch, ingested=ingested, dropped=dropped, deduped=deduped)
 
         counts = self.get_bridge_counts()
         return {
             "success": True,
+            "batch_id": batch["batch_id"],
             "total_available": total,
             "ingested": ingested,
             "dropped": dropped,
@@ -505,9 +591,15 @@ class BridgeIngestionWorker:
         }
 
         # Canonicalize: add signed fields for DatasetManifest compatibility
-        from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+        from impl_v1.training.safety.manifest_builder import safe_canonicalize_manifest
 
-        canonicalize_manifest(manifest)
+        try:
+            safe_canonicalize_manifest(manifest)
+        except RuntimeError as exc:
+            logger.error("[MANIFEST] Canonicalization failed: %s", exc)
+            raise RuntimeError(
+                "SYSTEM NOT READY: Missing authority key"
+            ) from exc
 
         try:
             with open(_MANIFEST_PATH, "w") as f:

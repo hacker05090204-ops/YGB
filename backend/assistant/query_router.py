@@ -26,6 +26,10 @@ from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
+
+def _sanitize_query_for_log(text: object, limit: int = 120) -> str:
+    return " ".join(str(text or "").split())[:limit]
+
 # =========================================================================
 # TYPES
 # =========================================================================
@@ -162,93 +166,106 @@ class QueryRouter:
 
     def classify(self, text: str) -> RouteDecision:
         """Classify a voice query. Returns routing decision with confidence."""
-        text_lower = text.lower().strip()
-        if not text_lower:
-            return RouteDecision(
-                mode=VoiceMode.SECURITY,
-                confidence=1.0,
-                reason="Empty query defaults to security",
-                matched_keywords=(),
-                timestamp=datetime.now(timezone.utc).isoformat(),
+        sanitized_text = _sanitize_query_for_log(text)
+        try:
+            text_lower = str(text or "").lower().strip()
+            if not text_lower:
+                return RouteDecision(
+                    mode=VoiceMode.SECURITY,
+                    confidence=1.0,
+                    reason="Empty query defaults to security",
+                    matched_keywords=(),
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                )
+
+            security_score = 0.0
+            research_score = 0.0
+            security_matches: List[str] = []
+            research_matches: List[str] = []
+
+            for kw, weight in SECURITY_KEYWORD_WEIGHTS.items():
+                if kw in text_lower:
+                    security_score += weight
+                    security_matches.append(kw)
+
+            for kw, weight in RESEARCH_KEYWORD_WEIGHTS.items():
+                if kw in text_lower:
+                    research_score += weight
+                    research_matches.append(kw)
+
+            for pattern in RESEARCH_PATTERNS:
+                if re.search(pattern, text_lower, re.IGNORECASE):
+                    research_score += 3.0
+                    research_matches.append(f"pattern:{pattern[:30]}")
+                    break
+
+            total_score = security_score + research_score
+            if total_score == 0:
+                logger.warning(
+                    "QueryRouter fallback routed unrouted query to clarification: %s",
+                    sanitized_text,
+                )
+                return RouteDecision(
+                    mode=VoiceMode.CLARIFICATION,
+                    confidence=0.0,
+                    reason="No keywords matched. Please clarify your query.",
+                    matched_keywords=(),
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                )
+
+            research_confidence = research_score / total_score if total_score > 0 else 0.0
+            security_confidence = security_score / total_score if total_score > 0 else 0.0
+            research_confidence = min(0.99, research_confidence)
+            security_confidence = min(0.99, security_confidence)
+
+            if research_confidence >= CONFIDENCE_THRESHOLD:
+                return RouteDecision(
+                    mode=VoiceMode.RESEARCH,
+                    confidence=round(research_confidence, 4),
+                    reason=f"Research confidence {research_confidence:.2f} >= threshold {CONFIDENCE_THRESHOLD}",
+                    matched_keywords=tuple(research_matches[:5]),
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                )
+            if security_confidence >= CONFIDENCE_THRESHOLD:
+                return RouteDecision(
+                    mode=VoiceMode.SECURITY,
+                    confidence=round(security_confidence, 4),
+                    reason=f"Security confidence {security_confidence:.2f} >= threshold {CONFIDENCE_THRESHOLD}",
+                    matched_keywords=tuple(security_matches[:5]),
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                )
+            if max(research_confidence, security_confidence) < LOW_CONFIDENCE_THRESHOLD:
+                return RouteDecision(
+                    mode=VoiceMode.RESEARCH,
+                    confidence=round(max(research_confidence, 0.3), 4),
+                    reason=f"Low confidence ({max(research_confidence, security_confidence):.2f} < {LOW_CONFIDENCE_THRESHOLD}), routing to Research",
+                    matched_keywords=tuple((research_matches + security_matches)[:5]),
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                )
+
+            logger.warning(
+                "QueryRouter fallback routed unrouted query to clarification: %s",
+                sanitized_text,
             )
-
-        # Weighted keyword scoring
-        security_score = 0.0
-        research_score = 0.0
-        security_matches: List[str] = []
-        research_matches: List[str] = []
-
-        for kw, weight in SECURITY_KEYWORD_WEIGHTS.items():
-            if kw in text_lower:
-                security_score += weight
-                security_matches.append(kw)
-
-        for kw, weight in RESEARCH_KEYWORD_WEIGHTS.items():
-            if kw in text_lower:
-                research_score += weight
-                research_matches.append(kw)
-
-        # Research pattern regex bonus (+3.0 weight)
-        research_pattern_match = False
-        for pattern in RESEARCH_PATTERNS:
-            if re.search(pattern, text_lower, re.IGNORECASE):
-                research_pattern_match = True
-                research_score += 3.0
-                research_matches.append(f"pattern:{pattern[:30]}")
-                break
-
-        # Compute confidence for each mode
-        total_score = security_score + research_score
-        if total_score == 0:
-            # No keywords matched — ask clarification instead of defaulting
-            return RouteDecision(
-                mode=VoiceMode.CLARIFICATION,
-                confidence=0.0,
-                reason="No keywords matched. Please clarify your query.",
-                matched_keywords=(),
-                timestamp=datetime.now(timezone.utc).isoformat(),
-            )
-
-        research_confidence = research_score / total_score if total_score > 0 else 0.0
-        security_confidence = security_score / total_score if total_score > 0 else 0.0
-
-        # Cap at 0.99
-        research_confidence = min(0.99, research_confidence)
-        security_confidence = min(0.99, security_confidence)
-
-        # Decision with threshold enforcement
-        if research_confidence >= CONFIDENCE_THRESHOLD:
-            return RouteDecision(
-                mode=VoiceMode.RESEARCH,
-                confidence=round(research_confidence, 4),
-                reason=f"Research confidence {research_confidence:.2f} >= threshold {CONFIDENCE_THRESHOLD}",
-                matched_keywords=tuple(research_matches[:5]),
-                timestamp=datetime.now(timezone.utc).isoformat(),
-            )
-        elif security_confidence >= CONFIDENCE_THRESHOLD:
-            return RouteDecision(
-                mode=VoiceMode.SECURITY,
-                confidence=round(security_confidence, 4),
-                reason=f"Security confidence {security_confidence:.2f} >= threshold {CONFIDENCE_THRESHOLD}",
-                matched_keywords=tuple(security_matches[:5]),
-                timestamp=datetime.now(timezone.utc).isoformat(),
-            )
-        elif max(research_confidence, security_confidence) < LOW_CONFIDENCE_THRESHOLD:
-            # Both below 0.6 — route to RESEARCH for knowledge expansion
-            return RouteDecision(
-                mode=VoiceMode.RESEARCH,
-                confidence=round(max(research_confidence, 0.3), 4),
-                reason=f"Low confidence ({max(research_confidence, security_confidence):.2f} < {LOW_CONFIDENCE_THRESHOLD}), routing to Research",
-                matched_keywords=tuple((research_matches + security_matches)[:5]),
-                timestamp=datetime.now(timezone.utc).isoformat(),
-            )
-        else:
-            # Ambiguous (0.6-0.75) — ask clarification
             return RouteDecision(
                 mode=VoiceMode.CLARIFICATION,
                 confidence=round(max(security_confidence, research_confidence), 4),
                 reason=f"Ambiguous ({max(security_confidence, research_confidence):.2f}). Did you mean a security operation or a research question?",
                 matched_keywords=tuple((security_matches + research_matches)[:5]),
+                timestamp=datetime.now(timezone.utc).isoformat(),
+            )
+        except Exception as exc:
+            logger.warning(
+                "QueryRouter fallback routed unrouted query to clarification: %s (%s: %s)",
+                sanitized_text,
+                type(exc).__name__,
+                exc,
+            )
+            return RouteDecision(
+                mode=VoiceMode.CLARIFICATION,
+                confidence=0.0,
+                reason=f"Router fallback after {type(exc).__name__}",
+                matched_keywords=(),
                 timestamp=datetime.now(timezone.utc).isoformat(),
             )
 

@@ -156,6 +156,14 @@ class TestMeasurementCompleteness(unittest.TestCase):
         ratio = get_measurement_completeness({}, [])
         self.assertAlmostEqual(ratio, 1.0)
 
+    def test_empty_fields_updates_completeness_gauge(self):
+        from backend.observability.metrics import metrics_registry, get_measurement_completeness
+
+        metrics_registry.reset()
+        ratio = get_measurement_completeness({}, [])
+        self.assertAlmostEqual(ratio, 1.0)
+        self.assertEqual(metrics_registry.get_gauge("measurement_completeness_ratio"), 1.0)
+
     def test_null_metric_ratio(self):
         from backend.observability.metrics import get_null_metric_ratio
         data = {"a": 1, "b": None, "c": None}
@@ -167,6 +175,14 @@ class TestMeasurementCompleteness(unittest.TestCase):
         data = {"a": 1, "b": 2}
         ratio = get_null_metric_ratio(data, ["a", "b"])
         self.assertAlmostEqual(ratio, 0.0)
+
+    def test_empty_metric_fields_updates_null_ratio_gauge(self):
+        from backend.observability.metrics import metrics_registry, get_null_metric_ratio
+
+        metrics_registry.reset()
+        ratio = get_null_metric_ratio({}, [])
+        self.assertAlmostEqual(ratio, 0.0)
+        self.assertEqual(metrics_registry.get_gauge("null_metric_ratio"), 0.0)
 
 
 if __name__ == "__main__":

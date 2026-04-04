@@ -15,7 +15,6 @@
 #include <string>
 #include <vector>
 
-
 // =============================================================================
 // GPU INFO STRUCTURE
 // =============================================================================
@@ -51,8 +50,8 @@ static void detect_gpus() {
 
   /*
    * In production: uses cudaGetDeviceCount() + cudaGetDeviceProperties().
-   * This stub provides the interface for Python ctypes binding.
-   * Actual CUDA calls are enabled when compiled with nvcc.
+   * This interface is hard-disabled unless compiled with CUDA support.
+   * No mock or stub GPU distribution path is permitted.
    */
 
 #ifdef __CUDACC__

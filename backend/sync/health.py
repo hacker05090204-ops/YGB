@@ -223,5 +223,9 @@ def fire_alerts(alerts: List[dict]):
         from backend.sync.gdrive_backup import GDRIVE_ENABLED
         # Could integrate with existing email_alerts here
         # For now, alerts are logged (visible in dashboard)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(
+            "Non-critical failure while preparing sync alerts: %s",
+            exc,
+            exc_info=True,
+        )

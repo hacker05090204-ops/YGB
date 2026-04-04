@@ -8,6 +8,7 @@ SLO tracking: 99.5% ingest success, 99.9% job execution.
 """
 
 import asyncio
+from dataclasses import asdict, dataclass, field, replace
 import logging
 import os
 import time
@@ -20,6 +21,22 @@ logger = logging.getLogger("ygb.cve_scheduler")
 _INGEST_INTERVAL = int(os.environ.get("CVE_INGEST_INTERVAL_SECONDS", "300"))
 _MAX_RETRIES = 3
 _BACKOFF_BASE = 30  # seconds
+
+
+@dataclass(frozen=True)
+class SourceCycleStats:
+    """Per-source scheduler stats for a single cycle."""
+
+    source_id: str
+    success: bool
+    no_delta: bool = False
+    records_seen: int = 0
+    records_ingested: int = 0
+    duplicates: int = 0
+    rejected: int = 0
+    attempts: int = 1
+    error: str = ""
+    rejection_reasons: Dict[str, int] = field(default_factory=dict)
 
 
 class CVEIngestScheduler:
@@ -42,6 +59,18 @@ class CVEIngestScheduler:
         self._total_runs: int = 0
         self._successful_runs: int = 0
         self._health_state: str = self.STATE_BOOTING
+        self._scheduler_stats: Dict[str, Any] = {
+            "cycles_completed": 0,
+            "sources_processed": 0,
+            "sources_succeeded": 0,
+            "sources_failed": 0,
+            "sources_no_delta": 0,
+            "records_seen": 0,
+            "records_ingested": 0,
+            "duplicates": 0,
+            "rejected": 0,
+        }
+        self._last_cycle_stats: Optional[Dict[str, Any]] = None
 
     @property
     def interval_seconds(self) -> int:
@@ -77,6 +106,10 @@ class CVEIngestScheduler:
             ),
             "slo_target_job": 0.999,
             "slo_target_ingest": 0.995,
+            "scheduler_stats": {
+                **self._scheduler_stats,
+                "last_cycle": self._last_cycle_stats,
+            },
         }
 
     async def start(self):
@@ -132,6 +165,24 @@ class CVEIngestScheduler:
         self._total_runs += 1
         self._last_run_at = datetime.now(timezone.utc).isoformat()
         cycle_success = True
+        cycle_started = time.monotonic()
+        cycle_stats: Dict[str, Any] = {
+            "cycle": self._total_runs,
+            "started_at": self._last_run_at,
+            "finished_at": None,
+            "duration_ms": 0.0,
+            "sources_attempted": 0,
+            "sources_skipped_circuit": 0,
+            "sources_not_configured": 0,
+            "sources_succeeded": 0,
+            "sources_failed": 0,
+            "sources_no_delta": 0,
+            "records_seen": 0,
+            "records_ingested": 0,
+            "duplicates": 0,
+            "rejected": 0,
+            "per_source": [],
+        }
 
         logger.info(
             f"[CVE_SCHEDULER] Ingest cycle #{self._total_runs} starting"
@@ -143,17 +194,30 @@ class CVEIngestScheduler:
                     f"[CVE_SCHEDULER] Skipping {source_id} "
                     f"(circuit breaker open)"
                 )
+                cycle_stats["sources_skipped_circuit"] += 1
                 continue
 
             status = pipeline._source_status.get(source_id)
             from backend.cve.cve_pipeline import SourceStatus
             if status == SourceStatus.NOT_CONFIGURED:
+                cycle_stats["sources_not_configured"] += 1
                 continue
 
-            success = await self._fetch_source_with_retry(
+            cycle_stats["sources_attempted"] += 1
+            source_stats = await self._fetch_source_with_retry(
                 pipeline, source_id
             )
-            if not success:
+            cycle_stats["per_source"].append(asdict(source_stats))
+            cycle_stats["records_seen"] += source_stats.records_seen
+            cycle_stats["records_ingested"] += source_stats.records_ingested
+            cycle_stats["duplicates"] += source_stats.duplicates
+            cycle_stats["rejected"] += source_stats.rejected
+            if source_stats.no_delta:
+                cycle_stats["sources_no_delta"] += 1
+            if source_stats.success or source_stats.no_delta:
+                cycle_stats["sources_succeeded"] += 1
+            else:
+                cycle_stats["sources_failed"] += 1
                 cycle_success = False
 
         pipeline.record_job_execution(cycle_success)
@@ -168,6 +232,21 @@ class CVEIngestScheduler:
             f"[CVE_SCHEDULER] Cycle #{self._total_runs} complete "
             f"(success={cycle_success})"
         )
+
+        cycle_stats["finished_at"] = datetime.now(timezone.utc).isoformat()
+        cycle_stats["duration_ms"] = round(
+            (time.monotonic() - cycle_started) * 1000, 2
+        )
+        self._last_cycle_stats = cycle_stats
+        self._scheduler_stats["cycles_completed"] += 1
+        self._scheduler_stats["sources_processed"] += cycle_stats["sources_attempted"]
+        self._scheduler_stats["sources_succeeded"] += cycle_stats["sources_succeeded"]
+        self._scheduler_stats["sources_failed"] += cycle_stats["sources_failed"]
+        self._scheduler_stats["sources_no_delta"] += cycle_stats["sources_no_delta"]
+        self._scheduler_stats["records_seen"] += cycle_stats["records_seen"]
+        self._scheduler_stats["records_ingested"] += cycle_stats["records_ingested"]
+        self._scheduler_stats["duplicates"] += cycle_stats["duplicates"]
+        self._scheduler_stats["rejected"] += cycle_stats["rejected"]
 
         # Stream new records to training bridge
         try:
@@ -184,37 +263,51 @@ class CVEIngestScheduler:
 
     async def _fetch_source_with_retry(
         self, pipeline, source_id: str
-    ) -> bool:
+    ) -> SourceCycleStats:
         """Fetch from a single source with retry/backoff."""
+        last_result = SourceCycleStats(
+            source_id=source_id,
+            success=False,
+            error="fetch_not_attempted",
+        )
         for attempt in range(1, _MAX_RETRIES + 1):
-            try:
-                result = await self._fetch_source(pipeline, source_id)
+            result = replace(
+                await self._fetch_source(pipeline, source_id),
+                attempts=attempt,
+            )
+            if result.success or result.no_delta:
                 return result
-            except Exception as e:
+
+            last_result = result
+            if attempt < _MAX_RETRIES:
                 backoff = _BACKOFF_BASE * (2 ** (attempt - 1))
                 logger.warning(
                     f"[CVE_SCHEDULER] {source_id} attempt {attempt}/"
-                    f"{_MAX_RETRIES} failed: {e}. "
+                    f"{_MAX_RETRIES} failed: {result.error}. "
                     f"Backoff {backoff}s"
                 )
-                if attempt < _MAX_RETRIES:
-                    await asyncio.sleep(backoff)
+                await asyncio.sleep(backoff)
 
-        pipeline.mark_source_error(
+        failure_message = last_result.error or f"All {_MAX_RETRIES} retries exhausted"
+        pipeline.mark_source_error(source_id, failure_message)
+        pipeline.record_stage_result(
             source_id,
-            f"All {_MAX_RETRIES} retries exhausted",
+            "FETCH",
+            "ERROR",
+            message=failure_message,
         )
-        return False
+        return last_result
 
     async def _fetch_source(self, pipeline, source_id: str) -> bool:
         """Fetch actual data from a source. Returns True on success."""
         try:
             import httpx
         except ImportError:
-            pipeline.mark_source_error(
-                source_id, "httpx not installed"
+            return SourceCycleStats(
+                source_id=source_id,
+                success=False,
+                error="httpx not installed",
             )
-            return False
 
         from backend.cve.cve_pipeline import _SOURCE_CONFIGS
         cfg = _SOURCE_CONFIGS[source_id]
@@ -243,10 +336,20 @@ class CVEIngestScheduler:
                 # 304 Not Modified → NO_DELTA
                 if resp.status_code == 304:
                     pipeline.mark_source_no_delta(source_id)
+                    pipeline.record_stage_result(
+                        source_id,
+                        "FETCH",
+                        "NO_DELTA",
+                        message="HTTP 304",
+                    )
                     logger.info(
                         f"[CVE_SCHEDULER] {source_id}: NO_DELTA (304)"
                     )
-                    return True
+                    return SourceCycleStats(
+                        source_id=source_id,
+                        success=True,
+                        no_delta=True,
+                    )
 
                 resp.raise_for_status()
 
@@ -255,40 +358,84 @@ class CVEIngestScheduler:
                 last_mod = resp.headers.get("Last-Modified", "")
 
                 data = resp.json()
-                records_ingested = self._parse_and_ingest(
+                ingest_stats = self._parse_and_ingest(
                     pipeline, source_id, data
                 )
 
                 pipeline.mark_source_success(
-                    source_id, records_ingested,
+                    source_id, ingest_stats["records_ingested"],
                     etag=etag,
                     last_modified_header=last_mod,
                 )
-                return True
+                pipeline.record_stage_result(
+                    source_id,
+                    "FETCH",
+                    "SUCCESS",
+                    records_seen=ingest_stats["records_seen"],
+                    records_ingested=ingest_stats["records_ingested"],
+                    duplicates=ingest_stats["duplicates"],
+                    rejected=ingest_stats["rejected"],
+                    rejection_reasons=ingest_stats["rejection_reasons"],
+                    message=f"HTTP {resp.status_code}",
+                )
+                return SourceCycleStats(
+                    source_id=source_id,
+                    success=True,
+                    records_seen=ingest_stats["records_seen"],
+                    records_ingested=ingest_stats["records_ingested"],
+                    duplicates=ingest_stats["duplicates"],
+                    rejected=ingest_stats["rejected"],
+                    rejection_reasons=ingest_stats["rejection_reasons"],
+                )
 
         except httpx.HTTPStatusError as e:
-            pipeline.mark_source_error(
-                source_id, f"HTTP {e.response.status_code}"
+            return SourceCycleStats(
+                source_id=source_id,
+                success=False,
+                error=f"HTTP {e.response.status_code}",
             )
-            return False
         except Exception as e:
             logger.error("[CVE_SCHEDULER] %s fetch error: %s", source_id, e)
-            pipeline.mark_source_error(source_id, f"Fetch failed: {type(e).__name__}")
-            return False
+            return SourceCycleStats(
+                source_id=source_id,
+                success=False,
+                error=f"Fetch failed: {type(e).__name__}",
+            )
 
     def _parse_and_ingest(
         self, pipeline, source_id: str, data: Any
-    ) -> int:
-        """Parse API response and ingest records. Returns count."""
+    ) -> Dict[str, Any]:
+        """Parse API response and ingest records. Returns stage stats."""
         from backend.cve.cve_pipeline import IngestResult
-        count = 0
+        stats: Dict[str, Any] = {
+            "records_seen": 0,
+            "records_ingested": 0,
+            "duplicates": 0,
+            "rejected": 0,
+            "rejection_reasons": {},
+        }
+
+        def reject(reason: str, payload: Any):
+            stats["rejected"] += 1
+            stats["rejection_reasons"][reason] = (
+                stats["rejection_reasons"].get(reason, 0) + 1
+            )
+            pipeline.record_rejection(source_id, reason, payload)
+
+        def count_result(result: IngestResult):
+            if result == IngestResult.DUPLICATE:
+                stats["duplicates"] += 1
+            elif result in (IngestResult.NEW, IngestResult.UPDATED):
+                stats["records_ingested"] += 1
 
         # Handle different source formats
         if source_id == "cisa_kev":
             vulns = data.get("vulnerabilities", [])
             for v in vulns:
+                stats["records_seen"] += 1
                 cve_id = v.get("cveID", "")
                 if not cve_id:
+                    reject("missing_cve_id", v)
                     continue
                 record, result = pipeline.ingest_record(
                     cve_id=cve_id,
@@ -305,16 +452,27 @@ class CVEIngestScheduler:
                     source_id=source_id,
                     raw_data=json.dumps(v),
                 )
-                if result != IngestResult.DUPLICATE:
-                    count += 1
+                count_result(result)
 
         elif source_id in ("nvd", "cve_services"):
             vulns = data.get("vulnerabilities", data.get("cveRecords", []))
             if isinstance(vulns, list):
                 for item in vulns:
+                    stats["records_seen"] += 1
                     cve_data = item.get("cve", item)
                     cve_id = cve_data.get("id", cve_data.get("cveId", ""))
                     if not cve_id:
+                        reject("missing_cve_id", item)
+                        continue
+
+                    vuln_status = str(
+                        cve_data.get("vulnStatus") or cve_data.get("state") or ""
+                    ).upper()
+                    if "REJECT" in vuln_status:
+                        reject(
+                            "rejected_status",
+                            {"cve_id": cve_id, "status": vuln_status},
+                        )
                         continue
 
                     # Extract CVSS
@@ -349,8 +507,7 @@ class CVEIngestScheduler:
                         raw_data=json.dumps(item),
                         last_modified=cve_data.get("lastModified", ""),
                     )
-                    if result != IngestResult.DUPLICATE:
-                        count += 1
+                    count_result(result)
 
         else:
             # Generic: try to extract from list
@@ -359,11 +516,23 @@ class CVEIngestScheduler:
             )
             if isinstance(items, list):
                 for item in items:
+                    stats["records_seen"] += 1
                     cve_id = (
                         item.get("cve_id") or item.get("id") or
                         item.get("cveId", "")
                     )
                     if not cve_id:
+                        reject("missing_cve_id", item)
+                        continue
+
+                    item_status = str(
+                        item.get("status") or item.get("vulnStatus") or ""
+                    ).upper()
+                    if "REJECT" in item_status:
+                        reject(
+                            "rejected_status",
+                            {"cve_id": cve_id, "status": item_status},
+                        )
                         continue
                     record, result = pipeline.ingest_record(
                         cve_id=cve_id,
@@ -381,10 +550,19 @@ class CVEIngestScheduler:
                         source_id=source_id,
                         raw_data=json.dumps(item),
                     )
-                    if result != IngestResult.DUPLICATE:
-                        count += 1
+                    count_result(result)
 
-        return count
+        pipeline.record_stage_result(
+            source_id,
+            "PARSE_INGEST",
+            "SUCCESS" if stats["records_seen"] or stats["rejected"] else "EMPTY",
+            records_seen=stats["records_seen"],
+            records_ingested=stats["records_ingested"],
+            duplicates=stats["duplicates"],
+            rejected=stats["rejected"],
+            rejection_reasons=stats["rejection_reasons"],
+        )
+        return stats
 
 
 # =============================================================================

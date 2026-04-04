@@ -7,7 +7,7 @@ import json
 import logging
 import os
 import time
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from aiolimiter import AsyncLimiter
@@ -25,7 +25,7 @@ from backend.ingestion.adapters import (
 )
 from backend.ingestion.dedup import DedupIndex
 from backend.ingestion.models import IngestedSample, sample_to_dict
-from backend.ingestion.normalizer import normalize_batch
+from backend.ingestion.normalizer import normalize_batch_with_report
 from backend.observability.metrics import metrics_registry
 
 logger = logging.getLogger("ygb.ingestion.async_ingestor")
@@ -37,6 +37,11 @@ class IngestCycleResult:
     dupes_found: int
     duration_ms: float
     errors: int
+    normalized_count: int = 0
+    normalization_cache_hits: int = 0
+    backpressure_events: int = 0
+    max_pending_depth: int = 0
+    normalization_reports: tuple[dict[str, object], ...] = ()
 
 
 class AsyncIngestor:
@@ -50,6 +55,14 @@ class AsyncIngestor:
         self.semaphore = asyncio.Semaphore(10)
         self.limiter = AsyncLimiter(2, 1)
         self.dedup = DedupIndex(dedup_index_path)
+        self.max_pending_samples = max(
+            1,
+            int(os.environ.get("INGEST_MAX_PENDING_SAMPLES", "500")),
+        )
+        self.max_normalize_batch = max(
+            1,
+            int(os.environ.get("INGEST_MAX_NORMALIZE_BATCH", "250")),
+        )
         self.adapters = adapters or [
             HackerOneAdapter(self.semaphore, self.limiter),
             NVDAdapter(self.semaphore, self.limiter),
@@ -81,6 +94,11 @@ class AsyncIngestor:
         new_count = 0
         dupes_found = 0
         errors = 0
+        normalized_count = 0
+        normalization_cache_hits = 0
+        backpressure_events = 0
+        max_pending_depth = 0
+        normalization_reports: list[dict[str, object]] = []
         try:
             results = await asyncio.gather(*(adapter.fetch() for adapter in self.adapters), return_exceptions=True)
             for adapter, result in zip(self.adapters, results):
@@ -106,12 +124,66 @@ class AsyncIngestor:
                     self.dedup.mark_seen(sample.sha256_hash, source=source)
                     unique_samples.append(sample)
 
-                normalized_samples = normalize_batch(unique_samples)
-                for sample in normalized_samples:
-                    self._write_sample(sample)
-                    new_count += 1
-                if normalized_samples:
-                    metrics_registry.increment(f"ingest_new_count_{metric_key}", len(normalized_samples))
+                max_pending_depth = max(max_pending_depth, len(unique_samples))
+                chunks = [
+                    unique_samples[index:index + self.max_pending_samples]
+                    for index in range(0, len(unique_samples), self.max_pending_samples)
+                ] or [[]]
+                source_backpressure = len(unique_samples) > self.max_pending_samples
+
+                for chunk_index, chunk in enumerate(chunks, start=1):
+                    if not chunk:
+                        continue
+                    normalized_samples, normalization_report = normalize_batch_with_report(
+                        chunk,
+                        batch_limit=self.max_normalize_batch,
+                    )
+                    normalized_count += normalization_report.emitted
+                    normalization_cache_hits += normalization_report.cache_hits
+                    source_backpressure = (
+                        source_backpressure or normalization_report.backpressure_applied
+                    )
+                    normalization_reports.append(
+                        {
+                            "source": source,
+                            "chunk_index": chunk_index,
+                            **asdict(normalization_report),
+                        }
+                    )
+                    metrics_registry.increment(
+                        "ingest_normalization_cache_hits",
+                        normalization_report.cache_hits,
+                    )
+                    metrics_registry.increment(
+                        f"ingest_normalization_cache_hits_{metric_key}",
+                        normalization_report.cache_hits,
+                    )
+                    metrics_registry.increment(
+                        "ingest_normalized_count",
+                        normalization_report.emitted,
+                    )
+                    for sample in normalized_samples:
+                        self._write_sample(sample)
+                        new_count += 1
+
+                if source_backpressure:
+                    backpressure_events += 1
+                    logger.warning(
+                        "ingest_backpressure_applied",
+                        extra={
+                            "event": "ingest_backpressure_applied",
+                            "source": source,
+                            "pending": len(unique_samples),
+                            "chunks": len([chunk for chunk in chunks if chunk]),
+                        },
+                    )
+                    metrics_registry.increment("ingest_backpressure_events")
+                    metrics_registry.increment(
+                        f"ingest_backpressure_events_{metric_key}"
+                    )
+
+                if unique_samples:
+                    metrics_registry.increment(f"ingest_new_count_{metric_key}", len(unique_samples))
 
             self.dedup.save()
             duration_ms = (time.monotonic() - start_time) * 1000
@@ -120,6 +192,7 @@ class AsyncIngestor:
             metrics_registry.increment("ingest_new_count", new_count)
             metrics_registry.increment("ingest_errors_count", errors)
             metrics_registry.set_gauge("duplicate_rate", duplicate_rate)
+            metrics_registry.set_gauge("ingest_max_pending_depth", max_pending_depth)
             metrics_registry.record("ingest_duration_ms", duration_ms)
 
             return IngestCycleResult(
@@ -127,6 +200,11 @@ class AsyncIngestor:
                 dupes_found=dupes_found,
                 duration_ms=duration_ms,
                 errors=errors,
+                normalized_count=normalized_count,
+                normalization_cache_hits=normalization_cache_hits,
+                backpressure_events=backpressure_events,
+                max_pending_depth=max_pending_depth,
+                normalization_reports=tuple(normalization_reports),
             )
         finally:
             self.dedup.close()

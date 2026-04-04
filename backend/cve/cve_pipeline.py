@@ -173,6 +173,7 @@ class SLOCounter:
     total_ingests: int = 0
     successful_ingests: int = 0
     no_delta_ingests: int = 0
+    rejected_records: int = 0
 
     @property
     def job_success_rate(self) -> float:
@@ -185,6 +186,23 @@ class SLOCounter:
         if self.total_ingests == 0:
             return 1.0
         return (self.successful_ingests + self.no_delta_ingests) / self.total_ingests
+
+
+@dataclass
+class StageResult:
+    """Reported result for an ingest stage."""
+    source_id: str
+    stage: str
+    outcome: str
+    records_seen: int = 0
+    records_ingested: int = 0
+    duplicates: int = 0
+    rejected: int = 0
+    rejection_reasons: Dict[str, int] = field(default_factory=dict)
+    message: str = ""
+    timestamp: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
 
 # =============================================================================
@@ -282,6 +300,8 @@ class CVEPipeline:
         self._circuit_breakers: Dict[str, CircuitBreaker] = {}
         self._slo: SLOCounter = SLOCounter()
         self._merge_log: List[Dict[str, Any]] = []
+        self._stage_results: List[Dict[str, Any]] = []
+        self._rejection_log: List[Dict[str, Any]] = []
         self._initialize_sources()
 
     def _initialize_sources(self):
@@ -376,6 +396,12 @@ class CVEPipeline:
                 "total_jobs": self._slo.total_jobs,
                 "successful_jobs": self._slo.successful_jobs,
                 "no_delta_count": self._slo.no_delta_ingests,
+                "rejected_records": self._slo.rejected_records,
+            },
+            "stage_results": self.get_stage_results(limit=10),
+            "strict_rejections": {
+                "total": self._slo.rejected_records,
+                "recent": self.get_rejection_log(limit=10),
             },
             "sources": self.get_source_status(),
             "checked_at": datetime.now(timezone.utc).isoformat(),
@@ -384,6 +410,87 @@ class CVEPipeline:
     def get_slo(self) -> SLOCounter:
         """Get SLO counters."""
         return self._slo
+
+    def record_stage_result(
+        self,
+        source_id: str,
+        stage: str,
+        outcome: str,
+        records_seen: int = 0,
+        records_ingested: int = 0,
+        duplicates: int = 0,
+        rejected: int = 0,
+        rejection_reasons: Optional[Dict[str, int]] = None,
+        message: str = "",
+    ):
+        """Persist stage-level results for scheduler and operator visibility."""
+        payload = asdict(
+            StageResult(
+                source_id=source_id,
+                stage=stage,
+                outcome=outcome,
+                records_seen=records_seen,
+                records_ingested=records_ingested,
+                duplicates=duplicates,
+                rejected=rejected,
+                rejection_reasons=dict(rejection_reasons or {}),
+                message=message,
+            )
+        )
+        self._stage_results.append(payload)
+        self._stage_results = self._stage_results[-100:]
+        logger.info(
+            "[CVE_STAGE] %s/%s outcome=%s seen=%s ingested=%s dup=%s rejected=%s",
+            source_id,
+            stage,
+            outcome,
+            records_seen,
+            records_ingested,
+            duplicates,
+            rejected,
+        )
+
+    def get_stage_results(self, limit: int = 20) -> List[Dict[str, Any]]:
+        """Return the most recent stage result events."""
+        if limit <= 0:
+            return []
+        return list(self._stage_results[-limit:])
+
+    def record_rejection(
+        self,
+        source_id: str,
+        reason: str,
+        payload: Optional[Any] = None,
+    ):
+        """Record a strict rejection with a compact payload preview."""
+        preview = ""
+        if payload is not None:
+            try:
+                preview = json.dumps(payload, sort_keys=True, default=str)[:400]
+            except Exception:
+                preview = str(payload)[:400]
+
+        entry = {
+            "source_id": source_id,
+            "reason": reason,
+            "payload_preview": preview,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        self._rejection_log.append(entry)
+        self._rejection_log = self._rejection_log[-100:]
+        self._slo.rejected_records += 1
+        logger.warning(
+            "[CVE_REJECTION] %s reason=%s payload=%s",
+            source_id,
+            reason,
+            preview,
+        )
+
+    def get_rejection_log(self, limit: int = 20) -> List[Dict[str, Any]]:
+        """Return the most recent rejection log entries."""
+        if limit <= 0:
+            return []
+        return list(self._rejection_log[-limit:])
 
     # ─── Circuit Breaker ─────────────────────────────────────────────
 

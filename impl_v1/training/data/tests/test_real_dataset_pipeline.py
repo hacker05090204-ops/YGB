@@ -13,6 +13,7 @@ Validates:
 import pytest
 import sys
 import os
+import errno
 import hashlib
 import json
 
@@ -332,6 +333,63 @@ class TestRealDatasetPipeline:
         manifest = json.loads((secure_data / "dataset_manifest.json").read_text(encoding="utf-8"))
         assert manifest["tensor_hash"] == metadata["tensor_hash"]
         assert manifest["sample_count"] == 2
+
+    def test_dataset_integrity_guard_accepts_parseable_finite_manifest(self, tmp_path):
+        from impl_v1.training.data.real_dataset_loader import DatasetIntegrityGuard
+
+        manifest_path = tmp_path / "dataset_manifest.json"
+        manifest_path.write_text(
+            json.dumps({"dataset_source": "INGESTION_PIPELINE", "sample_count": 10}),
+            encoding="utf-8",
+        )
+
+        result = DatasetIntegrityGuard().verify(manifest_path)
+
+        assert result.exists is True
+        assert result.parseable is True
+        assert result.finite is True
+        assert result.size_bytes > 0
+        assert result.issues == ()
+
+    def test_dataset_integrity_guard_rejects_non_finite_json_values(self, tmp_path):
+        from impl_v1.training.data.real_dataset_loader import (
+            DatasetIntegrityError,
+            DatasetIntegrityGuard,
+        )
+
+        manifest_path = tmp_path / "dataset_manifest.json"
+        manifest_path.write_text('{"sample_count": NaN}', encoding="utf-8")
+
+        with pytest.raises(DatasetIntegrityError, match="NaN"):
+            DatasetIntegrityGuard().verify(manifest_path)
+
+    def test_dataset_integrity_guard_retries_transient_io_errors(self, monkeypatch, tmp_path):
+        import builtins
+        import impl_v1.training.data.real_dataset_loader as rdl
+
+        manifest_path = tmp_path / "dataset_manifest.json"
+        manifest_path.write_text(json.dumps({"sample_count": 10}), encoding="utf-8")
+
+        attempts = {"count": 0}
+        sleeps = []
+        real_open = builtins.open
+
+        def _flaky_open(path, *args, **kwargs):
+            if os.fspath(path) == os.fspath(manifest_path) and attempts["count"] < 2:
+                attempts["count"] += 1
+                err = BlockingIOError("temporary dataset lock")
+                err.errno = errno.EAGAIN
+                raise err
+            return real_open(path, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "open", _flaky_open)
+        monkeypatch.setattr(rdl.time, "sleep", lambda seconds: sleeps.append(seconds))
+
+        result = rdl.DatasetIntegrityGuard().verify(manifest_path)
+
+        assert result.parseable is True
+        assert attempts["count"] == 2
+        assert sleeps == [0.5, 0.5]
 
 
 if __name__ == "__main__":

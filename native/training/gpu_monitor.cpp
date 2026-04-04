@@ -66,7 +66,7 @@ static void query_cuda_memory() {
 }
 
 // =============================================================================
-// NVML GPU UTILIZATION (stub — links with NVML when available)
+// NVML GPU UTILIZATION (hard-disabled unless NVML support is compiled in)
 // =============================================================================
 
 static void query_nvml_utilization() {
@@ -100,6 +100,8 @@ static void query_nvml_utilization() {
   }
 #else
   g_metrics.gpu_util_percent = 0.0;
+  std::fprintf(stderr, "[GPU_MON] ABORT: NVML monitoring unavailable; fallback "
+                       "telemetry is disabled\n");
 #endif
 }
 

@@ -409,15 +409,9 @@ class TestPrepareTrainingBatch:
 
 class TestSimulateGpuTraining:
     """Tests for simulate_gpu_training function."""
-    
-    @pytest.fixture(autouse=True)
-    def set_mock_training_env(self):
-        """Set YGB_ALLOW_MOCK_TRAINING=1 for these tests."""
+
+    def test_always_blocked_even_with_env_flag(self):
         os.environ["YGB_ALLOW_MOCK_TRAINING"] = "1"
-        yield
-        os.environ.pop("YGB_ALLOW_MOCK_TRAINING", None)
-    
-    def test_returns_training_result(self):
         batch = prepare_training_batch(
             (("b1", "h1", "REAL"),),
             tuple(),
@@ -431,14 +425,11 @@ class TestSimulateGpuTraining:
             gpu_memory_limit_mb=4096,
             internet_allowed=True,
         )
-        
-        result = simulate_gpu_training(batch, config, TrainingMode.IDLE)
-        
-        assert result.result_id.startswith("TRR-")
-        assert result.mode == TrainingMode.IDLE
-        assert result.is_mock is True  # Mock in Python
-    
-    def test_result_shows_mock_flag(self):
+        with pytest.raises(RuntimeError, match="UNSUPPORTED"):
+            simulate_gpu_training(batch, config, TrainingMode.IDLE)
+        os.environ.pop("YGB_ALLOW_MOCK_TRAINING", None)
+
+    def test_blocked_in_auto_mode(self):
         batch = prepare_training_batch(tuple(), tuple())
         config = GPUTrainingConfig(
             config_id="cfg1", model_name="test",
@@ -446,9 +437,8 @@ class TestSimulateGpuTraining:
             epochs=1, gpu_memory_limit_mb=4096,
             internet_allowed=True,
         )
-        
-        result = simulate_gpu_training(batch, config, TrainingMode.AUTO)
-        assert result.is_mock is True
+        with pytest.raises(RuntimeError, match="UNSUPPORTED"):
+            simulate_gpu_training(batch, config, TrainingMode.AUTO)
 
 
 class TestSimulateGpuTrainingBlocked:
@@ -466,7 +456,7 @@ class TestSimulateGpuTrainingBlocked:
             internet_allowed=True,
         )
         
-        with pytest.raises(RuntimeError, match="BLOCKED"):
+        with pytest.raises(RuntimeError, match="UNSUPPORTED"):
             simulate_gpu_training(batch, config, TrainingMode.IDLE)
 
 

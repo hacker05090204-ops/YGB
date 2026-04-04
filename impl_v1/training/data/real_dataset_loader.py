@@ -625,12 +625,14 @@ def validate_dataset_integrity(
 # =============================================================================
 
 import ctypes
+import errno
 import hashlib
 import json
 import os
 import logging
 import math
 import tempfile
+import time
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
@@ -647,6 +649,188 @@ except ImportError:
     SAFETENSORS_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class DatasetIntegrityResult:
+    """Structured result for on-disk dataset integrity verification."""
+
+    path: str
+    exists: bool
+    size_bytes: int
+    parseable: bool
+    finite: bool
+    retries: int
+    issues: Tuple[str, ...] = ()
+
+
+class DatasetIntegrityError(RuntimeError):
+    """Raised when a real dataset artifact fails integrity verification."""
+
+    def __init__(self, result: DatasetIntegrityResult):
+        self.result = result
+        issue_text = "; ".join(result.issues) if result.issues else "dataset integrity failure"
+        super().__init__(f"DATASET_INTEGRITY_ERROR: {result.path}: {issue_text}")
+
+
+class DatasetIntegrityGuard:
+    """Verify persisted real dataset artifacts without any synthetic fallback."""
+
+    _TRANSIENT_ERRNOS = frozenset(
+        value
+        for value in (
+            errno.EAGAIN,
+            errno.EBUSY,
+            errno.EINTR,
+            getattr(errno, "ETIMEDOUT", None),
+            getattr(errno, "EWOULDBLOCK", None),
+            getattr(errno, "ESTALE", None),
+        )
+        if value is not None
+    )
+
+    def __init__(self, retries: int = 3, backoff_seconds: float = 0.5):
+        self.retries = int(retries)
+        self.backoff_seconds = float(backoff_seconds)
+
+    @staticmethod
+    def _json_parse_constant(value: str):
+        raise ValueError(f"non-finite JSON constant {value}")
+
+    @classmethod
+    def _is_transient_io_error(cls, exc: BaseException) -> bool:
+        if isinstance(exc, (BlockingIOError, InterruptedError, TimeoutError)):
+            return True
+        if not isinstance(exc, OSError):
+            return False
+        return exc.errno in cls._TRANSIENT_ERRNOS
+
+    def _collect_nonfinite_issues(self, payload: Any, prefix: str = "root") -> Tuple[str, ...]:
+        issues = []
+        if isinstance(payload, dict):
+            for key, value in payload.items():
+                issues.extend(self._collect_nonfinite_issues(value, f"{prefix}.{key}"))
+            return tuple(issues)
+        if isinstance(payload, (list, tuple)):
+            for idx, value in enumerate(payload):
+                issues.extend(self._collect_nonfinite_issues(value, f"{prefix}[{idx}]"))
+            return tuple(issues)
+        if isinstance(payload, torch.Tensor):
+            if payload.is_floating_point() or payload.is_complex():
+                if not torch.isfinite(payload).all():
+                    issues.append(f"{prefix} contains NaN/Inf values")
+            return tuple(issues)
+        if isinstance(payload, np.ndarray):
+            if payload.dtype.kind in {"f", "c"}:
+                if not np.isfinite(payload).all():
+                    issues.append(f"{prefix} contains NaN/Inf values")
+            return tuple(issues)
+        if isinstance(payload, (float, np.floating)) and not math.isfinite(float(payload)):
+            issues.append(f"{prefix} contains NaN/Inf values")
+        return tuple(issues)
+
+    def _load_payload(self, target: Path) -> Any:
+        suffix = target.suffix.lower()
+        if suffix == ".json":
+            with open(target, "r", encoding="utf-8") as handle:
+                return json.load(handle, parse_constant=self._json_parse_constant)
+        if suffix == ".npy":
+            return np.load(target, allow_pickle=False)
+        if suffix == ".npz":
+            with np.load(target, allow_pickle=False) as payload:
+                return {key: payload[key] for key in payload.files}
+        if suffix == ".safetensors":
+            if load_safetensors_file is None:
+                raise ValueError("safetensors parser unavailable")
+            return load_safetensors_file(str(target))
+        if suffix in {".pt", ".pth"}:
+            return torch.load(str(target), map_location="cpu")
+        raise ValueError(f"unsupported dataset format {suffix or '<none>'}")
+
+    def _verify_once(self, target: Path, retries_used: int) -> DatasetIntegrityResult:
+        issues = []
+        if not target.exists():
+            return DatasetIntegrityResult(
+                path=str(target),
+                exists=False,
+                size_bytes=0,
+                parseable=False,
+                finite=False,
+                retries=retries_used,
+                issues=("dataset path does not exist",),
+            )
+
+        size_bytes = int(target.stat().st_size)
+        if size_bytes <= 0:
+            return DatasetIntegrityResult(
+                path=str(target),
+                exists=True,
+                size_bytes=size_bytes,
+                parseable=False,
+                finite=False,
+                retries=retries_used,
+                issues=("dataset file is empty",),
+            )
+
+        try:
+            payload = self._load_payload(target)
+        except (json.JSONDecodeError, ValueError) as exc:
+            return DatasetIntegrityResult(
+                path=str(target),
+                exists=True,
+                size_bytes=size_bytes,
+                parseable=False,
+                finite=False,
+                retries=retries_used,
+                issues=(f"dataset parse failed: {exc}",),
+            )
+
+        issues.extend(self._collect_nonfinite_issues(payload))
+        return DatasetIntegrityResult(
+            path=str(target),
+            exists=True,
+            size_bytes=size_bytes,
+            parseable=True,
+            finite=not issues,
+            retries=retries_used,
+            issues=tuple(issues),
+        )
+
+    def verify(self, path: Any) -> DatasetIntegrityResult:
+        """Verify a real dataset artifact, retrying transient I/O failures only."""
+        target = Path(path)
+        for attempt in range(self.retries + 1):
+            try:
+                result = self._verify_once(target, retries_used=attempt)
+            except OSError as exc:
+                if attempt < self.retries and self._is_transient_io_error(exc):
+                    time.sleep(self.backoff_seconds)
+                    continue
+                failure = DatasetIntegrityResult(
+                    path=str(target),
+                    exists=target.exists(),
+                    size_bytes=int(target.stat().st_size) if target.exists() else 0,
+                    parseable=False,
+                    finite=False,
+                    retries=attempt,
+                    issues=(f"dataset I/O failed: {type(exc).__name__}: {exc}",),
+                )
+                raise DatasetIntegrityError(failure) from exc
+
+            if result.issues:
+                raise DatasetIntegrityError(result)
+            return result
+
+        failure = DatasetIntegrityResult(
+            path=str(target),
+            exists=target.exists(),
+            size_bytes=int(target.stat().st_size) if target.exists() else 0,
+            parseable=False,
+            finite=False,
+            retries=self.retries,
+            issues=("dataset integrity retry budget exhausted",),
+        )
+        raise DatasetIntegrityError(failure)
 
 # Paths
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
@@ -1943,6 +2127,11 @@ def verify_dataset(dataset: "IngestionPipelineDataset") -> Dict[str, Any]:
         raise RuntimeError(
             "REAL_DATA_REQUIRED: Dataset tensors contain non-finite values"
         )
+
+    try:
+        DatasetIntegrityGuard().verify(_VALIDATION_MANIFEST_PATH)
+    except DatasetIntegrityError as exc:
+        raise RuntimeError(f"REAL_DATA_REQUIRED: {exc}") from exc
 
     from impl_v1.training.safety.dataset_manifest import validate_manifest
     from impl_v1.training.data.quality_gates import check_duplicates

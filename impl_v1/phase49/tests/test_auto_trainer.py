@@ -13,6 +13,7 @@ Tests cover:
 import pytest
 import asyncio
 import time
+import hashlib
 import json
 import tempfile
 from unittest.mock import patch, MagicMock, AsyncMock
@@ -386,6 +387,62 @@ class TestStatus:
 
         assert ok is True
         assert "MANIFEST_FAST_PATH" in msg
+
+    @patch("impl_v1.training.data.real_dataset_loader.DatasetIntegrityGuard.verify")
+    def test_fast_validate_dataset_manifest_uses_dataset_integrity_guard(self, mock_verify):
+        from impl_v1.training.data.real_dataset_loader import DatasetIntegrityResult
+
+        trainer = AutoTrainer()
+        manifest = {
+            "dataset_source": "INGESTION_PIPELINE",
+            "strict_real_mode": True,
+            "training_mode": "PRODUCTION_REAL",
+            "sample_count": 125993,
+            "class_histogram": {"1": 57296, "0": 68697},
+            "signed_by": "signer",
+            "signature_hash": "sig",
+        }
+
+        mock_verify.return_value = DatasetIntegrityResult(
+            path="manifest.json",
+            exists=True,
+            size_bytes=128,
+            parseable=True,
+            finite=True,
+            retries=0,
+            issues=(),
+        )
+
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
+            json.dump(manifest, handle)
+            path = handle.name
+
+        try:
+            trainer._dataset_manifest_path = path
+            ok, _msg = trainer._fast_validate_dataset_manifest(125000)
+        finally:
+            import os
+
+            os.remove(path)
+
+        assert ok is True
+        mock_verify.assert_called_once_with(path)
+
+    def test_checkpoint_state_hash_uses_actual_tensor_bytes(self):
+        torch = pytest.importorskip("torch")
+        from impl_v1.phase49.runtime.auto_trainer import _checkpoint_state_hash
+
+        model = torch.nn.Linear(2, 1)
+        with torch.no_grad():
+            model.weight.copy_(torch.tensor([[1.0, 2.0]], dtype=torch.float32))
+            model.bias.copy_(torch.tensor([3.0], dtype=torch.float32))
+
+        digest = hashlib.sha256()
+        state = model.state_dict()
+        for name in sorted(state):
+            digest.update(state[name].detach().cpu().contiguous().numpy().tobytes())
+
+        assert _checkpoint_state_hash(model) == digest.hexdigest()
 
 
 class _DatasetLeaf:
@@ -782,6 +839,34 @@ class TestReportGeneration:
         
         # Report should have been called
         assert mock_report.called
+
+    @patch("impl_v1.phase49.runtime.auto_trainer.generate_training_report")
+    def test_generate_session_report_includes_benchmark_metrics(self, mock_report):
+        mock_report.return_value = {"summary": "/path/to/report.txt"}
+
+        trainer = AutoTrainer()
+        trainer._current_session = TrainingSession(
+            started_at="2025-01-01T00:00:00Z",
+            start_epoch=0,
+            gpu_used=True,
+        )
+        trainer._epoch = 2
+        trainer._last_loss = 0.12
+        trainer._last_precision_at_5 = 0.81
+        trainer._last_precision_at_10 = 0.87
+        trainer._last_mrr = 0.73
+        trainer._last_f1 = 0.78
+
+        trainer._generate_session_report()
+
+        kwargs = mock_report.call_args.kwargs
+        assert kwargs["benchmark_metrics"] == {
+            "loss": 0.12,
+            "precision_at_5": 0.81,
+            "precision_at_10": 0.87,
+            "mrr": 0.73,
+            "f1": 0.78,
+        }
     
     def test_generate_session_report_no_session(self):
         trainer = AutoTrainer()

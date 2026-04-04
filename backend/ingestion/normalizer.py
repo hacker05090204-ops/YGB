@@ -5,11 +5,12 @@ from __future__ import annotations
 import atexit
 import json
 import logging
+import os
 import sys
 import unicodedata
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from html.parser import HTMLParser
 from os import cpu_count
 from pathlib import Path
@@ -22,6 +23,21 @@ logger = logging.getLogger("ygb.ingestion.normalizer")
 NORMALIZED_ROOT = Path("data/normalized")
 _POOL: ProcessPoolExecutor | None = None
 _POOL_DISABLED = False
+
+
+@dataclass(frozen=True)
+class NormalizationReport:
+    """Structured normalization reporting for back-pressure visibility."""
+
+    requested: int
+    cache_hits: int
+    cache_misses: int
+    normalized: int
+    emitted: int
+    used_process_pool: bool
+    pool_disabled: bool
+    backpressure_applied: bool
+    chunk_count: int
 
 
 class _HTMLStripper(HTMLParser):
@@ -119,34 +135,88 @@ def _normalize_pending(raw_texts: list[str]) -> list[str]:
         return [normalize_text(raw_text) for raw_text in raw_texts]
 
 
-def normalize_batch(samples: list[IngestedSample]) -> list[IngestedSample]:
+def _resolve_batch_limit(batch_limit: int) -> int:
+    if batch_limit > 0:
+        return batch_limit
+    try:
+        configured = int(os.environ.get("INGEST_NORMALIZE_BATCH_LIMIT", "250"))
+    except ValueError:
+        configured = 250
+    return max(1, configured)
+
+
+def normalize_batch_with_report(
+    samples: list[IngestedSample],
+    batch_limit: int = 0,
+) -> tuple[list[IngestedSample], NormalizationReport]:
+    """Normalize a batch with cache and back-pressure reporting."""
     if not samples:
-        return []
+        return [], NormalizationReport(
+            requested=0,
+            cache_hits=0,
+            cache_misses=0,
+            normalized=0,
+            emitted=0,
+            used_process_pool=False,
+            pool_disabled=_POOL_DISABLED,
+            backpressure_applied=False,
+            chunk_count=0,
+        )
 
     results: list[IngestedSample | None] = [None] * len(samples)
     pending: list[tuple[int, IngestedSample]] = []
+    cache_hits = 0
     for index, sample in enumerate(samples):
         cached = _load_cache(sample)
         if cached is None:
             pending.append((index, sample))
         else:
+            cache_hits += 1
             results[index] = cached
+
+    batch_size = _resolve_batch_limit(batch_limit)
+    chunk_count = 0
+    backpressure_applied = len(pending) > batch_size
+    used_process_pool = bool(pending) and not _POOL_DISABLED and _main_module_supports_spawn()
 
     if pending:
         if can_ai_execute()[0]:
             raise RuntimeError("GUARD")
-        normalized_texts = _normalize_pending([sample.raw_text for _, sample in pending])
-        for (index, sample), normalized_text in zip(pending, normalized_texts):
-            updated = replace(
-                sample,
-                raw_text=normalized_text,
-                token_count=len(normalized_text.split()),
-                lang=detect_language(normalized_text),
-            )
-            _write_cache(updated)
-            results[index] = updated
 
-    return [sample for sample in results if sample is not None]
+        for start in range(0, len(pending), batch_size):
+            chunk = pending[start:start + batch_size]
+            chunk_count += 1
+            normalized_texts = _normalize_pending(
+                [sample.raw_text for _, sample in chunk]
+            )
+            for (index, sample), normalized_text in zip(chunk, normalized_texts):
+                updated = replace(
+                    sample,
+                    raw_text=normalized_text,
+                    token_count=len(normalized_text.split()),
+                    lang=detect_language(normalized_text),
+                )
+                _write_cache(updated)
+                results[index] = updated
+
+    normalized_samples = [sample for sample in results if sample is not None]
+    report = NormalizationReport(
+        requested=len(samples),
+        cache_hits=cache_hits,
+        cache_misses=len(pending),
+        normalized=len(pending),
+        emitted=len(normalized_samples),
+        used_process_pool=used_process_pool and not _POOL_DISABLED,
+        pool_disabled=_POOL_DISABLED,
+        backpressure_applied=backpressure_applied,
+        chunk_count=chunk_count or (1 if pending else 0),
+    )
+    return normalized_samples, report
+
+
+def normalize_batch(samples: list[IngestedSample]) -> list[IngestedSample]:
+    normalized_samples, _ = normalize_batch_with_report(samples)
+    return normalized_samples
 
 
 MODULE_SHA256 = log_module_sha256(__file__, logger, __name__)

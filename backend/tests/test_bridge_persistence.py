@@ -116,6 +116,25 @@ class TestBridgeStatePersistence:
         assert loaded[0]["endpoint"] == "CVE-2024-0"
         assert loaded[99]["endpoint"] == "CVE-2024-99"
 
+    def test_flush_samples_persists_sample_metadata(self):
+        state = self._make_state()
+        state.append_sample({"endpoint": "CVE-2024-1"})
+        state.flush_samples()
+
+        reloaded = self._make_state()
+        assert reloaded.get_sample_count() == 1
+        assert reloaded._state["samples_path"] == str(self._samples_path)
+
+    def test_record_drop_and_dedup_persist(self):
+        state = self._make_state()
+        state.record_drop(3)
+        state.record_dedup(2)
+
+        reloaded = self._make_state()
+        counts = reloaded.get_counts()
+        assert counts["total_dropped"] == 3
+        assert counts["total_deduped"] == 2
+
 
 class TestReadinessTruth:
     """Readiness must be NO_GO when bridge counters are below threshold."""

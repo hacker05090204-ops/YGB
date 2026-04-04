@@ -9,7 +9,7 @@ run in parallel via ThreadPoolExecutor.
 import logging
 import os
 import time
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+from concurrent.futures import ThreadPoolExecutor, wait
 from typing import Any, Callable, Dict, List, NamedTuple, Optional
 
 logger = logging.getLogger("ygb.reliability.dependency_checker")
@@ -128,6 +128,19 @@ _BUILTIN_CHECKS: List[Callable[[], CheckResult]] = [
 ]
 
 
+def _emit_check_metrics(result: CheckResult, *, timed_out: bool = False) -> None:
+    try:
+        from backend.observability.metrics import metrics_registry
+
+        metrics_registry.record("dependency_latency_ms", float(result.latency_ms))
+        if timed_out:
+            metrics_registry.increment("timeout_count")
+        elif not result.ok:
+            metrics_registry.increment("error_count")
+    except Exception:
+        logger.debug("Failed to emit dependency-check metrics", exc_info=True)
+
+
 def register_external_check(url: str, timeout: float = 2.0) -> None:
     """Add an external URL check to the readiness suite."""
     _BUILTIN_CHECKS.append(lambda: _check_external_url(url, timeout))
@@ -147,43 +160,63 @@ def run_all_checks(
         }
     """
     check_fns = checks if checks is not None else list(_BUILTIN_CHECKS)
-    results: List[CheckResult] = []
+    if not check_fns:
+        return {
+            "ready": True,
+            "total_latency_ms": 0.0,
+            "checks": [],
+            "checked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+
+    results: List[Optional[CheckResult]] = [None] * len(check_fns)
     overall_start = time.monotonic()
 
-    with ThreadPoolExecutor(max_workers=len(check_fns) or 1) as pool:
-        futures = {pool.submit(fn): fn for fn in check_fns}
+    pool = ThreadPoolExecutor(max_workers=len(check_fns) or 1)
+    futures = {
+        pool.submit(fn): (idx, fn)
+        for idx, fn in enumerate(check_fns)
+    }
+    try:
+        done, not_done = wait(futures, timeout=timeout_per_check)
 
-        for future in futures:
-            fn = futures[future]
+        for future in done:
+            idx, fn = futures[future]
             fn_name = getattr(fn, "__name__", str(fn))
             try:
-                result = future.result(timeout=timeout_per_check)
-                results.append(result)
-            except FuturesTimeout:
-                elapsed = (time.monotonic() - overall_start) * 1000
-                results.append(
-                    CheckResult(fn_name, False, round(elapsed, 2), "TIMEOUT")
-                )
-                logger.warning("Readiness check '%s' timed out after %.1fs", fn_name, timeout_per_check)
+                result = future.result()
             except Exception as exc:
                 elapsed = (time.monotonic() - overall_start) * 1000
-                results.append(
-                    CheckResult(fn_name, False, round(elapsed, 2), type(exc).__name__)
-                )
+                result = CheckResult(fn_name, False, round(elapsed, 2), type(exc).__name__)
                 logger.error("Readiness check '%s' raised: %s", fn_name, exc)
+            results[idx] = result
+            _emit_check_metrics(result)
+
+        for future in not_done:
+            idx, fn = futures[future]
+            fn_name = getattr(fn, "__name__", str(fn))
+            elapsed = (time.monotonic() - overall_start) * 1000
+            result = CheckResult(fn_name, False, round(elapsed, 2), "TIMEOUT")
+            results[idx] = result
+            future.cancel()
+            _emit_check_metrics(result, timed_out=True)
+            logger.warning("Readiness check '%s' timed out after %.1fs", fn_name, timeout_per_check)
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
 
     total_latency = round((time.monotonic() - overall_start) * 1000, 2)
-    all_ok = all(r.ok for r in results)
+    complete_results = [r for r in results if r is not None]
+    all_ok = all(r.ok for r in complete_results)
 
     if not all_ok:
-        failed = [r.name for r in results if not r.ok]
+        failed = [r.name for r in complete_results if not r.ok]
         logger.warning(
             "Readiness FAILED — %d/%d checks failing: %s (%.1fms total)",
-            len(failed), len(results), ", ".join(failed), total_latency,
+            len(failed), len(complete_results), ", ".join(failed), total_latency,
         )
 
     return {
         "ready": all_ok,
         "total_latency_ms": total_latency,
-        "checks": [r._asdict() for r in results],
+        "checks": [r._asdict() for r in complete_results],
+        "checked_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }

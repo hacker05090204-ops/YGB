@@ -531,30 +531,12 @@ def simulate_gpu_training(
     """
     BLOCKED — real training uses g37_pytorch_backend.py.
 
-    This stub exists only for interface compatibility. It returns a
-    deterministic mock result only when YGB_ALLOW_MOCK_TRAINING=1.
-    Otherwise it raises RuntimeError in production to prevent accidental use.
+    This interface remains present for compatibility only.
+    Production must use a real backend, not a simulated training path.
     """
-    if os.environ.get("YGB_ALLOW_MOCK_TRAINING") == "1":
-        total_items = max(batch.total_items, 1)
-        epochs_completed = max(int(config.epochs), 1)
-        loss_final = round(1.0 / total_items, 4)
-        accuracy_estimate = round(min(0.99, 0.5 + (0.02 * total_items)), 4)
-        gpu_time_seconds = round(max(0.1, total_items * 0.05 * epochs_completed), 4)
-        training_flags = {"is" + "_mock": True}
-        return TrainingResult(
-            result_id=_generate_id("TRR"),
-            mode=mode,
-            epochs_completed=epochs_completed,
-            loss_final=loss_final,
-            accuracy_estimate=accuracy_estimate,
-            gpu_time_seconds=gpu_time_seconds,
-            **training_flags,
-        )
-
     raise RuntimeError(
-        "BLOCKED: simulate_gpu_training() is retired. "
-        "Real training runs through g37_pytorch_backend or the C++ GPU kernel."
+        "UNSUPPORTED: simulate_gpu_training() is retired. "
+        "Real training must run through g37_pytorch_backend or a native GPU kernel."
     )
 
 
@@ -600,4 +582,3 @@ def can_training_access_credentials() -> Tuple[bool, str]:
     ALWAYS returns (False, ...).
     """
     return False, "Training cannot access credentials - read-only data access"
-

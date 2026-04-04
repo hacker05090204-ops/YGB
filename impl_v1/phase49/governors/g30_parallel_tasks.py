@@ -25,6 +25,12 @@ from concurrent.futures import ThreadPoolExecutor, Future
 import threading
 
 
+_UNSUPPORTED_PARALLEL_EXECUTION_MESSAGE = (
+    "UNSUPPORTED: Real parallel task execution is not implemented; "
+    "mock or stub task execution is not allowed in production"
+)
+
+
 class TaskType(Enum):
     """CLOSED ENUM - Task types."""
     DISCOVERY = "DISCOVERY"
@@ -330,36 +336,10 @@ class ParallelTaskEngine:
             )
     
     def _run_task_logic(self, task: TaskSpec) -> Dict[str, Any]:
-        """Run task-specific logic (stub — real execution deferred to C++ backend)."""
-        # All operations are READ-ONLY
-        if task.task_type == TaskType.DISCOVERY:
-            return {
-                "discovered": True,
-                "endpoints_found": 5,
-                "target": task.target_url,
-            }
-        elif task.task_type == TaskType.SCOPE_SCAN:
-            domains = [v for k, v in task.parameters if k == "domain"]
-            return {
-                "in_scope": True,
-                "matched_domains": domains,
-            }
-        elif task.task_type == TaskType.CVE_LOOKUP:
-            cves = [v for k, v in task.parameters if k == "cve"]
-            return {
-                "cves_checked": len(cves),
-                "relevant": cves[:2] if cves else [],
-            }
-        elif task.task_type == TaskType.DUPLICATE_CHECK:
-            return {
-                "is_duplicate": False,
-            }
-        elif task.task_type == TaskType.METADATA_EXTRACT:
-            return {
-                "metadata": {"title": "Example", "tech": ["nginx"]},
-            }
-        
-        return {}  # pragma: no cover - fallback for unknown task types
+        """Reject stub execution until a real backend is wired."""
+        raise RuntimeError(
+            f"{_UNSUPPORTED_PARALLEL_EXECUTION_MESSAGE} (task_type={task.task_type.value})"
+        )
     
     def run_next(self) -> Optional[TaskResult]:
         """Run next task from queue synchronously."""

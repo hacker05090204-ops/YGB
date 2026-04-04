@@ -15,6 +15,7 @@ Cloud backup is async and NEVER blocks the main sync cycle.
 import json
 import logging
 import os
+import shutil
 import threading
 import time
 from pathlib import Path
@@ -35,6 +36,16 @@ GDRIVE_CREDS_PATH = os.getenv(
     "YGB_GDRIVE_CREDENTIALS_PATH",
     "C:/ygb_data/gdrive_service_account.json",
 )
+GDRIVE_REMOTE = os.getenv("YGB_GDRIVE_REMOTE", "ygb-gdrive:YGB_Backups/")
+GDRIVE_UPLOAD_RETRIES = max(1, int(os.getenv("YGB_GDRIVE_UPLOAD_RETRIES", "3")))
+GDRIVE_UPLOAD_BASE_DELAY_SECONDS = max(
+    0.5,
+    float(os.getenv("YGB_GDRIVE_UPLOAD_BASE_DELAY_SECONDS", "1")),
+)
+GDRIVE_SDK_CHUNK_BYTES = max(
+    256 * 1024,
+    int(float(os.getenv("YGB_GDRIVE_SDK_CHUNK_MB", "8")) * 1024 * 1024),
+)
 ENCRYPTION_KEY = os.getenv("YGB_BACKUP_ENCRYPTION_KEY", "")
 
 _upload_lock = threading.Lock()
@@ -43,6 +54,76 @@ _upload_lock = threading.Lock()
 def _ensure_dirs():
     for d in [STAGING_DIR, PENDING_DIR, UPLOADED_DIR]:
         d.mkdir(parents=True, exist_ok=True)
+
+
+def _pending_payload_files() -> list[Path]:
+    _ensure_dirs()
+    return sorted(
+        f for f in PENDING_DIR.iterdir()
+        if f.is_file() and f.suffix == ".enc"
+    )
+
+
+def _sidecar_for_payload(payload: Path) -> Path:
+    return PENDING_DIR / f"{payload.stem}.meta.json"
+
+
+def _move_uploaded_payload(payload: Path) -> None:
+    _ensure_dirs()
+    destination = UPLOADED_DIR / payload.name
+    payload.replace(destination)
+    sidecar = _sidecar_for_payload(payload)
+    if sidecar.exists():
+        sidecar.replace(UPLOADED_DIR / sidecar.name)
+
+
+def _sdk_available() -> bool:
+    try:
+        from google.oauth2 import service_account  # noqa: F401
+        from googleapiclient.discovery import build  # noqa: F401
+        from googleapiclient.http import MediaFileUpload  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _rclone_available() -> bool:
+    return shutil.which("rclone") is not None
+
+
+def _active_gdrive_client() -> str:
+    if _sdk_available() and Path(GDRIVE_CREDS_PATH).exists():
+        return "sdk"
+    if _rclone_available():
+        return "rclone"
+    return "none"
+
+
+def _call_with_retry(operation, *, label: str):
+    last_exc: Exception | None = None
+    for attempt in range(1, GDRIVE_UPLOAD_RETRIES + 1):
+        try:
+            return operation()
+        except Exception as exc:
+            last_exc = exc
+            if attempt >= GDRIVE_UPLOAD_RETRIES:
+                break
+            delay = min(
+                GDRIVE_UPLOAD_BASE_DELAY_SECONDS * (2 ** (attempt - 1)),
+                8.0,
+            )
+            logger.warning(
+                "%s failed on attempt %d/%d — retrying in %.1fs: %s",
+                label,
+                attempt,
+                GDRIVE_UPLOAD_RETRIES,
+                delay,
+                exc,
+            )
+            time.sleep(delay)
+    if last_exc is not None:
+        raise last_exc
+    raise RuntimeError(f"{label} failed without a captured exception")
 
 
 def _encrypt_data(data: bytes) -> bytes:
@@ -162,31 +243,35 @@ def upload_manifest_to_gdrive():
 def _upload_with_rclone() -> bool:
     """Upload pending files using rclone (simpler setup)."""
     import subprocess
-    try:
-        result = subprocess.run(
-            [
-                "rclone", "copy",
-                str(PENDING_DIR),
-                f"ygb-gdrive:YGB_Backups/",
-                "--progress",
-                "--transfers", "4",
-            ],
-            capture_output=True, text=True, timeout=600,
-        )
-        if result.returncode == 0:
-            # Move uploaded files to uploaded dir
-            for f in PENDING_DIR.iterdir():
-                if f.is_file():
-                    dest = UPLOADED_DIR / f.name
-                    f.replace(dest)
-            logger.info("rclone upload complete")
-            return True
-        else:
-            logger.error("rclone failed: %s", result.stderr[:500])
-            return False
-    except FileNotFoundError:
+    payloads = _pending_payload_files()
+    if not payloads:
+        return True
+    if not _rclone_available():
         logger.warning("rclone not installed — skipping cloud upload")
         return False
+    try:
+        def _run_copy():
+            result = subprocess.run(
+                [
+                    "rclone", "copy",
+                    str(PENDING_DIR),
+                    GDRIVE_REMOTE,
+                    "--include", "*.enc",
+                    "--progress",
+                    "--transfers", "4",
+                ],
+                capture_output=True, text=True, timeout=600,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(result.stderr[:500] or f"rclone exit {result.returncode}")
+            return result
+
+        _call_with_retry(_run_copy, label="rclone upload")
+        for payload in payloads:
+            if payload.exists():
+                _move_uploaded_payload(payload)
+        logger.info("rclone upload complete (%d files)", len(payloads))
+        return True
     except Exception as e:
         logger.error("rclone error: %s", e)
         return False
@@ -194,6 +279,9 @@ def _upload_with_rclone() -> bool:
 
 def _upload_with_sdk() -> bool:
     """Upload pending files using Google Drive Python SDK."""
+    payloads = _pending_payload_files()
+    if not payloads:
+        return True
     try:
         from google.oauth2 import service_account
         from googleapiclient.discovery import build
@@ -211,33 +299,61 @@ def _upload_with_sdk() -> bool:
             GDRIVE_CREDS_PATH,
             scopes=["https://www.googleapis.com/auth/drive.file"],
         )
-        service = build("drive", "v3", credentials=creds)
+        service = build("drive", "v3", credentials=creds, cache_discovery=False)
+
+        def _find_existing_file_id(name: str) -> Optional[str]:
+            safe_name = name.replace("'", "\\'")
+            query = f"name = '{safe_name}' and trashed = false"
+            if GDRIVE_FOLDER_ID:
+                query += f" and '{GDRIVE_FOLDER_ID}' in parents"
+            response = service.files().list(
+                q=query,
+                spaces="drive",
+                fields="files(id,name)",
+                pageSize=1,
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True,
+            ).execute()
+            matches = response.get("files", [])
+            if not matches:
+                return None
+            return str(matches[0].get("id", "") or "") or None
 
         uploaded = 0
-        for f in PENDING_DIR.iterdir():
-            if not f.is_file() or f.suffix == ".json":
-                continue  # Skip metadata sidecars — upload .enc files only
-            media = MediaFileUpload(str(f), resumable=True)
+        for f in payloads:
+            media = MediaFileUpload(
+                str(f),
+                resumable=True,
+                chunksize=GDRIVE_SDK_CHUNK_BYTES,
+            )
+            existing_id = _find_existing_file_id(f.name)
             file_metadata = {
                 "name": f.name,
                 "parents": [GDRIVE_FOLDER_ID] if GDRIVE_FOLDER_ID else [],
             }
-            service.files().create(
-                body=file_metadata,
-                media_body=media,
-                fields="id",
-            ).execute()
-            # Move to uploaded
-            dest = UPLOADED_DIR / f.name
-            f.replace(dest)
-            # Also move sidecar
-            sidecar = PENDING_DIR / f"{f.stem.replace('.enc', '')}.meta.json"
-            if sidecar.exists():
-                sidecar.replace(UPLOADED_DIR / sidecar.name)
+
+            def _upload_one():
+                if existing_id:
+                    return service.files().update(
+                        fileId=existing_id,
+                        media_body=media,
+                        fields="id",
+                        supportsAllDrives=True,
+                    ).execute()
+                return service.files().create(
+                    body=file_metadata,
+                    media_body=media,
+                    fields="id",
+                    supportsAllDrives=True,
+                ).execute()
+
+            _call_with_retry(_upload_one, label=f"gdrive sdk upload {f.name}")
+            if f.exists():
+                _move_uploaded_payload(f)
             uploaded += 1
 
         logger.info("GDrive SDK upload: %d files", uploaded)
-        return uploaded > 0
+        return uploaded == len(payloads)
     except Exception as e:
         logger.error("GDrive SDK upload failed: %s", e)
         return _upload_with_rclone()
@@ -246,7 +362,7 @@ def _upload_with_sdk() -> bool:
 def _upload_pending_files() -> bool:
     """Upload all pending files to Google Drive (tries SDK first, then rclone)."""
     with _upload_lock:
-        pending = list(PENDING_DIR.iterdir())
+        pending = _pending_payload_files()
         if not pending:
             return True
         logger.info("Uploading %d pending files to Google Drive...", len(pending))
@@ -264,8 +380,10 @@ def async_upload():
 def get_gdrive_status() -> dict:
     """Return current GDrive backup status."""
     _ensure_dirs()
-    pending = len(list(PENDING_DIR.iterdir())) if PENDING_DIR.exists() else 0
-    uploaded = len(list(UPLOADED_DIR.iterdir())) if UPLOADED_DIR.exists() else 0
+    pending = len(_pending_payload_files()) if PENDING_DIR.exists() else 0
+    uploaded = len(
+        [f for f in UPLOADED_DIR.iterdir() if f.is_file() and f.suffix == ".enc"]
+    ) if UPLOADED_DIR.exists() else 0
     return {
         "enabled": GDRIVE_ENABLED,
         "credentials_found": Path(GDRIVE_CREDS_PATH).exists(),
@@ -273,4 +391,7 @@ def get_gdrive_status() -> dict:
         "pending_files": pending,
         "uploaded_files": uploaded,
         "encryption_configured": bool(ENCRYPTION_KEY),
+        "sdk_available": _sdk_available(),
+        "rclone_available": _rclone_available(),
+        "active_client": _active_gdrive_client(),
     }

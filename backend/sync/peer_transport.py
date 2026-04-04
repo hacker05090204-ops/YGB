@@ -15,6 +15,9 @@ Endpoints added to the main YGB server:
 import json
 import logging
 import os
+import asyncio
+import threading
+from enum import Enum
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -54,6 +57,55 @@ SYNC_META = SYNC_ROOT / "ygb_sync"
 MANIFEST_PATH = SYNC_META / "manifest.json"
 PEER_STATE = SYNC_META / "peer_state"
 DEVICE_ID = _get_env("YGB_DEVICE_ID", "laptop_a")
+PEER_RETRY_BUDGET = max(1, int(_get_env("YGB_PEER_RETRY_BUDGET", "3")))
+PEER_BACKOFF_BASE_SECONDS = max(
+    0.0,
+    float(_get_env("YGB_PEER_BACKOFF_BASE_SECONDS", "1")),
+)
+PEER_BACKOFF_MAX_SECONDS = max(
+    PEER_BACKOFF_BASE_SECONDS,
+    float(_get_env("YGB_PEER_BACKOFF_MAX_SECONDS", "4")),
+)
+_PEER_STATUSES: dict[str, "PeerStatus"] = {}
+
+
+class PeerStatus(Enum):
+    REACHABLE = "REACHABLE"
+    UNREACHABLE = "UNREACHABLE"
+    DEGRADED = "DEGRADED"
+
+
+def _set_peer_status(peer_name: str, status: "PeerStatus") -> None:
+    _PEER_STATUSES[peer_name] = status
+
+
+def get_peer_statuses() -> dict[str, "PeerStatus"]:
+    return dict(_PEER_STATUSES)
+
+
+async def _async_backoff_sleep(delay_seconds: float) -> None:
+    await asyncio.sleep(delay_seconds)
+
+
+def _run_async_backoff_sleep(delay_seconds: float) -> None:
+    if delay_seconds <= 0:
+        return
+    try:
+        asyncio.run(_async_backoff_sleep(delay_seconds))
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        try:
+            loop.run_until_complete(_async_backoff_sleep(delay_seconds))
+        finally:
+            loop.close()
+
+
+def _peer_status_from_health(health_status: str) -> "PeerStatus":
+    if health_status == "ONLINE":
+        return PeerStatus.REACHABLE
+    if health_status == "ERROR":
+        return PeerStatus.DEGRADED
+    return PeerStatus.UNREACHABLE
 
 
 def _parse_peers() -> List[Dict[str, str]]:
@@ -87,6 +139,9 @@ def get_peers() -> List[Dict]:
     peers = _parse_peers()
     for peer in peers:
         peer["status"] = check_peer_health(peer["url"])
+        peer_status = _peer_status_from_health(peer["status"])
+        peer["peer_status"] = peer_status.value
+        _set_peer_status(peer["name"], peer_status)
     return peers
 
 
@@ -159,6 +214,9 @@ def parallel_download_chunks(
     Round-robins chunks across available online peers.
     Returns {chunk_hash: data} for successfully downloaded chunks.
     """
+    if not chunk_hashes:
+        return {}
+
     online_peers = [p for p in peers if p.get("status") == "ONLINE"]
     if not online_peers:
         logger.warning("No online peers for parallel download")
@@ -166,13 +224,54 @@ def parallel_download_chunks(
 
     results: Dict[str, bytes] = {}
     worker_count = min(max_workers, len(online_peers), len(chunk_hashes))
+    retry_budget: dict[str, int] = {
+        peer["name"]: PEER_RETRY_BUDGET for peer in online_peers
+    }
+    retry_budget_lock = threading.Lock()
+
+    def _remaining_budget(peer_name: str) -> int:
+        with retry_budget_lock:
+            return retry_budget.get(peer_name, 0)
+
+    def _consume_budget(peer_name: str) -> int:
+        with retry_budget_lock:
+            remaining = max(0, retry_budget.get(peer_name, 0) - 1)
+            retry_budget[peer_name] = remaining
+            return remaining
+
+    def _update_status_from_budget(peer_name: str, remaining: int) -> None:
+        if remaining <= 0:
+            _set_peer_status(peer_name, PeerStatus.UNREACHABLE)
+        else:
+            _set_peer_status(peer_name, PeerStatus.DEGRADED)
+
+    def _download_with_retry(peer: Dict[str, str], chunk_hash: str) -> Optional[bytes]:
+        peer_name = peer["name"]
+        for attempt in range(1, PEER_RETRY_BUDGET + 1):
+            if _remaining_budget(peer_name) <= 0:
+                _set_peer_status(peer_name, PeerStatus.UNREACHABLE)
+                return None
+            data = fetch_chunk_from_peer(peer["url"], chunk_hash)
+            if data:
+                _set_peer_status(peer_name, PeerStatus.REACHABLE)
+                return data
+            remaining = _consume_budget(peer_name)
+            _update_status_from_budget(peer_name, remaining)
+            if remaining <= 0 or attempt >= PEER_RETRY_BUDGET:
+                break
+            delay = min(
+                PEER_BACKOFF_BASE_SECONDS * (2 ** (attempt - 1)),
+                PEER_BACKOFF_MAX_SECONDS,
+            )
+            _run_async_backoff_sleep(float(delay))
+        return None
 
     with ThreadPoolExecutor(max_workers=worker_count) as executor:
         futures = {}
         for i, ch in enumerate(chunk_hashes):
             peer = online_peers[i % len(online_peers)]
             future = executor.submit(
-                fetch_chunk_from_peer, peer["url"], ch,
+                _download_with_retry, peer, ch,
             )
             futures[future] = (ch, peer["name"])
 
@@ -182,10 +281,18 @@ def parallel_download_chunks(
                 data = future.result()
                 if data:
                     results[ch] = data
+                    _set_peer_status(peer_name, PeerStatus.REACHABLE)
                     logger.debug("Downloaded chunk %s from %s", ch[:12], peer_name)
                 else:
-                    logger.warning("Empty chunk %s from %s", ch[:12], peer_name)
+                    logger.warning(
+                        "Chunk %s unavailable from %s after retries (remaining budget=%d)",
+                        ch[:12],
+                        peer_name,
+                        _remaining_budget(peer_name),
+                    )
             except Exception as e:
+                remaining = _consume_budget(peer_name)
+                _update_status_from_budget(peer_name, remaining)
                 logger.warning("Download failed chunk %s from %s: %s", ch[:12], peer_name, e)
 
     logger.info(
@@ -229,8 +336,13 @@ def load_peer_manifest(peer_name: str) -> Optional[dict]:
     if path.exists():
         try:
             return json.loads(path.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "Failed to load cached peer manifest for %s: %s",
+                peer_name,
+                exc,
+                exc_info=True,
+            )
     return None
 
 
@@ -241,6 +353,9 @@ def discover_online_peers() -> List[Dict]:
     for peer in peers:
         status = check_peer_health(peer["url"], timeout=2.0)
         peer["status"] = status
+        peer_status = _peer_status_from_health(status)
+        peer["peer_status"] = peer_status.value
+        _set_peer_status(peer["name"], peer_status)
         if status == "ONLINE":
             online.append(peer)
     logger.info("Peer discovery: %d/%d online", len(online), len(peers))

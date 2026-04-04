@@ -61,8 +61,12 @@ async def readiness():
     try:
         from backend.observability.metrics import metrics_registry
         metrics_registry.record("readiness_latency_ms", total_ms)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(
+            "Non-critical failure while recording readiness latency: %s",
+            exc,
+            exc_info=True,
+        )
 
     status_code = 200 if result["ready"] else 503
     return JSONResponse(status_code=status_code, content=result)

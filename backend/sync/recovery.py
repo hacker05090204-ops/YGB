@@ -18,6 +18,8 @@ import logging
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -26,6 +28,120 @@ logger = logging.getLogger("ygb.sync.recovery")
 SYNC_ROOT = Path(os.getenv("YGB_SYNC_ROOT", "D:\\"))
 SYNC_META = SYNC_ROOT / "ygb_sync"
 DEVICE_ID = os.getenv("YGB_DEVICE_ID", "laptop_a")
+RECOVERY_LOG_PATH = SYNC_META / "recovery_log.json"
+RECOVERY_LOG_ROTATE_AT = max(1, int(os.getenv("YGB_RECOVERY_LOG_ROTATE_AT", "1000")))
+RECOVERY_LOG_RETAIN_EVENTS = max(1, int(os.getenv("YGB_RECOVERY_LOG_RETAIN_EVENTS", "500")))
+PEER_RECOVERY_NO_PEERS_REASON = "no_online_peers"
+PEER_RECOVERY_INCOMPLETE_REASON = "peer_recovery_incomplete"
+CLOUD_RECOVERY_UNAVAILABLE_REASON = "cloud_recovery_unavailable"
+CLOUD_RECOVERY_FAILED_REASON = "cloud_recovery_failed"
+
+
+@dataclass
+class RecoveryEvent:
+    timestamp: str
+    peer_id: str
+    reason: str
+    resolved: bool
+
+
+def _rotate_recovery_events(events: list[RecoveryEvent]) -> list[RecoveryEvent]:
+    if len(events) <= RECOVERY_LOG_ROTATE_AT:
+        return events
+
+    unresolved = [event for event in events if event.resolved is False]
+    resolved = [event for event in events if event.resolved is True]
+    keep_unresolved = unresolved[-RECOVERY_LOG_RETAIN_EVENTS:]
+    remaining_slots = max(0, RECOVERY_LOG_RETAIN_EVENTS - len(keep_unresolved))
+    keep_resolved = resolved[-remaining_slots:] if remaining_slots else []
+    rotated = keep_resolved + keep_unresolved
+    rotated.sort(key=lambda event: event.timestamp)
+    return rotated
+
+
+def _load_recovery_log() -> list[RecoveryEvent]:
+    if not RECOVERY_LOG_PATH.exists():
+        return []
+    try:
+        payload = json.loads(RECOVERY_LOG_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        logger.warning("Failed to load recovery log: %s", exc)
+        return []
+    if not isinstance(payload, list):
+        return []
+    events: list[RecoveryEvent] = []
+    for entry in payload:
+        if not isinstance(entry, dict):
+            continue
+        try:
+            events.append(RecoveryEvent(**entry))
+        except TypeError:
+            continue
+    return events
+
+
+def _persist_recovery_log(events: list[RecoveryEvent]) -> None:
+    SYNC_META.mkdir(parents=True, exist_ok=True)
+    events = _rotate_recovery_events(events)
+    temp_path = RECOVERY_LOG_PATH.with_suffix(".tmp")
+    temp_path.write_text(
+        json.dumps([asdict(event) for event in events], indent=2),
+        encoding="utf-8",
+    )
+    os.replace(temp_path, RECOVERY_LOG_PATH)
+
+
+def _append_recovery_event(
+    peer_id: str,
+    reason: str,
+    *,
+    resolved: bool,
+    dedupe_open_events: bool = True,
+) -> None:
+    events = _load_recovery_log()
+    if dedupe_open_events and not resolved:
+        for event in events:
+            if event.peer_id == peer_id and event.reason == reason and event.resolved is False:
+                return
+    events.append(
+        RecoveryEvent(
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            peer_id=peer_id,
+            reason=reason,
+            resolved=resolved,
+        )
+    )
+    _persist_recovery_log(events)
+
+
+def mark_recovery_events_resolved(peer_id: str, reason: Optional[str] = None) -> int:
+    events = _load_recovery_log()
+    updated = 0
+    for event in events:
+        if event.resolved:
+            continue
+        if event.peer_id != peer_id:
+            continue
+        if reason is not None and event.reason != reason:
+            continue
+        event.resolved = True
+        updated += 1
+    if updated:
+        _persist_recovery_log(events)
+    return updated
+
+
+def get_unresolved_events(
+    peer_id: Optional[str] = None,
+    reason: Optional[str] = None,
+) -> list[RecoveryEvent]:
+    events = [event for event in _load_recovery_log() if event.resolved is False]
+    if peer_id is not None:
+        events = [event for event in events if event.peer_id == peer_id]
+    if reason is not None:
+        events = [event for event in events if event.reason == reason]
+    events.sort(key=lambda event: event.timestamp)
+    return events
 
 
 # ── Priority Classification ──────────────────────────────────────────
@@ -75,6 +191,11 @@ def recover_from_peers(
     peers = discover_online_peers()
     if not peers:
         logger.warning("No online peers for recovery — try cloud")
+        _append_recovery_event(
+            "peer_mesh",
+            PEER_RECOVERY_NO_PEERS_REASON,
+            resolved=False,
+        )
         return {"recovered": 0, "failed": 0, "skipped": 0, "bytes_downloaded": 0}
 
     target_files = target_manifest.get("files", {})
@@ -122,6 +243,15 @@ def recover_from_peers(
         stats["recovered"], stats["failed"], stats["skipped"],
         stats["bytes_downloaded"] / 1e6,
     )
+    if stats["failed"] > 0:
+        _append_recovery_event(
+            "peer_mesh",
+            PEER_RECOVERY_INCOMPLETE_REASON,
+            resolved=False,
+        )
+    else:
+        mark_recovery_events_resolved("peer_mesh", PEER_RECOVERY_NO_PEERS_REASON)
+        mark_recovery_events_resolved("peer_mesh", PEER_RECOVERY_INCOMPLETE_REASON)
     return stats
 
 
@@ -139,6 +269,11 @@ def recover_from_cloud() -> dict:
 
     if not GDRIVE_ENABLED:
         logger.error("Google Drive not enabled — cannot do cloud recovery")
+        _append_recovery_event(
+            "gdrive",
+            CLOUD_RECOVERY_UNAVAILABLE_REASON,
+            resolved=False,
+        )
         return {"recovered": 0, "failed": 0, "error": "GDrive not enabled"}
 
     logger.info("═══ DISASTER RECOVERY FROM CLOUD ═══")
@@ -162,6 +297,11 @@ def recover_from_cloud() -> dict:
         )
         if result.returncode != 0:
             logger.error("rclone download failed: %s", result.stderr[:500])
+            _append_recovery_event(
+                "gdrive",
+                CLOUD_RECOVERY_FAILED_REASON,
+                resolved=False,
+            )
             return {"recovered": 0, "failed": 0, "error": "rclone failed"}
 
         # Find and decrypt manifest
@@ -177,6 +317,11 @@ def recover_from_cloud() -> dict:
             )
         else:
             logger.error("No manifest found in cloud backup")
+            _append_recovery_event(
+                "gdrive",
+                CLOUD_RECOVERY_FAILED_REASON,
+                resolved=False,
+            )
             return {"recovered": 0, "failed": 0, "error": "No manifest"}
 
         # Decrypt and restore each file
@@ -204,10 +349,24 @@ def recover_from_cloud() -> dict:
             "═══ Cloud recovery done: %d recovered, %d failed ═══",
             stats["recovered"], stats["failed"],
         )
+        if stats["failed"] > 0:
+            _append_recovery_event(
+                "gdrive",
+                CLOUD_RECOVERY_FAILED_REASON,
+                resolved=False,
+            )
+        else:
+            mark_recovery_events_resolved("gdrive", CLOUD_RECOVERY_UNAVAILABLE_REASON)
+            mark_recovery_events_resolved("gdrive", CLOUD_RECOVERY_FAILED_REASON)
         return stats
 
     except FileNotFoundError:
         logger.error("rclone not installed — cannot do cloud recovery")
+        _append_recovery_event(
+            "gdrive",
+            CLOUD_RECOVERY_UNAVAILABLE_REASON,
+            resolved=False,
+        )
         return {"recovered": 0, "failed": 0, "error": "rclone not found"}
 
 

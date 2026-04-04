@@ -16,7 +16,11 @@ from backend.observability.metrics import metrics_registry
 from backend.training import feature_extractor
 from backend.training.data_watcher import DataWatcher
 from backend.training.feature_extractor import build_vocabulary, extract as extract_features, get_text_embedding, load_vocabulary
-from backend.training.incremental_trainer import EpochResult, IncrementalTrainer
+from backend.training.incremental_trainer import (
+    EpochResult,
+    IncrementalTrainer,
+    _StreamingFeatureDataset,
+)
 from backend.training.state_manager import TrainingMetrics, TrainingPausedException, TrainingStateManager
 
 
@@ -273,6 +277,174 @@ def test_incremental_trainer_build_dataset_guard(monkeypatch, tmp_path):
 
     with pytest.raises(RuntimeError, match="GUARD"):
         trainer.build_dataset([_sample_with_time(index, positive=index % 2 == 0) for index in range(10)])
+
+
+def test_incremental_trainer_load_evaluation_samples_uses_dataset_index_cache(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    raw_root = tmp_path / "raw"
+    sample = _sample_with_time(7)
+    _write_sample(raw_root, sample)
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=raw_root,
+        num_workers=0,
+    )
+
+    samples, source = trainer.load_evaluation_samples(max_samples=10)
+    assert source == "data_raw"
+    assert len(samples) == 1
+    assert trainer.dataset_index_path.exists()
+
+    def _unexpected_read(*args, **kwargs):
+        raise AssertionError("raw sample file should not be re-read when dataset index cache is warm")
+
+    monkeypatch.setattr(Path, "read_text", _unexpected_read)
+    cached_samples, cached_source = trainer.load_evaluation_samples(max_samples=10)
+    assert cached_source == "data_raw"
+    assert len(cached_samples) == 1
+
+
+def test_incremental_trainer_rejects_invalid_legacy_bridge_row(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+
+    rows = [
+        {
+            "endpoint": "not-a-cve",
+            "parameters": "x",
+            "exploit_vector": "y",
+            "impact": "CVSS:9.0|HIGH",
+            "source_tag": "nvd",
+            "ingested_at": datetime.now(timezone.utc).isoformat(),
+            "sha256_hash": "a" * 64,
+        }
+    ]
+
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.get_bridge_state",
+        lambda: SimpleNamespace(read_samples=lambda max_samples=0: rows),
+    )
+
+    samples = trainer._load_bridge_samples(max_samples=10)
+    assert samples == []
+
+
+def test_incremental_trainer_normalizes_and_persists_feature_stats(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.extract",
+        lambda sample: torch.arange(512, dtype=torch.float32),
+    )
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    sample = _sample_with_time(11)
+
+    feature = trainer._load_or_compute_feature(sample)
+    stats_path = trainer._feature_stats_path(sample)
+
+    assert stats_path.exists()
+    payload = json.loads(stats_path.read_text(encoding="utf-8"))
+    assert payload["safe_std"] > 0.0
+    assert abs(float(feature.mean().item())) < 1e-3
+    assert 0.5 < float(feature.std(unbiased=False).item()) < 1.5
+
+
+def test_incremental_trainer_invalid_feature_counts_and_raises(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+    monkeypatch.setattr(
+        "backend.training.incremental_trainer.extract",
+        lambda sample: torch.zeros(512, dtype=torch.float32),
+    )
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    sample = _sample_with_time(12)
+    dataset = _StreamingFeatureDataset(trainer, [sample], [0])
+
+    with pytest.raises(RuntimeError, match="invalid feature tensor"):
+        _ = dataset[0]
+
+    assert trainer._invalid_sample_count == 1
+
+
+def test_incremental_trainer_benchmark_returns_metric_dict(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+    monkeypatch.setattr("backend.training.incremental_trainer.extract", _feature_vector)
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=tmp_path / "raw",
+        num_workers=0,
+    )
+    trainer.load_evaluation_samples = lambda max_samples=1500: (
+        [_sample_with_time(index, positive=index % 2 == 0) for index in range(20)],
+        "data_raw",
+    )
+
+    result = trainer.benchmark_current_model(max_samples=20)
+
+    for key in ("loss", "precision_at_5", "precision_at_10", "mrr", "f1"):
+        assert key in result
+        assert float(result[key]) >= 0.0
+
+
+def test_incremental_trainer_refresh_dataset_index_uses_invalidation_source(monkeypatch, tmp_path):
+    fake_state = FakeStateManager()
+    monkeypatch.setattr("backend.training.incremental_trainer.get_training_state_manager", lambda: fake_state)
+
+    raw_root = tmp_path / "raw"
+    source_dir = raw_root / "nvd"
+    source_dir.mkdir(parents=True, exist_ok=True)
+    sample_dir = source_dir / datetime.now(timezone.utc).date().isoformat()
+    sample_dir.mkdir(parents=True, exist_ok=True)
+    sample = _sample_with_time(21)
+    sample_path = sample_dir / f"{sample.sha256_hash}.json"
+    sample_path.write_text(json.dumps(sample_to_dict(sample), indent=2), encoding="utf-8")
+
+    trainer = IncrementalTrainer(
+        model_path=tmp_path / "checkpoints" / "model.safetensors",
+        state_path=tmp_path / "checkpoints" / "training_state.json",
+        baseline_path=tmp_path / "checkpoints" / "baseline_accuracy.json",
+        raw_data_root=raw_root,
+        num_workers=0,
+    )
+
+    class _SingleDirInvalidationSource:
+        def get_changed_dirs(self):
+            return {sample_dir}
+
+    indexed = trainer._refresh_dataset_index(
+        invalidation_source=_SingleDirInvalidationSource()
+    )
+    assert len(indexed) == 1
 
 
 def test_incremental_trainer_run_epoch_emits_metrics(monkeypatch, tmp_path):

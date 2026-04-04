@@ -217,6 +217,24 @@ def check_secrets() -> CheckResult:
         return CheckResult("secrets", True, "All required secrets ≥32 chars")
 
 
+def check_manifest_authority_key() -> CheckResult:
+    """Verify manifest signing authority is configured before runtime starts."""
+    authority_key = os.environ.get("YGB_AUTHORITY_KEY", "").strip()
+    if not authority_key:
+        return CheckResult(
+            "manifest_authority_key",
+            False,
+            "YGB_AUTHORITY_KEY missing — manifest signing unavailable",
+            critical=True,
+        )
+    return CheckResult(
+        "manifest_authority_key",
+        True,
+        "Manifest authority key configured",
+        critical=True,
+    )
+
+
 def check_boot_summary() -> CheckResult:
     """Generate boot summary showing ENABLED/DISABLED/BLOCKED per feature."""
     profile = os.environ.get("YGB_PROFILE", "PRIVACY")
@@ -302,6 +320,7 @@ def run_preflight() -> PreflightReport:
         check_drift_baseline(),
         check_scope_registry(),
         check_secrets(),
+        check_manifest_authority_key(),
         check_boot_summary(),
     ]
 

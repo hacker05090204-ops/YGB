@@ -5,8 +5,11 @@ import pytest
 from datetime import datetime, UTC
 
 from impl_v1.phase49.governors.g15_cve_api import (
+    CVEAPISourceRouter,
     CVEAPIConfig,
     CVEAPIResult,
+    CVESourceAuthError,
+    CVESourceTransportError,
     APIStatus,
     fetch_cves_passive,
     can_cve_trigger_execution,
@@ -18,6 +21,18 @@ from impl_v1.phase49.governors.g15_cve_api import (
 from impl_v1.phase49.governors.g07_cve_intelligence import (
     clear_cache as clear_cve_cache,
 )
+
+
+class FakeAdapter:
+    def __init__(self, payload=None, error=None, source_id="nvd"):
+        self._payload = payload or {"vulnerabilities": []}
+        self._error = error
+        self.source_id = source_id
+
+    def fetch(self, product, config):
+        if self._error is not None:
+            raise self._error
+        return self._payload
 
 
 class TestCVEAPIConfig:
@@ -97,56 +112,77 @@ class TestFetchCVEsPassive:
     
     def test_mock_response_connected(self):
         config = CVEAPIConfig(api_key="test-key-for-mock")
-        mock = {
+        payload = {
             "vulnerabilities": [
                 {
                     "cve": {
                         "id": "CVE-2024-1234",
-                        "descriptions": [{"value": "Test vuln"}],
+                        "descriptions": [{"lang": "en", "value": "Test vuln"}],
                         "metrics": {
                             "cvssMetricV31": [{"cvssData": {"baseScore": 9.8}}]
                         },
+                        "references": [{"url": "https://example.com/advisory"}],
                     }
                 }
             ]
         }
-        result = fetch_cves_passive("test", config=config, _mock_response=mock)
+        router = CVEAPISourceRouter(adapters=(FakeAdapter(payload=payload),))
+        result = fetch_cves_passive("test", config=config, source_router=router)
         assert result.status == APIStatus.CONNECTED
-    
+        assert result.source_id == "nvd"
+        assert "records_normalized:1" in result.signals
+
     def test_mock_response_has_records(self):
         config = CVEAPIConfig(api_key="test-key-for-mock")
-        mock = {
+        payload = {
             "vulnerabilities": [
                 {
                     "cve": {
                         "id": "CVE-2024-5678",
-                        "descriptions": [{"value": "Another vuln"}],
+                        "descriptions": [{"lang": "en", "value": "Another vuln"}],
                         "metrics": {
                             "cvssMetricV31": [{"cvssData": {"baseScore": 7.5}}]
                         },
+                        "configurations": [
+                            {
+                                "nodes": [
+                                    {
+                                        "cpeMatch": [
+                                            {"criteria": "cpe:2.3:a:apache:http_server:*:*:*:*:*:*:*:*"}
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
                     }
                 }
             ]
         }
-        result = fetch_cves_passive("test", config=config, _mock_response=mock)
+        router = CVEAPISourceRouter(adapters=(FakeAdapter(payload=payload),))
+        result = fetch_cves_passive("test", config=config, source_router=router)
         assert len(result.records) == 1
-    
+        assert "apache/http_server" in result.records[0].affected_products
+
     def test_mock_error_returns_offline(self):
         config = CVEAPIConfig(api_key="test-key-for-mock")
-        mock = {"error": "Connection refused"}
-        result = fetch_cves_passive("test", config=config, _mock_response=mock)
+        router = CVEAPISourceRouter(
+            adapters=(FakeAdapter(error=CVESourceTransportError("Connection refused")),)
+        )
+        result = fetch_cves_passive("test", config=config, source_router=router)
         assert result.status == APIStatus.OFFLINE
-    
+
     def test_mock_invalid_key_returns_invalid_key(self):
         config = CVEAPIConfig(api_key="test-key-for-mock")
-        mock = {"error": "Invalid API key"}
-        result = fetch_cves_passive("test", config=config, _mock_response=mock)
+        router = CVEAPISourceRouter(
+            adapters=(FakeAdapter(error=CVESourceAuthError("Invalid API key")),)
+        )
+        result = fetch_cves_passive("test", config=config, source_router=router)
         assert result.status == APIStatus.INVALID_KEY
-    
+
     def test_caching_works(self):
         config = CVEAPIConfig(api_key="test-key-for-mock")
-        mock = {"vulnerabilities": []}
-        result1 = fetch_cves_passive("cached-test", config=config, _mock_response=mock)
+        router = CVEAPISourceRouter(adapters=(FakeAdapter(payload={"vulnerabilities": []}),))
+        result1 = fetch_cves_passive("cached-test", config=config, source_router=router)
         result2 = fetch_cves_passive("cached-test", config=config)
         assert result2.from_cache == True
 

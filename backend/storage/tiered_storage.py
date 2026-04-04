@@ -472,6 +472,7 @@ _init_dirs()
 # ---------------------------------------------------------------------------
 
 _enforcement_thread: Optional[threading.Thread] = None
+_enforcement_stop_event = threading.Event()
 
 
 def start_enforcement_loop(interval_seconds: int = 300):
@@ -481,12 +482,17 @@ def start_enforcement_loop(interval_seconds: int = 300):
         logger.info("Enforcement loop already running")
         return
 
+    _enforcement_stop_event.clear()
+
     def _loop():
         logger.info("Storage enforcement loop started (every %ds)", interval_seconds)
         MAX_ITERATIONS = 100000  # Loop guard
         LOOP_TIMEOUT = 2592000  # 30 days
         _start = time.time()
         for _i in range(MAX_ITERATIONS):
+            if _enforcement_stop_event.is_set():
+                logger.info("Storage enforcement loop stopping on stop event")
+                break
             if time.time() - _start > LOOP_TIMEOUT:
                 logger.warning("Enforcement loop guard: timeout reached")
                 break
@@ -494,11 +500,25 @@ def start_enforcement_loop(interval_seconds: int = 300):
                 enforce_ssd_cap()
             except Exception:
                 logger.exception("Error in storage enforcement loop")
-            time.sleep(interval_seconds)
+            if _enforcement_stop_event.wait(interval_seconds):
+                logger.info("Storage enforcement loop stop event received during wait")
+                break
         logger.info("Enforcement loop ended after %d iterations", _i + 1)
 
     _enforcement_thread = threading.Thread(target=_loop, daemon=True, name="storage-enforcement")
     _enforcement_thread.start()
+
+
+def stop_enforcement_loop(join_timeout_seconds: float = 5.0) -> None:
+    """Signal the background storage enforcement loop to stop."""
+    global _enforcement_thread
+    _enforcement_stop_event.set()
+    if _enforcement_thread and _enforcement_thread.is_alive():
+        _enforcement_thread.join(timeout=join_timeout_seconds)
+        if _enforcement_thread.is_alive():
+            logger.warning("Storage enforcement loop did not stop within timeout")
+        else:
+            logger.info("Storage enforcement loop stopped")
 
 
 # ---------------------------------------------------------------------------

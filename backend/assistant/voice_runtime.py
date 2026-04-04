@@ -13,9 +13,11 @@ import html
 import json
 import logging
 import re
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
+from uuid import uuid4
 
 from backend.api.field_progression_api import get_active_progress
 from backend.api.runtime_api import get_runtime_status
@@ -32,6 +34,51 @@ from native.research_assistant.source_consensus import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class VoiceSession:
+    """Tracks an active voice/assistant runtime session."""
+
+    session_id: str
+    started_at: str
+    ended_at: Optional[str] = None
+    turn_count: int = 0
+    last_error: Optional[str] = None
+
+
+_active_sessions: Dict[str, VoiceSession] = {}
+
+
+def _utc_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _start_voice_session(turn_count: int = 1) -> VoiceSession:
+    session = VoiceSession(
+        session_id=f"VRT-{uuid4().hex[:12].upper()}",
+        started_at=_utc_timestamp(),
+        turn_count=max(0, turn_count),
+    )
+    _active_sessions[session.session_id] = session
+    return session
+
+
+def _close_voice_session(session_id: str, *, last_error: Optional[str] = None) -> None:
+    session = _active_sessions.get(session_id)
+    if session is None:
+        return
+    session.ended_at = _utc_timestamp()
+    session.last_error = last_error
+    _active_sessions.pop(session_id, None)
+
+
+def get_active_sessions() -> Dict[str, Dict[str, Any]]:
+    """Return a snapshot of currently active voice sessions."""
+    return {
+        session_id: asdict(session)
+        for session_id, session in _active_sessions.items()
+    }
 
 _SEARCH_ENGINE_DOMAINS = {
     "bing.com",
@@ -96,8 +143,12 @@ def probe_microphone_capabilities() -> Dict[str, Any]:
             local_capture_available = True
             local_capture_backend = "sounddevice"
             reason = "Local capture available via sounddevice"
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(
+            "Microphone probe via sounddevice failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
 
     if not local_capture_available:
         try:
@@ -117,8 +168,12 @@ def probe_microphone_capabilities() -> Dict[str, Any]:
                     reason = "Local capture available via PyAudio"
             finally:
                 audio.terminate()
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "Microphone probe via PyAudio failed: %s: %s",
+                type(exc).__name__,
+                exc,
+            )
 
     if not local_capture_available and browser_relay_available:
         reason = "Local capture unavailable; browser transcript relay remains available"
@@ -355,6 +410,11 @@ def build_voice_pipeline_status() -> Dict[str, Any]:
 
         host_governance = HostActionGovernor().status_snapshot(active_host_session)
     except Exception as exc:
+        logger.warning(
+            "Host governance status snapshot failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
         host_governance = {
             "ledger_entries": 0,
             "chain_valid": False,
@@ -367,6 +427,11 @@ def build_voice_pipeline_status() -> Dict[str, Any]:
 
         focus_status = TaskFocusManager().status_snapshot()
     except Exception as exc:
+        logger.warning(
+            "Task focus status snapshot failed: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
         focus_status = {
             "has_active_objective": False,
             "error": f"{type(exc).__name__}: {exc}",
@@ -398,160 +463,194 @@ def build_voice_pipeline_status() -> Dict[str, Any]:
     }
 
 
-def dispatch_supported_command(command_type: str, args: Dict[str, str], transcript_text: str) -> Dict[str, Any]:
+def dispatch_supported_command(
+    command_type: str,
+    args: Dict[str, str],
+    transcript_text: str,
+    *,
+    voice_session: Optional[VoiceSession] = None,
+) -> Dict[str, Any]:
     """Dispatch a supported assistant command and return a structured result."""
     query = command_type.upper()
+    owns_session = voice_session is None
+    session = voice_session or _start_voice_session()
+    session_error: Optional[str] = None
 
-    if query in {"QUERY_STATUS", "QUERY_PROGRESS", "QUERY_GPU", "QUERY_TRAINING", "LIST_DEVICES"}:
-        payload = collect_status_snapshot(query)
-        return {
-            "status": "ok",
-            "command_type": query,
-            "output": json.dumps(payload, indent=2, sort_keys=True, default=str),
-            "data": payload,
-        }
-
-    if query == "RESEARCH_QUERY":
-        return dispatch_supported_command(
-            "RESEARCH_QUERY_INTERNAL",
-            {"query": args.get("query") or transcript_text},
-            transcript_text,
-        )
-
-    if query == "RESEARCH_QUERY_INTERNAL":
-        return run_research_analysis(args.get("query") or transcript_text)
-
-    if query == "OBJECTIVE_STATUS":
-        from backend.assistant.task_focus import TaskFocusManager
-
-        payload = TaskFocusManager().status_snapshot()
-        return {
-            "status": "ok",
-            "command_type": query,
-            "output": json.dumps(payload, indent=2, sort_keys=True, default=str),
-            "data": payload,
-        }
-
-    if query == "SET_OBJECTIVE":
-        from backend.assistant.task_focus import TaskFocusManager
-
-        result = TaskFocusManager().start_objective(
-            title=args.get("title", ""),
-            requested_by=args.get("requested_by", "unknown"),
-            summary=args.get("summary", ""),
-            force_switch=str(args.get("force_switch", "")).strip().lower() in {"1", "true", "yes", "force"},
-        )
-        return {
-            "status": "ok" if result.get("status") == "ok" else result.get("status", "blocked").lower(),
-            "command_type": query,
-            "output": json.dumps(result, indent=2, sort_keys=True, default=str),
-            "data": result,
-            "message": result.get("message"),
-        }
-
-    if query == "COMPLETE_OBJECTIVE":
-        from backend.assistant.task_focus import TaskFocusManager
-
-        result = TaskFocusManager().complete_active_objective(args.get("summary", ""))
-        return {
-            "status": "ok" if result.get("status") == "ok" else result.get("status", "blocked").lower(),
-            "command_type": query,
-            "output": json.dumps(result, indent=2, sort_keys=True, default=str),
-            "data": result,
-            "message": result.get("message"),
-        }
-
-    if query in {"LAUNCH_APP", "OPEN_APP", "OPEN_URL", "RUN_APPROVED_TASK"}:
-        from impl_v1.training.voice.voice_executors import (
-            AppRunnerExecutor,
-            ApprovedTaskExecutor,
-            BrowserExecutor,
-            ExecStatus,
-        )
-
-        try:
-            from backend.governance.host_action_governor import HostActionGovernor
-
-            governor = HostActionGovernor()
-            approval = governor.validate_request(
-                args.get("host_session_id", ""),
-                query,
-                args,
-            )
-        except Exception as exc:
-            return {
-                "status": "blocked",
-                "message": f"Host governance unavailable: {type(exc).__name__}",
-                "command_type": query,
-            }
-        if not approval["allowed"]:
-            return {
-                "status": "blocked",
-                "message": approval["reason"],
-                "command_type": query,
-            }
-
-        intent_id = args.get("_intent_id", "INT-UNKNOWN")
-
-        if query in {"LAUNCH_APP", "OPEN_APP"}:
-            result = AppRunnerExecutor().execute(
-                intent_id,
-                "launch",
-                approval["canonical_app"],
-                launch_command=approval["command"],
-            )
-        elif query == "OPEN_URL":
-            result = BrowserExecutor().execute(
-                intent_id,
-                args.get("url", ""),
-                launch_command=approval["command"],
-            )
-        else:
-            result = ApprovedTaskExecutor().execute(
-                intent_id,
-                approval["canonical_task"],
-                command=approval["command"],
-                workdir=approval.get("cwd"),
-            )
-
-        if result.status == ExecStatus.SUCCESS:
+    try:
+        if query in {"QUERY_STATUS", "QUERY_PROGRESS", "QUERY_GPU", "QUERY_TRAINING", "LIST_DEVICES"}:
+            payload = collect_status_snapshot(query)
             return {
                 "status": "ok",
                 "command_type": query,
-                "output": result.output,
-                "executor": result.executor,
-                "audit_hash": result.audit_hash,
-                "execution_ms": result.execution_ms,
+                "output": json.dumps(payload, indent=2, sort_keys=True, default=str),
+                "data": payload,
             }
 
-        result_status = "blocked" if result.status == ExecStatus.BLOCKED else "failed"
-        return {
-            "status": result_status,
-            "command_type": query,
-            "message": result.output,
-            "executor": result.executor,
-            "audit_hash": result.audit_hash,
-        }
+        if query == "RESEARCH_QUERY":
+            return dispatch_supported_command(
+                "RESEARCH_QUERY_INTERNAL",
+                {"query": args.get("query") or transcript_text},
+                transcript_text,
+                voice_session=session,
+            )
 
-    if query in _GOVERNANCE_BLOCKED_COMMANDS:
+        if query == "RESEARCH_QUERY_INTERNAL":
+            return run_research_analysis(args.get("query") or transcript_text)
+
+        if query == "OBJECTIVE_STATUS":
+            from backend.assistant.task_focus import TaskFocusManager
+
+            payload = TaskFocusManager().status_snapshot()
+            return {
+                "status": "ok",
+                "command_type": query,
+                "output": json.dumps(payload, indent=2, sort_keys=True, default=str),
+                "data": payload,
+            }
+
+        if query == "SET_OBJECTIVE":
+            from backend.assistant.task_focus import TaskFocusManager
+
+            result = TaskFocusManager().start_objective(
+                title=args.get("title", ""),
+                requested_by=args.get("requested_by", "unknown"),
+                summary=args.get("summary", ""),
+                force_switch=str(args.get("force_switch", "")).strip().lower() in {"1", "true", "yes", "force"},
+            )
+            return {
+                "status": "ok" if result.get("status") == "ok" else result.get("status", "blocked").lower(),
+                "command_type": query,
+                "output": json.dumps(result, indent=2, sort_keys=True, default=str),
+                "data": result,
+                "message": result.get("message"),
+            }
+
+        if query == "COMPLETE_OBJECTIVE":
+            from backend.assistant.task_focus import TaskFocusManager
+
+            result = TaskFocusManager().complete_active_objective(args.get("summary", ""))
+            return {
+                "status": "ok" if result.get("status") == "ok" else result.get("status", "blocked").lower(),
+                "command_type": query,
+                "output": json.dumps(result, indent=2, sort_keys=True, default=str),
+                "data": result,
+                "message": result.get("message"),
+            }
+
+        if query in {"LAUNCH_APP", "OPEN_APP", "OPEN_URL", "RUN_APPROVED_TASK"}:
+            from impl_v1.training.voice.voice_executors import (
+                AppRunnerExecutor,
+                ApprovedTaskExecutor,
+                BrowserExecutor,
+                ExecStatus,
+            )
+
+            try:
+                from backend.governance.host_action_governor import HostActionGovernor
+
+                governor = HostActionGovernor()
+                approval = governor.validate_request(
+                    args.get("host_session_id", ""),
+                    query,
+                    args,
+                )
+            except Exception as exc:
+                logger.warning(
+                    "Host governance validation failed for command %s: %s: %s",
+                    query,
+                    type(exc).__name__,
+                    exc,
+                )
+                return {
+                    "status": "blocked",
+                    "message": f"Host governance unavailable: {type(exc).__name__}",
+                    "command_type": query,
+                }
+            if not approval["allowed"]:
+                return {
+                    "status": "blocked",
+                    "message": approval["reason"],
+                    "command_type": query,
+                }
+
+            intent_id = args.get("_intent_id", "INT-UNKNOWN")
+
+            if query in {"LAUNCH_APP", "OPEN_APP"}:
+                result = AppRunnerExecutor().execute(
+                    intent_id,
+                    "launch",
+                    approval["canonical_app"],
+                    launch_command=approval["command"],
+                )
+            elif query == "OPEN_URL":
+                result = BrowserExecutor().execute(
+                    intent_id,
+                    args.get("url", ""),
+                    launch_command=approval["command"],
+                )
+            else:
+                result = ApprovedTaskExecutor().execute(
+                    intent_id,
+                    approval["canonical_task"],
+                    command=approval["command"],
+                    workdir=approval.get("cwd"),
+                )
+
+            if result.status == ExecStatus.SUCCESS:
+                return {
+                    "status": "ok",
+                    "command_type": query,
+                    "output": result.output,
+                    "executor": result.executor,
+                    "audit_hash": result.audit_hash,
+                    "execution_ms": result.execution_ms,
+                }
+
+            result_status = "blocked" if result.status == ExecStatus.BLOCKED else "failed"
+            return {
+                "status": result_status,
+                "command_type": query,
+                "message": result.output,
+                "executor": result.executor,
+                "audit_hash": result.audit_hash,
+            }
+
+        if query in _GOVERNANCE_BLOCKED_COMMANDS:
+            return {
+                "status": "blocked",
+                "message": _GOVERNANCE_BLOCKED_COMMANDS[query],
+                "command_type": query,
+            }
+
         return {
             "status": "blocked",
-            "message": _GOVERNANCE_BLOCKED_COMMANDS[query],
+            "message": f"Unsupported assistant command: {query}",
             "command_type": query,
         }
-
-    return {
-        "status": "blocked",
-        "message": f"Unsupported assistant command: {query}",
-        "command_type": query,
-    }
+    except Exception as exc:
+        session_error = f"{type(exc).__name__}: {exc}"
+        logger.warning(
+            "Voice runtime command failed for session %s and command %s: %s",
+            session.session_id,
+            query,
+            session_error,
+        )
+        raise
+    finally:
+        if owns_session:
+            _close_voice_session(session.session_id, last_error=session_error)
 
 
 def record_objective_progress(intent: Any, result: Dict[str, Any]) -> None:
     """Persist grounded command outcomes against the active objective."""
     try:
         from backend.assistant.task_focus import TaskFocusManager
-    except Exception:
+    except Exception as exc:
+        logger.warning(
+            "Task focus manager unavailable while recording objective progress: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
         return
 
     query = str(intent.command_type).upper()
@@ -599,126 +698,149 @@ def execute_orchestrated_intent(
     device_id: str = "browser",
 ) -> Dict[str, Any]:
     """Execute a previously parsed intent if it is supported and allowed."""
-    intent = orchestrator.get_intent(intent_id)
-    if intent is None:
-        return {
-            "status": "error",
-            "message": "INTENT_NOT_FOUND",
-        }
+    session = _start_voice_session()
+    session_error: Optional[str] = None
 
-    if intent.error and not intent.executed:
-        return {
-            "status": "blocked",
-            "message": intent.error,
-            "intent_id": intent_id,
-            "command_type": intent.command_type,
-        }
-
-    if intent.requires_confirmation and not intent.confirmed:
-        if not confirmer_id:
-            return {
-                "status": "blocked",
-                "gate": "CONFIRMATION",
-                "message": "Confirmation required before execution",
-                "intent_id": intent_id,
-                "command_type": intent.command_type,
-            }
-        if not orchestrator.confirm_intent(intent_id, confirmer_id):
-            return {
-                "status": "blocked",
-                "gate": "CONFIRMATION",
-                "message": "Intent not confirmable",
-                "intent_id": intent_id,
-                "command_type": intent.command_type,
-            }
+    try:
         intent = orchestrator.get_intent(intent_id)
+        if intent is None:
+            session_error = "INTENT_NOT_FOUND"
+            return {
+                "status": "error",
+                "message": "INTENT_NOT_FOUND",
+            }
 
-    if not orchestrator.is_ready_to_execute(intent_id):
-        return {
-            "status": "blocked",
-            "gate": "READINESS",
-            "message": "Intent is not ready to execute",
-            "intent_id": intent_id,
-            "command_type": intent.command_type,
-        }
+        if intent.error and not intent.executed:
+            session_error = intent.error
+            return {
+                "status": "blocked",
+                "message": intent.error,
+                "intent_id": intent_id,
+                "command_type": intent.command_type,
+            }
 
-    if policy is not None:
-        decision = policy.evaluate(intent.command_type, intent.args)
-        if decision.verdict.value != "ALLOWED":
+        if intent.requires_confirmation and not intent.confirmed:
+            if not confirmer_id:
+                session_error = "Confirmation required before execution"
+                return {
+                    "status": "blocked",
+                    "gate": "CONFIRMATION",
+                    "message": "Confirmation required before execution",
+                    "intent_id": intent_id,
+                    "command_type": intent.command_type,
+                }
+            if not orchestrator.confirm_intent(intent_id, confirmer_id):
+                session_error = "Intent not confirmable"
+                return {
+                    "status": "blocked",
+                    "gate": "CONFIRMATION",
+                    "message": "Intent not confirmable",
+                    "intent_id": intent_id,
+                    "command_type": intent.command_type,
+                }
+            intent = orchestrator.get_intent(intent_id)
+
+        if not orchestrator.is_ready_to_execute(intent_id):
+            session_error = "Intent is not ready to execute"
+            return {
+                "status": "blocked",
+                "gate": "READINESS",
+                "message": "Intent is not ready to execute",
+                "intent_id": intent_id,
+                "command_type": intent.command_type,
+            }
+
+        if policy is not None:
+            decision = policy.evaluate(intent.command_type, intent.args)
+            if decision.verdict.value != "ALLOWED":
+                if audit is not None:
+                    audit.log(
+                        user_id=user_id,
+                        device_id=device_id,
+                        transcript=intent.transcript_text,
+                        intent=intent.command_type,
+                        action="BLOCKED",
+                        policy=decision.verdict.value,
+                        result=decision.reason,
+                    )
+                orchestrator.mark_failed(intent_id, decision.reason)
+                session_error = decision.reason
+                return {
+                    "status": "blocked",
+                    "gate": "POLICY",
+                    "message": decision.reason,
+                    "intent_id": intent_id,
+                    "command_type": intent.command_type,
+                    "policy_verdict": decision.verdict.value,
+                }
+
+        dispatch_args = dict(intent.args)
+        dispatch_args["_intent_id"] = intent.intent_id
+        dispatch_args.setdefault("requested_by", getattr(intent, "user_id", user_id))
+
+        result = dispatch_supported_command(
+            intent.command_type,
+            dispatch_args,
+            intent.transcript_text,
+            voice_session=session,
+        )
+
+        if result.get("status") == "ok":
+            result_text = result.get("output")
+            if not result_text and "research" in result:
+                result_text = result["research"].get("summary")
+            if not result_text and "data" in result:
+                result_text = json.dumps(result["data"], sort_keys=True, default=str)
+            orchestrator.mark_executed(intent_id, result_text or "OK")
+            record_objective_progress(intent, result)
             if audit is not None:
                 audit.log(
                     user_id=user_id,
                     device_id=device_id,
                     transcript=intent.transcript_text,
                     intent=intent.command_type,
-                    action="BLOCKED",
-                    policy=decision.verdict.value,
-                    result=decision.reason,
+                    action="EXECUTED",
+                    policy="ALLOWED",
+                    result="OK",
                 )
-            orchestrator.mark_failed(intent_id, decision.reason)
             return {
-                "status": "blocked",
-                "gate": "POLICY",
-                "message": decision.reason,
+                "status": "ok",
+                "executed": True,
                 "intent_id": intent_id,
                 "command_type": intent.command_type,
-                "policy_verdict": decision.verdict.value,
+                "mode": intent.route_mode,
+                **result,
             }
 
-    dispatch_args = dict(intent.args)
-    dispatch_args["_intent_id"] = intent.intent_id
-    dispatch_args.setdefault("requested_by", getattr(intent, "user_id", user_id))
-
-    result = dispatch_supported_command(
-        intent.command_type,
-        dispatch_args,
-        intent.transcript_text,
-    )
-
-    if result.get("status") == "ok":
-        result_text = result.get("output")
-        if not result_text and "research" in result:
-            result_text = result["research"].get("summary")
-        if not result_text and "data" in result:
-            result_text = json.dumps(result["data"], sort_keys=True, default=str)
-        orchestrator.mark_executed(intent_id, result_text or "OK")
-        record_objective_progress(intent, result)
+        error_message = result.get("message", "Execution blocked")
+        session_error = error_message
+        orchestrator.mark_failed(intent_id, error_message)
         if audit is not None:
             audit.log(
                 user_id=user_id,
                 device_id=device_id,
                 transcript=intent.transcript_text,
                 intent=intent.command_type,
-                action="EXECUTED",
+                action="BLOCKED",
                 policy="ALLOWED",
-                result="OK",
+                result=error_message,
             )
         return {
-            "status": "ok",
-            "executed": True,
+            "status": result.get("status", "blocked"),
+            "executed": False,
             "intent_id": intent_id,
             "command_type": intent.command_type,
             "mode": intent.route_mode,
             **result,
         }
-
-    error_message = result.get("message", "Execution blocked")
-    orchestrator.mark_failed(intent_id, error_message)
-    if audit is not None:
-        audit.log(
-            user_id=user_id,
-            device_id=device_id,
-            transcript=intent.transcript_text,
-            intent=intent.command_type,
-            action="BLOCKED",
-            policy="ALLOWED",
-            result=error_message,
+    except Exception as exc:
+        session_error = f"{type(exc).__name__}: {exc}"
+        logger.warning(
+            "Voice session %s failed for intent %s: %s",
+            session.session_id,
+            intent_id,
+            session_error,
         )
-    return {
-        "status": result.get("status", "blocked"),
-        "executed": False,
-        "intent_id": intent_id,
-        "command_type": intent.command_type,
-        "mode": intent.route_mode,
-        **result,
-    }
+        raise
+    finally:
+        _close_voice_session(session.session_id, last_error=session_error)

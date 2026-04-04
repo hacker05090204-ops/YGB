@@ -25,6 +25,7 @@ import hashlib
 import json
 import logging
 import os
+import threading
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -50,6 +51,7 @@ class BridgeState:
     def __init__(self, state_path: Path = None, samples_path: Path = None):
         self._state_path = state_path or _STATE_PATH
         self._samples_path = samples_path or _SAMPLES_PATH
+        self._lock = threading.RLock()
         self._state: Dict[str, Any] = self._default_state()
         self._sample_buffer: List[Dict[str, str]] = []
         self._buffer_flush_threshold = 500  # flush every N samples
@@ -70,51 +72,69 @@ class BridgeState:
             "updated_at": None,
         }
 
+    def _refresh_ingest_hash(self) -> None:
+        self._state["ingest_hash"] = hashlib.sha256(
+            json.dumps(
+                {
+                    "count": self._state.get("bridge_count", 0),
+                    "verified": self._state.get("bridge_verified_count", 0),
+                    "ingested": self._state.get("total_ingested", 0),
+                    "dropped": self._state.get("total_dropped", 0),
+                    "deduped": self._state.get("total_deduped", 0),
+                    "samples_written": self._state.get("samples_written", 0),
+                },
+                sort_keys=True,
+            ).encode("utf-8")
+        ).hexdigest()[:16]
+
     # =========================================================================
     # LOAD / SAVE
     # =========================================================================
 
     def load(self) -> Dict[str, Any]:
         """Load persisted state from disk. Safe if file missing."""
-        if self._state_path.exists():
-            try:
-                with open(self._state_path, "r") as f:
-                    data = json.load(f)
-                # Merge with defaults to handle schema evolution
-                merged = self._default_state()
-                merged.update(data)
-                self._state = merged
-                logger.info(
-                    f"[BRIDGE_STATE] Loaded: count={self._state['bridge_count']}, "
-                    f"verified={self._state['bridge_verified_count']}"
-                )
-            except (json.JSONDecodeError, IOError) as e:
-                logger.error(f"[BRIDGE_STATE] Load failed: {e}, using defaults")
+        with self._lock:
+            if self._state_path.exists():
+                try:
+                    with open(self._state_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    # Merge with defaults to handle schema evolution
+                    merged = self._default_state()
+                    merged.update(data)
+                    self._state = merged
+                    logger.info(
+                        f"[BRIDGE_STATE] Loaded: count={self._state['bridge_count']}, "
+                        f"verified={self._state['bridge_verified_count']}"
+                    )
+                except (json.JSONDecodeError, IOError) as e:
+                    logger.error(f"[BRIDGE_STATE] Load failed: {e}, using defaults")
+                    self._state = self._default_state()
+            else:
+                logger.info("[BRIDGE_STATE] No persisted state, starting fresh")
                 self._state = self._default_state()
-        else:
-            logger.info("[BRIDGE_STATE] No persisted state, starting fresh")
-            self._state = self._default_state()
-        return self._state
+            return dict(self._state)
 
     def save(self):
         """Atomically persist current state to disk."""
-        self._state["updated_at"] = time.strftime(
-            "%Y-%m-%dT%H:%M:%S%z", time.localtime()
-        )
-        self._state_path.parent.mkdir(parents=True, exist_ok=True)
-        tmp_path = self._state_path.with_suffix(".json.tmp")
-        try:
-            with open(tmp_path, "w") as f:
-                json.dump(self._state, f, indent=2)
-            os.replace(str(tmp_path), str(self._state_path))
-        except Exception as e:
-            logger.error(f"[BRIDGE_STATE] Save failed: {e}")
-            # Clean up tmp if rename failed
-            if tmp_path.exists():
-                try:
-                    tmp_path.unlink()
-                except OSError:
-                    pass
+        with self._lock:
+            self._state["updated_at"] = time.strftime(
+                "%Y-%m-%dT%H:%M:%S%z", time.localtime()
+            )
+            self._refresh_ingest_hash()
+            self._state_path.parent.mkdir(parents=True, exist_ok=True)
+            tmp_path = self._state_path.with_suffix(".json.tmp")
+            try:
+                with open(tmp_path, "w", encoding="utf-8") as f:
+                    json.dump(self._state, f, indent=2)
+                os.replace(str(tmp_path), str(self._state_path))
+            except Exception as e:
+                logger.error(f"[BRIDGE_STATE] Save failed: {e}")
+                # Clean up tmp if rename failed
+                if tmp_path.exists():
+                    try:
+                        tmp_path.unlink()
+                    except OSError:
+                        pass
 
     # =========================================================================
     # COUNTER OPERATIONS
@@ -158,16 +178,6 @@ class BridgeState:
         self._state["last_ingest_at"] = time.strftime(
             "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
         )
-        # Compute integrity hash
-        self._state["ingest_hash"] = hashlib.sha256(
-            json.dumps(
-                {
-                    "count": bridge_count,
-                    "verified": bridge_verified_count,
-                    "ingested": total_ingested,
-                }
-            ).encode()
-        ).hexdigest()[:16]
         self.save()
         logger.info(
             f"[BRIDGE_STATE] Persisted: count={bridge_count}, "
@@ -187,10 +197,12 @@ class BridgeState:
     def record_drop(self, count: int = 1):
         """Record dropped samples."""
         self._state["total_dropped"] += count
+        self.save()
 
     def record_dedup(self, count: int = 1):
         """Record deduplicated samples."""
         self._state["total_deduped"] += count
+        self.save()
 
     # =========================================================================
     # SAMPLE STORE (disk-backed)
@@ -208,17 +220,19 @@ class BridgeState:
             return
         self._samples_path.parent.mkdir(parents=True, exist_ok=True)
         try:
+            buffer_to_flush = list(self._sample_buffer)
             mode = "ab" if self._samples_path.exists() else "wb"
             with gzip.open(str(self._samples_path), mode) as f:
-                for sample in self._sample_buffer:
+                for sample in buffer_to_flush:
                     line = json.dumps(sample, separators=(",", ":")) + "\n"
                     f.write(line.encode("utf-8"))
-            written = len(self._sample_buffer)
+            written = len(buffer_to_flush)
             self._state["samples_written"] = (
                 self._state.get("samples_written", 0) + written
             )
             self._state["samples_path"] = str(self._samples_path)
             self._sample_buffer.clear()
+            self.save()
             logger.debug(f"[BRIDGE_STATE] Flushed {written} samples to disk")
         except Exception as e:
             logger.error(f"[BRIDGE_STATE] Sample flush failed: {e}")

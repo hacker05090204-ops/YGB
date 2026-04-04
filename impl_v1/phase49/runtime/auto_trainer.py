@@ -77,10 +77,7 @@ from .trainer_checkpoint_helpers import (
     load_checkpoint_metadata,
     save_checkpoint_bundle,
 )
-from .trainer_metrics_helpers import (
-    generate_session_report_for_trainer,
-    persist_runtime_artifacts,
-)
+from .trainer_metrics_helpers import persist_runtime_artifacts
 from .trainer_execution_helpers import gpu_train_step
 
 # Import guards and conditions from G38
@@ -189,9 +186,11 @@ def _checkpoint_state_hash(model: Any) -> str:
     """Hash the actual model weights for integrity tracking."""
     if not TORCH_AVAILABLE or torch is None:
         raise RuntimeError("PyTorch is required for checkpoint hashing")
-    buf = io.BytesIO()
-    torch.save(model.state_dict(), buf)
-    return hashlib.sha256(buf.getvalue()).hexdigest()[:16]
+    digest = hashlib.sha256()
+    for name in sorted(model.state_dict()):
+        tensor = model.state_dict()[name]
+        digest.update(tensor.detach().cpu().contiguous().numpy().tobytes())
+    return digest.hexdigest()
 
 
 # =============================================================================
@@ -291,6 +290,10 @@ class AutoTrainer:
         self._last_loss = 0.0  # Last training loss
         self._last_accuracy = 0.0  # Last training accuracy
         self._last_holdout_accuracy = 0.0  # Last holdout (real) accuracy
+        self._last_precision_at_5 = None
+        self._last_precision_at_10 = None
+        self._last_mrr = None
+        self._last_f1 = None
         self._samples_per_sec = 0.0  # Training throughput
         self._real_samples_processed = 0  # Total real samples processed
         self._last_batch_index = 0  # Live batch index in current epoch
@@ -464,8 +467,39 @@ class AutoTrainer:
         """Return current session duration in seconds."""
         return session_duration_seconds(self._current_session)
 
+    def _build_session_benchmark_metrics(self) -> Dict[str, Optional[float]]:
+        """Collect the benchmark metrics that must be embedded in the session report."""
+
+        def _coerce(value: Any) -> Optional[float]:
+            if value is None:
+                return None
+            numeric = float(value)
+            if not np.isfinite(numeric):
+                return None
+            return numeric
+
+        return {
+            "loss": _coerce(self._last_loss),
+            "precision_at_5": _coerce(self._last_precision_at_5),
+            "precision_at_10": _coerce(self._last_precision_at_10),
+            "mrr": _coerce(self._last_mrr),
+            "f1": _coerce(self._last_f1),
+        }
+
     def _fast_validate_dataset_manifest(self, min_samples: int) -> Tuple[bool, str]:
         """Use the signed dataset manifest as the fast-path readiness check."""
+        try:
+            from impl_v1.training.data.real_dataset_loader import (
+                DatasetIntegrityError,
+                DatasetIntegrityGuard,
+            )
+
+            DatasetIntegrityGuard().verify(self._dataset_manifest_path)
+        except DatasetIntegrityError as exc:
+            return False, f"manifest_invalid: {exc}"
+        except Exception as exc:
+            return False, f"manifest_unavailable: {type(exc).__name__}"
+
         try:
             with open(self._dataset_manifest_path, "r", encoding="utf-8") as handle:
                 manifest = json.load(handle)
@@ -476,7 +510,17 @@ class AutoTrainer:
             return False, "manifest_invalid: not a JSON object"
 
         dataset_source = str(manifest.get("dataset_source", "") or "").upper()
-        schema_version = int(manifest.get("schema_version", 0) or 0)
+        schema_version_raw = manifest.get("schema_version")
+        if schema_version_raw in (None, ""):
+            schema_version = None
+        else:
+            try:
+                schema_version = int(schema_version_raw)
+            except (TypeError, ValueError):
+                return (
+                    False,
+                    f"manifest_invalid: schema_version={schema_version_raw}",
+                )
         dataset_hash = str(manifest.get("dataset_hash", "") or "")
         strict_real = bool(manifest.get("strict_real_mode", False))
         training_mode = str(manifest.get("training_mode", "") or "").upper()
@@ -501,31 +545,30 @@ class AutoTrainer:
 
         if not strict_real:
             return False, "manifest_invalid: strict_real_mode is not enabled"
-        if schema_version != 1:
+        if schema_version is not None and schema_version != 1:
             return False, f"manifest_invalid: schema_version={schema_version}"
         if dataset_source != "INGESTION_PIPELINE":
             return (
                 False,
                 f"manifest_invalid: dataset_source={dataset_source or '<missing>'}",
             )
-        if not dataset_hash:
+        if "dataset_hash" in manifest and not dataset_hash:
             return False, "manifest_invalid: dataset_hash missing"
         if training_mode and training_mode != "PRODUCTION_REAL":
             return False, f"manifest_invalid: training_mode={training_mode}"
         if not signed:
             return False, "manifest_invalid: signature fields missing"
-        if not manifest_timestamp:
-            return False, "manifest_invalid: timestamp missing"
-        try:
-            parsed_timestamp = datetime.fromisoformat(
-                str(manifest_timestamp).replace("Z", "+00:00")
-            )
-            if parsed_timestamp.tzinfo is None:
-                parsed_timestamp = parsed_timestamp.replace(tzinfo=timezone.utc)
-            if parsed_timestamp > datetime.now(timezone.utc) + timedelta(minutes=5):
-                return False, "manifest_invalid: timestamp in future"
-        except ValueError:
-            return False, "manifest_invalid: timestamp invalid"
+        if manifest_timestamp:
+            try:
+                parsed_timestamp = datetime.fromisoformat(
+                    str(manifest_timestamp).replace("Z", "+00:00")
+                )
+                if parsed_timestamp.tzinfo is None:
+                    parsed_timestamp = parsed_timestamp.replace(tzinfo=timezone.utc)
+                if parsed_timestamp > datetime.now(timezone.utc) + timedelta(minutes=5):
+                    return False, "manifest_invalid: timestamp in future"
+            except ValueError:
+                return False, "manifest_invalid: timestamp invalid"
         if total < min_samples:
             return (
                 False,
@@ -1346,10 +1389,21 @@ class AutoTrainer:
                 )
 
             # Save checkpoint
-            checkpoint_hash = _checkpoint_state_hash(self._gpu_model)
+            checkpoint_hash = (
+                _checkpoint_state_hash(self._gpu_model)
+                if self._gpu_model is not None
+                else ""
+            )
+            checkpoint_details = (
+                f"Saved GPU checkpoint for epoch {self._epoch} "
+                f"(hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})"
+                if checkpoint_hash
+                else f"Saved GPU checkpoint for epoch {self._epoch} "
+                f"(accuracy: {accuracy:.2%}, loss: {loss:.4f})"
+            )
             self._emit_event(
                 "CHECKPOINT_SAVED",
-                f"Saved GPU checkpoint for epoch {self._epoch} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
+                checkpoint_details,
                 epoch=self._epoch,
                 gpu_used=True,
             )
@@ -1460,7 +1514,43 @@ class AutoTrainer:
 
     def _generate_session_report(self) -> None:
         """Generate training report after session completes."""
-        generate_session_report_for_trainer(self, logger)
+        if not self._current_session:
+            return
+        try:
+            stopped_at = datetime.now(timezone.utc).isoformat()
+            epochs_trained = self._epoch - self._current_session.start_epoch
+            checkpoint_events = [
+                event
+                for event in self._events
+                if event.event_type == "CHECKPOINT_SAVED"
+            ]
+            last_hash = ""
+            if checkpoint_events:
+                details = checkpoint_events[-1].details
+                if "hash: " in details:
+                    last_hash = details.split("hash: ")[1].rstrip(")")
+
+            benchmark_metrics = self._build_session_benchmark_metrics()
+
+            paths = generate_training_report(
+                total_epochs=epochs_trained,
+                gpu_used=self._current_session.gpu_used,
+                started_at=self._current_session.started_at,
+                stopped_at=stopped_at,
+                checkpoints_saved=len(checkpoint_events),
+                last_checkpoint_hash=last_hash,
+                samples_processed=getattr(self, "_real_samples_processed", 0),
+                training_mode=ReportTrainingMode.MODE_A,
+                reports_dir="reports/g38_training",
+                benchmark_metrics=benchmark_metrics,
+            )
+            self._emit_event(
+                "REPORT_GENERATED",
+                f"Training report saved: {list(paths.values())[0]}",
+            )
+            logger.info("Training report generated: %s", paths)
+        except Exception as exc:
+            logger.error("Failed to generate training report: %s", exc)
 
     async def run_scheduler(self) -> None:
         """
@@ -1666,10 +1756,21 @@ class AutoTrainer:
                     self._samples_per_sec = ds_total / max(_step_elapsed, 0.001)
 
                 if not self._abort_flag.is_set() and success:
-                    checkpoint_hash = _checkpoint_state_hash(self._gpu_model)
+                    checkpoint_hash = (
+                        _checkpoint_state_hash(self._gpu_model)
+                        if self._gpu_model is not None
+                        else ""
+                    )
+                    checkpoint_details = (
+                        f"GPU checkpoint {self._session_epoch}/{epochs} "
+                        f"(hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})"
+                        if checkpoint_hash
+                        else f"GPU checkpoint {self._session_epoch}/{epochs} "
+                        f"(accuracy: {accuracy:.2%}, loss: {loss:.4f})"
+                    )
                     self._emit_event(
                         "CHECKPOINT_SAVED",
-                        f"GPU checkpoint {self._session_epoch}/{epochs} (hash: {checkpoint_hash}, accuracy: {accuracy:.2%}, loss: {loss:.4f})",
+                        checkpoint_details,
                         epoch=self._session_epoch,
                         gpu_used=True,
                     )

@@ -94,6 +94,18 @@ class TestCircuitBreaker(unittest.TestCase):
         cb.record_failure()
         self.assertEqual(cb.state, CircuitState.OPEN)
 
+    def test_half_open_allows_only_one_probe_at_a_time(self):
+        from backend.reliability.circuit_breaker import CircuitState
+        cb = self._make_breaker(failure_threshold=1, recovery_timeout=0.1)
+        cb.record_failure()
+        time.sleep(0.15)
+        self.assertEqual(cb.state, CircuitState.HALF_OPEN)
+        self.assertTrue(cb.allow_request())
+        self.assertFalse(cb.allow_request())
+        cb.record_success()
+        self.assertEqual(cb.state, CircuitState.HALF_OPEN)
+        self.assertTrue(cb.allow_request())
+
     def test_get_status(self):
         cb = self._make_breaker()
         status = cb.get_status()
@@ -185,6 +197,23 @@ class TestRetryWithBackoff(unittest.TestCase):
         with self.assertRaises(CircuitBreakerError):
             do_work()
 
+    def test_non_retryable_probe_failure_reopens_circuit(self):
+        from backend.reliability.circuit_breaker import (
+            CircuitBreaker, CircuitState, retry_with_backoff,
+        )
+
+        cb = CircuitBreaker("test", failure_threshold=1, recovery_timeout=0.05)
+        cb.record_failure()
+        time.sleep(0.06)
+
+        @retry_with_backoff(max_retries=0, circuit_breaker=cb, retryable_exceptions=(RuntimeError,))
+        def fail_with_non_retryable_error():
+            raise ValueError("fatal")
+
+        with self.assertRaises(ValueError):
+            fail_with_non_retryable_error()
+        self.assertEqual(cb.state, CircuitState.OPEN)
+
 
 class TestDependencyChecker(unittest.TestCase):
     """Test dependency checker parallel checks."""
@@ -231,6 +260,19 @@ class TestDependencyChecker(unittest.TestCase):
 
         result = run_all_checks(checks=[ok_check])
         self.assertGreater(result["total_latency_ms"], 0)
+
+    def test_dependency_checks_emit_latency_metrics(self):
+        from backend.observability.metrics import metrics_registry
+        from backend.reliability.dependency_checker import run_all_checks, CheckResult
+
+        metrics_registry.reset()
+
+        def ok_check():
+            return CheckResult("metrics", True, 12.5, "ok")
+
+        run_all_checks(checks=[ok_check])
+        stats = metrics_registry.get_histogram_stats("dependency_latency_ms")
+        self.assertEqual(stats["count"], 1)
 
     def test_config_check_passes_with_hmac(self):
         from backend.reliability.dependency_checker import _check_config_integrity

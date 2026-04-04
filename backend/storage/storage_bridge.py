@@ -1238,13 +1238,11 @@ def get_storage_health() -> Dict[str, Any]:
         reasons.append("Primary HDD/NAS root unavailable — running on local fallback")
 
     reason = "; ".join(reasons) if reasons else None
-    overall_status = (
-        "ACTIVE" if (storage_active and db_active and lifecycle_ok) else "INACTIVE"
-    )
-    if storage_active and not lifecycle_ok:
-        overall_status = "DEGRADED"
-    elif storage_active and topology.get("fallback_active"):
-        overall_status = "DEGRADED"
+    overall_status = "INACTIVE"
+    if storage_active and db_active:
+        overall_status = "ACTIVE"
+        if not lifecycle_ok or not disk_monitor_ok or topology.get("fallback_active"):
+            overall_status = "DEGRADED"
 
     return {
         "status": overall_status,

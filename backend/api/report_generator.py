@@ -197,8 +197,12 @@ async def create_report(request: Request, user=Depends(require_auth)):
     try:
         from backend.observability.metrics import metrics_registry
         metrics_registry.record("report_generation_latency_ms", _rpt_latency)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(
+            "Non-critical failure while recording report generation latency: %s",
+            exc,
+            exc_info=True,
+        )
 
     _log_activity(user_id, "REPORT_CREATED", f"Report '{title}' created ({report_id})")
     logger.info("Report created: %s by %s", report_id, user_id)

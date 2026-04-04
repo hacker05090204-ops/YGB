@@ -20,11 +20,16 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT))
 
-from impl_v1.training.safety.manifest_builder import canonicalize_manifest
+from impl_v1.training.safety.manifest_builder import (
+    MissingAuthorityKeyError,
+    canonicalize_manifest,
+    safe_canonicalize_manifest,
+)
 from impl_v1.training.safety.dataset_manifest import (
     DatasetManifest,
     validate_manifest,
 )
+from backend.startup.preflight import check_manifest_authority_key
 
 
 SIGNED_KEYS = {"dataset_hash", "signed_by", "version",
@@ -33,6 +38,16 @@ SIGNED_KEYS = {"dataset_hash", "signed_by", "version",
 
 class TestCanonicalizeManifest(unittest.TestCase):
     """Test canonicalize_manifest normalizer."""
+
+    def setUp(self):
+        self._original_authority_key = os.environ.get("YGB_AUTHORITY_KEY")
+        os.environ["YGB_AUTHORITY_KEY"] = "test-authority-key"
+
+    def tearDown(self):
+        if self._original_authority_key is None:
+            os.environ.pop("YGB_AUTHORITY_KEY", None)
+        else:
+            os.environ["YGB_AUTHORITY_KEY"] = self._original_authority_key
 
     def _legacy_manifest(self):
         """Return a typical legacy manifest (from _write_manifest)."""
@@ -84,10 +99,22 @@ class TestCanonicalizeManifest(unittest.TestCase):
         self.assertEqual(m["dataset_hash"], "abc123def456")
 
     def test_dataset_hash_computed_when_none(self):
-        """Computes a deterministic hash when no hash fields exist."""
+        """Explicit dataset hash input is now required."""
         m = {"sample_count": 100, "dataset_source": "TEST"}
-        canonicalize_manifest(m)
-        self.assertEqual(len(m["dataset_hash"]), 64)  # SHA-256 hex
+        with self.assertRaises(ValueError):
+            canonicalize_manifest(m)
+
+    def test_missing_authority_key_raises(self):
+        """Manifest signing must fail closed without authority key."""
+        os.environ.pop("YGB_AUTHORITY_KEY", None)
+        with self.assertRaises(MissingAuthorityKeyError):
+            canonicalize_manifest(self._legacy_manifest())
+
+    def test_safe_canonicalize_manifest_wraps_missing_authority_key(self):
+        """Safe wrapper must return a clear runtime readiness failure."""
+        os.environ.pop("YGB_AUTHORITY_KEY", None)
+        with self.assertRaisesRegex(RuntimeError, "SYSTEM NOT READY: Missing authority key"):
+            safe_canonicalize_manifest(self._legacy_manifest())
 
     def test_signed_by_is_64_char_hex(self):
         """signed_by is SHA-256 of authority key (64 hex chars)."""
@@ -120,7 +147,11 @@ class TestCanonicalizeManifest(unittest.TestCase):
 
     def test_sample_count_backfilled(self):
         """sample_count is backfilled when missing."""
-        m = {"total_samples": 5000, "dataset_source": "TEST"}
+        m = {
+            "total_samples": 5000,
+            "dataset_source": "TEST",
+            "dataset_hash": "b" * 64,
+        }
         canonicalize_manifest(m)
         self.assertEqual(m["sample_count"], 5000)
 
@@ -139,6 +170,16 @@ class TestCanonicalizeManifest(unittest.TestCase):
 
 class TestValidateManifestCompatibility(unittest.TestCase):
     """Test that validate_manifest() passes on canonicalized manifests."""
+
+    def setUp(self):
+        self._original_authority_key = os.environ.get("YGB_AUTHORITY_KEY")
+        os.environ["YGB_AUTHORITY_KEY"] = "test-authority-key"
+
+    def tearDown(self):
+        if self._original_authority_key is None:
+            os.environ.pop("YGB_AUTHORITY_KEY", None)
+        else:
+            os.environ["YGB_AUTHORITY_KEY"] = self._original_authority_key
 
     def test_validate_passes_canonicalized(self):
         """Canonicalized manifest passes validate_manifest()."""
@@ -191,12 +232,32 @@ class TestValidateManifestCompatibility(unittest.TestCase):
         if not manifest_path.exists():
             self.skipTest("No manifest file on disk")
 
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        required_signed_by = payload.get("signed_by")
+        configured_signed_by = hashlib.sha256(
+            os.environ["YGB_AUTHORITY_KEY"].encode("utf-8")
+        ).hexdigest()
+        if required_signed_by != configured_signed_by:
+            self.skipTest(
+                "Production manifest signer does not match test authority key in this environment"
+            )
+
         ok, reason, manifest = validate_manifest(path=str(manifest_path))
         self.assertTrue(ok, f"Production manifest validation failed: {reason}")
 
 
 class TestBridgeWorkerManifest(unittest.TestCase):
     """Test backward-compat keys are preserved in bridge worker schema."""
+
+    def setUp(self):
+        self._original_authority_key = os.environ.get("YGB_AUTHORITY_KEY")
+        os.environ["YGB_AUTHORITY_KEY"] = "test-authority-key"
+
+    def tearDown(self):
+        if self._original_authority_key is None:
+            os.environ.pop("YGB_AUTHORITY_KEY", None)
+        else:
+            os.environ["YGB_AUTHORITY_KEY"] = self._original_authority_key
 
     def test_bridge_worker_schema_has_legacy_keys(self):
         """Bridge worker manifest should keep verified_samples, source_mix."""
@@ -221,6 +282,31 @@ class TestBridgeWorkerManifest(unittest.TestCase):
         # All signed keys present
         for key in SIGNED_KEYS:
             self.assertIn(key, m)
+
+
+class TestManifestPreflight(unittest.TestCase):
+    """Manifest authority readiness checks must fail closed."""
+
+    def setUp(self):
+        self._original_authority_key = os.environ.get("YGB_AUTHORITY_KEY")
+
+    def tearDown(self):
+        if self._original_authority_key is None:
+            os.environ.pop("YGB_AUTHORITY_KEY", None)
+        else:
+            os.environ["YGB_AUTHORITY_KEY"] = self._original_authority_key
+
+    def test_manifest_authority_key_check_fails_when_missing(self):
+        os.environ.pop("YGB_AUTHORITY_KEY", None)
+        result = check_manifest_authority_key()
+        self.assertFalse(result.passed)
+        self.assertTrue(result.critical)
+        self.assertIn("YGB_AUTHORITY_KEY", result.detail)
+
+    def test_manifest_authority_key_check_passes_when_present(self):
+        os.environ["YGB_AUTHORITY_KEY"] = "test-authority-key"
+        result = check_manifest_authority_key()
+        self.assertTrue(result.passed)
 
 
 if __name__ == "__main__":

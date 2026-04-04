@@ -128,6 +128,18 @@ class TestQueryRouter:
         result = self.router.classify("hello there")
         assert result.mode == VoiceMode.CLARIFICATION
 
+    def test_unrouted_query_logs_sanitized_warning(self, caplog):
+        noisy = "hello\n" + ("unmatchedtoken " * 20)
+        expected = " ".join(noisy.split())[:120]
+
+        with caplog.at_level("WARNING", logger="backend.assistant.query_router"):
+            result = self.router.classify(noisy)
+
+        assert result.mode == VoiceMode.CLARIFICATION
+        assert caplog.records
+        assert expected in caplog.records[-1].message
+        assert "\n" not in caplog.records[-1].message
+
     def test_route_decision_has_timestamp(self):
         """All decisions have timestamp."""
         result = self.router.classify("What is Python?")

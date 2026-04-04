@@ -42,6 +42,7 @@ from backend.sync.chunker import (
 )
 
 logger = logging.getLogger("ygb.sync")
+_SYNC_STOP_EVENT = threading.Event()
 
 # ── Configuration ─────────────────────────────────────────────────────
 
@@ -327,6 +328,7 @@ def run_watcher():
         observer.schedule(handler, str(watch_path), recursive=True)
         logger.info("Watching: %s", watch_path)
 
+    _SYNC_STOP_EVENT.clear()
     observer.start()
     logger.info("╔══ YGB Sync Engine started ══╗")
     logger.info("║ Device: %-20s  ║", DEVICE_ID)
@@ -341,14 +343,19 @@ def run_watcher():
         logger.exception("Initial sync failed")
 
     try:
-        while True:
-            time.sleep(SYNC_INTERVAL)
+        while not _SYNC_STOP_EVENT.is_set():
+            if _SYNC_STOP_EVENT.wait(SYNC_INTERVAL):
+                logger.info("Shutting down sync engine on stop event...")
+                break
             try:
                 sync_cycle()
             except Exception:
                 logger.exception("Periodic sync failed")
     except KeyboardInterrupt:
         logger.info("Shutting down sync engine...")
+        _SYNC_STOP_EVENT.set()
+        observer.stop()
+    else:
         observer.stop()
     observer.join()
 
@@ -356,6 +363,7 @@ def run_watcher():
 def _run_periodic_only():
     """Fallback: periodic-only sync without filesystem events."""
     _init_dirs()
+    _SYNC_STOP_EVENT.clear()
     logger.info("Periodic-only mode: interval=%ds", SYNC_INTERVAL)
     try:
         sync_cycle()
@@ -363,14 +371,22 @@ def _run_periodic_only():
         logger.exception("Initial sync failed")
 
     try:
-        while True:
-            time.sleep(SYNC_INTERVAL)
+        while not _SYNC_STOP_EVENT.is_set():
+            if _SYNC_STOP_EVENT.wait(SYNC_INTERVAL):
+                logger.info("Shutting down sync engine on stop event...")
+                break
             try:
                 sync_cycle()
             except Exception:
                 logger.exception("Periodic sync failed")
     except KeyboardInterrupt:
         logger.info("Shutting down sync engine...")
+        _SYNC_STOP_EVENT.set()
+
+
+def request_sync_engine_stop() -> None:
+    """Signal cooperative shutdown for long-running sync loops."""
+    _SYNC_STOP_EVENT.set()
 
 
 def print_status():

@@ -13,16 +13,19 @@ GOVERNANCE: MODE-A only. No decision labels. No exploit content.
 """
 
 import numpy as np
-from typing import Tuple, Optional
+from typing import Optional, Sequence, Tuple
 from dataclasses import dataclass
 
 
 FIXED_SEED = 42
+_BLOCKED_SYNTHETIC_REPRESENTATION_MESSAGE = (
+    "DISABLED: Synthetic representation generation is forbidden in production"
+)
 
 
 def _abort_synthetic_generation(component: str) -> None:
     raise RuntimeError(
-        f"REAL_DATA_REQUIRED: {component} synthetic generation is disabled"
+        f"{_BLOCKED_SYNTHETIC_REPRESENTATION_MESSAGE} ({component})"
     )
 
 
@@ -38,6 +41,143 @@ class ExpansionConfig:
     dom_variance_boost: float = 0.25
     api_nesting_boost: float = 0.20
     auth_flow_templates: int = 10
+
+
+@dataclass(frozen=True)
+class RepresentationValidationResult:
+    """Result of validating one representation vector against stored state."""
+
+    valid: bool
+    reason: str
+    cosine_similarity: Optional[float] = None
+    matched_index: Optional[int] = None
+    stored_count: int = 0
+
+
+class InvalidRepresentationError(ValueError):
+    """Raised when a representation is rejected on the bridge path."""
+
+    def __init__(self, result: RepresentationValidationResult):
+        self.result = result
+        super().__init__(result.reason)
+
+
+class RepresentationValidator:
+    """Validate representation tensors before they are admitted to the bridge path."""
+
+    def __init__(self, duplicate_threshold: float = 0.99):
+        self.duplicate_threshold = float(duplicate_threshold)
+
+    @staticmethod
+    def _coerce_vector(representation: np.ndarray) -> np.ndarray:
+        vector = np.asarray(representation, dtype=np.float32)
+        if vector.ndim != 1:
+            raise ValueError("representation tensor must be 1-dimensional")
+        if vector.size == 0:
+            raise ValueError("representation tensor is empty")
+        if not np.isfinite(vector).all():
+            raise ValueError("representation tensor contains NaN/Inf values")
+
+        norm = float(np.linalg.norm(vector))
+        if norm <= 0.0:
+            raise ValueError("representation tensor norm must be greater than zero")
+        return vector
+
+    @staticmethod
+    def _iter_stored_representations(
+        stored_representations: Optional[Sequence[np.ndarray]],
+    ):
+        if stored_representations is None:
+            return ()
+
+        if isinstance(stored_representations, np.ndarray):
+            if stored_representations.ndim == 1:
+                return (stored_representations,)
+            if stored_representations.ndim == 2:
+                return tuple(stored_representations[idx] for idx in range(stored_representations.shape[0]))
+            raise ValueError("stored representations must be a 1D or 2D tensor")
+
+        return tuple(stored_representations)
+
+    def validate(
+        self,
+        representation: np.ndarray,
+        stored_representations: Optional[Sequence[np.ndarray]] = None,
+    ) -> RepresentationValidationResult:
+        """Return a structured validation result for a representation tensor."""
+        try:
+            vector = self._coerce_vector(representation)
+        except ValueError as exc:
+            return RepresentationValidationResult(valid=False, reason=str(exc))
+
+        vector_norm = float(np.linalg.norm(vector))
+        stored = self._iter_stored_representations(stored_representations)
+
+        for idx, candidate in enumerate(stored):
+            try:
+                candidate_vector = self._coerce_vector(candidate)
+            except ValueError as exc:
+                return RepresentationValidationResult(
+                    valid=False,
+                    reason=f"stored representation {idx} invalid: {exc}",
+                    matched_index=idx,
+                    stored_count=len(stored),
+                )
+
+            if candidate_vector.shape != vector.shape:
+                return RepresentationValidationResult(
+                    valid=False,
+                    reason=(
+                        f"stored representation {idx} dimensionality mismatch: "
+                        f"expected {vector.shape[0]}, got {candidate_vector.shape[0]}"
+                    ),
+                    matched_index=idx,
+                    stored_count=len(stored),
+                )
+
+            cosine_similarity = float(
+                np.dot(vector, candidate_vector)
+                / (vector_norm * float(np.linalg.norm(candidate_vector)))
+            )
+            if cosine_similarity > self.duplicate_threshold:
+                return RepresentationValidationResult(
+                    valid=False,
+                    reason=(
+                        "representation rejected as near-duplicate: "
+                        f"cosine_similarity={cosine_similarity:.6f} "
+                        f"> {self.duplicate_threshold:.2f}"
+                    ),
+                    cosine_similarity=cosine_similarity,
+                    matched_index=idx,
+                    stored_count=len(stored),
+                )
+
+        return RepresentationValidationResult(
+            valid=True,
+            reason="representation_valid",
+            stored_count=len(stored),
+        )
+
+    def validate_or_raise(
+        self,
+        representation: np.ndarray,
+        stored_representations: Optional[Sequence[np.ndarray]] = None,
+    ) -> RepresentationValidationResult:
+        """Bridge-path validation that raises for invalid representations."""
+        result = self.validate(representation, stored_representations)
+        if not result.valid:
+            raise InvalidRepresentationError(result)
+        return result
+
+
+def validate_representation_for_bridge(
+    representation: np.ndarray,
+    stored_representations: Optional[Sequence[np.ndarray]] = None,
+    validator: Optional[RepresentationValidator] = None,
+) -> RepresentationValidationResult:
+    """Bridge-facing validation entrypoint that raises on invalid tensors."""
+    active_validator = validator or RepresentationValidator()
+    return active_validator.validate_or_raise(representation, stored_representations)
 
 
 class RepresentationExpander:

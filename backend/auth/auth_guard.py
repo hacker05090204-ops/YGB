@@ -298,10 +298,14 @@ async def require_auth(
                 user_record = get_user(user_id)
                 if user_record and user_record.get("role"):
                     payload = {**payload, "role": user_record["role"]}
-            except Exception:
+            except Exception as exc:
                 # Fail closed for auth token validity, but avoid breaking
                 # regular auth if role lookup backend is unavailable.
-                pass
+                logger.warning(
+                    "Non-critical failure while hydrating auth role from storage: %s",
+                    exc,
+                    exc_info=True,
+                )
 
     return {**payload, "_auth_via": "cookie" if via_cookie else "bearer"}
 

@@ -221,8 +221,12 @@ class TrainingStateManager:
                 result["temperature"] = float(parts[1].strip())
         except TrainingPausedException:
             raise
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "Non-critical failure while collecting GPU metrics: %s",
+                exc,
+                exc_info=True,
+            )
 
         self._emit_gpu_runtime_metrics(result, force=force_emit)
         return result
