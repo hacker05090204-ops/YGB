@@ -13,7 +13,9 @@ Policy:
   3. Videos, activity logs, session data, user uploads → always HDD.
 """
 
+import asyncio
 import gzip
+import json
 import logging
 import os
 import shutil
@@ -107,6 +109,169 @@ class StorageReport:
         }
 
 
+@dataclass
+class StorageTierHealth:
+    tier_name: str
+    available_bytes: int
+    used_bytes: int
+    read_latency_ms: float
+    write_latency_ms: float
+
+
+STORAGE_WAL_PATH = Path(
+    os.environ.get("YGB_STORAGE_WAL_PATH", str(SSD_ROOT / ".wal.jsonl"))
+)
+_wal_lock = threading.Lock()
+_wal_recovery_in_progress = False
+
+
+def _load_wal_entries() -> list[dict[str, str]]:
+    if not STORAGE_WAL_PATH.exists():
+        return []
+
+    entries: list[dict[str, str]] = []
+    try:
+        with open(STORAGE_WAL_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                payload = line.strip()
+                if not payload:
+                    continue
+                try:
+                    entry = json.loads(payload)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(entry, dict) and entry.get("op") and entry.get("key"):
+                    entries.append(entry)
+    except OSError:
+        return []
+    return entries
+
+
+def _write_wal_entries(entries: list[dict[str, str]]) -> None:
+    STORAGE_WAL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    if not entries:
+        STORAGE_WAL_PATH.unlink(missing_ok=True)
+        return
+
+    tmp_path = STORAGE_WAL_PATH.with_suffix(STORAGE_WAL_PATH.suffix + ".tmp")
+    with open(tmp_path, "w", encoding="utf-8") as f:
+        for entry in entries:
+            f.write(json.dumps(entry, separators=(",", ":")) + "\n")
+    os.replace(str(tmp_path), str(STORAGE_WAL_PATH))
+
+
+def _append_wal_entry(op: str, key: str) -> dict[str, str]:
+    entry = {
+        "timestamp": datetime.now().isoformat(),
+        "op": op,
+        "key": key,
+    }
+    with _wal_lock:
+        STORAGE_WAL_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(STORAGE_WAL_PATH, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, separators=(",", ":")) + "\n")
+    return entry
+
+
+def _complete_wal_entry(entry: dict[str, str]) -> None:
+    with _wal_lock:
+        removed = False
+        filtered: list[dict[str, str]] = []
+        for candidate in _load_wal_entries():
+            if not removed and candidate == entry:
+                removed = True
+                continue
+            filtered.append(candidate)
+        _write_wal_entries(filtered)
+
+
+def _wal_protected_write(op: str, key: str, action):
+    if _wal_recovery_in_progress:
+        return action()
+
+    entry = _append_wal_entry(op, key)
+    try:
+        result = action()
+    except Exception:
+        raise
+    else:
+        _complete_wal_entry(entry)
+        return result
+
+
+def _write_probe_file(path: Path, payload: bytes = b"ok") -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "wb") as f:
+        f.write(payload)
+
+
+def _ensure_dir(path: Path) -> None:
+    _wal_protected_write(
+        "ensure_dir",
+        str(path),
+        lambda: path.mkdir(parents=True, exist_ok=True),
+    )
+
+
+def _replay_wal_entry(entry: dict[str, str]) -> bool:
+    op = str(entry.get("op", ""))
+    key = str(entry.get("key", ""))
+    if not op or not key:
+        return False
+
+    path = Path(key)
+    if op == "ensure_dir":
+        path.mkdir(parents=True, exist_ok=True)
+        return True
+
+    if op in {"path_probe", "tier_probe"}:
+        _write_probe_file(path)
+        path.unlink(missing_ok=True)
+        return True
+
+    if op == "compress_file":
+        compressed_path = path.with_suffix(path.suffix + ".gz")
+        if compressed_path.exists() or not path.exists():
+            return True
+        return _compress_file_impl(path) is not None
+
+    if op == "migrate_to_hdd":
+        try:
+            rel = path.relative_to(SSD_ROOT)
+        except ValueError:
+            rel = Path(path.name)
+        expected_dst = _active_hdd_dir("ssd_overflow") / rel
+        if expected_dst.exists() or not path.exists():
+            return True
+        return _migrate_to_hdd_impl(path) is not None
+
+    return False
+
+
+def _replay_incomplete_wal_entries() -> None:
+    global _wal_recovery_in_progress
+
+    pending_entries = _load_wal_entries()
+    if not pending_entries:
+        return
+
+    logger.info("Replaying %d incomplete storage WAL entries", len(pending_entries))
+    remaining_entries: list[dict[str, str]] = []
+    _wal_recovery_in_progress = True
+    try:
+        for entry in pending_entries:
+            try:
+                if not _replay_wal_entry(entry):
+                    remaining_entries.append(entry)
+            except Exception:
+                remaining_entries.append(entry)
+    finally:
+        _wal_recovery_in_progress = False
+
+    with _wal_lock:
+        _write_wal_entries(remaining_entries)
+
+
 # ---------------------------------------------------------------------------
 # Core helpers
 # ---------------------------------------------------------------------------
@@ -118,8 +283,8 @@ def _dir_size(path: Path) -> int:
         for entry in path.rglob("*"):
             if entry.is_file():
                 total += entry.stat().st_size
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to measure directory size for %s: %s", path, exc)
     return total
 
 
@@ -130,10 +295,9 @@ def _ssd_usage() -> int:
 def _path_is_usable(path: Path) -> tuple[bool, str]:
     """Check whether a root is currently writable enough for active storage."""
     try:
-        path.mkdir(parents=True, exist_ok=True)
+        _ensure_dir(path)
         probe = path / ".ygb_probe.tmp"
-        with open(probe, "wb") as f:
-            f.write(b"ok")
+        _wal_protected_write("path_probe", str(probe), lambda: _write_probe_file(probe))
         probe.unlink(missing_ok=True)
         return True, "ok"
     except Exception as exc:
@@ -246,8 +410,8 @@ def _cold_files(root: Path) -> list[Path]:
             if f.is_file() and f.stat().st_size >= MIN_COMPRESS_SIZE:
                 if f.stat().st_atime < cutoff:
                     candidates.append(f)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to scan compression candidates under %s: %s", root, exc)
     candidates.sort(key=lambda p: p.stat().st_atime)
     return candidates
 
@@ -256,7 +420,7 @@ def _cold_files(root: Path) -> list[Path]:
 # Compression
 # ---------------------------------------------------------------------------
 
-def compress_file(src: Path) -> Optional[Path]:
+def _compress_file_impl(src: Path) -> Optional[Path]:
     """Gzip-compress *src* in-place.  Returns the .gz path or None on error."""
     dst = src.with_suffix(src.suffix + ".gz")
     if dst.exists():
@@ -282,6 +446,10 @@ def compress_file(src: Path) -> Optional[Path]:
         return None
 
 
+def compress_file(src: Path) -> Optional[Path]:
+    return _wal_protected_write("compress_file", str(src), lambda: _compress_file_impl(src))
+
+
 def _human(b: int) -> str:
     if b >= _GB:
         return f"{b / _GB:.1f} GB"
@@ -294,14 +462,14 @@ def _human(b: int) -> str:
 # Migration (SSD → HDD overflow)
 # ---------------------------------------------------------------------------
 
-def migrate_to_hdd(src: Path) -> Optional[Path]:
+def _migrate_to_hdd_impl(src: Path) -> Optional[Path]:
     """Move a file from SSD to HDD overflow, preserving relative path."""
     try:
         rel = src.relative_to(SSD_ROOT)
     except ValueError:
         rel = Path(src.name)
     dst = _active_hdd_dir("ssd_overflow") / rel
-    dst.parent.mkdir(parents=True, exist_ok=True)
+    _ensure_dir(dst.parent)
     try:
         shutil.move(str(src), str(dst))
         logger.info("Migrated to HDD: %s → %s (%s)", src.name, dst, _human(dst.stat().st_size))
@@ -309,6 +477,10 @@ def migrate_to_hdd(src: Path) -> Optional[Path]:
     except Exception:
         logger.exception("Failed to migrate %s → HDD", src)
         return None
+
+
+def migrate_to_hdd(src: Path) -> Optional[Path]:
+    return _wal_protected_write("migrate_to_hdd", str(src), lambda: _migrate_to_hdd_impl(src))
 
 
 # ---------------------------------------------------------------------------
@@ -414,7 +586,7 @@ def resolve_path(category: str, filename: str = "") -> Path:
         "backup":     _backup_root(),
     }
     base = _mapping.get(category, _active_hdd_dir(category))
-    base.mkdir(parents=True, exist_ok=True)
+    _ensure_dir(base)
     return base / filename if filename else base
 
 
@@ -436,11 +608,74 @@ def get_storage_report() -> dict:
     return r.to_dict()
 
 
+def _probe_tier_health(root: Path, probe_name: str) -> tuple[float, float]:
+    read_latency_ms = -1.0
+    write_latency_ms = -1.0
+    probe_path = root / probe_name
+    payload = f"tier-health:{time.time_ns()}".encode("utf-8")
+
+    try:
+        _ensure_dir(root)
+
+        write_start = time.perf_counter()
+        _wal_protected_write(
+            "tier_probe",
+            str(probe_path),
+            lambda: _write_probe_file(probe_path, payload),
+        )
+        write_latency_ms = (time.perf_counter() - write_start) * 1000.0
+
+        read_start = time.perf_counter()
+        with open(probe_path, "rb") as f:
+            f.read()
+        read_latency_ms = (time.perf_counter() - read_start) * 1000.0
+    except Exception as exc:
+        logger.warning("Tier health probe failed for %s: %s", root, exc)
+    finally:
+        probe_path.unlink(missing_ok=True)
+
+    return read_latency_ms, write_latency_ms
+
+
+def get_tier_health() -> list[StorageTierHealth]:
+    results: list[StorageTierHealth] = []
+    for tier_name, root in [
+        ("ssd", SSD_ROOT),
+        ("primary_hdd", PRIMARY_HDD_ROOT),
+        ("fallback_hdd", FALLBACK_HDD_ROOT),
+    ]:
+        available_bytes = 0
+        used_bytes = 0
+        try:
+            _ensure_dir(root)
+            usage = shutil.disk_usage(root)
+            available_bytes = int(usage.free)
+            used_bytes = int(usage.used)
+        except Exception as exc:
+            logger.warning("Disk usage probe failed for %s (%s): %s", tier_name, root, exc)
+
+        read_latency_ms, write_latency_ms = _probe_tier_health(
+            root,
+            f".{tier_name}.health.tmp",
+        )
+        results.append(
+            StorageTierHealth(
+                tier_name=tier_name,
+                available_bytes=available_bytes,
+                used_bytes=used_bytes,
+                read_latency_ms=read_latency_ms,
+                write_latency_ms=write_latency_ms,
+            )
+        )
+    return results
+
+
 # ---------------------------------------------------------------------------
 # Ensure directories exist at import time
 # ---------------------------------------------------------------------------
 
 def _init_dirs():
+    _replay_incomplete_wal_entries()
     hdd_root, topology = resolve_hdd_root()
     hdd_dirs = [
         hdd_root / "videos",
@@ -459,7 +694,7 @@ def _init_dirs():
         *hdd_dirs,
     ]:
         try:
-            d.mkdir(parents=True, exist_ok=True)
+            _ensure_dir(d)
         except Exception as exc:
             logger.warning("Storage directory init skipped for %s: %s", d, exc)
 
@@ -473,6 +708,26 @@ _init_dirs()
 
 _enforcement_thread: Optional[threading.Thread] = None
 _enforcement_stop_event = threading.Event()
+
+
+async def _wait_for_stop_signal() -> None:
+    stop_signal = asyncio.Event()
+    if _enforcement_stop_event.is_set():
+        stop_signal.set()
+    else:
+        loop = asyncio.get_running_loop()
+
+        def _watch_stop() -> None:
+            _enforcement_stop_event.wait()
+            loop.call_soon_threadsafe(stop_signal.set)
+
+        threading.Thread(
+            target=_watch_stop,
+            daemon=True,
+            name="storage-enforcement-keepalive",
+        ).start()
+
+    await stop_signal.wait()
 
 
 def start_enforcement_loop(interval_seconds: int = 300):
@@ -538,9 +793,9 @@ if __name__ == "__main__":
         idx = sys.argv.index("--loop")
         interval = int(sys.argv[idx + 1]) if idx + 1 < len(sys.argv) else 300
         start_enforcement_loop(interval)
-        # Keep main alive with loop guard
-        MAX_KEEPALIVE = 100000
-        for _ka in range(MAX_KEEPALIVE):
-            time.sleep(60)
+        try:
+            asyncio.run(_wait_for_stop_signal())
+        finally:
+            stop_enforcement_loop()
     else:
         print(json.dumps(get_storage_report(), indent=2))

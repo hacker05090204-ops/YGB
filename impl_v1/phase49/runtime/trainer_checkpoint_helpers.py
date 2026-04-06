@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import tempfile
 from datetime import datetime, timezone
 from typing import Any, Dict
+
+
+logger = logging.getLogger(__name__)
 
 
 def checkpoint_paths_for(base_dir: str) -> tuple[str, str, str]:
@@ -58,8 +62,8 @@ def save_checkpoint_bundle(
     except Exception:
         try:
             os.remove(tmp_weights)
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Failed to remove temporary checkpoint file %s: %s", tmp_weights, exc)
         raise
 
     atomic_write_json(checkpoint_meta_path, metadata)
@@ -71,8 +75,14 @@ def load_checkpoint_metadata(checkpoint_meta_path: str) -> Dict[str, Any]:
             payload = json.load(handle)
         if isinstance(payload, dict):
             return payload
-    except (FileNotFoundError, json.JSONDecodeError, OSError):
-        pass
+    except FileNotFoundError:
+        logger.debug("Checkpoint metadata file not found: %s", checkpoint_meta_path)
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.warning(
+            "Failed to load checkpoint metadata from %s: %s",
+            checkpoint_meta_path,
+            exc,
+        )
     return {}
 
 

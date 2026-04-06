@@ -18,6 +18,7 @@ from typing import Tuple
 
 import numpy as np
 
+from backend.training.representation_bridge import SyntheticDataBlockedError
 from impl_v1.training.distributed.hash_utils import hash_model_weights
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,8 @@ def verify_scaling_determinism(
     input_dim: int = 256,
     num_runs: int = 3,
     epochs: int = 3,
+    X=None,
+    y=None,
 ) -> Tuple[bool, list]:
     """Run determinism check at the given batch_size.
 
@@ -47,13 +50,23 @@ def verify_scaling_determinism(
     except ImportError:
         return True, []
 
+    if X is None or y is None:
+        raise SyntheticDataBlockedError(
+            "scaling_safety.verify_scaling_determinism requires caller-supplied real tensors; "
+            "synthetic determinism data is blocked"
+        )
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
+
+    X_np = np.asarray(X, dtype=np.float32)
+    y_np = np.asarray(y, dtype=np.int64)
+    if X_np.shape[0] == 0 or y_np.shape[0] == 0:
+        raise ValueError("scaling_safety.verify_scaling_determinism requires non-empty real tensors")
 
     hashes = []
     for run in range(num_runs):
         torch.manual_seed(42)
-        np.random.seed(42)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
         try:
@@ -61,9 +74,8 @@ def verify_scaling_determinism(
         except Exception:
             pass
 
-        rng = np.random.RandomState(42)
-        X = torch.from_numpy(rng.randn(4000, input_dim).astype(np.float32)).to(device)
-        y = torch.from_numpy(rng.randint(0, 2, 4000).astype(np.int64)).to(device)
+        X = torch.from_numpy(X_np).to(device)
+        y = torch.from_numpy(y_np).to(device)
 
         model = nn.Sequential(
             nn.Linear(input_dim, 128), nn.ReLU(), nn.Dropout(0.3),
@@ -113,6 +125,8 @@ def verify_scaling_determinism(
 def safe_adaptive_scale(
     starting_batch: int = 1024,
     input_dim: int = 256,
+    X=None,
+    y=None,
 ) -> int:
     """Run adaptive scaling with determinism safety.
 
@@ -123,12 +137,12 @@ def safe_adaptive_scale(
     """
     from impl_v1.training.config.adaptive_batch import find_optimal_batch_size
 
-    result = find_optimal_batch_size(starting_batch, input_dim)
+    result = find_optimal_batch_size(starting_batch, input_dim, X=X, y=y)
     optimal = result.optimal_batch_size
 
     if optimal != starting_batch:
         # Verify determinism at new batch size
-        match, _ = verify_scaling_determinism(optimal, input_dim)
+        match, _ = verify_scaling_determinism(optimal, input_dim, X=X, y=y)
         if not match:
             logger.warning(
                 f"[SAFETY] Adaptive batch_size={optimal} breaks determinism — "

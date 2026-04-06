@@ -24,9 +24,12 @@ Python DECIDES. C/C++ EXECUTES only after approval.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional, Protocol, runtime_checkable
 import uuid
 from datetime import datetime, UTC
+
+from .g02_browser_types import BrowserProfile, can_profile_store_credentials, can_profile_submit_forms
+from .g03_browser_safety import BrowserSafetyGuard
 
 
 class InteractiveMode(Enum):
@@ -49,6 +52,16 @@ class Platform(Enum):
     INTIGRITI = "INTIGRITI"
     SYNACK = "SYNACK"
     UNKNOWN = "UNKNOWN"
+
+
+BROWSER_RUNTIME_PROVISIONING_MESSAGE = (
+    "InteractiveBrowser requires Playwright or CDP runtime. "
+    "Install playwright and set YGB_BROWSER_RUNTIME=playwright."
+)
+
+
+class RealBackendNotConfiguredError(RuntimeError):
+    pass
 
 
 @dataclass(frozen=True)
@@ -93,6 +106,70 @@ class PlatformDetection:
     confidence: float
     program_name: Optional[str]
     program_url: Optional[str]
+
+
+@dataclass(frozen=True)
+class BrowserSession:
+    """Real browser runtime session contract for infrastructure-backed launches."""
+
+    session_id: str
+    browser_type: str
+    started_at: str
+    target_url: str
+    status: str
+
+
+@runtime_checkable
+class BrowserRuntime(Protocol):
+    """Infrastructure contract for a real browser automation runtime."""
+
+    def launch(self, profile: BrowserProfile) -> BrowserSession:
+        ...
+
+    def close(self, session_id: str) -> bool:
+        ...
+
+
+class InteractiveBrowser:
+    """Fail-closed interactive browser gateway pending real runtime provisioning."""
+
+    def __init__(
+        self,
+        *,
+        safety_guard: BrowserSafetyGuard | None = None,
+        runtime: BrowserRuntime | None = None,
+    ):
+        self._safety_guard = safety_guard or BrowserSafetyGuard()
+        self._runtime = runtime
+
+    @staticmethod
+    def read_only_contract() -> dict[str, bool]:
+        """Production contract enforced for any future interactive runtime."""
+
+        return {
+            "form_submission_allowed": False,
+            "submit_login_clicks_allowed": False,
+            "credential_entry_allowed": False,
+        }
+
+    def _assert_read_only_contract(self, profile: BrowserProfile) -> None:
+        contract = self.read_only_contract()
+        if contract["form_submission_allowed"] or can_profile_submit_forms(profile):
+            raise PermissionError("Interactive browser contract forbids form submission")
+        if contract["credential_entry_allowed"] or can_profile_store_credentials(profile):
+            raise PermissionError("Interactive browser contract forbids credential entry")
+        if contract["submit_login_clicks_allowed"]:
+            raise PermissionError("Interactive browser contract forbids submit/login button clicks")
+
+    def launch(self, profile: BrowserProfile) -> BrowserSession:
+        """Validate governed safety policy before any infrastructure-backed launch."""
+
+        if not self._safety_guard.is_safe(profile):
+            raise PermissionError("Unsafe browser profile blocked from interactive launch")
+
+        self._assert_read_only_contract(profile)
+        del self._runtime
+        raise RealBackendNotConfiguredError(BROWSER_RUNTIME_PROVISIONING_MESSAGE)
 
 
 # In-memory session store

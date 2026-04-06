@@ -16,6 +16,7 @@ REQUIREMENTS:
 
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import Tuple, Dict, Optional, List, Any
 import hashlib
 import uuid
@@ -38,6 +39,16 @@ except ImportError:
     torch = None
     nn = None
     optim = None
+
+
+PYTORCH_BACKEND_PROVISIONING_MESSAGE = (
+    "PyTorchBackend requires real DataLoader with non-empty dataset. "
+    "Verify dataset exists and torch is installed."
+)
+
+
+class RealBackendNotConfiguredError(RuntimeError):
+    """Raised when the real PyTorch backend contract is not provisioned."""
 
 
 class DeviceType(Enum):
@@ -121,6 +132,28 @@ class InferenceResult:
     inference_time_ms: float
 
 
+@dataclass(frozen=True)
+class TrainingConfig:
+    """Infrastructure-gated training contract for the PyTorch backend."""
+
+    model_arch: str
+    learning_rate: float
+    batch_size: int
+    max_epochs: int
+    use_amp: bool
+
+
+@dataclass(frozen=True)
+class TrainingResult:
+    """Infrastructure-gated training result contract."""
+
+    run_id: str
+    final_loss: Optional[float]
+    epochs_completed: int
+    checkpoint_path: Optional[str]
+    status: str
+
+
 # =============================================================================
 # HELPER FUNCTIONS
 # =============================================================================
@@ -144,6 +177,54 @@ def _require_pytorch_runtime(operation: str) -> None:
     """Fail closed when real PyTorch execution is unavailable."""
     if not PYTORCH_AVAILABLE or torch is None or nn is None or optim is None:
         raise RuntimeError(f"PyTorch is required for {operation}")
+
+
+def _is_non_empty_real_dataloader(dataloader: Any) -> bool:
+    """Validate the infrastructure contract for a real PyTorch DataLoader."""
+    if not PYTORCH_AVAILABLE or torch is None:
+        return False
+
+    data_module = getattr(getattr(torch, "utils", None), "data", None)
+    data_loader_cls = getattr(data_module, "DataLoader", None)
+    if data_loader_cls is None or not isinstance(dataloader, data_loader_cls):
+        return False
+
+    dataset = getattr(dataloader, "dataset", None)
+    if dataset is None:
+        return False
+
+    try:
+        return len(dataset) > 0
+    except TypeError:
+        return False
+
+
+class PyTorchBackend:
+    """Infrastructure-gated PyTorch backend contract."""
+
+    def train(self, config: TrainingConfig, dataloader: Any) -> TrainingResult:
+        if not isinstance(config, TrainingConfig) or not _is_non_empty_real_dataloader(dataloader):
+            raise RealBackendNotConfiguredError(PYTORCH_BACKEND_PROVISIONING_MESSAGE)
+
+        raise RealBackendNotConfiguredError(PYTORCH_BACKEND_PROVISIONING_MESSAGE)
+
+    def load_checkpoint(self, path: str) -> Dict[str, Any]:
+        checkpoint_path = Path(path)
+        if not checkpoint_path.is_file():
+            raise FileNotFoundError(path)
+
+        if not PYTORCH_AVAILABLE or torch is None:
+            raise RealBackendNotConfiguredError(PYTORCH_BACKEND_PROVISIONING_MESSAGE)
+
+        try:
+            checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+        except TypeError:
+            checkpoint = torch.load(checkpoint_path, map_location="cpu")
+
+        if not isinstance(checkpoint, dict):
+            raise ValueError("Checkpoint payload must be a dict")
+
+        return checkpoint
 
 
 # =============================================================================

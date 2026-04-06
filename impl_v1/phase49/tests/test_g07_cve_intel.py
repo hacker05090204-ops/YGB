@@ -1,13 +1,19 @@
 # test_g07_cve_intel.py
 """Tests for G07: CVE Intelligence"""
 
+import inspect
+
 import pytest
 import backend.cve.cve_pipeline as pipeline_mod
+import impl_v1.phase49.governors.g07_cve_intelligence as intel_mod
 from impl_v1.phase49.governors.g07_cve_intelligence import (
+    CVEIntelligenceEngine,
+    CVEIntelligenceRecord,
     CVESeverity,
     CVEStatus,
     CVERecord,
     CVEQueryResult,
+    IntelligenceCache,
     clear_cache,
     cache_record,
     get_cached,
@@ -16,6 +22,17 @@ from impl_v1.phase49.governors.g07_cve_intelligence import (
     query_cves,
     correlate_target,
 )
+
+
+class FakeBridgeState:
+    def __init__(self, samples):
+        self._samples = list(samples)
+
+    def read_samples(self, max_samples: int = 0):
+        samples = list(self._samples)
+        if max_samples:
+            return samples[:max_samples]
+        return samples
 
 
 class TestEnumClosure:
@@ -162,6 +179,130 @@ class TestQueryCVEs:
         assert result.total_count == 1
         assert result.cached is False
         assert result.records[0].cve_id == "CVE-2026-1234"
+
+
+class TestCVEIntelligenceEngine:
+    def setup_method(self):
+        clear_cache()
+
+    def test_unknown_cve_returns_none(self):
+        pipeline = pipeline_mod.CVEPipeline()
+        engine = CVEIntelligenceEngine(
+            pipeline_getter=lambda: pipeline,
+            bridge_state_getter=lambda: FakeBridgeState([]),
+        )
+
+        assert engine.enrich("CVE-2099-0001") is None
+
+    def test_enrich_reads_local_pipeline_record(self):
+        pipeline = pipeline_mod.CVEPipeline()
+        pipeline.ingest_record(
+            cve_id="CVE-2026-2001",
+            title="Edge worker issue",
+            description="Runtime pipeline vulnerability in edge worker",
+            severity="HIGH",
+            cvss_score=8.7,
+            affected_products=["edge-worker"],
+            references=["https://example.test/advisory"],
+            is_exploited=True,
+            source_id="nvd",
+        )
+        engine = CVEIntelligenceEngine(
+            pipeline_getter=lambda: pipeline,
+            bridge_state_getter=lambda: FakeBridgeState([]),
+        )
+
+        result = engine.enrich("CVE-2026-2001")
+
+        assert isinstance(result, CVEIntelligenceRecord)
+        assert result is not None
+        assert result.cve_id == "CVE-2026-2001"
+        assert result.severity_score == pytest.approx(8.7)
+        assert result.affected_products == ["edge-worker"]
+        assert result.intelligence_source == "local_pipeline"
+        assert result.has_public_exploit is True
+
+    def test_enrich_reads_bridge_state_when_pipeline_misses(self):
+        pipeline = pipeline_mod.CVEPipeline()
+        bridge_state = FakeBridgeState(
+            [
+                {
+                    "endpoint": "CVE-2026-3001",
+                    "parameters": '["bridge-app", "shared-lib"]',
+                    "impact": "HIGH|CVSS:8.8",
+                    "published_at": "2026-04-05T00:00:00+00:00",
+                    "has_public_exploit": True,
+                }
+            ]
+        )
+        engine = CVEIntelligenceEngine(
+            pipeline_getter=lambda: pipeline,
+            bridge_state_getter=lambda: bridge_state,
+        )
+
+        result = engine.enrich("CVE-2026-3001")
+
+        assert result is not None
+        assert result.cve_id == "CVE-2026-3001"
+        assert result.severity_score == pytest.approx(8.8)
+        assert result.affected_products == ["bridge-app", "shared-lib"]
+        assert result.published_at == "2026-04-05T00:00:00+00:00"
+        assert result.intelligence_source == "local_pipeline"
+        assert result.has_public_exploit is True
+
+    def test_cache_ttl_is_respected(self):
+        clock = {"now": 10_000.0}
+        cache = IntelligenceCache(time_fn=lambda: clock["now"])
+        pipeline = pipeline_mod.CVEPipeline()
+        pipeline.ingest_record(
+            cve_id="CVE-2026-4001",
+            title="Initial record",
+            description="Initial severity snapshot",
+            severity="HIGH",
+            cvss_score=7.1,
+            affected_products=["cache-app"],
+            references=[],
+            is_exploited=False,
+            source_id="nvd",
+        )
+        engine = CVEIntelligenceEngine(
+            pipeline_getter=lambda: pipeline,
+            bridge_state_getter=lambda: FakeBridgeState([]),
+            cache=cache,
+        )
+
+        first = engine.enrich("CVE-2026-4001")
+        pipeline.ingest_record(
+            cve_id="CVE-2026-4001",
+            title="Updated record",
+            description="Updated severity snapshot",
+            severity="CRITICAL",
+            cvss_score=9.9,
+            affected_products=["cache-app"],
+            references=[],
+            is_exploited=True,
+            source_id="nvd",
+        )
+
+        cached = engine.enrich("CVE-2026-4001")
+        clock["now"] += 24 * 60 * 60 + 1
+        refreshed = engine.enrich("CVE-2026-4001")
+
+        assert first is not None
+        assert cached is not None
+        assert refreshed is not None
+        assert first.severity_score == pytest.approx(7.1)
+        assert cached.severity_score == pytest.approx(7.1)
+        assert refreshed.severity_score == pytest.approx(9.9)
+        assert refreshed.has_public_exploit is True
+
+
+class TestProductionSourcePath:
+    def test_production_path_has_no_mock_or_live_fetch_language(self):
+        source = inspect.getsource(intel_mod)
+
+        assert "mock" not in source.lower()
+        assert "fetch_cves_passive" not in source
 
 
 class TestCorrelateTarget:

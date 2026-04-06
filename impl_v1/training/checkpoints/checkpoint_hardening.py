@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import random
+import shutil
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
@@ -528,7 +529,7 @@ class HardenedCheckpointManager:
         extra_metadata: Optional[Dict[str, Any]],
     ) -> Dict[str, Any]:
         materialized_global_step = int(global_step if global_step is not None else step)
-        resolved_checkpoint_id = checkpoint_id or f"global_step_{materialized_global_step}"
+        resolved_checkpoint_id = checkpoint_id or f"ckpt_e{int(epoch):04d}_s{int(step):06d}"
         return {
             "checkpoint_id": resolved_checkpoint_id,
             "epoch": int(epoch),
@@ -594,6 +595,10 @@ class HardenedCheckpointManager:
                 extra={"tensor_hash": tensor_hash},
             )
         )
+
+        if rank == 0 and snapshot["world_size"] == 1:
+            legacy_single_file = self.checkpoint_dir / f"{checkpoint_id}.safetensors"
+            shutil.copyfile(model_path, legacy_single_file)
 
         if snapshot["optimizer_state"] is not None:
             optimizer_path = checkpoint_path / f"optimizer_{rank}.pt"

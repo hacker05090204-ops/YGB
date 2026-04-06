@@ -13,101 +13,142 @@ RULES:
 """
 
 from dataclasses import dataclass
-from enum import Enum
+from datetime import datetime, timezone
+import json
 from typing import Tuple, Optional
 import hashlib
 import platform
 import sys
-import os
 
-
-class SafeMode(Enum):
-    """CLOSED ENUM - Safe mode states."""
-    NORMAL = "NORMAL"              # Full operation
-    SAFE = "SAFE"                  # Restricted operation
-    LOCKDOWN = "LOCKDOWN"          # Manual only
-
-
-class DriftStatus(Enum):
-    """CLOSED ENUM - Environment drift status."""
-    TRUSTED = "TRUSTED"            # Matches baseline
-    DRIFTED = "DRIFTED"            # Changed from baseline
-    UNKNOWN = "UNKNOWN"            # No baseline
+try:
+    import torch
+except Exception:  # pragma: no cover - import failure is environment dependent
+    torch = None
 
 
 @dataclass(frozen=True)
 class EnvironmentFingerprint:
     """Immutable environment fingerprint."""
-    fingerprint_id: str
-    os_name: str
-    os_version: str
-    kernel_version: str
-    python_version: str
-    python_hash: str
-    platform_machine: str
-    libc_version: str
-    gpu_info: str
-    browser_version: str
-    fingerprint_hash: str
+    fingerprint_id: Optional[str]
+    os_type: Optional[str]
+    arch: Optional[str]
+    python_version: Optional[str]
+    gpu_available: Optional[bool]
+    computed_at: Optional[str]
+    hash_sha256: Optional[str]
 
 
-@dataclass(frozen=True)
-class DriftReport:
-    """Environment drift report."""
-    report_id: str
-    status: DriftStatus
-    baseline: Optional[EnvironmentFingerprint]
-    current: EnvironmentFingerprint
-    mismatches: Tuple[str, ...]
-    recommended_mode: SafeMode
+class FingerprintCollector:
+    """Collect real environment fingerprint data without fabrication."""
+
+    def collect(self) -> EnvironmentFingerprint:
+        os_type = _collect_value(platform.system)
+        arch = _collect_value(platform.machine)
+        python_version = _collect_value(lambda: sys.version)
+        gpu_available = _collect_value(_read_gpu_available)
+        computed_at = _collect_value(lambda: datetime.now(timezone.utc).isoformat())
+
+        hash_sha256 = _compute_hash(
+            os_type=os_type,
+            arch=arch,
+            python_version=python_version,
+            gpu_available=gpu_available,
+        )
+        fingerprint_id = hash_sha256[:16] if hash_sha256 is not None else None
+
+        return EnvironmentFingerprint(
+            fingerprint_id=fingerprint_id,
+            os_type=os_type,
+            arch=arch,
+            python_version=python_version,
+            gpu_available=gpu_available,
+            computed_at=computed_at,
+            hash_sha256=hash_sha256,
+        )
+
+
+class FingerprintStore:
+    """In-memory fingerprint history capped to the latest 10 entries."""
+
+    def __init__(self) -> None:
+        self._fingerprints = []
+
+    def add(self, fingerprint: EnvironmentFingerprint) -> None:
+        self._fingerprints.append(fingerprint)
+        if len(self._fingerprints) > 10:
+            self._fingerprints = self._fingerprints[-10:]
+
+    @property
+    def fingerprints(self) -> Tuple[EnvironmentFingerprint, ...]:
+        return tuple(self._fingerprints)
+
+    def latest(self) -> Optional[EnvironmentFingerprint]:
+        if not self._fingerprints:
+            return None
+        return self._fingerprints[-1]
 
 
 # =============================================================================
 # FINGERPRINT CAPTURE
 # =============================================================================
 
-def _hash_content(content: str) -> str:
-    """Generate hash."""
-    return hashlib.sha256(content.encode()).hexdigest()[:32]
+def _collect_value(getter):
+    """Safely collect a real environment value without fabricating fallbacks."""
+    try:
+        return getter()
+    except Exception:
+        return None
+
+
+def _read_gpu_available() -> bool:
+    """Return the real CUDA availability from torch."""
+    if torch is None or not hasattr(torch, "cuda") or not hasattr(torch.cuda, "is_available"):
+        raise RuntimeError("torch.cuda.is_available unavailable")
+    return bool(torch.cuda.is_available())
+
+
+def _serialize_hash_payload(
+    os_type: Optional[str],
+    arch: Optional[str],
+    python_version: Optional[str],
+    gpu_available: Optional[bool],
+) -> str:
+    """Serialize stable environment values deterministically for hashing."""
+    return json.dumps(
+        {
+            "arch": arch,
+            "gpu_available": gpu_available,
+            "os_type": os_type,
+            "python_version": python_version,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _compute_hash(
+    os_type: Optional[str],
+    arch: Optional[str],
+    python_version: Optional[str],
+    gpu_available: Optional[bool],
+) -> Optional[str]:
+    """Generate SHA-256 hash for the stable fingerprint values."""
+    serialized = _collect_value(
+        lambda: _serialize_hash_payload(
+            os_type=os_type,
+            arch=arch,
+            python_version=python_version,
+            gpu_available=gpu_available,
+        )
+    )
+    if serialized is None:
+        return None
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def capture_environment_fingerprint() -> EnvironmentFingerprint:
     """Capture current environment fingerprint."""
-    os_name = platform.system()
-    os_version = platform.release()
-    kernel = platform.version()
-    py_version = platform.python_version()
-    py_hash = _hash_content(sys.executable)
-    machine = platform.machine()
-    
-    # libc version
-    try:
-        libc = platform.libc_ver()[1] or "unknown"
-    except Exception:
-        libc = "unknown"
-    
-    # GPU info (from C++ bridge or env override)
-    gpu_info = os.environ.get("GPU_INFO", "undetected")
-    
-    # Browser version (from browser module or env override)
-    browser = os.environ.get("BROWSER_VERSION", "undetected")
-    
-    # Combine for hash
-    combined = f"{os_name}|{os_version}|{kernel}|{py_version}|{machine}|{libc}|{gpu_info}|{browser}"
-    
-    return EnvironmentFingerprint(
-        fingerprint_id=_hash_content(combined)[:16].upper(),
-        os_name=os_name,
-        os_version=os_version,
-        kernel_version=kernel,
-        python_version=py_version,
-        python_hash=py_hash,
-        platform_machine=machine,
-        libc_version=libc,
-        gpu_info=gpu_info,
-        browser_version=browser,
-        fingerprint_hash=_hash_content(combined),
-    )
+    return FingerprintCollector().collect()
 
 
 def compare_fingerprints(
@@ -121,62 +162,37 @@ def compare_fingerprints(
     """
     mismatches = []
     
-    if baseline.os_name != current.os_name:
-        mismatches.append(f"os_name: {baseline.os_name} → {current.os_name}")
-    if baseline.os_version != current.os_version:
-        mismatches.append(f"os_version: {baseline.os_version} → {current.os_version}")
-    if baseline.kernel_version != current.kernel_version:
-        mismatches.append(f"kernel: {baseline.kernel_version} → {current.kernel_version}")
+    if baseline.os_type != current.os_type:
+        mismatches.append(f"os_type: {baseline.os_type} → {current.os_type}")
+    if baseline.arch != current.arch:
+        mismatches.append(f"arch: {baseline.arch} → {current.arch}")
     if baseline.python_version != current.python_version:
-        mismatches.append(f"python: {baseline.python_version} → {current.python_version}")
-    if baseline.platform_machine != current.platform_machine:
-        mismatches.append(f"machine: {baseline.platform_machine} → {current.platform_machine}")
+        mismatches.append(f"python_version: {baseline.python_version} → {current.python_version}")
+    if baseline.gpu_available != current.gpu_available:
+        mismatches.append(
+            f"gpu_available: {baseline.gpu_available} → {current.gpu_available}"
+        )
     
     return len(mismatches) == 0, tuple(mismatches)
 
 
 def detect_drift(
-    baseline: Optional[EnvironmentFingerprint],
     current: EnvironmentFingerprint,
-) -> DriftReport:
-    """Detect environment drift and recommend safe mode."""
-    import uuid
-    
-    if baseline is None:
-        return DriftReport(
-            report_id=uuid.uuid4().hex[:16].upper(),
-            status=DriftStatus.UNKNOWN,
-            baseline=None,
-            current=current,
-            mismatches=tuple(),
-            recommended_mode=SafeMode.SAFE,
-        )
-    
-    matches, mismatches = compare_fingerprints(baseline, current)
-    
-    if matches:
-        return DriftReport(
-            report_id=uuid.uuid4().hex[:16].upper(),
-            status=DriftStatus.TRUSTED,
-            baseline=baseline,
-            current=current,
-            mismatches=tuple(),
-            recommended_mode=SafeMode.NORMAL,
-        )
-    
-    return DriftReport(
-        report_id=uuid.uuid4().hex[:16].upper(),
-        status=DriftStatus.DRIFTED,
-        baseline=baseline,
-        current=current,
-        mismatches=mismatches,
-        recommended_mode=SafeMode.SAFE,
+    previous: Optional[EnvironmentFingerprint],
+) -> bool:
+    """Return True when trusted environment identity fields have changed."""
+    if previous is None:
+        return False
+
+    return any(
+        getattr(current, field_name) != getattr(previous, field_name)
+        for field_name in ("os_type", "arch", "python_version")
     )
 
 
-def should_enter_safe_mode(drift: DriftReport) -> bool:
+def should_enter_safe_mode(drift_detected: bool) -> bool:
     """Check if safe mode should be activated."""
-    return drift.status != DriftStatus.TRUSTED
+    return drift_detected
 
 
 # =============================================================================

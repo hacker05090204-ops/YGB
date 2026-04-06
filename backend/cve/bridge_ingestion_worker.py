@@ -554,8 +554,8 @@ class BridgeIngestionWorker:
                         src = getattr(p, "source", None)
                         if src:
                             source_mix[src] = source_mix.get(src, 0) + 1
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("[MANIFEST] Source mix computation incomplete: %s", exc)
 
         manifest = {
             "schema_version": 1,

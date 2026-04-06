@@ -8,12 +8,18 @@ Tests for forensic evidence capture governor.
 import pytest
 import tempfile
 import os
+import inspect
 from pathlib import Path
+
+import impl_v1.phase49.governors.g26_forensic_evidence as forensic_evidence
 
 from impl_v1.phase49.governors.g26_forensic_evidence import (
     EvidenceType,
     CaptureStatus,
     EvidenceMetadata,
+    EvidenceRecord,
+    EvidenceStore,
+    EvidenceCapture,
     Screenshot,
     VideoRecording,
     DOMSnapshot,
@@ -632,4 +638,50 @@ class TestAllPoCGuardsReturnFalse:
         for guard in guards:
             result = guard()
             assert result == False, f"Guard {guard.__name__} returned True!"
+
+
+class TestBatch5GroupAForensicEvidence:
+    """Focused tests for Batch 5 Group A forensic evidence requirements."""
+
+    def test_capture_hash_uses_actual_bytes_and_is_queryable(self):
+        """Capture hashes actual source bytes and supports lookup by id."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            source_path = Path(tmpdir) / "response.bin"
+            actual_bytes = b"forensic-http-response-bytes\n"
+            source_path.write_bytes(actual_bytes)
+
+            store = EvidenceStore()
+            capture = EvidenceCapture(store)
+            record = capture.capture(source_path.as_uri(), "http_response")
+
+            assert isinstance(record, EvidenceRecord)
+            assert record.hash_sha256 == compute_sha256(actual_bytes)
+            assert record.size_bytes == len(actual_bytes)
+            assert record.status == "CAPTURED"
+            assert store.get_evidence_by_id(record.evidence_id) == record
+
+    def test_pending_render_list_is_populated_correctly(self):
+        """Only screenshot captures requiring render appear in pending list."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            html_path = Path(tmpdir) / "page.html"
+            html_path.write_bytes(b"<html><body>pending render</body></html>")
+
+            png_path = Path(tmpdir) / "capture.png"
+            png_path.write_bytes(b"\x89PNG\r\n\x1a\nactual-image-bytes")
+
+            store = EvidenceStore()
+            capture = EvidenceCapture(store)
+
+            pending_record = capture.capture(html_path.as_uri(), "screenshot")
+            captured_record = capture.capture(png_path.as_uri(), "screenshot")
+
+            assert pending_record.status == "PENDING_RENDER"
+            assert captured_record.status == "CAPTURED"
+            assert store.get_pending_render() == [pending_record]
+
+    def test_mock_metadata_wording_is_absent_from_production_module(self):
+        """Production module source does not retain mock metadata wording."""
+        module_source = inspect.getsource(forensic_evidence).lower()
+        assert "mock_metadata" not in module_source
+        assert "mock metadata" not in module_source
 

@@ -39,9 +39,66 @@ TRAINING MODES (STRICT SPLIT):
 
 from dataclasses import dataclass
 from enum import Enum
+import os
+from pathlib import Path
 from typing import Tuple, List, Optional, Set, FrozenSet
 import uuid
 from datetime import datetime, timezone
+
+
+SAFE_PRETRAINING_PROVISIONING_MESSAGE = (
+    "SafePretrainer requires real dataset at dataset_path and GPU runtime. "
+    "Verify dataset exists and torch.cuda.is_available()."
+)
+
+
+class RealBackendNotConfiguredError(RuntimeError):
+    """Raised when the real safe-pretraining runtime is not provisioned."""
+
+
+@dataclass(frozen=True)
+class PretrainingConfig:
+    """Infrastructure-gated contract for real pretraining runs."""
+
+    dataset_path: str
+    max_epochs: int
+    checkpoint_dir: str
+    real_data_only: bool
+
+
+@dataclass(frozen=True)
+class PretrainingContract:
+    """Fail-closed contract validation for the real pretraining runtime."""
+
+    config: PretrainingConfig
+
+    def validate(self) -> None:
+        violations: List[str] = []
+
+        if self.config.real_data_only is not True:
+            violations.append("real_data_only must be True for SafePretrainer")
+
+        if not Path(self.config.dataset_path).exists():
+            violations.append("dataset_path must exist on disk for SafePretrainer")
+
+        checkpoint_dir = Path(self.config.checkpoint_dir)
+        if not checkpoint_dir.is_dir() or not os.access(checkpoint_dir, os.W_OK):
+            violations.append("checkpoint_dir must exist and be writable for SafePretrainer")
+
+        if violations:
+            raise ValueError("; ".join(violations))
+
+
+class SafePretrainer:
+    """Fail-closed pretrainer that requires a real dataset and real GPU runtime."""
+
+    def __init__(self, config: PretrainingConfig):
+        self._config = config
+        self._contract = PretrainingContract(config)
+
+    def start(self) -> None:
+        self._contract.validate()
+        raise RealBackendNotConfiguredError(SAFE_PRETRAINING_PROVISIONING_MESSAGE)
 
 
 # =============================================================================

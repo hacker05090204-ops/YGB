@@ -25,19 +25,24 @@ AI MODEL:
 - NEVER mutate state
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
+import logging
 from typing import Tuple, Optional, Dict, List, Any, Protocol
 import hashlib
 import json
 import math
 import os
+from pathlib import Path
 from subprocess import SubprocessError, run
 import time
 import uuid
 import platform
 from datetime import datetime, timezone
 from abc import ABC, abstractmethod
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -246,8 +251,8 @@ class LinuxGPUBackend(GPUBackendInterface):
             )
             if result.returncode == 0:
                 return int(result.stdout.strip()) // 1000
-        except (SubprocessError, ValueError, FileNotFoundError):
-            pass
+        except (SubprocessError, ValueError, FileNotFoundError) as exc:
+            logger.debug("Linux idle probe via xprintidle unavailable: %s", exc)
         # Fallback: check /dev/input device timestamps
         try:
             from pathlib import Path
@@ -264,8 +269,8 @@ class LinuxGPUBackend(GPUBackendInterface):
                             continue
                 if latest > 0:
                     return max(0, int(time.time() - latest))
-        except (OSError, PermissionError):
-            pass
+        except (OSError, PermissionError) as exc:
+            logger.debug("Linux input device idle fallback unavailable: %s", exc)
         return 0  # Safe default — prevents accidental training trigger
     
     def check_power(self) -> bool:
@@ -334,8 +339,8 @@ class WindowsGPUBackend(GPUBackendInterface):
                 if idle_ms < 0:
                     idle_ms += 0xFFFFFFFF + 1
                 return idle_ms // 1000
-        except (ImportError, AttributeError, OSError):
-            pass
+        except (ImportError, AttributeError, OSError) as exc:
+            logger.debug("Windows idle probe unavailable: %s", exc)
         return 0  # Safe default — prevents accidental training trigger
     
     def check_power(self) -> bool:
@@ -357,8 +362,8 @@ class WindowsGPUBackend(GPUBackendInterface):
             status = SYSTEM_POWER_STATUS()
             if ctypes.windll.kernel32.GetSystemPowerStatus(byref(status)):
                 return status.ACLineStatus == 1
-        except (ImportError, AttributeError, OSError):
-            pass
+        except (ImportError, AttributeError, OSError) as exc:
+            logger.debug("Windows power probe unavailable: %s", exc)
         return True
     
     def get_memory_mb(self) -> int:
@@ -467,6 +472,302 @@ class LocalModelStatus:
     integrity_hash: str
     created_at: str
     last_trained_at: str
+
+
+DEFAULT_MODEL_CHECKPOINT_DIR = Path("checkpoints")
+DEFAULT_PROMOTION_LOG_PATH = DEFAULT_MODEL_CHECKPOINT_DIR / "g38_promotion_log.jsonl"
+
+
+@dataclass(frozen=True)
+class ModelVersion:
+    """Disk-backed self-trained model version metadata."""
+    version_id: str
+    checkpoint_path: str
+    trained_at: str
+    field_name: str
+    f1_score: Optional[float]
+    is_promoted: bool
+
+
+@dataclass(frozen=True)
+class PromotionRecord:
+    """Immutable promotion event."""
+    version_id: str
+    field_name: str
+    authorized_by: str
+    promoted_at: str
+
+
+@dataclass(frozen=True)
+class PromotionLog:
+    """Immutable append-only promotion log view."""
+    entries: Tuple[PromotionRecord, ...] = field(default_factory=tuple)
+
+    def append(self, entry: PromotionRecord) -> "PromotionLog":
+        return PromotionLog(entries=self.entries + (entry,))
+
+    @classmethod
+    def from_file(cls, path: str | Path) -> "PromotionLog":
+        log_path = Path(path)
+        if not log_path.exists():
+            return cls()
+
+        entries: List[PromotionRecord] = []
+        try:
+            with open(log_path, "r", encoding="utf-8") as handle:
+                for raw_line in handle:
+                    line = raw_line.strip()
+                    if not line:
+                        continue
+                    try:
+                        payload = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    entry = _promotion_record_from_payload(payload)
+                    if entry is not None:
+                        entries.append(entry)
+        except OSError:
+            return cls()
+
+        return cls(entries=tuple(entries))
+
+
+def _promotion_record_from_payload(payload: Any) -> Optional[PromotionRecord]:
+    if not isinstance(payload, dict):
+        return None
+
+    version_id = payload.get("version_id")
+    field_name = payload.get("field_name")
+    authorized_by = payload.get("authorized_by")
+    promoted_at = payload.get("promoted_at")
+
+    if not all(
+        isinstance(value, str) and value.strip()
+        for value in (version_id, field_name, authorized_by, promoted_at)
+    ):
+        return None
+
+    return PromotionRecord(
+        version_id=version_id.strip(),
+        field_name=field_name.strip(),
+        authorized_by=authorized_by.strip(),
+        promoted_at=promoted_at.strip(),
+    )
+
+
+def _model_version_sort_key(version: ModelVersion) -> Tuple[datetime, str]:
+    try:
+        trained_at = datetime.fromisoformat(version.trained_at.replace("Z", "+00:00"))
+    except ValueError:
+        trained_at = datetime.min.replace(tzinfo=timezone.utc)
+    return trained_at, version.version_id
+
+
+def _write_json_atomic(path: Path, payload: Dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp_path = path.with_suffix(path.suffix + ".tmp")
+    with open(temp_path, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+    os.replace(temp_path, path)
+
+
+class ModelRegistry:
+    """Load self-trained model versions from checkpoint metadata on disk."""
+
+    def __init__(self, checkpoint_dir: str | Path = DEFAULT_MODEL_CHECKPOINT_DIR):
+        self.checkpoint_dir = Path(checkpoint_dir)
+
+    def list_available_versions(self, field_name: Optional[str] = None) -> List[ModelVersion]:
+        versions, _ = self._load_versions_from_disk()
+        if field_name:
+            versions = [version for version in versions if version.field_name == field_name]
+        return sorted(versions, key=_model_version_sort_key, reverse=True)
+
+    def get_version(self, version_id: str) -> ModelVersion | None:
+        if not isinstance(version_id, str) or not version_id.strip():
+            return None
+
+        versions, _ = self._load_versions_from_disk()
+        for version in versions:
+            if version.version_id == version_id:
+                return version
+        return None
+
+    def promote_version(self, version_id: str) -> ModelVersion | None:
+        versions, metadata_paths = self._load_versions_from_disk()
+        target = next((version for version in versions if version.version_id == version_id), None)
+        if target is None:
+            return None
+
+        for version in versions:
+            if version.field_name != target.field_name:
+                continue
+
+            metadata_path = metadata_paths.get(version.version_id)
+            if metadata_path is None:
+                continue
+
+            payload = self._load_metadata_payload(metadata_path)
+            if payload is None:
+                continue
+
+            payload["is_promoted"] = version.version_id == target.version_id
+            _write_json_atomic(metadata_path, payload)
+
+        return self.get_version(target.version_id)
+
+    def _load_versions_from_disk(self) -> Tuple[List[ModelVersion], Dict[str, Path]]:
+        versions: List[ModelVersion] = []
+        metadata_paths: Dict[str, Path] = {}
+        if not self.checkpoint_dir.exists():
+            return versions, metadata_paths
+
+        for metadata_path in sorted(self.checkpoint_dir.rglob("*.json")):
+            payload = self._load_metadata_payload(metadata_path)
+            version = self._payload_to_model_version(metadata_path, payload)
+            if version is None:
+                continue
+            versions.append(version)
+            metadata_paths[version.version_id] = metadata_path
+
+        return versions, metadata_paths
+
+    @staticmethod
+    def _load_metadata_payload(metadata_path: Path) -> Optional[Dict[str, Any]]:
+        try:
+            with open(metadata_path, "r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except (OSError, json.JSONDecodeError):
+            return None
+
+        if not isinstance(payload, dict):
+            return None
+        return payload
+
+    @classmethod
+    def _payload_to_model_version(
+        cls,
+        metadata_path: Path,
+        payload: Optional[Dict[str, Any]],
+    ) -> ModelVersion | None:
+        if payload is None:
+            return None
+
+        version_id = payload.get("version_id")
+        checkpoint_path = payload.get("checkpoint_path")
+        trained_at = payload.get("trained_at")
+        field_name = payload.get("field_name")
+        is_promoted = payload.get("is_promoted")
+
+        if not all(
+            isinstance(value, str) and value.strip()
+            for value in (version_id, checkpoint_path, trained_at, field_name)
+        ):
+            return None
+        if not isinstance(is_promoted, bool):
+            return None
+
+        f1_score = payload.get("f1_score")
+        if f1_score is None:
+            parsed_f1_score = None
+        elif isinstance(f1_score, (int, float)) and not isinstance(f1_score, bool):
+            parsed_f1_score = float(f1_score)
+        else:
+            return None
+
+        resolved_checkpoint_path = cls._resolve_checkpoint_path(
+            metadata_path,
+            checkpoint_path.strip(),
+        )
+        if not resolved_checkpoint_path.exists():
+            return None
+
+        return ModelVersion(
+            version_id=version_id.strip(),
+            checkpoint_path=str(resolved_checkpoint_path),
+            trained_at=trained_at.strip(),
+            field_name=field_name.strip(),
+            f1_score=parsed_f1_score,
+            is_promoted=is_promoted,
+        )
+
+    @staticmethod
+    def _resolve_checkpoint_path(metadata_path: Path, checkpoint_path: str) -> Path:
+        candidate = Path(checkpoint_path)
+        if not candidate.is_absolute():
+            candidate = metadata_path.parent / candidate
+        return candidate.resolve()
+
+
+class SelfTrainedModelController:
+    """Promote and resolve active self-trained models from disk-backed metadata."""
+
+    def __init__(
+        self,
+        checkpoint_dir: str | Path = DEFAULT_MODEL_CHECKPOINT_DIR,
+        *,
+        registry: Optional[ModelRegistry] = None,
+        promotion_log_path: str | Path | None = None,
+    ):
+        self.registry = registry or ModelRegistry(checkpoint_dir)
+        self._promotion_log_path = (
+            Path(promotion_log_path)
+            if promotion_log_path is not None
+            else self.registry.checkpoint_dir / DEFAULT_PROMOTION_LOG_PATH.name
+        )
+        self._promotion_log = PromotionLog.from_file(self._promotion_log_path)
+
+    @property
+    def promotion_log(self) -> PromotionLog:
+        return self._promotion_log
+
+    def get_active_model(self, field_name: str) -> ModelVersion | None:
+        if not isinstance(field_name, str) or not field_name.strip():
+            return None
+
+        promoted_versions = [
+            version
+            for version in self.registry.list_available_versions(field_name.strip())
+            if version.is_promoted
+        ]
+        if not promoted_versions:
+            return None
+        return promoted_versions[0]
+
+    def promote(self, version_id: str, authorized_by: str) -> bool:
+        if not isinstance(authorized_by, str) or not authorized_by.strip():
+            return False
+
+        promoted_version = self.registry.promote_version(version_id)
+        if promoted_version is None:
+            return False
+
+        entry = PromotionRecord(
+            version_id=promoted_version.version_id,
+            field_name=promoted_version.field_name,
+            authorized_by=authorized_by.strip(),
+            promoted_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        )
+        self._promotion_log = self._promotion_log.append(entry)
+        self._append_promotion_entry(entry)
+        return True
+
+    def _append_promotion_entry(self, entry: PromotionRecord) -> None:
+        self._promotion_log_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self._promotion_log_path, "a", encoding="utf-8") as handle:
+            handle.write(
+                json.dumps(
+                    {
+                        "version_id": entry.version_id,
+                        "field_name": entry.field_name,
+                        "authorized_by": entry.authorized_by,
+                        "promoted_at": entry.promoted_at,
+                    },
+                    sort_keys=True,
+                )
+            )
+            handle.write("\n")
 
 
 # =============================================================================

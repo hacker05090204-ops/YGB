@@ -10,6 +10,7 @@ Configure via DATABASE_URL in .env (default: D:/ygb_data/ygb.db)
 """
 
 import asyncio
+import logging
 import os
 import uuid
 import json
@@ -19,12 +20,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, List, Any
 
+
+logger = logging.getLogger(__name__)
+
 # Load env
 try:
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).parent.parent / ".env")
 except ImportError:
-    pass
+    logger.debug("python-dotenv not installed; skipping .env autoload")
 
 # Database path from env
 _raw_url = os.getenv("DATABASE_URL", "sqlite:///D:/ygb_data/ygb.db")

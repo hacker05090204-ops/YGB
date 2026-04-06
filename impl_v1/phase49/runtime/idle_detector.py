@@ -17,11 +17,15 @@ USAGE:
 """
 
 import platform
+import logging
 import shutil
 import subprocess
 import time
 from typing import Tuple, Optional
 from pathlib import Path
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -73,8 +77,8 @@ def _get_linux_idle_xprintidle() -> Optional[int]:
             # xprintidle returns milliseconds
             idle_ms = int(result.stdout.strip())
             return idle_ms // 1000
-    except (subprocess.SubprocessError, ValueError, FileNotFoundError):
-        pass
+    except (subprocess.SubprocessError, ValueError, FileNotFoundError) as exc:
+        logger.debug("xprintidle idle probe unavailable: %s", exc)
     return None
 
 
@@ -101,8 +105,8 @@ def _get_linux_idle_loginctl() -> Optional[int]:
                     now_us = int(time.time() * 1_000_000)
                     idle_seconds = (now_us - idle_since_us) // 1_000_000
                     return max(0, idle_seconds)
-    except (subprocess.SubprocessError, ValueError, FileNotFoundError, IndexError):
-        pass
+    except (subprocess.SubprocessError, ValueError, FileNotFoundError, IndexError) as exc:
+        logger.debug("loginctl idle probe unavailable: %s", exc)
     return None
 
 
@@ -129,8 +133,8 @@ def _get_linux_idle_proc() -> Optional[int]:
             if latest_mtime > 0:
                 idle_seconds = int(time.time() - latest_mtime)
                 return max(0, idle_seconds)
-    except (OSError, PermissionError):
-        pass
+    except (OSError, PermissionError) as exc:
+        logger.debug("/dev/input idle probe unavailable: %s", exc)
     return None
 
 
@@ -192,8 +196,8 @@ def get_windows_idle_seconds() -> int:
             if idle_ms < 0:
                 idle_ms += 0xFFFFFFFF + 1
             return idle_ms // 1000
-    except (ImportError, AttributeError, OSError):
-        pass
+    except (ImportError, AttributeError, OSError) as exc:
+        logger.debug("Windows idle probe unavailable: %s", exc)
     
     # Cannot determine idle - return 0 (safe default)
     return 0
@@ -298,8 +302,8 @@ def is_power_connected() -> bool:
             if kernel32.GetSystemPowerStatus(byref(status)):
                 # ACLineStatus: 0=Offline, 1=Online, 255=Unknown
                 return status.ACLineStatus == 1
-        except (ImportError, AttributeError, OSError):
-            pass
+        except (ImportError, AttributeError, OSError) as exc:
+            logger.debug("Windows power probe unavailable: %s", exc)
         return True
     
     # Default to True for unknown platforms
@@ -321,8 +325,8 @@ def _load_scan_state() -> bool:
             import json
             data = json.loads(_SCAN_STATE_FILE.read_text(encoding="utf-8"))
             return bool(data.get("active", False))
-    except (OSError, ValueError, KeyError):
-        pass
+    except (OSError, ValueError, KeyError) as exc:
+        logger.warning("Failed to load persisted scan state from %s: %s", _SCAN_STATE_FILE, exc)
     return False
 
 
@@ -335,8 +339,8 @@ def _persist_scan_state(active: bool) -> None:
             json.dumps({"active": active, "updated_at": time.time()}),
             encoding="utf-8",
         )
-    except OSError:
-        pass  # Best-effort persistence; in-memory state is authoritative
+    except OSError as exc:
+        logger.warning("Failed to persist scan state to %s: %s", _SCAN_STATE_FILE, exc)
 
 
 # Initialize from persisted state on module load

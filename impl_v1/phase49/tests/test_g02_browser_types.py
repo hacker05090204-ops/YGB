@@ -3,11 +3,13 @@
 
 import pytest
 from impl_v1.phase49.governors.g02_browser_types import (
+    BrowserProfile,
     BrowserType,
     BrowserLaunchMode,
     BrowserRequestStatus,
     BrowserLaunchRequest,
     BrowserLaunchResult,
+    ProfileValidator,
     validate_launch_request,
     create_launch_result,
 )
@@ -16,8 +18,9 @@ from impl_v1.phase49.governors.g02_browser_types import (
 class TestEnumClosure:
     """Verify enums are closed."""
     
-    def test_browser_type_2_members(self):
-        assert len(BrowserType) == 2
+    def test_browser_type_3_members(self):
+        assert len(BrowserType) == 3
+        assert {member.value for member in BrowserType} == {"CHROMIUM", "FIREFOX", "EDGE"}
     
     def test_launch_mode_2_members(self):
         assert len(BrowserLaunchMode) == 2
@@ -180,6 +183,40 @@ class TestValidateLaunchRequest:
         is_valid, reason = validate_launch_request(request)
         assert not is_valid
         assert "Headless" in reason
+
+
+class TestProfileValidator:
+    """Test governed browser profile validation."""
+
+    def test_non_headless_rejected(self):
+        profile = BrowserProfile(
+            profile_id="PROFILE-1",
+            browser_type="CHROMIUM",
+            headless=False,
+            sandboxed=True,
+            allowed_domains=["example.com"],
+        )
+        assert ProfileValidator.validate(profile) is False
+
+    def test_non_sandboxed_rejected(self):
+        profile = BrowserProfile(
+            profile_id="PROFILE-1",
+            browser_type="FIREFOX",
+            headless=True,
+            sandboxed=False,
+            allowed_domains=["example.com"],
+        )
+        assert ProfileValidator.validate(profile) is False
+
+    def test_empty_domains_rejected(self):
+        profile = BrowserProfile(
+            profile_id="PROFILE-1",
+            browser_type="EDGE",
+            headless=True,
+            sandboxed=True,
+            allowed_domains=[],
+        )
+        assert ProfileValidator.validate(profile) is False
 
 
 class TestCreateLaunchResult:

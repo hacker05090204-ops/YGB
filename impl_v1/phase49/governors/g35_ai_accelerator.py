@@ -26,7 +26,22 @@ import hashlib
 import os
 import uuid
 
+try:
+    import torch
+except Exception:  # pragma: no cover - import failure is environment dependent
+    torch = None
+
 from impl_v1.phase49.governors.g38_self_trained_model import can_ai_execute
+
+
+AI_ACCELERATION_PROVISIONING_MESSAGE = (
+    "UNSUPPORTED: BLOCKED. AI acceleration readiness is advisory only. A real backend profile "
+    "has not been provisioned; use g37_pytorch_backend.py or g37_gpu_training_backend.py for execution."
+)
+
+
+class RealBackendNotConfiguredError(RuntimeError):
+    """Raised when the real AI acceleration backend contract is not provisioned."""
 
 
 class AdvisoryType(Enum):
@@ -381,6 +396,108 @@ def can_ai_override_human() -> Tuple[bool, str]:
 
 
 # =============================================================================
+# ACCELERATION CONTRACTS
+# =============================================================================
+
+@dataclass(frozen=True)
+class AccelerationProfile:
+    """Validated configuration for a real acceleration backend."""
+    profile_id: str
+    backend: str
+    precision: str
+    target_throughput_tps: float
+    memory_budget_gb: float
+
+
+class AccelerationContract:
+    """Validation contract for supported acceleration profiles."""
+
+    _ALLOWED_BACKENDS = ("cuda", "mps", "cpu")
+    _ALLOWED_PRECISIONS = ("fp32", "fp16", "bf16")
+
+    @staticmethod
+    def validate(profile: AccelerationProfile) -> bool:
+        """Return True only for supported backends, precisions, and memory budgets."""
+        return (
+            profile.backend in AccelerationContract._ALLOWED_BACKENDS
+            and profile.precision in AccelerationContract._ALLOWED_PRECISIONS
+            and profile.memory_budget_gb > 0
+        )
+
+
+def _cuda_available() -> bool:
+    """Return the real CUDA availability from torch when available."""
+    if torch is None or not hasattr(torch, "cuda") or not hasattr(torch.cuda, "is_available"):
+        return False
+    return bool(torch.cuda.is_available())
+
+
+def _mps_available() -> bool:
+    """Return the real MPS availability from torch when available."""
+    if torch is None:
+        return False
+    backends = getattr(torch, "backends", None)
+    mps_backend = getattr(backends, "mps", None)
+    if mps_backend is None or not hasattr(mps_backend, "is_available"):
+        return False
+    return bool(mps_backend.is_available())
+
+
+class AccelerationReadinessCheck:
+    """Readiness check using real torch capability signals only."""
+
+    def run(self) -> Dict[str, object]:
+        """Return the real backend readiness and the safest recommended backend."""
+        cuda_available = _cuda_available()
+        mps_available = _mps_available()
+
+        if cuda_available:
+            recommended_backend = "cuda"
+            reason = "CUDA is available via torch.cuda.is_available()"
+        elif mps_available:
+            recommended_backend = "mps"
+            reason = "MPS is available via torch.backends.mps.is_available()"
+        elif torch is None:
+            recommended_backend = "cpu"
+            reason = "torch unavailable; falling back to cpu"
+        else:
+            recommended_backend = "cpu"
+            reason = "CUDA and MPS unavailable; falling back to cpu"
+
+        return {
+            "cuda_available": cuda_available,
+            "mps_available": mps_available,
+            "recommended_backend": recommended_backend,
+            "reason": reason,
+        }
+
+
+_ACTIVE_ACCELERATION_PROFILE: Optional[AccelerationProfile] = None
+
+
+def _serialize_acceleration_profile(profile: AccelerationProfile) -> Dict[str, object]:
+    """Serialize the active acceleration profile for status reporting."""
+    return {
+        "profile_id": profile.profile_id,
+        "backend": profile.backend,
+        "precision": profile.precision,
+        "target_throughput_tps": profile.target_throughput_tps,
+        "memory_budget_gb": profile.memory_budget_gb,
+    }
+
+
+def get_acceleration_status() -> Dict[str, object]:
+    """Return current acceleration readiness with the active profile, if any."""
+    status = AccelerationReadinessCheck().run()
+    status["active_profile"] = (
+        _serialize_acceleration_profile(_ACTIVE_ACCELERATION_PROFILE)
+        if _ACTIVE_ACCELERATION_PROFILE is not None
+        else None
+    )
+    return status
+
+
+# =============================================================================
 # GPU TRAINING EXTENSION
 # =============================================================================
 
@@ -534,10 +651,7 @@ def simulate_gpu_training(
     This interface remains present for compatibility only.
     Production must use a real backend, not a simulated training path.
     """
-    raise RuntimeError(
-        "UNSUPPORTED: simulate_gpu_training() is retired. "
-        "Real training must run through g37_pytorch_backend or a native GPU kernel."
-    )
+    raise RealBackendNotConfiguredError(AI_ACCELERATION_PROVISIONING_MESSAGE)
 
 
 # =============================================================================

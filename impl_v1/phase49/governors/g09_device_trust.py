@@ -59,6 +59,14 @@ class VerificationChallenge:
     max_attempts: int
 
 
+@dataclass(frozen=True)
+class TrustAuditEntry:
+    timestamp: str
+    device_id: str
+    decision: str
+    reason: str
+
+
 MAX_DEVICES = 3
 MAX_VERIFICATION_ATTEMPTS = 3
 
@@ -68,10 +76,79 @@ _device_registry: Dict[str, DeviceRegistration] = {}
 _pending_challenges: Dict[str, VerificationChallenge] = {}
 
 
+class DeviceTrustGuard:
+    """Runtime device-trust evaluator with immutable audit entries."""
+
+    _MAX_AUDIT_LOG = 10000
+    _ROTATE_TO = 5000
+
+    def __init__(self):
+        self._registrations = _device_registry
+        self._audit_log: List[TrustAuditEntry] = []
+
+    def _record_audit(self, device_id: str, decision: DeviceTrustLevel, reason: str) -> None:
+        self._audit_log.append(
+            TrustAuditEntry(
+                timestamp=datetime.now(UTC).isoformat(),
+                device_id=device_id,
+                decision=decision.value,
+                reason=reason,
+            )
+        )
+        if len(self._audit_log) > self._MAX_AUDIT_LOG:
+            self._audit_log = self._audit_log[-self._ROTATE_TO :]
+
+    def evaluate(self, device_id: str, fingerprint_hash: str) -> DeviceTrustLevel:
+        registration = self._registrations.get(device_id)
+        if registration is None:
+            self._record_audit(device_id, DeviceTrustLevel.UNTRUSTED, "device not registered")
+            return DeviceTrustLevel.UNTRUSTED
+
+        if registration.trust_level == DeviceTrustLevel.BLOCKED:
+            self._record_audit(device_id, DeviceTrustLevel.BLOCKED, "device blocked")
+            return DeviceTrustLevel.BLOCKED
+
+        if registration.fingerprint_hash != fingerprint_hash:
+            self.revoke(device_id, reason="fingerprint mismatch")
+            return DeviceTrustLevel.BLOCKED
+
+        self._record_audit(device_id, registration.trust_level, "fingerprint match")
+        return registration.trust_level
+
+    def revoke(self, device_id: str, reason: str = "manual") -> bool:
+        registration = self._registrations.get(device_id)
+        if registration is None:
+            return False
+
+        blocked = DeviceRegistration(
+            device_id=registration.device_id,
+            device_name=registration.device_name,
+            fingerprint_hash=registration.fingerprint_hash,
+            trust_level=DeviceTrustLevel.BLOCKED,
+            ip_address=registration.ip_address,
+            registered_at=registration.registered_at,
+            last_seen=datetime.now(UTC).isoformat(),
+            verified=False,
+        )
+        self._registrations[device_id] = blocked
+        self._record_audit(device_id, DeviceTrustLevel.BLOCKED, reason)
+        return True
+
+    def get_audit_log(self, device_id: Optional[str] = None) -> List[TrustAuditEntry]:
+        if device_id is None:
+            return list(self._audit_log)
+        return [entry for entry in self._audit_log if entry.device_id == device_id]
+
+
+_trust_guard = DeviceTrustGuard()
+
+
 def clear_registry():
     """Clear device registry (for testing)."""
     _device_registry.clear()
     _pending_challenges.clear()
+    if "_trust_guard" in globals():
+        _trust_guard._audit_log.clear()
 
 
 def get_registered_devices() -> List[DeviceRegistration]:

@@ -12,9 +12,13 @@ from dataclasses import dataclass
 from typing import List, Optional, Tuple
 from datetime import datetime
 from pathlib import Path
+import logging
 import json
 import hashlib
 import ipaddress
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -73,7 +77,12 @@ class JurisdictionChecker:
                 signature=data["signature"],
                 signed_by=data["signed_by"],
             )
-        except Exception:
+        except Exception as exc:
+            logger.warning(
+                "Failed to load authorized scope from %s: %s",
+                self.SCOPE_FILE,
+                exc,
+            )
             return None
     
     def verify_scope_signature(self) -> Tuple[bool, str]:
@@ -133,8 +142,13 @@ class JurisdictionChecker:
                 )
         
         # Check IP range match
+        target_ip = None
         try:
             target_ip = ipaddress.ip_address(target)
+        except ValueError:
+            target_ip = None
+
+        if target_ip is not None:
             for ip_range in self.scope.ip_ranges:
                 network = ipaddress.ip_network(ip_range, strict=False)
                 if target_ip in network:
@@ -143,9 +157,7 @@ class JurisdictionChecker:
                         reason=f"Target in authorized IP range: {ip_range}",
                         scope_id=self.scope.scope_id,
                     )
-        except ValueError:
-            pass  # Not an IP address
-        
+
         return ScopeValidation(
             is_valid=False,
             reason="Target not in authorized scope",

@@ -12,6 +12,7 @@ provides the DataLoader-compatible interface.
 GOVERNANCE: MODE-A only. No decision labels. No exploit content.
 """
 
+from pathlib import Path
 import numpy as np
 from typing import Optional, Sequence, Tuple
 from dataclasses import dataclass
@@ -19,12 +20,24 @@ from dataclasses import dataclass
 
 FIXED_SEED = 42
 _BLOCKED_SYNTHETIC_REPRESENTATION_MESSAGE = (
-    "DISABLED: Synthetic representation generation is forbidden in production"
+    "blocked: DISABLED: Synthetic representation generation is forbidden in production"
 )
 
 
+class SyntheticDataBlockedError(RuntimeError):
+    pass
+
+
+class DataShapeError(ValueError):
+    """Raised when a feature tensor has an unexpected shape."""
+
+
+class DataValueError(ValueError):
+    """Raised when a feature tensor contains invalid values."""
+
+
 def _abort_synthetic_generation(component: str) -> None:
-    raise RuntimeError(
+    raise SyntheticDataBlockedError(
         f"{_BLOCKED_SYNTHETIC_REPRESENTATION_MESSAGE} ({component})"
     )
 
@@ -193,11 +206,57 @@ class RepresentationExpander:
       [192-255] Noise/regularization features
     """
 
-    def __init__(self, config: ExpansionConfig = None, seed: int = FIXED_SEED):
-        _abort_synthetic_generation("RepresentationExpander")
+    _SYNTHETIC_GENERATION_BLOCKED = True
+
+    def __init__(self, config: Optional[ExpansionConfig] = None, seed: int = FIXED_SEED):
+        effective_seed = seed if config is None else config.seed
+        self.config = config or ExpansionConfig(seed=effective_seed)
+        self.rng = np.random.RandomState(effective_seed)
+
+    def _raise_if_synthetic_generation_blocked(self) -> None:
+        if self._SYNTHETIC_GENERATION_BLOCKED:
+            raise SyntheticDataBlockedError(_BLOCKED_SYNTHETIC_REPRESENTATION_MESSAGE)
+
+    @staticmethod
+    def _coerce_feature_matrix(name: str, matrix: np.ndarray) -> np.ndarray:
+        array = np.asarray(matrix, dtype=np.float32)
+        if array.ndim != 2:
+            raise DataShapeError(f"{name} must be a 2D array, got shape {array.shape}")
+        if not np.isfinite(array).all():
+            raise DataValueError(f"{name} contains NaN/Inf values")
+        return array
+
+    def combine(self, *feature_groups: np.ndarray) -> np.ndarray:
+        """Combine real feature groups into one [N, 256] matrix."""
+        if not feature_groups:
+            raise DataShapeError("at least one feature group is required")
+
+        matrices = [
+            self._coerce_feature_matrix(f"feature_groups[{idx}]", group)
+            for idx, group in enumerate(feature_groups)
+        ]
+        row_count = matrices[0].shape[0]
+        for idx, matrix in enumerate(matrices[1:], start=1):
+            if matrix.shape[0] != row_count:
+                raise DataShapeError(
+                    "row count mismatch between feature groups: "
+                    f"feature_groups[0]={row_count}, feature_groups[{idx}]={matrix.shape[0]}"
+                )
+
+        combined = np.concatenate(matrices, axis=1).astype(np.float32, copy=False)
+        if combined.shape[1] != self.config.feature_dim:
+            raise DataShapeError(
+                f"combined features must have {self.config.feature_dim} columns, got {combined.shape[1]}"
+            )
+        return combined
+
+    def expand(self, *feature_groups: np.ndarray) -> np.ndarray:
+        """Pass through or combine real feature tensors without synthetic generation."""
+        return self.combine(*feature_groups)
 
     def generate_http_features(self, n: int) -> np.ndarray:
         """Generate HTTP protocol representation features (32 dims)."""
+        self._raise_if_synthetic_generation_blocked()
         feats = np.zeros((n, 32), dtype=np.float32)
         feats[:, 0] = self.rng.randint(0, 15, n) / 14.0  # method
         feats[:, 1] = self.rng.choice([0.2, 0.4, 0.6, 0.8, 1.0], n)  # status family
@@ -221,6 +280,7 @@ class RepresentationExpander:
 
     def generate_dom_features(self, n: int) -> np.ndarray:
         """Generate DOM topology representation features (32 dims)."""
+        self._raise_if_synthetic_generation_blocked()
         feats = np.zeros((n, 32), dtype=np.float32)
         feats[:, 0] = self.rng.randint(1, 21, n) / 20.0  # tree_depth
         feats[:, 1] = np.minimum(1, np.log2(1 + self.rng.uniform(0, 500, n)) / 9)
@@ -234,6 +294,7 @@ class RepresentationExpander:
 
     def generate_api_features(self, n: int) -> np.ndarray:
         """Generate API schema representation features (32 dims)."""
+        self._raise_if_synthetic_generation_blocked()
         feats = np.zeros((n, 32), dtype=np.float32)
         feats[:, 0] = self.rng.randint(1, 9, n) / 8.0  # path_depth
         feats[:, 6] = self.rng.randint(1, 11, n) / 10.0  # response_nesting
@@ -285,6 +346,7 @@ class RepresentationExpander:
 
     def generate_auth_features(self, n: int) -> np.ndarray:
         """Generate auth flow state graph features (32 dims)."""
+        self._raise_if_synthetic_generation_blocked()
         flow_states = [6, 4, 3, 5, 5, 4, 5, 4, 3, 4]
         flow_trans = [8, 5, 4, 7, 7, 5, 7, 5, 4, 6]
 
@@ -319,6 +381,7 @@ class RepresentationExpander:
         self, signal: np.ndarray, response: np.ndarray
     ) -> np.ndarray:
         """Generate interaction features from signal+response (64 dims)."""
+        self._raise_if_synthetic_generation_blocked()
         n = signal.shape[0]
         feats = np.zeros((n, 64), dtype=np.float32)
         for d in range(64):
@@ -335,6 +398,7 @@ class RepresentationExpander:
 
     def generate_noise_features(self, n: int) -> np.ndarray:
         """Generate noise/regularization features (64 dims)."""
+        self._raise_if_synthetic_generation_blocked()
         return self.rng.uniform(0, 1, (n, 64)).astype(np.float32)
 
     def generate_expanded_dataset(self, n: int = None) -> Tuple[np.ndarray, np.ndarray]:
@@ -344,6 +408,7 @@ class RepresentationExpander:
         Returns:
             Tuple of (features [N, 256], labels [N])
         """
+        self._raise_if_synthetic_generation_blocked()
         n = n or self.config.total_samples
 
         # Generate per-group features
@@ -357,7 +422,7 @@ class RepresentationExpander:
         interaction = self.generate_interaction_features(signal, response)
         noise = self.generate_noise_features(n)
 
-        features = np.concatenate([signal, response, interaction, noise], axis=1)
+        features = self.combine(signal, response, interaction, noise)
 
         # Labels based on signal + response pattern (representation only)
         signal_strength = np.mean(signal[:, :32], axis=1)
@@ -373,3 +438,50 @@ class RepresentationExpander:
         ).astype(np.float32)
 
         return features, labels
+
+
+class RealFeatureLoader:
+    """Load validated real feature matrices from on-disk artifacts."""
+
+    @staticmethod
+    def _load_safetensors(path: Path) -> np.ndarray:
+        try:
+            from safetensors.numpy import load_file as load_safetensors_file
+        except Exception as exc:  # pragma: no cover - depends on optional package state
+            raise DataValueError(f"{path}: safetensors support unavailable: {exc}") from exc
+
+        tensors = load_safetensors_file(str(path))
+        if "features" in tensors:
+            return np.asarray(tensors["features"])
+        if len(tensors) == 1:
+            return np.asarray(next(iter(tensors.values())))
+        raise DataShapeError(
+            f"{path}: expected exactly one tensor or a 'features' tensor, found {sorted(tensors.keys())}"
+        )
+
+    @staticmethod
+    def _validate(path: Path, array: np.ndarray) -> np.ndarray:
+        features = np.asarray(array)
+        if features.ndim != 2 or features.shape[1] != 256:
+            raise DataShapeError(f"{path}: expected shape (N, 256), got {features.shape}")
+        if features.dtype != np.float32:
+            raise DataValueError(f"{path}: expected dtype float32, got {features.dtype}")
+        invalid_locations = np.argwhere(~np.isfinite(features))
+        if invalid_locations.size:
+            row, column = invalid_locations[0]
+            raise DataValueError(
+                f"{path}: non-finite value at index ({int(row)}, {int(column)}): {features[row, column]!r}"
+            )
+        return features
+
+    @staticmethod
+    def load(path: Path) -> np.ndarray:
+        target = Path(path)
+        suffix = target.suffix.lower()
+        if suffix == ".npy":
+            features = np.load(target, allow_pickle=False)
+        elif suffix == ".safetensors":
+            features = RealFeatureLoader._load_safetensors(target)
+        else:
+            raise DataShapeError(f"{target}: unsupported feature file suffix '{target.suffix}'")
+        return RealFeatureLoader._validate(target, features)

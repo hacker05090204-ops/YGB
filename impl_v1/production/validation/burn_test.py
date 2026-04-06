@@ -17,8 +17,12 @@ from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from pathlib import Path
 from enum import Enum
+import logging
 import json
 import time
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -121,7 +125,10 @@ def collect_fd_count() -> int:
         if hasattr(process, 'num_handles'):
             return process.num_handles()
     except Exception:
-        pass
+        logger.warning(
+            "Failed to collect process descriptor count via psutil",
+            exc_info=True,
+        )
     # Fallback: try reading /proc on Linux
     try:
         import os
@@ -129,7 +136,10 @@ def collect_fd_count() -> int:
         if os.path.isdir(fd_dir):
             return len(os.listdir(fd_dir))
     except (OSError, PermissionError):
-        pass
+        logger.warning(
+            "Failed to inspect fallback FD directory for burn test",
+            exc_info=True,
+        )
     return None
 
 
@@ -156,9 +166,13 @@ def collect_gpu_metrics() -> tuple:
             temp = float(parts[0].strip())
             throttled = parts[1].strip().lower() not in ('not active', '0')
             return temp, throttled
-    except (FileNotFoundError, subprocess.SubprocessError,
-            ValueError, IndexError):
-        pass
+    except FileNotFoundError:
+        logger.debug("nvidia-smi not available; GPU metrics unavailable for burn test")
+    except Exception:
+        logger.warning(
+            "Failed to collect GPU metrics via nvidia-smi for burn test",
+            exc_info=True,
+        )
     return None, False
 
 
@@ -169,7 +183,10 @@ def collect_scan_latency() -> float:
         if latency_file.exists():
             return float(latency_file.read_text().strip())
     except (ValueError, OSError):
-        pass
+        logger.warning(
+            "Failed to read scan latency sample for burn test",
+            exc_info=True,
+        )
     return None
 
 

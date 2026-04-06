@@ -107,6 +107,18 @@ class DashboardState:
     last_updated: str
 
 
+@dataclass(frozen=True)
+class DashboardSummary:
+    """Real-time dashboard summary built from live component state."""
+
+    generated_at: str
+    training_status: str
+    cve_ingestion_count: int | None
+    pending_approvals: int
+    active_peers: int
+    system_health: str
+
+
 # =============================================================================
 # GUARDS (MANDATORY - ABSOLUTE)
 # =============================================================================
@@ -462,6 +474,89 @@ class DashboardManager:
             return 0
         total_progress = sum(t.progress_percent for t in self._targets.values())
         return int(total_progress / len(self._targets))
+
+
+def _read_value(source: Any, key: str, default: Any = None) -> Any:
+    if isinstance(source, dict):
+        return source.get(key, default)
+    return getattr(source, key, default)
+
+
+def _get_dashboard_cluster_state():
+    from .g20_dashboard_state import get_state_manager
+
+    return get_state_manager().get_current_state()
+
+
+def _get_training_progress():
+    from backend.training.state_manager import get_training_state_manager
+
+    return get_training_state_manager().get_training_progress()
+
+
+def _get_peer_transport_statuses() -> Dict[str, Any]:
+    from backend.sync.peer_transport import get_peer_statuses, get_peers
+
+    statuses = get_peer_statuses()
+    if statuses:
+        return statuses
+
+    return {
+        str(peer.get("name", "unknown")): peer.get("peer_status") or peer.get("status")
+        for peer in get_peers()
+    }
+
+
+def _get_last_ingestion_batch() -> Optional[Dict[str, Any]]:
+    from backend.cve.bridge_ingestion_worker import get_bridge_worker
+
+    worker_status = get_bridge_worker().get_status()
+    if not isinstance(worker_status, dict):
+        return None
+    last_batch = worker_status.get("last_batch")
+    return dict(last_batch) if isinstance(last_batch, dict) else None
+
+
+def _extract_training_status(progress: Any) -> str:
+    automode_status = _read_value(progress, "automode_status")
+    if automode_status:
+        return str(automode_status)
+    status = _read_value(progress, "status")
+    if status:
+        return str(status)
+    return "unavailable"
+
+
+def _count_active_peers(peer_statuses: Dict[str, Any]) -> int:
+    return sum(
+        1
+        for status in peer_statuses.values()
+        if str(getattr(status, "value", status)).upper() in {"REACHABLE", "ONLINE"}
+    )
+
+
+def build_summary() -> DashboardSummary:
+    """Build a dashboard summary from real component sources."""
+    cluster_state = _get_dashboard_cluster_state()
+    training_progress = _get_training_progress()
+    peer_statuses = _get_peer_transport_statuses()
+    last_batch = _get_last_ingestion_batch()
+
+    cve_ingestion_count = None
+    if isinstance(last_batch, dict) and last_batch.get("ingested") is not None:
+        try:
+            cve_ingestion_count = int(last_batch["ingested"])
+        except (TypeError, ValueError):
+            cve_ingestion_count = None
+
+    return DashboardSummary(
+        generated_at=datetime.now(UTC).isoformat(),
+        training_status=_extract_training_status(training_progress),
+        cve_ingestion_count=cve_ingestion_count,
+        pending_approvals=int(_read_value(cluster_state, "pending_approvals", 0) or 0),
+        active_peers=_count_active_peers(peer_statuses),
+        system_health=str(_read_value(cluster_state, "system_health", "UNKNOWN") or "UNKNOWN"),
+    )
 
 
 # =============================================================================

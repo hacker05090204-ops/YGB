@@ -5,6 +5,8 @@ Tests for evidence integrity chain governor.
 100% coverage required.
 """
 
+import logging
+
 import pytest
 from impl_v1.phase49.governors.g27_integrity_chain import (
     ChainStatus,
@@ -124,14 +126,23 @@ class TestChainBuilder:
         assert link3.prev_hash == link2.link_hash
     
     def test_get_chain(self):
-        """Get immutable chain."""
+        """Get chain snapshot list."""
         builder = IntegrityChainBuilder("SES-123")
         builder.add_evidence("EV-001", b"data")
         builder.add_evidence("EV-002", b"data2")
         
         chain = builder.get_chain()
         assert len(chain) == 2
-        assert isinstance(chain, tuple)
+        assert isinstance(chain, list)
+
+    def test_append_link(self):
+        """Append pre-hashed link."""
+        builder = IntegrityChainBuilder("SES-123")
+
+        link = builder.append_link("abc123")
+
+        assert isinstance(link, ChainLink)
+        assert link.content_hash == "abc123"
     
     def test_get_root_hash(self):
         """Get root hash."""
@@ -160,6 +171,7 @@ class TestChainVerifier:
         assert result.total_links == 2
         assert result.verified_links == 2
         assert len(result.violations) == 0
+        assert result.broken_at_index is None
     
     def test_verify_empty_chain(self):
         """Verify empty chain."""
@@ -168,6 +180,7 @@ class TestChainVerifier:
         
         assert result.status == ChainStatus.EMPTY
         assert result.is_valid is True
+        assert result.broken_at_index is None
     
     def test_verify_session_mismatch(self):
         """Detect session mismatch."""
@@ -182,7 +195,7 @@ class TestChainVerifier:
         assert any(v.violation_type == IntegrityViolation.SESSION_MISMATCH 
                    for v in result.violations)
     
-    def test_verify_chain_break(self):
+    def test_verify_chain_break(self, caplog):
         """Detect chain break."""
         builder = IntegrityChainBuilder("SES-123")
         builder.add_evidence("EV-001", b"data1")
@@ -203,10 +216,16 @@ class TestChainVerifier:
         chain = (builder.get_chain()[0], tampered)
         
         verifier = IntegrityChainVerifier()
-        result = verifier.verify_chain(chain, "SES-123")
+        with caplog.at_level(logging.CRITICAL):
+            result = verifier.verify_chain(chain, "SES-123")
         
         assert result.status == ChainStatus.BROKEN
         assert result.is_valid is False
+        assert result.broken_at_index == 1
+        assert any(
+            record.levelno == logging.CRITICAL and "broken_at_index=1" in record.getMessage()
+            for record in caplog.records
+        )
     
     def test_verify_sequence_mismatch(self):
         """Detect sequence mismatch."""

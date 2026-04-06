@@ -14,14 +14,16 @@ Validates:
 
 import threading
 import unittest
+from unittest.mock import patch
 
 
 class TestMetricsRegistry(unittest.TestCase):
     """Test the thread-safe metrics registry."""
 
     def setUp(self):
-        from backend.observability.metrics import MetricsRegistry
+        from backend.observability.metrics import MetricsRegistry, _series_store
         self.registry = MetricsRegistry()
+        _series_store.clear()
 
     def test_counter_increment(self):
         self.registry.increment("test_counter")
@@ -72,6 +74,32 @@ class TestMetricsRegistry(unittest.TestCase):
             self.registry.record("many", float(i))
         stats = self.registry.get_histogram_stats("many")
         self.assertLessEqual(stats["count"], 600)
+
+    def test_metric_series_rollover_keeps_last_thousand_points(self):
+        from backend.observability.metrics import get_series, record_metric
+
+        with patch(
+            "backend.observability.metrics.time.time",
+            side_effect=[float(i) for i in range(1001)],
+        ):
+            for i in range(1001):
+                record_metric("series_rollover", float(i))
+
+        series = get_series("series_rollover")
+        self.assertEqual(len(series), 1000)
+        self.assertEqual(series[0], (1.0, 1.0))
+        self.assertEqual(series[-1], (1000.0, 1000.0))
+
+    def test_metric_series_percentiles_are_correct(self):
+        from backend.observability.metrics import compute_percentiles, record_metric
+
+        for value in range(1, 101):
+            record_metric("series_percentiles", float(value))
+
+        percentiles = compute_percentiles("series_percentiles")
+        self.assertEqual(percentiles["p50"], 50.0)
+        self.assertEqual(percentiles["p95"], 95.0)
+        self.assertEqual(percentiles["p99"], 99.0)
 
     def test_snapshot_serializable(self):
         import json

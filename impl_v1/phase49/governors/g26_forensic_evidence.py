@@ -24,6 +24,8 @@ import base64
 from datetime import datetime, UTC
 from pathlib import Path
 import json
+from urllib.parse import urlparse
+from urllib.request import Request, urlopen
 
 
 class EvidenceType(Enum):
@@ -200,6 +202,175 @@ def generate_bundle_id() -> str:
 
 
 # =============================================================================
+# BATCH 5 / GROUP A — FORENSIC EVIDENCE RECORDS
+# =============================================================================
+
+ALLOWED_CAPTURE_TYPES = frozenset({
+    "screenshot",
+    "network_log",
+    "dom_snapshot",
+    "http_response",
+})
+
+ALLOWED_EVIDENCE_STATUSES = frozenset({
+    "CAPTURED",
+    "PENDING_RENDER",
+    "FAILED",
+})
+
+_EVIDENCE_RECORD_PREFIXES = {
+    "screenshot": "SCR",
+    "network_log": "NET",
+    "dom_snapshot": "DOM",
+    "http_response": "HTR",
+}
+
+
+@dataclass(frozen=True)
+class EvidenceRecord:
+    """Minimal forensic evidence record for Batch 5 Group A."""
+    evidence_id: str
+    capture_type: str
+    source_url: str
+    captured_at: str
+    hash_sha256: str
+    size_bytes: int
+    status: str
+
+    def __post_init__(self) -> None:
+        if self.capture_type not in ALLOWED_CAPTURE_TYPES:
+            raise ValueError(f"Unsupported capture_type: {self.capture_type}")
+        if self.status not in ALLOWED_EVIDENCE_STATUSES:
+            raise ValueError(f"Unsupported evidence status: {self.status}")
+        if self.size_bytes < 0:
+            raise ValueError("size_bytes must be non-negative")
+
+
+@dataclass
+class EvidenceStore:
+    """Append-only evidence store with bounded retention."""
+    records: List[EvidenceRecord] = field(default_factory=list)
+    max_records: int = 10000
+    rotate_to: int = 5000
+
+    def append(self, record: EvidenceRecord) -> EvidenceRecord:
+        self.records.append(record)
+        if len(self.records) > self.max_records:
+            self.records[:] = self.records[-self.rotate_to:]
+        return record
+
+    def get_evidence_by_id(self, evidence_id: str) -> Optional[EvidenceRecord]:
+        for record in reversed(self.records):
+            if record.evidence_id == evidence_id:
+                return record
+        return None
+
+    def get_pending_render(self) -> List[EvidenceRecord]:
+        return [record for record in self.records if record.status == "PENDING_RENDER"]
+
+
+def _generate_evidence_record_id(capture_type: str) -> str:
+    prefix = _EVIDENCE_RECORD_PREFIXES[capture_type]
+    return f"ER-{prefix}-{uuid.uuid4().hex[:12].upper()}"
+
+
+def _looks_like_local_path(source_url: str) -> bool:
+    if source_url.startswith("\\\\"):
+        return True
+    if len(source_url) >= 3 and source_url[1] == ":" and source_url[2] in ("\\", "/"):
+        return True
+    return "://" not in source_url and not source_url.startswith("file:")
+
+
+def _read_capture_source_bytes(
+    source_url: str,
+) -> Tuple[bytes, str, int, Tuple[Tuple[str, str], ...]]:
+    if _looks_like_local_path(source_url):
+        source_path = Path(source_url)
+        if not source_path.is_file():
+            raise FileNotFoundError(f"Evidence source not found: {source_url}")
+        return (source_path.read_bytes(), str(source_path.resolve()), 200, tuple())
+
+    parsed = urlparse(source_url)
+    if parsed.scheme not in {"http", "https", "file"}:
+        raise ValueError(f"Unsupported source_url scheme: {parsed.scheme or 'local'}")
+
+    request = Request(source_url, headers={"User-Agent": "YGB-ForensicEvidence/1.0"})
+    with urlopen(request, timeout=10) as response:
+        response_bytes = response.read()
+        status_code = getattr(response, "status", None) or response.getcode() or 200
+        response_headers = tuple(sorted((key, value) for key, value in response.headers.items()))
+        resolved_url = response.geturl()
+
+    return (response_bytes, resolved_url, int(status_code), response_headers)
+
+
+def _capture_network_log_bytes(source_url: str) -> bytes:
+    response_bytes, resolved_url, status_code, response_headers = _read_capture_source_bytes(source_url)
+    network_log = {
+        "source_url": resolved_url,
+        "status_code": status_code,
+        "size_bytes": len(response_bytes),
+        "headers": list(response_headers),
+    }
+    return json.dumps(network_log, sort_keys=True).encode("utf-8")
+
+
+def _is_image_capture_bytes(captured_bytes: bytes) -> bool:
+    return (
+        captured_bytes.startswith(b"\x89PNG\r\n\x1a\n")
+        or captured_bytes.startswith(b"\xff\xd8\xff")
+        or captured_bytes.startswith(b"GIF87a")
+        or captured_bytes.startswith(b"GIF89a")
+        or captured_bytes.startswith(b"BM")
+        or (
+            captured_bytes.startswith(b"RIFF")
+            and len(captured_bytes) >= 12
+            and captured_bytes[8:12] == b"WEBP"
+        )
+    )
+
+
+def _resolve_evidence_status(capture_type: str, captured_bytes: bytes) -> str:
+    if capture_type == "screenshot":
+        if not captured_bytes:
+            return "FAILED"
+        if _is_image_capture_bytes(captured_bytes):
+            return "CAPTURED"
+        return "PENDING_RENDER"
+    return "CAPTURED"
+
+
+class EvidenceCapture:
+    """Minimal evidence capture facade backed by real captured bytes."""
+
+    def __init__(self, store: Optional[EvidenceStore] = None):
+        self.store = store if store is not None else EvidenceStore()
+
+    def capture(self, source_url: str, capture_type: str) -> EvidenceRecord:
+        normalized_capture_type = capture_type.strip().lower()
+        if normalized_capture_type not in ALLOWED_CAPTURE_TYPES:
+            raise ValueError(f"Unsupported capture_type: {capture_type}")
+
+        if normalized_capture_type == "network_log":
+            captured_bytes = _capture_network_log_bytes(source_url)
+        else:
+            captured_bytes, _, _, _ = _read_capture_source_bytes(source_url)
+
+        record = EvidenceRecord(
+            evidence_id=_generate_evidence_record_id(normalized_capture_type),
+            capture_type=normalized_capture_type,
+            source_url=source_url,
+            captured_at=datetime.now(UTC).isoformat(),
+            hash_sha256=compute_sha256(captured_bytes),
+            size_bytes=len(captured_bytes),
+            status=_resolve_evidence_status(normalized_capture_type, captured_bytes),
+        )
+        self.store.append(record)
+        return record
+
+
+# =============================================================================
 # CAPTURE ENGINE — C++ BACKEND REQUIRED FOR REAL DATA
 # =============================================================================
 
@@ -226,7 +397,7 @@ class EvidenceCaptureEngine:
         Capture screenshot.
         
         In production: calls C++ native capture.
-        In tests: uses provided mock data.
+        In tests: uses provided capture bytes.
         """
         if can_evidence_capture_without_session():  # pragma: no cover
             raise RuntimeError("SECURITY: Cannot capture without session")  # pragma: no cover
@@ -291,14 +462,14 @@ class EvidenceCaptureEngine:
         evidence_id = generate_evidence_id(EvidenceType.VIDEO)
         
         # Video data provided by C++ native capture engine
-        # Write placeholder metadata — real rendering deferred to C++
-        video_meta = f"PENDING_VIDEO_{duration_seconds}s_{evidence_id}".encode()
-        sha256_hash = compute_sha256(video_meta)
+        # Persist deferred render descriptor until native rendering completes
+        render_descriptor = f"PENDING_VIDEO_{duration_seconds}s_{evidence_id}".encode()
+        sha256_hash = compute_sha256(render_descriptor)
         
         file_ext = format.lower()
         file_path = str(self.output_dir / f"{evidence_id}.{file_ext}")
         with open(file_path, "wb") as f:
-            f.write(video_meta)
+            f.write(render_descriptor)
         
         metadata = EvidenceMetadata(
             evidence_id=evidence_id,
@@ -308,7 +479,7 @@ class EvidenceCaptureEngine:
             source_url=source_url,
             sha256_hash=sha256_hash,
             file_path=file_path,
-            size_bytes=len(video_meta),
+            size_bytes=len(render_descriptor),
             capture_duration_ms=int(duration_seconds * 1000),
         )
         
@@ -548,7 +719,7 @@ class PoCVideoOutput:
     width: int
     height: int
     integrity_hash: str
-    is_rendered: bool  # False = mock, True = real (C++)
+    is_rendered: bool  # False = deferred native render, True = rendered output
 
 
 def _generate_poc_id(prefix: str) -> str:
@@ -678,7 +849,7 @@ def export_poc_video(output: PoCVideoOutput) -> bytes:
     Export PoC video as bytes.
     
     PENDING: Real rendering deferred to C++.
-    Returns JSON metadata as bytes.
+    Returns JSON export metadata as bytes.
     """
     export_data = {
         "output_id": output.output_id,
@@ -693,7 +864,7 @@ def export_poc_video(output: PoCVideoOutput) -> bytes:
         "status": "PENDING_RENDER_BY_CPP",
     }
     
-    # Write mock metadata file
+    # Write export metadata sidecar file
     with open(output.video_path + ".meta.json", "w") as f:
         json.dump(export_data, f, indent=2)
     

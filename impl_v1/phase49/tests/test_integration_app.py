@@ -29,13 +29,11 @@ from impl_v1.phase49.governors.g20_dashboard_state import (
     clear_dashboard_state,
 )
 from impl_v1.phase49.governors.g21_auto_update import (
-    check_for_updates,
-    request_update_approval,
-    submit_approval,
-    install_update,
-    UpdateStatus,
+    AUTO_UPDATE_PROVISIONING_MESSAGE,
+    AutoUpdater,
+    RealBackendNotConfiguredError,
+    UpdateContract,
     can_auto_update_execute,
-    clear_update_state,
 )
 from impl_v1.phase49.governors.g22_user_database import (
     create_user,
@@ -53,7 +51,6 @@ class TestAppStartupFlow:
         clear_sessions()
         clear_dashboard_state()
         clear_database()
-        clear_update_state()
     
     def test_app_creates_user_session(self):
         """App startup creates user and session."""
@@ -153,32 +150,26 @@ class TestVoiceToDashboardFlow:
         assert can_approve == False
 
 
-class TestUpdateFlowWithApproval:
-    """Tests for update flow requiring approval."""
-    
-    def setup_method(self):
-        clear_update_state()
-    
-    def test_update_requires_approval(self):
-        """Update requires explicit user approval."""
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        
-        # Try to install without approval
-        result = install_update(update.update_id)
-        assert result.status == UpdateStatus.FAILED
-    
-    def test_update_installs_with_approval(self):
-        """Update installs after user approval."""
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        
-        approval = request_update_approval(update.update_id, "user1")
-        submit_approval(approval.approval_id, True)
-        
-        result = install_update(update.update_id)
-        assert result.status == UpdateStatus.INSTALLED
-    
+class TestUpdateInfrastructureGate:
+    """Tests for update flow remaining infrastructure gated."""
+
+    def test_update_check_requires_real_backend(self):
+        updater = AutoUpdater()
+        with pytest.raises(RealBackendNotConfiguredError, match=AUTO_UPDATE_PROVISIONING_MESSAGE):
+            updater.check_for_update()
+
+    def test_update_apply_requires_real_backend(self):
+        updater = AutoUpdater()
+        update = UpdateContract(
+            update_id="UPD-999",
+            version="9.9.9",
+            signature="e" * 64,
+            download_url="https://updates.example.com/9.9.9",
+            checksum_sha256="f" * 64,
+        )
+        with pytest.raises(RealBackendNotConfiguredError, match=AUTO_UPDATE_PROVISIONING_MESSAGE):
+            updater.apply_update(update)
+
     def test_auto_update_impossible(self):
         """Auto-update without approval is impossible."""
         can_exec, _ = can_auto_update_execute()

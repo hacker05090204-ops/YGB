@@ -1,23 +1,32 @@
 # test_g10_owner_alerts.py
 """Tests for G10: Owner Alerts"""
 
+from pathlib import Path
+import logging
+
 import pytest
+
 from impl_v1.phase49.governors.g10_owner_alerts import (
-    AlertType,
+    ALERT_SEVERITY_MAP,
+    AlertRecord,
     AlertSeverity,
     AlertStatus,
+    AlertType,
     OwnerAlert,
-    ALERT_SEVERITY_MAP,
-    clear_alerts,
-    get_all_alerts,
-    get_pending_alerts,
-    create_alert,
-    alert_new_login,
-    alert_new_ip,
+    OwnerAlertManager,
+    acknowledge_alert,
+    alert_autonomy_abuse,
     alert_geo_mismatch,
     alert_headless_request,
-    alert_autonomy_abuse,
-    acknowledge_alert,
+    alert_new_ip,
+    alert_new_login,
+    clear_alerts,
+    create_alert,
+    get_alerts_by_severity,
+    get_all_alerts,
+    get_pending_alerts,
+    get_undelivered,
+    send_alert,
 )
 
 
@@ -27,8 +36,13 @@ class TestEnumClosure:
     def test_alert_type_7_members(self):
         assert len(AlertType) == 7
     
-    def test_alert_severity_4_members(self):
-        assert len(AlertSeverity) == 4
+    def test_alert_severity_3_members(self):
+        assert len(AlertSeverity) == 3
+
+    def test_alert_severity_expected_members(self):
+        assert AlertSeverity.INFO.value == "INFO"
+        assert AlertSeverity.WARNING.value == "WARNING"
+        assert AlertSeverity.CRITICAL.value == "CRITICAL"
     
     def test_alert_status_4_members(self):
         assert len(AlertStatus) == 4
@@ -171,3 +185,53 @@ class TestDataclassFrozen:
         alert = create_alert(AlertType.NEW_LOGIN, "T", "M")
         with pytest.raises(AttributeError):
             alert.status = AlertStatus.DISMISSED
+
+
+class TestOwnerAlertManager:
+    """Tests for owner alert manager delivery tracking."""
+
+    def setup_method(self):
+        clear_alerts()
+
+    def test_send_alert_returns_alert_record(self):
+        alert = send_alert(AlertSeverity.WARNING, "Owner follow-up required")
+
+        assert isinstance(alert, AlertRecord)
+        assert alert.severity == "WARNING"
+        assert alert.delivery_channel == "email"
+        assert alert.delivered is False
+
+    def test_critical_alert_logs_immediately(self, caplog):
+        manager = OwnerAlertManager()
+
+        with caplog.at_level(logging.CRITICAL):
+            manager.send_alert(AlertSeverity.CRITICAL, "Immediate owner action required")
+
+        assert any(
+            record.levelno == logging.CRITICAL and "Immediate owner action required" in record.message
+            for record in caplog.records
+        )
+
+    def test_get_undelivered_returns_pending_alerts(self):
+        sent = send_alert(AlertSeverity.INFO, "Info path")
+
+        undelivered = get_undelivered()
+
+        assert undelivered == [sent]
+
+    def test_get_alerts_by_severity_filters_records(self):
+        send_alert(AlertSeverity.INFO, "Info path")
+        critical = send_alert(AlertSeverity.CRITICAL, "Critical path")
+
+        critical_alerts = get_alerts_by_severity(AlertSeverity.CRITICAL)
+
+        assert critical_alerts == [critical]
+
+    def test_production_file_has_no_mock_send_wording(self):
+        source = (
+            Path(__file__).resolve().parents[1]
+            / "governors"
+            / "g10_owner_alerts.py"
+        ).read_text(encoding="utf-8").lower()
+
+        assert "mock" not in source

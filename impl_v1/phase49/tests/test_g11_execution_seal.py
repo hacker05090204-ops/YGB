@@ -1,16 +1,20 @@
 # test_g11_execution_seal.py
 """Tests for G11: Execution Seal"""
 
+import logging
 import pytest
 from impl_v1.phase49.governors.g11_execution_seal import (
     SealCheckType,
     SealCheckResult,
     SealCheckEntry,
     ExecutionSealResult,
+    SealVerificationError,
+    compute_seal,
     create_check,
     seal_execution_intent,
     validate_seal,
     can_execute,
+    verify_seal,
 )
 
 
@@ -215,3 +219,29 @@ class TestDataclassFrozen:
         check = create_check(SealCheckType.G01_EXECUTION_STATE, True, "")
         with pytest.raises(AttributeError):
             check.result = SealCheckResult.FAIL
+
+
+class TestVerifySeal:
+    """Test seal hashing and verification."""
+
+    def test_valid_seal_passes(self):
+        execution_id = "exec-123"
+        timestamp_iso = "2026-04-05T16:00:00Z"
+        payload_hash = "payload-hash"
+        claimed = compute_seal(execution_id, timestamp_iso, payload_hash)
+
+        assert verify_seal(execution_id, timestamp_iso, payload_hash, claimed) is True
+
+    def test_wrong_seal_raises_error(self):
+        with pytest.raises(SealVerificationError, match="seal mismatch"):
+            verify_seal("exec-123", "2026-04-05T16:00:00Z", "payload-hash", "wrong-seal")
+
+    def test_wrong_seal_logs_critical(self, caplog):
+        with caplog.at_level(logging.CRITICAL):
+            with pytest.raises(SealVerificationError):
+                verify_seal("exec-123", "2026-04-05T16:00:00Z", "payload-hash", "wrong-seal")
+
+        assert any(
+            record.levelno == logging.CRITICAL and "mismatch" in record.message.lower()
+            for record in caplog.records
+        )

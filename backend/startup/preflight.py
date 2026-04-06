@@ -32,18 +32,26 @@ class PreflightError(RuntimeError):
 
 
 @dataclass
-class CheckResult:
+class PreflightCheck:
     name: str
     passed: bool
     detail: str
     critical: bool = True
 
 
+CheckResult = PreflightCheck
+
+
 @dataclass
 class PreflightReport:
     passed: bool
-    checks: List[CheckResult] = field(default_factory=list)
+    checks: List[PreflightCheck] = field(default_factory=list)
     fatal_errors: List[str] = field(default_factory=list)
+
+    @property
+    def all_passed(self) -> bool:
+        """Return True only when every recorded preflight check passed."""
+        return all(check.passed for check in self.checks)
 
 
 # =========================================================================
@@ -310,8 +318,8 @@ def check_boot_summary() -> CheckResult:
 # PREFLIGHT RUNNER
 # =========================================================================
 
-def run_preflight() -> PreflightReport:
-    """Run all preflight checks. Raises PreflightError if critical check fails."""
+def preflight() -> PreflightReport:
+    """Run all preflight checks and return a structured report."""
     checks = [
         check_report_directory(),
         check_hdd_writable(),
@@ -343,6 +351,9 @@ def run_preflight() -> PreflightReport:
     )
 
     if not report.passed:
+        for check in checks:
+            if not check.passed:
+                logger.critical("[PREFLIGHT] %s: %s", check.name, check.detail)
         error_msg = (
             f"PREFLIGHT FAILED — {len(fatal_errors)} critical error(s):\n"
             + "\n".join(f"  • {e}" for e in fatal_errors)
@@ -352,6 +363,12 @@ def run_preflight() -> PreflightReport:
 
     logger.info(f"PREFLIGHT PASSED — {len(checks)} checks, all clear.")
     return report
+
+
+def run_preflight() -> bool:
+    """Thin wrapper returning whether every preflight check passed."""
+    report = preflight()
+    return report.all_passed
 
 
 # =========================================================================
@@ -365,7 +382,7 @@ def _self_test():
                         format="%(levelname)s: %(message)s")
 
     try:
-        report = run_preflight()
+        report = preflight()
         print(f"\nPreflight result: {'PASS' if report.passed else 'FAIL'}")
         for c in report.checks:
             status = "✓" if c.passed else ("✗" if c.critical else "⚠")

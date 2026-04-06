@@ -32,8 +32,8 @@ async def db_transaction(db):
 
     try:
         setattr(db, _TX_FLAG, True)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to mark DB transaction state as active: %s", exc, exc_info=True)
 
     try:
         await db.execute("BEGIN IMMEDIATE")
@@ -48,8 +48,8 @@ async def db_transaction(db):
     finally:
         try:
             setattr(db, _TX_FLAG, False)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("Failed to clear DB transaction state: %s", exc, exc_info=True)
 
 
 def _resolve_db_handle(args: tuple, kwargs: dict) -> Any:

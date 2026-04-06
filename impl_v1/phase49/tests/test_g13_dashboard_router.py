@@ -8,6 +8,8 @@ from impl_v1.phase49.governors.g13_dashboard_router import (
     RiskLevel,
     ApprovalRequest,
     ApprovalDecision,
+    RouteDecision,
+    DashboardRouter,
     clear_requests,
     get_pending_requests,
     create_approval_request,
@@ -142,3 +144,66 @@ class TestDataclassFrozen:
         request = create_approval_request("a.com", "*")
         with pytest.raises(AttributeError):
             request.status = ApprovalStatus.APPROVED
+
+
+class TestDashboardRouter:
+    def setup_method(self):
+        clear_requests()
+
+    def test_route_falls_back_when_confidence_low(self):
+        router = DashboardRouter()
+
+        decision = router.route(
+            {
+                "type": "approve_execution",
+                "user_role": "user",
+                "system_state": {
+                    "active_view": "ACTIVITY",
+                    "pending_approvals": 0,
+                    "system_health": "HEALTHY",
+                },
+            }
+        )
+
+        assert isinstance(decision, RouteDecision)
+        assert decision.fallback is True
+        assert decision.destination == DashboardRouter.SAFE_DEFAULT_VIEW
+        assert decision.confidence < 0.5
+
+    def test_route_never_returns_action_endpoint(self):
+        router = DashboardRouter()
+
+        decision = router.route(
+            {
+                "type": "overview",
+                "user_role": "admin",
+                "destination": "/dashboard/execute",
+                "system_state": {
+                    "active_view": "OVERVIEW",
+                    "pending_approvals": 0,
+                    "system_health": "HEALTHY",
+                },
+            }
+        )
+
+        assert decision.destination == DashboardRouter.SAFE_DEFAULT_VIEW
+        assert "execute" not in decision.destination
+
+    def test_admin_approval_request_routes_to_display_queue(self):
+        router = DashboardRouter()
+
+        decision = router.route(
+            {
+                "type": "pending_approvals",
+                "user_role": "admin",
+                "system_state": {
+                    "active_view": "OVERVIEW",
+                    "pending_approvals": 3,
+                    "system_health": "HEALTHY",
+                },
+            }
+        )
+
+        assert decision.fallback is False
+        assert decision.destination == "/dashboard/approvals"
+        assert decision.confidence >= 0.5

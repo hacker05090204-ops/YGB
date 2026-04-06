@@ -39,6 +39,10 @@ from impl_v1.phase49.governors.g38_self_trained_model import (
     TrainingDataSourceEnum,
     TrainingSample,
     LocalModelStatus,
+    ModelVersion,
+    ModelRegistry,
+    PromotionLog,
+    SelfTrainedModelController,
     create_model_architecture,
     run_inference,
     # Training Trigger
@@ -92,6 +96,34 @@ def _write_checkpoint(tmp_path, input_dim=100):
     checkpoint_path = tmp_path / "g38_checkpoint.json"
     checkpoint_path.write_text(json.dumps(checkpoint), encoding="utf-8")
     return str(checkpoint_path)
+
+
+def _write_model_version_metadata(
+    checkpoint_dir,
+    *,
+    version_id="g38-v1",
+    field_name="security",
+    trained_at="2026-04-06T00:00:00Z",
+    f1_score=0.91,
+    is_promoted=False,
+    checkpoint_exists=True,
+):
+    version_dir = checkpoint_dir / version_id
+    version_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = version_dir / "model.safetensors"
+    if checkpoint_exists:
+        checkpoint_path.write_text("real-checkpoint", encoding="utf-8")
+
+    metadata = {
+        "version_id": version_id,
+        "checkpoint_path": "model.safetensors",
+        "trained_at": trained_at,
+        "field_name": field_name,
+        "f1_score": f1_score,
+        "is_promoted": is_promoted,
+    }
+    (version_dir / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
+    return version_dir
 
 
 # =============================================================================
@@ -438,6 +470,104 @@ class TestInference:
         features = tuple([0.5] * 100)
         with pytest.raises(RuntimeError, match="Model checkpoint not found"):
             run_inference(features, model_status)
+
+
+class TestModelRegistryAndController:
+    """Tests for disk-backed self-trained model registry behavior."""
+
+    def test_model_registry_loads_versions_from_disk_metadata(self, tmp_path):
+        checkpoint_dir = tmp_path / "checkpoints"
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        (checkpoint_dir / "training_state.json").write_text(
+            json.dumps({"epoch_number": 7}),
+            encoding="utf-8",
+        )
+        _write_model_version_metadata(
+            checkpoint_dir,
+            version_id="g38-v2",
+            field_name="security",
+            trained_at="2026-04-06T09:00:00Z",
+            f1_score=0.97,
+            is_promoted=True,
+        )
+
+        registry = ModelRegistry(checkpoint_dir)
+        versions = registry.list_available_versions("security")
+
+        assert len(versions) == 1
+        version = versions[0]
+        assert isinstance(version, ModelVersion)
+        assert version.version_id == "g38-v2"
+        assert version.field_name == "security"
+        assert version.trained_at == "2026-04-06T09:00:00Z"
+        assert version.f1_score == pytest.approx(0.97)
+        assert version.is_promoted is True
+        assert version.checkpoint_path.endswith("model.safetensors")
+
+    def test_get_active_model_returns_none_when_promoted_checkpoint_missing(self, tmp_path):
+        checkpoint_dir = tmp_path / "checkpoints"
+        _write_model_version_metadata(
+            checkpoint_dir,
+            version_id="g38-missing",
+            field_name="security",
+            is_promoted=True,
+            checkpoint_exists=False,
+        )
+
+        controller = SelfTrainedModelController(checkpoint_dir=checkpoint_dir)
+
+        assert controller.get_active_model("security") is None
+
+    def test_promote_rejects_empty_authorized_by(self, tmp_path):
+        checkpoint_dir = tmp_path / "checkpoints"
+        _write_model_version_metadata(
+            checkpoint_dir,
+            version_id="g38-v3",
+            field_name="security",
+            is_promoted=False,
+        )
+
+        controller = SelfTrainedModelController(checkpoint_dir=checkpoint_dir)
+
+        assert controller.promote("g38-v3", "   ") is False
+        assert controller.get_active_model("security") is None
+        assert controller.promotion_log.entries == ()
+
+    def test_promote_logs_immutably_and_updates_active_model(self, tmp_path):
+        checkpoint_dir = tmp_path / "checkpoints"
+        _write_model_version_metadata(
+            checkpoint_dir,
+            version_id="g38-v4",
+            field_name="security",
+            is_promoted=False,
+        )
+
+        controller = SelfTrainedModelController(checkpoint_dir=checkpoint_dir)
+        original_log = controller.promotion_log
+
+        assert isinstance(original_log, PromotionLog)
+        assert controller.promote("g38-v4", "owner@example.com") is True
+        assert original_log.entries == ()
+        assert controller.promotion_log is not original_log
+        assert len(controller.promotion_log.entries) == 1
+
+        entry = controller.promotion_log.entries[0]
+        active_model = controller.get_active_model("security")
+        log_lines = [
+            json.loads(line)
+            for line in (checkpoint_dir / "g38_promotion_log.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+
+        assert entry.version_id == "g38-v4"
+        assert entry.field_name == "security"
+        assert entry.authorized_by == "owner@example.com"
+        assert active_model is not None
+        assert active_model.version_id == "g38-v4"
+        assert active_model.is_promoted is True
+        assert len(log_lines) == 1
+        assert log_lines[0]["version_id"] == "g38-v4"
+        assert log_lines[0]["authorized_by"] == "owner@example.com"
 
 
 # =============================================================================

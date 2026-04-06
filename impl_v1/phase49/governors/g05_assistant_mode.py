@@ -13,18 +13,24 @@ Human approval MANDATORY for:
 - Headless browser
 """
 
-from dataclasses import dataclass
+from collections import deque
+from dataclasses import dataclass, replace
+from datetime import UTC, datetime
 from enum import Enum
-from typing import List, Optional, Tuple
+import logging
+from typing import Callable, Deque, Dict, List, Optional, Tuple, Union
 import uuid
-from datetime import datetime, UTC
+
+
+LOGGER = logging.getLogger(__name__)
+_QUERY_LOG_LIMIT = 120
+_MAX_SESSION_LOG_SIZE = 1000
 
 
 class AssistantMode(Enum):
-    """CLOSED ENUM - 3 modes"""
-    EXPLAIN = "EXPLAIN"      # Default - explain only
-    SUGGEST = "SUGGEST"      # Suggest actions
-    GUIDE = "GUIDE"          # Step-by-step guidance
+    """Closed assistant interaction modes."""
+    PASSIVE = "PASSIVE"
+    INTERACTIVE = "INTERACTIVE"
 
 
 class MethodDecision(Enum):
@@ -59,10 +65,145 @@ class AssistantExplanation:
     timestamp: str
 
 
+@dataclass(frozen=True)
+class AssistantSession:
+    """Assistant session bound to real system state queries."""
+    session_id: str
+    mode: AssistantMode
+    started_at: str
+    turn_count: int
+    last_query: Optional[str]
+
+
+class SessionLog:
+    """Append-only bounded session log."""
+
+    def __init__(self, max_sessions: int = _MAX_SESSION_LOG_SIZE):
+        self._sessions: Deque[AssistantSession] = deque(maxlen=max_sessions)
+
+    def append(self, session: AssistantSession) -> None:
+        self._sessions.append(session)
+
+    def entries(self) -> Tuple[AssistantSession, ...]:
+        return tuple(self._sessions)
+
+    def __len__(self) -> int:
+        return len(self._sessions)
+
+
+RealStateProvider = Callable[[str], Union[str, Tuple[bool, str], None]]
+
+
+class AssistantController:
+    """Controller that answers only from real system state providers."""
+
+    def __init__(
+        self,
+        state_provider: Optional[RealStateProvider] = None,
+        session_log: Optional[SessionLog] = None,
+    ):
+        self._state_provider = state_provider
+        self._sessions: Dict[str, AssistantSession] = {}
+        self._session_log = session_log or SessionLog()
+
+    @property
+    def session_log(self) -> SessionLog:
+        return self._session_log
+
+    def start_session(self, mode: Union[AssistantMode, str]) -> AssistantSession:
+        resolved_mode = self._resolve_mode(mode)
+        session = AssistantSession(
+            session_id=f"AST-{uuid.uuid4().hex[:16].upper()}",
+            mode=resolved_mode,
+            started_at=datetime.now(UTC).isoformat(),
+            turn_count=0,
+            last_query=None,
+        )
+        self._sessions[session.session_id] = session
+        self._session_log.append(session)
+        LOGGER.info(
+            "Assistant session started session_id=%s mode=%s",
+            session.session_id,
+            session.mode.value,
+        )
+        return session
+
+    def handle_query(self, session_id: str, query: str) -> str:
+        if session_id not in self._sessions:
+            raise KeyError(f"Unknown assistant session: {session_id}")
+
+        LOGGER.info(
+            "Assistant query session_id=%s query=%s",
+            session_id,
+            _truncate_for_log(query),
+        )
+
+        session = self._sessions[session_id]
+        self._sessions[session_id] = replace(
+            session,
+            turn_count=session.turn_count + 1,
+            last_query=query,
+        )
+
+        unavailable_reason = self._get_unavailable_reason(query)
+        if unavailable_reason is not None:
+            return f"Data unavailable: {unavailable_reason}"
+
+        return self._get_real_state_response(query)
+
+    def get_session(self, session_id: str) -> AssistantSession:
+        return self._sessions[session_id]
+
+    def _resolve_mode(self, mode: Union[AssistantMode, str]) -> AssistantMode:
+        if isinstance(mode, AssistantMode):
+            return mode
+
+        normalized_mode = str(mode).strip().upper()
+        if normalized_mode == "AUTONOMOUS":
+            raise ValueError("AUTONOMOUS mode is not allowed")
+
+        try:
+            return AssistantMode[normalized_mode]
+        except KeyError as exc:
+            raise ValueError(f"Unsupported assistant mode: {mode}") from exc
+
+    def _get_unavailable_reason(self, query: str) -> Optional[str]:
+        if self._state_provider is None:
+            return "no real system state provider configured"
+
+        provider_result = self._state_provider(query)
+        if isinstance(provider_result, tuple):
+            available, payload = provider_result
+            if not available:
+                return str(payload)
+            return None
+
+        if provider_result is None:
+            return "no matching real system data"
+
+        return None
+
+    def _get_real_state_response(self, query: str) -> str:
+        if self._state_provider is None:
+            return "Data unavailable: no real system state provider configured"
+
+        provider_result = self._state_provider(query)
+        if isinstance(provider_result, tuple):
+            available, payload = provider_result
+            if not available:
+                return f"Data unavailable: {payload}"
+            return str(payload)
+
+        if provider_result is None:
+            return "Data unavailable: no matching real system data"
+
+        return provider_result
+
+
 class AssistantContext:
     """Context for assistant explanations."""
     
-    def __init__(self, mode: AssistantMode = AssistantMode.EXPLAIN):
+    def __init__(self, mode: AssistantMode = AssistantMode.PASSIVE):
         self._mode = mode
         self._explanations: List[AssistantExplanation] = []
     
@@ -138,3 +279,8 @@ def requires_human_approval(explanation: AssistantExplanation) -> Tuple[bool, st
         return True, "Multiple AMSE proposals require review"
     
     return False, ""
+
+
+def _truncate_for_log(query: str, limit: int = _QUERY_LOG_LIMIT) -> str:
+    """Truncate query text for logging without exceeding the limit."""
+    return query[:limit]

@@ -1,11 +1,28 @@
 # test_g04_voice_proxy.py
 """Tests for G04: Voice Proxy"""
 
-import os
 import pytest
 
-# Enable test bypass for process_voice_request (skip real HTTP in tests)
-os.environ["YGB_TEST_MODE"] = "true"
+
+class _SuccessfulTTSResponse:
+    status = 200
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
+
+
+def _mock_tts_proxy_success(monkeypatch):
+    import urllib.request
+
+    monkeypatch.delenv("YGB_TEST_MODE", raising=False)
+    monkeypatch.setattr(
+        urllib.request,
+        "urlopen",
+        lambda *args, **kwargs: _SuccessfulTTSResponse(),
+    )
 
 from impl_v1.phase49.governors.g04_voice_proxy import (
     VoiceOutputType,
@@ -85,7 +102,8 @@ class TestProcessVoiceRequest:
     def setup_method(self):
         reset_rate_limit()
     
-    def test_successful_request(self):
+    def test_successful_request(self, monkeypatch):
+        _mock_tts_proxy_success(monkeypatch)
         request = create_voice_request("Test message")
         result = process_voice_request(request)
         assert result.status == VoiceOutputStatus.DELIVERED
@@ -103,7 +121,8 @@ class TestProcessVoiceRequest:
         assert result.status == VoiceOutputStatus.FAILED
         assert "Empty text" in result.error_message
     
-    def test_result_has_timestamp(self):
+    def test_result_has_timestamp(self, monkeypatch):
+        _mock_tts_proxy_success(monkeypatch)
         request = create_voice_request("Test")
         result = process_voice_request(request)
         assert result.timestamp is not None
@@ -118,7 +137,8 @@ class TestRateLimiting:
     def test_rate_limit_check_initially_true(self):
         assert check_rate_limit() is True
     
-    def test_rate_limit_after_max_requests(self):
+    def test_rate_limit_after_max_requests(self, monkeypatch):
+        _mock_tts_proxy_success(monkeypatch)
         # Process max requests
         for i in range(MAX_REQUESTS_PER_MINUTE):
             request = create_voice_request(f"Message {i}")
@@ -138,7 +158,8 @@ class TestDataclassFrozen:
         with pytest.raises(AttributeError):
             request.text = "Modified"
     
-    def test_result_frozen(self):
+    def test_result_frozen(self, monkeypatch):
+        _mock_tts_proxy_success(monkeypatch)
         request = create_voice_request("Test")
         result = process_voice_request(request)
         with pytest.raises(AttributeError):

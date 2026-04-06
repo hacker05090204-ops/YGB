@@ -14,9 +14,13 @@ Dashboard CANNOT approve execution directly.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Dict
+import logging
+from typing import Optional, List, Dict, Any
 import uuid
 from datetime import datetime, UTC
+
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardPanel(Enum):
@@ -147,6 +151,10 @@ class DashboardState:
     report_session: Optional[ReportSessionState]
     active_panel: DashboardPanel
     last_updated: str
+    session_id: str
+    active_view: str
+    pending_approvals: int
+    system_health: str
 
 
 @dataclass(frozen=True)
@@ -159,6 +167,304 @@ class DashboardEvent:
     timestamp: str
 
 
+@dataclass(frozen=True)
+class StateTransition:
+    """Append-only dashboard state transition record."""
+
+    transition_id: str
+    session_id: str
+    from_view: str
+    to_view: str
+    timestamp: str
+    reason: str
+    pending_approvals: int
+    system_health: str
+
+
+class StateTransitionLog:
+    """Append-only log for dashboard state transitions."""
+
+    def __init__(self):
+        self._entries: List[StateTransition] = []
+
+    def append(self, transition: StateTransition) -> None:
+        self._entries.append(transition)
+
+    def snapshot(self) -> tuple[StateTransition, ...]:
+        return tuple(self._entries)
+
+    def clear(self) -> None:
+        self._entries.clear()
+
+
+def _get_pending_approval_count() -> int:
+    try:
+        from .g13_dashboard_router import get_pending_requests
+
+        return len(get_pending_requests())
+    except Exception:
+        return 0
+
+
+def _load_peer_statuses() -> Dict[str, str]:
+    try:
+        from backend.sync.peer_transport import get_peer_statuses, get_peers
+
+        statuses = {
+            name: getattr(status, "value", str(status)).upper()
+            for name, status in get_peer_statuses().items()
+        }
+        if statuses:
+            return statuses
+
+        peers = get_peers()
+        return {
+            str(peer.get("name", "unknown")): str(
+                peer.get("peer_status") or peer.get("status") or "UNKNOWN"
+            ).upper()
+            for peer in peers
+        }
+    except Exception:
+        return {}
+
+
+def _load_circuit_breaker_states() -> List[str]:
+    try:
+        from backend.cve.cve_pipeline import get_pipeline
+
+        source_status = get_pipeline().get_source_status()
+        return [
+            str(details.get("circuit_breaker") or "").upper()
+            for details in source_status.values()
+            if isinstance(details, dict) and details.get("circuit_breaker")
+        ]
+    except Exception:
+        return []
+
+
+def _derive_system_health(
+    circuit_breaker_states: Optional[List[str]] = None,
+    peer_statuses: Optional[Dict[str, str]] = None,
+) -> str:
+    breaker_states = [
+        str(state or "").upper()
+        for state in (circuit_breaker_states if circuit_breaker_states is not None else _load_circuit_breaker_states())
+        if str(state or "").strip()
+    ]
+    peers = {
+        name: str(status or "").upper()
+        for name, status in (peer_statuses if peer_statuses is not None else _load_peer_statuses()).items()
+    }
+
+    if not breaker_states and not peers:
+        return "UNKNOWN"
+
+    any_breaker_degraded = any(state in {"OPEN", "HALF_OPEN"} for state in breaker_states)
+    all_breakers_open = bool(breaker_states) and all(state == "OPEN" for state in breaker_states)
+    peer_values = list(peers.values())
+    any_peer_degraded = any(value in {"DEGRADED", "UNREACHABLE", "OFFLINE", "ERROR"} for value in peer_values)
+    all_peers_unreachable = bool(peer_values) and all(
+        value in {"UNREACHABLE", "OFFLINE"} for value in peer_values
+    )
+
+    if (all_breakers_open and (not peer_values or all_peers_unreachable)) or (
+        any_breaker_degraded and all_peers_unreachable
+    ):
+        return "CRITICAL"
+    if any_breaker_degraded or any_peer_degraded:
+        return "DEGRADED"
+    return "HEALTHY"
+
+
+def _normalize_view(view: str) -> str:
+    normalized = str(view or "").strip().upper()
+    aliases = {
+        "": DashboardPanel.USER.value,
+        "OVERVIEW": DashboardPanel.USER.value,
+        "USER": DashboardPanel.USER.value,
+        "ADMIN": DashboardPanel.ADMIN.value,
+        "ACTIVITY": DashboardPanel.ACTIVITY.value,
+        "REPORT": DashboardPanel.REPORT.value,
+        "REPORTS": DashboardPanel.REPORT.value,
+        "APPROVALS": "APPROVALS",
+        "STATUS": "STATUS",
+        "HEALTH": "HEALTH",
+        "/DASHBOARD/OVERVIEW": DashboardPanel.USER.value,
+        "/DASHBOARD/USER": DashboardPanel.USER.value,
+        "/DASHBOARD/ADMIN": DashboardPanel.ADMIN.value,
+        "/DASHBOARD/ACTIVITY": DashboardPanel.ACTIVITY.value,
+        "/DASHBOARD/REPORT": DashboardPanel.REPORT.value,
+        "/DASHBOARD/REPORTS": DashboardPanel.REPORT.value,
+        "/DASHBOARD/APPROVALS": "APPROVALS",
+        "/DASHBOARD/STATUS": "STATUS",
+        "/DASHBOARD/HEALTH": "HEALTH",
+    }
+    if any(token in normalized for token in ("EXECUTE", "LAUNCH", "SUBMIT", "CLICK", "AUTOMATE", "APPROVE", "BYPASS")):
+        return DashboardPanel.USER.value
+    return aliases.get(normalized, DashboardPanel.USER.value)
+
+
+def _panel_for_view(view: str) -> DashboardPanel:
+    normalized = _normalize_view(view)
+    if normalized in {DashboardPanel.ADMIN.value, "APPROVALS"}:
+        return DashboardPanel.ADMIN
+    if normalized == DashboardPanel.ACTIVITY.value:
+        return DashboardPanel.ACTIVITY
+    if normalized == DashboardPanel.REPORT.value:
+        return DashboardPanel.REPORT
+    return DashboardPanel.USER
+
+
+def _build_dashboard_snapshot(
+    dashboard_id: str,
+    user_panel: Optional[UserPanelState],
+    admin_panel: Optional[AdminPanelState],
+    activity_session: Optional[ActivitySessionState],
+    report_session: Optional[ReportSessionState],
+    active_panel: DashboardPanel,
+    last_updated: str,
+) -> DashboardState:
+    pending_approvals = _get_pending_approval_count()
+    refreshed_admin_panel = admin_panel
+    if admin_panel is not None:
+        refreshed_admin_panel = AdminPanelState(
+            admin_id=admin_panel.admin_id,
+            total_users=admin_panel.total_users,
+            active_sessions=admin_panel.active_sessions,
+            pending_approvals=pending_approvals,
+            recent_alerts=admin_panel.recent_alerts,
+            risk_flags=admin_panel.risk_flags,
+            last_updated=last_updated,
+        )
+
+    return DashboardState(
+        dashboard_id=dashboard_id,
+        user_panel=user_panel,
+        admin_panel=refreshed_admin_panel,
+        activity_session=activity_session,
+        report_session=report_session,
+        active_panel=active_panel,
+        last_updated=last_updated,
+        session_id=activity_session.session_id if activity_session is not None else dashboard_id,
+        active_view=active_panel.value,
+        pending_approvals=pending_approvals,
+        system_health=_derive_system_health(),
+    )
+
+
+_state_transition_log = StateTransitionLog()
+
+
+def _append_state_transition(
+    session_id: str,
+    from_view: str,
+    to_view: str,
+    reason: str,
+    *,
+    pending_approvals: int,
+    system_health: str,
+    transition_log: Optional[StateTransitionLog] = None,
+) -> StateTransition:
+    transition = StateTransition(
+        transition_id=f"TRN-{uuid.uuid4().hex[:16].upper()}",
+        session_id=session_id,
+        from_view=_normalize_view(from_view),
+        to_view=_normalize_view(to_view),
+        timestamp=datetime.now(UTC).isoformat(),
+        reason=reason,
+        pending_approvals=pending_approvals,
+        system_health=system_health,
+    )
+    (transition_log or _state_transition_log).append(transition)
+    return transition
+
+
+def get_state_transition_log() -> tuple[StateTransition, ...]:
+    """Return a snapshot of the append-only transition log."""
+    return _state_transition_log.snapshot()
+
+
+class StateManager:
+    """Authoritative cluster-level dashboard state manager."""
+
+    def __init__(
+        self,
+        session_id: Optional[str] = None,
+        transition_log: Optional[StateTransitionLog] = None,
+    ):
+        self._session_id = session_id or f"DST-{uuid.uuid4().hex[:12].upper()}"
+        self._active_view = DashboardPanel.USER.value
+        self._last_updated = datetime.now(UTC).isoformat()
+        self._transition_log = transition_log or _state_transition_log
+
+    @property
+    def transition_log(self) -> StateTransitionLog:
+        return self._transition_log
+
+    def _load_circuit_breaker_states(self) -> List[str]:
+        return _load_circuit_breaker_states()
+
+    def _load_peer_statuses(self) -> Dict[str, str]:
+        return _load_peer_statuses()
+
+    def _current_health(self) -> str:
+        return _derive_system_health(
+            self._load_circuit_breaker_states(),
+            self._load_peer_statuses(),
+        )
+
+    def get_current_state(self) -> DashboardState:
+        """Get current dashboard cluster state."""
+        return DashboardState(
+            dashboard_id=self._session_id,
+            user_panel=None,
+            admin_panel=None,
+            activity_session=None,
+            report_session=None,
+            active_panel=_panel_for_view(self._active_view),
+            last_updated=self._last_updated,
+            session_id=self._session_id,
+            active_view=self._active_view,
+            pending_approvals=_get_pending_approval_count(),
+            system_health=self._current_health(),
+        )
+
+    def update_view(self, view: str) -> DashboardState:
+        """Update the active view and append a transition log entry."""
+        previous_view = self._active_view
+        self._active_view = _normalize_view(view)
+        self._last_updated = datetime.now(UTC).isoformat()
+        state = self.get_current_state()
+        _append_state_transition(
+            self._session_id,
+            previous_view,
+            self._active_view,
+            "dashboard_view_updated",
+            pending_approvals=state.pending_approvals,
+            system_health=state.system_health,
+            transition_log=self._transition_log,
+        )
+        return state
+
+
+_default_state_manager: Optional[StateManager] = None
+_state_managers: Dict[str, StateManager] = {}
+
+
+def get_state_manager(session_id: Optional[str] = None) -> StateManager:
+    """Return the shared dashboard cluster state manager."""
+    global _default_state_manager
+
+    if session_id is None:
+        if _default_state_manager is None:
+            _default_state_manager = StateManager()
+        return _default_state_manager
+
+    if session_id not in _state_managers:
+        _state_managers[session_id] = StateManager(session_id=session_id)
+    return _state_managers[session_id]
+
+
 # In-memory state store
 _dashboard_states: Dict[str, DashboardState] = {}
 _events: List[DashboardEvent] = []
@@ -166,8 +472,19 @@ _events: List[DashboardEvent] = []
 
 def clear_dashboard_state():
     """Clear all state (for testing)."""
+    global _default_state_manager
+
     _dashboard_states.clear()
     _events.clear()
+    _state_transition_log.clear()
+    _state_managers.clear()
+    _default_state_manager = None
+    try:
+        from .g13_dashboard_router import clear_requests
+
+        clear_requests()
+    except Exception as exc:
+        logger.debug("Dashboard request cache clear skipped: %s", exc)
 
 
 def create_dashboard_state(
@@ -224,7 +541,7 @@ def create_dashboard_state(
         last_updated=now,
     )
     
-    dashboard = DashboardState(
+    dashboard = _build_dashboard_snapshot(
         dashboard_id=dashboard_id,
         user_panel=user_panel,
         admin_panel=admin_panel,
@@ -235,6 +552,14 @@ def create_dashboard_state(
     )
     
     _dashboard_states[dashboard_id] = dashboard
+    _append_state_transition(
+        dashboard.session_id,
+        "INITIAL",
+        dashboard.active_view,
+        "dashboard_created",
+        pending_approvals=dashboard.pending_approvals,
+        system_health=dashboard.system_health,
+    )
     return dashboard
 
 
@@ -280,7 +605,7 @@ def update_activity_with_targets(
         last_updated=now,
     )
     
-    new_dashboard = DashboardState(
+    new_dashboard = _build_dashboard_snapshot(
         dashboard_id=dashboard.dashboard_id,
         user_panel=dashboard.user_panel,
         admin_panel=dashboard.admin_panel,
@@ -291,6 +616,15 @@ def update_activity_with_targets(
     )
     
     _dashboard_states[dashboard_id] = new_dashboard
+    if dashboard.active_view != new_dashboard.active_view:
+        _append_state_transition(
+            new_dashboard.session_id,
+            dashboard.active_view,
+            new_dashboard.active_view,
+            "activity_targets_updated",
+            pending_approvals=new_dashboard.pending_approvals,
+            system_health=new_dashboard.system_health,
+        )
     
     # Log event
     emit_event(ActivityType.TARGET_DISCOVERED, DashboardPanel.ACTIVITY, {
@@ -324,7 +658,7 @@ def set_quantity_selected(
         last_updated=now,
     )
     
-    new_dashboard = DashboardState(
+    new_dashboard = _build_dashboard_snapshot(
         dashboard_id=dashboard.dashboard_id,
         user_panel=dashboard.user_panel,
         admin_panel=dashboard.admin_panel,
@@ -383,7 +717,7 @@ def update_report_progress(
         last_updated=now,
     )
     
-    new_dashboard = DashboardState(
+    new_dashboard = _build_dashboard_snapshot(
         dashboard_id=dashboard.dashboard_id,
         user_panel=dashboard.user_panel,
         admin_panel=dashboard.admin_panel,

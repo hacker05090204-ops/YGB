@@ -263,6 +263,8 @@ class RTX2050Node:
         scale_result = find_optimal_batch_size(
             starting_batch=self.starting_batch,
             input_dim=self.input_dim,
+            X=self.X,
+            y=self.y,
         )
 
         self.optimal_batch_2050 = scale_result.optimal_batch_size

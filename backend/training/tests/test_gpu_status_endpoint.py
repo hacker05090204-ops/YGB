@@ -19,6 +19,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from backend.observability.metrics import metrics_registry
+from backend.training.gpu_status import get_native_gpu_status
 from backend.training.state_manager import (
     GPU_DRIVER_INSTALL_COMMAND,
     GPU_WATCHDOG_ALERT_METRIC,
@@ -367,3 +368,46 @@ class TestCheckpointCount:
             result = mgr.get_checkpoint_count()
         # Could be None or a real count
         assert result is None or isinstance(result, int)
+
+
+class TestNativeGpuStatus:
+    REQUIRED_KEYS = {
+        "nvml_available",
+        "cuda_available",
+        "native_compiled",
+        "gpu_count",
+        "status_source",
+    }
+
+    def test_get_native_gpu_status_returns_dict_when_torch_probe_fails(self):
+        mock_torch = MagicMock()
+        mock_torch.cuda.is_available.side_effect = RuntimeError("boom")
+
+        with patch.dict("sys.modules", {"torch": mock_torch}):
+            result = get_native_gpu_status()
+
+        assert isinstance(result, dict)
+        assert set(result) == self.REQUIRED_KEYS
+        assert result == {
+            "nvml_available": False,
+            "cuda_available": False,
+            "native_compiled": False,
+            "gpu_count": 0,
+            "status_source": "python_torch",
+        }
+
+    def test_get_native_gpu_status_keeps_native_compiled_false_without_verified_build(self):
+        mock_torch = MagicMock()
+        mock_torch.cuda.is_available.return_value = True
+        mock_torch.cuda.device_count.return_value = 2
+
+        with patch.dict("sys.modules", {"torch": mock_torch}):
+            result = get_native_gpu_status()
+
+        assert isinstance(result, dict)
+        assert set(result) == self.REQUIRED_KEYS
+        assert result["nvml_available"] is False
+        assert result["cuda_available"] is True
+        assert result["native_compiled"] is False
+        assert result["gpu_count"] == 2
+        assert result["status_source"] == "python_torch"

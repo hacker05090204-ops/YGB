@@ -34,8 +34,12 @@ from enum import Enum
 from typing import List, Optional, Dict, Any
 from pathlib import Path
 from datetime import datetime, UTC
+import logging
 import json
 import os
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -179,8 +183,12 @@ def load_state() -> RolloutState:
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             return RolloutState(**data)
-        except (json.JSONDecodeError, TypeError):
-            pass
+        except (json.JSONDecodeError, TypeError) as exc:
+            logger.warning(
+                "Failed to load rollout governor state from %s: %s",
+                path,
+                exc,
+            )
     return RolloutState()
 
 

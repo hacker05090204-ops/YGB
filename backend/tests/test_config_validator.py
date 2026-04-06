@@ -14,14 +14,20 @@ import sys
 import unittest
 from unittest.mock import patch
 
+import backend.config.config_validator as config_validator_module
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from backend.config.config_validator import (
     _is_placeholder,
+    ConfigDriftDetector,
+    ConfigValidationError,
     validate_required_secrets,
+    validate_required_fields,
     validate_bind_host,
     validate_config,
     ConfigurationError,
+    REQUIRED_FIELDS,
     REQUIRED_SECRETS,
     CONNECTED_ONLY_SECRETS,
     _PLACEHOLDER_PATTERNS,
@@ -165,6 +171,29 @@ class TestValidateConfig(unittest.TestCase):
         with patch.dict(os.environ, env, clear=True):
             validate_config(strict=True)  # Should not raise
 
+    def test_accepts_valid_explicit_config_mapping(self):
+        config_validator_module._drift_detector._baseline_hash = None
+        config = {
+            "JWT_SECRET": "a" * 32,
+            "YGB_HMAC_SECRET": "b" * 32,
+            "YGB_VIDEO_JWT_SECRET": "c" * 32,
+        }
+        with patch.dict(os.environ, {}, clear=True):
+            validate_config(strict=True, config=config)
+
+    def test_missing_required_field_raises_config_validation_error(self):
+        config_validator_module._drift_detector._baseline_hash = None
+        config = {
+            "JWT_SECRET": "a" * 32,
+            "YGB_HMAC_SECRET": "b" * 32,
+        }
+        with self.assertRaises(ConfigValidationError) as ctx:
+            validate_config(strict=True, config=config)
+        self.assertEqual(
+            str(ctx.exception),
+            "Missing required config field: YGB_VIDEO_JWT_SECRET",
+        )
+
 
 class TestConfigurationError(unittest.TestCase):
     """Test ConfigurationError exception."""
@@ -179,6 +208,63 @@ class TestConfigurationError(unittest.TestCase):
     def test_empty_violations(self):
         err = ConfigurationError([])
         self.assertEqual(err.violations, [])
+
+
+class TestConfigValidationError(unittest.TestCase):
+    """Test explicit config field validation helpers."""
+
+    def test_is_value_error(self):
+        self.assertTrue(issubclass(ConfigValidationError, ValueError))
+
+    def test_required_fields_populated(self):
+        self.assertEqual(REQUIRED_FIELDS, [
+            "JWT_SECRET",
+            "YGB_HMAC_SECRET",
+            "YGB_VIDEO_JWT_SECRET",
+        ])
+
+    def test_validate_required_fields_accepts_complete_mapping(self):
+        validate_required_fields({
+            "JWT_SECRET": "a" * 32,
+            "YGB_HMAC_SECRET": "b" * 32,
+            "YGB_VIDEO_JWT_SECRET": "c" * 32,
+        })
+
+
+class TestConfigDriftDetector(unittest.TestCase):
+    """Test config drift detection support."""
+
+    def setUp(self):
+        self.config = {
+            "JWT_SECRET": "a" * 32,
+            "YGB_HMAC_SECRET": "b" * 32,
+            "YGB_VIDEO_JWT_SECRET": "c" * 32,
+        }
+
+    def test_no_drift_on_same_config(self):
+        detector = ConfigDriftDetector()
+        self.assertFalse(detector.check_drift(self.config))
+        self.assertFalse(detector.check_drift(dict(self.config)))
+
+    def test_drift_detected_on_change(self):
+        detector = ConfigDriftDetector()
+        self.assertFalse(detector.check_drift(self.config))
+        changed = dict(self.config)
+        changed["JWT_SECRET"] = "z" * 32
+        self.assertTrue(detector.check_drift(changed))
+
+    def test_drift_logs_critical_on_change(self):
+        detector = ConfigDriftDetector()
+        detector.check_drift(self.config)
+        changed = dict(self.config)
+        changed["JWT_SECRET"] = "z" * 32
+
+        with self.assertLogs("ygb.config_validator", level="CRITICAL") as captured:
+            self.assertTrue(detector.check_drift(changed))
+
+        self.assertTrue(
+            any("Configuration drift detected" in message for message in captured.output)
+        )
 
 
 if __name__ == "__main__":

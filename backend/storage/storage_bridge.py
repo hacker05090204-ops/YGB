@@ -15,6 +15,7 @@ import logging
 import threading
 import time
 import uuid
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List, Tuple
 from pathlib import Path
@@ -64,6 +65,259 @@ _PAGE_CACHE_SECONDS = max(1.0, float(os.getenv("YGB_STORAGE_PAGE_CACHE_SECONDS",
 _PAGE_CACHE_LOCK = threading.Lock()
 _PAGE_CACHE: Dict[str, tuple[float, Any]] = {}
 _ADMIN_STATS_CACHE: Dict[str, Any] = {"checked_at": 0.0, "value": None}
+_READ_ENGINE_CACHE_LOCK = threading.Lock()
+_READ_ENGINE_CACHE: Dict[str, HDDEngine] = {}
+
+
+@dataclass(frozen=True)
+class BridgeAuditEntry:
+    timestamp: str
+    op: str
+    tier: str
+    key: str
+    result: str
+    latency_ms: float
+
+
+class BridgeAuditLog:
+    def __init__(self, max_entries: int = 10000, rotate_to: int = 5000):
+        self._entries: List[BridgeAuditEntry] = []
+        self._lock = threading.Lock()
+        self._max_entries = max_entries
+        self._rotate_to = rotate_to
+
+    def append(self, entry: BridgeAuditEntry) -> None:
+        with self._lock:
+            self._entries.append(entry)
+            if len(self._entries) > self._max_entries:
+                self._entries = self._entries[-self._rotate_to :]
+
+    def get_entries(self) -> List[BridgeAuditEntry]:
+        with self._lock:
+            return list(self._entries)
+
+
+_audit_log = BridgeAuditLog()
+
+
+def _normalize_root(root: Any) -> str:
+    raw_root = str(root or "").strip()
+    if not raw_root:
+        return ""
+    return os.path.normcase(os.path.normpath(raw_root))
+
+
+def _safe_storage_topology(active_root: Optional[str] = None) -> Dict[str, Any]:
+    topology = {
+        "primary_root": os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        "fallback_root": os.getenv("YGB_HDD_FALLBACK_ROOT", "C:/ygb_hdd_fallback"),
+        "active_root": active_root or _storage_active_root or os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd"),
+        "primary_available": None,
+        "fallback_available": None,
+        "fallback_active": False,
+        "mode": _storage_mode,
+        "reason": None,
+    }
+    if get_storage_topology:
+        try:
+            topology = dict(get_storage_topology())
+        except Exception as exc:
+            logger.warning("Storage topology resolution failed for bridge audit: %s", exc)
+    if active_root:
+        topology["active_root"] = active_root
+    return topology
+
+
+def _tier_name_for_root(root: Any, topology: Optional[Dict[str, Any]] = None) -> str:
+    topology = topology or _safe_storage_topology()
+    normalized_root = _normalize_root(root)
+    if normalized_root == _normalize_root(topology.get("primary_root")):
+        return "PRIMARY"
+    if normalized_root == _normalize_root(topology.get("fallback_root")):
+        return "FALLBACK"
+    if normalized_root == _normalize_root(topology.get("active_root")):
+        return "ACTIVE"
+    return "UNKNOWN"
+
+
+def _append_bridge_audit(
+    op: str,
+    tier: str,
+    key: str,
+    result: str,
+    started_at: float,
+) -> None:
+    _audit_log.append(
+        BridgeAuditEntry(
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            op=op,
+            tier=tier,
+            key=key,
+            result=result,
+            latency_ms=round((time.perf_counter() - started_at) * 1000.0, 3),
+        )
+    )
+
+
+def _describe_read_result(value: Any) -> str:
+    if value is None:
+        return "miss"
+    if isinstance(value, list):
+        return "ok" if value else "empty"
+    return "ok"
+
+
+def _get_read_engine_for_root(root: str):
+    normalized_root = _normalize_root(root)
+    with _READ_ENGINE_CACHE_LOCK:
+        engine = _READ_ENGINE_CACHE.get(normalized_root)
+        if engine is None:
+            engine = HDDEngine(root)
+            engine._initialized = True
+            _READ_ENGINE_CACHE[normalized_root] = engine
+    return engine
+
+
+def _perform_read_with_fallback(primary_engine, op: str, key: str, reader, default):
+    active_root = str(getattr(primary_engine, "root", "") or _storage_active_root or "")
+    topology = _safe_storage_topology(active_root)
+
+    ordered_roots: List[str] = []
+    seen_roots = set()
+    for candidate in [active_root, topology.get("primary_root"), topology.get("fallback_root")]:
+        normalized_candidate = _normalize_root(candidate)
+        if candidate and normalized_candidate and normalized_candidate not in seen_roots:
+            seen_roots.add(normalized_candidate)
+            ordered_roots.append(str(candidate))
+
+    for idx, root in enumerate(ordered_roots):
+        tier_name = _tier_name_for_root(root, topology)
+        engine = (
+            primary_engine
+            if _normalize_root(getattr(primary_engine, "root", "")) == _normalize_root(root)
+            else _get_read_engine_for_root(root)
+        )
+        started_at = time.perf_counter()
+        try:
+            result = reader(engine)
+            _append_bridge_audit(op, tier_name, key, _describe_read_result(result), started_at)
+            return result
+        except Exception as exc:
+            _append_bridge_audit(
+                op,
+                tier_name,
+                key,
+                f"error:{type(exc).__name__}",
+                started_at,
+            )
+            if idx + 1 < len(ordered_roots):
+                logger.warning(
+                    "Storage read failed on tier %s for %s; attempting next tier",
+                    tier_name,
+                    key,
+                )
+                continue
+            logger.error("Storage read failed on all tiers for %s: %s", key, exc)
+            return default
+
+    return default
+
+
+def _perform_write_with_audit(active_engine, op: str, key: str, writer):
+    topology = _safe_storage_topology(str(getattr(active_engine, "root", "") or _storage_active_root or ""))
+    tier_name = _tier_name_for_root(getattr(active_engine, "root", ""), topology)
+    started_at = time.perf_counter()
+    try:
+        result = writer()
+    except Exception as exc:
+        _append_bridge_audit(
+            op,
+            tier_name,
+            key,
+            f"error:{type(exc).__name__}",
+            started_at,
+        )
+        raise
+    _append_bridge_audit(op, tier_name, key, "ok", started_at)
+    return result
+
+
+class _BridgeEngineProxy:
+    def __init__(self, engine):
+        self._engine = engine
+
+    @property
+    def root(self):
+        return getattr(self._engine, "root", None)
+
+    def create_entity(self, entity_type: str, entity_id: str, data: Dict[str, Any]):
+        key = f"{entity_type}/{entity_id}"
+        return _perform_write_with_audit(
+            self._engine,
+            "CREATE",
+            key,
+            lambda: self._engine.create_entity(entity_type, entity_id, data),
+        )
+
+    def append_record(self, entity_type: str, entity_id: str, data: Dict[str, Any]):
+        key = f"{entity_type}/{entity_id}"
+        return _perform_write_with_audit(
+            self._engine,
+            "APPEND",
+            key,
+            lambda: self._engine.append_record(entity_type, entity_id, data),
+        )
+
+    def read_entity(self, entity_type: str, entity_id: str):
+        key = f"{entity_type}/{entity_id}"
+        return _perform_read_with_fallback(
+            self._engine,
+            "READ",
+            key,
+            lambda engine: engine.read_entity(entity_type, entity_id),
+            None,
+        )
+
+    def list_entities(self, entity_type: str, limit: int = 100, offset: int = 0):
+        key = f"{entity_type}:limit={limit}:offset={offset}"
+        return _perform_read_with_fallback(
+            self._engine,
+            "LIST",
+            key,
+            lambda engine: engine.list_entities(entity_type, limit=limit, offset=offset),
+            [],
+        )
+
+    def count_entities(self, entity_type: str):
+        return _perform_read_with_fallback(
+            self._engine,
+            "COUNT",
+            entity_type,
+            lambda engine: engine.count_entities(entity_type),
+            0,
+        )
+
+    def get_stats(self):
+        return _perform_read_with_fallback(
+            self._engine,
+            "STATS",
+            "engine/stats",
+            lambda engine: engine.get_stats(),
+            {},
+        )
+
+    def __getattr__(self, item: str):
+        return getattr(self._engine, item)
+
+
+def _wrap_engine(engine):
+    if engine is None or isinstance(engine, _BridgeEngineProxy):
+        return engine
+    return _BridgeEngineProxy(engine)
+
+
+def get_audit_log() -> List[BridgeAuditEntry]:
+    return _audit_log.get_entries()
 
 
 def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
@@ -99,7 +353,8 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     if resolved_root is None:
         resolved_root = os.getenv("YGB_HDD_ROOT", "D:/ygb_hdd")
 
-    _engine = get_engine(resolved_root)
+    raw_engine = get_engine(resolved_root)
+    _engine = _wrap_engine(raw_engine)
     _EMAIL_INDEX = {}
     _EMAIL_INDEX_BUILT = False
     _GITHUB_ID_INDEX = {}
@@ -110,27 +365,29 @@ def init_storage(hdd_root: Optional[str] = None) -> Dict[str, Any]:
     _PHONE_INDEX_BUILT = False
     _DEVICE_INDEX = {}
     _DEVICE_INDEX_BUILT = False
-    _storage_active_root = str(_engine.root)
+    with _READ_ENGINE_CACHE_LOCK:
+        _READ_ENGINE_CACHE.clear()
+    _storage_active_root = str(raw_engine.root)
     _storage_mode = topology.get("mode", "PRIMARY")
 
-    _lifecycle = LifecycleManager(_engine)
+    _lifecycle = LifecycleManager(raw_engine)
     _lifecycle.start_sweep_thread()
 
-    _disk_monitor = DiskMonitor(_engine)
+    _disk_monitor = DiskMonitor(raw_engine)
     _disk_monitor.start()
 
-    _video_streamer = VideoStreamer(str(_engine.root))
+    _video_streamer = VideoStreamer(str(raw_engine.root))
 
-    logger.info(f"Storage bridge initialized at: {_engine.root}")
+    logger.info(f"Storage bridge initialized at: {raw_engine.root}")
     if topology.get("fallback_active"):
         logger.warning(
             "Primary HDD/NAS root unavailable; storage bridge running on fallback root %s",
-            _engine.root,
+            raw_engine.root,
         )
 
     return {
         "status": "initialized",
-        "hdd_root": str(_engine.root),
+        "hdd_root": str(raw_engine.root),
         "storage_mode": _storage_mode,
         "primary_hdd_root": topology.get("primary_root"),
         "fallback_hdd_root": topology.get("fallback_root"),

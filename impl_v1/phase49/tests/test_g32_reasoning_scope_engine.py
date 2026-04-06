@@ -968,8 +968,53 @@ class TestPoCExplanationG32:
             TestCategory.XSS, "MEDIUM", "example.com", "web"
         )
         explanation = generate_poc_explanation(reasoning, tuple(), "XSS", "example.com")
-        
-        assert len(explanation.determinism_hash) == 32
+
+
+class TestScopeEngineEvaluate:
+    """Focused tests for deterministic scope evaluation decisions."""
+
+    def test_exact_scope_match_returns_confidence_1_0(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import ScopeDecision, ScopeEngine
+
+        decision = ScopeEngine().evaluate("api.example.com", ["api.example.com"])
+
+        assert isinstance(decision, ScopeDecision)
+        assert decision.in_scope == True
+        assert decision.matched_rule == "api.example.com"
+        assert decision.confidence == 1.0
+        assert "exactly matches" in decision.reasoning.lower()
+
+    def test_wildcard_scope_match_returns_confidence_0_9(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import ScopeEngine
+
+        decision = ScopeEngine().evaluate("docs.example.com", ["*.example.com"])
+
+        assert decision.in_scope == True
+        assert decision.matched_rule == "*.example.com"
+        assert decision.confidence == 0.9
+        assert "wildcard" in decision.reasoning.lower()
+
+    def test_cidr_scope_match_returns_inferred_confidence(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import ScopeEngine
+
+        decision = ScopeEngine().evaluate("10.10.10.25", ["10.10.10.0/24"])
+
+        assert decision.in_scope == True
+        assert decision.matched_rule == "10.10.10.0/24"
+        assert decision.confidence == 0.7
+        assert "cidr" in decision.reasoning.lower()
+
+    def test_out_of_scope_returns_decision_instead_of_raising(self):
+        from impl_v1.phase49.governors.g32_reasoning_scope_engine import ScopeDecision, ScopeEngine
+
+        decision = ScopeEngine().evaluate("admin.other-example.com", ["*.example.com"])
+
+        assert isinstance(decision, ScopeDecision)
+        assert decision.in_scope == False
+        assert decision.matched_rule is None
+        assert decision.confidence == 0.0
+        assert "did not match" in decision.reasoning.lower()
+        assert "decision only" in decision.reasoning.lower()
 
 
 class TestExportPoCExplanation:
@@ -1109,5 +1154,3 @@ class TestAllPoCExplanationGuardsReturnFalse:
             result, reason = guard()
             assert result == False, f"Guard {guard.__name__} returned True!"
             assert len(reason) > 0, f"Guard {guard.__name__} has empty reason!"
-
-

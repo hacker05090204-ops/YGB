@@ -13,10 +13,14 @@ Block merges that introduce security regressions:
 
 import re
 import json
+import logging
 from pathlib import Path
 from typing import List, Dict, Tuple
 from dataclasses import dataclass
 from enum import Enum
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -162,8 +166,8 @@ def check_seccomp_changed(baseline_path: Path, current_path: Path) -> List[Regre
                 description=f"Blocked syscall removed: {syscall}",
                 blocker=True,
             ))
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to inspect seccomp baseline: %s", exc)
     
     return regressions
 

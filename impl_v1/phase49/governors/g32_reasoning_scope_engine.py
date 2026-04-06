@@ -35,6 +35,8 @@ from enum import Enum
 from typing import Optional, List, Dict, Tuple, FrozenSet
 import hashlib
 from datetime import datetime, UTC
+import ipaddress
+from urllib.parse import urlparse
 
 
 class ScopeClassification(Enum):
@@ -148,6 +150,16 @@ class ReasoningExplanation:
     determinism_hash: str
 
 
+@dataclass(frozen=True)
+class ScopeDecision:
+    """Immutable scope decision for a target evaluation."""
+    target: str
+    in_scope: bool
+    matched_rule: Optional[str]
+    confidence: float
+    reasoning: str
+
+
 # ============================================================
 # SCOPE INTELLIGENCE ENGINE
 # ============================================================
@@ -161,6 +173,167 @@ def _generate_id(prefix: str) -> str:
 def _hash_content(content: str) -> str:
     """Generate hash for determinism verification."""
     return hashlib.sha256(content.encode()).hexdigest()[:32]
+
+
+def _coerce_scope_rule(rule: object) -> Tuple[str, Optional[ScopeClassification]]:
+    """Normalize plain-string or ScopeAsset rules into comparable values."""
+    if isinstance(rule, ScopeAsset):
+        return rule.asset.strip(), rule.classification
+    return str(rule).strip(), None
+
+
+def _normalize_scope_target(value: str) -> str:
+    """Normalize host or IP content from a domain, host, or URL string."""
+    raw_value = str(value).strip()
+    if not raw_value:
+        return ""
+
+    parsed = urlparse(raw_value if "://" in raw_value else f"//{raw_value}")
+    if parsed.hostname:
+        return parsed.hostname.rstrip(".").lower()
+
+    first_segment = raw_value.split("/")[0]
+    if first_segment.count(":") == 1:
+        first_segment = first_segment.split(":", 1)[0]
+    return first_segment.rstrip(".").lower()
+
+
+def _parse_ip_candidate(value: str) -> Optional[object]:
+    """Parse an IP address candidate if possible."""
+    try:
+        return ipaddress.ip_address(value)
+    except ValueError:
+        return None
+
+
+def _build_scope_decision(
+    target: str,
+    matched_rule: Optional[str],
+    confidence: float,
+    classification: Optional[ScopeClassification],
+    match_reason: str,
+) -> ScopeDecision:
+    """Create a consistent human-readable scope decision."""
+    if classification == ScopeClassification.FORBIDDEN:
+        return ScopeDecision(
+            target=target,
+            in_scope=False,
+            matched_rule=matched_rule,
+            confidence=confidence,
+            reasoning=f"{match_reason} Matched rule is classified as forbidden. Decision only; no autonomous action is taken.",
+        )
+
+    if classification == ScopeClassification.READ_ONLY:
+        return ScopeDecision(
+            target=target,
+            in_scope=False,
+            matched_rule=matched_rule,
+            confidence=confidence,
+            reasoning=f"{match_reason} Matched rule is classified as read-only. Decision only; no autonomous action is taken.",
+        )
+
+    if classification == ScopeClassification.CONDITIONAL:
+        return ScopeDecision(
+            target=target,
+            in_scope=True,
+            matched_rule=matched_rule,
+            confidence=confidence,
+            reasoning=f"{match_reason} Matched rule is conditional and requires human review of program conditions. Decision only; no autonomous action is taken.",
+        )
+
+    return ScopeDecision(
+        target=target,
+        in_scope=matched_rule is not None,
+        matched_rule=matched_rule,
+        confidence=confidence,
+        reasoning=f"{match_reason} Decision only; no autonomous action is taken.",
+    )
+
+
+class ScopeEngine:
+    """Deterministic scope-matching engine that only returns decisions."""
+
+    def evaluate(self, target: str, scope_rules: list) -> ScopeDecision:
+        """Evaluate whether a target matches exact, wildcard, or CIDR scope rules."""
+        normalized_target = _normalize_scope_target(target)
+        target_ip = _parse_ip_candidate(normalized_target)
+
+        if not normalized_target:
+            return ScopeDecision(
+                target=target,
+                in_scope=False,
+                matched_rule=None,
+                confidence=0.0,
+                reasoning="No target value was supplied for scope evaluation. Decision only; no autonomous action is taken.",
+            )
+
+        for raw_rule in scope_rules:
+            rule_text, classification = _coerce_scope_rule(raw_rule)
+            if not rule_text:
+                continue
+
+            normalized_rule = _normalize_scope_target(rule_text)
+
+            if target_ip is not None:
+                rule_ip = _parse_ip_candidate(normalized_rule)
+                if rule_ip is not None and normalized_rule == normalized_target:
+                    return _build_scope_decision(
+                        target=target,
+                        matched_rule=rule_text,
+                        confidence=1.0,
+                        classification=classification,
+                        match_reason=f"Target IP '{normalized_target}' exactly matches scope rule '{rule_text}'.",
+                    )
+
+                try:
+                    network = ipaddress.ip_network(rule_text, strict=False)
+                except ValueError:
+                    network = None
+
+                if network is not None and target_ip in network:
+                    return _build_scope_decision(
+                        target=target,
+                        matched_rule=rule_text,
+                        confidence=0.7,
+                        classification=classification,
+                        match_reason=f"Target IP '{normalized_target}' falls within CIDR rule '{rule_text}'.",
+                    )
+
+                continue
+
+            if normalized_rule == normalized_target and not rule_text.startswith("*."):
+                return _build_scope_decision(
+                    target=target,
+                    matched_rule=rule_text,
+                    confidence=1.0,
+                    classification=classification,
+                    match_reason=f"Target '{normalized_target}' exactly matches scope rule '{rule_text}'.",
+                )
+
+            if rule_text.startswith("*."):
+                wildcard_suffix = rule_text[2:].rstrip(".").lower()
+                if normalized_target != wildcard_suffix and normalized_target.endswith(f".{wildcard_suffix}"):
+                    return _build_scope_decision(
+                        target=target,
+                        matched_rule=rule_text,
+                        confidence=0.9,
+                        classification=classification,
+                        match_reason=(
+                            f"Target '{normalized_target}' matches wildcard rule '{rule_text}' "
+                            f"because it ends with '.{wildcard_suffix}'."
+                        ),
+                    )
+
+        return ScopeDecision(
+            target=target,
+            in_scope=False,
+            matched_rule=None,
+            confidence=0.0,
+            reasoning=(
+                f"Target '{normalized_target}' did not match any exact domain, wildcard, or CIDR scope rule. "
+                "Decision only; no autonomous action is taken."
+            ),
+        )
 
 
 def parse_scope_text(
@@ -1166,5 +1339,4 @@ def can_poc_submit_report() -> Tuple[bool, str]:
     ALWAYS returns (False, ...).
     """
     return False, "PoC cannot submit reports - human submission required"
-
 

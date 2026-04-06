@@ -14,6 +14,8 @@ import numpy as np
 from dataclasses import dataclass, field
 from typing import List, Mapping, Optional
 
+from backend.training.representation_bridge import SyntheticDataBlockedError
+
 
 _BLOCKED_RANDOM_AUGMENTATION_MESSAGE = (
     "DISABLED: Random or synthetic feature augmentation is forbidden in production"
@@ -21,7 +23,7 @@ _BLOCKED_RANDOM_AUGMENTATION_MESSAGE = (
 
 
 def _abort_random_augmentation(operation: str) -> None:
-    raise RuntimeError(
+    raise SyntheticDataBlockedError(
         f"{_BLOCKED_RANDOM_AUGMENTATION_MESSAGE} ({operation})"
     )
 

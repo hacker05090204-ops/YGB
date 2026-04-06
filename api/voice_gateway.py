@@ -45,6 +45,11 @@ logger = logging.getLogger(__name__)
 voice_gw_router = APIRouter(tags=["voice-gateway"])
 
 
+def _get_audit():
+    """Indirection for tests and endpoint-local audit retrieval."""
+    return get_voice_audit()
+
+
 def _voice_ws_origins() -> set[str]:
     return set(get_allowed_origins()) | {
         "http://localhost:3000",
@@ -176,7 +181,7 @@ async def transcribe_audio(req: TranscribeRequest, user=Depends(require_auth)):
     except Exception:
         logger.debug("Metrics recording unavailable", exc_info=True)
 
-    audit = get_voice_audit()
+    audit = _get_audit()
     audit.log(
         user_id=user_id,
         device_id=req.device_id,
@@ -249,7 +254,7 @@ async def parse_intent(req: IntentRequest, user=Depends(require_auth)):
         logger.debug("Metrics recording unavailable", exc_info=True)
 
     # Audit
-    audit = get_voice_audit()
+    audit = _get_audit()
     audit.log(
         user_id=user_id,
         device_id=req.device_id,
@@ -293,7 +298,7 @@ async def execute_intent(req: ExecuteRequest, user=Depends(require_auth)):
         req.intent_id,
         req.confirmer_id,
         policy=get_voice_policy(),
-        audit=get_voice_audit(),
+        audit=_get_audit(),
         user_id=user_id,
         device_id="browser",
     )
@@ -347,7 +352,7 @@ async def upload_stt_sample(req: STTSampleRequest, user=Depends(require_auth)):
         provider=req.provider,
         session_id=req.session_id,
     )
-    audit = get_voice_audit()
+    audit = _get_audit()
     audit.log(
         user_id=user_id,
         device_id=req.device_id,
@@ -411,7 +416,7 @@ async def voice_stream(ws: WebSocket):
 
     logger.info(f"[VOICE_GW] WebSocket connected: user={user_id}")
     chain = get_voice_stt_chain()
-    audit = get_voice_audit()
+    audit = _get_audit()
     rl = get_voice_rate_limiter()
 
     import time as _time
@@ -516,4 +521,8 @@ async def voice_stream(ws: WebSocket):
         try:
             await ws.close(code=1011, reason="Internal server error")
         except Exception:
-            pass
+            logger.warning(
+                "[VOICE_GW] Failed to close WebSocket after error for user=%s",
+                user_id,
+                exc_info=True,
+            )

@@ -1,0 +1,2 @@
+backend/training/label_injector.py:126:features = torch.stack([_label_to_tensor(label) for label in labels]).to(device)
+impl_v1/training/voice/stt_trainer.py:179:audios = torch.stack(audios)

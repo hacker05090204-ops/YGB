@@ -14,6 +14,8 @@ import logging
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
+from backend.training.representation_bridge import SyntheticDataBlockedError
+
 logger = logging.getLogger(__name__)
 
 EFFICIENCY_THRESHOLD = 0.70
@@ -56,6 +58,8 @@ def measure_single_node_baseline(
     num_samples: int = 4000,
     batch_size: int = 1024,
     epochs: int = 1,
+    X=None,
+    y=None,
 ) -> float:
     """Measure single-node throughput baseline (samples/sec).
 
@@ -70,15 +74,22 @@ def measure_single_node_baseline(
     except ImportError:
         return 0.0
 
+    if X is None or y is None:
+        raise SyntheticDataBlockedError(
+            "scaling_efficiency.measure_single_node_baseline requires caller-supplied real tensors; "
+            "synthetic baseline data is blocked"
+        )
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    rng = np.random.RandomState(42)
-    X = torch.from_numpy(
-        rng.randn(num_samples, input_dim).astype(np.float32)
-    ).to(device)
-    y = torch.from_numpy(
-        rng.randint(0, 2, num_samples).astype(np.int64)
-    ).to(device)
+    X_np = np.asarray(X, dtype=np.float32)
+    y_np = np.asarray(y, dtype=np.int64)
+    num_samples = min(num_samples, X_np.shape[0], y_np.shape[0])
+    if num_samples <= 0:
+        raise ValueError("scaling_efficiency.measure_single_node_baseline requires non-empty real tensors")
+
+    X = torch.from_numpy(X_np[:num_samples]).to(device)
+    y = torch.from_numpy(y_np[:num_samples]).to(device)
 
     model = nn.Sequential(
         nn.Linear(input_dim, 512), nn.ReLU(),

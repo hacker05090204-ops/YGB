@@ -1,8 +1,8 @@
 {
   "gpu": {
     "available": true,
-    "memory_used_mb": 0,
-    "utilization_pct": 58.0
+    "memory_used_mb": 87,
+    "utilization_pct": 4.0
   },
   "ingestion": {
     "last_cycle_time": "2026-03-22T10:42:27.348662+00:00",
@@ -17,7 +17,7 @@
       "nvd"
     ]
   },
-  "last_updated": "2026-03-24T15:26:56.599322+00:00",
+  "last_updated": "2026-04-06T19:57:04.739432+00:00",
   "schema_version": 2,
   "sync": {
     "files_synced_last_cycle": 0,

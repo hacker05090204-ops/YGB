@@ -16,18 +16,24 @@ STRICTLY FORBIDDEN:
 ✗ Write operations
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional, Tuple, Dict, Any, Callable
+from typing import List, Optional, Tuple, Dict, Any, Protocol, Sequence, runtime_checkable
 import uuid
 from datetime import datetime, UTC
 from concurrent.futures import ThreadPoolExecutor, Future
 import threading
+import math
 
 
 _UNSUPPORTED_PARALLEL_EXECUTION_MESSAGE = (
     "UNSUPPORTED: Real parallel task execution is not implemented; "
     "mock or stub task execution is not allowed in production"
+)
+
+_MISSING_DISPATCHER_MESSAGE = (
+    "UNSUPPORTED: Real parallel task execution requires a wired "
+    "RealBackendDispatcher; mock or stub task execution is not allowed in production"
 )
 
 
@@ -61,6 +67,14 @@ class ExecutionBackend(Enum):
     """CLOSED ENUM - Execution backend."""
     CPU = "CPU"
     GPU = "GPU"
+
+
+@runtime_checkable
+class RealBackendDispatcher(Protocol):
+    """Production dispatcher contract for real parallel task execution."""
+
+    def dispatch(self, task_type: TaskType, target_url: str, parameters: tuple) -> dict:
+        ...
 
 
 @dataclass(frozen=True)
@@ -105,6 +119,171 @@ class ResourceLimits:
     max_memory_mb: int
     max_cpu_percent: int
     timeout_seconds: int
+
+
+@dataclass(frozen=True)
+class TaskMetrics:
+    """Per-task execution metrics snapshot."""
+
+    task_id: str
+    task_type: str
+    duration_ms: int
+    worker_id: str
+    queue_wait_ms: int
+
+
+@dataclass(frozen=True)
+class ParallelExecutionReport:
+    """Aggregate report for a completed parallel execution batch."""
+
+    total_tasks: int
+    completed: int
+    failed: int
+    mean_duration_ms: float
+    p95_duration_ms: float
+    generated_at: str
+
+
+def _utc_now() -> str:
+    """Return the current UTC timestamp in ISO-8601 format."""
+
+    return datetime.now(UTC).isoformat()
+
+
+def _get_percentile_value(values: Sequence[int], percentile: float) -> float:
+    """Return a nearest-rank percentile from the observed duration distribution."""
+
+    if not values:
+        return 0.0
+
+    sorted_values = sorted(values)
+    index = max(0, min(len(sorted_values) - 1, math.ceil(len(sorted_values) * percentile) - 1))
+    return float(sorted_values[index])
+
+
+def _missing_dispatcher_error(task_type: TaskType) -> RuntimeError:
+    """Return the fail-closed dispatcher wiring error."""
+
+    return RuntimeError(f"{_MISSING_DISPATCHER_MESSAGE} (task_type={task_type.value})")
+
+
+def _is_missing_dispatcher_error(error: RuntimeError) -> bool:
+    """Check whether a runtime error represents a missing real dispatcher."""
+
+    return str(error).startswith(_MISSING_DISPATCHER_MESSAGE)
+
+
+class TaskWorkerPool:
+    """Thread-backed worker pool for real dispatcher execution."""
+
+    def __init__(
+        self,
+        max_workers: int = 4,
+        dispatcher: Optional[RealBackendDispatcher] = None,
+        backend: Optional[ExecutionBackend] = None,
+    ):
+        self.max_workers = max_workers
+        self._dispatcher = dispatcher
+        self._backend = backend or get_execution_backend()
+        self._executor = ThreadPoolExecutor(max_workers=max_workers)
+        self._active_workers = 0
+        self._queued_tasks = 0
+        self._completed_total = 0
+        self._failed_total = 0
+        self._lock = threading.Lock()
+
+    def submit(self, task: TaskSpec) -> Future:
+        """Submit a task to the pool."""
+
+        with self._lock:
+            self._queued_tasks += 1
+        return self._executor.submit(self._execute_task, task)
+
+    def _execute_task(self, task: TaskSpec) -> TaskResult:
+        """Execute a submitted task through the real dispatcher."""
+
+        started_at = datetime.now(UTC)
+        with self._lock:
+            self._queued_tasks -= 1
+            self._active_workers += 1
+
+        try:
+            if self._dispatcher is None:
+                raise _missing_dispatcher_error(task.task_type)
+
+            result_data = self._dispatcher.dispatch(task.task_type, task.target_url, task.parameters)
+            completed_at = datetime.now(UTC)
+            elapsed_ms = int((completed_at - started_at).total_seconds() * 1000)
+
+            with self._lock:
+                self._completed_total += 1
+
+            return TaskResult(
+                task_id=task.task_id,
+                status=TaskStatus.COMPLETED,
+                started_at=started_at.isoformat(),
+                completed_at=completed_at.isoformat(),
+                result_data=result_data,
+                error_message=None,
+                execution_time_ms=elapsed_ms,
+                backend_used=self._backend,
+            )
+        except RuntimeError as e:
+            completed_at = datetime.now(UTC)
+            elapsed_ms = int((completed_at - started_at).total_seconds() * 1000)
+
+            with self._lock:
+                self._failed_total += 1
+
+            if _is_missing_dispatcher_error(e):
+                raise
+
+            return TaskResult(
+                task_id=task.task_id,
+                status=TaskStatus.FAILED,
+                started_at=started_at.isoformat(),
+                completed_at=completed_at.isoformat(),
+                result_data=None,
+                error_message=str(e),
+                execution_time_ms=elapsed_ms,
+                backend_used=self._backend,
+            )
+        except Exception as e:  # pragma: no cover - defensive exception handling
+            completed_at = datetime.now(UTC)  # pragma: no cover
+            elapsed_ms = int((completed_at - started_at).total_seconds() * 1000)  # pragma: no cover
+
+            with self._lock:
+                self._failed_total += 1
+
+            return TaskResult(  # pragma: no cover
+                task_id=task.task_id,
+                status=TaskStatus.FAILED,
+                started_at=started_at.isoformat(),
+                completed_at=completed_at.isoformat(),
+                result_data=None,
+                error_message=str(e),
+                execution_time_ms=elapsed_ms,
+                backend_used=self._backend,
+            )
+        finally:
+            with self._lock:
+                self._active_workers -= 1
+
+    def get_pool_stats(self) -> dict:
+        """Return current worker-pool statistics."""
+
+        with self._lock:
+            return {
+                "active_workers": self._active_workers,
+                "queued_tasks": self._queued_tasks,
+                "completed_total": self._completed_total,
+                "failed_total": self._failed_total,
+            }
+
+    def shutdown(self) -> None:
+        """Shutdown the pool executor."""
+
+        self._executor.shutdown(wait=False)
 
 
 # =============================================================================
@@ -253,6 +432,7 @@ class ParallelTaskEngine:
         self,
         max_workers: int = 4,
         limits: Optional[ResourceLimits] = None,
+        dispatcher: Optional[RealBackendDispatcher] = None,
     ):
         self.max_workers = max_workers
         self.limits = limits or ResourceLimits(
@@ -267,6 +447,7 @@ class ParallelTaskEngine:
         self._results: Dict[str, TaskResult] = {}
         self._lock = threading.Lock()
         self._backend = get_execution_backend()
+        self._dispatcher = dispatcher
     
     @property
     def backend(self) -> ExecutionBackend:
@@ -304,7 +485,6 @@ class ParallelTaskEngine:
         started_at = datetime.now(UTC)
         
         try:
-            # Stub task execution (READ-ONLY) — real C++ backend pending
             result_data = self._run_task_logic(task)
             
             completed_at = datetime.now(UTC)
@@ -317,6 +497,23 @@ class ParallelTaskEngine:
                 completed_at=completed_at.isoformat(),
                 result_data=result_data,
                 error_message=None,
+                execution_time_ms=elapsed_ms,
+                backend_used=self._backend,
+            )
+        except RuntimeError as e:
+            if _is_missing_dispatcher_error(e):
+                raise
+
+            completed_at = datetime.now(UTC)
+            elapsed_ms = int((completed_at - started_at).total_seconds() * 1000)
+
+            return TaskResult(
+                task_id=task.task_id,
+                status=TaskStatus.FAILED,
+                started_at=started_at.isoformat(),
+                completed_at=completed_at.isoformat(),
+                result_data=None,
+                error_message=str(e),
                 execution_time_ms=elapsed_ms,
                 backend_used=self._backend,
             )
@@ -336,10 +533,12 @@ class ParallelTaskEngine:
             )
     
     def _run_task_logic(self, task: TaskSpec) -> Dict[str, Any]:
-        """Reject stub execution until a real backend is wired."""
-        raise RuntimeError(
-            f"{_UNSUPPORTED_PARALLEL_EXECUTION_MESSAGE} (task_type={task.task_type.value})"
-        )
+        """Dispatch a task through the real backend or fail closed."""
+
+        if self._dispatcher is None:
+            raise _missing_dispatcher_error(task.task_type)
+
+        return self._dispatcher.dispatch(task.task_type, task.target_url, task.parameters)
     
     def run_next(self) -> Optional[TaskResult]:
         """Run next task from queue synchronously."""
@@ -371,12 +570,26 @@ class ParallelTaskEngine:
         for task_id, future in futures:
             try:
                 result = future.result(timeout=self.limits.timeout_seconds)
+            except RuntimeError as e:
+                if _is_missing_dispatcher_error(e):
+                    raise
+
+                result = TaskResult(
+                    task_id=task_id,
+                    status=TaskStatus.FAILED,
+                    started_at=_utc_now(),
+                    completed_at=_utc_now(),
+                    result_data=None,
+                    error_message=str(e),
+                    execution_time_ms=0,
+                    backend_used=self._backend,
+                )
             except Exception as e:  # pragma: no cover - defensive exception handling
                 result = TaskResult(  # pragma: no cover
                     task_id=task_id,
                     status=TaskStatus.FAILED,
-                    started_at=datetime.now(UTC).isoformat(),
-                    completed_at=datetime.now(UTC).isoformat(),
+                    started_at=_utc_now(),
+                    completed_at=_utc_now(),
                     result_data=None,
                     error_message=str(e),
                     execution_time_ms=0,
@@ -427,9 +640,40 @@ class ParallelTaskEngine:
 def create_parallel_engine(
     max_workers: int = 4,
     limits: Optional[ResourceLimits] = None,
+    dispatcher: Optional[RealBackendDispatcher] = None,
 ) -> ParallelTaskEngine:
     """Create a new parallel task engine."""
-    return ParallelTaskEngine(max_workers, limits)
+    return ParallelTaskEngine(max_workers, limits, dispatcher)
+
+
+def aggregate_results(results: Sequence[TaskResult]) -> Dict[str, int]:
+    """Aggregate task results by status."""
+
+    return {
+        "total_tasks": len(results),
+        "queued": sum(1 for result in results if result.status == TaskStatus.QUEUED),
+        "running": sum(1 for result in results if result.status == TaskStatus.RUNNING),
+        "completed": sum(1 for result in results if result.status == TaskStatus.COMPLETED),
+        "failed": sum(1 for result in results if result.status == TaskStatus.FAILED),
+        "cancelled": sum(1 for result in results if result.status == TaskStatus.CANCELLED),
+    }
+
+
+def generate_execution_report(results: Sequence[TaskResult]) -> ParallelExecutionReport:
+    """Generate an execution report from observed task results."""
+
+    counts = aggregate_results(results)
+    durations = [result.execution_time_ms for result in results]
+    mean_duration_ms = float(sum(durations) / len(durations)) if durations else 0.0
+
+    return ParallelExecutionReport(
+        total_tasks=counts["total_tasks"],
+        completed=counts["completed"],
+        failed=counts["failed"],
+        mean_duration_ms=mean_duration_ms,
+        p95_duration_ms=_get_percentile_value(durations, 0.95),
+        generated_at=_utc_now(),
+    )
 
 
 def is_parallelism_safe(task: TaskSpec) -> bool:

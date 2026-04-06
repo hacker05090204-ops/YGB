@@ -10,9 +10,11 @@ import impl_v1.phase49.governors.g37_gpu_training_backend as backend
 from impl_v1.phase49.governors.g37_gpu_training_backend import (
     FeatureVector,
     GPUBackend,
+    GPUConfig,
     GPUDeviceInfo,
     InferenceResult,
     ModelCheckpoint,
+    RealBackendNotConfiguredError,
     TrainingConfig,
     TrainingMetrics,
     TrainingObjective,
@@ -83,6 +85,105 @@ class TestDeviceDetection:
     def test_select_best_device(self):
         best = select_best_device(detect_gpu_devices())
         assert isinstance(best, GPUDeviceInfo)
+
+
+class TestInfrastructureGatedGPUBackend:
+    def test_check_availability_returns_unavailable_dict_when_torch_missing(self, monkeypatch):
+        monkeypatch.setattr(backend._pt_backend, "PYTORCH_AVAILABLE", False)
+        monkeypatch.setattr(backend._pt_backend, "torch", None)
+
+        assert GPUBackend.check_availability() == {
+            "available": False,
+            "device_count": 0,
+            "devices": [],
+        }
+
+    def test_check_availability_returns_unavailable_dict_when_cuda_unavailable(self, monkeypatch):
+        class _CudaUnavailable:
+            @staticmethod
+            def is_available():
+                return False
+
+            @staticmethod
+            def device_count():
+                return 0
+
+        class _TorchUnavailable:
+            cuda = _CudaUnavailable()
+
+        monkeypatch.setattr(backend._pt_backend, "PYTORCH_AVAILABLE", True)
+        monkeypatch.setattr(backend._pt_backend, "torch", _TorchUnavailable())
+
+        assert GPUBackend.check_availability() == {
+            "available": False,
+            "device_count": 0,
+            "devices": [],
+        }
+
+    def test_train_raises_real_backend_not_configured_error_when_gpu_unavailable(self, monkeypatch):
+        class _CudaUnavailable:
+            @staticmethod
+            def is_available():
+                return False
+
+            @staticmethod
+            def device_count():
+                return 0
+
+        class _TorchUnavailable:
+            cuda = _CudaUnavailable()
+
+        monkeypatch.setattr(backend._pt_backend, "PYTORCH_AVAILABLE", True)
+        monkeypatch.setattr(backend._pt_backend, "torch", _TorchUnavailable())
+
+        training_config = backend._pt_backend.TrainingConfig(
+            model_arch="mlp",
+            learning_rate=0.001,
+            batch_size=4,
+            max_epochs=1,
+            use_amp=False,
+        )
+
+        with pytest.raises(RealBackendNotConfiguredError) as exc_info:
+            GPUBackend.train(GPUConfig(device_id=0, memory_limit_gb=8.0, mixed_precision=False), training_config, object())
+
+        assert str(exc_info.value) == "GPU training requires CUDA. torch.cuda.is_available() returned False."
+
+    def test_train_does_not_silently_fallback_to_cpu(self, monkeypatch):
+        class _CudaUnavailable:
+            @staticmethod
+            def is_available():
+                return False
+
+            @staticmethod
+            def device_count():
+                return 0
+
+        class _TorchUnavailable:
+            cuda = _CudaUnavailable()
+
+        delegated = {"called": False}
+
+        def _unexpected_delegate(self, training_config, dataloader):
+            delegated["called"] = True
+            raise AssertionError("CPU fallback delegate should not be called")
+
+        monkeypatch.setattr(backend._pt_backend, "PYTORCH_AVAILABLE", True)
+        monkeypatch.setattr(backend._pt_backend, "torch", _TorchUnavailable())
+        monkeypatch.setattr(backend._pt_backend.PyTorchBackend, "train", _unexpected_delegate)
+
+        training_config = backend._pt_backend.TrainingConfig(
+            model_arch="mlp",
+            learning_rate=0.001,
+            batch_size=4,
+            max_epochs=1,
+            use_amp=False,
+        )
+
+        with pytest.raises(RealBackendNotConfiguredError):
+            GPUBackend.train(GPUConfig(device_id=0, memory_limit_gb=8.0, mixed_precision=True), training_config, object())
+
+        assert delegated["called"] is False
 
 
 class TestFeatureExtraction:

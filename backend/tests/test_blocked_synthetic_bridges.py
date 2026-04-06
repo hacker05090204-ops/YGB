@@ -3,10 +3,15 @@ import pytest
 
 
 def test_representation_expander_is_blocked_in_backend_runtime():
-    from backend.training.representation_bridge import RepresentationExpander
+    from backend.training.representation_bridge import (
+        RepresentationExpander,
+        SyntheticDataBlockedError,
+    )
 
-    with pytest.raises(RuntimeError, match="Synthetic representation generation is forbidden"):
-        RepresentationExpander()
+    expander = RepresentationExpander()
+
+    with pytest.raises(SyntheticDataBlockedError, match="blocked"):
+        expander.generate_http_features(1)
 
 
 def test_feature_diversifier_random_augmentation_is_blocked():

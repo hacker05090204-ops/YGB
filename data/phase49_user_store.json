@@ -1,0 +1,17 @@
+{
+  "max_users": 50,
+  "users": {
+    "USR-A753CED8A4D24266": {
+      "active": true,
+      "bounty_count": 0,
+      "created_at": "2026-04-06T11:08:09.073059+00:00",
+      "current_targets": [],
+      "email": null,
+      "last_seen": "2026-04-06T11:08:09.073059+00:00",
+      "role": "VIEWER",
+      "total_earnings": 0.0,
+      "user_id": "USR-A753CED8A4D24266",
+      "username": "Hunter1"
+    }
+  }
+}

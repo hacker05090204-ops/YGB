@@ -19,6 +19,8 @@ from typing import Optional
 
 import numpy as np
 
+from backend.training.representation_bridge import SyntheticDataBlockedError
+
 logger = logging.getLogger(__name__)
 
 BASELINE_PATH = os.path.join('reports', 'baseline_benchmark.json')
@@ -45,6 +47,8 @@ def run_benchmark(
     input_dim: int = 256,
     num_samples: int = 5000,
     seed: int = 42,
+    X=None,
+    y=None,
 ) -> BenchmarkResult:
     """Run controlled benchmark training.
 
@@ -71,6 +75,12 @@ def run_benchmark(
             timestamp=time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
         )
 
+    if X is None or y is None:
+        raise SyntheticDataBlockedError(
+            "baseline_benchmark.run_benchmark requires caller-supplied real tensors; "
+            "synthetic benchmark data is blocked"
+        )
+
     # Setup
     os.environ.setdefault("CUBLAS_WORKSPACE_CONFIG", ":4096:8")
     torch.manual_seed(seed)
@@ -86,10 +96,14 @@ def run_benchmark(
     if has_gpu:
         torch.cuda.reset_peak_memory_stats()
 
-    # Generate data
-    rng = np.random.RandomState(seed)
-    X = torch.from_numpy(rng.randn(num_samples, input_dim).astype(np.float32)).to(device)
-    y = torch.from_numpy(rng.randint(0, 2, num_samples).astype(np.int64)).to(device)
+    X_np = np.asarray(X, dtype=np.float32)
+    y_np = np.asarray(y, dtype=np.int64)
+    num_samples = min(num_samples, X_np.shape[0], y_np.shape[0])
+    if num_samples <= 0:
+        raise ValueError("baseline_benchmark.run_benchmark requires non-empty real tensors")
+
+    X = torch.from_numpy(X_np[:num_samples]).to(device)
+    y = torch.from_numpy(y_np[:num_samples]).to(device)
 
     # Model
     model = nn.Sequential(

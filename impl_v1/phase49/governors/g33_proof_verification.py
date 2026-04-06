@@ -33,9 +33,13 @@ GUARDS (ALL RETURN FALSE):
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple, Optional, Dict
+from typing import Dict, List, Optional, Tuple
 import hashlib
+import logging
 import uuid
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProofStatus(Enum):
@@ -135,6 +139,18 @@ def _hash_content(content: str) -> str:
     return hashlib.sha256(content.encode()).hexdigest()[:32]
 
 
+def _finalize_result(result: ProofVerificationResult) -> ProofVerificationResult:
+    """Emit rejection logs required by governance before returning a result."""
+    if result.status in (ProofStatus.NOT_REAL, ProofStatus.DUPLICATE):
+        logger.warning(
+            "Rejected proof proof_id=%s status=%s reason=%s",
+            result.result_id,
+            result.status.value,
+            result.reason,
+        )
+    return result
+
+
 def _is_scanner_noise(finding_text: str) -> Tuple[bool, RejectionReason]:
     """Check if finding is scanner noise."""
     text_lower = finding_text.lower()
@@ -221,7 +237,7 @@ def verify_bug_proof(
     # Step 1: Check for scanner noise
     is_noise, noise_reason = _is_scanner_noise(finding_text)
     if is_noise:
-        return ProofVerificationResult(
+        return _finalize_result(ProofVerificationResult(
             result_id=_generate_id("PRF"),
             status=ProofStatus.NOT_REAL,
             confidence=95,
@@ -231,11 +247,11 @@ def verify_bug_proof(
             rejection_reason=noise_reason,
             evidence=None,
             determinism_hash=_hash_content(finding_text),
-        )
+        ))
     
     # Step 2: Check for controllable input
     if not _has_controllable_input(finding_data):
-        return ProofVerificationResult(
+        return _finalize_result(ProofVerificationResult(
             result_id=_generate_id("PRF"),
             status=ProofStatus.NOT_REAL,
             confidence=80,
@@ -245,11 +261,11 @@ def verify_bug_proof(
             rejection_reason=RejectionReason.NO_CONTROLLABLE_INPUT,
             evidence=None,
             determinism_hash=_hash_content(finding_text),
-        )
+        ))
     
     # Step 3: Check for response delta
     if not _has_response_delta(finding_data):
-        return ProofVerificationResult(
+        return _finalize_result(ProofVerificationResult(
             result_id=_generate_id("PRF"),
             status=ProofStatus.NEEDS_HUMAN,
             confidence=50,
@@ -259,7 +275,7 @@ def verify_bug_proof(
             rejection_reason=RejectionReason.NO_RESPONSE_DELTA,
             evidence=None,
             determinism_hash=_hash_content(finding_text),
-        )
+        ))
     
     # Step 4: Check for auth violation
     has_auth = _has_auth_violation(finding_data)
@@ -295,7 +311,7 @@ def verify_bug_proof(
         confidence = 70
         reason = "No real impact demonstrated"
     
-    return ProofVerificationResult(
+    return _finalize_result(ProofVerificationResult(
         result_id=_generate_id("PRF"),
         status=status,
         confidence=confidence,
@@ -305,7 +321,41 @@ def verify_bug_proof(
         rejection_reason=RejectionReason.NONE,
         evidence=evidence,
         determinism_hash=_hash_content(finding_text + str(finding_data)),
-    )
+    ))
+
+
+class ProofVerifier:
+    """Stateful proof verification wrapper with pending and rejected queues."""
+
+    def __init__(self):
+        self._pending: List[ProofVerificationResult] = []
+        self._rejected: List[ProofVerificationResult] = []
+
+    def verify(
+        self,
+        finding_text: str,
+        finding_data: Dict,
+        scanner_output: bool = False,
+    ) -> ProofVerificationResult:
+        result = verify_bug_proof(
+            finding_text=finding_text,
+            finding_data=finding_data,
+            scanner_output=scanner_output,
+        )
+        if result.status == ProofStatus.NEEDS_HUMAN:
+            self._pending.append(result)
+        elif result.status in (ProofStatus.NOT_REAL, ProofStatus.DUPLICATE):
+            self._rejected.append(result)
+        return result
+
+    def get_pending(self) -> Tuple[ProofVerificationResult, ...]:
+        return tuple(self._pending)
+
+    def get_rejected(self) -> Tuple[ProofVerificationResult, ...]:
+        return tuple(self._rejected)
+
+
+_verifier = ProofVerifier()
 
 
 # =============================================================================

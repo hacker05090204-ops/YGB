@@ -15,16 +15,25 @@ NOT used for:
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Iterable, List, Optional
-import uuid
+import json
+import re
+import time
 from datetime import datetime, UTC
+from typing import Any, Callable, Dict, Iterable, List, Optional
+import uuid
 
 try:
     from backend.cve import get_pipeline as _get_cve_pipeline
 except Exception:  # pragma: no cover - backend import may be unavailable in thin envs
     _get_cve_pipeline = None
+
+try:
+    from backend.bridge.bridge_state import get_bridge_state as _get_bridge_state
+except Exception:  # pragma: no cover - bridge import may be unavailable in thin envs
+    _get_bridge_state = None
 
 
 class CVESeverity(Enum):
@@ -71,6 +80,81 @@ class CVEQueryResult:
     total_count: int
     timestamp: str
     cached: bool
+
+
+@dataclass(frozen=True)
+class CVEIntelligenceRecord:
+    """Local CVE enrichment sourced only from ingested runtime state."""
+
+    cve_id: str
+    severity_score: float
+    affected_products: list[str]
+    published_at: str
+    intelligence_source: str
+    has_public_exploit: bool
+
+
+@dataclass(frozen=True)
+class _IntelligenceCacheEntry:
+    record: CVEIntelligenceRecord
+    expires_at: float
+
+
+class IntelligenceCache:
+    """TTL cache for local CVE intelligence lookups."""
+
+    def __init__(
+        self,
+        ttl_seconds: int = 24 * 60 * 60,
+        max_entries: int = 10_000,
+        time_fn: Optional[Callable[[], float]] = None,
+    ):
+        self.ttl_seconds = int(ttl_seconds)
+        self.max_entries = int(max_entries)
+        self._time_fn = time_fn or time.time
+        self._entries: OrderedDict[str, _IntelligenceCacheEntry] = OrderedDict()
+
+    def __len__(self) -> int:
+        return len(self._entries)
+
+    def clear(self):
+        self._entries.clear()
+
+    def get(self, cve_id: str) -> CVEIntelligenceRecord | None:
+        now = self._time_fn()
+        self._purge_expired(now)
+        key = str(cve_id or "").strip().upper()
+        entry = self._entries.get(key)
+        if entry is None:
+            return None
+        if entry.expires_at <= now:
+            self._entries.pop(key, None)
+            return None
+        return entry.record
+
+    def set(self, cve_id: str, record: CVEIntelligenceRecord):
+        key = str(cve_id or "").strip().upper()
+        if not key:
+            return
+        now = self._time_fn()
+        self._purge_expired(now)
+        self._entries.pop(key, None)
+        self._entries[key] = _IntelligenceCacheEntry(
+            record=record,
+            expires_at=now + self.ttl_seconds,
+        )
+        while len(self._entries) > self.max_entries:
+            self._entries.popitem(last=False)
+
+    def _purge_expired(self, now: float):
+        expired_keys = [
+            key for key, entry in self._entries.items() if entry.expires_at <= now
+        ]
+        for key in expired_keys:
+            self._entries.pop(key, None)
+
+
+_CVSS_SCORE_RE = re.compile(r"CVSS:(?P<score>[0-9]+(?:\.[0-9]+)?)", re.IGNORECASE)
 
 
 _cve_cache: Dict[str, CVERecord] = {}
@@ -180,6 +264,201 @@ def _pipeline_record_to_cve(record: object) -> Optional[CVERecord]:
     )
 
 
+def _read_field(data: object, key: str, default: Any = None) -> Any:
+    if isinstance(data, dict):
+        value = data.get(key, default)
+    else:
+        value = getattr(data, key, default)
+    return default if value is None else value
+
+
+def _as_str_list(values: Any) -> list[str]:
+    if values is None:
+        return []
+    if isinstance(values, (list, tuple, set)):
+        raw_items = values
+    else:
+        raw_items = [values]
+    items: list[str] = []
+    for value in raw_items:
+        text = str(value).strip()
+        if text:
+            items.append(text)
+    return items
+
+
+def _parse_bridge_products(sample: Dict[str, Any]) -> list[str]:
+    if "affected_products" in sample:
+        return _as_str_list(sample.get("affected_products"))
+
+    raw_parameters = sample.get("parameters", [])
+    if isinstance(raw_parameters, str):
+        text = raw_parameters.strip()
+        if not text:
+            return []
+        if text.startswith("["):
+            try:
+                decoded = json.loads(text)
+            except (TypeError, ValueError):
+                decoded = None
+            if isinstance(decoded, list):
+                return _as_str_list(decoded)
+        return [text]
+
+    return _as_str_list(raw_parameters)
+
+
+def _parse_bridge_score(sample: Dict[str, Any]) -> float:
+    for key in ("severity_score", "cvss_score"):
+        raw_value = sample.get(key)
+        if raw_value in (None, ""):
+            continue
+        try:
+            return float(raw_value)
+        except (TypeError, ValueError):
+            continue
+
+    impact = str(sample.get("impact", "") or "")
+    match = _CVSS_SCORE_RE.search(impact)
+    if match:
+        try:
+            return float(match.group("score"))
+        except (TypeError, ValueError):
+            return 0.0
+    return 0.0
+
+
+def _parse_bool_flag(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    return str(value or "").strip().lower() in {"1", "true", "yes", "y", "on"}
+
+
+class CVEIntelligenceEngine:
+    """Local-only CVE enrichment backed by pipeline and bridge state."""
+
+    def __init__(
+        self,
+        pipeline_getter: Optional[Callable[[], Any]] = _get_cve_pipeline,
+        bridge_state_getter: Optional[Callable[[], Any]] = _get_bridge_state,
+        cache: Optional[IntelligenceCache] = None,
+    ):
+        self._pipeline_getter = pipeline_getter
+        self._bridge_state_getter = bridge_state_getter
+        self._cache = cache if cache is not None else IntelligenceCache()
+
+    def enrich(self, cve_id: str) -> CVEIntelligenceRecord | None:
+        normalized_id = str(cve_id or "").strip().upper()
+        if not normalized_id:
+            return None
+
+        cached = self._cache.get(normalized_id)
+        if cached is not None:
+            return cached
+
+        record = self._read_from_pipeline(normalized_id)
+        if record is None:
+            record = self._read_from_bridge_state(normalized_id)
+        if record is None:
+            return None
+
+        self._cache.set(normalized_id, record)
+        return record
+
+    def _read_from_pipeline(self, cve_id: str) -> CVEIntelligenceRecord | None:
+        if self._pipeline_getter is None:
+            return None
+
+        try:
+            pipeline = self._pipeline_getter()
+        except Exception:
+            return None
+
+        if pipeline is None or not hasattr(pipeline, "get_record"):
+            return None
+
+        try:
+            record = pipeline.get_record(cve_id)
+        except Exception:
+            return None
+        return self._pipeline_record_to_intelligence(record)
+
+    def _read_from_bridge_state(self, cve_id: str) -> CVEIntelligenceRecord | None:
+        if self._bridge_state_getter is None:
+            return None
+
+        try:
+            bridge_state = self._bridge_state_getter()
+        except Exception:
+            return None
+
+        if bridge_state is None or not hasattr(bridge_state, "read_samples"):
+            return None
+
+        try:
+            samples = bridge_state.read_samples()
+        except TypeError:
+            try:
+                samples = bridge_state.read_samples(0)
+            except Exception:
+                return None
+        except Exception:
+            return None
+
+        for sample in reversed(list(samples or [])):
+            if not isinstance(sample, dict):
+                continue
+            endpoint = str(sample.get("endpoint", sample.get("cve_id", "")) or "").strip().upper()
+            if endpoint != cve_id:
+                continue
+            return self._bridge_sample_to_intelligence(sample)
+        return None
+
+    @staticmethod
+    def _pipeline_record_to_intelligence(record: object) -> CVEIntelligenceRecord | None:
+        if record is None:
+            return None
+
+        cve_id = str(_read_field(record, "cve_id", "") or "").strip().upper()
+        if not cve_id:
+            return None
+
+        return CVEIntelligenceRecord(
+            cve_id=cve_id,
+            severity_score=float(_read_field(record, "cvss_score", 0.0) or 0.0),
+            affected_products=_as_str_list(_read_field(record, "affected_products", [])),
+            published_at=str(
+                _read_field(record, "merged_at", "")
+                or _read_field(record, "last_modified", "")
+                or ""
+            ),
+            intelligence_source="local_pipeline",
+            has_public_exploit=bool(_read_field(record, "is_exploited", False)),
+        )
+
+    @staticmethod
+    def _bridge_sample_to_intelligence(sample: Dict[str, Any]) -> CVEIntelligenceRecord | None:
+        cve_id = str(sample.get("endpoint", sample.get("cve_id", "")) or "").strip().upper()
+        if not cve_id:
+            return None
+
+        return CVEIntelligenceRecord(
+            cve_id=cve_id,
+            severity_score=_parse_bridge_score(sample),
+            affected_products=_parse_bridge_products(sample),
+            published_at=str(
+                sample.get("published_at")
+                or sample.get("merged_at")
+                or sample.get("timestamp")
+                or ""
+            ),
+            intelligence_source="local_pipeline",
+            has_public_exploit=_parse_bool_flag(
+                sample.get("has_public_exploit", sample.get("is_exploited", False))
+            ),
+        )
+
+
 def _query_pipeline(search_term: str, min_score: float) -> List[CVERecord]:
     if _get_cve_pipeline is None:
         return []
@@ -207,32 +486,6 @@ def _query_pipeline(search_term: str, min_score: float) -> List[CVERecord]:
         seen.add(cve_id)
         record = _pipeline_record_to_cve(pipeline.get_record(cve_id))
         if record is None or record.cvss_score < min_score:
-            continue
-        records.append(record)
-    return records
-
-
-def _query_passive_live(search_term: str, min_score: float) -> List[CVERecord]:
-    needle = (search_term or "").strip()
-    if len(needle) < 3:
-        return []
-
-    try:
-        from .g15_cve_api import APIStatus, fetch_cves_passive
-    except Exception:
-        return []
-
-    try:
-        result = fetch_cves_passive(needle)
-    except Exception:
-        return []
-
-    if result.status not in (APIStatus.CONNECTED, APIStatus.DEGRADED):
-        return []
-
-    records: List[CVERecord] = []
-    for record in result.records:
-        if record.cvss_score < min_score:
             continue
         records.append(record)
     return records
@@ -272,7 +525,8 @@ def query_cves(
     Resolution order:
     1. Local authoritative cache, when present.
     2. Canonical runtime CVE pipeline.
-    3. Passive live NVD lookup via g15, if configured.
+
+    No live fetches are issued from this layer.
     """
 
     local_records = list(_iter_local_matches(search_term, min_score))
@@ -299,13 +553,11 @@ def query_cves(
             cached=False,
         )
 
-    live_records = _query_passive_live(search_term, min_score)
-    records = _sort_records(live_records, search_term)[:max_results]
     return CVEQueryResult(
         query_id=f"QRY-{uuid.uuid4().hex[:16].upper()}",
         query_term=search_term,
-        records=tuple(records),
-        total_count=len(records),
+        records=tuple(),
+        total_count=0,
         timestamp=_now_iso(),
         cached=False,
     )

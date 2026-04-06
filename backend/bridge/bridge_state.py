@@ -27,6 +27,7 @@ import logging
 import os
 import threading
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -41,6 +42,25 @@ _SAMPLES_PATH = _SECURE_DATA / "bridge_samples.jsonl.gz"
 BRIDGE_THRESHOLD = int(os.environ.get("YGB_MIN_REAL_SAMPLES", "125000"))
 
 
+@dataclass(frozen=True)
+class StateDelta:
+    key: str
+    old_val: Any
+    new_val: Any
+
+
+def compute_diff(old_state: dict, new_state: dict) -> list[StateDelta]:
+    old_payload = old_state or {}
+    new_payload = new_state or {}
+    deltas: list[StateDelta] = []
+    for key in sorted(set(old_payload.keys()) | set(new_payload.keys())):
+        old_val = old_payload.get(key)
+        new_val = new_payload.get(key)
+        if old_val != new_val:
+            deltas.append(StateDelta(key=key, old_val=old_val, new_val=new_val))
+    return deltas
+
+
 class BridgeState:
     """Persistent, cross-process bridge counter state.
 
@@ -51,10 +71,12 @@ class BridgeState:
     def __init__(self, state_path: Path = None, samples_path: Path = None):
         self._state_path = state_path or _STATE_PATH
         self._samples_path = samples_path or _SAMPLES_PATH
+        self._checkpoint_path = self._state_path.parent / ".bridge_checkpoint.json"
         self._lock = threading.RLock()
         self._state: Dict[str, Any] = self._default_state()
         self._sample_buffer: List[Dict[str, str]] = []
         self._buffer_flush_threshold = 500  # flush every N samples
+        self._state_change_count = 0
         self.load()
 
     @staticmethod
@@ -114,7 +136,29 @@ class BridgeState:
                 self._state = self._default_state()
             return dict(self._state)
 
-    def save(self):
+    def _save_checkpoint(self) -> bool:
+        with self._lock:
+            tmp_path = self._checkpoint_path.with_suffix(".json.tmp")
+            try:
+                self._checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(tmp_path, "w", encoding="utf-8") as f:
+                    json.dump(self._state, f, indent=2)
+                os.replace(str(tmp_path), str(self._checkpoint_path))
+                return True
+            except Exception as e:
+                logger.error(f"[BRIDGE_STATE] Checkpoint save failed: {e}")
+                if tmp_path.exists():
+                    try:
+                        tmp_path.unlink()
+                    except OSError as cleanup_exc:
+                        logger.warning(
+                            "[BRIDGE_STATE] Failed to remove temporary checkpoint file %s: %s",
+                            tmp_path,
+                            cleanup_exc,
+                        )
+                return False
+
+    def save(self) -> bool:
         """Atomically persist current state to disk."""
         with self._lock:
             self._state["updated_at"] = time.strftime(
@@ -127,14 +171,43 @@ class BridgeState:
                 with open(tmp_path, "w", encoding="utf-8") as f:
                     json.dump(self._state, f, indent=2)
                 os.replace(str(tmp_path), str(self._state_path))
+                return True
             except Exception as e:
                 logger.error(f"[BRIDGE_STATE] Save failed: {e}")
                 # Clean up tmp if rename failed
                 if tmp_path.exists():
                     try:
                         tmp_path.unlink()
-                    except OSError:
-                        pass
+                    except OSError as cleanup_exc:
+                        logger.warning(
+                            "[BRIDGE_STATE] Failed to remove temporary state file %s: %s",
+                            tmp_path,
+                            cleanup_exc,
+                        )
+                return False
+
+    def restore_from_checkpoint(self, path: str) -> bool:
+        try:
+            checkpoint_path = Path(path)
+            with self._lock:
+                with open(checkpoint_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if not isinstance(data, dict):
+                    return False
+                restored = self._default_state()
+                restored.update(data)
+                self._state = restored
+                self._state_change_count = 0
+                return self.save()
+        except Exception:
+            return False
+
+    def _persist_state_change(self) -> None:
+        with self._lock:
+            self._state_change_count += 1
+            saved = self.save()
+            if saved and self._state_change_count % 100 == 0:
+                self._save_checkpoint()
 
     # =========================================================================
     # COUNTER OPERATIONS
@@ -178,7 +251,7 @@ class BridgeState:
         self._state["last_ingest_at"] = time.strftime(
             "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
         )
-        self.save()
+        self._persist_state_change()
         logger.info(
             f"[BRIDGE_STATE] Persisted: count={bridge_count}, "
             f"verified={bridge_verified_count}"
@@ -192,17 +265,17 @@ class BridgeState:
         self._state["last_ingest_at"] = time.strftime(
             "%Y-%m-%dT%H:%M:%SZ", time.gmtime()
         )
-        self.save()
+        self._persist_state_change()
 
     def record_drop(self, count: int = 1):
         """Record dropped samples."""
         self._state["total_dropped"] += count
-        self.save()
+        self._persist_state_change()
 
     def record_dedup(self, count: int = 1):
         """Record deduplicated samples."""
         self._state["total_deduped"] += count
-        self.save()
+        self._persist_state_change()
 
     # =========================================================================
     # SAMPLE STORE (disk-backed)
@@ -232,7 +305,7 @@ class BridgeState:
             )
             self._state["samples_path"] = str(self._samples_path)
             self._sample_buffer.clear()
-            self.save()
+            self._persist_state_change()
             logger.debug(f"[BRIDGE_STATE] Flushed {written} samples to disk")
         except Exception as e:
             logger.error(f"[BRIDGE_STATE] Sample flush failed: {e}")
@@ -247,7 +320,7 @@ class BridgeState:
                     f.write(line.encode("utf-8"))
             self._state["samples_written"] = len(samples)
             self._state["samples_path"] = str(self._samples_path)
-            self.save()
+            self._persist_state_change()
             logger.info(
                 f"[BRIDGE_STATE] Wrote {len(samples)} samples to {self._samples_path}"
             )

@@ -14,18 +14,22 @@ from impl_v1.phase49.governors.g20_dashboard_state import (
     ReportSessionState,
     DashboardState,
     DashboardEvent,
+    StateManager,
+    StateTransitionLog,
     create_dashboard_state,
     get_dashboard,
     update_activity_with_targets,
     set_quantity_selected,
     emit_event,
     get_events,
+    get_state_transition_log,
     update_report_progress,
     can_dashboard_approve_execution,
     can_dashboard_trigger_action,
     can_dashboard_bypass_router,
     clear_dashboard_state,
 )
+from impl_v1.phase49.governors.g13_dashboard_router import create_approval_request
 
 
 class TestDashboardPanel:
@@ -214,3 +218,52 @@ class TestCanDashboardBypass:
         can_bypass, reason = can_dashboard_bypass_router()
         assert can_bypass == False
         assert "G13" in reason or "router" in reason.lower()
+
+
+class TestStateManager:
+    def setup_method(self):
+        clear_dashboard_state()
+
+    def test_dashboard_state_includes_cluster_fields(self):
+        dashboard = create_dashboard_state("user1", "Hunter1")
+
+        assert dashboard.session_id == dashboard.activity_session.session_id
+        assert dashboard.active_view == DashboardPanel.USER.value
+        assert isinstance(dashboard.pending_approvals, int)
+        assert isinstance(dashboard.system_health, str)
+
+    def test_state_transitions_are_logged(self, monkeypatch):
+        manager = StateManager(session_id="DST-TEST")
+
+        monkeypatch.setattr(manager, "_load_circuit_breaker_states", lambda: ["CLOSED"])
+        monkeypatch.setattr(manager, "_load_peer_statuses", lambda: {"peer-a": "REACHABLE"})
+
+        state = manager.update_view("REPORT")
+        transitions = get_state_transition_log()
+
+        assert isinstance(manager.transition_log, StateTransitionLog)
+        assert state.active_view == DashboardPanel.REPORT.value
+        assert len(transitions) == 1
+        assert transitions[0].from_view == DashboardPanel.USER.value
+        assert transitions[0].to_view == DashboardPanel.REPORT.value
+
+    def test_system_health_is_derived_from_component_state(self, monkeypatch):
+        manager = StateManager(session_id="DST-HEALTH")
+
+        monkeypatch.setattr(manager, "_load_circuit_breaker_states", lambda: ["OPEN"])
+        monkeypatch.setattr(manager, "_load_peer_statuses", lambda: {"peer-a": "UNREACHABLE"})
+
+        state = manager.get_current_state()
+
+        assert state.system_health == "CRITICAL"
+
+    def test_pending_approvals_come_from_request_store(self, monkeypatch):
+        create_approval_request("example.com", "*")
+        manager = StateManager(session_id="DST-APPROVALS")
+
+        monkeypatch.setattr(manager, "_load_circuit_breaker_states", lambda: ["CLOSED"])
+        monkeypatch.setattr(manager, "_load_peer_statuses", lambda: {"peer-a": "REACHABLE"})
+
+        state = manager.get_current_state()
+
+        assert state.pending_approvals == 1

@@ -20,6 +20,7 @@ from unittest import mock
 
 from backend.api.runtime_api import (
     get_runtime_status,
+    get_detailed_status,
     _validate_structure,
     _sign_payload,
     REQUIRED_FIELDS,
@@ -99,11 +100,16 @@ class TestGetRuntimeStatus(unittest.TestCase):
         with open(self.tmp_path, 'w') as f:
             json.dump(data, f)
 
+    def _assert_trace_id(self, result):
+        self.assertIn("trace_id", result)
+        self.assertEqual(len(result["trace_id"]), 8)
+
     @mock.patch('backend.api.runtime_api.RUNTIME_STATE_PATH', '/nonexistent/path.json')
     def test_missing_file_returns_awaiting(self):
         result = get_runtime_status()
         self.assertEqual(result["status"], "awaiting_data")
         self.assertIn("timestamp", result)
+        self._assert_trace_id(result)
 
     @mock.patch('backend.api.runtime_api.RUNTIME_STATE_PATH')
     def test_valid_file_returns_active(self, mock_path):
@@ -120,6 +126,7 @@ class TestGetRuntimeStatus(unittest.TestCase):
             self.assertEqual(result["runtime"]["completed_epochs"], 42)
             self.assertEqual(result["runtime"]["precision"], 0.95)
             self.assertTrue(result["determinism_ok"])
+            self._assert_trace_id(result)
 
     @mock.patch('backend.api.runtime_api.RUNTIME_STATE_PATH')
     def test_invalid_structure_returns_invalid(self, mock_path):
@@ -128,6 +135,7 @@ class TestGetRuntimeStatus(unittest.TestCase):
             result = get_runtime_status()
             self.assertEqual(result["status"], "invalid")
             self.assertIn("Missing required fields", result["message"])
+            self._assert_trace_id(result)
 
     @mock.patch('backend.api.runtime_api.RUNTIME_STATE_PATH')
     def test_stale_data_detected(self, mock_path):
@@ -138,6 +146,7 @@ class TestGetRuntimeStatus(unittest.TestCase):
             result = get_runtime_status()
             self.assertEqual(result["status"], "active")
             self.assertTrue(result["stale"])
+            self._assert_trace_id(result)
 
     @mock.patch('backend.api.runtime_api.RUNTIME_STATE_PATH')
     def test_fresh_data_not_stale(self, mock_path):
@@ -147,6 +156,7 @@ class TestGetRuntimeStatus(unittest.TestCase):
             result = get_runtime_status()
             self.assertEqual(result["status"], "active")
             self.assertFalse(result["stale"])
+            self._assert_trace_id(result)
 
     @mock.patch('backend.api.runtime_api.RUNTIME_STATE_PATH')
     def test_determinism_false_flagged(self, mock_path):
@@ -156,6 +166,7 @@ class TestGetRuntimeStatus(unittest.TestCase):
             result = get_runtime_status()
             self.assertEqual(result["status"], "active")
             self.assertFalse(result["determinism_ok"])
+            self._assert_trace_id(result)
 
     @mock.patch('backend.api.runtime_api.RUNTIME_STATE_PATH')
     def test_corrupt_file_returns_error(self, mock_path):
@@ -164,6 +175,69 @@ class TestGetRuntimeStatus(unittest.TestCase):
                 f.write("not json {{{")
             result = get_runtime_status()
             self.assertEqual(result["status"], "error")
+            self.assertIn("detail", result)
+            self._assert_trace_id(result)
+
+
+class TestDetailedRuntimeStatus(unittest.TestCase):
+    def test_detailed_status_response_shape(self):
+        from backend.training.feature_bridge import FeatureHealthReport
+
+        mock_pipeline = mock.Mock()
+        mock_pipeline.get_source_status.return_value = {
+            "nvd": {
+                "name": "NVD",
+                "status": "CONNECTED",
+                "circuit_breaker": "CLOSED",
+            }
+        }
+        mock_worker = mock.Mock()
+        mock_worker.get_status.return_value = {
+            "last_batch": {
+                "batch_id": "CBI-000001",
+                "ingested": 3,
+                "deduped": 1,
+            }
+        }
+        mock_diversifier = mock.Mock()
+        mock_diversifier.get_health.return_value = FeatureHealthReport(
+            total=1,
+            valid=1,
+            invalid=0,
+            invalid_paths=[],
+        )
+
+        with mock.patch('backend.cve.cve_pipeline.get_pipeline', return_value=mock_pipeline), \
+                mock.patch('backend.sync.peer_transport.get_peer_statuses', return_value={"peer-a": "REACHABLE"}), \
+                mock.patch(
+                    'backend.storage.tiered_storage.get_tier_health',
+                    return_value=[{
+                        "tier_name": "ssd",
+                        "available_bytes": 1024,
+                        "used_bytes": 512,
+                        "read_latency_ms": 0.5,
+                        "write_latency_ms": 0.75,
+                    }],
+                ), \
+                mock.patch('backend.training.feature_bridge.FeatureDiversifier', return_value=mock_diversifier), \
+                mock.patch('backend.cve.bridge_ingestion_worker.get_bridge_worker', return_value=mock_worker):
+            result = get_detailed_status()
+
+        self.assertIn("trace_id", result)
+        self.assertEqual(len(result["trace_id"]), 8)
+        self.assertIn("timestamp", result)
+        self.assertIn("components", result)
+
+        for name in (
+            "circuit_breaker_stats",
+            "peer_statuses",
+            "tier_health",
+            "feature_health",
+            "last_batch",
+        ):
+            self.assertIn(name, result["components"])
+            self.assertIn("status", result["components"][name])
+            self.assertIn("detail", result["components"][name])
 
 
 if __name__ == "__main__":

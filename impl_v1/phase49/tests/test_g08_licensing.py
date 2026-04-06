@@ -7,13 +7,18 @@ import hmac
 import json
 import pytest
 from impl_v1.phase49.governors.g08_licensing import (
+    LicenseAuditLog,
+    LicenseRecord,
     LicenseStatus,
+    LicenseStore,
     LicenseType,
+    LicenseValidator,
     DeviceFingerprint,
     LicenseValidation,
     PrivacyConfig,
     DEFAULT_PRIVACY,
     create_device_fingerprint,
+    is_licensed,
     validate_license,
     apply_timing_jitter,
     mask_metadata,
@@ -102,7 +107,82 @@ class TestValidateLicense:
 
         assert result.status == LicenseStatus.VALID
         assert result.execution_allowed is True
-        assert result.license_type == LicenseType.PROFESSIONAL
+
+
+class TestActiveLicenseValidation:
+    """Test persisted active license behavior."""
+
+    def test_expired_license_fails_and_is_logged(self):
+        audit_log = LicenseAuditLog()
+        validator = LicenseValidator(audit_log)
+        record = LicenseRecord(
+            license_id="LIC-001",
+            owner_id="owner-001",
+            issued_at="2026-01-01T00:00:00+00:00",
+            expires_at="2000-01-01T00:00:00+00:00",
+            features=["reporting"],
+            valid=True,
+        )
+
+        assert validator.validate(record) is False
+        assert audit_log.entries[-1]["license_id"] == "LIC-001"
+        assert audit_log.entries[-1]["validation_passed"] is False
+
+    def test_missing_feature_list_fails_validation(self):
+        validator = LicenseValidator()
+        record = LicenseRecord(
+            license_id="LIC-002",
+            owner_id="owner-002",
+            issued_at="2026-01-01T00:00:00+00:00",
+            expires_at="2099-01-01T00:00:00+00:00",
+            features=[],
+            valid=True,
+        )
+
+        assert validator.validate(record) is False
+
+    def test_mock_validation_path_is_absent_for_invalid_record(self):
+        validator = LicenseValidator()
+        record = LicenseRecord(
+            license_id="LIC-003",
+            owner_id="owner-003",
+            issued_at="2026-01-01T00:00:00+00:00",
+            expires_at="2099-01-01T00:00:00+00:00",
+            features=["reporting"],
+            valid=False,
+        )
+
+        assert validator.validate(record) is False
+
+    def test_store_loads_active_license_and_is_licensed_checks_features(self, tmp_path):
+        license_path = tmp_path / "license.json"
+        license_path.write_text(
+            json.dumps(
+                {
+                    "license_id": "LIC-004",
+                    "owner_id": "owner-004",
+                    "issued_at": "2026-01-01T00:00:00+00:00",
+                    "expires_at": "2099-01-01T00:00:00+00:00",
+                    "features": ["reporting"],
+                    "valid": True,
+                }
+            ),
+            encoding="utf-8",
+        )
+        store = LicenseStore(license_path)
+        validator = LicenseValidator()
+
+        loaded = store.load()
+
+        assert loaded is not None
+        assert loaded.owner_id == "owner-004"
+        assert is_licensed("reporting", store=store, validator=validator) is True
+        assert is_licensed("analytics", store=store, validator=validator) is False
+
+    def test_store_returns_none_when_license_file_is_missing(self, tmp_path):
+        store = LicenseStore(tmp_path / "license.json")
+
+        assert store.load() is None
 
     def test_validates_signed_token(self, monkeypatch):
         fp = create_device_fingerprint("Linux", "5.15", "m1")

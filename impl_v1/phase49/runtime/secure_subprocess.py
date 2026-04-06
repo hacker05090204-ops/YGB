@@ -17,11 +17,15 @@ USAGE:
 
 import subprocess
 import os
+import logging
 import platform
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass
 from enum import Enum
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -315,7 +319,6 @@ def safe_terminate(proc: subprocess.Popen, timeout: int = 5) -> bool:
     except (OSError, subprocess.TimeoutExpired):
         try:
             proc.kill()
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning("Failed to force-kill process %s: %s", getattr(proc, "pid", "?"), exc)
     return True
-

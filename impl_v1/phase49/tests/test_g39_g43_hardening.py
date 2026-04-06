@@ -5,6 +5,13 @@ Tests for G39-G43 final hardening governors.
 100% coverage required.
 """
 
+from dataclasses import replace
+import hashlib
+import inspect
+import json
+import platform
+import sys
+
 import pytest
 
 
@@ -16,13 +23,32 @@ class TestG39EnvironmentFingerprint:
     """Tests for G39 environment fingerprint governor."""
     
     def test_capture_fingerprint(self):
-        from impl_v1.phase49.governors.g39_environment_fingerprint import (
-            capture_environment_fingerprint,
-        )
-        fp = capture_environment_fingerprint()
+        from impl_v1.phase49.governors import g39_environment_fingerprint as g39
+
+        fp = g39.FingerprintCollector().collect()
+
         assert fp.fingerprint_id
-        assert fp.os_name
-        assert fp.python_version
+        assert fp.os_type == platform.system()
+        assert fp.arch == platform.machine()
+        assert fp.python_version == sys.version
+        if g39.torch is None or not hasattr(g39.torch, "cuda") or not hasattr(g39.torch.cuda, "is_available"):
+            assert fp.gpu_available is None
+        else:
+            assert fp.gpu_available is bool(g39.torch.cuda.is_available())
+
+        expected_hash = hashlib.sha256(
+            json.dumps(
+                {
+                    "arch": fp.arch,
+                    "gpu_available": fp.gpu_available,
+                    "os_type": fp.os_type,
+                    "python_version": fp.python_version,
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest()
+        assert fp.hash_sha256 == expected_hash
     
     def test_compare_same_fingerprints(self):
         from impl_v1.phase49.governors.g39_environment_fingerprint import (
@@ -38,25 +64,71 @@ class TestG39EnvironmentFingerprint:
         from impl_v1.phase49.governors.g39_environment_fingerprint import (
             capture_environment_fingerprint,
             detect_drift,
-            DriftStatus,
-            SafeMode,
         )
         current = capture_environment_fingerprint()
-        drift = detect_drift(None, current)
-        assert drift.status == DriftStatus.UNKNOWN
-        assert drift.recommended_mode == SafeMode.SAFE
+        drift = detect_drift(current, None)
+        assert drift is False
     
     def test_detect_drift_trusted(self):
         from impl_v1.phase49.governors.g39_environment_fingerprint import (
             capture_environment_fingerprint,
             detect_drift,
-            DriftStatus,
-            SafeMode,
         )
         fp = capture_environment_fingerprint()
         drift = detect_drift(fp, fp)
-        assert drift.status == DriftStatus.TRUSTED
-        assert drift.recommended_mode == SafeMode.NORMAL
+        assert drift is False
+
+    def test_hash_is_deterministic_for_same_environment(self):
+        from impl_v1.phase49.governors.g39_environment_fingerprint import FingerprintCollector
+
+        first = FingerprintCollector().collect()
+        second = FingerprintCollector().collect()
+
+        assert first.hash_sha256 == second.hash_sha256
+        assert first.fingerprint_id == second.fingerprint_id
+
+    def test_detect_drift_on_python_version_change(self):
+        from impl_v1.phase49.governors.g39_environment_fingerprint import (
+            FingerprintCollector,
+            detect_drift,
+        )
+
+        previous = FingerprintCollector().collect()
+        current = replace(previous, python_version=f"{previous.python_version}::changed")
+
+        assert detect_drift(current, previous) is True
+
+    def test_fingerprint_store_keeps_only_last_ten(self):
+        from impl_v1.phase49.governors.g39_environment_fingerprint import (
+            FingerprintCollector,
+            FingerprintStore,
+        )
+
+        store = FingerprintStore()
+        baseline = FingerprintCollector().collect()
+
+        for index in range(12):
+            store.add(
+                replace(
+                    baseline,
+                    fingerprint_id=f"fp-{index}",
+                    computed_at=f"2026-01-01T00:00:{index:02d}+00:00",
+                    hash_sha256=hashlib.sha256(f"fp-{index}".encode("utf-8")).hexdigest(),
+                )
+            )
+
+        assert len(store.fingerprints) == 10
+        assert store.fingerprints[0].fingerprint_id == "fp-2"
+        assert store.latest().fingerprint_id == "fp-11"
+
+    def test_no_mock_fingerprint_values_remain_in_production(self):
+        from impl_v1.phase49.governors import g39_environment_fingerprint as g39
+
+        source = inspect.getsource(g39)
+
+        assert "GPU_INFO" not in source
+        assert "BROWSER_VERSION" not in source
+        assert "undetected" not in source
     
     def test_should_enter_safe_mode(self):
         from impl_v1.phase49.governors.g39_environment_fingerprint import (
@@ -64,8 +136,9 @@ class TestG39EnvironmentFingerprint:
             detect_drift,
             should_enter_safe_mode,
         )
-        fp = capture_environment_fingerprint()
-        drift = detect_drift(None, fp)
+        previous = capture_environment_fingerprint()
+        fp = replace(previous, python_version=f"{previous.python_version}::safe")
+        drift = detect_drift(fp, previous)
         assert should_enter_safe_mode(drift) is True
     
     def test_guards_return_false(self):
@@ -258,7 +331,92 @@ class TestG42ReportDiversity:
         score = calculate_diversity_score(pool)
         assert score.entropy == 1.0
         assert score.is_diverse is True
-    
+
+    def test_identical_text_scores_zero_and_is_flagged(self):
+        from impl_v1.phase49.governors.g42_report_diversity import (
+            DiversityAnalyzer,
+        )
+
+        report_text = """# Summary
+alpha beta gamma delta
+# Evidence
+epsilon zeta eta theta
+"""
+
+        analyzer = DiversityAnalyzer()
+        score = analyzer.analyze(report_text, prior_reports=[report_text])
+
+        assert score.structural_score == 0.0
+        assert score.vocabulary_score == 0.0
+        assert score.overall == 0.0
+        assert score.flagged is True
+        assert analyzer.get_flagged_reports() == [score]
+
+    def test_unique_text_scores_high(self):
+        from impl_v1.phase49.governors.g42_report_diversity import (
+            DiversityAnalyzer,
+        )
+
+        report_text = """# Overview
+alpha beta gamma delta epsilon zeta eta theta
+# Evidence
+iota kappa lambda mu nu xi omicron pi
+# Containment
+rho sigma tau upsilon phi chi psi omega
+"""
+
+        score = DiversityAnalyzer().analyze(report_text, prior_reports=[])
+
+        assert score.structural_score == 1.0
+        assert score.vocabulary_score == 1.0
+        assert score.overall == 1.0
+        assert score.flagged is False
+
+    def test_analyze_is_deterministic_for_same_input(self):
+        from impl_v1.phase49.governors.g42_report_diversity import (
+            DiversityAnalyzer,
+        )
+
+        report_text = """# Overview
+alpha beta gamma delta epsilon
+# Evidence
+zeta eta theta iota kappa
+"""
+        prior_reports = [
+            """# Summary
+lambda mu nu xi omicron
+"""
+        ]
+
+        score_one = DiversityAnalyzer().analyze(report_text, prior_reports=prior_reports)
+        score_two = DiversityAnalyzer().analyze(report_text, prior_reports=prior_reports)
+
+        assert score_one == score_two
+
+    def test_diversity_log_retains_last_100_scores(self):
+        from impl_v1.phase49.governors.g42_report_diversity import (
+            DiversityAnalyzer,
+        )
+
+        analyzer = DiversityAnalyzer()
+        trimmed_report_ids = []
+
+        for index in range(105):
+            report_text = f"""# Section {index}
+alpha{index} beta{index} gamma{index} delta{index}
+# Detail {index}
+epsilon{index} zeta{index} eta{index} theta{index}
+"""
+            score = analyzer.analyze(report_text, prior_reports=[])
+            if index < 5:
+                trimmed_report_ids.append(score.report_id)
+
+        retained_report_ids = {score.report_id for score in analyzer.log.scores}
+
+        assert len(analyzer.log.scores) == 100
+        assert retained_report_ids.isdisjoint(trimmed_report_ids)
+        assert analyzer.get_flagged_reports() == []
+
     def test_update_cooldown(self):
         from impl_v1.phase49.governors.g42_report_diversity import (
             create_pattern_pool,
@@ -345,7 +503,35 @@ class TestG43AutoModeSafety:
         ))
         assert safe is False
         assert len(violations) == 1
-    
+
+    def test_critical_failure_triggers_manual_fallback(self):
+        from impl_v1.phase49.governors.g06_autonomy_modes import (
+            AutonomyController,
+            AutonomyLevel,
+        )
+        from impl_v1.phase49.governors.g43_auto_mode_safety import AutoModeSafetyGuard
+
+        controller = AutonomyController(initial_mode=AutonomyLevel.SUPERVISED)
+        guard = AutoModeSafetyGuard(
+            controller=controller,
+            critical_alert_provider=lambda: ["ALERT-001"],
+            training_state_provider=lambda: False,
+        )
+
+        results = guard.run_all_checks()
+
+        assert controller.get_current_mode() == AutonomyLevel.MANUAL
+        assert any(
+            result.check_name == "no_critical_alerts_pending"
+            and result.passed is False
+            and result.severity == "CRITICAL"
+            for result in results
+        )
+
+        status = guard.get_safety_status()
+        assert status["all_safe"] is False
+        assert "no_critical_alerts_pending" in status["failed_checks"]
+
     def test_guards_return_false(self):
         from impl_v1.phase49.governors.g43_auto_mode_safety import (
             can_auto_exploit,

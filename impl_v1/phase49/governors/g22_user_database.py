@@ -15,18 +15,20 @@ RULES:
 ✗ NO bulk deletes without approval
 """
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, replace
 from enum import Enum
-from typing import Optional, List, Dict
+import json
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
 import uuid
 from datetime import datetime, UTC
 
 
-class UserRole(Enum):
-    """CLOSED ENUM - User roles"""
-    HUNTER = "HUNTER"
-    ADMIN = "ADMIN"
+class UserRole(str, Enum):
+    """Closed enum for persisted user roles."""
     OWNER = "OWNER"
+    ADMIN = "ADMIN"
+    VIEWER = "VIEWER"
 
 
 class Permission(Enum):
@@ -48,17 +50,33 @@ class SessionStatus(Enum):
 
 
 @dataclass(frozen=True)
-class User:
-    """User entity."""
+class UserRecord:
+    """Persisted user record."""
     user_id: str
-    name: str
-    email: Optional[str]
-    role: UserRole
-    bounty_count: int
-    total_earnings: float
-    current_targets: tuple  # Tuple[str, ...]
+    username: str
+    role: str
     created_at: str
-    last_active: str
+    last_seen: Optional[str]
+    active: bool
+    email: Optional[str] = None
+    bounty_count: int = 0
+    total_earnings: float = 0.0
+    current_targets: Tuple[str, ...] = tuple()
+
+    @property
+    def name(self) -> str:
+        return self.username
+
+    @property
+    def last_active(self) -> str:
+        return self.last_seen or self.created_at
+
+    @property
+    def role_enum(self) -> UserRole:
+        return _coerce_user_role(self.role)
+
+
+User = UserRecord
 
 
 @dataclass(frozen=True)
@@ -109,16 +127,227 @@ class DeleteRequest:
 
 
 # In-memory stores
-_users: Dict[str, User] = {}
 _sessions: Dict[str, UserSession] = {}
 _admins: Dict[str, Admin] = {}
 _audit_logs: List[AuditLog] = []
 _delete_requests: Dict[str, DeleteRequest] = {}
 
 
+def _coerce_user_role(role: Union[UserRole, str]) -> UserRole:
+    """Normalize user roles to the governed enum."""
+    if isinstance(role, UserRole):
+        return role
+
+    normalized = str(role).strip().upper()
+    try:
+        return UserRole[normalized]
+    except KeyError:
+        try:
+            return UserRole(normalized)
+        except ValueError as exc:
+            raise ValueError(f"Unknown role: {role}") from exc
+
+
+class UserStore:
+    """Disk-backed user record store."""
+
+    def __init__(
+        self,
+        storage_path: Optional[Union[str, Path]] = None,
+        max_users: int = 50,
+    ):
+        self.storage_path = (
+            Path(storage_path)
+            if storage_path is not None
+            else Path(__file__).resolve().parents[3] / "data" / "phase49_user_store.json"
+        )
+        self.max_users = max_users
+        self.users: Dict[str, UserRecord] = {}
+        self.load_on_startup()
+
+    def load_on_startup(self) -> Dict[str, UserRecord]:
+        """Load persisted users from disk if the JSON file exists."""
+        self.users.clear()
+        if not self.storage_path.exists():
+            return self.users
+
+        try:
+            payload = json.loads(self.storage_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return self.users
+
+        users_payload = payload.get("users", payload) if isinstance(payload, dict) else {}
+        if isinstance(payload, dict):
+            self.max_users = int(payload.get("max_users", self.max_users))
+
+        if not isinstance(users_payload, dict):
+            return self.users
+
+        for user_id, raw in users_payload.items():
+            if not isinstance(raw, dict):
+                continue
+
+            try:
+                self.users[user_id] = UserRecord(
+                    user_id=user_id,
+                    username=str(raw["username"]),
+                    role=_coerce_user_role(raw.get("role", UserRole.VIEWER.value)).value,
+                    created_at=str(raw["created_at"]),
+                    last_seen=raw.get("last_seen"),
+                    active=bool(raw.get("active", True)),
+                    email=raw.get("email"),
+                    bounty_count=int(raw.get("bounty_count", 0)),
+                    total_earnings=float(raw.get("total_earnings", 0.0)),
+                    current_targets=tuple(raw.get("current_targets", []) or []),
+                )
+            except (KeyError, TypeError, ValueError):
+                continue
+
+        return self.users
+
+    def persist_on_change(self) -> None:
+        """Persist the current user map to disk as JSON."""
+        self.storage_path.parent.mkdir(parents=True, exist_ok=True)
+        payload = {
+            "max_users": self.max_users,
+            "users": {
+                user_id: self._serialize_user(record)
+                for user_id, record in self.users.items()
+            },
+        }
+
+        temp_path = self.storage_path.with_name(f"{self.storage_path.name}.tmp")
+        temp_path.write_text(
+            json.dumps(payload, indent=2, sort_keys=True),
+            encoding="utf-8",
+        )
+        temp_path.replace(self.storage_path)
+
+    def clear(self, remove_file: bool = True) -> None:
+        """Clear the store and optionally remove the persisted JSON file."""
+        self.users.clear()
+        if remove_file and self.storage_path.exists():
+            self.storage_path.unlink()
+        elif not remove_file:
+            self.persist_on_change()
+
+    @staticmethod
+    def _serialize_user(record: UserRecord) -> Dict[str, object]:
+        payload = asdict(record)
+        payload["current_targets"] = list(record.current_targets)
+        return payload
+
+
+class UserManager:
+    """Managed user CRUD operations with persistence and validation."""
+
+    def __init__(self, store: Optional[UserStore] = None):
+        self.store = store or UserStore()
+
+    def create_user(
+        self,
+        username: str,
+        email: Optional[str] = None,
+        role: Union[UserRole, str] = UserRole.VIEWER,
+    ) -> UserRecord:
+        normalized_role = _coerce_user_role(role)
+        lowered_username = username.casefold()
+
+        if any(existing.username.casefold() == lowered_username for existing in self.store.users.values()):
+            raise ValueError(f"Username already taken: {username}")
+        if len(self.store.users) >= self.store.max_users:
+            raise ValueError(f"Maximum user count exceeded: {self.store.max_users}")
+
+        now = datetime.now(UTC).isoformat()
+        user = UserRecord(
+            user_id=f"USR-{uuid.uuid4().hex[:16].upper()}",
+            username=username,
+            role=normalized_role.value,
+            created_at=now,
+            last_seen=now,
+            active=True,
+            email=email,
+        )
+
+        self.store.users[user.user_id] = user
+        self.store.persist_on_change()
+        _log_action("SYSTEM", "CREATE_USER", user.user_id, f"Created user: {username}")
+        return user
+
+    def get_user(self, user_id: str) -> Optional[UserRecord]:
+        return self.store.users.get(user_id)
+
+    def get_all_users(self) -> List[UserRecord]:
+        return list(self.store.users.values())
+
+    def update_user_bounty(
+        self,
+        user_id: str,
+        bounty_delta: int,
+        earnings_delta: float,
+    ) -> Optional[UserRecord]:
+        user = self.get_user(user_id)
+        if not user:
+            return None
+
+        updated = replace(
+            user,
+            bounty_count=user.bounty_count + bounty_delta,
+            total_earnings=user.total_earnings + earnings_delta,
+            last_seen=datetime.now(UTC).isoformat(),
+        )
+        self.store.users[user_id] = updated
+        self.store.persist_on_change()
+        _log_action("SYSTEM", "UPDATE_BOUNTY", user_id, f"Added {bounty_delta} bounties, ${earnings_delta}")
+        return updated
+
+    def update_user_targets(self, user_id: str, targets: List[str]) -> Optional[UserRecord]:
+        user = self.get_user(user_id)
+        if not user:
+            return None
+
+        updated = replace(
+            user,
+            current_targets=tuple(targets),
+            last_seen=datetime.now(UTC).isoformat(),
+        )
+        self.store.users[user_id] = updated
+        self.store.persist_on_change()
+        _log_action("SYSTEM", "UPDATE_TARGETS", user_id, f"Set targets: {targets}")
+        return updated
+
+    def deactivate_user(self, user_id: str) -> bool:
+        user = self.get_user(user_id)
+        if not user:
+            return False
+
+        self.store.users[user_id] = replace(
+            user,
+            active=False,
+            last_seen=datetime.now(UTC).isoformat(),
+        )
+        self.store.persist_on_change()
+        _log_action("SYSTEM", "DEACTIVATE_USER", user_id, f"Deactivated user: {user.username}")
+        return True
+
+    def get_active_users(self) -> List[UserRecord]:
+        return [user for user in self.store.users.values() if user.active]
+
+    def delete_user(self, user_id: str) -> bool:
+        if user_id not in self.store.users:
+            return False
+        del self.store.users[user_id]
+        self.store.persist_on_change()
+        return True
+
+
+_DEFAULT_USER_STORE = UserStore()
+_DEFAULT_USER_MANAGER = UserManager(_DEFAULT_USER_STORE)
+
+
 def clear_database():
     """Clear all data (for testing)."""
-    _users.clear()
+    _DEFAULT_USER_STORE.clear()
     _sessions.clear()
     _admins.clear()
     _audit_logs.clear()
@@ -146,37 +375,20 @@ def _log_action(actor_id: str, action: str, target_id: Optional[str], details: s
 def create_user(
     name: str,
     email: Optional[str] = None,
-    role: UserRole = UserRole.HUNTER,
-) -> User:
+    role: Union[UserRole, str] = UserRole.VIEWER,
+) -> UserRecord:
     """Create a new user."""
-    user_id = f"USR-{uuid.uuid4().hex[:16].upper()}"
-    now = datetime.now(UTC).isoformat()
-    
-    user = User(
-        user_id=user_id,
-        name=name,
-        email=email,
-        role=role,
-        bounty_count=0,
-        total_earnings=0.0,
-        current_targets=tuple(),
-        created_at=now,
-        last_active=now,
-    )
-    
-    _users[user_id] = user
-    _log_action("SYSTEM", "CREATE_USER", user_id, f"Created user: {name}")
-    return user
+    return _DEFAULT_USER_MANAGER.create_user(name, email=email, role=role)
 
 
-def get_user(user_id: str) -> Optional[User]:
+def get_user(user_id: str) -> Optional[UserRecord]:
     """Get user by ID (read-only)."""
-    return _users.get(user_id)
+    return _DEFAULT_USER_MANAGER.get_user(user_id)
 
 
-def get_all_users() -> List[User]:
+def get_all_users() -> List[UserRecord]:
     """Get all users (read-only)."""
-    return list(_users.values())
+    return _DEFAULT_USER_MANAGER.get_all_users()
 
 
 def update_user_bounty(
@@ -185,27 +397,7 @@ def update_user_bounty(
     earnings_delta: float,
 ) -> Optional[User]:
     """Update user's bounty count and earnings."""
-    user = get_user(user_id)
-    if not user:
-        return None
-    
-    now = datetime.now(UTC).isoformat()
-    
-    new_user = User(
-        user_id=user.user_id,
-        name=user.name,
-        email=user.email,
-        role=user.role,
-        bounty_count=user.bounty_count + bounty_delta,
-        total_earnings=user.total_earnings + earnings_delta,
-        current_targets=user.current_targets,
-        created_at=user.created_at,
-        last_active=now,
-    )
-    
-    _users[user_id] = new_user
-    _log_action("SYSTEM", "UPDATE_BOUNTY", user_id, f"Added {bounty_delta} bounties, ${earnings_delta}")
-    return new_user
+    return _DEFAULT_USER_MANAGER.update_user_bounty(user_id, bounty_delta, earnings_delta)
 
 
 def update_user_targets(
@@ -213,27 +405,17 @@ def update_user_targets(
     targets: List[str],
 ) -> Optional[User]:
     """Update user's current targets."""
-    user = get_user(user_id)
-    if not user:
-        return None
-    
-    now = datetime.now(UTC).isoformat()
-    
-    new_user = User(
-        user_id=user.user_id,
-        name=user.name,
-        email=user.email,
-        role=user.role,
-        bounty_count=user.bounty_count,
-        total_earnings=user.total_earnings,
-        current_targets=tuple(targets),
-        created_at=user.created_at,
-        last_active=now,
-    )
-    
-    _users[user_id] = new_user
-    _log_action("SYSTEM", "UPDATE_TARGETS", user_id, f"Set targets: {targets}")
-    return new_user
+    return _DEFAULT_USER_MANAGER.update_user_targets(user_id, targets)
+
+
+def deactivate_user(user_id: str) -> bool:
+    """Deactivate a user without deleting the persisted record."""
+    return _DEFAULT_USER_MANAGER.deactivate_user(user_id)
+
+
+def get_active_users() -> List[UserRecord]:
+    """Return only active users from the persisted store."""
+    return _DEFAULT_USER_MANAGER.get_active_users()
 
 
 # ============================================================
@@ -432,8 +614,8 @@ def approve_delete(
 
 def _execute_delete(target_type: str, target_id: str):
     """Execute approved deletion."""
-    if target_type == "user" and target_id in _users:
-        del _users[target_id]
+    if target_type == "user":
+        _DEFAULT_USER_MANAGER.delete_user(target_id)
     elif target_type == "session" and target_id in _sessions:
         del _sessions[target_id]
     elif target_type == "admin" and target_id in _admins:

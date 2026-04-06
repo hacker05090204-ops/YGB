@@ -11,8 +11,17 @@ This is the last checkpoint before any real execution.
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Tuple
+import hashlib
+import logging
 import uuid
 from datetime import datetime, UTC
+
+
+logger = logging.getLogger(__name__)
+
+
+class SealVerificationError(RuntimeError):
+    pass
 
 
 class SealCheckType(Enum):
@@ -151,3 +160,26 @@ def validate_seal(seal: ExecutionSealResult) -> Tuple[bool, str]:
 def can_execute(seal: ExecutionSealResult) -> bool:
     """Simple check if execution is allowed."""
     return seal.sealed and seal.all_passed
+
+
+def compute_seal(execution_id: str, timestamp_iso: str, payload_hash: str) -> str:
+    payload = f"{execution_id}:{timestamp_iso}:{payload_hash}".encode()
+    return hashlib.sha256(payload).hexdigest()
+
+
+def verify_seal(
+    execution_id: str,
+    timestamp_iso: str,
+    payload_hash: str,
+    claimed_seal: str,
+) -> bool:
+    expected = compute_seal(execution_id, timestamp_iso, payload_hash)
+    if claimed_seal != expected:
+        logger.critical(
+            "Execution seal mismatch for execution_id=%s timestamp=%s payload_hash=%s",
+            execution_id,
+            timestamp_iso,
+            payload_hash,
+        )
+        raise SealVerificationError("seal mismatch")
+    return True

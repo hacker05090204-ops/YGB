@@ -22,6 +22,7 @@ from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
+from backend.training.representation_bridge import SyntheticDataBlockedError
 from impl_v1.training.distributed.hash_utils import hash_model_weights
 
 logger = logging.getLogger(__name__)
@@ -213,9 +214,10 @@ def run_single_epoch(
 
         # Dataset
         if X is None or y is None:
-            rng = np.random.RandomState(config.seed)
-            X = rng.randn(4000, config.input_dim).astype(np.float32)
-            y = rng.randint(0, config.num_classes, 4000).astype(np.int64)
+            raise SyntheticDataBlockedError(
+                "production_ddp_launcher.run_single_epoch requires caller-supplied real tensors; "
+                "synthetic dataset fallback is blocked"
+            )
 
         X_t = torch.from_numpy(X).to(device)
         y_t = torch.from_numpy(y).to(device)
@@ -283,6 +285,9 @@ def run_single_epoch(
 
         return metrics
 
+    except SyntheticDataBlockedError:
+        raise
+
     except Exception as e:
         logger.error(f"[DDP_LAUNCH] Training failed rank {config.rank}: {e}")
         return NodeMetrics(
@@ -298,6 +303,8 @@ def run_single_epoch(
 
 def run_deterministic_validation(
     config: DDPLaunchConfig,
+    X: np.ndarray = None,
+    y: np.ndarray = None,
     num_runs: int = 3,
 ) -> Tuple[bool, List[str]]:
     """Run multiple training passes and verify identical weight hashes.
@@ -311,7 +318,7 @@ def run_deterministic_validation(
     """
     hashes = []
     for run in range(num_runs):
-        metrics = run_single_epoch(config)
+        metrics = run_single_epoch(config, X=X, y=y)
         hashes.append(metrics.weight_hash)
         logger.info(
             f"[DDP_LAUNCH] Deterministic run {run + 1}/{num_runs}: "
@@ -334,6 +341,8 @@ def run_deterministic_validation(
 
 def launch_production_ddp(
     config: DDPLaunchConfig,
+    X: np.ndarray = None,
+    y: np.ndarray = None,
     node0_baseline_sps: float = 0.0,
     node1_baseline_sps: float = 0.0,
     authority_resumed: bool = False,
@@ -352,11 +361,11 @@ def launch_production_ddp(
     setup_production_env()
 
     # Run 1 real epoch
-    metrics = run_single_epoch(config)
+    metrics = run_single_epoch(config, X=X, y=y)
 
     # Run deterministic validation
     det_match, det_hashes = run_deterministic_validation(
-        config, num_runs=config.deterministic_runs,
+        config, X=X, y=y, num_runs=config.deterministic_runs,
     )
 
     # Calculate efficiency

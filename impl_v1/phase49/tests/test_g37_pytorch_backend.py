@@ -20,9 +20,14 @@ from impl_v1.phase49.governors.g37_pytorch_backend import (
     EpochMetrics,
     ModelCheckpoint,
     InferenceResult,
+    TrainingConfig,
     # Device functions
     detect_compute_device,
     get_torch_device,
+    # Infrastructure-gated backend contract
+    PYTORCH_BACKEND_PROVISIONING_MESSAGE,
+    PyTorchBackend,
+    RealBackendNotConfiguredError,
     # Training
     create_model_config,
     prepare_training_batch,
@@ -186,6 +191,68 @@ class TestInference:
         sample = TrainingSample("S001", (0.1, 0.2, 0.3), 0, "G33")
         with pytest.raises(RuntimeError, match="Loaded model required"):
             infer_single(None, sample)
+
+
+class TestPyTorchBackendContract:
+    """Tests for the infrastructure-gated PyTorch backend wrapper."""
+
+    def test_train_raises_real_backend_not_configured_error(self):
+        runtime = PyTorchBackend()
+        config = TrainingConfig(
+            model_arch="mlp",
+            learning_rate=0.001,
+            batch_size=4,
+            max_epochs=1,
+            use_amp=False,
+        )
+
+        with pytest.raises(RealBackendNotConfiguredError) as exc_info:
+            runtime.train(config, None)
+
+        assert str(exc_info.value) == PYTORCH_BACKEND_PROVISIONING_MESSAGE
+
+    @pytest.mark.skipif(not PYTORCH_AVAILABLE, reason="PyTorch unavailable")
+    def test_train_with_real_dataloader_still_fails_closed(self):
+        runtime = PyTorchBackend()
+        config = TrainingConfig(
+            model_arch="mlp",
+            learning_rate=0.001,
+            batch_size=1,
+            max_epochs=1,
+            use_amp=False,
+        )
+        dataset = backend.torch.utils.data.TensorDataset(
+            backend.torch.tensor([[0.1, 0.2, 0.3]], dtype=backend.torch.float32),
+            backend.torch.tensor([1], dtype=backend.torch.long),
+        )
+        dataloader = backend.torch.utils.data.DataLoader(dataset, batch_size=1)
+
+        with pytest.raises(RealBackendNotConfiguredError) as exc_info:
+            runtime.train(config, dataloader)
+
+        assert str(exc_info.value) == PYTORCH_BACKEND_PROVISIONING_MESSAGE
+
+    def test_load_checkpoint_missing_file_raises_file_not_found(self, tmp_path):
+        runtime = PyTorchBackend()
+        missing_path = tmp_path / "missing.pt"
+
+        with pytest.raises(FileNotFoundError):
+            runtime.load_checkpoint(str(missing_path))
+
+    @pytest.mark.skipif(not PYTORCH_AVAILABLE, reason="PyTorch unavailable")
+    def test_load_checkpoint_returns_real_checkpoint_dict(self, tmp_path):
+        runtime = PyTorchBackend()
+        checkpoint_path = tmp_path / "real_checkpoint.pt"
+        expected = {
+            "epoch": 3,
+            "accuracy": 0.875,
+            "metadata": {"status": "saved"},
+        }
+        backend.torch.save(expected, checkpoint_path)
+
+        loaded = runtime.load_checkpoint(str(checkpoint_path))
+
+        assert loaded == expected
 
 
 class TestGuards:

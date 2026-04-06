@@ -22,9 +22,90 @@ import os
 import stat
 import time
 import uuid
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Optional
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class IntegrityReport:
+    entries_checked: int
+    hash_chain_valid: bool
+    first_broken_entry_id: Optional[str]
+    checked_at: str
+
+
+last_integrity_report: Optional[IntegrityReport] = None
+
+
+def _integrity_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _integrity_entry_id(entry: dict) -> Optional[str]:
+    if entry.get("entry_id"):
+        return str(entry["entry_id"])
+    if "sequence" in entry:
+        return str(entry["sequence"])
+    token = entry.get("token", {})
+    if token.get("nonce"):
+        return str(token["nonce"])
+    return None
+
+
+class LedgerIntegrityCheck:
+    @staticmethod
+    def _payload_without_hash(entry: dict) -> str:
+        return json.dumps(
+            {k: v for k, v in entry.items() if k not in {"entry_hash", "prev_hash"}},
+            sort_keys=True,
+        )
+
+    @staticmethod
+    def _legacy_payload(entry: dict) -> str:
+        return json.dumps(
+            {k: v for k, v in entry.items() if k != "entry_hash"},
+            sort_keys=True,
+        )
+
+    @staticmethod
+    def verify(entries: list) -> IntegrityReport:
+        prev_hash = "0" * 64
+        checked_at = _integrity_timestamp()
+
+        for index, entry in enumerate(entries, start=1):
+            entry_id = _integrity_entry_id(entry)
+            if entry.get("prev_hash") != prev_hash:
+                logger.critical(
+                    "APPROVAL_LEDGER_INTEGRITY_BROKEN entry_id=%s reason=prev_hash_mismatch",
+                    entry_id or "unknown",
+                )
+                return IntegrityReport(index, False, entry_id, checked_at)
+
+            payload = LedgerIntegrityCheck._payload_without_hash(entry)
+            computed_hash = hashlib.sha256(f"{prev_hash}{payload}".encode()).hexdigest()
+            legacy_payload = LedgerIntegrityCheck._legacy_payload(entry)
+            legacy_hash = hashlib.sha256(legacy_payload.encode()).hexdigest()
+            if entry.get("entry_hash") not in {computed_hash, legacy_hash}:
+                logger.critical(
+                    "APPROVAL_LEDGER_INTEGRITY_BROKEN entry_id=%s reason=hash_mismatch",
+                    entry_id or "unknown",
+                )
+                return IntegrityReport(index, False, entry_id, checked_at)
+
+            prev_hash = str(entry.get("entry_hash", ""))
+
+        return IntegrityReport(len(entries), True, None, checked_at)
+
+
+def run_integrity_check() -> IntegrityReport:
+    global last_integrity_report
+    ledger = ApprovalLedger()
+    ledger.load()
+    last_integrity_report = LedgerIntegrityCheck.verify(list(ledger._entries))
+    return last_integrity_report
 
 
 # ===========================================================

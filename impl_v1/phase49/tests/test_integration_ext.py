@@ -26,6 +26,7 @@ from impl_v1.phase49.governors.g15_cve_api import (
     get_risk_context,
 )
 from impl_v1.phase49.governors.g16_gmail_alerts import (
+    RealBackendNotConfiguredError as GmailBackendNotConfiguredError,
     send_new_device_alert,
     can_email_approve_execution,
     clear_verification_store,
@@ -36,12 +37,14 @@ from impl_v1.phase49.governors.g17_voice_reporting import (
     clear_reports,
 )
 from impl_v1.phase49.governors.g18_screen_inspection import (
+    RealBackendNotConfiguredError as ScreenInspectionBackendNotConfiguredError,
     create_inspection_request,
     authorize_inspection,
     perform_inspection,
     can_inspection_interact,
     clear_inspection_store,
 )
+from impl_v1.phase49.governors.g02_browser_types import BrowserProfile
 from impl_v1.phase49.governors.g10_owner_alerts import clear_alerts
 
 
@@ -109,16 +112,24 @@ class TestScreenInspectionIntegration:
     def test_screen_takeover_intent_triggers_inspection_request(self):
         intent = validate_voice_input("takeover the screen")
         if intent.intent_type == VoiceIntentType.SCREEN_TAKEOVER:
+            profile = BrowserProfile(
+                profile_id="PROFILE-SAFE",
+                browser_type="CHROMIUM",
+                headless=True,
+                sandboxed=True,
+                allowed_domains=["example.com"],
+            )
             request = create_inspection_request(
                 device_id="DEV-TEST",
                 user_id="USR-TEST",
                 device_trusted=True,
                 user_verified=True,
+                profile=profile,
+                target_url="https://example.com",
             )
             authorize_inspection(request.request_id)
-            result = perform_inspection(request.request_id)
-            assert result is not None
-            assert len(result.voice_explanation_en) > 0
+            with pytest.raises(ScreenInspectionBackendNotConfiguredError):
+                perform_inspection(request.request_id)
 
 
 class TestNoExecutionFromAnySource:
@@ -147,15 +158,14 @@ class TestNoExecutionFromAnySource:
 
 class TestAlertSystemIntegration:
     """Tests for alert system integration."""
-    
+
     def setup_method(self):
         clear_verification_store()
         clear_alerts()
-    
-    def test_new_device_triggers_alert(self):
-        result = send_new_device_alert("DEV-NEW", "192.168.1.100")
-        assert result is not None
-        assert result.error_message is None
+
+    def test_new_device_triggers_infrastructure_gate_without_credentials(self):
+        with pytest.raises(GmailBackendNotConfiguredError):
+            send_new_device_alert("DEV-NEW", "192.168.1.100")
 
 
 class TestApprovalRequiredFlow:

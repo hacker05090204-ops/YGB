@@ -356,8 +356,11 @@ class UnifiedPhaseRunner:
         if self.driver:
             try:
                 self.driver.quit()
-            except:
-                pass
+            except Exception:
+                logger.warning(
+                    "Failed to close browser driver during workflow cleanup",
+                    exc_info=True,
+                )
         
         # ==========================================================
         # WORKFLOW COMPLETE
@@ -434,8 +437,12 @@ class UnifiedPhaseRunner:
                 if module_path:
                     await asyncio.to_thread(importlib.import_module, module_path)
                     loaded += 1
-            except:
-                pass
+            except Exception:
+                logger.warning(
+                    "Failed to import governance phase module %s",
+                    module_path,
+                    exc_info=True,
+                )
         
         context.governance_data["phases_loaded"] = loaded
         return {"governance_phases": loaded}
@@ -1017,9 +1024,9 @@ class UnifiedPhaseRunner:
                 self.driver.save_screenshot(path)
                 await self._emit_action("SCREENSHOT", path)
                 return {"path": path}
-            except:
-                pass
-        
+            except Exception:
+                logger.warning("Screenshot capture failed", exc_info=True)
+
         await self._emit_action("SCREENSHOT", "skipped (HTTP mode)")
         return {"skipped": True}
     

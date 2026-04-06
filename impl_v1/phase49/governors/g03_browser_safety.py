@@ -9,9 +9,94 @@ This is the gatekeeper before any browser can launch.
 
 from dataclasses import dataclass
 from enum import Enum
+import logging
 from typing import List, Optional
 import uuid
 from datetime import datetime, UTC
+
+from impl_v1.phase49.governors.g02_browser_types import (
+    BrowserProfile,
+    can_profile_store_credentials,
+    can_profile_write,
+)
+
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass(frozen=True)
+class SafetyCheck:
+    """Single browser preflight check result."""
+    check_id: str
+    check_type: str
+    passed: bool
+    detail: str
+
+
+class BrowserSafetyGuard:
+    """Preflight browser safety gate with no unsafe bypass path."""
+
+    def __init__(self, guard_logger: Optional[logging.Logger] = None):
+        self._logger = guard_logger or logger
+
+    def _new_check(self, check_type: str, passed: bool, detail: str) -> SafetyCheck:
+        return SafetyCheck(
+            check_id=f"CHK-{uuid.uuid4().hex[:12].upper()}",
+            check_type=check_type,
+            passed=passed,
+            detail=detail,
+        )
+
+    def run_preflight(self, profile: BrowserProfile) -> list[SafetyCheck]:
+        """Run required browser profile checks before a session can start."""
+        checks = [
+            self._new_check(
+                "profile_headless_true",
+                profile.headless,
+                "Browser profile must run headless",
+            ),
+            self._new_check(
+                "profile_sandboxed_true",
+                profile.sandboxed,
+                "Browser profile must be sandboxed",
+            ),
+            self._new_check(
+                "no_write_permissions",
+                not can_profile_write(profile),
+                "Browser profile must not allow write permissions",
+            ),
+            self._new_check(
+                "no_credential_storage",
+                not can_profile_store_credentials(profile),
+                "Browser profile must not store credentials",
+            ),
+            self._new_check(
+                "domain_whitelist_non_empty",
+                bool(profile.allowed_domains),
+                "Browser profile must define a non-empty domain whitelist",
+            ),
+        ]
+
+        for check in checks:
+            if not check.passed:
+                self._logger.warning(check.detail)
+
+        return checks
+
+    def is_safe(self, profile: BrowserProfile) -> bool:
+        """Return ``True`` only when every required preflight check passes."""
+        return all(check.passed for check in self.run_preflight(profile))
+
+    def start_session(self, profile: BrowserProfile) -> dict[str, str]:
+        """Start a browser session only when the governed profile is safe."""
+        checks = self.run_preflight(profile)
+        if not all(check.passed for check in checks):
+            raise PermissionError("Unsafe browser profile blocked from starting a session")
+
+        return {
+            "session_id": f"BRW-{uuid.uuid4().hex[:16].upper()}",
+            "profile_id": profile.profile_id,
+        }
 
 
 class BrowserSafetyCheck(Enum):

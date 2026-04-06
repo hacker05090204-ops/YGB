@@ -148,8 +148,8 @@ class ContentHashIndex:
                 data = json.load(f)
             self._url_hashes = data.get("url_hashes", {})
             self._content_hashes = data.get("content_hashes", {})
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Failed to load content hash index from %s: %s", self._index_path, exc)
 
 
 # =========================================================================

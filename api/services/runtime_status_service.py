@@ -78,7 +78,10 @@ def get_runtime_status_payload(
                         _glob.glob(str(project_root / "training" / "*.safetensors"))
                     )
                 except Exception:
-                    pass
+                    logger.debug(
+                        "runtime_status checkpoint enumeration failed",
+                        exc_info=True,
+                    )
 
                 duration_seconds = 0.0
                 wall_clock = _time.time()
@@ -101,7 +104,10 @@ def get_runtime_status_payload(
                                     _dt2.now(_tz2.utc) - ts
                                 ).total_seconds()
                     except Exception:
-                        pass
+                        logger.debug(
+                            "runtime_status event-based duration fallback failed",
+                            exc_info=True,
+                        )
 
                 gpu_temp = 0.0
                 gpu_util_pct = 0.0
@@ -121,7 +127,10 @@ def get_runtime_status_payload(
                         gpu_temp = float(parts[0].strip())
                         gpu_util_pct = float(parts[1].strip())
                 except Exception:
-                    pass
+                    logger.debug(
+                        "runtime_status GPU probe unavailable",
+                        exc_info=True,
+                    )
 
                 cpu_util = 0.0
                 try:
@@ -129,7 +138,10 @@ def get_runtime_status_payload(
 
                     cpu_util = psutil.cpu_percent(interval=0)
                 except Exception:
-                    pass
+                    logger.debug(
+                        "runtime_status CPU probe unavailable",
+                        exc_info=True,
+                    )
 
                 progress_pct = float(status.get("progress", 0) or 0)
                 if is_continuous and is_training:
@@ -210,7 +222,11 @@ def get_runtime_status_payload(
             try:
                 telemetry_path.unlink(missing_ok=True)
             except OSError:
-                pass
+                logger.warning(
+                    "Failed to remove invalid telemetry file: %s",
+                    telemetry_path,
+                    exc_info=True,
+                )
 
             if live_status is not None:
                 logger.warning(
@@ -234,14 +250,20 @@ def get_runtime_status_payload(
                         start = _dt.fromisoformat(str(session.started_at))
                         duration_seconds = (_dt.now(_tz.utc) - start).total_seconds()
                 except Exception:
-                    pass
+                    logger.debug(
+                        "runtime_status live fallback duration probe failed",
+                        exc_info=True,
+                    )
                 cpu_util_val = 0.0
                 try:
                     import psutil
 
                     cpu_util_val = psutil.cpu_percent(interval=0)
                 except Exception:
-                    pass
+                    logger.debug(
+                        "runtime_status live fallback CPU probe unavailable",
+                        exc_info=True,
+                    )
                 gpu_temp_val = 0.0
                 gpu_util_val = 0.0
                 try:
@@ -262,7 +284,10 @@ def get_runtime_status_payload(
                         gpu_temp_val = float(parts[0].strip())
                         gpu_util_val = float(parts[1].strip())
                 except Exception:
-                    pass
+                    logger.debug(
+                        "runtime_status live fallback GPU probe unavailable",
+                        exc_info=True,
+                    )
                 return store_runtime_status_cached(
                     {
                         "api_version": 2,

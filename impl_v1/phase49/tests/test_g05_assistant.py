@@ -3,11 +3,14 @@
 
 import pytest
 from impl_v1.phase49.governors.g05_assistant_mode import (
+    AssistantController,
     AssistantMode,
+    AssistantSession,
     MethodDecision,
     MethodExplanation,
     AssistantExplanation,
     AssistantContext,
+    SessionLog,
     create_method_explanation,
     requires_human_approval,
 )
@@ -16,8 +19,11 @@ from impl_v1.phase49.governors.g05_assistant_mode import (
 class TestEnumClosure:
     """Verify enums are closed."""
     
-    def test_assistant_mode_3_members(self):
-        assert len(AssistantMode) == 3
+    def test_assistant_mode_2_members(self):
+        assert len(AssistantMode) == 2
+
+    def test_assistant_mode_members(self):
+        assert {mode.name for mode in AssistantMode} == {"PASSIVE", "INTERACTIVE"}
     
     def test_method_decision_3_members(self):
         assert len(MethodDecision) == 3
@@ -74,13 +80,13 @@ class TestCreateMethodExplanation:
 class TestAssistantContext:
     """Test assistant context."""
     
-    def test_default_mode_is_explain(self):
+    def test_default_mode_is_passive(self):
         ctx = AssistantContext()
-        assert ctx.mode == AssistantMode.EXPLAIN
+        assert ctx.mode == AssistantMode.PASSIVE
     
     def test_custom_mode(self):
-        ctx = AssistantContext(AssistantMode.GUIDE)
-        assert ctx.mode == AssistantMode.GUIDE
+        ctx = AssistantContext(AssistantMode.INTERACTIVE)
+        assert ctx.mode == AssistantMode.INTERACTIVE
     
     def test_explain_selection(self):
         ctx = AssistantContext()
@@ -151,3 +157,59 @@ class TestRequiresHumanApproval:
         required, reason = requires_human_approval(explanation)
         assert not required
         assert reason == ""
+
+
+class TestAssistantController:
+    """Test assistant controller real-state-only behavior."""
+
+    def test_autonomous_mode_rejected(self):
+        controller = AssistantController()
+
+        with pytest.raises(ValueError, match="AUTONOMOUS mode is not allowed"):
+            controller.start_session("AUTONOMOUS")
+
+    def test_unavailable_data_returns_exact_format(self):
+        controller = AssistantController(
+            state_provider=lambda _query: (False, "system status is offline")
+        )
+
+        session = controller.start_session(AssistantMode.PASSIVE)
+        response = controller.handle_query(session.session_id, "What is the current status?")
+
+        assert response == "Data unavailable: system status is offline"
+
+    def test_query_truncated_in_logs(self, caplog):
+        suffix = "TRUNCATE_THIS_SUFFIX"
+        query = ("Q" * 120) + suffix
+        controller = AssistantController(state_provider=lambda _query: "live system status")
+        session = controller.start_session(AssistantMode.INTERACTIVE)
+
+        with caplog.at_level("INFO"):
+            controller.handle_query(session.session_id, query)
+
+        query_logs = [
+            record.getMessage()
+            for record in caplog.records
+            if "Assistant query session_id=" in record.getMessage()
+        ]
+        assert query_logs
+        assert any(query[:120] in message for message in query_logs)
+        assert all(suffix not in message for message in query_logs)
+
+    def test_start_session_returns_assistant_session(self):
+        controller = AssistantController(state_provider=lambda _query: "runtime ok")
+
+        session = controller.start_session(AssistantMode.PASSIVE)
+
+        assert isinstance(session, AssistantSession)
+        assert session.turn_count == 0
+        assert session.last_query is None
+
+    def test_session_log_is_bounded_to_1000_sessions(self):
+        controller = AssistantController(state_provider=lambda _query: "runtime ok")
+
+        for _ in range(1005):
+            controller.start_session(AssistantMode.PASSIVE)
+
+        assert isinstance(controller.session_log, SessionLog)
+        assert len(controller.session_log) == 1000

@@ -444,8 +444,8 @@ class TrainingStateManager:
                 metrics_registry.set_gauge("drift_kl", drift_value)
         except TrainingPausedException:
             raise
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("Failed to emit drift_kl gauge: %s", exc, exc_info=True)
 
 
 # Singleton instance

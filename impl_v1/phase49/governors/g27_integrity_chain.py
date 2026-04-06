@@ -13,10 +13,14 @@ FAILURE = REPORT INVALID
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 import hashlib
+import logging
 import uuid
 from datetime import datetime, UTC
+
+
+logger = logging.getLogger(__name__)
 
 
 class ChainStatus(Enum):
@@ -59,6 +63,7 @@ class ChainVerificationResult:
     violations: Tuple["IntegrityViolationRecord", ...]
     computed_root_hash: Optional[str]
     is_valid: bool
+    broken_at_index: Optional[int] = None
 
 
 @dataclass(frozen=True)
@@ -149,20 +154,15 @@ class IntegrityChainBuilder:
         self.chain_id = f"CHN-{uuid.uuid4().hex[:16].upper()}"
         self._links: List[ChainLink] = []
         self._sequence = 0
-    
-    def add_evidence(self, evidence_id: str, content: bytes) -> ChainLink:
-        """
-        Add evidence to the chain.
-        
-        Returns the created chain link.
-        """
+
+    def _append_hashed_link(self, evidence_id: str, content_hash: str) -> ChainLink:
+        """Append an already-hashed payload to the chain."""
         if can_integrity_modify_chain() and len(self._links) > 0:  # pragma: no cover
             raise RuntimeError("SECURITY: Cannot modify existing chain")  # pragma: no cover
-        
-        content_hash = compute_content_hash(content)
+
         prev_hash = self._links[-1].link_hash if self._links else None
         link_hash = compute_link_hash(content_hash, prev_hash)
-        
+
         link = ChainLink(
             link_id=f"LNK-{uuid.uuid4().hex[:12].upper()}",
             evidence_id=evidence_id,
@@ -173,15 +173,33 @@ class IntegrityChainBuilder:
             session_id=self.session_id,
             sequence=self._sequence,
         )
-        
+
         self._links.append(link)
         self._sequence += 1
-        
         return link
     
-    def get_chain(self) -> Tuple[ChainLink, ...]:
-        """Get immutable chain."""
-        return tuple(self._links)
+    def add_evidence(self, evidence_id: str, content: bytes) -> ChainLink:
+        """
+        Add evidence to the chain.
+        
+        Returns the created chain link.
+        """
+        content_hash = compute_content_hash(content)
+        return self._append_hashed_link(evidence_id=evidence_id, content_hash=content_hash)
+
+    def append_link(self, payload_hash: str) -> ChainLink:
+        """Append a pre-hashed payload to the chain."""
+        normalized_hash = payload_hash.strip()
+        if not normalized_hash:
+            raise ValueError("payload_hash must not be empty")
+        return self._append_hashed_link(
+            evidence_id=f"EV-{self._sequence:06d}",
+            content_hash=normalized_hash,
+        )
+    
+    def get_chain(self) -> List[ChainLink]:
+        """Get chain snapshot as a list."""
+        return list(self._links)
     
     def get_root_hash(self) -> Optional[str]:
         """Get root hash of current chain."""
@@ -197,7 +215,7 @@ class IntegrityChainVerifier:
     
     def verify_chain(
         self,
-        chain: Tuple[ChainLink, ...],
+        chain: Sequence[ChainLink],
         session_id: str,
     ) -> ChainVerificationResult:
         """
@@ -223,15 +241,23 @@ class IntegrityChainVerifier:
                 violations=(),
                 computed_root_hash=None,
                 is_valid=True,  # Empty chain is valid
+                broken_at_index=None,
             )
         
         violations: List[IntegrityViolationRecord] = []
         verified_count = 0
+        broken_at_index: Optional[int] = None
+
+        def record_violation(index: int, violation: IntegrityViolationRecord) -> None:
+            nonlocal broken_at_index
+            violations.append(violation)
+            if broken_at_index is None:
+                broken_at_index = index
         
         for i, link in enumerate(chain):
             # Check session binding
             if link.session_id != session_id:
-                violations.append(IntegrityViolationRecord(
+                record_violation(i, IntegrityViolationRecord(
                     violation_type=IntegrityViolation.SESSION_MISMATCH,
                     link_id=link.link_id,
                     expected=session_id,
@@ -242,7 +268,7 @@ class IntegrityChainVerifier:
             
             # Check sequence
             if link.sequence != i:
-                violations.append(IntegrityViolationRecord(
+                record_violation(i, IntegrityViolationRecord(
                     violation_type=IntegrityViolation.MISSING_LINK,
                     link_id=link.link_id,
                     expected=str(i),
@@ -255,7 +281,7 @@ class IntegrityChainVerifier:
             if i > 0:
                 expected_prev = chain[i - 1].link_hash
                 if link.prev_hash != expected_prev:
-                    violations.append(IntegrityViolationRecord(
+                    record_violation(i, IntegrityViolationRecord(
                         violation_type=IntegrityViolation.CHAIN_BREAK,
                         link_id=link.link_id,
                         expected=expected_prev,
@@ -266,7 +292,7 @@ class IntegrityChainVerifier:
             else:
                 # Genesis link should have no prev_hash
                 if link.prev_hash is not None:
-                    violations.append(IntegrityViolationRecord(
+                    record_violation(i, IntegrityViolationRecord(
                         violation_type=IntegrityViolation.CHAIN_BREAK,
                         link_id=link.link_id,
                         expected="None",
@@ -278,7 +304,7 @@ class IntegrityChainVerifier:
             # Verify link hash
             expected_link_hash = compute_link_hash(link.content_hash, link.prev_hash)
             if link.link_hash != expected_link_hash:
-                violations.append(IntegrityViolationRecord(
+                record_violation(i, IntegrityViolationRecord(
                     violation_type=IntegrityViolation.HASH_MISMATCH,
                     link_id=link.link_id,
                     expected=expected_link_hash,
@@ -297,6 +323,14 @@ class IntegrityChainVerifier:
             for v in violations
         ):
             status = ChainStatus.BROKEN
+
+        if status == ChainStatus.BROKEN:
+            logger.critical(
+                "Broken integrity chain chain_id=%s broken_at_index=%s violations=%s",
+                chain_id,
+                broken_at_index,
+                "; ".join(f"{v.link_id}:{v.message}" for v in violations),
+            )
         
         return ChainVerificationResult(
             chain_id=chain_id,
@@ -306,6 +340,7 @@ class IntegrityChainVerifier:
             violations=tuple(violations),
             computed_root_hash=compute_chain_root_hash(list(chain)),
             is_valid=is_valid,
+            broken_at_index=broken_at_index,
         )
 
 
@@ -314,7 +349,7 @@ class IntegrityChainVerifier:
 # =============================================================================
 
 def verify_for_report(
-    chain: Tuple[ChainLink, ...],
+    chain: Sequence[ChainLink],
     report_id: str,
     session_id: str,
 ) -> ReportIntegrityStatus:

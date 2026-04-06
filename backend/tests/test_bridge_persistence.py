@@ -135,6 +135,43 @@ class TestBridgeStatePersistence:
         assert counts["total_dropped"] == 3
         assert counts["total_deduped"] == 2
 
+    def test_checkpoint_written_on_hundredth_state_change(self):
+        state = self._make_state()
+        checkpoint_path = Path(self._tmpdir) / ".bridge_checkpoint.json"
+
+        for _ in range(99):
+            state.record_drop(1)
+
+        assert not checkpoint_path.exists()
+
+        state.record_drop(1)
+
+        assert checkpoint_path.exists()
+        with open(checkpoint_path, "r", encoding="utf-8") as f:
+            checkpoint = json.load(f)
+        assert checkpoint["total_dropped"] == 100
+
+    def test_restore_from_corrupt_checkpoint_returns_false(self):
+        state = self._make_state()
+        checkpoint_path = Path(self._tmpdir) / ".bridge_checkpoint.json"
+        checkpoint_path.write_text("{corrupt", encoding="utf-8")
+
+        assert state.restore_from_checkpoint(str(checkpoint_path)) is False
+
+    def test_compute_diff_returns_expected_deltas(self):
+        from backend.bridge.bridge_state import compute_diff
+
+        deltas = compute_diff(
+            {"bridge_count": 10, "bridge_verified_count": 5, "samples_written": 2},
+            {"bridge_count": 10, "bridge_verified_count": 8, "last_ingest_at": "now"},
+        )
+
+        assert [(delta.key, delta.old_val, delta.new_val) for delta in deltas] == [
+            ("bridge_verified_count", 5, 8),
+            ("last_ingest_at", None, "now"),
+            ("samples_written", 2, None),
+        ]
+
 
 class TestReadinessTruth:
     """Readiness must be NO_GO when bridge counters are below threshold."""

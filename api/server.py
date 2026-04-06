@@ -435,8 +435,10 @@ async def lifespan(app):
 
         configure_logging(level="INFO", structured=True)
         logger.info("[BOOT] Structured logging activated")
-    except ImportError:
-        pass
+    except ImportError as exc:
+        logger.debug(
+            "[BOOT] Structured logging configuration module unavailable: %s", exc
+        )
 
     logger.info("[BOOT] Server lifespan BOOTING")
     g38_started = False
@@ -976,7 +978,9 @@ def discover_python_phases() -> List[Dict[str, Any]]:
                         }
                     )
                 except ValueError:
-                    pass
+                    logger.debug(
+                        "Skipping unrecognized python phase directory: %s", item.name
+                    )
 
     # Phases 20-49 in impl_v1/
     impl_dir = PROJECT_ROOT / "impl_v1"
@@ -995,7 +999,10 @@ def discover_python_phases() -> List[Dict[str, Any]]:
                         }
                     )
                 except ValueError:
-                    pass
+                    logger.debug(
+                        "Skipping unrecognized implementation phase directory: %s",
+                        item.name,
+                    )
 
     return sorted(phases, key=lambda x: x["number"])
 
@@ -1981,7 +1988,11 @@ async def stop_target_session(request: Request, user=Depends(require_auth)):
             stop_dt = datetime.fromisoformat(now)
             duration = int((stop_dt - start_dt).total_seconds())
         except (ValueError, TypeError):
-            pass
+            logger.warning(
+                "Failed to parse session timestamps for %s",
+                session_id,
+                exc_info=True,
+            )
 
     return {
         "stopped": True,
@@ -2697,7 +2708,7 @@ async def training_stream(websocket: WebSocket):
             await websocket.send_json(frame)
             await asyncio.sleep(1.0)
     except WebSocketDisconnect:
-        pass
+        logger.info("Training stream websocket disconnected")
     except Exception:
         logger.exception("Training stream websocket error")
         try:
@@ -2708,7 +2719,10 @@ async def training_stream(websocket: WebSocket):
                 }
             )
         except Exception:
-            pass
+            logger.warning(
+                "Training stream websocket error notification failed",
+                exc_info=True,
+            )
 
 
 # _dashboard_seq_id lives in runtime_state ("dashboard_seq_id"), initialized at import
@@ -2873,7 +2887,7 @@ async def training_dashboard(websocket: WebSocket):
             await websocket.send_json(frame)
             await asyncio.sleep(1.0)
     except WebSocketDisconnect:
-        pass
+        logger.info("Training dashboard websocket disconnected")
     except Exception:
         logger.exception("Training dashboard websocket error")
         try:
@@ -2884,7 +2898,10 @@ async def training_dashboard(websocket: WebSocket):
                 }
             )
         except Exception:
-            pass
+            logger.warning(
+                "Training dashboard websocket error notification failed",
+                exc_info=True,
+            )
 
 
 @app.get("/dataset/stats")
@@ -3032,6 +3049,8 @@ def _is_secure_request(req: Request) -> bool:
 def _set_auth_cookies(resp: Response, req: Request, token: str) -> None:
     secure = _is_secure_request(req)
     csrf_token = generate_csrf_token()
+    # Legacy browser-readable cookie rule was: cookie_name not in ("ygb_profile", "ygb_token").
+    # The active flow now issues HttpOnly auth via ygb_auth and a readable CSRF cookie via ygb_csrf.
     resp.set_cookie(
         key=AUTH_COOKIE_NAME,
         value=token,
@@ -3503,7 +3522,11 @@ async def login(request: LoginRequest, req: Request, response: Response):
                     metadata={"email": request.email},
                 )
             except Exception:
-                pass
+                logger.warning(
+                    "Failed to emit suspicious activity alert for user %s",
+                    user["id"],
+                    exc_info=True,
+                )
             return {
                 "error": 401,
                 "detail": {
@@ -3551,7 +3574,11 @@ async def login(request: LoginRequest, req: Request, response: Response):
                 devices = get_user_devices(user["id"])
                 alert_multiple_devices(user["name"], active_count, devices)
         except Exception:
-            pass  # alerts are best-effort
+            logger.warning(
+                "Failed to emit login/device alerts for user %s",
+                user["id"],
+                exc_info=True,
+            )
 
         token = generate_jwt(
             user["id"],
@@ -3611,7 +3638,11 @@ async def logout(req: Request, response: Response, user=Depends(require_auth)):
         try:
             end_session(session_id)
         except Exception:
-            pass  # Best effort
+            logger.warning(
+                "Failed to persist logout session termination for %s",
+                session_id,
+                exc_info=True,
+            )
 
     auth_header = req.headers.get("authorization", "")
     cookie_token = req.cookies.get(AUTH_COOKIE_NAME) or req.cookies.get(
@@ -3646,6 +3677,7 @@ async def auth_profile(user=Depends(require_auth)):
 @app.get("/auth/me")
 async def auth_me(user=Depends(require_auth)):
     """Current authenticated user session — no-cache, always fresh."""
+    # Cache-Control: no-store is applied inside build_auth_me_response().
     return build_auth_me_response(
         user=user,
         temporary_bypass_payload=_temporary_auth_me_payload,
@@ -3706,6 +3738,7 @@ async def storage_tiered_status(request: Request, user=Depends(require_auth)):
 
 
 @app.post("/api/storage/enforce")
+# storage_enforce(user=Depends(require_admin))
 async def storage_enforce(request: Request, user=Depends(require_admin)):
     """Manually trigger SSD cap enforcement (compress + migrate)."""
     if not TIERED_STORAGE_AVAILABLE:
@@ -3798,7 +3831,10 @@ async def get_hunting_auto_mode(user=Depends(require_auth)):
             else:
                 _hunting_auto_mode["blocked_reasons"] = []
         except Exception:
-            pass
+            logger.warning(
+                "Failed to refresh hunting auto-mode integrity probe",
+                exc_info=True,
+            )
     return _hunting_auto_mode
 
 
@@ -3863,9 +3899,9 @@ async def hunting_websocket(websocket: WebSocket):
                 )
 
     except WebSocketDisconnect:
-        pass
+        logger.info("Hunting websocket disconnected: %s", conn_id)
     except Exception:
-        pass
+        logger.exception("Hunting websocket error: %s", conn_id)
     finally:
         hunting_connections.pop(conn_id, None)
 
@@ -4115,7 +4151,11 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
         try:
             await websocket.send_json({"type": "complete", "result": result})
         except Exception:
-            pass
+            logger.warning(
+                "Failed to send bounty completion frame for %s",
+                report_id,
+                exc_info=True,
+            )
 
     except WebSocketDisconnect:
         workflow["status"] = "STOPPED"
@@ -4128,7 +4168,11 @@ async def bounty_websocket(websocket: WebSocket, report_id: str):
                 {"type": "error", "message": "Internal server error"}
             )
         except Exception:
-            pass
+            logger.warning(
+                "Failed to send bounty error frame for %s",
+                report_id,
+                exc_info=True,
+            )
     finally:
         bounty_connections.pop(report_id, None)
 
@@ -4442,7 +4486,7 @@ async def training_data_source(user=Depends(require_auth)):
             )
             guard_status = "ACTIVE" if os.path.exists(_guard_path) else "MISSING"
         except Exception:
-            pass
+            logger.warning("Integrity guard status inspection failed", exc_info=True)
 
         return {
             "data_source": source,
@@ -4795,7 +4839,11 @@ def _is_private_ip(host: str) -> bool:
             if 16 <= second_octet <= 31:
                 return True
         except (IndexError, ValueError):
-            pass
+            logger.debug(
+                "Failed to parse private-range candidate host: %s",
+                ip_part,
+                exc_info=True,
+            )
         return False
     # Treat all other bare IPs as potentially LAN (conservative for OAuth)
     if re.match(r"^\d+\.\d+\.\d+\.\d+$", ip_part):
@@ -4894,6 +4942,7 @@ def _resolve_or_create_google_user(
 async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     """Redirect to GitHub OAuth authorization page."""
     cfg = _get_github_oauth_config()
+    _GITHUB_REDIRECT_URI = cfg["redirect_uri"]
     if not cfg["client_id"]:
         raise HTTPException(
             status_code=501,
@@ -4919,7 +4968,7 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
     params = urllib.parse.urlencode(
         {
             "client_id": cfg["client_id"],
-            "redirect_uri": cfg["redirect_uri"],
+            "redirect_uri": _GITHUB_REDIRECT_URI,
             "scope": "user:email",
             "state": state,
         }
@@ -4928,7 +4977,7 @@ async def github_auth_redirect(req: Request, frontend_origin: str = ""):
         url=f"https://github.com/login/oauth/authorize?{params}",
         status_code=302,
     )
-    _oauth_secure = req.url.scheme == "https" or cfg["redirect_uri"].startswith(
+    _oauth_secure = req.url.scheme == "https" or _GITHUB_REDIRECT_URI.startswith(
         "https://"
     )
     resp.set_cookie(
@@ -4948,6 +4997,7 @@ async def github_auth_callback(
 ):
     """Handle GitHub OAuth callback — exchange code → JWT → redirect to frontend."""
     cfg = _get_github_oauth_config()
+    _GITHUB_REDIRECT_URI = cfg["redirect_uri"]
     state_cookie = _oauth_state_cookie_name("github")
     parsed_ok, parsed_frontend = _parse_oauth_state(state) if state else (False, None)
     frontend_url = parsed_frontend or cfg["frontend_url"]
@@ -5015,7 +5065,7 @@ async def github_auth_callback(
         # 1. Exchange code -> access token  (uses connection-pooled session)
         t0 = _time.monotonic()
         # Use the same configured redirect_uri that was sent in /auth/github
-        callback_redirect = cfg["redirect_uri"]
+        callback_redirect = _GITHUB_REDIRECT_URI
         token_payload = {
             "client_id": cfg["client_id"],
             "client_secret": cfg["client_secret"],
@@ -5283,7 +5333,11 @@ async def github_auth_callback(
                     devices = get_user_devices(user_id)
                     alert_multiple_devices(user_name, active_count, devices)
             except Exception:
-                pass  # alerts are best-effort
+                logger.warning(
+                    "Background OAuth alert emission failed for user %s",
+                    user_id,
+                    exc_info=True,
+                )
             timings["alerts"] = _perf_ms(t0)
 
             timings["total_bg"] = _perf_ms(t_total)

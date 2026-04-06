@@ -34,8 +34,8 @@ class OSVAdapter(BaseAdapter):
                         elif isinstance(value, str):
                             try:
                                 scores.append(float(value))
-                            except ValueError:
-                                pass
+                            except ValueError as exc:
+                                logger.debug("Skipping non-numeric OSV score value %r: %s", value, exc)
                     visit(value)
             elif isinstance(node, list):
                 for item in node:

@@ -390,8 +390,8 @@ class AutoTrainer:
         except Exception:
             try:
                 os.remove(tmp_path)
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.warning("Failed to remove temporary JSON file %s: %s", tmp_path, exc)
             raise
 
     @staticmethod
@@ -1222,6 +1222,7 @@ class AutoTrainer:
 
     def _gpu_train_step(self) -> tuple:
         """Execute one FULL EPOCH over the entire DataLoader with AMP."""
+        # Real training iterates over self._gpu_dataloader inside gpu_train_step().
         return gpu_train_step(
             self,
             logger,
@@ -1243,8 +1244,8 @@ class AutoTrainer:
             import torch
 
             gpu_available = torch.cuda.is_available()
-        except ImportError:
-            pass
+        except ImportError as exc:
+            logger.debug("PyTorch unavailable during idle GPU detection: %s", exc)
 
         return IdleConditions(
             no_active_scan=not scan_active,

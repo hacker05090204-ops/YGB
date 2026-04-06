@@ -1,0 +1,12 @@
+{
+  "entity_id": "test-8dea5bd0",
+  "entity_type": "users",
+  "lifecycle_state": "COMPLETED",
+  "created_at": "2026-04-06T19:56:13.853495+00:00",
+  "updated_at": "2026-04-06T19:56:13.886731+00:00",
+  "backup_verified": false,
+  "integrity_verified": true,
+  "legal_hold": false,
+  "record_count": 2,
+  "total_bytes": 250
+}

@@ -57,19 +57,19 @@ def emit_training_event(
     if trainer._on_event_callback:
         try:
             trainer._on_event_callback(event)
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("Training event callback failed: %s", exc)
 
     if trainer._telegram_notifier is not None:
         try:
             trainer._telegram_notifier.notify(event, trainer.get_status())
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Telegram notifier skipped: %s", exc)
 
     try:
         write_worker_status(trainer, logger)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Worker status write skipped after event emission: %s", exc)
 
     return event
 

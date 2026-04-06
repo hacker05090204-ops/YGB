@@ -1,0 +1,120 @@
+........................................................................ [  1%]
+........................................................................ [  3%]
+........................................................................ [  5%]
+........................................................................ [  6%]
+........................................................................ [  8%]
+........................................................................ [ 10%]
+........................................................................ [ 11%]
+........................................................................ [ 13%]
+........................................................................ [ 15%]
+........................................................................ [ 17%]
+........................................................................ [ 18%]
+........................................................................ [ 20%]
+........................................................................ [ 22%]
+........................................................................ [ 23%]
+........................................................................ [ 25%]
+........................................................................ [ 27%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+........................................................................ [ 32%]
+........................................................................ [ 34%]
+........................................................................ [ 35%]
+........................................................................ [ 37%]
+........................................................................ [ 39%]
+........................................................................ [ 41%]
+........................................................................ [ 42%]
+........................................................................ [ 44%]
+........................................................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 49%]
+........................................................................ [ 51%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 56%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 61%]
+........................................................................ [ 63%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 68%]
+........................................................................ [ 70%]
+........................................................................ [ 71%]
+........................................................................ [ 73%]
+........................................................................ [ 75%]
+........................................................................ [ 77%]
+........................................................................ [ 78%]
+........................................................................ [ 80%]
+........................................................................ [ 82%]
+........................................................................ [ 83%]
+........................................................................ [ 85%]
+........................................................................ [ 87%]
+........................................................................ [ 89%]
+........................................................................ [ 90%]
+........................................................................ [ 92%]
+........................................................................ [ 94%]
+..................................s..................................... [ 95%]
+........................................................................ [ 97%]
+........................................................................ [ 99%]
+.........................                                                [100%]
+============================== warnings summary ===============================
+backend\auth\auth_guard.py:37
+  c:\Users\Unkno\Videos\New folder\YGB-main (1)\backend\auth\auth_guard.py:37: RuntimeWarning: [AUTH] JWT_SECRET not set. Token operations will fail. Set JWT_SECRET environment variable before starting the server.
+    from backend.auth.auth import verify_jwt, verify_csrf_token
+
+impl_v1\phase49\governors\g29_voice_stt.py:23
+  c:\Users\Unkno\Videos\New folder\YGB-main (1)\impl_v1\phase49\governors\g29_voice_stt.py:23: DeprecationWarning: 'audioop' is deprecated and slated for removal in Python 3.13
+    import audioop
+
+impl_v1\phase49\governors\g32_reasoning_scope_engine.py:50
+  c:\Users\Unkno\Videos\New folder\YGB-main (1)\impl_v1\phase49\governors\g32_reasoning_scope_engine.py:50: PytestCollectionWarning: cannot collect test class 'TestCategory' because it has a __init__ constructor (from: impl_v1/phase49/tests/test_g32_reasoning_scope_engine.py)
+    class TestCategory(Enum):
+
+impl_v1\phase49\governors\g32_reasoning_scope_engine.py:111
+  c:\Users\Unkno\Videos\New folder\YGB-main (1)\impl_v1\phase49\governors\g32_reasoning_scope_engine.py:111: PytestCollectionWarning: cannot collect test class 'TestSelectionReasoning' because it has a __init__ constructor (from: impl_v1/phase49/tests/test_g32_reasoning_scope_engine.py)
+    @dataclass(frozen=True)
+
+impl_v1\phase49\governors\g32_reasoning_scope_engine.py:120
+  c:\Users\Unkno\Videos\New folder\YGB-main (1)\impl_v1\phase49\governors\g32_reasoning_scope_engine.py:120: PytestCollectionWarning: cannot collect test class 'TestSelectionResult' because it has a __init__ constructor (from: impl_v1/phase49/tests/test_g32_reasoning_scope_engine.py)
+    @dataclass(frozen=True)
+
+backend/tests/test_coverage_boost.py::TestAuthServerHelpers::test_load_json_file_missing
+  c:\Users\Unkno\Videos\New folder\YGB-main (1)\backend\tests\test_coverage_boost.py:39: DeprecationWarning: auth_server.py is deprecated and unmounted. Use backend/auth/auth.py and auth_guard.py instead.
+    from backend.api.auth_server import load_json
+
+backend/tests/test_coverage_boost7_real.py::TestAdminAuthRealJWT::test_real_jwt_tampering_detected
+  C:\Users\Unkno\AppData\Roaming\Python\Python311\site-packages\jwt\api_jwt.py:371: InsecureKeyLengthWarning: The HMAC key is 12 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+    decoded = self.decode_complete(
+
+impl_v1/phase49/tests/test_operational_validation.py::test_corrupted_har
+  C:\Users\Unkno\AppData\Roaming\Python\Python311\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but impl_v1/phase49/tests/test_operational_validation.py::test_corrupted_har returned <class 'impl_v1.phase49.validation.chaos_tests.ChaosResult'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+impl_v1/phase49/tests/test_operational_validation.py::test_malformed_dom
+  C:\Users\Unkno\AppData\Roaming\Python\Python311\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but impl_v1/phase49/tests/test_operational_validation.py::test_malformed_dom returned <class 'impl_v1.phase49.validation.chaos_tests.ChaosResult'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+impl_v1/phase49/tests/test_operational_validation.py::test_large_payload
+  C:\Users\Unkno\AppData\Roaming\Python\Python311\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but impl_v1/phase49/tests/test_operational_validation.py::test_large_payload returned <class 'impl_v1.phase49.validation.chaos_tests.ChaosResult'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+impl_v1/phase49/tests/test_operational_validation.py::test_interrupted_training
+  C:\Users\Unkno\AppData\Roaming\Python\Python311\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but impl_v1/phase49/tests/test_operational_validation.py::test_interrupted_training returned <class 'impl_v1.phase49.validation.chaos_tests.ChaosResult'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+impl_v1/phase49/tests/test_operational_validation.py::test_generalization
+  C:\Users\Unkno\AppData\Roaming\Python\Python311\site-packages\_pytest\python.py:170: PytestReturnNotNoneWarning: Test functions should return None, but impl_v1/phase49/tests/test_operational_validation.py::test_generalization returned <class 'impl_v1.phase49.validation.stability_tests.GeneralizationResult'>.
+  Did you mean to use `assert` instead of `return`?
+  See https://docs.pytest.org/en/stable/how-to/assert.html#return-not-none for more information.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+4200 passed, 1 skipped, 12 warnings in 293.32s (0:04:53)

@@ -33,6 +33,7 @@ from typing import Optional, List, Dict, Tuple
 import uuid
 from datetime import datetime, UTC
 import hashlib
+import re
 
 
 class ReportSection(Enum):
@@ -68,6 +69,49 @@ FORBIDDEN_WORDS = frozenset([
     "perhaps", "probably", "seems like", "appears to",
     "i think", "i believe", "in my opinion",
 ])
+SUPPORTED_REASONING_TYPES = frozenset({
+    "scope_analysis",
+    "risk_assessment",
+    "duplicate_check",
+    "evidence_evaluation",
+})
+_REASONING_TYPE_LABELS = {
+    "scope_analysis": "Scope analysis derived from provided context",
+    "risk_assessment": "Risk assessment derived from provided context",
+    "duplicate_check": "Duplicate check derived from provided context",
+    "evidence_evaluation": "Evidence evaluation derived from provided context",
+}
+_REASONING_TYPE_KEYWORDS = {
+    "scope_analysis": frozenset({
+        "scope", "allowed", "excluded", "in scope", "out of scope",
+        "wildcard", "cidr", "domain", "host", "ip",
+    }),
+    "risk_assessment": frozenset({
+        "risk", "severity", "impact", "critical", "high", "medium", "low",
+        "exposure", "business", "priority",
+    }),
+    "duplicate_check": frozenset({
+        "duplicate", "overlap", "historical", "acceptance", "density", "cve",
+        "prior", "existing",
+    }),
+    "evidence_evaluation": frozenset({
+        "evidence", "screenshot", "screen", "log", "response", "request",
+        "header", "observation", "metadata", "cve",
+    }),
+}
+_EVIDENCE_MARKERS = frozenset({
+    "evidence", "screenshot", "screen", "log", "response", "request",
+    "header", "observation", "metadata", "cve",
+})
+_CONTEXT_COMPLETENESS_GROUPS = {
+    "target": frozenset({"target", "host", "domain", "url", "ip"}),
+    "scope": frozenset({"scope", "allowed", "excluded", "in scope", "out of scope", "wildcard", "cidr"}),
+    "evidence": _EVIDENCE_MARKERS,
+    "analysis": frozenset({"risk", "severity", "impact", "duplicate", "overlap", "acceptance", "reasoning"}),
+}
+_ASSET_REFERENCE_PATTERN = re.compile(
+    r"(?:\*\.)?[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+|(?:\d{1,3}\.){3}\d{1,3}(?:/\d{1,2})?"
+)
 _REASONING_PATTERNS = {
     "XSS": "User input is reflected in response without sanitization. This allows script injection.",
     "SQLi": "User input is concatenated into SQL query without parameterization. This allows query manipulation.",
@@ -151,6 +195,195 @@ class ReasoningResult:
     video_meta: Optional[VideoNarrationMeta]
     error_message: Optional[str]
     timestamp: str
+
+
+class ReasoningDepthError(RuntimeError):
+    """Raised when a reasoning session exceeds the hard depth limit."""
+
+
+@dataclass(frozen=True)
+class ReasoningStep:
+    """Single immutable reasoning step."""
+    step_id: str
+    input_context: str
+    reasoning_type: str
+    output: str
+    confidence: float
+
+
+@dataclass(frozen=True)
+class ReasoningAuditLog:
+    """Immutable audit record of reasoning steps for a session."""
+    session_id: str
+    steps: tuple  # Tuple[ReasoningStep, ...]
+    created_at: str
+
+    def with_step(self, step: ReasoningStep) -> "ReasoningAuditLog":
+        """Return a new immutable audit log containing the appended step."""
+        return ReasoningAuditLog(
+            session_id=self.session_id,
+            steps=self.steps + (step,),
+            created_at=self.created_at,
+        )
+
+
+def _split_context_lines(context: str) -> List[str]:
+    """Split context into non-empty normalized lines."""
+    return [line.strip() for line in context.splitlines() if line.strip()]
+
+
+def _collect_evidence_lines(lines: List[str]) -> List[str]:
+    """Collect lines that explicitly reference evidence."""
+    evidence_lines = []
+    for line in lines:
+        line_lower = line.lower()
+        if any(marker in line_lower for marker in _EVIDENCE_MARKERS):
+            evidence_lines.append(line)
+    return evidence_lines
+
+
+def _calculate_context_completeness(context: str) -> float:
+    """Score how complete the supplied reasoning context is."""
+    context_lower = context.lower()
+    matched_groups = 0
+    for markers in _CONTEXT_COMPLETENESS_GROUPS.values():
+        if any(marker in context_lower for marker in markers):
+            matched_groups += 1
+    return matched_groups / len(_CONTEXT_COMPLETENESS_GROUPS)
+
+
+def _calculate_scope_match_strength(context: str) -> float:
+    """Derive scope signal strength from explicit scope markers in the context."""
+    context_lower = context.lower()
+    has_asset_reference = bool(_ASSET_REFERENCE_PATTERN.search(context))
+    has_explicit_scope = any(
+        marker in context_lower
+        for marker in ("in scope", "out of scope", "allowed", "excluded")
+    )
+    has_wildcard = "*." in context or "wildcard" in context_lower
+    has_cidr = bool(re.search(r"\b(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}\b", context)) or "cidr" in context_lower
+    has_generic_scope = "scope" in context_lower
+
+    if has_explicit_scope and has_asset_reference and not (has_wildcard or has_cidr):
+        return 1.0
+    if has_explicit_scope and (has_wildcard or has_cidr):
+        return 0.9
+    if has_generic_scope or has_asset_reference:
+        return 0.7
+    return 0.4
+
+
+def _summarize_scope_signal(context: str) -> str:
+    """Summarize scope indicators using only facts visible in the context."""
+    context_lower = context.lower()
+    has_asset_reference = bool(_ASSET_REFERENCE_PATTERN.search(context))
+    has_explicit_scope = any(
+        marker in context_lower
+        for marker in ("in scope", "out of scope", "allowed", "excluded")
+    )
+    has_wildcard = "*." in context or "wildcard" in context_lower
+    has_cidr = bool(re.search(r"\b(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}\b", context)) or "cidr" in context_lower
+
+    if has_explicit_scope and has_asset_reference and has_wildcard:
+        return "explicit wildcard scope reference found"
+    if has_explicit_scope and has_asset_reference and has_cidr:
+        return "explicit CIDR scope reference found"
+    if has_explicit_scope and has_asset_reference:
+        return "explicit scope rule with asset reference found"
+    if "scope" in context_lower:
+        return "generic scope reference found"
+    return "no explicit scope reference found"
+
+
+def _extract_relevant_lines(context: str, reasoning_type: str) -> Tuple[str, ...]:
+    """Extract context lines relevant to the requested reasoning type."""
+    lines = _split_context_lines(context)
+    keywords = _REASONING_TYPE_KEYWORDS[reasoning_type]
+    relevant = []
+    for line in lines:
+        line_lower = line.lower()
+        if any(keyword in line_lower for keyword in keywords):
+            relevant.append(line)
+
+    if not relevant:
+        relevant = lines[:2]
+
+    return tuple(dict.fromkeys(relevant[:3]))
+
+
+def _derive_reasoning_output(context: str, reasoning_type: str) -> str:
+    """Create a factual reasoning summary using only the provided context."""
+    lines = _split_context_lines(context)
+    relevant_lines = _extract_relevant_lines(context, reasoning_type)
+    evidence_count = len(_collect_evidence_lines(lines))
+    scope_summary = _summarize_scope_signal(context)
+    label = _REASONING_TYPE_LABELS[reasoning_type]
+
+    if relevant_lines:
+        excerpts = " | ".join(relevant_lines)
+        return (
+            f"{label}: {excerpts}. "
+            f"Evidence indicators found: {evidence_count}. "
+            f"Scope signal: {scope_summary}."
+        )
+
+    return (
+        f"{label}: no explicit indicators were present in the provided context. "
+        f"Evidence indicators found: {evidence_count}. "
+        f"Scope signal: {scope_summary}."
+    )
+
+
+def _derive_reasoning_confidence(context: str) -> float:
+    """Derive confidence from completeness, evidence count, and scope-match strength."""
+    lines = _split_context_lines(context)
+    context_completeness = _calculate_context_completeness(context)
+    evidence_count = len(_collect_evidence_lines(lines))
+    evidence_score = min(evidence_count / 3, 1.0)
+    scope_match_strength = _calculate_scope_match_strength(context)
+    confidence = (context_completeness * 0.4) + (evidence_score * 0.3) + (scope_match_strength * 0.3)
+    return round(min(max(confidence, 0.0), 1.0), 3)
+
+
+class ReasoningEngine:
+    """Deterministic reasoning session manager with immutable audit logging."""
+
+    MAX_REASONING_DEPTH = 5
+
+    def __init__(self, session_id: Optional[str] = None):
+        self.session_id = session_id or f"RSN-SESSION-{uuid.uuid4().hex[:12].upper()}"
+        self._audit_log = ReasoningAuditLog(
+            session_id=self.session_id,
+            steps=tuple(),
+            created_at=datetime.now(UTC).isoformat(),
+        )
+
+    @property
+    def audit_log(self) -> ReasoningAuditLog:
+        """Return the immutable audit log for this reasoning session."""
+        return self._audit_log
+
+    def reason(self, context: str, reasoning_type: str) -> ReasoningStep:
+        """Create a single deterministic reasoning step and append it to the audit log."""
+        if not isinstance(context, str) or not context.strip():
+            raise ValueError("context must be a non-empty string")
+        if reasoning_type not in SUPPORTED_REASONING_TYPES:
+            raise ValueError(f"Unsupported reasoning type: {reasoning_type}")
+        if len(self._audit_log.steps) >= self.MAX_REASONING_DEPTH:
+            raise ReasoningDepthError(
+                f"Maximum reasoning depth of {self.MAX_REASONING_DEPTH} steps exceeded for session {self.session_id}"
+            )
+
+        normalized_context = context.strip()
+        step = ReasoningStep(
+            step_id=f"RST-{uuid.uuid4().hex[:16].upper()}",
+            input_context=normalized_context,
+            reasoning_type=reasoning_type,
+            output=_derive_reasoning_output(normalized_context, reasoning_type),
+            confidence=_derive_reasoning_confidence(normalized_context),
+        )
+        self._audit_log = self._audit_log.with_step(step)
+        return step
 
 
 def create_evidence_item(

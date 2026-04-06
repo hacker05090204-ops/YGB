@@ -75,6 +75,18 @@ class LicenseValidation:
 
 
 @dataclass(frozen=True)
+class LicenseRecord:
+    """Persisted active license record."""
+
+    license_id: str
+    owner_id: str
+    issued_at: str
+    expires_at: Optional[str]
+    features: list[str]
+    valid: bool
+
+
+@dataclass(frozen=True)
 class PrivacyConfig:
     """Privacy protection configuration."""
 
@@ -100,6 +112,7 @@ _DEFAULT_LICENSE_PATHS = (
     _PROJECT_ROOT / "config" / "licenses.json",
     _PROJECT_ROOT / "config" / "license_registry.json",
 )
+_ACTIVE_LICENSE_PATH = _PROJECT_ROOT / "secure_data" / "license.json"
 
 
 def _now_iso() -> str:
@@ -158,6 +171,120 @@ def _parse_timestamp(value: object) -> Optional[datetime]:
         return parsed
     except ValueError:
         return None
+
+
+def _normalize_feature_list(raw_features: object) -> list[str]:
+    if not isinstance(raw_features, list):
+        return []
+
+    normalized: list[str] = []
+    for feature in raw_features:
+        text = str(feature).strip()
+        if text:
+            normalized.append(text)
+    return normalized
+
+
+def _coerce_bool(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
+class LicenseAuditLog:
+    """In-memory audit trail for license validation."""
+
+    def __init__(self) -> None:
+        self._entries: list[dict[str, object]] = []
+
+    @property
+    def entries(self) -> list[dict[str, object]]:
+        return list(self._entries)
+
+    def record(
+        self,
+        record: Optional[LicenseRecord],
+        validation_passed: bool,
+        reason: str,
+    ) -> None:
+        self._entries.append(
+            {
+                "timestamp": _now_iso(),
+                "license_id": record.license_id if record else None,
+                "owner_id": record.owner_id if record else None,
+                "validation_passed": validation_passed,
+                "reason": reason,
+            }
+        )
+
+
+class LicenseValidator:
+    """Validate persisted active license records."""
+
+    def __init__(self, audit_log: Optional[LicenseAuditLog] = None) -> None:
+        self.audit_log = audit_log or LicenseAuditLog()
+
+    def validate(self, record: Optional[LicenseRecord]) -> bool:
+        validation_passed, reason = self._evaluate(record)
+        self.audit_log.record(record, validation_passed, reason)
+        return validation_passed
+
+    def _evaluate(self, record: Optional[LicenseRecord]) -> tuple[bool, str]:
+        if record is None:
+            return False, "No active license"
+        if not record.valid:
+            return False, "License marked invalid"
+        if not str(record.owner_id).strip():
+            return False, "License owner_id is required"
+        if _parse_timestamp(record.issued_at) is None:
+            return False, "License issued_at must be parseable"
+
+        if record.expires_at not in (None, ""):
+            expires_at = _parse_timestamp(record.expires_at)
+            if expires_at is None:
+                return False, "License expires_at must be parseable"
+            if expires_at <= datetime.now(UTC):
+                return False, "License expired"
+
+        if not _normalize_feature_list(record.features):
+            return False, "License must include at least one feature"
+
+        return True, "License valid"
+
+
+class LicenseStore:
+    """Load the active license from secure storage."""
+
+    def __init__(self, path: Optional[Path] = None) -> None:
+        self.path = Path(path) if path is not None else _ACTIVE_LICENSE_PATH
+
+    def load(self) -> Optional[LicenseRecord]:
+        if not self.path.exists():
+            return None
+
+        try:
+            payload = json.loads(self.path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            return None
+
+        if not isinstance(payload, dict):
+            return None
+
+        record = payload.get("license", payload)
+        if not isinstance(record, dict):
+            return None
+
+        expires_at = record.get("expires_at")
+        return LicenseRecord(
+            license_id=str(record.get("license_id") or ""),
+            owner_id=str(record.get("owner_id") or ""),
+            issued_at=str(record.get("issued_at") or ""),
+            expires_at=None if expires_at in (None, "") else str(expires_at),
+            features=_normalize_feature_list(record.get("features")),
+            valid=_coerce_bool(record.get("valid", False)),
+        )
 
 
 def _get_license_secret() -> Optional[str]:
@@ -479,6 +606,28 @@ def validate_license(
         device,
         "License key not recognized by configured registry",
     )
+
+
+def is_licensed(
+    feature: str,
+    *,
+    store: Optional[LicenseStore] = None,
+    validator: Optional[LicenseValidator] = None,
+) -> bool:
+    """Check whether the active license authorizes a specific feature."""
+
+    requested_feature = str(feature).strip()
+    if not requested_feature:
+        return False
+
+    active_store = store or LicenseStore()
+    active_validator = validator or LicenseValidator()
+    active_license = active_store.load()
+    if not active_validator.validate(active_license):
+        return False
+
+    assert active_license is not None
+    return requested_feature in _normalize_feature_list(active_license.features)
 
 
 def apply_timing_jitter(config: PrivacyConfig) -> int:

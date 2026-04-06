@@ -17,6 +17,8 @@ import stat
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0, os.path.join(PROJECT_ROOT, 'backend'))
@@ -55,6 +57,17 @@ class TestKeyFingerprint(unittest.TestCase):
 class TestFilePermissions(unittest.TestCase):
     """Test file permission checking."""
 
+    @staticmethod
+    def _check_posix_mode(mode: int):
+        module = sys.modules[KeyManager.__module__]
+        fake_stat = SimpleNamespace(st_mode=mode)
+        with patch.object(module.os, "name", "posix"), patch.object(
+            module.os,
+            "stat",
+            return_value=fake_stat,
+        ):
+            return KeyManager._check_file_permissions("synthetic-key-path")
+
     def test_windows_always_passes(self):
         """On Windows, NTFS ACLs are trusted — always passes."""
         if os.name == 'nt':
@@ -70,46 +83,22 @@ class TestFilePermissions(unittest.TestCase):
         else:
             self.skipTest("Windows-specific test")
 
-    @unittest.skipIf(os.name == 'nt', "POSIX permission test")
     def test_mode_600_passes(self):
         """Mode 0o600 passes permission check."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
-            f.write(b"secret")
-            path = f.name
-        try:
-            os.chmod(path, 0o600)
-            ok, reason = KeyManager._check_file_permissions(path)
-            self.assertTrue(ok)
-        finally:
-            os.unlink(path)
+        ok, reason = self._check_posix_mode(stat.S_IFREG | 0o600)
+        self.assertTrue(ok)
 
-    @unittest.skipIf(os.name == 'nt', "POSIX permission test")
     def test_world_readable_rejected(self):
         """Mode 0o644 (world-readable) is rejected."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
-            f.write(b"secret")
-            path = f.name
-        try:
-            os.chmod(path, 0o644)
-            ok, reason = KeyManager._check_file_permissions(path)
-            self.assertFalse(ok)
-            self.assertIn("INSECURE_PERMISSIONS", reason)
-        finally:
-            os.unlink(path)
+        ok, reason = self._check_posix_mode(stat.S_IFREG | 0o644)
+        self.assertFalse(ok)
+        self.assertIn("INSECURE_PERMISSIONS", reason)
 
-    @unittest.skipIf(os.name == 'nt', "POSIX permission test")
     def test_group_readable_rejected(self):
         """Mode 0o640 (group-readable) is rejected."""
-        with tempfile.NamedTemporaryFile(delete=False) as f:
-            f.write(b"secret")
-            path = f.name
-        try:
-            os.chmod(path, 0o640)
-            ok, reason = KeyManager._check_file_permissions(path)
-            self.assertFalse(ok)
-            self.assertIn("INSECURE_PERMISSIONS", reason)
-        finally:
-            os.unlink(path)
+        ok, reason = self._check_posix_mode(stat.S_IFREG | 0o640)
+        self.assertFalse(ok)
+        self.assertIn("INSECURE_PERMISSIONS", reason)
 
 
 class TestAuditLog(unittest.TestCase):

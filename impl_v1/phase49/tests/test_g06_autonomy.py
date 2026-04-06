@@ -2,9 +2,13 @@
 """Tests for G06: Autonomy Modes"""
 
 import pytest
+
+from backend.governance.approval_ledger import ApprovalLedger
 from impl_v1.phase49.governors.g06_autonomy_modes import (
     AutonomyMode,
     AutonomyAction,
+    AutonomyController,
+    AutonomyLevel,
     SessionStatus,
     AutonomySession,
     create_session,
@@ -17,11 +21,30 @@ from impl_v1.phase49.governors.g06_autonomy_modes import (
 )
 
 
+def _build_controller(tmp_path, monkeypatch):
+    monkeypatch.setenv("YGB_APPROVAL_SECRET", "phase49-test-approval-secret")
+    ledger = ApprovalLedger(ledger_path=str(tmp_path / "approval_ledger.jsonl"))
+    return AutonomyController(approval_ledger=ledger), ledger
+
+
+def _append_transition_approval(ledger, field_id: int, approver_id: str = "operator-1"):
+    token = ledger.sign_approval(
+        field_id=field_id,
+        approver_id=approver_id,
+        reason="Authorize autonomy transition",
+    )
+    ledger.append(token, expected_field_id=field_id)
+    return token
+
+
 class TestEnumClosure:
     """Verify enums are closed."""
     
     def test_autonomy_mode_3_members(self):
         assert len(AutonomyMode) == 3
+
+    def test_autonomy_level_3_members(self):
+        assert len(AutonomyLevel) == 3
     
     def test_autonomy_action_8_members(self):
         assert len(AutonomyAction) == 8
@@ -155,3 +178,35 @@ class TestDataclassFrozen:
         session = create_session(AutonomyMode.READ_ONLY)
         with pytest.raises(AttributeError):
             session.status = SessionStatus.STOPPED
+
+
+class TestAutonomyController:
+    """Test the human-authorized autonomy controller."""
+
+    def test_transition_requires_authorization_token(self, tmp_path, monkeypatch):
+        controller, ledger = _build_controller(tmp_path, monkeypatch)
+
+        assert controller.request_transition(AutonomyLevel.ASSISTED, "operator-1") is False
+
+        _append_transition_approval(ledger, controller.approval_field_id, "operator-1")
+
+        assert controller.request_transition(AutonomyLevel.ASSISTED, "operator-1") is True
+        assert controller.get_current_mode() == AutonomyLevel.ASSISTED
+
+        records = controller.transition_log.snapshot()
+        assert len(records) == 2
+        assert "AUTHORIZATION" in records[0].reason
+        assert records[1].to_mode == AutonomyLevel.ASSISTED
+
+    def test_manual_is_always_reachable(self, tmp_path, monkeypatch):
+        controller, ledger = _build_controller(tmp_path, monkeypatch)
+
+        _append_transition_approval(ledger, controller.approval_field_id, "operator-1")
+        assert controller.request_transition(AutonomyLevel.SUPERVISED, "operator-1") is True
+
+        assert controller.request_transition(AutonomyLevel.MANUAL, "emergency-stop") is True
+        assert controller.get_current_mode() == AutonomyLevel.MANUAL
+
+        last_record = controller.transition_log.snapshot()[-1]
+        assert last_record.to_mode == AutonomyLevel.MANUAL
+        assert last_record.reason == "EMERGENCY_FALLBACK"

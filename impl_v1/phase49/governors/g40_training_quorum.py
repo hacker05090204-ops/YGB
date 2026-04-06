@@ -14,8 +14,9 @@ RULES:
 """
 
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Tuple, List
+from typing import List, Optional, Sequence, Tuple
 import hashlib
 
 
@@ -24,6 +25,13 @@ class QuorumStatus(Enum):
     MET = "MET"                    # Quorum achieved
     NOT_MET = "NOT_MET"            # Insufficient data
     BLOCKED = "BLOCKED"            # Outlier detected
+
+
+class QuorumState(Enum):
+    """Node-availability quorum state for training readiness."""
+    QUORUM_MET = "QUORUM_MET"
+    QUORUM_NOT_MET = "QUORUM_NOT_MET"
+    QUORUM_UNKNOWN = "QUORUM_UNKNOWN"
 
 
 class DataCategory(Enum):
@@ -65,6 +73,63 @@ class QuorumResult:
     meets_rejection_threshold: bool
     outlier_detected: bool
     can_train: bool
+
+
+@dataclass(frozen=True)
+class QuorumRecord:
+    """Quorum evaluation for active training nodes."""
+    quorum_id: str
+    required_nodes: int
+    active_nodes: int
+    state: QuorumState
+    evaluated_at: str
+
+
+class QuorumAuditLog:
+    """Append-only log of node quorum evaluations."""
+
+    def __init__(self):
+        self._entries: List[QuorumRecord] = []
+
+    def append(self, record: QuorumRecord) -> None:
+        self._entries.append(record)
+
+    def entries(self) -> List[QuorumRecord]:
+        return list(self._entries)
+
+    def __len__(self) -> int:
+        return len(self._entries)
+
+
+class QuorumChecker:
+    """Evaluate whether training may start based on active nodes."""
+
+    def __init__(self, audit_log: Optional[QuorumAuditLog] = None):
+        self.audit_log = audit_log if audit_log is not None else QuorumAuditLog()
+
+    def evaluate(self, required_nodes: int, active_node_ids: Sequence[str]) -> QuorumRecord:
+        active_ids = tuple(active_node_ids)
+        active_count = len(active_ids)
+
+        if active_count == 0:
+            state = QuorumState.QUORUM_UNKNOWN
+        elif active_count >= required_nodes:
+            state = QuorumState.QUORUM_MET
+        else:
+            state = QuorumState.QUORUM_NOT_MET
+
+        record = QuorumRecord(
+            quorum_id=_generate_id("QRC"),
+            required_nodes=required_nodes,
+            active_nodes=active_count,
+            state=state,
+            evaluated_at=datetime.now(UTC).isoformat(),
+        )
+        self.audit_log.append(record)
+        return record
+
+    def can_start_training(self, required_nodes: int, active_node_ids: Sequence[str]) -> bool:
+        return self.evaluate(required_nodes, active_node_ids).state == QuorumState.QUORUM_MET
 
 
 # =============================================================================

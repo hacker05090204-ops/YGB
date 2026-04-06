@@ -20,10 +20,14 @@ NO security theater.
 
 import hashlib
 import json
+import logging
 import os
 import secrets
 import time
 from typing import Optional, Dict, Any
+
+
+logger = logging.getLogger(__name__)
 
 # =========================================================================
 # PATHS
@@ -83,8 +87,8 @@ def _ensure_secure_dir():
                 continue
             try:
                 os.chmod(path, 0o700)
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.debug("Failed to harden secure directory permissions for %s: %s", path, exc)
 
 
 # =========================================================================
@@ -108,8 +112,8 @@ def audit_log(action: str, user_id: str = '', ip: str = '',
     try:
         with open(AUDIT_LOG_PATH, 'a') as f:
             f.write(json.dumps(entry) + '\n')
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.warning("Failed to append admin audit log: %s", exc)
 
 
 # =========================================================================
@@ -238,8 +242,8 @@ def validate_session(token: str) -> Optional[dict]:
     try:
         with open(session_path, 'w') as f:
             json.dump(session, f, indent=2)
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.warning("Failed to update session activity for %s: %s", token[:12], exc)
 
     return session
 
@@ -518,8 +522,8 @@ def login(email: str, totp_code: str, ip: str = '0.0.0.0') -> dict:
     jwt_token = None
     try:
         jwt_token = create_jwt(user_id, role)
-    except RuntimeError:
-        pass  # JWT secret not configured, session-only mode
+    except RuntimeError as exc:
+        logger.warning("JWT creation unavailable; falling back to session-only mode: %s", exc)
 
     # Phase 5: Login notification
     audit_log('LOGIN_SUCCESS', user_id, ip,
@@ -623,8 +627,8 @@ def _send_login_notification(email: str, ip: str):
         _ensure_secure_dir()
         with open(notif_path, 'a') as f:
             f.write(json.dumps(notification) + '\n')
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.warning("Failed to write login notification log: %s", exc)
 
     # If email alerting is configured, use it
     try:
@@ -634,5 +638,5 @@ def _send_login_notification(email: str, ip: str):
             body=f'Admin login detected.\nEmail: {email}\nIP: {ip}\n'
                  f'Time: {time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())}'
         )
-    except (ImportError, Exception):
-        pass  # Email not configured, that's OK
+    except Exception as exc:
+        logger.info("Admin login email alert skipped: %s", exc)

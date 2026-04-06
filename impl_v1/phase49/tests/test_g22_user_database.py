@@ -1,6 +1,8 @@
 # test_g22_user_database.py
 """Tests for G22 User/Admin Database."""
 
+from pathlib import Path
+
 import pytest
 
 from impl_v1.phase49.governors.g22_user_database import (
@@ -8,11 +10,16 @@ from impl_v1.phase49.governors.g22_user_database import (
     Permission,
     SessionStatus,
     User,
+    UserManager,
+    UserRecord,
+    UserStore,
     UserSession,
     Admin,
     AuditLog,
     DeleteRequest,
     create_user,
+    deactivate_user,
+    get_active_users,
     get_user,
     get_all_users,
     update_user_bounty,
@@ -40,14 +47,14 @@ from impl_v1.phase49.governors.g22_user_database import (
 class TestUserRole:
     """Tests for UserRole enum."""
     
-    def test_has_hunter(self):
-        assert UserRole.HUNTER.value == "HUNTER"
+    def test_has_owner(self):
+        assert UserRole.OWNER.value == "OWNER"
     
     def test_has_admin(self):
         assert UserRole.ADMIN.value == "ADMIN"
     
-    def test_has_owner(self):
-        assert UserRole.OWNER.value == "OWNER"
+    def test_has_viewer(self):
+        assert UserRole.VIEWER.value == "VIEWER"
 
 
 class TestPermission:
@@ -72,14 +79,15 @@ class TestCreateUser:
     def test_creates_user(self):
         user = create_user("Hunter1", "hunter1@test.com")
         assert isinstance(user, User)
+        assert isinstance(user, UserRecord)
     
     def test_user_has_id(self):
         user = create_user("Hunter1")
         assert user.user_id.startswith("USR-")
     
-    def test_default_role_hunter(self):
+    def test_default_role_viewer(self):
         user = create_user("Hunter1")
-        assert user.role == UserRole.HUNTER
+        assert user.role == UserRole.VIEWER.value
     
     def test_can_get_user(self):
         user = create_user("Hunter1")
@@ -109,6 +117,49 @@ class TestUpdateUser:
         user = create_user("Hunter1")
         updated = update_user_targets(user.user_id, ["example.com", "test.com"])
         assert len(updated.current_targets) == 2
+
+
+class TestUserManagerContracts:
+    """Tests for new persisted user manager behavior."""
+
+    def setup_method(self):
+        clear_database()
+
+    def test_unknown_role_rejected(self):
+        manager = UserManager(UserStore(storage_path=Path("impl_v1/phase49/tests/.tmp_g22_roles.json")))
+        with pytest.raises(ValueError):
+            manager.create_user("viewer1", role="SUPERUSER")
+        manager.store.clear()
+
+    def test_duplicate_username_rejected(self):
+        manager = UserManager(UserStore(storage_path=Path("impl_v1/phase49/tests/.tmp_g22_duplicates.json")))
+        manager.create_user("viewer1", role=UserRole.VIEWER)
+        with pytest.raises(ValueError):
+            manager.create_user("viewer1", role=UserRole.ADMIN)
+        manager.store.clear()
+
+    def test_deactivated_user_not_deleted(self):
+        user = create_user("viewer1")
+        assert deactivate_user(user.user_id) is True
+
+        stored_user = get_user(user.user_id)
+        assert stored_user is not None
+        assert stored_user.active is False
+        assert user.user_id not in {active_user.user_id for active_user in get_active_users()}
+
+    def test_persistence_roundtrip(self, tmp_path):
+        store_path = tmp_path / "users.json"
+        manager = UserManager(UserStore(storage_path=store_path))
+
+        created = manager.create_user("viewer1", role=UserRole.VIEWER)
+
+        reloaded_store = UserStore(storage_path=store_path)
+        reloaded_manager = UserManager(reloaded_store)
+        reloaded = reloaded_manager.get_user(created.user_id)
+
+        assert reloaded is not None
+        assert reloaded.username == "viewer1"
+        assert reloaded.role == UserRole.VIEWER.value
 
 
 class TestCreateSession:

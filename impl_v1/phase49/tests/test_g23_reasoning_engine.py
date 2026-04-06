@@ -417,3 +417,63 @@ class TestCanReasoningModifyState:
         can_modify, reason = can_reasoning_modify_state()
         assert can_modify == False
         assert "read-only" in reason.lower()
+
+
+class TestReasoningEngine:
+    """Focused tests for the incremental reasoning engine additions."""
+
+    def test_valid_reasoning_step_is_returned(self):
+        from impl_v1.phase49.governors.g23_reasoning_engine import ReasoningEngine, ReasoningStep
+
+        engine = ReasoningEngine(session_id="TEST-G23-SESSION")
+        context = "\n".join([
+            "Target: api.example.com",
+            "Scope: in scope for api.example.com",
+            "Evidence: response reflects the search parameter",
+            "Evidence: screenshot captures the reflected value",
+            "Risk: high user exposure if a trusted user loads the page",
+        ])
+
+        step = engine.reason(context, "scope_analysis")
+
+        assert isinstance(step, ReasoningStep)
+        assert step.reasoning_type == "scope_analysis"
+        assert step.input_context == context
+        assert "api.example.com" in step.output
+        assert 0.0 < step.confidence <= 1.0
+        assert engine.audit_log.steps == (step,)
+
+    def test_depth_limit_is_enforced(self):
+        from impl_v1.phase49.governors.g23_reasoning_engine import ReasoningDepthError, ReasoningEngine
+
+        engine = ReasoningEngine(session_id="TEST-G23-DEPTH")
+        context = "\n".join([
+            "Target: api.example.com",
+            "Scope: in scope for api.example.com",
+            "Evidence: response log present",
+            "Evidence: screenshot present",
+        ])
+
+        for _ in range(5):
+            engine.reason(context, "evidence_evaluation")
+
+        with pytest.raises(ReasoningDepthError):
+            engine.reason(context, "evidence_evaluation")
+
+    def test_reasoning_audit_is_immutable_after_write(self):
+        from impl_v1.phase49.governors.g23_reasoning_engine import ReasoningEngine
+
+        engine = ReasoningEngine(session_id="TEST-G23-AUDIT")
+        step = engine.reason(
+            "Target: api.example.com\nScope: in scope for api.example.com\nEvidence: screenshot present",
+            "scope_analysis",
+        )
+        audit_log = engine.audit_log
+
+        assert audit_log.steps == (step,)
+
+        with pytest.raises(AttributeError):
+            audit_log.steps = tuple()
+
+        with pytest.raises(AttributeError):
+            audit_log.steps[0].output = "modified"

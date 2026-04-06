@@ -141,8 +141,8 @@ def cleanup_orphan_chunks(manifest_files: dict, max_age_hours: int = 48):
                 if chunk_path.stat().st_mtime < cutoff:
                     chunk_path.unlink()
                     removed += 1
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.debug("Failed to remove orphan chunk %s: %s", chunk_path, exc)
     if removed:
         logger.info("Cleaned %d orphan chunks", removed)
     return removed

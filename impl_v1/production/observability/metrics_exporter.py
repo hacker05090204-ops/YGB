@@ -14,7 +14,11 @@ from dataclasses import dataclass
 from typing import Dict, List
 from datetime import datetime
 from pathlib import Path
+import logging
 import json
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -189,8 +193,12 @@ def get_metrics() -> str:
         try:
             state = json.loads(state_file.read_text())
             auto_mode_enabled = state.get("auto_mode_enabled", False)
-        except (json.JSONDecodeError, OSError):
-            pass
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning(
+                "Failed to read governance state metrics from %s: %s",
+                state_file,
+                exc,
+            )
     collector.collect_auto_mode_state(auto_mode_enabled)
 
     # Drift events: read from incident logs
@@ -206,8 +214,12 @@ def get_metrics() -> str:
                     accuracy_drift += 1
                 elif trigger == "CALIBRATION_INFLATION":
                     calibration_drift += 1
-            except (json.JSONDecodeError, OSError):
-                pass
+            except (json.JSONDecodeError, OSError) as exc:
+                logger.warning(
+                    "Failed to read incident metrics from %s: %s",
+                    f,
+                    exc,
+                )
     collector.collect_drift_events(accuracy_drift, calibration_drift)
 
     # Performance: real system metrics
@@ -219,8 +231,10 @@ def get_metrics() -> str:
         proc = psutil.Process()
         memory_mb = proc.memory_info().rss / (1024 * 1024)
         cpu_percent = proc.cpu_percent(interval=0.1)
-    except (ImportError, Exception):
-        pass
+    except ImportError:
+        logger.debug("psutil not available; process performance metrics unavailable")
+    except Exception:
+        logger.warning("Failed to collect process performance metrics", exc_info=True)
     collector.collect_performance_metrics(scan_latency, memory_mb, cpu_percent)
 
     # Seccomp: read from violation log
@@ -229,8 +243,12 @@ def get_metrics() -> str:
     if seccomp_log.exists():
         try:
             seccomp_count = sum(1 for _ in seccomp_log.open())
-        except OSError:
-            pass
+        except OSError as exc:
+            logger.warning(
+                "Failed to read seccomp violation log %s: %s",
+                seccomp_log,
+                exc,
+            )
     collector.collect_seccomp_violations(seccomp_count)
 
     # Emergency lock: read from lock file
@@ -244,8 +262,12 @@ def get_metrics() -> str:
         try:
             cal = json.loads(cal_report.read_text())
             ece = cal.get("ece", 0.0)
-        except (json.JSONDecodeError, OSError):
-            pass
+        except (json.JSONDecodeError, OSError) as exc:
+            logger.warning(
+                "Failed to read calibration metrics from %s: %s",
+                cal_report,
+                exc,
+            )
     collector.collect_calibration_trend(ece)
 
     return collector.export()

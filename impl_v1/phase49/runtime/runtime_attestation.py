@@ -17,12 +17,16 @@ import os
 import sys
 import hashlib
 import json
+import logging
 import platform
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -257,8 +261,8 @@ def check_kernel_capabilities() -> List[AttestationCheck]:
                                 actual="0",
                                 message="",
                             ))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Capability attestation check skipped: %s", exc)
     
     return checks
 
@@ -312,8 +316,8 @@ def check_container_security() -> List[AttestationCheck]:
                                 actual="rw",
                                 message="Root filesystem is writable",
                             ))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Container root mount attestation skipped: %s", exc)
     
     # Check cgroup memory limit
     if platform.system() == "Linux":
@@ -336,8 +340,8 @@ def check_container_security() -> List[AttestationCheck]:
                         actual="Unlimited",
                         message="No memory limit set",
                     ))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Container memory limit attestation skipped: %s", exc)
     
     return checks
 
@@ -363,9 +367,8 @@ def check_gpu_determinism() -> List[AttestationCheck]:
                 actual=str(is_det),
                 message="" if is_det else "Deterministic mode not enabled",
             ))
-        except AttributeError:
-            # Older PyTorch version
-            pass
+        except AttributeError as exc:
+            logger.debug("Deterministic algorithm probe unavailable on this torch version: %s", exc)
         
         # Check cudnn settings
         if torch.backends.cudnn.is_available():

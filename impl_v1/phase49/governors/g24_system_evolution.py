@@ -20,11 +20,15 @@ ABSOLUTE GUARANTEES:
 
 from dataclasses import dataclass
 from enum import Enum
+import logging
 from typing import Optional, List, Tuple, Dict, FrozenSet
 import uuid
 from datetime import datetime, UTC
 import hashlib
 import sys
+
+
+logger = logging.getLogger(__name__)
 
 
 class PythonVersionStatus(Enum):
@@ -297,8 +301,14 @@ def check_dependency_stability(
                 target_major = int(target_ver.split(".")[0])
                 if target_major != current_major:
                     breaking.append(f"{pkg}: {current_ver} -> {target_ver} (major change)")
-            except (ValueError, IndexError):
-                pass
+            except (ValueError, IndexError) as exc:
+                logger.debug(
+                    "Dependency version parse skipped for %s (%s -> %s): %s",
+                    pkg,
+                    current_ver,
+                    target_ver,
+                    exc,
+                )
     
     # New packages are not breaking
     

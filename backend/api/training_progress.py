@@ -85,8 +85,8 @@ def get_training_progress() -> dict:
         age = time.time() - file_mtime
         if age > STALL_THRESHOLD_SECONDS:
             stalled = True
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.debug("Failed to stat training telemetry for stall detection: %s", exc)
 
     return {
         "status": "training",

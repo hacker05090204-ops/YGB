@@ -16,9 +16,10 @@ import json
 import time
 import secrets
 import logging
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Any, Optional, Dict, List
 
 from fastapi import APIRouter, Request, HTTPException, Depends
 
@@ -29,6 +30,22 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from backend.auth.auth_guard import require_auth
 
 logger = logging.getLogger("ygb.report_generator")
+REPORT_GENERATOR_VERSION = "1.0"
+
+
+@dataclass(frozen=True)
+class ValidationResult:
+    valid: bool
+    missing_fields: list[str]
+
+
+class ReportValidator:
+    REQUIRED = ["generated_at", "generator_version"]
+
+    @staticmethod
+    def validate(report: dict) -> ValidationResult:
+        missing_fields = [field for field in ReportValidator.REQUIRED if not report.get(field)]
+        return ValidationResult(valid=not missing_fields, missing_fields=missing_fields)
 
 
 def _get_db_path() -> str:
@@ -133,6 +150,67 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _normalize_report_metadata(metadata: Any, *, generated_at: Optional[str] = None) -> dict:
+    """Attach required generator metadata to report metadata payloads."""
+    normalized = dict(metadata) if isinstance(metadata, dict) else {}
+    normalized.setdefault("generated_at", generated_at or _now_iso())
+    normalized["generator_version"] = REPORT_GENERATOR_VERSION
+    return normalized
+
+
+def _metadata_from_report(report: Dict[str, Any]) -> Dict[str, Any]:
+    """Safely parse report metadata from metadata_json."""
+    metadata_json = report.get("metadata_json", {})
+    if isinstance(metadata_json, dict):
+        return dict(metadata_json)
+    if not isinstance(metadata_json, str):
+        return {}
+    try:
+        parsed = json.loads(metadata_json or "{}")
+    except (json.JSONDecodeError, TypeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _finalize_report_for_response(
+    report: Dict[str, Any], *, ensure_metadata: bool = True
+) -> Dict[str, Any]:
+    """Prepare report payloads for API responses with validation warnings."""
+    final_report = dict(report)
+    metadata = _metadata_from_report(final_report)
+
+    if ensure_metadata:
+        final_report["generated_at"] = (
+            final_report.get("generated_at")
+            or metadata.get("generated_at")
+            or final_report.get("created_at")
+            or _now_iso()
+        )
+        final_report["generator_version"] = (
+            final_report.get("generator_version")
+            or metadata.get("generator_version")
+            or REPORT_GENERATOR_VERSION
+        )
+        merged_metadata = dict(metadata)
+        merged_metadata.setdefault("generated_at", final_report["generated_at"])
+        merged_metadata["generator_version"] = final_report["generator_version"]
+        if "metadata_json" in final_report:
+            final_report["metadata_json"] = json.dumps(merged_metadata)
+
+    validation = ReportValidator.validate(final_report)
+    if not validation.valid:
+        logger.warning(
+            "Report validation failed for %s: missing_fields=%s",
+            final_report.get("id", "unknown"),
+            validation.missing_fields,
+        )
+        final_report["validation_warnings"] = [
+            f"Missing required field: {field}" for field in validation.missing_fields
+        ]
+
+    return final_report
+
+
 # =============================================================================
 # REPORT ENDPOINTS
 # =============================================================================
@@ -153,6 +231,7 @@ async def create_report(request: Request, user=Depends(require_auth)):
 
     report_id = _generate_id("rpt")
     now = _now_iso()
+    metadata = _normalize_report_metadata(body.get("metadata", {}), generated_at=now)
     report = {
         "id": report_id,
         "title": title,
@@ -163,7 +242,9 @@ async def create_report(request: Request, user=Depends(require_auth)):
         "created_by": user_id,
         "created_at": now,
         "updated_at": now,
-        "metadata_json": json.dumps(body.get("metadata", {})),
+        "metadata_json": json.dumps(metadata),
+        "generated_at": metadata["generated_at"],
+        "generator_version": metadata["generator_version"],
     }
 
     conn = get_db_connection()
@@ -207,7 +288,10 @@ async def create_report(request: Request, user=Depends(require_auth)):
     _log_activity(user_id, "REPORT_CREATED", f"Report '{title}' created ({report_id})")
     logger.info("Report created: %s by %s", report_id, user_id)
 
-    return {"success": True, "report": {**report, "content": body.get("content", {})}}
+    response_report = _finalize_report_for_response(
+        {**report, "content": body.get("content", {})}
+    )
+    return {"success": True, "report": response_report}
 
 
 @router.get("")
@@ -233,7 +317,10 @@ async def list_reports(request: Request, user=Depends(require_auth)):
                 (user_id,),
             )
         columns = [desc[0] for desc in cursor.description]
-        reports = [dict(zip(columns, row)) for row in cursor.fetchall()]
+        reports = [
+            _finalize_report_for_response(dict(zip(columns, row)))
+            for row in cursor.fetchall()
+        ]
     except Exception as e:
         logger.error("Failed to list reports: %s", e)
         reports = []
@@ -271,6 +358,8 @@ async def get_report(report_id: str, user=Depends(require_auth)):
             raise HTTPException(status_code=403, detail={
                 "error": "FORBIDDEN", "detail": "Access denied"
             })
+
+        report = _finalize_report_for_response(report)
 
         # Fetch attached videos
         cursor.execute(
@@ -335,6 +424,8 @@ async def get_report_content(report_id: str, user=Depends(require_auth)):
         except (json.JSONDecodeError, TypeError):
             content = {}
 
+        validated_report = _finalize_report_for_response(report)
+
     except HTTPException:
         raise
     except Exception as e:
@@ -350,6 +441,9 @@ async def get_report_content(report_id: str, user=Depends(require_auth)):
         "report_id": report_id,
         "content": content,
         "status": report.get("status", "unknown"),
+        "generated_at": validated_report.get("generated_at"),
+        "generator_version": validated_report.get("generator_version"),
+        "validation_warnings": validated_report.get("validation_warnings", []),
     }
 
 

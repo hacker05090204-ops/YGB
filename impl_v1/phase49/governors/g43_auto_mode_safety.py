@@ -21,7 +21,10 @@ AUTO MODE MAY NOT:
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Tuple, List
+from typing import Tuple, List, Optional
+
+from backend.governance.authority_lock import AuthorityLock
+from impl_v1.phase49.governors.g06_autonomy_modes import AutonomyController, AutonomyLevel
 
 
 class AutoModeState(Enum):
@@ -74,6 +77,142 @@ class AutoModeStatus:
     actions_allowed: int
     actions_blocked: int
     is_safe: bool
+
+
+@dataclass(frozen=True)
+class SafetyCheckResult:
+    """Result of a single auto-mode safety check."""
+
+    check_name: str
+    passed: bool
+    detail: str
+    severity: str
+
+
+class AutoModeSafetyGuard:
+    """Safety boundary that forces MANUAL fallback on critical failures."""
+
+    def __init__(
+        self,
+        controller: Optional[AutonomyController] = None,
+        authority_lock=AuthorityLock,
+        critical_alert_provider=None,
+        training_state_provider=None,
+    ):
+        self._controller = controller or AutonomyController()
+        self._authority_lock = authority_lock
+        self._critical_alert_provider = critical_alert_provider or (lambda: [])
+        self._training_state_provider = training_state_provider or (lambda: False)
+        self._last_results: List[SafetyCheckResult] = []
+
+    def _normalize_critical_alerts(self) -> List[str]:
+        alerts = self._critical_alert_provider()
+        if alerts is None:
+            return []
+        if isinstance(alerts, bool):
+            return ["CRITICAL_ALERT_PENDING"] if alerts else []
+        if isinstance(alerts, dict):
+            pending = alerts.get("alerts") or alerts.get("pending") or []
+            if isinstance(pending, bool):
+                return ["CRITICAL_ALERT_PENDING"] if pending else []
+            if isinstance(pending, (list, tuple, set, frozenset)):
+                return [str(item) for item in pending if str(item).strip()]
+            return [str(pending)] if str(pending).strip() else []
+        if isinstance(alerts, (list, tuple, set, frozenset)):
+            return [str(item) for item in alerts if str(item).strip()]
+        return [str(alerts)] if str(alerts).strip() else []
+
+    def _is_training_mid_epoch(self) -> bool:
+        state = self._training_state_provider()
+        if isinstance(state, bool):
+            return state
+        if isinstance(state, dict):
+            if "mid_epoch" in state:
+                return bool(state["mid_epoch"])
+            return bool(state.get("is_training", False))
+
+        mid_epoch = getattr(state, "mid_epoch", None)
+        if mid_epoch is not None:
+            return bool(mid_epoch)
+        return bool(getattr(state, "is_training", False))
+
+    def _check_mode_not_fully_autonomous(self) -> SafetyCheckResult:
+        mode = self._controller.get_current_mode()
+        passed = isinstance(mode, AutonomyLevel)
+        detail = (
+            f"Current mode {mode.value} remains human-governed"
+            if passed
+            else f"Unsupported autonomous mode detected: {mode}"
+        )
+        return SafetyCheckResult(
+            check_name="mode_not_fully_autonomous",
+            passed=passed,
+            detail=detail,
+            severity="INFO" if passed else "CRITICAL",
+        )
+
+    def _check_authority_lock(self) -> SafetyCheckResult:
+        result = self._authority_lock.verify_all_locked()
+        passed = bool(result.get("all_locked", False))
+        detail = str(result.get("status", "UNKNOWN"))
+        return SafetyCheckResult(
+            check_name="authority_lock_all_locked",
+            passed=passed,
+            detail=detail,
+            severity="INFO" if passed else "CRITICAL",
+        )
+
+    def _check_critical_alerts(self) -> SafetyCheckResult:
+        alerts = self._normalize_critical_alerts()
+        passed = len(alerts) == 0
+        detail = (
+            "No critical alerts pending"
+            if passed
+            else f"Critical alerts pending: {', '.join(alerts)}"
+        )
+        return SafetyCheckResult(
+            check_name="no_critical_alerts_pending",
+            passed=passed,
+            detail=detail,
+            severity="INFO" if passed else "CRITICAL",
+        )
+
+    def _check_training_not_mid_epoch(self) -> SafetyCheckResult:
+        mid_epoch = self._is_training_mid_epoch()
+        return SafetyCheckResult(
+            check_name="training_not_mid_epoch",
+            passed=not mid_epoch,
+            detail="Training is idle" if not mid_epoch else "Training is currently mid-epoch",
+            severity="INFO" if not mid_epoch else "CRITICAL",
+        )
+
+    def run_all_checks(self) -> list[SafetyCheckResult]:
+        results: List[SafetyCheckResult] = []
+        fallback_triggered = False
+
+        for check in (
+            self._check_mode_not_fully_autonomous,
+            self._check_authority_lock,
+            self._check_critical_alerts,
+            self._check_training_not_mid_epoch,
+        ):
+            result = check()
+            results.append(result)
+
+            if not result.passed and result.severity.upper() == "CRITICAL" and not fallback_triggered:
+                self._controller.request_transition(AutonomyLevel.MANUAL, "safety_guard")
+                fallback_triggered = True
+
+        self._last_results = results
+        return list(results)
+
+    def get_safety_status(self) -> dict:
+        results = self._last_results or self.run_all_checks()
+        failed_checks = [result.check_name for result in results if not result.passed]
+        return {
+            "all_safe": len(failed_checks) == 0,
+            "failed_checks": failed_checks,
+        }
 
 
 # =============================================================================

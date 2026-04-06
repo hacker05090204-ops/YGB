@@ -9,8 +9,12 @@ from dataclasses import dataclass
 from typing import List, Dict
 from datetime import datetime
 from pathlib import Path
+import logging
 import json
 import hashlib
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -50,8 +54,12 @@ class EvidenceChain:
                 for line in f:
                     data = json.loads(line)
                     self.records.append(EvidenceRecord(**data))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning(
+                "Failed to load evidence chain from %s: %s",
+                self.CHAIN_FILE,
+                exc,
+            )
     
     def _compute_hash(self, record_data: str) -> str:
         """Compute SHA256 hash of record."""

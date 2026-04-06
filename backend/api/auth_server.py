@@ -28,6 +28,7 @@ import secrets
 import hashlib
 import time
 import math
+import logging
 import bcrypt
 import smtplib
 from email.message import EmailMessage
@@ -37,6 +38,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 # ===================================================================
 # Directories
@@ -278,8 +280,13 @@ def send_admin_alert_new_device(username: str, ip: str, fingerprint: str):
             s.starttls()
             s.login(smtp_user, smtp_pass)
             s.send_message(msg)
-    except Exception:
-        pass  # Alert is best-effort; login should not fail due to admin alert
+    except Exception as exc:
+        logger.warning(
+            "Admin device alert email failed for %s from %s: %s",
+            username,
+            ip,
+            exc,
+        )
 
 
 def generate_and_store_otp(username: str, to_email: str) -> bool:

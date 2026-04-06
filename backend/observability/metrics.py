@@ -17,9 +17,10 @@ logged and metric_missing_counter is incremented.
 
 import collections
 import logging
+import math
 import threading
 import time
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger("ygb.observability.metrics")
 
@@ -62,6 +63,64 @@ AUXILIARY_COUNTER_METRICS = frozenset({
 
 # Combined set for snapshot completeness
 CRITICAL_METRICS = INFRASTRUCTURE_METRICS | TRAINING_ONLY_METRICS | GPU_RUNTIME_METRICS
+
+
+class MetricSeries:
+    def __init__(self, max_points: int = 1000) -> None:
+        self._lock = threading.Lock()
+        self._points: collections.deque[Tuple[float, float]] = collections.deque(
+            maxlen=max_points
+        )
+
+    def append(self, timestamp: float, value: float) -> None:
+        with self._lock:
+            self._points.append((float(timestamp), float(value)))
+
+    def get_points(self) -> List[Tuple[float, float]]:
+        with self._lock:
+            return list(self._points)
+
+
+_series_store: Dict[str, MetricSeries] = {}
+_series_store_lock = threading.Lock()
+
+
+def _get_or_create_series(key: str) -> MetricSeries:
+    with _series_store_lock:
+        series = _series_store.get(key)
+        if series is None:
+            series = MetricSeries()
+            _series_store[key] = series
+        return series
+
+
+def _get_percentile_value(values: List[float], percentile: float) -> float:
+    if not values:
+        return 0.0
+    index = max(0, min(len(values) - 1, math.ceil(len(values) * percentile) - 1))
+    return float(values[index])
+
+
+def get_series(key: str) -> List[Tuple[float, float]]:
+    with _series_store_lock:
+        series = _series_store.get(key)
+    if series is None:
+        return []
+    return series.get_points()
+
+
+def compute_percentiles(key: str) -> Dict[str, float]:
+    values = sorted(value for _, value in get_series(key))
+    return {
+        "p50": _get_percentile_value(values, 0.50),
+        "p95": _get_percentile_value(values, 0.95),
+        "p99": _get_percentile_value(values, 0.99),
+    }
+
+
+def record_metric(key: str, value: float) -> None:
+    metrics_registry.record(key, value)
+    _get_or_create_series(key).append(time.time(), value)
 
 
 class MetricsRegistry:
@@ -187,6 +246,8 @@ class MetricsRegistry:
             self._last_updated.clear()
             for name in CRITICAL_METRICS | AUXILIARY_COUNTER_METRICS:
                 self._counters[name] = 0.0
+        with _series_store_lock:
+            _series_store.clear()
 
 
 # Module-level singleton

@@ -2,17 +2,58 @@
 """Tests for G14: Target Discovery Assistant"""
 
 import pytest
+from unittest.mock import patch
+
+import impl_v1.phase49.governors.g14_target_discovery as target_discovery
+
 from impl_v1.phase49.governors.g14_target_discovery import (
     DiscoverySource,
     PayoutTier,
     ReportDensity,
     TargetCandidate,
     DiscoveryResult,
+    TargetValidator,
     discover_targets,
     get_high_value_targets,
+    get_discovery_stats,
     can_discovery_trigger_execution,
+    clear_discovery_state,
     validate_candidate,
 )
+
+
+def _build_program(
+    *,
+    name="Example Program",
+    scope="example.com",
+    target_url="https://example.com",
+    payout="HIGH",
+    density="LOW",
+    public=True,
+    invite=False,
+    source="HACKERONE_PUBLIC",
+    discovery_method="SECURITY_TXT",
+    confidence=0.92,
+):
+    return {
+        "name": name,
+        "source": source,
+        "scope": scope,
+        "target_url": target_url,
+        "payout": payout,
+        "density": density,
+        "public": public,
+        "invite": invite,
+        "discovery_method": discovery_method,
+        "confidence": confidence,
+    }
+
+
+@pytest.fixture(autouse=True)
+def reset_discovery_state():
+    clear_discovery_state()
+    yield
+    clear_discovery_state()
 
 
 class TestEnumClosure:
@@ -45,6 +86,94 @@ class TestDiscoverTargets:
         for candidate in result.candidates:
             assert not candidate.requires_invite
 
+    def test_wildcard_scope_match_works(self):
+        programs = [
+            _build_program(
+                name="Wildcard Program",
+                scope="*.example.com",
+                target_url="https://api.example.com",
+                discovery_method="SECURITY_TXT",
+                confidence=0.81,
+            )
+        ]
+
+        with patch.object(target_discovery, "_load_programs", return_value=programs):
+            with patch.object(
+                target_discovery.AuthorityLock,
+                "is_action_allowed",
+                return_value={"allowed": True, "reason": "test override"},
+            ):
+                result = discover_targets(scope_rules=["*.example.com"])
+
+        assert len(result.candidates) == 1
+        assert result.target_url == "https://api.example.com"
+        assert result.scope_matched is True
+        assert result.discovery_method == "SECURITY_TXT"
+        assert result.confidence == pytest.approx(0.81)
+        assert result.discovered_at
+
+        stats = get_discovery_stats()
+        assert stats["sessions_run"] == 1
+        assert stats["total_targets_evaluated"] == 1
+        assert stats["in_scope"] == 1
+        assert stats["out_of_scope"] == 0
+        assert stats["recorded_targets"] == 1
+
+    def test_out_of_scope_targets_are_blocked(self):
+        programs = [
+            _build_program(
+                name="Outside Scope Program",
+                scope="outside.example.net",
+                target_url="https://outside.example.net",
+            )
+        ]
+
+        with patch.object(target_discovery, "_load_programs", return_value=programs):
+            with patch.object(
+                target_discovery.AuthorityLock,
+                "is_action_allowed",
+                return_value={"allowed": True, "reason": "test override"},
+            ):
+                result = discover_targets(scope_rules=["*.example.com"])
+
+        assert result.candidates == tuple()
+        assert result.scope_matched is False
+        assert result.target_url == ""
+
+        stats = get_discovery_stats()
+        assert stats["sessions_run"] == 1
+        assert stats["total_targets_evaluated"] == 1
+        assert stats["in_scope"] == 0
+        assert stats["out_of_scope"] == 1
+        assert stats["recorded_targets"] == 0
+
+    def test_authority_lock_is_respected(self):
+        programs = [
+            _build_program(
+                name="In Scope Program",
+                scope="api.example.com",
+                target_url="https://api.example.com",
+            )
+        ]
+
+        with patch.object(target_discovery, "_load_programs", return_value=programs):
+            with patch.object(
+                target_discovery.AuthorityLock,
+                "is_action_allowed",
+                return_value={"allowed": False, "reason": "PERMANENTLY_BLOCKED: target_company"},
+            ):
+                result = discover_targets(scope_rules=["api.example.com"])
+
+        assert result.candidates == tuple()
+
+        stats = get_discovery_stats()
+        assert stats["sessions_run"] == 1
+        assert stats["total_targets_evaluated"] == 1
+        assert stats["in_scope"] == 1
+        assert stats["out_of_scope"] == 0
+        assert stats["recorded_targets"] == 0
+        assert stats["authority_blocked"] == 1
+
 
 class TestGetHighValueTargets:
     def test_high_payout_only(self):
@@ -63,6 +192,14 @@ class TestDiscoveryCannotExecute:
         can, reason = can_discovery_trigger_execution()
         assert not can
         assert "read-only" in reason
+
+
+class TestTargetValidator:
+    def test_validate_scope_supports_real_wildcards(self):
+        assert TargetValidator.validate_scope("https://app.example.com", ["*.example.com"]) is True
+
+    def test_validate_scope_does_not_match_apex_for_wildcard(self):
+        assert TargetValidator.validate_scope("https://example.com", ["*.example.com"]) is False
 
 
 class TestValidateCandidate:

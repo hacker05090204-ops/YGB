@@ -15,6 +15,7 @@ import logging
 import random
 import threading
 import time
+from dataclasses import dataclass
 from enum import Enum
 from functools import wraps
 from typing import Any, Callable, Optional, TypeVar
@@ -22,6 +23,7 @@ from typing import Any, Callable, Optional, TypeVar
 logger = logging.getLogger("ygb.reliability.circuit_breaker")
 
 F = TypeVar("F", bound=Callable[..., Any])
+_RECOVERY_TIME_EPSILON_S = 0.01
 
 
 def _metric_fragment(name: str) -> str:
@@ -48,6 +50,14 @@ class CircuitBreakerError(Exception):
         self.name = name
         self.state = state
         self.retry_after_s = remaining
+
+
+@dataclass(frozen=True)
+class CircuitBreakerStats:
+    total_calls: int
+    total_failures: int
+    trips: int
+    last_trip_at: Optional[float]
 
 
 class CircuitBreaker:
@@ -79,6 +89,10 @@ class CircuitBreaker:
         self._last_failure_time = 0.0
         self._opened_at = 0.0
         self._half_open_probe_in_flight = False
+        self._total_calls = 0
+        self._total_failures = 0
+        self._trips = 0
+        self._last_trip_at: Optional[float] = None
         self._metric_name = _metric_fragment(name)
         self._emit_metrics()
 
@@ -120,7 +134,10 @@ class CircuitBreaker:
         if self._state != new_state:
             self._state = new_state
             if new_state == CircuitState.OPEN:
+                trip_at = time.monotonic()
                 self._opened_at = opened_at if opened_at is not None else time.monotonic()
+                self._trips += 1
+                self._last_trip_at = trip_at
                 self._half_open_probe_in_flight = False
             elif new_state == CircuitState.HALF_OPEN:
                 self._success_count = 0
@@ -151,11 +168,15 @@ class CircuitBreaker:
         with self._lock:
             return self._current_state_unlocked()
 
+    @property
+    def is_open(self) -> bool:
+        return self.state == CircuitState.OPEN
+
     def _current_state_unlocked(self) -> CircuitState:
         """Determine effective state (may auto-transition OPEN → HALF_OPEN)."""
         if self._state == CircuitState.OPEN:
             elapsed = time.monotonic() - self._opened_at
-            if elapsed >= self.recovery_timeout:
+            if elapsed + _RECOVERY_TIME_EPSILON_S >= self.recovery_timeout:
                 self._transition_state(
                     CircuitState.HALF_OPEN,
                     log_level=logging.INFO,
@@ -180,6 +201,7 @@ class CircuitBreaker:
     def record_success(self) -> None:
         """Record a successful call."""
         with self._lock:
+            self._total_calls += 1
             state = self._current_state_unlocked()
             if state == CircuitState.HALF_OPEN:
                 self._half_open_probe_in_flight = False
@@ -203,6 +225,8 @@ class CircuitBreaker:
         """Record a failed call."""
         now = time.monotonic()
         with self._lock:
+            self._total_calls += 1
+            self._total_failures += 1
             state = self._current_state_unlocked()
             if state == CircuitState.HALF_OPEN:
                 # Probe failed — reopen
@@ -227,6 +251,15 @@ class CircuitBreaker:
                     )
                 else:
                     self._emit_metrics()
+
+    def get_stats(self) -> CircuitBreakerStats:
+        with self._lock:
+            return CircuitBreakerStats(
+                total_calls=self._total_calls,
+                total_failures=self._total_failures,
+                trips=self._trips,
+                last_trip_at=self._last_trip_at,
+            )
 
     def get_status(self) -> dict:
         """Return a JSON-serializable status snapshot."""

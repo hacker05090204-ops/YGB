@@ -16,11 +16,13 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import logging
 import os
 import shutil
 import sys
 import time
 import uuid
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, Optional
@@ -32,6 +34,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 HOST_ACTION_LEDGER_PATH = PROJECT_ROOT / "data" / "host_action_ledger.jsonl"
 DEFAULT_SESSION_SECONDS = 3600
 MAX_SESSION_SECONDS = 8 * 3600
+logger = logging.getLogger(__name__)
 
 SUPPORTED_ACTIONS = {
     "LAUNCH_APP",
@@ -99,6 +102,103 @@ TASK_REGISTRY: Dict[str, Dict[str, object]] = {
         "description": "Run the project antigravity harness",
     },
 }
+
+
+@dataclass
+class QuotaStatus:
+    action_type: str
+    used: int
+    limit: int
+    window_seconds: int
+    resets_at: float
+
+
+class ActionQuotaTracker:
+    WINDOW_SECONDS = 24 * 60 * 60
+    DEFAULT_LIMITS: dict[str, int] = {
+        "LAUNCH_APP": 100,
+        "OPEN_APP": 100,
+        "OPEN_URL": 250,
+        "RUN_APPROVED_TASK": 50,
+    }
+
+    def __init__(
+        self,
+        default_limits: Optional[dict[str, int]] = None,
+        *,
+        window_seconds: int = WINDOW_SECONDS,
+        time_func=None,
+    ):
+        self.default_limits = dict(self.DEFAULT_LIMITS)
+        if default_limits:
+            self.default_limits.update({str(k).strip().upper(): int(v) for k, v in default_limits.items()})
+        self.window_seconds = int(window_seconds)
+        self._time_func = time_func or time.time
+        self._windows: dict[str, deque[float]] = {}
+
+    def _normalize_action_type(self, action_type: str) -> str:
+        return str(action_type).strip().upper()
+
+    def _limit_for(self, action_type: str) -> int:
+        return int(self.default_limits.get(action_type, 100))
+
+    def _bucket(self, action_type: str) -> tuple[deque[float], float]:
+        normalized = self._normalize_action_type(action_type)
+        now = float(self._time_func())
+        bucket = self._windows.setdefault(normalized, deque())
+        cutoff = now - self.window_seconds
+        while bucket and bucket[0] <= cutoff:
+            bucket.popleft()
+        return bucket, now
+
+    def track(self, action_type: str) -> bool:
+        normalized = self._normalize_action_type(action_type)
+        bucket, now = self._bucket(normalized)
+        del now
+        if len(bucket) >= self._limit_for(normalized):
+            return False
+        bucket.append(float(self._time_func()))
+        return True
+
+    def get_quota_status(self, action_type: str) -> QuotaStatus:
+        normalized = self._normalize_action_type(action_type)
+        bucket, now = self._bucket(normalized)
+        resets_at = bucket[0] + self.window_seconds if bucket else now + self.window_seconds
+        return QuotaStatus(
+            action_type=normalized,
+            used=len(bucket),
+            limit=self._limit_for(normalized),
+            window_seconds=self.window_seconds,
+            resets_at=resets_at,
+        )
+
+    def get_all(self) -> dict:
+        action_types = sorted(set(self.default_limits) | set(self._windows))
+        return {action_type: self.get_quota_status(action_type) for action_type in action_types}
+
+
+_quota_tracker = ActionQuotaTracker()
+
+
+def _apply_quota_decision(action_type: str, decision: dict) -> dict:
+    if not decision.get("allowed"):
+        return decision
+
+    normalized = str(action_type).strip().upper()
+    if _quota_tracker.track(normalized):
+        return decision
+
+    logger.warning("Host action quota exceeded for action_type=%s", normalized)
+    return {
+        "allowed": False,
+        "reason": "HOST_ACTION_QUOTA_EXCEEDED",
+        "action_type": normalized,
+        "quota": _quota_tracker.get_quota_status(normalized),
+    }
+
+
+def get_quota_statuses() -> dict:
+    return _quota_tracker.get_all()
 
 
 def _canonical_join(values: Iterable[str]) -> str:
@@ -539,13 +639,16 @@ class HostActionGovernor:
                     "allowed": False,
                     "reason": f"HOST_ACTION_APP_NOT_FOUND: {app}",
                 }
-            return {
-                "allowed": True,
-                "reason": "OK",
-                "session": session,
-                "canonical_app": app,
-                "command": command,
-            }
+            return _apply_quota_decision(
+                action_name,
+                {
+                    "allowed": True,
+                    "reason": "OK",
+                    "session": session,
+                    "canonical_app": app,
+                    "command": command,
+                },
+            )
 
         if action_name == "OPEN_URL":
             raw_url = str(args.get("url", "")).strip()
@@ -572,13 +675,16 @@ class HostActionGovernor:
                     "allowed": False,
                     "reason": f"HOST_ACTION_APP_NOT_FOUND: {app}",
                 }
-            return {
-                "allowed": True,
-                "reason": "OK",
-                "session": session,
-                "canonical_app": app,
-                "command": command + [raw_url],
-            }
+            return _apply_quota_decision(
+                action_name,
+                {
+                    "allowed": True,
+                    "reason": "OK",
+                    "session": session,
+                    "canonical_app": app,
+                    "command": command + [raw_url],
+                },
+            )
 
         if action_name == "RUN_APPROVED_TASK":
             task = self.canonicalize_task_name(args.get("task", ""))
@@ -608,14 +714,17 @@ class HostActionGovernor:
                         "allowed": False,
                         "reason": "HOST_ACTION_PATH_OUT_OF_SCOPE",
                     }
-            return {
-                "allowed": True,
-                "reason": "OK",
-                "session": session,
-                "canonical_task": task,
-                "command": task_meta["command"],
-                "cwd": task_meta["cwd"],
-            }
+            return _apply_quota_decision(
+                action_name,
+                {
+                    "allowed": True,
+                    "reason": "OK",
+                    "session": session,
+                    "canonical_task": task,
+                    "command": task_meta["command"],
+                    "cwd": task_meta["cwd"],
+                },
+            )
 
         return {
             "allowed": False,

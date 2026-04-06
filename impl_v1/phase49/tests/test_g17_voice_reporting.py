@@ -1,23 +1,28 @@
 # test_g17_voice_reporting.py
 """Tests for G17 Voice Reporting governor."""
 
+from pathlib import Path
+import logging
+
 import pytest
 
 from impl_v1.phase49.governors.g17_voice_reporting import (
-    VoiceReportType,
-    VoiceReport,
+    HIGH_IMPACT_SUGGESTIONS,
     ProgressNarration,
     ReportLanguage,
-    create_progress_narration,
-    generate_high_impact_tips,
-    explain_report,
+    ReportQueue,
+    VoiceReport,
+    VoiceReportType,
+    VoiceReporter,
     answer_follow_up,
-    get_voice_text,
     can_voice_execute,
     clear_reports,
+    create_progress_narration,
+    explain_report,
+    generate_high_impact_tips,
     get_all_narrations,
     get_all_reports,
-    HIGH_IMPACT_SUGGESTIONS,
+    get_voice_text,
 )
 
 
@@ -225,3 +230,54 @@ class TestHighImpactSuggestions:
     def test_suggestions_are_bilingual(self):
         for tips in HIGH_IMPACT_SUGGESTIONS["xss"]:
             assert len(tips) == 2  # (en, hi)
+
+
+class TestVoiceReporterQueueing:
+    """Tests for queue-backed voice report delivery."""
+
+    def setup_method(self):
+        clear_reports()
+
+    def test_generate_report_returns_queued_report_without_tts(self):
+        reporter = VoiceReporter()
+
+        report = reporter.generate_report("Queued voice summary")
+
+        assert isinstance(report, VoiceReport)
+        assert report.content == "Queued voice summary"
+        assert report.delivery_status == "QUEUED"
+        assert report.tts_ready is False
+
+    def test_voice_reports_queue_correctly(self):
+        reporter = VoiceReporter()
+
+        first = reporter.generate_report("first")
+        second = reporter.generate_report("second")
+
+        pending = reporter.report_queue.get_pending()
+
+        assert pending == [first, second]
+
+    def test_queue_overflow_drops_oldest_with_warning(self, caplog):
+        reporter = VoiceReporter(report_queue=ReportQueue(max_pending=100))
+
+        with caplog.at_level(logging.WARNING):
+            for index in range(101):
+                reporter.generate_report(f"report-{index}")
+
+        pending = reporter.report_queue.get_pending()
+
+        assert len(pending) == 100
+        assert pending[0].content == "report-1"
+        assert pending[-1].content == "report-100"
+        assert any("Dropping oldest queued voice report" in record.message for record in caplog.records)
+
+    def test_production_file_has_no_simulated_tts_wording(self):
+        source = (
+            Path(__file__).resolve().parents[1]
+            / "governors"
+            / "g17_voice_reporting.py"
+        ).read_text(encoding="utf-8").lower()
+
+        assert "simulated" not in source
+        assert "simulate" not in source

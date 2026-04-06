@@ -10,6 +10,7 @@ import os
 import sqlite3
 import tempfile
 import unittest
+from datetime import datetime
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -68,6 +69,10 @@ class TestReportEndpointsRealDB(unittest.TestCase):
         self.assertTrue(data["report"]["id"].startswith("rpt-"))
         self.assertEqual(data["report"]["title"], "SQL Injection in Login")
         self.assertEqual(data["report"]["status"], "draft")
+        self.assertEqual(data["report"]["generator_version"], "1.0")
+        self.assertIsNotNone(
+            datetime.fromisoformat(data["report"]["generated_at"].replace("Z", "+00:00"))
+        )
 
         # Save the ID for later tests
         self.__class__.created_report_id = data["report"]["id"]
@@ -98,6 +103,8 @@ class TestReportEndpointsRealDB(unittest.TestCase):
         data = resp.json()
         self.assertTrue(data["success"])
         self.assertGreater(len(data["reports"]), 0)
+        self.assertIn("generated_at", data["reports"][0])
+        self.assertEqual(data["reports"][0]["generator_version"], "1.0")
 
     def test_get_report(self):
         """GET /api/reports/{id} — get a specific report."""
@@ -114,6 +121,8 @@ class TestReportEndpointsRealDB(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertEqual(data["report"]["id"], report_id)
         self.assertIn("videos", data)
+        self.assertIn("generated_at", data["report"])
+        self.assertEqual(data["report"]["generator_version"], "1.0")
 
     def test_get_report_not_found(self):
         """GET /api/reports/{id} — should return 404 for non-existent."""
@@ -135,6 +144,8 @@ class TestReportEndpointsRealDB(unittest.TestCase):
         self.assertTrue(data["success"])
         self.assertEqual(data["report_id"], report_id)
         self.assertIn("findings", data["content"])
+        self.assertIn("generated_at", data)
+        self.assertEqual(data["generator_version"], "1.0")
 
     def test_get_report_content_not_found(self):
         """GET /api/reports/{id}/content — 404 for non-existent."""

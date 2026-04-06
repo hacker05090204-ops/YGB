@@ -11,9 +11,17 @@ Tests cover:
 - All pretraining guards
 """
 
+import re
+
 import pytest
 
 from impl_v1.phase49.governors.g38_safe_pretraining import (
+    # Infrastructure-Gated Pretraining
+    PretrainingConfig,
+    PretrainingContract,
+    RealBackendNotConfiguredError,
+    SAFE_PRETRAINING_PROVISIONING_MESSAGE,
+    SafePretrainer,
     # Training Modes
     TrainingMode,
     TrainingModeStatus,
@@ -465,3 +473,65 @@ class TestLearningTypeAllowed:
         )
         assert allowed is False
         assert "LOCKED" in msg
+
+
+class TestSafePretrainerContract:
+    """Tests for the infrastructure-gated safe pretrainer contract."""
+
+    def test_start_rejects_real_data_only_false(self, tmp_path):
+        dataset_path = tmp_path / "real-dataset"
+        dataset_path.mkdir()
+        checkpoint_dir = tmp_path / "checkpoints"
+        checkpoint_dir.mkdir()
+
+        trainer = SafePretrainer(
+            PretrainingConfig(
+                dataset_path=str(dataset_path),
+                max_epochs=1,
+                checkpoint_dir=str(checkpoint_dir),
+                real_data_only=False,
+            )
+        )
+
+        with pytest.raises(ValueError, match="real_data_only"):
+            trainer.start()
+
+    def test_start_rejects_missing_dataset_path(self, tmp_path):
+        checkpoint_dir = tmp_path / "checkpoints"
+        checkpoint_dir.mkdir()
+
+        trainer = SafePretrainer(
+            PretrainingConfig(
+                dataset_path=str(tmp_path / "missing-dataset"),
+                max_epochs=1,
+                checkpoint_dir=str(checkpoint_dir),
+                real_data_only=True,
+            )
+        )
+
+        with pytest.raises(ValueError, match="dataset_path"):
+            trainer.start()
+
+    def test_start_fails_closed_after_valid_contract(self, tmp_path):
+        dataset_path = tmp_path / "real-dataset.jsonl"
+        dataset_path.write_text('{"record": "real"}\n', encoding="utf-8")
+        checkpoint_dir = tmp_path / "checkpoints"
+        checkpoint_dir.mkdir()
+
+        contract = PretrainingContract(
+            PretrainingConfig(
+                dataset_path=str(dataset_path),
+                max_epochs=1,
+                checkpoint_dir=str(checkpoint_dir),
+                real_data_only=True,
+            )
+        )
+        contract.validate()
+
+        trainer = SafePretrainer(contract.config)
+
+        with pytest.raises(
+            RealBackendNotConfiguredError,
+            match=re.escape(SAFE_PRETRAINING_PROVISIONING_MESSAGE),
+        ):
+            trainer.start()

@@ -1,39 +1,36 @@
 # G16: Gmail Owner Alerts
-"""
-Owner notification system via Gmail SMTP.
+"""Infrastructure-gated Gmail alert governance contract."""
 
-OWNER EMAIL: Configurable via OWNER_EMAIL env variable
-Default: hacker05090204@gmail.com
-
-FEATURES:
-- Email verification flow with random password
-- Password expires every 5 minutes
-- Alerts on: new device, new IP, new geo, license violation, risk escalation
-
-RULES:
-- Email ALERT ONLY
-- Email NEVER approves execution
-"""
+from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List, Dict
-import uuid
+from pathlib import Path
+from typing import Dict, List, Optional, Protocol, runtime_checkable
+import logging
 import os
 import secrets
-from datetime import datetime, UTC, timedelta
+import uuid
+from datetime import UTC, datetime, timedelta
 
-# Import owner alert types
-from .g10_owner_alerts import (
-    AlertType,
-    AlertSeverity,
-    AlertStatus,
-    OwnerAlert,
+from .g10_owner_alerts import OwnerAlert
+
+
+logger = logging.getLogger(__name__)
+
+GMAIL_PROVISIONING_MESSAGE = (
+    "GmailAlerter requires Gmail OAuth credentials. "
+    "Set GMAIL_CREDENTIALS_PATH to a valid credentials.json file."
 )
 
 
+class RealBackendNotConfiguredError(RuntimeError):
+    pass
+
+
 class EmailStatus(Enum):
-    """CLOSED ENUM - 5 statuses"""
+    """Legacy enum export retained for compatibility."""
+
     PENDING = "PENDING"
     SENT = "SENT"
     FAILED = "FAILED"
@@ -42,7 +39,8 @@ class EmailStatus(Enum):
 
 
 class VerificationStatus(Enum):
-    """CLOSED ENUM - 4 statuses"""
+    """Verification status for password workflow."""
+
     PENDING = "PENDING"
     VERIFIED = "VERIFIED"
     EXPIRED = "EXPIRED"
@@ -51,31 +49,56 @@ class VerificationStatus(Enum):
 
 @dataclass(frozen=True)
 class GmailAlertConfig:
-    """Gmail SMTP configuration."""
+    """Real Gmail alert delivery configuration."""
+
     owner_email: str
-    smtp_server: str = "smtp.gmail.com"
-    smtp_port: int = 587
-    use_tls: bool = True
+    credentials_path: Optional[str] = None
 
 
 @dataclass(frozen=True)
 class VerificationPassword:
     """Time-limited verification password."""
+
     password_id: str
-    password_hash: str  # Never store plaintext
+    password_hash: str
     created_at: str
     expires_at: str
     status: VerificationStatus
 
 
 @dataclass(frozen=True)
-class AlertSendResult:
-    """Result of sending an alert."""
-    result_id: str
-    alert_id: str
-    email_status: EmailStatus
-    error_message: Optional[str]
-    timestamp: str
+class EmailMessage:
+    """Concrete Gmail delivery payload contract."""
+
+    to: str
+    subject: str
+    body: str
+    sent_at: Optional[str]
+
+
+AlertSendResult = EmailMessage
+
+
+@runtime_checkable
+class GmailAdapter(Protocol):
+    """Real Gmail API adapter contract for production delivery."""
+
+    def send(self, message: EmailMessage) -> bool:
+        ...
+
+
+class _ProvisionedGmailAPIAdapter:
+    """Fail-closed adapter placeholder for a provisioned Gmail API runtime."""
+
+    def __init__(self, credentials_path: str):
+        self._credentials_path = credentials_path
+
+    def send(self, message: EmailMessage) -> bool:
+        del message
+        raise RuntimeError(
+            "Gmail OAuth runtime is not connected. Provide a concrete GmailAdapter "
+            "bound to a provisioned Gmail API token store."
+        )
 
 
 # Default owner email (configurable)
@@ -86,49 +109,37 @@ PASSWORD_EXPIRY_MINUTES = 5
 
 # In-memory verification store
 _verification_store: Dict[str, VerificationPassword] = {}
-_sent_alerts: List[AlertSendResult] = []
+_sent_alerts: List[EmailMessage] = []
 
 
 def get_config() -> GmailAlertConfig:
-    """Get Gmail configuration from environment."""
+    """Get Gmail alert configuration from environment."""
+
     return GmailAlertConfig(
         owner_email=os.environ.get("OWNER_EMAIL", DEFAULT_OWNER_EMAIL),
-        smtp_server=os.environ.get("SMTP_SERVER", "smtp.gmail.com"),
-        smtp_port=int(os.environ.get("SMTP_PORT", "587")),
-        use_tls=os.environ.get("SMTP_USE_TLS", "true").lower() == "true",
+        credentials_path=os.environ.get("GMAIL_CREDENTIALS_PATH"),
     )
 
 
-def clear_verification_store():
-    """Clear verification store (for testing)."""
+def clear_verification_store() -> None:
+    """Clear verification and alert state for tests."""
+
     _verification_store.clear()
     _sent_alerts.clear()
 
 
-def generate_verification_password() -> tuple:
-    """
-    Generate cryptographically random password.
-    
-    Returns:
-        (plaintext_password, VerificationPassword)
-        
-    Password characteristics:
-    - Variable length (16-24 characters)
-    - Cryptographically secure random
-    - URL-safe base64 characters
-    - Expires in 5 minutes
-    """
-    # Variable length password (16-24 chars)
-    length = secrets.randbelow(9) + 16  # 16-24 chars
+def generate_verification_password() -> tuple[str, VerificationPassword]:
+    """Generate a cryptographically strong verification password."""
+
+    length = secrets.randbelow(9) + 16
     plaintext = secrets.token_urlsafe(length)[:length]
-    
-    # Hash for storage using HMAC-SHA256
+
     import hashlib
+
     password_hash = hashlib.sha256(plaintext.encode()).hexdigest()
-    
     now = datetime.now(UTC)
     expires = now + timedelta(minutes=PASSWORD_EXPIRY_MINUTES)
-    
+
     verification = VerificationPassword(
         password_id=f"PWD-{uuid.uuid4().hex[:16].upper()}",
         password_hash=password_hash,
@@ -136,161 +147,139 @@ def generate_verification_password() -> tuple:
         expires_at=expires.isoformat(),
         status=VerificationStatus.PENDING,
     )
-    
     _verification_store[verification.password_id] = verification
-    
     return plaintext, verification
 
 
 def is_password_expired(password: VerificationPassword) -> bool:
-    """Check if password has expired."""
+    """Check whether a verification password has expired."""
+
     try:
         expires_dt = datetime.fromisoformat(password.expires_at.replace("Z", "+00:00"))
-        now = datetime.now(UTC)
-        return now >= expires_dt
+        return datetime.now(UTC) >= expires_dt
     except (ValueError, TypeError):
         return True
 
 
-def verify_password(password_id: str, submitted_password: str) -> tuple:
-    """
-    Verify a submitted password.
-    
-    Returns:
-        (verified: bool, reason: str)
-    """
+def verify_password(password_id: str, submitted_password: str) -> tuple[bool, str]:
+    """Verify a submitted password against the stored hash."""
+
     if password_id not in _verification_store:
         return False, "Password ID not found"
-    
+
     password = _verification_store[password_id]
-    
     if is_password_expired(password):
-        # Update status
-        expired = VerificationPassword(
+        _verification_store[password_id] = VerificationPassword(
             password_id=password.password_id,
             password_hash=password.password_hash,
             created_at=password.created_at,
             expires_at=password.expires_at,
             status=VerificationStatus.EXPIRED,
         )
-        _verification_store[password_id] = expired
         return False, "Password has expired (5 minute limit)"
-    
-    # Compare password hash
+
     import hashlib
+
     submitted_hash = hashlib.sha256(submitted_password.encode()).hexdigest()
     if submitted_hash != password.password_hash:
         return False, "Invalid password"
-    
-    verified = VerificationPassword(
+
+    _verification_store[password_id] = VerificationPassword(
         password_id=password.password_id,
         password_hash=password.password_hash,
         created_at=password.created_at,
         expires_at=password.expires_at,
         status=VerificationStatus.VERIFIED,
     )
-    _verification_store[password_id] = verified
-    
     return True, "Password verified successfully"
+
+
+class GmailAlerter:
+    """Fail-closed Gmail alert sender pending a real Gmail API backend."""
+
+    def __init__(
+        self,
+        config: Optional[GmailAlertConfig] = None,
+        adapter: Optional[GmailAdapter] = None,
+        alert_logger: Optional[logging.Logger] = None,
+    ):
+        self._config = config or get_config()
+        self._adapter = adapter
+        self._logger = alert_logger or logger
+
+    def _resolve_credentials_path(self) -> str:
+        credentials_path = (self._config.credentials_path or "").strip()
+        if not credentials_path or not Path(credentials_path).is_file():
+            raise RealBackendNotConfiguredError(GMAIL_PROVISIONING_MESSAGE)
+        return credentials_path
+
+    def _resolve_adapter(self, credentials_path: str) -> GmailAdapter:
+        if self._adapter is not None:
+            return self._adapter
+        return _ProvisionedGmailAPIAdapter(credentials_path)
+
+    def _build_message(self, alert: OwnerAlert) -> EmailMessage:
+        return EmailMessage(
+            to=self._config.owner_email,
+            subject=f"[YGB] {alert.title}",
+            body=(
+                f"Alert Type: {alert.alert_type.value}\n"
+                f"Title: {alert.title}\n"
+                f"Message: {alert.message}\n"
+                f"Device: {alert.device_id}\n"
+                f"Severity: {alert.severity.value}\n"
+                f"Created At: {alert.created_at}\n"
+            ),
+            sent_at=None,
+        )
+
+    def send_alert(self, alert: OwnerAlert) -> EmailMessage:
+        """Attempt real Gmail API delivery or fail closed."""
+
+        credentials_path = self._resolve_credentials_path()
+        message = self._build_message(alert)
+        adapter = self._resolve_adapter(credentials_path)
+
+        try:
+            delivered = adapter.send(message)
+        except Exception:
+            self._logger.critical("Gmail API alert delivery failed", exc_info=True)
+            _sent_alerts.append(message)
+            return message
+
+        if not delivered:
+            self._logger.critical("Gmail API alert delivery failed: adapter returned False")
+            _sent_alerts.append(message)
+            return message
+
+        delivered_message = EmailMessage(
+            to=message.to,
+            subject=message.subject,
+            body=message.body,
+            sent_at=datetime.now(UTC).isoformat(),
+        )
+        _sent_alerts.append(delivered_message)
+        return delivered_message
 
 
 def send_alert(
     alert: OwnerAlert,
     config: Optional[GmailAlertConfig] = None,
-    _mock_send: bool = False,  # Set to True only in test code
-) -> AlertSendResult:
-    """
-    Send alert email to owner.
-    
-    RULE: Email is ALERT ONLY - cannot approve execution.
-    
-    Args:
-        alert: The alert to send
-        config: Gmail configuration
-        _mock_send: If True, don't actually send (testing only — must be explicitly set)
-    
-    Returns:
-        AlertSendResult with send status
-    """
-    if config is None:
-        config = get_config()
-    
-    if _mock_send:
-        # Mock successful send for testing
-        result = AlertSendResult(
-            result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
-            alert_id=alert.alert_id,
-            email_status=EmailStatus.SENT,
-            error_message=None,
-            timestamp=datetime.now(UTC).isoformat(),
-        )
-        _sent_alerts.append(result)
-        return result
-    
-    # Real SMTP path — send if SMTP password is configured
-    # Unified key: SMTP_PASS (canonical) or SMTP_PASSWORD (backward compat)
-    smtp_password = os.environ.get("SMTP_PASS") or os.environ.get("SMTP_PASSWORD")
-    owner_email_override = os.environ.get("OWNER_EMAIL", "").strip()
-    if smtp_password and owner_email_override:
-        try:
-            import smtplib
-            from email.mime.text import MIMEText
+    adapter: Optional[GmailAdapter] = None,
+) -> EmailMessage:
+    """Module-level wrapper for governed Gmail alert delivery."""
 
-            msg = MIMEText(
-                f"[YGB Alert] {alert.alert_type.value}\n\n"
-                f"Title: {alert.title}\n"
-                f"Message: {alert.message}\n"
-                f"Device: {alert.device_id}\n"
-                f"Severity: {alert.severity.value}\n"
-                f"Time: {alert.created_at}\n"
-            )
-            msg["Subject"] = f"[YGB] {alert.title}"
-            msg["From"] = config.owner_email
-            msg["To"] = config.owner_email
-
-            server = smtplib.SMTP(config.smtp_server, config.smtp_port)
-            if config.use_tls:
-                server.starttls()
-            server.login(config.owner_email, smtp_password)
-            server.send_message(msg)
-            server.quit()
-
-            result = AlertSendResult(
-                result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
-                alert_id=alert.alert_id,
-                email_status=EmailStatus.SENT,
-                error_message=None,
-                timestamp=datetime.now(UTC).isoformat(),
-            )
-            _sent_alerts.append(result)
-            return result
-        except Exception as e:
-            return AlertSendResult(
-                result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
-                alert_id=alert.alert_id,
-                email_status=EmailStatus.FAILED,
-                error_message=str(e),
-                timestamp=datetime.now(UTC).isoformat(),
-            )
-
-    # SMTP not configured — safe fallback to PENDING (notification queued)
-    return AlertSendResult(
-        result_id=f"SND-{uuid.uuid4().hex[:16].upper()}",
-        alert_id=alert.alert_id,
-        email_status=EmailStatus.PENDING,
-        error_message=None,
-        timestamp=datetime.now(UTC).isoformat(),
-    )
+    return GmailAlerter(config=config, adapter=adapter).send_alert(alert)
 
 
-def send_new_device_alert(device_id: str, ip_address: str) -> AlertSendResult:
+def send_new_device_alert(device_id: str, ip_address: str) -> EmailMessage:
     """Send alert for new device registration."""
     from .g10_owner_alerts import alert_new_login
     alert = alert_new_login(device_id, ip_address)
     return send_alert(alert)
 
 
-def send_new_ip_alert(device_id: str, old_ip: str, new_ip: str) -> AlertSendResult:
+def send_new_ip_alert(device_id: str, old_ip: str, new_ip: str) -> EmailMessage:
     """Send alert for IP address change."""
     from .g10_owner_alerts import alert_new_ip
     alert = alert_new_ip(device_id, old_ip, new_ip)
@@ -301,14 +290,14 @@ def send_geo_mismatch_alert(
     device_id: str,
     expected_country: str,
     actual_country: str,
-) -> AlertSendResult:
+) -> EmailMessage:
     """Send alert for geographic mismatch."""
     from .g10_owner_alerts import alert_geo_mismatch
     alert = alert_geo_mismatch(device_id, expected_country, actual_country)
     return send_alert(alert)
 
 
-def send_license_violation_alert(device_id: str, violation: str) -> AlertSendResult:
+def send_license_violation_alert(device_id: str, violation: str) -> EmailMessage:
     """Send alert for license violation."""
     from .g10_owner_alerts import create_alert, AlertType
     alert = create_alert(
@@ -320,7 +309,7 @@ def send_license_violation_alert(device_id: str, violation: str) -> AlertSendRes
     return send_alert(alert)
 
 
-def send_risk_escalation_alert(device_id: str, risk_level: str, reason: str) -> AlertSendResult:
+def send_risk_escalation_alert(device_id: str, risk_level: str, reason: str) -> EmailMessage:
     """Send alert for risk escalation."""
     from .g10_owner_alerts import create_alert, AlertType, AlertSeverity
     alert = create_alert(
@@ -339,6 +328,6 @@ def can_email_approve_execution() -> tuple:
     return False, "Email alerts are NOTIFICATION ONLY - cannot approve execution"
 
 
-def get_sent_alerts() -> List[AlertSendResult]:
+def get_sent_alerts() -> List[EmailMessage]:
     """Get list of sent alerts (for testing/audit)."""
     return list(_sent_alerts)

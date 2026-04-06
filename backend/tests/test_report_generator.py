@@ -10,6 +10,7 @@ import os
 import sys
 import sqlite3
 import tempfile
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
@@ -74,6 +75,52 @@ class TestReportTablesCreation(unittest.TestCase):
                 pattern, source,
                 f"Production code must not contain '{pattern}'"
             )
+
+
+class TestReportValidation(unittest.TestCase):
+    def test_report_validator_detects_missing_fields(self):
+        from backend.api.report_generator import ReportValidator
+
+        validation = ReportValidator.validate({"id": "rpt-legacy"})
+        self.assertFalse(validation.valid)
+        self.assertEqual(
+            set(validation.missing_fields),
+            {"generated_at", "generator_version"},
+        )
+
+    def test_finalize_report_returns_warning_for_partial_report(self):
+        from backend.api.report_generator import _finalize_report_for_response
+
+        with self.assertLogs("ygb.report_generator", level="WARNING") as captured:
+            report = _finalize_report_for_response(
+                {"id": "rpt-legacy", "title": "Legacy Report"},
+                ensure_metadata=False,
+            )
+
+        self.assertIn("validation_warnings", report)
+        self.assertIn(
+            "Missing required field: generated_at",
+            report["validation_warnings"],
+        )
+        self.assertIn(
+            "Missing required field: generator_version",
+            report["validation_warnings"],
+        )
+        self.assertTrue(any("Report validation failed" in line for line in captured.output))
+
+    def test_finalize_report_adds_generator_metadata(self):
+        from backend.api.report_generator import _finalize_report_for_response
+
+        report = _finalize_report_for_response({
+            "id": "rpt-1",
+            "title": "Generated Report",
+            "created_at": "2026-01-01T00:00:00+00:00",
+            "metadata_json": "{}",
+        })
+
+        self.assertEqual(report["generator_version"], "1.0")
+        parsed = datetime.fromisoformat(report["generated_at"].replace("Z", "+00:00"))
+        self.assertIsNotNone(parsed)
 
 
 class TestVideoRecordingMetadata(unittest.TestCase):

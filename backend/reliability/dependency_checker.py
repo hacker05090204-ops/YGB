@@ -6,15 +6,18 @@ and returns a typed CheckResult with latency measurement. Checks
 run in parallel via ThreadPoolExecutor.
 """
 
+import asyncio
 import logging
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor, wait
-from typing import Any, Callable, Dict, List, NamedTuple, Optional
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Union
 
 logger = logging.getLogger("ygb.reliability.dependency_checker")
 
 DEFAULT_TIMEOUT_S = 2.0
+CHECK_ALL_TIMEOUT_S = 5.0
 
 
 class CheckResult(NamedTuple):
@@ -23,6 +26,14 @@ class CheckResult(NamedTuple):
     ok: bool
     latency_ms: float
     detail: str
+
+
+@dataclass(frozen=True)
+class DependencyCheckResult:
+    name: str
+    available: bool
+    latency_ms: float
+    error: Optional[str]
 
 
 def _check_storage() -> CheckResult:
@@ -128,17 +139,146 @@ _BUILTIN_CHECKS: List[Callable[[], CheckResult]] = [
 ]
 
 
-def _emit_check_metrics(result: CheckResult, *, timed_out: bool = False) -> None:
+def _normalize_dependency_result(
+    result: Union[CheckResult, DependencyCheckResult, Any],
+    *,
+    fallback_name: str,
+    fallback_latency_ms: float,
+) -> DependencyCheckResult:
+    if isinstance(result, DependencyCheckResult):
+        return result
+    if isinstance(result, CheckResult):
+        return DependencyCheckResult(
+            name=result.name,
+            available=result.ok,
+            latency_ms=float(result.latency_ms),
+            error=None if result.ok else str(result.detail),
+        )
+    return DependencyCheckResult(
+        name=fallback_name,
+        available=False,
+        latency_ms=float(fallback_latency_ms),
+        error=f"unexpected_result:{type(result).__name__}",
+    )
+
+
+def _emit_check_metrics(
+    result: Union[CheckResult, DependencyCheckResult],
+    *,
+    timed_out: bool = False,
+) -> None:
+    normalized = _normalize_dependency_result(
+        result,
+        fallback_name=getattr(result, "name", "unknown"),
+        fallback_latency_ms=float(getattr(result, "latency_ms", 0.0) or 0.0),
+    )
     try:
         from backend.observability.metrics import metrics_registry
 
-        metrics_registry.record("dependency_latency_ms", float(result.latency_ms))
-        if timed_out:
+        metrics_registry.record("dependency_latency_ms", float(normalized.latency_ms))
+        if timed_out or normalized.error == "timeout":
             metrics_registry.increment("timeout_count")
-        elif not result.ok:
+        elif not normalized.available:
             metrics_registry.increment("error_count")
     except Exception:
         logger.debug("Failed to emit dependency-check metrics", exc_info=True)
+
+
+def _run_check_with_timeout(
+    check: Callable[[], CheckResult],
+    timeout: float,
+) -> DependencyCheckResult:
+    start = time.monotonic()
+    check_name = getattr(check, "__name__", str(check))
+
+    async def _runner() -> Union[CheckResult, DependencyCheckResult, Any]:
+        return await asyncio.wait_for(asyncio.to_thread(check), timeout=timeout)
+
+    try:
+        raw_result = asyncio.run(_runner())
+    except asyncio.TimeoutError:
+        result = DependencyCheckResult(
+            name=check_name,
+            available=False,
+            latency_ms=round((time.monotonic() - start) * 1000, 2),
+            error="timeout",
+        )
+        _emit_check_metrics(result, timed_out=True)
+        logger.warning("Dependency check '%s' timed out after %.1fs", check_name, timeout)
+        return result
+    except BaseException as exc:
+        result = DependencyCheckResult(
+            name=check_name,
+            available=False,
+            latency_ms=round((time.monotonic() - start) * 1000, 2),
+            error=type(exc).__name__,
+        )
+        _emit_check_metrics(result)
+        logger.error("Dependency check '%s' raised: %s", check_name, exc)
+        return result
+
+    result = _normalize_dependency_result(
+        raw_result,
+        fallback_name=check_name,
+        fallback_latency_ms=round((time.monotonic() - start) * 1000, 2),
+    )
+    _emit_check_metrics(result)
+    return result
+
+
+def check_all(
+    checks: Optional[List[Callable[[], CheckResult]]] = None,
+    timeout: float = CHECK_ALL_TIMEOUT_S,
+) -> List[DependencyCheckResult]:
+    try:
+        check_fns = list(_BUILTIN_CHECKS if checks is None else checks)
+    except BaseException as exc:
+        logger.error("Failed to prepare dependency checks: %s", exc, exc_info=True)
+        return [
+            DependencyCheckResult(
+                name="check_all",
+                available=False,
+                latency_ms=0.0,
+                error=type(exc).__name__,
+            )
+        ]
+
+    if not check_fns:
+        return []
+
+    results: List[Optional[DependencyCheckResult]] = [None] * len(check_fns)
+
+    try:
+        with ThreadPoolExecutor(max_workers=len(check_fns) or 1) as pool:
+            futures = {
+                pool.submit(_run_check_with_timeout, fn, timeout): (idx, fn)
+                for idx, fn in enumerate(check_fns)
+            }
+
+            for future, (idx, fn) in futures.items():
+                check_name = getattr(fn, "__name__", str(fn))
+                try:
+                    results[idx] = future.result()
+                except BaseException as exc:
+                    logger.error("Dependency check '%s' failed unexpectedly: %s", check_name, exc)
+                    results[idx] = DependencyCheckResult(
+                        name=check_name,
+                        available=False,
+                        latency_ms=0.0,
+                        error=type(exc).__name__,
+                    )
+    except BaseException as exc:
+        logger.error("Unexpected failure in check_all: %s", exc, exc_info=True)
+        return [
+            DependencyCheckResult(
+                name="check_all",
+                available=False,
+                latency_ms=0.0,
+                error=type(exc).__name__,
+            )
+        ]
+
+    return [result for result in results if result is not None]
 
 
 def register_external_check(url: str, timeout: float = 2.0) -> None:

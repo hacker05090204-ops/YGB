@@ -17,6 +17,9 @@ import time
 from dataclasses import dataclass, asdict
 from typing import Dict, List, Optional
 
+import numpy as np
+
+from backend.training.representation_bridge import SyntheticDataBlockedError
 from impl_v1.training.distributed.hash_utils import hash_model_weights
 
 logger = logging.getLogger(__name__)
@@ -87,6 +90,8 @@ def run_cluster_benchmark(
     epochs: int = 1,
     input_dim: int = 256,
     num_samples: int = 20000,
+    X: Optional[np.ndarray] = None,
+    y: Optional[np.ndarray] = None,
 ) -> ClusterTrainingResult:
     """Run cluster training benchmark (simulated for single machine).
 
@@ -113,6 +118,18 @@ def run_cluster_benchmark(
             dataset_hash_match=True, weight_hash_match=True,
             total_time_sec=0,
         )
+
+    if X is None or y is None:
+        raise SyntheticDataBlockedError(
+            "cluster_training.run_cluster_benchmark requires caller-supplied real tensors; "
+            "synthetic benchmark data is blocked"
+        )
+
+    X_all = np.asarray(X, dtype=np.float32)
+    y_all = np.asarray(y, dtype=np.int64)
+    if X_all.shape[0] != y_all.shape[0]:
+        raise ValueError("cluster_training.run_cluster_benchmark requires aligned feature and label counts")
+    num_samples = int(X_all.shape[0])
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     world_size = config['world_size']
@@ -142,10 +159,6 @@ def run_cluster_benchmark(
         shard_size = num_samples // world_size
         shard_start = rank * shard_size
         shard_end = shard_start + shard_size
-
-        rng = np.random.RandomState(42)
-        X_all = rng.randn(num_samples, input_dim).astype(np.float32)
-        y_all = rng.randint(0, 2, num_samples).astype(np.int64)
 
         X = torch.from_numpy(X_all[shard_start:shard_end]).to(device)
         y = torch.from_numpy(y_all[shard_start:shard_end]).to(device)

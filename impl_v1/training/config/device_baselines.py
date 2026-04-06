@@ -116,7 +116,8 @@ class DeviceBaselineStore:
             from impl_v1.training.config.adaptive_batch import find_optimal_batch_size
             result = find_optimal_batch_size(starting_batch=1024)
             optimal_batch = result.optimal_batch_size
-        except Exception:
+        except Exception as exc:
+            logger.warning("[BASELINES] Adaptive batch scaling unavailable without real tensors: %s", exc)
             optimal_batch = 1024
 
         # Run quick benchmark
@@ -127,8 +128,8 @@ class DeviceBaselineStore:
             bench = run_benchmark(epochs=1, batch_size=optimal_batch)
             sps = bench.samples_per_sec
             vram_peak = bench.vram_peak_mb
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("[BASELINES] Benchmark capture unavailable: %s", exc)
 
         baseline = DeviceBaseline(
             device_name=device_name,

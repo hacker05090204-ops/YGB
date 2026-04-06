@@ -1,217 +1,87 @@
 # test_g21_auto_update.py
-"""Tests for G21 Auto-Update Governance."""
+"""Tests for G21 auto-update infrastructure gating."""
+
+import inspect
 
 import pytest
 
 from impl_v1.phase49.governors.g21_auto_update import (
-    UpdateStatus,
-    UpdateChannel,
-    UpdateInfo,
-    UpdateApproval,
-    UpdateResult,
-    RollbackInfo,
-    get_current_version,
-    set_current_version,
-    check_for_updates,
-    get_update_status,
-    verify_signature,
-    request_update_approval,
-    submit_approval,
-    install_update,
-    rollback,
+    AUTO_UPDATE_PROVISIONING_MESSAGE,
+    AutoUpdater,
+    RealBackendNotConfiguredError,
+    UpdateContract,
     can_auto_update_execute,
-    can_update_skip_signature,
     can_update_prevent_rollback,
-    clear_update_state,
+    can_update_skip_signature,
+    check_for_updates,
 )
 
 
-class TestUpdateStatus:
-    """Tests for UpdateStatus enum."""
-    
-    def test_has_none_available(self):
-        assert UpdateStatus.NONE_AVAILABLE.value == "NONE_AVAILABLE"
-    
-    def test_has_available(self):
-        assert UpdateStatus.AVAILABLE.value == "AVAILABLE"
-    
-    def test_has_awaiting_approval(self):
-        assert UpdateStatus.AWAITING_APPROVAL.value == "AWAITING_APPROVAL"
-    
-    def test_has_installed(self):
-        assert UpdateStatus.INSTALLED.value == "INSTALLED"
-    
-    def test_has_rolled_back(self):
-        assert UpdateStatus.ROLLED_BACK.value == "ROLLED_BACK"
+class TestUpdateContract:
+    """Tests for the real update payload contract."""
+
+    def test_contract_shape(self):
+        update = UpdateContract(
+            update_id="UPD-123",
+            version="2.0.0",
+            signature="a" * 64,
+            download_url="https://updates.example.com/2.0.0",
+            checksum_sha256="b" * 64,
+        )
+        assert update.update_id == "UPD-123"
+        assert update.version == "2.0.0"
+        assert update.signature == "a" * 64
+        assert update.download_url.startswith("https://")
+        assert update.checksum_sha256 == "b" * 64
 
 
-class TestUpdateChannel:
-    """Tests for UpdateChannel enum."""
-    
-    def test_has_stable(self):
-        assert UpdateChannel.STABLE.value == "STABLE"
-    
-    def test_has_beta(self):
-        assert UpdateChannel.BETA.value == "BETA"
+class TestAutoUpdater:
+    """Tests for fail-closed update governance."""
 
+    def test_mock_update_parameter_is_absent(self):
+        parameters = inspect.signature(check_for_updates).parameters
+        assert "_mock_update" not in parameters
 
-class TestCheckForUpdates:
-    """Tests for check_for_updates."""
-    
-    def setup_method(self):
-        clear_update_state()
-    
-    def test_no_update_by_default(self):
-        result = check_for_updates()
-        assert result is None
-        assert get_update_status() == UpdateStatus.NONE_AVAILABLE
-    
-    def test_mock_update_available(self):
-        mock = {"version": "1.0.1", "channel": "STABLE"}
-        result = check_for_updates(_mock_update=mock)
-        assert result is not None
-        assert result.version == "1.0.1"
-    
-    def test_status_changes_to_available(self):
-        mock = {"version": "1.0.1"}
-        check_for_updates(_mock_update=mock)
-        assert get_update_status() == UpdateStatus.AVAILABLE
+    def test_check_for_update_raises_real_backend_not_configured(self):
+        updater = AutoUpdater()
+        with pytest.raises(RealBackendNotConfiguredError, match=AUTO_UPDATE_PROVISIONING_MESSAGE):
+            updater.check_for_update()
 
-
-class TestVerifySignature:
-    """Tests for verify_signature."""
-    
-    def setup_method(self):
-        clear_update_state()
-    
-    def test_valid_signature(self):
-        mock = {"version": "1.0.1", "signature": "valid-sig"}
-        update = check_for_updates(_mock_update=mock)
-        is_valid, reason = verify_signature(update)
-        assert is_valid == True
-    
-    def test_invalid_signature(self):
-        mock = {"version": "1.0.1", "signature": "invalid"}
-        update = check_for_updates(_mock_update=mock)
-        is_valid, reason = verify_signature(update)
-        assert is_valid == False
-
-
-class TestUpdateApproval:
-    """Tests for update approval flow."""
-    
-    def setup_method(self):
-        clear_update_state()
-    
-    def test_request_approval(self):
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        approval = request_update_approval(update.update_id, "user1")
-        assert approval is not None
-        assert approval.approved == False
-    
-    def test_status_awaiting_approval(self):
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        request_update_approval(update.update_id, "user1")
-        assert get_update_status() == UpdateStatus.AWAITING_APPROVAL
-    
-    def test_submit_approval_approved(self):
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        approval = request_update_approval(update.update_id, "user1")
-        result = submit_approval(approval.approval_id, True)
-        assert result.approved == True
-        assert get_update_status() == UpdateStatus.READY_TO_INSTALL
-    
-    def test_submit_approval_rejected(self):
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        approval = request_update_approval(update.update_id, "user1")
-        result = submit_approval(approval.approval_id, False)
-        assert result.approved == False
-
-
-class TestInstallUpdate:
-    """Tests for install_update."""
-    
-    def setup_method(self):
-        clear_update_state()
-    
-    def test_fails_without_approval(self):
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        result = install_update(update.update_id)
-        assert result.status == UpdateStatus.FAILED
-        assert "not approved" in result.error_message.lower()
-    
-    def test_installs_with_approval(self):
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        approval = request_update_approval(update.update_id, "user1")
-        submit_approval(approval.approval_id, True)
-        
-        result = install_update(update.update_id)
-        assert result.status == UpdateStatus.INSTALLED
-        assert result.new_version == "1.0.1"
-    
-    def test_rollback_available_after_install(self):
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        approval = request_update_approval(update.update_id, "user1")
-        submit_approval(approval.approval_id, True)
-        
-        result = install_update(update.update_id)
-        assert result.rollback_available == True
-
-
-class TestRollback:
-    """Tests for rollback."""
-    
-    def setup_method(self):
-        clear_update_state()
-    
-    def test_rollback_without_install_fails(self):
-        result = rollback()
-        assert result.status == UpdateStatus.FAILED
-    
-    def test_rollback_restores_version(self):
-        set_current_version("1.0.0")
-        mock = {"version": "1.0.1"}
-        update = check_for_updates(_mock_update=mock)
-        approval = request_update_approval(update.update_id, "user1")
-        submit_approval(approval.approval_id, True)
-        install_update(update.update_id)
-        
-        assert get_current_version() == "1.0.1"
-        
-        result = rollback()
-        assert result.status == UpdateStatus.ROLLED_BACK
-        assert get_current_version() == "1.0.0"
+    def test_apply_update_raises_real_backend_not_configured(self):
+        updater = AutoUpdater()
+        update = UpdateContract(
+            update_id="UPD-456",
+            version="2.0.1",
+            signature="c" * 64,
+            download_url="https://updates.example.com/2.0.1",
+            checksum_sha256="d" * 64,
+        )
+        with pytest.raises(RealBackendNotConfiguredError, match=AUTO_UPDATE_PROVISIONING_MESSAGE):
+            updater.apply_update(update)
 
 
 class TestCanAutoUpdateExecute:
-    """Tests for can_auto_update_execute guard."""
-    
+    """Tests for auto-update execution guard."""
+
     def test_cannot_auto_execute(self):
         can_exec, reason = can_auto_update_execute()
-        assert can_exec == False
+        assert can_exec is False
         assert "approval" in reason.lower()
 
 
 class TestCanUpdateSkipSignature:
-    """Tests for can_update_skip_signature guard."""
-    
+    """Tests for mandatory signature verification guard."""
+
     def test_cannot_skip_signature(self):
         can_skip, reason = can_update_skip_signature()
-        assert can_skip == False
+        assert can_skip is False
         assert "signature" in reason.lower()
 
 
 class TestCanUpdatePreventRollback:
-    """Tests for can_update_prevent_rollback guard."""
-    
+    """Tests for rollback availability guard."""
+
     def test_cannot_prevent_rollback(self):
         can_prevent, reason = can_update_prevent_rollback()
-        assert can_prevent == False
+        assert can_prevent is False
         assert "rollback" in reason.lower()

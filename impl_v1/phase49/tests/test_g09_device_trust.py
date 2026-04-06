@@ -7,12 +7,15 @@ from impl_v1.phase49.governors.g09_device_trust import (
     VerificationStatus,
     DeviceRegistration,
     VerificationChallenge,
+    TrustAuditEntry,
     clear_registry,
     get_registered_devices,
     get_trusted_count,
     register_device,
     verify_device,
     is_device_trusted,
+    _device_registry,
+    _trust_guard,
     MAX_DEVICES,
     MAX_VERIFICATION_ATTEMPTS,
 )
@@ -169,3 +172,59 @@ class TestDataclassFrozen:
         device, _, _ = register_device("D1", "fp1", "1.1.1.1")
         with pytest.raises(AttributeError):
             device.trust_level = DeviceTrustLevel.BLOCKED
+
+
+class TestDeviceTrustGuard:
+    """Test runtime guard evaluation and audit behavior."""
+
+    def setup_method(self):
+        clear_registry()
+
+    def test_match_returns_trusted(self):
+        device, _, _ = register_device("D1", "fp1", "1.1.1.1")
+
+        result = _trust_guard.evaluate(device.device_id, device.fingerprint_hash)
+
+        assert result == DeviceTrustLevel.TRUSTED
+
+    def test_mismatch_blocks_and_revokes_device(self):
+        device, _, _ = register_device("D1", "fp1", "1.1.1.1")
+
+        result = _trust_guard.evaluate(device.device_id, "wrong-fingerprint-hash")
+
+        assert result == DeviceTrustLevel.BLOCKED
+        assert _device_registry[device.device_id].trust_level == DeviceTrustLevel.BLOCKED
+
+    def test_blocked_device_stays_blocked(self):
+        device, _, _ = register_device("D1", "fp1", "1.1.1.1")
+        assert _trust_guard.revoke(device.device_id)
+
+        result = _trust_guard.evaluate(device.device_id, device.fingerprint_hash)
+
+        assert result == DeviceTrustLevel.BLOCKED
+        assert _device_registry[device.device_id].trust_level == DeviceTrustLevel.BLOCKED
+
+    def test_revoke_unknown_returns_false(self):
+        assert _trust_guard.revoke("UNKNOWN-DEVICE") is False
+
+    def test_audit_entry_added_for_every_evaluate(self):
+        device, _, _ = register_device("D1", "fp1", "1.1.1.1")
+
+        _trust_guard.evaluate(device.device_id, device.fingerprint_hash)
+        _trust_guard.evaluate("UNKNOWN-DEVICE", "fp")
+
+        audit = _trust_guard.get_audit_log()
+
+        assert len(audit) == 2
+        assert all(isinstance(entry, TrustAuditEntry) for entry in audit)
+        assert audit[0].decision == DeviceTrustLevel.TRUSTED.value
+        assert audit[1].decision == DeviceTrustLevel.UNTRUSTED.value
+
+    def test_audit_log_rotates_after_max_entries(self):
+        for _ in range(10001):
+            _trust_guard.evaluate("UNKNOWN-DEVICE", "fp")
+
+        audit = _trust_guard.get_audit_log()
+
+        assert len(audit) == 5000
+        assert audit[-1].device_id == "UNKNOWN-DEVICE"

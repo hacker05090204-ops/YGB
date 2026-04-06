@@ -2,8 +2,11 @@
 """Tests for G03: Browser Safety Adapter"""
 
 import pytest
+from impl_v1.phase49.governors.g02_browser_types import BrowserProfile
 from impl_v1.phase49.governors.g03_browser_safety import (
+    BrowserSafetyGuard,
     BrowserSafetyCheck,
+    SafetyCheck,
     SafetyCheckResult,
     check_scope,
     check_ethics,
@@ -214,3 +217,60 @@ class TestFullSafetyCheck:
             locked_resources=[],
         )
         assert result.result_id.startswith("SAF-")
+
+
+class TestBrowserSafetyGuard:
+    """Tests for governed browser profile preflight checks."""
+
+    def test_unsafe_profile_blocked(self, caplog):
+        guard = BrowserSafetyGuard()
+        profile = BrowserProfile(
+            profile_id="PROFILE-1",
+            browser_type="CHROMIUM",
+            headless=False,
+            sandboxed=True,
+            allowed_domains=["example.com"],
+        )
+
+        caplog.set_level("WARNING")
+
+        assert guard.is_safe(profile) is False
+        with pytest.raises(PermissionError):
+            guard.start_session(profile)
+
+        assert any(record.levelname == "WARNING" and "headless" in record.message.lower() for record in caplog.records)
+
+    def test_all_required_check_types_covered(self):
+        guard = BrowserSafetyGuard()
+        profile = BrowserProfile(
+            profile_id="PROFILE-1",
+            browser_type="EDGE",
+            headless=True,
+            sandboxed=True,
+            allowed_domains=["example.com"],
+        )
+
+        checks = guard.run_preflight(profile)
+
+        assert all(isinstance(check, SafetyCheck) for check in checks)
+        assert {check.check_type for check in checks} == {
+            "profile_headless_true",
+            "profile_sandboxed_true",
+            "no_write_permissions",
+            "no_credential_storage",
+            "domain_whitelist_non_empty",
+        }
+
+    def test_no_bypass_path(self):
+        guard = BrowserSafetyGuard()
+        unsafe_profile = BrowserProfile(
+            profile_id="PROFILE-1",
+            browser_type="FIREFOX",
+            headless=True,
+            sandboxed=False,
+            allowed_domains=[],
+        )
+
+        assert guard.is_safe(unsafe_profile) is False
+        with pytest.raises(PermissionError):
+            guard.start_session(unsafe_profile)

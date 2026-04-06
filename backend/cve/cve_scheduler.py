@@ -131,7 +131,7 @@ class CVEIngestScheduler:
             try:
                 await self._task
             except asyncio.CancelledError:
-                pass
+                logger.debug("[CVE_SCHEDULER] Scheduler task cancellation acknowledged")
             self._task = None
         logger.info("[CVE_SCHEDULER] Stopped")
 

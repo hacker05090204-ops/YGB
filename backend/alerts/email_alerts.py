@@ -33,8 +33,11 @@ sys.path.insert(0, str(PROJECT_ROOT))
 try:
     from dotenv import load_dotenv
     load_dotenv(PROJECT_ROOT / ".env")
-except ImportError:
-    pass
+except ImportError as exc:
+    logging.getLogger("ygb.alerts").debug(
+        "python-dotenv unavailable; .env auto-load skipped: %s",
+        exc,
+    )
 
 logger = logging.getLogger("ygb.alerts")
 

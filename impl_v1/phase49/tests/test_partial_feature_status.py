@@ -114,33 +114,32 @@ class TestCVEApiTruthfulness:
 
 
 class TestGmailAlertsTruthfulness:
-    """Gmail alerts must return PENDING without SMTP credentials."""
+    """Gmail alerts must fail closed without OAuth credentials."""
 
-    def test_send_alert_returns_pending_without_smtp(self):
-        """send_new_device_alert must return PENDING without SMTP password."""
+    def test_send_alert_requires_gmail_credentials(self):
+        """send_new_device_alert must raise when Gmail OAuth credentials are absent."""
         from impl_v1.phase49.governors.g16_gmail_alerts import (
-            send_new_device_alert, EmailStatus,
+            RealBackendNotConfiguredError,
+            send_new_device_alert,
         )
-        result = send_new_device_alert(
-            device_id="test-device-abc",
-            ip_address="192.168.1.1",
-        )
-        # Without SMTP creds, status must be PENDING, not SENT
-        assert result.email_status == EmailStatus.PENDING, (
-            f"Expected PENDING without SMTP, got: {result.email_status.value}"
-        )
+
+        with pytest.raises(RealBackendNotConfiguredError):
+            send_new_device_alert(
+                device_id="test-device-abc",
+                ip_address="192.168.1.1",
+            )
 
 
 class TestScreenInspectionTruthfulness:
     """Screen inspection must report actual availability, never fake findings."""
 
     def test_mode_indicator_is_truthful(self):
-        """Mode info must reflect local availability or explicit unavailability."""
+        """Mode info must reflect infrastructure gating without fake runtime claims."""
         from impl_v1.phase49.governors.g18_screen_inspection import get_inspection_mode_info
 
         info = get_inspection_mode_info()
         assert info["is_stub"] is False
-        assert info["mode"] in {"LOCAL_READ_ONLY", "UNAVAILABLE_READ_ONLY"}
+        assert info["mode"] == "INFRASTRUCTURE_GATED_PASSIVE_ONLY"
         assert isinstance(info["native_capture_available"], bool)
         assert "stub" not in info["description"].lower()
 
@@ -151,7 +150,7 @@ class TestScreenInspectionTruthfulness:
         )
         result, reason = can_inspection_interact()
         assert result is False, f"Inspection interact should be blocked, got: {reason}"
-        assert "READ-ONLY" in reason
+        assert "PASSIVE ONLY" in reason
 
 
 if __name__ == "__main__":

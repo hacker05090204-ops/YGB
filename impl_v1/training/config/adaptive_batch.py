@@ -24,6 +24,8 @@ import time
 from dataclasses import dataclass, asdict
 from typing import Tuple
 
+from backend.training.representation_bridge import SyntheticDataBlockedError
+
 logger = logging.getLogger(__name__)
 
 BATCH_CONFIG_PATH = os.path.join('secure_data', 'adaptive_batch_config.json')
@@ -82,7 +84,13 @@ def _get_gpu_util() -> float:
 # WARMUP EPOCH
 # =============================================================================
 
-def _run_warmup(batch_size: int, input_dim: int = 256, num_samples: int = 4000) -> Tuple[bool, float, float]:
+def _run_warmup(
+    batch_size: int,
+    input_dim: int = 256,
+    num_samples: int = 4000,
+    X=None,
+    y=None,
+) -> Tuple[bool, float, float]:
     """Run a warmup epoch to test a batch size.
 
     Returns:
@@ -96,14 +104,25 @@ def _run_warmup(batch_size: int, input_dim: int = 256, num_samples: int = 4000) 
     except ImportError:
         return False, 0.0, 0.0
 
+    if X is None or y is None:
+        raise SyntheticDataBlockedError(
+            "adaptive_batch._run_warmup requires caller-supplied real tensors; "
+            "synthetic warmup data is blocked"
+        )
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     try:
         torch.cuda.reset_peak_memory_stats()
 
-        rng = np.random.RandomState(42)
-        X = torch.from_numpy(rng.randn(num_samples, input_dim).astype(np.float32)).to(device)
-        y = torch.from_numpy(rng.randint(0, 2, num_samples).astype(np.int64)).to(device)
+        X_np = np.asarray(X, dtype=np.float32)
+        y_np = np.asarray(y, dtype=np.int64)
+        num_samples = min(num_samples, X_np.shape[0], y_np.shape[0])
+        if num_samples <= 0:
+            raise ValueError("adaptive_batch warmup requires at least one real sample")
+
+        X = torch.from_numpy(X_np[:num_samples]).to(device)
+        y = torch.from_numpy(y_np[:num_samples]).to(device)
 
         model = nn.Sequential(
             nn.Linear(input_dim, 512), nn.ReLU(),
@@ -159,6 +178,8 @@ def _run_warmup(batch_size: int, input_dim: int = 256, num_samples: int = 4000) 
 def find_optimal_batch_size(
     starting_batch: int = 1024,
     input_dim: int = 256,
+    X=None,
+    y=None,
 ) -> BatchScaleResult:
     """Find optimal batch size via warmup scaling.
 
@@ -179,7 +200,7 @@ def find_optimal_batch_size(
     attempts = 0
 
     # Initial warmup
-    ok, vram_pct, sps = _run_warmup(current_batch, input_dim)
+    ok, vram_pct, sps = _run_warmup(current_batch, input_dim, X=X, y=y)
     if not ok:
         return BatchScaleResult(
             original_batch_size=starting_batch,
@@ -201,7 +222,7 @@ def find_optimal_batch_size(
 
         logger.info(f"[BATCH] Attempt {attempts}: trying batch_size={current_batch}")
 
-        ok, vram_pct, sps = _run_warmup(current_batch, input_dim)
+        ok, vram_pct, sps = _run_warmup(current_batch, input_dim, X=X, y=y)
 
         if not ok:
             # OOM — rollback

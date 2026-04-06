@@ -1,6 +1,8 @@
 # test_g33_proof_verification.py
 """Tests for G33 Proof-Based Bug Verification."""
 
+import logging
+
 import pytest
 
 from impl_v1.phase49.governors.g33_proof_verification import (
@@ -10,7 +12,9 @@ from impl_v1.phase49.governors.g33_proof_verification import (
     RejectionReason,
     # Data structures
     ProofEvidence,
+    ProofVerifier,
     ProofVerificationResult,
+    _verifier,
     # Functions
     verify_bug_proof,
     verify_findings_batch,
@@ -144,6 +148,50 @@ class TestDeterministicVerification:
         
         assert result1.status == result2.status
         assert result1.determinism_hash == result2.determinism_hash
+
+
+class TestProofVerifier:
+    """Tests for ProofVerifier wrapper."""
+
+    def test_verify_tracks_pending(self):
+        verifier = ProofVerifier()
+
+        result = verifier.verify(
+            "SQL injection found",
+            {"input_vector": "id=1'"},
+        )
+
+        assert result.status == ProofStatus.NEEDS_HUMAN
+        assert verifier.get_pending() == (result,)
+
+    def test_verify_tracks_rejected(self):
+        verifier = ProofVerifier()
+
+        result = verifier.verify(
+            "Missing X-Frame-Options header",
+            {},
+        )
+
+        assert result.status == ProofStatus.NOT_REAL
+        assert verifier.get_rejected() == (result,)
+
+    def test_module_singleton_exists(self):
+        assert isinstance(_verifier, ProofVerifier)
+
+    def test_rejected_proofs_log_warning_with_proof_id(self, caplog):
+        with caplog.at_level(logging.WARNING):
+            result = verify_bug_proof(
+                finding_text="Missing X-Frame-Options header",
+                finding_data={},
+            )
+
+        assert result.status == ProofStatus.NOT_REAL
+        assert any(
+            record.levelno == logging.WARNING
+            and "proof_id=" in record.getMessage()
+            and result.result_id in record.getMessage()
+            for record in caplog.records
+        )
 
 
 class TestBatchVerification:

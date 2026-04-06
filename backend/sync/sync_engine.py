@@ -148,8 +148,8 @@ def enforce_retention() -> int:
                     fpath.unlink()
                     deleted += 1
                     logger.info("Retention: deleted %s (>%dd)", fpath.name, max_days)
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.debug("Retention cleanup skipped for %s: %s", fpath, exc)
 
     # Clean conflict archive (7 days)
     cutoff_conflict = now - (7 * 86400)
@@ -160,8 +160,8 @@ def enforce_retention() -> int:
                     if fpath.stat().st_mtime < cutoff_conflict:
                         fpath.unlink()
                         deleted += 1
-                except OSError:
-                    pass
+                except OSError as exc:
+                    logger.debug("Conflict archive cleanup skipped for %s: %s", fpath, exc)
     if deleted:
         logger.info("Retention: cleaned %d files total", deleted)
     return deleted
@@ -195,8 +195,8 @@ def compress_cold_files() -> int:
                         cctx.copy_stream(fin, fout)
                     fpath.unlink()
                     compressed += 1
-            except OSError:
-                pass
+            except OSError as exc:
+                logger.debug("Compression skipped for %s: %s", fpath, exc)
     if compressed:
         logger.info("Compressed %d cold files with zstd", compressed)
     return compressed

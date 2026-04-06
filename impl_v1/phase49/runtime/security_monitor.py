@@ -14,12 +14,16 @@ Logs written to: reports/security/
 import os
 import time
 import hashlib
+import logging
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 from enum import Enum
 import platform
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -111,8 +115,8 @@ def get_memory_usage_mb() -> float:
                     if line.startswith("VmRSS:"):
                         kb = int(line.split()[1])
                         return kb / 1024
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning("Failed to read runtime memory usage: %s", exc)
     return 0.0
 
 

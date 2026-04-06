@@ -246,6 +246,13 @@ class TestSanityGate:
 
 class TestProductionDDPLauncher:
 
+    @staticmethod
+    def _real_batch(n=512, d=64, c=2, seed=42):
+        rng = np.random.RandomState(seed)
+        X = rng.randn(n, d).astype(np.float32)
+        y = rng.randint(0, c, n).astype(np.int64)
+        return X, y
+
     def test_setup_env(self):
         from impl_v1.training.distributed.production_ddp_launcher import (
             setup_production_env,
@@ -263,7 +270,8 @@ class TestProductionDDPLauncher:
             rank=0, world_size=1, input_dim=64,
             num_classes=2, batch_size=128,
         )
-        metrics = run_single_epoch(config)
+        X, y = self._real_batch()
+        metrics = run_single_epoch(config, X=X, y=y)
         assert metrics.local_sps > 0
         assert len(metrics.weight_hash) == 64
 
@@ -276,7 +284,8 @@ class TestProductionDDPLauncher:
             num_classes=2, batch_size=128,
             deterministic_runs=3,
         )
-        match, hashes = run_deterministic_validation(config, num_runs=3)
+        X, y = self._real_batch()
+        match, hashes = run_deterministic_validation(config, X=X, y=y, num_runs=3)
         assert match is True
         assert len(hashes) == 3
         assert len(set(hashes)) == 1
@@ -290,8 +299,11 @@ class TestProductionDDPLauncher:
             num_classes=2, batch_size=128,
             deterministic_runs=2,
         )
+        X, y = self._real_batch()
         report = launch_production_ddp(
             config,
+            X=X,
+            y=y,
             node0_baseline_sps=5000, node1_baseline_sps=4000,
             authority_resumed=False,
         )

@@ -3,6 +3,7 @@
 
 import pytest
 import os
+import impl_v1.phase49.governors.g35_ai_accelerator as g35
 
 from impl_v1.phase49.governors.g35_ai_accelerator import (
     # Enums
@@ -27,6 +28,10 @@ from impl_v1.phase49.governors.g35_ai_accelerator import (
     can_ai_bypass_governance,
     can_ai_make_binding_decision,
     can_ai_override_human,
+    AccelerationProfile,
+    AccelerationContract,
+    AccelerationReadinessCheck,
+    get_acceleration_status,
 )
 
 
@@ -308,6 +313,67 @@ class TestAiCannotApproveOrVerify:
         
         # Binding decisions MUST be 0
         assert result.binding_decisions == 0
+
+
+class TestAccelerationContract:
+    """Tests for acceleration profile validation."""
+
+    def test_rejects_unknown_backend(self):
+        profile = AccelerationProfile(
+            profile_id="acc-1",
+            backend="quantum",
+            precision="fp16",
+            target_throughput_tps=128.0,
+            memory_budget_gb=8.0,
+        )
+
+        assert AccelerationContract.validate(profile) is False
+
+
+class TestAccelerationReadinessCheck:
+    """Tests for real torch-backed acceleration readiness."""
+
+    def test_matches_real_torch_capability_signals(self):
+        readiness = AccelerationReadinessCheck().run()
+
+        assert set(readiness) == {
+            "cuda_available",
+            "mps_available",
+            "recommended_backend",
+            "reason",
+        }
+
+        if g35.torch is None:
+            expected_cuda = False
+            expected_mps = False
+        else:
+            expected_cuda = bool(g35.torch.cuda.is_available())
+            mps_backend = getattr(getattr(g35.torch, "backends", None), "mps", None)
+            expected_mps = bool(mps_backend.is_available()) if mps_backend is not None else False
+
+        assert readiness["cuda_available"] is expected_cuda
+        assert readiness["mps_available"] is expected_mps
+
+        expected_backend = "cuda" if expected_cuda else "mps" if expected_mps else "cpu"
+        assert readiness["recommended_backend"] == expected_backend
+        assert isinstance(readiness["reason"], str)
+        assert readiness["reason"]
+
+
+class TestAccelerationStatus:
+    """Tests for acceleration status reporting."""
+
+    def test_status_dict_shape_is_correct(self):
+        status = get_acceleration_status()
+
+        assert set(status) == {
+            "cuda_available",
+            "mps_available",
+            "recommended_backend",
+            "reason",
+            "active_profile",
+        }
+        assert status["active_profile"] is None
 
 
 # =============================================================================

@@ -19,9 +19,13 @@ from typing import List, Dict, Optional
 from pathlib import Path
 from datetime import datetime
 import json
+import logging
 import time
 import os
 import platform
+
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -78,8 +82,8 @@ def get_file_descriptor_count() -> int:
             fd_path = Path(f"/proc/{os.getpid()}/fd")
             if fd_path.exists():
                 return len(list(fd_path.iterdir()))
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("psutil FD probe unavailable; defaulting descriptor count to 0: %s", exc)
     return 0
 
 

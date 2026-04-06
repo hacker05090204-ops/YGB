@@ -14,6 +14,10 @@ Frontend NEVER receives the vault key.
 import os
 import json
 import time
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 # =========================================================================
 # PATHS
@@ -40,8 +44,8 @@ def _audit_log(action: str, ip: str = '', details: str = ''):
         os.makedirs(os.path.dirname(AUDIT_LOG_PATH), exist_ok=True)
         with open(AUDIT_LOG_PATH, 'a') as f:
             f.write(json.dumps(entry) + '\n')
-    except OSError:
-        pass
+    except OSError as exc:
+        logger.warning("Failed to append vault audit log: %s", exc)
 
 
 # =========================================================================

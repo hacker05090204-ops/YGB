@@ -3,7 +3,11 @@
 
 import pytest
 
+from impl_v1.phase49.governors.g02_browser_types import BrowserProfile
 from impl_v1.phase49.governors.g19_interactive_browser import (
+    BROWSER_RUNTIME_PROVISIONING_MESSAGE,
+    BrowserSession,
+    InteractiveBrowser,
     InteractiveMode,
     SessionState,
     Platform,
@@ -11,6 +15,7 @@ from impl_v1.phase49.governors.g19_interactive_browser import (
     InteractiveSession,
     ObservationResult,
     PlatformDetection,
+    RealBackendNotConfiguredError,
     create_interactive_session,
     get_session,
     update_session_state,
@@ -250,3 +255,51 @@ class TestCanSessionScan:
         can_scan, reason = can_session_scan()
         assert can_scan == False
         assert "scanning" in reason.lower() or "forbidden" in reason.lower()
+
+
+class TestInteractiveBrowserContracts:
+    """Tests for infrastructure-gated interactive browser contracts."""
+
+    def test_browser_session_contract_shape(self):
+        session = BrowserSession(
+            session_id="SES-REAL-1",
+            browser_type="CHROMIUM",
+            started_at="2026-04-06T00:00:00+00:00",
+            target_url="https://example.com",
+            status="READY",
+        )
+        assert session.session_id == "SES-REAL-1"
+        assert session.browser_type == "CHROMIUM"
+        assert session.target_url == "https://example.com"
+
+    def test_unsafe_profile_blocked_before_infrastructure_error(self):
+        browser = InteractiveBrowser()
+        unsafe_profile = BrowserProfile(
+            profile_id="PROFILE-UNSAFE",
+            browser_type="CHROMIUM",
+            headless=False,
+            sandboxed=True,
+            allowed_domains=["example.com"],
+        )
+
+        with pytest.raises(PermissionError, match="Unsafe browser profile blocked"):
+            browser.launch(unsafe_profile)
+
+    def test_safe_profile_raises_real_backend_not_configured(self):
+        browser = InteractiveBrowser()
+        safe_profile = BrowserProfile(
+            profile_id="PROFILE-SAFE",
+            browser_type="CHROMIUM",
+            headless=True,
+            sandboxed=True,
+            allowed_domains=["example.com"],
+        )
+
+        with pytest.raises(RealBackendNotConfiguredError, match=BROWSER_RUNTIME_PROVISIONING_MESSAGE):
+            browser.launch(safe_profile)
+
+    def test_read_only_contract_is_explicit(self):
+        contract = InteractiveBrowser.read_only_contract()
+        assert contract["form_submission_allowed"] is False
+        assert contract["submit_login_clicks_allowed"] is False
+        assert contract["credential_entry_allowed"] is False

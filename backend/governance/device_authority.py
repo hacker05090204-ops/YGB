@@ -16,10 +16,14 @@ NO auto-approve for unknown devices.
 
 import hashlib
 import json
+import logging
 import os
 import secrets
 import time
 from typing import Optional, Dict, Any
+
+
+logger = logging.getLogger(__name__)
 
 # =========================================================================
 # PATHS
@@ -325,5 +329,5 @@ def _update_request_status(device_id: str, status: str):
         data['processed_at'] = int(time.time())
         with open(path, 'w') as f:
             json.dump(data, f, indent=2)
-    except (json.JSONDecodeError, OSError):
-        pass
+    except (json.JSONDecodeError, OSError) as exc:
+        logger.warning("Failed to update pairing request status for %s: %s", device_id, exc)

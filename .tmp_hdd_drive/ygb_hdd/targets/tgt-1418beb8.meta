@@ -1,0 +1,12 @@
+{
+  "entity_id": "tgt-1418beb8",
+  "entity_type": "targets",
+  "lifecycle_state": "CREATED",
+  "created_at": "2026-04-06T06:00:36.649408+00:00",
+  "updated_at": "2026-04-06T06:00:36.649408+00:00",
+  "backup_verified": false,
+  "integrity_verified": true,
+  "legal_hold": false,
+  "record_count": 1,
+  "total_bytes": 148
+}

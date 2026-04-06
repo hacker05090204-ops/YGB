@@ -33,6 +33,19 @@ except Exception:  # pragma: no cover - optional runtime dependency
 from . import g37_pytorch_backend as _pt_backend
 
 
+class RealBackendNotConfiguredError(RuntimeError):
+    """Raised when the real GPU backend contract is not provisioned."""
+
+
+@dataclass(frozen=True)
+class GPUConfig:
+    """Infrastructure-gated GPU execution contract."""
+
+    device_id: int
+    memory_limit_gb: float
+    mixed_precision: bool
+
+
 class GPUBackend(Enum):
     """Available training backends."""
 
@@ -40,6 +53,51 @@ class GPUBackend(Enum):
     ROCM = "ROCM"
     CPU = "CPU"
     UNAVAILABLE = "UNAVAILABLE"
+
+    @staticmethod
+    def check_availability() -> Dict[str, Any]:
+        """Report real CUDA availability without synthetic fallback."""
+
+        torch_module = getattr(_pt_backend, "torch", None)
+        if not getattr(_pt_backend, "PYTORCH_AVAILABLE", False) or torch_module is None:
+            return {"available": False, "device_count": 0, "devices": []}
+
+        cuda_module = getattr(torch_module, "cuda", None)
+        if cuda_module is None:
+            return {"available": False, "device_count": 0, "devices": []}
+
+        available = bool(cuda_module.is_available())
+        device_count = int(cuda_module.device_count())
+        devices = [str(cuda_module.get_device_name(device_id)) for device_id in range(device_count)] if available else []
+        return {
+            "available": available,
+            "device_count": device_count,
+            "devices": devices,
+        }
+
+    @staticmethod
+    def train(
+        gpu_config: GPUConfig,
+        training_config: _pt_backend.TrainingConfig,
+        dataloader: Any,
+    ) -> Any:
+        """Fail closed unless a real CUDA-backed training contract is provisioned."""
+
+        availability = GPUBackend.check_availability()
+        if not availability["available"]:
+            raise RealBackendNotConfiguredError(
+                "GPU training requires CUDA. torch.cuda.is_available() returned False."
+            )
+
+        if not isinstance(gpu_config, GPUConfig) or not isinstance(training_config, _pt_backend.TrainingConfig):
+            raise RealBackendNotConfiguredError(_pt_backend.PYTORCH_BACKEND_PROVISIONING_MESSAGE)
+
+        if gpu_config.device_id < 0 or gpu_config.device_id >= availability["device_count"]:
+            raise RealBackendNotConfiguredError(
+                f"GPU device_id {gpu_config.device_id} is unavailable. Detected {availability['device_count']} CUDA device(s)."
+            )
+
+        return _pt_backend.PyTorchBackend().train(training_config, dataloader)
 
 
 class TrainingObjective(Enum):

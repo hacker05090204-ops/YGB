@@ -575,6 +575,8 @@ def validate_dataset_integrity(
                 False,
                 f"INSUFFICIENT_REAL_SAMPLES: {msg} (threshold: {min_samples})",
             )
+        elif "YGB_AUTHORITY_KEY" in msg:
+            result = (False, f"STRICT_REAL_MODE_VIOLATION: {msg}")
         else:
             result = (False, f"REAL_DATA_REQUIRED: {msg}")
     except Exception as e:
@@ -583,7 +585,14 @@ def validate_dataset_integrity(
         try:
             verification = verify_dataset(dataset)
         except RuntimeError as exc:
-            result = (False, str(exc))
+            verification_error = str(exc)
+            if "YGB_AUTHORITY_KEY" in verification_error:
+                result = (
+                    False,
+                    f"STRICT_REAL_MODE_VIOLATION: {verification_error}",
+                )
+            else:
+                result = (False, verification_error)
         else:
             stats = dataset.get_statistics()
 

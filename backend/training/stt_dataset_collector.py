@@ -62,8 +62,8 @@ def _dataset_root() -> Path:
     if resolve_path:
         try:
             return resolve_path("dataset") / "stt"
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.debug("Storage topology dataset resolution failed; using local dataset root: %s", exc)
     return PROJECT_ROOT / "data" / "stt"
 
 
@@ -243,8 +243,8 @@ def _checkpoint_info() -> Dict[str, Any]:
                 "latest_checkpoint": _file_info(latest_path) if latest_path else None,
                 "best_checkpoint": _file_info(best_path) if best_path else None,
             }
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("Checkpoint manager inspection failed for %s: %s", checkpoint_dir, exc)
 
     latest = checkpoint_dir / "conformer_ctc_latest.pt"
     best = checkpoint_dir / "conformer_ctc_best.pt"
@@ -539,5 +539,5 @@ def train_local_stt_model(
     finally:
         try:
             lock_path.unlink()
-        except FileNotFoundError:
-            pass
+        except FileNotFoundError as exc:
+            logger.debug("Training lock already removed for %s: %s", lock_path, exc)

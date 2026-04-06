@@ -25,6 +25,10 @@ import hmac
 import hashlib
 import struct
 import logging
+import time
+import uuid
+from dataclasses import asdict, is_dataclass
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +67,127 @@ def _sign_payload(payload: dict) -> str:
     import hashlib
     canonical = json.dumps(payload, sort_keys=True, separators=(',', ':'))
     return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+
+
+def _new_trace_id() -> str:
+    """Create a short trace identifier for API responses and logs."""
+    return str(uuid.uuid4())[:8]
+
+
+def _serialize_detail(detail):
+    """Convert dataclasses/enums into JSON-serializable structures."""
+    if is_dataclass(detail):
+        return _serialize_detail(asdict(detail))
+    if isinstance(detail, dict):
+        return {str(key): _serialize_detail(value) for key, value in detail.items()}
+    if isinstance(detail, list):
+        return [_serialize_detail(item) for item in detail]
+    if hasattr(detail, 'value') and not isinstance(
+        detail,
+        (str, bytes, int, float, bool, type(None)),
+    ):
+        return _serialize_detail(detail.value)
+    return detail
+
+
+def _finalize_handler_result(handler_name: str, trace_id: str, started_at: float, result: dict) -> dict:
+    """Attach trace metadata and emit exit timing logs."""
+    payload = dict(result)
+    payload.setdefault("trace_id", trace_id)
+    duration_ms = round((time.perf_counter() - started_at) * 1000.0, 2)
+    logger.info(
+        "runtime_api exit handler=%s trace_id=%s duration_ms=%.2f status=%s",
+        handler_name,
+        trace_id,
+        duration_ms,
+        payload.get("status", "ok"),
+    )
+    return payload
+
+
+def _runtime_error_response(trace_id: str, error, **extras) -> dict:
+    """Standardized runtime API error payload."""
+    payload = {
+        "trace_id": trace_id,
+        "status": "error",
+        "detail": str(error),
+    }
+    payload.update(extras)
+    return payload
+
+
+def _component_payload(status: str, detail) -> dict:
+    """Build a component status entry for detailed status responses."""
+    return {
+        "status": status,
+        "detail": _serialize_detail(detail),
+    }
+
+
+def _load_circuit_breaker_component() -> dict:
+    """Summarize circuit breaker state from CVE pipeline source status."""
+    from backend.cve.cve_pipeline import get_pipeline
+
+    source_status = get_pipeline().get_source_status()
+    status = "unknown" if not source_status else "ok"
+    if any(
+        details.get("circuit_breaker") in {"OPEN", "HALF_OPEN"}
+        for details in source_status.values()
+    ):
+        status = "degraded"
+    return _component_payload(status, source_status)
+
+
+def _load_peer_status_component() -> dict:
+    """Summarize peer connectivity state."""
+    from backend.sync.peer_transport import get_peer_statuses
+
+    peer_statuses = _serialize_detail(get_peer_statuses())
+    status = "unknown" if not peer_statuses else "ok"
+    if any(value in {"DEGRADED", "UNREACHABLE"} for value in peer_statuses.values()):
+        status = "degraded"
+    return _component_payload(status, peer_statuses)
+
+
+def _load_tier_health_component() -> dict:
+    """Summarize storage tier health probes."""
+    from backend.storage.tiered_storage import get_tier_health
+
+    tiers = _serialize_detail(get_tier_health())
+    status = "unknown" if not tiers else "ok"
+    if any(
+        isinstance(tier, dict)
+        and (
+            float(tier.get("read_latency_ms", -1.0)) < 0.0
+            or float(tier.get("write_latency_ms", -1.0)) < 0.0
+        )
+        for tier in tiers
+    ):
+        status = "degraded"
+    return _component_payload(status, tiers)
+
+
+def _load_feature_health_component() -> dict:
+    """Summarize feature-bridge health."""
+    from backend.training.feature_bridge import FeatureDiversifier
+
+    health = _serialize_detail(FeatureDiversifier().get_health())
+    total = int(health.get("total", 0)) if isinstance(health, dict) else 0
+    invalid = int(health.get("invalid", 0)) if isinstance(health, dict) else 0
+    status = "unknown" if total == 0 else "ok"
+    if invalid > 0:
+        status = "degraded"
+    return _component_payload(status, health)
+
+
+def _load_last_batch_component() -> dict:
+    """Return the most recent bridge ingestion batch summary."""
+    from backend.cve.bridge_ingestion_worker import get_bridge_worker
+
+    worker_status = get_bridge_worker().get_status()
+    last_batch = worker_status.get("last_batch")
+    status = "ok" if last_batch else "unknown"
+    return _component_payload(status, last_batch)
 
 
 # =========================================================================
@@ -374,7 +499,8 @@ def get_runtime_status():
     Separates storage_engine_status from dataset_readiness_status.
     Blocks 'training ready' if dataset is blocked.
     """
-    import time as _time
+    trace_id = _new_trace_id()
+    started_at = time.perf_counter()
 
     # Determine dataset readiness (strict real mode check)
     strict_real = os.environ.get("YGB_STRICT_REAL_MODE", "true").lower() != "false"
@@ -386,23 +512,28 @@ def get_runtime_status():
         "reason": f"Strict real mode active — need {min_samples} verified samples before training"
     }
 
-    # Try runtime state file first
-    if os.path.exists(RUNTIME_STATE_PATH):
-        try:
+    try:
+        # Try runtime state file first
+        if os.path.exists(RUNTIME_STATE_PATH):
             with open(RUNTIME_STATE_PATH, 'r') as f:
                 data = json.load(f)
 
             missing = _validate_structure(data)
             if missing:
-                return {
-                    "status": "invalid",
-                    "storage_engine_status": "ERROR",
-                    "dataset_readiness": dataset_readiness,
-                    "message": f"Missing required fields: {', '.join(missing)}",
-                    "timestamp": int(_time.time() * 1000)
-                }
+                return _finalize_handler_result(
+                    "get_runtime_status",
+                    trace_id,
+                    started_at,
+                    {
+                        "status": "invalid",
+                        "storage_engine_status": "ERROR",
+                        "dataset_readiness": dataset_readiness,
+                        "message": f"Missing required fields: {', '.join(missing)}",
+                        "timestamp": int(time.time() * 1000),
+                    },
+                )
 
-            now_ms = int(_time.time() * 1000)
+            now_ms = int(time.time() * 1000)
             last_update = data.get('last_update_ms', 0)
             stale = (now_ms - last_update) > STALE_THRESHOLD_MS
 
@@ -421,59 +552,126 @@ def get_runtime_status():
                 and dataset_readiness["status"] != "BLOCKED_REAL_DATA"
             )
 
-            return {
-                "status": "active",
-                "storage_engine_status": storage_status,
-                "dataset_readiness": dataset_readiness,
-                "training_ready": training_ready,
-                "runtime": data,
-                "signature": _sign_payload(data),
-                "stale": stale,
-                "determinism_ok": data.get('determinism_status', False),
-                "timestamp": now_ms
-            }
-        except json.JSONDecodeError:
-            return {
-                "status": "error",
-                "storage_engine_status": "ERROR",
-                "dataset_readiness": dataset_readiness,
-                "message": "Corrupt runtime state file",
-                "timestamp": int(_time.time() * 1000)
-            }
-        except OSError as e:
-            logger.exception("Failed to read runtime state")
-            return {
-                "status": "error",
-                "storage_engine_status": "ERROR",
-                "dataset_readiness": dataset_readiness,
-                "message": "Failed to read runtime state",
-                "timestamp": int(_time.time() * 1000)
-            }
+            return _finalize_handler_result(
+                "get_runtime_status",
+                trace_id,
+                started_at,
+                {
+                    "status": "active",
+                    "storage_engine_status": storage_status,
+                    "dataset_readiness": dataset_readiness,
+                    "training_ready": training_ready,
+                    "runtime": data,
+                    "signature": _sign_payload(data),
+                    "stale": stale,
+                    "determinism_ok": data.get('determinism_status', False),
+                    "timestamp": now_ms,
+                },
+            )
 
-    # Optional telemetry fallback for deployments that still expose only the
-    # signed telemetry stream. Default is fail-safe awaiting_data because test
-    # and cold-start environments often have stale telemetry artifacts.
-    telemetry_fallback_enabled = (
-        os.environ.get("YGB_RUNTIME_ALLOW_TELEMETRY_FALLBACK", "false")
-        .strip()
-        .lower()
-        in _TRUTHY_VALUES
-    )
-    if telemetry_fallback_enabled and os.path.exists(TELEMETRY_PATH):
-        result = validate_telemetry()
-        result["storage_engine_status"] = "ACTIVE" if result.get("status") == "ok" else "ERROR"
-        result["dataset_readiness"] = dataset_readiness
-        result["training_ready"] = False  # Always blocked until dataset ready
-        return result
+        # Optional telemetry fallback for deployments that still expose only the
+        # signed telemetry stream. Default is fail-safe awaiting_data because test
+        # and cold-start environments often have stale telemetry artifacts.
+        telemetry_fallback_enabled = (
+            os.environ.get("YGB_RUNTIME_ALLOW_TELEMETRY_FALLBACK", "false")
+            .strip()
+            .lower()
+            in _TRUTHY_VALUES
+        )
+        if telemetry_fallback_enabled and os.path.exists(TELEMETRY_PATH):
+            result = validate_telemetry()
+            result["storage_engine_status"] = "ACTIVE" if result.get("status") == "ok" else "ERROR"
+            result["dataset_readiness"] = dataset_readiness
+            result["training_ready"] = False  # Always blocked until dataset ready
+            return _finalize_handler_result(
+                "get_runtime_status",
+                trace_id,
+                started_at,
+                result,
+            )
 
-    return {
-        "status": "awaiting_data",
-        "storage_engine_status": "NOT_INITIALIZED",
-        "dataset_readiness": dataset_readiness,
-        "training_ready": False,
-        "message": "No runtime state yet",
-        "timestamp": int(_time.time() * 1000)
-    }
+        return _finalize_handler_result(
+            "get_runtime_status",
+            trace_id,
+            started_at,
+            {
+                "status": "awaiting_data",
+                "storage_engine_status": "NOT_INITIALIZED",
+                "dataset_readiness": dataset_readiness,
+                "training_ready": False,
+                "message": "No runtime state yet",
+                "timestamp": int(time.time() * 1000),
+            },
+        )
+    except json.JSONDecodeError as e:
+        logger.warning("runtime_api [%s]: %s", trace_id, repr(e))
+        return _finalize_handler_result(
+            "get_runtime_status",
+            trace_id,
+            started_at,
+            _runtime_error_response(
+                trace_id,
+                e,
+                message="Corrupt runtime state file",
+                storage_engine_status="ERROR",
+                dataset_readiness=dataset_readiness,
+                timestamp=int(time.time() * 1000),
+            ),
+        )
+    except Exception as e:
+        logger.warning("runtime_api [%s]: %s", trace_id, repr(e))
+        return _finalize_handler_result(
+            "get_runtime_status",
+            trace_id,
+            started_at,
+            _runtime_error_response(
+                trace_id,
+                e,
+                storage_engine_status="ERROR",
+                dataset_readiness=dataset_readiness,
+                timestamp=int(time.time() * 1000),
+            ),
+        )
+
+
+def get_detailed_status() -> dict:
+    """Aggregate detailed subsystem health for operator visibility."""
+    trace_id = _new_trace_id()
+    started_at = time.perf_counter()
+
+    try:
+        components = {}
+        loaders = {
+            "circuit_breaker_stats": _load_circuit_breaker_component,
+            "peer_statuses": _load_peer_status_component,
+            "tier_health": _load_tier_health_component,
+            "feature_health": _load_feature_health_component,
+            "last_batch": _load_last_batch_component,
+        }
+        for component_name, loader in loaders.items():
+            try:
+                components[component_name] = loader()
+            except Exception as e:
+                logger.warning("runtime_api [%s]: %s", trace_id, repr(e))
+                components[component_name] = _component_payload("error", str(e))
+
+        return _finalize_handler_result(
+            "get_detailed_status",
+            trace_id,
+            started_at,
+            {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "components": components,
+            },
+        )
+    except Exception as e:
+        logger.warning("runtime_api [%s]: %s", trace_id, repr(e))
+        return _finalize_handler_result(
+            "get_detailed_status",
+            trace_id,
+            started_at,
+            _runtime_error_response(trace_id, e),
+        )
 
 
 # =========================================================================
@@ -482,15 +680,19 @@ def get_runtime_status():
 
 def register_routes(app):
     """Register runtime API endpoints with Flask app."""
-    from functools import wraps
-
     @app.route('/runtime/status', methods=['GET'])
     def runtime_status_route():
         result = get_runtime_status()
         status_code = 200 if result.get('status') == 'ok' else 500
         return json.dumps(result), status_code, {'Content-Type': 'application/json'}
 
-    logger.info("Registered runtime API routes: /runtime/status")
+    @app.route('/api/v1/status/detailed', methods=['GET'])
+    def detailed_status_route():
+        result = get_detailed_status()
+        status_code = 500 if result.get('status') == 'error' else 200
+        return json.dumps(result), status_code, {'Content-Type': 'application/json'}
+
+    logger.info("Registered runtime API routes: /runtime/status, /api/v1/status/detailed")
 
 
 # =========================================================================

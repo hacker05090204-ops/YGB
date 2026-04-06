@@ -6,6 +6,7 @@ Tests for app dashboard governor.
 """
 
 import pytest
+from types import SimpleNamespace
 from impl_v1.phase49.governors.g28_app_dashboard import (
     DashboardMode,
     SessionStatus,
@@ -15,6 +16,7 @@ from impl_v1.phase49.governors.g28_app_dashboard import (
     ActivitySession,
     DashboardAlert,
     DashboardState,
+    DashboardSummary,
     can_dashboard_execute,
     can_dashboard_approve_execution,
     can_dashboard_trigger_automation,
@@ -26,9 +28,11 @@ from impl_v1.phase49.governors.g28_app_dashboard import (
     generate_alert_id,
     generate_state_id,
     DashboardManager,
+    build_summary,
     validate_dashboard_action,
     create_dashboard,
 )
+from impl_v1.phase49.governors import g28_app_dashboard as dashboard_module
 
 
 class TestGuards:
@@ -387,3 +391,64 @@ class TestDataclasses:
         )
         with pytest.raises(Exception):
             target.progress_percent = 50
+
+
+class TestDashboardSummary:
+    def test_build_summary_uses_real_sources(self, monkeypatch):
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_dashboard_cluster_state",
+            lambda: SimpleNamespace(pending_approvals=4, system_health="DEGRADED"),
+        )
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_training_progress",
+            lambda: SimpleNamespace(status="training", automode_status="TRAINING"),
+        )
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_peer_transport_statuses",
+            lambda: {"peer-a": "REACHABLE", "peer-b": "DEGRADED"},
+        )
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_last_ingestion_batch",
+            lambda: {"ingested": 12},
+        )
+
+        summary = build_summary()
+
+        assert isinstance(summary, DashboardSummary)
+        assert summary.training_status == "TRAINING"
+        assert summary.cve_ingestion_count == 12
+        assert summary.pending_approvals == 4
+        assert summary.active_peers == 1
+        assert summary.system_health == "DEGRADED"
+
+    def test_build_summary_does_not_fabricate_missing_ingestion_count(self, monkeypatch):
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_dashboard_cluster_state",
+            lambda: SimpleNamespace(pending_approvals=1, system_health="HEALTHY"),
+        )
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_training_progress",
+            lambda: SimpleNamespace(status="idle", automode_status="IDLE"),
+        )
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_peer_transport_statuses",
+            lambda: {"peer-a": "REACHABLE"},
+        )
+        monkeypatch.setattr(
+            dashboard_module,
+            "_get_last_ingestion_batch",
+            lambda: None,
+        )
+
+        summary = build_summary()
+
+        assert summary.training_status == "IDLE"
+        assert summary.cve_ingestion_count is None
+        assert summary.active_peers == 1

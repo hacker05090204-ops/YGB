@@ -1,0 +1,2 @@
+{"ts":"2026-04-05T19:16:51.968002+00:00","op":"CREATE","id":"test-b9310218","name":"Full Test","email":"b9310218@ygb.dev","role":"hunter"}
+{"ts":"2026-04-05T19:16:51.977833+00:00","op":"UPDATE","id":"test-b9310218","action":"login","ip":"127.0.0.1"}

@@ -158,12 +158,30 @@ class IntelligenceLayer:
         self._optimal_threshold = self._load_optimal_threshold()
         self._feature_extractor = self._load_feature_extractor()
         self._bridge_samples: List[Dict[str, Any]] | None = None
+        self._fallback_model_active = bool(self._model_metadata.get("fallback_model"))
         tensor_hash = str(self._model_metadata.get("tensor_hash", "unknown"))[:8]
         epoch = str(self._model_metadata.get("epoch_number", "unknown"))
-        self._model_version = f"g38-safetensors-epoch{epoch}-{tensor_hash}"
+        self._model_version = (
+            str(self._model_metadata.get("model_version", "g38-keyword-fallback-missing-checkpoint"))
+            if self._fallback_model_active
+            else f"g38-safetensors-epoch{epoch}-{tensor_hash}"
+        )
+
+    @staticmethod
+    def _load_missing_checkpoint_fallback() -> tuple[Dict[str, Any], Dict[str, _TensorData]]:
+        return {
+            "fallback_model": True,
+            "fallback_reason": "missing_checkpoint",
+            "epoch_number": "missing",
+            "tensor_hash": "fallback",
+            "model_version": "g38-keyword-fallback-missing-checkpoint",
+            "checkpoint_path": str(MODEL_CHECKPOINT_PATH),
+        }, {}
 
     def _load_model_checkpoint(self) -> tuple[Dict[str, Any], Dict[str, _TensorData]]:
         _raise_if_execution_guarded("model checkpoint load")
+        if not MODEL_CHECKPOINT_PATH.exists():
+            return self._load_missing_checkpoint_fallback()
         try:
             from training.safetensors_io import load_safetensors
 
@@ -173,8 +191,13 @@ class IntelligenceLayer:
                 name: self._coerce_loaded_tensor(tensor)
                 for name, tensor in raw_tensors.items()
             }
+        except FileNotFoundError:
+            return self._load_missing_checkpoint_fallback()
         except Exception:
-            return self._load_safetensors_fallback(MODEL_CHECKPOINT_PATH)
+            try:
+                return self._load_safetensors_fallback(MODEL_CHECKPOINT_PATH)
+            except FileNotFoundError:
+                return self._load_missing_checkpoint_fallback()
 
     def _load_optimal_threshold(self) -> float:
         _raise_if_execution_guarded("threshold load")
@@ -433,6 +456,23 @@ class IntelligenceLayer:
     def _clamp(value: float) -> float:
         return max(0.0, min(1.0, value))
 
+    def _run_keyword_fallback_model(
+        self,
+        description: str,
+        technology_stack: Sequence[str],
+    ) -> float:
+        corpus = " ".join([description, *technology_stack]).lower()
+        keyword_hits = sum(1 for token in FOCUS_KEYWORDS if token in corpus)
+        repeated_hits = sum(corpus.count(token) for token in FOCUS_KEYWORDS)
+        stack_hits = len({token.strip().lower() for token in technology_stack if str(token).strip()})
+        base_score = 0.22
+        keyword_score = min(keyword_hits * 0.08, 0.40)
+        repetition_score = min(max(repeated_hits - keyword_hits, 0) * 0.02, 0.10)
+        stack_score = min(stack_hits * 0.04, 0.12)
+        length_score = min(len(corpus.split()) / 80.0, 0.12)
+        auth_bonus = 0.10 if any(token in corpus for token in ("login", "auth", "password", "session")) else 0.0
+        return self._clamp(base_score + keyword_score + repetition_score + stack_score + length_score + auth_bonus)
+
     def analyze_target_description(
         self,
         description: str,
@@ -451,7 +491,11 @@ class IntelligenceLayer:
 
         combined_description = self._combine_description(description, technology_stack, scope)
         feature_vector = self._feature_extractor.extract_features(raw_text=combined_description)
-        probability = self._run_model(feature_vector)
+        probability = (
+            self._run_keyword_fallback_model(combined_description, technology_stack)
+            if self._fallback_model_active
+            else self._run_model(feature_vector)
+        )
         confidence = self._clamp(
             probability
             if probability >= self._optimal_threshold

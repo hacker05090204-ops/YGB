@@ -16,7 +16,12 @@ import time
 import hashlib
 import hmac
 import secrets
+import logging
+from collections import deque
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from http.cookies import SimpleCookie
+from threading import RLock
 from urllib.parse import urlparse
 from typing import Optional, Dict, Set
 from pathlib import Path
@@ -42,6 +47,8 @@ from backend.auth.revocation_store import (
     is_session_revoked,
 )
 
+logger = logging.getLogger(__name__)
+
 # Bearer token scheme
 _bearer_scheme = HTTPBearer(auto_error=False)
 AUTH_COOKIE_NAME = "ygb_auth"
@@ -50,6 +57,122 @@ CSRF_COOKIE_NAME = "ygb_csrf"
 CSRF_HEADER_NAME = "x-csrf-token"
 _SAFE_HTTP_METHODS = frozenset({"GET", "HEAD", "OPTIONS", "TRACE"})
 _TRUTHY_VALUES = frozenset({"1", "true", "yes", "on"})
+_AUDIT_MAX_ENTRIES = 50000
+_AUDIT_ROTATE_ENTRIES = 25000
+_RATE_LIMIT_WINDOW_SECONDS = 60
+_RATE_LIMIT_MAX_CALLS = 100
+
+
+@dataclass(frozen=True)
+class AuthAuditEntry:
+    timestamp: str
+    subject: str
+    resource: str
+    action: str
+    decision: str
+    reason: str
+
+
+class AuthAuditTrail:
+    def __init__(self, max_entries: int = _AUDIT_MAX_ENTRIES, retain_entries: int = _AUDIT_ROTATE_ENTRIES):
+        self._max_entries = max(1, int(max_entries))
+        self._retain_entries = max(1, min(int(retain_entries), self._max_entries))
+        self._entries: list[AuthAuditEntry] = []
+        self._lock = RLock()
+
+    def append(self, entry: AuthAuditEntry) -> None:
+        with self._lock:
+            self._entries.append(entry)
+            if len(self._entries) > self._max_entries:
+                self._entries = self._entries[-self._retain_entries:]
+
+    def get(self, subject: Optional[str] = None) -> list[AuthAuditEntry]:
+        with self._lock:
+            if subject is None:
+                return list(self._entries)
+            return [entry for entry in self._entries if entry.subject == subject]
+
+
+_audit_trail = AuthAuditTrail()
+_subject_rate_limit_windows: dict[str, deque[float]] = {}
+
+
+def _audit_timestamp() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _request_resource(request: Optional[Request]) -> str:
+    if request is None:
+        return "auth"
+    try:
+        return str(request.url.path)
+    except Exception:
+        return "auth"
+
+
+def _normalize_audit_reason(value: object, fallback: str) -> str:
+    if isinstance(value, dict):
+        detail = value.get("detail")
+        if isinstance(detail, str) and detail.strip():
+            return detail.strip().lower().replace(" ", "_")
+        error = value.get("error")
+        if isinstance(error, str) and error.strip():
+            return error.strip().lower().replace(" ", "_")
+    if isinstance(value, str) and value.strip():
+        return value.strip().lower().replace(" ", "_")
+    return fallback
+
+
+def _append_auth_audit(
+    *,
+    subject: str,
+    resource: str,
+    action: str,
+    decision: str,
+    reason: str,
+) -> None:
+    _audit_trail.append(
+        AuthAuditEntry(
+            timestamp=_audit_timestamp(),
+            subject=subject or "anonymous",
+            resource=resource,
+            action=action,
+            decision=decision,
+            reason=reason,
+        )
+    )
+
+
+def _check_subject_rate_limit(subject: str) -> bool:
+    normalized_subject = subject or "anonymous"
+    now = time.time()
+    attempts = _subject_rate_limit_windows.setdefault(normalized_subject, deque())
+    cutoff = now - _RATE_LIMIT_WINDOW_SECONDS
+    while attempts and attempts[0] <= cutoff:
+        attempts.popleft()
+    if len(attempts) >= _RATE_LIMIT_MAX_CALLS:
+        return False
+    attempts.append(now)
+    return True
+
+
+def _raise_rate_limited(subject: str, resource: str, action: str) -> None:
+    logger.warning("Auth rate limit exceeded for subject %s", subject)
+    _append_auth_audit(
+        subject=subject,
+        resource=resource,
+        action=action,
+        decision="deny",
+        reason="rate_limited",
+    )
+    raise HTTPException(
+        status_code=429,
+        detail={"error": "RATE_LIMITED", "detail": "rate_limited"},
+    )
+
+
+def get_auth_audit_trail(subject: Optional[str] = None) -> list[AuthAuditEntry]:
+    return _audit_trail.get(subject)
 
 
 def is_temporary_auth_bypass_enabled() -> bool:
@@ -146,6 +269,13 @@ def _enforce_cookie_csrf(request: Request) -> None:
 
 def _verify_token_or_401(token: str) -> Dict:
     if is_token_revoked(token):
+        _append_auth_audit(
+            subject="anonymous",
+            resource="token",
+            action="verify_token",
+            decision="deny",
+            reason="token_revoked",
+        )
         raise HTTPException(
             status_code=401,
             detail={"error": "AUTH_REQUIRED", "detail": "Token has been revoked"},
@@ -154,6 +284,13 @@ def _verify_token_or_401(token: str) -> Dict:
 
     payload = verify_jwt(token)
     if payload is None:
+        _append_auth_audit(
+            subject="anonymous",
+            resource="token",
+            action="verify_token",
+            decision="deny",
+            reason="invalid_or_expired_token",
+        )
         raise HTTPException(
             status_code=401,
             detail={"error": "AUTH_REQUIRED", "detail": "Invalid or expired token"},
@@ -162,6 +299,13 @@ def _verify_token_or_401(token: str) -> Dict:
 
     session_id = payload.get("session_id")
     if session_id and is_session_revoked(session_id):
+        _append_auth_audit(
+            subject=str(payload.get("sub", "anonymous")),
+            resource="token",
+            action="verify_token",
+            decision="deny",
+            reason="session_revoked",
+        )
         raise HTTPException(
             status_code=401,
             detail={"error": "AUTH_REQUIRED", "detail": "Session has been invalidated"},
@@ -188,7 +332,26 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
     _ws_logger = logging.getLogger("ygb.ws_auth")
 
     if is_temporary_auth_bypass_enabled():
-        return build_temporary_auth_user("temporary_websocket")
+        user = build_temporary_auth_user("temporary_websocket")
+        subject = str(user.get("sub", "anonymous"))
+        if not _check_subject_rate_limit(subject):
+            logger.warning("Auth rate limit exceeded for subject %s", subject)
+            _append_auth_audit(
+                subject=subject,
+                resource="websocket",
+                action="ws_authenticate",
+                decision="deny",
+                reason="rate_limited",
+            )
+            return None
+        _append_auth_audit(
+            subject=subject,
+            resource="websocket",
+            action="ws_authenticate",
+            decision="allow",
+            reason="temporary_bypass",
+        )
+        return user
 
     token = None
 
@@ -196,6 +359,13 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
     if websocket.query_params.get("token"):
         _ws_logger.warning(
             "WS auth via query param rejected — use Sec-WebSocket-Protocol instead"
+        )
+        _append_auth_audit(
+            subject="anonymous",
+            resource="websocket",
+            action="ws_authenticate",
+            decision="deny",
+            reason="query_token_rejected",
         )
         return None
 
@@ -219,15 +389,36 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
                 break
 
     if not token:
+        _append_auth_audit(
+            subject="anonymous",
+            resource="websocket",
+            action="ws_authenticate",
+            decision="deny",
+            reason="auth_required",
+        )
         return None
 
     # Check revocation
     if is_token_revoked(token):
+        _append_auth_audit(
+            subject="anonymous",
+            resource="websocket",
+            action="ws_authenticate",
+            decision="deny",
+            reason="token_revoked",
+        )
         return None
 
     # Verify JWT
     payload = verify_jwt(token)
     if not payload:
+        _append_auth_audit(
+            subject="anonymous",
+            resource="websocket",
+            action="ws_authenticate",
+            decision="deny",
+            reason="invalid_or_expired_token",
+        )
         return None
 
     # ── Session revocation parity with HTTP auth ──────────
@@ -237,7 +428,34 @@ async def ws_authenticate(websocket) -> Optional[Dict]:
     session_id = payload.get("session_id")
     if session_id and is_session_revoked(session_id):
         _ws_logger.warning("WS auth rejected — session %s revoked", session_id[:8])
+        _append_auth_audit(
+            subject=str(payload.get("sub", "anonymous")),
+            resource="websocket",
+            action="ws_authenticate",
+            decision="deny",
+            reason="session_revoked",
+        )
         return None
+
+    subject = str(payload.get("sub", "anonymous"))
+    if not _check_subject_rate_limit(subject):
+        logger.warning("Auth rate limit exceeded for subject %s", subject)
+        _append_auth_audit(
+            subject=subject,
+            resource="websocket",
+            action="ws_authenticate",
+            decision="deny",
+            reason="rate_limited",
+        )
+        return None
+
+    _append_auth_audit(
+        subject=subject,
+        resource="websocket",
+        action="ws_authenticate",
+        decision="allow",
+        reason="ok",
+    )
 
     return payload
 
@@ -265,10 +483,23 @@ async def require_auth(
     Raises HTTPException(401) on failure.
     """
     if is_temporary_auth_bypass_enabled():
-        return build_temporary_auth_user("temporary_http")
+        user = build_temporary_auth_user("temporary_http")
+        subject = str(user.get("sub", "anonymous"))
+        resource = _request_resource(request)
+        if not _check_subject_rate_limit(subject):
+            _raise_rate_limited(subject, resource, "require_auth")
+        _append_auth_audit(
+            subject=subject,
+            resource=resource,
+            action="require_auth",
+            decision="allow",
+            reason="temporary_bypass",
+        )
+        return user
 
     token = None
     via_cookie = False
+    resource = _request_resource(request)
 
     if credentials:
         token = credentials.credentials
@@ -277,6 +508,13 @@ async def require_auth(
         via_cookie = bool(token)
 
     if not token:
+        _append_auth_audit(
+            subject="anonymous",
+            resource=resource,
+            action="require_auth",
+            decision="deny",
+            reason="auth_required",
+        )
         raise HTTPException(
             status_code=401,
             detail={"error": "AUTH_REQUIRED", "detail": "Authentication required"},
@@ -284,7 +522,17 @@ async def require_auth(
         )
 
     if via_cookie:
-        _enforce_cookie_csrf(request)
+        try:
+            _enforce_cookie_csrf(request)
+        except HTTPException as exc:
+            _append_auth_audit(
+                subject="anonymous",
+                resource=resource,
+                action="require_auth",
+                decision="deny",
+                reason=_normalize_audit_reason(exc.detail, "csrf_blocked"),
+            )
+            raise
 
     payload = _verify_token_or_401(token)
 
@@ -307,6 +555,18 @@ async def require_auth(
                     exc_info=True,
                 )
 
+    subject = str(payload.get("sub", "anonymous"))
+    if not _check_subject_rate_limit(subject):
+        _raise_rate_limited(subject, resource, "require_auth")
+
+    _append_auth_audit(
+        subject=subject,
+        resource=resource,
+        action="require_auth",
+        decision="allow",
+        reason="ok",
+    )
+
     return {**payload, "_auth_via": "cookie" if via_cookie else "bearer"}
 
 
@@ -321,12 +581,27 @@ async def require_admin(
     
     Raises HTTPException(403) if user is not admin.
     """
+    subject = str(user.get("sub", "anonymous"))
     role = user.get("role", "")
     if role != "admin":
+        _append_auth_audit(
+            subject=subject,
+            resource="admin",
+            action="require_admin",
+            decision="deny",
+            reason="insufficient_permissions",
+        )
         raise HTTPException(
             status_code=403,
             detail={"error": "AUTH_REQUIRED", "detail": "Insufficient permissions — admin access required"},
         )
+    _append_auth_audit(
+        subject=subject,
+        resource="admin",
+        action="require_admin",
+        decision="allow",
+        reason="ok",
+    )
     return user
 
 
@@ -490,8 +765,8 @@ def validate_target_url(url: str) -> tuple:
                     "message": f"Private/reserved IP address blocked: {hostname}"
                 })
                 return False, violations
-    except ValueError:
-        pass  # Not an IP — it's a hostname, which is fine
+    except ValueError as exc:
+        logger.debug("Target hostname is not a literal IP address: %s (%s)", hostname, exc)
 
     # Block wildcard TLDs
     import re
