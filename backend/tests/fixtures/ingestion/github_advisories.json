@@ -1,0 +1,43 @@
+[
+    {
+        "cwes": [],
+        "description": "",
+        "ghsa_id": "GHSA-skip-skip-skip",
+        "html_url": "https://github.com/advisories/GHSA-skip-skip-skip",
+        "identifiers": [],
+        "severity": "low",
+        "summary": ""
+    },
+    {
+        "cwes": [
+            {
+                "cwe_id": "CWE-89"
+            }
+        ],
+        "description": "An SQL injection vulnerability in Example Service allows attackers to extract sensitive data through crafted API parameters.",
+        "ghsa_id": "GHSA-4h2x-9jgm-6wph",
+        "html_url": "https://github.com/advisories/GHSA-4h2x-9jgm-6wph",
+        "identifiers": [
+            {
+                "type": "GHSA",
+                "value": "GHSA-4h2x-9jgm-6wph"
+            },
+            {
+                "type": "CVE",
+                "value": "CVE-2026-3001"
+            }
+        ],
+        "published_at": "2026-04-03T00:00:00Z",
+        "severity": "high",
+        "summary": "Example service SQL injection",
+        "updated_at": "2026-04-04T00:00:00Z",
+        "vulnerabilities": [
+            {
+                "package": {
+                    "ecosystem": "pip",
+                    "name": "example-service"
+                }
+            }
+        ]
+    }
+]

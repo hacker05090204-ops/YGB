@@ -8,6 +8,7 @@ from backend.training.representation_bridge import (
     RepresentationExpander,
     SyntheticDataBlockedError,
 )
+from backend.training.safetensors_store import SafetensorsFeatureStore
 
 
 def test_representation_bridge_generate_http_features_raises_blocked_error():
@@ -34,6 +35,19 @@ def test_real_feature_loader_loads_valid_npy_shape(tmp_path):
     np.save(path, features)
 
     loaded = RealFeatureLoader.load(path)
+
+    assert loaded.shape == (2, 256)
+    assert loaded.dtype == np.float32
+    assert np.array_equal(loaded, features)
+
+
+def test_real_feature_loader_loads_valid_safetensors_shape(tmp_path):
+    features = np.arange(512, dtype=np.float32).reshape(2, 256)
+    labels = np.asarray([0, 1], dtype=np.int64)
+    store = SafetensorsFeatureStore(tmp_path / "feature_store")
+    shard_path = store.write("bridge_valid", features, labels, metadata={"source": "test"})
+
+    loaded = RealFeatureLoader.load(shard_path)
 
     assert loaded.shape == (2, 256)
     assert loaded.dtype == np.float32

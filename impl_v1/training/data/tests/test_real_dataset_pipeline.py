@@ -16,6 +16,7 @@ import os
 import errno
 import hashlib
 import json
+from datetime import datetime, timezone
 
 import numpy as np
 
@@ -263,13 +264,14 @@ class TestRealDatasetPipeline:
         accepted, rejected_policy, rejected_quality = dataset._process_persisted_samples(
             [
                 {
-                    "endpoint": "/api/users/7",
+                    "endpoint": "CVE-2026-00007",
                     "parameters": "id=7&role=user",
                     "exploit_vector": "probe-vector",
                     "impact": "CVSS:7.3|impact",
                     "source_tag": "nvd",
                     "fingerprint": "abc123",
                     "reliability": 0.91,
+                    "published_at": datetime.now(timezone.utc).isoformat(),
                 }
             ],
             policy=object(),
@@ -390,6 +392,62 @@ class TestRealDatasetPipeline:
         assert result.parseable is True
         assert attempts["count"] == 2
         assert sleeps == [0.5, 0.5]
+
+    def test_dataset_integrity_validator_rejects_invalid_cve_format(self):
+        from impl_v1.training.data.real_dataset_loader import DatasetIntegrityValidator
+
+        validator = DatasetIntegrityValidator()
+
+        assert validator.validate_sample(
+            {
+                "text": "Verified vulnerability description",
+                "cve_id": "BAD-2026-00001",
+                "severity": "HIGH",
+                "published_at": "2026-01-01T00:00:00+00:00",
+            }
+        ) is False
+
+    def test_dataset_integrity_validator_rejects_invalid_severity(self):
+        from impl_v1.training.data.real_dataset_loader import DatasetIntegrityValidator
+
+        validator = DatasetIntegrityValidator()
+
+        assert validator.validate_sample(
+            {
+                "text": "Verified vulnerability description",
+                "cve_id": "CVE-2026-00001",
+                "severity": "SEVERE",
+                "published_at": "2026-01-01T00:00:00+00:00",
+            }
+        ) is False
+
+    def test_dataset_integrity_validator_rejects_unparseable_date(self):
+        from impl_v1.training.data.real_dataset_loader import DatasetIntegrityValidator
+
+        validator = DatasetIntegrityValidator()
+
+        assert validator.validate_sample(
+            {
+                "text": "Verified vulnerability description",
+                "cve_id": "CVE-2026-00001",
+                "severity": "LOW",
+                "published_at": "not-a-date",
+            }
+        ) is False
+
+    def test_dataset_integrity_validator_accepts_valid_sample(self):
+        from impl_v1.training.data.real_dataset_loader import DatasetIntegrityValidator
+
+        validator = DatasetIntegrityValidator()
+
+        assert validator.validate_sample(
+            {
+                "text": "Verified vulnerability description",
+                "cve_id": "CVE-2026-00001",
+                "severity": "INFORMATIONAL",
+                "published_at": "2026-01-01T00:00:00+00:00",
+            }
+        ) is True
 
 
 if __name__ == "__main__":

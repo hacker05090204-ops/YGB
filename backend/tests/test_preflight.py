@@ -41,14 +41,22 @@ class TestPreflightReporting(unittest.TestCase):
             ),
         }
 
-    def _run_preflight_with_results(self, results):
+    def _run_preflight_with_results(self, results, *, bootstrap_side_effect=None):
         with ExitStack() as stack:
             for attr_name, result in results.items():
                 stack.enter_context(patch.object(preflight_module, attr_name, return_value=result))
-            return preflight_module.preflight()
+            bootstrap_mock = stack.enter_context(
+                patch.object(
+                    preflight_module,
+                    "bootstrap_pipeline",
+                    side_effect=bootstrap_side_effect,
+                )
+            )
+            report = preflight_module.preflight()
+            return report, bootstrap_mock
 
     def test_preflight_returns_report_with_all_checks_listed(self):
-        report = self._run_preflight_with_results(self._passing_results())
+        report, _ = self._run_preflight_with_results(self._passing_results())
 
         self.assertIsInstance(report, preflight_module.PreflightReport)
         self.assertTrue(report.passed)
@@ -72,6 +80,12 @@ class TestPreflightReporting(unittest.TestCase):
             all(isinstance(check, preflight_module.PreflightCheck) for check in report.checks)
         )
 
+    def test_preflight_calls_bootstrap_after_checks_pass(self):
+        report, bootstrap_mock = self._run_preflight_with_results(self._passing_results())
+
+        self.assertTrue(report.passed)
+        bootstrap_mock.assert_called_once_with()
+
     def test_run_preflight_returns_report_all_passed_flag(self):
         report = preflight_module.PreflightReport(
             passed=True,
@@ -87,6 +101,20 @@ class TestPreflightReporting(unittest.TestCase):
 
         with patch.object(preflight_module, "preflight", return_value=report):
             self.assertFalse(preflight_module.run_preflight())
+
+    def test_bootstrap_failure_logged_critical_without_raising(self):
+        with self.assertLogs(preflight_module.logger.name, level="CRITICAL") as captured:
+            report, bootstrap_mock = self._run_preflight_with_results(
+                self._passing_results(),
+                bootstrap_side_effect=RuntimeError("pipeline bootstrap exploded"),
+            )
+
+        self.assertTrue(report.passed)
+        self.assertTrue(report.all_passed)
+        bootstrap_mock.assert_called_once_with()
+        output = "\n".join(captured.output)
+        self.assertIn("automatic pipeline bootstrap failed", output.lower())
+        self.assertIn("pipeline bootstrap exploded", output)
 
     def test_failed_checks_logged_at_critical_before_raise(self):
         results = self._passing_results()

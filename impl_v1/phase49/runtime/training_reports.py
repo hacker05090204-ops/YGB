@@ -203,7 +203,7 @@ class TrainingReportGenerator:
             start = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
             stop = datetime.fromisoformat(stopped_at.replace("Z", "+00:00"))
             duration = int((stop - start).total_seconds())
-        except:
+        except (ValueError, TypeError, AttributeError):
             duration = 0
         
         # Determine learning focus based on mode

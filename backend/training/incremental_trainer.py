@@ -34,6 +34,7 @@ from backend.training.model_thresholds import (
     load_threshold_artifact,
     save_threshold_artifact,
 )
+from backend.training.safetensors_store import SafetensorsFeatureStore
 from backend.training.state_manager import TrainingMetrics, get_training_state_manager
 from impl_v1.phase49.governors.g37_pytorch_backend import (
     BugClassifier,
@@ -51,6 +52,7 @@ DEFAULT_BASELINE_PATH = Path("checkpoints/baseline_accuracy.json")
 DEFAULT_RAW_DATA_ROOT = Path("data/raw")
 DEFAULT_DATASET_INDEX_PATH = Path("checkpoints/raw_data_index.json")
 DEFAULT_FEATURE_CACHE_ROOT = Path("checkpoints/feature_cache")
+DEFAULT_FEATURE_STORE_ROOT = Path("training/features_safetensors")
 _IMPACT_RE = re.compile(r"CVSS:(?P<score>[0-9.]+)\|(?P<severity>[^|]+)")
 _CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{4,}$", re.IGNORECASE)
 
@@ -290,6 +292,138 @@ class DatasetQualityGate:
             failed_reasons=failed_reasons,
         )
 
+    def validate_arrays(
+        self,
+        features: np.ndarray,
+        labels: np.ndarray,
+        sample_count: int,
+    ) -> DatasetQualityReport:
+        feature_array = np.asarray(features)
+        label_array = np.asarray(labels)
+        effective_sample_count = int(sample_count)
+        failed_reasons: list[str] = []
+        quality_scores: list[float] = []
+        unique_feature_hashes: set[str] = set()
+
+        if effective_sample_count < 0:
+            failed_reasons.append(
+                f"sample_count_invalid:{effective_sample_count}<0"
+            )
+            effective_sample_count = 0
+
+        if feature_array.ndim != 2:
+            failed_reasons.append(
+                f"feature_array_shape_invalid:{tuple(feature_array.shape)}"
+            )
+        if label_array.ndim != 1:
+            failed_reasons.append(
+                f"label_array_shape_invalid:{tuple(label_array.shape)}"
+            )
+        if feature_array.ndim == 2 and feature_array.shape[0] != effective_sample_count:
+            failed_reasons.append(
+                "feature_sample_count_mismatch:"
+                f"{feature_array.shape[0]}!={effective_sample_count}"
+            )
+        if label_array.ndim == 1 and label_array.shape[0] != effective_sample_count:
+            failed_reasons.append(
+                "label_sample_count_mismatch:"
+                f"{label_array.shape[0]}!={effective_sample_count}"
+            )
+        if not np.issubdtype(label_array.dtype, np.integer):
+            failed_reasons.append(f"label_dtype_invalid:{label_array.dtype}")
+
+        rows_to_validate = 0
+        if feature_array.ndim == 2 and label_array.ndim == 1:
+            rows_to_validate = min(
+                feature_array.shape[0],
+                label_array.shape[0],
+                effective_sample_count,
+            )
+
+        for index in range(rows_to_validate):
+            feature_row = np.asarray(feature_array[index], dtype=np.float32)
+            row_quality = 1.0
+            if feature_row.size == 0:
+                failed_reasons.append(f"feature_array_invalid[{index}]: empty_row")
+                row_quality = 0.0
+            elif not np.isfinite(feature_row).all():
+                failed_reasons.append(f"feature_array_invalid[{index}]: non_finite")
+                row_quality = 0.0
+            elif np.all(feature_row == 0.0):
+                failed_reasons.append(f"feature_array_invalid[{index}]: all_zero")
+                row_quality = 0.0
+            elif float(np.var(feature_row)) <= 0.0:
+                failed_reasons.append(
+                    f"feature_array_invalid[{index}]: zero_variance"
+                )
+                row_quality = 0.0
+            quality_scores.append(row_quality)
+            unique_feature_hashes.add(
+                hashlib.sha256(
+                    np.ascontiguousarray(feature_row).tobytes()
+                ).hexdigest()
+            )
+
+        mean_quality_score = (
+            float(sum(quality_scores) / effective_sample_count)
+            if effective_sample_count > 0
+            else 0.0
+        )
+        unique_cve_count = len(unique_feature_hashes)
+
+        severity_distribution: dict[str, float]
+        if label_array.ndim == 1 and np.issubdtype(label_array.dtype, np.integer):
+            effective_labels = [int(value) for value in label_array[:rows_to_validate].tolist()]
+            if set(effective_labels).issubset({0, 1}):
+                label_aliases = {0: "NEGATIVE", 1: "POSITIVE"}
+                expected_labels = (0, 1)
+            else:
+                expected_labels = tuple(sorted(set(effective_labels)))
+                label_aliases = {
+                    label_value: f"LABEL_{label_value}"
+                    for label_value in expected_labels
+                }
+            severity_distribution = {
+                label_aliases[label_value]: (
+                    float(sum(1 for entry in effective_labels if entry == label_value))
+                    / float(effective_sample_count)
+                    if effective_sample_count > 0
+                    else 0.0
+                )
+                for label_value in expected_labels
+            }
+        else:
+            severity_distribution = {}
+
+        if effective_sample_count < self.MIN_SAMPLES:
+            failed_reasons.append(
+                f"sample_count_below_min:{effective_sample_count}<{self.MIN_SAMPLES}"
+            )
+        if mean_quality_score < self.MIN_QUALITY_SCORE:
+            failed_reasons.append(
+                "mean_quality_below_min:"
+                f"{mean_quality_score:.4f}<{self.MIN_QUALITY_SCORE:.4f}"
+            )
+        if unique_cve_count < self.MIN_UNIQUE_CVES:
+            failed_reasons.append(
+                f"unique_cves_below_min:{unique_cve_count}<{self.MIN_UNIQUE_CVES}"
+            )
+        for label_name, distribution in severity_distribution.items():
+            if distribution < self.MIN_SEVERITY_DISTRIBUTION:
+                failed_reasons.append(
+                    "severity_distribution_below_min:"
+                    f"{label_name}={distribution:.4f}"
+                )
+
+        return DatasetQualityReport(
+            passed=not failed_reasons,
+            sample_count=effective_sample_count,
+            mean_quality_score=mean_quality_score,
+            unique_cves=unique_cve_count,
+            severity_distribution=severity_distribution,
+            failed_reasons=failed_reasons,
+        )
+
 
 class _StreamingFeatureDataset(Dataset):
     """Lazy real-data dataset backed by extracted or cached features."""
@@ -366,6 +500,7 @@ class IncrementalTrainer:
         dataset_index_path: str | Path | None = None,
         feature_cache_root: str | Path | None = None,
         num_workers: int = 4,
+        feature_store_root: str | Path | None = None,
     ) -> None:
         self.model_path = Path(model_path)
         self.state_path = Path(state_path)
@@ -382,6 +517,13 @@ class IncrementalTrainer:
             else self.state_path.parent / DEFAULT_FEATURE_CACHE_ROOT.name
         )
         self.num_workers = num_workers
+        project_root = self.state_path.parent.parent
+        self.feature_store_root = (
+            Path(feature_store_root)
+            if feature_store_root is not None
+            else project_root / DEFAULT_FEATURE_STORE_ROOT
+        )
+        self.feature_store = SafetensorsFeatureStore(self.feature_store_root)
         self._indexed_raw_samples_cache: list[tuple[str, IngestedSample]] | None = None
         self._invalid_sample_warnings: set[str] = set()
         self._invalid_sample_count: int = 0
@@ -453,10 +595,7 @@ class IncrementalTrainer:
         }
 
     def _feature_cache_path(self, sample: IngestedSample) -> Path:
-        return self.feature_cache_root / f"{sample.sha256_hash}.npy"
-
-    def _feature_stats_path(self, sample: IngestedSample) -> Path:
-        return self.feature_cache_root / f"{sample.sha256_hash}.stats.json"
+        return self.feature_store.shard_path(sample.sha256_hash)
 
     def _write_feature_cache(self, path: Path, feature: torch.Tensor) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -465,11 +604,78 @@ class IncrementalTrainer:
             np.save(handle, feature.detach().cpu().numpy(), allow_pickle=False)
         os.replace(temp_path, path)
 
-    def _write_feature_stats(self, path: Path, payload: dict[str, object]) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        temp_path = path.with_suffix(f"{path.suffix}.tmp")
-        temp_path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
-        os.replace(temp_path, path)
+    @staticmethod
+    def _compress_feature_tensor(feature: torch.Tensor) -> np.ndarray:
+        feature_cpu = feature.detach().cpu().to(dtype=torch.float32).reshape(-1)
+        if tuple(feature_cpu.shape) != (512,):
+            raise RuntimeError(
+                f"REAL_DATA_REQUIRED: feature tensor must have shape (512,), got {tuple(feature_cpu.shape)}"
+            )
+        compressed = feature_cpu.reshape(256, 2).mean(dim=1).numpy().astype(np.float32, copy=False)
+        return compressed.reshape(1, 256)
+
+    @staticmethod
+    def _expand_feature_tensor(stored_feature: np.ndarray) -> torch.Tensor:
+        feature_row = np.asarray(stored_feature)
+        if feature_row.dtype != np.float32 or feature_row.shape != (256,):
+            raise ValueError(
+                f"stored feature row must have shape (256,) and dtype float32, got {feature_row.shape}/{feature_row.dtype}"
+            )
+        expanded = np.repeat(feature_row, 2).astype(np.float32, copy=False)
+        return torch.from_numpy(expanded.copy())
+
+    def _feature_store_metadata(
+        self,
+        sample: IngestedSample,
+        stats_payload: dict[str, object],
+    ) -> dict[str, object]:
+        return {
+            "sample_sha256": sample.sha256_hash,
+            "sample_source": sample.source,
+            "sample_cve_id": sample.cve_id,
+            "sample_severity": sample.severity,
+            "sample_ingested_at": sample.ingested_at.isoformat(),
+            "sample_token_count": sample.token_count,
+            "label": self._label_for_sample(sample),
+            "original_feature_dim": 512,
+            "stored_feature_dim": 256,
+            "compression": "pairwise_mean_repeat_v1",
+            "stats": stats_payload,
+        }
+
+    def _load_feature_from_store(
+        self,
+        sample: IngestedSample,
+        cache_path: Path,
+    ) -> torch.Tensor | None:
+        if not cache_path.exists():
+            return None
+
+        try:
+            shard = self.feature_store.read(sample.sha256_hash)
+            stats_available = isinstance(shard.metadata.get("stats"), dict)
+            if shard.features.shape != (1, 256) or not stats_available:
+                logger.warning(
+                    "feature_cache_invalid",
+                    extra={
+                        "event": "feature_cache_invalid",
+                        "path": str(cache_path),
+                        "shape": tuple(shard.features.shape),
+                        "stats_present": stats_available,
+                    },
+                )
+                return None
+            return self._expand_feature_tensor(shard.features[0])
+        except (FileNotFoundError, OSError, ValueError, TypeError) as exc:
+            logger.warning(
+                "feature_cache_unavailable",
+                extra={
+                    "event": "feature_cache_unavailable",
+                    "path": str(cache_path),
+                    "reason": type(exc).__name__,
+                },
+            )
+            return None
 
     @staticmethod
     def _normalize_feature_tensor(
@@ -543,32 +749,9 @@ class IncrementalTrainer:
 
     def _load_or_compute_feature(self, sample: IngestedSample) -> torch.Tensor:
         cache_path = self._feature_cache_path(sample)
-        stats_path = self._feature_stats_path(sample)
-        if cache_path.exists():
-            try:
-                with open(cache_path, "rb") as handle:
-                    array = np.load(handle, allow_pickle=False)
-                feature = torch.from_numpy(array).to(dtype=torch.float32)
-                if tuple(feature.shape) == (512,) and stats_path.exists():
-                    return feature
-                logger.warning(
-                    "feature_cache_invalid",
-                    extra={
-                        "event": "feature_cache_invalid",
-                        "path": str(cache_path),
-                        "shape": tuple(feature.shape),
-                        "stats_present": stats_path.exists(),
-                    },
-                )
-            except (OSError, ValueError) as exc:
-                logger.warning(
-                    "feature_cache_unavailable",
-                    extra={
-                        "event": "feature_cache_unavailable",
-                        "path": str(cache_path),
-                        "reason": type(exc).__name__,
-                    },
-                )
+        cached_feature = self._load_feature_from_store(sample, cache_path)
+        if cached_feature is not None:
+            return cached_feature
 
         raw_feature = extract(sample).detach().cpu().to(dtype=torch.float32)
         feature, stats_payload = self._normalize_feature_tensor(raw_feature)
@@ -577,9 +760,13 @@ class IncrementalTrainer:
                 f"REAL_DATA_REQUIRED: feature extractor returned invalid shape {tuple(feature.shape)}"
             )
         try:
-            self._write_feature_cache(cache_path, feature)
-            self._write_feature_stats(stats_path, stats_payload)
-        except OSError as exc:
+            self.feature_store.write(
+                sample.sha256_hash,
+                self._compress_feature_tensor(feature),
+                np.asarray([self._label_for_sample(sample)], dtype=np.int64),
+                metadata=self._feature_store_metadata(sample, stats_payload),
+            )
+        except (OSError, ValueError, TypeError) as exc:
             logger.warning(
                 "feature_cache_write_failed",
                 extra={

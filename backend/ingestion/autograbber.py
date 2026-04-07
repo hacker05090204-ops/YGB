@@ -2,28 +2,44 @@
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 import threading
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
 
-from aiolimiter import AsyncLimiter
+import numpy as np
 
 from backend.cve.bridge_ingestion_worker import get_bridge_worker
 from backend.ingestion._integrity import log_module_sha256
-from backend.ingestion.async_ingestor import DEFAULT_ADAPTER_TYPES
 from backend.ingestion.dedup import DedupIndex
-from backend.ingestion.models import IngestedSample
+from backend.ingestion.models import IngestedSample, detect_language, make_sample
 from backend.ingestion.normalizer import (
     QualityRejectionLog,
     SampleQualityScorer,
-    normalize_batch_with_report,
-    normalize_sample_with_quality,
+    normalize_text,
 )
+from backend.ingestion.scrapers import (
+    BaseScraper,
+    CISAScraper,
+    GitHubAdvisoryScraper,
+    NVDScraper,
+    OSVScraper,
+    ScrapedSample,
+)
+import backend.training.feature_extractor as feature_extractor
+from backend.training.safetensors_store import SafetensorsFeatureStore
 
 logger = logging.getLogger("ygb.ingestion.autograbber")
+DEFAULT_SOURCE_NAMES = ["nvd", "cisa", "osv", "github"]
+SCRAPER_TYPES_BY_SOURCE: dict[str, type[BaseScraper]] = {
+    "nvd": NVDScraper,
+    "cisa": CISAScraper,
+    "osv": OSVScraper,
+    "github": GitHubAdvisoryScraper,
+}
 
 
 class RealBackendNotConfiguredError(RuntimeError):
@@ -32,7 +48,7 @@ class RealBackendNotConfiguredError(RuntimeError):
 
 @dataclass(frozen=True)
 class AutoGrabberConfig:
-    sources: list[str]
+    sources: list[str] = field(default_factory=lambda: list(DEFAULT_SOURCE_NAMES))
     cycle_interval_seconds: int = 3600
     quality_threshold: float = 0.4
     max_per_cycle: int = 500
@@ -70,6 +86,7 @@ class GrabberCycleResult:
     samples_fetched: int
     samples_accepted: int
     samples_rejected: int
+    features_stored: int
     bridge_published: int
     errors: list[str]
 
@@ -85,32 +102,36 @@ class AutoGrabber:
         self._results_lock = threading.Lock()
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
-        self._adapter_types = self._resolve_adapter_types(config.sources)
+        self._scraper_types = self._resolve_scraper_types(config.sources)
         self._dedup_path = os.environ.get(
             "YGB_CVE_DEDUP_STORE_PATH",
             "data/dedup_store.json",
         )
+        self._feature_store_root = Path(
+            os.environ.get(
+                "YGB_AUTOGRABBER_FEATURE_STORE_PATH",
+                "training/features_safetensors",
+            )
+        )
+        self._feature_store = SafetensorsFeatureStore(self._feature_store_root)
 
     @staticmethod
-    def _available_adapter_types() -> dict[str, type[object]]:
-        return {
-            str(getattr(adapter_type, "SOURCE", adapter_type.__name__)).strip().lower(): adapter_type
-            for adapter_type in DEFAULT_ADAPTER_TYPES
-        }
+    def _available_scraper_types() -> dict[str, type[BaseScraper]]:
+        return dict(SCRAPER_TYPES_BY_SOURCE)
 
-    def _resolve_adapter_types(self, sources: list[str]) -> tuple[type[object], ...]:
-        available = self._available_adapter_types()
-        selected: list[type[object]] = []
+    def _resolve_scraper_types(self, sources: list[str]) -> tuple[type[BaseScraper], ...]:
+        available = self._available_scraper_types()
+        selected: list[type[BaseScraper]] = []
         missing: list[str] = []
         for source in sources:
-            adapter_type = available.get(source)
-            if adapter_type is None:
+            scraper_type = available.get(source)
+            if scraper_type is None:
                 missing.append(source)
                 continue
-            selected.append(adapter_type)
+            selected.append(scraper_type)
         if missing:
             raise RealBackendNotConfiguredError(
-                "No real ingestion adapter is configured for source(s): " + ", ".join(missing)
+                "No real ingestion scraper is configured for source(s): " + ", ".join(missing)
             )
         return tuple(selected)
 
@@ -119,39 +140,107 @@ class AutoGrabber:
             self._cycle_sequence += 1
             return f"AGC-{self._cycle_sequence:06d}"
 
-    async def _fetch_all_sources(self) -> list[tuple[str, object]]:
-        semaphore = asyncio.Semaphore(10)
-        limiter = AsyncLimiter(2, 1)
-        adapters = [
-            adapter_type(semaphore, limiter)
-            for adapter_type in self._adapter_types
-        ]
-        results = await asyncio.gather(
-            *(adapter.fetch() for adapter in adapters),
-            return_exceptions=True,
-        )
-        return [
-            (
-                str(getattr(adapter, "SOURCE", adapter.__class__.__name__)).strip().lower(),
-                result,
-            )
-            for adapter, result in zip(adapters, results)
-        ]
+    @staticmethod
+    def _label_for_sample(sample: IngestedSample) -> int:
+        return 1 if sample.severity in {"CRITICAL", "HIGH", "MEDIUM"} else 0
 
     @staticmethod
-    def _quality_payload(sample: IngestedSample) -> dict[str, object]:
+    def _compress_feature_tensor(feature_tensor: Any) -> np.ndarray:
+        feature_cpu = feature_tensor.detach().cpu().to(dtype=feature_tensor.dtype).reshape(-1)
+        feature_array = feature_cpu.numpy().astype(np.float32, copy=False)
+        if feature_array.shape != (512,):
+            raise RuntimeError(
+                f"REAL_DATA_REQUIRED: feature tensor must have shape (512,), got {feature_array.shape}"
+            )
+        compressed = feature_array.reshape(256, 2).mean(axis=1, dtype=np.float32)
+        return compressed.reshape(1, 256)
+
+    def _feature_metadata(self, sample: IngestedSample) -> dict[str, object]:
+        return {
+            "sample_sha256": sample.sha256_hash,
+            "sample_source": sample.source,
+            "sample_cve_id": sample.cve_id,
+            "sample_severity": sample.severity,
+            "sample_url": sample.url,
+            "sample_ingested_at": sample.ingested_at.isoformat(),
+            "sample_token_count": sample.token_count,
+            "label": self._label_for_sample(sample),
+            "original_feature_dim": 512,
+            "stored_feature_dim": 256,
+            "compression": "pairwise_mean_repeat_v1",
+        }
+
+    def _store_feature_artifact(self, sample: IngestedSample) -> None:
+        feature_tensor = feature_extractor.extract(sample)
+        compressed_feature = self._compress_feature_tensor(feature_tensor)
+        labels = np.asarray([self._label_for_sample(sample)], dtype=np.int64)
+        self._feature_store.write(
+            sample.sha256_hash,
+            compressed_feature,
+            labels,
+            metadata=self._feature_metadata(sample),
+        )
+
+    @staticmethod
+    def _scraped_sample_to_payload(sample: ScrapedSample) -> dict[str, object]:
+        raw_text_parts = [
+            str(part).strip()
+            for part in (
+                f"{sample.vendor} {sample.product}".strip() if sample.vendor or sample.product else "",
+                sample.description,
+            )
+            if str(part or "").strip()
+        ]
+        normalized_text = normalize_text(" ".join(raw_text_parts))
+        unique_tags = list(
+            dict.fromkeys(
+                [
+                    tag
+                    for tag in (*sample.tags, *sample.aliases)
+                    if str(tag or "").strip() and str(tag or "").strip() != sample.cve_id
+                ]
+            )
+        )
         return {
             "source": sample.source,
-            "description": sample.raw_text,
-            "raw_text": sample.raw_text,
+            "description": normalized_text,
+            "raw_text": normalized_text,
             "url": sample.url,
             "cve_id": sample.cve_id,
             "severity": sample.severity,
-            "tags": list(sample.tags),
-            "token_count": sample.token_count,
-            "lang": sample.lang,
-            "sha256_hash": sample.sha256_hash,
+            "cvss_score": sample.cvss_score,
+            "is_exploited": sample.is_exploited,
+            "tags": unique_tags,
+            "aliases": list(sample.aliases),
+            "references": list(sample.references),
+            "published_at": sample.published_at,
+            "modified_at": sample.modified_at,
+            "token_count": len(normalized_text.split()),
+            "lang": detect_language(normalized_text),
         }
+
+    @staticmethod
+    def _payload_to_ingested_sample(payload: dict[str, object]) -> IngestedSample:
+        return make_sample(
+            source=str(payload.get("source", "") or ""),
+            raw_text=str(payload.get("raw_text", payload.get("description", "")) or ""),
+            url=str(payload.get("url", "") or ""),
+            cve_id=str(payload.get("cve_id", "") or ""),
+            severity=str(payload.get("severity", "UNKNOWN") or "UNKNOWN"),
+            tags=[str(tag) for tag in payload.get("tags", []) if str(tag or "").strip()],
+        )
+
+    def _fetch_scraper_results(self, scraper_type: type[BaseScraper], max_items: int) -> tuple[str, object]:
+        source = str(getattr(scraper_type, "SOURCE", scraper_type.__name__)).strip().lower()
+        scraper = scraper_type()
+        try:
+            return source, list(scraper.fetch(max_items))
+        except Exception as exc:
+            return source, exc
+        finally:
+            close_method = getattr(scraper, "close", None)
+            if callable(close_method):
+                close_method()
 
     def _store_result(self, result: GrabberCycleResult) -> None:
         with self._results_lock:
@@ -168,8 +257,8 @@ class AutoGrabber:
         samples_fetched = 0
         samples_accepted = 0
         samples_rejected = 0
+        features_stored = 0
         bridge_published = 0
-        processed_candidates = 0
         accepted_samples: list[IngestedSample] = []
 
         dedup_store = DedupIndex(self._dedup_path)
@@ -179,7 +268,11 @@ class AutoGrabber:
         )
 
         try:
-            fetched_results = asyncio.run(self._fetch_all_sources())
+            per_source_limit = self.config.max_per_cycle // len(self._scraper_types)
+            fetched_results = [
+                self._fetch_scraper_results(scraper_type, per_source_limit)
+                for scraper_type in self._scraper_types
+            ]
             for source, fetch_result in fetched_results:
                 sources_attempted += 1
                 if isinstance(fetch_result, Exception):
@@ -188,82 +281,61 @@ class AutoGrabber:
                     errors.append(error_message)
                     continue
 
-                source_samples = list(fetch_result)
+                source_samples = list(fetch_result)[: max(per_source_limit, 0)]
                 samples_fetched += len(source_samples)
-
-                try:
-                    if processed_candidates >= self.config.max_per_cycle:
-                        if source_samples:
-                            logger.info(
-                                "autograbber_cycle_capacity_reached source=%s fetched=%s",
-                                source,
-                                len(source_samples),
-                            )
-                        sources_succeeded += 1
-                        continue
-
-                    remaining_capacity = self.config.max_per_cycle - processed_candidates
-                    samples_to_process = source_samples[:remaining_capacity]
-                    if len(source_samples) > len(samples_to_process):
-                        logger.info(
-                            "autograbber_source_capped source=%s fetched=%s processed=%s",
-                            source,
-                            len(source_samples),
-                            len(samples_to_process),
-                        )
-
-                    normalized_samples, _ = normalize_batch_with_report(samples_to_process)
-                    processed_candidates += len(samples_to_process)
-
-                    for sample in normalized_samples:
-                        try:
-                            normalized_payload, accepted, rejection_reason, score = normalize_sample_with_quality(
-                                self._quality_payload(sample),
-                                scorer=quality_scorer,
-                                ignore_duplicates=not self.config.dedup_enabled,
-                            )
-                        except Exception as exc:
-                            error_message = (
-                                f"{source}: sample processing failed for {sample.cve_id or '<missing-cve-id>'}: "
-                                f"{type(exc).__name__}: {exc}"
-                            )
-                            logger.error("autograbber_sample_processing_failed %s", error_message)
-                            errors.append(error_message)
-                            continue
-
+                for scraped_sample in source_samples:
+                    try:
+                        payload = self._scraped_sample_to_payload(scraped_sample)
+                        if self.config.dedup_enabled:
+                            accepted = quality_scorer.is_acceptable(payload)
+                        else:
+                            accepted, _, _ = quality_scorer.evaluate(payload, ignore_duplicates=True)
+                        score = quality_scorer.last_score
+                        rejection_reason = quality_scorer.last_rejection_reason
                         if accepted and score < self.config.quality_threshold:
                             accepted = False
                             rejection_reason = "quality_threshold_not_met"
-
+                            quality_scorer.rejection_log.append(
+                                str(payload.get("cve_id", "") or ""),
+                                rejection_reason,
+                                score,
+                            )
                         if not accepted:
                             samples_rejected += 1
                             logger.warning(
-                                "autograbber_sample_rejected source=%s cve_id=%s reason=%s score=%.6f",
+                                "autograbber_sample_rejected source=%s advisory_id=%s cve_id=%s reason=%s score=%.6f",
                                 source,
-                                sample.cve_id,
+                                scraped_sample.advisory_id,
+                                scraped_sample.cve_id,
                                 rejection_reason or "quality_rejected",
                                 score,
                             )
                             continue
-
                         if self.config.dedup_enabled:
-                            quality_scorer.record_seen(normalized_payload)
-
-                        accepted_samples.append(
-                            replace(
-                                sample,
-                                raw_text=str(normalized_payload.get("raw_text", sample.raw_text)),
-                                token_count=int(normalized_payload.get("token_count", sample.token_count)),
-                                lang=str(normalized_payload.get("lang", sample.lang)),
-                            )
-                        )
+                            quality_scorer.record_seen(payload)
+                        ingested_sample = self._payload_to_ingested_sample(payload)
+                        accepted_samples.append(ingested_sample)
                         samples_accepted += 1
-
-                    sources_succeeded += 1
-                except Exception as exc:
-                    error_message = f"{source}: processing failed: {type(exc).__name__}: {exc}"
-                    logger.error("autograbber_source_processing_failed %s", error_message)
-                    errors.append(error_message)
+                        try:
+                            self._store_feature_artifact(ingested_sample)
+                            features_stored += 1
+                        except Exception as exc:
+                            error_message = (
+                                f"{source}: feature storage failed for "
+                                f"{ingested_sample.cve_id or ingested_sample.sha256_hash}: "
+                                f"{type(exc).__name__}: {exc}"
+                            )
+                            logger.error("autograbber_feature_storage_failed %s", error_message)
+                            errors.append(error_message)
+                    except Exception as exc:
+                        error_message = (
+                            f"{source}: sample processing failed for "
+                            f"{scraped_sample.cve_id or scraped_sample.advisory_id or '<missing-id>'}: "
+                            f"{type(exc).__name__}: {exc}"
+                        )
+                        logger.error("autograbber_sample_processing_failed %s", error_message)
+                        errors.append(error_message)
+                sources_succeeded += 1
 
             if accepted_samples:
                 bridge_worker = get_bridge_worker()
@@ -297,6 +369,7 @@ class AutoGrabber:
                 samples_fetched=samples_fetched,
                 samples_accepted=samples_accepted,
                 samples_rejected=samples_rejected,
+                features_stored=features_stored,
                 bridge_published=bridge_published,
                 errors=list(errors),
             )

@@ -4,6 +4,7 @@
 *.pyo
 .coverage
 .pytest_cache/
+.ruff_cache/
 *.egg-info/
 
 # Virtual environments
@@ -31,6 +32,15 @@ logs/
 reports/
 api/reports/g38_training/
 
+# Repo cleanup artifacts
+.tmp_agent_reports/
+backend-test-results-artifact/
+archive_bundle/
+.tmp_hdd_drive/**/*.lock
+.tmp_hdd_drive/**/*.meta
+.tmp_hdd_drive/**/*.log
+*.log
+ 
 # Node.js
 node_modules/
 .next/

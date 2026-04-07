@@ -640,10 +640,13 @@ import json
 import os
 import logging
 import math
+import re
 import tempfile
 import time
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
+
+from backend.training.safetensors_store import SafetensorsFeatureStore
 
 try:
     from safetensors.torch import (
@@ -658,6 +661,82 @@ except ImportError:
     SAFETENSORS_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
+
+
+class DatasetIntegrityValidator:
+    """Validate real samples before they enter the training pipeline."""
+
+    _CVE_ID_RE = re.compile(r"^CVE-\d{4}-\d{5,}$", re.IGNORECASE)
+    _ALLOWED_SEVERITIES = frozenset(
+        {"CRITICAL", "HIGH", "MEDIUM", "LOW", "INFORMATIONAL"}
+    )
+
+    @staticmethod
+    def _log_rejection(sample: dict[str, Any], reason: str) -> None:
+        logger.warning(
+            "real_dataset_sample_rejected",
+            extra={
+                "event": "real_dataset_sample_rejected",
+                "reason": reason,
+                "cve_id": str(sample.get("cve_id", "") or ""),
+                "published_at": str(sample.get("published_at", "") or ""),
+            },
+        )
+
+    @classmethod
+    def _validate_with_reason(cls, sample: dict[str, Any]) -> tuple[bool, str | None]:
+        if not isinstance(sample, dict):
+            return False, "sample_not_dict"
+
+        text = str(
+            sample.get("text")
+            or sample.get("raw_text")
+            or sample.get("description")
+            or ""
+        ).strip()
+        if not text:
+            return False, "text_empty"
+
+        cve_id = str(sample.get("cve_id", "") or "").strip().upper()
+        if not cls._CVE_ID_RE.fullmatch(cve_id):
+            return False, f"invalid_cve_id:{cve_id or '<missing>'}"
+
+        severity = str(sample.get("severity", "") or "").strip().upper()
+        if severity == "INFO":
+            severity = "INFORMATIONAL"
+        if severity not in cls._ALLOWED_SEVERITIES:
+            return False, f"invalid_severity:{severity or '<missing>'}"
+
+        published_at = str(sample.get("published_at", "") or "").strip()
+        if not published_at:
+            return False, "published_at_missing"
+        try:
+            datetime.fromisoformat(published_at.replace("Z", "+00:00"))
+        except ValueError:
+            return False, f"invalid_published_at:{published_at}"
+
+        return True, None
+
+    def validate_sample(self, sample: dict[str, Any]) -> bool:
+        accepted, reason = self._validate_with_reason(sample)
+        if not accepted and reason is not None:
+            self._log_rejection(sample, reason)
+        return accepted
+
+    def validate_batch(
+        self, samples: list[dict[str, Any]]
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        accepted: list[dict[str, Any]] = []
+        rejected: list[dict[str, Any]] = []
+        for sample in samples:
+            is_valid, reason = self._validate_with_reason(sample)
+            if is_valid:
+                accepted.append(sample)
+                continue
+            rejected.append(sample)
+            if reason is not None:
+                self._log_rejection(sample, reason)
+        return accepted, rejected
 
 
 @dataclass(frozen=True)
@@ -956,6 +1035,7 @@ class IngestionPipelineDataset(Dataset):
         self._features = []
         self._labels = []
         self._tensor_cache_metadata: Dict[str, Any] = {}
+        self._integrity_validator = DatasetIntegrityValidator()
 
         logger.info(
             f"[INGESTION] DLL verified={dll_verified}, "
@@ -1058,6 +1138,28 @@ class IngestionPipelineDataset(Dataset):
                 impact = imp.value.decode("utf-8", errors="replace")
                 source_tag = st.value.decode("utf-8", errors="replace")
                 fingerprint = fp.value.decode("utf-8", errors="replace")
+
+                try:
+                    published_at = (
+                        datetime.fromtimestamp(
+                            int(ingested_at.value), tz=timezone.utc
+                        ).isoformat()
+                        if int(ingested_at.value) > 0
+                        else ""
+                    )
+                except (OSError, OverflowError, ValueError):
+                    published_at = ""
+
+                validation_sample = self._build_integrity_validation_sample(
+                    endpoint=endpoint,
+                    parameters=parameters,
+                    exploit_vector=exploit_vector,
+                    impact=impact,
+                    published_at=published_at,
+                )
+                if not self._integrity_validator.validate_sample(validation_sample):
+                    rejected_policy += 1
+                    continue
 
                 ok = self._process_one_sample(
                     endpoint,
@@ -1241,6 +1343,70 @@ class IngestionPipelineDataset(Dataset):
             )
             vec.append(min(max(val, 0.0), 1.0))
         return vec
+
+    @staticmethod
+    def _severity_for_integrity_validation(impact: str) -> str:
+        impact_text = str(impact or "").strip()
+        if not impact_text:
+            return ""
+
+        upper_impact = impact_text.upper()
+        if upper_impact.startswith("CVSS:"):
+            parts = upper_impact.split("|", 1)
+            if len(parts) == 2:
+                explicit_severity = parts[1].strip()
+                if explicit_severity == "INFO":
+                    return "INFORMATIONAL"
+                if explicit_severity in DatasetIntegrityValidator._ALLOWED_SEVERITIES:
+                    return explicit_severity
+            try:
+                score = float(parts[0].split(":", 1)[1])
+            except (IndexError, ValueError):
+                score = None
+            if score is not None:
+                if score >= 9.0:
+                    return "CRITICAL"
+                if score >= 7.0:
+                    return "HIGH"
+                if score >= 4.0:
+                    return "MEDIUM"
+                if score > 0.0:
+                    return "LOW"
+                return "INFORMATIONAL"
+
+        if "CRITICAL" in upper_impact:
+            return "CRITICAL"
+        if "HIGH" in upper_impact:
+            return "HIGH"
+        if "MEDIUM" in upper_impact:
+            return "MEDIUM"
+        if "LOW" in upper_impact:
+            return "LOW"
+        if "INFORMATIONAL" in upper_impact or "INFO" in upper_impact:
+            return "INFORMATIONAL"
+        return ""
+
+    @classmethod
+    def _build_integrity_validation_sample(
+        cls,
+        *,
+        endpoint: str,
+        parameters: str,
+        exploit_vector: str,
+        impact: str,
+        published_at: str,
+    ) -> dict[str, str]:
+        text = " ".join(
+            value.strip()
+            for value in (endpoint, parameters, exploit_vector, impact)
+            if str(value or "").strip()
+        ).strip()
+        return {
+            "text": text,
+            "cve_id": str(endpoint or "").strip().upper(),
+            "severity": cls._severity_for_integrity_validation(impact),
+            "published_at": str(published_at or "").strip(),
+        }
 
     def _process_one_sample(
         self,
@@ -1509,11 +1675,35 @@ class IngestionPipelineDataset(Dataset):
         accepted = 0
         rejected_policy = 0
         rejected_quality = 0
+        validator = getattr(self, "_integrity_validator", DatasetIntegrityValidator())
 
         for sample in disk_samples:
+            if not isinstance(sample, dict):
+                rejected_policy += 1
+                logger.warning(
+                    "real_dataset_sample_rejected",
+                    extra={
+                        "event": "real_dataset_sample_rejected",
+                        "reason": "sample_not_dict",
+                    },
+                )
+                continue
             reliability_val = sample.get("reliability", 0.7)
             # Only process verified samples (reliability >= 0.7)
             if reliability_val < 0.7:
+                continue
+
+            validation_sample = self._build_integrity_validation_sample(
+                endpoint=str(sample.get("endpoint", "") or ""),
+                parameters=str(sample.get("parameters", "") or ""),
+                exploit_vector=str(sample.get("exploit_vector", "") or ""),
+                impact=str(sample.get("impact", "") or ""),
+                published_at=str(
+                    sample.get("published_at") or sample.get("ingested_at") or ""
+                ),
+            )
+            if not validator.validate_sample(validation_sample):
+                rejected_policy += 1
                 continue
 
             ok = self._process_one_sample(
@@ -1696,11 +1886,14 @@ class IngestionPipelineDataset(Dataset):
         return digest.hexdigest()
 
     def _tensor_cache_paths(self, verified_count: int) -> Tuple[Path, Path]:
-        cache_base = (
-            self._tensor_cache_dir()
-            / f"ingestion_{self._tensor_cache_key(verified_count)}"
+        store = SafetensorsFeatureStore(
+            self._tensor_cache_dir(),
+            feature_dim=self.feature_dim,
         )
-        return cache_base.with_suffix(".safetensors"), cache_base.with_suffix(".json")
+        weights_path = store.shard_path(
+            f"ingestion_{self._tensor_cache_key(verified_count)}"
+        )
+        return weights_path, weights_path.with_suffix(".json")
 
     @staticmethod
     def _tensor_hash_for_tensors(
@@ -1763,16 +1956,21 @@ class IngestionPipelineDataset(Dataset):
         if not SAFETENSORS_AVAILABLE or load_safetensors_file is None:
             return False
 
-        weights_path, meta_path = self._tensor_cache_paths(verified_count)
-        if not weights_path.exists() or not meta_path.exists():
+        store = SafetensorsFeatureStore(
+            self._tensor_cache_dir(),
+            feature_dim=self.feature_dim,
+        )
+        shard_name = f"ingestion_{self._tensor_cache_key(verified_count)}"
+        weights_path = store.shard_path(shard_name)
+        if not weights_path.exists():
             return False
 
         try:
-            with open(meta_path, "r", encoding="utf-8") as handle:
-                metadata = json.load(handle)
-        except (OSError, json.JSONDecodeError):
+            shard = store.read(shard_name)
+        except (FileNotFoundError, OSError, ValueError, TypeError):
             return False
 
+        metadata = shard.metadata
         if not isinstance(metadata, dict):
             return False
         if metadata.get("schema_version") != _INGESTION_TENSOR_CACHE_SCHEMA_VERSION:
@@ -1790,15 +1988,8 @@ class IngestionPipelineDataset(Dataset):
         if bool(metadata.get("strict_real_mode", False)) != bool(STRICT_REAL_MODE):
             return False
 
-        try:
-            tensors = load_safetensors_file(str(weights_path))
-        except Exception:
-            return False
-
-        features_tensor = tensors.get("features")
-        labels_tensor = tensors.get("labels")
-        if features_tensor is None or labels_tensor is None:
-            return False
+        features_tensor = torch.as_tensor(shard.features)
+        labels_tensor = torch.as_tensor(shard.labels)
         if features_tensor.ndim != 2 or labels_tensor.ndim != 1:
             return False
         if features_tensor.shape[1] != self.feature_dim:
@@ -1833,29 +2024,19 @@ class IngestionPipelineDataset(Dataset):
         verified_count = int(
             metadata.get("verified_count", self._verified_count) or self._verified_count
         )
-        weights_path, meta_path = self._tensor_cache_paths(verified_count)
-        weights_path.parent.mkdir(parents=True, exist_ok=True)
-        fd, tmp_weights = tempfile.mkstemp(
-            dir=str(weights_path.parent),
-            prefix=weights_path.name + ".",
-            suffix=".tmp",
+        store = SafetensorsFeatureStore(
+            self._tensor_cache_dir(),
+            feature_dim=self.feature_dim,
         )
-        os.close(fd)
+        shard_name = f"ingestion_{self._tensor_cache_key(verified_count)}"
         try:
-            save_safetensors_file(
-                {
-                    "features": self._features_tensor.detach().cpu(),
-                    "labels": self._labels_tensor.detach().cpu(),
-                },
-                tmp_weights,
+            store.write(
+                shard_name,
+                self._features_tensor.detach().cpu().numpy().astype(np.float32, copy=False),
+                self._labels_tensor.detach().cpu().numpy().astype(np.int64, copy=False),
+                metadata=metadata,
             )
-            os.replace(tmp_weights, weights_path)
-            self._atomic_write_json(meta_path, metadata)
-        except Exception as exc:
-            try:
-                os.remove(tmp_weights)
-            except OSError:
-                pass
+        except (OSError, ValueError, TypeError) as exc:
             logger.warning("[INGESTION] Tensor cache save skipped: %s", exc)
 
     def _manifest_matches_cache(self, metadata: Dict[str, Any]) -> bool:

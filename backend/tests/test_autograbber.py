@@ -3,8 +3,8 @@ from __future__ import annotations
 import time
 
 import backend.ingestion.autograbber as autograbber_module
-import backend.ingestion.normalizer as normalizer
-from backend.ingestion.models import make_sample
+from backend.ingestion.scrapers import ScrapedSample
+from backend.training.safetensors_store import SafetensorsFeatureStore
 
 
 def _long_description(seed: str) -> str:
@@ -42,147 +42,217 @@ class FakeBridgeWorker:
         return dict(self._stats)
 
 
-class NVDSuccessAdapter:
+def _scraped_sample(
+    source: str,
+    advisory_id: str,
+    cve_id: str,
+    description: str,
+    *,
+    severity: str = "HIGH",
+) -> ScrapedSample:
+    return ScrapedSample(
+        source=source,
+        advisory_id=advisory_id,
+        url=f"https://example.test/{advisory_id.lower()}",
+        title=advisory_id,
+        description=description,
+        severity=severity,
+        cve_id=cve_id,
+        cvss_score=8.7,
+        tags=("CWE-79",),
+        references=(f"https://example.test/reference/{advisory_id.lower()}",),
+    )
+
+
+def _configure_test_environment(monkeypatch, tmp_path):
+    monkeypatch.setenv("YGB_CVE_DEDUP_STORE_PATH", str(tmp_path / "dedup_store.json"))
+    monkeypatch.setenv(
+        "YGB_AUTOGRABBER_FEATURE_STORE_PATH",
+        str(tmp_path / "features_safetensors"),
+    )
+    monkeypatch.setattr(
+        autograbber_module.feature_extractor,
+        "load_vocabulary",
+        lambda: [f"token_{index}" for index in range(508)],
+    )
+
+
+class NVDSuccessScraper:
     SOURCE = "nvd"
+    last_max_items: int | None = None
 
-    def __init__(self, semaphore, limiter) -> None:
-        self.semaphore = semaphore
-        self.limiter = limiter
-
-    async def fetch(self):
+    def fetch(self, max_items: int):
+        type(self).last_max_items = max_items
         return [
-            make_sample(
+            _scraped_sample(
                 "nvd",
-                _long_description("Accepted NVD sample."),
-                "https://example.test/nvd",
-                "CVE-2026-6101",
-                "HIGH",
-                ("kev",),
+                f"NVD-{index}",
+                f"CVE-2026-610{index}",
+                _long_description(f"Accepted NVD sample {index}."),
             )
+            for index in range(max_items)
         ]
 
+    def close(self):
+        return None
 
-class OSVRejectedAdapter:
-    SOURCE = "osv"
 
-    def __init__(self, semaphore, limiter) -> None:
-        self.semaphore = semaphore
-        self.limiter = limiter
+class CISARejectedScraper:
+    SOURCE = "cisa"
+    last_max_items: int | None = None
 
-    async def fetch(self):
+    def fetch(self, max_items: int):
+        type(self).last_max_items = max_items
         return [
-            make_sample(
-                "osv",
+            _scraped_sample(
+                "cisa",
+                "CISA-LOW-1",
+                "CVE-2026-7101",
                 "too short",
-                "https://example.test/osv",
-                "CVE-2026-6102",
-                "MEDIUM",
-                (),
+                severity="CRITICAL",
             )
-        ]
+        ][:max_items]
+
+    def close(self):
+        return None
 
 
-class FailingAdapter:
-    SOURCE = "github_advisory"
+class FailingScraper:
+    SOURCE = "github"
 
-    def __init__(self, semaphore, limiter) -> None:
-        self.semaphore = semaphore
-        self.limiter = limiter
-
-    async def fetch(self):
+    def fetch(self, max_items: int):
         raise RuntimeError("upstream fetch failure")
 
+    def close(self):
+        return None
 
-class DuplicateNVDAdapter:
+
+class LowQualityScraper:
     SOURCE = "nvd"
 
-    def __init__(self, semaphore, limiter) -> None:
-        self.semaphore = semaphore
-        self.limiter = limiter
+    def fetch(self, max_items: int):
+        return [
+            _scraped_sample(
+                "nvd",
+                "NVD-LOW-1",
+                "CVE-2026-6201",
+                "too short",
+                severity="HIGH",
+            )
+        ][:max_items]
 
-    async def fetch(self):
+    def close(self):
+        return None
+
+
+class DuplicateNVDScraper:
+    SOURCE = "nvd"
+
+    def fetch(self, max_items: int):
         description = _long_description("Duplicate sample.")
         return [
-            make_sample(
+            _scraped_sample(
                 "nvd",
-                description,
-                "https://example.test/dup-1",
+                "NVD-DUP-1",
                 "CVE-2026-6201",
-                "HIGH",
-                (),
-            ),
-            make_sample(
-                "nvd",
                 description,
-                "https://example.test/dup-2",
-                "CVE-2026-6202",
-                "HIGH",
-                (),
             ),
-        ]
+            _scraped_sample(
+                "nvd",
+                "NVD-DUP-2",
+                "CVE-2026-6202",
+                description,
+            ),
+        ][:max_items]
+
+    def close(self):
+        return None
 
 
 def test_run_cycle_returns_real_counts_and_stores_history(monkeypatch, tmp_path):
-    monkeypatch.setenv("YGB_CVE_DEDUP_STORE_PATH", str(tmp_path / "autograbber_counts.json"))
-    monkeypatch.setattr(normalizer, "NORMALIZED_ROOT", tmp_path / "normalized")
-    monkeypatch.setattr(normalizer, "_main_module_supports_spawn", lambda: False)
+    _configure_test_environment(monkeypatch, tmp_path)
     monkeypatch.setattr(
         autograbber_module,
-        "DEFAULT_ADAPTER_TYPES",
-        (NVDSuccessAdapter, OSVRejectedAdapter),
+        "SCRAPER_TYPES_BY_SOURCE",
+        {"nvd": NVDSuccessScraper, "cisa": CISARejectedScraper},
     )
     bridge_worker = FakeBridgeWorker()
     monkeypatch.setattr(autograbber_module, "get_bridge_worker", lambda: bridge_worker)
 
     grabber = autograbber_module.AutoGrabber(
-        autograbber_module.AutoGrabberConfig(sources=["nvd", "osv"], max_per_cycle=10)
+        autograbber_module.AutoGrabberConfig(sources=["nvd", "cisa"], max_per_cycle=6)
     )
     result = grabber.run_cycle()
+    feature_store = SafetensorsFeatureStore(tmp_path / "features_safetensors")
 
     assert result.sources_attempted == 2
     assert result.sources_succeeded == 2
-    assert result.samples_fetched == 2
-    assert result.samples_accepted == 1
+    assert NVDSuccessScraper.last_max_items == 3
+    assert CISARejectedScraper.last_max_items == 3
+    assert result.samples_fetched == 4
+    assert result.samples_accepted == 3
     assert result.samples_rejected == 1
-    assert result.bridge_published == 1
+    assert result.features_stored == 3
+    assert result.bridge_published == 3
     assert result.errors == []
     assert grabber.get_last_cycle_result() == result
     assert grabber.get_all_results() == [result]
     assert bridge_worker.manifest_updates == 1
+    assert feature_store.total_samples() == 3
 
 
 def test_one_source_failure_does_not_stop_other_sources(monkeypatch, tmp_path):
-    monkeypatch.setenv("YGB_CVE_DEDUP_STORE_PATH", str(tmp_path / "autograbber_failure.json"))
-    monkeypatch.setattr(normalizer, "NORMALIZED_ROOT", tmp_path / "normalized")
-    monkeypatch.setattr(normalizer, "_main_module_supports_spawn", lambda: False)
+    _configure_test_environment(monkeypatch, tmp_path)
     monkeypatch.setattr(
         autograbber_module,
-        "DEFAULT_ADAPTER_TYPES",
-        (FailingAdapter, NVDSuccessAdapter),
+        "SCRAPER_TYPES_BY_SOURCE",
+        {"github": FailingScraper, "nvd": NVDSuccessScraper},
     )
     monkeypatch.setattr(autograbber_module, "get_bridge_worker", lambda: FakeBridgeWorker())
 
     grabber = autograbber_module.AutoGrabber(
-        autograbber_module.AutoGrabberConfig(sources=["github_advisory", "nvd"], max_per_cycle=10)
+        autograbber_module.AutoGrabberConfig(sources=["github", "nvd"], max_per_cycle=4)
     )
     result = grabber.run_cycle()
 
     assert result.sources_attempted == 2
     assert result.sources_succeeded == 1
-    assert result.samples_accepted == 1
-    assert result.bridge_published == 1
+    assert result.samples_accepted == 2
+    assert result.features_stored == 2
+    assert result.bridge_published == 2
     assert len(result.errors) == 1
-    assert "github_advisory" in result.errors[0]
+    assert "github" in result.errors[0]
 
 
-def test_rejected_samples_are_not_counted_in_bridge_published(monkeypatch, tmp_path):
-    monkeypatch.setenv("YGB_CVE_DEDUP_STORE_PATH", str(tmp_path / "autograbber_rejected.json"))
-    monkeypatch.setattr(normalizer, "NORMALIZED_ROOT", tmp_path / "normalized")
-    monkeypatch.setattr(normalizer, "_main_module_supports_spawn", lambda: False)
+def test_rejected_samples_do_not_enter_bridge_or_store_counts(monkeypatch, tmp_path):
+    _configure_test_environment(monkeypatch, tmp_path)
     monkeypatch.setattr(
         autograbber_module,
-        "DEFAULT_ADAPTER_TYPES",
-        (DuplicateNVDAdapter,),
+        "SCRAPER_TYPES_BY_SOURCE",
+        {"nvd": LowQualityScraper},
+    )
+    monkeypatch.setattr(autograbber_module, "get_bridge_worker", lambda: FakeBridgeWorker())
+
+    grabber = autograbber_module.AutoGrabber(
+        autograbber_module.AutoGrabberConfig(sources=["nvd"], max_per_cycle=10)
+    )
+    result = grabber.run_cycle()
+    feature_store = SafetensorsFeatureStore(tmp_path / "features_safetensors")
+
+    assert result.samples_fetched == 1
+    assert result.samples_accepted == 0
+    assert result.samples_rejected == 1
+    assert result.features_stored == 0
+    assert result.bridge_published == 0
+    assert feature_store.list_shards() == []
+
+
+def test_duplicate_samples_are_not_counted_twice(monkeypatch, tmp_path):
+    _configure_test_environment(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        autograbber_module,
+        "SCRAPER_TYPES_BY_SOURCE",
+        {"nvd": DuplicateNVDScraper},
     )
     monkeypatch.setattr(autograbber_module, "get_bridge_worker", lambda: FakeBridgeWorker())
 
@@ -194,17 +264,16 @@ def test_rejected_samples_are_not_counted_in_bridge_published(monkeypatch, tmp_p
     assert result.samples_fetched == 2
     assert result.samples_accepted == 1
     assert result.samples_rejected == 1
+    assert result.features_stored == 1
     assert result.bridge_published == 1
 
 
 def test_scheduled_loop_starts_and_stops_cleanly(monkeypatch, tmp_path):
-    monkeypatch.setenv("YGB_CVE_DEDUP_STORE_PATH", str(tmp_path / "autograbber_scheduled.json"))
-    monkeypatch.setattr(normalizer, "NORMALIZED_ROOT", tmp_path / "normalized")
-    monkeypatch.setattr(normalizer, "_main_module_supports_spawn", lambda: False)
+    _configure_test_environment(monkeypatch, tmp_path)
     monkeypatch.setattr(
         autograbber_module,
-        "DEFAULT_ADAPTER_TYPES",
-        (NVDSuccessAdapter,),
+        "SCRAPER_TYPES_BY_SOURCE",
+        {"nvd": NVDSuccessScraper},
     )
     monkeypatch.setattr(autograbber_module, "get_bridge_worker", lambda: FakeBridgeWorker())
 
@@ -228,13 +297,11 @@ def test_scheduled_loop_starts_and_stops_cleanly(monkeypatch, tmp_path):
 
 
 def test_bridge_backend_not_configured_raises(monkeypatch, tmp_path):
-    monkeypatch.setenv("YGB_CVE_DEDUP_STORE_PATH", str(tmp_path / "autograbber_bridge_missing.json"))
-    monkeypatch.setattr(normalizer, "NORMALIZED_ROOT", tmp_path / "normalized")
-    monkeypatch.setattr(normalizer, "_main_module_supports_spawn", lambda: False)
+    _configure_test_environment(monkeypatch, tmp_path)
     monkeypatch.setattr(
         autograbber_module,
-        "DEFAULT_ADAPTER_TYPES",
-        (NVDSuccessAdapter,),
+        "SCRAPER_TYPES_BY_SOURCE",
+        {"nvd": NVDSuccessScraper},
     )
     monkeypatch.setattr(
         autograbber_module,

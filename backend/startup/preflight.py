@@ -26,6 +26,13 @@ from typing import List
 logger = logging.getLogger(__name__)
 
 
+def bootstrap_pipeline():
+    """Proxy bootstrap import to keep preflight import-time dependencies lightweight."""
+    from backend.startup.pipeline_bootstrap import bootstrap_pipeline as _bootstrap_pipeline
+
+    return _bootstrap_pipeline()
+
+
 class PreflightError(RuntimeError):
     """Raised when a critical preflight check fails — service must NOT start."""
     pass
@@ -362,6 +369,15 @@ def preflight() -> PreflightReport:
         raise PreflightError(error_msg)
 
     logger.info(f"PREFLIGHT PASSED — {len(checks)} checks, all clear.")
+    try:
+        bootstrap_pipeline()
+    except Exception as exc:
+        logger.critical(
+            "[PREFLIGHT] Automatic pipeline bootstrap failed; server will continue and "
+            "the pipeline can be restarted later via API: %s",
+            exc,
+            exc_info=True,
+        )
     return report
 
 

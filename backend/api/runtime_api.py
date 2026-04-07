@@ -30,7 +30,14 @@ import uuid
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
 
+from fastapi import APIRouter, Depends, Response, status as http_status
+
+from backend.auth.auth_guard import require_auth
+from backend.training.auto_train_controller import get_auto_train_controller
+
 logger = logging.getLogger(__name__)
+
+router = APIRouter(tags=["runtime"])
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
@@ -672,6 +679,37 @@ def get_detailed_status() -> dict:
             started_at,
             _runtime_error_response(trace_id, e),
         )
+
+
+def get_auto_training_status() -> dict[str, object]:
+    controller = get_auto_train_controller()
+    return {
+        "status": "ok",
+        **controller.get_status(),
+    }
+
+
+def trigger_auto_training_check() -> dict[str, str]:
+    controller = get_auto_train_controller()
+    return controller.trigger_check()
+
+
+@router.get("/api/v1/training/auto/status")
+async def auto_training_status(user=Depends(require_auth)) -> dict[str, object]:
+    return get_auto_training_status()
+
+
+@router.post("/api/v1/training/auto/trigger")
+async def auto_training_trigger(
+    response: Response,
+    user=Depends(require_auth),
+) -> dict[str, str]:
+    payload = trigger_auto_training_check()
+    if payload["status"] == "triggered":
+        response.status_code = http_status.HTTP_202_ACCEPTED
+    else:
+        response.status_code = http_status.HTTP_200_OK
+    return payload
 
 
 # =========================================================================

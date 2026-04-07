@@ -519,6 +519,19 @@ async def lifespan(app):
     except Exception as e:
         logger.warning(f"[BOOT] Bridge ingestion worker not available: {e}")
 
+    try:
+        from backend.startup.pipeline_bootstrap import bootstrap_pipeline
+
+        bootstrap_pipeline()
+        logger.info("[BOOT] Fully automatic ingestion-to-training pipeline started")
+    except Exception as e:
+        logger.critical(
+            "[BOOT] Fully automatic ingestion-to-training pipeline bootstrap failed; "
+            "server will continue and the pipeline can be restarted later: %s",
+            e,
+            exc_info=True,
+        )
+
     # Start G38 auto-training scheduler only when explicitly enabled.
     if G38_AVAILABLE and _ENABLE_G38_AUTO_TRAINING:
         start_auto_training()  # Starts background monitor
@@ -735,6 +748,17 @@ try:
     logger.info("[BOOT] System status endpoint registered: /api/system/status")
 except ImportError as e:
     logger.warning(f"[BOOT] System status endpoint not available: {e}")
+
+# Runtime API router (runtime status + auto-training endpoints)
+try:
+    from backend.api.runtime_api import router as runtime_api_router
+
+    app.include_router(runtime_api_router)
+    logger.info(
+        "[BOOT] Runtime API endpoints registered: /api/v1/training/auto/status, /api/v1/training/auto/trigger"
+    )
+except ImportError as e:
+    logger.warning(f"[BOOT] Runtime API router not available: {e}")
 
 # =============================================================================
 # REQUEST/RESPONSE MODELS

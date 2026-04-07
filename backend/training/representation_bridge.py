@@ -17,6 +17,8 @@ import numpy as np
 from typing import Optional, Sequence, Tuple
 from dataclasses import dataclass
 
+from backend.training.safetensors_store import SafetensorsFeatureStore
+
 
 FIXED_SEED = 42
 _BLOCKED_SYNTHETIC_REPRESENTATION_MESSAGE = (
@@ -446,18 +448,12 @@ class RealFeatureLoader:
     @staticmethod
     def _load_safetensors(path: Path) -> np.ndarray:
         try:
-            from safetensors.numpy import load_file as load_safetensors_file
-        except Exception as exc:  # pragma: no cover - depends on optional package state
+            shard = SafetensorsFeatureStore.read_path(path)
+        except FileNotFoundError:
+            raise
+        except (OSError, ValueError, TypeError) as exc:
             raise DataValueError(f"{path}: safetensors support unavailable: {exc}") from exc
-
-        tensors = load_safetensors_file(str(path))
-        if "features" in tensors:
-            return np.asarray(tensors["features"])
-        if len(tensors) == 1:
-            return np.asarray(next(iter(tensors.values())))
-        raise DataShapeError(
-            f"{path}: expected exactly one tensor or a 'features' tensor, found {sorted(tensors.keys())}"
-        )
+        return np.asarray(shard.features)
 
     @staticmethod
     def _validate(path: Path, array: np.ndarray) -> np.ndarray:

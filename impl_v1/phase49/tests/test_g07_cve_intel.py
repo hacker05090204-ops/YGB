@@ -6,6 +6,8 @@ import inspect
 import pytest
 import backend.cve.cve_pipeline as pipeline_mod
 import impl_v1.phase49.governors.g07_cve_intelligence as intel_mod
+from backend.ingestion.dedup import DedupIndex
+from backend.ingestion.normalizer import QualityRejectionLog, SampleQualityScorer
 from impl_v1.phase49.governors.g07_cve_intelligence import (
     CVEIntelligenceEngine,
     CVEIntelligenceRecord,
@@ -22,6 +24,30 @@ from impl_v1.phase49.governors.g07_cve_intelligence import (
     query_cves,
     correlate_target,
 )
+
+
+def _long_description(seed: str) -> str:
+    return (
+        f"{seed} "
+        "This detailed runtime pipeline description includes scope, impact, exploitability, "
+        "and mitigation context so that Group 1 quality rules accept the sample."
+    )
+
+
+class _PermissiveQualityScorer(SampleQualityScorer):
+    def evaluate(self, sample, *, ignore_duplicates: bool = False):
+        return super().evaluate(sample, ignore_duplicates=True)
+
+    def record_seen(self, sample):
+        return None
+
+
+def _make_quality_scorer(tmp_path, *, permissive: bool = False) -> SampleQualityScorer:
+    scorer_cls = _PermissiveQualityScorer if permissive else SampleQualityScorer
+    return scorer_cls(
+        dedup_store=DedupIndex(str(tmp_path / "dedup_store.json")),
+        rejection_log=QualityRejectionLog(),
+    )
 
 
 class FakeBridgeState:
@@ -158,14 +184,18 @@ class TestQueryCVEs:
         result = query_cves("test")
         assert result.cached is True
 
-    def test_uses_runtime_pipeline_when_local_cache_empty(self):
+    def test_uses_runtime_pipeline_when_local_cache_empty(self, tmp_path, monkeypatch):
         clear_cache()
         pipeline_mod._pipeline = None
+        monkeypatch.setenv(
+            "YGB_CVE_DEDUP_STORE_PATH",
+            str(tmp_path / "runtime_pipeline_dedup_store.json"),
+        )
         pipeline = pipeline_mod.get_pipeline()
         pipeline.ingest_record(
             cve_id="CVE-2026-1234",
             title="Runtime pipeline issue",
-            description="Runtime pipeline vulnerability in edge worker",
+            description=_long_description("Runtime pipeline vulnerability in edge worker."),
             severity="HIGH",
             cvss_score=8.2,
             affected_products=["edge-worker"],
@@ -194,12 +224,14 @@ class TestCVEIntelligenceEngine:
 
         assert engine.enrich("CVE-2099-0001") is None
 
-    def test_enrich_reads_local_pipeline_record(self):
-        pipeline = pipeline_mod.CVEPipeline()
+    def test_enrich_reads_local_pipeline_record(self, tmp_path):
+        pipeline = pipeline_mod.CVEPipeline(
+            quality_scorer=_make_quality_scorer(tmp_path)
+        )
         pipeline.ingest_record(
             cve_id="CVE-2026-2001",
             title="Edge worker issue",
-            description="Runtime pipeline vulnerability in edge worker",
+            description=_long_description("Runtime pipeline vulnerability in edge worker."),
             severity="HIGH",
             cvss_score=8.7,
             affected_products=["edge-worker"],
@@ -250,14 +282,16 @@ class TestCVEIntelligenceEngine:
         assert result.intelligence_source == "local_pipeline"
         assert result.has_public_exploit is True
 
-    def test_cache_ttl_is_respected(self):
+    def test_cache_ttl_is_respected(self, tmp_path):
         clock = {"now": 10_000.0}
         cache = IntelligenceCache(time_fn=lambda: clock["now"])
-        pipeline = pipeline_mod.CVEPipeline()
+        pipeline = pipeline_mod.CVEPipeline(
+            quality_scorer=_make_quality_scorer(tmp_path, permissive=True)
+        )
         pipeline.ingest_record(
             cve_id="CVE-2026-4001",
             title="Initial record",
-            description="Initial severity snapshot",
+            description=_long_description("Initial severity snapshot."),
             severity="HIGH",
             cvss_score=7.1,
             affected_products=["cache-app"],
@@ -275,7 +309,7 @@ class TestCVEIntelligenceEngine:
         pipeline.ingest_record(
             cve_id="CVE-2026-4001",
             title="Updated record",
-            description="Updated severity snapshot",
+            description=_long_description("Updated severity snapshot."),
             severity="CRITICAL",
             cvss_score=9.9,
             affected_products=["cache-app"],

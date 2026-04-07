@@ -514,11 +514,15 @@ def test_incremental_trainer_normalizes_and_persists_feature_stats(monkeypatch, 
     sample = _sample_with_time(11)
 
     feature = trainer._load_or_compute_feature(sample)
-    stats_path = trainer._feature_stats_path(sample)
+    cache_path = trainer._feature_cache_path(sample)
+    legacy_stats_path = trainer.feature_cache_root / f"{sample.sha256_hash}.stats.json"
+    cached_features, cached_labels, cached_metadata = trainer.feature_store.read(sample.sha256_hash)
 
-    assert stats_path.exists()
-    payload = json.loads(stats_path.read_text(encoding="utf-8"))
-    assert payload["safe_std"] > 0.0
+    assert cache_path.exists()
+    assert legacy_stats_path.exists() is False
+    assert cached_features.shape == (1, 256)
+    assert cached_labels.tolist() == [trainer._label_for_sample(sample)]
+    assert cached_metadata["stats"]["safe_std"] > 0.0
     assert abs(float(feature.mean().item())) < 1e-3
     assert 0.5 < float(feature.std(unbiased=False).item()) < 1.5
 

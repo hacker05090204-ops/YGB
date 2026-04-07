@@ -1,0 +1,11 @@
+# RepoClean keep list. These repo-root paths are never eligible for deletion.
+secure_data
+checkpoints
+backend
+impl_v1
+native
+governance
+scripts
+tests
+pyproject.toml
+setup.sh
